@@ -13,7 +13,7 @@ from preview_generator.exception import UnavailablePreviewType
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 
-from tracim_backend import CFG
+from tracim_backend.config import CFG
 from tracim_backend.config import DepotFileStorageType
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import PageOfPreviewNotFound
@@ -326,6 +326,7 @@ class StorageLib:
                 # https://docs.python.org/3/library/tempfile.html#tempfile.gettempdir
                 with open(file_path, "wb",) as tmp:
                     tmp.write(depot_stored_file.read())
+                    tmp.flush()
                     yield file_path
             finally:
                 try:

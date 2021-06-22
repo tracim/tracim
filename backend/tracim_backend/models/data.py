@@ -42,6 +42,7 @@ from tracim_backend.exceptions import ContentStatusNotExist
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import CopyRevisionAbortedDepotCorrupted
 from tracim_backend.exceptions import NewRevisionAbortedDepotCorrupted
+from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import get_locale
@@ -95,6 +96,13 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         nullable=False,
         default=False,
         server_default=sqlalchemy.sql.expression.literal(False),
+    )
+    publication_enabled = Column(
+        Boolean,
+        unique=False,
+        nullable=False,
+        default=True,
+        server_default=sqlalchemy.sql.expression.literal(True),
     )
     access_type = Column(
         Enum(WorkspaceAccessType),
@@ -219,6 +227,12 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
             ):
                 if not content_types or child.type in content_types:
                     yield child
+
+    def check_for_publication(self) -> None:
+        if not self.publication_enabled:
+            raise WorkspaceFeatureDisabled(
+                "Feature {} is disabled in workspace {}".format("publication", self.workspace_id)
+            )
 
 
 Index("idx__workspaces__parent_id", Workspace.parent_id)
@@ -405,7 +419,12 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
 
     __tablename__ = "content_revisions"
 
-    revision_id = Column(Integer, primary_key=True)
+    revision_id = Column(
+        Integer,
+        Sequence("seq__content_revisions__revision_id"),
+        autoincrement=True,
+        primary_key=True,
+    )
     # NOTE - S.G - 2020-05-06: cannot set nullable=False as post_update is used
     # for current_revision in Content.
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
@@ -413,7 +432,6 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
     owner = relationship("User", remote_side=[User.user_id])
 
-    label = Column(Unicode(1024), unique=False, nullable=False)
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
     file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
@@ -424,7 +442,10 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     depot_file = Column(TracimUploadedFileField, unique=False, nullable=True)
     properties = Column("properties", Text(), unique=False, nullable=False, default="")
 
+    # INFO - G.M - same type are used for FavoriteContent.
+    label = Column(Unicode(1024), unique=False, nullable=False)
     type = Column(Unicode(32), unique=False, nullable=False)
+
     status = Column(
         Unicode(32),
         unique=False,
@@ -680,7 +701,7 @@ class Content(DeclarativeBase):
         -0
     )  # This flag allow to serialize a given revision if required by the user
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, Sequence("seq__content__id"), autoincrement=True, primary_key=True)
     cached_revision_id = Column(
         Integer, ForeignKey("content_revisions.revision_id", ondelete="RESTRICT")
     )
@@ -1364,20 +1385,6 @@ class RevisionReadStatus(DeclarativeBase):
     )
 
     user = relationship("User")
-
-
-# TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
-class NodeTreeItem(object):
-    """
-        This class implements a model that allow to simply represents
-        the left-panel menu items. This model is used by dbapi but
-        is not directly related to sqlalchemy and database
-    """
-
-    def __init__(self, node: Content, children: List["NodeTreeItem"], is_selected: bool = False):
-        self.node = node
-        self.children = children
-        self.is_selected = is_selected
 
 
 # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704

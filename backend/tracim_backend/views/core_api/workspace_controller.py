@@ -22,6 +22,7 @@ from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
+from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -44,6 +45,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
@@ -183,6 +185,7 @@ class WorkspaceController(Controller):
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
             default_user_role=hapic_data.body.default_user_role,
+            publication_enabled=hapic_data.body.publication_enabled,
             save_now=True,
         )
         wapi.execute_update_workspace_actions(request.current_workspace)
@@ -215,6 +218,7 @@ class WorkspaceController(Controller):
             public_download_enabled=hapic_data.body.public_download_enabled,
             public_upload_enabled=hapic_data.body.public_upload_enabled,
             default_user_role=hapic_data.body.default_user_role,
+            publication_enabled=hapic_data.body.publication_enabled,
             parent=parent,
         )
         wapi.execute_created_workspace_actions(workspace)
@@ -395,6 +399,8 @@ class WorkspaceController(Controller):
                     email=hapic_data.body.user_email,
                     password=password_generator(),
                     do_notify=True,
+                    creation_type=UserCreationType.INVITATION,
+                    creation_author=request.current_user,
                 )
                 if (
                     app_config.EMAIL__NOTIFICATION__ACTIVATED
@@ -408,6 +414,8 @@ class WorkspaceController(Controller):
                     email=hapic_data.body.user_email,
                     password=None,
                     do_notify=False,
+                    creation_type=UserCreationType.INVITATION,
+                    creation_author=request.current_user,
                 )
             uapi.execute_created_user_actions(user)
             newly_created = True
@@ -485,7 +493,7 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         content_filter = hapic_data.query
-        api = ContentApi(
+        content_api = ContentApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
@@ -494,10 +502,10 @@ class WorkspaceController(Controller):
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
         )
-        paged_contents = api.get_all(
+        paged_contents = content_api.get_all(
             parent_ids=content_filter.parent_ids,
             complete_path_to_id=content_filter.complete_path_to_id,
-            workspace=request.current_workspace,
+            workspaces=[request.current_workspace],
             content_type=content_filter.content_type or content_type_list.Any_SLUG,
             label=content_filter.label,
             order_by_properties=[
@@ -507,7 +515,7 @@ class WorkspaceController(Controller):
             count=content_filter.count,
             page_token=content_filter.page_token,
         )
-        contents = [api.get_content_in_context(content) for content in paged_contents]
+        contents = [content_api.get_content_in_context(content) for content in paged_contents]
         return PaginatedObject(paged_contents, contents)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
@@ -515,6 +523,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ParentNotFound, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspaceFeatureDisabled, HTTPStatus.BAD_REQUEST)
     @check_right(can_create_content)
     @hapic.input_path(WorkspaceIdPathSchema())
     @hapic.input_body(ContentCreationSchema())
@@ -627,6 +636,7 @@ class WorkspaceController(Controller):
     @hapic.handle_exception(UnallowedSubContent, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ConflictingMoveInItself, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ConflictingMoveInChild, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(WorkspaceFeatureDisabled, HTTPStatus.BAD_REQUEST)
     @check_right(can_move_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentMoveSchema())

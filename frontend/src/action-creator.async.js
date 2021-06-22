@@ -26,6 +26,7 @@ import {
   SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
+  USAGE_CONDITIONS,
   USER,
   USER_CONFIGURATION,
   USER_CONNECTED,
@@ -54,12 +55,14 @@ import {
   WORKSPACE_MEMBER_REMOVE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
-  WORKSPACE_RECENT_ACTIVITY,
   ACCESSIBLE_WORKSPACE_LIST,
+  WORKSPACE_SUBSCRIPTION,
   WORKSPACE_SUBSCRIPTION_LIST,
   CUSTOM_PROPERTIES_UI_SCHEMA,
   CUSTOM_PROPERTIES_SCHEMA,
-  USER_PUBLIC_PROFILE
+  USER_PUBLIC_PROFILE,
+  FAVORITE_LIST,
+  FAVORITE
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -151,6 +154,20 @@ export const postUserLogin = (credentials, rememberMe) => async dispatch => {
         ...credentials
         // remember_me: rememberMe
       })
+    },
+    actionName: USER_LOGIN,
+    dispatch
+  })
+}
+
+export const postUserRegister = (newUser) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/register`,
+    param: {
+      credentials: 'include',
+      headers: { ...FETCH_CONFIG.headers },
+      method: 'POST',
+      body: JSON.stringify(newUser)
     },
     actionName: USER_LOGIN,
     dispatch
@@ -450,21 +467,6 @@ export const putUserLang = (user, newLang) => dispatch => {
   })
 }
 
-export const putMyselfWorkspaceRead = workspaceId => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/read`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'PUT'
-    },
-    actionName: USER_KNOWN_MEMBER_LIST,
-    dispatch
-  })
-}
-
 export const putMyselfWorkspaceDoNotify = (workspaceId, doNotify) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/notifications/${doNotify ? 'activate' : 'deactivate'}`,
@@ -611,21 +613,6 @@ export const getContentPathList = (workspaceId, contentId, folderIdList) => disp
       method: 'GET'
     },
     actionName: WORKSPACE_CONTENT_PATH,
-    dispatch
-  })
-}
-
-export const getMyselfWorkspaceRecentActivityList = (workspaceId, beforeId = null) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/me/workspaces/${workspaceId}/contents/recently_active?limit=10${beforeId ? `&before_content_id=${beforeId}` : ''}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: WORKSPACE_RECENT_ACTIVITY,
     dispatch
   })
 }
@@ -1007,6 +994,21 @@ export const getWorkspaceSubscriptions = userId => dispatch => {
   })
 }
 
+export const getSubscriptions = workspaceId => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/subscriptions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_SUBSCRIPTION,
+    dispatch
+  })
+}
+
 export const postUserWorkspace = (workspaceId, userId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/workspaces`,
@@ -1046,7 +1048,8 @@ export const putUserWorkspaceSubscription = (workspaceId, userId) => dispatch =>
 export const getHTMLPreview = (workspaceId, contentType, contentId, label) => {
   // RJ - NOTE - 17-11-2020 - this uses fetch instead of fetchWrapper due to the
   // specific error handling
-  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${encodeURIComponent(label)}.html`, {
+  const filename = encodeURIComponent(label.replace(/\//g, '_'))
+  return fetch(`${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}/preview/html/${filename}.html`, {
     credentials: 'include',
     headers: FETCH_CONFIG.headers,
     method: 'GET'
@@ -1232,7 +1235,7 @@ export const postPublicationFile = (workspaceId, content, label) => async dispat
     { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
     { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
     { status: 400, code: 6003, message: i18n.t('Error, the space exceed its maximum size') },
-    { status: 400, code: 6004, message: i18n.t('You have reach your storage limit, you cannot add new files') }
+    { status: 400, code: 6004, message: i18n.t('You have reached your storage limit, you cannot add new files') }
   ]
   const result = await uploadFile(
     content,
@@ -1252,4 +1255,65 @@ export const postPublicationFile = (workspaceId, content, label) => async dispat
     }
   )
   return result
+}
+
+export const getFavoriteContentList = (userId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: FAVORITE_LIST,
+    dispatch
+  })
+}
+
+export const postContentToFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: { content_id: contentId }
+    },
+    actionName: FAVORITE,
+    dispatch
+  })
+}
+
+export const deleteContentFromFavoriteList = (userId, contentId) => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/favorite-contents/${contentId}`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'DELETE'
+    },
+    actionName: FAVORITE,
+    dispatch
+  })
+}
+
+export const getUsageConditions = () => async dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/system/usage_conditions`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: USAGE_CONDITIONS,
+    dispatch
+  })
 }

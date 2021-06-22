@@ -1,0 +1,24 @@
+@import '../../../css/Variable.styl'
+
+.autocomplete
+  width 100%
+  left 0
+  padding 3px 0
+  background-color offWhite
+  box-shadow shadow-all
+  border-radius 5px
+  font-size 14px
+  &__delimiter
+    height 2px
+    margin 5px 20px
+    background-color grey
+  &__item
+    display flex
+    flex-direction row
+    padding 1px 5px
+    cursor pointer
+    align-items baseline
+    &__highlight
+      margin-left 5px
+    &:hover, &__active
+      background-color grey-hover

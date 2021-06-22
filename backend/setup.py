@@ -33,7 +33,7 @@ requires = [
     "filedepot>=0.8.0",
     "babel",
     "python-slugify",
-    "preview-generator>=0.15.4",
+    "preview-generator>=0.20",
     "colour",
     "python-dateutil",
     "gitpython",
@@ -76,6 +76,7 @@ requires = [
     "tnetstring3",
     "pyzmq",
     "jsonschema",
+    "webpreview",
 ]
 
 tests_require = [
@@ -104,7 +105,7 @@ devtools_require = [
 
 # add black for python 3.6+
 if sys.version_info.major == 3 and sys.version_info.minor >= 6:
-    devtools_require.append("black")
+    devtools_require.append("black==19.10b0")
 
 mysql_require = ["PyMySQL[rsa]"]
 

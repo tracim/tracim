@@ -3,6 +3,8 @@ frontend/dist/app/
 frontend/dist/tracim.app.entry.js
 frontend/dist/asset/tracim/tracim.vendor.bundle.js
 frontend/dist/assets/custom_toolbox/
+frontend/dist/assets/branding/
+
 color.json
 /backend/venv3.7/
 backend/env

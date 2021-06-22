@@ -25,8 +25,18 @@ export class FeedItemHeader extends React.Component {
 
     if (currentRevisionType === 'status-update') return props.t('status modified')
     if (TLM_ET.MENTION === lastModificationEntityType) return props.t('mention made')
-    if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) return props.t('commented')
-
+    if (CONTENT_TYPE.COMMENT === lastModificationSubEntityType) {
+      switch (lastModificationType) {
+        case TLM_CET.CREATED:
+          return props.t('commented')
+        case TLM_CET.MODIFIED:
+          return props.t('comment modified')
+        case TLM_CET.DELETED:
+          return props.t('comment deleted')
+        case TLM_CET.UNDELETED:
+          return props.t('comment restored ')
+      }
+    }
     switch (lastModificationType) {
       case TLM_CET.CREATED:
         return props.t('created')
@@ -40,12 +50,20 @@ export class FeedItemHeader extends React.Component {
     return props.t('unknown')
   }
 
+  getTitleComponent (contentType, contentLabel) {
+    const { props } = this
+    return contentType === CONTENT_TYPE.FILE
+      ? <FilenameWithExtension file={props.content} customClass='content__name' />
+      : <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
+  }
+
   render () {
     const { props } = this
     const contentId = props.content.id
     const contentLabel = props.content.label
     const contentType = props.content.type
     const showLastModification = (
+      props.contentAvailable &&
       props.lastModificationType &&
       props.lastModificationEntityType &&
       props.lastModificationSubEntityType &&
@@ -58,25 +76,20 @@ export class FeedItemHeader extends React.Component {
       { label: props.t(`No App for content-type ${contentType}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
     )
 
+    const icon = (props.isPublication && contentType === CONTENT_TYPE.THREAD) ? 'fas fa-stream' : app.faIcon
+
     return (
       <div className='feedItemHeader'>
         <Icon
           customClass='feedItemHeader__icon'
           color={props.isPublication ? publicationColor : app.hexcolor}
           title={props.isPublication ? props.t('Publication') : app.label}
-          icon={props.isPublication ? 'fa-fw fas fa-stream' : `fa-fw ${app.faIcon}`}
+          icon={`fa-fw ${icon}`}
         />
         <div className='feedItemHeader__title'>
-          <Link
-            to={props.isPublication
-              ? PAGE.WORKSPACE.PUBLICATION(props.workspaceId)
-              : PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
-          >
-            {(contentType === CONTENT_TYPE.FILE
-              ? <FilenameWithExtension file={props.content} customClass='content__name' />
-              : <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
-            )}
-          </Link>
+          {props.titleLink
+            ? <Link to={props.titleLink}>{this.getTitleComponent(contentType, contentLabel)}</Link>
+            : <span>{this.getTitleComponent(contentType, contentLabel)}</span>}
           {props.breadcrumbsList && (
             <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
           )}
@@ -103,29 +116,47 @@ export class FeedItemHeader extends React.Component {
           />
         )}
 
-        <DropdownMenu
-          buttonCustomClass='feedItemHeader__actionMenu'
-          buttonIcon='fas fa-ellipsis-v'
-          buttonTooltip={props.t('Actions')}
-        >
-          <IconButton
-            customClass='feedItemHeader__actionMenu__item'
-            icon='fas fa-link'
-            onClick={props.onClickCopyLink}
-            text={props.t('Copy content link')}
-            key={`link-${contentId}`}
-          />
+        {!props.contentAvailable && (
+          <span className='feedItemHeader__unavailable'>
+            {props.t('This content is not available')}
+          </span>
+        )}
 
-          <Link
-            className='feedItemHeader__actionMenu__item'
-            title={props.t('Open content')}
-            to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
-            key={`open-${contentId}`}
+        {props.contentAvailable && (
+          <DropdownMenu
+            buttonCustomClass='feedItemHeader__actionMenu'
+            buttonIcon='fas fa-ellipsis-v'
+            buttonTooltip={props.t('Actions')}
           >
-            <i className={`fa-fw ${app.faIcon}`} />
-            {props.t('Open content')}
-          </Link>
-        </DropdownMenu>
+            <IconButton
+              customClass='feedItemHeader__actionMenu__item'
+              icon='fas fa-link'
+              onClick={props.onClickCopyLink}
+              text={props.t('Copy content link')}
+              key={`link-${contentId}`}
+            />
+
+            {props.allowEdition && (
+              <IconButton
+                customClass='feedItemHeader__actionMenu__item'
+                icon='fas fa-pencil-alt'
+                onClick={props.onClickEdit}
+                text={props.t('Edit')}
+                key={`edit-${contentId}`}
+              />
+            )}
+
+            <Link
+              className='feedItemHeader__actionMenu__item'
+              title={props.t('Open as content')}
+              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
+              key={`open-${contentId}`}
+            >
+              <i className={`fa-fw ${app.faIcon}`} />
+              {props.t('Open as content')}
+            </Link>
+          </DropdownMenu>
+        )}
       </div>
     )
   }
@@ -136,20 +167,25 @@ export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
+  contentAvailable: PropTypes.bool.isRequired,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  isPublication: PropTypes.bool.isRequired,
+  allowEdition: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
   eventList: PropTypes.array,
-  isPublication: PropTypes.bool,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
   lastModificationType: PropTypes.string,
   lastModifier: PropTypes.object,
   modifiedDate: PropTypes.string,
-  onEventClicked: PropTypes.func
+  onEventClicked: PropTypes.func,
+  onClickEdit: PropTypes.func,
+  titleLink: PropTypes.string
 }
 
 FeedItemHeader.defaultProps = {
+  allowEdition: false,
   breadcrumbsList: [],
   eventList: [],
   isPublication: false,
@@ -157,5 +193,7 @@ FeedItemHeader.defaultProps = {
   lastModificationSubEntityType: '',
   lastModificationType: '',
   lastModifier: {},
-  modifiedDate: ''
+  modifiedDate: '',
+  onClickEdit: () => {},
+  titleLink: null
 }

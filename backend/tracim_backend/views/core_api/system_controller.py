@@ -24,6 +24,7 @@ from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import GetUsernameAvailability
 from tracim_backend.views.core_api.schemas import ReservedUsernamesSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
+from tracim_backend.views.core_api.schemas import UsageConditionsSchema
 from tracim_backend.views.core_api.schemas import UserCustomPropertiesSchema
 from tracim_backend.views.core_api.schemas import UserCustomPropertiesUiSchema
 from tracim_backend.views.core_api.schemas import UsernameAvailability
@@ -38,7 +39,7 @@ class SystemController(Controller):
     @hapic.output_body(ApplicationSchema(many=True))
     def applications(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get list of alls applications installed in this tracim instance.
+        Get list of all applications installed in this tracim instance.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         app_api = ApplicationApi(app_list=app_list)
@@ -52,7 +53,7 @@ class SystemController(Controller):
     @hapic.output_body(ContentTypeSchema(many=True))
     def content_types(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get list of alls content types availables in this tracim instance.
+        Get list of all content types availables in this tracim instance.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         content_types_slugs = content_type_list.endpoint_allowed_types_slug()
@@ -154,6 +155,17 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
+    @hapic.output_body(UsageConditionsSchema())
+    def usage_conditions(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get usage conditions documents. All theses documents should be accepted to
+        do any actions as connected user. This list may be empty.
+        """
+        system_api = SystemApi(request.app_config, request.dbsession)
+        return {"items": system_api.get_usage_conditions_files()}
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
     @hapic.output_body(UserCustomPropertiesUiSchema())
     def custom_user_properties_ui_schema(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -214,6 +226,10 @@ class SystemController(Controller):
             "username_availability", "/system/username-availability", request_method="GET"
         )
         configurator.add_view(self.username_availability, route_name="username_availability")
+
+        # usage conditions
+        configurator.add_route("usage_conditions", "/system/usage_conditions", request_method="GET")
+        configurator.add_view(self.usage_conditions, route_name="usage_conditions")
 
         # user custom-properties schema
         configurator.add_route(

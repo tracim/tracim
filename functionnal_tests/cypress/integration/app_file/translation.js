@@ -31,5 +31,8 @@ describe('App File', () => {
 
     cy.changeLanguage('pt')
     cy.get('.file__option__menu').contains('Carregar uma nova versão')
+
+    cy.changeLanguage('de')
+    cy.get('.file__option__menu').contains('Hochladen einer neuen Version')
   })
 })

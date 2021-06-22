@@ -231,6 +231,7 @@ class TestMentionBuilder:
         mention_event = context.pending_events[0]
         assert "content" in mention_event.fields
         assert mention_event.content["parent_content_type"] == "html-document"
+        assert mention_event.content["parent_content_namespace"] == "content"
 
     def test_unit_on_content_created__ok__no_mention(
         self, session_factory, app_config, one_content_without_mention: Content
@@ -336,5 +337,6 @@ class TestMentionBuilder:
                 "mention": {"recipient": recipient, "id": "foobar123"},
                 "workspace": {"workspace_id": one_content_with_a_mention.workspace.workspace_id},
             },
+            workspace_id=one_content_with_a_mention.workspace.workspace_id,
         )
         assert receiver_ids == MentionBuilder.get_receiver_ids(event, session, app_config)

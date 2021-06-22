@@ -30,6 +30,7 @@ import {
   parserStringToList,
   checkEmailValidity,
   buildFilePreviewUrl,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   computeProgressionPercentage,
   buildHeadTitle,
@@ -54,18 +55,22 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  htmlCodeToDocumentFragment,
   sendGlobalFlashMessage,
   PAGE,
   getAvatarBaseUrl,
   getCoverBaseUrl,
-  DATE_FNS_LOCALE
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl,
+  htmlToText
 } from './helper.js'
 import {
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleInvalidMentionInComment,
+  handleLinksBeforeSave,
   handleMentionsBeforeSave
-} from './mention.js'
+} from './mentionOrLink.js'
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -104,6 +109,7 @@ import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+import EditCommentPopup from './component/Timeline/EditCommentPopup.jsx'
 
 import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './component/Timeline/DisplayFileToUpload.jsx'
@@ -114,7 +120,7 @@ import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
 import SingleChoiceList from './component/Input/SingleChoiceList/SingleChoiceList.jsx'
-import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
+import AutoComplete from './component/Input/AutoComplete/AutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
@@ -203,7 +209,9 @@ import {
   getFileChildContent,
   getContent,
   getWorkspaceContent,
-  getCommentTranslated
+  getHtmlDocTranslated,
+  getCommentTranslated,
+  getGenericWorkspaceContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -219,10 +227,12 @@ document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, customEventRed
 export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
+export const deTranslation = require('../i18next.scanner/de/translation.json')
 
 export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
+export { default as Comment } from './component/Timeline/Comment.jsx'
 
 export { default as SCREEN_SIZE } from './screenSizes.json'
 export { removeInteractiveContentFromHTML } from './htmlRemoveInteractivity.js'
@@ -234,11 +244,19 @@ export {
   removeLocalStorageItem
 } from './localStorage.js'
 
+export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
 export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
+export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
+export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
+export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
+export { default as TagList } from './component/Tags/TagList.jsx'
+export { default as Tag } from './component/Tags/Tag.jsx'
 
 export {
   TRANSLATION_STATE,
+  handleTranslateComment,
+  handleTranslateHtmlContent,
   getTranslationApiErrorMessage,
   getDefaultTranslationState
 } from './translation.js'
@@ -253,8 +271,10 @@ export {
   DisplayFileToUpload,
   createSpaceTree,
   DropdownMenu,
+  EditCommentPopup,
   getContentPath,
   handleInvalidMentionInComment,
+  handleLinksBeforeSave,
   naturalCompareLabels,
   ScrollToBottomWrapper,
   sortWorkspaceList,
@@ -269,6 +289,7 @@ export {
   hasSpaces,
   buildFilePreviewUrl,
   buildHeadTitle,
+  splitFilenameExtension,
   removeExtensionOfFilename,
   removeAtInUsername,
   computeProgressionPercentage,
@@ -344,7 +365,7 @@ export {
   NUMBER_RESULTS_BY_PAGE,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   formatAbsoluteDate,
-  MentionAutoComplete,
+  AutoComplete,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
@@ -387,6 +408,7 @@ export {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
+  htmlCodeToDocumentFragment,
   sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
@@ -407,5 +429,9 @@ export {
   getCoverBaseUrl,
   TranslateButton,
   getCommentTranslated,
-  DATE_FNS_LOCALE
+  getHtmlDocTranslated,
+  DATE_FNS_LOCALE,
+  getFileDownloadUrl,
+  getGenericWorkspaceContent,
+  htmlToText
 }

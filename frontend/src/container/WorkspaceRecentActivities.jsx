@@ -5,27 +5,19 @@ import { translate } from 'react-i18next'
 
 import {
   TracimComponent,
-  BREADCRUMBS_TYPE,
-  buildHeadTitle,
-  CUSTOM_EVENT,
-  PAGE,
-  permissiveNumberEqual
+  permissiveNumberEqual,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
 
-import { getWorkspaceDetail } from '../action-creator.async.js'
 import {
   setWorkspaceActivityList,
   setWorkspaceActivityNextPage,
-  setBreadcrumbs,
-  setHeadTitle,
-  newFlashMessage,
-  setWorkspaceDetail,
   resetWorkspaceActivity,
   setWorkspaceActivityEventList
 } from '../action-creator.sync.js'
 
 import ActivityList from '../component/Activity/ActivityList.jsx'
-import TabBar from '../component/TabBar/TabBar.jsx'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
 require('../css/RecentActivities.styl')
@@ -34,83 +26,32 @@ export class WorkspaceRecentActivities extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.handleTlm)
-    props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
-    ])
   }
 
   componentDidMount () {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
-    this.loadWorkspaceDetail()
-    this.setHeadTitle()
-    this.buildBreadcrumbs()
+  }
+
+  componentWillUnmount () {
+    this.props.cancelCurrentLoadActivities()
   }
 
   componentDidUpdate (prevProps) {
     if (prevProps.workspaceId === this.props.workspaceId) return
+    this.props.cancelCurrentLoadActivities()
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
-    this.loadWorkspaceDetail()
-    this.setHeadTitle()
-    this.buildBreadcrumbs()
-  }
-
-  handleAllAppChangeLanguage = () => {
-    this.buildBreadcrumbs()
-    this.setHeadTitle()
   }
 
   handleTlm = (data) => {
+    const { props } = this
     if (!data.fields.workspace ||
-      !permissiveNumberEqual(data.fields.workspace.workspace_id, this.props.workspaceId)) return
-    this.props.handleTlm(data)
-  }
-
-  loadWorkspaceDetail = async () => {
-    const { props } = this
-
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.workspaceId))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        this.setHeadTitle()
-        this.buildBreadcrumbs()
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
+      !permissiveNumberEqual(data.fields.workspace.workspace_id, props.workspaceId)) return
+    if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
+      const member = props.currentWorkspace.memberList.find(user => user.id === data.fields.user.user_id)
+      if (!member || member.role === data.fields.member.role) return
     }
-  }
 
-  buildBreadcrumbs = () => {
-    const { props } = this
-
-    const breadcrumbsList = [
-      {
-        link: PAGE.WORKSPACE.DASHBOARD(props.workspaceId),
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.currentWorkspace.label,
-        isALink: true
-      },
-      {
-        link: PAGE.WORKSPACE.RECENT_ACTIVITIES(props.workspaceId),
-        type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Recent activities'),
-        isALink: false
-      }
-    ]
-
-    props.dispatch(setBreadcrumbs(breadcrumbsList))
-  }
-
-  setHeadTitle = () => {
-    const { props } = this
-
-    const headTitle = buildHeadTitle(
-      [props.t('Recent activities'), props.currentWorkspace.label]
-    )
-    props.dispatch(setHeadTitle(headTitle))
+    props.handleTlm(data)
   }
 
   render () {
@@ -118,10 +59,10 @@ export class WorkspaceRecentActivities extends React.Component {
 
     return (
       <div className='workspaceRecentActivities'>
-        <TabBar
-          currentSpace={props.currentWorkspace}
-          breadcrumbs={props.breadcrumbs}
-        />
+        <div className='workspaceRecentActivities__header subTitle'>
+          {props.t('Recent activities')}
+        </div>
+
         <ActivityList
           activity={props.activity}
           onRefreshClicked={props.onRefreshClicked}
@@ -135,6 +76,7 @@ export class WorkspaceRecentActivities extends React.Component {
           onCopyLinkClicked={props.onCopyLinkClicked}
           onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
+          workspaceList={props.workspaceList}
         />
       </div>
     )
@@ -146,11 +88,11 @@ WorkspaceRecentActivities.propTypes = {
   handleTlm: PropTypes.func.isRequired,
   onRefreshClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  workspaceId: PropTypes.string.isRequired
+  workspaceId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired
 }
 
-const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs }) => {
-  return { lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs }
+const mapStateToProps = ({ lang, user, workspaceActivity, currentWorkspace, breadcrumbs, workspaceList }) => {
+  return { lang, user, activity: workspaceActivity, currentWorkspace, breadcrumbs, workspaceList }
 }
 const component = withActivity(
   TracimComponent(WorkspaceRecentActivities),

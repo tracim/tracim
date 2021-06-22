@@ -1,0 +1,79 @@
+@import '../../css/Variable.styl'
+
+.tagList__form
+  padding 15px
+  flex-direction column
+  height 100%
+  width 100%
+  &__title
+    font-size fontSizeMedium
+    margin-bottom 25px
+  &__tag
+    margin-bottom 10px
+  &__close
+    position absolute
+    right 20px
+  &__member
+    margin 0 0 20px 0
+    &__name
+      position relative
+      .name__label
+        margin 0 0 15px 0
+        font-weight bold
+      .name__input
+        margin 0 0 0 0
+      .name__adminmsg
+        margin 10px 0 10px 0
+        font-size fontSizeSmall
+      .autocomplete
+        position absolute
+        width 300px
+        background-color offWhite
+        border-radius 10px
+        border-width 1px
+        border-style solid
+        z-index 1
+        &__item
+          display flex
+          align-items center
+          cursor pointer
+          padding 5px 8px
+          &:hover
+            background-color: grey-hover
+          &:first-child
+            border-top-left-radius 10px
+            border-top-right-radius 10px
+          &:last-child
+            border-bottom-left-radius 10px
+            border-bottom-right-radius 10px
+          &__avatar
+            width 45px
+            height 45px
+            border-radius 50%
+          &__icon
+            font-size 28px
+          &__name
+            margin-left 15px
+            overflow hidden
+            text-overflow ellipsis
+            white-space nowrap
+    .name__input
+      border 1px solid grey
+      border-radius 10px
+      padding 10px
+      width 100%
+    &__create
+      display flex
+      align-items center
+      margin 15px 0
+      line-height 23px
+      &__checkbox
+        padding-top 6px
+  &__role
+    margin-bottom 15px
+    &__text
+      margin 0 0 15px 0
+      font-weight bold
+  &__submitBtn
+    display flex
+    justify-content flex-end

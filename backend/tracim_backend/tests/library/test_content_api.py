@@ -11,7 +11,6 @@ from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import SameValueError
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.lib.core.content import ContentApi
-from tracim_backend.lib.core.content import compare_content_for_sorting_by_type_and_name
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
@@ -21,74 +20,6 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import eq_
-
-
-class TestSortContentApi(object):
-    def test_compare_content_for_sorting_by_type(self, content_type_list, app_config):
-        c1 = Content()
-        c1.label = ""
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = ""
-        c2.type = "folder"
-
-        c11 = c1
-
-        assert 1 == compare_content_for_sorting_by_type_and_name(c1, c2)
-        assert -1 == compare_content_for_sorting_by_type_and_name(c2, c1)
-        assert 0 == compare_content_for_sorting_by_type_and_name(c1, c11)
-
-    def test_compare_content_for_sorting_by_label(self):
-        c1 = Content()
-        c1.label = "bbb"
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = "aaa"
-        c2.type = "file"
-
-        c11 = c1
-
-        assert 1 == compare_content_for_sorting_by_type_and_name(c1, c2)
-        assert -1 == compare_content_for_sorting_by_type_and_name(c2, c1)
-        assert 0 == compare_content_for_sorting_by_type_and_name(c1, c11)
-
-    def test_sort_by_label_or_filename(self):
-        c1 = Content()
-        c1.label = "ABCD"
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = ""
-        c2.type = "file"
-        c2.file_name = "AABC"
-
-        c3 = Content()
-        c3.label = "BCDE"
-        c3.type = "file"
-
-        items = [c1, c2, c3]
-        sorteds = ContentApi.sort_content(items)
-
-        assert sorteds[0] == c2
-        assert sorteds[1] == c1
-        assert sorteds[2] == c3
-
-    def test_sort_by_content_type(self):
-        c1 = Content()
-        c1.label = "AAAA"
-        c1.type = "file"
-
-        c2 = Content()
-        c2.label = "BBBB"
-        c2.type = "folder"
-
-        items = [c1, c2]
-        sorteds = ContentApi.sort_content(items)
-
-        assert sorteds[0] == c2
-        assert sorteds[1] == c1
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -635,10 +566,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.delete(items[0])
         transaction.commit()
@@ -648,7 +579,7 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -657,7 +588,7 @@ class TestContentApi(object):
         user = uapi.get_one(uid)
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(current_user=user, session=session, config=app_config, show_deleted=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
     def test_unit__delete__ok__do_not_change_file_extension(
@@ -775,10 +706,10 @@ class TestContentApi(object):
         workspace_api = workspace_api_factory.get(current_user=user)
         api = ContentApi(session=session, current_user=user, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         with new_revision(session=session, tm=transaction.manager, content=items[0]):
             api.archive(items[0])
         transaction.commit()
@@ -789,7 +720,7 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(1, len(items))
         transaction.commit()
 
@@ -801,7 +732,7 @@ class TestContentApi(object):
 
         # Test that the item is still available if "show deleted" is activated
         api = ContentApi(current_user=None, session=session, config=app_config, show_archived=True)
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
     def test_get_all_with_filter(
@@ -839,14 +770,14 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(2, len(items))
 
-        items2 = api.get_all(None, content_type_list.File.slug, workspace)
+        items2 = api.get_all(None, content_type_list.File.slug, [workspace])
         eq_(1, len(items2))
         eq_("thefile", items2[0].label)
 
-        items3 = api.get_all(None, content_type_list.Folder.slug, workspace)
+        items3 = api.get_all(None, content_type_list.Folder.slug, [workspace])
         eq_(1, len(items3))
         eq_("thefolder", items3[0].label)
 
@@ -875,10 +806,10 @@ class TestContentApi(object):
         workspace = workspace_api.get_one(wid)
         api = ContentApi(current_user=user, session=session, config=app_config)
 
-        items = api.get_all(None, content_type_list.Any_SLUG, workspace)
+        items = api.get_all(None, content_type_list.Any_SLUG, [workspace])
         eq_(3, len(items))
 
-        items2 = api.get_all([parent_id], content_type_list.File.slug, workspace)
+        items2 = api.get_all([parent_id], content_type_list.File.slug, [workspace])
         eq_(1, len(items2))
         eq_(child_id, items2[0].content_id)
 

@@ -1,0 +1,20 @@
+.tracimBrandingWelcomePage__main {
+  background-image: url('welcome-simple-bg.jpg');
+  min-height: 100%;
+  padding: 20px;
+}
+
+.tracimBrandingWelcomePage__text {
+  /* You can restrict the size of the text block by uncommenting the following line: /*
+  /* width: 66%; */
+  padding: 10px;
+  color: Black;
+  background-color: White;
+}
+
+.tracimBrandingWelcomePage__background {
+  padding: 10px;
+  height: 100%;
+  z-index: -1;
+  opacity: 70%;
+}

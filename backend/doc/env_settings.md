@@ -4,14 +4,13 @@ This list is generated using
 ```
 tracimcli dev parameters list --template "| {env_var_name: <74}| {config_file_name: <63}| {config_name: <67}|"
 ```
-Note that you need to activate all applcations (`app.enabled` setting) for this list to be complete.
+Note that you need to activate all applications (`app.enabled` setting) for this list to be complete.
 
 | Environment variable name                                                 | Configuration file name                                        | Displayed configuration name                                       |
 |---------------------------------------------------------------------------|----------------------------------------------------------------|--------------------------------------------------------------------|
 | TRACIM_APP__ENABLED                                                       | app.enabled                                                    | APP__ENABLED                                                       |
 | TRACIM_SQLALCHEMY__URL                                                    | sqlalchemy.url                                                 | SQLALCHEMY__URL                                                    |
 | TRACIM_DEFAULT_LANG                                                       | default_lang                                                   | DEFAULT_LANG                                                       |
-| TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
 | TRACIM_PREVIEW_CACHE_DIR                                                  | preview_cache_dir                                              | PREVIEW_CACHE_DIR                                                  |
 | TRACIM_AUTH_TYPES                                                         | auth_types                                                     | AUTH_TYPES                                                         |
 | TRACIM_REMOTE_USER_HEADER                                                 | remote_user_header                                             | REMOTE_USER_HEADER                                                 |
@@ -23,6 +22,10 @@ Note that you need to activate all applcations (`app.enabled` setting) for this 
 | TRACIM_SESSION__HTTPONLY                                                  | session.httponly                                               | SESSION__HTTPONLY                                                  |
 | TRACIM_SESSION__SECURE                                                    | session.secure                                                 | SESSION__SECURE                                                    |
 | TRACIM_WEBSITE__TITLE                                                     | website.title                                                  | WEBSITE__TITLE                                                     |
+| TRACIM_WEBSITE__DESCRIPTION                                               | website.description                                            | WEBSITE__DESCRIPTION                                               |
+| TRACIM_WEBSITE__USAGE_CONDITIONS                                          | website.usage_conditions                                       | WEBSITE__USAGE_CONDITIONS                                          |
+| TRACIM_WEBSITE__WELCOME_PAGE                                              | website.welcome_page                                           | WEBSITE__WELCOME_PAGE                                              |
+| TRACIM_WEBSITE__WELCOME_PAGE_STYLE                                        | website.welcome_page_style                                     | WEBSITE__WELCOME_PAGE_STYLE                                        |
 | TRACIM_WEB__NOTIFICATIONS__EXCLUDED                                       | web.notifications.excluded                                     | WEB__NOTIFICATIONS__EXCLUDED                                       |
 | TRACIM_WEBSITE__BASE_URL                                                  | website.base_url                                               | WEBSITE__BASE_URL                                                  |
 | TRACIM_API__BASE_URL                                                      | api.base_url                                                   | API__BASE_URL                                                      |
@@ -31,6 +34,7 @@ Note that you need to activate all applcations (`app.enabled` setting) for this 
 | TRACIM_USER__AUTH_TOKEN__VALIDITY                                         | user.auth_token.validity                                       | USER__AUTH_TOKEN__VALIDITY                                         |
 | TRACIM_USER__RESET_PASSWORD__TOKEN_LIFETIME                               | user.reset_password.token_lifetime                             | USER__RESET_PASSWORD__TOKEN_LIFETIME                               |
 | TRACIM_USER__DEFAULT_PROFILE                                              | user.default_profile                                           | USER__DEFAULT_PROFILE                                              |
+| TRACIM_USER__SELF_REGISTRATION__ENABLED                                   | user.self_registration.enabled                                 | USER__SELF_REGISTRATION__ENABLED                                   |
 | TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     | user.custom_properties.json_schema_file_path                   | USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     |
 | TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       | user.custom_properties.ui_schema_file_path                     | USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       |
 | TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     | user.custom_properties.translations_dir_path                   | USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     |
@@ -45,8 +49,11 @@ Note that you need to activate all applcations (`app.enabled` setting) for this 
 | TRACIM_FRONTEND__CACHE_TOKEN                                              | frontend.cache_token                                           | FRONTEND__CACHE_TOKEN                                              |
 | TRACIM_BACKEND__I18N_FOLDER_PATH                                          | backend.i18n_folder_path                                       | BACKEND__I18N_FOLDER_PATH                                          |
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
+| TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
 | TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               | frontend.custom_toolbox_folder_path                            | FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               |
+| TRACIM_URL_PREVIEW__FETCH_TIMEOUT                                         | url_preview.fetch_timeout                                      | URL_PREVIEW__FETCH_TIMEOUT                                         |
+| TRACIM_UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 | ui.spaces.creation.parent_space_choice.visible                 | UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 |
 | TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
 | TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
 | TRACIM_UPLOADED_FILES__STORAGE__STORAGE_NAME                              | uploaded_files.storage.storage_name                            | UPLOADED_FILES__STORAGE__STORAGE_NAME                              |
@@ -131,14 +138,17 @@ Note that you need to activate all applcations (`app.enabled` setting) for this 
 | TRACIM_CONTENT_SECURITY_POLICY__REPORT_ONLY                               | content_security_policy.report_only                            | CONTENT_SECURITY_POLICY__REPORT_ONLY                               |
 | TRACIM_CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     | content_security_policy.additional_directives                  | CONTENT_SECURITY_POLICY__ADDITIONAL_DIRECTIVES                     |
 | TRACIM_TRANSLATION_SERVICE__ENABLED                                       | translation_service.enabled                                    | TRANSLATION_SERVICE__ENABLED                                       |
+| TRACIM_TRANSLATION_SERVICE__TIMEOUT                                       | translation_service.timeout                                    | TRANSLATION_SERVICE__TIMEOUT                                       |
 | TRACIM_TRANSLATION_SERVICE__PROVIDER                                      | translation_service.provider                                   | TRANSLATION_SERVICE__PROVIDER                                      |
 | TRACIM_TRANSLATION_SERVICE__SYSTRAN__API_URL                              | translation_service.systran.api_url                            | TRANSLATION_SERVICE__SYSTRAN__API_URL                              |
 | TRACIM_TRANSLATION_SERVICE__SYSTRAN__API_KEY                              | translation_service.systran.api_key                            | TRANSLATION_SERVICE__SYSTRAN__API_KEY                              |
+| TRACIM_TRANSLATION_SERVICE__TARGET_LANGUAGES                              | translation_service.target_languages                           | TRANSLATION_SERVICE__TARGET_LANGUAGES                              |
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                | collaborative_document_edition.collabora.base_url              | COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  | collaborative_document_edition.file_template_dir               | COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  |
+| TRACIM_COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS                 | collaborative_document_edition.enabled_extensions              | COLLABORATIVE_DOCUMENT_EDITION__ENABLED_EXTENSIONS                 |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     | email.notification.share_content_to_receiver.template.html     | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__TEMPLATE__HTML     |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            | email.notification.share_content_to_receiver.subject           | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_RECEIVER__SUBJECT            |
 | TRACIM_EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      | email.notification.share_content_to_emitter.template.html      | EMAIL__NOTIFICATION__SHARE_CONTENT_TO_EMITTER__TEMPLATE__HTML      |

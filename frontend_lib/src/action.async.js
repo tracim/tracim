@@ -19,8 +19,17 @@ export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle
     ...propertiesToAddToBody
   })
 
-export const postNewComment = (apiUrl, workspaceId, contentId, newComment) =>
+export const postNewComment = (apiUrl, workspaceId, contentId, newComment, namespace) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`, {
+    raw_content: newComment,
+    content_namespace: namespace
+  })
+
+export const deleteComment = (apiUrl, workspaceId, contentId, commentId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
+
+export const putComment = (apiUrl, workspaceId, contentId, commentId, newComment) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`, {
     raw_content: newComment
   })
 
@@ -56,6 +65,14 @@ export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToIncl
   if (workspaceIdToExclude) opts += `&exclude_workspace_ids=${workspaceIdToExclude}`
   if (limit) opts += `&limit=${limit}`
   return baseFetch('GET', `${apiUrl}/users/me/known_members?acp=${userNameToSearch}${opts}`)
+}
+
+export const getMyselfKnownContents = (apiUrl, searchString, limit) => {
+  const queryParameterList = []
+  queryParameterList.push(`acp=${encodeURIComponent(searchString)}`)
+  if (Number.isInteger(limit)) queryParameterList.push(`limit=${limit}`)
+
+  return baseFetch('GET', `${apiUrl}/users/me/known_contents?${queryParameterList.join('&')}`)
 }
 
 const getResponse = async (url) => {
@@ -105,6 +122,9 @@ export const putFileIsDeleted = (apiUrl, workspaceId, contentId) =>
 export const getFileRevision = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`)
 
+export const getUrlPreview = (apiUrl, url) =>
+  baseFetch('GET', `${apiUrl}/url-preview?url=${encodeURIComponent(url)}`)
+
 export const putFileDescription = (apiUrl, workspaceId, contentId, label, newDescription) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}`, {
     label: label,
@@ -133,3 +153,39 @@ export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, 
   const name = `comment-${commentId}.html`
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}/translated/${name}?target_language_code=${targetLanguageCode}`)
 }
+
+export const getHtmlDocTranslated = (apiUrl, workspaceId, contentId, revisionId, targetLanguageCode) => {
+  const name = `content-${contentId}-${targetLanguageCode}.html`
+  const url = `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions/${revisionId}/translated/${name}?target_language_code=${targetLanguageCode}`
+  return baseFetch('GET', url)
+}
+
+export const getFavoriteContentList = (apiUrl, userId) => {
+  return baseFetch('GET', `${apiUrl}/users/${userId}/favorite-contents`)
+}
+
+export const postContentToFavoriteList = (apiUrl, userId, contentId) => {
+  return baseFetch('POST', `${apiUrl}/users/${userId}/favorite-contents`, { content_id: contentId })
+}
+
+export const deleteContentFromFavoriteList = (apiUrl, userId, contentId) => {
+  return baseFetch('DELETE', `${apiUrl}/users/${userId}/favorite-contents/${contentId}`)
+}
+
+export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}`)
+
+export const getContentTagList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`)
+
+export const getWorkspaceTagList = (apiUrl, workspaceId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/tags`)
+
+export const postContentTag = (apiUrl, workspaceId, contentId, tagName) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`, { tag_name: tagName })
+
+export const putContentTag = (apiUrl, workspaceId, contentId, tagId) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags/${tagId}`)
+
+export const deleteContentTag = (apiUrl, workspaceId, contentId, tagId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags/${tagId}`)

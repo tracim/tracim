@@ -11,14 +11,16 @@ from hapic.data import HapicFile
 from pyramid_ldap3 import Connector
 from sqlakeyset import Page
 from sqlakeyset import get_page
+import sqlalchemy
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.expression import cast
 import transaction
 
-from tracim_backend import app_list
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import TracimValidator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -66,6 +68,7 @@ from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
+from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.storage import StorageLib
@@ -78,9 +81,13 @@ from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import AboutUser
+from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import UserInContext
+from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.mention import ALL__GROUP_MENTIONS
 from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
@@ -88,6 +95,7 @@ from tracim_backend.models.user_custom_properties import UserCustomProperties
 from tracim_backend.models.userconfig import UserConfig
 
 KNOWN_MEMBERS_ITEMS_LIMIT = 5
+KNOWN_CONTENT_ITEMS_DEFAULT_LIMIT = 15
 AVATAR_RATIO = ImageRatio(1, 1)
 COVER_RATIO = ImageRatio(35, 4)
 DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
@@ -327,13 +335,56 @@ class UserApi(object):
             return query.all()
         return self.get_all()
 
+    def get_known_contents_in_context(
+        self, acp: typing.Optional[str] = None, limit: typing.Optional[int] = None
+    ) -> typing.List[ContentInContext]:
+        """
+        Return list of known contents by current UserApi user.
+        :param acp: autocomplete filter by content id / content label
+        :limit: maximum number of contents to return.
+            - 0 for no limit
+            - None for the default limit (KNOWN_CONTENT_ITEMS_DEFAULT_LIMIT)
+        :return: List of found contents
+        """
+
+        if limit is None:
+            limit = KNOWN_CONTENT_ITEMS_DEFAULT_LIMIT
+
+        content_api = ContentApi(
+            session=self._session, current_user=self._user, config=self._config,
+        )
+
+        query = content_api.get_base_query(workspaces=self.get_user_workspaces())
+        query = query.filter(Content.type != content_type_list.Comment.slug)
+
+        if acp:
+            query = query.filter(
+                or_(
+                    cast(Content.content_id, sqlalchemy.String).ilike("%{}%".format(acp)),
+                    Content.label.ilike("%{}%".format(acp)),
+                )
+            )
+            query.order_by(Content.content_id)
+
+        if limit:
+            query = query.limit(limit)
+
+        contents = query.all()
+        return [content_api.get_content_in_context(content) for content in contents]
+
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
         return ALL__GROUP_MENTIONS
 
-    def _get_user_ids_in_same_workspace(self, user_id: int):
-        user_workspaces_id_query = self._session.query(UserRoleInWorkspace.workspace_id).filter(
+    def get_user_workspaces_query(self, user_id: int) -> Query:
+        return self._session.query(UserRoleInWorkspace.workspace_id).filter(
             UserRoleInWorkspace.user_id == user_id
         )
+
+    def get_user_workspaces(self) -> typing.List[Workspace]:
+        return self.get_user_workspaces_query(self._user.user_id).all()
+
+    def _get_user_ids_in_same_workspace(self, user_id: int):
+        user_workspaces_id_query = self.get_user_workspaces_query(user_id)
         users_in_workspaces = (
             self._session.query(UserRoleInWorkspace.user_id)
             .distinct(UserRoleInWorkspace.user_id)
@@ -901,6 +952,8 @@ class UserApi(object):
         auth_type: AuthType = AuthType.UNKNOWN,
         profile: typing.Optional[Profile] = None,
         allowed_space: typing.Optional[int] = None,
+        creation_type: typing.Optional[UserCreationType] = None,
+        creation_author: typing.Optional[User] = None,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> User:
@@ -923,6 +976,11 @@ class UserApi(object):
             lang=lang,
             do_save=False,
         )
+        new_user.creation_type = creation_type
+        if creation_type == UserCreationType.REGISTER and not creation_author:
+            new_user.creation_author = new_user
+        else:
+            new_user.creation_author = creation_author
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with
         # new auth system

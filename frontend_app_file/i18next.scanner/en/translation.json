@@ -50,7 +50,7 @@
   "Number of shares:": "Number of shares:",
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
   "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
-  "You have reach your storage limit, you cannot add new files": "You have reach your storage limit, you cannot add new files",
+  "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Upload files": "Upload files",
   "New file": "New file",
   "Preview loading...": "Preview loading...",
@@ -61,5 +61,6 @@
   "Note: Your browser might not be able to read this file.": "Note: Your browser might not be able to read this file.",
   "The file has been updated, it can't be edited anymore": "The file has been updated, it can't be edited anymore",
   "The content has been modified by {{author}}": "The content has been modified by {{author}}",
-  "Error while saving the user configuration": "Error while saving the user configuration"
+  "Error while saving the user configuration": "Error while saving the user configuration",
+  "Tags": "Tags"
 }

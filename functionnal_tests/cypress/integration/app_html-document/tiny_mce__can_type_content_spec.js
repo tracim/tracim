@@ -31,7 +31,7 @@ describe('Known users as a workspace-manager', function () {
 
   it('Type into tiny mce and save from dashboard', function () {
     cy.visit(`/ui/workspaces/${this.workspace.workspace_id}/dashboard`)
-    cy.get('[data-cy="contentTypeBtn_contents/html-document"]').click()
+    cy.get('button[title="Write a note"]').click()
     cy.get('[data-cy=createcontent__form__input]').type(DOCUMENT_TITLE)
     cy.get('[data-cy=popup__createcontent__form__button]').click()
 

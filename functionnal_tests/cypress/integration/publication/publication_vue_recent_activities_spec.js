@@ -14,6 +14,8 @@ describe('In recent activities', () => {
       cy.createThread(threadLabel, workspaceId)
       cy.createPublication(publicationLabel, workspaceId)
       cy.visitPage({ pageName: PAGES.WORKSPACE_RECENT_ACTIVITIES, params: { workspaceId } })
+      cy.get('.feedItem')
+      cy.get('.activityList').scrollIntoView()
     })
   })
 

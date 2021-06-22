@@ -3,6 +3,7 @@ import base64
 import cgi
 from datetime import datetime
 import enum
+from typing import Dict
 from typing import Generic
 from typing import List
 from typing import Optional
@@ -38,6 +39,7 @@ from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EventTypeDatabaseParameters
 from tracim_backend.models.event import ReadStatus
+from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.roles import WorkspaceRoles
 
 
@@ -72,6 +74,9 @@ class ConfigModel(object):
         instance_name: str,
         email_required: bool,
         search_engine: str,
+        translation_service__target_languages: List[Dict[str, str]],
+        user__self_registration__enabled: bool,
+        ui__spaces__creation__parent_space_choice__visible: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -85,6 +90,11 @@ class ConfigModel(object):
         self.email_required = email_required
         self.search_engine = search_engine
         self.translation_service__enabled = translation_service__enabled
+        self.translation_service__target_languages = translation_service__target_languages
+        self.user__self_registration__enabled = user__self_registration__enabled
+        self.ui__spaces__creation__parent_space_choice__visible = (
+            ui__spaces__creation__parent_space_choice__visible
+        )
 
 
 class ErrorCodeModel(object):
@@ -97,6 +107,12 @@ class PreviewAllowedDim(object):
     def __init__(self, restricted: bool, dimensions: List[PreviewDim]) -> None:
         self.restricted = restricted
         self.dimensions = dimensions
+
+
+class UsageConditionModel(object):
+    def __init__(self, title: str, url: str = None) -> None:
+        self.title = title
+        self.url = url
 
 
 class MoveParams(object):
@@ -384,6 +400,16 @@ class WorkspaceAndUserPath(object):
         self.user_id = user_id
 
 
+class ContentAndUserPath(object):
+    """
+    Paths params with content id and user_id
+    """
+
+    def __init__(self, content_id: int, user_id: int) -> None:
+        self.content_id = content_id
+        self.user_id = user_id
+
+
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem
@@ -437,6 +463,17 @@ class ReactionPath(object):
         self.reaction_id = reaction_id
 
 
+class TagPath(object):
+    """
+    Paths params with workspace id and content_id and tag_id model
+    """
+
+    def __init__(self, workspace_id: int, tag_id: int, content_id: Optional[int] = None) -> None:
+        self.workspace_id = workspace_id
+        self.content_id = content_id
+        self.tag_id = tag_id
+
+
 class CommentPathFilename(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -452,7 +489,7 @@ class CommentPathFilename(object):
 
 class KnownMembersQuery(object):
     """
-    Autocomplete query model
+    Member autocomplete query model
     """
 
     def __init__(
@@ -467,6 +504,16 @@ class KnownMembersQuery(object):
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
         self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
+        self.limit = limit
+
+
+class KnownContentsQuery(object):
+    """
+    Content autocomplete query model
+    """
+
+    def __init__(self, acp: str, limit: int = None,) -> None:
+        self.acp = acp
         self.limit = limit
 
 
@@ -544,12 +591,6 @@ class ContentFilter(object):
         self.count = count
 
 
-class ActiveContentFilter(object):
-    def __init__(self, limit: int = None, before_content_id: datetime = None) -> None:
-        self.limit = limit
-        self.before_content_id = before_content_id
-
-
 class ContentIdsQuery(object):
     def __init__(self, content_ids: str = None) -> None:
         self.content_ids = string_to_list(content_ids, ",", int)
@@ -595,6 +636,7 @@ class WorkspaceUpdate(object):
         agenda_enabled: Optional[bool] = None,
         public_upload_enabled: Optional[bool] = None,
         public_download_enabled: Optional[bool] = None,
+        publication_enabled: Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -604,6 +646,7 @@ class WorkspaceUpdate(object):
         self.default_user_role = None
         if default_user_role:
             self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
+        self.publication_enabled = publication_enabled
 
 
 class WorkspaceCreate(object):
@@ -621,6 +664,7 @@ class WorkspaceCreate(object):
         public_upload_enabled: bool = True,
         public_download_enabled: bool = True,
         parent_id: Optional[int] = None,
+        publication_enabled: Optional[bool] = None,
     ) -> None:
         self.label = label
         self.description = description
@@ -630,6 +674,7 @@ class WorkspaceCreate(object):
         self.access_type = WorkspaceAccessType(access_type)
         self.default_user_role = WorkspaceRoles.get_role_from_slug(default_user_role)
         self.parent_id = parent_id
+        self.publication_enabled = publication_enabled
 
 
 class ContentCreation(object):
@@ -666,6 +711,16 @@ class ReactionCreation(object):
 
     def __init__(self, value: str) -> None:
         self.value = value
+
+
+class TagCreation(object):
+    """
+    tag creation model
+    """
+
+    def __init__(self, tag_name: Optional[str] = None, tag_id: Optional[int] = None) -> None:
+        self.tag_name = tag_name
+        self.tag_id = tag_id
 
 
 class SetContentStatus(object):
@@ -1006,6 +1061,10 @@ class WorkspaceInContext(object):
     def parent_id(self) -> int:
         return self.workspace.parent_id
 
+    @property
+    def publication_enabled(self) -> bool:
+        return self.workspace.publication_enabled
+
 
 class UserRoleWorkspaceInContext(object):
     """
@@ -1129,7 +1188,7 @@ class ContentInContext(object):
 
     @property
     def content_namespace(self) -> ContentNamespaces:
-        return self.content.content_namespace.value
+        return self.content.content_namespace
 
     @property
     def parent(self) -> Optional["ContentInContext"]:
@@ -1153,6 +1212,13 @@ class ContentInContext(object):
         p = self.parent
         if p:
             return p.content_type
+        return None
+
+    @property
+    def parent_content_namespace(self) -> Optional[ContentNamespaces]:
+        p = self.parent
+        if p:
+            return p.content_namespace
         return None
 
     @property
@@ -1843,3 +1909,35 @@ class AuthoredContentRevisionsInfos:
     def __init__(self, revisions_count: int, revisions_space_count: int) -> None:
         self.count = revisions_count
         self.space_count = revisions_space_count
+
+
+class FavoriteContentInContext:
+    """
+    Favorite Content objet for api, permitting to override content with the correct filter
+    """
+
+    def __init__(self, favorite_content: FavoriteContent, content: Content):
+        self._favorite_content = favorite_content
+        self._content = content
+
+    @property
+    def user_id(self) -> int:
+        return self._favorite_content.user_id
+
+    @property
+    def content_id(self) -> int:
+        return self._favorite_content.content_id
+
+    @property
+    def content(self) -> ContentInContext:
+        # INFO - G.M - 2021-03-24 - Overriding the content of the favorite content in order to
+        # handle access limitation here.
+        return self._content
+
+    @property
+    def original_label(self) -> str:
+        return self._favorite_content.original_label
+
+    @property
+    def original_type(self) -> str:
+        return self._favorite_content.original_type

@@ -9,7 +9,7 @@ const veryLongComment = 'this_is_a_very_long_comment lorem_ipsum_dolor_sit_amet_
 const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: htmlDocTitle } })
 
 const commentArea = '.comment__body'
-const commentText = '.comment__body__text'
+const commentText = '.comment__body__content__text'
 const cancelDocBtn = '.html-document__editionmode__cancel'
 const submitBtn = '.timeline__texteditor__submit__btn'
 const commentField = '#wysiwygTimelineComment'

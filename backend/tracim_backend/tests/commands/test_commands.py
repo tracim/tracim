@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+from os.path import dirname
 import subprocess
 
 from depot.manager import DepotManager
@@ -28,6 +29,8 @@ from tracim_backend.models.userconfig import UserConfig
 from tracim_backend.tests.fixtures import *  # noqa: F403,F401
 from tracim_backend.tests.utils import TEST_CONFIG_FILE_PATH
 from tracim_backend.tests.utils import create_1000px_png_test_image
+
+COMMAND_CONFIG_PATH = dirname(dirname(dirname(dirname(__file__)))) + "/test_commands.ini"
 
 
 class TestCommandsList(object):
@@ -353,9 +356,7 @@ class TestCommands(object):
         DepotManager._clear()
         app = TracimCLI()
         with pytest.raises(DatabaseInitializationFailed):
-            app.run(
-                ["db", "init", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
-            )
+            app.run(["db", "init", "-c", COMMAND_CONFIG_PATH, "--debug"])
 
     def test__init__db__ok_nominal_case(self, hapic, session, user_api_factory):
         """
@@ -372,19 +373,8 @@ class TestCommands(object):
         DepotManager._clear()
         app = TracimCLI()
         # delete config to be sure command will work
-        app.run(
-            [
-                "db",
-                "delete",
-                "--force",
-                "-c",
-                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "--debug",
-            ]
-        )
-        result = app.run(
-            ["db", "init", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
-        )
+        app.run(["db", "delete", "--force", "-c", COMMAND_CONFIG_PATH, "--debug"])
+        result = app.run(["db", "init", "-c", COMMAND_CONFIG_PATH, "--debug"])
         assert result == 0
 
     def test__init__db__no_config_file(self, hapic, session, user_api_factory):

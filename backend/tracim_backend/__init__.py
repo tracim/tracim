@@ -5,6 +5,7 @@ import sys
 import warnings
 
 from hapic.ext.pyramid import PyramidContext
+from preview_generator.preview.builder.office__libreoffice import LO_MIMETYPES
 from pyramid.config import Configurator
 from pyramid.request import Request
 from pyramid.router import Router
@@ -59,10 +60,13 @@ from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.core_api.favorite_content_controller import FavoriteContentController
 from tracim_backend.views.core_api.reaction_controller import ReactionController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
+from tracim_backend.views.core_api.tag_controller import TagController
+from tracim_backend.views.core_api.url_preview_controller import URLPreviewController
 from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
@@ -77,6 +81,41 @@ except ImportError:
 # useful to avoid apispec error
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
+
+
+# HACK - G.M - 2021-06-14 - disable spreadsheet support for preview by overriding
+# Preview generator Libreoffice mimetype list.
+spreadsheet_mimetypes = (
+    # Excel file mimetypes:
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # .xslx
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.template",  # .xlst
+    "application/vnd.ms-excel.sheet.binary.macroEnabled.12",  # .xlsb
+    "application/vnd.ms-excel.sheet.macroEnabled.12",  # .xlsm
+    "application/vnd.ms-excel.template.macroEnabled.12",  # .xltm
+    "application/wps-office.xls",  # .xls
+    "application/wps-office.xlsx",  # .xlsx
+    # Openoffice calc mimetypes:
+    "application/vnd.oasis.opendocument.spreadsheet",  # .ods
+    "application/vnd.oasis.opendocument.spreadsheet-template",  # .ots
+    "application/vnd.oasis.opendocument.spreadsheet-flat-xml",  # .fods
+    # Staroffice
+    "application/vnd.sun.xml.calc",
+    "application/vnd.sun.xml.calc.template",
+    "application/vnd.stardivision.calc",
+    "application/x-starcalc",
+    # Apple numbers
+    "application/x-iwork-numbers-sffnumbers",
+    "application/vnd.apple.numbers",
+    # others:
+    "application/x-gnumeric",
+    "text/spreadsheet",
+    "application/vnd.lotus-1-2-3",
+)
+for mimetype in spreadsheet_mimetypes:
+    try:
+        LO_MIMETYPES.pop(mimetype)
+    except KeyError:
+        pass
 
 
 class TracimPyramidContext(PyramidContext):
@@ -136,14 +175,26 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
 
     configurator = Configurator(settings=settings, autocommit=True)
     # Add beaker session cookie
-    tracim_setting_for_beaker = sliced_dict(settings, beginning_key_string="session.")
-    tracim_setting_for_beaker["session.data_dir"] = app_config.SESSION__DATA_DIR
-    tracim_setting_for_beaker["session.lock_dir"] = app_config.SESSION__LOCK_DIR
-    tracim_setting_for_beaker["session.httponly"] = app_config.SESSION__HTTPONLY
-    tracim_setting_for_beaker["session.secure"] = app_config.SESSION__SECURE
-    session_factory = pyramid_beaker.session_factory_from_settings(tracim_setting_for_beaker)
+    tracim_setting_for_beaker_session = sliced_dict(settings, beginning_key_string="session.")
+    tracim_setting_for_beaker_session["session.data_dir"] = app_config.SESSION__DATA_DIR
+    tracim_setting_for_beaker_session["session.lock_dir"] = app_config.SESSION__LOCK_DIR
+    tracim_setting_for_beaker_session["session.httponly"] = app_config.SESSION__HTTPONLY
+    tracim_setting_for_beaker_session["session.secure"] = app_config.SESSION__SECURE
+    session_factory = pyramid_beaker.session_factory_from_settings(
+        tracim_setting_for_beaker_session
+    )
     configurator.set_session_factory(session_factory)
-    pyramid_beaker.set_cache_regions_from_settings(tracim_setting_for_beaker)
+
+    # TODO - G.M - 2021-03-31 Make beaker cache configurable like sessions
+    #  through tracim config, see https://github.com/tracim/tracim/issues/4386
+    cached_region_settings = {
+        "cache.enabled": "True",
+        "cache.regions": "url_preview",
+        "cache.type": "memory",
+        "cache.url_preview.expire": "1800",  # = 30 min
+    }
+    pyramid_beaker.set_cache_regions_from_settings(cached_region_settings)
+
     # Add AuthPolicy
     configurator.include("pyramid_multiauth")
     policies = []
@@ -240,6 +291,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
     reaction_controller = ReactionController()
+    tag_controller = TagController()
+    url_preview_controller = URLPreviewController()
+    favorite_content_controller = FavoriteContentController()
     configurator.include(session_controller.bind, route_prefix=BASE_API)
     configurator.include(system_controller.bind, route_prefix=BASE_API)
     configurator.include(user_controller.bind, route_prefix=BASE_API)
@@ -248,6 +302,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(workspace_controller.bind, route_prefix=BASE_API)
     configurator.include(comment_controller.bind, route_prefix=BASE_API)
     configurator.include(reaction_controller.bind, route_prefix=BASE_API)
+    configurator.include(tag_controller.bind, route_prefix=BASE_API)
+    configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
+    configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():

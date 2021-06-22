@@ -125,9 +125,15 @@ class FrontendController(Controller):
         return render_to_response(
             self._get_index_file_path(),
             {
-                "colors": {"primary": ExtendedColor(app_config.APPS_COLORS["primary"])},
+                "colors": {
+                    "primary": ExtendedColor(app_config.APPS_COLORS["primary"]),
+                    "sidebar": ExtendedColor(app_config.APPS_COLORS["sidebar"]),
+                },
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,
+                "website_description": app_config.WEBSITE__DESCRIPTION,
+                "website__welcome_page": app_config.WEBSITE__WELCOME_PAGE,
+                "website__welcome_page_style": app_config.WEBSITE__WELCOME_PAGE_STYLE,
                 "custom_toolbox_files": self.custom_toolbox_files,
                 "cache_token": self.cache_token,
                 "excluded_notifications": app_config.WEB__NOTIFICATIONS__EXCLUDED,

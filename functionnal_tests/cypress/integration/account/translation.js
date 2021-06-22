@@ -16,5 +16,8 @@ describe('Account page', function () {
 
     cy.changeLanguage('pt')
     cy.get('.account__userpreference__setting').contains('Mudar minhas definições de conta')
+
+    cy.changeLanguage('de')
+    cy.get('.account__userpreference__setting').contains('Meine Kontoeinstellungen ändern')
   })
 })

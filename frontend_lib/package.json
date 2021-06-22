@@ -88,19 +88,24 @@
     "globals": [
       "GLOBAL_dispatchEvent",
       "localStorage",
+      "location",
       "tinymce",
       "fetch",
       "Element",
       "EventSource",
       "CustomEvent",
       "HTMLElement",
+      "HTMLAnchorElement",
       "DOMParser",
       "globalThis",
       "GLOBAL_primaryColor",
       "FormData",
       "XMLHttpRequest",
       "Image",
-      "FileReader"
+      "FileReader",
+      "wysiwyg",
+      "File",
+      "ResizeObserver"
     ],
     "parser": "babel-eslint",
     "ignore": []

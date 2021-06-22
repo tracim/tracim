@@ -5,22 +5,20 @@ import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import * as Cookies from 'js-cookie'
-import Card from '../component/common/Card/Card.jsx'
-import CardHeader from '../component/common/Card/CardHeader.jsx'
-import CardBody from '../component/common/Card/CardBody.jsx'
-import InputGroupText from '../component/common/Input/InputGroupText.jsx'
-import Button from '../component/common/Input/Button.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   PAGE,
+  putUserConfiguration,
   serialize
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setUserConnected,
+  setUserDisconnected,
   setWorkspaceList,
   setContentTypeList,
   setAppList,
@@ -41,23 +39,52 @@ import {
   getContentTypeList,
   getMyselfWorkspaceList,
   getNotificationList,
+  getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
   getWorkspaceMemberList,
+  postUserLogout,
   postUserLogin,
   putUserLang,
-  getAccessibleWorkspaces
+  getAccessibleWorkspaces,
+  postUserRegister
 } from '../action-creator.async.js'
-import { COOKIE_FRONTEND } from '../util/helper.js'
+import {
+  COOKIE_FRONTEND,
+  FETCH_CONFIG,
+  MINIMUM_CHARACTERS_PUBLIC_NAME,
+  WELCOME_ELEMENT_ID
+} from '../util/helper.js'
 import { serializeUserProps } from '../reducer/user.js'
+import Conditions from './Conditions.jsx'
+import SignIn from '../component/Login/SignIn.jsx'
+import CreateAccount from '../component/Login/CreateAccount.jsx'
 
 const qs = require('query-string')
+const USAGE_CONDITIONS_STATUS = {
+  ACCEPTED: 'accepted'
+}
+const DISPLAY = {
+  CONDITIONS: 'Conditions',
+  CREATE: 'CreateAccount',
+  SIGN_IN: 'SignIn'
+}
 
 class Login extends React.Component {
   constructor (props) {
     super(props)
+
+    // NOTE - SG - 2021-03-23 - the welcome DOM element is defined
+    // statically in the loaded HTML page so that its content can be parsed by
+    // search engines' robots.
+    // A copy of its html is made in order to display it in this component (see render()).
+    // The original welcome element is hidden unconditionally in Tracim.jsx
+    const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
     this.state = {
-      inputRememberMe: false
+      displayedOption: DISPLAY.SIGN_IN,
+      inputRememberMe: false,
+      usageConditionsList: [],
+      welcomeHtml: welcomeElement.innerHTML
     }
 
     document.addEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
@@ -72,9 +99,15 @@ class Login extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { props } = this
+    const { props, state } = this
 
-    if (prevProps.system.config.instance_name !== props.system.config.instance_name) {
+    if (
+      prevProps.system.config.instance_name !== props.system.config.instance_name ||
+      (
+        prevState.displayedOption !== state.displayedOption &&
+        state.displayedOption === DISPLAY.SIGN_IN
+      )
+    ) {
       this.setHeadTitle()
     }
   }
@@ -113,12 +146,77 @@ class Login extends React.Component {
     this.setState(prev => ({ inputRememberMe: !prev.inputRememberMe }))
   }
 
-  handleClickSubmit = async (event) => {
-    const { props, state } = this
+  handleClickCreateAccount = async (event) => {
+    const { props } = this
 
     event.preventDefault()
 
-    const { login, password } = event.target
+    const { name, login, password } = event.target
+
+    if (name.value === '' || login.value === '' || password.value === '') {
+      props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
+      return
+    }
+
+    if (!checkEmailValidity(login.value)) {
+      props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
+      return
+    }
+
+    if (name.value.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
+      props.dispatch(newFlashMessage(
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
+        'warning'))
+      return
+    }
+
+    if (password.value.length < 6) {
+      props.dispatch(newFlashMessage(props.t('New password is too short (minimum 6 characters)'), 'warning'))
+      return
+    }
+
+    if (password.value.length > 512) {
+      props.dispatch(newFlashMessage(props.t('New password is too long (maximum 512 characters)'), 'warning'))
+      return
+    }
+
+    const fetchPostUserRegister = await props.dispatch(postUserRegister({
+      email: login.value,
+      password: password.value,
+      public_name: name.value
+    }))
+
+    switch (fetchPostUserRegister.status) {
+      case 200:
+        this.handleClickSignIn({
+          login: login,
+          password: password
+
+        })
+        break
+      case 400:
+        switch (fetchPostUserRegister.json.code) {
+          case 2001: props.dispatch(newFlashMessage(props.t('Invalid email'), 'warning')); break
+          case 2036: props.dispatch(newFlashMessage(props.t('Email already exists'), 'warning')); break
+          default: props.dispatch(newFlashMessage(props.t('Error while creating account'), 'warning')); break
+        }
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while creating account'), 'warning')); break
+    }
+  }
+
+  handleClickSignInEvent = async (event) => {
+    event.preventDefault()
+    this.handleClickSignIn({
+      login: event.target.login,
+      password: event.target.password
+    })
+  }
+
+  handleClickSignIn = async (signInObject) => {
+    const { props, state } = this
+
+    const { login, password } = signInObject
 
     if (login.value === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
@@ -134,10 +232,7 @@ class Login extends React.Component {
 
     switch (fetchPostUserLogin.status) {
       case 200: {
-        const loggedUser = {
-          ...fetchPostUserLogin.json,
-          logged: true
-        }
+        const loggedUser = fetchPostUserLogin.json
 
         if (fetchPostUserLogin.json.lang === null) this.setDefaultUserLang(fetchPostUserLogin.json)
 
@@ -154,13 +249,6 @@ class Login extends React.Component {
         this.loadNotificationNotRead(loggedUser.user_id)
         this.loadNotificationList(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
-
-        if (props.system.redirectLogin !== '') {
-          props.history.push(props.system.redirectLogin)
-          return
-        }
-
-        props.history.push(PAGE.HOME)
         break
       }
       case 400:
@@ -171,6 +259,43 @@ class Login extends React.Component {
         break
       case 403: props.dispatch(newFlashMessage(props.t('Invalid credentials'), 'warning')); break
       default: props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning')); break
+    }
+  }
+
+  handleUserConnection = async () => {
+    const { props } = this
+    props.dispatch(setUserConnected({ ...props.user, logged: true }))
+    if (props.system.redirectLogin !== '') {
+      props.history.push(props.system.redirectLogin)
+      return
+    }
+
+    const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(
+      FETCH_CONFIG.apiUrl,
+      props.user.userId,
+      { ...props.user.config, usage_conditions__status: USAGE_CONDITIONS_STATUS.ACCEPTED }
+    ))
+
+    if (fetchPutUserConfiguration.status !== 204) {
+      props.dispatch(newFlashMessage(props.t('Error while saving the user configuration')))
+    }
+
+    props.history.push(PAGE.HOME)
+  }
+
+  handleClickLogout = async () => {
+    const { props } = this
+
+    const fetchPostUserLogout = await props.dispatch(postUserLogout())
+    if (fetchPostUserLogout.status === 204) {
+      props.dispatch(setUserDisconnected())
+      props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
+      this.setState({
+        usageConditionsList: [],
+        displayedOption: DISPLAY.SIGN_IN
+      })
+    } else {
+      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
     }
   }
 
@@ -233,7 +358,29 @@ class Login extends React.Component {
 
     const fetchGetUserConfig = await props.dispatch(getUserConfiguration(userId))
     switch (fetchGetUserConfig.status) {
-      case 200: props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters)); break
+      case 200: {
+        props.dispatch(setUserConfiguration(fetchGetUserConfig.json.parameters))
+
+        if (fetchGetUserConfig.json.parameters.usage_conditions__status !== USAGE_CONDITIONS_STATUS.ACCEPTED) {
+          const fetchGetUsageConditions = await props.dispatch(getUsageConditions())
+          switch (fetchGetUsageConditions.status) {
+            case 200: {
+              if (fetchGetUsageConditions.json.items.length === 0) this.handleUserConnection()
+              else {
+                this.setState({
+                  usageConditionsList: fetchGetUsageConditions.json.items,
+                  displayedOption: DISPLAY.CONDITIONS
+                })
+              }
+              break
+            }
+            default: props.dispatch(newFlashMessage(props.t('Error while loading the usage conditions'))); break
+          }
+        } else {
+          this.handleUserConnection()
+        }
+        break
+      }
       default: props.dispatch(newFlashMessage(props.t('Error while loading the user configuration')))
     }
   }
@@ -279,75 +426,38 @@ class Login extends React.Component {
     }
   }
 
-  handleClickForgotPassword = () => {
-    const { props } = this
-    props.history.push(
-      props.system.config.email_notification_activated
-        ? PAGE.FORGOT_PASSWORD
-        : PAGE.FORGOT_PASSWORD_NO_EMAIL_NOTIF
-    )
-  }
-
   render () {
-    const { props } = this
+    const { props, state } = this
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
-      <section className='loginpage'>
-        <Card customClass='loginpage__card'>
-          <CardHeader customClass='loginpage__card__header primaryColorBgLighten'>
-            {props.t('Connection')}
-          </CardHeader>
+      <div className='loginpage'>
+        <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
+        <section className='loginpage__main'>
+          {state.displayedOption === DISPLAY.SIGN_IN && (
+            <SignIn
+              onClickCreateAccount={() => this.setState({ displayedOption: DISPLAY.CREATE })}
+              onClickSubmit={this.handleClickSignInEvent}
+            />
+          )}
 
-          <CardBody formClass='loginpage__card__form'>
-            <form onSubmit={this.handleClickSubmit} noValidate>
-              <InputGroupText
-                parentClassName='loginpage__card__form__groupelogin'
-                customClass='mb-3 mt-4'
-                icon='fa-user'
-                type='text'
-                placeHolder={props.t('Email address or username')}
-                invalidMsg={props.t('Invalid email or username')}
-                maxLength={512}
-                name='login'
-              />
+          {state.displayedOption === DISPLAY.CONDITIONS && (
+            <Conditions
+              onClickCancel={this.handleClickLogout}
+              onClickValidate={this.handleUserConnection}
+              usageConditionsList={state.usageConditionsList}
+            />
+          )}
 
-              <InputGroupText
-                parentClassName='loginpage__card__form__groupepw'
-                customClass=''
-                icon='fa-lock'
-                type='password'
-                placeHolder={props.t('Password')}
-                invalidMsg={props.t('Invalid password')}
-                maxLength={512}
-                name='password'
-              />
-
-              <div className='row mt-4 mb-4'>
-                <div className='col-12 col-sm-6'>
-                  <div
-                    className='loginpage__card__form__pwforgot'
-                    onClick={this.handleClickForgotPassword}
-                  >
-                    {props.t('Forgotten password?')}
-                  </div>
-                </div>
-
-                <div className='col-12 col-sm-6 d-flex align-items-end'>
-                  <Button
-                    htmlType='submit'
-                    bootstrapType=''
-                    customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover loginpage__card__form__btnsubmit ml-auto'
-                    label={props.t('Connection')}
-                  />
-                </div>
-              </div>
-            </form>
-          </CardBody>
-        </Card>
-
-        <FooterLogin />
-      </section>
+          {state.displayedOption === DISPLAY.CREATE && (
+            <CreateAccount
+              onClickSignIn={() => this.setState({ displayedOption: DISPLAY.SIGN_IN })}
+              onClickCreateAccount={this.handleClickCreateAccount}
+            />
+          )}
+          <FooterLogin />
+        </section>
+      </div>
     )
   }
 }

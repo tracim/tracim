@@ -103,9 +103,9 @@ Create [configuration file](doc/setting.md) for a development environment:
 The provided default configuration is suitable for local-test. If you need to run Tracim
 over network, see [configuration file documentation](doc/setting.md).
 
-You need to create a color.json file at root of Tracim:
+You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
-    cp ../color.json.sample ../color.json
+    cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding
 
 You should also create requested folder for running Tracim:
 
@@ -114,10 +114,6 @@ You should also create requested folder for running Tracim:
 Initialize the database using [tracimcli](doc/cli.md) tool
 
     tracimcli db init
-
-Stamp current version of database to last (useful for migration):
-
-    alembic -c development.ini stamp head
 
 Optional functionalities are available through official plugins, please [read their documentation](official_plugins/README.md) to discover their functionalities and how to activate them.
 

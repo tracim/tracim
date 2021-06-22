@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .git/
 node_modules/
+dist/assets/branding
 dist/assets/tracim.app.js
 dist/assets/tracim.vendors~app.js
 dist/assets/custom_toolbox/

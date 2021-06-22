@@ -36,7 +36,8 @@ import {
   getUserProfile,
   toggleFavicon,
   FETCH_CONFIG,
-  SEARCH_TYPE
+  SEARCH_TYPE,
+  WELCOME_ELEMENT_ID
 } from '../util/helper.js'
 import {
   getAppList,
@@ -78,16 +79,16 @@ import { serializeUserProps } from '../reducer/user.js'
 import ReduxTlmDispatcher from './ReduxTlmDispatcher.jsx'
 import JoinWorkspace from './JoinWorkspace.jsx'
 import PersonalRecentActivities from './PersonalRecentActivities.jsx'
-import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import PublicProfile from './PublicProfile.jsx'
 import Publications from './Publications.jsx'
+import Favorites from './Favorites.jsx'
+import ContentRedirection from './ContentRedirection.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
 export class Tracim extends React.Component {
   constructor (props) {
     super(props)
-
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
       displayConnectionError: false,
@@ -95,6 +96,13 @@ export class Tracim extends React.Component {
     }
 
     this.liveMessageManager = new LiveMessageManager()
+
+    // NOTE - S.G. - Unconditionally hide the original welcome element
+    // so that it does not interfere with Tracim render.
+    // It is not done statically in index.mak because search engine robots have a tendency to
+    // ignore hidden elements…
+    const welcomeElement = document.getElementById(WELCOME_ELEMENT_ID)
+    if (welcomeElement) welcomeElement.hidden = true
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.REDIRECT, handler: this.handleRedirect },
@@ -450,6 +458,15 @@ export class Tracim extends React.Component {
           />
 
           <Route
+            path={PAGE.FAVORITES}
+            render={() => (
+              <div className='tracim__content fullWidthFullHeight'>
+                <Favorites />
+              </div>
+            )}
+          />
+
+          <Route
             path='/ui/workspaces/:idws?'
             render={() =>
               <>
@@ -489,7 +506,7 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={PAGE.WORKSPACE.PUBLICATION(':idws')}
+                  path={[PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts'), PAGE.WORKSPACE.PUBLICATIONS(':idws')]}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Publications />
@@ -499,8 +516,10 @@ export class Tracim extends React.Component {
 
                 <Route
                   path={PAGE.WORKSPACE.RECENT_ACTIVITIES(':idws')}
-                  render={(routerProps) => (
-                    <WorkspaceRecentActivities workspaceId={routerProps.match.params.idws} />
+                  render={({ match }) => (
+                    // NOTE - RJ - 2021-03-29 - This redirection is there to avoid breaking old links to recent activities
+                    // We may want to remove this redirection in the future. We will need to fix the related Cypress tests
+                    <Redirect to={PAGE.WORKSPACE.DASHBOARD(match.params.idws)} />
                   )}
                 />
 
@@ -549,6 +568,7 @@ export class Tracim extends React.Component {
           <Route path={PAGE.GUEST_UPLOAD(':token')} component={GuestUpload} />
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
           <Route path={PAGE.JOIN_WORKSPACE} component={JoinWorkspace} />
+          <Route path={PAGE.CONTENT(':idcts')} component={ContentRedirection} />
 
           {/* the 3 divs below must stay here so that they always exist in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />

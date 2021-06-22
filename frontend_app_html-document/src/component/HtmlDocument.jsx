@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
   ConfirmPopup,
-  MentionAutoComplete,
+  AutoComplete,
   PromptMessage,
   HTMLContent,
   TextAreaApp,
@@ -87,6 +87,9 @@ export const HtmlDocument = props => {
             <div className='html-document__contentpage__textnote__top'>
               <TranslateButton
                 translationState={props.translationState}
+                targetLanguageList={props.translationTargetLanguageList}
+                targetLanguageCode={props.translationTargetLanguageCode}
+                onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
                 onClickTranslate={props.onClickTranslateDocument}
                 onClickRestore={props.onClickRestoreDocument}
                 dataCy='htmlDocumentTranslateButton'
@@ -134,7 +137,7 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <div className='html-document__editionmode__container'>
             {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <MentionAutoComplete
+              <AutoComplete
                 apiUrl={props.apiUrl}
                 autoCompleteItemList={props.autoCompleteItemList}
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}
@@ -193,5 +196,8 @@ HtmlDocument.propTypes = {
   isRefreshNeeded: PropTypes.bool,
   onClickTranslateDocument: PropTypes.func,
   onClickRestoreDocument: PropTypes.func,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired
 }

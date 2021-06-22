@@ -11,7 +11,7 @@ apispec==2.0.2            # via apispec-marshmallow-advanced, hapic
 attrs==18.2.0             # via cmd2, jsonschema
 babel==2.6.0              # via tracim_backend (setup.py)
 beaker==1.10.0            # via pyramid-beaker, tracim_backend (setup.py)
-beautifulsoup4==4.6.3     # via tracim_backend (setup.py)
+beautifulsoup4==4.6.3     # via tracim_backend (setup.py), webpreview
 cairocffi==1.1.0          # via cairosvg
 cairosvg==2.4.2           # via preview-generator
 caldav==0.6.0             # via tracim_backend (setup.py)
@@ -53,6 +53,7 @@ markupsafe==1.1.0         # via mako
 marshmallow==2.21.0       # via apispec-marshmallow-advanced, hapic, tracim_backend (setup.py)
 more-itertools==7.2.0     # via zipp
 multidict==4.5.2          # via hapic
+packaging==20.9           # via sqlakeyset
 pastedeploy==2.0.0        # via plaster-pastedeploy
 pathlib==1.0.1            # via preview-generator
 pbr==5.1.1                # via cliff, stevedore
@@ -62,14 +63,14 @@ plaster-pastedeploy==0.6  # via pyramid, tracim_backend (setup.py)
 plaster==1.0              # via plaster-pastedeploy, pyramid
 pluggy==0.13.1            # via tracim_backend (setup.py)
 prettytable==0.7.2        # via cliff
-preview-generator==0.15.4  # via tracim_backend (setup.py)
+preview-generator==0.20   # via tracim_backend (setup.py)
 pubcontrol==3.0.0         # via gripcontrol
 pyasn1==0.4.4             # via ldap3
 pycparser==2.19           # via cffi
 pyexifinfo==0.4.0         # via preview-generator
 pygments==2.3.0           # via pyramid-debugtoolbar
 pyjwt==1.7.1              # via gripcontrol, pubcontrol
-pyparsing==2.3.0          # via cliff
+pyparsing==2.3.0          # via cliff, packaging
 pypdf2==1.26.0            # via preview-generator
 pyperclip==1.7.0          # via cmd2
 pyramid-beaker==0.8       # via tracim_backend (setup.py)
@@ -91,7 +92,7 @@ pyzmq==19.0.2             # via tracim_backend (setup.py)
 radicale==2.1.11          # via tracim_backend (setup.py)
 redis==2.10.6             # via rq, tracim_backend (setup.py)
 repoze.lru==0.7           # via pyramid-debugtoolbar
-requests==2.25.0          # via caldav, pubcontrol, tracim_backend (setup.py)
+requests==2.25.0          # via caldav, pubcontrol, tracim_backend (setup.py), webpreview
 rq==0.12.0                # via tracim_backend (setup.py)
 six==1.11.0               # via caldav, cliff, elasticsearch-dsl, gripcontrol, imapclient, jsonschema, python-dateutil, stevedore
 smmap==3.0.4              # via gitdb
@@ -113,6 +114,7 @@ wand==0.4.5               # via preview-generator
 wcwidth==0.1.7            # via cmd2
 webencodings==0.5.1       # via tinycss2
 webob==1.8.4              # via pyramid
+webpreview==1.6.0         # via tracim_backend (setup.py)
 wsgidav==2.4.1            # via tracim_backend (setup.py)
 xvfbwrapper==0.2.9        # via preview-generator
 zipp==0.6.0               # via importlib-metadata

@@ -65,7 +65,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ### Lang ###
 ## default lang used in backend if user doesn't provided any lang.
-# Available parameter: en, fr, pt
+# Available parameter: en, fr, pt, de
 ; default_lang = en
 
 ### Apps ###
@@ -167,6 +167,11 @@ workspace.join.max_messages_history_count = -1
 # additional directives to tune the CSP header, they are added without any change to the header
 ; content_security_policy.additional_directives =
 
+###
+# URL PREVIEW
+###
+# timeout for fetching URL preview (in sec).
+; url_preview.fetch_timeout = 30
 
 ####
 # LIMITATION
@@ -352,6 +357,9 @@ api.key = %(basic_setup.api_key)s
 ; user.reset_password.token_lifetime = 900
 ## Default profile of created user, valid values are: users, trusted-users, administrators
 ; user.default_profile = users
+## Allow people to register/create an account themselves without authentication.
+## The profile of those users will be user.default_profile
+; user.self_registration.enabled = False
 
 ## enable or disable filter on known user, if True, user cannot see at all informations about
 ## member with no common space. If False, it can access to these informations.
@@ -379,13 +387,26 @@ api.key = %(basic_setup.api_key)s
 ####
 
 ### Website config ###
-## title of website, used in email
+## title of website, used in email and is part of the title in browsers
 ; website.title = Tracim
 website.title = %(basic_setup.website_title)s
+## description of website, used by search engines to display their results
+; website.description =
+## Custom welcome page displayed during login
+## The path of those files is relative to frontend/dist/assets/branding/
+## Please read the documentation in doc/branding.md for further information
+; website.welcome_page = welcome-simple.html
+; website.welcome_page_style = welcome-simple.css
+
 # The following base_url is used for links and icons
 # integrated in the email notifcations, it's the frontend config.
 ; website.base_url = http://localhost:6543
 website.base_url = %(basic_setup.website_base_url)s
+
+# paths to usage conditions files (relative to frontend/dist/assets/branding)
+# separated by ",", by default there are no usage conditions files.
+website.usage_conditions =
+
 
 ### Frontend ###
 ## if you want to use Tracim API without frontend, change this parameter
@@ -433,7 +454,7 @@ website.base_url = %(basic_setup.website_base_url)s
 ; webdav.ui.enabled = True
 
 ### Notifications ###
-# Comma-separated events listed in this setting are not displayed in notifications to the user.
+# Comma-separated events listed in this setting are not displayed in recent activities and notifications to the user.
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
 # ENTITY_TYPE  = user | workspace | content | mention | workspace_member
 # EVENT_TYPE   = created | modified | deleted | undeleted
@@ -442,6 +463,12 @@ website.base_url = %(basic_setup.website_base_url)s
 # To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
 # will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
 ; web.notifications.excluded = user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*
+
+### UI Customization
+# These parameters configure the user interface without affecting the backend proper
+
+# Enable the parent space choice when creating a new space from the user interface.
+; ui.spaces.creation.parent_space_choice.visible = True
 
 ####
 # JOB EXECUTION
@@ -754,6 +781,13 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # both CollaboraOnline and LibreofficeOnline, example:
 # collaborative_document_edition.software = collabora
 
+# list of extensions for which online edition will be provided.
+# This list is used to filter the extensions returned by the collaborative edition software.
+# It is also used to filter the list of template files.
+# If empty (which is the default value),no filtering is done.
+; collaborative_document_edition.enabled_extensions =
+# collaborative_document_edition.enabled_extensions = odt,ods
+
 # base url where collabora server exist
 ; collaborative_document_edition.collabora.base_url =
 # example:
@@ -772,6 +806,12 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 ; translation_service.enabled = False
 
+## Translation service target languages that will be proposed in Tracim's interface
+# It is a comma-separated list of <ISO-639-1 language code>:<Language string to display> pairs.
+# The string can use any UTF-8 character.
+; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch
+# example:
+# translation_service.target_languages = fr:Français,ar:العربية,ja:日本語
 
 ## Translation service timeout in seconds.
 # This timeout will be applied to each translation request.

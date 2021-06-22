@@ -6,13 +6,23 @@ import {
   Avatar,
   AVATAR_SIZE,
   Breadcrumbs,
-  IconButton
+  IconButton,
+  BREADCRUMBS_TYPE,
+  PAGE
 } from 'tracim_frontend_lib'
 
 import { FETCH_CONFIG } from '../../util/helper.js'
 
 export const ProfileMainBar = props => {
   const hasUser = Object.keys(props.displayedUser).length > 0
+  const title = props.t('Home')
+  const breadcrumbsRoot = {
+    link: PAGE.HOME,
+    label: title,
+    icon: 'fas fa-home',
+    type: BREADCRUMBS_TYPE.CORE,
+    isALink: true
+  }
   return (
     <div className='profile__mainBar'>
       <div className='profile__mainBar__avatar' data-cy='profile-avatar'>
@@ -42,17 +52,19 @@ export const ProfileMainBar = props => {
       </div>
       {hasUser
         ? (
-          <div className='profile__mainBar__info'>
-            <div className='profile__mainBar__info__user'>
-              {props.displayedUser.publicName}
-              {props.displayedUser.username && (
-                <>
-                  <span className='profile__mainBar__info__user__separator'> - </span>
-                  <span className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</span>
-                </>
-              )}
+          <div className='profile__mainBar__info__wrapper'>
+            <div className='profile__mainBar__info'>
+              <div className='profile__mainBar__info__user'>
+                <div className='profile__mainBar__info__user__name'>{props.displayedUser.publicName} </div>
+                {props.displayedUser.username && (
+                  <div className='profile__mainBar__info__user__username__wrapper'>
+                    <div className='profile__mainBar__info__user__username__separator'> - </div>
+                    <div className='profile__mainBar__info__user__username'>@{props.displayedUser.username}</div>
+                  </div>
+                )}
+              </div>
+              <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
             </div>
-            <Breadcrumbs breadcrumbsList={props.breadcrumbsList} />
           </div>
         )
         : (

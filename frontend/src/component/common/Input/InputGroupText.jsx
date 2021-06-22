@@ -6,7 +6,7 @@ require('./InputGroupText.styl')
 
 const InputGroupText = props => {
   return (
-    <div className={classnames(`inputGroupText ${props.parentClassName}`, props.customClass, 'form-group')}>
+    <div className={classnames(`inputGroupText ${props.parentClassName}`, props.customClass, 'form-group')} data-cy={props.dataCy}>
       {props.icon !== '' && <i className={classnames('inputGroupText__icon fas fa-fw', props.icon)} />}
       <input
         type={props.type}
@@ -39,7 +39,8 @@ InputGroupText.propTypes = {
   onChange: PropTypes.func,
   onKeyDown: PropTypes.func,
   maxLength: PropTypes.number,
-  name: PropTypes.string
+  name: PropTypes.string,
+  dataCy: PropTypes.string
 }
 
 InputGroupText.defaultProps = {
@@ -51,5 +52,6 @@ InputGroupText.defaultProps = {
   onChange: () => {},
   onKeyDown: () => {},
   maxLength: 512,
-  name: ''
+  name: '',
+  dataCy: ''
 }

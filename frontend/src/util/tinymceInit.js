@@ -1,5 +1,6 @@
 import i18n from './i18n.js'
 import { uniqueId } from 'lodash'
+import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
 
 (function () {
   function base64EncodeAndTinyMceInsert (files) {
@@ -61,10 +62,26 @@ import { uniqueId } from 'lodash'
           return 'fr_FR'
         case 'pt':
           return 'pt_PT'
+        case 'de':
+          return 'de'
         default:
           return lang
       }
     }
+
+    const hiddenTinymceFileInput = document.createElement('input')
+    hiddenTinymceFileInput.id = 'hidden_tinymce_fileinput'
+    hiddenTinymceFileInput.type = 'file'
+    hiddenTinymceFileInput.style.display = 'none'
+    hiddenTinymceFileInput.addEventListener('change', () => {
+      base64EncodeAndTinyMceInsert(hiddenTinymceFileInput.files)
+    })
+
+    document.body.append(hiddenTinymceFileInput)
+
+    const textarea = document.querySelector(selector)
+    const content = htmlCodeToDocumentFragment(textarea.value)
+    textarea.value = ''
 
     globalThis.tinymce.init({
       selector: selector,
@@ -82,9 +99,18 @@ import { uniqueId } from 'lodash'
       insert_button_items: 'media anchor insertdatetime',
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
       content_style: 'div {height: 100%;}',
+      paste_data_images: true,
       height: '100%',
       setup: function ($editor) {
         $editor.on('init', function (e) {
+          // NOTE - RJ - 2021-04-28 - appending the content of the textarea
+          // after initialization instead of using TinyMCE's own mechanism works
+          // around a performance issue in Chrome with big base64 images.
+          // See https://github.com/tracim/tracim/issues/4591
+          const body = $editor.contentDocument.body
+          body.textContent = ''
+          body.appendChild(content)
+
           // INFO - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag at the end of the text in order to start the text outside the other existing tags
           const id = uniqueId()
           if ($editor.getBody().textContent) {
@@ -139,19 +165,8 @@ import { uniqueId } from 'lodash'
           icon: 'mce-ico mce-i-image',
           title: 'Image',
           onclick: function () {
-            const hiddenTinymceFileInput = $('#hidden_tinymce_fileinput')
-            if (hiddenTinymceFileInput.length > 0) hiddenTinymceFileInput.remove()
-
-            const fileTag = document.createElement('input')
-            fileTag.id = 'hidden_tinymce_fileinput'
-            fileTag.type = 'file'
-            fileTag.style.display = 'none'
-            $('body').append(fileTag)
-
-            hiddenTinymceFileInput.on('change', function () {
-              base64EncodeAndTinyMceInsert($(this)[0].files)
-            })
-
+            $editor.focus()
+            hiddenTinymceFileInput.value = ''
             hiddenTinymceFileInput.click()
           }
         })
@@ -166,6 +181,7 @@ import { uniqueId } from 'lodash'
           icon: 'mce-ico mce-i-fullscreen',
           title: 'Fullscreen',
           onclick: function () {
+            $editor.focus()
             const headerHeight = 61 // 61px is Tracim's header height
             var iframeElement = $editor.getWin()
 

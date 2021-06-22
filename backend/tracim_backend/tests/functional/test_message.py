@@ -72,6 +72,7 @@ def create_workspace_messages(
             entity_type=tracim_event.EntityType.WORKSPACE,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 1}, "workspace": {"workspace_id": 1}},
+            workspace_id=1,
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -85,6 +86,7 @@ def create_workspace_messages(
             entity_type=tracim_event.EntityType.WORKSPACE_MEMBER,
             operation=tracim_event.OperationType.MODIFIED,
             fields={"author": {"user_id": 2}, "workspace": {"workspace_id": 2}},
+            workspace_id=2,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))

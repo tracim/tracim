@@ -11,12 +11,15 @@ describe('Dashboard button list', () => {
   })
 
   it('should have translations', () => {
-    cy.get('[data-cy="contentTypeBtn_contents/thread"]').contains('Start a topic')
+    cy.get('button[title="Start a topic"]').contains('Start a topic')
 
     cy.changeLanguage('fr')
-    cy.get('[data-cy="contentTypeBtn_contents/thread"]').contains('Lancer une discussion')
+    cy.get('button[title="Lancer une discussion"]').contains('Lancer une discussion')
 
     cy.changeLanguage('pt')
-    cy.get('[data-cy="contentTypeBtn_contents/thread"]').contains('Começar uma discussão')
+    cy.get('button[title="Começar uma discussão').contains('Começar uma discussão')
+
+    cy.changeLanguage('de')
+    cy.get('button[title="Começar uma discussão').contains('Diskussion beginnen')
   })
 })

@@ -8,6 +8,7 @@ import { CONTENT_TYPE } from 'tracim_frontend_lib'
 describe('<Preview />', () => {
   const props = {
     content,
+    link: '/',
     t: key => key
   }
 

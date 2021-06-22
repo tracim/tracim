@@ -24,17 +24,17 @@ describe('<SelectStatus />', () => {
 
   describe('Static design', () => {
     it('should have the button enabled when the property disabled is false', () =>
-      expect(wrapper.find('#dropdownMenuButton').prop('disabled')).to.equal(props.disabled)
+      expect(wrapper.find('.dropdownMenuButton').prop('disabled')).to.equal(props.disabled)
     )
 
     it('should have the button disabled when the property disabled is true', () => {
       wrapper.setProps({ disabled: true })
-      expect(wrapper.find('#dropdownMenuButton').prop('disabled')).to.equal(true)
+      expect(wrapper.find('.dropdownMenuButton').prop('disabled')).to.equal(true)
       wrapper.setProps({ disabled: props.disabled })
     })
 
     it(`should display "${props.selectedStatus.label}" in the dropdownbtn`, () => {
-      expect(wrapper.find('#dropdownMenuButton')).to.have.text().contains(props.selectedStatus.label)
+      expect(wrapper.find('.dropdownMenuButton')).to.have.text().contains(props.selectedStatus.label)
     })
 
     it(`should have ${props.availableStatus.length} submenu_item`, () => {

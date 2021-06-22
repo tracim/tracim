@@ -13,27 +13,37 @@ describe('Login after a disconnection ', function () {
     cy.setupBaseDB()
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '?dc=1' }, waitForTlm: false })
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.contains('.flashmessage__container__content__text__paragraph', 'You have been disconnected, please login again')
+      .should('be.visible')
+
+    cy.get('.flashmessage__container__close__icon')
+      .should('be.visible')
+      .click()
+
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=text]')
       .type(login)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('input[type=password]')
       .type(login)
 
-    cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-      .find('.loginpage__card__form__btnsubmit')
+    cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+      .find('.loginpage__main__form__btnsubmit')
       .click()
   })
 
   it('should allow adding a user', function () {
+    cy.get('.pageTitleGeneric__title__label')
+      .should('be.visible')
+
     cy.getTag({ selectorName: s.HEADER })
       .get('[data-cy=adminlink__dropdown__btn]')
       .should('be.visible')
       .click()
 
-    cy.getTag({ selectorName: s.HEADER })
-      .find('[data-cy=adminlink__user__link]')
+    cy.get('[data-cy=adminlink__user__link]')
+      .should('be.visible')
       .click()
 
     cy.getTag({ selectorName: s.ADMIN_USER_PAGE })

@@ -62,3 +62,8 @@ export const postWorkspaceMember = (apiUrl, workspaceId, newMember) =>
     user_username: newMember.username || null,
     role: newMember.role
   })
+
+export const putPublicationEnabled = (apiUrl, workspace, publicationEnabled) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspace.workspace_id}`, {
+    publication_enabled: publicationEnabled
+  })

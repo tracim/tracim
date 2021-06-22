@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING
 from pyramid.interfaces import IAuthorizationPolicy
 from zope.interface import implementer
 
-from tracim_backend import PageNotFound
 from tracim_backend.app_models.contents import ContentTypeList
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import AllUsersAreNotKnown
 from tracim_backend.exceptions import ContentTypeNotAllowed
 from tracim_backend.exceptions import InsufficientUserProfile
 from tracim_backend.exceptions import InsufficientUserRoleInWorkspace
+from tracim_backend.exceptions import PageNotFound
 from tracim_backend.exceptions import TracimException
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
@@ -361,7 +361,7 @@ can_move_content = AndAuthorizationChecker(
 can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments
 is_comment_owner = CommentOwnerChecker()
-can_delete_comment = OrAuthorizationChecker(
+can_edit_comment = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
 )
 # reaction

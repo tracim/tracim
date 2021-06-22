@@ -60,6 +60,25 @@ fi
 
 
 if [ "$mode" = "cypress" ]; then
+    if ! [ -s "$script_dir/functionnal_tests/cypress.json" ]; then
+        cat <<EOF
+It seems you haven't configured Cypress yet. The following command needs to be run before continuing:
+
+cd "$script_dir"; ./setup_functionnal_tests.sh
+
+EOF
+        read -p "Do you want me to run it for you? [Y/n] " -r answer
+
+        if [ "$answer" = "y" ] || [ "$answer" = "Y" ] || [ "$answer" = "" ]; then
+            (cd "$script_dir"; if ! ./setup_functionnal_tests.sh; then
+                echo "Setting up Cypress failed, exiting."
+                exit 1
+            fi)
+        else
+            exit 1
+        fi
+    fi
+
     if [ -z "$cypress_arg" ]; then
         echo "cypress mode needs an argument, ('open' or 'run')"
         exit 1
@@ -122,7 +141,10 @@ fi
 trap teardown HUP INT TERM
 
 export TRACIM_TRANSLATION_SERVICE__ENABLED=True
+export TRACIM_TRANSLATION_SERVICE__ENABLED=True
 export TRACIM_TRANSLATION_SERVICE__PROVIDER=test
+export TRACIM_USER__SELF_REGISTRATION__ENABLED=True
+
 if [ "$mode" = "cypress" ]; then
     run_docker_services "$sleep"
     tracimcli db delete --force || true
@@ -143,7 +165,6 @@ else
     run_docker_services "$sleep"
     if tracimcli db init; then
         echo "Tagging database schema"
-        alembic -c development.ini stamp head
     else
         echo "Upgrading database schema"
         alembic -c development.ini upgrade head

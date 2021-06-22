@@ -22,10 +22,20 @@ require('./ActivityList.styl')
 const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
   [TLM_ET.CONTENT, (activity, breadcrumbsList, onCopyLinkClicked, onEventClicked) => {
     const [entityType, coreEventType, subEntityType] = activity.newestMessage.event_type.split('.')
-    return activity.newestMessage.fields.content.content_type === CONTENT_TYPE.FOLDER
+    const isPublication = activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+    const openInAppLink = PAGE.WORKSPACE.CONTENT(activity.content.workspace_id, activity.content.content_type, activity.content.content_id)
+    const openAsPublicationLink = PAGE.WORKSPACE.PUBLICATION(activity.content.workspace_id, activity.content.content_id)
+    const titleLink = isPublication
+      ? openAsPublicationLink
+      : openInAppLink
+    const previewLink = isPublication
+      ? openAsPublicationLink
+      : openInAppLink
+    return activity.content.content_type === CONTENT_TYPE.FOLDER
       ? (
         <ContentWithoutPreviewActivity
           activity={activity}
+          isPublication={isPublication}
           key={activity.id}
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
@@ -33,16 +43,18 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           lastModificationType={coreEventType}
           lastModificationEntityType={entityType}
           lastModificationSubEntityType={subEntityType}
-          content={serialize(activity.newestMessage.fields.content, serializeContentProps)}
+          content={serialize(activity.content, serializeContentProps)}
         />
       )
       : (
         <FeedItemWithPreview
           breadcrumbsList={breadcrumbsList}
+          contentAvailable={activity.contentAvailable}
           commentList={activity.commentList}
           content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
-          isPublication={activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION}
+          isPublication={isPublication}
+          inRecentActivities
           key={activity.id}
           lastModifier={activity.newestMessage.fields.author}
           lastModificationType={coreEventType}
@@ -52,6 +64,8 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           onClickCopyLink={onCopyLinkClicked}
           onEventClicked={onEventClicked}
           workspaceId={activity.newestMessage.fields.workspace.workspace_id}
+          titleLink={titleLink}
+          previewLink={previewLink}
         />
       )
   }],
@@ -71,7 +85,7 @@ const ActivityList = (props) => {
       isALink: true
     }
 
-    if (activity.contentPath.length > 0) {
+    if (activity.contentAvailable && activity.contentPath.length > 0) {
       return [
         dashboardBreadcrumb,
         ...activity.contentPath.map(crumb => ({
@@ -94,12 +108,15 @@ const ActivityList = (props) => {
       ? componentConstructor(
         activity,
         activity.entityType === TLM_ET.CONTENT ? buildActivityBreadcrumbsList(activity) : [],
-        () => props.onCopyLinkClicked(activity.newestMessage.fields.content),
+        () => props.onCopyLinkClicked(activity.content),
         () => props.onEventClicked(activity)
       )
       : <span>{props.t('Unknown activity type')}</span>
     return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
+
+  // FIXME - MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in withActivity
+  // See this ticket https://github.com/tracim/tracim/issues/4677
 
   const isSubscriptionRequestOrRejection = (activity) => {
     return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
@@ -112,10 +129,18 @@ const ActivityList = (props) => {
       DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
   }
 
+  const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
+    if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
+        !activity.newestMessage.fields.workspace) return true
+    const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
+    if (!currentWorkspace) return true
+    return currentWorkspace.publicationEnabled
+  }
+
   const activityDisplayFilter = (activity) => {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
       (
-        activity.entityType === TLM_ET.CONTENT ||
+        (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
         isSubscriptionRequestOrRejection(activity) ||
         isMemberCreatedOrModified(activity)
       )
@@ -161,7 +186,8 @@ ActivityList.propTypes = {
   onRefreshClicked: PropTypes.func.isRequired,
   onLoadMoreClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
-  onEventClicked: PropTypes.func
+  onEventClicked: PropTypes.func,
+  workspaceList: PropTypes.arrayOf(PropTypes.object)
 }
 
 export default translate()(ActivityList)

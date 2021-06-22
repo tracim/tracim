@@ -1,3 +1,150 @@
+# 3.8.2 / 2021-05-27
+
+### New Features
+ 
+- Add links to the public profile in the favorites page
+- Configuration parameter (in server config) allows disabling the space parent input when creating a space
+
+### Fixed Issues
+
+- UX: [#4551](https://github.com/tracim/tracim/issues/4551)
+- Frontend: [#3796](https://github.com/tracim/tracim/issues/3796),
+[#4190](https://github.com/tracim/tracim/issues/4190),
+[#4430](https://github.com/tracim/tracim/issues/4430),
+[#4573](https://github.com/tracim/tracim/issues/4573),
+[#4637](https://github.com/tracim/tracim/issues/4637),
+[#4646](https://github.com/tracim/tracim/issues/4646),
+[#4654](https://github.com/tracim/tracim/issues/4654)
+- Misc: [#4649](https://github.com/tracim/tracim/issues/4649),
+[#4656](https://github.com/tracim/tracim/issues/4656)
+
+
+### Breaking/Important change
+
+- Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
+:warning: if you not apply this, Tracim can't show the `favicon.ico`.
+- All necessary files to customize Tracim instance (logo, color) must be placed in the `branding/` folder (issue [#4606](https://github.com/tracim/tracim/issues/4606)). A `branding.sample`folder is given as an example. Some manual changes are required to run this version (same process for local installation or docker installation):
+  - for Tracim >= 3.8.0
+  :warning: if you not apply that, Tracim won't start and use your customization
+    - First, it's necessary to backup the existing branding folder if you have added some customization (if not, it's necessary to delete the branding folder: `rm -r /{docker-volume}/etc/branding`). To do that, you need to:
+      - `mv /{docker-volume}/etc/branding/ /{docker-volume}/etc/branding-back/`
+      - The `branding/` folder is created automatically by Tracim if it does not exist
+    - Second, start Tracim 3.8.2 and after that you need to:
+      - if you have customized your `logo.png`:
+        - `mv /{docker-volume}/etc/logo.png /{docker-volume}/etc/branding/images/tracim-logo.png`
+      - if you have customized your `color.json`:
+        - it's better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
+      - if you have customized some files in the old `branding/` folder, you need to copy your file from `/{docker-volume}/etc/branding-back/` folder
+    - Finally, restart Tracim
+  - for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json`
+  :warning: if you not apply that, Tracim can't use your customization
+    - After first start of the version 3.8.2, you need to:
+      - if you have customized your `logo.png`:
+        - `mv /{docker-volume}/etc/logo.png /{docker-volume}/etc/branding/images/tracim-logo.png`
+      - if you have customized your `color.json`:
+        - it's better to change the new `color.json` file available in `/{docker-volume}/etc/branding/` (the new key `"sidebar":` is mandatory and available by default since Tracim 3.8.1)
+
+
+# 3.8.1 / 2021-05-12
+
+### New Features
+
+- The color of the sidebar can be configured in color.json
+- Terms and conditions are displayed when a user signs in for the first time
+- env_settings.md and branding.md have been documented
+- A user can now create a public account
+- The user interface is now available in German
+- The user account interface uses explicit placeholders and labels for guidance
+
+### Fixed Issues
+
+- Frontend: [#3786](https://github.com/tracim/tracim/issues/3786),
+[#3899](https://github.com/tracim/tracim/issues/3899),
+[#4495](https://github.com/tracim/tracim/issues/4495),
+[#4521](https://github.com/tracim/tracim/issues/4521),
+[#4591](https://github.com/tracim/tracim/issues/4591)
+- Frontend/Backend: [#4539](https://github.com/tracim/tracim/issues/4539),
+[#4557](https://github.com/tracim/tracim/issues/4557),
+[#4586](https://github.com/tracim/tracim/issues/4586),
+[#4590](https://github.com/tracim/tracim/issues/4590)
+- Backend: [#3911](https://github.com/tracim/tracim/issues/3911),
+[#4587](https://github.com/tracim/tracim/issues/4587),
+[#4631](https://github.com/tracim/tracim/issues/4631),
+[#4632](https://github.com/tracim/tracim/issues/4632)
+- Docker: [#4603](https://github.com/tracim/tracim/issues/4603)
+- Documentation: [#4619](https://github.com/tracim/tracim/issues/4619)
+
+### Breaking/Important change
+
+- An alternative target language can be chosen for content and comment translation
+- Update pushpin's version
+- Update preview-generator version
+- Change of the graphic charter (tracim logo, standard image for login page)
+
+
+# 3.8.0 / 2021-04-27
+
+### New Features
+
+- Contents can be added to personal favourites
+- The Home/login page can be customized
+- Links in comments and publications are now previewed when possible
+- Subspaces can be folded in the sidebar
+- The dashboard has been improved
+- Comments can be edited and removed
+- User profile can now be reached from places where the user has commented something and from the member's list of a space
+- There is a new button on the content page to open the gallery
+- Files uploaded in a comment can now be opened as a content
+- The space description is now editable using a rich text editor
+
+### Fixed Issues
+
+- Frontend: [#3787](https://github.com/tracim/tracim/issues/3787),
+[#3811](https://github.com/tracim/tracim/issues/3811),
+[#4464](https://github.com/tracim/tracim/issues/4464),
+[#4532](https://github.com/tracim/tracim/issues/4532),
+[#4567](https://github.com/tracim/tracim/issues/4567)
+- Backend: [#4552](https://github.com/tracim/tracim/issues/4552)
+
+### Breaking/Important change
+
+- Some rewording (issue [#4348](https://github.com/tracim/tracim/issues/4348)):
+  - `Open advanced Dashboard` is changed to `Space settings`
+  - `Recent activity` and `Activity feed` is changed to `Recent activities`
+  - `Click here to unsubscribe/subscribe` is changed to `Email notifications`
+
+
+# 3.7.1 / 2021-04-14
+
+### Fixed Issues
+
+- Frontend: fix for a problem where the dashboard blinks in some cases
+
+
+# 3.7.0 / 2021-04-02
+
+### New Features
+
+- You can create your own publications to share information with other members without creating a specific content (like a blog page).
+- You can add reactions to contents using emojis like you can find on social networking platforms or instant messaging tools.
+- The activity feed of a space is now visible in the dashboard and replaces the recent activity view.
+
+### Fixed Issues
+
+- Frontend: [#4341](https://github.com/tracim/tracim/issues/4341)
+
+### Breaking Changes
+
+- Database: databases that were created using Tracim v1 need to be updated manually, [more information here](https://github.com/tracim/tracim/issues/4282#issuecomment-801944438) (issue [#4266](https://github.com/tracim/tracim/issues/4266)).
+
+### Other Changes
+
+- This new version requires a special migration for mysql/mariadb (due to the reaction feature): [tracimcli command line](https://github.com/tracim/tracim/blob/2a6aae281046e7a10bf4c5b24dfc60f81214c709/backend/doc/cli.md#migrate-mysqlmariadb-database-to-utf8mb4-added-for-tracim-37) (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
+- API: this API`/api/workspaces/<workspace_id>/contents` now returns an object containing the contents in "items" instead of a direct list and also contains pagination information when the count/page_token parameters are used (issue [#4264](https://github.com/tracim/tracim/issues/4264)).
+- Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed to a simpler syntax for `user` and adds filtering for the new notification type `reaction` (issue [#4272](https://github.com/tracim/tracim/issues/4272)).
+  - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+
+
 # 3.6.1 / 2021-03-26
 
 ### Fixed Issues

@@ -40,10 +40,10 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import CommentPathFilename
+from tracim_backend.models.context_models import ContentAndUserPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
@@ -55,6 +55,7 @@ from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
+from tracim_backend.models.context_models import KnownContentsQuery
 from tracim_backend.models.context_models import KnownMembersQuery
 from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
@@ -74,6 +75,8 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
+from tracim_backend.models.context_models import TagCreation
+from tracim_backend.models.context_models import TagPath
 from tracim_backend.models.context_models import TranslationQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
@@ -103,6 +106,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
 FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
+DEFAULT_KNOWN_CONTENT_NB_LIMIT = 15
 
 
 class StrippedString(String):
@@ -500,6 +504,44 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
         return UserAllowedSpace(**data)
 
 
+class UserRegistrationSchema(marshmallow.Schema):
+    email = marshmallow.fields.Email(
+        required=True, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
+    )
+    username = String(
+        required=False, example="My-Power_User99", validate=user_username_validator, allow_none=True
+    )
+    password = String(
+        example="8QLa$<w",
+        required=True,
+        validate=user_password_validator,
+        allow_none=True,
+        default=None,
+    )
+    timezone = StrippedString(
+        description=FIELD_TIMEZONE_DESC,
+        example="Europe/Paris",
+        required=False,
+        default="",
+        validate=user_timezone_validator,
+    )
+    public_name = StrippedString(
+        example="John Doe", required=True, default=None, validate=user_public_name_validator
+    )
+    lang = StrippedString(
+        description=FIELD_LANG_DESC,
+        example="en",
+        required=False,
+        validate=user_lang_validator,
+        allow_none=True,
+        default=None,
+    )
+
+    @post_load
+    def register_user(self, data: typing.Dict[str, typing.Any]) -> object:
+        return UserCreation(**data)
+
+
 class UserCreationSchema(marshmallow.Schema):
     email = marshmallow.fields.Email(
         required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
@@ -530,10 +572,7 @@ class UserCreationSchema(marshmallow.Schema):
         validate=user_timezone_validator,
     )
     public_name = StrippedString(
-        example="John Doe",
-        required=False,
-        default=None,
-        # validate=user_public_name_validator
+        example="John Doe", required=False, default=None, validate=user_public_name_validator
     )
     lang = StrippedString(
         description=FIELD_LANG_DESC,
@@ -709,6 +748,15 @@ class ContentIdPathSchema(marshmallow.Schema):
     )
 
 
+class ContentIdBodySchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(
+        example=6,
+        required=True,
+        description="id of a valid content",
+        validate=strictly_positive_int_validator,
+    )
+
+
 class RevisionIdPathSchema(marshmallow.Schema):
     revision_id = marshmallow.fields.Int(example=6, required=True)
 
@@ -806,6 +854,12 @@ class UserWorkspaceIdPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
         return WorkspaceAndUserPath(**data)
 
 
+class UserContentIdPathSchema(UserIdPathSchema, ContentIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ContentAndUserPath(**data)
+
+
 class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
     reaction_id = marshmallow.fields.Int(
         example=6,
@@ -817,6 +871,23 @@ class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return ReactionPath(**data)
+
+
+class TagPathSchema(WorkspaceIdPathSchema):
+    tag_id = marshmallow.fields.Int(
+        example=6,
+        description="id of a valid tag related to content content_id",
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return TagPath(**data)
+
+
+class ContentTagPathSchema(ContentIdPathSchema, TagPathSchema):
+    pass
 
 
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
@@ -869,6 +940,21 @@ class KnownMembersQuerySchema(marshmallow.Schema):
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return KnownMembersQuery(**data)
+
+
+class KnownContentsQuerySchema(marshmallow.Schema):
+    acp = StrippedString(example="test", description="search text to query", required=True)
+
+    limit = marshmallow.fields.Int(
+        example=15,
+        default=DEFAULT_KNOWN_CONTENT_NB_LIMIT,
+        description="limit the number of results to this value, if not 0",
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return KnownContentsQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):
@@ -984,26 +1070,6 @@ class FilterContentQuerySchema(marshmallow.Schema):
     @post_load
     def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentFilter(**data)
-
-
-class ActiveContentFilterQuerySchema(marshmallow.Schema):
-    limit = marshmallow.fields.Int(
-        example=2,
-        default=0,
-        description="if 0 or not set, return all elements, else return only "
-        "the first limit elem (according to offset)",
-        validate=strictly_positive_int_validator,
-    )
-    before_content_id = marshmallow.fields.Int(
-        example=41,
-        default=None,
-        allow_none=True,
-        description="return only content updated before this content",
-    )
-
-    @post_load
-    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
-        return ActiveContentFilter(**data)
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
@@ -1172,6 +1238,12 @@ class WorkspaceModifySchema(marshmallow.Schema):
         allow_none=True,
         default=None,
     )
+    publication_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="define whether a user can create and view publications in this workspace",
+        default=None,
+        allow_none=True,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1217,6 +1289,12 @@ class WorkspaceCreationSchema(marshmallow.Schema):
         required=False,
         validate=positive_int_validator,
     )
+    publication_enabled = marshmallow.fields.Bool(
+        required=False,
+        description="define whether a user can create and view publications in this workspace",
+        default=None,
+        allow_none=True,
+    )
 
     @post_load
     def make_workspace_modifications(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1256,7 +1334,8 @@ class WorkspaceDigestSchema(marshmallow.Schema):
     label = StrippedString(example="Intranet")
 
 
-class WorkspaceSchema(WorkspaceDigestSchema):
+# NOTE - SG - 2021-04-29 - Used to avoid transmitting description in all TLMs
+class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
     access_type = StrippedString(
         example=WorkspaceAccessType.CONFIDENTIAL.value,
         validate=workspace_access_type_validator,
@@ -1268,7 +1347,6 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         required=True,
         description="default role for new users in this workspace",
     )
-    description = StrippedString(example="All intranet data.")
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Workspace creation date"
     )
@@ -1293,6 +1371,14 @@ class WorkspaceSchema(WorkspaceDigestSchema):
         required=True,
         validate=positive_int_validator,
     )
+    publication_enabled = marshmallow.fields.Bool(
+        default=True,
+        description="define whether a user can create and view publications in this workspace",
+    )
+
+
+class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):
+    description = StrippedString(example="All intranet data.")
 
     class Meta:
         description = "Full workspace information"
@@ -1485,7 +1571,7 @@ class ContentCreationSchema(marshmallow.Schema):
         required=True, example="html-document", validate=all_content_types_validator
     )
     content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content",
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -1514,7 +1600,7 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(UserInfoContentAbstractSchema):
-    content_namespace = marshmallow.fields.String(example="content")
+    content_namespace = EnumField(ContentNamespaces, example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     current_revision_id = marshmallow.fields.Int(example=12)
     current_revision_type = StrippedString(
@@ -1566,6 +1652,19 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
 
 class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(ContentDigestSchema, many=True)
+
+
+class FavoriteContentSchema(marshmallow.Schema):
+    user_id = marshmallow.fields.Int(example=3, validate=strictly_positive_int_validator)
+    user = marshmallow.fields.Nested(UserDigestSchema())
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content = marshmallow.fields.Nested(ContentDigestSchema, allow_none=True)
+    original_label = StrippedString(example="Intervention Report 12")
+    original_type = StrippedString(example="html-document", validate=all_content_types_validator)
+
+
+class PaginatedFavoriteContentSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(FavoriteContentSchema, many=True)
 
 
 class ReadStatusSchema(marshmallow.Schema):
@@ -1657,11 +1756,20 @@ class ReactionSchema(marshmallow.Schema):
     )
 
 
+class TagSchema(marshmallow.Schema):
+    tag_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    tag_name = StrippedString(example="todo")
+
+
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
     parent_content_type = String(example="html-document", validate=all_content_types_validator)
+    parent_content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
     parent_label = String(example="This is a label")
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     description = StrippedString(example="This is a description")
@@ -1689,6 +1797,14 @@ class SetReactionSchema(marshmallow.Schema):
     @post_load()
     def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
         return ReactionCreation(**data)
+
+
+class SetTagByNameSchema(marshmallow.Schema):
+    tag_name = StrippedString(example="todo", validate=not_empty_string_validator, required=True)
+
+    @post_load()
+    def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:
+        return TagCreation(**data)
 
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
@@ -1741,6 +1857,11 @@ class SetContentStatusSchema(marshmallow.Schema):
         return SetContentStatus(**data)
 
 
+class TargetLanguageSchema(marshmallow.Schema):
+    code = marshmallow.fields.String(required=True, example="fr")
+    display = marshmallow.fields.String(required=True, example="Français")
+
+
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
@@ -1756,6 +1877,20 @@ class ConfigSchema(marshmallow.Schema):
     instance_name = marshmallow.fields.String()
     email_required = marshmallow.fields.Bool()
     search_engine = marshmallow.fields.String()
+    translation_service__target_languages = marshmallow.fields.Nested(
+        TargetLanguageSchema, many=True
+    )
+    user__self_registration__enabled = marshmallow.fields.Bool()
+    ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
+
+
+class ConditionFileSchema(marshmallow.Schema):
+    title = marshmallow.fields.String()
+    url = marshmallow.fields.URL()
+
+
+class UsageConditionsSchema(marshmallow.Schema):
+    items = marshmallow.fields.Nested(ConditionFileSchema, many=True)
 
 
 class EventSchema(marshmallow.Schema):
@@ -1792,6 +1927,16 @@ class LiveMessageSchemaPage(BasePaginatedSchemaPage):
 
 class ContentPathInfoSchema(marshmallow.Schema):
     items = marshmallow.fields.Nested(ContentMinimalSchema, many=True)
+
+
+class UrlQuerySchema(marshmallow.Schema):
+    url = marshmallow.fields.URL()
+
+
+class UrlPreviewSchema(marshmallow.Schema):
+    title = StrippedString(allow_none=True)
+    description = StrippedString(allow_none=True)
+    image = marshmallow.fields.URL(allow_none=True)
 
 
 class TranslationQuerySchema(FileQuerySchema):

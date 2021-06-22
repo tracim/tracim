@@ -1,117 +1,78 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import Avatar, { AVATAR_SIZE } from '../Avatar/Avatar.jsx'
 import {
   buildFilePreviewUrl,
-  formatAbsoluteDate,
-  removeExtensionOfFilename
+  removeExtensionOfFilename,
+  getFileDownloadUrl
 } from '../../helper.js'
-import EmojiReactions from '../../container/EmojiReactions.jsx'
+import AttachedFile from '../AttachedFile/AttachedFile.jsx'
 
-export const CommentFilePreview = props => {
-  const styleSent = {
-    borderColor: props.customColor
+export class CommentFilePreview extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      fallbackPreview: false
+    }
   }
-  const apiAuthor = props.apiContent.author
-  const createdFormatted = formatAbsoluteDate(props.apiContent.created_raw, props.loggedUser.lang)
-  const fromMe = props.loggedUser.userId === apiAuthor.user_id
 
-  const previewUrl = buildFilePreviewUrl(
-    props.apiUrl,
-    props.apiContent.workspace_id,
-    props.apiContent.content_id,
-    props.apiContent.revision_id,
-    removeExtensionOfFilename(props.apiContent.filename),
-    1, // page
-    380, // width
-    380 // height
-  )
+  handleError = () => {
+    this.setState({ fallbackPreview: true })
+  }
 
-  return (
-    <li className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
-      <div
-        className={classnames(`${props.customClass}`, 'comment', {
-          sent: fromMe,
-          received: !fromMe
-        })}
-        style={fromMe ? styleSent : {}}
+  render () {
+    const { props } = this
+
+    const workspaceId = props.apiContent.workspace_id || props.apiContent.workspaceId
+    const filename = props.apiContent.filename || props.apiContent.fileName
+    const id = props.apiContent.content_id || props.apiContent.id
+    const currentRevisionId = props.apiContent.revision_id || props.apiContent.currentRevisionId
+
+    const previewUrl = buildFilePreviewUrl(
+      props.apiUrl,
+      workspaceId,
+      id,
+      currentRevisionId,
+      removeExtensionOfFilename(filename),
+      1, // page
+      380, // width
+      380 // height
+    )
+
+    const title = props.t('Download {{filename}}', { filename })
+    const fileDownloadUrl = getFileDownloadUrl(
+      props.apiUrl,
+      workspaceId,
+      id,
+      filename
+    )
+
+    return (
+      <a
+        className='CommentFilePreview'
+        title={title}
+        href={fileDownloadUrl}
+        download
       >
-        <div
-          className={classnames(`${props.customClass}__body`, 'comment__body')}
-        >
-          <div className='comment__body__content'>
-            <Avatar
-              size={AVATAR_SIZE.MEDIUM}
-              user={apiAuthor}
-              apiUrl={props.apiUrl}
-            />
-            <div className='comment__body__content__text'>
-              <div className={classnames(`${props.customClass}__body__author`, 'comment__body__author')}>
-                {apiAuthor.public_name}
-              </div>
-
-              <div
-                className={classnames(`${props.customClass}__body__date`, 'comment__body__date')}
-                title={createdFormatted}
-              >
-                {props.apiContent.created}
-              </div>
-
-              <div
-                className={classnames(`${props.customClass}__body__text`, 'comment__body__text')}
-              >
-                <img
-                  className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
-                  src={previewUrl}
-                  alt={props.apiContent.filename}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className={classnames(`${props.customClass}__footer`, 'comment__footer')}>
-            <EmojiReactions
-              apiUrl={props.apiUrl}
-              loggedUser={props.loggedUser}
-              contentId={props.apiContent.content_id}
-              workspaceId={props.apiContent.workspace_id}
-            />
-          </div>
-        </div>
-      </div>
-    </li>
-  )
+        {(!props.isPublication) && <AttachedFile fileName={filename} />}
+        {(!this.state.fallbackPreview &&
+          <img
+            className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
+            src={previewUrl}
+            alt={filename}
+            onError={this.handleError}
+          />
+        )}
+      </a>
+    )
+  }
 }
 
-export default CommentFilePreview
+export default translate()(CommentFilePreview)
 
 CommentFilePreview.propTypes = {
-  customClass: PropTypes.string,
-  customColor: PropTypes.string,
-  apiUrl: PropTypes.string,
-  apiContent: PropTypes.object,
-  loggedUser: PropTypes.object
-}
-
-CommentFilePreview.defaultProps = {
-  customClass: '',
-  customColor: '',
-  apiUrl: '',
-  apiContent: {
-    author: {
-      user_id: '',
-      public_name: ''
-    },
-    created_raw: '',
-    workspace_id: '',
-    content_id: '',
-    revision_id: '',
-    filename: '',
-    created: ''
-  },
-  loggedUser: {
-    lang: '',
-    userId: ''
-  }
+  apiUrl: PropTypes.string.isRequired,
+  apiContent: PropTypes.object.isRequired,
+  isPublication: PropTypes.bool.isRequired
 }

@@ -70,6 +70,10 @@ class ReactionAlreadyExistError(TracimError):
     error_code = ErrorCode.REACTION_ALREADY_EXISTS
 
 
+class TagAlreadyExistsError(TracimError):
+    error_code = ErrorCode.TAG_ALREADY_EXISTS
+
+
 class ForceArgumentNeeded(TracimException):
     pass
 
@@ -92,6 +96,10 @@ class DaemonException(TracimException):
 
 class AlreadyRunningDaemon(DaemonException):
     pass
+
+
+class UserSelfRegistrationDisabledException(TracimException):
+    error_code = ErrorCode.USER_SELF_REGISTRATION_DISABLED
 
 
 class WorkspaceAgendaDisabledException(TracimException):
@@ -172,6 +180,10 @@ class WorkspaceNotFound(NotFound):
 
 class ReactionNotFound(NotFound):
     error_code = ErrorCode.REACTION_NOT_FOUND
+
+
+class TagNotFound(NotFound):
+    error_code = ErrorCode.TAG_NOT_FOUND
 
 
 class UploadPermissionNotFound(NotFound):
@@ -301,6 +313,10 @@ class InvalidUserId(InvalidId):
 
 class ContentNotFound(TracimException):
     error_code = ErrorCode.CONTENT_NOT_FOUND
+
+
+class FavoriteContentNotFound(TracimException):
+    error_code = ErrorCode.FAVORITE_CONTENT_NOT_FOUND
 
 
 class ContentTypeNotAllowed(TracimException):
@@ -541,7 +557,11 @@ class UsernameAlreadyExists(TracimException):
 
 
 class UnavailablePreview(TracimException):
-    error_code = ErrorCode.UNAIVALABLE_PREVIEW
+    error_code = ErrorCode.UNAVAILABLE_FILE_PREVIEW
+
+
+class UnavailableURLPreview(TracimException):
+    error_code = ErrorCode.UNAVAILABLE_URL_PREVIEW
 
 
 class EmptyNotificationError(TracimException):
@@ -634,3 +654,7 @@ class AdvancedSearchNotEnabled(TracimException):
 
 class IndexingError(TracimException):
     pass
+
+
+class WorkspaceFeatureDisabled(TracimException):
+    error_code = ErrorCode.WORKSPACE_FEATURE_DISABLED

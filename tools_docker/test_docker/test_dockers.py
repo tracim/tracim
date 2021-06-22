@@ -91,12 +91,10 @@ def test_default_file_created(tracim):
     assert tracim.file("/etc/uwsgi/apps-available/tracim_web.ini").is_symlink
     assert tracim.file("/etc/uwsgi/apps-enabled/tracim_web.ini").is_symlink
 
-    assert tracim.file("/etc/tracim/color.json").is_file
-    assert tracim.file("/tracim/color.json").is_symlink
+    assert tracim.file("/etc/tracim/branding/color.json").is_file
+    assert tracim.file("/etc/tracim/branding/tracim-logo.png").is_file
+    assert tracim.file("/tracim/frontend/dist/assets/branding").is_directory
 
-    assert tracim.file("/etc/tracim/logo.png").is_file
-    assert tracim.file("/tracim/frontend/dist/assets/images/logo-tracim.png.default").is_file
-    assert tracim.file("/tracim/frontend/dist/assets/images/logo-tracim.png").is_symlink
     assert tracim.file("/etc/tracim/plugins").is_directory
     assert tracim.file("/etc/tracim/custom_toolbox").is_directory
 

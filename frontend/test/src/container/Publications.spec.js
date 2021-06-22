@@ -10,14 +10,13 @@ import { firstWorkspace } from '../../fixture/workspace/firstWorkspace.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   mockGetContentComments200,
+  mockGetFileChildContent200,
   mockGetPublicationList200,
   mockPostThreadPublication204
 } from '../../apiMock.js'
 import {
-  ADD,
   APPEND,
   BREADCRUMBS,
-  COMMENT,
   COMMENT_LIST,
   HEAD_TITLE,
   PUBLICATION,
@@ -28,12 +27,11 @@ import {
 } from '../../../src/action-creator.sync.js'
 
 describe('<Publications />', () => {
-  const addCommentListToPublicationCallBack = sinon.spy()
-  const appendCommentToPublicationCallBack = sinon.spy()
   const appendPublicationCallBack = sinon.spy()
   const updatePublicationCallBack = sinon.spy()
   const removePublicationCallBack = sinon.spy()
   const setBreadcrumbsCallBack = sinon.spy()
+  const setCommentListToPublicationCallBack = sinon.spy()
   const setHeadTitleCallBack = sinon.spy()
   const setPublicationListCallBack = sinon.spy()
 
@@ -43,13 +41,12 @@ describe('<Publications />', () => {
     }
 
     switch (param.type) {
-      case `${ADD}/${PUBLICATION}/${COMMENT_LIST}`: addCommentListToPublicationCallBack(); break
       case `${APPEND}/${PUBLICATION}`: appendPublicationCallBack(); break
-      case `${APPEND}/${PUBLICATION}/${COMMENT}`: appendCommentToPublicationCallBack(); break
       case `${UPDATE}/${PUBLICATION}`: updatePublicationCallBack(); break
       case `${REMOVE}/${PUBLICATION}`: removePublicationCallBack(); break
       case `${SET}/${BREADCRUMBS}`: setBreadcrumbsCallBack(); break
       case `${SET}/${HEAD_TITLE}`: setHeadTitleCallBack(); break
+      case `${SET}/${PUBLICATION}/${COMMENT_LIST}`: setCommentListToPublicationCallBack(); break
       case `${SET}/${WORKSPACE_PUBLICATION_LIST}`: setPublicationListCallBack(); break
       default:
         return param
@@ -57,6 +54,8 @@ describe('<Publications />', () => {
   }
 
   const props = {
+    addCommentToTimeline: () => {},
+    buildTimelineFromCommentAndRevision: () => [],
     dispatch: dispatchCallBack,
     setApiUrl: () => {},
     registerLiveMessageHandlerList: () => {},
@@ -87,14 +86,16 @@ describe('<Publications />', () => {
       content: {
         content_id: 12,
         content_namespace: 'publication',
-        parent_id: 9
+        parent_id: null,
+        workspace_id: firstWorkspace.id
       },
       client_token: ''
     }
   }
 
   mockGetPublicationList200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, [])
-  mockGetContentComments200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, props.publicationList[0].id, [])
+  mockGetContentComments200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
+  mockGetFileChildContent200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
   mockPostThreadPublication204(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
 
   describe('handleContentCreatedOrRestored()', () => {
@@ -105,13 +106,25 @@ describe('<Publications />', () => {
   })
 
   describe('handleContentCommented()', () => {
-    it('should call appendCommentToPublication()', () => {
-      PublicationsInstance.handleContentCommented(publicationTLM)
-      expect(appendCommentToPublicationCallBack.called).to.equal(true)
+    it('should call setCommentListToPublication()', () => {
+      PublicationsInstance.handleContentCommented({
+        ...publicationTLM,
+        fields: {
+          ...publicationTLM.fields,
+          content: { ...publicationTLM.fields.content, parent_id: 9 }
+        }
+      })
+      expect(setCommentListToPublicationCallBack.called).to.equal(true)
     })
 
     it('should call updatePublication()', () => {
-      PublicationsInstance.handleContentCommented(publicationTLM)
+      PublicationsInstance.handleContentCommented({
+        ...publicationTLM,
+        fields: {
+          ...publicationTLM.fields,
+          content: { ...publicationTLM.fields.content, parent_id: 9 }
+        }
+      })
       expect(updatePublicationCallBack.called).to.equal(true)
     })
   })
@@ -153,9 +166,12 @@ describe('<Publications />', () => {
   })
 
   describe('getCommentList()', () => {
-    it('should call addCommentListToPublication()', (done) => {
-      PublicationsInstance.getCommentList(publicationTLM.fields.content).then(() => {
-        expect(addCommentListToPublicationCallBack.called).to.equal(true)
+    it('should call setCommentListToPublication()', (done) => {
+      PublicationsInstance.getCommentList(
+        content.id,
+        publicationTLM.fields.content.content_namespace
+      ).then(() => {
+        expect(setCommentListToPublicationCallBack.called).to.equal(true)
       }).then(done, done)
     })
   })

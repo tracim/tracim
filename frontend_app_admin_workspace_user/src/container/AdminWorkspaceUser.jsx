@@ -366,7 +366,7 @@ export class AdminWorkspaceUser extends React.Component {
       is_active: message.fields.user.is_active,
       role: message.fields.member.role
     })
-    const newWorkspace = { ...message.workspace, memberList: newMemberList }
+    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       newWorkspace,
@@ -434,8 +434,8 @@ export class AdminWorkspaceUser extends React.Component {
 
     if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
       this.sendGlobalFlashMsg(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
-      )
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
+        'warning')
       return
     }
 
@@ -535,6 +535,7 @@ export class AdminWorkspaceUser extends React.Component {
           userRoleIdInWorkspace: ROLE.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
         },
         config: {
+          history: state.config.history,
           label: 'Advanced dashboard',
           slug: 'workspace_advanced',
           faIcon: 'fas fa-users',

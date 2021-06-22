@@ -60,6 +60,8 @@ describe('appContentFactory.js', () => {
         'appContentCustomEventHandlerAllAppChangeLanguage',
         'appContentChangeTitle',
         'appContentChangeComment',
+        'appContentDeleteComment',
+        'appContentEditComment',
         'appContentAddCommentAsFile',
         'appContentNotifyAll',
         'appContentSaveNewComment',
@@ -71,9 +73,15 @@ describe('appContentFactory.js', () => {
         'appContentRestoreArchive',
         'appContentRestoreDelete',
         'buildTimelineFromCommentAndRevision',
-        'searchForMentionInQuery',
+        'searchForMentionOrLinkInQuery',
         'handleTranslateComment',
-        'handleRestoreComment'
+        'handleRestoreComment',
+        'addContentToFavoriteList',
+        'isContentInFavoriteList',
+        'loadFavoriteContentList',
+        'removeContentFromFavoriteList',
+        'removeCommentFromTimeline',
+        'updateCommentOnTimeline'
       )
     })
   })
@@ -324,17 +332,17 @@ describe('appContentFactory.js', () => {
       let response
       const newComment = 'Edited comment'
       const fakeTinymceSetContent = sinon.spy()
+      const activeEditor = {
+        dom: {
+          select: () => []
+        },
+        getContent: () => newComment,
+        setContent: fakeTinymceSetContent
+      }
+
       global.tinymce = {
         ...global.tinymce,
-        get: () => ({
-          setContent: fakeTinymceSetContent
-        }),
-        activeEditor: {
-          dom: {
-            select: () => []
-          },
-          getContent: () => newComment
-        }
+        get: (id) => activeEditor
       }
 
       before(async () => {
@@ -344,7 +352,7 @@ describe('appContentFactory.js', () => {
           lang: 'en'
         }
         const isCommentWysiwyg = true
-        mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment)
+        mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment, fakeContent.content_namespace)
         response = await wrapper.instance().saveCommentAsText(
           fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, loggedUser, 'foo'
         )

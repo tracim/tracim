@@ -1,7 +1,7 @@
 <VirtualHost *:80>
 
     Alias "/assets" "/tracim/frontend/dist/assets"
-    Alias "/favicon.ico" "/tracim/frontend/dist/assets/favicon.ico"
+    Alias "/favicon.ico" "/tracim/frontend/dist/assets/branding/images/favicon/favicon.ico"
     <Directory "/tracim/frontend/dist/assets">
         Require all granted
         RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'

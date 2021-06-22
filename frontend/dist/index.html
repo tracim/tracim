@@ -5,13 +5,13 @@
   <meta name='viewport' content='width=device-width, user-scalable=no'>
   <title>Tracim</title>
   <link class="tracim__favicon" rel="icon" type="image/png" sizes="64x64"
-    href="/assets/images/favicon/tracim_64x64.png">
+    href="/assets/branding/images/favicon/tracim-64x64.png">
   <link class="tracim__favicon" rel="icon" type="image/png" sizes="32x32"
-    href="/assets/images/favicon/tracim_32x32.png">
+    href="/assets/branding/images/favicon/tracim-32x32.png">
   <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16"
-    href="/assets/images/favicon/tracim_16x16.png">
+    href="/assets/branding/images/favicon/tracim-16x16.png">
 
-  <link rel='manifest' href='/assets/manifest.json'>
+  <link rel='manifest' href='/assets/branding/manifest.json'>
 
   <link rel='stylesheet' type='text/css' href='/assets/font/fontawesome-free-5.15.2-web/css/all.css'>
   <link rel='stylesheet' type='text/css' href='/assets/font/fontawesome-free-5.15.2-web/css/regular.css'>
@@ -19,91 +19,35 @@
   <link rel='stylesheet' type='text/css' href='/assets/bootstrap/bootstrap-4.0.0-beta.css'>
 
   <style>
-    .primaryColorFont {
-      color: #7d4e24;
-    }
+      .primaryColorFont { color: #2f7d30; }
+      .primaryColorFontDarken { color: #286a29; }
+      .primaryColorFontLighten { color: #369037; }
 
-    .primaryColorFontDarken {
-      color: #522c00;
-    }
-
-    .primaryColorFontLighten {
-      color: #a37346;
-    }
-
-    .primaryColorFontHover:hover {
-      color: #7d4e24;
-    }
-
-    .primaryColorFontDarkenHover:hover {
-      color: #522c00;
-    }
-
-    .primaryColorFontLightenHover:hover {
-      color: #a37346;
-    }
+      .primaryColorFontHover:hover { color: #2f7d30; }
+      .primaryColorFontDarkenHover:hover { color: #286a29; }
+      .primaryColorFontLightenHover:hover { color: #369037; }
 
 
-    .primaryColorBg {
-      background-color: #7d4e24;
-    }
+      .primaryColorBg { background-color: #2f7d30; }
+      .primaryColorBgDarken { background-color: #286a29; }
+      .primaryColorBgLighten { background-color: #369037; }
 
-    .primaryColorBgDarken {
-      background-color: #522c00;
-    }
+      .primaryColorBgHover:hover { background-color: #2f7d30; }
+      .primaryColorBgDarkenHover:hover { background-color: #286a29; }
+      .primaryColorBgLightenHover:hover { background-color: #369037; }
 
-    .primaryColorBgLighten {
-      background-color: #a37346;
-    }
-
-    .primaryColorBgHover:hover {
-      background-color: #7d4e24;
-    }
-
-    .primaryColorBgDarkenHover:hover {
-      background-color: #522c00;
-    }
-
-    .primaryColorBgLightenHover:hover {
-      background-color: #a37346;
-    }
-
-    .primaryColorBgActive:active {
-      background-color: #7d4e24;
-    }
-
-    .primaryColorBgDarkenActive:active {
-      background-color: #522c00;
-    }
-
-    .primaryColorBgLightenActive:active {
-      background-color: #a37346;
-    }
+      .primaryColorBgActive:active { background-color: #2f7d30; }
+      .primaryColorBgDarkenActive:active { background-color: #286a29; }
+      .primaryColorBgLightenActive:active { background-color: #369037; }
 
 
-    .primaryColorBorder {
-      border-color: #7d4e24;
-    }
+      .primaryColorBorder { border-color: #2f7d30; }
+      .primaryColorBorderDarken { border-color: #286a29; }
+      .primaryColorBorderLighten { border-color: #369037; }
 
-    .primaryColorBorderDarken {
-      border-color: #522c00;
-    }
-
-    .primaryColorBorderLighten {
-      border-color: #a37346;
-    }
-
-    .primaryColorBorderHover:hover {
-      border-color: #7d4e24;
-    }
-
-    .primaryColorBorderDarkenHover:hover {
-      border-color: #522c00;
-    }
-
-    .primaryColorBorderLightenHover:hover {
-      border-color: #a37346;
-    }
+      .primaryColorBorderHover:hover { border-color: #2f7d30; }
+      .primaryColorBorderDarkenHover:hover { border-color: #286a29; }
+      .primaryColorBorderLightenHover:hover { border-color: #369037; }
   </style>
 
   <style>
@@ -116,6 +60,12 @@
       font-family: 'Quicksand';
       src: url('/assets/font/Quicksand/Quicksand-Bold.ttf');
       font-weight: bold;
+    }
+
+    :root {
+        --sidebarColor: #333;
+        --sidebarColorDarken: #2b2b2b;
+        --sidebarColorLighten: #3b3b3b;
     }
 
     body {
@@ -131,6 +81,7 @@
 
 <body>
   <div id='content'></div>
+  <div id='welcome'><h1>Welcome to Tracim dev</h1></div>
 
   <!--
   INFO - CH - 2021-01-14

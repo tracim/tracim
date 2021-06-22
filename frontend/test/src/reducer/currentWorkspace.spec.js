@@ -8,8 +8,6 @@ import {
   ADD,
   addWorkspaceContentList,
   addWorkspaceMember,
-  APPEND,
-  appendWorkspaceRecentActivityList,
   deleteWorkspaceContentList,
   FOLDER_READ,
   REMOVE,
@@ -21,7 +19,6 @@ import {
   setWorkspaceDetail,
   setWorkspaceMemberList,
   setWorkspaceReadStatusList,
-  setWorkspaceRecentActivityList,
   UPDATE,
   updateUser,
   updateUserWorkspaceSubscriptionNotif,
@@ -38,7 +35,6 @@ import {
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_READ_STATUS,
   WORKSPACE_READ_STATUS_LIST,
-  WORKSPACE_RECENT_ACTIVITY_LIST,
   WORKSPACE_CONTENT_SHARE_FOLDER
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
@@ -63,7 +59,8 @@ describe('reducer currentWorkspace.js', () => {
           description: firstWorkspaceFromApi.description,
           agendaEnabled: firstWorkspaceFromApi.agenda_enabled,
           downloadEnabled: firstWorkspaceFromApi.public_download_enabled,
-          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled
+          uploadEnabled: firstWorkspaceFromApi.public_upload_enabled,
+          publicationEnabled: firstWorkspaceFromApi.publication_enabled
         })
       })
     })
@@ -143,12 +140,16 @@ describe('reducer currentWorkspace.js', () => {
         username: 'random'
       }
       const initialStateWithMember = { ...initialState, memberList: [randomMember] }
-      const rez = currentWorkspace(
-        initialStateWithMember,
-        addWorkspaceMember(globalManagerFromApi, initialState.id, { role: ROLE.workspaceManager.slug, do_notify: true })
-      )
-
       it('should return a workspace object with the new member', () => {
+        const rez = currentWorkspace(
+          initialStateWithMember,
+          addWorkspaceMember(
+            globalManagerFromApi,
+            initialState.id,
+            { role: ROLE.workspaceManager.slug, do_notify: true }
+          )
+        )
+
         expect(rez).to.deep.equal({
           ...initialState,
           memberList: [
@@ -156,6 +157,19 @@ describe('reducer currentWorkspace.js', () => {
             serializeMember(globalManagerAsMemberFromApi)
           ]
         })
+      })
+
+      it('should return a uniq by id object the same member is added twice', () => {
+        const rez = currentWorkspace(
+          initialStateWithMember,
+          addWorkspaceMember(
+            { user_id: randomMember.id },
+            initialState.id,
+            randomMember
+          )
+        )
+
+        expect(rez).to.deep.equal(initialStateWithMember)
       })
     })
 
@@ -203,39 +217,6 @@ describe('reducer currentWorkspace.js', () => {
             ...globalManagerAsMember,
             doNotify: false
           }]
-        })
-      })
-    })
-
-    describe(`${SET}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, () => {
-      const initialStateWithRecentActivity = {
-        ...initialState,
-        recentActivityList: [{ id: 42, dummyProperty: 'nothing' }]
-      }
-      const rez = currentWorkspace(initialStateWithRecentActivity, setWorkspaceRecentActivityList([contentFromApi]))
-      it('should return a workspace object with a recent activity list with only the added content', () => {
-        expect(rez).to.deep.equal({
-          ...initialStateWithRecentActivity,
-          recentActivityList: [serialize(contentFromApi, serializeContentProps)]
-        })
-      })
-    })
-
-    describe(`${APPEND}/${WORKSPACE_RECENT_ACTIVITY_LIST}`, () => {
-      const initialStateWithRecentActivity = {
-        ...initialState,
-        recentActivityList: [
-          serialize({ ...contentFromApi, content_id: 42, label: 'content for test' }, serializeContentProps)
-        ]
-      }
-      const rez = currentWorkspace(initialStateWithRecentActivity, appendWorkspaceRecentActivityList([contentFromApi]))
-      it('should return a workspace object with a recent activity list with the added content at the end', () => {
-        expect(rez).to.deep.equal({
-          ...initialStateWithRecentActivity,
-          recentActivityList: [
-            ...initialStateWithRecentActivity.recentActivityList,
-            serialize(contentFromApi, serializeContentProps)
-          ]
         })
       })
     })

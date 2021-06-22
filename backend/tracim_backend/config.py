@@ -63,6 +63,11 @@ class DepotFileStorageType(Enum):
         self.depot_storage_backend = depot_storage_backend
 
 
+def create_target_langage(value: str) -> typing.Tuple[str, str]:
+    code, display = value.split(":")
+    return (code, display)
+
+
 class ConfigParam(object):
     def __init__(
         self,
@@ -173,6 +178,10 @@ class CFG(object):
             )
 
     # INFO - G.M - 2019-04-05 - Utils Methods
+
+    @property
+    def branding_folder_path(self) -> str:
+        return os.path.join(self.FRONTEND__DIST_FOLDER_PATH, "assets", "branding")
 
     def deprecate_parameter(
         self, parameter_name: str, parameter_value: typing.Any, extended_information: str,
@@ -365,10 +374,6 @@ class CFG(object):
         self.DEFAULT_LANG = self.get_raw_config("default_lang", DEFAULT_FALLBACK_LANG)
         backend_folder = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         tracim_folder = os.path.dirname(backend_folder)
-        default_color_config_file_path = os.path.join(tracim_folder, "color.json")
-        self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
-            "color.config_file_path", default_color_config_file_path
-        )
         default_preview_cache_dir = self.here_macro_replace("%(here)s/previews")
         self.PREVIEW_CACHE_DIR = self.get_raw_config("preview_cache_dir", default_preview_cache_dir)
 
@@ -390,6 +395,19 @@ class CFG(object):
         self.SESSION__HTTPONLY = asbool(self.get_raw_config("session.httponly", "True"))
         self.SESSION__SECURE = asbool(self.get_raw_config("session.secure", "False"))
         self.WEBSITE__TITLE = self.get_raw_config("website.title", "Tracim")
+        self.WEBSITE__DESCRIPTION = self.get_raw_config("website.description", "")
+        self.WEBSITE__USAGE_CONDITIONS = string_to_unique_item_list(
+            self.get_raw_config("website.usage_conditions", ""),
+            separator=",",
+            cast_func=str,
+            do_strip=True,
+        )
+        self.WEBSITE__WELCOME_PAGE = self.get_raw_config(
+            "website.welcome_page", "welcome-simple.html"
+        )
+        self.WEBSITE__WELCOME_PAGE_STYLE = self.get_raw_config(
+            "website.welcome_page_style", "welcome-simple.css"
+        )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
             "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*",
@@ -429,7 +447,9 @@ class CFG(object):
             )
         )
         self.USER__DEFAULT_PROFILE = self.get_raw_config("user.default_profile", Profile.USER.slug)
-
+        self.USER__SELF_REGISTRATION__ENABLED = asbool(
+            self.get_raw_config("user.self_registration.enabled", "False")
+        )
         default_user_custom_properties_path = self.here_macro_replace(
             "%(here)s/tracim_backend/templates/user_custom_properties/default/"
         )
@@ -490,6 +510,12 @@ class CFG(object):
         self.FRONTEND__DIST_FOLDER_PATH = self.get_raw_config(
             "frontend.dist_folder_path", frontend_dist_folder
         )
+
+        default_color_config_file_path = os.path.join(self.branding_folder_path, "color.json")
+        self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
+            "color.config_file_path", default_color_config_file_path
+        )
+
         default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")
         self.PLUGIN__FOLDER_PATH = self.get_raw_config(
             "plugin.folder_path", default_plugin_folder_path
@@ -497,6 +523,14 @@ class CFG(object):
 
         self.FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH = self.get_raw_config(
             "frontend.custom_toolbox_folder_path", None
+        )
+
+        self.URL_PREVIEW__FETCH_TIMEOUT = int(
+            self.get_raw_config("url_preview.fetch_timeout", "30")
+        )
+
+        self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
+            self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
     def __load_uploaded_files_config(self) -> None:
@@ -837,6 +871,19 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
+        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch"
+        target_language_pairs = string_to_unique_item_list(
+            self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
+            separator=",",
+            cast_func=create_target_langage,
+            do_strip=True,
+        )
+        try:
+            self.TRANSLATION_SERVICE__TARGET_LANGUAGES = [
+                {"code": code, "display": display} for code, display in target_language_pairs
+            ]
+        except ValueError:
+            raise ConfigurationError("The value of {}.target_languages is malformed".format(prefix))
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 
@@ -908,12 +955,15 @@ class CFG(object):
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
         )
 
-        try:
-            self.APPS_COLORS["primary"]
-        except KeyError as e:
-            raise ConfigurationError(
-                "Error: primary color is required in {} file".format(self.COLOR__CONFIG_FILE_PATH)
-            ) from e
+        for required_color in ("primary", "sidebar"):
+            try:
+                self.APPS_COLORS[required_color]
+            except KeyError as e:
+                raise ConfigurationError(
+                    "Error: {} color is required in {} file".format(
+                        required_color, self.COLOR__CONFIG_FILE_PATH
+                    )
+                ) from e
 
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
         self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
@@ -934,14 +984,14 @@ class CFG(object):
         )
 
         # INFO - G.M - 2018-08-06 - We check dist folder existence
-        if self.FRONTEND__SERVE:
-            self.check_mandatory_param(
-                "FRONTEND__DIST_FOLDER_PATH",
-                self.FRONTEND__DIST_FOLDER_PATH,
-                when_str="if frontend serving is activated",
-            )
-            self.check_directory_path_param(
-                "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
+        self.check_directory_path_param(
+            "FRONTEND__DIST_FOLDER_PATH", self.FRONTEND__DIST_FOLDER_PATH
+        )
+
+        for condition_file_name in self.WEBSITE__USAGE_CONDITIONS:
+            condition_file_path = os.path.join(self.branding_folder_path, condition_file_name)
+            self.check_file_path_param(
+                param_name="WEBSITE__USAGE_CONDITIONS", path=condition_file_path
             )
 
         if self.USER__DEFAULT_PROFILE not in Profile.get_all_valid_slugs():
@@ -999,6 +1049,13 @@ class CFG(object):
 
         self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA = json_schema
         self.USER__CUSTOM_PROPERTIES__UI_SCHEMA = ui_schema
+
+        if self.URL_PREVIEW__FETCH_TIMEOUT < 1:
+            raise ConfigurationError(
+                'ERROR  "{}" should be a strictly positive value (currently "{}")'.format(
+                    "URL_PREVIEW__FETCH_TIMEOUT", self.URL_PREVIEW__FETCH_TIMEOUT
+                )
+            )
 
     def _check_uploaded_files_config_validity(self) -> None:
         self.check_mandatory_param(

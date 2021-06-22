@@ -6,6 +6,7 @@ import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
+import dateFnsDe from 'date-fns/locale/de'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -16,6 +17,7 @@ import {
 } from './action.async.js'
 
 export const PAGE = {
+  CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,
   HOME: '/ui',
   WORKSPACE: {
     ROOT: '/ui/workspaces',
@@ -29,7 +31,8 @@ export const PAGE = {
     CONTENT_EDITION: (idws = ':idws', idcts = ':idcts') => `/ui/online_edition/workspaces/${idws}/contents/${idcts}`,
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
     RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
-    PUBLICATION: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
+    PUBLICATION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/publications/${idcts}`,
+    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -49,13 +52,15 @@ export const PAGE = {
   JOIN_WORKSPACE: '/ui/join-workspace',
   RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
-  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`
+  PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`,
+  FAVORITES: '/ui/favorites'
 }
 
 export const DATE_FNS_LOCALE = {
   fr: dateFnsFr,
   en: dateFnsEn,
-  pt: dateFnsPt
+  pt: dateFnsPt,
+  de: dateFnsDe
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -458,7 +463,15 @@ export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, 
   return `${apiUrl}/workspaces/${workspaceId}/files/${contentId}${rev}/preview/jpg/${width}x${height}/${encodeURIComponent(filenameNoExtension) + '.jpg'}?page=${page}`
 }
 
-export const removeExtensionOfFilename = filename => filename.split('.').splice(0, (filename.split('.').length - 1)).join('.')
+export const splitFilenameExtension = filename => {
+  const match = filename.match(/^([\s\S]*?)((?:\.tar)?(?:\.[^.]+))$/)
+  return {
+    basename: match ? match[1] : filename,
+    extension: match ? match[2] : ''
+  }
+}
+
+export const removeExtensionOfFilename = filename => splitFilenameExtension(filename).basename
 
 export const computeProgressionPercentage = (progressionLoaded, progressionTotal, elementListLength = 1) => (progressionLoaded / progressionTotal * 99) / elementListLength
 
@@ -672,7 +685,12 @@ export const createSpaceTree = spaceList => {
 
 export const naturalCompareLabels = (itemA, itemB, lang) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA.label.localeCompare(itemB.label, lang, { numeric: true })
+  return naturalCompare(itemA, itemB, lang, 'label')
+}
+
+export const naturalCompare = (itemA, itemB, lang, field) => {
+  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
+  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {
@@ -736,6 +754,14 @@ export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
 
+export const htmlCodeToDocumentFragment = (htmlCode) => {
+  // NOTE - RJ - 2021-04-28 - <template> provides a convenient content property.
+  // See https://stackoverflow.com/questions/8202195/using-document-createdocumentfragment-and-innerhtml-to-manipulate-a-dom
+  const template = document.createElement('template')
+  template.innerHTML = htmlCode
+  return template.content
+}
+
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const workspaceId = content.workspace_id || content.workspaceId
   const contentId = content.content_id || content.contentId
@@ -769,3 +795,7 @@ export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_d
 export const getAvatarBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/avatar`
 
 export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/cover`
+
+export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`
+
+export const htmlToText = (domParser, htmlString) => domParser.parseFromString(htmlString, 'text/html').documentElement.textContent

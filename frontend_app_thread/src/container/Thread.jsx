@@ -6,8 +6,10 @@ import {
   appContentFactory,
   addAllResourceI18n,
   buildContentPathBreadcrumbs,
+  CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
+  PAGE,
   PopinFixed,
   PopinFixedHeader,
   PopinFixedOption,
@@ -29,7 +31,9 @@ import {
   getFileChildContent,
   permissiveNumberEqual,
   getDefaultTranslationState,
-  CONTENT_NAMESPACE
+  FavoriteButton,
+  FAVORITE_STATE,
+  ToolBar
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -66,7 +70,8 @@ export class Thread extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       isLastTimelineItemCurrentToken: false,
-      showInvalidMentionPopupInComment: false
+      showInvalidMentionPopupInComment: false,
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -85,8 +90,11 @@ export class Thread extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
       // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleCommentCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
@@ -168,6 +176,7 @@ export class Thread extends React.Component {
   componentDidMount () {
     console.log('%c<Thread> did Mount', `color: ${this.state.config.hexcolor}`)
     this.updateTimelineAndContent()
+    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async updateTimelineAndContent () {
@@ -304,22 +313,22 @@ export class Thread extends React.Component {
   }
 
   handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, CONTENT_NAMESPACE.CONTENT, this.setState.bind(this))
+    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
   }
 
   handleRemoveCommentAsFile = fileToRemove => {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewCommentBtn = async () => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
-      state.config.workspace.memberList,
+      state.config.workspace && state.config.workspace.memberList,
       state.timelineWysiwyg,
       state.newComment,
       this.setState.bind(this)
@@ -374,6 +383,56 @@ export class Thread extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickEditComment = (comment) => {
+    const { props, state } = this
+    props.appContentEditComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id,
+      state.loggedUser.username
+    )
+  }
+
+  handleClickDeleteComment = async (comment) => {
+    const { state } = this
+    this.props.appContentDeleteComment(
+      state.content.workspace_id,
+      comment.parent_id,
+      comment.content_id
+    )
+  }
+
+  handleClickOpenFileComment = (comment) => {
+    const { state } = this
+    state.config.history.push(PAGE.WORKSPACE.CONTENT(
+      state.content.workspace_id,
+      CONTENT_TYPE.FILE,
+      comment.content_id
+    ))
+  }
+
+  handleContentCommentModified = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+    const newTimeline = props.updateCommentOnTimeline(
+      data.fields.content,
+      state.timeline,
+      state.loggedUser.username
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
+  handleContentCommentDeleted = (data) => {
+    const { props, state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const newTimeline = props.removeCommentFromTimeline(
+      data.fields.content.content_id,
+      state.timeline
+    )
+    this.setState({ timeline: newTimeline })
+  }
+
   handleClickRefresh = () => {
     const { state } = this
 
@@ -391,6 +450,10 @@ export class Thread extends React.Component {
     }))
     this.setHeadTitle(newObjectContent.label)
     this.buildBreadcrumbs(newObjectContent)
+  }
+
+  handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
+    this.setState({ translationTargetLanguageCode })
   }
 
   render () {
@@ -418,12 +481,25 @@ export class Thread extends React.Component {
           i18n={i18n}
         >
           <div>
-            {state.showRefreshWarning && (
-              <RefreshWarningMessage
-                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                onClickRefresh={this.handleClickRefresh}
+            <ToolBar>
+              <FavoriteButton
+                favoriteState={props.isContentInFavoriteList(state.content, state)
+                  ? FAVORITE_STATE.FAVORITE
+                  : FAVORITE_STATE.NOT_FAVORITE}
+                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
+                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+                  state.content, state.loggedUser, this.setState.bind(this)
+                )}
               />
-            )}
+              {state.showRefreshWarning && (
+                <RefreshWarningMessage
+                  tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                  onClickRefresh={this.handleClickRefresh}
+                />
+              )}
+            </ToolBar>
             <AppContentRightMenu
               apiUrl={state.config.apiUrl}
               onChangeStatus={this.handleChangeStatus}
@@ -445,6 +521,7 @@ export class Thread extends React.Component {
               customClass={`${state.config.slug}__contentpage`}
               customColor={state.config.hexcolor}
               loggedUser={state.loggedUser}
+              memberList={state.config.workspace && state.config.workspace.memberList}
               apiUrl={state.config.apiUrl}
               timelineData={state.timeline}
               newComment={state.newComment}
@@ -474,14 +551,20 @@ export class Thread extends React.Component {
               onInitWysiwyg={this.handleInitWysiwyg}
               workspaceId={state.content.workspace_id}
               showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-              searchForMentionInQuery={this.searchForMentionInQuery}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
               onClickTranslateComment={comment => props.handleTranslateComment(
                 comment,
                 state.content.workspace_id,
-                state.loggedUser.lang,
+                state.translationTargetLanguageCode,
                 this.setState.bind(this)
               )}
               onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+              onClickEditComment={this.handleClickEditComment}
+              onClickDeleteComment={this.handleClickDeleteComment}
+              onClickOpenFileComment={this.handleClickOpenFileComment}
+              translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+              translationTargetLanguageCode={state.translationTargetLanguageCode}
+              onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             />
           ) : null}
         </PopinFixedContent>

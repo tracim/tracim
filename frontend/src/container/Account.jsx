@@ -269,7 +269,7 @@ export class Account extends React.Component {
             <PageTitle
               parentClass='account'
               title={props.t('Account Settings')}
-              icon='user-o'
+              icon='fas fa-cogs'
               breadcrumbsList={props.breadcrumbs}
             />
 
@@ -290,6 +290,9 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
+                            userEmail={props.user.email}
+                            userUsername={props.user.username}
+                            userPublicName={props.user.publicName}
                             userAuthType={props.user.authType}
                             onClickSubmit={this.handleSubmitPersonalData}
                             onChangeUsername={this.handleChangeUsername}

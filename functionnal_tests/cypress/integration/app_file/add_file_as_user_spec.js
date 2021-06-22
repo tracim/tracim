@@ -25,7 +25,7 @@ context('Add file(s) with PopupCreateFile', function () {
   describe('Adds a file to a workspace', () => {
     it('should open the app file with the newly added file', () => {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .get('[data-cy="contentTypeBtn_contents/file"]')
+        .get('button[title="Upload files"]')
         .click()
 
       cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', 'file_exemple1.png')
@@ -47,7 +47,7 @@ context('Add file(s) with PopupCreateFile', function () {
         const fileName2 = 'pdf_exemple2'
 
         cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-          .get('[data-cy="contentTypeBtn_contents/file"]')
+          .get('button[title="Upload files"]')
           .click()
 
         cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName1}.png`)
@@ -70,7 +70,7 @@ context('Add file(s) with PopupCreateFile', function () {
         cy.createFile(pngFile, 'image/png', `${fileName1}.png`, workspaceId)
 
         cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-          .get('[data-cy="contentTypeBtn_contents/file"]')
+          .get('button[title="Upload files"]')
           .click()
 
         cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName1}.png`)
@@ -93,7 +93,7 @@ context('Add file(s) with PopupCreateFile', function () {
         const fileName3 = 'png_exemple4_1'
 
         cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-          .get('[data-cy="contentTypeBtn_contents/file"]')
+          .get('button[title="Upload files"]')
           .click()
 
         cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName1}.png`)
