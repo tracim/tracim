@@ -67,8 +67,16 @@ class PopinFixedHeader extends React.Component {
       disableChangeTitle,
       showChangeTitleButton,
       t,
-      actionList
+      actionList,
+      apiUrl,
+      content,
+      favoriteState,
+      loggedUser,
+      onClickAddToFavoriteList,
+      onClickRemoveFromFavoriteList,
+      showReactions
     } = props
+    const filteredActionList = actionList ? actionList.filter(action => action.showAction) : []
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
@@ -93,22 +101,22 @@ class PopinFixedHeader extends React.Component {
             : componentTitle}
         </div>
 
-        {props.showReactions && (
+        {showReactions && (
           <div>
             <EmojiReactions
-              apiUrl={props.apiUrl}
-              loggedUser={props.loggedUser}
-              contentId={props.content.content_id}
-              workspaceId={props.content.workspace_id}
+              apiUrl={apiUrl}
+              loggedUser={loggedUser}
+              contentId={content.content_id}
+              workspaceId={content.workspace_id}
             />
           </div>
         )}
 
-        {props.favoriteState && (
+        {favoriteState && (
           <FavoriteButton
-            favoriteState={props.favoriteState}
-            onClickAddToFavoriteList={props.onClickAddToFavoriteList}
-            onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
+            favoriteState={favoriteState}
+            onClickAddToFavoriteList={onClickAddToFavoriteList}
+            onClickRemoveFromFavoriteList={onClickRemoveFromFavoriteList}
           />
         )}
 
@@ -134,14 +142,14 @@ class PopinFixedHeader extends React.Component {
               ? <i className='fas fa-check' title={t('Validate the title')} />
               : <i className='fas fa-pencil-alt' title={t('Edit title')} />}
           </button>}
-        {actionList && actionList.length > 0 && (
+        {filteredActionList.length > 0 && (
           <DropdownMenu
             buttonCustomClass='wsContentGeneric__header__actions'
             buttonIcon='fas fa-ellipsis-v'
             buttonTooltip={t('Actions')}
             buttonDataCy='dropdownContentButton'
           >
-            {actionList.filter(action => action.showAction).map((action) => action.downloadLink
+            {filteredActionList.map((action) => action.downloadLink
               ? (
                 <a
                   href={action.downloadLink}
@@ -196,7 +204,14 @@ PopinFixedHeader.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   disableChangeTitle: PropTypes.bool,
   showChangeTitleButton: PropTypes.bool,
-  actionList: PropTypes.array
+  actionList: PropTypes.array,
+  apiUrl: PropTypes.string,
+  content: PropTypes.object,
+  favoriteState: PropTypes.string,
+  loggedUser: PropTypes.object,
+  onClickAddToFavoriteList: PropTypes.func,
+  onClickRemoveFromFavoriteList: PropTypes.func,
+  showReactions: PropTypes.bool
 }
 
 PopinFixedHeader.defaultProps = {
@@ -208,5 +223,15 @@ PopinFixedHeader.defaultProps = {
   onChangeTitle: () => { },
   disableChangeTitle: false,
   showChangeTitleButton: true,
-  actionList: []
+  actionList: [],
+  apiUrl: '',
+  content: {
+    content_id: 0,
+    workspace_id: 0
+  },
+  favoriteState: '',
+  loggedUser: {},
+  onClickAddToFavoriteList: () => {},
+  onClickRemoveFromFavoriteList: () => {},
+  showReactions: false
 }

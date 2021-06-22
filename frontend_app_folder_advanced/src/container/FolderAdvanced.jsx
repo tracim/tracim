@@ -289,7 +289,8 @@ export class FolderAdvanced extends React.Component {
           componentTitle={<div>{state.content.label}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
-          onValidateChangeTitle={this.handleSaveEditLabel} actionList={[
+          onValidateChangeTitle={this.handleSaveEditLabel}
+          actionList={[
             {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),

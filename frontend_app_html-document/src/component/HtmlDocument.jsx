@@ -182,9 +182,12 @@ export const HtmlDocument = props => {
 export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
-  mode: PropTypes.string,
   apiUrl: PropTypes.string.isRequired,
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
   customColor: PropTypes.string,
+  editionAuthor: PropTypes.string,
   wysiwygNewVersion: PropTypes.string,
   disableValidateBtn: PropTypes.bool,
   text: PropTypes.string,
@@ -193,18 +196,28 @@ HtmlDocument.propTypes = {
   isDeprecated: PropTypes.bool,
   deprecatedStatus: PropTypes.object,
   isDraftAvailable: PropTypes.bool,
+  isRefreshNeeded: PropTypes.bool,
+  mode: PropTypes.string,
   onClickValidateBtn: PropTypes.func,
   onChangeText: PropTypes.func,
   onClickCloseEditMode: PropTypes.func,
   onClickCloseNotifyAllMessage: PropTypes.func,
+  onClickLastVersion: PropTypes.func,
   onClickNotifyAll: PropTypes.func,
+  onClickRefresh: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func,
   onClickTranslateDocument: PropTypes.func,
   onClickRestoreDocument: PropTypes.func,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired,
-  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
+}
+
+HtmlDocument.defaultProps = {
+  customColor: '#252525',
+  editionAuthor: '',
+  isRefreshNeeded: false,
+  mode: APP_FEATURE_MODE.VIEW,
+  onClickLastVersion: () => { },
+  onClickRefresh: () => { }
 }

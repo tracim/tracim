@@ -184,7 +184,6 @@ PreviewComponent.propTypes = {
   previewUrl: PropTypes.string,
   downloadPdfPageUrl: PropTypes.string,
   color: PropTypes.string,
-  downloadRawUrl: PropTypes.string,
   onClickPreviousPage: PropTypes.func,
   onClickNextPage: PropTypes.func,
   lightboxUrlList: PropTypes.array
@@ -199,7 +198,6 @@ PreviewComponent.defaultProps = {
   previewUrl: '',
   downloadPdfPageUrl: '',
   color: '',
-  downloadRawUrl: '',
   onClickPreviousPage: () => {},
   onClickNextPage: () => {},
   lightboxUrlList: []

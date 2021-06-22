@@ -1,6 +1,6 @@
 import React from 'react'
 import { expect } from 'chai'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import PopinFixed from '../../src/component/PopinFixed/PopinFixed'
 import PopinFixedContent from '../../src/component/PopinFixed/PopinFixedContent'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
@@ -12,15 +12,35 @@ describe('<PopinFixed />', () => {
     visible: false,
     style: {
       color: 'yellow'
-    }
+    },
+    actionList: [],
+    componentTitle: <div />,
+    config: {
+      hexcolor: '',
+      faIcon: ''
+    },
+    content: {
+      is_archived: false,
+      is_deleted: false
+    },
+    disableChangeTitle: false,
+    favoriteState: '',
+    loggedUser: {
+      userRoleIdInWorkspace: 0
+    },
+    onClickCloseBtn: () => { },
+    onValidateChangeTitle: () => { },
+    showReactions: false
   }
 
-  const wrapper = shallow(
+  const wrapper = mount(
     <PopinFixed
       {...props}
     >
       <PopinFixedHeader />
-      <PopinFixedContent />
+      <PopinFixedContent>
+        <div>test</div>
+      </PopinFixedContent>
     </PopinFixed>
   )
 
