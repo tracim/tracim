@@ -20,6 +20,7 @@
   .timeline
     margin 0
     width 100%
+    height calc(100% - 40px)
   .thread
     &__contentpage
       width 100%
@@ -29,6 +30,7 @@
         padding 10px
       &__content
         width 100%
+        height "calc(100% - %s)" % headerHeight
       &__texteditor
         flex 0 0 auto
 
