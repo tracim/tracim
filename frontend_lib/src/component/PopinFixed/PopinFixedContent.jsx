@@ -81,10 +81,10 @@ class PopinFixedContent extends React.Component {
                   >
                     {props.t(
                       'Version #{{versionNumber}}', {
-                      versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                        ? props.lastVersion
-                        : props.content.number
-                    }
+                        versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                          ? props.lastVersion
+                          : props.content.number
+                      }
                     )}
                     {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
                       <div
