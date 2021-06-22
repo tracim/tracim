@@ -533,7 +533,7 @@ export class Thread extends React.Component {
             </div>
             {state.showRefreshWarning && (
               <RefreshWarningMessage
-                tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
                 onClickRefresh={this.handleClickRefresh}
               />
             )}

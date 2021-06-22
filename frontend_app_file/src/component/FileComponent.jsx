@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
@@ -214,3 +215,21 @@ export class FileComponent extends React.Component {
 const FileComponentWithHOC = translate()(Radium(FileComponent))
 
 export default React.forwardRef((props, ref) => <FileComponentWithHOC {...props} myForwardedRef={ref} />)
+
+FileComponent.propTypes = {
+  customColor: PropTypes.string,
+  editionAuthor: PropTypes.string,
+  isRefreshNeeded: PropTypes.bool,
+  mode: PropTypes.string,
+  onClickLastVersion: PropTypes.func,
+  onClickRefresh: PropTypes.func
+}
+
+FileComponent.defaultProps = {
+  customColor: '#252525',
+  editionAuthor: '',
+  isRefreshNeeded: false,
+  mode: APP_FEATURE_MODE.VIEW,
+  onClickLastVersion: () => { },
+  onClickRefresh: () => { }
+}

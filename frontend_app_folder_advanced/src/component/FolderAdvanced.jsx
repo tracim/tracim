@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { Checkbox, RefreshWarningMessage } from 'tracim_frontend_lib'
 
@@ -78,3 +79,15 @@ const FolderAdvanced = props => {
 }
 
 export default translate()(FolderAdvanced)
+
+FolderAdvanced.propTypes = {
+  editionAuthor: PropTypes.string,
+  isRefreshNeeded: PropTypes.bool,
+  onClickRefresh: PropTypes.func
+}
+
+FolderAdvanced.defaultProps = {
+  editionAuthor: '',
+  isRefreshNeeded: false,
+  onClickRefresh: () => { }
+}

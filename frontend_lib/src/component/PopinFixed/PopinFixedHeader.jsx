@@ -67,7 +67,14 @@ class PopinFixedHeader extends React.Component {
       disableChangeTitle,
       showChangeTitleButton,
       t,
-      actionList
+      actionList,
+      apiUrl,
+      content,
+      favoriteState,
+      loggedUser,
+      onClickAddToFavoriteList,
+      onClickRemoveFromFavoriteList,
+      showReactions
     } = props
     const filteredActionList = actionList ? actionList.filter(action => action.showAction) : []
 
@@ -94,22 +101,22 @@ class PopinFixedHeader extends React.Component {
             : componentTitle}
         </div>
 
-        {props.showReactions && (
+        {showReactions && (
           <div>
             <EmojiReactions
-              apiUrl={props.apiUrl}
-              loggedUser={props.loggedUser}
-              contentId={props.content.content_id}
-              workspaceId={props.content.workspace_id}
+              apiUrl={apiUrl}
+              loggedUser={loggedUser}
+              contentId={content.content_id}
+              workspaceId={content.workspace_id}
             />
           </div>
         )}
 
-        {props.favoriteState && (
+        {favoriteState && (
           <FavoriteButton
-            favoriteState={props.favoriteState}
-            onClickAddToFavoriteList={props.onClickAddToFavoriteList}
-            onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
+            favoriteState={favoriteState}
+            onClickAddToFavoriteList={onClickAddToFavoriteList}
+            onClickRemoveFromFavoriteList={onClickRemoveFromFavoriteList}
           />
         )}
 
@@ -197,7 +204,14 @@ PopinFixedHeader.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   disableChangeTitle: PropTypes.bool,
   showChangeTitleButton: PropTypes.bool,
-  actionList: PropTypes.array
+  actionList: PropTypes.array,
+  apiUrl: PropTypes.string,
+  content: PropTypes.object,
+  favoriteState: PropTypes.string,
+  loggedUser: PropTypes.object,
+  onClickAddToFavoriteList: PropTypes.func,
+  onClickRemoveFromFavoriteList: PropTypes.func,
+  showReactions: PropTypes.bool
 }
 
 PopinFixedHeader.defaultProps = {
@@ -209,5 +223,15 @@ PopinFixedHeader.defaultProps = {
   onChangeTitle: () => { },
   disableChangeTitle: false,
   showChangeTitleButton: true,
-  actionList: []
+  actionList: [],
+  apiUrl: '',
+  content: {
+    content_id: 0,
+    workspace_id: 0
+  },
+  favoriteState: '',
+  loggedUser: {},
+  onClickAddToFavoriteList: () => {},
+  onClickRemoveFromFavoriteList: () => {},
+  showReactions: false
 }

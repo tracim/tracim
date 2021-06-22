@@ -13,35 +13,24 @@ describe('<PopinFixed />', () => {
     style: {
       color: 'yellow'
     },
-    lastVersion: 1337,
     actionList: [],
-    availableStatuses: [],
-    breadcrumbsList: [],
     componentTitle: <div />,
     config: {
       hexcolor: '',
-      faIcon: '',
-      apiUrl: ''
+      faIcon: ''
     },
     content: {
       is_archived: false,
-      is_deleted: false,
-      number: 42,
-      status: ''
+      is_deleted: false
     },
     disableChangeTitle: false,
     favoriteState: '',
-    isRefreshNeeded: false,
     loggedUser: {
       userRoleIdInWorkspace: 0
     },
-    onChangeStatus: () => { },
-    onClickAddToFavoriteList: () => { },
     onClickCloseBtn: () => { },
-    onClickRemoveFromFavoriteList: () => { },
     onValidateChangeTitle: () => { },
-    showReactions: false,
-    t: key => key
+    showReactions: false
   }
 
   const wrapper = mount(
