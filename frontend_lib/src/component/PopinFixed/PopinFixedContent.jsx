@@ -57,7 +57,7 @@ class PopinFixedContent extends React.Component {
               onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
-              {props.breadcrumbsList && (
+              {props.breadcrumbsList.length && (
                 <Breadcrumbs
                   root={{
                     link: PAGE.HOME,
@@ -130,6 +130,13 @@ class PopinFixedContent extends React.Component {
 export default translate()(PopinFixedContent)
 
 PopinFixedContent.propTypes = {
+  actionList: PropTypes.array,
+  appMode: PropTypes.string,
+  availableStatuses: PropTypes.array,
+  breadcrumbsList: PropTypes.array,
+  componentTitle: PropTypes.node,
+  config: PropTypes.object,
+  content: PropTypes.object,
   customClass: PropTypes.string,
   children: (props, propName, componentName) => {
     if (Array.isArray(props) && props.length !== 2) {
@@ -137,5 +144,49 @@ PopinFixedContent.propTypes = {
     } else if (typeof props !== 'object') {
       return new Error(`PropType Error: childrens of ${componentName} must have 1 or 2 children.`)
     }
-  }
+  },
+  disableChangeTitle: PropTypes.bool,
+  favoriteState: PropTypes.string,
+  isRefreshNeeded: PropTypes.bool,
+  lastVersion: PropTypes.number,
+  loggedUser: PropTypes.object,
+  onChangeStatus: PropTypes.func,
+  onClickAddToFavoriteList: PropTypes.func,
+  onClickCloseBtn: PropTypes.func,
+  onClickRemoveFromFavoriteList: PropTypes.func,
+  onValidateChangeTitle: PropTypes.func,
+  showReactions: PropTypes.bool
+}
+
+PopinFixedContent.defaultProps = {
+  actionList: [],
+  appMode: APP_FEATURE_MODE.VIEW,
+  availableStatuses: [],
+  breadcrumbsList: [],
+  componentTitle: <div />,
+  config: {
+    hexcolor: '',
+    faIcon: '',
+    apiUrl: ''
+  },
+  content: {
+    is_archived: false,
+    is_deleted: false,
+    number: 0,
+    status: ''
+  },
+  customClass: '',
+  disableChangeTitle: false,
+  favoriteState: '',
+  isRefreshNeeded: false,
+  loggedUser: {
+    userRoleIdInWorkspace: 0
+  },
+  lastVersion: 0,
+  onChangeStatus: () => {},
+  onClickAddToFavoriteList: () => {},
+  onClickCloseBtn: () => {},
+  onClickRemoveFromFavoriteList: () => {},
+  onValidateChangeTitle: () => {},
+  showReactions: false
 }

@@ -69,6 +69,7 @@ class PopinFixedHeader extends React.Component {
       t,
       actionList
     } = props
+    const filteredActionList = actionList ? actionList.filter(action => action.showAction) : []
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
@@ -134,14 +135,14 @@ class PopinFixedHeader extends React.Component {
               ? <i className='fas fa-check' title={t('Validate the title')} />
               : <i className='fas fa-pencil-alt' title={t('Edit title')} />}
           </button>}
-        {actionList && actionList.length > 0 && (
+        {filteredActionList.length > 0 && (
           <DropdownMenu
             buttonCustomClass='wsContentGeneric__header__actions'
             buttonIcon='fas fa-ellipsis-v'
             buttonTooltip={t('Actions')}
             buttonDataCy='dropdownContentButton'
           >
-            {actionList.filter(action => action.showAction).map((action) => action.downloadLink
+            {filteredActionList.map((action) => action.downloadLink
               ? (
                 <a
                   href={action.downloadLink}
