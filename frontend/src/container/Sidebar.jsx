@@ -169,7 +169,7 @@ export class Sidebar extends React.Component {
         : CUSTOM_EVENT.HIDE_SIDEBAR,
       data: { }
     })
-    this.setState(prev => ({ sidebarClose: !prev.sidebarClose }))
+    this.setState(previousState => ({ sidebarClose: !previousState.sidebarClose }))
   }
 
   handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
