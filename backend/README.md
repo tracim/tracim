@@ -69,6 +69,10 @@ Install packaging tools:
 
     pip install -r requirements.txt
 
+(Optional) Install all previews builders to be able to generate preview for most previews:
+
+    pip install -r requirements-full-preview-generator.txt
+
 Install the project in editable mode with its develop requirements:
 
     pip install -r requirements-test.txt
