@@ -966,7 +966,8 @@ export class HtmlDocument extends React.Component {
           config={state.config}
           customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
-          headerButtons={[{
+          headerButtons={[
+            {
               icon: 'fas fa-plus-circle',
               label: props.t('Edit'),
               key: props.t('Edit'),

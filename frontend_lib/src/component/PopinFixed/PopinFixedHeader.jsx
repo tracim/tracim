@@ -77,7 +77,18 @@ class PopinFixedHeader extends React.Component {
       onClickRemoveFromFavoriteList,
       showReactions
     } = props
-    const filteredActionList = actionList ? actionList.filter(action => action.showAction) : []
+    const actionListWithEditTitle = [
+      {
+        icon: 'fas fa-pencil-alt',
+        label: props.t('Edit title'),
+        onClick: this.handleClickChangeTitleBtn,
+        showAction: userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && !state.editTitle,
+        disabled: disableChangeTitle,
+        dataCy: 'popinListItem__newVersion'
+      },
+      ...actionList
+    ]
+    const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
     const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
 
     return (
@@ -165,16 +176,6 @@ class PopinFixedHeader extends React.Component {
             buttonTooltip={t('Actions')}
             buttonDataCy='dropdownContentButton'
           >
-            {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && !state.editTitle && (
-              <IconButton
-                icon='fas fa-pencil-alt'
-                text={t('Edit title')}
-                label={t('Edit title')}
-                key={t('Edit title')}
-                onClick={this.handleClickChangeTitleBtn} // eslint-disable-line react/jsx-handler-names
-                customClass='transparentButton'
-              />
-            )}
             {filteredActionList.map((action) => action.downloadLink
               ? (
                 <a

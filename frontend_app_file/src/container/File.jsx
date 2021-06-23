@@ -1118,15 +1118,15 @@ export class File extends React.Component {
           config={state.config}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
-          headerButtons={[{
-            icon: 'fas fa-plus-circle',
-            label: props.t('Edit'),
-            key: props.t('Edit'),
-            onClick: this.handleClickNewVersion,
-            showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-            disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-            dataCy: 'popinListItem__newVersion'
-          }
+          headerButtons={[
+            {
+              icon: 'fas fa-upload',
+              label: props.t('Upload a new version'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'newVersionBtn'
+            }
           ]}
           isRefreshNeeded={state.showRefreshWarning}
           lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
@@ -1136,18 +1136,18 @@ export class File extends React.Component {
           onValidateChangeTitle={this.handleSaveEditTitle}
           actionList={[
             {
+              icon: 'fas fa-edit',
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'wsContentGeneric__option__menu__addversion'
+            }, {
               icon: 'fas fa-play',
               label: props.t('Play video'),
               onClick: () => this.setState({ previewVideo: true }),
               showAction: isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST),
               dataCy: 'popinListItem__playVideo'
-            }, {
-              icon: 'fas fa-upload',
-              label: props.t('Upload a new version'),
-              onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'newVersionBtn'
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
