@@ -150,7 +150,7 @@ class PopinFixedHeader extends React.Component {
             label={action.label}
             key={action.label}
             onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
-            customClass='transparentButton'
+            customClass='transparentButton headerBtn'
             showAction={action.showAction}
             dataCy={action.dataCy}
           />
@@ -165,6 +165,16 @@ class PopinFixedHeader extends React.Component {
             buttonTooltip={t('Actions')}
             buttonDataCy='dropdownContentButton'
           >
+            {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && !state.editTitle && (
+              <IconButton
+                icon='fas fa-pencil-alt'
+                text={t('Edit title')}
+                label={t('Edit title')}
+                key={t('Edit title')}
+                onClick={this.handleClickChangeTitleBtn} // eslint-disable-line react/jsx-handler-names
+                customClass='transparentButton'
+              />
+            )}
             {filteredActionList.map((action) => action.downloadLink
               ? (
                 <a
@@ -191,15 +201,6 @@ class PopinFixedHeader extends React.Component {
                   dataCy={action.dataCy}
                 />
               ))}
-            {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && !state.editTitle && (
-              <button
-                className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
-                onClick={this.handleClickChangeTitleBtn}
-                disabled={disableChangeTitle}
-              >
-                <i className='fas fa-pencil-alt' title={t('Edit title')} />
-              </button>
-            )}
           </DropdownMenu>
         )}
 

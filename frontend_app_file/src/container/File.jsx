@@ -1118,6 +1118,16 @@ export class File extends React.Component {
           config={state.config}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
+          headerButtons={[{
+            icon: 'fas fa-plus-circle',
+            label: props.t('Edit'),
+            key: props.t('Edit'),
+            onClick: this.handleClickNewVersion,
+            showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+            disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+            dataCy: 'popinListItem__newVersion'
+          }
+          ]}
           isRefreshNeeded={state.showRefreshWarning}
           lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
           loggedUser={state.loggedUser}
@@ -1126,13 +1136,6 @@ export class File extends React.Component {
           onValidateChangeTitle={this.handleSaveEditTitle}
           actionList={[
             {
-              icon: 'fas fa-edit',
-              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
-              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
-              showAction: onlineEditionAction,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'wsContentGeneric__option__menu__addversion'
-            }, {
               icon: 'fas fa-play',
               label: props.t('Play video'),
               onClick: () => this.setState({ previewVideo: true }),
