@@ -119,6 +119,7 @@ def tracim_webserver(
                 "Error while starting server, return code={}".format(process.returncode)
             )
         except subprocess.TimeoutExpired:
+            # INFO 2021/06/22 - SG - the process started successfully
             pass
         # INFO 2021/06/22 - SG - then wait for pserve to listen on its port
         starting = True
