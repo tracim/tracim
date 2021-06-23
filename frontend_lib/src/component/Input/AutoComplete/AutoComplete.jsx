@@ -11,9 +11,28 @@ export const AutoComplete = props => {
         <div key={autocompleteItem.mention || autocompleteItem.content_id}>
           <div
             className={
-              classnames('autocomplete__item', { autocomplete__item__active: props.autoCompleteCursorPosition === i })
+              classnames('autocomplete__item', {
+                autocomplete__item__active: props.autoCompleteCursorPosition === i
+              })
             }
-            onClick={() => props.onClickAutoCompleteItem(autocompleteItem)}
+            onClick={(e) => {
+              props.onClickAutoCompleteItem(autocompleteItem)
+
+              // HACK - RJ - 2021-06-23 (https://github.com/tracim/tracim/issues/4757)
+              //
+              // Clicking outside of TinyMCE seems to trigger some modifications
+              // in TinyMCE (maybe some clean-up).
+              // These modifications trigger a TinyMCE change event with the
+              // current content and prevents the modifications done by the
+              // autocompletion from producing a TinyMCE change event.
+              //
+              // This hack prevents these modifications from happening
+              // We shall find out what really causes these modifications and
+              // remove the following lines that cancel the click event.
+
+              e.preventDefault()
+              e.stopPropagation()
+            }}
           >
             {autocompleteItem.username && (
               <Avatar
