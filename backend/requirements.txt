@@ -21,13 +21,12 @@ cmd2==0.9.6               # via cliff
 colorama==0.4.1           # via cmd2
 colorlog==4.0.2           # via tracim_backend (setup.py)
 colour==0.1.5             # via tracim_backend (setup.py)
-cssselect2==0.2.2         # via cairosvg
-defusedxml==0.5.0         # via cairosvg, wsgidav
+defusedxml==0.5.0         # via wsgidav
 elasticsearch-dsl==7.0.0  # via tracim_backend (setup.py)
 elasticsearch==7.0.1      # via elasticsearch-dsl, tracim_backend (setup.py)
 email-reply-parser==0.5.9  # via tracim_backend (setup.py)
 filedepot==0.8.0          # via tracim_backend (setup.py)
-filelock==3.0.10          # via tracim_backend (setup.py)
+filelock==3.0.10          # via preview-generator, tracim_backend (setup.py)
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.2          # via tracim_backend (setup.py)
 gripcontrol==4.0.0        # via tracim_backend (setup.py)
@@ -53,12 +52,12 @@ pastedeploy==2.0.0        # via plaster-pastedeploy
 pathlib==1.0.1            # via preview-generator
 pbr==5.1.1                # via cliff, stevedore
 pdf2image==1.1.0          # via preview-generator
-pillow==5.3.0             # via cairosvg, pdf2image, preview-generator
+pillow==5.3.0             # via pdf2image, preview-generator
 plaster-pastedeploy==0.6  # via pyramid, tracim_backend (setup.py)
 plaster==1.0              # via plaster-pastedeploy, pyramid
 pluggy==0.13.1            # via tracim_backend (setup.py)
 prettytable==0.7.2        # via cliff
-preview-generator==0.20   # via tracim_backend (setup.py)
+preview-generator==0.22   # via tracim_backend (setup.py)
 pubcontrol==3.0.0         # via gripcontrol
 pyasn1==0.4.4             # via ldap3
 pyexifinfo==0.4.0         # via preview-generator
@@ -93,7 +92,6 @@ smmap==3.0.4              # via gitdb
 sqlakeyset==1.0.1615859905  # via tracim_backend (setup.py)
 sqlalchemy==1.3.18        # via alembic, sqlakeyset, tracim_backend (setup.py), zope.sqlalchemy
 stevedore==1.30.0         # via cliff
-tinycss2==1.0.2           # via cairosvg, cssselect2
 tnetstring3==0.3.1        # via tracim_backend (setup.py)
 transaction==2.4.0        # via pyramid-tm, tracim_backend (setup.py), zope.sqlalchemy
 translationstring==1.3    # via pyramid
@@ -105,7 +103,6 @@ vobject==0.9.6.1          # via caldav, radicale
 waitress==1.1.0           # via tracim_backend (setup.py)
 wand==0.4.5               # via preview-generator
 wcwidth==0.1.7            # via cmd2
-webencodings==0.5.1       # via tinycss2
 webob==1.8.4              # via pyramid
 webpreview==1.6.0         # via tracim_backend (setup.py)
 wsgidav==2.4.1            # via tracim_backend (setup.py)
