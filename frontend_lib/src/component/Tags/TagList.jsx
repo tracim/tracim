@@ -97,7 +97,6 @@ class TagList extends React.Component {
         ? [...previousState.checkedTagIdList, tag.tag_id]
         : previousState.checkedTagIdList.filter(id => id !== tag.tag_id)
       const tagList = previousState.tagList.sort(this.sortTagList(checkedTagIdList))
-      console.log('FOOO', tag, checkedTagIdList, checked)
       return { checkedTagIdList, tagList }
     })
   }
