@@ -15,7 +15,7 @@
   &__header
     display flex
     align-items center
-    margin 5px 5px 5px 40px
+    margin 5px 5px 5px 30px
     height 60px
     border-bottom 1px solid mediumGrey
     & > *
@@ -29,13 +29,22 @@
     &__title
       margin-right 10px
       border-radius 5px
-      width 100%
+      flex 2
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
       font-size fontSizeMedium
+      font-weight bold
+      & > div
+        text-overflow ellipsis
+        overflow hidden
       & > input
         padding-left 5px
+    &__reactions
+      flex 1
+      height 100%
+      & > .EmojiReactions
+        flex-wrap wrap-reverse
     &__close
       border-radius 5px
       padding 3px 7px
@@ -90,6 +99,7 @@
         color lightDarkGrey
         font-size fontSizeSmall
         padding 5px 10px
+        margin-inline-start 20px
         & .breadcrumbs
           margin-inline-end auto
           overflow auto
@@ -230,6 +240,8 @@ responsiveColumnStyle()
     width 100%
     max-width 100%
     top headerHeight
+    &.sidebarVisible
+      max-width 100%
     &__option
       display none
     &__content

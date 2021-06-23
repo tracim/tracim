@@ -124,7 +124,7 @@ class PopinFixedHeader extends React.Component {
         )}
 
         {showReactions && (
-          <div>
+          <div className='wsContentGeneric__header__reactions'>
             <EmojiReactions
               apiUrl={apiUrl}
               loggedUser={loggedUser}
