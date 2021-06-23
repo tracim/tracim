@@ -51,7 +51,7 @@ function install_backend_python_packages {
     pip install -r "requirements-build.txt" && loggood "Successfully installed pip and setuptools" || logerror "Failed to install pip and setuptools"
     log "Installing dependencies from requirements.txt..."
     pip install -r "requirements.txt" && loggood "Successfully installed the dependencies in requirements.txt" || logerror "Failed to install dependencies in requirements.txt"
-    log "Installing all previews dependencies from requirements-full-preview-generator.txt"
+    log "Installing all preview dependencies from requirements-full-preview-generator.txt"
     pip install -r "requirements-full-preview-generator.txt"  && loggood "Successfully installed the dependencies in requirements-full-preview-generator.txt" || logerror "Failed to install dependencies in requirements-full-preview-generator.txt"
     log "Installing the Tracim backend (sqlite_backend)..."
     pip install -e "." && loggood "Successfully installed the Tracim backend (sqlite_backend)" || logerror "Failed to install the Tracim backend (sqlite_backend)"

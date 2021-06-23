@@ -69,7 +69,7 @@ Install packaging tools:
 
     pip install -r requirements.txt
 
-(Optional) Install all previews builders to be able to generate preview for most previews:
+(Optional) Install all preview builders to be able to generate preview for most previews:
 
     pip install -r requirements-full-preview-generator.txt
 
