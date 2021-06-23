@@ -17,7 +17,7 @@ describe.skip('Create tags', () => {
     cy.setupBaseDB()
   })
 
-  describe('Tag list', () => {
+  describe('Tags', () => {
     for (const testedContent of ['file', 'note']) {
       describe(`in a ${testedContent}`, () => {
         before(() => {
