@@ -809,7 +809,7 @@ class EventBuilder:
                 workspace_in_context
             ).data,
             Event.CONTENT_FIELD: content_dict,
-            Event.TAG_FIELD: EventApi.tag_schema.dump(content_tag).data,
+            Event.TAG_FIELD: EventApi.tag_schema.dump(content_tag.tag).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(

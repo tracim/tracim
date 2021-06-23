@@ -256,6 +256,14 @@ class TestLiveMessages(object):
         one_thread,
         rq_database_worker,
     ):
+        def assert_mention_event(event):
+            result = json.loads(event.data)
+            assert result["event_type"] == "mention.created"
+            assert result["fields"]["mention"]
+            assert result["fields"]["author"]
+            assert result["fields"]["author"]["user_id"] == 1
+            assert event.event == "message"
+
         with messages_stream_client() as client_events:
             params = {
                 "raw_content": '<p><span id="mention-foo123">@all</span>This is just an html comment!</p>'
@@ -269,12 +277,12 @@ class TestLiveMessages(object):
             )
             assert post_comment.status_code == 200
             event = next(client_events)
-        result = json.loads(event.data)
-        assert result["event_type"] == "mention.created"
-        assert result["fields"]["mention"]
-        assert result["fields"]["author"]
-        assert result["fields"]["author"]["user_id"] == 1
-        assert event.event == "message"
+            # INFO - SG - 2021/06/23 - mention.created and content.created.comment order is not stable
+            try:
+                assert_mention_event(event)
+            except AssertionError:
+                event = next(client_events)
+                assert_mention_event(event)
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize(
