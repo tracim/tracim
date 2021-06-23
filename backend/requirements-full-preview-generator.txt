@@ -2,14 +2,14 @@
 vtk==9.0.1                # via preview-generator
 # Scribus,drawio
 xvfbwrapper==0.2.9        # via preview-generator
-# CairoSVG
-cairocffi==1.2.0          # via cairosvg
-cairosvg==2.5.2           # via preview-generator
-cffi==1.14.5              # via cairocffi
-pycparser==2.20           # via cffi
-cssselect2==0.4.1         # via cairosvg
-tinycss2==1.1.0           # via cairosvg, cssselect2
-webencodings==0.5.1       # via cssselect2, tinycss2
+# CairoSVG (disabled for now)
+# cairocffi==1.2.0          # via cairosvg
+# cairosvg==2.5.2           # via preview-generator
+# cffi==1.14.5              # via cairocffi
+# pycparser==2.20           # via cffi
+# cssselect2==0.4.1         # via cairosvg
+# tinycss2==1.1.0           # via cairosvg, cssselect2
+# webencodings==0.5.1       # via cssselect2, tinycss2
 # defusedxml==0.5.0         # via cairosvg, wsgidav: already installed
 # pillow==5.3.0             # via cairosvg, preview-generator: already installed
 # FFMPEG (vidéo)
