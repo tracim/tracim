@@ -157,6 +157,9 @@ class IndexedContent(Document):
     raw_content = HtmlText()
     content_size = Integer()
 
+    tags = Keyword()
+    tag_count = Integer()
+
     # INFO - G.M - 2019-05-31 - b64_file is needed for storing the raw file contents
     # it is analysed then removed by the ingest pipeline.
     b64_file = Text()

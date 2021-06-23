@@ -76,6 +76,7 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
         created_to: typing.Optional[datetime] = None,
         modified_from: typing.Optional[datetime] = None,
         modified_to: typing.Optional[datetime] = None,
+        tags: typing.Optional[typing.List[str]] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -90,6 +91,7 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
         self.created_to = created_to
         self.modified_from = modified_from
         self.modified_to = modified_to
+        self.tags = tags or []
 
 
 class ContentSearchQuerySchema(marshmallow.Schema):
@@ -185,6 +187,11 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
     modified_to = marshmallow.fields.DateTime(
         required=False, format=DATETIME_FORMAT, allow_none=True
     )
+    tags = StringList(
+        marshmallow.fields.String(),
+        required=False,
+        description="select contents matching the given tags",
+    )
 
 
 class WorkspaceSearchSchema(marshmallow.Schema):
@@ -255,6 +262,11 @@ class ContentFacetsSchema(marshmallow.Schema):
     statuses = marshmallow.fields.List(
         marshmallow.fields.Nested(
             FacetCountSchema(), description="search matches contents with these statuses"
+        )
+    )
+    tags = marshmallow.fields.List(
+        marshmallow.fields.Nested(
+            FacetCountSchema(), description="search matches contents with these tags"
         )
     )
 

@@ -57,7 +57,7 @@ class TagOnContent(CreationDateMixin, DeclarativeBase):
     author_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     author = relationship("User", remote_side=[User.user_id])
 
-    content = relationship("Content", remote_side=[Content.id], lazy="joined")
+    content = relationship("Content", remote_side=[Content.id], lazy="joined", backref="tags")
     tag = relationship("Tag", remote_side=[Tag.tag_id], lazy="joined")
 
     def __repr__(self):
