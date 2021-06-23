@@ -41,6 +41,7 @@ class PopinFixedContent extends React.Component {
               customClass={props.customClass}
               customColor={props.config.hexcolor}
               faIcon={props.config.faIcon}
+              headerButtons={props.headerButtons}
               rawTitle={props.content.label}
               componentTitle={props.componentTitle}
               userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
@@ -57,7 +58,7 @@ class PopinFixedContent extends React.Component {
               onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
-              {props.breadcrumbsList.length && (
+              {props.breadcrumbsList.length > 0 && (
                 <Breadcrumbs
                   root={{
                     link: PAGE.HOME,
@@ -146,6 +147,7 @@ PopinFixedContent.propTypes = {
     }
   },
   disableChangeTitle: PropTypes.bool,
+  headerButtons: PropTypes.array,
   favoriteState: PropTypes.string,
   isRefreshNeeded: PropTypes.bool,
   lastVersion: PropTypes.number,
@@ -178,6 +180,7 @@ PopinFixedContent.defaultProps = {
   customClass: '',
   disableChangeTitle: false,
   favoriteState: '',
+  headerButtons: [],
   isRefreshNeeded: false,
   loggedUser: {
     userRoleIdInWorkspace: 0

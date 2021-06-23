@@ -9,7 +9,7 @@ const fullFilename = 'Linux-Free-PNG.png'
 const mimeType = 'image/png'
 const fileTitle = 'A file'
 
-const appContentRightMenuClassName = '.appContentRightMenu'
+const headerClassName = '.wsContentGeneric__header'
 
 let workspaceId
 const contentIdByType = {}
@@ -36,7 +36,7 @@ function addAdminEmoji (contentType, contentId) {
     params: { workspaceId, contentType, contentId }
   })
 
-  addEmojiReaction(appContentRightMenuClassName, 'grinning', '😀')
+  addEmojiReaction(headerClassName, 'grinning', '😀')
 }
 
 describe('Reactions', function () {
@@ -84,7 +84,7 @@ describe('Reactions', function () {
     })
 
     for (const [container, containerName] of [
-      [appContentRightMenuClassName, 'a content'],
+      [headerClassName, 'a content'],
       ['.comment__footer', 'a comment']
     ]) {
       it('should allow creating and deleting reactions in ' + containerName, () => {
@@ -108,7 +108,7 @@ describe('Reactions', function () {
 
   // INFO - RJ - 2021-03-23 - These tests are unstable and will be fixed in https://github.com/tracim/tracim/issues/4320
   describe.skip('In a file and a note', () => {
-    const container = appContentRightMenuClassName
+    const container = headerClassName
     for (const contentType of ['file', 'html-document']) {
       it('should allow creating and deleting reactions with an existing reaction in a ' + contentType, () => {
         const contentId = contentIdByType[contentType]

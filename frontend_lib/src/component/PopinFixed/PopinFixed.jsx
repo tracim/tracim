@@ -48,18 +48,18 @@ export default TracimComponent(PopinFixed)
 
 PopinFixed.propTypes = {
   // from http://www.mattzabriskie.com/blog/react-validating-children
-  children: PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
-    if (
-      children.length > 2 ||
-      (
-        children[0].type !== PopinFixedHeader &&
-        children[0].type !== PopinFixedContent
-      ) ||
-      children[1].type !== PopinFixedContent
-    ) {
-      return new Error(`PropType Error: childrens of ${componentName} must be: 1 PopinFixedHeader and 1 PopinFixedContent.`)
-    }
-  }).isRequired,
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf((children, key, componentName /* , location, propFullName */) => {
+      if (
+        children.length > 2 ||
+        children[0].type !== PopinFixedHeader ||
+        children[1].type !== PopinFixedContent
+      ) {
+        return new Error(`PropType Error: childrens of ${componentName} must be: 1 PopinFixedHeader and 1 PopinFixedContent.`)
+      }
+    }),
+    PropTypes.element
+  ]).isRequired,
   customClass: PropTypes.string,
   visible: PropTypes.bool
 }

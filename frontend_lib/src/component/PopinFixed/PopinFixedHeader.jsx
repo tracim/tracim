@@ -59,6 +59,7 @@ class PopinFixedHeader extends React.Component {
     const {
       customClass,
       customColor,
+      headerButtons,
       faIcon,
       rawTitle,
       componentTitle,
@@ -77,6 +78,7 @@ class PopinFixedHeader extends React.Component {
       showReactions
     } = props
     const filteredActionList = actionList ? actionList.filter(action => action.showAction) : []
+    const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
@@ -101,6 +103,26 @@ class PopinFixedHeader extends React.Component {
             : componentTitle}
         </div>
 
+        {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
+          <button
+            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
+            onClick={this.handleClickUndoChangeTitleBtn}
+            disabled={disableChangeTitle}
+          >
+            <i className='fas fa-undo' title={t('Undo change in title')} />
+          </button>
+        )}
+
+        {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
+          <button
+            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
+            onClick={this.handleClickChangeTitleBtn}
+            disabled={disableChangeTitle}
+          >
+            <i className='fas fa-check' title={t('Validate the title')} />
+          </button>
+        )}
+
         {showReactions && (
           <div>
             <EmojiReactions
@@ -120,28 +142,22 @@ class PopinFixedHeader extends React.Component {
           />
         )}
 
-        {props.children}
-
-        {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
-          <button
-            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
-            onClick={this.handleClickUndoChangeTitleBtn}
-            disabled={disableChangeTitle}
-          >
-            <i className='fas fa-undo' title={t('Undo change in title')} />
-          </button>
+        {filteredHeaderButtons.map((action) =>
+          <IconButton
+            disabled={action.disabled}
+            icon={action.icon}
+            text={action.label}
+            label={action.label}
+            key={action.label}
+            onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
+            customClass='transparentButton'
+            showAction={action.showAction}
+            dataCy={action.dataCy}
+          />
         )}
 
-        {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton &&
-          <button
-            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
-            onClick={this.handleClickChangeTitleBtn}
-            disabled={disableChangeTitle}
-          >
-            {state.editTitle
-              ? <i className='fas fa-check' title={t('Validate the title')} />
-              : <i className='fas fa-pencil-alt' title={t('Edit title')} />}
-          </button>}
+        {props.children}
+
         {filteredActionList.length > 0 && (
           <DropdownMenu
             buttonCustomClass='wsContentGeneric__header__actions'
@@ -175,6 +191,15 @@ class PopinFixedHeader extends React.Component {
                   dataCy={action.dataCy}
                 />
               ))}
+            {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && !state.editTitle && (
+              <button
+                className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
+                onClick={this.handleClickChangeTitleBtn}
+                disabled={disableChangeTitle}
+              >
+                <i className='fas fa-pencil-alt' title={t('Edit title')} />
+              </button>
+            )}
           </DropdownMenu>
         )}
 
@@ -198,6 +223,7 @@ PopinFixedHeader.propTypes = {
   onClickCloseBtn: PropTypes.func.isRequired,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
+  headerButtons: PropTypes.array,
   rawTitle: PropTypes.string,
   componentTitle: PropTypes.element,
   userRoleIdInWorkspace: PropTypes.number,
@@ -217,6 +243,7 @@ PopinFixedHeader.propTypes = {
 PopinFixedHeader.defaultProps = {
   customClass: '',
   customColor: '',
+  headerButtons: [],
   rawTitle: '',
   componentTitle: <div />,
   userRoleIdInWorkspace: ROLE.reader.id,
@@ -231,7 +258,7 @@ PopinFixedHeader.defaultProps = {
   },
   favoriteState: '',
   loggedUser: {},
-  onClickAddToFavoriteList: () => {},
-  onClickRemoveFromFavoriteList: () => {},
+  onClickAddToFavoriteList: () => { },
+  onClickRemoveFromFavoriteList: () => { },
   showReactions: false
 }
