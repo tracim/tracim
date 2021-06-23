@@ -45,6 +45,8 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_workspace_subscription_created(
                     subscription=obj, context=session.context
                 )
+            elif isinstance(obj, Reaction):
+                self._plugin_manager.hook.on_reaction_created(reaction=obj, context=session.context)
             elif isinstance(obj, TagOnContent):
                 self._plugin_manager.hook.on_content_tag_created(
                     content_tag=obj, context=session.context
