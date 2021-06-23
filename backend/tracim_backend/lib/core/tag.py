@@ -17,7 +17,7 @@ from tracim_backend.models.tracim_session import TracimSession
 
 class TagLib:
     """
-    This class allows to manage tags on contents.
+    This class manages tags on contents.
     Tags are created in the context of a workspace, then referenced by contents.
     """
 
