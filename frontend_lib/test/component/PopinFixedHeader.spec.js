@@ -29,11 +29,10 @@ describe('<PopinFixedHeader />', () => {
   )
 
   describe('Static design', () => {
-    it(`6 elements should have the class: "${(props.customClass)}"`, () => {
+    it(`4 elements should have the class: "${(props.customClass)}"`, () => {
       expect(wrapper.find(`div.${(props.customClass)}__header`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${(props.customClass)}__header__icon`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${(props.customClass)}__header__title`)).to.have.lengthOf(1)
-      expect(wrapper.find(`button.${(props.customClass)}__header__changetitle`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${(props.customClass)}__header__close`)).to.have.lengthOf(1)
     })
 
@@ -96,12 +95,6 @@ describe('<PopinFixedHeader />', () => {
   })
 
   describe('Handlers', () => {
-    it('onValidateChangeTitleCallBack should be call when click the undo button', () => {
-      wrapper.find(`button.${(props.customClass)}__header__changetitle`).at(0).simulate('click')
-      wrapper.find(`button.${(props.customClass)}__header__changetitle`).at(1).simulate('click')
-      expect(onValidateChangeTitleCallBack.called).to.equal(true)
-    })
-
     it('onClickCloseBtnCallBack should be call when click the close button', () => {
       wrapper.find(`div.${(props.customClass)}__header__close`).simulate('click')
       expect(onClickCloseBtnCallBack.called).to.equal(true)

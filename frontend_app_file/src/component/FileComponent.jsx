@@ -1,13 +1,16 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PreviewComponent from './PreviewComponent.jsx'
 import {
   APP_FEATURE_MODE,
-  PromptMessage,
   FileDropzone,
-  PopupProgressUpload
+  IconButton,
+  PromptMessage,
+  PopupProgressUpload,
+  RefreshWarningMessage
 } from 'tracim_frontend_lib'
 
 const color = require('color')
@@ -74,7 +77,27 @@ export class FileComponent extends React.Component {
         )}
       >
         <div style={{ visibility: 'hidden' }} ref={props.myForwardedRef} />
-
+        <div className='file__contentpage__option'>
+          {props.mode === APP_FEATURE_MODE.REVISION && (
+            <IconButton
+              customClass='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
+              color={props.customColor}
+              intent='primary'
+              mode='light'
+              onClick={props.onClickLastVersion}
+              icon='fas fa-history'
+              text={props.t('Last version')}
+              title={props.t('Last version')}
+              dataCy='appFileLastVersionBtn'
+            />
+          )}
+          {props.isRefreshNeeded && (
+            <RefreshWarningMessage
+              tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+              onClickRefresh={props.onClickRefresh}
+            />
+          )}
+        </div>
         {props.displayNotifyAllMessage && (
           <PromptMessage
             msg={
@@ -192,3 +215,21 @@ export class FileComponent extends React.Component {
 const FileComponentWithHOC = translate()(Radium(FileComponent))
 
 export default React.forwardRef((props, ref) => <FileComponentWithHOC {...props} myForwardedRef={ref} />)
+
+FileComponent.propTypes = {
+  customColor: PropTypes.string,
+  editionAuthor: PropTypes.string,
+  isRefreshNeeded: PropTypes.bool,
+  mode: PropTypes.string,
+  onClickLastVersion: PropTypes.func,
+  onClickRefresh: PropTypes.func
+}
+
+FileComponent.defaultProps = {
+  customColor: '#252525',
+  editionAuthor: '',
+  isRefreshNeeded: false,
+  mode: APP_FEATURE_MODE.VIEW,
+  onClickLastVersion: () => { },
+  onClickRefresh: () => { }
+}

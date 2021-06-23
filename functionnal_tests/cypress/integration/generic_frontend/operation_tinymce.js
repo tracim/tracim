@@ -92,7 +92,6 @@ describe('TinyMce text editor', function () {
         cy.waitForTinyMCELoaded().then(() => {
           cy.inputInTinyMCE('@johndoe')
           cy.get('.html-document__editionmode__submit').click()
-          cy.get('.html-document__contentpage__textnote__top__version').should('be.visible')
           cy.get('#autocomplete').should('be.not.visible')
         })
       })

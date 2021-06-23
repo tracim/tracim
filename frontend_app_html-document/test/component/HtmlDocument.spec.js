@@ -53,11 +53,6 @@ describe('<HtmlDocument />', () => {
     const wrapper = shallow(
       <HtmlDocument {...props} />
     )
-
-    it(`should display the last version number ${props.lastVersion}`, () =>
-      expect(wrapper.find('.html-document__contentpage__textnote__top__version').render().text()).to.contains(props.lastVersion)
-    )
-
     it('should display the content of the document', () =>
       expect(wrapper.find('.html-document__contentpage__textnote__text').render().text()).to.contains(props.text)
     )
@@ -142,22 +137,6 @@ describe('<HtmlDocument />', () => {
       )
     })
   })
-})
-
-describe('in REVISION mode', () => {
-  const wrapper = shallow(
-    <HtmlDocument
-      {...props}
-      mode={APP_FEATURE_MODE.REVISION}
-    />
-  )
-
-  it(`should display the version number ${props.version}`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__top__version').render().text()).to.contains(props.version)
-  )
-  it(`should display the last version number ${props.lastVersion}`, () =>
-    expect(wrapper.find('.html-document__contentpage__textnote__top__lastversion').render().text()).to.contains(props.lastVersion)
-  )
 })
 
 describe('in EDIT mode', () => {

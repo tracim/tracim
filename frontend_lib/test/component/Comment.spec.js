@@ -34,7 +34,8 @@ describe('<Comment />', () => {
     onChangeTranslationTargetLanguageCode: () => {},
     translationTargetLanguageCode: 'en',
     targetLanguageList: [{ code: 'fr', display: 'Français' }],
-    translationTargetLanguageList: [{ code: 'fr', display: 'Français' }]
+    translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
+    onChangeTargetLanguageCode: () => {}
   }
 
   const CommentWithHOC = withRouterMock(Comment)

@@ -99,7 +99,6 @@ import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
-import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPartContent.jsx'
@@ -229,7 +228,6 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
 
-export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
 export { default as Comment } from './component/Timeline/Comment.jsx'
@@ -296,7 +294,6 @@ export {
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
   PopinFixedRightPartContent,

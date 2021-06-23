@@ -33,8 +33,8 @@ describe('operation :: workspace > create_new > html-document', function () {
       .then(() => cy.typeInTinyMCE('example'))
 
     cy.get('button.html-document__editionmode__submit.editionmode__button__submit').click()
-    cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').should('be.visible')
-    cy.get('.html-document.visible .wsContentGeneric__header__close.html-document__header__close').click()
+    cy.get('.html-document__contentpage__header__close.iconBtn').should('be.visible')
+    cy.get('.html-document__contentpage__header__close.iconBtn').click()
     cy.get('.html-document.visible').should('not.be.visible')
     cy.get('.content__name').contains(titre1).should('be.visible')
   })

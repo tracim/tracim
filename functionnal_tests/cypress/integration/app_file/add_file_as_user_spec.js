@@ -33,7 +33,7 @@ context('Add file(s) with PopupCreateFile', function () {
         .get('[data-cy=popup__createcontent__form__button]')
         .click()
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .get('.previewcomponent__dloption__icon').should('have.length', 1)
+        .get('.previewcomponent').should('have.length', 1)
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .get('.selectStatus').contains('Opened')
       cy.url().should('include', `/ui/workspaces/${workspaceId}/contents/file/`)

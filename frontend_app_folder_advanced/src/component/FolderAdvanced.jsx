@@ -1,6 +1,7 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { Checkbox } from 'tracim_frontend_lib'
+import { Checkbox, RefreshWarningMessage } from 'tracim_frontend_lib'
 
 const FolderAdvanced = props => {
   return (
@@ -31,6 +32,13 @@ const FolderAdvanced = props => {
             {props.t('Restore')}
           </button>
         </div>
+      )}
+
+      {props.isRefreshNeeded && (
+        <RefreshWarningMessage
+          tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+          onClickRefresh={props.onClickRefresh}
+        />
       )}
 
       <div className='formBlock folder_advanced__content'>
@@ -71,3 +79,15 @@ const FolderAdvanced = props => {
 }
 
 export default translate()(FolderAdvanced)
+
+FolderAdvanced.propTypes = {
+  editionAuthor: PropTypes.string,
+  isRefreshNeeded: PropTypes.bool,
+  onClickRefresh: PropTypes.func
+}
+
+FolderAdvanced.defaultProps = {
+  editionAuthor: '',
+  isRefreshNeeded: false,
+  onClickRefresh: () => { }
+}
