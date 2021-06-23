@@ -1,6 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
 import {
+  AutoComplete,
   BtnSwitch,
   ConfirmPopup,
   ROLE_LIST,
@@ -26,10 +27,15 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
   }
 
   componentDidMount () {
+    const { props } = this
     globalThis.wysiwyg(
       WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR,
-      this.props.i18n.language,
-      this.props.onChangeDescription
+      props.i18n.language,
+      props.onChangeDescription,
+      props.onTinyMceInput,
+      props.onTinyMceKeyDown,
+      props.onTinyMceKeyUp,
+      props.onTinyMceSelectionChange
     )
   }
 
@@ -48,6 +54,15 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
           </div>
 
           <div className='formBlock__field workspace_advanced__description__text '>
+            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+              <AutoComplete
+                apiUrl={props.apiUrl}
+                autoCompleteItemList={props.autoCompleteItemList}
+                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+              />
+            )}
             <textarea
               id={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
               className='workspace_advanced__description__text__textarea'

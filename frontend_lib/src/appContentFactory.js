@@ -190,8 +190,15 @@ export function appContentFactory (WrappedComponent) {
         return Promise.reject(e)
       }
 
+      let newCommentForApiWithMentionAndLink
+      try {
+        newCommentForApiWithMentionAndLink = handleLinksBeforeSave(newCommentForApiWithMention)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
       const response = await handleFetchResult(
-        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMention)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMentionAndLink)
       )
 
       switch (response.apiResponse.status) {
