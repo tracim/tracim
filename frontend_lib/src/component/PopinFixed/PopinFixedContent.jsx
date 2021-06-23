@@ -101,7 +101,7 @@ class PopinFixedContent extends React.Component {
                   </div>
                 )}
 
-              {props.availableStatuses && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
+              {props.availableStatuses.length > 0 && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                 <SelectStatus
                   selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
                   availableStatus={props.availableStatuses}

@@ -14,13 +14,10 @@
   &__header
     &__editionmode
       display none
-    &__icon
-      .fa-comments
-        color white
   .timeline
     margin 0
     width 100%
-    height calc(100% - 40px)
+    height "calc(100% - %s)" % headerHeight
   .thread
     &__contentpage
       width 100%

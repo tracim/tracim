@@ -25,7 +25,7 @@
       justify-content flex-end
     &__left
       &__wrapper
-        height calc(100% - 102px)
+        height "calc(100% - %s)" % (2 * headerHeight) // INFO - G.B. - 20210623 - app header + tracim header
         overflow-y auto
         display flex
         flex-direction column
