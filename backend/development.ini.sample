@@ -781,6 +781,13 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # both CollaboraOnline and LibreofficeOnline, example:
 # collaborative_document_edition.software = collabora
 
+# list of extensions for which online edition will be provided.
+# This list is used to filter the extensions returned by the collaborative edition software.
+# It is also used to filter the list of template files.
+# If empty (which is the default value),no filtering is done.
+; collaborative_document_edition.enabled_extensions =
+# collaborative_document_edition.enabled_extensions = odt,ods
+
 # base url where collabora server exist
 ; collaborative_document_edition.collabora.base_url =
 # example:

@@ -105,7 +105,7 @@ devtools_require = [
 
 # add black for python 3.6+
 if sys.version_info.major == 3 and sys.version_info.minor >= 6:
-    devtools_require.append("black")
+    devtools_require.append("black==19.10b0")
 
 mysql_require = ["PyMySQL[rsa]"]
 
@@ -150,6 +150,7 @@ setup(
             "db_delete = tracim_backend.command.database:DeleteDBCommand",
             "db update-naming-conventions = tracim_backend.command.database:UpdateNamingConventionsV1ToV2Command",
             "db migrate-mysql-charset = tracim_backend.command.database:MigrateMysqlCharsetCommand",
+            "db migrate-storage = tracim_backend.command.database:MigrateStorageCommand",
             # search
             "search index-create = tracim_backend.command.search:SearchIndexInitCommand",
             "search index-populate = tracim_backend.command.search:SearchIndexIndexCommand",

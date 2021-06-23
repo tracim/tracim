@@ -107,7 +107,6 @@ function setup_db {
     else
        log "The database seems missing, initializing it..."
        tracimcli db init && loggood "Successfully initialized the database" || logerror "Failed to initialize the database"
-       alembic -c development.ini stamp head && loggood "Successfully ran alembic stamp head" || logerror "Failed to run alembic stamp head"
     fi
 }
 

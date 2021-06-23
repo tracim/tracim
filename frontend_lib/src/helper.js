@@ -685,7 +685,12 @@ export const createSpaceTree = spaceList => {
 
 export const naturalCompareLabels = (itemA, itemB, lang) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA.label.localeCompare(itemB.label, lang, { numeric: true })
+  return naturalCompare(itemA, itemB, lang, 'label')
+}
+
+export const naturalCompare = (itemA, itemB, lang, field) => {
+  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
+  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {

@@ -20,6 +20,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.expression import cast
 import transaction
 
+from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.validator import TracimValidator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -354,6 +355,7 @@ class UserApi(object):
         )
 
         query = content_api.get_base_query(workspaces=self.get_user_workspaces())
+        query = query.filter(Content.type != content_type_list.Comment.slug)
 
         if acp:
             query = query.filter(

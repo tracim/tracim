@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import CloseButton from '../Button/CloseButton.jsx'
 
 // require('./CardPopup.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -15,9 +16,7 @@ const CardPopup = props => {
 
         {props.hideCloseBtn === false && (
           <div className='cardPopup__close'>
-            <button className='transparentButton' onClick={props.onClose}>
-              <i className='fas fa-times' />
-            </button>
+            <CloseButton onClick={props.onClose} />
           </div>
         )}
 

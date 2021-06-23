@@ -5,6 +5,7 @@ import sys
 import warnings
 
 from hapic.ext.pyramid import PyramidContext
+from preview_generator.preview.builder.office__libreoffice import LO_MIMETYPES
 from pyramid.config import Configurator
 from pyramid.request import Request
 from pyramid.router import Router
@@ -64,6 +65,7 @@ from tracim_backend.views.core_api.reaction_controller import ReactionController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
 from tracim_backend.views.core_api.session_controller import SessionController
 from tracim_backend.views.core_api.system_controller import SystemController
+from tracim_backend.views.core_api.tag_controller import TagController
 from tracim_backend.views.core_api.url_preview_controller import URLPreviewController
 from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
@@ -79,6 +81,41 @@ except ImportError:
 # useful to avoid apispec error
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
+
+
+# HACK - G.M - 2021-06-14 - disable spreadsheet support for preview by overriding
+# Preview generator Libreoffice mimetype list.
+spreadsheet_mimetypes = (
+    # Excel file mimetypes:
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # .xslx
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.template",  # .xlst
+    "application/vnd.ms-excel.sheet.binary.macroEnabled.12",  # .xlsb
+    "application/vnd.ms-excel.sheet.macroEnabled.12",  # .xlsm
+    "application/vnd.ms-excel.template.macroEnabled.12",  # .xltm
+    "application/wps-office.xls",  # .xls
+    "application/wps-office.xlsx",  # .xlsx
+    # Openoffice calc mimetypes:
+    "application/vnd.oasis.opendocument.spreadsheet",  # .ods
+    "application/vnd.oasis.opendocument.spreadsheet-template",  # .ots
+    "application/vnd.oasis.opendocument.spreadsheet-flat-xml",  # .fods
+    # Staroffice
+    "application/vnd.sun.xml.calc",
+    "application/vnd.sun.xml.calc.template",
+    "application/vnd.stardivision.calc",
+    "application/x-starcalc",
+    # Apple numbers
+    "application/x-iwork-numbers-sffnumbers",
+    "application/vnd.apple.numbers",
+    # others:
+    "application/x-gnumeric",
+    "text/spreadsheet",
+    "application/vnd.lotus-1-2-3",
+)
+for mimetype in spreadsheet_mimetypes:
+    try:
+        LO_MIMETYPES.pop(mimetype)
+    except KeyError:
+        pass
 
 
 class TracimPyramidContext(PyramidContext):
@@ -254,6 +291,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     workspace_controller = WorkspaceController()
     comment_controller = CommentController()
     reaction_controller = ReactionController()
+    tag_controller = TagController()
     url_preview_controller = URLPreviewController()
     favorite_content_controller = FavoriteContentController()
     configurator.include(session_controller.bind, route_prefix=BASE_API)
@@ -264,6 +302,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(workspace_controller.bind, route_prefix=BASE_API)
     configurator.include(comment_controller.bind, route_prefix=BASE_API)
     configurator.include(reaction_controller.bind, route_prefix=BASE_API)
+    configurator.include(tag_controller.bind, route_prefix=BASE_API)
     configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
     configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
 

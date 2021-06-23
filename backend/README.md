@@ -119,10 +119,6 @@ Initialize the database using [tracimcli](doc/cli.md) tool
 
     tracimcli db init
 
-Stamp current version of database to last (useful for migration):
-
-    alembic -c development.ini stamp head
-
 Optional functionalities are available through official plugins, please [read their documentation](official_plugins/README.md) to discover their functionalities and how to activate them.
 
 ## Deployment
