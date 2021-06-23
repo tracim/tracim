@@ -974,7 +974,7 @@ export class HtmlDocument extends React.Component {
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'popinListItem__newVersion'
+              dataCy: 'newVersionButton'
             }
           ]}
           isRefreshNeeded={state.showRefreshWarning}

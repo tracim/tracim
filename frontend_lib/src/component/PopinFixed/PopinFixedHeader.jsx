@@ -84,7 +84,7 @@ class PopinFixedHeader extends React.Component {
         onClick: this.handleClickChangeTitleBtn,
         showAction: userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && !state.editTitle,
         disabled: disableChangeTitle,
-        dataCy: 'popinListItem__newVersion'
+        dataCy: 'popinListItem__editTitle'
       },
       ...actionList
     ]

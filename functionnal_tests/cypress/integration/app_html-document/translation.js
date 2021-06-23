@@ -20,18 +20,18 @@ describe('App HTML Document', function () {
 
   it('should have translations', () => {
     cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__newVersion"]').contains('Edit')
+    cy.get('[data-cy="popinListItem__editTitle"]').contains('Edit title')
 
     cy.changeLanguage('fr')
     cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__newVersion"]').contains('Modifier')
+    cy.get('[data-cy="popinListItem__editTitle"]').contains('Modifier le titre')
 
     cy.changeLanguage('pt')
     cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__newVersion"]').contains('Editar')
+    cy.get('[data-cy="popinListItem__editTitle"]').contains('Editar o título')
 
     cy.changeLanguage('de')
     cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__newVersion"]').contains('Bearbeiten')
+    cy.get('[data-cy="popinListItem__editTitle"]').contains('Titel bearbeiten')
   })
 })
