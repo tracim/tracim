@@ -162,7 +162,15 @@ export class Sidebar extends React.Component {
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
 
-  handleClickToggleSidebar = () => this.setState(prev => ({ sidebarClose: !prev.sidebarClose }))
+  handleClickToggleSidebar = () => {
+    GLOBAL_dispatchEvent({
+      type: this.state.sidebarClose
+        ? CUSTOM_EVENT.SHOW_SIDEBAR
+        : CUSTOM_EVENT.HIDE_SIDEBAR,
+      data: { }
+    })
+    this.setState(previousState => ({ sidebarClose: !previousState.sidebarClose }))
+  }
 
   handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
 

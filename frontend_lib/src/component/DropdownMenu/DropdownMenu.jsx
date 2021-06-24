@@ -23,7 +23,7 @@ const DropdownMenu = props => {
         type='button'
       >
         {props.buttonOpts}
-        {props.buttonIcon && <i className={`fa-fw ${props.buttonIcon}`} />}
+        {props.buttonIcon && <i className={`fa-fw ${props.buttonIcon}`} style={{ color: props.buttonIconColor }} />}
         {props.buttonImage && <img className='dropdownMenu__image' src={props.buttonImage} />}
         {props.buttonLabel && <span>{props.buttonLabel}</span>}
       </button>
@@ -49,6 +49,7 @@ DropdownMenu.propTypes = {
   buttonDataCy: PropTypes.string,
   buttonDisabled: PropTypes.bool,
   buttonIcon: PropTypes.string,
+  buttonIconColor: PropTypes.string,
   buttonImage: PropTypes.string,
   buttonLabel: PropTypes.string,
   buttonOpts: PropTypes.node,
@@ -64,6 +65,7 @@ DropdownMenu.defaultProps = {
   buttonDataCy: '',
   buttonDisabled: false,
   buttonIcon: '',
+  buttonIconColor: '',
   buttonImage: '',
   buttonLabel: '',
   buttonTooltip: '',

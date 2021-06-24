@@ -3,29 +3,6 @@
 .selectStatus
   white-space pre
   &__dropdownbtn
-    border 1px solid grey
-    &::after
-      color fontColor
-    &__label
-      margin-right 1ex
-      color fontColor
-    &__selectedStatus__icon
-      display inline-block
-      margin 0 10px
-  &__submenu
-    width 100%
-    &__item
-      justify-content space-between
-      &:active
-        color fontColor
-
-@media (max-width: max-md)
-  .selectStatus__dropdownbtn__label, .selectStatus__dropdownbtn__selectedStatus__label
-    display none
-    margin 0
-
-@media (min-width: min-xs) and (max-width: max-lg)
-  .selectStatus
-    &__dropdownbtn
-      &__selectedStatus__icon
-        margin 0
+    color lightDarkGrey
+    font-size fontSizeSmall
+    padding 0

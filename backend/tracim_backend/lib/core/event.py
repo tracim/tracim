@@ -64,12 +64,15 @@ from tracim_backend.models.event import OperationType
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.models.reaction import Reaction
 from tracim_backend.models.roles import WorkspaceRoles
+from tracim_backend.models.tag import Tag
+from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import ReactionSchema
+from tracim_backend.views.core_api.schemas import TagSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -93,6 +96,7 @@ class EventApi:
         THREAD_TYPE: ContentSchema(),
     }
     reaction_schema = ReactionSchema()
+    tag_schema = TagSchema()
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
@@ -678,6 +682,28 @@ class EventBuilder:
     def on_reaction_deleted(self, reaction: Reaction, context: TracimContext) -> None:
         self._create_reaction_event(OperationType.DELETED, reaction, context)
 
+    # Tag events
+    @hookimpl
+    def on_tag_created(self, tag: Tag, context: TracimContext) -> None:
+        self._create_tag_event(OperationType.CREATED, tag, context)
+
+    @hookimpl
+    def on_tag_modified(self, tag: Tag, context: TracimContext) -> None:
+        self._create_tag_event(OperationType.MODIFIED, tag, context)
+
+    @hookimpl
+    def on_tag_deleted(self, tag: Tag, context: TracimContext) -> None:
+        self._create_tag_event(OperationType.DELETED, tag, context)
+
+    # TagOnContent events
+    @hookimpl
+    def on_content_tag_created(self, content_tag: TagOnContent, context: TracimContext) -> None:
+        self._create_content_tag_event(OperationType.CREATED, content_tag, context)
+
+    @hookimpl
+    def on_content_tag_deleted(self, content_tag: TagOnContent, context: TracimContext) -> None:
+        self._create_content_tag_event(OperationType.DELETED, content_tag, context)
+
     def _create_subscription_event(
         self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
     ) -> None:
@@ -735,6 +761,59 @@ class EventBuilder:
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(
             entity_type=EntityType.REACTION,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
+    def _create_tag_event(self, operation: OperationType, tag: Tag, context: TracimContext) -> None:
+        """Create an event for a tag operation (create/update/delete)."""
+        current_user = context.safe_current_user()
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=self._config, current_user=None,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(tag.workspace_id)
+        )
+        fields = {
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
+            Event.TAG_FIELD: EventApi.tag_schema.dump(tag).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.TAG,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
+    def _create_content_tag_event(
+        self, operation: OperationType, content_tag: TagOnContent, context: TracimContext
+    ) -> None:
+        """Create an event for a tag operation on a content (add/remove)."""
+        current_user = context.safe_current_user()
+        workspace_api = WorkspaceApi(
+            session=context.dbsession, config=self._config, current_user=None,
+        )
+        workspace_in_context = workspace_api.get_workspace_with_context(
+            workspace_api.get_one(content_tag.content.workspace_id)
+        )
+        content_api = ContentApi(context.dbsession, current_user, self._config)
+        content_in_context = content_api.get_content_in_context(content_tag.content)
+        content_schema = EventApi.get_content_schema_for_type(content_tag.content.type)
+        content_dict = content_schema.dump(content_in_context).data
+        fields = {
+            Event.WORKSPACE_FIELD: EventApi.workspace_without_description_schema.dump(
+                workspace_in_context
+            ).data,
+            Event.CONTENT_FIELD: content_dict,
+            Event.TAG_FIELD: EventApi.tag_schema.dump(content_tag.tag).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.CONTENT_TAG,
             operation=operation,
             additional_fields=fields,
             context=context,
@@ -842,6 +921,8 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.CONTENT: _get_content_event_receiver_ids,
         EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
         EntityType.REACTION: _get_content_event_receiver_ids,
+        EntityType.TAG: _get_workspace_event_receiver_ids,
+        EntityType.CONTENT_TAG: _get_content_event_receiver_ids,
     }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:

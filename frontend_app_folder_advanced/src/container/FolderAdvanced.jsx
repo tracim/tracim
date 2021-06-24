@@ -8,22 +8,17 @@ import {
   appContentFactory,
   PopinFixed,
   PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedContent,
   handleFetchResult,
   addAllResourceI18n,
-  ArchiveDeleteContent,
   CUSTOM_EVENT,
   ROLE,
   buildHeadTitle,
-  RefreshWarningMessage,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
-  FavoriteButton,
-  FAVORITE_STATE,
-  ToolBar
+  FAVORITE_STATE
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -182,7 +177,7 @@ export class FolderAdvanced extends React.Component {
     }
   }
 
-  loadTimeline = () => {}
+  loadTimeline = () => { }
 
   buildBreadcrumbs = async content => {
     try {
@@ -295,56 +290,35 @@ export class FolderAdvanced extends React.Component {
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
+          actionList={[
+            {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
+            }
+          ]}
+          favoriteState={(
+            props.isContentInFavoriteList(state.content, state)
+              ? FAVORITE_STATE.FAVORITE
+              : FAVORITE_STATE.NOT_FAVORITE
+          )}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
         />
-
-        <PopinFixedOption>
-          <div className='folder_advanced__header'>
-            <ToolBar>
-              <FavoriteButton
-                favoriteState={(
-                  props.isContentInFavoriteList(state.content, state)
-                    ? FAVORITE_STATE.FAVORITE
-                    : FAVORITE_STATE.NOT_FAVORITE
-                )}
-                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-              />
-              {state.showRefreshWarning && (
-                <RefreshWarningMessage
-                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                  onClickRefresh={this.handleClickRefresh}
-                />
-              )}
-            </ToolBar>
-            <div className='folder_advanced__header__deleteButton'>
-              {/* state.loggedUser.userRoleIdInWorkspace >= 2 &&
-                <SelectStatus
-                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
-                  availableStatus={state.config.availableStatuses}
-                  onChangeStatus={this.handleChangeStatus}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              */}
-
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <ArchiveDeleteContent
-                  customColor={state.config.hexcolor}
-                  onClickArchiveBtn={this.handleClickArchive}
-                  onClickDeleteBtn={this.handleClickDelete}
-                  disabled={state.content.is_archived || state.content.is_deleted}
-                />
-              )}
-            </div>
-          </div>
-        </PopinFixedOption>
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
           <FolderAdvancedComponent
+            editionAuthor={state.editionAuthor}
             folderSubContentType={state.content.sub_content_types || []}
+            isRefreshNeeded={state.showRefreshWarning}
+            onClickRefresh={this.handleClickRefresh}
             tracimContentTypeList={state.tracimContentTypeList}
             onClickApp={this.handleClickCheckbox}
             isArchived={state.content.is_archived}

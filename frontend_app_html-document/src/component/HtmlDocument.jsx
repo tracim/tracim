@@ -7,8 +7,10 @@ import {
   APP_FEATURE_MODE,
   ConfirmPopup,
   AutoComplete,
+  IconButton,
   PromptMessage,
   HTMLContent,
+  RefreshWarningMessage,
   TextAreaApp,
   TRANSLATION_STATE,
   TranslateButton
@@ -26,6 +28,28 @@ export const HtmlDocument = props => {
 
   return (
     <div className='html-document__contentpage__left__wrapper'>
+      <div className='html-document__contentpage__option'>
+        {props.mode === APP_FEATURE_MODE.REVISION && (
+          <IconButton
+            customClass='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
+            color={props.customColor}
+            intent='primary'
+            mode='light'
+            onClick={props.onClickLastVersion}
+            icon='fas fa-history'
+            text={props.t('Last version')}
+            title={props.t('Last version')}
+          />
+        )}
+
+        {props.isRefreshNeeded && (
+          <RefreshWarningMessage
+            tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+            onClickRefresh={props.onClickRefresh}
+          />
+        )}
+      </div>
+
       {props.displayNotifyAllMessage && (
         <PromptMessage
           msg={
@@ -94,20 +118,6 @@ export const HtmlDocument = props => {
                 onClickRestore={props.onClickRestoreDocument}
                 dataCy='htmlDocumentTranslateButton'
               />
-              <div className='html-document__contentpage__textnote__top__version'>
-                {props.t(
-                  'Version #{{versionNumber}}', {
-                    versionNumber: props.mode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                      ? props.lastVersion
-                      : props.version
-                  }
-                )}
-                {(props.mode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
-                  <div className='html-document__contentpage__textnote__top__lastversion'>
-                    ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                  </div>
-                )}
-              </div>
             </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
             <div className={noteClassName}>
@@ -172,32 +182,42 @@ export const HtmlDocument = props => {
 export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
-  mode: PropTypes.string,
   apiUrl: PropTypes.string.isRequired,
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  translationTargetLanguageCode: PropTypes.string.isRequired,
   customColor: PropTypes.string,
+  editionAuthor: PropTypes.string,
   wysiwygNewVersion: PropTypes.string,
   disableValidateBtn: PropTypes.bool,
-  version: PropTypes.string,
-  lastVersion: PropTypes.number,
   text: PropTypes.string,
   isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,
   isDeprecated: PropTypes.bool,
   deprecatedStatus: PropTypes.object,
   isDraftAvailable: PropTypes.bool,
+  isRefreshNeeded: PropTypes.bool,
+  mode: PropTypes.string,
   onClickValidateBtn: PropTypes.func,
   onChangeText: PropTypes.func,
   onClickCloseEditMode: PropTypes.func,
   onClickCloseNotifyAllMessage: PropTypes.func,
+  onClickLastVersion: PropTypes.func,
   onClickNotifyAll: PropTypes.func,
+  onClickRefresh: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickShowDraft: PropTypes.func,
-  isRefreshNeeded: PropTypes.bool,
   onClickTranslateDocument: PropTypes.func,
   onClickRestoreDocument: PropTypes.func,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired,
-  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
+}
+
+HtmlDocument.defaultProps = {
+  customColor: '#252525',
+  editionAuthor: '',
+  isRefreshNeeded: false,
+  mode: APP_FEATURE_MODE.VIEW,
+  onClickLastVersion: () => { },
+  onClickRefresh: () => { }
 }

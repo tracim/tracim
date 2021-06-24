@@ -410,7 +410,7 @@ class CFG(object):
         )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
-            "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*",
+            "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*",
         )
 
         # base url of the frontend

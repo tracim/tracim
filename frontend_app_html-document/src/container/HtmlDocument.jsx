@@ -7,6 +7,7 @@ import {
   addRevisionFromTLM,
   APP_FEATURE_MODE,
   appContentFactory,
+  BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   CONTENT_TYPE,
@@ -16,19 +17,13 @@ import {
   getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
-  NewVersionBtn,
   PAGE,
   PopinFixed,
   PopinFixedContent,
-  PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedRightPart,
-  RefreshWarningMessage,
   ROLE,
-  AppContentRightMenu,
   Timeline,
   TagList,
-  IconButton,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
@@ -52,9 +47,7 @@ import {
   TRANSLATION_STATE,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
-  FavoriteButton,
-  FAVORITE_STATE,
-  ToolBar
+  FAVORITE_STATE
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -73,6 +66,7 @@ export class HtmlDocument extends React.Component {
     props.setApiUrl(param.config.apiUrl)
     this.state = {
       appName: 'html-document',
+      breadcrumbsList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -368,6 +362,13 @@ export class HtmlDocument extends React.Component {
           breadcrumbs: contentBreadcrumbsList
         }
       })
+      const space = {
+        link: PAGE.WORKSPACE.DASHBOARD(content.workspace_id),
+        label: this.state.config.workspace.label,
+        type: BREADCRUMBS_TYPE.CORE,
+        isALink: true
+      }
+      this.setState({ breadcrumbsList: [space, ...contentBreadcrumbsList] })
     } catch (e) {
       console.error('Error in app html-document, count not build breadcrumbs', e)
     }
@@ -949,95 +950,65 @@ export class HtmlDocument extends React.Component {
 
     const displayTranslatedText = (
       state.mode !== APP_FEATURE_MODE.EDIT &&
-        state.translationState === TRANSLATION_STATE.TRANSLATED
+      state.translationState === TRANSLATION_STATE.TRANSLATED
     )
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
-        <PopinFixedHeader
-          customClass={`${state.config.slug}`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
-          rawTitle={state.content.label}
+        <PopinFixedContent
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
           componentTitle={<div>{state.content.label}</div>}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          content={state.content}
+          config={state.config}
+          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          disableChangeTitle={!state.content.is_editable}
+          headerButtons={[
+            {
+              icon: 'fas fa-plus-circle',
+              label: props.t('Edit'),
+              key: props.t('Edit'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'newVersionButton'
+            }
+          ]}
+          isRefreshNeeded={state.showRefreshWarning}
+          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!state.content.is_editable}
-        />
-
-        <PopinFixedOption
-          customColor={state.config.hexcolor}
-          customClass={`${state.config.slug}`}
-          i18n={i18n}
-        >
-          <div>
-            <ToolBar>
-              <FavoriteButton
-                favoriteState={props.isContentInFavoriteList(state.content, state)
-                  ? FAVORITE_STATE.FAVORITE
-                  : FAVORITE_STATE.NOT_FAVORITE}
-                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-              />
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <NewVersionBtn
-                  customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Edit')}
-                  icon='fas fa-plus-circle'
-                />
-              )}
-
-              {state.mode === APP_FEATURE_MODE.REVISION && (
-                <IconButton
-                  customClass='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
-                  color={state.config.hexcolor}
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickLastVersion}
-                  icon='fas fa-history'
-                  text={props.t('Last version')}
-                  title={props.t('Last version')}
-                />
-              )}
-
-              {state.showRefreshWarning && (
-                <RefreshWarningMessage
-                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                  onClickRefresh={this.handleClickRefresh}
-                />
-              )}
-            </ToolBar>
-            <AppContentRightMenu
-              apiUrl={state.config.apiUrl}
-              content={state.content}
-              availableStatuses={state.config.availableStatuses}
-              appMode={state.mode}
-              loggedUser={state.loggedUser}
-              hexcolor={state.config.hexcolor}
-              onChangeStatus={this.handleChangeStatus}
-              onClickArchive={this.handleClickArchive}
-              onClickDelete={this.handleClickDelete}
-            />
-          </div>
-        </PopinFixedOption>
-
-        <PopinFixedContent
-          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          favoriteState={props.isContentInFavoriteList(state.content, state)
+            ? FAVORITE_STATE.FAVORITE
+            : FAVORITE_STATE.NOT_FAVORITE}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          showReactions
+          actionList={[{
+            icon: 'far fa-trash-alt',
+            label: props.t('Delete'),
+            onClick: this.handleClickDelete,
+            showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+            disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
+            dataCy: 'popinListItem__delete'
+          }
+          ]}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
+            editionAuthor={state.editionAuthor}
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
             apiUrl={state.config.apiUrl}
@@ -1046,8 +1017,6 @@ export class HtmlDocument extends React.Component {
             onClickCloseEditMode={this.handleCloseNewVersion}
             disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleClickSaveDocument}
-            version={state.content.number}
-            lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
             onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
@@ -1077,6 +1046,8 @@ export class HtmlDocument extends React.Component {
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickRefresh={this.handleClickRefresh}
+            onClickLastVersion={this.handleClickLastVersion}
           />
 
           <PopinFixedRightPart

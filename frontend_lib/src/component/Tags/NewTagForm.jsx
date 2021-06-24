@@ -68,7 +68,7 @@ export class NewTagForm extends React.Component {
             disabled={!this.state.tagName}
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
-            data-cy='ValidateTag'
+            dataCy='validate_tag'
             text={props.t('Validate')}
           />
         </div>

@@ -33,7 +33,8 @@ describe("A content's name inside an app", () => {
       pageName: PAGES.CONTENT_OPEN,
       params: { workspaceId: workspaceId, contentType: 'file', contentId: fileId }
     })
-    cy.get('.newVersionBtn').click()
+    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.get('[data-cy="newVersionBtn"]').click()
     cy.dropFixtureInDropZone(fullFilename, contentType, '.filecontent__form', fullFilename)
     cy.get('.file__contentpage__dropzone__btn__validate').click()
     cy.contains('.FilenameWithExtension .badge', '.png')
@@ -47,3 +48,4 @@ describe("A content's name inside an app", () => {
     cy.get('.FilenameWithExtension').should('not.exist')
   })
 })
+
