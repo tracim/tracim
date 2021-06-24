@@ -11,9 +11,6 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
 
-const WORKSPACE_DESCRIPTION_TEXTAREA_ID = 'workspace_advanced__description__text__textarea'
-const WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR = `#${WORKSPACE_DESCRIPTION_TEXTAREA_ID}`
-
 export class WorkspaceAdvancedConfiguration extends React.Component {
   constructor (props) {
     super(props)
@@ -29,7 +26,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
   componentDidMount () {
     const { props } = this
     globalThis.wysiwyg(
-      WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR,
+      `#${props.textareaId}`,
       props.i18n.language,
       props.onChangeDescription,
       props.onTinyMceInput,
@@ -40,7 +37,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove(WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR)
+    globalThis.tinymce.remove(`#${this.props.textareaId}`)
   }
 
   render () {
@@ -64,7 +61,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
               />
             )}
             <textarea
-              id={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
+              id={props.textareaId}
               className='workspace_advanced__description__text__textarea'
               placeholder={props.t("Space's description")}
               value={props.description}

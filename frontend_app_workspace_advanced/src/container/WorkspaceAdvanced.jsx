@@ -52,6 +52,8 @@ import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
 import OptionalFeatures from '../component/OptionalFeatures.jsx'
 import SpaceSubscriptionsRequests from '../component/SpaceSubscriptionsRequests.jsx'
 
+const WORKSPACE_DESCRIPTION_TEXTAREA_ID = 'workspace_advanced__description__text__textarea'
+
 export class WorkspaceAdvanced extends React.Component {
   constructor (props) {
     super(props)
@@ -326,7 +328,14 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     let newDescription
     try {
-      newDescription = handleLinksBeforeSave(state.content.description)
+      newDescription = handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent())
+      // RJ - NOTE - 2021-06-24
+      // We are using tinymce's getContent() method and not
+      // state.content.description here because it has an outdated
+      // value after autocompleting a content.
+      // This is also what does appContentFactory after saving a new advanced comment
+      // (see saveCommentAsText in appContentFactory.js)
+      // We might want to look into it later
     } catch (e) {
       return Promise.reject(e.message || props.t('Error while saving the new version'))
     }
@@ -800,6 +809,7 @@ export class WorkspaceAdvanced extends React.Component {
         >
           <WorkspaceAdvancedConfiguration
             apiUrl={state.config.apiUrl}
+            textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             autoCompleteItemList={state.autoCompleteItemList}
             customColor={state.config.hexcolor}
@@ -807,7 +817,9 @@ export class WorkspaceAdvanced extends React.Component {
             defaultRole={state.content.default_user_role}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
             isAutoCompleteActivated={state.isAutoCompleteActivated}
-            onClickAutoCompleteItem={(item) => tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))}
+            onClickAutoCompleteItem={(item) => {
+              tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
+            }}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
