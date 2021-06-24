@@ -180,7 +180,7 @@ class TagList extends React.Component {
       <div className='tagList' data-cy='tag_list'>
 
         <div className='tagList__header'>
-          {props.t('Tag List')}
+          {props.t('Tags')}
         </div>
 
         <div className='tagList__wrapper'>

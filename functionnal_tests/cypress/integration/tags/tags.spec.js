@@ -9,8 +9,13 @@ describe('Create tags', () => {
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
 
-  describe('Tag list', () => {
-    for (const testedContent of ['note', 'file']) {
+  before(() => {
+    cy.resetDB()
+    cy.setupBaseDB()
+  })
+
+  describe('Tags', () => {
+    for (const testedContent of ['file', 'note']) {
       describe(`in a ${testedContent}`, () => {
         before(() => {
           cy.resetDB()
