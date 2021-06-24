@@ -972,7 +972,7 @@ export class HtmlDocument extends React.Component {
               label: props.t('Edit'),
               key: props.t('Edit'),
               onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionButton'
             }
