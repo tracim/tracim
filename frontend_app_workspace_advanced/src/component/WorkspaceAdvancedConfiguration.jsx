@@ -1,6 +1,7 @@
 import React from 'react'
 import Radium from 'radium'
 import {
+  AutoComplete,
   BtnSwitch,
   ConfirmPopup,
   ROLE_LIST,
@@ -9,9 +10,6 @@ import {
 import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
-
-const WORKSPACE_DESCRIPTION_TEXTAREA_ID = 'workspace_advanced__description__text__textarea'
-const WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR = `#${WORKSPACE_DESCRIPTION_TEXTAREA_ID}`
 
 export class WorkspaceAdvancedConfiguration extends React.Component {
   constructor (props) {
@@ -26,15 +24,20 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
   }
 
   componentDidMount () {
+    const { props } = this
     globalThis.wysiwyg(
-      WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR,
-      this.props.i18n.language,
-      this.props.onChangeDescription
+      `#${props.textareaId}`,
+      props.i18n.language,
+      props.onChangeDescription,
+      props.onTinyMceInput,
+      props.onTinyMceKeyDown,
+      props.onTinyMceKeyUp,
+      props.onTinyMceSelectionChange
     )
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove(WORKSPACE_DESCRIPTION_TEXTAREA_SELECTOR)
+    globalThis.tinymce.remove(`#${this.props.textareaId}`)
   }
 
   render () {
@@ -48,8 +51,17 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
           </div>
 
           <div className='formBlock__field workspace_advanced__description__text '>
+            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+              <AutoComplete
+                apiUrl={props.apiUrl}
+                autoCompleteItemList={props.autoCompleteItemList}
+                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+              />
+            )}
             <textarea
-              id={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
+              id={props.textareaId}
               className='workspace_advanced__description__text__textarea'
               placeholder={props.t("Space's description")}
               value={props.description}

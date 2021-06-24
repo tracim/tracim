@@ -3,6 +3,7 @@ import WorkspaceAdvancedConfiguration from '../component/WorkspaceAdvancedConfig
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  handleLinksBeforeSave,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -19,7 +20,12 @@ import {
   getMyselfKnownMember,
   PAGE,
   SPACE_TYPE,
-  PopinFixedRightPartContent
+  PopinFixedRightPartContent,
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -44,6 +50,8 @@ import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
 import OptionalFeatures from '../component/OptionalFeatures.jsx'
 import SpaceSubscriptionsRequests from '../component/SpaceSubscriptionsRequests.jsx'
 
+const WORKSPACE_DESCRIPTION_TEXTAREA_ID = 'workspace_advanced__description__text__textarea'
+
 export class WorkspaceAdvanced extends React.Component {
   constructor (props) {
     super(props)
@@ -53,6 +61,9 @@ export class WorkspaceAdvanced extends React.Component {
 
     this.state = {
       appName: 'workspace_advanced',
+      autoCompleteCursorPosition: 0,
+      autoCompleteItemList: [],
+      isAutoCompleteActivated: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -313,7 +324,21 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleClickValidateNewDescription = async () => {
     const { props, state } = this
-    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, state.content.description))
+    let newDescription
+    try {
+      newDescription = handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent())
+      // RJ - NOTE - 2021-06-24
+      // We are using tinymce's getContent() method and not
+      // state.content.description here because it has an outdated
+      // value after autocompleting a content.
+      // This is also what does appContentFactory after saving a new advanced comment
+      // (see saveCommentAsText in appContentFactory.js)
+      // We might want to look into it later
+    } catch (e) {
+      return Promise.reject(e.message || props.t('Error while saving the new version'))
+    }
+
+    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, newDescription))
 
     switch (fetchPutDescription.apiResponse.status) {
       case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
@@ -500,6 +525,51 @@ export class WorkspaceAdvanced extends React.Component {
         break
       default: this.sendGlobalFlashMessage(props.t('Error while removing member'), 'warning')
     }
+  }
+
+  handleTinyMceInput = (e, position) => {
+    tinymceAutoCompleteHandleInput(
+      e,
+      this.setState.bind(this),
+      this.searchForMentionOrLinkInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
+  handleTinyMceKeyUp = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyUp(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      this.searchForMentionOrLinkInQuery
+    )
+  }
+
+  handleTinyMceKeyDown = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyDown(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      state.autoCompleteCursorPosition,
+      state.autoCompleteItemList,
+      this.searchForMentionOrLinkInQuery
+    )
+  }
+
+  handleTinyMceSelectionChange = () => {
+    tinymceAutoCompleteHandleSelectionChange(
+      this.setState.bind(this),
+      this.searchForMentionOrLinkInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewMember = async () => {
@@ -725,10 +795,18 @@ export class WorkspaceAdvanced extends React.Component {
           disableChangeTitle={false}
         >
           <WorkspaceAdvancedConfiguration
+            apiUrl={state.config.apiUrl}
+            textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            autoCompleteItemList={state.autoCompleteItemList}
             customColor={state.config.hexcolor}
             description={state.content.description}
             defaultRole={state.content.default_user_role}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
+            isAutoCompleteActivated={state.isAutoCompleteActivated}
+            onClickAutoCompleteItem={(item) => {
+              tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
+            }}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
@@ -737,6 +815,10 @@ export class WorkspaceAdvanced extends React.Component {
             onChangeDescription={this.handleChangeDescription}
             onChangeNewDefaultRole={this.handleChangeNewDefaultRole}
             key='workspace_advanced'
+            onTinyMceInput={this.handleTinyMceInput}
+            onTinyMceKeyDown={this.handleTinyMceKeyDown}
+            onTinyMceKeyUp={this.handleTinyMceKeyUp}
+            onTinyMceSelectionChange={this.handleTinyMceSelectionChange}
           />
 
           <PopinFixedRightPart

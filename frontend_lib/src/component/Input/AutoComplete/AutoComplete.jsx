@@ -11,9 +11,13 @@ export const AutoComplete = props => {
         <div key={autocompleteItem.mention || autocompleteItem.content_id}>
           <div
             className={
-              classnames('autocomplete__item', { autocomplete__item__active: props.autoCompleteCursorPosition === i })
+              classnames('autocomplete__item', {
+                autocomplete__item__active: props.autoCompleteCursorPosition === i
+              })
             }
-            onClick={() => props.onClickAutoCompleteItem(autocompleteItem)}
+            onClick={(e) => {
+              props.onClickAutoCompleteItem(autocompleteItem)
+            }}
           >
             {autocompleteItem.username && (
               <Avatar
