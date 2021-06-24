@@ -1,7 +1,6 @@
 import logging
 import os
-from os.path import basename
-from os.path import dirname
+import pathlib
 import subprocess
 import typing
 
@@ -9,7 +8,6 @@ from depot.manager import DepotManager
 import plaster
 from pyramid import testing
 import pytest
-from pytest_pyramid_server import PyramidTestServer
 import requests
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -97,31 +95,48 @@ def rq_database_worker(config_uri, app_config):
 
 
 @pytest.fixture
-def tracim_webserver(settings, config_uri, engine, session_factory) -> PyramidTestServer:
-    config_filename = basename(config_uri)
-    config_dir = dirname(config_uri)
+def tracim_webserver(
+    settings, config_uri, engine, session_factory, config_section
+) -> typing.Generator[subprocess.Popen, None, None]:
+    config_filepath = pathlib.Path(__file__).parent.parent.parent / config_uri
     try:
-        with PyramidTestServer(
-            config_filename=config_filename,
-            config_dir=config_dir,
-            extra_config_vars={"app:main": settings},
-            hostname="127.0.0.1",
-            # NOTE SG 2020-12-22: this port MUST be the same as the one defined in
-            # backend/pushpin_config/routes file
-            port=6543,
-        ) as server:
-            # FIXME GM 2020-11-25 : Server process here (from pytest-pyramid-server)
-            # will check hostname:port to verify if test server
-            # is correctly runned. So server run check can take forever and fail if for some reason,
-            # your local hostname to not redirect to 127.0.0.1/localhost. Check your hosts file.
-            # See Github issue https://github.com/tracim/tracim/issues/4050
-            server.start()
-            yield server
-    except Exception:
-        raise Exception(
-            "The Tracim test server didn't start, please check that your "
-            "local hostname (as returned by 'hostname') resolves to '127.0.0.1'"
+        process = subprocess.Popen(
+            [
+                "pserve",
+                str(config_filepath),
+                "-n",
+                "tracim_webserver",
+                "--server-name",
+                "tracim_webserver",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
         )
+        try:
+            # INFO 2021/06/22 - SG - wait to see if pserve executes properly
+            process.wait(0.5)
+            raise Exception(
+                "Error while starting server, return code={}".format(process.returncode)
+            )
+        except subprocess.TimeoutExpired:
+            # INFO 2021/06/22 - SG - the process started successfully
+            pass
+        # INFO 2021/06/22 - SG - then wait for pserve to listen on its port
+        starting = True
+        while starting:
+            try:
+                requests.get("http://localhost:6543")
+                starting = False
+            except requests.exceptions.ConnectionError:
+                pass
+        yield process
+
+    finally:
+        process.terminate()
+        try:
+            process.wait(timeout=2)
+        except Exception:
+            process.kill()
     session_factory.close_all()
     DeclarativeBase.metadata.drop_all(engine)
 
@@ -220,7 +235,7 @@ def migration_engine(engine):
 
 @pytest.fixture()
 def official_plugin_folder():
-    return dirname(dirname(dirname(__file__))) + "/official_plugins"
+    return os.path.dirname(os.path.dirname(os.path.dirname(__file__))) + "/official_plugins"
 
 
 @pytest.fixture()

@@ -6,6 +6,11 @@ import {
   naturalCompare,
   handleFetchResult
 } from '../../helper.js'
+import {
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET
+} from '../../tracimLiveMessage.js'
+import { TracimComponent } from '../../tracimComponent.js'
 import classnames from 'classnames'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
@@ -24,26 +29,75 @@ class TagList extends React.Component {
     super(props)
 
     this.state = {
-      tagList: []
+      tagList: [],
+      checkedTagIdList: []
+    }
+
+    props.registerLiveMessageHandlerList([
+      {
+        entityType: TLM_ET.TAG,
+        coreEntityType: TLM_CET.CREATED,
+        handler: tlm => {
+          if (!this.isTlmForMyWorkspace(tlm)) return
+          this.addTag(tlm.fields.tag)
+        }
+      },
+      {
+        entityType: TLM_ET.TAG,
+        coreEntityType: TLM_CET.DELETED,
+        handler: tlm => {
+          if (!this.isTlmForMyWorkspace(tlm)) return
+          this.removeTag(tlm.fields.tag)
+        }
+      },
+      {
+        entityType: TLM_ET.CONTENT_TAG,
+        coreEntityType: TLM_CET.CREATED,
+        handler: tlm => {
+          if (!this.isTlmForMyContent(tlm)) return
+          this.updateCheckedState(tlm.fields.tag, true)
+        }
+      },
+      {
+        entityType: TLM_ET.CONTENT_TAG,
+        coreEntityType: TLM_CET.DELETED,
+        handler: tlm => {
+          if (!this.isTlmForMyContent(tlm)) return
+          this.updateCheckedState(tlm.fields.tag, false)
+        }
+      }
+    ])
+  }
+
+  isTlmForMyContent (tlm) {
+    const { props } = this
+    const hasSameContent = tlm.fields.content && tlm.fields.content.content_id === props.contentId
+    return hasSameContent
+  }
+
+  isTlmForMyWorkspace (tlm) {
+    const { props } = this
+    const hasSameWorkspace = tlm.fields.workspace && tlm.fields.workspace.workspace_id === props.workspaceId
+    return hasSameWorkspace
+  }
+
+  toggleChecked = tag => {
+    const { props, state } = this
+    const checked = state.checkedTagIdList.includes(tag.tag_id)
+    if (checked) {
+      deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
+    } else {
+      putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
     }
   }
 
-  toggleChecked = tagId => {
+  updateCheckedState (tag, checked) {
     this.setState(previousState => {
-      const { props } = this
-      const checkedToggled = !previousState.tagIsChecked[tagId]
-      if (checkedToggled) {
-        putContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
-      } else {
-        deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
-      }
-
-      return {
-        tagIsChecked: {
-          ...previousState.tagIsChecked,
-          [tagId]: checkedToggled
-        }
-      }
+      const checkedTagIdList = checked
+        ? [...previousState.checkedTagIdList, tag.tag_id]
+        : previousState.checkedTagIdList.filter(id => id !== tag.tag_id)
+      const tagList = previousState.tagList.sort(this.sortTagList(checkedTagIdList))
+      return { checkedTagIdList, tagList }
     })
   }
 
@@ -79,35 +133,44 @@ class TagList extends React.Component {
       return
     }
 
-    const isContentTag = (tag) => {
-      return fetchGetContentTagList.body.some(t => t.tag_id === tag.tag_id)
-    }
+    // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
+    const checkedTagIdList = fetchGetContentTagList.body.map(t => t.tag_id)
+    const tagList = fetchGetWsTagList.body.sort(this.sortTagList(checkedTagIdList))
+    this.setState({ tagList, checkedTagIdList })
+  }
 
-    const sortTagList = (tagA, tagB) => {
-      const isTagAContent = isContentTag(tagA)
-      const isTagBContent = isContentTag(tagB)
+  addTag (tag) {
+    this.setState(previousState => {
+      return {
+        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.checkedTagIdList))
+      }
+    })
+  }
 
-      if (!isTagAContent && isTagBContent) {
+  removeTag (tag) {
+    this.setState(previousState => {
+      const tagList = previousState.tagList.filter(t => t.tag_id !== tag.tag_id)
+      const checkedTagIdList = previousState.checkedTagIdList.filter(id => id !== tag.tag_id)
+      return { tagList, checkedTagIdList }
+    })
+  }
+
+  sortTagList (checkedTagIdList) {
+    const { props } = this
+    return (tagA, tagB) => {
+      const isTagAChecked = checkedTagIdList.includes(tagA.tag_id)
+      const isTagBChecked = checkedTagIdList.includes(tagB.tag_id)
+
+      if (!isTagAChecked && isTagBChecked) {
         return 1
       }
 
-      if (isTagAContent && !isTagBContent) {
+      if (isTagAChecked && !isTagBChecked) {
         return -1
       }
 
       return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
     }
-
-    // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
-    const sortedTagList = fetchGetWsTagList.body.sort(sortTagList)
-
-    const tagIsChecked = {}
-
-    for (const tag of fetchGetContentTagList.body) {
-      tagIsChecked[tag.tag_id] = true
-    }
-
-    this.setState({ tagList: sortedTagList, tagIsChecked: tagIsChecked })
   }
 
   render () {
@@ -158,13 +221,11 @@ class TagList extends React.Component {
                 key={tag.tag_id}
               >
                 <Tag
-                  title={tag.tag_name}
-                  done={tag.done}
-                  checked={state.tagIsChecked[tag.tag_id]}
+                  checked={state.checkedTagIdList.includes(tag.tag_id)}
                   name={tag.tag_name}
                   tagId={tag.tag_id}
                   description={tag.description}
-                  onClickCheckbox={() => this.toggleChecked(tag.tag_id)}
+                  onClickCheckbox={() => { this.toggleChecked(tag) }}
                 />
               </li>
             )}
@@ -175,7 +236,7 @@ class TagList extends React.Component {
   }
 }
 
-export default translate()(TagList)
+export default translate()(TracimComponent(TagList))
 
 TagList.propTypes = {
   onClickAddTagBtn: PropTypes.func.isRequired,

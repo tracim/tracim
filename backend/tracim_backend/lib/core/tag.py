@@ -16,6 +16,11 @@ from tracim_backend.models.tracim_session import TracimSession
 
 
 class TagLib:
+    """
+    This class manages tags on contents.
+    Tags are created in the context of a workspace, then referenced by contents.
+    """
+
     def __init__(self, session: TracimSession) -> None:
         self._session = session
 
