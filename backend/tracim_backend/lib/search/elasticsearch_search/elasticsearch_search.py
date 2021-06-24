@@ -505,6 +505,9 @@ class ESSearchApi(SearchApi):
                 ]
             )
 
+        if ContentSearchField.TAGS in search_fields:
+            es_search_fields.extend(["tags^5", "tags.text^3"])
+
         if ContentSearchField.RAW_CONTENT in search_fields:
             es_search_fields.extend(
                 [
@@ -641,7 +644,6 @@ class ESSearchApi(SearchApi):
         search.aggs.metric("created_to", "max", field="created")
         search.aggs.metric("modified_from", "min", field="modified")
         search.aggs.metric("modified_to", "max", field="modified")
-
         res = search.execute()
         return res
 

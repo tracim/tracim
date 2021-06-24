@@ -68,6 +68,13 @@ class HtmlText(Text):
         )
 
 
+class KeywordWithText(Keyword):
+    def __init__(self, **kwargs: dict) -> None:
+        super().__init__(
+            fields={"text": Text(analyzer=edge_ngram_folding, search_analyzer=folding, **kwargs)},
+        )
+
+
 class DigestUser(InnerDoc):
     user_id = Integer()
     public_name = Text(fields={EXACT_FIELD: Keyword()})
@@ -157,7 +164,7 @@ class IndexedContent(Document):
     raw_content = HtmlText()
     content_size = Integer()
 
-    tags = Keyword()
+    tags = KeywordWithText()
     tag_count = Integer()
 
     # INFO - G.M - 2019-05-31 - b64_file is needed for storing the raw file contents

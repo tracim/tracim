@@ -14,6 +14,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tag import Tag
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import RoleApiFactory
@@ -70,6 +71,35 @@ def content_search_fixture(
     transaction.commit()
     elasticsearch.refresh_elasticsearch()
     return content
+
+
+@pytest.fixture
+def content_with_tag(
+    workspace_api_factory, content_api_factory, session, admin_user
+) -> typing.Tuple[Content, Tag]:
+    """Create two contents with one associated with at tag.
+
+    :returns: the content and its tag.
+    """
+    workspace_api = workspace_api_factory.get(show_deleted=True)
+    workspace = workspace_api.create_workspace("test", save_now=True)
+    api = content_api_factory.get()
+    content = api.create(
+        content_type_slug="html-document",
+        workspace=workspace,
+        label="stringtosearch doc",
+        do_save=True,
+    )
+    tag_lib = TagLib(session)
+    tag = tag_lib.add_tag_to_content(user=admin_user, content=content, tag_name="World")
+    api.create(
+        content_type_slug="html-document",
+        workspace=workspace,
+        label="stringtosearch doc 2",
+        do_save=True,
+    )
+    transaction.commit()
+    return (content, tag)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -433,6 +463,25 @@ class TestElasticSearch(object):
             ]
             assert is_now(search_result["created_range"]["from"])
 
+    @pytest.mark.parametrize("search_string,expected_result_count", [("World", 1), ("Hello", 0)])
+    def test_api___elasticsearch_search_ok__search_by_tags(
+        self,
+        web_testapp,
+        elasticsearch,
+        content_with_tag: typing.Tuple[Content, Tag],
+        search_string: str,
+        expected_result_count: int,
+    ) -> None:
+        elasticsearch.refresh_elasticsearch()
+        params = {"search_string": search_string}
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == expected_result_count
+        assert search_result["is_total_hits_accurate"] is True
+        assert len(search_result["contents"]) == expected_result_count
+
     def test_api___elasticsearch_search_ok__wildcard__facet_only(
         self,
         user_api_factory,
@@ -767,36 +816,12 @@ class TestElasticSearch(object):
     @pytest.mark.parametrize("search_tag,expected_result_count", [("World", 1), ("Hello", 0)])
     def test_api___elasticsearch_search_ok__filter_by_tags(
         self,
-        user_api_factory,
-        role_api_factory,
-        workspace_api_factory,
-        content_api_factory,
         web_testapp,
         elasticsearch,
-        session,
-        admin_user,
+        content_with_tag: typing.Tuple[Content, Tag],
         search_tag: str,
         expected_result_count: int,
     ) -> None:
-
-        workspace_api = workspace_api_factory.get(show_deleted=True)
-        workspace = workspace_api.create_workspace("test", save_now=True)
-        api = content_api_factory.get()
-        content = api.create(
-            content_type_slug="html-document",
-            workspace=workspace,
-            label="stringtosearch doc",
-            do_save=True,
-        )
-        tag_lib = TagLib(session)
-        tag_lib.add_tag_to_content(user=admin_user, content=content, tag_name="World")
-        api.create(
-            content_type_slug="html-document",
-            workspace=workspace,
-            label="stringtosearch doc 2",
-            do_save=True,
-        )
-        transaction.commit()
         elasticsearch.refresh_elasticsearch()
         # get all
         params = {"search_string": "stringtosearch", "tags": search_tag}

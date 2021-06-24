@@ -9,6 +9,7 @@ class ContentSearchField(str, Enum):
     RAW_CONTENT = "raw_content"
     COMMENTS = "comments"
     DESCRIPTION = "description"
+    TAGS = "tags"
 
 
 class UserSearchField(str, Enum):
