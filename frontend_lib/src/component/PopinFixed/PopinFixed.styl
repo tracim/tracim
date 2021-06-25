@@ -15,7 +15,7 @@
   &__header
     display flex
     align-items center
-    margin 5px 5px 5px 30px
+    margin 5px 10px 5px 30px
     height 60px
     border-bottom 1px solid mediumGrey
     & > *
@@ -50,6 +50,7 @@
       padding 3px 7px
       & > i
         font-size fontSizeMedium
+        vertical-align middle
   &__option
     &__menu
       & > div
@@ -91,7 +92,7 @@
       background-color #fbe294
     &__left
       transition width 0.4s ease
-      width 25%
+      width 30%
       height 100%
       &__top
         display flex
@@ -112,7 +113,7 @@
     &__right
       display flex
       transition width 0.4s ease
-      width 25%
+      width 20%
       height 100%
       &__content
         width calc(100% - 65px) // 65px is the width of the rightPart header
@@ -198,6 +199,9 @@ responsiveColumnStyle()
   responsiveColumnStyle()
 
 @media (min-width: min-md) and (max-width: max-md)
+  .headerBtn
+    & span
+      display none
   .wsContentGeneric
     &__content
       overflow-Y auto
@@ -214,6 +218,9 @@ responsiveColumnStyle()
   responsiveColumnStyle()
 
 @media (min-width: min-sm) and (max-width: max-sm)
+  .headerBtn
+    & span
+      display none
   .wsContentGeneric
     width 100%
     max-width 100%

@@ -21,10 +21,15 @@
   .thread
     &__contentpage
       width 100%
+      height 100%
       &__top
         display flex
         justify-content space-between
         padding 10px
+        margin-left 20px
+      &__messagelist
+        padding-left 20px
+        padding-right 20px
       &__content
         width 100%
         height "calc(100% - %s)" % headerHeight

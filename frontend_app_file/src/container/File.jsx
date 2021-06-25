@@ -1120,12 +1120,12 @@ export class File extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
-              icon: 'fas fa-upload',
-              label: props.t('Upload a new version'),
-              onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              icon: 'fas fa-edit',
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'newVersionBtn'
+              dataCy: 'wsContentGeneric__option__menu__addversion'
             }
           ]}
           isRefreshNeeded={state.showRefreshWarning}
@@ -1136,13 +1136,14 @@ export class File extends React.Component {
           onValidateChangeTitle={this.handleSaveEditTitle}
           actionList={[
             {
-              icon: 'fas fa-edit',
-              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
-              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
-              showAction: onlineEditionAction,
+              icon: 'fas fa-upload',
+              label: props.t('Upload a new version'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'wsContentGeneric__option__menu__addversion'
-            }, {
+              dataCy: 'newVersionBtn'
+            }
+            , {
               icon: 'fas fa-play',
               label: props.t('Play video'),
               onClick: () => this.setState({ previewVideo: true }),
