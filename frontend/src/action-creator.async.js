@@ -1167,6 +1167,7 @@ export const getAdvancedSearchResult = (
       if (searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
       if (searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
       if (searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+      if (searchFacets.tags) queryParameterList.push(`tags=${searchFacets.tags}`)
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {

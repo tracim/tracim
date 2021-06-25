@@ -65,6 +65,17 @@ export class ContentFacets extends React.Component {
           />
         )}
 
+        {props.searchFacets.tags && props.searchFacets.tags.length > 0 && (
+          <CheckboxFilter
+            appliedFilterList={[{ id: props.appliedFilters.tags }]}
+            filterList={this.addIdToFilter(props.searchFacets.tags)}
+            label={props.t('Tags')}
+            onChangeSearchFacets={(value) => props.onChangeSearchFacets({ tags: value })}
+            onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_CONTENT_FACETS.TAGS.slug)}
+            showFilter={state.showTagList}
+          />
+        )}
+
         {props.searchFacets.statuses && props.searchFacets.statuses.length > 0 && (
           <CheckboxFilter
             appliedFilterList={[{ id: props.appliedFilters.statuses }]}
