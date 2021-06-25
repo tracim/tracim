@@ -1142,8 +1142,7 @@ export class File extends React.Component {
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionBtn'
-            }
-            , {
+            }, {
               icon: 'fas fa-play',
               label: props.t('Play video'),
               onClick: () => this.setState({ previewVideo: true }),
