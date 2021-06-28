@@ -148,7 +148,7 @@ class TagLib:
             self._session.flush()
 
     def get_contents(self, tag: Tag) -> typing.List[Content]:
-        """Return the list of contents which includes the given tag."""
+        """Return the list of contents which include the given tag."""
         return (
             self._session.query(Content)
             .filter(TagOnContent.content_id == Content.content_id)
