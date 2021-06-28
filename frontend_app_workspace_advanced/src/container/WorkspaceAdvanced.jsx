@@ -25,7 +25,8 @@ import {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
+  tinymceAutoCompleteHandleSelectionChange,
+  TagList
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -766,11 +767,32 @@ export class WorkspaceAdvanced extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    const tagList = {
+      id: 'tag',
+      label: props.t('Tags'),
+      icon: 'fas fa-tag',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Tags')}
+        >
+          <TagList
+            apiUrl={state.config.apiUrl}
+            workspaceId={state.content.workspace_id}
+            // contentId={state.content.content_id}
+            displayNewTagForm={state.displayNewTagForm}
+            onClickAddTagBtn={this.handleToggleAddTagForm}
+            onClickCloseAddTagBtn={this.handleToggleAddTagForm}
+            searchedKnownTagList={props.searchedKnownTagList}
+            // onClickAutoComplete={this.handleClickAutoComplete}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
 
     if (state.content.access_type === SPACE_TYPE.onRequest.slug) {
       return [memberlistObject, subscriptionObject, functionalitesObject]
     } else {
-      return [memberlistObject, functionalitesObject]
+      return [memberlistObject, functionalitesObject, tagList]
     }
   }
 
