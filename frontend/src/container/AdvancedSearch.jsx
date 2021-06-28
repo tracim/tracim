@@ -266,7 +266,12 @@ export class AdvancedSearch extends React.Component {
     return newValueList.length > 0 ? newValueList : null
   }
 
-  updateScalar = (value) => value
+  /* INFO - SG - 2021/06/28 - return the value as it is.
+     Used in conjunction with updateAppliedFilter to avoid a
+     static if.
+   */
+
+  updateScalar = value => value
 
   updateAppliedFilter = (type, oldAppliedFilter = {}, filterObject, updateFilterValue) => {
     const { props, state } = this
