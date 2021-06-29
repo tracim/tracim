@@ -30,6 +30,7 @@ import {
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
+  deleteTag,
   getSubscriptionRequestList,
   getWorkspaceMember,
   putLabel,
@@ -468,6 +469,17 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
 
+  handleClickDeleteTag = async (tagId) => {
+    const { props, state } = this
+    const fetchDeleteTag = await deleteTag(state.config.apiUrl, state.content.workspace_id, tagId)
+    switch (fetchDeleteTag.status) {
+      case 204:
+        this.sendGlobalFlashMessage(props.t('Tag removed'), 'info')
+        break
+      default: this.sendGlobalFlashMessage(props.t('Error while removing tag'), 'warning')
+    }
+  }
+
   isEmail = string => /\S*@\S*\.\S{2,}/.test(string)
 
   handleChangeNewMemberName = async newPersonalData => {
@@ -790,6 +802,7 @@ export class WorkspaceAdvanced extends React.Component {
             onClickCloseAddTagBtn={this.handleToggleAddTagForm}
             searchedKnownTagList={props.searchedKnownTagList}
             onClickAutoComplete={this.handleClickAutoComplete}
+            onClickDeleteTag={this.handleClickDeleteTag}
           />
         </PopinFixedRightPartContent>
       )
