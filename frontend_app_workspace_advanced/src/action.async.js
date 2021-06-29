@@ -52,9 +52,6 @@ export const putSubscriptionAccept = (apiUrl, spaceId, userId, defaultRole) =>
 export const putSubscriptionReject = (apiUrl, spaceId, userId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${spaceId}/subscriptions/${userId}/reject`)
 
-export const deleteTag = (apiUrl, workspaceId, tagId) =>
-  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/tags/${tagId}`)
-
 export const deleteMember = (apiUrl, workspaceId, memberId) =>
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/members/${memberId}`)
 

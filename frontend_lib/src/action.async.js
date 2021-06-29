@@ -189,3 +189,6 @@ export const putContentTag = (apiUrl, workspaceId, contentId, tagId) =>
 
 export const deleteContentTag = (apiUrl, workspaceId, contentId, tagId) =>
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags/${tagId}`)
+
+export const deleteWorkspaceTag = (apiUrl, workspaceId, tagId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/tags/${tagId}`)

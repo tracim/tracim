@@ -17,9 +17,10 @@ import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
 import Icon from '../Icon/Icon.jsx'
 import {
+  deleteContentTag,
+  deleteWorkspaceTag,
   getWorkspaceTagList,
   getContentTagList,
-  deleteContentTag,
   putContentTag
 } from '../../action.async.js'
 
@@ -49,7 +50,15 @@ class TagList extends React.Component {
         coreEntityType: TLM_CET.DELETED,
         handler: tlm => {
           if (!this.isTlmForMyWorkspace(tlm)) return
-          this.removeTag(tlm.fields.tag)
+          this.removeTag(tlm.fields.tag.tag_id)
+        }
+      },
+      {
+        entityType: TLM_ET.CONTENT_TAG,
+        coreEntityType: TLM_CET.DELETED,
+        handler: tlm => {
+          if (!this.isTlmForMyWorkspace(tlm)) return
+          this.removeTag(tlm.fields.tag.tag_id)
         }
       },
       {
@@ -90,6 +99,23 @@ class TagList extends React.Component {
       deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
     } else {
       putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
+    }
+  }
+
+  handleClickDeleteTag = async (tagId) => {
+    const { props } = this
+
+    const fetchDeleteTag = props.contentId
+      ? await deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
+      : await deleteWorkspaceTag(props.apiUrl, props.workspaceId, tagId)
+
+    switch (fetchDeleteTag.status) {
+      case 204:
+        sendGlobalFlashMessage(props.t('Tag removed'), 'info')
+        this.setState({ workspaceTagToDeleteId: 0 })
+        this.removeTag(tagId)
+        break
+      default: sendGlobalFlashMessage(props.t('Error while removing tag'))
     }
   }
 
@@ -155,11 +181,10 @@ class TagList extends React.Component {
     })
   }
 
-  removeTag (tag) {
+  removeTag (tagId) {
     this.setState(previousState => {
-      const tagList = previousState.tagList.filter(t => t.tag_id !== tag.tag_id)
-      const checkedTagIdList = previousState.checkedTagIdList.filter(id => id !== tag.tag_id)
-      return { tagList, checkedTagIdList }
+      const tagList = previousState.tagList.filter(tag => tag.tag_id !== tagId)
+      return { tagList }
     })
   }
 
@@ -182,7 +207,7 @@ class TagList extends React.Component {
   }
 
   handleDeleteWorkspaceTag = () => {
-    this.props.onClickDeleteWorkspaceTag(this.state.workspaceTagToDeleteId)
+    this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)
     this.setState({ workspaceTagToDeleteId: 0 })
   }
 
@@ -241,7 +266,7 @@ class TagList extends React.Component {
                   onClickCheckbox={() => { this.toggleChecked(tag) }} // remove from the content
                   isContent={!!props.contentId}
                   onClickDeleteTag={() => props.contentId
-                    ? console.log('content')
+                    ? this.handleClickDeleteTag(tag.tag_id)
                     : this.setState({ workspaceTagToDeleteId: tag.tag_id })
                   }
                 />
@@ -270,13 +295,11 @@ TagList.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
   onChangeTag: PropTypes.func,
-  onClickDeleteWorkspaceTag: PropTypes.func,
   viewMode: PropTypes.bool
 }
 
 TagList.defaultProps = {
   contentId: 0,
   onChangeTag: () => {},
-  onClickDeleteWorkspaceTag: () => {},
   viewMode: false // true
 }
