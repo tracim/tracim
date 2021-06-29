@@ -9,6 +9,7 @@ class ContentSearchField(str, Enum):
     RAW_CONTENT = "raw_content"
     COMMENTS = "comments"
     DESCRIPTION = "description"
+    TAGS = "tags"
 
 
 class UserSearchField(str, Enum):
@@ -92,6 +93,8 @@ class SearchedContent(object):
         workspace_id: int,
         active_shares: int,
         content_size: int,
+        tags: Optional[List[str]] = None,
+        tag_count: int = 0,
         parent_id: Optional[int] = None,
     ) -> None:
         self.current_revision_id = current_revision_id
@@ -122,6 +125,8 @@ class SearchedContent(object):
         self.score = score
         self.active_shares = active_shares
         self.content_size = content_size
+        self.tags = tags or []
+        self.tag_count = tag_count
 
 
 class ContentSearchResponse:

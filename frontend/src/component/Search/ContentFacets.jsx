@@ -56,7 +56,7 @@ export class ContentFacets extends React.Component {
       <div className='contentFacets'>
         {props.searchFacets.workspace_names && props.searchFacets.workspace_names.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ id: props.appliedFilters.workspace_names }]}
+            checkedFilterIdList={props.appliedFilters.workspace_names}
             filterList={this.addIdToFilter(props.searchFacets.workspace_names)}
             label={props.t('Space')}
             onChangeSearchFacets={(value) => props.onChangeSearchFacets({ workspace_names: value })}
@@ -65,9 +65,20 @@ export class ContentFacets extends React.Component {
           />
         )}
 
+        {props.searchFacets.tags && props.searchFacets.tags.length > 0 && (
+          <CheckboxFilter
+            checkedFilterIdList={props.appliedFilters.tags}
+            filterList={this.addIdToFilter(props.searchFacets.tags)}
+            label={props.t('Tags')}
+            onChangeSearchFacets={(value) => props.onChangeSearchFacets({ tags: value })}
+            onClickOpenOrCloseFilter={() => this.handleOpenOrCloseFilter(SEARCH_CONTENT_FACETS.TAGS.slug)}
+            showFilter={state.showTagList}
+          />
+        )}
+
         {props.searchFacets.statuses && props.searchFacets.statuses.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ id: props.appliedFilters.statuses }]}
+            checkedFilterIdList={props.appliedFilters.statuses}
             filterList={this.addIdToFilter(props.searchFacets.statuses)}
             label={props.t('Status')}
             onChangeSearchFacets={(value) => props.onChangeSearchFacets({ statuses: value })}
@@ -78,7 +89,7 @@ export class ContentFacets extends React.Component {
 
         {props.searchFacets.content_types && props.searchFacets.content_types.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ id: props.appliedFilters.content_types }]}
+            checkedFilterIdList={props.appliedFilters.content_types}
             filterList={this.addIdToFilter(props.searchFacets.content_types).map(type => ({
               ...type,
               value: `${type.value}_search`
@@ -92,7 +103,7 @@ export class ContentFacets extends React.Component {
 
         {props.searchFacets.file_extensions && showFileExtensionList.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ id: props.appliedFilters.file_extensions }]}
+            checkedFilterIdList={props.appliedFilters.file_extensions}
             filterList={this.addIdToFilter(showFileExtensionList)}
             label={props.t('File extension')}
             onChangeSearchFacets={(value) => props.onChangeSearchFacets({ file_extensions: value })}
@@ -103,7 +114,7 @@ export class ContentFacets extends React.Component {
 
         {props.searchFacets.author__public_names && props.searchFacets.author__public_names.length > 0 && (
           <CheckboxFilter
-            appliedFilterList={[{ id: props.appliedFilters.author__public_names }]}
+            checkedFilterIdList={props.appliedFilters.author__public_names}
             filterList={this.addIdToFilter(props.searchFacets.author__public_names)}
             label={props.t('Author')}
             onChangeSearchFacets={(value) => props.onChangeSearchFacets({ author__public_names: value })}

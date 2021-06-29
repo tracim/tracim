@@ -30,7 +30,7 @@ export const CheckboxFilter = props => {
           <Checkbox
             name={item.id}
             onClickCheckbox={() => props.onChangeSearchFacets(item.id)}
-            checked={props.appliedFilterList.findIndex(filter => filter.id === item.id) !== -1}
+            checked={props.checkedFilterIdList.findIndex(filter => filter === item.id) !== -1}
             styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
             styleCheck={{ top: '-5px' }}
           />
@@ -47,7 +47,7 @@ export default translate()(CheckboxFilter)
 
 CheckboxFilter.propTypes = {
   filterList: PropTypes.array.isRequired,
-  appliedFilterList: PropTypes.array,
+  checkedFilterIdList: PropTypes.arrayOf(PropTypes.string),
   label: PropTypes.string,
   onChangeSearchFacets: PropTypes.func,
   onClickOpenOrCloseFilter: PropTypes.func,
@@ -55,7 +55,7 @@ CheckboxFilter.propTypes = {
 }
 
 CheckboxFilter.defaultProps = {
-  appliedFilterList: [],
+  checkedFilterIdList: [],
   label: '',
   onChangeSearchFacets: () => {},
   onClickOpenOrCloseFilter: () => {},

@@ -29,6 +29,7 @@ class ContentFacets:
         file_extensions: typing.Optional[typing.List[str]],
         statuses: typing.Optional[typing.List[str]],
         content_types: typing.Optional[typing.List[FacetCount]],
+        tags: typing.Optional[typing.List[str]],
     ) -> None:
         self.workspace_names = workspace_names
         self.author__public_names = author__public_names
@@ -36,6 +37,7 @@ class ContentFacets:
         self.file_extensions = file_extensions
         self.statuses = statuses
         self.content_types = content_types
+        self.tags = tags
 
 
 def facet_count(
@@ -123,6 +125,7 @@ class ESContentSearchResponse(ContentSearchResponse):
             file_extensions=facet_count(aggregations, "file_extensions", exclude_empty_values=True),
             statuses=facet_count(aggregations, "statuses"),
             content_types=facet_count(aggregations, "content_types"),
+            tags=facet_count(aggregations, "tags"),
         )
 
         super().__init__(

@@ -146,3 +146,12 @@ class TagLib:
         self._session.delete(tag)
         if do_save:
             self._session.flush()
+
+    def get_contents(self, tag: Tag) -> typing.List[Content]:
+        """Return the list of contents which include the given tag."""
+        return (
+            self._session.query(Content)
+            .filter(TagOnContent.content_id == Content.content_id)
+            .filter(TagOnContent.tag_id == tag.tag_id)
+            .all()
+        )

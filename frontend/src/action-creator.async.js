@@ -1133,6 +1133,11 @@ const getDateRangeParameters = (range, rangeParameterPrefix) => {
   return rangeParameterList
 }
 
+const encodeArrayAsURIComponent = (arrayOrItem, separator = ',') => {
+  if (!(arrayOrItem instanceof Array)) return encodeURIComponent(arrayOrItem)
+  return arrayOrItem.map(item => encodeURIComponent(item)).join(',')
+}
+
 export const getAdvancedSearchResult = (
   searchString,
   contentTypes,
@@ -1162,11 +1167,12 @@ export const getAdvancedSearchResult = (
     if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange, 'created'))
     if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange, 'modified'))
     if (searchFacets) {
-      if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
-      if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
-      if (searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
-      if (searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
-      if (searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+      if (searchFacets.workspace_names && searchFacets.workspace_names.length > 0) queryParameterList.push(`workspace_names=${encodeArrayAsURIComponent(searchFacets.workspace_names)}`)
+      if (searchFacets.statuses && searchFacets.statuses.length > 0) queryParameterList.push(`statuses=${encodeArrayAsURIComponent(searchFacets.statuses)}`)
+      if (searchFacets.content_types && searchFacets.content_types.length > 0) queryParameterList.push(`content_types=${encodeArrayAsURIComponent(searchFacets.content_types)}`)
+      if (searchFacets.file_extensions && searchFacets.file_extensions.length > 0) queryParameterList.push(`file_extensions=${encodeArrayAsURIComponent(searchFacets.file_extensions)}`)
+      if (searchFacets.author__public_names && searchFacets.author_public_names.length > 0) queryParameterList.push(`author__public_names=${encodeArrayAsURIComponent(searchFacets.author__public_names)}`)
+      if (searchFacets.tags && searchFacets.tags.length > 0) queryParameterList.push(`tags=${encodeArrayAsURIComponent(searchFacets.tags)}`)
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {

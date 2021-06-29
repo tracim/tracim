@@ -1,6 +1,7 @@
 import re
 import typing
 
+from sqlalchemy import and_
 from sqlalchemy import desc
 from sqlalchemy import or_
 from sqlalchemy.orm import Query
@@ -12,6 +13,8 @@ from tracim_backend.lib.search.models import ContentSearchResponse
 from tracim_backend.lib.search.search import SearchApi
 from tracim_backend.lib.search.simple_search.models import SimpleContentSearchResponse
 from tracim_backend.models.data import Content
+from tracim_backend.models.tag import Tag
+from tracim_backend.models.tag import TagOnContent
 from tracim_backend.views.search_api.schemas import ContentSearchQuery
 
 SEARCH_SEPARATORS = ",| "
@@ -124,7 +127,14 @@ class SimpleSearchApi(SearchApi):
         filter_group_raw_content = list(
             Content.raw_content.ilike("%{}%".format(keyword)) for keyword in keywords
         )
-        title_keyworded_items = (
+        filter_group_tags = [Tag.tag_name.ilike("%{}%".format(keyword)) for keyword in keywords]
+        tags_subquery = (
+            self._session.query(TagOnContent)
+            .filter(and_(or_(*filter_group_tags), TagOnContent.content_id == Content.content_id))
+            .join(Tag)
+            .exists()
+        )
+        content_query = (
             content_api.get_base_query(None)
             .filter(
                 or_(
@@ -133,7 +143,8 @@ class SimpleSearchApi(SearchApi):
                         + filter_group_filename
                         + filter_group_description
                         + filter_group_raw_content
-                    )
+                    ),
+                    tags_subquery
                 )
             )
             .options(joinedload("children_revisions"))
@@ -146,11 +157,9 @@ class SimpleSearchApi(SearchApi):
         # INFO - G.M - 2019-06-13 - we add comment to content_types checked
         if content_types:
             searched_content_types = set(content_types + [content_type_list.Comment.slug])
-            title_keyworded_items = title_keyworded_items.filter(
-                Content.type.in_(searched_content_types)
-            )
+            content_query = content_query.filter(Content.type.in_(searched_content_types))
 
-        return title_keyworded_items
+        return content_query
 
     def search_content(self, search_parameters: ContentSearchQuery) -> ContentSearchResponse:
         """
