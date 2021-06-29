@@ -232,7 +232,7 @@ class TagList extends React.Component {
                   name={tag.tag_name}
                   tagId={tag.tag_id}
                   description={tag.description}
-                  onClickCheckbox={() => { this.toggleChecked(tag) }}
+                  onClickCheckbox={() => { this.toggleChecked(tag) }} // remove from the content
                   isContent={!!props.contentId}
                 />
               </li>

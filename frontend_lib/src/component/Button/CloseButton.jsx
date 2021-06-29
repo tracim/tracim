@@ -5,7 +5,10 @@ import Icon from '../Icon/Icon.jsx'
 
 const CloseButton = (props) => (
   <button className={`transparentButton ${props.customClass}`} onClick={props.onClick}>
-    <Icon icon='fas fa-times' title={props.t('Close')} />
+    <Icon
+      icon='fas fa-times'
+      title={props.t('Close')}
+    />
   </button>
 )
 

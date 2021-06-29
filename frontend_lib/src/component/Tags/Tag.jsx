@@ -2,6 +2,8 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import { Checkbox } from '../Input/Checkbox.jsx'
 import PropTypes from 'prop-types'
+import CloseButton from '../Button/CloseButton.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 require('./TagList.styl')
 
@@ -22,8 +24,28 @@ export const Tag = props => {
       >
         {props.name}
       </label>
-
-      {/* ici mettre le boolean des boutons */}
+      {props.isContent
+      ? (
+        <IconButton
+          customClass='personaldata__form__button'
+          intent='secondary'
+          // disabled={!props.isUsernameValid}
+          // onClick={this.handleRemoveTag}
+          icon='fas fa-times'
+          title={props.t('Remove tag from content')}
+          dataCy='IconButton_RemoveTagFromContent'
+        />
+        ) : (
+        <IconButton
+          customClass='personaldata__form__button'
+          intent='secondary'
+          // disabled={!props.isUsernameValid}
+          // onClick={this.handleClickSubmit}
+          icon='fas fa-trash-alt'
+          title={props.t('Delete tag from space')}
+          dataCy='IconButton_DeleteTagFromSpace'
+        />
+      )}
     </div>
   )
 }
