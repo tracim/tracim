@@ -13,7 +13,5 @@ services:
       # Still need to put a combination of server_name and domain for this container to work
       # domain: <real IP> with \\., e.g. 192\\.168\\.1\\.1
       # server_name: http://192.168.1.1:6543
-      domain: 172\\.17\\.0\\.1
-      server_name: http://172.17.0.1:6543
     cap_add:
       - MKNOD
