@@ -97,7 +97,8 @@ describe('In <AdvancedSearch />', () => {
         advancedSearchInstance.updateAppliedFilter(
           ADVANCED_SEARCH_FILTER.SEARCH_FACETS,
           { },
-          { filterKey: 'value' }
+          { filterKey: 'value' },
+          value => value
         )
         expect(setAppliedFilterCallBack.called).to.equal(true)
       })
