@@ -60,6 +60,8 @@ import {
 } from '../action.async.js'
 import FileProperties from '../component/FileProperties.jsx'
 
+const ACTION_EDIT = 'edit'
+
 export class File extends React.Component {
   constructor (props) {
     super(props)
@@ -1123,9 +1125,17 @@ export class File extends React.Component {
               icon: 'fas fa-edit',
               label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
               onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
-              showAction: onlineEditionAction,
+              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT,
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'wsContentGeneric__option__menu__addversion'
+            }, {
+              icon: 'fas fa-upload',
+              label: props.t('Upload a new version'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'newVersionBtn'
             }
           ]}
           isRefreshNeeded={state.showRefreshWarning}
@@ -1139,7 +1149,8 @@ export class File extends React.Component {
               icon: 'fas fa-upload',
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+                (onlineEditionAction && onlineEditionAction.action === ACTION_EDIT),
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionBtn'
             }, {
@@ -1148,6 +1159,13 @@ export class File extends React.Component {
               onClick: () => this.setState({ previewVideo: true }),
               showAction: isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST),
               dataCy: 'popinListItem__playVideo'
+            }, {
+              icon: 'fas fa-edit',
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'wsContentGeneric__option__menu__addversion'
             }, {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),

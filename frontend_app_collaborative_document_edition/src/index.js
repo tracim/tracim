@@ -50,6 +50,7 @@ const appInterface = {
     if (!editorType) return null
 
     return {
+      action: editorType.associated_action,
       label: editorType.associated_action === ACTION_EDIT && userRoleId >= ROLE.contributor.id ? i18n.t('Edit online') : i18n.t('View online'),
       handleClick: () => {
         GLOBAL_dispatchEvent({
