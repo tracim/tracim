@@ -5,7 +5,6 @@ describe('App File', () => {
     const fileTitle_1 = 'file-1'
     const fullFilename_1 = 'Linux-Free-PNG.png'
     const contentType = 'image/png'
-    let firstContentId
 
     cy.resetDB()
     cy.setupBaseDB()
@@ -24,19 +23,20 @@ describe('App File', () => {
   })
 
   it('should have translations', () => {
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="newVersionBtn"]').contains('Upload a new version')
+    cy.changeLanguage('en')
+    cy.get('.FilenameWithExtension').should('be.visible')
+    cy.get('.timeline__title').contains('Timeline')
 
     cy.changeLanguage('fr')
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="newVersionBtn"]').contains('Téléverser une nouvelle version')
+    cy.get('.FilenameWithExtension').should('be.visible')
+    cy.get('.timeline__title').contains('Historique')
 
     cy.changeLanguage('pt')
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="newVersionBtn"]').contains('Carregar uma nova versão')
+    cy.get('.FilenameWithExtension').should('be.visible')
+    cy.get('.timeline__title').contains('Linha cronológica')
 
     cy.changeLanguage('de')
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="newVersionBtn"]').contains('Hochladen einer neuen Version')
+    cy.get('.FilenameWithExtension').should('be.visible')
+    cy.get('.timeline__title').contains('Zeitleiste')
   })
 })

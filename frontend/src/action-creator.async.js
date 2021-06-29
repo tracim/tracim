@@ -66,7 +66,6 @@ import {
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
-  updateTLMAuthor,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   TLM_CORE_EVENT_TYPE,
@@ -917,7 +916,7 @@ export const getNotificationList = (
       ...notification,
       fields: {
         ...notification.fields,
-        author: updateTLMAuthor(notification.fields.author),
+        author: updateTLMUser(notification.fields.author, true),
         user: updateTLMUser(notification.fields.user)
       }
     }))
@@ -970,7 +969,7 @@ export const getUserMessagesSummary = userId => dispatch => {
       ...message,
       fields: {
         ...message.fields,
-        author: updateTLMAuthor(message.fields.author),
+        author: updateTLMUser(message.fields.author, true),
         user: updateTLMUser(message.fields.user)
       }
     }))
