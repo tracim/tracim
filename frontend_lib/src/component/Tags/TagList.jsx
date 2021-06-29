@@ -12,6 +12,7 @@ import {
 } from '../../tracimLiveMessage.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import classnames from 'classnames'
+import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
 import Icon from '../Icon/Icon.jsx'
@@ -30,7 +31,8 @@ class TagList extends React.Component {
 
     this.state = {
       tagList: [],
-      checkedTagIdList: []
+      checkedTagIdList: [],
+      workspaceTagToDeleteId: 0
     }
 
     props.registerLiveMessageHandlerList([
@@ -138,7 +140,6 @@ class TagList extends React.Component {
       }
 
       tagList = fetchGetContentTagList.body
-
     }
     // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
     // const tagList = fetchGetWsTagList.body.sort(this.sortTagList(checkedTagIdList))
@@ -180,6 +181,11 @@ class TagList extends React.Component {
     }
   }
 
+  handleDeleteWorkspaceTag = () => {
+    this.props.onClickDeleteWorkspaceTag(this.state.workspaceTagToDeleteId)
+    this.setState({ workspaceTagToDeleteId: 0 })
+  }
+
   render () {
     const { props, state } = this
 
@@ -191,7 +197,7 @@ class TagList extends React.Component {
         </div>
 
         <div className='tagList__wrapper'>
-          {props.displayNewTagForm
+          {!props.viewMode && props.displayNewTagForm
             ? (
               <NewTagForm
                 apiUrl={props.apiUrl}
@@ -234,11 +240,22 @@ class TagList extends React.Component {
                   description={tag.description}
                   onClickCheckbox={() => { this.toggleChecked(tag) }} // remove from the content
                   isContent={!!props.contentId}
-                  onClickDeleteTag={() => props.contentId ? console.log('content') : props.onClickDeleteTag(tag.tag_id)}
+                  onClickDeleteTag={() => props.contentId
+                    ? console.log('content')
+                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })
+                  }
                 />
               </li>
             )}
           </ul>
+
+          {!!state.workspaceTagToDeleteId && (
+            <ConfirmPopup
+              onConfirm={this.handleDeleteWorkspaceTag}
+              onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
+              confirmLabel={props.t('Delete')}
+            />
+          )}
         </div>
       </div>
     )
@@ -248,13 +265,18 @@ class TagList extends React.Component {
 export default translate()(TracimComponent(TagList))
 
 TagList.propTypes = {
-  onClickAddTagBtn: PropTypes.func.isRequired,
-  onChangeTag: PropTypes.func,
   apiUrl: PropTypes.string.isRequired,
+  onClickAddTagBtn: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  contentId: PropTypes.number
+  contentId: PropTypes.number,
+  onChangeTag: PropTypes.func,
+  onClickDeleteWorkspaceTag: PropTypes.func,
+  viewMode: PropTypes.bool
 }
 
 TagList.defaultProps = {
-  contentId: 0
+  contentId: 0,
+  onChangeTag: () => {},
+  onClickDeleteWorkspaceTag: () => {},
+  viewMode: false // true
 }

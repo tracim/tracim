@@ -802,7 +802,8 @@ export class WorkspaceAdvanced extends React.Component {
             onClickCloseAddTagBtn={this.handleToggleAddTagForm}
             searchedKnownTagList={props.searchedKnownTagList}
             onClickAutoComplete={this.handleClickAutoComplete}
-            onClickDeleteTag={this.handleClickDeleteTag}
+            onClickDeleteWorkspaceTag={this.handleClickDeleteTag}
+            viewMode={false} // state.loggedUser.userRoleIdInWorkspace}
           />
         </PopinFixedRightPartContent>
       )

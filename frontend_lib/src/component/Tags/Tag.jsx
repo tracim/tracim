@@ -43,12 +43,12 @@ Tag.propTypes = {
   checked: PropTypes.bool,
   onClickCheckbox: PropTypes.func,
   isContent: PropTypes.bool,
-  onClickDeleteTag: PropTypes.func,
-  onClickRemoveTag: PropTypes.func
+  onClickDeleteTag: PropTypes.func
 }
 
 Tag.defaultProps = {
   checked: false,
   onClickCheckbox: () => { },
-  isContent: true
+  isContent: true,
+  onClickDeleteTag: () => { }
 }
