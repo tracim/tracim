@@ -24,28 +24,13 @@ export const Tag = props => {
       >
         {props.name}
       </label>
-      {props.isContent
-      ? (
-        <IconButton
-          customClass='personaldata__form__button'
-          intent='secondary'
-          // disabled={!props.isUsernameValid}
-          // onClick={this.handleRemoveTag}
-          icon='fas fa-times'
-          title={props.t('Remove tag from content')}
-          dataCy='IconButton_RemoveTagFromContent'
-        />
-        ) : (
-        <IconButton
-          customClass='personaldata__form__button'
-          intent='secondary'
-          // disabled={!props.isUsernameValid}
-          // onClick={this.handleClickSubmit}
-          icon='fas fa-trash-alt'
-          title={props.t('Delete tag from space')}
-          dataCy='IconButton_DeleteTagFromSpace'
-        />
-      )}
+      <IconButton
+        intent='link'
+        onClick={props.onClickDeleteTag}
+        icon={props.isContent ? 'fas fa-times' : 'fas fa-trash-alt'}
+        title={props.isContent ? props.t('Remove tag from content') : props.t('Delete tag from space')}
+        dataCy='IconButton_DeleteTagFromSpace'
+      />
     </div>
   )
 }
@@ -57,7 +42,9 @@ Tag.propTypes = {
   tagId: PropTypes.number.isRequired,
   checked: PropTypes.bool,
   onClickCheckbox: PropTypes.func,
-  isContent: PropTypes.bool
+  isContent: PropTypes.bool,
+  onClickDeleteTag: PropTypes.func,
+  onClickRemoveTag: PropTypes.func
 }
 
 Tag.defaultProps = {

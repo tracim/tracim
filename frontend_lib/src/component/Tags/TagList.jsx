@@ -234,6 +234,7 @@ class TagList extends React.Component {
                   description={tag.description}
                   onClickCheckbox={() => { this.toggleChecked(tag) }} // remove from the content
                   isContent={!!props.contentId}
+                  onClickDeleteTag={() => props.contentId ? console.log('content') : props.onClickDeleteTag(tag.tag_id)}
                 />
               </li>
             )}
