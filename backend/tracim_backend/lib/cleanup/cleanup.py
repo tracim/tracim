@@ -393,6 +393,17 @@ class CleanupLib(object):
         self.safe_delete(user)
         return user_id
 
+    def prepare_deletion_or_anonymization(
+        self, user: User,
+    ):
+        """
+        Disable and delete user with flag to get proper TLM.
+        """
+        user.is_active = False
+        user.is_deleted = True
+        self.safe_update(user)
+        return user
+
     def anonymize_user(
         self, user: User, anonymized_user_display_name: typing.Optional[str] = None
     ) -> User:
