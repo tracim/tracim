@@ -22,20 +22,24 @@ export const Tag = props => {
       >
         {props.name}
       </label>
+
+      {/* ici mettre le boolean des boutons */}
     </div>
   )
 }
 
 export default translate()(Tag)
 
-Tag.defaultProps = {
-  checked: false,
-  onClickCheckbox: () => { }
-}
-
 Tag.propTypes = {
-  checked: PropTypes.bool,
   name: PropTypes.string.isRequired,
   tagId: PropTypes.number.isRequired,
-  onClickCheckbox: PropTypes.func
+  checked: PropTypes.bool,
+  onClickCheckbox: PropTypes.func,
+  isContent: PropTypes.bool
+}
+
+Tag.defaultProps = {
+  checked: false,
+  onClickCheckbox: () => { },
+  isContent: true
 }

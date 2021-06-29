@@ -115,6 +115,7 @@ class TagList extends React.Component {
 
   async updateTagList () {
     const { props } = this
+    let tagList
     const fetchGetWsTagList = await handleFetchResult(
       await getWorkspaceTagList(props.apiUrl, props.workspaceId)
     )
@@ -124,19 +125,25 @@ class TagList extends React.Component {
       return
     }
 
-    const fetchGetContentTagList = await handleFetchResult(
-      await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
-    )
+    tagList = fetchGetWsTagList.body
 
-    if (!fetchGetContentTagList.apiResponse.ok) {
-      sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
-      return
+    if (props.contentId) {
+      const fetchGetContentTagList = await handleFetchResult(
+        await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
+      )
+
+      if (!fetchGetContentTagList.apiResponse.ok) {
+        sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
+        return
+      }
+
+      tagList = fetchGetContentTagList.body
+
     }
-
     // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
-    const checkedTagIdList = fetchGetContentTagList.body.map(t => t.tag_id)
-    const tagList = fetchGetWsTagList.body.sort(this.sortTagList(checkedTagIdList))
-    this.setState({ tagList, checkedTagIdList })
+    // const tagList = fetchGetWsTagList.body.sort(this.sortTagList(checkedTagIdList))
+    // const checkedTagIdList = fetchGetContentTagList.body.map(t => t.tag_id)
+    this.setState({ tagList, checkedTagIdList: tagList })
   }
 
   addTag (tag) {
@@ -226,6 +233,7 @@ class TagList extends React.Component {
                   tagId={tag.tag_id}
                   description={tag.description}
                   onClickCheckbox={() => { this.toggleChecked(tag) }}
+                  isContent={!!props.contentId}
                 />
               </li>
             )}
@@ -243,5 +251,9 @@ TagList.propTypes = {
   onChangeTag: PropTypes.func,
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  contentId: PropTypes.number.isRequired
+  contentId: PropTypes.number
+}
+
+TagList.defaultProps = {
+  contentId: 0
 }

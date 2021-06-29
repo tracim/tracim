@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { postContentTag } from '../../action.async.js'
+import { postWorkspaceTag } from '../../action.async.js'
 import { sendGlobalFlashMessage, handleFetchResult } from '../../helper.js'
 import CloseButton from '../Button/CloseButton.jsx'
 import IconButton from '../Button/IconButton.jsx'
@@ -18,11 +19,33 @@ export class NewTagForm extends React.Component {
 
   handleClickBtnValidate = async () => {
     const { props } = this
+
+    props.contentId
+      ? await this.handleClickBtnValidateContent()
+      : await this.handleClickBtnValidateSpace()
+  }
+
+  handleClickBtnValidateContent = async () => {
+    const { props } = this
     const response = await handleFetchResult(
       await postContentTag(props.apiUrl, props.workspaceId, props.contentId, this.state.tagName)
     )
     if (!response.ok) {
       sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+      return
+    }
+
+    sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
+    this.setState({ tagName: '' })
+  }
+
+  handleClickBtnValidateSpace = async () => {
+    const { props } = this
+    const response = await handleFetchResult(
+      await postWorkspaceTag(props.apiUrl, props.workspaceId, this.state.tagName)
+    )
+    if (!response.ok) {
+      sendGlobalFlashMessage(props.i18n.t('Error while creating a space tag'))
       return
     }
 
@@ -69,7 +92,7 @@ export class NewTagForm extends React.Component {
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
             dataCy='validate_tag'
-            text={props.t('Validate')}
+            text={props.t('Validate')} // mettre le boolean ici
           />
         </div>
       </div>

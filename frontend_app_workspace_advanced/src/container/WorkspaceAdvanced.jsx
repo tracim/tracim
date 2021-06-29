@@ -78,6 +78,7 @@ export class WorkspaceAdvanced extends React.Component {
         avatarUrl: '',
         isEmail: false
       },
+      displayNewTagForm: false,
       autoCompleteFormNewMemberActive: false,
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
@@ -686,6 +687,13 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
+  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
+
+  handleClickAutoComplete = () => this.setState({
+    autoCompleteFormNewTagActive: false,
+    autoCompleteClicked: true
+  })
+
   getMenuItemList = () => {
     const { props, state } = this
     const memberlistObject = {
@@ -772,18 +780,16 @@ export class WorkspaceAdvanced extends React.Component {
       label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
-        <PopinFixedRightPartContent
-          label={props.t('Tags')}
-        >
+        <PopinFixedRightPartContent>
           <TagList
             apiUrl={state.config.apiUrl}
             workspaceId={state.content.workspace_id}
-            // contentId={state.content.content_id}
+            contentId={state.content.content_id}
             displayNewTagForm={state.displayNewTagForm}
             onClickAddTagBtn={this.handleToggleAddTagForm}
             onClickCloseAddTagBtn={this.handleToggleAddTagForm}
             searchedKnownTagList={props.searchedKnownTagList}
-            // onClickAutoComplete={this.handleClickAutoComplete}
+            onClickAutoComplete={this.handleClickAutoComplete}
           />
         </PopinFixedRightPartContent>
       )
