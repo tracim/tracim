@@ -66,12 +66,12 @@ import {
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
-  updateTLMAuthor,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   TLM_CORE_EVENT_TYPE,
   TLM_ENTITY_TYPE,
   CONTENT_TYPE,
+  updateTLMUser,
   uploadFile
 } from 'tracim_frontend_lib'
 
@@ -916,7 +916,8 @@ export const getNotificationList = (
       ...notification,
       fields: {
         ...notification.fields,
-        author: updateTLMAuthor(notification.fields.author)
+        author: updateTLMUser(notification.fields.author, true),
+        user: updateTLMUser(notification.fields.user)
       }
     }))
   }
@@ -950,7 +951,7 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
 }
 
 export const getUserMessagesSummary = userId => dispatch => {
-  return fetchWrapper({
+  const fetchGetMessages = fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`,
     param: {
       credentials: 'include',
@@ -962,6 +963,18 @@ export const getUserMessagesSummary = userId => dispatch => {
     actionName: NOTIFICATION_NOT_READ_COUNT,
     dispatch
   })
+
+  if (fetchGetMessages.status === 200) {
+    fetchGetMessages.json.items = fetchGetMessages.json.items.map(message => ({
+      ...message,
+      fields: {
+        ...message.fields,
+        author: updateTLMUser(message.fields.author, true),
+        user: updateTLMUser(message.fields.user)
+      }
+    }))
+  }
+  return fetchGetMessages
 }
 
 export const getAccessibleWorkspaces = userId => dispatch => {

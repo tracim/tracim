@@ -366,9 +366,9 @@ export const APP_FEATURE_MODE = {
   REVISION: 'revision'
 }
 
-export const updateTLMAuthor = author => {
-  return author
-    ? { ...author, is_from_system_admin: false }
+export const updateTLMUser = (user, isAdmin) => {
+  return user
+    ? { ...user, is_from_system_admin: false }
     : {
       allowed_space: 0,
       auth_type: 'internal',
@@ -380,7 +380,7 @@ export const updateTLMAuthor = author => {
       is_from_system_admin: true,
       lang: 'en',
       profile: 'administrators',
-      public_name: i18n.t('System Administrator'),
+      public_name: isAdmin ? i18n.t('System Administrator') : i18n.t('Unknown'),
       timezone: '',
       user_id: 0,
       username: ''
