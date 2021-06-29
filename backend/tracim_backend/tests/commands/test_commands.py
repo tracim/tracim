@@ -573,6 +573,7 @@ class TestCommands(object):
         workspace_api_factory,
         content_type_list,
         admin_user,
+        event_helper,
     ) -> None:
         """
         Test User deletion : nominal case, user has change nothing in other user workspace
@@ -657,6 +658,11 @@ class TestCommands(object):
             session.query(UserCustomProperties).filter(
                 UserCustomProperties.user_id == user_id
             ).one()
+
+        events = event_helper.last_events(count=1)
+        deleted_user_event = events[-1]
+        assert deleted_user_event.event_type == "user.deleted"
+        assert deleted_user_event.user["public_name"] == "Global manager"
 
     def test_func__delete_user__err__cannot_remove_user(
         self,
@@ -901,6 +907,7 @@ class TestCommands(object):
         role_api_factory,
         content_type_list,
         admin_user,
+        event_helper,
     ) -> None:
         """
         Test User deletion with best-effort option and custom display name for anonymous user
@@ -1019,6 +1026,17 @@ class TestCommands(object):
             session.query(UserCustomProperties).filter(
                 UserCustomProperties.user_id == user_id
             ).one()
+
+        events = event_helper.last_events(count=3)
+        remove_user_from_space_2 = events[-3]
+        deleted_user_event = events[-2]
+        anonymized_user_event = events[-1]
+        assert remove_user_from_space_2.event_type == "workspace_member.deleted"
+        assert remove_user_from_space_2.user["public_name"] == "bob"
+        assert deleted_user_event.event_type == "user.deleted"
+        assert deleted_user_event.user["public_name"] == "bob"
+        assert anonymized_user_event.event_type == "user.modified"
+        assert anonymized_user_event.user["public_name"] == "Custom Name"
 
     def test_func__delete_user__ok__force_delete_all_user_content(
         self,
@@ -1254,6 +1272,7 @@ class TestCommands(object):
         role_api_factory,
         content_type_list,
         admin_user,
+        event_helper,
     ) -> None:
         """
         Test User anonymization
@@ -1303,6 +1322,14 @@ class TestCommands(object):
         assert test_user_retrieve.email.endswith("@anonymous.local")
         assert test_user_retrieve.config.fields == {}
 
+        events = event_helper.last_events(count=2)
+        deleted_user_event = events[0]
+        anonymized_user_event = events[1]
+        assert deleted_user_event.event_type == "user.deleted"
+        assert deleted_user_event.user["public_name"] == "bob"
+        assert anonymized_user_event.event_type == "user.modified"
+        assert anonymized_user_event.user["public_name"] == "Deleted user"
+
     def test_func__anonymize_user__ok__specific_display_name(
         self,
         session,
@@ -1313,6 +1340,7 @@ class TestCommands(object):
         role_api_factory,
         content_type_list,
         admin_user,
+        event_helper,
     ) -> None:
         """
         Test User anonymization
@@ -1360,3 +1388,10 @@ class TestCommands(object):
         assert test_user_retrieve.display_name == "Custom Name"
         assert test_user_retrieve.email.endswith("@anonymous.local")
         assert test_user_retrieve.config.fields == {}
+        events = event_helper.last_events(count=2)
+        deleted_user_event = events[0]
+        anonymized_user_event = events[1]
+        assert deleted_user_event.event_type == "user.deleted"
+        assert deleted_user_event.user["public_name"] == "bob"
+        assert anonymized_user_event.event_type == "user.modified"
+        assert anonymized_user_event.user["public_name"] == "Custom Name"

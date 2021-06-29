@@ -207,7 +207,6 @@ class CleanupLib(object):
                 ),
             )
             self.safe_delete(role)
-
         # INFO - G.M - 2019-12-11 - delete permissions on workspace
         upload_permissions = self.session.query(UploadPermission).filter(
             UploadPermission.workspace_id == workspace.workspace_id

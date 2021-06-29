@@ -302,7 +302,10 @@ class DeleteUserCommand(AppContextCommand):
             user_config = user.config
             user_custom_properties = user.custom_properties
             cleanup_lib.delete_user_associated_data(user)
+            # INFO - G.M 2021-06-29 - Flush to send all Workspace members deleted event.
+            self._session.flush()
             cleanup_lib.prepare_deletion_or_anonymization(user)
+            # INFO - G.M 2021-06-29 - Flush to send user deletion event.
             self._session.flush()
             cleanup_lib.anonymize_user(
                 user, anonymized_user_display_name=anonymized_user_display_name
@@ -321,8 +324,10 @@ class DeleteUserCommand(AppContextCommand):
             user_config = user.config
             user_custom_properties = user.custom_properties
             cleanup_lib.delete_user_associated_data(user)
+            # INFO - G.M 2021-06-29 - Flush to send all Workspace members deleted event.
+            self._session.flush()
             cleanup_lib.prepare_deletion_or_anonymization(user)
-            # INFO - G.M 2021-03-15 - Flush to send all Workspace members deleted event.
+            # INFO - G.M 2021-06-29 - Flush to send user deletion event.
             self._session.flush()
             # INFO - G.M 2021-03-15 - Check None case to avoid error when deleting
             # a previously anonymized user
@@ -397,6 +402,7 @@ class AnonymizeUserCommand(AppContextCommand):
                 )
                 print("anonymize user {}.".format(user.user_id))
                 cleanup_lib.prepare_deletion_or_anonymization(user)
+                # INFO - G.M 2021-06-29 - Flush to send user deletion event.
                 self._session.flush()
                 cleanup_lib.anonymize_user(
                     user, anonymized_user_display_name=parsed_args.anonymize_name
