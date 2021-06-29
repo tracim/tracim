@@ -87,7 +87,7 @@ describe('helper.js', () => {
         is_deleted: false,
         is_from_system_admin: true,
         lang: 'en',
-        profile: 'users',
+        profile: 'administrators',
         public_name: 'Unknown',
         timezone: '',
         user_id: 0,
