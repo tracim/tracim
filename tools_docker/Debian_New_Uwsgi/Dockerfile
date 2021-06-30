@@ -51,6 +51,7 @@ RUN \
 # Install backend
     && python3 -m pip install -r requirements-build.txt \
     && python3 -m pip install -r requirements.txt \
+    && python3 -m pip install -r requirements-full-preview-generator.txt \
     && python3 -m pip install -r requirements-db-postgres.txt \
     && python3 -m pip install -r requirements-db-mysql.txt \
     && python3 -m pip install -e "." \
