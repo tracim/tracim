@@ -92,16 +92,6 @@ class TagList extends React.Component {
     return hasSameWorkspace
   }
 
-  toggleChecked = tag => {
-    const { props, state } = this
-    const checked = state.checkedTagIdList.includes(tag.tag_id)
-    if (checked) {
-      deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
-    } else {
-      putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
-    }
-  }
-
   handleClickDeleteTag = async (tagId) => {
     const { props } = this
 
@@ -259,11 +249,9 @@ class TagList extends React.Component {
                 key={tag.tag_id}
               >
                 <Tag
-                  checked={state.checkedTagIdList.includes(tag.tag_id)}
                   name={tag.tag_name}
                   tagId={tag.tag_id}
                   description={tag.description}
-                  onClickCheckbox={() => { this.toggleChecked(tag) }} // remove from the content
                   isContent={!!props.contentId}
                   onClickDeleteTag={() => props.contentId
                     ? this.handleClickDeleteTag(tag.tag_id)
