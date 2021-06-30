@@ -21,7 +21,8 @@ import {
   deleteWorkspaceTag,
   getWorkspaceTagList,
   getContentTagList,
-  putContentTag
+  putContentTag,
+  postContentTag
 } from '../../action.async.js'
 
 // require('./TagList.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -32,7 +33,8 @@ class TagList extends React.Component {
 
     this.state = {
       tagList: [],
-      checkedTagIdList: [],
+      //checkedTagIdList: [],
+      spaceTagList: [],
       workspaceTagToDeleteId: 0
     }
 
@@ -92,6 +94,16 @@ class TagList extends React.Component {
     return hasSameWorkspace
   }
 
+  toggleChecked = tagId => {
+    const { props, state } = this
+    const tagExits = state.spaceTagList.map(tag => tag.tag_id).includes(tagId)
+    if (tagExits) {
+      postContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
+    } else {
+      putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
+    }
+  }
+
   handleClickDeleteTag = async (tagId) => {
     const { props } = this
 
@@ -142,8 +154,8 @@ class TagList extends React.Component {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
       return
     }
-
-    tagList = fetchGetWsTagList.body
+    const spaceTagList = fetchGetWsTagList.body
+    tagList = spaceTagList
 
     if (props.contentId) {
       const fetchGetContentTagList = await handleFetchResult(
@@ -160,7 +172,7 @@ class TagList extends React.Component {
     // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
     // const tagList = fetchGetWsTagList.body.sort(this.sortTagList(checkedTagIdList))
     // const checkedTagIdList = fetchGetContentTagList.body.map(t => t.tag_id)
-    this.setState({ tagList, checkedTagIdList: tagList })
+    this.setState({ tagList, spaceTagList })
   }
 
   addTag (tag) {
@@ -168,12 +180,7 @@ class TagList extends React.Component {
       return {
         tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.checkedTagIdList))
       }
-    })
-  }
-
-  removeTag (tagId) {
-    this.setState(previousState => {
-      const tagList = previousState.tagList.filter(tag => tag.tag_id !== tagId)
+    })spaceTagList
       return { tagList }
     })
   }
@@ -251,11 +258,11 @@ class TagList extends React.Component {
                 <Tag
                   name={tag.tag_name}
                   tagId={tag.tag_id}
-                  description={tag.description}
                   isContent={!!props.contentId}
                   onClickDeleteTag={() => props.contentId
                     ? this.handleClickDeleteTag(tag.tag_id)
-                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })}
+                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })
+                  }
                   viewMode={props.viewMode}
                 />
               </li>
