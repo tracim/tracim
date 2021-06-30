@@ -539,13 +539,11 @@ export class Dashboard extends React.Component {
                       )
                     )}
                     <div className='dashboard__workspace__detail__buttons'>
-                      {userRoleIdInWorkspace >= ROLE.workspaceManager.id && (
-                        <IconButton
-                          icon='fas fa-fw fa-cog'
-                          text={props.t('Space settings')}
-                          onClick={this.handleClickOpenAdvancedDashboard}
-                        />
-                      )}
+                      <IconButton
+                        icon='fas fa-fw fa-cog'
+                        text={props.t('Space settings')}
+                        onClick={this.handleClickOpenAdvancedDashboard}
+                      />
                     </div>
                   </div>
                   {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}

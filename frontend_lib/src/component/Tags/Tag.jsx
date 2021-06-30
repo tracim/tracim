@@ -15,13 +15,15 @@ export const Tag = props => {
       >
         {props.name}
       </label>
-      <IconButton
-        intent='link'
-        onClick={props.onClickDeleteTag}
-        icon={props.isContent ? 'fas fa-times' : 'fas fa-trash-alt'}
-        title={props.isContent ? props.t('Remove tag from content') : props.t('Delete tag from space')}
-        dataCy='IconButton_DeleteTagFromSpace'
-      />
+      {!props.viewMode && (
+        <IconButton
+          intent='link'
+          onClick={props.onClickDeleteTag}
+          icon={props.isContent ? 'fas fa-times' : 'fas fa-trash-alt'}
+          title={props.isContent ? props.t('Remove tag from content') : props.t('Delete tag from space')}
+          dataCy='IconButton_DeleteTagFromSpace'
+        />
+      )}
     </div>
   )
 }
@@ -32,10 +34,12 @@ Tag.propTypes = {
   name: PropTypes.string.isRequired,
   tagId: PropTypes.number.isRequired,
   isContent: PropTypes.bool,
-  onClickDeleteTag: PropTypes.func
+  onClickDeleteTag: PropTypes.func,
+  viewMode: PropTypes.bool
 }
 
 Tag.defaultProps = {
   isContent: true,
-  onClickDeleteTag: () => { }
+  onClickDeleteTag: () => { },
+  viewMode: true
 }
