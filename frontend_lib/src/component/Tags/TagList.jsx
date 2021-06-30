@@ -94,30 +94,25 @@ class TagList extends React.Component {
     return hasSameWorkspace
   }
 
-  toggleChecked = tagId => {
-    const { props, state } = this
-    const tagExits = state.spaceTagList.map(tag => tag.tag_id).includes(tagId)
-    if (tagExits) {
-      postContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
-    } else {
-      putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
+  componentDidMount () {
+    this.updateTagList()
+  }
+
+  componentDidUpdate (prevProps) {
+    const { props } = this
+
+    if (prevProps.contentId !== props.contentId) {
+      this.updateTagList()
     }
   }
 
-  handleClickDeleteTag = async (tagId) => {
-    const { props } = this
-
-    const fetchDeleteTag = props.contentId
-      ? await deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
-      : await deleteWorkspaceTag(props.apiUrl, props.workspaceId, tagId)
-
-    switch (fetchDeleteTag.status) {
-      case 204:
-        sendGlobalFlashMessage(props.t('Tag removed'), 'info')
-        this.setState({ workspaceTagToDeleteId: 0 })
-        this.removeTag(tagId)
-        break
-      default: sendGlobalFlashMessage(props.t('Error while removing tag'))
+  toggleChecked = tagId => {
+    const { props, state } = this
+    const tagExits = state.spaceTagList.map(tag => tag.tag_id).includes(tagId)
+    if (tagExits) { // TODO
+      postContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
+    } else {
+      putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
     }
   }
 
@@ -129,18 +124,6 @@ class TagList extends React.Component {
       const tagList = previousState.tagList.sort(this.sortTagList(checkedTagIdList))
       return { checkedTagIdList, tagList }
     })
-  }
-
-  componentDidMount () {
-    this.updateTagList()
-  }
-
-  componentDidUpdate (prevProps) {
-    const { props } = this
-
-    if (prevProps.contentId !== props.contentId) {
-      this.updateTagList()
-    }
   }
 
   async updateTagList () {
@@ -180,8 +163,6 @@ class TagList extends React.Component {
       return {
         tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.checkedTagIdList))
       }
-    })spaceTagList
-      return { tagList }
     })
   }
 
@@ -203,9 +184,21 @@ class TagList extends React.Component {
     }
   }
 
-  handleDeleteWorkspaceTag = () => {
-    this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)
-    this.setState({ workspaceTagToDeleteId: 0 })
+  handleClickDeleteTag = async (tagId) => {
+    const { props } = this
+
+    const fetchDeleteTag = props.contentId
+      ? await deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
+      : await deleteWorkspaceTag(props.apiUrl, props.workspaceId, tagId)
+
+    switch (fetchDeleteTag.status) {
+      case 204:
+        sendGlobalFlashMessage(props.t('Tag removed'), 'info')
+        this.setState({ workspaceTagToDeleteId: 0 })
+        this.removeTag(tagId)
+        break
+      default: sendGlobalFlashMessage(props.t('Error while removing tag'))
+    }
   }
 
   render () {
@@ -271,7 +264,7 @@ class TagList extends React.Component {
 
           {!!state.workspaceTagToDeleteId && (
             <ConfirmPopup
-              onConfirm={this.handleDeleteWorkspaceTag}
+              onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
               onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
               confirmLabel={props.t('Delete')}
             />
@@ -295,6 +288,6 @@ TagList.propTypes = {
 
 TagList.defaultProps = {
   contentId: 0,
-  onChangeTag: () => {},
+  onChangeTag: () => { },
   viewMode: true
 }
