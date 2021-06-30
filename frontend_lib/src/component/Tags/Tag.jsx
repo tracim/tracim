@@ -9,13 +9,12 @@ export const Tag = props => {
   return (
     <div className='tagList__list__item'>
       <label
-        htmlFor={'checkbox-tag-' + props.tagId}
         className='tagList__list__item__info'
         title={props.name}
       >
         {props.name}
       </label>
-      {!props.viewMode && (
+      {!props.isReadOnlyMode && (
         <IconButton
           intent='link'
           onClick={props.onClickDeleteTag}
@@ -32,14 +31,13 @@ export default translate()(Tag)
 
 Tag.propTypes = {
   name: PropTypes.string.isRequired,
-  tagId: PropTypes.number.isRequired,
   isContent: PropTypes.bool,
   onClickDeleteTag: PropTypes.func,
-  viewMode: PropTypes.bool
+  isReadOnlyMode: PropTypes.bool
 }
 
 Tag.defaultProps = {
   isContent: true,
   onClickDeleteTag: () => { },
-  viewMode: true
+  isReadOnlyMode: true
 }

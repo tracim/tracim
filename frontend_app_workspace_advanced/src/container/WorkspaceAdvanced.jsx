@@ -793,7 +793,7 @@ export class WorkspaceAdvanced extends React.Component {
             onClickCloseAddTagBtn={this.handleToggleAddTagForm}
             searchedKnownTagList={props.searchedKnownTagList}
             onClickAutoComplete={this.handleClickAutoComplete}
-            viewMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id}
+            isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id}
           />
         </PopinFixedRightPartContent>
       )

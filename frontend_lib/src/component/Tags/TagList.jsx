@@ -158,14 +158,6 @@ class TagList extends React.Component {
     this.setState({ tagList, spaceTagList })
   }
 
-  addTag (tag) {
-    this.setState(previousState => {
-      return {
-        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.checkedTagIdList))
-      }
-    })
-  }
-
   sortTagList (checkedTagIdList) {
     const { props } = this
     return (tagA, tagB) => {
@@ -182,6 +174,21 @@ class TagList extends React.Component {
 
       return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
     }
+  }
+
+  addTag (tag) {
+    this.setState(previousState => {
+      return {
+        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.checkedTagIdList))
+      }
+    })
+  }
+
+  removeTag (tagId) {
+    this.setState(previousState => {
+      const tagList = previousState.tagList.filter(tag => tag.tag_id !== tagId)
+      return { tagList }
+    })
   }
 
   handleClickDeleteTag = async (tagId) => {
@@ -212,7 +219,7 @@ class TagList extends React.Component {
         </div>
 
         <div className='tagList__wrapper'>
-          {!props.viewMode && (props.displayNewTagForm
+          {!props.isReadOnlyMode && (props.displayNewTagForm
             ? (
               <NewTagForm
                 apiUrl={props.apiUrl}
@@ -249,14 +256,13 @@ class TagList extends React.Component {
                 key={tag.tag_id}
               >
                 <Tag
-                  name={tag.tag_name}
-                  tagId={tag.tag_id}
                   isContent={!!props.contentId}
+                  isReadOnlyMode={props.isReadOnlyMode}
+                  name={tag.tag_name}
                   onClickDeleteTag={() => props.contentId
                     ? this.handleClickDeleteTag(tag.tag_id)
                     : this.setState({ workspaceTagToDeleteId: tag.tag_id })
                   }
-                  viewMode={props.viewMode}
                 />
               </li>
             )}
@@ -264,9 +270,9 @@ class TagList extends React.Component {
 
           {!!state.workspaceTagToDeleteId && (
             <ConfirmPopup
-              onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
-              onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
               confirmLabel={props.t('Delete')}
+              onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
+              onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
             />
           )}
         </div>
@@ -283,11 +289,11 @@ TagList.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
   onChangeTag: PropTypes.func,
-  viewMode: PropTypes.bool
+  isReadOnlyMode: PropTypes.bool
 }
 
 TagList.defaultProps = {
   contentId: 0,
   onChangeTag: () => { },
-  viewMode: true
+  isReadOnlyMode: true
 }
