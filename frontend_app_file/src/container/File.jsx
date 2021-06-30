@@ -974,6 +974,7 @@ export class File extends React.Component {
           onClickCloseAddTagBtn={this.handleToggleAddTagForm}
           searchedKnownTagList={props.searchedKnownTagList}
           onClickAutoComplete={this.handleClickAutoComplete}
+          viewMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id}
         />
       )
     }

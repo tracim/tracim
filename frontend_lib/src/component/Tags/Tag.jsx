@@ -2,7 +2,6 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import { Checkbox } from '../Input/Checkbox.jsx'
 import PropTypes from 'prop-types'
-import CloseButton from '../Button/CloseButton.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
 require('./TagList.styl')
@@ -24,13 +23,15 @@ export const Tag = props => {
       >
         {props.name}
       </label>
-      <IconButton
-        intent='link'
-        onClick={props.onClickDeleteTag}
-        icon={props.isContent ? 'fas fa-times' : 'fas fa-trash-alt'}
-        title={props.isContent ? props.t('Remove tag from content') : props.t('Delete tag from space')}
-        dataCy='IconButton_DeleteTagFromSpace'
-      />
+      {!props.viewMode && (
+        <IconButton
+          intent='link'
+          onClick={props.onClickDeleteTag}
+          icon={props.isContent ? 'fas fa-times' : 'fas fa-trash-alt'}
+          title={props.isContent ? props.t('Remove tag from content') : props.t('Delete tag from space')}
+          dataCy='IconButton_DeleteTagFromSpace'
+        />
+      )}
     </div>
   )
 }
@@ -43,12 +44,14 @@ Tag.propTypes = {
   checked: PropTypes.bool,
   onClickCheckbox: PropTypes.func,
   isContent: PropTypes.bool,
-  onClickDeleteTag: PropTypes.func
+  onClickDeleteTag: PropTypes.func,
+  viewMode: PropTypes.bool
 }
 
 Tag.defaultProps = {
   checked: false,
   onClickCheckbox: () => { },
   isContent: true,
-  onClickDeleteTag: () => { }
+  onClickDeleteTag: () => { },
+  viewMode: true
 }

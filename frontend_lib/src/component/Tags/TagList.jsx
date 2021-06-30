@@ -222,7 +222,7 @@ class TagList extends React.Component {
         </div>
 
         <div className='tagList__wrapper'>
-          {!props.viewMode && props.displayNewTagForm
+          {!props.viewMode && (props.displayNewTagForm
             ? (
               <NewTagForm
                 apiUrl={props.apiUrl}
@@ -248,7 +248,7 @@ class TagList extends React.Component {
                   </div>
                 </div>
               </div>
-            )}
+            ))}
           <ul className='tagList__list'>
             {state.tagList.map((tag, index) =>
               <li
@@ -267,8 +267,8 @@ class TagList extends React.Component {
                   isContent={!!props.contentId}
                   onClickDeleteTag={() => props.contentId
                     ? this.handleClickDeleteTag(tag.tag_id)
-                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })
-                  }
+                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })}
+                  viewMode={props.viewMode}
                 />
               </li>
             )}
@@ -301,5 +301,5 @@ TagList.propTypes = {
 TagList.defaultProps = {
   contentId: 0,
   onChangeTag: () => {},
-  viewMode: false // true
+  viewMode: true
 }
