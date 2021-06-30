@@ -760,21 +760,19 @@ export class WorkspaceAdvanced extends React.Component {
         <PopinFixedRightPartContent
           label={props.t('Optional Functionalities')}
         >
-          {state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id && (
-            <OptionalFeatures
-              appAgendaAvailable={state.content.appAgendaAvailable}
-              agendaEnabled={state.content.agenda_enabled}
-              onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
-              downloadEnabled={state.content.public_download_enabled}
-              appDownloadAvailable={state.content.appDownloadAvailable}
-              onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
-              uploadEnabled={state.content.public_upload_enabled}
-              appUploadAvailable={state.content.appUploadAvailable}
-              onToggleUploadEnabled={this.handleToggleUploadEnabled}
-              publicationEnabled={state.content.publication_enabled}
-              onTogglePublicationEnabled={this.handleTogglePublicationEnabled}
-            />
-          )}
+          <OptionalFeatures
+            appAgendaAvailable={state.content.appAgendaAvailable}
+            agendaEnabled={state.content.agenda_enabled}
+            onToggleAgendaEnabled={this.handleToggleAgendaEnabled}
+            downloadEnabled={state.content.public_download_enabled}
+            appDownloadAvailable={state.content.appDownloadAvailable}
+            onToggleDownloadEnabled={this.handleToggleDownloadEnabled}
+            uploadEnabled={state.content.public_upload_enabled}
+            appUploadAvailable={state.content.appUploadAvailable}
+            onToggleUploadEnabled={this.handleToggleUploadEnabled}
+            publicationEnabled={state.content.publication_enabled}
+            onTogglePublicationEnabled={this.handleTogglePublicationEnabled}
+          />
         </PopinFixedRightPartContent>
       )
     }
@@ -799,11 +797,19 @@ export class WorkspaceAdvanced extends React.Component {
       )
     }
 
-    if (state.content.access_type === SPACE_TYPE.onRequest.slug && state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) {
-      return [memberlistObject, subscriptionObject, functionalitesObject]
-    } else {
-      return [memberlistObject, functionalitesObject, tagList]
+    const menuItemList = [memberlistObject]
+    const isWorkspaceManager = state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id
+    if (state.content.access_type === SPACE_TYPE.onRequest.slug && isWorkspaceManager) {
+      menuItemList.push(subscriptionObject)
     }
+
+    if (isWorkspaceManager) {
+      menuItemList.push(functionalitesObject)
+    }
+
+    menuItemList.push(tagList)
+
+    return menuItemList
   }
 
   render () {

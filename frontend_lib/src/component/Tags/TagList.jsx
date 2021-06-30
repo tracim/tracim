@@ -59,7 +59,7 @@ class TagList extends React.Component {
         entityType: TLM_ET.CONTENT_TAG,
         coreEntityType: TLM_CET.DELETED,
         handler: tlm => {
-          if (!this.isTlmForMyWorkspace(tlm)) return
+          if (!this.isTlmForMyContent(tlm)) return
           this.removeTag(tlm.fields.tag.tag_id)
         }
       },
