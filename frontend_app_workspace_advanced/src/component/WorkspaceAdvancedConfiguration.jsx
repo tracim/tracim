@@ -1,5 +1,6 @@
 import React from 'react'
 import Radium from 'radium'
+import PropTypes from 'prop-types'
 import {
   AutoComplete,
   BtnSwitch,
@@ -25,19 +26,22 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 
   componentDidMount () {
     const { props } = this
-    globalThis.wysiwyg(
-      `#${props.textareaId}`,
-      props.i18n.language,
-      props.onChangeDescription,
-      props.onTinyMceInput,
-      props.onTinyMceKeyDown,
-      props.onTinyMceKeyUp,
-      props.onTinyMceSelectionChange
-    )
+    if (!props.isReadOnlyMode) {
+      globalThis.wysiwyg(
+        `#${props.textareaId}`,
+        props.i18n.language,
+        props.onChangeDescription,
+        props.onTinyMceInput,
+        props.onTinyMceKeyDown,
+        props.onTinyMceKeyUp,
+        props.onTinyMceSelectionChange
+      )
+    }
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove(`#${this.props.textareaId}`)
+    const { props } = this
+    if (!props.isReadOnlyMode) globalThis.tinymce.remove(`#${props.textareaId}`)
   }
 
   render () {
@@ -49,37 +53,42 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
           <div className='formBlock__title workspace_advanced__description__title '>
             {props.t('Description')}
           </div>
+          {props.isReadOnlyMode
+            ? <div dangerouslySetInnerHTML={{ __html: props.description }} />
+            : (
+              <div>
+                <div className='formBlock__field workspace_advanced__description__text '>
+                  {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+                    <AutoComplete
+                      apiUrl={props.apiUrl}
+                      autoCompleteItemList={props.autoCompleteItemList}
+                      autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                      onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                      delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+                    />
+                  )}
+                  <textarea
+                    id={props.textareaId}
+                    className='workspace_advanced__description__text__textarea'
+                    placeholder={props.t("Space's description")}
+                    value={props.description}
+                    onChange={props.onChangeDescription}
+                    rows='3'
+                  />
+                </div>
 
-          <div className='formBlock__field workspace_advanced__description__text '>
-            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <AutoComplete
-                apiUrl={props.apiUrl}
-                autoCompleteItemList={props.autoCompleteItemList}
-                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-              />
+                <div className='workspace_advanced__description__bottom'>
+                  <button
+                    type='button'
+                    className='workspace_advanced__description__bottom__btn btn highlightBtn'
+                    onClick={props.onClickValidateNewDescription}
+                    style={{ backgroundColor: props.customColor }}
+                  >
+                    {props.t('Confirm')}
+                  </button>
+                </div>
+              </div>
             )}
-            <textarea
-              id={props.textareaId}
-              className='workspace_advanced__description__text__textarea'
-              placeholder={props.t("Space's description")}
-              value={props.description}
-              onChange={props.onChangeDescription}
-              rows='3'
-            />
-          </div>
-
-          <div className='workspace_advanced__description__bottom'>
-            <button
-              type='button'
-              className='workspace_advanced__description__bottom__btn btn highlightBtn'
-              onClick={props.onClickValidateNewDescription}
-              style={{ backgroundColor: props.customColor }}
-            >
-              {props.t('Confirm')}
-            </button>
-          </div>
         </div>
 
         <div className='workspace_advanced__defaultRole formBlock'>
@@ -107,49 +116,58 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
             </Popover>
           </div>
 
-          <div className='workspace_advanced__defaultRole__list'>
-            <SingleChoiceList
-              list={ROLE_LIST}
-              onChange={props.onChangeNewDefaultRole}
-              currentValue={props.defaultRole}
-            />
-          </div>
+          {props.isReadOnlyMode
+            ? (
+              <div>{props.defaultRole}</div>
+            ) : (
+              <div>
+                <div className='workspace_advanced__defaultRole__list'>
+                  <SingleChoiceList
+                    list={ROLE_LIST}
+                    onChange={props.onChangeNewDefaultRole}
+                    currentValue={props.defaultRole}
+                  />
+                </div>
 
-          <div className='workspace_advanced__defaultRole__bottom'>
-            <button
-              type='button'
-              className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-              onClick={props.onClickValidateNewDefaultRole}
-            >
-              {props.t('Confirm')}
-            </button>
-          </div>
+                <div className='workspace_advanced__defaultRole__bottom'>
+                  <button
+                    type='button'
+                    className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                    onClick={props.onClickValidateNewDefaultRole}
+                  >
+                    {props.t('Confirm')}
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
 
-        <div className='formBlock workspace_advanced__delete'>
-          <div className='formBlock__title workspace_advanced__delete__title'>
-            {props.t('Delete space')}
+        {!props.isReadOnlyMode && (
+          <div className='formBlock workspace_advanced__delete'>
+            <div className='formBlock__title workspace_advanced__delete__title'>
+              {props.t('Delete space')}
+            </div>
+
+            <div className='formBlock__field workspace_advanced__delete__content'>
+              <button
+                className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
+                onClick={props.onClickDeleteWorkspaceBtn}
+              >
+                {props.t('Delete')}
+              </button>
+
+              <div className='workspace_advanced__delete__content__warning' />
+            </div>
+
+            {(props.displayPopupValidateDeleteWorkspace &&
+              <ConfirmPopup
+                onConfirm={props.onClickValidatePopupDeleteWorkspace}
+                onCancel={props.onClickClosePopupDeleteWorkspace}
+                confirmLabel={props.t('Delete')}
+              />
+            )}
           </div>
-
-          <div className='formBlock__field workspace_advanced__delete__content'>
-            <button
-              className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
-              onClick={props.onClickDeleteWorkspaceBtn}
-            >
-              {props.t('Delete')}
-            </button>
-
-            <div className='workspace_advanced__delete__content__warning' />
-          </div>
-
-          {(props.displayPopupValidateDeleteWorkspace &&
-            <ConfirmPopup
-              onConfirm={props.onClickValidatePopupDeleteWorkspace}
-              onCancel={props.onClickClosePopupDeleteWorkspace}
-              confirmLabel={props.t('Delete')}
-            />
-          )}
-        </div>
+        )}
 
         <div
           className='workspace_advanced__functionality'
@@ -190,3 +208,13 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 }
 
 export default translate()(Radium(WorkspaceAdvancedConfiguration))
+
+WorkspaceAdvancedConfiguration.propTypes = {
+  description: PropTypes.string,
+  isReadOnlyMode: PropTypes.bool
+}
+
+WorkspaceAdvancedConfiguration.defaultProps = {
+  description: '',
+  isReadOnlyMode: true
+}

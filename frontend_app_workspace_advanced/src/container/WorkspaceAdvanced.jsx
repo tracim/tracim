@@ -832,34 +832,33 @@ export class WorkspaceAdvanced extends React.Component {
           onValidateChangeTitle={this.handleSaveEditLabel}
           disableChangeTitle={false}
         >
-          {state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id
-            ? <WorkspaceAdvancedConfiguration
-              apiUrl={state.config.apiUrl}
-              textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
-              autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-              autoCompleteItemList={state.autoCompleteItemList}
-              customColor={state.config.hexcolor}
-              description={state.content.description}
-              defaultRole={state.content.default_user_role}
-              displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
-              isAutoCompleteActivated={state.isAutoCompleteActivated}
-              onClickAutoCompleteItem={(item) => {
-                tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
-              }}
-              onClickValidateNewDescription={this.handleClickValidateNewDescription}
-              onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
-              onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
-              onClickValidateNewDefaultRole={this.handleClickValidateNewDefaultRole}
-              onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
-              onChangeDescription={this.handleChangeDescription}
-              onChangeNewDefaultRole={this.handleChangeNewDefaultRole}
-              key='workspace_advanced'
-              onTinyMceInput={this.handleTinyMceInput}
-              onTinyMceKeyDown={this.handleTinyMceKeyDown}
-              onTinyMceKeyUp={this.handleTinyMceKeyUp}
-              onTinyMceSelectionChange={this.handleTinyMceSelectionChange}
-            />
-            : <div />}
+          <WorkspaceAdvancedConfiguration
+            apiUrl={state.config.apiUrl}
+            isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id}
+            textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            autoCompleteItemList={state.autoCompleteItemList}
+            customColor={state.config.hexcolor}
+            description={state.content.description}
+            defaultRole={state.content.default_user_role}
+            displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
+            isAutoCompleteActivated={state.isAutoCompleteActivated}
+            onClickAutoCompleteItem={(item) => {
+              tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
+            }}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
+            onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
+            onClickValidateNewDefaultRole={this.handleClickValidateNewDefaultRole}
+            onClickValidatePopupDeleteWorkspace={this.handleClickValidateDeleteWorkspace}
+            onChangeDescription={this.handleChangeDescription}
+            onChangeNewDefaultRole={this.handleChangeNewDefaultRole}
+            key='workspace_advanced'
+            onTinyMceInput={this.handleTinyMceInput}
+            onTinyMceKeyDown={this.handleTinyMceKeyDown}
+            onTinyMceKeyUp={this.handleTinyMceKeyUp}
+            onTinyMceSelectionChange={this.handleTinyMceSelectionChange}
+          />
 
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
