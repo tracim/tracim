@@ -831,6 +831,7 @@ export class WorkspaceAdvanced extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
           disableChangeTitle={false}
+          showChangeTitleButton={state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id}
         >
           <WorkspaceAdvancedConfiguration
             apiUrl={state.config.apiUrl}

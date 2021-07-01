@@ -13,7 +13,7 @@ import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
 
 export class WorkspaceAdvancedConfiguration extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       popoverDefaultRoleInfoOpen: false
@@ -91,117 +91,113 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
             )}
         </div>
 
-        <div className='workspace_advanced__defaultRole formBlock'>
-          <div className='formBlock__title'>
-            {props.t('Default role:')}
-            <button
-              type='button'
-              className='btn transparentButton workspace_advanced__defaultRole__info'
-              id='popoverDefaultRoleInfo'
-            >
-              <i className='fas fa-fw fa-question-circle' />
-            </button>
-
-            <Popover
-              placement='bottom'
-              isOpen={state.popoverDefaultRoleInfoOpen}
-              target='popoverDefaultRoleInfo'
-              // INFO - GB - 2020-11-16 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-              toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
-              trigger={isMobile ? 'focus' : 'hover'}
-            >
-              <PopoverBody>
-                {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
-              </PopoverBody>
-            </Popover>
-          </div>
-
-          {props.isReadOnlyMode
-            ? (
-              <div>{props.defaultRole}</div>
-            ) : (
-              <div>
-                <div className='workspace_advanced__defaultRole__list'>
-                  <SingleChoiceList
-                    list={ROLE_LIST}
-                    onChange={props.onChangeNewDefaultRole}
-                    currentValue={props.defaultRole}
-                  />
-                </div>
-
-                <div className='workspace_advanced__defaultRole__bottom'>
-                  <button
-                    type='button'
-                    className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                    onClick={props.onClickValidateNewDefaultRole}
-                  >
-                    {props.t('Confirm')}
-                  </button>
-                </div>
-              </div>
-            )}
-        </div>
-
         {!props.isReadOnlyMode && (
-          <div className='formBlock workspace_advanced__delete'>
-            <div className='formBlock__title workspace_advanced__delete__title'>
-              {props.t('Delete space')}
+          <div>
+            <div className='workspace_advanced__defaultRole formBlock'>
+              <div className='formBlock__title'>
+                {props.t('Default role:')}
+                <button
+                  type='button'
+                  className='btn transparentButton workspace_advanced__defaultRole__info'
+                  id='popoverDefaultRoleInfo'
+                >
+                  <i className='fas fa-fw fa-question-circle' />
+                </button>
+
+                <Popover
+                  placement='bottom'
+                  isOpen={state.popoverDefaultRoleInfoOpen}
+                  target='popoverDefaultRoleInfo'
+                  // INFO - GB - 2020-11-16 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+                  toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
+                  trigger={isMobile ? 'focus' : 'hover'}
+                >
+                  <PopoverBody>
+                    {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
+                  </PopoverBody>
+                </Popover>
+              </div>
+
+              <div className='workspace_advanced__defaultRole__list'>
+                <SingleChoiceList
+                  list={ROLE_LIST}
+                  onChange={props.onChangeNewDefaultRole}
+                  currentValue={props.defaultRole}
+                />
+              </div>
+
+              <div className='workspace_advanced__defaultRole__bottom'>
+                <button
+                  type='button'
+                  className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                  onClick={props.onClickValidateNewDefaultRole}
+                >
+                  {props.t('Confirm')}
+                </button>
+              </div>
             </div>
 
-            <div className='formBlock__field workspace_advanced__delete__content'>
-              <button
-                className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
-                onClick={props.onClickDeleteWorkspaceBtn}
-              >
-                {props.t('Delete')}
-              </button>
 
-              <div className='workspace_advanced__delete__content__warning' />
+            <div className='formBlock workspace_advanced__delete'>
+              <div className='formBlock__title workspace_advanced__delete__title'>
+                {props.t('Delete space')}
+              </div>
+
+              <div className='formBlock__field workspace_advanced__delete__content'>
+                <button
+                  className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
+                  onClick={props.onClickDeleteWorkspaceBtn}
+                >
+                  {props.t('Delete')}
+                </button>
+
+                <div className='workspace_advanced__delete__content__warning' />
+              </div>
+
+              {(props.displayPopupValidateDeleteWorkspace &&
+                <ConfirmPopup
+                  onConfirm={props.onClickValidatePopupDeleteWorkspace}
+                  onCancel={props.onClickClosePopupDeleteWorkspace}
+                  confirmLabel={props.t('Delete')}
+                />
+              )}
             </div>
 
-            {(props.displayPopupValidateDeleteWorkspace &&
-              <ConfirmPopup
-                onConfirm={props.onClickValidatePopupDeleteWorkspace}
-                onCancel={props.onClickClosePopupDeleteWorkspace}
-                confirmLabel={props.t('Delete')}
-              />
-            )}
+            <div
+              className='workspace_advanced__functionality'
+              style={{ display: 'none' }}
+            // Côme - 2018/09/10 - hide this div until webdav and/or visioconf is activated
+            >
+              <div className='workspace_advanced__functionality__title'>
+                Liste des fonctionnalités
+              </div>
+
+              <div className='workspace_advanced__functionality__text'>
+                Liste des fonctionnalités présentes sur Tracim que vous pouvez désactiver :
+              </div>
+
+              <ul className='workspace_advanced__functionality__list'>
+                <li className='workspace_advanced__functionality__list__item'>
+                  <div className='item__text'>
+                    Calendrier de l'espace de travail :
+                  </div>
+                  <div className='item__btnswitch'>
+                    <BtnSwitch />
+                  </div>
+                </li>
+
+                <li className='workspace_advanced__functionality__list__item'>
+                  <div className='item__text'>
+                    Visioconférence :
+                  </div>
+                  <div className='item__btnswitch'>
+                    <BtnSwitch />
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         )}
-
-        <div
-          className='workspace_advanced__functionality'
-          style={{ display: 'none' }}
-        // Côme - 2018/09/10 - hide this div until webdav and/or visioconf is activated
-        >
-          <div className='workspace_advanced__functionality__title'>
-            Liste des fonctionnalités
-          </div>
-
-          <div className='workspace_advanced__functionality__text'>
-            Liste des fonctionnalités présentes sur Tracim que vous pouvez désactiver :
-          </div>
-
-          <ul className='workspace_advanced__functionality__list'>
-            <li className='workspace_advanced__functionality__list__item'>
-              <div className='item__text'>
-                Calendrier de l'espace de travail :
-              </div>
-              <div className='item__btnswitch'>
-                <BtnSwitch />
-              </div>
-            </li>
-
-            <li className='workspace_advanced__functionality__list__item'>
-              <div className='item__text'>
-                Visioconférence :
-              </div>
-              <div className='item__btnswitch'>
-                <BtnSwitch />
-              </div>
-            </li>
-          </ul>
-        </div>
       </div>
     )
   }
