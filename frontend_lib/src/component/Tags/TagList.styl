@@ -2,35 +2,25 @@
 
 .tagList
   flex-direction column
-  width calc(100% - 65px)
+  width calc(100% - 15px)
   height 100%
-  min-height 260px
   overflow auto
-  margin-bottom 10px
   &__header
     margin 10px 15px
     padding 10px
     font-size fontSizeMedium
-  &__wrapper
-    position relative
-    margin-left 15px
-    width calc(100% - 25px)
-    border 1px solid grey
-    background-color offWhite
   &__list
     margin 0
     padding 0
     list-style none
-    width 100%
     &__item
-      border-bottom 1px solid grey
+      border 1px solid grey
       display flex
       padding 10px 15px
-      &:hover
-        background-color grey-hover
+      background-color offWhite
+      margin 10px
       &__info
         flex 1
-        cursor pointer
         margin-bottom 0
       &__delete
         font-size fontSizeMedium

@@ -56,6 +56,7 @@ class PopinFixedContent extends React.Component {
               favoriteState={props.favoriteState}
               onClickAddToFavoriteList={props.onClickAddToFavoriteList}
               onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
+              showChangeTitleButton={props.showChangeTitleButton}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
               {props.breadcrumbsList.length > 0 && (
@@ -157,6 +158,7 @@ PopinFixedContent.propTypes = {
   onClickCloseBtn: PropTypes.func,
   onClickRemoveFromFavoriteList: PropTypes.func,
   onValidateChangeTitle: PropTypes.func,
+  showChangeTitleButton: PropTypes.bool,
   showReactions: PropTypes.bool
 }
 
@@ -191,5 +193,6 @@ PopinFixedContent.defaultProps = {
   onClickCloseBtn: () => {},
   onClickRemoveFromFavoriteList: () => {},
   onValidateChangeTitle: () => {},
+  showChangeTitleButton: true,
   showReactions: false
 }

@@ -79,7 +79,6 @@ export class WorkspaceAdvanced extends React.Component {
         avatarUrl: '',
         isEmail: false
       },
-      displayNewTagForm: false,
       autoCompleteFormNewMemberActive: false,
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
@@ -688,8 +687,6 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
-
   handleClickAutoComplete = () => this.setState({
     autoCompleteFormNewTagActive: false,
     autoCompleteClicked: true
@@ -781,19 +778,14 @@ export class WorkspaceAdvanced extends React.Component {
       label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
-        <PopinFixedRightPartContent>
-          <TagList
-            apiUrl={state.config.apiUrl}
-            workspaceId={state.content.workspace_id}
-            contentId={state.content.content_id}
-            displayNewTagForm={state.displayNewTagForm}
-            onClickAddTagBtn={this.handleToggleAddTagForm}
-            onClickCloseAddTagBtn={this.handleToggleAddTagForm}
-            searchedKnownTagList={props.searchedKnownTagList}
-            onClickAutoComplete={this.handleClickAutoComplete}
-            isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id}
-          />
-        </PopinFixedRightPartContent>
+        <TagList
+          apiUrl={state.config.apiUrl}
+          workspaceId={state.content.workspace_id}
+          contentId={state.content.content_id}
+          searchedKnownTagList={props.searchedKnownTagList}
+          onClickAutoComplete={this.handleClickAutoComplete}
+          isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id}
+        />
       )
     }
 
