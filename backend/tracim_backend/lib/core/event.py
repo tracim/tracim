@@ -1,6 +1,7 @@
 import abc
 import contextlib
 from datetime import datetime
+import typing
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -410,7 +411,7 @@ class EventPublisher:
     def on_context_session_created(self, db_session: TracimSession, context: TracimContext) -> None:
         """Listen for db session events (flush/commit) to publish TLMs
         for events added during the given context."""
-        commit_event = "after_flush"
+        commit_event = "before_commit"
         if self._config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
             # We need after commit event when processing in async
             # Otherwise we can't be sure that events will be visible
@@ -836,16 +837,26 @@ class EventBuilder:
         return False
 
 
+def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[int]:
+    try:
+        user_id = session.query(User.user_id).filter(User.user_id == event.user["user_id"]).one()
+        return user_id[0]
+    except AttributeError:
+        # no user in event
+        return None
+    except NoResultFound:
+        # user doesn't exist anymore
+        return None
+
+
 def _get_user_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     user_api = UserApi(current_user=event.user, session=session, config=config)
     receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
-    try:
-        receiver_ids.append(event.user["user_id"])
-        same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(event.user["user_id"])
+    event_user_id = get_event_user_id(session, event)
+    if event_user_id:
+        receiver_ids.append(event_user_id)
+        same_workspaces_user_ids = user_api.get_users_ids_in_same_workpaces(event_user_id)
         receiver_ids = set(receiver_ids + same_workspaces_user_ids)
-    except AttributeError:
-        # no user in event
-        pass
     return receiver_ids
 
 
@@ -860,11 +871,9 @@ def _get_members_and_administrators_ids(
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
     receiver_ids = set(administrators + workspace_members)
-    try:
-        receiver_ids.add(event.user["user_id"])
-    except (AttributeError, TypeError):
-        # no user in event
-        pass
+    event_user_id = get_event_user_id(session, event)
+    if event_user_id:
+        receiver_ids.add(event_user_id)
     return receiver_ids
 
 
