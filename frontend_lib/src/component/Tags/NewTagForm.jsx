@@ -136,7 +136,6 @@ NewTagForm.propTypes = {
   onClickAutoComplete: PropTypes.func,
   autoCompleteClicked: PropTypes.bool,
   onClickKnownTag: PropTypes.func,
-  onClickAddTag: PropTypes.func,
   autoCompleteActive: PropTypes.bool,
   spaceTaglist: PropTypes.array
 }
@@ -146,7 +145,6 @@ NewTagForm.defaultProps = {
   autoCompleteClicked: false,
   autoCompleteActive: false,
   onClickKnownTag: () => { },
-  onClickAddTag: () => { },
   onClickAutoComplete: () => { },
   onClickCloseAddTagBtn: () => { },
   spaceTaglist: []

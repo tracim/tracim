@@ -40,7 +40,7 @@ class TagList extends React.Component {
         entityType: TLM_ET.TAG,
         coreEntityType: TLM_CET.CREATED,
         handler: tlm => {
-          if (!this.isTlmForMyWorkspace(tlm)) return
+          if (!this.isTlmForMyWorkspace(tlm) || props.contentId) return
           this.addTag(tlm.fields.tag)
         }
       },
@@ -134,7 +134,7 @@ class TagList extends React.Component {
   addTag (tag) {
     this.setState(previousState => {
       return {
-        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.tagList)) // changer state à la fin
+        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.tagList))
       }
     })
   }
