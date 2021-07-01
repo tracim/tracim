@@ -16,6 +16,7 @@ export class NewTagForm extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      autoCompleteActive: false,
       tagName: ''
     }
   }
@@ -78,8 +79,17 @@ export class NewTagForm extends React.Component {
     this.setState({ tagName: '' })
   }
 
-  render () {
-    const { props } = this
+  handleClickKnownTag = knownTag => {
+    this.setState({
+      tagName: knownTag.tag_name,
+      autoCompleteActive: false
+    })
+  }
+
+  render() {
+    const { props, state } = this
+    const filterTags = props.spaceTagList.filter(tag => tag.tag_name.includes(state.tagName)).slice(0, 4)
+
     return (
       <div className='tagList__form'>
         <CloseButton
@@ -101,11 +111,33 @@ export class NewTagForm extends React.Component {
               id='addTag'
               placeholder={props.t('Create new tag...')}
               data-cy='add_tag'
-              value={this.state.tagName}
+              value={state.tagName}
               onChange={(e) => this.setState({ tagName: e.target.value })}
-              autoComplete='off'
-              autoFocus
+              onFocus={() => this.setState({ autoCompleteActive: true })}
+              // onBlur={() => this.setState({ autoCompleteActive: false })} // TODO
             />
+
+            {state.autoCompleteActive && !!props.contentId && filterTags.length > 0 && (
+              <div
+                className='autocomplete primaryColorBorder'
+              >
+                {filterTags.map(tag =>
+                    <div
+                      className='autocomplete__item'
+                      onClick={() => this.handleClickKnownTag(tag)}
+                      key={tag.tag_id}
+                    >
+                      <div
+                        className='autocomplete__item__name'
+                        data-cy='autocomplete__item__name'
+                        title={tag.tag_name}
+                      >
+                        {tag.tag_name}
+                      </div>
+                    </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -113,7 +145,7 @@ export class NewTagForm extends React.Component {
           <IconButton
             intent='primary'
             mode='light'
-            disabled={!this.state.tagName}
+            disabled={!state.tagName}
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
             dataCy='validate_tag'
@@ -128,24 +160,14 @@ export class NewTagForm extends React.Component {
 export default translate()(NewTagForm)
 
 NewTagForm.propTypes = {
-  onClickCloseAddTagBtn: PropTypes.func,
   apiUrl: PropTypes.string.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  searchedKnownTagList: PropTypes.arrayOf(PropTypes.object),
-  onClickAutoComplete: PropTypes.func,
-  autoCompleteClicked: PropTypes.bool,
-  onClickKnownTag: PropTypes.func,
-  autoCompleteActive: PropTypes.bool,
+  onClickCloseAddTagBtn: PropTypes.func,
   spaceTaglist: PropTypes.array
 }
 
 NewTagForm.defaultProps = {
-  searchedKnownTagList: [],
-  autoCompleteClicked: false,
-  autoCompleteActive: false,
-  onClickKnownTag: () => { },
-  onClickAutoComplete: () => { },
   onClickCloseAddTagBtn: () => { },
   spaceTaglist: []
 }
