@@ -75,7 +75,6 @@ export class File extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       timeline: [],
-      displayNewTagForm: false,
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -827,8 +826,6 @@ export class File extends React.Component {
     autoCompleteClicked: true
   })
 
-  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
-
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
 
@@ -969,9 +966,6 @@ export class File extends React.Component {
           apiUrl={state.config.apiUrl}
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
-          displayNewTagForm={state.displayNewTagForm}
-          onClickAddTagBtn={this.handleToggleAddTagForm}
-          onClickCloseAddTagBtn={this.handleToggleAddTagForm}
           searchedKnownTagList={props.searchedKnownTagList}
           onClickAutoComplete={this.handleClickAutoComplete}
           isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id}

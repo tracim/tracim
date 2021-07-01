@@ -78,7 +78,6 @@ export class HtmlDocument extends React.Component {
         props.t('notes'),
         props.t('Write a note')
       ],
-      displayNewTagForm: false,
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
@@ -475,8 +474,6 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.EDIT
     }))
   }
-
-  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
 
   handleCloseNewVersion = () => {
     globalThis.tinymce.remove('#wysiwygNewVersion')
@@ -932,9 +929,6 @@ export class HtmlDocument extends React.Component {
           apiUrl={state.config.apiUrl}
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
-          displayNewTagForm={state.displayNewTagForm}
-          onClickAddTagBtn={this.handleToggleAddTagForm}
-          onClickCloseAddTagBtn={this.handleToggleAddTagForm}
           searchedKnownTagList={props.searchedKnownTagList}
           onClickAutoComplete={this.handleClickAutoComplete}
           isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id}

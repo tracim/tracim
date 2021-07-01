@@ -82,24 +82,18 @@ export class NewTagForm extends React.Component {
     const { props } = this
     return (
       <div className='tagList__form'>
-        <CloseButton
-          onClick={props.onClickCloseAddTagBtn}
-          customClass='tagList__form__close'
-        />
-
         <div className='tagList__form__tag'>
-          <div className='tagList__form__title'>{props.t('Add a tag')}</div>
-
           <div className='tagList__form__member__tag'>
-            <label className='name__label' htmlFor='addTag'>
-              {props.t('Create a tag or choose one in the list for this content')}
-            </label>
+            {props.contentId
+              ? props.t('Add a tag to your content.')
+              : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')
+            }
 
             <input
               type='text'
               className='name__input form-control'
               id='addTag'
-              placeholder={props.t('Create new tag...')}
+              placeholder={props.t('e.g. Important')}
               data-cy='add_tag'
               value={this.state.tagName}
               onChange={(e) => this.setState({ tagName: e.target.value })}
@@ -117,7 +111,7 @@ export class NewTagForm extends React.Component {
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
             dataCy='validate_tag'
-            text={props.t('Validate')} // mettre le boolean ici
+            text={props.contentId ? props.t('Validate') : props.t('Create')}
           />
         </div>
       </div>
@@ -128,7 +122,6 @@ export class NewTagForm extends React.Component {
 export default translate()(NewTagForm)
 
 NewTagForm.propTypes = {
-  onClickCloseAddTagBtn: PropTypes.func,
   apiUrl: PropTypes.string.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
@@ -146,6 +139,5 @@ NewTagForm.defaultProps = {
   autoCompleteActive: false,
   onClickKnownTag: () => { },
   onClickAutoComplete: () => { },
-  onClickCloseAddTagBtn: () => { },
   spaceTaglist: []
 }

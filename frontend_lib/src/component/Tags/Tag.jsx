@@ -18,7 +18,7 @@ export const Tag = props => {
         <IconButton
           intent='link'
           onClick={props.onClickDeleteTag}
-          icon={props.isContent ? 'fas fa-times' : 'fas fa-trash-alt'}
+          icon={props.isContent ? 'fas fa-times' : 'far fa-trash-alt'}
           title={props.isContent ? props.t('Remove tag from content') : props.t('Delete tag from space')}
           dataCy='IconButton_DeleteTagFromSpace'
         />

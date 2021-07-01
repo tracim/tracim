@@ -173,34 +173,14 @@ class TagList extends React.Component {
         </div>
 
         <div className='tagList__wrapper'>
-          {!props.isReadOnlyMode && (props.displayNewTagForm
-            ? (
-              <NewTagForm
-                apiUrl={props.apiUrl}
-                workspaceId={props.workspaceId}
-                contentId={props.contentId}
-                onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
-                spaceTagList={state.spaceTagList}
-              />
-            )
-            : (
-              <div className='tagList__btnAdd' data-cy='tag_list__btn_add' onClick={props.onClickAddTagBtn}>
-                <div className='tagList__btnAdd__button primaryColorFontHover primaryColorBorderHover'>
-                  <div className='tagList__btnAdd__button__plus'>
-                    <div className='tagList__btnAdd__button__plus__icon'>
-                      <Icon
-                        icon='fas fa-plus'
-                        title={props.t('Add a tag')}
-                      />
-                    </div>
-                  </div>
-
-                  <div className='tagList__btnAdd__button__text'>
-                    {props.t('Add a tag')}
-                  </div>
-                </div>
-              </div>
-            ))}
+          {!props.isReadOnlyMode && (
+            <NewTagForm
+              apiUrl={props.apiUrl}
+              workspaceId={props.workspaceId}
+              contentId={props.contentId}
+              spaceTagList={state.spaceTagList}
+            />
+          )}
           <ul className='tagList__list'>
             {state.tagList.map((tag, index) =>
               <li
@@ -240,7 +220,6 @@ export default translate()(TracimComponent(TagList))
 
 TagList.propTypes = {
   apiUrl: PropTypes.string.isRequired,
-  onClickAddTagBtn: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
   onChangeTag: PropTypes.func,
