@@ -1,7 +1,11 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import { postContentTag, postWorkspaceTag } from '../../action.async.js'
+import {
+  putContentTag,
+  postContentTag,
+  postWorkspaceTag
+} from '../../action.async.js'
 import { sendGlobalFlashMessage, handleFetchResult } from '../../helper.js'
 import CloseButton from '../Button/CloseButton.jsx'
 import IconButton from '../Button/IconButton.jsx'
@@ -25,13 +29,32 @@ export class NewTagForm extends React.Component {
   }
 
   handleClickBtnValidateContent = async () => {
-    const { props } = this
-    const response = await handleFetchResult(
-      await postContentTag(props.apiUrl, props.workspaceId, props.contentId, this.state.tagName)
-    )
-    if (!response.ok) {
-      sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
-      return
+    const { props, state } = this
+
+    if (!props.spaceTagList) return
+
+    const tagExits = props.spaceTagList.map(t => t.tag_name).includes(state.tagName)
+
+    if (tagExits) {
+      const tagId = (props.spaceTagList.find(t => t.tag_name === state.tagName)).tag_id
+
+      const fetchPutContentTag = await handleFetchResult(
+        await putContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
+      )
+
+      if (!fetchPutContentTag.ok) {
+        sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+        return
+      }
+    } else {
+      const fetchPostContentTag = await handleFetchResult(
+        await postContentTag(props.apiUrl, props.workspaceId, props.contentId, state.tagName)
+      )
+
+      if (!fetchPostContentTag.ok) {
+        sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+        return
+      }
     }
 
     sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
@@ -39,9 +62,12 @@ export class NewTagForm extends React.Component {
   }
 
   handleClickBtnValidateSpace = async () => {
-    const { props } = this
+    const { props, state } = this
+
+    if (!props.spaceTagList) return
+
     const response = await handleFetchResult(
-      await postWorkspaceTag(props.apiUrl, props.workspaceId, this.state.tagName)
+      await postWorkspaceTag(props.apiUrl, props.workspaceId, state.tagName)
     )
     if (!response.ok) {
       sendGlobalFlashMessage(props.i18n.t('Error while creating a space tag'))
@@ -110,7 +136,9 @@ NewTagForm.propTypes = {
   onClickAutoComplete: PropTypes.func,
   autoCompleteClicked: PropTypes.bool,
   onClickKnownTag: PropTypes.func,
-  autoCompleteActive: PropTypes.bool
+  onClickAddTag: PropTypes.func,
+  autoCompleteActive: PropTypes.bool,
+  spaceTaglist: PropTypes.array
 }
 
 NewTagForm.defaultProps = {
@@ -118,6 +146,8 @@ NewTagForm.defaultProps = {
   autoCompleteClicked: false,
   autoCompleteActive: false,
   onClickKnownTag: () => { },
+  onClickAddTag: () => { },
   onClickAutoComplete: () => { },
-  onClickCloseAddTagBtn: () => { }
+  onClickCloseAddTagBtn: () => { },
+  spaceTaglist: []
 }

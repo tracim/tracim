@@ -20,9 +20,7 @@ import {
   deleteContentTag,
   deleteWorkspaceTag,
   getWorkspaceTagList,
-  getContentTagList,
-  putContentTag,
-  postContentTag
+  getContentTagList
 } from '../../action.async.js'
 
 // require('./TagList.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -33,7 +31,6 @@ class TagList extends React.Component {
 
     this.state = {
       tagList: [],
-      //checkedTagIdList: [],
       spaceTagList: [],
       workspaceTagToDeleteId: 0
     }
@@ -68,15 +65,7 @@ class TagList extends React.Component {
         coreEntityType: TLM_CET.CREATED,
         handler: tlm => {
           if (!this.isTlmForMyContent(tlm)) return
-          this.updateCheckedState(tlm.fields.tag, true)
-        }
-      },
-      {
-        entityType: TLM_ET.CONTENT_TAG,
-        coreEntityType: TLM_CET.DELETED,
-        handler: tlm => {
-          if (!this.isTlmForMyContent(tlm)) return
-          this.updateCheckedState(tlm.fields.tag, false)
+          this.addTag(tlm.fields.tag)
         }
       }
     ])
@@ -106,26 +95,6 @@ class TagList extends React.Component {
     }
   }
 
-  toggleChecked = tagId => {
-    const { props, state } = this
-    const tagExits = state.spaceTagList.map(tag => tag.tag_id).includes(tagId)
-    if (tagExits) { // TODO
-      postContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
-    } else {
-      putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
-    }
-  }
-
-  updateCheckedState (tag, checked) {
-    this.setState(previousState => {
-      const checkedTagIdList = checked
-        ? [...previousState.checkedTagIdList, tag.tag_id]
-        : previousState.checkedTagIdList.filter(id => id !== tag.tag_id)
-      const tagList = previousState.tagList.sort(this.sortTagList(checkedTagIdList))
-      return { checkedTagIdList, tagList }
-    })
-  }
-
   async updateTagList () {
     const { props } = this
     let tagList
@@ -152,26 +121,12 @@ class TagList extends React.Component {
 
       tagList = fetchGetContentTagList.body
     }
-    // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
-    // const tagList = fetchGetWsTagList.body.sort(this.sortTagList(checkedTagIdList))
-    // const checkedTagIdList = fetchGetContentTagList.body.map(t => t.tag_id)
     this.setState({ tagList, spaceTagList })
   }
 
-  sortTagList (checkedTagIdList) {
+  sortTagList () {
     const { props } = this
     return (tagA, tagB) => {
-      const isTagAChecked = checkedTagIdList.includes(tagA.tag_id)
-      const isTagBChecked = checkedTagIdList.includes(tagB.tag_id)
-
-      if (!isTagAChecked && isTagBChecked) {
-        return 1
-      }
-
-      if (isTagAChecked && !isTagBChecked) {
-        return -1
-      }
-
       return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
     }
   }
@@ -179,7 +134,7 @@ class TagList extends React.Component {
   addTag (tag) {
     this.setState(previousState => {
       return {
-        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.checkedTagIdList))
+        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.tagList)) // changer state à la fin
       }
     })
   }
@@ -210,7 +165,6 @@ class TagList extends React.Component {
 
   render () {
     const { props, state } = this
-
     return (
       <div className='tagList' data-cy='tag_list'>
 
@@ -226,6 +180,7 @@ class TagList extends React.Component {
                 workspaceId={props.workspaceId}
                 contentId={props.contentId}
                 onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
+                spaceTagList={state.spaceTagList}
               />
             )
             : (
