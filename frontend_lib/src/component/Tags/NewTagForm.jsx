@@ -6,7 +6,11 @@ import {
   postContentTag,
   postWorkspaceTag
 } from '../../action.async.js'
-import { sendGlobalFlashMessage, handleFetchResult } from '../../helper.js'
+import {
+  handleFetchResult,
+  NUMBER_RESULTS_BY_PAGE,
+  sendGlobalFlashMessage
+} from '../../helper.js'
 import IconButton from '../Button/IconButton.jsx'
 
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -55,6 +59,7 @@ export class NewTagForm extends React.Component {
               sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
               break
           }
+          break
         }
         default:
           sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
@@ -78,6 +83,7 @@ export class NewTagForm extends React.Component {
               sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
               break
           }
+          break
         }
         default:
           sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
@@ -113,7 +119,9 @@ export class NewTagForm extends React.Component {
 
   render () {
     const { props, state } = this
-    const filterTags = props.spaceTagList.filter(tag => tag.tag_name.includes(state.tagName)).slice(0, 4)
+    const filterTags = props.spaceTagList
+      .filter(tag => !props.contentTagList.some(contentTag => contentTag.tag_id === tag.tag_id) && tag.tag_name.includes(state.tagName))
+      .slice(0, NUMBER_RESULTS_BY_PAGE - 1)
 
     return (
       <div className='tagList__form'>
@@ -172,16 +180,13 @@ NewTagForm.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
+  contentTagList: PropTypes.array,
   onClickCloseAddTagBtn: PropTypes.func,
   spaceTaglist: PropTypes.array
 }
 
 NewTagForm.defaultProps = {
+  contentTagList: [],
   onClickCloseAddTagBtn: () => { },
-  searchedKnownTagList: [],
-  autoCompleteClicked: false,
-  autoCompleteActive: false,
-  onClickKnownTag: () => { },
-  onClickAutoComplete: () => { },
   spaceTaglist: []
 }

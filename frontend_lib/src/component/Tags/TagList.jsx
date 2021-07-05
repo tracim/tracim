@@ -176,8 +176,9 @@ class TagList extends React.Component {
           {!props.isReadOnlyMode && (
             <NewTagForm
               apiUrl={props.apiUrl}
-              workspaceId={props.workspaceId}
               contentId={props.contentId}
+              contentTagList={state.tagList}
+              workspaceId={props.workspaceId}
               spaceTagList={state.spaceTagList}
             />
           )}
