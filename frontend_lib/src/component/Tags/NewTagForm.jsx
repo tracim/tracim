@@ -9,6 +9,7 @@ import {
 import {
   handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
+  ROLE,
   sendGlobalFlashMessage
 } from '../../helper.js'
 import IconButton from '../Button/IconButton.jsx'
@@ -65,7 +66,6 @@ export class NewTagForm extends React.Component {
           sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
           break
       }
-
     } else {
       const fetchPostContentTag = await handleFetchResult(
         await postContentTag(props.apiUrl, props.workspaceId, props.contentId, state.tagName)
@@ -117,11 +117,21 @@ export class NewTagForm extends React.Component {
     })
   }
 
+  getSubmitButtonLabel (tagExitsInSpace) {
+    const { props } = this
+    if (props.contentId) {
+      return props.userRoleIdInWorkspace < ROLE.contentManager.id || tagExitsInSpace
+        ? props.t('Add')
+        : props.t('Create and add')
+    } else return props.t('Create')
+  }
+
   render () {
     const { props, state } = this
     const filterTags = props.spaceTagList
       .filter(tag => !props.contentTagList.some(contentTag => contentTag.tag_id === tag.tag_id) && tag.tag_name.includes(state.tagName))
       .slice(0, NUMBER_RESULTS_BY_PAGE - 1)
+    const tagExitsInSpace = props.spaceTagList.map(tag => tag.tag_name).includes(state.tagName)
 
     return (
       <div className='tagList__form'>
@@ -140,10 +150,7 @@ export class NewTagForm extends React.Component {
             onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}
           />
 
-          {state.autoCompleteActive &&
-            state.tagName !== '' &&
-            !!props.contentId &&
-            filterTags.length > 0 && (
+          {state.autoCompleteActive && state.tagName !== '' && !!props.contentId && filterTags.length > 0 && (
             <div className='autocomplete'>
               {filterTags.map(tag =>
                 <div
@@ -162,11 +169,15 @@ export class NewTagForm extends React.Component {
           <IconButton
             intent='primary'
             mode='light'
-            disabled={!state.tagName}
+            disabled={
+              !state.tagName ||
+              (!props.contentId && tagExitsInSpace) ||
+              (props.contentId && !tagExitsInSpace && props.userRoleIdInWorkspace < ROLE.contentManager.id)
+            }
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
             dataCy='validate_tag'
-            text={props.contentId ? props.t('Add') : props.t('Create')}
+            text={this.getSubmitButtonLabel(tagExitsInSpace)}
           />
         </div>
       </div>
@@ -182,11 +193,13 @@ NewTagForm.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   contentTagList: PropTypes.array,
   onClickCloseAddTagBtn: PropTypes.func,
-  spaceTaglist: PropTypes.array
+  spaceTaglist: PropTypes.array,
+  userRoleIdInWorkspace: PropTypes.number
 }
 
 NewTagForm.defaultProps = {
   contentTagList: [],
   onClickCloseAddTagBtn: () => { },
-  spaceTaglist: []
+  spaceTaglist: [],
+  userRoleIdInWorkspace: ROLE.reader.id
 }

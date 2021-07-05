@@ -968,7 +968,7 @@ export class File extends React.Component {
           contentId={state.content.content_id}
           searchedKnownTagList={props.searchedKnownTagList}
           onClickAutoComplete={this.handleClickAutoComplete}
-          isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
         />
       )
     }

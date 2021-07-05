@@ -4,7 +4,8 @@ import PropTypes from 'prop-types'
 import {
   sendGlobalFlashMessage,
   naturalCompare,
-  handleFetchResult
+  handleFetchResult,
+  ROLE
 } from '../../helper.js'
 import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -164,22 +165,25 @@ class TagList extends React.Component {
 
   render () {
     const { props, state } = this
+    const isReadOnlyMode = props.contentId
+      ? props.userRoleIdInWorkspace < ROLE.contributor.id
+      : props.userRoleIdInWorkspace < ROLE.contentManager.id
 
     return (
       <div className='tagList' data-cy='tag_list'>
-
         <div className='tagList__header'>
           {props.t('Tags')}
         </div>
 
         <div className='tagList__wrapper'>
-          {!props.isReadOnlyMode && (
+          {!isReadOnlyMode && (
             <NewTagForm
               apiUrl={props.apiUrl}
               contentId={props.contentId}
               contentTagList={state.tagList}
-              workspaceId={props.workspaceId}
               spaceTagList={state.spaceTagList}
+              userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+              workspaceId={props.workspaceId}
             />
           )}
           <ul className='tagList__list'>
@@ -193,7 +197,7 @@ class TagList extends React.Component {
               >
                 <Tag
                   isContent={!!props.contentId}
-                  isReadOnlyMode={props.isReadOnlyMode}
+                  isReadOnlyMode={isReadOnlyMode}
                   name={tag.tag_name}
                   onClickDeleteTag={() => props.contentId
                     ? this.handleClickDeleteTag(tag.tag_id)
@@ -222,10 +226,10 @@ TagList.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
-  isReadOnlyMode: PropTypes.bool
+  userRoleIdInWorkspace: PropTypes.number
 }
 
 TagList.defaultProps = {
   contentId: 0,
-  isReadOnlyMode: true
+  userRoleIdInWorkspace: ROLE.reader.id
 }
