@@ -19,7 +19,8 @@ def upgrade():
             sa.Column(
                 "connection_status",
                 sa.Enum("ONLINE", "OFFLINE", name="userconnectionstatus"),
-                nullable=True,
+                nullable=False,
+                default="OFFLINE",
             )
         )
 

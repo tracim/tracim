@@ -196,6 +196,9 @@ workspace.join.max_messages_history_count = -1
 ## limit. Limit is on the sum of sizes of owned by user space.
 ; limitation.user_default_allowed_space = 0
 
+# maximum count of simulteanously connected users, 0 means unlimited and is the default value.
+; limitation.maximum_connected_users = 0
+
 ####
 # STORAGE
 ####

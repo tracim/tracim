@@ -40,6 +40,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.lib.core.live_messages import ServerSideEventType
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import DEFAULT_AVATAR_SIZE
 from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
@@ -838,53 +839,70 @@ class UserController(Controller):
             ("Cache-Control", "no-cache"),
         ]
 
-        stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
-            str(request.candidate_user.user_id)
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
-        if True:  # TODO vérifier ici s'il y a trop d'utilisateurs
-            stream_opened_event += ":Too many connected users\nevent: stream-error\ndata: {}\n\n".format(
-                ErrorCode.TOO_MANY_CONNECTED_USERS
+        connected_user_count = user_api.get_connected_users_count(exclude_current_user=True)
+        if (
+            app_config.LIMITATION__MAXIMUM_CONNECTED_USERS
+            and connected_user_count >= app_config.LIMITATION__MAXIMUM_CONNECTED_USERS
+        ):
+            error = {
+                "code": ErrorCode.TOO_MANY_CONNECTED_USERS.value,
+                "message": "Too many connected users ({}/{})".format(
+                    connected_user_count, app_config.LIMITATION__MAXIMUM_CONNECTED_USERS
+                ),
+            }
+            response_body = LiveMessagesLib.get_server_side_event_string(
+                ServerSideEventType.STREAM_ERROR, data=error, comment="Too many connected users"
             )
-        else:
-            after_event_id = hapic_data.query["after_event_id"]  # type: int
-            if after_event_id:
-                app_config = request.registry.settings["CFG"]  # type: CFG
-                event_api = EventApi(request.current_user, request.dbsession, app_config)
-                messages = event_api.get_messages_for_user(
-                    request.candidate_user.user_id, after_event_id=after_event_id
-                )  # type: typing.List[Message]
+            return Response(
+                headerlist=headers, charset="utf-8", status_code=200, body=response_body
+            )
 
-                stream_opened_event += "".join(
-                    [
-                        "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
-                        for message in messages
-                    ]
-                )
+        response_body = LiveMessagesLib.get_server_side_event_string(
+            event_type=ServerSideEventType.STREAM_OPEN,
+            data=None,
+            comment="Tracim Live Messages for user {}".format(request.candidate_user.user_id),
+        )
+        after_event_id = hapic_data.query["after_event_id"]  # type: int
+        if after_event_id:
+            app_config = request.registry.settings["CFG"]  # type: CFG
+            event_api = EventApi(request.current_user, request.dbsession, app_config)
+            messages = event_api.get_messages_for_user(
+                request.candidate_user.user_id, after_event_id=after_event_id
+            )  # type: typing.List[Message]
 
-            escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
-            user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
-            headers.append(
+            response_body += "".join(
+                [
+                    "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
+                    for message in messages
+                ]
+            )
+
+        escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
+        user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
+        headers.extend(
+            (
+                # Here we ask push pin to keep the connection open
+                ("Grip-Hold", "stream"),
+                # and register this connection on the given channel
+                # multiple channels subscription is possible
+                ("Grip-Channel", user_channel_name),
                 (
-                    # Here we ask push pin to keep the connection open
-                    ("Grip-Hold", "stream"),
-                    # and register this connection on the given channel
-                    # multiple channels subscription is possible
-                    ("Grip-Channel", user_channel_name),
-                    (
-                        "Grip-Keep-Alive",
-                        "{}; format=cstring; timeout=30".format(escaped_keepalive_event),
-                    ),
-                    # content type for SSE
-                    ("Content-Type", "text/event-stream"),
-                    # do not cache the events
-                    ("Cache-Control", "no-cache"),
-                )
+                    "Grip-Keep-Alive",
+                    "{}; format=cstring; timeout=30".format(escaped_keepalive_event),
+                ),
+                # content type for SSE
+                ("Content-Type", "text/event-stream"),
+                # do not cache the events
+                ("Cache-Control", "no-cache"),
             )
-
-        return Response(
-            headerlist=headers, charset="utf-8", status_code=200, body=stream_opened_event
         )
+
+        return Response(headerlist=headers, charset="utf-8", status_code=200, body=response_body)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)

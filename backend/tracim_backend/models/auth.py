@@ -168,7 +168,9 @@ class User(TrashableMixin, DeclarativeBase):
         "User", post_update=True, backref=backref("creation_author", remote_side=user_id)
     )
     creation_type = Column(Enum(UserCreationType), nullable=True)
-    connection_status = Column(Enum(UserConnectionStatus, nullable=False))
+    connection_status = Column(
+        Enum(UserConnectionStatus), nullable=False, default=UserConnectionStatus.OFFLINE
+    )
 
     @hybrid_property
     def email_address(self):

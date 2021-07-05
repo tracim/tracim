@@ -81,6 +81,7 @@ from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.auth import UserConnectionStatus
 from tracim_backend.models.auth import UserCreationType
 from tracim_backend.models.context_models import AboutUser
 from tracim_backend.models.context_models import ContentInContext
@@ -1448,3 +1449,15 @@ class UserApi(object):
                 cropped_io.getvalue(), "{}.png".format(cropped_basename), "image/png"
             )
         return (original, cropped)
+
+    def get_connected_users_count(self, exclude_current_user: bool = True) -> int:
+        """Return the number of connected users.
+
+        By default, exclude the current user from the count.
+        """
+        query = self._session.query(User.user_id).filter(
+            User.connection_status == UserConnectionStatus.ONLINE
+        )
+        if exclude_current_user:
+            query = query.filter(User.user_id != self._user.user_id)
+        return query.count()

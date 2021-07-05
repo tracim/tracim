@@ -7,8 +7,10 @@ import requests
 import sseclient
 import transaction
 
+from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -110,20 +112,26 @@ def one_thread(content_api_factory, content_type_list, workspace_api_factory, se
 
 @contextlib.contextmanager
 def messages_stream_client(
+    user_id: int = 1,
+    login: str = "admin@admin.admin",
+    password: typing.Optional[str] = "admin@admin.admin",
     after_event_id: int = 0,
+    skip_first_event: bool = True,
 ) -> typing.Generator[typing.Iterable, None, None]:
     headers = {"Accept": "text/event-stream"}
     query = "?after_event_id={}".format(after_event_id) if after_event_id else ""
     response = requests.get(
-        "http://localhost:7999/api/users/1/live_messages{}".format(query),
-        auth=("admin@admin.admin", "admin@admin.admin"),
+        "http://localhost:7999/api/users/{}/live_messages{}".format(user_id, query),
+        auth=(login, password),
         stream=True,
         headers=headers,
     )
+    assert response.status_code == 200, response.json()
     client = sseclient.SSEClient(response)
     client_events = client.events()
     # INFO - G.M - 2020-06-29 - Skip first event
-    next(client_events)
+    if skip_first_event:
+        next(client_events)
     yield client_events
     response.close()
 
@@ -167,6 +175,49 @@ class TestLiveMessages(object):
             event = next(client_events)
         assert json.loads(event.data) == {"test_message": "example"}
         assert event.event == "message"
+
+    @pytest.mark.pushpin
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__err__too_many_connected_users(
+        self, pushpin, app_config: CFG, bob_user: User, admin_user: User, session,
+    ):
+        # TODO: ne pas simuler la connexion de l'admin
+        from tracim_backend.models.auth import UserConnectionStatus
+
+        admin_user.connection_status = UserConnectionStatus.ONLINE
+        session.add(admin_user)
+        session.flush()
+        transaction.commit()
+        with messages_stream_client(skip_first_event=False) as client_events:
+            event = next(client_events)
+            assert event.event == "stream-open"
+            with messages_stream_client(
+                user_id=bob_user.user_id,
+                login=bob_user.email,
+                password="password",
+                skip_first_event=False,
+            ) as bob_events:
+                bob_event = next(bob_events)
+                assert bob_event.event == "stream-error"
+                assert json.loads(bob_event.data) == {
+                    "code": ErrorCode.TOO_MANY_CONNECTED_USERS.value,
+                    "message": "Too many connected users (1/1)",
+                }
+
+                with pytest.raises(StopIteration):
+                    next(bob_events)
+        # TODO: ne pas simuler la connexion de l'admin
+        admin_user.connection_status = UserConnectionStatus.OFFLINE
+        session.add(admin_user)
+        session.flush()
+        transaction.commit()
+        with messages_stream_client(
+            user_id=bob_user.user_id,
+            login=bob_user.email,
+            password="password",
+            skip_first_event=False,
+        ) as bob_events:
+            bob_event = next(bob_events)
+            assert bob_event.event == "stream-open"
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)

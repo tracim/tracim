@@ -594,6 +594,9 @@ class CFG(object):
         self.LIMITATION__USER_DEFAULT_ALLOWED_SPACE = int(
             self.get_raw_config("limitation.user_default_allowed_space", "0")
         )
+        self.LIMITATION__MAXIMUM_CONNECTED_USERS = int(
+            self.get_raw_config("limitation.maximum_connected_users", "0")
+        )
 
     def _load_email_config(self) -> None:
         """
