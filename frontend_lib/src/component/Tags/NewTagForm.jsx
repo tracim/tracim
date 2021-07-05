@@ -136,7 +136,7 @@ export class NewTagForm extends React.Component {
     return (
       <div className='tagList__form'>
         {props.contentId
-          ? props.t('Add a tag to your content.')
+          ? props.t('Add a tag to your content. To see the list of tags available in this space, go to space settings.')
           : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')}
         <div className='tagList__form__tag'>
           <input
