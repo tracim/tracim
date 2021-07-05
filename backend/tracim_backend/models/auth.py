@@ -44,6 +44,16 @@ if TYPE_CHECKING:
 __all__ = ["User"]
 
 
+class UserConnectionStatus(str, enum.Enum):
+    """Possible connection status for a user.
+
+    ONLINE means connected to live messages.
+    """
+
+    ONLINE = "online"
+    OFFLINE = "offline"
+
+
 class UserCreationType(str, enum.Enum):
     ADMIN = "admin"
     INVITATION = "invitation"
@@ -158,6 +168,7 @@ class User(TrashableMixin, DeclarativeBase):
         "User", post_update=True, backref=backref("creation_author", remote_side=user_id)
     )
     creation_type = Column(Enum(UserCreationType), nullable=True)
+    connection_status = Column(Enum(UserConnectionStatus, nullable=False))
 
     @hybrid_property
     def email_address(self):
