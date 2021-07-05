@@ -96,7 +96,7 @@ class TagList extends React.Component {
 
   async updateTagList () {
     const { props } = this
-    let tagList
+    let tagList = []
     const fetchGetWsTagList = await handleFetchResult(
       await getWorkspaceTagList(props.apiUrl, props.workspaceId)
     )
@@ -120,20 +120,20 @@ class TagList extends React.Component {
 
       tagList = fetchGetContentTagList.body
     }
-    this.setState({ tagList, spaceTagList })
+    this.setState({ tagList: this.sortTagList(tagList), spaceTagList })
   }
 
-  sortTagList () {
+  sortTagList (tagList) {
     const { props } = this
-    return (tagA, tagB) => {
+    return tagList.sort((tagA, tagB) => {
       return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
-    }
+    })
   }
 
   addTag (tag) {
     this.setState(previousState => {
       return {
-        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.tagList))
+        tagList: this.sortTagList([...previousState.tagList, tag])
       }
     })
   }
@@ -164,6 +164,7 @@ class TagList extends React.Component {
 
   render () {
     const { props, state } = this
+
     return (
       <div className='tagList' data-cy='tag_list'>
 
@@ -181,7 +182,7 @@ class TagList extends React.Component {
             />
           )}
           <ul className='tagList__list'>
-            {state.tagList.map((tag, index) =>
+            {state.tagList && state.tagList.map((tag, index) =>
               <li
                 className={classnames(
                   'tagList__list__item_wrapper',
@@ -195,8 +196,7 @@ class TagList extends React.Component {
                   name={tag.tag_name}
                   onClickDeleteTag={() => props.contentId
                     ? this.handleClickDeleteTag(tag.tag_id)
-                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })
-                  }
+                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })}
                 />
               </li>
             )}
@@ -221,12 +221,10 @@ TagList.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
-  onChangeTag: PropTypes.func,
   isReadOnlyMode: PropTypes.bool
 }
 
 TagList.defaultProps = {
   contentId: 0,
-  onChangeTag: () => { },
   isReadOnlyMode: true
 }

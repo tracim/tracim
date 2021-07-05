@@ -34,7 +34,7 @@ export const WorkspaceMembersList = props => {
           />
         ) : (
           <div>
-            {props.userRoleIdInWorkspace > ROLE.contentManager.id &&
+            {props.userRoleIdInWorkspace > ROLE.contentManager.id && (
               <div
                 className='formBlock__bottom workspace_advanced__userlist__adduser'
                 onClick={props.onClickToggleFormNewMember}
@@ -51,7 +51,7 @@ export const WorkspaceMembersList = props => {
                   </div>
                 </div>
               </div>
-            }
+            )}
             <ul className='formBlock__field workspace_advanced__userlist__list'>
               {props.memberList && props.memberList.filter(m => m.user).map(m =>
                 <li
@@ -81,27 +81,30 @@ export const WorkspaceMembersList = props => {
                     {(() => {
                       const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
                       return props.userRoleIdInWorkspace > ROLE.contentManager.id
-                        ? <DropdownMenu
-                          buttonOpts={<i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
-                          buttonLabel={props.t(role.label)}
-                          buttonCustomClass='nohover btndropdown transparentButton'
-                          isButton
-                        >
-                          {props.roleList.map(r =>
-                            <button
-                              className='transparentButton'
-                              onClick={() => props.onClickNewRole(m.user_id, r.slug)}
-                              key={r.id}
-                            >
-                              <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
-                              {props.t(r.label)}
-                            </button>
-                          )}
-                        </DropdownMenu>
-                        : <div>
-                          <i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />
-                          {props.t(role.label)}
-                        </div>
+                        ? (
+                          <DropdownMenu
+                            buttonOpts={<i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
+                            buttonLabel={props.t(role.label)}
+                            buttonCustomClass='nohover btndropdown transparentButton'
+                            isButton
+                          >
+                            {props.roleList.map(r =>
+                              <button
+                                className='transparentButton'
+                                onClick={() => props.onClickNewRole(m.user_id, r.slug)}
+                                key={r.id}
+                              >
+                                <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
+                                {props.t(r.label)}
+                              </button>
+                            )}
+                          </DropdownMenu>
+                        ) : (
+                          <div>
+                            <i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />
+                            {props.t(role.label)}
+                          </div>
+                        )
                     })()}
                   </div>
                   {props.userRoleIdInWorkspace > ROLE.contentManager.id && (m.user_id !== props.loggedUser.userId

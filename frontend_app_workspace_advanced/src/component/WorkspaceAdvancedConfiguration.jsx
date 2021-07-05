@@ -13,7 +13,7 @@ import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
 
 export class WorkspaceAdvancedConfiguration extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       popoverDefaultRoleInfoOpen: false
@@ -136,7 +136,6 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
                 </button>
               </div>
             </div>
-
 
             <div className='formBlock workspace_advanced__delete'>
               <div className='formBlock__title workspace_advanced__delete__title'>

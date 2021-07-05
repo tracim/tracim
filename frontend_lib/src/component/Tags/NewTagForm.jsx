@@ -12,7 +12,7 @@ import IconButton from '../Button/IconButton.jsx'
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export class NewTagForm extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       autoCompleteActive: false,
@@ -26,6 +26,7 @@ export class NewTagForm extends React.Component {
     props.contentId
       ? await this.handleClickBtnValidateContent()
       : await this.handleClickBtnValidateSpace()
+    this.setState({ tagName: '', autoCompleteActive: false })
   }
 
   handleClickBtnValidateContent = async () => {
@@ -50,11 +51,13 @@ export class NewTagForm extends React.Component {
             case 3014:
               sendGlobalFlashMessage(props.i18n.t('This tag already exists'))
               break
-            default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+            default:
+              sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
               break
           }
         }
-        default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+        default:
+          sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
           break
       }
 
@@ -63,22 +66,26 @@ export class NewTagForm extends React.Component {
         await postContentTag(props.apiUrl, props.workspaceId, props.contentId, state.tagName)
       )
       switch (fetchPostContentTag.apiResponse.status) {
-        case 200: sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
+        case 200:
+          sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
           break
         case 400: {
           switch (fetchPostContentTag.body.code) {
             case 3014:
               sendGlobalFlashMessage(props.i18n.t('This tag already exists'))
-                break
-            default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+              break
+            default:
+              sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
               break
           }
         }
-        default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+        default:
+          sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
           break
       }
     }
-    this.setState({ tagName: '' })
+
+    sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
   }
 
   handleClickBtnValidateSpace = async () => {
@@ -94,8 +101,7 @@ export class NewTagForm extends React.Component {
       return
     }
 
-    sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
-    this.setState({ tagName: '' })
+    sendGlobalFlashMessage(props.i18n.t('Your tag has been created'), 'info')
   }
 
   handleClickKnownTag = knownTag => {
@@ -105,53 +111,43 @@ export class NewTagForm extends React.Component {
     })
   }
 
-  render() {
+  render () {
     const { props, state } = this
     const filterTags = props.spaceTagList.filter(tag => tag.tag_name.includes(state.tagName)).slice(0, 4)
 
     return (
       <div className='tagList__form'>
+        {props.contentId
+          ? props.t('Add a tag to your content.')
+          : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')}
         <div className='tagList__form__tag'>
-          <div className='tagList__form__member__tag'>
-            {props.contentId
-              ? props.t('Add a tag to your content.')
-              : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')
-            }
+          <input
+            autoFocus
+            type='text'
+            className='name__input form-control'
+            id='addTag'
+            placeholder={props.t('e.g. Important')}
+            data-cy='add_tag'
+            value={state.tagName}
+            onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}
+          />
 
-            <input
-              type='text'
-              className='name__input form-control'
-              id='addTag'
-              placeholder={props.t('e.g. Important')}
-              data-cy='add_tag'
-              value={state.tagName}
-              onChange={(e) => this.setState({ tagName: e.target.value })}
-              onFocus={() => this.setState({ autoCompleteActive: true })}
-            // onBlur={() => this.setState({ autoCompleteActive: false })} // TODO
-            />
-
-            {state.autoCompleteActive && !!props.contentId && filterTags.length > 0 && (
-              <div
-                className='autocomplete primaryColorBorder'
-              >
-                {filterTags.map(tag =>
-                  <div
-                    className='autocomplete__item'
-                    onClick={() => this.handleClickKnownTag(tag)}
-                    key={tag.tag_id}
-                  >
-                    <div
-                      className='autocomplete__item__name'
-                      data-cy='autocomplete__item__name'
-                      title={tag.tag_name}
-                    >
-                      {tag.tag_name}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {state.autoCompleteActive &&
+            state.tagName !== '' &&
+            !!props.contentId &&
+            filterTags.length > 0 && (
+            <div className='autocomplete'>
+              {filterTags.map(tag =>
+                <div
+                  className='autocomplete__item'
+                  onClick={() => this.handleClickKnownTag(tag)}
+                  key={tag.tag_id}
+                >
+                  {tag.tag_name}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className='tagList__form__submitBtn'>
@@ -162,7 +158,7 @@ export class NewTagForm extends React.Component {
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
             dataCy='validate_tag'
-            text={props.contentId ? props.t('Validate') : props.t('Create')}
+            text={props.contentId ? props.t('Add') : props.t('Create')}
           />
         </div>
       </div>
