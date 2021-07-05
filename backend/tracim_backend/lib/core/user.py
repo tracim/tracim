@@ -52,6 +52,7 @@ from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import RemoteUserAuthDisabled
 from tracim_backend.exceptions import ReservedUsernameError
+from tracim_backend.exceptions import TooManyConnectedUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
@@ -1461,3 +1462,15 @@ class UserApi(object):
         if exclude_current_user:
             query = query.filter(User.user_id != self._user.user_id)
         return query.count()
+
+    def check_maximum_connected_users(self) -> None:
+        connected_user_count = self.get_connected_users_count(exclude_current_user=True)
+        if (
+            self._config.LIMITATION__MAXIMUM_CONNECTED_USERS
+            and connected_user_count >= self._config.LIMITATION__MAXIMUM_CONNECTED_USERS
+        ):
+            raise TooManyConnectedUsersError(
+                "Too many connected users ({}/{})".format(
+                    connected_user_count, self._config.LIMITATION__MAXIMUM_CONNECTED_USERS
+                )
+            )

@@ -658,3 +658,7 @@ class IndexingError(TracimException):
 
 class WorkspaceFeatureDisabled(TracimException):
     error_code = ErrorCode.WORKSPACE_FEATURE_DISABLED
+
+
+class TooManyConnectedUsersError(TracimException):
+    error_code = ErrorCode.TOO_MANY_CONNECTED_USERS

@@ -23,6 +23,7 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyConnectedUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimValidationFailed
@@ -844,16 +845,12 @@ class UserController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
-        connected_user_count = user_api.get_connected_users_count(exclude_current_user=True)
-        if (
-            app_config.LIMITATION__MAXIMUM_CONNECTED_USERS
-            and connected_user_count >= app_config.LIMITATION__MAXIMUM_CONNECTED_USERS
-        ):
+        try:
+            user_api.check_maximum_connected_users()
+        except TooManyConnectedUsersError as exc:
             error = {
-                "code": ErrorCode.TOO_MANY_CONNECTED_USERS.value,
-                "message": "Too many connected users ({}/{})".format(
-                    connected_user_count, app_config.LIMITATION__MAXIMUM_CONNECTED_USERS
-                ),
+                "code": exc.error_code.value,
+                "message": str(exc),
             }
             response_body = LiveMessagesLib.get_server_side_event_string(
                 ServerSideEventType.STREAM_ERROR, data=error, comment="Too many connected users"
