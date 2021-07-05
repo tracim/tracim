@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-03 12:31+0200\n"
+"POT-Creation-Date: 2021-06-29 12:15+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -18,17 +18,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:628
+#: tracim_backend/config.py:651
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:637
+#: tracim_backend/config.py:660
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Quelqu'un vous a créé un compte"
 
-#: tracim_backend/config.py:647
+#: tracim_backend/config.py:670
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Demande de réinitialisation de mot de passe"
 
@@ -98,11 +98,11 @@ msgstr "Message de {username} : {message}"
 msgid "Uploaded by {username}."
 msgstr "Téléversé par {username}."
 
-#: tracim_backend/lib/core/content.py:2082
+#: tracim_backend/lib/core/content.py:1896
 msgid "New folder"
 msgstr "Nouveau dossier"
 
-#: tracim_backend/lib/core/content.py:2087
+#: tracim_backend/lib/core/content.py:1901
 msgid "New folder {0}"
 msgstr "Nouveau dossier {0}"
 
@@ -217,7 +217,7 @@ msgstr "Bonne journée :)"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:25
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
-#: tracim_backend/templates/mail/reset_password_body_html.mak:18
+#: tracim_backend/templates/mail/reset_password_body_html.mak:20
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
 msgid "Suricat', your digital assistant"
@@ -225,7 +225,7 @@ msgstr "Suricate, votre assistant numérique"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:29
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
-#: tracim_backend/templates/mail/reset_password_body_html.mak:22
+#: tracim_backend/templates/mail/reset_password_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
@@ -233,7 +233,7 @@ msgstr "Suricate, le robot"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:32
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
-#: tracim_backend/templates/mail/reset_password_body_html.mak:25
+#: tracim_backend/templates/mail/reset_password_body_html.mak:27
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
@@ -284,6 +284,10 @@ msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr ""
 "Si le lien ne fonctionne pas, Je vous suggère de copier/coller l'url "
 "entière :"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:18
+msgid "The link is valid for {} minutes."
+msgstr "Le lien est valide pendant {} minutes."
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
 msgid "You shared the file <i>{content_filename}</i> with:"
@@ -377,4 +381,3 @@ msgstr ""
 "Le téléversement est protégé par un mot de passe, merci de me contacter "
 "(<a href=\"mailto:{emitter_email}\">{username}</a>) pour avoir le mot de "
 "passe."
-

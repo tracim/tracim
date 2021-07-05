@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 3.7.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-03 12:31+0200\n"
+"POT-Creation-Date: 2021-06-29 12:15+0200\n"
 "PO-Revision-Date: 2021-04-30 16:42+0100\n"
 "Last-Translator: marie <marie.begue@algoo.fr>\n"
 "Language: de\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:628
+#: tracim_backend/config.py:651
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
@@ -28,11 +28,11 @@ msgstr ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 
-#: tracim_backend/config.py:637
+#: tracim_backend/config.py:660
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Jemand hat ein Konto für Sie erstellt"
 
-#: tracim_backend/config.py:647
+#: tracim_backend/config.py:670
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Ein Passwort-Reset wurde angefordert"
 
@@ -102,11 +102,11 @@ msgstr "Nachricht von {username}: {message}"
 msgid "Uploaded by {username}."
 msgstr "Hochgeladen von {username}."
 
-#: tracim_backend/lib/core/content.py:2082
+#: tracim_backend/lib/core/content.py:1896
 msgid "New folder"
 msgstr "Neuer Ordner"
 
-#: tracim_backend/lib/core/content.py:2087
+#: tracim_backend/lib/core/content.py:1901
 msgid "New folder {0}"
 msgstr "Neuer Ordner {0}"
 
@@ -147,8 +147,8 @@ msgid ""
 "Reply to this email directly or <a href=\"{call_to_action_url}\">view it "
 "on tracim</a>"
 msgstr ""
-"Antworten Sie direkt auf diese E-Mail oder <a href=\"{call_to_action_url}\">sehen Sie "
-"auf tracim</a>"
+"Antworten Sie direkt auf diese E-Mail oder <a "
+"href=\"{call_to_action_url}\">sehen Sie auf tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:63
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
@@ -222,7 +222,7 @@ msgstr "Schönen Tag noch :)"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:25
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
-#: tracim_backend/templates/mail/reset_password_body_html.mak:18
+#: tracim_backend/templates/mail/reset_password_body_html.mak:20
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
 msgid "Suricat', your digital assistant"
@@ -230,7 +230,7 @@ msgstr "Suricat', Ihr digitaler Assistent"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:29
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
-#: tracim_backend/templates/mail/reset_password_body_html.mak:22
+#: tracim_backend/templates/mail/reset_password_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
@@ -238,7 +238,7 @@ msgstr "Suricat', der Bot"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:32
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
-#: tracim_backend/templates/mail/reset_password_body_html.mak:25
+#: tracim_backend/templates/mail/reset_password_body_html.mak:27
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
@@ -287,6 +287,10 @@ msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr ""
 "Wenn der Link nicht funktioniert, empfehle ich Ihnen, die vollständige "
 "URL zu kopieren/einzufügen: "
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:18
+msgid "The link is valid for {} minutes."
+msgstr "Der Link ist für {} Minuten gültig."
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
 msgid "You shared the file <i>{content_filename}</i> with:"
@@ -384,4 +388,3 @@ msgstr ""
 "Dieser Upload ist durch ein Passwort geschützt, bitte kontaktieren Sie "
 "mich (<a href=\"mailto:{emitter_email}\">{username}</a>), um das Passwort"
 " zu erhalten."
-

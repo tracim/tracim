@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 1.9.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-05-03 12:31+0200\n"
+"POT-Creation-Date: 2021-06-29 12:15+0200\n"
 "PO-Revision-Date: 2018-08-21 15:04+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -14,17 +14,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: tracim_backend/config.py:628
+#: tracim_backend/config.py:651
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
 
-#: tracim_backend/config.py:637
+#: tracim_backend/config.py:660
 msgid "[{website_title}] Someone created an account for you"
 msgstr ""
 
-#: tracim_backend/config.py:647
+#: tracim_backend/config.py:670
 msgid "[{website_title}] A password reset has been requested"
 msgstr ""
 
@@ -84,11 +84,11 @@ msgstr ""
 msgid "Uploaded by {username}."
 msgstr ""
 
-#: tracim_backend/lib/core/content.py:2082
+#: tracim_backend/lib/core/content.py:1896
 msgid "New folder"
 msgstr ""
 
-#: tracim_backend/lib/core/content.py:2087
+#: tracim_backend/lib/core/content.py:1901
 msgid "New folder {0}"
 msgstr ""
 
@@ -193,7 +193,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:25
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
-#: tracim_backend/templates/mail/reset_password_body_html.mak:18
+#: tracim_backend/templates/mail/reset_password_body_html.mak:20
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
 msgid "Suricat', your digital assistant"
@@ -201,7 +201,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:29
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
-#: tracim_backend/templates/mail/reset_password_body_html.mak:22
+#: tracim_backend/templates/mail/reset_password_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
@@ -209,7 +209,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:32
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
-#: tracim_backend/templates/mail/reset_password_body_html.mak:25
+#: tracim_backend/templates/mail/reset_password_body_html.mak:27
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
@@ -248,6 +248,10 @@ msgstr ""
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:14
 msgid "If the link is not working, I suggest to copy/paste the full url: "
+msgstr ""
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:18
+msgid "The link is valid for {} minutes."
 msgstr ""
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
@@ -336,4 +340,3 @@ msgstr ""
 #~ "to upload files in this shared "
 #~ "space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 #~ msgstr ""
-

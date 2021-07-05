@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
-import { withRouter } from 'react-router-dom'
+import { translate, Trans } from 'react-i18next'
+import { withRouter, Link } from 'react-router-dom'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -106,6 +106,21 @@ export class ResetPassword extends React.Component {
       case 204:
         props.history.push(PAGE.LOGIN)
         props.dispatch(newFlashMessage(props.t('Your password has been changed, you can now login'), 'info'))
+        break
+      case 400:
+        switch (fetchPostResetPassword.json.code) {
+          case 2040: {
+            const message = (
+              <Trans>
+                Your reset password link has expired, you can regenerate one by following&nbsp;
+                <Link to={PAGE.FORGOT_PASSWORD}>this link</Link>.
+              </Trans>
+            )
+            props.dispatch(newFlashMessage(message, 'warning'))
+            break
+          }
+          default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning'))
+        }
         break
       default: props.dispatch(newFlashMessage(props.t('An error has happened, please try again'), 'warning'))
     }
