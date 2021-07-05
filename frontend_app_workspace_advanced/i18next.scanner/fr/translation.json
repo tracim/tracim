@@ -6,6 +6,7 @@
   "Description": "Description",
   "Error while rejecting user": "Erreur lors du rejet d'un utilisateur",
   "Error while saving new default role": "Erreur lors de la sauvegarde d'un nouveau rôle par défaut",
+  "Error while saving the new version": "Erreur lors de la sauvegarde de la nouvelle version",
   "Add a member": "Ajouter un membre",
   "Error while loading members list": "Erreur lors du chargement de la liste des membres",
   "Save successful": "Sauvegarde réussie",
@@ -54,5 +55,6 @@
   "Publications activated": "Publications activées",
   "Publications deactivated": "Publications desactivées",
   "Error while activating publications": "Erreur pendant l'activation des publications",
-  "Error while deactivating publications": "Erreur pendant la désactivation des publications"
+  "Error while deactivating publications": "Erreur pendant la désactivation des publications",
+  "Tags": "Étiquettes"
 }
