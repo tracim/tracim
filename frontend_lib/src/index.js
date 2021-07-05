@@ -81,7 +81,8 @@ import {
 
 import {
   LiveMessageManager,
-  LIVE_MESSAGE_STATUS
+  LIVE_MESSAGE_STATUS,
+  LIVE_MESSAGE_ERROR_CODE
 } from './LiveMessageManager.js'
 
 import { appContentFactory } from './appContentFactory.js'
@@ -409,6 +410,7 @@ export {
   sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
+  LIVE_MESSAGE_ERROR_CODE,
   TextInput,
   getContent,
   DistanceDate,

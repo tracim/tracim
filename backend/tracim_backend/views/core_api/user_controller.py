@@ -830,39 +830,58 @@ class UserController(Controller):
         Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
         """
-        stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
-            str(request.candidate_user.user_id)
-        )
 
-        after_event_id = hapic_data.query["after_event_id"]  # type: int
-        if after_event_id:
-            app_config = request.registry.settings["CFG"]  # type: CFG
-            event_api = EventApi(request.current_user, request.dbsession, app_config)
-            messages = event_api.get_messages_for_user(
-                request.candidate_user.user_id, after_event_id=after_event_id
-            )  # type: typing.List[Message]
-
-            stream_opened_event += "".join(
-                [
-                    "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
-                    for message in messages
-                ]
-            )
-
-        escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
-        user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
         headers = [
-            # Here we ask push pin to keep the connection open
-            ("Grip-Hold", "stream"),
-            # and register this connection on the given channel
-            # multiple channels subscription is possible
-            ("Grip-Channel", user_channel_name),
-            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keepalive_event)),
             # content type for SSE
             ("Content-Type", "text/event-stream"),
             # do not cache the events
             ("Cache-Control", "no-cache"),
         ]
+
+        stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
+            str(request.candidate_user.user_id)
+        )
+
+        if True:  # TODO vérifier ici s'il y a trop d'utilisateurs
+            stream_opened_event += ":Too many connected users\nevent: stream-error\ndata: {}\n\n".format(
+                ErrorCode.TOO_MANY_CONNECTED_USERS
+            )
+        else:
+            after_event_id = hapic_data.query["after_event_id"]  # type: int
+            if after_event_id:
+                app_config = request.registry.settings["CFG"]  # type: CFG
+                event_api = EventApi(request.current_user, request.dbsession, app_config)
+                messages = event_api.get_messages_for_user(
+                    request.candidate_user.user_id, after_event_id=after_event_id
+                )  # type: typing.List[Message]
+
+                stream_opened_event += "".join(
+                    [
+                        "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
+                        for message in messages
+                    ]
+                )
+
+            escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
+            user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
+            headers.append(
+                (
+                    # Here we ask push pin to keep the connection open
+                    ("Grip-Hold", "stream"),
+                    # and register this connection on the given channel
+                    # multiple channels subscription is possible
+                    ("Grip-Channel", user_channel_name),
+                    (
+                        "Grip-Keep-Alive",
+                        "{}; format=cstring; timeout=30".format(escaped_keepalive_event),
+                    ),
+                    # content type for SSE
+                    ("Content-Type", "text/event-stream"),
+                    # do not cache the events
+                    ("Cache-Control", "no-cache"),
+                )
+            )
+
         return Response(
             headerlist=headers, charset="utf-8", status_code=200, body=stream_opened_event
         )

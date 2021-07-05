@@ -25,9 +25,12 @@ import {
   PROFILE,
   NUMBER_RESULTS_BY_PAGE,
   serialize,
+  CardPopup,
+  IconButton,
   TracimComponent,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
+  LIVE_MESSAGE_ERROR_CODE,
   PAGE
 } from 'tracim_frontend_lib'
 import {
@@ -48,6 +51,7 @@ import {
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
+  postUserLogout,
   getUserMessagesSummary,
   getWorkspaceMemberList,
   getAccessibleWorkspaces
@@ -62,6 +66,7 @@ import {
   setNotificationList,
   setUserConfiguration,
   setUserConnected,
+  setUserDisconnected,
   setWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
@@ -118,6 +123,20 @@ export class Tracim extends React.Component {
     ])
   }
 
+  handleClickLogout = async () => {
+    // TODO FACTORIZE WITH Header.jsx
+    const { props } = this
+    const fetchPostUserLogout = await props.dispatch(postUserLogout())
+    if (fetchPostUserLogout.status === 204) {
+      props.dispatch(setUserDisconnected())
+      GLOBAL_dispatchEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
+      props.history.push(PAGE.LOGIN)
+    } else {
+      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
+      this.setState({ tooManyUsers: false })
+    }
+  }
+
   handleRedirect = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.REDIRECT, data)
     this.props.history.push(data.url)
@@ -145,7 +164,9 @@ export class Tracim extends React.Component {
 
   handleTlmStatusChanged = (data) => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, data)
-    const { status } = data
+    const { status, code } = data
+    const { props } = this
+
     if (status === LIVE_MESSAGE_STATUS.OPENED || status === LIVE_MESSAGE_STATUS.CLOSED) {
       globalThis.clearTimeout(this.connectionErrorDisplayTimeoutId)
       this.connectionErrorDisplayTimeoutId = 0
@@ -153,6 +174,8 @@ export class Tracim extends React.Component {
       if (this.state.displayConnectionError) {
         this.setState({ displayConnectionError: false })
       }
+    } else if (status === LIVE_MESSAGE_STATUS.ERROR && code === LIVE_MESSAGE_ERROR_CODE.TOO_MANY_CONNECTED_USERS) {
+      this.setState({ tooManyUsers: true })
     } else if (!this.connectionErrorDisplayTimeoutId) {
       this.connectionErrorDisplayTimeoutId = globalThis.setTimeout(
         this.displayConnectionError,
@@ -575,6 +598,42 @@ export class Tracim extends React.Component {
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />
         </div>
+        {state.tooManyUsers && (
+          <div className='tracim__pageBlock'>
+            <CardPopup hideCloseBtn customHeaderClass='bg-danger'>
+              <div className='tracim__pageBlock__cardPopupContent'>
+                <div className='tracim__pageBlock__cardPopupContent__message'>
+                  {props.t('There are too many active users. Please try again later or contact your administrator.')}
+                </div>
+                <div className='tracim__pageBlock__cardPopupContent__buttons'>
+                  <IconButton
+                    icon='fas fa-fw fa-sign-out-alt'
+                    text={props.t('Log out')}
+                    title={props.t('Log out')}
+                    type='button'
+                    intent='secondary'
+                    mode='dark'
+                    disabled={false}
+                    onClick={this.handleClickLogout}
+                    dataCy='tracim__pageBlock__logout'
+                  />
+                  &nbsp;
+                  <IconButton
+                    icon='fas fa-redo'
+                    text={props.t('Retry')}
+                    title={props.t('Retry')}
+                    type='button'
+                    intent='secondary'
+                    mode='dark'
+                    disabled={false}
+                    onClick={() => location.reload()}
+                    dataCy='tracim__pageBlock__retry'
+                  />
+                </div>
+              </div>
+            </CardPopup>
+          </div>
+        )}
       </div>
     )
   }

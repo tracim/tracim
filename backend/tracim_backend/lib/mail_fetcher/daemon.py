@@ -16,7 +16,7 @@ class MailFetcherDaemon(FakeDaemon):
     def __init__(self, config: "CFG", burst=True, *args, **kwargs):
         """
         :param config: Tracim Config
-        :param burst: if true, run one time, if false, run continously
+        :param burst: if true, run one time, if false, run continuously
         """
         super().__init__(*args, **kwargs)
         self.config = config
@@ -24,7 +24,7 @@ class MailFetcherDaemon(FakeDaemon):
         self.burst = burst
 
     def append_thread_callback(self, callback: typing.Callable) -> None:
-        logger.warning("MailFetcherrDaemon not implement append_thread_callback")
+        logger.warning("MailFetcherDaemon does not implement append_thread_callback")
         pass
 
     def stop(self) -> None:

@@ -9,6 +9,9 @@ export const LIVE_MESSAGE_STATUS = {
   HEARTBEAT_FAILED: 'heartbeat_failed'
 }
 
+export const LIVE_MESSAGE_ERROR_CODE = {
+  TOO_MANY_CONNECTED_USERS: 8001
+}
 // INFO - RJ - 2020-08-12  - increment this number each time the channel protocol is changed in an incompatible way
 const BROADCAST_CHANNEL_NAME = 'tracim-frontend-1'
 
@@ -102,7 +105,7 @@ export class LiveMessageManager {
     }
 
     this.eventSource.onerror = (e) => {
-      console.log('%c.:. TLM Error: ', 'color: #ccc0e2', e)
+      console.log('%c.:. TLM Connection Error: ', 'color: #ccc0e2', e)
       this.broadcastStatus(LIVE_MESSAGE_STATUS.ERROR)
       this.restartEventSourceConnection()
     }
@@ -110,6 +113,12 @@ export class LiveMessageManager {
     this.eventSource.addEventListener('stream-open', () => {
       console.log('%c.:. TLM StreamOpen: ', 'color: #ccc0e2')
       this.broadcastStatus(LIVE_MESSAGE_STATUS.OPENED)
+    })
+
+    this.eventSource.addEventListener('stream-error', (e) => {
+      console.log('%c.:. TLM Backend Error: ', 'color: #ccc0e2')
+      this.closeLiveMessageConnection()
+      this.setStatus(LIVE_MESSAGE_STATUS.ERROR, parseInt(e.data))
     })
 
     this.eventSource.addEventListener('keep-alive', () => {
@@ -265,19 +274,19 @@ export class LiveMessageManager {
     this.restartEventSourceConnection()
   }
 
-  broadcastStatus (status) {
+  broadcastStatus (status, code) {
     if (this.status === status) return
-    this.setStatus(status)
-    this.broadcastChannel.postMessage({ status })
+    this.setStatus(status, code)
+    this.broadcastChannel.postMessage({ status, code })
   }
 
-  setStatus (status) {
+  setStatus (status, code = -1) {
     if (this.status === status) return
     console.log('TLM STATUS: ', status)
     this.status = status
     GLOBAL_dispatchEvent({
       type: CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED,
-      data: { status }
+      data: { status, code }
     })
   }
 }
