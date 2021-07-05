@@ -202,5 +202,6 @@
   "Create new tag...": "Créer un nouveau tag",
   "Error while fetching a list of tags": "Erreur pendant la récupération d'une liste d'étiquettes ",
   "Tags": "Étiquettes",
-  "Your tag has been added": "Votre étiquette a été ajoutée"
+  "Your tag has been added": "Votre étiquette a été ajoutée",
+  "Add a tag here...": "Ajouter une étiquette ici..."
 }

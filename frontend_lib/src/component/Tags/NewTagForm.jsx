@@ -126,7 +126,7 @@ export class NewTagForm extends React.Component {
             type='text'
             className='name__input form-control'
             id='addTag'
-            placeholder={props.t('e.g. Important')}
+            placeholder={props.t('Add a tag here...')}
             data-cy='add_tag'
             value={state.tagName}
             onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}

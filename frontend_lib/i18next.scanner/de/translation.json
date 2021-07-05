@@ -202,5 +202,6 @@
   "Create new tag...": "Neue Markierung erstellen...",
   "Error while fetching a list of tags": "Fehler beim Holen einer Liste von Markierungen",
   "Tags": "Markierungsliste",
-  "Your tag has been added": "Ihre Markierung wurde hinzugefügt"
+  "Your tag has been added": "Ihre Markierung wurde hinzugefügt",
+  "Add a tag here...": "Hier eine Markierung hinzufügen..."
 }
