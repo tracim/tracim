@@ -15,7 +15,6 @@ import classnames from 'classnames'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
-import Icon from '../Icon/Icon.jsx'
 import {
   deleteContentTag,
   deleteWorkspaceTag,

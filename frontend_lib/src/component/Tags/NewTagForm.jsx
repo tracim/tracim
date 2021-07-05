@@ -7,13 +7,12 @@ import {
   postWorkspaceTag
 } from '../../action.async.js'
 import { sendGlobalFlashMessage, handleFetchResult } from '../../helper.js'
-import CloseButton from '../Button/CloseButton.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export class NewTagForm extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       autoCompleteActive: false,
@@ -42,23 +41,43 @@ export class NewTagForm extends React.Component {
       const fetchPutContentTag = await handleFetchResult(
         await putContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
       )
-
-      if (!fetchPutContentTag.ok) {
-        sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
-        return
+      switch (fetchPutContentTag.apiResponse.status) {
+        case 200:
+          sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
+          break
+        case 400: {
+          switch (fetchPutContentTag.body.code) {
+            case 3014:
+              sendGlobalFlashMessage(props.i18n.t('This tag already exists'))
+              break
+            default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+              break
+          }
+        }
+        default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+          break
       }
+
     } else {
       const fetchPostContentTag = await handleFetchResult(
         await postContentTag(props.apiUrl, props.workspaceId, props.contentId, state.tagName)
       )
-
-      if (!fetchPostContentTag.ok) {
-        sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
-        return
+      switch (fetchPostContentTag.apiResponse.status) {
+        case 200: sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
+          break
+        case 400: {
+          switch (fetchPostContentTag.body.code) {
+            case 3014:
+              sendGlobalFlashMessage(props.i18n.t('This tag already exists'))
+                break
+            default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+              break
+          }
+        }
+        default: sendGlobalFlashMessage(props.i18n.t('Error while adding a tag to the content'))
+          break
       }
     }
-
-    sendGlobalFlashMessage(props.i18n.t('Your tag has been added'), 'info')
     this.setState({ tagName: '' })
   }
 
@@ -108,7 +127,7 @@ export class NewTagForm extends React.Component {
               value={state.tagName}
               onChange={(e) => this.setState({ tagName: e.target.value })}
               onFocus={() => this.setState({ autoCompleteActive: true })}
-              // onBlur={() => this.setState({ autoCompleteActive: false })} // TODO
+            // onBlur={() => this.setState({ autoCompleteActive: false })} // TODO
             />
 
             {state.autoCompleteActive && !!props.contentId && filterTags.length > 0 && (
@@ -116,19 +135,19 @@ export class NewTagForm extends React.Component {
                 className='autocomplete primaryColorBorder'
               >
                 {filterTags.map(tag =>
+                  <div
+                    className='autocomplete__item'
+                    onClick={() => this.handleClickKnownTag(tag)}
+                    key={tag.tag_id}
+                  >
                     <div
-                      className='autocomplete__item'
-                      onClick={() => this.handleClickKnownTag(tag)}
-                      key={tag.tag_id}
+                      className='autocomplete__item__name'
+                      data-cy='autocomplete__item__name'
+                      title={tag.tag_name}
                     >
-                      <div
-                        className='autocomplete__item__name'
-                        data-cy='autocomplete__item__name'
-                        title={tag.tag_name}
-                      >
-                        {tag.tag_name}
-                      </div>
+                      {tag.tag_name}
                     </div>
+                  </div>
                 )}
               </div>
             )}
