@@ -148,6 +148,7 @@ export class NewTagForm extends React.Component {
             data-cy='add_tag'
             value={state.tagName}
             onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}
+            onKeyDown={this.handleClickBtnValidate}
           />
 
           {state.autoCompleteActive && state.tagName !== '' && !!props.contentId && filterTags.length > 0 && (
@@ -194,7 +195,8 @@ NewTagForm.propTypes = {
   contentTagList: PropTypes.array,
   onClickCloseAddTagBtn: PropTypes.func,
   spaceTaglist: PropTypes.array,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  onKeyDown: PropTypes.func
 }
 
 NewTagForm.defaultProps = {
