@@ -201,6 +201,7 @@ const wrapLinksFromText = async (text, doc, apiUrl) => {
   wrappedLink.href = PAGE.CONTENT(contentId)
   wrappedLink.textContent = contentTitle
   wrappedLink.title = match[0] 
+  wrappedLink.style = 'background-color: whitesmoke;'
   fragment.appendChild(wrappedLink)
 
   const linkEndIndex = match.index + match[0].length
