@@ -173,7 +173,7 @@ export class Tracim extends React.Component {
       if (this.state.displayConnectionError) {
         this.setState({ displayConnectionError: false })
       }
-    } else if (status === LIVE_MESSAGE_STATUS.ERROR && code === LIVE_MESSAGE_ERROR_CODE.TOO_MANY_CONNECTED_USERS) {
+    } else if (status === LIVE_MESSAGE_STATUS.ERROR && code === LIVE_MESSAGE_ERROR_CODE.TOO_MANY_ONLINE_USERS) {
       this.setState({ tooManyUsers: true })
     } else if (!this.connectionErrorDisplayTimeoutId) {
       this.connectionErrorDisplayTimeoutId = globalThis.setTimeout(
@@ -602,7 +602,7 @@ export class Tracim extends React.Component {
             <CardPopup hideCloseBtn customHeaderClass='bg-danger'>
               <div className='tracim__pageBlock__cardPopupContent'>
                 <div className='tracim__pageBlock__cardPopupContent__message'>
-                  {props.t('There are too many active users. Please try again later or contact your administrator.')}
+                  {props.t('There are too many users online. Please try again later or contact your administrator.')}
                 </div>
                 <div className='tracim__pageBlock__cardPopupContent__buttons'>
                   <IconButton

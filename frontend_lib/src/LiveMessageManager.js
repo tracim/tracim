@@ -10,7 +10,7 @@ export const LIVE_MESSAGE_STATUS = {
 }
 
 export const LIVE_MESSAGE_ERROR_CODE = {
-  TOO_MANY_CONNECTED_USERS: 8001
+  TOO_MANY_ONLINE_USERS: 8001
 }
 // INFO - RJ - 2020-08-12  - increment this number each time the channel protocol is changed in an incompatible way
 const BROADCAST_CHANNEL_NAME = 'tracim-frontend-1'

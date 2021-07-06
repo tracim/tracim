@@ -23,7 +23,7 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
-from tracim_backend.exceptions import TooManyConnectedUsersError
+from tracim_backend.exceptions import TooManyOnlineUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimValidationFailed
@@ -846,14 +846,14 @@ class UserController(Controller):
         )
 
         try:
-            user_api.check_maximum_connected_users()
-        except TooManyConnectedUsersError as exc:
+            user_api.check_maximum_online_users()
+        except TooManyOnlineUsersError as exc:
             error = {
                 "code": exc.error_code.value,
                 "message": str(exc),
             }
             response_body = LiveMessagesLib.get_server_side_event_string(
-                ServerSideEventType.STREAM_ERROR, data=error, comment="Too many connected users"
+                ServerSideEventType.STREAM_ERROR, data=error, comment="Too many online users"
             )
             return Response(
                 headerlist=headers, charset="utf-8", status_code=200, body=response_body

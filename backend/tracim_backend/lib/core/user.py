@@ -52,7 +52,7 @@ from tracim_backend.exceptions import NoUserSetted
 from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import RemoteUserAuthDisabled
 from tracim_backend.exceptions import ReservedUsernameError
-from tracim_backend.exceptions import TooManyConnectedUsersError
+from tracim_backend.exceptions import TooManyOnlineUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.exceptions import UnknownAuthType
@@ -127,7 +127,7 @@ class UserApi(object):
             query = query.filter(User.is_active == True)  # noqa: E711
         return query
 
-    def _base_query(self):
+    def base_query(self):
         return self._apply_base_filters(self._session.query(User))
 
     def get_user_with_context(self, user: User) -> UserInContext:
@@ -143,7 +143,7 @@ class UserApi(object):
         Get one user by user id
         """
         try:
-            user = self._base_query().filter(User.user_id == user_id).one()
+            user = self.base_query().filter(User.user_id == user_id).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(user_id)) from exc
         return user
@@ -159,7 +159,7 @@ class UserApi(object):
 
     def get_one_by_token(self, token: str) -> User:
         try:
-            user = self._base_query().filter(User.auth_token == token).one()
+            user = self.base_query().filter(User.auth_token == token).one()
         except NoResultFound as exc:
             raise UserDoesNotExist("User with given token not found in database") from exc
         return user
@@ -173,7 +173,7 @@ class UserApi(object):
         if not email:
             raise UserDoesNotExist("User not found : no email provided")
         try:
-            user = self._base_query().filter(User.email == email.lower()).one()
+            user = self.base_query().filter(User.email == email.lower()).one()
         except NoResultFound as exc:
             raise UserDoesNotExist('User "{}" not found in database'.format(email)) from exc
         return user
@@ -185,7 +185,7 @@ class UserApi(object):
         :return: one user
         """
         try:
-            user = self._base_query().filter(User.username == username).one()
+            user = self.base_query().filter(User.username == username).one()
         except NoResultFound as exc:
             raise UserDoesNotExist(
                 'User for username "{}" not found in database'.format(username)
@@ -201,7 +201,7 @@ class UserApi(object):
         return self._user
 
     def _get_all_query(self) -> Query:
-        return self._base_query().order_by(func.lower(User.display_name))
+        return self.base_query().order_by(func.lower(User.display_name))
 
     def get_all(self) -> typing.List[User]:
         return self._get_all_query().all()
@@ -287,7 +287,7 @@ class UserApi(object):
             user_ids_in_workspaces = self.get_members_of_workspaces(exclude_workspace_ids)
             exclude_user_ids = (exclude_user_ids or []) + user_ids_in_workspaces
 
-        query = self._base_query().order_by(User.display_name)
+        query = self.base_query().order_by(User.display_name)
         query = query.filter(
             or_(
                 User.display_name.ilike("%{}%".format(acp)),
@@ -1451,7 +1451,7 @@ class UserApi(object):
             )
         return (original, cropped)
 
-    def get_connected_users_count(self, exclude_current_user: bool = True) -> int:
+    def get_online_user_count(self, exclude_current_user: bool = True) -> int:
         """Return the number of connected users.
 
         By default, exclude the current user from the count.
@@ -1463,14 +1463,14 @@ class UserApi(object):
             query = query.filter(User.user_id != self._user.user_id)
         return query.count()
 
-    def check_maximum_connected_users(self) -> None:
-        connected_user_count = self.get_connected_users_count(exclude_current_user=True)
+    def check_maximum_online_users(self) -> None:
+        online_user_count = self.get_online_user_count(exclude_current_user=True)
         if (
-            self._config.LIMITATION__MAXIMUM_CONNECTED_USERS
-            and connected_user_count >= self._config.LIMITATION__MAXIMUM_CONNECTED_USERS
+            self._config.LIMITATION__MAXIMUM_ONLINE_USERS
+            and online_user_count >= self._config.LIMITATION__MAXIMUM_ONLINE_USERS
         ):
-            raise TooManyConnectedUsersError(
+            raise TooManyOnlineUsersError(
                 "Too many connected users ({}/{})".format(
-                    connected_user_count, self._config.LIMITATION__MAXIMUM_CONNECTED_USERS
+                    online_user_count, self._config.LIMITATION__MAXIMUM_ONLINE_USERS
                 )
             )
