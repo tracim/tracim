@@ -841,11 +841,8 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
     try:
         user_id = session.query(User.user_id).filter(User.user_id == event.user["user_id"]).one()
         return user_id[0]
-    except AttributeError:
-        # no user in event
-        return None
-    except NoResultFound:
-        # user doesn't exist anymore
+    except (AttributeError, NoResultFound):
+        # no user in event or user doesn't exist anymore
         return None
 
 
