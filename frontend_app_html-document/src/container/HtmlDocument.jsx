@@ -47,7 +47,8 @@ import {
   TRANSLATION_STATE,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
-  FAVORITE_STATE
+  FAVORITE_STATE,
+  addExternalLinksIcons
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -421,8 +422,8 @@ export class HtmlDocument extends React.Component {
     )
 
     const hasLocalStorageRawContent = !!localStorageRawContent
-
-    const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
+    const rawContentWithExternalLinkIcons = addExternalLinksIcons (resHtmlDocument.body.raw_content)
+    const rawContentBeforeEdit = addClassToMentionsOfUser(rawContentWithExternalLinkIcons, state.loggedUser.username)
     this.setState(previousState => {
       return {
         mode: modeToRender,
@@ -533,7 +534,7 @@ export class HtmlDocument extends React.Component {
 
     let newDocumentForApiWithMentionAndLink
     try {
-      newDocumentForApiWithMentionAndLink = handleLinksBeforeSave(newDocumentForApiWithMention)
+      newDocumentForApiWithMentionAndLink = await handleLinksBeforeSave(addExternalLinksIcons(newDocumentForApiWithMention), state.config.apiUrl)
     } catch (e) {
       return Promise.reject(e.message || props.t('Error while saving the new version'))
     }

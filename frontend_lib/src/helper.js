@@ -799,3 +799,27 @@ export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/co
 export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`
 
 export const htmlToText = (domParser, htmlString) => domParser.parseFromString(htmlString, 'text/html').documentElement.textContent
+
+export const addExternalLinksIcons = (htmlString) => {
+  const doc = getDocumentFromHTMLString(htmlString)
+  const locationUrl = new URL(location.toString())
+  for (const link of doc.getElementsByTagName('a')){
+    const url = new URL(link.href)
+    if (url.origin === locationUrl.origin) continue
+    const icon = doc.createElement('i')
+    icon.className = 'fas fa-external-link-alt'
+    icon.style = 'margin-inline-start :5px;'
+    link.appendChild(icon)
+  }
+  return doc.body.innerHTML
+}
+
+export const getDocumentFromHTMLString = (htmlString) => {
+  const doc = new DOMParser().parseFromString(htmlString, 'text/html')
+
+  if (doc.documentElement.tagName === 'parsererror') {
+    throw new Error('Cannot parse string: ' + doc.documentElement.textContent)
+  }
+
+  return doc
+}

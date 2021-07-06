@@ -192,7 +192,7 @@ export function appContentFactory (WrappedComponent) {
 
       let newCommentForApiWithMentionAndLink
       try {
-        newCommentForApiWithMentionAndLink = handleLinksBeforeSave(newCommentForApiWithMention)
+        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
       } catch (e) {
         return Promise.reject(e)
       }
@@ -279,7 +279,7 @@ export function appContentFactory (WrappedComponent) {
 
       let newCommentForApiWithMentionAndLink
       try {
-        newCommentForApiWithMentionAndLink = handleLinksBeforeSave(newCommentForApiWithMention)
+        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
       } catch (e) {
         return Promise.reject(e)
       }

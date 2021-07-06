@@ -11,6 +11,7 @@ import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
+import { addExternalLinksIcons } from 'tracim_frontend_lib'
 import {
   ROLE,
   CONTENT_TYPE,
@@ -136,7 +137,7 @@ const Comment = props => {
                     )
                     : (
                       <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>
-                        {props.text}
+                        {addExternalLinksIcons(props.text)}
                       </HTMLContent>
                     )
                   )}

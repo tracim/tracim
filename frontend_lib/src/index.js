@@ -62,9 +62,11 @@ import {
   getCoverBaseUrl,
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
-  htmlToText
+  htmlToText,
+  addExternalLinksIcons
 } from './helper.js'
 import {
+  getDocumentFromHTMLString,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleInvalidMentionInComment,
@@ -395,6 +397,8 @@ export {
   putMyselfFileRead,
   getContentComment,
   getFileChildContent,
+  getDocumentFromHTMLString,
+  addExternalLinksIcons,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,
