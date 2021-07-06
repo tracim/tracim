@@ -116,9 +116,10 @@ export class LiveMessageManager {
     })
 
     this.eventSource.addEventListener('stream-error', (e) => {
-      console.log('%c.:. TLM Backend Error: ', 'color: #ccc0e2')
+      const error = JSON.parse(e.data)
+      console.log('%c.:. TLM Backend Error: ' + error.message, 'color: #ccc0e2')
       this.closeLiveMessageConnection()
-      this.setStatus(LIVE_MESSAGE_STATUS.ERROR, parseInt(e.data))
+      this.setStatus(LIVE_MESSAGE_STATUS.ERROR, error.code)
     })
 
     this.eventSource.addEventListener('keep-alive', () => {
