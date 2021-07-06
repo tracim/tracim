@@ -199,8 +199,8 @@ const wrapLinksFromText = async (text, doc, apiUrl) => {
 
   const wrappedLink = doc.createElement(LINK_TAG_NAME)
   wrappedLink.href = PAGE.CONTENT(contentId)
-  wrappedLink.textContent = match[0]
-  wrappedLink.title = contentTitle 
+  wrappedLink.textContent = contentTitle
+  wrappedLink.title = match[0] 
   fragment.appendChild(wrappedLink)
 
   const linkEndIndex = match.index + match[0].length
