@@ -133,8 +133,8 @@ export class Tracim extends React.Component {
       props.history.push(PAGE.LOGIN)
     } else {
       props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
-      this.setState({ tooManyUsers: false })
     }
+    this.setState({ tooManyUsers: false })
   }
 
   handleRedirect = data => {
@@ -165,7 +165,6 @@ export class Tracim extends React.Component {
   handleTlmStatusChanged = (data) => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, data)
     const { status, code } = data
-    const { props } = this
 
     if (status === LIVE_MESSAGE_STATUS.OPENED || status === LIVE_MESSAGE_STATUS.CLOSED) {
       globalThis.clearTimeout(this.connectionErrorDisplayTimeoutId)
