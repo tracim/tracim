@@ -153,8 +153,7 @@ export const HtmlDocument = props => {
                 autoCompleteCursorPosition={props.autoCompleteCursorPosition}
                 onClickAutoCompleteItem={props.onClickAutoCompleteItem}
                 style={{
-                  top: props.tinymcePosition.top +
-                    (props.tinymcePosition.isSelectionToTheTop ? props.tinymcePosition.selectionHeight : 0),
+                  top: props.tinymcePosition.isSelectionToTheTop ? props.tinymcePosition.bottom : props.tinymcePosition.top,
                   transform: !props.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none',
                   position: props.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
                   zIndex: props.tinymcePosition.isFullscreen ? 1061 : 20
