@@ -248,7 +248,7 @@ class TestNotificationsSync(object):
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[Tracim] A password reset has been requested"
         message = email.message_from_string(response[0]["Raw"]["Data"], policy=email.policy.default)
-        assert "This link is valid for 15 minutes" in message.get_body().get_content()
+        assert "The link is valid for 15 minutes" in message.get_body().get_content()
 
 
 @pytest.mark.usefixtures("base_fixture")
