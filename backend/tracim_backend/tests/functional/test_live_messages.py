@@ -2,6 +2,7 @@ import contextlib
 import json
 import os
 import subprocess
+import sys
 import typing
 
 import pytest
@@ -88,6 +89,22 @@ def small_html_document_b(workspace_api_factory, content_api_factory, session) -
 @pytest.fixture
 def small_html_document_c(workspace_api_factory, content_api_factory, session) -> Content:
     return small_html_document(workspace_api_factory, content_api_factory, session, "C")
+
+
+@pytest.fixture
+def connection_monitor_process():
+    env = {"TRACIM_CONF_PATH": "tests_config_user_status_connection_monitor.ini"}
+    env.update(os.environ)
+    p = subprocess.Popen(
+        [
+            sys.executable,
+            os.path.dirname(__file__) + "/../../../daemons/user_connection_state_monitor.py",
+        ],
+        env=env,
+        stderr=subprocess.PIPE,
+    )
+    yield p
+    p.terminate()
 
 
 def put_document(doc):
@@ -189,7 +206,13 @@ class TestLiveMessages(object):
 
     @pytest.mark.pushpin
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__err__too_many_online_users(
-        self, pushpin, app_config: CFG, bob_user: User, admin_user: User, session,
+        self,
+        pushpin,
+        app_config: CFG,
+        bob_user: User,
+        admin_user: User,
+        session,
+        connection_monitor_process,
     ):
         # NOTE - RJ - 07-078-2021
         # This test does the following:
@@ -203,54 +226,45 @@ class TestLiveMessages(object):
         # - connects to the bob live messages
         # - checks that it works
 
-        env = {"TRACIM_CONF_PATH": "tests_config_user_status_connection_monitor.ini"}
-        env.update(os.environ)
+        expect_line_containing(b"Connected to ", connection_monitor_process.stderr)
+        with messages_stream_client(skip_first_event=False) as client_events:
+            event = next(client_events)
+            assert event.event == "stream-open"
+            expect_line_containing(
+                b"Setting connection status of user %d to online" % admin_user.user_id,
+                connection_monitor_process.stderr,
+            )
+            with messages_stream_client(
+                user_id=bob_user.user_id,
+                login=bob_user.email,
+                password="password",
+                skip_first_event=False,
+            ) as bob_events:
+                bob_event = next(bob_events)
+                assert bob_event.event == "stream-error"
+                assert json.loads(bob_event.data) == {
+                    "code": ErrorCode.TOO_MANY_ONLINE_USERS.value,
+                    "message": "Too many users online (1/1)",
+                }
 
-        with subprocess.Popen(
-            ["python3", "daemons/user_connection_state_monitor.py"], env=env, stderr=subprocess.PIPE
-        ) as monitor:
-            expect_line_containing(b"Connected to ", monitor.stderr)
-            try:
-                with messages_stream_client(skip_first_event=False) as client_events:
-                    event = next(client_events)
-                    assert event.event == "stream-open"
-                    expect_line_containing(
-                        b"Setting connection status of user %d to online" % admin_user.user_id,
-                        monitor.stderr,
-                    )
-                    with messages_stream_client(
-                        user_id=bob_user.user_id,
-                        login=bob_user.email,
-                        password="password",
-                        skip_first_event=False,
-                    ) as bob_events:
-                        bob_event = next(bob_events)
-                        assert bob_event.event == "stream-error"
-                        assert json.loads(bob_event.data) == {
-                            "code": ErrorCode.TOO_MANY_ONLINE_USERS.value,
-                            "message": "Too many users online (1/1)",
-                        }
+                with pytest.raises(StopIteration):
+                    next(bob_events)
 
-                        with pytest.raises(StopIteration):
-                            next(bob_events)
+            client_events.close()
 
-                    client_events.close()
+            expect_line_containing(
+                b"Setting connection status of user %d to offline" % admin_user.user_id,
+                connection_monitor_process.stderr,
+            )
 
-                    expect_line_containing(
-                        b"Setting connection status of user %d to offline" % admin_user.user_id,
-                        monitor.stderr,
-                    )
-
-                with messages_stream_client(
-                    user_id=bob_user.user_id,
-                    login=bob_user.email,
-                    password="password",
-                    skip_first_event=False,
-                ) as bob_events:
-                    bob_event = next(bob_events)
-                    assert bob_event.event == "stream-open"
-            finally:
-                monitor.terminate()
+        with messages_stream_client(
+            user_id=bob_user.user_id,
+            login=bob_user.email,
+            password="password",
+            skip_first_event=False,
+        ) as bob_events:
+            bob_event = next(bob_events)
+            assert bob_event.event == "stream-open"
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
