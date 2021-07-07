@@ -124,7 +124,7 @@ class UserConnectionStateMonitor:
                 logger.debug(self, "Channel {} is not a live message channel")
                 continue
 
-            user_id = int(match[1])
+            user_id = int(match.group(1))
 
             if m.get(b"unavailable", False) or m.get(b"subscribers", 0) == 0:
                 self.add_to_pending_offline_users(user_id)
