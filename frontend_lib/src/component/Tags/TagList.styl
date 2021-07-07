@@ -13,13 +13,14 @@
     margin 0
     padding 0
     list-style none
+    text-align center
     &__item
-      display flex
+      display inline-flex
       padding 10px 15px
       background-color mediumGrey
-      margin 10px
+      margin 10px 0px
       border-radius 3px
-      align-items center
+      width 85%
       & i
         padding 5px
         margin-right 5px
@@ -28,6 +29,8 @@
         overflow hidden
         flex 1
         margin-bottom 0
+        position relative
+        right 30px
       &__delete
         font-size fontSizeMedium
         color darkGrey
@@ -44,6 +47,15 @@
         border-radius 10px
         align-self center
         margin auto 5px
+        position relative
+        right 30px
+      &__triangle
+        font-size 46px
+        transform rotate(58deg)
+        position relative
+        left 16px
+        top 14px
+        color mediumGrey
   &__btnAdd
     border-bottom 2px solid grey
     padding 15px
@@ -69,7 +81,6 @@
         font-size 18px
         cursor pointer
 
-
 // MEDIAQUERIES
 
 @media (min-width: min-md) and (max-width: max-md)
@@ -93,7 +104,7 @@
     &__list
       height auto
       overflow-Y visible
-      &__item:nth-last-child(1)
-        border-bottom 1px solid grey
+      // &__item:nth-last-child(1)
+      //   border-bottom 1px solid grey
     &__btnAdd
       border-top 0

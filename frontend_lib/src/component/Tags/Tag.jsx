@@ -8,6 +8,7 @@ require('./TagList.styl')
 export const Tag = props => {
   return (
     <div className='tagList__list__item__wrapper'>
+      <i className='fas fa-play tagList__list__item__triangle'></i>
       <div className='tagList__list__item'>
         <div className='tagList__list__item__circle' />
         <label
