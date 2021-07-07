@@ -534,7 +534,7 @@ export class HtmlDocument extends React.Component {
 
     let newDocumentForApiWithMentionAndLink
     try {
-      newDocumentForApiWithMentionAndLink = await handleLinksBeforeSave(addExternalLinksIcons(newDocumentForApiWithMention), state.config.apiUrl)
+      newDocumentForApiWithMentionAndLink = await handleLinksBeforeSave(newDocumentForApiWithMention, state.config.apiUrl)
     } catch (e) {
       return Promise.reject(e.message || props.t('Error while saving the new version'))
     }
@@ -558,7 +558,7 @@ export class HtmlDocument extends React.Component {
             mode: APP_FEATURE_MODE.VIEW,
             content: {
               ...previousState.content,
-              raw_content: newDocumentForApiWithMentionAndLink
+              raw_content: addExternalLinksIcons(newDocumentForApiWithMentionAndLink)
             },
             oldInvalidMentionList: allInvalidMentionList,
             showInvalidMentionPopupInContent: false,

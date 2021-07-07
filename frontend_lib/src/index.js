@@ -65,14 +65,15 @@ import {
   htmlToText,
   addExternalLinksIcons
 } from './helper.js'
+
 import {
-  getDocumentFromHTMLString,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleInvalidMentionInComment,
   handleLinksBeforeSave,
   handleMentionsBeforeSave
 } from './mentionOrLink.js'
+
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -397,7 +398,6 @@ export {
   putMyselfFileRead,
   getContentComment,
   getFileChildContent,
-  getDocumentFromHTMLString,
   addExternalLinksIcons,
   addClassToMentionsOfUser,
   getInvalidMentionList,

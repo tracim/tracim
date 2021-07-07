@@ -11,11 +11,11 @@ import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
-import { addExternalLinksIcons } from 'tracim_frontend_lib'
 import {
   ROLE,
   CONTENT_TYPE,
-  formatAbsoluteDate
+  formatAbsoluteDate,
+  addExternalLinksIcons
 } from '../../helper.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'
