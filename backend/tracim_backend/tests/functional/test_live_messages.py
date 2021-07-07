@@ -199,8 +199,8 @@ class TestLiveMessages(object):
                 bob_event = next(bob_events)
                 assert bob_event.event == "stream-error"
                 assert json.loads(bob_event.data) == {
-                    "code": ErrorCode.TOO_MANY_CONNECTED_USERS.value,
-                    "message": "Too many connected users (1/1)",
+                    "code": ErrorCode.TOO_MANY_ONLINE_USERS.value,
+                    "message": "Too many online users (1/1)",
                 }
 
                 with pytest.raises(StopIteration):
