@@ -1470,7 +1470,7 @@ class UserApi(object):
             and online_user_count >= self._config.LIMITATION__MAXIMUM_ONLINE_USERS
         ):
             raise TooManyOnlineUsersError(
-                "Too many connected users ({}/{})".format(
+                "Too many users online ({}/{})".format(
                     online_user_count, self._config.LIMITATION__MAXIMUM_ONLINE_USERS
                 )
             )
