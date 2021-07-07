@@ -38,7 +38,7 @@ class CustomTracimContext(TracimContext):
 
     @property
     def dbsession(self) -> TracimSession:
-        return None
+        return self._session
 
     @property
     def plugin_manager(self) -> pluggy.PluginManager:
@@ -47,7 +47,6 @@ class CustomTracimContext(TracimContext):
 
 class UserConnectionStateMonitor:
     def __init__(self, config: CFG):
-        self.context = CustomTracimContext(config)
         self.config = config
         self.session_factory = get_session_factory(get_engine(config))
         self.pending_offline_users = {}
@@ -63,9 +62,10 @@ class UserConnectionStateMonitor:
         except KeyError:
             pass
 
-        session = create_dbsession_for_context(
-            self.session_factory, transaction.manager, self.context
-        )
+        context = CustomTracimContext(self.config)
+        session = create_dbsession_for_context(self.session_factory, transaction.manager, context)
+
+        context._session = session
 
         uapi = UserApi(session=session, current_user=None, config=self.config)
         query = uapi.base_query()

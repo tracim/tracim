@@ -8,8 +8,7 @@ from tracim_backend.lib.utils.logger import logger
 
 class UserConnectionStateMonitorDaemon(FakeDaemon):
     """
-    Thread containing a daemon who fetch new mail from a mailbox and
-    send http request to a tracim endpoint to handle them.
+    This daemon sets the online/offline status of users by listening to events from pushpin
     """
 
     def __init__(self, config: CFG, burst=True, *args, **kwargs):
