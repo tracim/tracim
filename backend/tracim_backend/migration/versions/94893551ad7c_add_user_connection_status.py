@@ -21,6 +21,7 @@ def upgrade():
                 sa.Enum("ONLINE", "OFFLINE", name="userconnectionstatus"),
                 nullable=False,
                 default="OFFLINE",
+                server_default="OFFLINE",
             )
         )
 

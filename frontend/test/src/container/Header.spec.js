@@ -72,15 +72,6 @@ describe('In <Header />', () => {
       ])
     })
 
-    describe('handleClickLogout', () => {
-      it('should call setUserDisconnectedCallBack', (done) => {
-        mockPostUserLogout204(FETCH_CONFIG.apiUrl)
-        headerInstance.handleClickLogout().then(() => {
-          expect(setUserDisconnectedCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
     describe('handleChangeLang', () => {
       it('should set language if user is not connected', (done) => {
         props.user.userId = -1
