@@ -14,11 +14,10 @@ import NotificationButton from '../component/Header/MenuActionListItem/Notificat
 import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
 import {
   newFlashMessage,
-  setUserLang,
-  setUserDisconnected
+  setUserLang
 } from '../action-creator.sync.js'
 import {
-  postUserLogout,
+  logoutUser,
   putUserLang
 } from '../action-creator.async.js'
 import {
@@ -75,17 +74,8 @@ export class Header extends React.Component {
 
   handleClickHelp = () => {}
 
-  handleClickLogout = async () => {
-    const { props } = this
-
-    const fetchPostUserLogout = await props.dispatch(postUserLogout())
-    if (fetchPostUserLogout.status === 204) {
-      props.dispatch(setUserDisconnected())
-      this.props.dispatchCustomEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
-      props.history.push(PAGE.LOGIN)
-    } else {
-      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
-    }
+  handleClickLogout = () => {
+    this.props.dispatch(logoutUser(this.props.history))
   }
 
   handleClickSearch = async (searchString) => {

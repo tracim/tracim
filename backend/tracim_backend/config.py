@@ -601,6 +601,9 @@ class CFG(object):
         self.LIMITATION__MAXIMUM_ONLINE_USERS = int(
             self.get_raw_config("limitation.maximum_online_users", "0")
         )
+        self.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE = self.get_raw_config(
+            "limitation.maximum_online_users_message", ""
+        )
 
     def _load_email_config(self) -> None:
         """

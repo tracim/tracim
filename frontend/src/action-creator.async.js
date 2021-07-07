@@ -71,6 +71,7 @@ import {
   TLM_CORE_EVENT_TYPE,
   TLM_ENTITY_TYPE,
   CONTENT_TYPE,
+  CUSTOM_EVENT,
   updateTLMUser,
   uploadFile
 } from 'tracim_frontend_lib'
@@ -1335,4 +1336,15 @@ export const getUsageConditions = () => async dispatch => {
     actionName: USAGE_CONDITIONS,
     dispatch
   })
+}
+
+export const logoutUser = (history) => async (dispatch) => {
+  const fetchPostUserLogout = await dispatch(postUserLogout())
+  if (fetchPostUserLogout.status === 204) {
+    dispatch(setUserDisconnected())
+    GLOBAL_dispatchEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
+    history.push(PAGE.LOGIN)
+  } else {
+    dispatch(newFlashMessage(i18n.t('Disconnection error', 'danger')))
+  }
 }

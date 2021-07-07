@@ -96,6 +96,7 @@
   "Disconnection error": "Erro de desconexão",
   "Thank you for trusting us and using our collaborative tool": "Obrigado por confiar em nós e utilizar nossa ferramenta colaborativa",
   "You have been disconnected, please login again": "Você foi desconectado, inicie sessão novamente",
+  "You have reached the authorised number of simultaneous users. Please contact your administrator.": "Chegou ao número autorizado de utilizadores simultâneos. Por favor contacte o seu administrador.",
   "Connection": "Conexão",
   "Password": "Palavra-passe",
   "Error while loading read status list": "Erro ao carregar a lista de status de leitura",

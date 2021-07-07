@@ -573,6 +573,12 @@ By default, no limitation is enforced (value: 0).
 limitation.maximum_online_users = 0
 ```
 
+A customized message can be shown to the user using the following parameter:
+
+```
+limitation.maximum_online_users_message = We suggest you contact your manager to upgrade your offer:<br /><b>Leslie Doe</b>, <a href="tel:+336123456789">+336123456789</a>, <a href="mailto:leslie.doe@example.org">leslie.doe@example.org</a>
+```
+
 The delay in seconds after which a user is considered offline after closing the
 last browser tab can be tweaked with the following setting.
 NOTE: this setting is experimental and may be removed without notice in a

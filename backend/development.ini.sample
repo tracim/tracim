@@ -204,6 +204,12 @@ workspace.join.max_messages_history_count = -1
 # maximum count of simulteanously online users, 0 means unlimited and is the default value.
 ; limitation.maximum_online_users = 0
 
+# The customized error message shown to the user when the limit is reached.
+# Empty by default. HTML is allowed.
+; limitation.maximum_online_users_message =
+# For instance:
+# limitation.maximum_online_users_message = We suggest you contact your manager to upgrade your offer:<br /><b>Leslie Doe</b>, <a href="tel:+336123456789">+336123456789</a>, <a href="mailto:leslie.doe@example.org">leslie.doe@example.org</a>
+
 ####
 # STORAGE
 ####
@@ -371,6 +377,9 @@ api.key = %(basic_setup.api_key)s
 
 # The delay in seconds after which a user is considered offline after all
 # connections to live messages are closed.
+# NOTE: this setting is experimental and may be removed without notice in a
+# later version of Tracim.
+
 ; user.online_timeout = 10
 
 ## enable or disable filter on known user, if True, user cannot see at all informations about

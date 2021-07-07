@@ -126,6 +126,7 @@
   "Deprecated": "Obsolète",
   "Wrong administrator's password": "Mauvais mot de passe administrateur",
   "You have been disconnected, please login again": "Vous avez été déconnecté. Veuillez vous reconnecter",
+  "You have reached the authorised number of simultaneous users. Please contact your administrator.": "Vous avez atteint le nombre d'utilisateurs simultanées autorisés. Merci de contacter votre administrateur",
   "New password is too long (maximum 512 characters)": "Nouveau mot de passe trop long (maximum 512 caractères)",
   "Password cannot exceed 512 characters": "Mot de passe trop long (maximum 512 caractères)",
   "Your role in the space": "Votre rôle dans l'espace",

@@ -53,6 +53,7 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import knows_candidate_user
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
@@ -848,9 +849,11 @@ class UserController(Controller):
         try:
             user_api.check_maximum_online_users()
         except TooManyOnlineUsersError as exc:
+            message = str(exc)
+            logger.warning(self, message)
             error = {
                 "code": exc.error_code.value,
-                "message": str(exc),
+                "message": message,
             }
             response_body = LiveMessagesLib.get_server_side_event_string(
                 ServerSideEventType.STREAM_ERROR, data=error, comment="Too many online users"

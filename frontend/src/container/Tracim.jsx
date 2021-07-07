@@ -43,6 +43,7 @@ import {
   WELCOME_ELEMENT_ID
 } from '../util/helper.js'
 import {
+  logoutUser,
   getAppList,
   getConfig,
   getContentTypeList,
@@ -51,7 +52,6 @@ import {
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
-  postUserLogout,
   getUserMessagesSummary,
   getWorkspaceMemberList,
   getAccessibleWorkspaces
@@ -66,7 +66,6 @@ import {
   setNotificationList,
   setUserConfiguration,
   setUserConnected,
-  setUserDisconnected,
   setWorkspaceList,
   setBreadcrumbs,
   appendBreadcrumbs,
@@ -124,16 +123,7 @@ export class Tracim extends React.Component {
   }
 
   handleClickLogout = async () => {
-    // TODO FACTORIZE WITH Header.jsx
-    const { props } = this
-    const fetchPostUserLogout = await props.dispatch(postUserLogout())
-    if (fetchPostUserLogout.status === 204) {
-      props.dispatch(setUserDisconnected())
-      GLOBAL_dispatchEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
-      props.history.push(PAGE.LOGIN)
-    } else {
-      props.dispatch(newFlashMessage(props.t('Disconnection error', 'danger')))
-    }
+    await this.props.dispatch(logoutUser(this.props.history))
     this.setState({ tooManyUsers: false })
   }
 
@@ -602,7 +592,11 @@ export class Tracim extends React.Component {
             <CardPopup hideCloseBtn customHeaderClass='bg-danger'>
               <div className='tracim__pageBlock__cardPopupContent'>
                 <div className='tracim__pageBlock__cardPopupContent__message'>
-                  {props.t('There are too many users online. Please try again later or contact your administrator.')}
+                  {props.t('You have reached the authorised number of simultaneous users. Please contact your administrator.')}
+                  <div
+                    className='tracim__pageBlock__cardPopupContent__customMessage'
+                    dangerouslySetInnerHTML={{ __html: props.system.config.limitation__maximum_online_users_message }}
+                  />
                 </div>
                 <div className='tracim__pageBlock__cardPopupContent__buttons'>
                   <IconButton
@@ -625,7 +619,7 @@ export class Tracim extends React.Component {
                     intent='secondary'
                     mode='dark'
                     disabled={false}
-                    onClick={() => location.reload()}
+                    onClick={() => window.location.reload()}
                     dataCy='tracim__pageBlock__retry'
                   />
                 </div>
