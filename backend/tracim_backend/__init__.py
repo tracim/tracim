@@ -254,7 +254,14 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     context = TracimPyramidContext(
         configurator=configurator, default_error_builder=ErrorSchema(), debug=app_config.DEBUG
     )
-    hapic.set_context(context)
+    # HACK - G.M - 2021-07-01 - Force reset of context if already set.
+    # This case happened in some test now for unclear reasons.
+    try:
+        hapic.set_context(context)
+    except AssertionError:
+        hapic.reset_context()
+        hapic.set_context(context)
+        logger.warning(web, "Hapic context already setted, something may be wrong !")
     # INFO - G.M - 2018-07-04 - global-context exceptions
     # Not found
     context.handle_exception(PageNotFound, HTTPStatus.NOT_FOUND)
