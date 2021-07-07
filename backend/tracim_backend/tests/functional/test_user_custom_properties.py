@@ -47,7 +47,7 @@ class TestUserCustomProperties(object):
             "/api/users/{user_id}/custom-properties".format(user_id=user_id), status=200
         )
 
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == {}
+        assert json.loads(res.body)["parameters"] == {}
 
     def test__put_user_custom_properties_endpoint(
         self, user_api_factory: UserApiFactory, web_testapp: TestApp
@@ -92,14 +92,14 @@ class TestUserCustomProperties(object):
             "/api/users/{user_id}/custom-properties".format(user_id=user_id), status=200
         )
 
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == fixture_params
+        assert json.loads(res.body)["parameters"] == fixture_params
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get(
             "/api/users/{user_id}/custom-properties".format(user_id=user_id), status=200
         )
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == fixture_params
+        assert json.loads(res.body)["parameters"] == fixture_params
 
     @pytest.mark.parametrize(
         "user_custom_properties",
