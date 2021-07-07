@@ -12,7 +12,7 @@ requires = [
     "waitress",
     # Database
     "pyramid_tm",
-    "SQLAlchemy",
+    "SQLAlchemy<1.4.0",
     "transaction",
     "zope.sqlalchemy",
     "alembic",
