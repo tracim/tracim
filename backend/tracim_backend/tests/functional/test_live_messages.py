@@ -177,7 +177,7 @@ class TestLiveMessages(object):
         assert event.event == "message"
 
     @pytest.mark.pushpin
-    def test_api__user_live_messages_endpoint_with_GRIP_proxy__err__too_many_connected_users(
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__err__too_many_online_users(
         self, pushpin, app_config: CFG, bob_user: User, admin_user: User, session,
     ):
         # TODO: ne pas simuler la connexion de l'admin
