@@ -238,3 +238,34 @@ Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.
 By default, the Docker image is built from the main repository of Tracim. To clone Tracim from another repository, use the REPO argument. Don't forget to set a suitable image name.
 
 Ex: `docker build --build-arg REPO="https://github.com/<me>/tracim.git" -t algoo/tracim:myrepo .`
+
+
+#### Multiarch Minimal Build (Experimental):
+
+The build process as been improved to permit both minimal an full build. To avoid building unwanted stage, we recommand
+you to either use buildx or buildkit. In this doc, we will use buildx as it's known to work for multi-arch.
+
+### AMD64 build
+
+```
+docker buildx build -t algoo/tracim:minimal . --build-arg PG_DEP=minimal --build-arg ENCRYPTION_DEP=minimal --build-arg DB_DEP=minimal
+```
+
+### ARM build
+
+To test it on your own AMD64 machine, you first need to activate or install buildx feature of
+docker and install qemu-user-static.
+see also: https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with-buildx-27d80f7e2408
+
+note: if you are using a recent version of docker you should have either buildx by default or you need to install it manually : https://github.com/docker/buildx#docker
+
+then do:
+```
+docker buildx build -t algoo/tracim:minimal . --platform linux/arm64/v8 --build-arg PG_DEP=minimal --build-arg ENCRYPTION_DEP=minimal --build-arg DB_DEP=minimal
+```
+for arm64/aarch64/v8
+
+```
+docker buildx  build -t algoo/tracim:minimal . --platform linux/arm/v7 --build-arg PG_DEP=minimal --build-arg ENCRYPTION_DEP=minimal --build-arg DB_DEP=minimal
+```
+for armhf/arm/v7
