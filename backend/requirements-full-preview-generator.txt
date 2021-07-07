@@ -1,5 +1,5 @@
 # VTK (3D)
-vtk==8.1.2               # via preview-generator
+vtk==9.0.2              # via preview-generator
 # Scribus,drawio
 xvfbwrapper==0.2.9        # via preview-generator
 # CairoSVG (disabled for now)

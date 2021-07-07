@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
 from argparse import Namespace
-import logging
 import sys
 from typing import Any
 from typing import List
@@ -76,6 +75,8 @@ class AppContextCommand(Command):
             setup_logging(parsed_args.config_file)
         else:
             # INFO - G.M - 2019-03-13 - disable all logging
+            import logging.config
+
             logging.config.dictConfig({"version": 1, "disable_existing_loggers": True})
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
