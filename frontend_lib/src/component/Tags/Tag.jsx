@@ -35,13 +35,12 @@ export default translate()(Tag)
 
 Tag.propTypes = {
   name: PropTypes.string.isRequired,
-  isContent: PropTypes.bool,
   onClickDeleteTag: PropTypes.func.isRequired,
+  isContent: PropTypes.bool,
   isReadOnlyMode: PropTypes.bool
 }
 
 Tag.defaultProps = {
   isContent: true,
-  onClickDeleteTag: () => { },
   isReadOnlyMode: true
 }
