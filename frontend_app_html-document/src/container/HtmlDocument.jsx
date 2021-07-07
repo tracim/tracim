@@ -423,6 +423,7 @@ export class HtmlDocument extends React.Component {
 
     const hasLocalStorageRawContent = !!localStorageRawContent
     const rawContentWithExternalLinkIcons = addExternalLinksIcons (resHtmlDocument.body.raw_content)
+ 
     const rawContentBeforeEdit = addClassToMentionsOfUser(rawContentWithExternalLinkIcons, state.loggedUser.username)
     this.setState(previousState => {
       return {

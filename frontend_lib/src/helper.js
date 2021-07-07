@@ -803,7 +803,7 @@ export const htmlToText = (domParser, htmlString) => domParser.parseFromString(h
 export const addExternalLinksIcons = (htmlString) => {
   const doc = getDocumentFromHTMLString(htmlString)
   const locationUrl = new URL(location.toString())
-  for (const link of doc.getElementsByTagName('a')){
+  for (const link of doc.getElementsByTagName('a')) {
     const url = new URL(link.href)
     if (url.origin === locationUrl.origin) continue
     const icon = doc.createElement('i')

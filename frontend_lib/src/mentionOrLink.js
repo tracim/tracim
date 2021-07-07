@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import i18n from './i18n.js'
-import { 
+import {
   PAGE,
   getDocumentFromHTMLString
 } from './helper.js'
@@ -189,21 +189,18 @@ const wrapLinksFromText = async (text, doc, apiUrl) => {
   if (!match || (match.index > 0 && (text[match.index - 1].trim()))) {
     return doc.createTextNode(text)
   }
-  
   const contentId = match[0].substring(1)
-  const fetchContent = await getContent(apiUrl, contentId) 
-  const contentTitle = fetchContent.status === 200 ? (await fetchContent.json()).label : '' 
+  const fetchContent = await getContent(apiUrl, contentId)
+  const contentTitle = fetchContent.status === 200 ? (await fetchContent.json()).label : ''
   const fragment = doc.createDocumentFragment()
-
   fragment.appendChild(doc.createTextNode(text.substring(0, match.index)))
 
   const wrappedLink = doc.createElement(LINK_TAG_NAME)
   wrappedLink.href = PAGE.CONTENT(contentId)
   wrappedLink.textContent = contentTitle
-  wrappedLink.title = match[0] 
+  wrappedLink.title = match[0]
   wrappedLink.style = 'background-color: whitesmoke;'
   fragment.appendChild(wrappedLink)
-
   const linkEndIndex = match.index + match[0].length
   fragment.appendChild(await wrapLinksFromText(text.substring(linkEndIndex), doc, apiUrl))
 

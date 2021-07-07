@@ -25,7 +25,7 @@ import {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
+  tinymceAutoCompleteHandleSelectionChange
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
