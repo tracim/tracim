@@ -10,11 +10,6 @@ import transaction
 
 import tracim_backend
 from tracim_backend.command import TracimCLI
-from tracim_backend.exceptions import DatabaseInitializationFailed
-from tracim_backend.exceptions import EmailAlreadyExists
-from tracim_backend.exceptions import ExternalAuthUserPasswordModificationDisallowed
-from tracim_backend.exceptions import ForceArgumentNeeded
-from tracim_backend.exceptions import NotificationDisabledCantCreateUserWithInvitation
 from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
@@ -159,22 +154,22 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(SystemExit):
-            app.run(
-                [
-                    "user",
-                    "create",
-                    "-c",
-                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-e",
-                    "command_test@user",
-                    "-p",
-                    "new_password",
-                    "--profile",
-                    "unknown",
-                    "--debug",
-                ]
-            )
+        res = app.run(
+            [
+                "user",
+                "create",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-e",
+                "command_test@user",
+                "-p",
+                "new_password",
+                "--profile",
+                "unknown",
+                "--debug",
+            ]
+        )
+        assert res == 1
 
     def test_func__user_create_command__err_user_already_exist(self, hapic, session) -> None:
         """
@@ -185,21 +180,21 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(EmailAlreadyExists):
-            app.run(
-                [
-                    "--debug",
-                    "user",
-                    "create",
-                    "-c",
-                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-e",
-                    "admin@admin.admin",
-                    "-p",
-                    "new_password",
-                    "--debug",
-                ]
-            )
+        res = app.run(
+            [
+                "--debug",
+                "user",
+                "create",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-e",
+                "admin@admin.admin",
+                "-p",
+                "new_password",
+                "--debug",
+            ]
+        )
+        assert res == 1
 
     def test_func__user_create_command__err__with_email_notification_disabled(
         self, hapic, session
@@ -212,22 +207,22 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(NotificationDisabledCantCreateUserWithInvitation):
-            app.run(
-                [
-                    "--debug",
-                    "user",
-                    "create",
-                    "-c",
-                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-e",
-                    "pof@pof.pof",
-                    "-p",
-                    "new_password",
-                    "--send-email",
-                    "--debug",
-                ]
-            )
+        res = app.run(
+            [
+                "--debug",
+                "user",
+                "create",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-e",
+                "pof@pof.pof",
+                "-p",
+                "new_password",
+                "--send-email",
+                "--debug",
+            ]
+        )
+        assert res == 1
 
     def test_func__user_update_command__ok__nominal_case(
         self, hapic, session, user_api_factory
@@ -286,20 +281,20 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(ExternalAuthUserPasswordModificationDisallowed):
-            app.run(
-                [
-                    "user",
-                    "update",
-                    "-c",
-                    "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                    "-l",
-                    "admin@admin.admin",
-                    "-p",
-                    "new_ldap_password",
-                    "--debug",
-                ]
-            )
+        res = app.run(
+            [
+                "user",
+                "update",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-l",
+                "admin@admin.admin",
+                "-p",
+                "new_ldap_password",
+                "--debug",
+            ]
+        )
+        assert res == 1
 
     def test_func__user_update_command__ok__update_profile(
         self, hapic, session, user_api_factory
@@ -355,8 +350,8 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(DatabaseInitializationFailed):
-            app.run(["db", "init", "-c", COMMAND_CONFIG_PATH, "--debug"])
+        res = app.run(["db", "init", "-c", COMMAND_CONFIG_PATH, "--debug"])
+        assert res == 1
 
     def test__init__db__ok_nominal_case(self, hapic, session, user_api_factory):
         """
@@ -392,8 +387,8 @@ class TestCommands(object):
         DepotManager._clear()
 
         app = TracimCLI()
-        with pytest.raises(FileNotFoundError):
-            app.run(["db", "init", "-c", "filewhonotexit.ini#command_test", "--debug"])
+        res = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test", "--debug"])
+        assert res == 1
         result = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test"])
         assert result == 1
 
@@ -437,10 +432,10 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(ForceArgumentNeeded):
-            app.run(
-                ["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
-            )
+        res = app.run(
+            ["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
+        )
+        assert res == 1
         result = app.run(["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)])
         assert result == 1
 
@@ -458,8 +453,8 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        with pytest.raises(FileNotFoundError):
-            app.run(["db", "delete", "-c", "donotexit.ini#command_test", "--debug"])
+        res = app.run(["db", "delete", "-c", "donotexit.ini#command_test", "--debug"])
+        assert res == 1
         result = app.run(["db", "delete", "-c", "donotexist.ini#command_test"])
         assert result == 1
 
