@@ -6,7 +6,7 @@ from setuptools import setup
 requires = [
     # pyramid
     "plaster_pastedeploy",
-    "pyramid >= 1.9a",
+    "pyramid <2.0",
     "pyramid_debugtoolbar",
     "pyramid_retry",
     "waitress",
@@ -27,7 +27,7 @@ requires = [
     # CLI
     "cliff",
     # Webdav
-    "wsgidav",
+    "wsgidav<3.0.0",
     "PyYAML",
     # others
     "filedepot>=0.8.0",
@@ -40,8 +40,8 @@ requires = [
     # mail-notifier
     "mako",
     "lxml",
-    "redis<3.0.0",
-    "rq",
+    "redis>=3.5.3",
+    "rq>=1.9.0",
     "html2text",
     # mail-fetcher
     "markdown",
@@ -77,6 +77,8 @@ requires = [
     "pyzmq",
     "jsonschema",
     "webpreview",
+    # importlib
+    "importlib_metadata",
 ]
 
 tests_require = [

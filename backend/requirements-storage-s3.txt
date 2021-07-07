@@ -1,4 +1,4 @@
-boto3==1.16.31
-botocore==1.19.31
+boto3==1.17.103
+botocore==1.20.103
 jmespath==0.10.0
-s3transfer==0.3.3
+s3transfer==0.4.2
