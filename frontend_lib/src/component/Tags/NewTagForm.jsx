@@ -204,8 +204,7 @@ NewTagForm.propTypes = {
   contentTagList: PropTypes.array,
   onClickCloseAddTagBtn: PropTypes.func,
   spaceTaglist: PropTypes.array,
-  userRoleIdInWorkspace: PropTypes.number,
-  onKeyDown: PropTypes.func
+  userRoleIdInWorkspace: PropTypes.number
 }
 
 NewTagForm.defaultProps = {

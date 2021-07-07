@@ -687,11 +687,6 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  handleClickAutoComplete = () => this.setState({
-    autoCompleteFormNewTagActive: false,
-    autoCompleteClicked: true
-  })
-
   getMenuItemList = () => {
     const { props, state } = this
     const memberlistObject = {
@@ -782,8 +777,6 @@ export class WorkspaceAdvanced extends React.Component {
           apiUrl={state.config.apiUrl}
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
-          searchedKnownTagList={props.searchedKnownTagList}
-          onClickAutoComplete={this.handleClickAutoComplete}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
         />
       )
