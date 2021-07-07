@@ -606,7 +606,7 @@ export class Tracim extends React.Component {
                 </div>
                 <div className='tracim__pageBlock__cardPopupContent__buttons'>
                   <IconButton
-                    icon='fas fa-fw fa-sign-out-alt'
+                    icon='fas fa-sign-out-alt'
                     text={props.t('Log out')}
                     title={props.t('Log out')}
                     type='button'
