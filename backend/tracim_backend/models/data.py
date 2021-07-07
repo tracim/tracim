@@ -81,7 +81,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
     description = Column(Text(), unique=False, nullable=False, default="")
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
-    revisions = relationship("ContentRevisionRO", back_populates="workspace")
+    revisions = relationship("ContentRevisionRO")
     agenda_enabled = Column(Boolean, unique=False, nullable=False, default=False)
     public_upload_enabled = Column(
         Boolean,
@@ -459,7 +459,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     workspace_id = Column(
         Integer, ForeignKey("workspaces.workspace_id"), unique=False, nullable=True
     )
-    workspace = relationship("Workspace", back_populates="revisions")
+    workspace = relationship("Workspace", remote_side=[Workspace.workspace_id])
 
     parent_id = Column(Integer, ForeignKey("content.id"), nullable=True, default=None)
     parent = relationship("Content", foreign_keys=[parent_id], back_populates="children_revisions")
