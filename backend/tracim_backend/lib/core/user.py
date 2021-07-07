@@ -1452,7 +1452,7 @@ class UserApi(object):
         return (original, cropped)
 
     def get_online_user_count(self, exclude_current_user: bool = True) -> int:
-        """Return the number of connected users.
+        """Return the number of online users.
 
         By default, exclude the current user from the count.
         """
