@@ -27,6 +27,7 @@ class CustomTracimContext(TracimContext):
         super().__init__()
         self._app_config = config
         self._plugin_manager = init_plugin_manager(config)
+        self._session = None
 
     @property
     def app_config(self) -> CFG:
@@ -54,9 +55,6 @@ class UserConnectionStateMonitor:
     def set_user_connection_status(
         self, user_id: typing.Optional[int], status: UserConnectionStatus
     ) -> None:
-        logger.debug(
-            self, "Setting connection status of user {} to {}".format(user_id or "*", status)
-        )
         try:
             del self.pending_offline_users[user_id]
         except KeyError:
@@ -75,6 +73,7 @@ class UserConnectionStateMonitor:
 
         query.update({User.connection_status: status})
         transaction.commit()
+        logger.debug(self, "Set connection status of user {} to {}".format(user_id or "*", status))
 
     def add_to_pending_offline_users(self, user_id: int) -> None:
         logger.debug(self, "User {} left".format(user_id))

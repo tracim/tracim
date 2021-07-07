@@ -93,13 +93,11 @@ def small_html_document_c(workspace_api_factory, content_api_factory, session) -
 
 @pytest.fixture
 def connection_monitor_process():
-    env = {"TRACIM_CONF_PATH": "tests_config_user_status_connection_monitor.ini"}
+    backend_path = os.path.dirname(__file__) + "/../../../"
+    env = {"TRACIM_CONF_PATH": backend_path + "tests_config_user_status_connection_monitor.ini"}
     env.update(os.environ)
     p = subprocess.Popen(
-        [
-            sys.executable,
-            os.path.dirname(__file__) + "/../../../daemons/user_connection_state_monitor.py",
-        ],
+        [sys.executable, backend_path + "daemons/user_connection_state_monitor.py"],
         env=env,
         stderr=subprocess.PIPE,
     )
@@ -214,7 +212,7 @@ class TestLiveMessages(object):
         session,
         connection_monitor_process,
     ):
-        # NOTE - RJ - 07-078-2021
+        # NOTE - RJ - 2021-07-07
         # This test does the following:
         # - run the user connection state monitor daemon using config tests_config_user_status_connection_monitor.ini
         # - waits for it to be connected to Pushpin
@@ -231,7 +229,7 @@ class TestLiveMessages(object):
             event = next(client_events)
             assert event.event == "stream-open"
             expect_line_containing(
-                b"Setting connection status of user %d to online" % admin_user.user_id,
+                b"Set connection status of user %d to online" % admin_user.user_id,
                 connection_monitor_process.stderr,
             )
             with messages_stream_client(
@@ -253,7 +251,7 @@ class TestLiveMessages(object):
             client_events.close()
 
             expect_line_containing(
-                b"Setting connection status of user %d to offline" % admin_user.user_id,
+                b"Set connection status of user %d to offline" % admin_user.user_id,
                 connection_monitor_process.stderr,
             )
 
