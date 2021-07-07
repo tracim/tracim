@@ -21,6 +21,7 @@ export const GROUP_MENTION_LIST = [
 ]
 export const LINK_REGEX = /#([0-9]+)(?=\s|$)/
 export const LINK_TAG_NAME = 'a'
+export const LINK_CLASS = 'internal_link'
 
 export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos', 'alle']
 
@@ -199,7 +200,7 @@ const wrapLinksFromText = async (text, doc, apiUrl) => {
   wrappedLink.href = PAGE.CONTENT(contentId)
   wrappedLink.textContent = contentTitle
   wrappedLink.title = match[0]
-  wrappedLink.style = 'background-color: whitesmoke;'
+  wrappedLink.className = LINK_CLASS
   fragment.appendChild(wrappedLink)
   const linkEndIndex = match.index + match[0].length
   fragment.appendChild(await wrapLinksFromText(text.substring(linkEndIndex), doc, apiUrl))
