@@ -22,7 +22,7 @@ attrs==21.2.0
     #   jsonschema
 babel==2.9.1
     # via tracim-backend (setup.py)
-beaker==1.11.0
+beaker==1.10.1
     # via
     #   pyramid-beaker
     #   tracim-backend (setup.py)
