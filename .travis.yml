@@ -156,10 +156,21 @@ jobs:
       <<: *_backend_quick_test
       python: "3.7"
       if: commit_message !~ /(\[skip ci pytest\])/
+    - stage: quick-tests
+      name: "Python: 3.8"
+      <<: *_backend_quick_test
+      python: "3.8"
+      if: commit_message !~ /(\[skip ci pytest\])/
+    - stage: quick-tests
+      name: "Python: 3.9"
+      <<: *_backend_quick_test
+      python: "3.9"
+      if: commit_message !~ /(\[skip ci pytest\])/
 
     # INFO - G.M - 2019-04-25 - Stage: Backend ###
     - stage: backend
       <<: *_backend_test
+      name: "Backend: Sqlite"
       env:
         - DB=sqlite
         - COVERAGE=1
@@ -170,16 +181,31 @@ jobs:
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
+      name: "Backend: Sqlite 3.9"
+      python: "3.9"
+      env:
+        - DB=sqlite
+        - COVERAGE=1
+      after_success:
+        - cd $TRAVIS_BUILD_DIR
+        - cat .coverage
+        - coveralls
+      if: commit_message !~ /(\[skip ci pytest\])/
+    - stage: backend
+      <<: *_backend_test
+      name: "Backend: Postgresql"
       env:
         - DB=postgresql
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
+      name: "Backend: Postgresql MySQL 8"
       env:
         - DB=mysql
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
+      name: "Backend: Postgresql MariaDB"
       env:
         - DB=mariadb
       if: commit_message !~ /(\[skip ci pytest\])/
