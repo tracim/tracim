@@ -7,8 +7,8 @@ import elasticsearch_dsl as es_dsl
 import pytest
 import transaction
 
-from tracim_backend.lib.rq import RqQueueName
-from tracim_backend.lib.rq import get_rq_queue2
+from tracim_backend.lib.rq import get_redis_connection
+from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.rq.worker import DatabaseWorker
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESContentIndexer
 from tracim_backend.lib.search.elasticsearch_search.elasticsearch_search import ESUserIndexer
@@ -218,8 +218,9 @@ class TestElasticSearchContentIndexer:
         test_context_without_plugins.dbsession.flush()
         indexer.index_contents([content], test_context_without_plugins)
         transaction.commit()
-        queue = get_rq_queue2(
-            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        queue = get_rq_queue(
+            get_redis_connection(test_context_without_plugins.app_config),
+            test_context_without_plugins.app_config.SEARCH__ELASTICSEARCH__ASYNC_QUEUE_NAME,
         )
         assert not queue.is_empty()
         job = queue.jobs[0]
@@ -259,8 +260,9 @@ class TestElasticSearchContentIndexer:
         test_context_without_plugins.dbsession.flush()
         indexer.index_contents([content], test_context_without_plugins)
         transaction.commit()
-        queue = get_rq_queue2(
-            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        queue = get_rq_queue(
+            get_redis_connection(test_context_without_plugins.app_config),
+            test_context_without_plugins.app_config.SEARCH__ELASTICSEARCH__ASYNC_QUEUE_NAME,
         )
         assert not queue.is_empty()
         job = queue.jobs[0]
@@ -322,8 +324,9 @@ class TestElasticSearchUserIndexer:
         test_context_without_plugins.dbsession.flush()
         indexer.index_user(user, test_context_without_plugins)
         transaction.commit()
-        queue = get_rq_queue2(
-            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        queue = get_rq_queue(
+            get_redis_connection(test_context_without_plugins.app_config),
+            test_context_without_plugins.app_config.SEARCH__ELASTICSEARCH__ASYNC_QUEUE_NAME,
         )
         assert not queue.is_empty()
         job = queue.jobs[0]
@@ -384,8 +387,9 @@ class TestElasticSearchWorkspaceIndexer:
         test_context_without_plugins.dbsession.flush()
         indexer.index_workspace(workspace, test_context_without_plugins)
         transaction.commit()
-        queue = get_rq_queue2(
-            test_context_without_plugins.app_config, RqQueueName.ELASTICSEARCH_INDEXER
+        queue = get_rq_queue(
+            get_redis_connection(test_context_without_plugins.app_config),
+            test_context_without_plugins.app_config.SEARCH__ELASTICSEARCH__ASYNC_QUEUE_NAME,
         )
         assert not queue.is_empty()
         job = queue.jobs[0]

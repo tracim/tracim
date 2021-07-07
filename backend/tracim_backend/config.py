@@ -893,6 +893,9 @@ class CFG(object):
         self.SEARCH__ELASTICSEARCH__REQUEST_TIMEOUT = int(
             self.get_raw_config("search.elasticsearch.request_timeout", "60")
         )
+        self.SEARCH__ELASTICSEARCH__ASYNC_QUEUE_NAME = self.get_raw_config(
+            "search.elasticsearch.async_queue_name", "elasticsearch_indexer"
+        )
 
     def _load_jobs_config(self) -> None:
         self.JOBS__PROCESSING_MODE = self.get_raw_config("jobs.processing_mode", "sync").upper()

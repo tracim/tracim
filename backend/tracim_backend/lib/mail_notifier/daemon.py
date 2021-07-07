@@ -6,7 +6,6 @@ from rq.dummy import do_nothing
 from rq.worker import StopRequested
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.daemon import FakeDaemon
@@ -38,13 +37,13 @@ class MailSenderDaemon(FakeDaemon):
             return
         self.worker._stop_requested = True
         redis_connection = get_redis_connection(self.config)
-        queue = get_rq_queue(redis_connection, RqQueueName.MAIL_SENDER)
+        queue = get_rq_queue(redis_connection, self.config.EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME)
         queue.enqueue(do_nothing)
 
     def run(self) -> None:
 
         with RQConnection(get_redis_connection(self.config)):
-            self.worker = RQWorker([RqQueueName.MAIL_SENDER.value])
+            self.worker = RQWorker([self.config.EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME])
             self.worker.work(burst=self.burst)
 
 

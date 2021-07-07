@@ -6,7 +6,6 @@ import typing
 from tracim_backend.config import CFG
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
 from tracim_backend.lib.mail_notifier.utils import SmtpEncryption
-from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
@@ -35,7 +34,7 @@ def send_email_through(
             "mail_notifier daemon".format(message["To"]),
         )
         redis_connection = get_redis_connection(config)
-        queue = get_rq_queue(redis_connection, RqQueueName.MAIL_SENDER)
+        queue = get_rq_queue(redis_connection, config.EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME)
         queue.enqueue(sendmail_callable, message)
     else:
         raise NotImplementedError(

@@ -28,7 +28,6 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.fixtures.users import Test as FixtureTest
-from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.lib.utils.logger import logger
@@ -159,10 +158,16 @@ def pushpin_base_url(
 
 
 @pytest.fixture
-def rq_database_worker(config_uri, app_config):
+def rq_database_worker(config_uri, app_config: CFG):
+    queue_names = [
+        app_config.LIVE_MESSAGES__ASYNC_QUEUE_NAME,
+        app_config.EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME,
+        app_config.SEARCH__ELASTICSEARCH__ASYNC_QUEUE_NAME,
+    ]
+
     def empty_event_queues():
         redis_connection = get_redis_connection(app_config)
-        for queue_name in RqQueueName:
+        for queue_name in queue_names:
             queue = get_rq_queue(redis_connection, queue_name)
             queue.delete()
 
@@ -170,29 +175,11 @@ def rq_database_worker(config_uri, app_config):
     worker_env = os.environ.copy()
     worker_env["TRACIM_CONF_PATH"] = "{}#rq_worker_test".format(config_uri)
     base_args = ["rq", "worker", "-q", "-w", "tracim_backend.lib.rq.worker.DatabaseWorker"]
-    queue_name_args = [queue_name.value for queue_name in RqQueueName]
-    worker_process = subprocess.Popen(base_args + queue_name_args, env=worker_env,)
+    worker_process = subprocess.Popen(base_args + queue_names, env=worker_env,)
 
     yield worker_process
     empty_event_queues()
     quit_process(worker_process, "rq worker")
-
-@pytest.fixture
-def tracim_webserver(
-    settings, config_uri, engine, session_factory
-) -> typing.Generator[subprocess.Popen, None, None]:
-    config_filepath = pathlib.Path(__file__).parent.parent.parent / config_uri
-
-    # NOTE SG 2020-12-22: those ports MUST be the same as the ones defined in
-    # backend/pushpin_config/routes file
-    start = 6543
-    WORKER_ID_PORTS = {
-        "master": start,
-    }
-    WORKER_ID_PORTS.update({"gw{}".format(index): start + index + 1 for index in range(8)})
-=======
-    quit_process(worker_process, "rq worker")
-    queue.delete()
 
 
 @pytest.fixture
@@ -230,6 +217,7 @@ def tracim_webserver(
     penv = os.environ.copy()
     penv["TRACIM_DEBUG"] = "1"
     listen = "localhost:{}".format(port)
+    config_filepath = pathlib.Path(__file__).parent.parent.parent / config_uri
     process = subprocess.Popen(
         [
             "pserve",
@@ -238,15 +226,15 @@ def tracim_webserver(
             "tracim_webserver",
             "--server-name",
             "tracim_webserver",
-            "http_listen={}".format(listen)
+            "http_listen={}".format(listen),
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=penv,
     )
     wait_for_url("http://{}".format(listen))
-    yield server_process
-    quit_process(server_process, "tracim webserver")
+    yield process
+    quit_process(process, "tracim webserver")
     session_factory.close_all()
     DeclarativeBase.metadata.drop_all(engine)
 
@@ -271,7 +259,7 @@ def config_section(request) -> str:
 @pytest.fixture
 def settings(config_uri, config_section, sqlalchemy_url, tmp_path, unique_name):
     _settings = plaster.get_settings(config_uri, config_section)
-    _settings["here"] = str(tmp_path)
+    _settings["here"] = os.path.dirname(os.path.abspath(TEST_CONFIG_FILE_PATH))
     for path_setting in (
         "uploaded_files.storage.local.storage_path",
         "caldav.radicale.storage.filesystem_folder",
@@ -289,7 +277,7 @@ def settings(config_uri, config_section, sqlalchemy_url, tmp_path, unique_name):
     os.environ["TRACIM_SQLALCHEMY__URL"] = sqlalchemy_url
     _settings["sqlalchemy.url"] = sqlalchemy_url
 
-    _settings["search.elasticsearch.index_alias"] = unique_name
+    _settings["search.elasticsearch.index_alias_prefix"] = unique_name
 
     live_messages_queue_name = "{}__event".format(unique_name)
     os.environ["TRACIM_LIVE_MESSAGES__ASYNC_QUEUE_NAME"] = live_messages_queue_name
@@ -298,7 +286,6 @@ def settings(config_uri, config_section, sqlalchemy_url, tmp_path, unique_name):
     mail_sender_queue_name = "{}__mail_sender".format(unique_name)
     os.environ["TRACIM_EMAIL__NOTIFICATION__ASYNC_QUEUE_NAME"] = mail_sender_queue_name
     _settings["email.notification.async_queue_name"] = mail_sender_queue_name
-
     return _settings
 
 
@@ -319,7 +306,7 @@ def app_config(settings) -> CFG:
 
 
 @pytest.fixture
-def web_testapp(settings, hapic, session):
+def we_testapp(settings, hapic, session):
     DepotManager._clear()
     app = web({}, **settings)
     return TestApp(app)
@@ -415,8 +402,8 @@ def session(request, engine, session_factory, app_config, test_logger, test_cont
             transaction.abort()
             raise e
     yield context.dbsession
-
-    context.dbsession.rollback()
+    if context.dbsession.is_active:
+        context.dbsession.rollback()
     context.dbsession.close_all()
     transaction.abort()
     DeclarativeBase.metadata.drop_all(engine)
