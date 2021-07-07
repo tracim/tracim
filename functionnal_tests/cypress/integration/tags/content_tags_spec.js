@@ -2,9 +2,6 @@ import { PAGES } from '../../support/urls_commands'
 
 
 describe('Create tags', () => {
-  let htmlContentId
-  let workspaceId
-
   const fileTitle = 'FileForSwitch'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
@@ -17,7 +14,7 @@ describe('Create tags', () => {
   describe('Tags', () => {
     for (const testedContent of ['file', 'note']) {
       describe(`in a ${testedContent}`, () => {
-        before(() => {
+        beforeEach(() => {
           cy.resetDB()
           cy.setupBaseDB()
           cy.loginAs('administrators')
@@ -29,6 +26,7 @@ describe('Create tags', () => {
                   params: { workspaceId, contentType: 'file', contentId }
                 })
               })
+              cy.get('[data-cy=popin_right_part_tag]').click()
             } else {
               cy.createHtmlDocument('A note', workspaceId).then(({ content_id: contentId }) => {
                 cy.visitPage({
@@ -38,46 +36,41 @@ describe('Create tags', () => {
                 cy.waitForTinyMCELoaded()
                 cy.typeInTinyMCE('Bar')
                 cy.get('[data-cy=editionmode__button__submit]').click()
+                cy.get('[data-cy=popin_right_part_tag]').click()
               })
             }
           })
         })
 
-        after(cy.cancelXHR)
+        afterEach(function () {
+          cy.cancelXHR()
+        })
 
-        it('should create two tags', () => {
-          cy.loginAs('administrators')
-          cy.get('[data-cy=popin_right_part_tag]').click()
-          cy.get('[data-cy=tag_list__btn_add]').click()
+        it('should create and add two tags', () => {
           cy.get('[data-cy=add_tag]').type('TagOne')
           cy.get('[data-cy=validate_tag]').click()
+          cy.contains('.flashmessage__container__content__text__paragraph', 'Your tag has been added')
           cy.get('[data-cy=tag_list] li').should('have.length', 1)
           cy.get('[data-cy=add_tag]').type('TagTwo')
           cy.get('[data-cy=validate_tag]').click()
+          cy.contains('.flashmessage__container__content__text__paragraph', 'Your tag has been added')
           cy.get('[data-cy=tag_list] li').should('have.length', 2)
         })
 
         it('should list the tags', () => {
-          cy.loginAs('administrators')
+          cy.get('[data-cy=add_tag]').type('TagOne')
+          cy.get('[data-cy=validate_tag]').click()
+          cy.contains('.flashmessage__container__content__text__paragraph', 'Your tag has been added')
+          cy.get('[data-cy=tag_list] li').should('have.length', 1)
+          cy.get('[data-cy=add_tag]').type('TagTwo')
+          cy.get('[data-cy=validate_tag]').click()
+          cy.contains('.flashmessage__container__content__text__paragraph', 'Your tag has been added')
+          cy.get('[data-cy=tag_list] li').should('have.length', 2)
           // switch tab and come back
           cy.get('[data-cy=popin_right_part_timeline]').click()
           cy.get('[data-cy=popin_right_part_tag]').click()
           cy.get('[data-cy=tag_list] li').should('have.length', 2)
           cy.get('[data-cy=tag_list]').first().should('contain', 'TagTwo')
-        })
-
-        it('clicking on a tag should uncheck it', () => {
-          cy.loginAs('administrators')
-          cy.get('[data-cy=tag_list] .checkboxCustom__checked').should('have.length', 2)
-          cy.get('[data-cy=tag_list] .checkboxCustom__checked').first().click()
-          cy.get('[data-cy=tag_list] .checkboxCustom__checked').should('have.length', 1)
-        })
-
-        it('clicking on an unchecked tag should check it', () => {
-          cy.loginAs('administrators')
-          cy.get('[data-cy=tag_list] li').should('have.length', 2)
-          cy.get('[data-cy=tag_list] li label').first().click()
-          cy.get('[data-cy=tag_list] li').should('have.length', 2)
         })
       })
     }
