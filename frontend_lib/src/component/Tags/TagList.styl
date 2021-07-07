@@ -1,7 +1,6 @@
 @import '../../css/Variable.styl'
 
 .tagList
-  flex-direction column
   width calc(100% - 65px)
   height 100%
   overflow auto
@@ -16,35 +15,20 @@
     text-align center
     &__item
       display inline-flex
-      padding 10px 15px
+      padding 12px
       background-color mediumGrey
-      margin 10px 0px
       border-radius 7px 3px 3px 7px
-      width 85%
-      & i
-        padding 5px
-        margin-right 5px
+      width 90%
       &__info
         text-overflow ellipsis
         overflow hidden
         flex 1
-        margin-bottom 0
         position relative
-        right 30px
+        right 20px
         text-align left
-        padding-left 5px
-      &__delete
-        font-size fontSizeMedium
-        color darkGrey
-        cursor pointer
-      &__last
-        border none
-      .checkboxCustom
-        margin-bottom 0
-        align-self center
       &__circle
-        width 15px
-        height 15px
+        width 10px
+        height 10px
         background-color veryLightGrey
         border-radius 10px
         align-self center
@@ -56,55 +40,23 @@
         transform rotate(58deg)
         position relative
         left 16px
-        top 14px
+        top 17px
         color mediumGrey
-  &__btnAdd
-    border-bottom 2px solid grey
-    padding 15px
-    &__button
-      display flex
-      align-items center
-      border-color grey
-      color grey
-      &__plus
-        display flex
-        justify-content center
-        align-items center
-        margin-right 20px
-        border-width 2px
-        border-style dashed
-        border-radius 50%
-        width 50px
-        height 50px
-        cursor pointer
-        &__icon
-          font-size fontSizeTitle
-      &__text
-        font-size 18px
-        cursor pointer
 
-// MEDIAQUERIES
-
-@media (min-width: min-md) and (max-width: max-md)
-
+@media (max-width: max-lg)
   .tagList
     width 100%
 
-@media (min-width: min-sm) and (max-width: max-sm)
-  .tagList
-    margin 50px 0
-    width 100%
+@media (max-width: min-sm) and (max-width: max-sm)
+.tagList
+  &__list
+    &__item
+      width 85%
 
 @media (max-width: max-xs)
   .tagList
-    margin 50px 0
-    width 100%
-    &__title
-      margin-left 10px
     &__wrapper
       height auto
     &__list
       height auto
-      overflow-Y visible
-    &__btnAdd
-      border-top 0
+      overflow-Y auto

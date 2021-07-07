@@ -202,14 +202,12 @@ NewTagForm.propTypes = {
   contentId: PropTypes.number.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentTagList: PropTypes.array,
-  onClickCloseAddTagBtn: PropTypes.func,
   spaceTaglist: PropTypes.array,
   userRoleIdInWorkspace: PropTypes.number
 }
 
 NewTagForm.defaultProps = {
   contentTagList: [],
-  onClickCloseAddTagBtn: () => { },
   spaceTaglist: [],
   userRoleIdInWorkspace: ROLE.reader.id
 }

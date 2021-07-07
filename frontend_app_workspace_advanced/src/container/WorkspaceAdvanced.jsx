@@ -233,7 +233,9 @@ export class WorkspaceAdvanced extends React.Component {
     console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
-    this.loadSubscriptionRequestList()
+    if (this.state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) {
+      this.loadSubscriptionRequestList()
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {

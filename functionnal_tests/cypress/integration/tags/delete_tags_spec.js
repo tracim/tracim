@@ -37,6 +37,24 @@ describe('Create tags', () => {
     cy.cancelXHR()
   })
 
+  describe('in a space', () => {
+    it('should create the tag and show it in content autocomplete', () => {
+      cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
+      cy.contains('.userstatus__role__text', 'Space manager')
+      cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })
+        .find('.dashboard__workspace__detail__buttons .iconbutton')
+        .click()
+      cy.get('[data-cy=popin_right_part_tag').click()
+
+      cy.get(inputClass).type(tagCreatedByWorkspace)
+      cy.get(validateButtonClass).click()
+
+      cy.get('[data-cy=IconButton_DeleteTagFromSpace]').click()
+      cy.get('[data-cy=confirm_popup__button_confirm]').click()
+      cy.get(itemListClass).should('have.length', 0)
+    })
+  })
+
   describe('in a content', () => {
     it('should delete the tag and show it in space settings', () => {
       cy.visitPage({
@@ -50,24 +68,6 @@ describe('Create tags', () => {
 
       cy.get('[data-cy=IconButton_DeleteTagFromSpace]').click()
       cy.get(itemListClass).should('have.length', 0)
-    })
-  })
-
-  describe('in a space', () => {
-    it('should create the tag and show it in content autocomplete', () => {
-      cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
-      cy.contains('.userstatus__role__text', 'Space manager')
-      cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
-      cy.get('[data-cy=popin_right_part_tag').click()
-
-      cy.get(inputClass).type(tagCreatedByWorkspace)
-      cy.get(validateButtonClass).click()
-
-      cy.get('[data-cy=IconButton_DeleteTagFromSpace]').first().click()
-      cy.get('[data-cy=confirm_popup__button_confirm]').click()
-      cy.get(itemListClass).should('have.length', 1)
     })
   })
 })
