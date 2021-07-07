@@ -49,7 +49,6 @@ describe('<Timeline />', () => {
     workspaceId: 1,
     translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
     translationTargetLanguageCode: 'en',
-    onChangeTargetLanguageCode: () => {},
     onChangeTranslationTargetLanguageCode: () => {}
   }
 

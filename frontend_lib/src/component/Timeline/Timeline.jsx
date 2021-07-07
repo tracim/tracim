@@ -369,8 +369,7 @@ Timeline.propTypes = {
   onClickTranslateComment: PropTypes.func.isRequired,
   onClickRestoreComment: PropTypes.func.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired,
-  onChangeTargetLanguageCode: PropTypes.func.isRequired
+  translationTargetLanguageCode: PropTypes.string.isRequired
 }
 
 Timeline.defaultProps = {

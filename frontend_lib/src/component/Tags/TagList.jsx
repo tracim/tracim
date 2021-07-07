@@ -4,7 +4,8 @@ import PropTypes from 'prop-types'
 import {
   sendGlobalFlashMessage,
   naturalCompare,
-  handleFetchResult
+  handleFetchResult,
+  ROLE
 } from '../../helper.js'
 import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -12,14 +13,14 @@ import {
 } from '../../tracimLiveMessage.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import classnames from 'classnames'
+import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
-import Icon from '../Icon/Icon.jsx'
 import {
-  getWorkspaceTagList,
-  getContentTagList,
   deleteContentTag,
-  putContentTag
+  deleteWorkspaceTag,
+  getWorkspaceTagList,
+  getContentTagList
 } from '../../action.async.js'
 
 // require('./TagList.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -30,7 +31,8 @@ class TagList extends React.Component {
 
     this.state = {
       tagList: [],
-      checkedTagIdList: []
+      spaceTagList: [],
+      workspaceTagToDeleteId: 0
     }
 
     props.registerLiveMessageHandlerList([
@@ -38,7 +40,7 @@ class TagList extends React.Component {
         entityType: TLM_ET.TAG,
         coreEntityType: TLM_CET.CREATED,
         handler: tlm => {
-          if (!this.isTlmForMyWorkspace(tlm)) return
+          if (!this.isTlmForMyWorkspace(tlm) || props.contentId) return
           this.addTag(tlm.fields.tag)
         }
       },
@@ -47,15 +49,7 @@ class TagList extends React.Component {
         coreEntityType: TLM_CET.DELETED,
         handler: tlm => {
           if (!this.isTlmForMyWorkspace(tlm)) return
-          this.removeTag(tlm.fields.tag)
-        }
-      },
-      {
-        entityType: TLM_ET.CONTENT_TAG,
-        coreEntityType: TLM_CET.CREATED,
-        handler: tlm => {
-          if (!this.isTlmForMyContent(tlm)) return
-          this.updateCheckedState(tlm.fields.tag, true)
+          this.removeTag(tlm.fields.tag.tag_id)
         }
       },
       {
@@ -63,7 +57,15 @@ class TagList extends React.Component {
         coreEntityType: TLM_CET.DELETED,
         handler: tlm => {
           if (!this.isTlmForMyContent(tlm)) return
-          this.updateCheckedState(tlm.fields.tag, false)
+          this.removeTag(tlm.fields.tag.tag_id)
+        }
+      },
+      {
+        entityType: TLM_ET.CONTENT_TAG,
+        coreEntityType: TLM_CET.CREATED,
+        handler: tlm => {
+          if (!this.isTlmForMyContent(tlm)) return
+          this.addTag(tlm.fields.tag)
         }
       }
     ])
@@ -81,26 +83,6 @@ class TagList extends React.Component {
     return hasSameWorkspace
   }
 
-  toggleChecked = tag => {
-    const { props, state } = this
-    const checked = state.checkedTagIdList.includes(tag.tag_id)
-    if (checked) {
-      deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
-    } else {
-      putContentTag(props.apiUrl, props.workspaceId, props.contentId, tag.tag_id)
-    }
-  }
-
-  updateCheckedState (tag, checked) {
-    this.setState(previousState => {
-      const checkedTagIdList = checked
-        ? [...previousState.checkedTagIdList, tag.tag_id]
-        : previousState.checkedTagIdList.filter(id => id !== tag.tag_id)
-      const tagList = previousState.tagList.sort(this.sortTagList(checkedTagIdList))
-      return { checkedTagIdList, tagList }
-    })
-  }
-
   componentDidMount () {
     this.updateTagList()
   }
@@ -115,6 +97,7 @@ class TagList extends React.Component {
 
   async updateTagList () {
     const { props } = this
+    let tagList = []
     const fetchGetWsTagList = await handleFetchResult(
       await getWorkspaceTagList(props.apiUrl, props.workspaceId)
     )
@@ -123,96 +106,88 @@ class TagList extends React.Component {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
       return
     }
+    const spaceTagList = fetchGetWsTagList.body
+    tagList = spaceTagList
 
-    const fetchGetContentTagList = await handleFetchResult(
-      await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
-    )
+    if (props.contentId) {
+      const fetchGetContentTagList = await handleFetchResult(
+        await getContentTagList(props.apiUrl, props.workspaceId, props.contentId)
+      )
 
-    if (!fetchGetContentTagList.apiResponse.ok) {
-      sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
-      return
+      if (!fetchGetContentTagList.apiResponse.ok) {
+        sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
+        return
+      }
+
+      tagList = fetchGetContentTagList.body
     }
+    this.setState({ tagList: this.sortTagList(tagList), spaceTagList })
+  }
 
-    // RJ - INFO - 2021-06-10 - sort calls sortTagList with two elements of the tag list to do the sort
-    const checkedTagIdList = fetchGetContentTagList.body.map(t => t.tag_id)
-    const tagList = fetchGetWsTagList.body.sort(this.sortTagList(checkedTagIdList))
-    this.setState({ tagList, checkedTagIdList })
+  sortTagList (tagList) {
+    const { props } = this
+    return tagList.sort((tagA, tagB) => {
+      return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
+    })
   }
 
   addTag (tag) {
     this.setState(previousState => {
       return {
-        tagList: [...previousState.tagList, tag].sort(this.sortTagList(previousState.checkedTagIdList))
+        tagList: this.sortTagList([...previousState.tagList, tag])
       }
     })
   }
 
-  removeTag (tag) {
+  removeTag (tagId) {
     this.setState(previousState => {
-      const tagList = previousState.tagList.filter(t => t.tag_id !== tag.tag_id)
-      const checkedTagIdList = previousState.checkedTagIdList.filter(id => id !== tag.tag_id)
-      return { tagList, checkedTagIdList }
+      const tagList = previousState.tagList.filter(tag => tag.tag_id !== tagId)
+      return { tagList }
     })
   }
 
-  sortTagList (checkedTagIdList) {
+  handleClickDeleteTag = async (tagId) => {
     const { props } = this
-    return (tagA, tagB) => {
-      const isTagAChecked = checkedTagIdList.includes(tagA.tag_id)
-      const isTagBChecked = checkedTagIdList.includes(tagB.tag_id)
 
-      if (!isTagAChecked && isTagBChecked) {
-        return 1
-      }
+    const fetchDeleteTag = props.contentId
+      ? await deleteContentTag(props.apiUrl, props.workspaceId, props.contentId, tagId)
+      : await deleteWorkspaceTag(props.apiUrl, props.workspaceId, tagId)
 
-      if (isTagAChecked && !isTagBChecked) {
-        return -1
-      }
-
-      return naturalCompare(tagA, tagB, props.i18n.language, 'tag_name')
+    switch (fetchDeleteTag.status) {
+      case 204:
+        sendGlobalFlashMessage(props.t('Tag removed'), 'info')
+        this.setState({ workspaceTagToDeleteId: 0 })
+        this.removeTag(tagId)
+        break
+      default: sendGlobalFlashMessage(props.t('Error while removing tag'))
     }
   }
 
   render () {
     const { props, state } = this
+    const isReadOnlyMode = props.contentId
+      ? props.userRoleIdInWorkspace < ROLE.contributor.id
+      : props.userRoleIdInWorkspace < ROLE.contentManager.id
 
     return (
       <div className='tagList' data-cy='tag_list'>
-
         <div className='tagList__header'>
           {props.t('Tags')}
         </div>
 
         <div className='tagList__wrapper'>
-          {props.displayNewTagForm
-            ? (
-              <NewTagForm
-                apiUrl={props.apiUrl}
-                workspaceId={props.workspaceId}
-                contentId={props.contentId}
-                onClickCloseAddTagBtn={props.onClickCloseAddTagBtn}
-              />
-            )
-            : (
-              <div className='tagList__btnAdd' data-cy='tag_list__btn_add' onClick={props.onClickAddTagBtn}>
-                <div className='tagList__btnAdd__button primaryColorFontHover primaryColorBorderHover'>
-                  <div className='tagList__btnAdd__button__plus'>
-                    <div className='tagList__btnAdd__button__plus__icon'>
-                      <Icon
-                        icon='fas fa-plus'
-                        title={props.t('Add a tag')}
-                      />
-                    </div>
-                  </div>
-
-                  <div className='tagList__btnAdd__button__text'>
-                    {props.t('Add a tag')}
-                  </div>
-                </div>
-              </div>
-            )}
+          {!isReadOnlyMode && (
+            <NewTagForm
+              apiUrl={props.apiUrl}
+              contentId={props.contentId}
+              contentTagList={state.tagList}
+              spaceTagList={state.spaceTagList}
+              userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+              workspaceId={props.workspaceId}
+            />
+          )}
           <ul className='tagList__list'>
-            {state.tagList.map((tag, index) =>
+            {state.tagList && state.tagList.map((tag, index) =>
               <li
                 className={classnames(
                   'tagList__list__item_wrapper',
@@ -221,15 +196,24 @@ class TagList extends React.Component {
                 key={tag.tag_id}
               >
                 <Tag
-                  checked={state.checkedTagIdList.includes(tag.tag_id)}
+                  isContent={!!props.contentId}
+                  isReadOnlyMode={isReadOnlyMode}
                   name={tag.tag_name}
-                  tagId={tag.tag_id}
-                  description={tag.description}
-                  onClickCheckbox={() => { this.toggleChecked(tag) }}
+                  onClickDeleteTag={() => props.contentId
+                    ? this.handleClickDeleteTag(tag.tag_id)
+                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })}
                 />
               </li>
             )}
           </ul>
+
+          {!!state.workspaceTagToDeleteId && (
+            <ConfirmPopup
+              confirmLabel={props.t('Delete')}
+              onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
+              onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
+            />
+          )}
         </div>
       </div>
     )
@@ -239,9 +223,13 @@ class TagList extends React.Component {
 export default translate()(TracimComponent(TagList))
 
 TagList.propTypes = {
-  onClickAddTagBtn: PropTypes.func.isRequired,
-  onChangeTag: PropTypes.func,
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  contentId: PropTypes.number.isRequired
+  contentId: PropTypes.number,
+  userRoleIdInWorkspace: PropTypes.number
+}
+
+TagList.defaultProps = {
+  contentId: 0,
+  userRoleIdInWorkspace: ROLE.reader.id
 }

@@ -78,7 +78,6 @@ export class HtmlDocument extends React.Component {
         props.t('notes'),
         props.t('Write a note')
       ],
-      displayNewTagForm: false,
       rawContentBeforeEdit: '',
       timeline: [],
       newComment: '',
@@ -476,8 +475,6 @@ export class HtmlDocument extends React.Component {
     }))
   }
 
-  handleToggleAddTagForm = () => this.setState(prev => ({ displayNewTagForm: !prev.displayNewTagForm }))
-
   handleCloseNewVersion = () => {
     globalThis.tinymce.remove('#wysiwygNewVersion')
 
@@ -867,11 +864,6 @@ export class HtmlDocument extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
-  handleClickAutoComplete = () => this.setState({
-    autoCompleteFormNewTagActive: false,
-    autoCompleteClicked: true
-  })
-
   getMenuItemList = () => {
     const { props, state } = this
     const timelineObject = {
@@ -932,11 +924,7 @@ export class HtmlDocument extends React.Component {
           apiUrl={state.config.apiUrl}
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
-          displayNewTagForm={state.displayNewTagForm}
-          onClickAddTagBtn={this.handleToggleAddTagForm}
-          onClickCloseAddTagBtn={this.handleToggleAddTagForm}
-          searchedKnownTagList={props.searchedKnownTagList}
-          onClickAutoComplete={this.handleClickAutoComplete}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
         />
       )
     }

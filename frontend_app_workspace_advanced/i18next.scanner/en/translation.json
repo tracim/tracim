@@ -6,6 +6,7 @@
   "Description": "Description",
   "Error while rejecting user": "Error while rejecting user",
   "Error while saving new default role": "Error while saving new default role",
+  "Error while saving the new version": "Error while saving the new version",
   "Add a member": "Add a member",
   "Error while loading members list": "Error while loading members list",
   "Save successful": "Save successful",
@@ -54,5 +55,6 @@
   "Publications activated": "Publications activated",
   "Publications deactivated": "Publications deactivated",
   "Error while activating publications": "Error while activating publications",
-  "Error while deactivating publications": "Error while deactivating publications"
+  "Error while deactivating publications": "Error while deactivating publications",
+  "Tags": "Tags"
 }
