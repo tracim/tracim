@@ -137,10 +137,15 @@ export class NewTagForm extends React.Component {
 
   render () {
     const { props, state } = this
-    const filterTags = props.spaceTagList
-      .filter(tag => !props.contentTagList.some(contentTag => contentTag.tag_id === tag.tag_id) && tag.tag_name.includes(state.tagName))
-      .slice(0, NUMBER_RESULTS_BY_PAGE - 1)
-    const tagExitsInSpace = props.spaceTagList.map(tag => tag.tag_name).includes(state.tagName)
+    let filterTags = []
+    let tagExitsInSpace
+
+    if (props.spaceTagList) {
+      filterTags = props.spaceTagList
+        .filter(tag => !props.contentTagList.some(contentTag => contentTag.tag_id === tag.tag_id) && tag.tag_name.includes(state.tagName))
+        .slice(0, NUMBER_RESULTS_BY_PAGE - 1)
+      tagExitsInSpace = props.spaceTagList.map(tag => tag.tag_name).includes(state.tagName)
+    }
 
     return (
       <div className='tagList__form'>
