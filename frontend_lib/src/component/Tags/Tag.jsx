@@ -2,7 +2,6 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import IconButton from '../Button/IconButton.jsx'
-import Icon from '../Icon/Icon.jsx'
 
 require('./TagList.styl')
 
@@ -10,11 +9,7 @@ export const Tag = props => {
   return (
     <div className='tagList__list__item__wrapper'>
       <div className='tagList__list__item'>
-        <Icon
-          icon='fas fa-circle'
-          color='#f0f0f0'
-          className='tagList__list__item__circle'
-        />
+        <div className='tagList__list__item__circle' />
         <label
           className='tagList__list__item__info'
           title={props.name}

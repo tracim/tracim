@@ -821,11 +821,6 @@ export class File extends React.Component {
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
-  handleClickAutoComplete = () => this.setState({
-    autoCompleteFormNewTagActive: false,
-    autoCompleteClicked: true
-  })
-
   handleClickDeleteShareLink = async shareLinkId => {
     const { props, state } = this
 
@@ -966,8 +961,6 @@ export class File extends React.Component {
           apiUrl={state.config.apiUrl}
           workspaceId={state.content.workspace_id}
           contentId={state.content.content_id}
-          searchedKnownTagList={props.searchedKnownTagList}
-          onClickAutoComplete={this.handleClickAutoComplete}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
         />
       )
