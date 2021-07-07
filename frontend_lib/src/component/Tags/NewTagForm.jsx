@@ -126,6 +126,15 @@ export class NewTagForm extends React.Component {
     } else return props.t('Create')
   }
 
+  handleKeyDown = e => {
+    if (e.key === 'Enter') this.handleClickBtnValidate()
+    if (e.key === 'Escape') {
+      this.setState({
+        autoCompleteActive: false
+      })
+    }
+  }
+
   render () {
     const { props, state } = this
     const filterTags = props.spaceTagList
@@ -148,7 +157,7 @@ export class NewTagForm extends React.Component {
             data-cy='add_tag'
             value={state.tagName}
             onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}
-            onKeyDown={this.handleClickBtnValidate}
+            onKeyDown={this.handleKeyDown}
           />
 
           {state.autoCompleteActive && state.tagName !== '' && !!props.contentId && filterTags.length > 0 && (
