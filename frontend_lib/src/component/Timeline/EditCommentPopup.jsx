@@ -68,7 +68,6 @@ export class EditCommentPopup extends React.Component {
 
         <CommentTextArea
           apiUrl={props.apiUrl}
-          disableAutocompletePosition
           id={wysiwygId}
           newComment={state.newComment}
           onChangeNewComment={this.handleChangeNewComment}

@@ -130,15 +130,16 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
 
         const getPosition = (e) => {
           const toolbarPosition = $($editor.getContainer()).find('.mce-toolbar-grp').first()
-          const selectionNode = $($editor.selection.getNode())
-          const nodePosition = selectionNode.position()
-          const nodeOffset = selectionNode.offset()
-          const nodeHeight = selectionNode.height()
+          const nodePosition = $editor.selection.getNode().getBoundingClientRect()
           const isFullscreen = $editor.getContainer().className.includes('mce-fullscreen')
+
+          const topPosition = (isFullscreen ? $editor.getContainer().offsetTop : 0) + nodePosition.top + toolbarPosition.height()
+          const AUTOCOMPLETE_HEIGHT = 280
+
           return {
-            top: (isFullscreen ? $editor.getContainer().offsetTop + nodePosition.top : nodePosition.top) + toolbarPosition.height(),
-            isSelectionToTheTop: nodePosition.top === 0,
-            selectionHeight: (nodeOffset.top * 2) + nodeHeight,
+            top: topPosition,
+            bottom: (isFullscreen ? $editor.getContainer().offsetTop : 0) + nodePosition.bottom + toolbarPosition.height(),
+            isSelectionToTheTop: topPosition < AUTOCOMPLETE_HEIGHT,
             isFullscreen
           }
         }
