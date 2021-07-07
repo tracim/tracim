@@ -91,21 +91,38 @@ class UserConnectionStateMonitor:
                 self.set_user_connection_status(user_id, UserConnectionStatus.OFFLINE)
 
     def run(self) -> None:
+        # We assume everybody is offline when starting the daemon. This is true when starting a
+        # Tracim instance, at worst Pushpin will send events to the daemon for online users so we
+        # will rapidly notice online users
         self.set_user_connection_status(user_id=None, status=UserConnectionStatus.OFFLINE)
+
         online_timeout = self.config.USER__ONLINE_TIMEOUT
+
+        # Connection to pushpin using ZMQ
         ctx = zmq.Context()
         sock = ctx.socket(zmq.SUB)
         sock.connect(self.config.LIVE_MESSAGES__STATS_ZMQ_URI)
         logger.info(self, "Connected to " + self.config.LIVE_MESSAGES__STATS_ZMQ_URI)
         sock.setsockopt(zmq.SUBSCRIBE, b"")
+
+        # We use a poller, so we can have a timeout when reading messages
         poller = zmq.Poller()
         poller.register(sock, zmq.POLLIN)
+
         while True:
+            # Let's wait messages for online_timeout seconds
             evts = poller.poll(online_timeout * 1000)
+
+            # When a message is received, or after the timeout, we mark as offline users that should
+            # be marked as offline
             self.handle_pending_offline_users(online_timeout)
+
             if not evts:
+                # No message was received
                 continue
 
+            # We parse messages the way given by the Pushpin documentation (see the info message at
+            # the top of this file)
             m_raw = sock.recv()
             mtype, mdata = m_raw.split(b" ", 1)
             if mdata[0] != ord("T"):
@@ -114,10 +131,12 @@ class UserConnectionStateMonitor:
 
             m = tnetstring.loads(mdata[1:])
 
+            # Let's check that the message is about a user channel
             channel_name = m.get(b"channel", None)
             if not channel_name:
                 continue
 
+            # If so, let's get the user id
             match = re.match("^user_([\\d]+)$", channel_name.decode())
 
             if not match:
@@ -127,6 +146,8 @@ class UserConnectionStateMonitor:
             user_id = int(match.group(1))
 
             if m.get(b"unavailable", False) or m.get(b"subscribers", 0) == 0:
+                # The user just disconnected, we will mark them as online after a delay
                 self.add_to_pending_offline_users(user_id)
             else:
+                # The user is online
                 self.set_user_connection_status(user_id, UserConnectionStatus.ONLINE)
