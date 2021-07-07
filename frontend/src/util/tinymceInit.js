@@ -134,11 +134,12 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
           const isFullscreen = $editor.getContainer().className.includes('mce-fullscreen')
 
           const topPosition = (isFullscreen ? $editor.getContainer().offsetTop : 0) + nodePosition.top + toolbarPosition.height()
+          const AUTOCOMPLETE_HEIGHT = 280
 
           return {
             top: topPosition,
             bottom: (isFullscreen ? $editor.getContainer().offsetTop : 0) + nodePosition.bottom + toolbarPosition.height(),
-            isSelectionToTheTop: topPosition < 280, // INFO - GB - 2021-07-06 - 280px is the autocomplete height
+            isSelectionToTheTop: topPosition < AUTOCOMPLETE_HEIGHT,
             isFullscreen
           }
         }
