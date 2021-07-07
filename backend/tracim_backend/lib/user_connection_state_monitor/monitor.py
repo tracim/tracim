@@ -95,10 +95,8 @@ class UserConnectionStateMonitor:
         online_timeout = self.config.USER__ONLINE_TIMEOUT
         ctx = zmq.Context()
         sock = ctx.socket(zmq.SUB)
-        logger.debug(
-            self, "Connecting to the ZeroMQ URL " + self.config.LIVE_MESSAGES__STATS_ZMQ_URI
-        )
         sock.connect(self.config.LIVE_MESSAGES__STATS_ZMQ_URI)
+        logger.info(self, "Connected to " + self.config.LIVE_MESSAGES__STATS_ZMQ_URI)
         sock.setsockopt(zmq.SUBSCRIBE, b"")
         poller = zmq.Poller()
         poller.register(sock, zmq.POLLIN)
@@ -106,18 +104,15 @@ class UserConnectionStateMonitor:
             evts = poller.poll(online_timeout * 1000)
             self.handle_pending_offline_users(online_timeout)
             if not evts:
-                print("NO EVTS")
                 continue
 
             m_raw = sock.recv()
             mtype, mdata = m_raw.split(b" ", 1)
             if mdata[0] != ord("T"):
-                logger.debug(self, "Unsupported format ", mdata[0])
+                logger.warning(self, "Unsupported format ", mdata[0])
                 continue
 
             m = tnetstring.loads(mdata[1:])
-
-            print("EVTS:", m)
 
             channel_name = m.get(b"channel", None)
             if not channel_name:

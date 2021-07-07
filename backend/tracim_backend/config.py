@@ -157,11 +157,11 @@ class CFG(object):
         # with object in some context
         self.settings = settings.copy()
         self.config_info = []  # type: typing.List[ConfigParam]
-        logger.debug(self, "CONFIG_PROCESS:1: load enabled apps")
+        logger.debug(self, "CONFIG_PROCESS:1: Loading enabled apps")
         self.load_enabled_apps()
-        logger.debug(self, "CONFIG_PROCESS:3: load config from settings")
+        logger.debug(self, "CONFIG_PROCESS:3: Loading config from settings")
         self.load_config()
-        logger.debug(self, "CONFIG_PROCESS:4: check validity of config given")
+        logger.debug(self, "CONFIG_PROCESS:4: Checking the validity of the given config")
         self._check_consistency()
         self.check_config_validity()
         logger.debug(self, "CONFIG_PROCESS:5: End of config process")
