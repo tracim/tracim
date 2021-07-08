@@ -1,3 +1,4 @@
+import enum
 import json
 import threading
 import typing
@@ -11,27 +12,33 @@ from tracim_backend.config import CFG
 from tracim_backend.models.event import Message
 from tracim_backend.views.core_api.schemas import LiveMessageSchema
 
-TLM_EVENT_NAME = "message"
-STREAM_OPENED_EVENT_NAME = "stream-opened"
-KEEPALIVE_EVENT_NAME = "keepalive"
+
+class ServerSideEventType(str, enum.Enum):
+    TLM = "message"
+    STREAM_OPEN = "stream-open"
+    KEEPALIVE = "keep-alive"
+    STREAM_ERROR = "stream-error"
 
 
-class JsonServerSideEvent(object):
+class JsonServerSideEvent:
     """Create a ServerSideEvent with single-line json as data"""
 
     def __init__(
-        self, data: typing.Dict[str, typing.Any], event: typing.Optional[str] = None,
-    ):
+        self,
+        event_type: ServerSideEventType,
+        data: typing.Optional[typing.Dict[str, typing.Any]] = None,
+        comment: str = "",
+    ) -> None:
+        self.event_type = event_type
         self.data = data
-        self.event = event
+        self.comment = comment
 
-    def __str__(self):
-        buffer = ""
-        if self.event:
-            buffer += "event: {}\n".format(self.event)
-        buffer += "data: {}\n".format(json.dumps(self.data))
-        buffer += "\n"
-        return buffer
+    def __str__(self) -> str:
+        comment_string = ":{}\n".format(self.comment) if self.comment else ""
+        data_string = json.dumps(self.data) if self.data is not None else ""
+        return "{}event: {}\ndata: {}\n\n".format(
+            comment_string, self.event_type.value, data_string
+        )
 
 
 # NOTE S.G - 2020-08-06 - only one GripPubControl instance as it is:
@@ -65,6 +72,12 @@ class LiveMessagesLib(object):
     def message_as_dict(cls, message: Message):
         return cls._message_schema.dump(message).data
 
+    @classmethod
+    def get_server_side_event_string(
+        cls, event_type: ServerSideEventType, data: typing.Any, comment: str = ""
+    ) -> str:
+        return str(JsonServerSideEvent(event_type=event_type, data=data, comment=comment))
+
     @staticmethod
     def user_grip_channel(user_id: int) -> str:
         return "user_{}".format(user_id)
@@ -83,6 +96,6 @@ class LiveMessagesLib(object):
         assert _grip_pub_control
         _grip_pub_control.publish_http_stream(
             channel_name,
-            str(JsonServerSideEvent(data=message_as_dict, event=TLM_EVENT_NAME)),
+            str(JsonServerSideEvent(data=message_as_dict, event_type=ServerSideEventType.TLM)),
             blocking=self._blocking_publish,
         )

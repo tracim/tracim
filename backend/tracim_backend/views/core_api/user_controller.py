@@ -23,6 +23,7 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyOnlineUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimValidationFailed
@@ -40,6 +41,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.lib.core.live_messages import ServerSideEventType
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import DEFAULT_AVATAR_SIZE
 from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
@@ -51,6 +53,7 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import knows_candidate_user
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
@@ -830,10 +833,40 @@ class UserController(Controller):
         Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
         """
-        stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
-            str(request.candidate_user.user_id)
+
+        headers = [
+            # content type for SSE
+            ("Content-Type", "text/event-stream"),
+            # do not cache the events
+            ("Cache-Control", "no-cache"),
+        ]
+
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
+        try:
+            user_api.check_maximum_online_users()
+        except TooManyOnlineUsersError as exc:
+            message = str(exc)
+            logger.warning(self, message)
+            error = {
+                "code": exc.error_code.value,
+                "message": message,
+            }
+            response_body = LiveMessagesLib.get_server_side_event_string(
+                ServerSideEventType.STREAM_ERROR, data=error, comment="Too many online users"
+            )
+            return Response(
+                headerlist=headers, charset="utf-8", status_code=200, body=response_body
+            )
+
+        response_body = LiveMessagesLib.get_server_side_event_string(
+            event_type=ServerSideEventType.STREAM_OPEN,
+            data=None,
+            comment="Tracim Live Messages for user {}".format(request.candidate_user.user_id),
+        )
         after_event_id = hapic_data.query["after_event_id"]  # type: int
         if after_event_id:
             app_config = request.registry.settings["CFG"]  # type: CFG
@@ -842,7 +875,7 @@ class UserController(Controller):
                 request.candidate_user.user_id, after_event_id=after_event_id
             )  # type: typing.List[Message]
 
-            stream_opened_event += "".join(
+            response_body += "".join(
                 [
                     "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
                     for message in messages
@@ -851,21 +884,25 @@ class UserController(Controller):
 
         escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
         user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
-        headers = [
-            # Here we ask push pin to keep the connection open
-            ("Grip-Hold", "stream"),
-            # and register this connection on the given channel
-            # multiple channels subscription is possible
-            ("Grip-Channel", user_channel_name),
-            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keepalive_event)),
-            # content type for SSE
-            ("Content-Type", "text/event-stream"),
-            # do not cache the events
-            ("Cache-Control", "no-cache"),
-        ]
-        return Response(
-            headerlist=headers, charset="utf-8", status_code=200, body=stream_opened_event
+        headers.extend(
+            (
+                # Here we ask push pin to keep the connection open
+                ("Grip-Hold", "stream"),
+                # and register this connection on the given channel
+                # multiple channels subscription is possible
+                ("Grip-Channel", user_channel_name),
+                (
+                    "Grip-Keep-Alive",
+                    "{}; format=cstring; timeout=30".format(escaped_keepalive_event),
+                ),
+                # content type for SSE
+                ("Content-Type", "text/event-stream"),
+                # do not cache the events
+                ("Cache-Control", "no-cache"),
+            )
         )
+
+        return Response(headerlist=headers, charset="utf-8", status_code=200, body=response_body)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)

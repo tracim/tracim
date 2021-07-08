@@ -77,6 +77,7 @@ class ConfigModel(object):
         translation_service__target_languages: List[Dict[str, str]],
         user__self_registration__enabled: bool,
         ui__spaces__creation__parent_space_choice__visible: bool,
+        limitation__maximum_online_users_message: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -95,6 +96,7 @@ class ConfigModel(object):
         self.ui__spaces__creation__parent_space_choice__visible = (
             ui__spaces__creation__parent_space_choice__visible
         )
+        self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
 
 
 class ErrorCodeModel(object):

@@ -120,6 +120,7 @@ if [ ! -d /var/tracim/logs ]; then
     touch /var/tracim/logs/apache2-access.log
     touch /var/tracim/logs/apache2-error.log
     touch /var/tracim/logs/mail_notifier.log
+    touch /var/tracim/logs/user_connection_state_monitor.log
     touch /var/tracim/logs/rq_worker.log
     touch /var/tracim/logs/supervisord.log
     touch /var/tracim/logs/redis/redis-server.log

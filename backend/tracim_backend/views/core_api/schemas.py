@@ -1882,6 +1882,7 @@ class ConfigSchema(marshmallow.Schema):
     )
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
+    limitation__maximum_online_users_message = marshmallow.fields.String()
 
 
 class ConditionFileSchema(marshmallow.Schema):

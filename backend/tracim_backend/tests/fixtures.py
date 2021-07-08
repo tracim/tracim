@@ -96,10 +96,12 @@ def rq_database_worker(config_uri, app_config):
 
 @pytest.fixture
 def tracim_webserver(
-    settings, config_uri, engine, session_factory, config_section
+    settings, config_uri, engine, session_factory
 ) -> typing.Generator[subprocess.Popen, None, None]:
     config_filepath = pathlib.Path(__file__).parent.parent.parent / config_uri
     try:
+        penv = os.environ.copy()
+        penv["TRACIM_DEBUG"] = "1"
         process = subprocess.Popen(
             [
                 "pserve",
@@ -111,6 +113,7 @@ def tracim_webserver(
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            env=penv,
         )
         try:
             # INFO 2021/06/22 - SG - wait to see if pserve executes properly

@@ -68,6 +68,7 @@ class SystemApi(object):
             translation_service__target_languages=self._config.TRANSLATION_SERVICE__TARGET_LANGUAGES,
             user__self_registration__enabled=self._config.USER__SELF_REGISTRATION__ENABLED,
             ui__spaces__creation__parent_space_choice__visible=self._config.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE,
+            limitation__maximum_online_users_message=self._config.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

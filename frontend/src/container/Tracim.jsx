@@ -25,9 +25,12 @@ import {
   PROFILE,
   NUMBER_RESULTS_BY_PAGE,
   serialize,
+  CardPopup,
+  IconButton,
   TracimComponent,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
+  LIVE_MESSAGE_ERROR_CODE,
   PAGE
 } from 'tracim_frontend_lib'
 import {
@@ -40,6 +43,7 @@ import {
   WELCOME_ELEMENT_ID
 } from '../util/helper.js'
 import {
+  logoutUser,
   getAppList,
   getConfig,
   getContentTypeList,
@@ -118,6 +122,11 @@ export class Tracim extends React.Component {
     ])
   }
 
+  handleClickLogout = async () => {
+    await this.props.dispatch(logoutUser(this.props.history))
+    this.setState({ tooManyUsers: false })
+  }
+
   handleRedirect = data => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.REDIRECT, data)
     this.props.history.push(data.url)
@@ -145,7 +154,8 @@ export class Tracim extends React.Component {
 
   handleTlmStatusChanged = (data) => {
     console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.TRACIM_LIVE_MESSAGE_STATUS_CHANGED, data)
-    const { status } = data
+    const { status, code } = data
+
     if (status === LIVE_MESSAGE_STATUS.OPENED || status === LIVE_MESSAGE_STATUS.CLOSED) {
       globalThis.clearTimeout(this.connectionErrorDisplayTimeoutId)
       this.connectionErrorDisplayTimeoutId = 0
@@ -153,6 +163,8 @@ export class Tracim extends React.Component {
       if (this.state.displayConnectionError) {
         this.setState({ displayConnectionError: false })
       }
+    } else if (status === LIVE_MESSAGE_STATUS.ERROR && code === LIVE_MESSAGE_ERROR_CODE.TOO_MANY_ONLINE_USERS) {
+      this.setState({ tooManyUsers: true })
     } else if (!this.connectionErrorDisplayTimeoutId) {
       this.connectionErrorDisplayTimeoutId = globalThis.setTimeout(
         this.displayConnectionError,
@@ -575,6 +587,46 @@ export class Tracim extends React.Component {
           <div id='appFeatureContainer' />
           <div id='popupCreateContentContainer' />
         </div>
+        {state.tooManyUsers && (
+          <div className='tracim__pageBlock'>
+            <CardPopup hideCloseBtn customHeaderClass='bg-danger'>
+              <div className='tracim__pageBlock__cardPopupContent'>
+                <div className='tracim__pageBlock__cardPopupContent__message'>
+                  {props.t('You have reached the authorised number of simultaneous users. Please contact your administrator.')}
+                  <div
+                    className='tracim__pageBlock__cardPopupContent__customMessage'
+                    dangerouslySetInnerHTML={{ __html: props.system.config.limitation__maximum_online_users_message }}
+                  />
+                </div>
+                <div className='tracim__pageBlock__cardPopupContent__buttons'>
+                  <IconButton
+                    icon='fas fa-sign-out-alt'
+                    text={props.t('Log out')}
+                    title={props.t('Log out')}
+                    type='button'
+                    intent='secondary'
+                    mode='dark'
+                    disabled={false}
+                    onClick={this.handleClickLogout}
+                    dataCy='tracim__pageBlock__logout'
+                  />
+                  &nbsp;
+                  <IconButton
+                    icon='fas fa-redo'
+                    text={props.t('Retry')}
+                    title={props.t('Retry')}
+                    type='button'
+                    intent='secondary'
+                    mode='dark'
+                    disabled={false}
+                    onClick={() => window.location.reload()}
+                    dataCy='tracim__pageBlock__retry'
+                  />
+                </div>
+              </div>
+            </CardPopup>
+          </div>
+        )}
       </div>
     )
   }

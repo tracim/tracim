@@ -19,7 +19,7 @@ class MailSenderDaemon(FakeDaemon):
     def __init__(self, config: "CFG", burst=True, *args, **kwargs):
         """
         :param config: tracim config
-        :param burst: if true, run one time, if false, run continously
+        :param burst: if true, run one time, if false, run continuously
         """
         super().__init__(*args, **kwargs)
         self.config = config
@@ -27,7 +27,7 @@ class MailSenderDaemon(FakeDaemon):
         self.burst = burst
 
     def append_thread_callback(self, callback: typing.Callable) -> None:
-        logger.warning("MailSenderDaemon not implement append_thread_callback")
+        logger.warning("MailSenderDaemon does not implement append_thread_callback")
         pass
 
     def stop(self) -> None:
