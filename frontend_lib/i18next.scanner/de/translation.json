@@ -214,5 +214,7 @@
   "Remove tag from content": "Etikett aus dem Inhalt entfernen",
   "Delete tag from space": "Etikett aus dem Bereich löschen",
   "Tag removed": "Etikett entfernt",
-  "Error while removing tag": "Fehler beim Entfernen des Etiketts"
+  "Error while removing tag": "Fehler beim Entfernen des Etiketts",
+  "This content has no associated tags yet.": "Dieser Inhalt hat noch keine zugehörigen Markierungen.",
+  "This space has no tags yet.": "Dieser Bereich hat noch keine Markierungen."
 }

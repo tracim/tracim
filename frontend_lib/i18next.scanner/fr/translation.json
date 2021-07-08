@@ -211,6 +211,8 @@
   "Remove tag from content": "Retirer l'étiquette du contenu",
   "Tag removed": "Étiquette retirée",
   "Tags": "Étiquettes",
+  "This content has no associated tags yet.": "Ce contenu n'a pas encore de étiquettes associées.",
+  "This space has no tags yet.": "Cet espace n'a pas encore d'étiquettes.",
   "This tag already exists": "Cette étiquette existe déjà",
   "Version #{{versionNumber}}": "Version n°{{versionNumber}}",
   "Your tag has been added": "Votre étiquette a été ajoutée",

@@ -211,6 +211,8 @@
   "Remove tag from content": "Remove tag from content",
   "Tag removed": "Tag removed",
   "Tags": "Tags",
+  "This content has no associated tags yet.": "This content has no associated tags yet.",
+  "This space has no tags yet.": "This space has no tags yet.",
   "This tag already exists": "This tag already exists",
   "Version #{{versionNumber}}": "Version #{{versionNumber}}",
   "Your tag has been added": "Your tag has been added",

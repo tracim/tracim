@@ -207,6 +207,14 @@ class TagList extends React.Component {
             )}
           </ul>
 
+          {state.tagList && state.tagList.length === 0 && (
+            <span className='tagList__list'>
+              {props.contentId
+                ? props.t('This content has no associated tags yet.')
+                : props.t('This space has no tags yet.')}
+            </span>
+          )}
+
           {!!state.workspaceTagToDeleteId && (
             <ConfirmPopup
               confirmLabel={props.t('Delete')}
