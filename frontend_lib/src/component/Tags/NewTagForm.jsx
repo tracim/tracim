@@ -152,8 +152,9 @@ export class NewTagForm extends React.Component {
 
     if (props.spaceTagList) {
       filterTags = props.spaceTagList
-        .filter(tag => !props.contentTagList.some(contentTag => contentTag.tag_id === tag.tag_id) && tag.tag_name.includes(state.tagName))
-        .slice(0, NUMBER_RESULTS_BY_PAGE - 1)
+        .filter(tag => !props.contentTagList.some(contentTag =>
+          contentTag.tag_id === tag.tag_id) && tag.tag_name.toUpperCase().includes(state.tagName.toUpperCase()
+        )).slice(0, NUMBER_RESULTS_BY_PAGE - 1)
       tagExitsInSpace = props.spaceTagList.map(tag => tag.tag_name).includes(state.tagName)
     }
 
