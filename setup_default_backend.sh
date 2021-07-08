@@ -178,7 +178,9 @@ cd "$DEFAULTDIR/backend"  || exit 1
 if [ -z "$IGNORE_APT_INSTALL" ]; then
     install_backend_system_dep
 fi
-setup_pyenv
+if [ -z "$DONT_GENERATE_PYENV" ]; then
+    setup_pyenv
+fi
 install_backend_python_packages
 setup_config_file
 create_require_dirs
