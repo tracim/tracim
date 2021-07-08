@@ -147,6 +147,17 @@ export const tinymceAutoCompleteHandleClickItem = (autoCompleteItem, setState) =
 
   sel.anchorNode.textContent = textBegin + textEnd
   sel.collapse(sel.anchorNode, textBegin.length)
+
+  // NOTE - RJ - 2021-07-08 - focusing the editor lets TinyMCE execute its cleanups
+  // routine. If we don't do this and the user saves the document right after an
+  // autocompletion and the user picked the autocompletion item by clicking on it
+  // (as opposed to pressing the enter key), the editor never receives the focus
+  // and do its cleanups after removing TinyMCE and this happens asynchronously.
+  // This modifies the document and saves the result in the draft stored in
+  // local storage after posting the document on the API. Then, we tell the
+  // user that they have a pending draft, which is confusing.
+  globalThis.tinymce.activeEditor.focus()
+
   setState({ isAutoCompleteActivated: false })
 }
 
