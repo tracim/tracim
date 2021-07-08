@@ -12,13 +12,16 @@ import sqlalchemy as sa
 revision = "94893551ad7c"
 down_revision = "e733c295afb4"
 
+enum = sa.Enum("ONLINE", "OFFLINE", name="userconnectionstatus")
+
 
 def upgrade():
     with op.batch_alter_table("users") as bop:
+        enum.create(op.get_bind(), checkfirst=False)
         bop.add_column(
             sa.Column(
                 "connection_status",
-                sa.Enum("ONLINE", "OFFLINE", name="userconnectionstatus"),
+                enum,
                 nullable=False,
                 default="OFFLINE",
                 server_default="OFFLINE",
@@ -29,3 +32,4 @@ def upgrade():
 def downgrade():
     with op.batch_alter_table("users") as bop:
         bop.drop_column("connection_status")
+    enum.drop(op.get_bind(), checkfirst=False)
