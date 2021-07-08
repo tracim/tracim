@@ -802,13 +802,13 @@ export const htmlToText = (domParser, htmlString) => domParser.parseFromString(h
 
 export const addExternalLinksIcons = (htmlString) => {
   const doc = getDocumentFromHTMLString(htmlString)
-  const locationUrl = new URL(location.toString())
+  const locationUrl = new URL(window.location.toString())
   for (const link of doc.getElementsByTagName('a')) {
     const url = new URL(link.href)
     if (url.origin === locationUrl.origin) continue
     const icon = doc.createElement('i')
     icon.className = 'fas fa-external-link-alt'
-    icon.style = 'margin-inline-start :5px;'
+    icon.style = 'margin-inline-start: 5px;'
     link.appendChild(icon)
   }
   return doc.body.innerHTML
