@@ -9,13 +9,11 @@ import {
   USER,
   USER_DISCONNECTED
 } from '../../../src/action-creator.sync.js'
-import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   restoreHistoryCallBack,
   isFunction
 } from '../../hocMock/helper'
 import { shallow } from 'enzyme'
-import { mockPostUserLogout204 } from '../../apiMock'
 
 describe('In <Header />', () => {
   const setUserDisconnectedCallBack = sinon.spy()
