@@ -165,19 +165,26 @@ class EnumField(marshmallow.fields.Field):
     def _serialize(
         self, value: typing.Union[Enum, str], *arg: typing.Any, **kwargs: typing.Any
     ) -> typing.Any:
+        # INFO - G.M - 2021-07-08 -
+        # EnumField support both Enum and valid string corresponding to enum
+        # Both are serialized enum value.
         if isinstance(value, Enum):
             if value not in (elem for elem in self._enum):
                 raise marshmallow.ValidationError(
                     "'{}' is not a valid value for this field".format(value)
                 )
             return value.value
-        else:
+        elif isinstance(value, str):
             try:
                 return self._enum(value).value
             except Exception:
                 raise marshmallow.ValidationError(
                     "'{}' is not a valid value for this field".format(value)
                 )
+        else:
+            raise marshmallow.ValidationError(
+                "'{}' is not a valid type for this field".format(value)
+            )
 
 
 class RestrictedStringField(marshmallow.fields.String):
