@@ -6,6 +6,6 @@ pytest-services==2.0.1
 pytest-timeout==1.4.2
 responses==0.10.11
 mock==3.0.5
-Pillow==5.3.0
+# Pillow is already install with preview-generator
 freezegun==0.3.12
 sseclient-py==1.7
