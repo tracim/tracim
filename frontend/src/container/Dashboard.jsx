@@ -17,7 +17,8 @@ import {
   buildHeadTitle,
   PAGE,
   removeAtInUsername,
-  SPACE_TYPE
+  SPACE_TYPE,
+  addExternalLinksIcons
 } from 'tracim_frontend_lib'
 import {
   getWorkspaceDetail,
@@ -507,7 +508,7 @@ export class Dashboard extends React.Component {
       hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
-    const description = props.curWs.description.trim()
+    const description = addExternalLinksIcons(props.curWs.description.trim())
 
     return (
       <div className='tracim__content fullWidthFullHeight'>

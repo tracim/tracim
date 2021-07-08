@@ -14,7 +14,8 @@ import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigati
 import {
   ROLE,
   CONTENT_TYPE,
-  formatAbsoluteDate
+  formatAbsoluteDate,
+  addExternalLinksIcons
 } from '../../helper.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'
@@ -136,7 +137,7 @@ const Comment = props => {
                     )
                     : (
                       <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>
-                        {props.text}
+                        {addExternalLinksIcons(props.text)}
                       </HTMLContent>
                     )
                   )}

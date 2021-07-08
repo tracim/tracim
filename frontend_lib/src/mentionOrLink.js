@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import i18n from './i18n.js'
-import { PAGE } from './helper.js'
+import {
+  PAGE,
+  getDocumentFromHTMLString
+} from './helper.js'
+import { getContent } from './action.async.js'
 export const MENTION_ID_PREFIX = 'mention-'
 export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
@@ -17,8 +21,9 @@ export const GROUP_MENTION_LIST = [
 ]
 export const LINK_REGEX = /#([0-9]+)(?=\s|$)/
 export const LINK_TAG_NAME = 'a'
+export const LINK_CLASS = 'internal_link primaryColorFont'
 
-export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos']
+export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos', 'alle']
 
 const wrapMentionsFromText = (text, doc, invalidMentionList) => {
   // takes a text as string, and returns a document fragment
@@ -102,16 +107,6 @@ export const wrapMentionsInSpanTags = (node, doc, invalidMentionList) => {
   return resultingNode
 }
 
-const getDocumentFromHTMLString = (htmlString) => {
-  const doc = new DOMParser().parseFromString(htmlString, 'text/html')
-
-  if (doc.documentElement.tagName === 'parsererror') {
-    throw new Error('Cannot parse string: ' + doc.documentElement.textContent)
-  }
-
-  return doc
-}
-
 const getMentions = function * (node) {
   for (const candidate of node.querySelectorAll(MENTION_TAG_NAME)) {
     if (isAWrappedMention(candidate)) {
@@ -163,10 +158,10 @@ export const getMatchingGroupMentionList = (query) => {
   return matching
 }
 
-export const handleLinksBeforeSave = (htmlString) => {
+export const handleLinksBeforeSave = async (htmlString, apiUrl) => {
   try {
     const doc = getDocumentFromHTMLString(htmlString)
-    const bodyWithWrappedLinks = wrapLinksInATags(doc.body, doc)
+    const bodyWithWrappedLinks = await wrapLinksInATags(doc.body, doc, apiUrl)
     return bodyWithWrappedLinks.innerHTML
   } catch (e) {
     console.error('Error while parsing links', e)
@@ -174,40 +169,41 @@ export const handleLinksBeforeSave = (htmlString) => {
   }
 }
 
-export const wrapLinksInATags = (node, doc) => {
+export const wrapLinksInATags = async (node, doc, apiUrl) => {
   const resultingNode = node.cloneNode(false)
 
   for (const child of node.childNodes) {
     resultingNode.appendChild(
       (child.nodeName === '#text')
-        ? wrapLinksFromText(child.textContent, doc)
-        : wrapLinksInATags(child, doc)
+        ? await wrapLinksFromText(child.textContent, doc, apiUrl)
+        : await wrapLinksInATags(child, doc, apiUrl)
     )
   }
 
   return resultingNode
 }
 
-const wrapLinksFromText = (text, doc) => {
+const wrapLinksFromText = async (text, doc, apiUrl) => {
   // takes a text as string, and returns a document fragment
   // containing this text, with tags added for the link
   const match = text.match(LINK_REGEX)
   if (!match || (match.index > 0 && (text[match.index - 1].trim()))) {
     return doc.createTextNode(text)
   }
-
   const contentId = match[0].substring(1)
+  const fetchContent = await getContent(apiUrl, contentId)
+  const contentTitle = fetchContent.status === 200 ? (await fetchContent.json()).label : ''
   const fragment = doc.createDocumentFragment()
-
   fragment.appendChild(doc.createTextNode(text.substring(0, match.index)))
 
   const wrappedLink = doc.createElement(LINK_TAG_NAME)
   wrappedLink.href = PAGE.CONTENT(contentId)
-  wrappedLink.textContent = match[0]
+  wrappedLink.textContent = contentTitle
+  wrappedLink.title = match[0]
+  wrappedLink.className = LINK_CLASS
   fragment.appendChild(wrappedLink)
-
   const linkEndIndex = match.index + match[0].length
-  fragment.appendChild(wrapLinksFromText(text.substring(linkEndIndex), doc))
+  fragment.appendChild(await wrapLinksFromText(text.substring(linkEndIndex), doc, apiUrl))
 
   return fragment
 }

@@ -62,8 +62,10 @@ import {
   getCoverBaseUrl,
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
-  htmlToText
+  htmlToText,
+  addExternalLinksIcons
 } from './helper.js'
+
 import {
   addClassToMentionsOfUser,
   getInvalidMentionList,
@@ -71,6 +73,7 @@ import {
   handleLinksBeforeSave,
   handleMentionsBeforeSave
 } from './mentionOrLink.js'
+
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -396,6 +399,7 @@ export {
   putMyselfFileRead,
   getContentComment,
   getFileChildContent,
+  addExternalLinksIcons,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,

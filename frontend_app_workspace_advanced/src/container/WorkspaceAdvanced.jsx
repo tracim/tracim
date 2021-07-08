@@ -330,7 +330,7 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     let newDescription
     try {
-      newDescription = handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent())
+      newDescription = await handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent(), state.config.apiUrl)
       // RJ - NOTE - 2021-06-24
       // We are using tinymce's getContent() method and not
       // state.content.description here because it has an outdated
