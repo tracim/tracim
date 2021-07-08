@@ -127,7 +127,17 @@ export class NewTagForm extends React.Component {
   }
 
   handleKeyDown = e => {
-    if (e.key === 'Enter') this.handleClickBtnValidate()
+    const { props, state } = this
+    const tagExitsInSpace = props.spaceTagList
+      ? props.spaceTagList.map(tag => tag.tag_name).includes(state.tagName)
+      : []
+    if (
+      e.key === 'Enter' && !(
+        !state.tagName ||
+        (!props.contentId && tagExitsInSpace) ||
+        (props.contentId && !tagExitsInSpace && props.userRoleIdInWorkspace < ROLE.contentManager.id)
+      )
+    ) this.handleClickBtnValidate()
     if (e.key === 'Escape') {
       this.setState({
         autoCompleteActive: false
