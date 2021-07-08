@@ -9,16 +9,16 @@
     padding 10px
     font-size fontSizeMedium
   &__list
-    margin 0
+    margin 10px
     padding 0
     list-style none
     text-align center
     &__item
-      display inline-flex
+      display flex
       padding 12px
       background-color mediumGrey
       border-radius 7px 3px 3px 7px
-      width 90%
+      flex 1
       &__info
         text-overflow ellipsis
         overflow hidden
@@ -34,14 +34,23 @@
         align-self center
         margin auto 5px
         position relative
+        position relative
         right 30px
+        display inline-block
       &__triangle
         font-size 46px
         transform rotate(58deg)
+        transform-origin top
+        margin-right -19px
         position relative
         left 16px
         top 17px
         color mediumGrey
+      &__wrapper
+        position relative
+        display flex
+        flex-direction row
+        margin-left 12px
 
 @media (max-width: max-lg)
   .tagList
