@@ -3,7 +3,7 @@
 ### New Features
 
 For end users:
- - Internal links. Contents a user can access can be linked to in comments and notes. An autocompletion popup
+ - Links to Tracim contents. A user can now create a link to other Tracim contents in comments and notes. An autocompletion popup
    will help the user create the link as soon as they type `#` and then a word in the title of the content, or
    its id. The created link will display the title of the document, and will have a specific color showing it is
    an internal link in notes.
