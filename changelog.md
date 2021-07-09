@@ -9,7 +9,7 @@ For end users:
    an internal link in notes.
  - Tags on contents (notes and files). Tagging is done in the new tab between the area that shows the
    content and the timeline. Tags can be added and removed there. They are per space (spaces have different sets of
-   tags). Tags of aspace can be listed and managed in the space settings accessed from the dashboard.
+   tags). Tags of a space can be listed and managed in the space settings that a user can find in the dashboard.
    Readers cannot add or remove tags to contents or to space. Contributor can add/remove tags to/from contents, but
    cannot manage tags of a space. Space and content managers can manage tags of a space. Contents can be searched
    by tags when the advanced search feature is enabled.
