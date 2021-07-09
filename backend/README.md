@@ -231,7 +231,7 @@ Run the CalDAV server:
 
 ## Running the Tracim Backend Daemons
 
-Features such as async email notification and email reply system need additional daemons to work.
+Features such as async email notification and email reply system require additional daemons to work.
 
 ### Manually
 
@@ -244,17 +244,10 @@ Features such as async email notification and email reply system need additional
     python3 daemons/mail_notifier.py &
     # email fetcher (if email reply is enabled)
     python3 daemons/mail_fetcher.py &
+    # user online/offline status monitoring
+    python3 daemons/user_connection_state_monitor.py &
     # RQ worker for live messages
     rq worker -q -w tracim_backend.lib.rq.worker.DatabaseWorker event elasticsearch_indexer &
-
-#### Stop Daemons
-
-    # email notifier
-    killall python3 daemons/mail_notifier.py
-    # email fetcher
-    killall python3 daemons/mail_fetcher.py
-    # RQ worker
-    killall rq
 
 ### Using Supervisor
 
@@ -289,6 +282,16 @@ Example of `supervisord.conf`:
     autorestart=true
     environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
 
+    ; user connection status monitor (online / offline0)
+    [program:tracim_user_connection_state_monitor]
+    directory=/tracim/backend/
+    command=python3 /tracim/backend/daemons/user_connection_state_monitor.py
+    stdout_logfile=/var/tracim/logs/user_connection_state_monitor.log
+    redirect_stderr=true
+    autostart=true
+    autorestart=false
+    environment=TRACIM_CONF_PATH=/etc/tracim/development.ini
+
     ; RQ worker (if async jobs processing is enabled)
     [program:rq_database_worker]
     directory=<PATH>/tracim/backend/
@@ -298,6 +301,8 @@ Example of `supervisord.conf`:
     autostart=true
     autorestart=true
     environment=TRACIM_CONF_PATH=<PATH>/tracim/backend/development.ini
+
+A complete example of such a configuration is available in `tools_docker/Debian_Uwsgi/supervisord_tracim.conf`.
 
 Run with (supervisord.conf should be provided, see [supervisord.conf default_paths](http://supervisord.org/configuration.html):
 
