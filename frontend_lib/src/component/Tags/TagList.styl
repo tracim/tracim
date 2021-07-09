@@ -20,25 +20,26 @@
       border-radius 7px 3px 3px 7px
       flex 1
       overflow hidden
+
+      // NOTE - RJ - 2021-07-09 positioning puts the item above the triangle
+      // allowing the label to be selectable from the start
+      position relative
+
       &__info
         text-overflow ellipsis
         overflow hidden
         flex 1
-        position relative
-        right 20px
         text-align left
+        white-space pre
       &__circle
         width 10px
         height 10px
+        top calc(50% - 5px)
+        position absolute
         background-color veryLightGrey
         border-radius 10px
-        align-self center
-        margin auto 5px
-        position relative
-        position relative
-        right 30px
-        display inline-block
-      &__triangle
+        left 10px
+      &__triangleIcon
         font-size 46px
         transform rotate(58deg)
         transform-origin top
