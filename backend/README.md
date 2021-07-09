@@ -284,8 +284,8 @@ Example of `supervisord.conf`:
 
     ; user connection status monitor (online / offline0)
     [program:tracim_user_connection_state_monitor]
-    directory=/tracim/backend/
-    command=python3 /tracim/backend/daemons/user_connection_state_monitor.py
+    directory=<PATH>/tracim/backend/
+    command=python3 <PATH>/tracim/backend/daemons/user_connection_state_monitor.py
     stdout_logfile=/var/tracim/logs/user_connection_state_monitor.log
     redirect_stderr=true
     autostart=true
