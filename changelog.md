@@ -1,7 +1,99 @@
+# 3.9.0 / 2021-07-09
+
+### New Features
+
+For end users:
+ - Internal links. Contents a user can access can be linked to in comments and notes. An autocompletion popup
+   will help the user create the link as soon as they type `#` and then a word in the title of the content, or
+   its id. The created link will display the title of the document, and will have a specific color showing it is
+   an internal link in notes.
+ - Tags on contents (notes and files). Tagging is done in the new tab between the area that shows the
+   content and the timeline. Tags can be added and removed there. They are per space (spaces have different sets of
+   tags). Tags of aspace can be listed and managed in the space settings accessed from the dashboard.
+   Readers cannot add or remove tags to contents or to space. Contributor can add/remove tags to/from contents, but
+   cannot manage tags of a space. Space and content managers can manage tags of a space. Contents can be searched
+   by tags when the advanced search feature is enabled.
+ - Revamped app appearance (size and headers). Formerly, apps showing notes, topics and files didn't take the whole
+   space vertically and horizontally. They also had both a header and a toolbar. The header had a distinctive color.
+   The space and screen estate is now better used. Apps now take as much space as possible, both vertically and
+   horizontally, to put the focus on the content. The header and the toolbar have been merged and the specific color
+   in the header is now only used for the icon.
+ - The valitity time of password reset link is given in the reset password email sent when users forget their passwords
+ - The autocompletion popup for mentions (and now, for links) is now correctly positionned even when the text being
+   edited is scrolled.
+
+For administrators:
+ - More robust previews. Some office documents take a lot of time and resources to preview. There is now a timeout for
+   previews of documents generated using LibreOffice to limit issues that can arise from this problem. For this reason,
+   Previews of spreadsheets are now disabled by default.
+ - Easier database creation (feature for administrators): when creating a database with `tracimcli db init`,
+   the command now automatically stamps `head`, which, until now, required to run a dedicated command. It is now
+   a bit easier to install a new database when installing Tracim.
+ - Migration to MinIO (feature for administrators). Instances using standard storage can now be easily be migrated
+   to MinIO using the new command `tracimcli db migrate-storage`.
+ - Limitation of simultaneous online users: administrators can now limit how many simultaneous users are using a Tracim
+   instance. If the limit is reached, user loading tracim will be shown an error message telling them to contact
+   the administrator. A custom message can be configured. This feature is disabled by default.
+ - Restriction of support to specific kinds of document in Collabora Online. The support can be restricted to a
+   limited set of extensions. This feature is disabled by default.
+
+### Fixed Issues
+ - Frontend: [#4692](https://github.com/tracim/tracim/issues/4692),
+[#4746](https://github.com/tracim/tracim/issues/4746),
+[#4766](https://github.com/tracim/tracim/issues/4766),
+[#4702](https://github.com/tracim/tracim/issues/4702),
+[#4701](https://github.com/tracim/tracim/issues/4701),
+[#4711](https://github.com/tracim/tracim/issues/4711),
+[#2594](https://github.com/tracim/tracim/issues/2594),
+[#4694](https://github.com/tracim/tracim/issues/4694),
+[#4709](https://github.com/tracim/tracim/issues/4709),
+[#4686](https://github.com/tracim/tracim/issues/4686),
+[#4692](https://github.com/tracim/tracim/issues/4692),
+[#4708](https://github.com/tracim/tracim/issues/4708),
+[#4707](https://github.com/tracim/tracim/issues/4707),
+[#4730](https://github.com/tracim/tracim/issues/4730)
+
+ - Backend: [#4751](https://github.com/tracim/tracim/issues/4751),
+[#3559](https://github.com/tracim/tracim/issues/3559),
+[#4552](https://github.com/tracim/tracim/issues/4552),
+[#4713](https://github.com/tracim/tracim/issues/4713),
+[#4087](https://github.com/tracim/tracim/issues/4087),
+[#4685](https://github.com/tracim/tracim/issues/4685),
+[#4404](https://github.com/tracim/tracim/issues/4404)
+
+ - Backend and frontend: [#4732](https://github.com/tracim/tracim/issues/4732),
+[#4680](https://github.com/tracim/tracim/issues/4680),
+[#4703](https://github.com/tracim/tracim/issues/4703),
+[#4700](https://github.com/tracim/tracim/issues/4700),
+[#4768](https://github.com/tracim/tracim/issues/4768),
+[#4712](https://github.com/tracim/tracim/issues/4712)
+
+### Breaking/Important change
+
+- The new tags feature adds new live message types which are excluded from web notifications by default.
+  If you have customized parameter `web.notifications.excluded`, you should update it and add `tag.*,content_tag.*`.
+- The template at backend/tracim_backend/templates/mail/reset_password_body_html.mak related to the password reset
+  email has been updated to show the validity duration of the reset passwork link.
+  If you have customized this template, you may want to update it.
+- The limitation of simultaneous online users requires running an additionnal
+  daemon (`daemons/user_connection_state_monitor.py`). This is done automatically in our Docker container but you
+  need to run it manually if you run Tracim without using the Docker container.
+  If you are running Pushpin using the our docker compose configuration, be sure to set the configuration parameter
+  `live_messages.stats_zmq_uri` accordingly in `develop.ini`.
+- Support for tags has been added to the advanced search feature. If you use it, you will need to rebuild the
+  Elastic search index by running the following commands in the backend folder:
+
+  ```sh
+  tracimcli index-drop
+  tracimcli index-create
+  tracimcli index-populate
+  ```
+
+
 # 3.8.2 / 2021-05-27
 
 ### New Features
- 
+
 - Add links to the public profile in the favorites page
 - Configuration parameter (in server config) allows disabling the space parent input when creating a space
 
