@@ -25,7 +25,7 @@ For end users:
 For administrators:
  - More robust previews. Some office documents take a lot of time and resources to preview. There is now a timeout for
    previews of documents generated using LibreOffice to limit issues that can arise from this problem. For this reason,
-   Previews of spreadsheets are now disabled by default.
+   previews of spreadsheets are now disabled by default.
  - Easier database creation (feature for administrators): when creating a database with `tracimcli db init`,
    the command now automatically stamps `head`, which, until now, required to run a dedicated command. It is now
    a bit easier to install a new database when installing Tracim.
