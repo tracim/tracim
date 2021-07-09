@@ -18,7 +18,7 @@ For end users:
    The space and screen estate is now better used. Apps now take as much space as possible, both vertically and
    horizontally, to put the focus on the content. The header and the toolbar have been merged and the specific color
    in the header is now only used for the icon.
- - The valitity time of password reset link is given in the reset password email sent when users forget their passwords
+ - The valitity time of the password reset link is given in the reset password email sent when users forget their passwords
  - The autocompletion popup for mentions (and now, for links) is now correctly positionned even when the text being
    edited is scrolled.
 
