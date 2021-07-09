@@ -5,6 +5,9 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
+from tracim_backend.models.reaction import Reaction
+from tracim_backend.models.tag import Tag
+from tracim_backend.models.tag import TagOnContent
 
 
 class DatabaseCrudHookSpec:
@@ -13,6 +16,10 @@ class DatabaseCrudHookSpec:
     - Content
     - Workspace
     - UserRoleInWorkspace
+    - WorkspaceSubscription
+    - Reaction
+    - Tag
+    - TagOnContent
     """
 
     @hookspec
@@ -89,4 +96,36 @@ class DatabaseCrudHookSpec:
     def on_workspace_subscription_deleted(
         self, subscription: WorkspaceSubscription, context: TracimContext
     ) -> None:
+        ...
+
+    @hookspec
+    def on_reaction_created(self, reaction: Reaction, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_reaction_modified(self, reaction: Reaction, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_reaction_deleted(self, reaction: Reaction, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_tag_created(self, tag: Tag, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_tag_modified(self, tag: Tag, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_tag_deleted(self, tag: Tag, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_content_tag_created(self, content_tag: TagOnContent, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_content_tag_deleted(self, content_tag: TagOnContent, context: TracimContext) -> None:
         ...

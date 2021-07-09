@@ -77,6 +77,7 @@ class ConfigModel(object):
         translation_service__target_languages: List[Dict[str, str]],
         user__self_registration__enabled: bool,
         ui__spaces__creation__parent_space_choice__visible: bool,
+        limitation__maximum_online_users_message: str,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -95,6 +96,7 @@ class ConfigModel(object):
         self.ui__spaces__creation__parent_space_choice__visible = (
             ui__spaces__creation__parent_space_choice__visible
         )
+        self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
 
 
 class ErrorCodeModel(object):
@@ -463,6 +465,17 @@ class ReactionPath(object):
         self.reaction_id = reaction_id
 
 
+class TagPath(object):
+    """
+    Paths params with workspace id and content_id and tag_id model
+    """
+
+    def __init__(self, workspace_id: int, tag_id: int, content_id: Optional[int] = None) -> None:
+        self.workspace_id = workspace_id
+        self.content_id = content_id
+        self.tag_id = tag_id
+
+
 class CommentPathFilename(object):
     """
     Paths params with workspace id and content_id and comment_id model
@@ -478,7 +491,7 @@ class CommentPathFilename(object):
 
 class KnownMembersQuery(object):
     """
-    Autocomplete query model
+    Member autocomplete query model
     """
 
     def __init__(
@@ -493,6 +506,16 @@ class KnownMembersQuery(object):
         self.exclude_user_ids = string_to_list(exclude_user_ids, ",", int)
         self.exclude_workspace_ids = string_to_list(exclude_workspace_ids, ",", int)
         self.include_workspace_ids = string_to_list(include_workspace_ids, ",", int)
+        self.limit = limit
+
+
+class KnownContentsQuery(object):
+    """
+    Content autocomplete query model
+    """
+
+    def __init__(self, acp: str, limit: int = None,) -> None:
+        self.acp = acp
         self.limit = limit
 
 
@@ -568,12 +591,6 @@ class ContentFilter(object):
         self.sort = sort or ContentSortOrder.LABEL_ASC
         self.page_token = page_token
         self.count = count
-
-
-class ActiveContentFilter(object):
-    def __init__(self, limit: int = None, before_content_id: datetime = None) -> None:
-        self.limit = limit
-        self.before_content_id = before_content_id
 
 
 class ContentIdsQuery(object):
@@ -696,6 +713,16 @@ class ReactionCreation(object):
 
     def __init__(self, value: str) -> None:
         self.value = value
+
+
+class TagCreation(object):
+    """
+    tag creation model
+    """
+
+    def __init__(self, tag_name: Optional[str] = None, tag_id: Optional[int] = None) -> None:
+        self.tag_name = tag_name
+        self.tag_id = tag_id
 
 
 class SetContentStatus(object):

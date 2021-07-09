@@ -1,4 +1,6 @@
 export const CUSTOM_EVENT = {
+  HIDE_SIDEBAR: 'hideSidebar',
+  TRACIM_LIVE_MESSAGE_ERROR: 'TracimLiveMessageError',
   TRACIM_LIVE_MESSAGE_STATUS_CHANGED: 'TracimLiveMessageStatusChanged',
   TRACIM_LIVE_MESSAGE: 'TracimLiveMessage',
   ADD_FLASH_MSG: 'addFlashMsg',
@@ -23,6 +25,7 @@ export const CUSTOM_EVENT = {
   SET_HEAD_TITLE: 'setHeadTitle',
   SHOW_APP: type => `${type}_showApp`,
   SHOW_CREATE_WORKSPACE_POPUP: 'showCreateWorkspacePopup',
+  SHOW_SIDEBAR: 'showSidebar',
   UNMOUNT_APP: 'unmount_app',
   UNMOUNT_APP_FEATURE: 'unmount_appFeature',
   USER_CONNECTED: 'userConnected',

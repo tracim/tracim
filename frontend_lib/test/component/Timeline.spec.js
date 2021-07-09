@@ -46,7 +46,10 @@ describe('<Timeline />', () => {
     availableStatusList: [],
     registerCustomEventHandlerList: () => {},
     t: key => key,
-    workspaceId: 1
+    workspaceId: 1,
+    translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
+    translationTargetLanguageCode: 'en',
+    onChangeTranslationTargetLanguageCode: () => {}
   }
 
   const TimelineWithHOC = withRouterMock(Timeline)

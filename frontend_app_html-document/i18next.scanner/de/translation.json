@@ -29,5 +29,6 @@
   "The content has been modified by {{author}}": "Der Inhalt wurde von {{author}} geändert",
   "Error while saving the user configuration": "Fehler beim Speichern der Benutzerkonfiguration",
   "Your text contains mentions that do not match any member of this space:": "Ihr Text enthält Erwähnungen, die mit keinem Mitglied dieses Bereichs übereinstimmen:",
-  "Validate anyway": "Trotzdem validieren"
+  "Validate anyway": "Trotzdem validieren",
+  "Tags": "Markierungen"
 }

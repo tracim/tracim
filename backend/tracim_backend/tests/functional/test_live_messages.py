@@ -1,15 +1,32 @@
+import contextlib
 import json
+import os
+import subprocess
+import sys
+import typing
 
 import pytest
 import requests
 import sseclient
 import transaction
 
+from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+
+
+def expect_line_containing(text: bytes, file) -> None:
+    """
+    Returns when a line containing text in the given file is found
+    """
+    while True:
+        line = file.readline()
+        if text in line:
+            return
 
 
 def html_document(
@@ -74,6 +91,20 @@ def small_html_document_c(workspace_api_factory, content_api_factory, session) -
     return small_html_document(workspace_api_factory, content_api_factory, session, "C")
 
 
+@pytest.fixture
+def connection_monitor_process():
+    backend_path = os.path.dirname(__file__) + "/../../../"
+    env = {"TRACIM_CONF_PATH": backend_path + "tests_config_user_status_connection_monitor.ini"}
+    env.update(os.environ)
+    p = subprocess.Popen(
+        [sys.executable, backend_path + "daemons/user_connection_state_monitor.py"],
+        env=env,
+        stderr=subprocess.PIPE,
+    )
+    yield p
+    p.terminate()
+
+
 def put_document(doc):
     update_user_request = requests.put(
         "http://localhost:7999/api/workspaces/{}/html-documents/{}/status".format(
@@ -104,6 +135,31 @@ def one_thread(content_api_factory, content_type_list, workspace_api_factory, se
         )
     transaction.commit()
     return test_thread
+
+
+@contextlib.contextmanager
+def messages_stream_client(
+    user_id: int = 1,
+    login: str = "admin@admin.admin",
+    password: typing.Optional[str] = "admin@admin.admin",
+    after_event_id: int = 0,
+    skip_first_event: bool = True,
+) -> typing.Generator[typing.Iterable, None, None]:
+    headers = {"Accept": "text/event-stream"}
+    query = "?after_event_id={}".format(after_event_id) if after_event_id else ""
+    response = requests.get(
+        "http://localhost:7999/api/users/{}/live_messages{}".format(user_id, query),
+        auth=(login, password),
+        stream=True,
+        headers=headers,
+    )
+    assert response.status_code == 200, response.json()
+    client = sseclient.SSEClient(response)
+    client_events = client.events()
+    if skip_first_event:
+        next(client_events)
+    yield client_events
+    response.close()
 
 
 @pytest.mark.timeout(30)
@@ -140,49 +196,89 @@ class TestLiveMessages(object):
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__nominal_case(
         self, pushpin, app_config
     ):
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-        # INFO - G.M - 2020-06-29 - Skip first event
-        next(client_events)
-        LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
-        event1 = next(client_events)
-        response.close()
-        assert json.loads(event1.data) == {"test_message": "example"}
-        assert event1.event == "message"
+        with messages_stream_client() as client_events:
+            LiveMessagesLib(config=app_config).publish_dict("user_1", {"test_message": "example"})
+            event = next(client_events)
+        assert json.loads(event.data) == {"test_message": "example"}
+        assert event.event == "message"
+
+    @pytest.mark.pushpin
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__err__too_many_online_users(
+        self,
+        pushpin,
+        app_config: CFG,
+        bob_user: User,
+        admin_user: User,
+        session,
+        connection_monitor_process,
+    ):
+        # NOTE - RJ - 2021-07-07
+        # This test does the following:
+        # - run the user connection state monitor daemon using config tests_config_user_status_connection_monitor.ini
+        # - waits for it to be connected to Pushpin
+        # - connects to the admin live messages
+        # - checks that it works
+        # - connects to the bob live messages
+        # - checks that it does not work (number of simultaneous users = 1)
+        # - disconnects from the admin live messages
+        # - connects to the bob live messages
+        # - checks that it works
+
+        expect_line_containing(b"Connected to ", connection_monitor_process.stderr)
+        with messages_stream_client(skip_first_event=False) as client_events:
+            event = next(client_events)
+            assert event.event == "stream-open"
+            expect_line_containing(
+                b"Set connection status of user %d to online" % admin_user.user_id,
+                connection_monitor_process.stderr,
+            )
+            with messages_stream_client(
+                user_id=bob_user.user_id,
+                login=bob_user.email,
+                password="password",
+                skip_first_event=False,
+            ) as bob_events:
+                bob_event = next(bob_events)
+                assert bob_event.event == "stream-error"
+                assert json.loads(bob_event.data) == {
+                    "code": ErrorCode.TOO_MANY_ONLINE_USERS.value,
+                    "message": "Too many users online (1/1)",
+                }
+
+                with pytest.raises(StopIteration):
+                    next(bob_events)
+
+            client_events.close()
+
+            expect_line_containing(
+                b"Set connection status of user %d to offline" % admin_user.user_id,
+                connection_monitor_process.stderr,
+            )
+
+        with messages_stream_client(
+            user_id=bob_user.user_id,
+            login=bob_user.email,
+            password="password",
+            skip_first_event=False,
+        ) as bob_events:
+            bob_event = next(bob_events)
+            assert bob_event.event == "stream-open"
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update(
         self, pushpin, app_config
     ):
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-        # INFO - G.M - 2020-06-29 - Skip first event
-        next(client_events)
         params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        update_user_request = requests.put(
-            "http://localhost:7999/api/users/1",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            json=params,
-        )
-        assert update_user_request.status_code == 200
-        event1 = next(client_events)
-        response.close()
-        result = json.loads(event1.data)
+        with messages_stream_client() as client_events:
+            update_user_request = requests.put(
+                "http://localhost:7999/api/users/1",
+                auth=("admin@admin.admin", "admin@admin.admin"),
+                json=params,
+            )
+            assert update_user_request.status_code == 200
+            event = next(client_events)
+        result = json.loads(event.data)
         assert result["event_type"] == "user.modified"
         assert result["read"] is None
         assert result["fields"]
@@ -192,34 +288,23 @@ class TestLiveMessages(object):
         assert result["fields"]["user"]["user_id"] == 1
         assert result["fields"]["author"]
         assert result["fields"]["author"]["user_id"] == 1
-        assert event1.event == "message"
+        assert event.event == "message"
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__user_update__check_email_leaked(
         self, pushpin, app_config
     ):
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-        # INFO - G.M - 2020-06-29 - Skip first event
-        next(client_events)
-        params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        update_user_request = requests.put(
-            "http://localhost:7999/api/users/1",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            json=params,
-        )
-        assert update_user_request.status_code == 200
-        event1 = next(client_events)
-        response.close()
-        result = json.loads(event1.data)
+        with messages_stream_client() as client_events:
+            params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+            update_user_request = requests.put(
+                "http://localhost:7999/api/users/1",
+                auth=("admin@admin.admin", "admin@admin.admin"),
+                json=params,
+            )
+            assert update_user_request.status_code == 200
+            event = next(client_events)
+        result = json.loads(event.data)
         # verify no email are leaked
         assert not result["fields"]["user"].get("email")
         assert not result["fields"]["author"].get("email")
@@ -233,27 +318,16 @@ class TestLiveMessages(object):
         self, pushpin, app_config, rq_database_worker
     ):
 
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-        # INFO - G.M - 2020-06-29 - Skip first event
-        next(client_events)
-        params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
-        update_user_request = requests.put(
-            "http://localhost:7999/api/users/1",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            json=params,
-        )
-        assert update_user_request.status_code == 200
-        event1 = next(client_events)
-        response.close()
-        result = json.loads(event1.data)
+        with messages_stream_client() as client_events:
+            params = {"public_name": "updated", "timezone": "Europe/London", "lang": "en"}
+            update_user_request = requests.put(
+                "http://localhost:7999/api/users/1",
+                auth=("admin@admin.admin", "admin@admin.admin"),
+                json=params,
+            )
+            assert update_user_request.status_code == 200
+            event = next(client_events)
+        result = json.loads(event.data)
         assert result["event_type"] == "user.modified"
         assert result["read"] is None
         assert result["fields"]
@@ -263,7 +337,7 @@ class TestLiveMessages(object):
         assert result["fields"]["user"]["user_id"] == 1
         assert result["fields"]["author"]
         assert result["fields"]["author"]["user_id"] == 1
-        assert event1.event == "message"
+        assert event.event == "message"
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize(
@@ -278,36 +352,33 @@ class TestLiveMessages(object):
         one_thread,
         rq_database_worker,
     ):
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-        # INFO - G.M - 2020-06-29 - Skip first event
-        next(client_events)
-        params = {
-            "raw_content": '<p><span id="mention-foo123">@all</span>This is just an html comment!</p>'
-        }
-        post_comment = requests.post(
-            "http://localhost:7999/api/workspaces/{}/contents/{}/comments".format(
-                one_thread.workspace_id, one_thread.content_id
-            ),
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            json=params,
-        )
-        assert post_comment.status_code == 200
-        event1 = next(client_events)
-        result = json.loads(event1.data)
-        response.close()
-        assert result["event_type"] == "mention.created"
-        assert result["fields"]["mention"]
-        assert result["fields"]["author"]
-        assert result["fields"]["author"]["user_id"] == 1
-        assert event1.event == "message"
+        def assert_mention_event(event):
+            result = json.loads(event.data)
+            assert result["event_type"] == "mention.created"
+            assert result["fields"]["mention"]
+            assert result["fields"]["author"]
+            assert result["fields"]["author"]["user_id"] == 1
+            assert event.event == "message"
+
+        with messages_stream_client() as client_events:
+            params = {
+                "raw_content": '<p><span id="mention-foo123">@all</span>This is just an html comment!</p>'
+            }
+            post_comment = requests.post(
+                "http://localhost:7999/api/workspaces/{}/contents/{}/comments".format(
+                    one_thread.workspace_id, one_thread.content_id
+                ),
+                auth=("admin@admin.admin", "admin@admin.admin"),
+                json=params,
+            )
+            assert post_comment.status_code == 200
+            event = next(client_events)
+            # INFO - SG - 2021/06/23 - mention.created and content.created.comment order is not stable
+            try:
+                assert_mention_event(event)
+            except AssertionError:
+                event = next(client_events)
+                assert_mention_event(event)
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize(
@@ -322,25 +393,11 @@ class TestLiveMessages(object):
         rq_database_worker,
     ):
 
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-
-        status = put_document(big_html_document)
-        assert status == 204
-
-        # Skip first event which only signals the opening
-        next(client_events)
-
-        event1 = next(client_events)
-        result = json.loads(event1.data)
+        with messages_stream_client() as client_events:
+            status = put_document(big_html_document)
+            assert status == 204
+            event = next(client_events)
+        result = json.loads(event.data)
         assert result["event_type"] == "content.modified.html-document"
 
     @pytest.mark.pushpin
@@ -358,73 +415,79 @@ class TestLiveMessages(object):
         # the events generated by the other fixtures
         rq_database_worker,
     ):
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-
-        put_document(small_html_document_a)
-        put_document(small_html_document_b)
-
-        # Skip first event which only signals the opening
-        next(client_events)
-
-        event1 = next(client_events)
-        event2 = next(client_events)
-        response.close()
+        with messages_stream_client() as client_events:
+            put_document(small_html_document_a)
+            put_document(small_html_document_b)
+            event1 = next(client_events)
+            event2 = next(client_events)
         result1 = json.loads(event1.data)
         result2 = json.loads(event2.data)
         assert result1["fields"]["content"]["label"] == "Small document A"
         assert result2["fields"]["content"]["label"] == "Small document B"
 
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages?after_event_id={}".format(
-                result1["event_id"]
-            ),
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
+        with messages_stream_client(after_event_id=result1["event_id"]) as client_events:
+            event2 = next(client_events)
+            assert json.loads(event2.data)["fields"]["content"]["label"] == "Small document B"
+            put_document(small_html_document_c)
 
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-        next(client_events)
-        event2 = next(client_events)
-
-        put_document(small_html_document_c)
-
-        assert json.loads(event2.data)["fields"]["content"]["label"] == "Small document B"
-
-        event3 = next(client_events)
-        assert json.loads(event3.data)["fields"]["content"]["label"] == "Small document C"
+            event3 = next(client_events)
+            assert json.loads(event3.data)["fields"]["content"]["label"] == "Small document C"
 
     @pytest.mark.pushpin
     def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__disconnect(
         self, pushpin, app_config
     ):
-        headers = {"Accept": "text/event-stream"}
-        response = requests.get(
-            "http://localhost:7999/api/users/1/live_messages",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-            stream=True,
-            headers=headers,
-        )
-        client = sseclient.SSEClient(response)
-        client_events = client.events()
-        # INFO - G.M - 2020-06-29 - Skip first event
-        next(client_events)
+        with messages_stream_client() as client_events:
+            requests.post(
+                "http://localhost:7999/api/auth/logout",
+                auth=("admin@admin.admin", "admin@admin.admin"),
+            )
 
-        requests.post(
-            "http://localhost:7999/api/auth/logout",
-            auth=("admin@admin.admin", "admin@admin.admin"),
-        )
+            with pytest.raises(StopIteration):
+                next(client_events)
 
-        with pytest.raises(StopIteration):
-            next(client_events)
-        response.close()
+    @pytest.mark.pushpin
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "functional_async_live_test"}], indirect=True
+    )
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__ok__content_tag__async(
+        self, small_html_document_a: Content, pushpin, app_config, rq_database_worker
+    ):
+        params = {"tag_name": "foo"}
+        with messages_stream_client() as client_events:
+            update_user_request = requests.post(
+                "http://localhost:7999/api/workspaces/{}/contents/{}/tags".format(
+                    small_html_document_a.workspace_id, small_html_document_a.content_id
+                ),
+                auth=("admin@admin.admin", "admin@admin.admin"),
+                json=params,
+            )
+            assert update_user_request.status_code == 200
+            tag_event = next(client_events)
+            content_tag_event = next(client_events)
+        assert tag_event.event == "message"
+        result = json.loads(tag_event.data)
+        assert result["event_type"] == "tag.created"
+        assert result["read"] is None
+        assert result["fields"]
+        assert result["created"]
+        assert result["event_id"]
+        assert result["fields"]["author"]
+        assert result["fields"]["author"]["user_id"] == 1
+        assert result["fields"]["workspace"]
+        assert result["fields"]["tag"]
+        assert result["fields"]["tag"]["tag_name"] == "foo"
+
+        assert content_tag_event.event == "message"
+        result = json.loads(content_tag_event.data)
+        assert result["event_type"] == "content_tag.created"
+        assert result["read"] is None
+        assert result["fields"]
+        assert result["created"]
+        assert result["event_id"]
+        assert result["fields"]["author"]
+        assert result["fields"]["author"]["user_id"] == 1
+        assert result["fields"]["workspace"]
+        assert result["fields"]["tag"]
+        assert result["fields"]["tag"]["tag_name"] == "foo"
+        assert result["fields"]["content"]

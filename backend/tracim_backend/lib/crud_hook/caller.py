@@ -8,6 +8,8 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.reaction import Reaction
+from tracim_backend.models.tag import Tag
+from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.user_custom_properties import UserCustomProperties
 
@@ -45,6 +47,12 @@ class DatabaseCrudHookCaller:
                 )
             elif isinstance(obj, Reaction):
                 self._plugin_manager.hook.on_reaction_created(reaction=obj, context=session.context)
+            elif isinstance(obj, TagOnContent):
+                self._plugin_manager.hook.on_content_tag_created(
+                    content_tag=obj, context=session.context
+                )
+            elif isinstance(obj, Tag):
+                self._plugin_manager.hook.on_tag_created(tag=obj, context=session.context)
 
         for obj in session.dirty:
             # NOTE S.G 2020-05-08: session.dirty contains objects that do not have to be
@@ -74,6 +82,12 @@ class DatabaseCrudHookCaller:
                 self._plugin_manager.hook.on_reaction_modified(
                     reaction=obj, context=session.context
                 )
+            elif isinstance(obj, TagOnContent):
+                self._plugin_manager.hook.on_content_tag_modified(
+                    content_tag=obj, context=session.context
+                )
+            elif isinstance(obj, Tag):
+                self._plugin_manager.hook.on_tag_modified(tag=obj, context=session.context)
 
         for obj in session.deleted:
             if isinstance(obj, User):
@@ -94,3 +108,9 @@ class DatabaseCrudHookCaller:
                 )
             elif isinstance(obj, Reaction):
                 self._plugin_manager.hook.on_reaction_deleted(reaction=obj, context=session.context)
+            elif isinstance(obj, TagOnContent):
+                self._plugin_manager.hook.on_content_tag_deleted(
+                    content_tag=obj, context=session.context
+                )
+            elif isinstance(obj, Tag):
+                self._plugin_manager.hook.on_tag_deleted(tag=obj, context=session.context)

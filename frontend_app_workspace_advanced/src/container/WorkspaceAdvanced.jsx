@@ -3,6 +3,7 @@ import WorkspaceAdvancedConfiguration from '../component/WorkspaceAdvancedConfig
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  handleLinksBeforeSave,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -10,8 +11,6 @@ import {
   addAllResourceI18n,
   handleFetchResult,
   PopinFixed,
-  PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
   CUSTOM_EVENT,
@@ -21,7 +20,14 @@ import {
   getMyselfKnownMember,
   PAGE,
   SPACE_TYPE,
-  PopinFixedRightPartContent
+  PopinFixedRightPartContent,
+  ROLE,
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
+  TagList
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -46,6 +52,8 @@ import WorkspaceMembersList from '../component/WorkspaceMembersList.jsx'
 import OptionalFeatures from '../component/OptionalFeatures.jsx'
 import SpaceSubscriptionsRequests from '../component/SpaceSubscriptionsRequests.jsx'
 
+const WORKSPACE_DESCRIPTION_TEXTAREA_ID = 'workspace_advanced__description__text__textarea'
+
 export class WorkspaceAdvanced extends React.Component {
   constructor (props) {
     super(props)
@@ -55,6 +63,9 @@ export class WorkspaceAdvanced extends React.Component {
 
     this.state = {
       appName: 'workspace_advanced',
+      autoCompleteCursorPosition: 0,
+      autoCompleteItemList: [],
+      isAutoCompleteActivated: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -102,7 +113,7 @@ export class WorkspaceAdvanced extends React.Component {
   // Custom Event Handlers
   handleShowApp = data => {
     console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(this.state.config.slug), data)
-    this.props.appContentCustomEventHandlerShowApp(data.content, this.state.content, this.setState.bind(this), () => {})
+    this.props.appContentCustomEventHandlerShowApp(data.content, this.state.content, this.setState.bind(this), () => { })
   }
 
   handleHideApp = data => {
@@ -222,7 +233,9 @@ export class WorkspaceAdvanced extends React.Component {
     console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
-    this.loadSubscriptionRequestList()
+    if (this.state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) {
+      this.loadSubscriptionRequestList()
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -315,7 +328,21 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleClickValidateNewDescription = async () => {
     const { props, state } = this
-    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, state.content.description))
+    let newDescription
+    try {
+      newDescription = await handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent(), state.config.apiUrl)
+      // RJ - NOTE - 2021-06-24
+      // We are using tinymce's getContent() method and not
+      // state.content.description here because it has an outdated
+      // value after autocompleting a content.
+      // This is also what does appContentFactory after saving a new advanced comment
+      // (see saveCommentAsText in appContentFactory.js)
+      // We might want to look into it later
+    } catch (e) {
+      return Promise.reject(e.message || props.t('Error while saving the new version'))
+    }
+
+    const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, newDescription))
 
     switch (fetchPutDescription.apiResponse.status) {
       case 200: this.sendGlobalFlashMessage(props.t('Save successful', 'info')); break
@@ -502,6 +529,51 @@ export class WorkspaceAdvanced extends React.Component {
         break
       default: this.sendGlobalFlashMessage(props.t('Error while removing member'), 'warning')
     }
+  }
+
+  handleTinyMceInput = (e, position) => {
+    tinymceAutoCompleteHandleInput(
+      e,
+      this.setState.bind(this),
+      this.searchForMentionOrLinkInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
+  handleTinyMceKeyUp = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyUp(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      this.searchForMentionOrLinkInQuery
+    )
+  }
+
+  handleTinyMceKeyDown = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyDown(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      state.autoCompleteCursorPosition,
+      state.autoCompleteItemList,
+      this.searchForMentionOrLinkInQuery
+    )
+  }
+
+  handleTinyMceSelectionChange = () => {
+    tinymceAutoCompleteHandleSelectionChange(
+      this.setState.bind(this),
+      this.searchForMentionOrLinkInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewMember = async () => {
@@ -698,12 +770,33 @@ export class WorkspaceAdvanced extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-
-    if (state.content.access_type === SPACE_TYPE.onRequest.slug) {
-      return [memberlistObject, subscriptionObject, functionalitesObject]
-    } else {
-      return [memberlistObject, functionalitesObject]
+    const tagList = {
+      id: 'tag',
+      label: props.t('Tags'),
+      icon: 'fas fa-tag',
+      children: (
+        <TagList
+          apiUrl={state.config.apiUrl}
+          workspaceId={state.content.workspace_id}
+          contentId={state.content.content_id}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+        />
+      )
     }
+
+    const menuItemList = [memberlistObject]
+    const isWorkspaceManager = state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id
+    if (state.content.access_type === SPACE_TYPE.onRequest.slug && isWorkspaceManager) {
+      menuItemList.push(subscriptionObject)
+    }
+
+    if (isWorkspaceManager) {
+      menuItemList.push(functionalitesObject)
+    }
+
+    menuItemList.push(tagList)
+
+    return menuItemList
   }
 
   render () {
@@ -716,32 +809,31 @@ export class WorkspaceAdvanced extends React.Component {
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
-        <PopinFixedHeader
-          customClass={`${state.config.slug}`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
-          rawTitle={state.content.label}
+        <PopinFixedContent
           componentTitle={<div>{state.content.label}</div>}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          config={state.config}
+          content={state.content}
+          customClass={`${state.config.slug}__contentpage`}
+          loggedUser={state.loggedUser}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
-        />
-
-        <PopinFixedOption
-          customColor={state.config.hexcolor}
-          customClass={`${state.config.slug}`}
-          i18n={i18n}
-          display={false}
-        />
-
-        <PopinFixedContent
-          customClass={`${state.config.slug}__contentpage`}
+          disableChangeTitle={false}
+          showChangeTitleButton={state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id}
         >
           <WorkspaceAdvancedConfiguration
+            apiUrl={state.config.apiUrl}
+            isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id}
+            textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
+            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+            autoCompleteItemList={state.autoCompleteItemList}
             customColor={state.config.hexcolor}
             description={state.content.description}
             defaultRole={state.content.default_user_role}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
+            isAutoCompleteActivated={state.isAutoCompleteActivated}
+            onClickAutoCompleteItem={(item) => {
+              tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
+            }}
             onClickValidateNewDescription={this.handleClickValidateNewDescription}
             onClickClosePopupDeleteWorkspace={this.handleClickClosePopupDeleteWorkspace}
             onClickDeleteWorkspaceBtn={this.handleClickDeleteWorkspaceBtn}
@@ -750,6 +842,10 @@ export class WorkspaceAdvanced extends React.Component {
             onChangeDescription={this.handleChangeDescription}
             onChangeNewDefaultRole={this.handleChangeNewDefaultRole}
             key='workspace_advanced'
+            onTinyMceInput={this.handleTinyMceInput}
+            onTinyMceKeyDown={this.handleTinyMceKeyDown}
+            onTinyMceKeyUp={this.handleTinyMceKeyUp}
+            onTinyMceSelectionChange={this.handleTinyMceSelectionChange}
           />
 
           <PopinFixedRightPart

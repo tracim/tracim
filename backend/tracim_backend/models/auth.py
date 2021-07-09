@@ -44,6 +44,16 @@ if TYPE_CHECKING:
 __all__ = ["User"]
 
 
+class UserConnectionStatus(str, enum.Enum):
+    """Possible connection status for a user.
+
+    ONLINE means connected to live messages.
+    """
+
+    ONLINE = "online"
+    OFFLINE = "offline"
+
+
 class UserCreationType(str, enum.Enum):
     ADMIN = "admin"
     INVITATION = "invitation"
@@ -158,6 +168,9 @@ class User(TrashableMixin, DeclarativeBase):
         "User", post_update=True, backref=backref("creation_author", remote_side=user_id)
     )
     creation_type = Column(Enum(UserCreationType), nullable=True)
+    connection_status = Column(
+        Enum(UserConnectionStatus), nullable=False, default=UserConnectionStatus.OFFLINE
+    )
 
     @hybrid_property
     def email_address(self):
@@ -336,17 +349,10 @@ class User(TrashableMixin, DeclarativeBase):
         salt = salt.hexdigest()
 
         hashed = sha256()
-        # Make sure password is a str because we cannot hash unicode objects
         hashed.update((cleartext_password_or_token + salt).encode("utf-8"))
         hashed = hashed.hexdigest()
 
         ciphertext_password = salt + hashed
-
-        # Make sure the hashed password is a unicode object at the end of the
-        # process because SQLAlchemy _wants_ unicode objects for Unicode cols
-        # FIXME - D.A. - 2013-11-20 - The following line has been removed since using python3. Is this normal ?!
-        # password = password.decode('utf-8')
-
         return ciphertext_password
 
     @classmethod

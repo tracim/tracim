@@ -67,6 +67,14 @@ export const getMyselfKnownMember = (apiUrl, userNameToSearch, workspaceIdToIncl
   return baseFetch('GET', `${apiUrl}/users/me/known_members?acp=${userNameToSearch}${opts}`)
 }
 
+export const getMyselfKnownContents = (apiUrl, searchString, limit) => {
+  const queryParameterList = []
+  queryParameterList.push(`acp=${encodeURIComponent(searchString)}`)
+  if (Number.isInteger(limit)) queryParameterList.push(`limit=${limit}`)
+
+  return baseFetch('GET', `${apiUrl}/users/me/known_contents?${queryParameterList.join('&')}`)
+}
+
 const getResponse = async (url) => {
   const response = await baseFetch('GET', url)
   return {
@@ -166,3 +174,24 @@ export const deleteContentFromFavoriteList = (apiUrl, userId, contentId) => {
 
 export const getGenericWorkspaceContent = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}`)
+
+export const getContentTagList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`)
+
+export const getWorkspaceTagList = (apiUrl, workspaceId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/tags`)
+
+export const postWorkspaceTag = (apiUrl, workspaceId, tagName) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/tags`, { tag_name: tagName })
+
+export const postContentTag = (apiUrl, workspaceId, contentId, tagName) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags`, { tag_name: tagName })
+
+export const putContentTag = (apiUrl, workspaceId, contentId, tagId) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags/${tagId}`)
+
+export const deleteContentTag = (apiUrl, workspaceId, contentId, tagId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/tags/${tagId}`)
+
+export const deleteWorkspaceTag = (apiUrl, workspaceId, tagId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/tags/${tagId}`)

@@ -6,7 +6,6 @@ from hapic.data import HapicFile
 from pyramid.config import Configurator
 from pyramid.response import Response
 
-from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
@@ -24,6 +23,7 @@ from tracim_backend.exceptions import PasswordDoNotMatch
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import ReservedUsernameError
 from tracim_backend.exceptions import RoleAlreadyExistError
+from tracim_backend.exceptions import TooManyOnlineUsersError
 from tracim_backend.exceptions import TooShortAutocompleteString
 from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimValidationFailed
@@ -41,6 +41,7 @@ from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.lib.core.live_messages import ServerSideEventType
 from tracim_backend.lib.core.subscription import SubscriptionLib
 from tracim_backend.lib.core.user import DEFAULT_AVATAR_SIZE
 from tracim_backend.lib.core.user import DEFAULT_COVER_SIZE
@@ -52,6 +53,7 @@ from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import knows_candidate_user
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.lib.utils.utils import password_generator
@@ -67,7 +69,6 @@ from tracim_backend.models.event import Message
 from tracim_backend.models.event import ReadStatus
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import AboutUserSchema
-from tracim_backend.views.core_api.schemas import ActiveContentFilterQuerySchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
@@ -75,6 +76,7 @@ from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
 from tracim_backend.views.core_api.schemas import GetUserFollowQuerySchema
+from tracim_backend.views.core_api.schemas import KnownContentsQuerySchema
 from tracim_backend.views.core_api.schemas import KnownMembersQuerySchema
 from tracim_backend.views.core_api.schemas import LiveMessageSchemaPage
 from tracim_backend.views.core_api.schemas import MessageIdsPathSchema
@@ -280,6 +282,29 @@ class UserController(Controller):
         )
         context_users = [uapi.get_user_with_context(user) for user in users]
         return context_users
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(KnownContentsQuerySchema())
+    @hapic.output_body(ContentDigestSchema(many=True))
+    @hapic.handle_exception(CannotUseBothIncludeAndExcludeWorkspaceUsers, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(TooShortAutocompleteString, HTTPStatus.BAD_REQUEST)
+    def known_contents(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Get known contents list
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        uapi = UserApi(
+            current_user=request.candidate_user,
+            session=request.dbsession,
+            config=app_config,
+            show_deactivated=False,
+        )
+        context_contents = uapi.get_known_contents_in_context(
+            acp=hapic_data.query.acp, limit=hapic_data.query.limit
+        )
+        return context_contents
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @hapic.handle_exception(WrongUserPassword, HTTPStatus.FORBIDDEN)
@@ -566,42 +591,6 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserWorkspaceIdPathSchema())
-    @hapic.input_query(ActiveContentFilterQuerySchema())
-    @hapic.output_body(ContentDigestSchema(many=True))
-    def last_active_content(self, context, request: TracimRequest, hapic_data=None):
-        """
-        Get last_active_content for user
-        """
-        app_config = request.registry.settings["CFG"]  # type: CFG
-        content_filter = hapic_data.query
-        api = ContentApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        wapi = WorkspaceApi(
-            current_user=request.candidate_user,  # User
-            session=request.dbsession,
-            config=app_config,
-        )
-        workspace = None
-        if hapic_data.path.workspace_id:
-            workspace = wapi.get_one(hapic_data.path.workspace_id)
-        before_content = None
-        if content_filter.before_content_id:
-            before_content = api.get_one(
-                content_id=content_filter.before_content_id,
-                workspace=workspace,
-                content_type=content_type_list.Any_SLUG,
-            )
-        last_actives = api.get_last_active(
-            workspace=workspace, limit=content_filter.limit or None, before_content=before_content
-        )
-        return [api.get_content_in_context(content) for content in last_actives]
-
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
-    @check_right(has_personal_access)
-    @hapic.input_path(UserWorkspaceIdPathSchema())
     @hapic.input_query(ContentIdsQuerySchema())
     @hapic.output_body(ReadStatusSchema(many=True))
     def contents_read_status(self, context, request: TracimRequest, hapic_data=None):
@@ -609,7 +598,7 @@ class UserController(Controller):
         get user_read status of contents
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
+        content_api = ContentApi(
             current_user=request.candidate_user,  # User
             session=request.dbsession,
             config=app_config,
@@ -622,13 +611,13 @@ class UserController(Controller):
         workspace = None
         if hapic_data.path.workspace_id:
             workspace = wapi.get_one(hapic_data.path.workspace_id)
-        last_actives = api.get_last_active(
+        last_actives = content_api.get_last_active(
             workspace=workspace,
             limit=None,
             before_content=None,
             content_ids=hapic_data.query.content_ids or None,
         )
-        return [api.get_content_in_context(content) for content in last_actives]
+        return [content_api.get_content_in_context(content) for content in last_actives]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -639,14 +628,14 @@ class UserController(Controller):
         set user_read status of content to read
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
+        content_api = ContentApi(
             show_archived=True,
             show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
         )
-        api.mark_read(request.current_content, do_flush=True)
+        content_api.mark_read(request.current_content, do_flush=True)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -657,14 +646,14 @@ class UserController(Controller):
         set user_read status of content to unread
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
+        content_api = ContentApi(
             show_archived=True,
             show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
         )
-        api.mark_unread(request.current_content, do_flush=True)
+        content_api.mark_unread(request.current_content, do_flush=True)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)
@@ -675,14 +664,14 @@ class UserController(Controller):
         set user_read status of all content of workspace to read
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        api = ContentApi(
+        content_api = ContentApi(
             show_archived=True,
             show_deleted=True,
             current_user=request.candidate_user,
             session=request.dbsession,
             config=app_config,
         )
-        api.mark_read__workspace(request.current_workspace)
+        content_api.mark_read__workspace(request.current_workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_NOTIFICATION_ENDPOINTS])
     @check_right(has_personal_access)
@@ -844,10 +833,40 @@ class UserController(Controller):
         Open the message stream for the given user.
         Tracim Live Message Events as ServerSide Event Stream
         """
-        stream_opened_event = ":Tracim Live Messages for user {}\n\nevent: stream-open\ndata:\n\n".format(
-            str(request.candidate_user.user_id)
+
+        headers = [
+            # content type for SSE
+            ("Content-Type", "text/event-stream"),
+            # do not cache the events
+            ("Cache-Control", "no-cache"),
+        ]
+
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        user_api = UserApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config  # User
         )
 
+        try:
+            user_api.check_maximum_online_users()
+        except TooManyOnlineUsersError as exc:
+            message = str(exc)
+            logger.warning(self, message)
+            error = {
+                "code": exc.error_code.value,
+                "message": message,
+            }
+            response_body = LiveMessagesLib.get_server_side_event_string(
+                ServerSideEventType.STREAM_ERROR, data=error, comment="Too many online users"
+            )
+            return Response(
+                headerlist=headers, charset="utf-8", status_code=200, body=response_body
+            )
+
+        response_body = LiveMessagesLib.get_server_side_event_string(
+            event_type=ServerSideEventType.STREAM_OPEN,
+            data=None,
+            comment="Tracim Live Messages for user {}".format(request.candidate_user.user_id),
+        )
         after_event_id = hapic_data.query["after_event_id"]  # type: int
         if after_event_id:
             app_config = request.registry.settings["CFG"]  # type: CFG
@@ -856,7 +875,7 @@ class UserController(Controller):
                 request.candidate_user.user_id, after_event_id=after_event_id
             )  # type: typing.List[Message]
 
-            stream_opened_event += "".join(
+            response_body += "".join(
                 [
                     "data:" + json.dumps(LiveMessagesLib.message_as_dict(message)) + "\n\n"
                     for message in messages
@@ -865,21 +884,25 @@ class UserController(Controller):
 
         escaped_keepalive_event = "event: keep-alive\\ndata:\\n\\n"
         user_channel_name = LiveMessagesLib.user_grip_channel(request.candidate_user.user_id)
-        headers = [
-            # Here we ask push pin to keep the connection open
-            ("Grip-Hold", "stream"),
-            # and register this connection on the given channel
-            # multiple channels subscription is possible
-            ("Grip-Channel", user_channel_name),
-            ("Grip-Keep-Alive", "{}; format=cstring; timeout=30".format(escaped_keepalive_event)),
-            # content type for SSE
-            ("Content-Type", "text/event-stream"),
-            # do not cache the events
-            ("Cache-Control", "no-cache"),
-        ]
-        return Response(
-            headerlist=headers, charset="utf-8", status_code=200, body=stream_opened_event
+        headers.extend(
+            (
+                # Here we ask push pin to keep the connection open
+                ("Grip-Hold", "stream"),
+                # and register this connection on the given channel
+                # multiple channels subscription is possible
+                ("Grip-Channel", user_channel_name),
+                (
+                    "Grip-Keep-Alive",
+                    "{}; format=cstring; timeout=30".format(escaped_keepalive_event),
+                ),
+                # content type for SSE
+                ("Content-Type", "text/event-stream"),
+                # do not cache the events
+                ("Cache-Control", "no-cache"),
+            )
         )
+
+        return Response(headerlist=headers, charset="utf-8", status_code=200, body=response_body)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONFIG_ENDPOINTS])
     @check_right(has_personal_access)
@@ -1336,13 +1359,21 @@ class UserController(Controller):
         configurator.add_route("users", "/users", request_method="GET")
         configurator.add_view(self.users, route_name="users")
 
-        # known members lists
+        # known members list
         configurator.add_route(
             "known_members",
             "/users/{user_id:\d+}/known_members",
             request_method="GET",  # noqa: W605
         )
         configurator.add_view(self.known_members, route_name="known_members")
+
+        # known contents list
+        configurator.add_route(
+            "known_contents",
+            "/users/{user_id:\d+}/known_contents",
+            request_method="GET",  # noqa: W605
+        )
+        configurator.add_view(self.known_contents, route_name="known_contents")
 
         # set user email
         configurator.add_route(
@@ -1423,13 +1454,6 @@ class UserController(Controller):
             request_method="GET",
         )
         configurator.add_view(self.contents_read_status, route_name="contents_read_status")
-        # last active content for user
-        configurator.add_route(
-            "last_active_content",
-            "/users/{user_id:\d+}/workspaces/{workspace_id}/contents/recently_active",  # noqa: W605
-            request_method="GET",
-        )
-        configurator.add_view(self.last_active_content, route_name="last_active_content")
 
         # set content as read/unread
         configurator.add_route(

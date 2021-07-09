@@ -23,8 +23,9 @@ import {
   addClassToMentionsOfUser,
   handleMentionsBeforeSave,
   getInvalidMentionList,
-  getMatchingGroupMentionList
-} from './mention.js'
+  getMatchingGroupMentionList,
+  handleLinksBeforeSave
+} from './mentionOrLink.js'
 
 import {
   getTranslationApiErrorMessage,
@@ -41,6 +42,7 @@ import {
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
+  getMyselfKnownContents,
   getMyselfKnownMember,
   getCommentTranslated,
   postContentToFavoriteList,
@@ -177,7 +179,7 @@ export function appContentFactory (WrappedComponent) {
     appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
       this.checkApiUrl()
       const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
-      let knownMentions = await this.searchForMentionInQuery('', workspaceId)
+      let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
       knownMentions = knownMentions.map(member => `@${member.username}`)
       const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
 
@@ -188,8 +190,15 @@ export function appContentFactory (WrappedComponent) {
         return Promise.reject(e)
       }
 
+      let newCommentForApiWithMentionAndLink
+      try {
+        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
       const response = await handleFetchResult(
-        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMention)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMentionAndLink)
       )
 
       switch (response.apiResponse.status) {
@@ -257,7 +266,7 @@ export function appContentFactory (WrappedComponent) {
       const newCommentForApi = isCommentWysiwyg
         ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
         : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
-      let knownMentions = await this.searchForMentionInQuery('', content.workspace_id)
+      let knownMentions = await this.searchForMentionOrLinkInQuery('', content.workspace_id)
       knownMentions = knownMentions.map(member => `@${member.username}`)
       const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
 
@@ -268,8 +277,21 @@ export function appContentFactory (WrappedComponent) {
         return Promise.reject(e)
       }
 
+      let newCommentForApiWithMentionAndLink
+      try {
+        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
+      } catch (e) {
+        return Promise.reject(e)
+      }
+
       const response = await handleFetchResult(
-        await postNewComment(this.apiUrl, content.workspace_id, content.content_id, newCommentForApiWithMention, content.content_namespace)
+        await postNewComment(
+          this.apiUrl,
+          content.workspace_id,
+          content.content_id,
+          newCommentForApiWithMentionAndLink,
+          content.content_namespace
+        )
       )
 
       switch (response.apiResponse.status) {
@@ -571,16 +593,52 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    searchForMentionInQuery = async (query, workspaceId) => {
-      const mentionList = getMatchingGroupMentionList(query)
+    searchForMentionOrLinkInQuery = async (query, workspaceId) => {
+      function matchingContentIdsFirst (contentA, contentB) {
+        const aContentId = contentA.content_id.toString()
+        const bContentId = contentB.content_id.toString()
 
-      const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, query, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
+        if (keyword) {
+          const idOfAStartsWithKeyword = aContentId.startsWith(keyword)
+          const idOfBStartsWithKeyword = bContentId.startsWith(keyword)
 
-      switch (fetchUserKnownMemberList.apiResponse.status) {
-        case 200: return [...mentionList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-        default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
+          if (idOfAStartsWithKeyword && !idOfBStartsWithKeyword) {
+            return -1
+          }
+
+          if (idOfBStartsWithKeyword && !idOfAStartsWithKeyword) {
+            return 1
+          }
+        }
+
+        return aContentId.localeCompare(bContentId, undefined, { numeric: true })
       }
-      return mentionList
+
+      let autoCompleteItemList = []
+      const keyword = query.substring(1)
+
+      if (query.includes('#')) {
+        const fetchUserKnownContents = await handleFetchResult(
+          await getMyselfKnownContents(this.apiUrl, keyword, NUMBER_RESULTS_BY_PAGE)
+        )
+
+        switch (fetchUserKnownContents.apiResponse.status) {
+          case 200: {
+            const matchingList = fetchUserKnownContents.body.map(m => ({ detail: m.label, ...m }))
+            return matchingList.sort(matchingContentIdsFirst)
+          }
+          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known content list'), 'warning'); break
+        }
+      } else {
+        autoCompleteItemList = getMatchingGroupMentionList(keyword)
+        const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, keyword, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
+
+        switch (fetchUserKnownMemberList.apiResponse.status) {
+          case 200: return [...autoCompleteItemList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
+        }
+      }
+      return autoCompleteItemList
     }
 
     // INFO - CH - 20210318 - This function can add comment and comment as file
@@ -690,7 +748,7 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          searchForMentionInQuery={this.searchForMentionInQuery}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           addCommentToTimeline={this.addCommentToTimeline}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}

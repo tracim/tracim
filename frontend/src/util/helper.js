@@ -85,6 +85,9 @@ export const SEARCH_CONTENT_FACETS = {
   },
   AUTHOR: {
     slug: 'author__public_names'
+  },
+  TAGS: {
+    slug: 'tags'
   }
 }
 

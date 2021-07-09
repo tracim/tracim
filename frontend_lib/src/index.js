@@ -51,7 +51,7 @@ import {
   formatAbsoluteDate,
   permissiveNumberEqual,
   sortWorkspaceList,
-  updateTLMAuthor,
+  updateTLMUser,
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
@@ -62,14 +62,18 @@ import {
   getCoverBaseUrl,
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
-  htmlToText
+  htmlToText,
+  addExternalLinksIcons
 } from './helper.js'
+
 import {
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleInvalidMentionInComment,
+  handleLinksBeforeSave,
   handleMentionsBeforeSave
-} from './mention.js'
+} from './mentionOrLink.js'
+
 import { TracimComponent } from './tracimComponent.js'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
@@ -80,7 +84,8 @@ import {
 
 import {
   LiveMessageManager,
-  LIVE_MESSAGE_STATUS
+  LIVE_MESSAGE_STATUS,
+  LIVE_MESSAGE_ERROR_CODE
 } from './LiveMessageManager.js'
 
 import { appContentFactory } from './appContentFactory.js'
@@ -98,7 +103,6 @@ import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
-import PopinFixedOption from './component/PopinFixed/PopinFixedOption.jsx'
 import PopinFixedContent from './component/PopinFixed/PopinFixedContent.jsx'
 import PopinFixedRightPart from './component/PopinFixed/PopinFixedRightPart.jsx'
 import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPartContent.jsx'
@@ -119,7 +123,7 @@ import TextAreaApp from './component/Input/TextAreaApp/TextAreaApp.jsx'
 import BtnSwitch from './component/Input/BtnSwitch/BtnSwitch.jsx'
 import Checkbox from './component/Input/Checkbox.jsx'
 import SingleChoiceList from './component/Input/SingleChoiceList/SingleChoiceList.jsx'
-import MentionAutoComplete from './component/Input/MentionAutoComplete/MentionAutoComplete.jsx'
+import AutoComplete from './component/Input/AutoComplete/AutoComplete.jsx'
 
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
@@ -228,7 +232,6 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
 
-export { default as AppContentRightMenu } from './component/AppContent/AppContentRightMenu.jsx'
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
 export { default as Comment } from './component/Timeline/Comment.jsx'
@@ -249,6 +252,8 @@ export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
 export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
 export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
+export { default as TagList } from './component/Tags/TagList.jsx'
+export { default as Tag } from './component/Tags/Tag.jsx'
 
 export {
   TRANSLATION_STATE,
@@ -271,6 +276,7 @@ export {
   EditCommentPopup,
   getContentPath,
   handleInvalidMentionInComment,
+  handleLinksBeforeSave,
   naturalCompareLabels,
   ScrollToBottomWrapper,
   sortWorkspaceList,
@@ -292,7 +298,6 @@ export {
   Breadcrumbs,
   PopinFixed,
   PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedContent,
   PopinFixedRightPart,
   PopinFixedRightPartContent,
@@ -361,13 +366,13 @@ export {
   NUMBER_RESULTS_BY_PAGE,
   CHECK_USERNAME_DEBOUNCE_WAIT,
   formatAbsoluteDate,
-  MentionAutoComplete,
+  AutoComplete,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  updateTLMAuthor,
+  updateTLMUser,
   baseFetch,
   putEditContent,
   postNewComment,
@@ -394,6 +399,7 @@ export {
   putMyselfFileRead,
   getContentComment,
   getFileChildContent,
+  addExternalLinksIcons,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,
@@ -408,6 +414,7 @@ export {
   sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
+  LIVE_MESSAGE_ERROR_CODE,
   TextInput,
   getContent,
   DistanceDate,

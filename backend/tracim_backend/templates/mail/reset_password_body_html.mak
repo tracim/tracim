@@ -15,6 +15,9 @@
 </p>
 <pre>${reset_password_url}</pre>
 
+## the lifetime is converted from seconds to minutes.
+${_('The link is valid for {} minutes.'.format(config.USER__RESET_PASSWORD__TOKEN_LIFETIME // 60))}
+
 <p>${_("Suricat', your digital assistant")}</p>
 
 <pre>

@@ -2,11 +2,17 @@
 import argparse
 import re
 import traceback
+import typing
 
+from alembic import command as alembic_command
+from alembic.config import Config
+from depot.io.utils import FileIntent
 from depot.manager import DepotManager
 from pyramid.paster import get_appsettings
+from sqlalchemy import text
 from sqlalchemy.engine import reflection
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 import transaction
 
 from tracim_backend.command import AppContextCommand
@@ -17,6 +23,8 @@ from tracim_backend.fixtures import FixturesLoader
 from tracim_backend.fixtures.content import Content as ContentFixture
 from tracim_backend.fixtures.users import Base as BaseFixture
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.models.auth import User
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.setup_models import get_engine
 from tracim_backend.models.setup_models import get_session_factory
@@ -52,6 +60,11 @@ class InitializeDBCommand(AppContextCommand):
         app_config = CFG(settings)
         self._create_schema(app_config)
         self._populate_database(app_config, add_test_data=parsed_args.test_data)
+        alembic_config = Config(parsed_args.config_file)
+        alembic_command.stamp(config=alembic_config, revision="head")
+        print("-------------------")
+        print("Current database version:")
+        alembic_command.show(config=alembic_config, rev="head")
 
     @classmethod
     def _create_schema(cls, app_config: CFG) -> None:
@@ -117,6 +130,8 @@ class DeleteDBCommand(AppContextCommand):
         if parsed_args.force:
             print("Database deletion begin.")
             DeclarativeBase.metadata.drop_all(engine)
+            sql = text("DROP TABLE IF EXISTS migrate_version;")
+            engine.execute(sql)
             print("Database deletion done.")
             try:
                 print("Cleaning depot begin.")
@@ -296,3 +311,87 @@ class UpdateNamingConventionsV1ToV2Command(AppContextCommand):
                         engine.execute(
                             "ALTER INDEX {} RENAME TO {}".format(primary_key["name"], new_name)
                         )
+
+
+class MigrateStorageCommand(AppContextCommand):
+    auto_setup_context = False
+
+    def get_description(self) -> str:
+        return "migrate database storage"
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "-o",
+            "--old-config",
+            help="old configuration file to use",
+            dest="old_config_file",
+            required=True,
+        )
+        return parser
+
+    def _reupload_depot_file(self, db_object, field_names: typing.List[str], dbsession: Session):
+        for field_name in field_names:
+            field_value = getattr(db_object, field_name)
+            if field_value:
+                setattr(
+                    db_object,
+                    field_name,
+                    FileIntent(field_value.file, field_value.filename, field_value.content_type),
+                )
+                dbsession.add(db_object)
+                dbsession.flush()
+
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
+        super(MigrateStorageCommand, self).take_action(parsed_args)
+
+        config_uri = parsed_args.config_file
+        settings = get_appsettings(config_uri)
+        settings.update(settings.global_conf)
+        new_cfg = CFG(settings)
+        new_cfg.configure_filedepot()
+
+        old_config_uri = parsed_args.old_config_file
+        old_settings = get_appsettings(old_config_uri)
+        old_settings.update(old_settings.global_conf)
+        old_cfg = CFG(old_settings)
+        old_cfg.configure_filedepot()
+
+        original_storage_name = old_cfg.UPLOADED_FILES__STORAGE__STORAGE_NAME
+        original_storage_type = old_cfg.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+        new_storage_name = new_cfg.UPLOADED_FILES__STORAGE__STORAGE_NAME
+        new_storage_type = new_cfg.UPLOADED_FILES__STORAGE__STORAGE_TYPE
+        print(
+            "Migration of storage from {}({}) to {}({}) started".format(
+                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+            )
+        )
+
+        if new_storage_name == original_storage_name:
+            raise Exception(
+                "You need to use a different storage name between old and new storage type"
+            )
+        if new_cfg.SQLALCHEMY__URL != old_cfg.SQLALCHEMY__URL:
+            raise Exception("This feature cannot be used between different databases")
+
+        DepotManager.set_default(new_cfg.UPLOADED_FILES__STORAGE__STORAGE_NAME)
+        engine = get_engine(new_cfg)
+        session_factory = get_session_factory(engine)
+        with transaction.manager:
+            dbsession = get_tm_session(session_factory, transaction.manager)
+            revisions = dbsession.query(ContentRevisionRO).all()
+            for revision in revisions:
+                self._reupload_depot_file(revision, field_names=["depot_file"], dbsession=dbsession)
+            users = dbsession.query(User).all()
+            for user in users:
+                self._reupload_depot_file(
+                    user,
+                    field_names=["avatar", "cropped_avatar", "cover", "cropped_cover"],
+                    dbsession=dbsession,
+                )
+            transaction.commit()
+        print(
+            "Migration of storage finished from {}({}) to {}({})".format(
+                original_storage_name, original_storage_type, new_storage_name, new_storage_type
+            )
+        )

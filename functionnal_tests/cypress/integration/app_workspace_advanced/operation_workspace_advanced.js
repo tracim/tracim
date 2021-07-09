@@ -16,6 +16,7 @@ describe('App Workspace Advanced', function () {
   beforeEach(function () {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+    cy.contains('.userstatus__role__text', 'Space manager')
   })
 
   afterEach(function () {
@@ -86,6 +87,7 @@ describe('App Workspace Advanced', function () {
 
     it('Should be able to add a user with their public name', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+      cy.contains('.userstatus__role__text', 'Space manager')
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
@@ -120,6 +122,7 @@ describe('App Workspace Advanced', function () {
 
     it('Should be able to add a user with his email', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+      cy.contains('.userstatus__role__text', 'Space manager')
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
@@ -154,6 +157,7 @@ describe('App Workspace Advanced', function () {
 
     it('Should be able to add a user with his username', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+      cy.contains('.userstatus__role__text', 'Space manager')
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
@@ -189,6 +193,7 @@ describe('App Workspace Advanced', function () {
     it('Should not display disabled user(s)', () => {
       cy.disableUser(userId)
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+      cy.contains('.userstatus__role__text', 'Space manager')
 
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
@@ -206,6 +211,7 @@ describe('App Workspace Advanced', function () {
     beforeEach(() => {
       cy.loginAs('administrators')
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+      cy.contains('.userstatus__role__text', 'Space manager')
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()

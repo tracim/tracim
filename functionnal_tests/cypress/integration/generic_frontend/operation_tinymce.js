@@ -37,7 +37,7 @@ describe('TinyMce text editor', function () {
         cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
       })
 
-      it('the autocompletion popup should open when type "@"', function () {
+      it('the autocompletion popup should open when typing "@"', function () {
         cy.waitForTinyMCELoaded().then(() => {
           cy.inputInTinyMCE('@')
           cy.get('.autocomplete').should('be.visible')
@@ -92,7 +92,6 @@ describe('TinyMce text editor', function () {
         cy.waitForTinyMCELoaded().then(() => {
           cy.inputInTinyMCE('@johndoe')
           cy.get('.html-document__editionmode__submit').click()
-          cy.get('.html-document__contentpage__textnote__top__version').should('be.visible')
           cy.get('#autocomplete').should('be.not.visible')
         })
       })

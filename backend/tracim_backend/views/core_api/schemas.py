@@ -40,7 +40,6 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
-from tracim_backend.models.context_models import ActiveContentFilter
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import CommentPathFilename
@@ -56,6 +55,7 @@ from tracim_backend.models.context_models import FilePreviewSizedPath
 from tracim_backend.models.context_models import FileQuery
 from tracim_backend.models.context_models import FileRevisionPath
 from tracim_backend.models.context_models import FolderContentUpdate
+from tracim_backend.models.context_models import KnownContentsQuery
 from tracim_backend.models.context_models import KnownMembersQuery
 from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
@@ -75,6 +75,8 @@ from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
+from tracim_backend.models.context_models import TagCreation
+from tracim_backend.models.context_models import TagPath
 from tracim_backend.models.context_models import TranslationQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
@@ -104,6 +106,7 @@ from tracim_backend.models.roles import WorkspaceRoles
 FIELD_LANG_DESC = "User langage in ISO 639 format. " "See https://fr.wikipedia.org/wiki/ISO_639"
 FIELD_PROFILE_DESC = "Profile of the user. The profile is Tracim wide."
 FIELD_TIMEZONE_DESC = "Timezone as in tz database format"
+DEFAULT_KNOWN_CONTENT_NB_LIMIT = 15
 
 
 class StrippedString(String):
@@ -870,6 +873,23 @@ class ReactionPathSchema(WorkspaceAndContentIdPathSchema):
         return ReactionPath(**data)
 
 
+class TagPathSchema(WorkspaceIdPathSchema):
+    tag_id = marshmallow.fields.Int(
+        example=6,
+        description="id of a valid tag related to content content_id",
+        required=True,
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return TagPath(**data)
+
+
+class ContentTagPathSchema(ContentIdPathSchema, TagPathSchema):
+    pass
+
+
 class CommentsPathSchema(WorkspaceAndContentIdPathSchema):
     comment_id = marshmallow.fields.Int(
         example=6,
@@ -920,6 +940,21 @@ class KnownMembersQuerySchema(marshmallow.Schema):
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return KnownMembersQuery(**data)
+
+
+class KnownContentsQuerySchema(marshmallow.Schema):
+    acp = StrippedString(example="test", description="search text to query", required=True)
+
+    limit = marshmallow.fields.Int(
+        example=15,
+        default=DEFAULT_KNOWN_CONTENT_NB_LIMIT,
+        description="limit the number of results to this value, if not 0",
+        validate=strictly_positive_int_validator,
+    )
+
+    @post_load
+    def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
+        return KnownContentsQuery(**data)
 
 
 class FileQuerySchema(marshmallow.Schema):
@@ -1035,26 +1070,6 @@ class FilterContentQuerySchema(marshmallow.Schema):
     @post_load
     def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentFilter(**data)
-
-
-class ActiveContentFilterQuerySchema(marshmallow.Schema):
-    limit = marshmallow.fields.Int(
-        example=2,
-        default=0,
-        description="if 0 or not set, return all elements, else return only "
-        "the first limit elem (according to offset)",
-        validate=strictly_positive_int_validator,
-    )
-    before_content_id = marshmallow.fields.Int(
-        example=41,
-        default=None,
-        allow_none=True,
-        description="return only content updated before this content",
-    )
-
-    @post_load
-    def make_content_filter(self, data: typing.Dict[str, typing.Any]) -> object:
-        return ActiveContentFilter(**data)
 
 
 class ContentIdsQuerySchema(marshmallow.Schema):
@@ -1556,7 +1571,7 @@ class ContentCreationSchema(marshmallow.Schema):
         required=True, example="html-document", validate=all_content_types_validator
     )
     content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content",
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
     parent_id = marshmallow.fields.Integer(
         example=35,
@@ -1741,6 +1756,12 @@ class ReactionSchema(marshmallow.Schema):
     )
 
 
+class TagSchema(marshmallow.Schema):
+    tag_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    tag_name = StrippedString(example="todo")
+
+
 class CommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
@@ -1776,6 +1797,14 @@ class SetReactionSchema(marshmallow.Schema):
     @post_load()
     def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
         return ReactionCreation(**data)
+
+
+class SetTagByNameSchema(marshmallow.Schema):
+    tag_name = StrippedString(example="todo", validate=not_empty_string_validator, required=True)
+
+    @post_load()
+    def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:
+        return TagCreation(**data)
 
 
 class ContentModifyAbstractSchema(marshmallow.Schema):
@@ -1853,6 +1882,7 @@ class ConfigSchema(marshmallow.Schema):
     )
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
+    limitation__maximum_online_users_message = marshmallow.fields.String()
 
 
 class ConditionFileSchema(marshmallow.Schema):

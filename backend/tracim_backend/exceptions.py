@@ -70,6 +70,10 @@ class ReactionAlreadyExistError(TracimError):
     error_code = ErrorCode.REACTION_ALREADY_EXISTS
 
 
+class TagAlreadyExistsError(TracimError):
+    error_code = ErrorCode.TAG_ALREADY_EXISTS
+
+
 class ForceArgumentNeeded(TracimException):
     pass
 
@@ -176,6 +180,10 @@ class WorkspaceNotFound(NotFound):
 
 class ReactionNotFound(NotFound):
     error_code = ErrorCode.REACTION_NOT_FOUND
+
+
+class TagNotFound(NotFound):
+    error_code = ErrorCode.TAG_NOT_FOUND
 
 
 class UploadPermissionNotFound(NotFound):
@@ -650,3 +658,7 @@ class IndexingError(TracimException):
 
 class WorkspaceFeatureDisabled(TracimException):
     error_code = ErrorCode.WORKSPACE_FEATURE_DISABLED
+
+
+class TooManyOnlineUsersError(TracimException):
+    error_code = ErrorCode.TOO_MANY_ONLINE_USERS

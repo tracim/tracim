@@ -207,7 +207,6 @@ class CleanupLib(object):
                 ),
             )
             self.safe_delete(role)
-
         # INFO - G.M - 2019-12-11 - delete permissions on workspace
         upload_permissions = self.session.query(UploadPermission).filter(
             UploadPermission.workspace_id == workspace.workspace_id
@@ -392,6 +391,17 @@ class CleanupLib(object):
         user_id = user.user_id
         self.safe_delete(user)
         return user_id
+
+    def prepare_deletion_or_anonymization(
+        self, user: User,
+    ):
+        """
+        Disable and delete user with flag to get proper TLM.
+        """
+        user.is_active = False
+        user.is_deleted = True
+        self.safe_update(user)
+        return user
 
     def anonymize_user(
         self, user: User, anonymized_user_display_name: typing.Optional[str] = None

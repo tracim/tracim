@@ -79,7 +79,6 @@ _install_full_tracim: &_install_full_tracim
     - cd $TRAVIS_BUILD_DIR/backend
     - cp development.ini.sample development.ini
     - tracimcli db init -d
-    - alembic -c development.ini stamp head
     # install frontend
     - cd $TRAVIS_BUILD_DIR
     - ./install_frontend_dependencies.sh

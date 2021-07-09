@@ -20,7 +20,7 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   permissiveNumberEqual,
-  updateTLMAuthor
+  updateTLMUser
 } from '../src/helper.js'
 
 import {
@@ -42,10 +42,10 @@ describe('helper.js', () => {
     })
   })
 
-  describe('updateTLMAuthor()', () => {
+  describe('updateTLMUser()', () => {
     it('should return the author object added with is_from_system_admin if author is not null', () => {
       const author = { username: 'Author' }
-      const returnedObject = updateTLMAuthor(author)
+      const returnedObject = updateTLMUser(author, true)
       expect(returnedObject).to.deep.equal({ ...author, is_from_system_admin: false })
     })
 
@@ -66,8 +66,35 @@ describe('helper.js', () => {
         user_id: 0,
         username: ''
       }
-      const returnedObject = updateTLMAuthor(null)
+      const returnedObject = updateTLMUser(null, true)
       expect(returnedObject).to.deep.equal(systemAdministratorAuthor)
+    })
+
+    it('should return the user object added with is_from_system_admin if user is not null', () => {
+      const user = { username: 'user' }
+      const returnedObject = updateTLMUser(user)
+      expect(returnedObject).to.deep.equal({ ...user, is_from_system_admin: false })
+    })
+
+    it('should return the Unknkown user object if user is null', () => {
+      const unknownUser = {
+        allowed_space: 0,
+        auth_type: 'internal',
+        avatar_url: null,
+        created: '',
+        email: '',
+        is_active: true,
+        is_deleted: false,
+        is_from_system_admin: true,
+        lang: 'en',
+        profile: 'administrators',
+        public_name: 'Unknown',
+        timezone: '',
+        user_id: 0,
+        username: ''
+      }
+      const returnedObject = updateTLMUser(null)
+      expect(returnedObject).to.deep.equal(unknownUser)
     })
   })
 

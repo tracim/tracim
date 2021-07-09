@@ -157,11 +157,11 @@ class CFG(object):
         # with object in some context
         self.settings = settings.copy()
         self.config_info = []  # type: typing.List[ConfigParam]
-        logger.debug(self, "CONFIG_PROCESS:1: load enabled apps")
+        logger.debug(self, "CONFIG_PROCESS:1: Loading enabled apps")
         self.load_enabled_apps()
-        logger.debug(self, "CONFIG_PROCESS:3: load config from settings")
+        logger.debug(self, "CONFIG_PROCESS:3: Loading config from settings")
         self.load_config()
-        logger.debug(self, "CONFIG_PROCESS:4: check validity of config given")
+        logger.debug(self, "CONFIG_PROCESS:4: Checking the validity of the given config")
         self._check_consistency()
         self.check_config_validity()
         logger.debug(self, "CONFIG_PROCESS:5: End of config process")
@@ -410,7 +410,7 @@ class CFG(object):
         )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
-            "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*",
+            "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*",
         )
 
         # base url of the frontend
@@ -450,6 +450,7 @@ class CFG(object):
         self.USER__SELF_REGISTRATION__ENABLED = asbool(
             self.get_raw_config("user.self_registration.enabled", "False")
         )
+        self.USER__ONLINE_TIMEOUT = int(self.get_raw_config("user.online_timeout", 10))
         default_user_custom_properties_path = self.here_macro_replace(
             "%(here)s/tracim_backend/templates/user_custom_properties/default/"
         )
@@ -578,6 +579,9 @@ class CFG(object):
         self.LIVE_MESSAGES__CONTROL_ZMQ_URI = self.get_raw_config(
             "live_messages.control_zmq_uri", "tcp://localhost:5563"
         )
+        self.LIVE_MESSAGES__STATS_ZMQ_URI = self.get_raw_config(
+            "live_messages.stats_zmq_uri", "ipc:///var/run/pushpin/pushpin-stats"
+        )
         async_processing = str(self.JOBS__PROCESSING_MODE == self.CST.ASYNC)
         self.LIVE_MESSAGES__BLOCKING_PUBLISH = asbool(
             self.get_raw_config("live_messages.blocking_publish", async_processing)
@@ -593,6 +597,12 @@ class CFG(object):
         self.LIMITATION__WORKSPACE_SIZE = int(self.get_raw_config("limitation.workspace_size", "0"))
         self.LIMITATION__USER_DEFAULT_ALLOWED_SPACE = int(
             self.get_raw_config("limitation.user_default_allowed_space", "0")
+        )
+        self.LIMITATION__MAXIMUM_ONLINE_USERS = int(
+            self.get_raw_config("limitation.maximum_online_users", "0")
+        )
+        self.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE = self.get_raw_config(
+            "limitation.maximum_online_users_message", ""
         )
 
     def _load_email_config(self) -> None:
@@ -1107,6 +1117,10 @@ class CFG(object):
     def _check_live_messages_config_validity(self) -> None:
         self.check_mandatory_param(
             "LIVE_MESSAGES__CONTROL_ZMQ_URI", self.LIVE_MESSAGES__CONTROL_ZMQ_URI
+        )
+
+        self.check_mandatory_param(
+            "LIVE_MESSAGES__STATS_ZMQ_URI", self.LIVE_MESSAGES__STATS_ZMQ_URI
         )
 
     def _check_email_config_validity(self) -> None:

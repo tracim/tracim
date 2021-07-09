@@ -6,6 +6,7 @@ from dateutil.parser import parse
 import pytest
 import transaction
 
+from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
@@ -13,6 +14,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tag import Tag
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import ContentApiFactory
 from tracim_backend.tests.utils import RoleApiFactory
@@ -69,6 +71,35 @@ def content_search_fixture(
     transaction.commit()
     elasticsearch.refresh_elasticsearch()
     return content
+
+
+@pytest.fixture
+def content_with_tag(
+    workspace_api_factory, content_api_factory, session, admin_user
+) -> typing.Tuple[Content, Tag]:
+    """Create two contents with one associated with at tag.
+
+    :returns: the content and its tag.
+    """
+    workspace_api = workspace_api_factory.get(show_deleted=True)
+    workspace = workspace_api.create_workspace("test", save_now=True)
+    api = content_api_factory.get()
+    content = api.create(
+        content_type_slug="html-document",
+        workspace=workspace,
+        label="stringtosearch doc",
+        do_save=True,
+    )
+    tag_lib = TagLib(session)
+    tag = tag_lib.add_tag_to_content(user=admin_user, content=content, tag_name="World")
+    api.create(
+        content_type_slug="html-document",
+        workspace=workspace,
+        label="stringtosearch doc 2",
+        do_save=True,
+    )
+    transaction.commit()
+    return (content, tag)
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -432,6 +463,25 @@ class TestElasticSearch(object):
             ]
             assert is_now(search_result["created_range"]["from"])
 
+    @pytest.mark.parametrize("search_string,expected_result_count", [("World", 1), ("Hello", 0)])
+    def test_api___elasticsearch_search_ok__search_by_tags(
+        self,
+        web_testapp,
+        elasticsearch,
+        content_with_tag: typing.Tuple[Content, Tag],
+        search_string: str,
+        expected_result_count: int,
+    ) -> None:
+        elasticsearch.refresh_elasticsearch()
+        params = {"search_string": search_string}
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == expected_result_count
+        assert search_result["is_total_hits_accurate"] is True
+        assert len(search_result["contents"]) == expected_result_count
+
     def test_api___elasticsearch_search_ok__wildcard__facet_only(
         self,
         user_api_factory,
@@ -474,14 +524,18 @@ class TestElasticSearch(object):
         content = api.create(
             content_type_slug="html-document", workspace=workspace, label="document", do_save=True,
         )
+        tag_lib = TagLib(session)
+        tag_lib.add_tag_to_content(user=user, content=content, tag_name="World")
+        tag_lib.add_tag_to_content(user=user, content=content, tag_name="Hello")
         with new_revision(session=session, tm=transaction.manager, content=content):
             api = content_api_factory.get(current_user=user2)
             api.update_content(content, new_label="document", new_raw_content="just some content")
             api.save(content)
         api = content_api_factory.get(current_user=user)
-        api.create(
+        content2 = api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
         )
+        tag_lib.add_tag_to_content(user=user, content=content2, tag_name="World")
         api.create(
             content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
         )
@@ -514,6 +568,10 @@ class TestElasticSearch(object):
         assert search_result["facets"]["last_modifier__public_names"] == [
             {"value": user_public_name, "count": 2},
             {"value": user2_public_name, "count": 1},
+        ]
+        assert search_result["facets"]["tags"] == [
+            {"count": 2, "value": "World"},
+            {"count": 1, "value": "Hello"},
         ]
         assert search_result["created_range"]
 
@@ -754,6 +812,26 @@ class TestElasticSearch(object):
         assert search_result["is_total_hits_accurate"] is True
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"] == "stringtosearch folder"
+
+    @pytest.mark.parametrize("search_tag,expected_result_count", [("World", 1), ("Hello", 0)])
+    def test_api___elasticsearch_search_ok__filter_by_tags(
+        self,
+        web_testapp,
+        elasticsearch,
+        content_with_tag: typing.Tuple[Content, Tag],
+        search_tag: str,
+        expected_result_count: int,
+    ) -> None:
+        elasticsearch.refresh_elasticsearch()
+        # get all
+        params = {"search_string": "stringtosearch", "tags": search_tag}
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == expected_result_count
+        assert search_result["is_total_hits_accurate"] is True
+        assert len(search_result["contents"]) == expected_result_count
 
     def test_api___elasticsearch_search_ok__filter_by_deleted_archived_active(
         self,

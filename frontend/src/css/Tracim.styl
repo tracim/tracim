@@ -12,5 +12,20 @@ body
     &-scrollview
       height 100%
       overflow-y auto
+  &__pageBlock
+    background rgba(0, 0, 0, 0.85) // INFO - RJ - 2020-07-06 - matches the dark background of the gallery
+    position fixed
+    z-index zIndexOverHeader
+    top 0
+    left 0
+    right 0
+    bottom 0
+    &__cardPopupContent
+      width 100%
+      &__message
+        margin 10px
+      &__buttons
+        text-align right
+
 #AppFullScreenManager
   display none

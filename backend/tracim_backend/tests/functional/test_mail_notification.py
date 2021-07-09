@@ -1,6 +1,7 @@
 # coding=utf-8
 # INFO - G.M - 09-06-2018 - Those test need a working MailHog
 
+import email
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -246,6 +247,8 @@ class TestNotificationsSync(object):
         assert headers["From"][0] == "Tracim Notifications <test_user_from+0@localhost>"
         assert headers["To"][0] == "Global manager <admin@admin.admin>"
         assert headers["Subject"][0] == "[Tracim] A password reset has been requested"
+        message = email.message_from_string(response[0]["Raw"]["Data"], policy=email.policy.default)
+        assert "The link is valid for 15 minutes" in message.get_body().get_content()
 
 
 @pytest.mark.usefixtures("base_fixture")

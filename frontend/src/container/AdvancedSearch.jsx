@@ -222,7 +222,8 @@ export class AdvancedSearch extends React.Component {
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.NEWEST_AUTHORED_CONTENT_RANGE,
       currentSearch.appliedFilters.newestAuthoredContentRange,
-      dateObject
+      dateObject,
+      this.updateScalar
     )
   }
 
@@ -232,7 +233,8 @@ export class AdvancedSearch extends React.Component {
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.CREATED_RANGE,
       currentSearch.appliedFilters.createdRange,
-      dateObject
+      dateObject,
+      this.updateScalar
     )
   }
 
@@ -242,7 +244,8 @@ export class AdvancedSearch extends React.Component {
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.MODIFIED_RANGE,
       currentSearch.appliedFilters.modifiedRange,
-      dateObject
+      dateObject,
+      this.updateScalar
     )
   }
 
@@ -251,28 +254,47 @@ export class AdvancedSearch extends React.Component {
     this.updateAppliedFilter(
       ADVANCED_SEARCH_FILTER.SEARCH_FACETS,
       currentSearch.appliedFilters.searchFacets,
-      facetObject
+      facetObject,
+      this.updateList
     )
   }
 
-  updateAppliedFilter = (type, oldAppliedFilter, filterObject) => {
+  updateList = (value, oldValueList = []) => {
+    const newValueList = oldValueList.includes(value)
+      ? oldValueList.filter(f => f !== value)
+      : [...oldValueList, value]
+    return newValueList.length > 0 ? newValueList : null
+  }
+
+  /* INFO - SG - 2021/06/28 - return the value as it is.
+     Used in conjunction with updateAppliedFilter to avoid a
+     static if.
+   */
+
+  updateScalar = value => value
+
+  updateAppliedFilter = (type, oldAppliedFilter = {}, filterObject, updateFilterValue) => {
     const { props, state } = this
-    const currentSearch = this.getCurrentSearchObject()
 
-    let newAppliedFilter = oldAppliedFilter ? { ...oldAppliedFilter } : filterObject
     const filterKey = Object.keys(filterObject)[0]
+    const filterValue = filterObject[filterKey]
+    const oldFilterValue = oldAppliedFilter[filterKey]
 
-    if (oldAppliedFilter) {
-      if (Object.keys(oldAppliedFilter).includes(filterKey)) {
-        if (Array.isArray(newAppliedFilter[filterKey])) {
-          if (newAppliedFilter[filterKey].find(filter => filter === filterObject[filterKey][0])) {
-            newAppliedFilter[filterKey] = newAppliedFilter[filterKey].filter(filter => filter !== filterObject[filterKey][0])
-          } else newAppliedFilter[filterKey] = newAppliedFilter[filterKey].concat(filterObject[filterKey])
-        } else delete newAppliedFilter[filterKey]
-      } else newAppliedFilter = { ...newAppliedFilter, ...filterObject }
+    const newFilterValue = updateFilterValue(filterValue, oldFilterValue)
+    /* INFO - SG - 2021/06/28 - If the new filter value is not existing,
+       remove the key from the applied filter object, else set its value.
+       This is done in order to properly get facets only when no filter is selected.
+       Please see onlyGetFacet in getSearchResult().
+    */
+    let newAppliedFilter
+    if (newFilterValue) {
+      newAppliedFilter = { ...oldAppliedFilter, [filterKey]: newFilterValue }
+    } else {
+      newAppliedFilter = { ...oldAppliedFilter }
+      delete newAppliedFilter[filterKey]
     }
-
     props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
+    const currentSearch = this.getCurrentSearchObject()
     this.getSearchResult(
       { ...currentSearch, searchType: state.searchType },
       0, // INFO - CH - 20210319 - Force to 0 to force hasFirstPage (from getSearchResult()) to be evaluated to false to

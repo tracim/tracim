@@ -61,5 +61,6 @@
   "Note: Your browser might not be able to read this file.": "Nota: O seu browser pode não conseguir ler este ficheiro.",
   "The file has been updated, it can't be edited anymore": "O ficheiro foi actualizado, já não pode ser editado",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
-  "Error while saving the user configuration": "Erro ao guardar a configuração do utilizador"
+  "Error while saving the user configuration": "Erro ao guardar a configuração do utilizador",
+  "Tags": "Etiquetas"
 }

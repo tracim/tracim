@@ -51,7 +51,7 @@ export const MenuProfil = props => {
           key='menuprofil__dropdown__logout__link'
         >
           <i className='fas fa-fw fa-sign-out-alt' />
-          {props.t('Logout')}
+          {props.t('Log out')}
         </button>
       </DropdownMenu>
     </li>

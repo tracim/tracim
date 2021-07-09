@@ -7,7 +7,7 @@ import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
 import { ROLE, formatAbsoluteDate, TIMELINE_TYPE } from '../../helper.js'
-import { handleInvalidMentionInComment } from '../../mention.js'
+import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
@@ -258,7 +258,7 @@ export class Timeline extends React.Component {
                 newComment={props.newComment}
                 disableComment={props.disableComment}
                 wysiwyg={props.wysiwyg}
-                searchForMentionInQuery={props.searchForMentionInQuery}
+                searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
                 onInitWysiwyg={props.onInitWysiwyg}
               />
             </div>
@@ -361,7 +361,7 @@ Timeline.propTypes = {
   onClickRestoreDeleted: PropTypes.func,
   onClickSaveAnyway: PropTypes.func,
   showTitle: PropTypes.bool,
-  searchForMentionInQuery: PropTypes.func,
+  searchForMentionOrLinkInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
   onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
@@ -369,8 +369,7 @@ Timeline.propTypes = {
   onClickTranslateComment: PropTypes.func.isRequired,
   onClickRestoreComment: PropTypes.func.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired,
-  onChangeTargetLanguageCode: PropTypes.func.isRequired
+  translationTargetLanguageCode: PropTypes.string.isRequired
 }
 
 Timeline.defaultProps = {
@@ -399,7 +398,7 @@ Timeline.defaultProps = {
   onClickCancelSave: () => { },
   onClickSaveAnyway: () => { },
   showTitle: true,
-  searchForMentionInQuery: () => { },
+  searchForMentionOrLinkInQuery: () => { },
   showInvalidMentionPopup: false,
   onClickTranslateComment: content => { },
   onClickDeleteComment: () => {},

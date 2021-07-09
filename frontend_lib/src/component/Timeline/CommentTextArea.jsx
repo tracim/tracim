@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import MentionAutoComplete from '../Input/MentionAutoComplete/MentionAutoComplete'
+import AutoComplete from '../Input/AutoComplete/AutoComplete'
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
@@ -47,31 +47,31 @@ export class CommentTextArea extends React.Component {
     }
 
     if (!this.props.wysiwyg && prevProps.newComment !== this.props.newComment) {
-      this.searchForMentionCandidate()
+      this.searchForMentionOrLinkCandidate()
     }
   }
 
-  searchForMentionCandidate = async () => {
-    const mentionCandidate = this.getMentionCandidate(this.props.newComment)
-    if (mentionCandidate === undefined) {
+  searchForMentionOrLinkCandidate = async () => {
+    const mentionOrLinkCandidate = this.getMentionOrLinkCandidate(this.props.newComment)
+    if (mentionOrLinkCandidate === undefined) {
       if (this.state.isAutoCompleteActivated) this.setState({ isAutoCompleteActivated: false })
       return
     }
 
-    const mentionList = await this.props.searchForMentionInQuery(mentionCandidate)
+    const autoCompleteItemList = await this.props.searchForMentionOrLinkInQuery(mentionOrLinkCandidate)
     this.setState({
       isAutoCompleteActivated: true,
-      autoCompleteCursorPosition: mentionList.length - 1,
-      autoCompleteItemList: mentionList
+      autoCompleteCursorPosition: autoCompleteItemList.length - 1,
+      autoCompleteItemList: autoCompleteItemList.reverse() // NOTE - RJ - 2021-06-09 - reverse puts most interesting results closer
     })
   }
 
-  getMentionCandidate = newComment => {
+  getMentionOrLinkCandidate = newComment => {
     const lastCharBeforeCursorIndex = this.textAreaRef.selectionStart - 1
     let index = lastCharBeforeCursorIndex
     while (newComment[index] !== ' ' && index >= 0) {
-      if (newComment[index] === '@' && (index === 0 || newComment[index - 1] === ' ')) {
-        return newComment.slice(index + 1, lastCharBeforeCursorIndex + 1)
+      if ((newComment[index] === '@' || newComment[index] === '#') && (index === 0 || newComment[index - 1] === ' ')) {
+        return newComment.slice(index, lastCharBeforeCursorIndex + 1)
       }
       index--
     }
@@ -118,28 +118,32 @@ export class CommentTextArea extends React.Component {
   // RJ - 2020-09-25 - FIXME
   // Duplicate code with tinymceAutoCompleteHelper.js
   // See https://github.com/tracim/tracim/issues/3639
-
   handleClickAutoCompleteItem = (autoCompleteItem) => {
-    if (!autoCompleteItem.mention) {
-      console.log('Error: this member does not have a username')
-      return
+    let character, keyword
+
+    if (autoCompleteItem.content_id) {
+      character = '#'
+      keyword = autoCompleteItem.content_id
+    } else {
+      character = '@'
+      keyword = autoCompleteItem.mention
     }
 
     const cursorPos = this.textAreaRef.selectionStart
-    const spaceAfterMention = ' '
+    const endSpace = ' '
 
     const charAtCursor = cursorPos - 1
     const text = this.props.newComment
-    const posAt = text.lastIndexOf('@', charAtCursor)
+    const posAt = text.lastIndexOf(character, charAtCursor)
     let textBegin, textEnd
 
     if (posAt > -1) {
       const end = seekUsernameEnd(text, cursorPos)
-      textBegin = text.substring(0, posAt) + '@' + autoCompleteItem.mention + spaceAfterMention
+      textBegin = text.substring(0, posAt) + character + keyword + endSpace
       textEnd = text.substring(end)
     } else {
-      console.log('Error: mention autocomplete: did not find "@"')
-      textBegin = text + ' @' + autoCompleteItem.mention + spaceAfterMention
+      console.log(`Error in autocompletion: did not find ${character}`)
+      textBegin = `${text} ${character}${keyword}${endSpace}`
       textEnd = ''
     }
 
@@ -158,7 +162,7 @@ export class CommentTextArea extends React.Component {
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.props.searchForMentionInQuery,
+      this.props.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -171,7 +175,7 @@ export class CommentTextArea extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
-      this.props.searchForMentionInQuery
+      this.props.searchForMentionOrLinkInQuery
     )
   }
 
@@ -181,14 +185,14 @@ export class CommentTextArea extends React.Component {
       event,
       this.setState.bind(this),
       state.isAutoCompleteActivated,
-      this.props.searchForMentionInQuery
+      this.props.searchForMentionOrLinkInQuery
     )
   }
 
   handleTinyMceSelectionChange = (e, position) => {
     tinymceAutoCompleteHandleSelectionChange(
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.props.searchForMentionInQuery,
+      this.props.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -200,8 +204,13 @@ export class CommentTextArea extends React.Component {
       transform: 'translateY(-100%)',
       position: 'absolute',
       ...(props.wysiwyg && {
-        top: state.tinymcePosition.top,
+        top: state.tinymcePosition.isFullscreen && state.tinymcePosition.isSelectionToTheTop
+          ? state.tinymcePosition.bottom
+          : state.tinymcePosition.top,
         position: state.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
+        transform: state.tinymcePosition.isFullscreen && state.tinymcePosition.isSelectionToTheTop
+          ? 'none'
+          : 'translateY(-100%)',
         zIndex: state.tinymcePosition.isFullscreen ? 1061 : 20
       })
     }
@@ -209,7 +218,7 @@ export class CommentTextArea extends React.Component {
     return (
       <>
         {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
-          <MentionAutoComplete
+          <AutoComplete
             autoCompleteItemList={state.autoCompleteItemList}
             style={props.disableAutocompletePosition ? {} : style}
             apiUrl={props.apiUrl}
@@ -252,7 +261,7 @@ CommentTextArea.propTypes = {
   disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   wysiwyg: PropTypes.bool,
-  searchForMentionInQuery: PropTypes.func,
+  searchForMentionOrLinkInQuery: PropTypes.func,
   customClass: PropTypes.string,
   onInitWysiwyg: PropTypes.func
 }
@@ -265,6 +274,6 @@ CommentTextArea.defaultProps = {
   newComment: '',
   onChangeNewComment: () => {},
   wysiwyg: false,
-  searchForMentionInQuery: () => {},
+  searchForMentionOrLinkInQuery: () => {},
   onInitWysiwyg: () => {}
 }

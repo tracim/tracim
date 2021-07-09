@@ -33,10 +33,6 @@ describe('<PreviewComponent />', () => {
       it('should display the loading message', () =>
         expect(wrapper.find('.previewcomponent__fileimg__text-msg')).to.have.text().equal(loadingMessage)
       )
-
-      it('should display just one dloption button', () =>
-        expect(wrapper.find('.previewcomponent__dloption__icon')).to.have.lengthOf(1)
-      )
     })
 
     describe('when the image is available but not displayable', () => {
@@ -57,12 +53,6 @@ describe('<PreviewComponent />', () => {
       it('should display the preview in `img` html tag', () =>
         expect(wrapper.find('img.previewcomponent__fileimg__img').prop('src')).to.equal(props.previewUrl)
       )
-
-      it('should display the 3 pdf download buttons if pdf is available', () => {
-        wrapper.setProps({ isPdfAvailable: true })
-        expect(wrapper.find('.previewcomponent__dloption__icon')).to.have.lengthOf(3)
-        wrapper.setProps({ isPdfAvailable: props.isPdfAvailable })
-      })
 
       it('should display the page counter and 2 navigations buttons if the file has more than 1 page', () => {
         wrapper.setProps({ filePageNb: 4 })

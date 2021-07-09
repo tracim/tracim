@@ -6,6 +6,7 @@
   "Description": "Beschreibung",
   "Error while rejecting user": "Fehler beim Abweisen von Benutzern",
   "Error while saving new default role": "Fehler beim Speichern einer neuen Standardrolle",
+  "Error while saving the new version": "Fehler beim Speichern der neuen Version",
   "Add a member": "Ein Mitglied hinzufügen",
   "Error while loading members list": "Fehler beim Laden der Mitgliederliste",
   "Save successful": "Erfolgreich speichern",
@@ -54,5 +55,6 @@
   "Publications activated": "Publikationen aktiviert",
   "Publications deactivated": "Publikationen deaktiviert",
   "Error while activating publications": "Fehler beim Aktivieren von Publikationen",
-  "Error while deactivating publications": "Fehler beim Deaktivieren von Publikationen"
+  "Error while deactivating publications": "Fehler beim Deaktivieren von Publikationen",
+  "Tags": "Markierungen"
 }

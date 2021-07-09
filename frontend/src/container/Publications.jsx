@@ -545,8 +545,8 @@ export class Publications extends React.Component {
     this.setState({ showReorderButton: false })
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.props.match.params.idws)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.props.match.params.idws)
   }
 
   getPreviewLinkParameters = (publication) => {
@@ -658,7 +658,7 @@ export class Publications extends React.Component {
               newComment={state.newComment}
               onChangeNewComment={this.handleChangeNewPublication}
               onInitWysiwyg={this.handleInitPublicationWysiwyg}
-              searchForMentionInQuery={this.searchForMentionInQuery}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
               wysiwyg={state.publicationWysiwyg}
               disableAutocompletePosition
             />

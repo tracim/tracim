@@ -30,7 +30,12 @@ describe('<Comment />', () => {
     onClickEditComment: () => {},
     onClickDeleteComment: () => {},
     fromMe: true,
-    translationState: TRANSLATION_STATE.DISABLED
+    translationState: TRANSLATION_STATE.DISABLED,
+    onChangeTranslationTargetLanguageCode: () => {},
+    translationTargetLanguageCode: 'en',
+    targetLanguageList: [{ code: 'fr', display: 'Français' }],
+    translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
+    onChangeTargetLanguageCode: () => {}
   }
 
   const CommentWithHOC = withRouterMock(Comment)

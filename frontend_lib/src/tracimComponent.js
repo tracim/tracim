@@ -1,6 +1,6 @@
 import React from 'react'
 import { CUSTOM_EVENT } from './customEvent.js'
-import { buildTracimLiveMessageEventType, updateTLMAuthor } from './helper.js'
+import { buildTracimLiveMessageEventType, updateTLMUser } from './helper.js'
 
 export function TracimComponent (WrappedComponent) {
   return class TracimComponent extends React.Component {
@@ -49,7 +49,7 @@ export function TracimComponent (WrappedComponent) {
     execLiveMessageHandler = ({ detail: { type, data } }) => {
       const typeHandler = this.liveMessageHandlerList[type]
       const hasGlobalHandler = this.globalLiveMessageHandlerList.length > 0
-      if (typeHandler || hasGlobalHandler) data.fields.author = updateTLMAuthor(data.fields.author)
+      if (typeHandler || hasGlobalHandler) data.fields.author = updateTLMUser(data.fields.author, true)
       if (typeHandler) typeHandler(data)
       if (hasGlobalHandler) {
         for (const handler of this.globalLiveMessageHandlerList) {

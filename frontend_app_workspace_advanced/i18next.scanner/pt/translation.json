@@ -6,6 +6,7 @@
   "Description": "Descrição",
   "Error while rejecting user": "Erro ao rejeitar o utilizador",
   "Error while saving new default role": "Erro ao salvar nova função predefinida",
+  "Error while saving the new version": "Erro ao salvar a nova versão",
   "Add a member": "Acrescentar um membro",
   "Error while loading members list": "Erro ao carregamento da lista de membros",
   "Save successful": "Salvo com sucesso",
@@ -54,5 +55,6 @@
   "Publications activated": "Publicações ativadas",
   "Publications deactivated": "Publicações desativadas",
   "Error while activating publications": "Erro ao activar publicações",
-  "Error while deactivating publications": "Erro ao desactivar publicações"
+  "Error while deactivating publications": "Erro ao desactivar publicações",
+  "Tags": "Etiquetas"
 }

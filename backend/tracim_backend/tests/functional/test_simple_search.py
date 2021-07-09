@@ -1,6 +1,7 @@
 import pytest
 import transaction
 
+from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
@@ -663,3 +664,42 @@ class TestSimpleSearch(object):
         assert search_result["is_total_hits_accurate"] is False
         assert len(search_result["contents"]) == 1
         assert search_result["contents"][0]["label"].startswith("stringtosearch archived")
+
+    @pytest.mark.parametrize(
+        "search_string,expected_results_count",
+        [("World", 1), ("world", 1), ("orl", 1), ("Hello", 0)],
+    )
+    def test_api___simple_search_ok__by_tags(
+        self,
+        user_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        session,
+        admin_user,
+        search_string: str,
+        expected_results_count: int,
+    ) -> None:
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        content_api = content_api_factory.get()
+        content_api.create(
+            content_type_slug="html-document", workspace=workspace, label="Foo", do_save=True,
+        )
+        bar = content_api.create(
+            content_type_slug="html-document", workspace=workspace, label="Bar", do_save=True
+        )
+        tag_lib = TagLib(session)
+        tag_lib.add_tag_to_content(user=admin_user, content=bar, tag_name="World")
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {"search_string": search_string}
+        res = web_testapp.get("/api/search/content".format(), status=200, params=params)
+        search_result = res.json_body
+        assert search_result
+        assert search_result["total_hits"] == expected_results_count
+        assert search_result["is_total_hits_accurate"] is False
+        if expected_results_count:
+            assert search_result["contents"][0]["label"] == "Bar"

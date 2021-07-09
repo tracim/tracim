@@ -37,7 +37,7 @@ describe('Switching between workspaces advanced', () => {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.wsContentGeneric__header.workspace_advanced__header')
+        .find('.wsContentGeneric__header.workspace_advanced__contentpage__header')
         .should('be.visible')
     })
   })
@@ -58,7 +58,7 @@ describe('Switching between workspaces advanced', () => {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.wsContentGeneric__header.workspace_advanced__header')
+        .find('.wsContentGeneric__header.workspace_advanced__contentpage__header')
         .should('be.visible')
     })
   })
@@ -79,7 +79,7 @@ describe('Switching between workspaces advanced', () => {
         .click()
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.wsContentGeneric__header.workspace_advanced__header')
+        .find('.wsContentGeneric__header.workspace_advanced__contentpage__header')
         .should('be.visible')
     })
   })

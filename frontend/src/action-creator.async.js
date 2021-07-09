@@ -66,12 +66,13 @@ import {
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
-  updateTLMAuthor,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   TLM_CORE_EVENT_TYPE,
   TLM_ENTITY_TYPE,
   CONTENT_TYPE,
+  CUSTOM_EVENT,
+  updateTLMUser,
   uploadFile
 } from 'tracim_frontend_lib'
 
@@ -916,7 +917,8 @@ export const getNotificationList = (
       ...notification,
       fields: {
         ...notification.fields,
-        author: updateTLMAuthor(notification.fields.author)
+        author: updateTLMUser(notification.fields.author, true),
+        user: updateTLMUser(notification.fields.user)
       }
     }))
   }
@@ -950,7 +952,7 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
 }
 
 export const getUserMessagesSummary = userId => dispatch => {
-  return fetchWrapper({
+  const fetchGetMessages = fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`,
     param: {
       credentials: 'include',
@@ -962,6 +964,18 @@ export const getUserMessagesSummary = userId => dispatch => {
     actionName: NOTIFICATION_NOT_READ_COUNT,
     dispatch
   })
+
+  if (fetchGetMessages.status === 200) {
+    fetchGetMessages.json.items = fetchGetMessages.json.items.map(message => ({
+      ...message,
+      fields: {
+        ...message.fields,
+        author: updateTLMUser(message.fields.author, true),
+        user: updateTLMUser(message.fields.user)
+      }
+    }))
+  }
+  return fetchGetMessages
 }
 
 export const getAccessibleWorkspaces = userId => dispatch => {
@@ -1133,6 +1147,11 @@ const getDateRangeParameters = (range, rangeParameterPrefix) => {
   return rangeParameterList
 }
 
+const encodeArrayAsURIComponent = (arrayOrItem, separator = ',') => {
+  if (!(arrayOrItem instanceof Array)) return encodeURIComponent(arrayOrItem)
+  return arrayOrItem.map(item => encodeURIComponent(item)).join(',')
+}
+
 export const getAdvancedSearchResult = (
   searchString,
   contentTypes,
@@ -1162,11 +1181,12 @@ export const getAdvancedSearchResult = (
     if (createdRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(createdRange, 'created'))
     if (modifiedRange) queryParameterList = queryParameterList.concat(getDateRangeParameters(modifiedRange, 'modified'))
     if (searchFacets) {
-      if (searchFacets.workspace_names) queryParameterList.push(`workspace_names=${searchFacets.workspace_names}`)
-      if (searchFacets.statuses) queryParameterList.push(`statuses=${searchFacets.statuses}`)
-      if (searchFacets.content_types) queryParameterList.push(`content_types=${searchFacets.content_types}`)
-      if (searchFacets.file_extensions) queryParameterList.push(`file_extensions=${searchFacets.file_extensions}`)
-      if (searchFacets.author__public_names) queryParameterList.push(`author__public_names=${searchFacets.author__public_names}`)
+      if (searchFacets.workspace_names && searchFacets.workspace_names.length > 0) queryParameterList.push(`workspace_names=${encodeArrayAsURIComponent(searchFacets.workspace_names)}`)
+      if (searchFacets.statuses && searchFacets.statuses.length > 0) queryParameterList.push(`statuses=${encodeArrayAsURIComponent(searchFacets.statuses)}`)
+      if (searchFacets.content_types && searchFacets.content_types.length > 0) queryParameterList.push(`content_types=${encodeArrayAsURIComponent(searchFacets.content_types)}`)
+      if (searchFacets.file_extensions && searchFacets.file_extensions.length > 0) queryParameterList.push(`file_extensions=${encodeArrayAsURIComponent(searchFacets.file_extensions)}`)
+      if (searchFacets.author__public_names && searchFacets.author_public_names.length > 0) queryParameterList.push(`author__public_names=${encodeArrayAsURIComponent(searchFacets.author__public_names)}`)
+      if (searchFacets.tags && searchFacets.tags.length > 0) queryParameterList.push(`tags=${encodeArrayAsURIComponent(searchFacets.tags)}`)
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {
@@ -1316,4 +1336,15 @@ export const getUsageConditions = () => async dispatch => {
     actionName: USAGE_CONDITIONS,
     dispatch
   })
+}
+
+export const logoutUser = (history) => async (dispatch) => {
+  const fetchPostUserLogout = await dispatch(postUserLogout())
+  if (fetchPostUserLogout.status === 204) {
+    dispatch(setUserDisconnected())
+    GLOBAL_dispatchEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
+    history.push(PAGE.LOGIN)
+  } else {
+    dispatch(newFlashMessage(i18n.t('Disconnection error', 'danger')))
+  }
 }

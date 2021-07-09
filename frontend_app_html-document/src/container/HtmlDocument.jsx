@@ -7,6 +7,7 @@ import {
   addRevisionFromTLM,
   APP_FEATURE_MODE,
   appContentFactory,
+  BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   CONTENT_TYPE,
@@ -16,18 +17,13 @@ import {
   getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
-  NewVersionBtn,
   PAGE,
   PopinFixed,
   PopinFixedContent,
-  PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedRightPart,
-  RefreshWarningMessage,
   ROLE,
-  AppContentRightMenu,
   Timeline,
-  IconButton,
+  TagList,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
@@ -44,15 +40,15 @@ import {
   getContentComment,
   getFileChildContent,
   handleMentionsBeforeSave,
+  handleLinksBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
   permissiveNumberEqual,
   TRANSLATION_STATE,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
-  FavoriteButton,
   FAVORITE_STATE,
-  ToolBar
+  addExternalLinksIcons
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -71,6 +67,7 @@ export class HtmlDocument extends React.Component {
     props.setApiUrl(param.config.apiUrl)
     this.state = {
       appName: 'html-document',
+      breadcrumbsList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -293,7 +290,7 @@ export class HtmlDocument extends React.Component {
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionInQuery,
+      this.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -301,7 +298,7 @@ export class HtmlDocument extends React.Component {
   handleTinyMceSelectionChange = (e, position) => {
     tinymceAutoCompleteHandleSelectionChange(
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionInQuery,
+      this.searchForMentionOrLinkInQuery,
       this.state.isAutoCompleteActivated
     )
   }
@@ -313,7 +310,7 @@ export class HtmlDocument extends React.Component {
       event,
       this.setState.bind(this),
       state.isAutoCompleteActivated,
-      this.searchForMentionInQuery
+      this.searchForMentionOrLinkInQuery
     )
   }
 
@@ -326,7 +323,7 @@ export class HtmlDocument extends React.Component {
       state.isAutoCompleteActivated,
       state.autoCompleteCursorPosition,
       state.autoCompleteItemList,
-      this.searchForMentionInQuery
+      this.searchForMentionOrLinkInQuery
     )
   }
 
@@ -365,6 +362,13 @@ export class HtmlDocument extends React.Component {
           breadcrumbs: contentBreadcrumbsList
         }
       })
+      const space = {
+        link: PAGE.WORKSPACE.DASHBOARD(content.workspace_id),
+        label: this.state.config.workspace.label,
+        type: BREADCRUMBS_TYPE.CORE,
+        isALink: true
+      }
+      this.setState({ breadcrumbsList: [space, ...contentBreadcrumbsList] })
     } catch (e) {
       console.error('Error in app html-document, count not build breadcrumbs', e)
     }
@@ -417,8 +421,9 @@ export class HtmlDocument extends React.Component {
     )
 
     const hasLocalStorageRawContent = !!localStorageRawContent
+    const rawContentWithExternalLinkIcons = addExternalLinksIcons(resHtmlDocument.body.raw_content)
 
-    const rawContentBeforeEdit = addClassToMentionsOfUser(resHtmlDocument.body.raw_content, state.loggedUser.username)
+    const rawContentBeforeEdit = addClassToMentionsOfUser(rawContentWithExternalLinkIcons, state.loggedUser.username)
     this.setState(previousState => {
       return {
         mode: modeToRender,
@@ -525,8 +530,15 @@ export class HtmlDocument extends React.Component {
       return
     }
 
+    let newDocumentForApiWithMentionAndLink
+    try {
+      newDocumentForApiWithMentionAndLink = await handleLinksBeforeSave(newDocumentForApiWithMention, state.config.apiUrl)
+    } catch (e) {
+      return Promise.reject(e.message || props.t('Error while saving the new version'))
+    }
+
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMention)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMentionAndLink)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -544,7 +556,7 @@ export class HtmlDocument extends React.Component {
             mode: APP_FEATURE_MODE.VIEW,
             content: {
               ...previousState.content,
-              raw_content: newDocumentForApiWithMention
+              raw_content: addExternalLinksIcons(newDocumentForApiWithMentionAndLink)
             },
             oldInvalidMentionList: allInvalidMentionList,
             showInvalidMentionPopupInContent: false,
@@ -599,8 +611,8 @@ export class HtmlDocument extends React.Component {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateAnywayNewComment = () => {
@@ -854,6 +866,73 @@ export class HtmlDocument extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  getMenuItemList = () => {
+    const { props, state } = this
+    const timelineObject = {
+      id: 'timeline',
+      label: props.t('Timeline'),
+      icon: 'fa-history',
+      children: state.config.apiUrl ? (
+        <Timeline
+          customClass={`${state.config.slug}__contentpage__timeline`}
+          customColor={state.config.hexcolor}
+          apiUrl={state.config.apiUrl}
+          loggedUser={state.loggedUser}
+          timelineData={state.timeline}
+          memberList={state.config.workspace.memberList}
+          newComment={state.newComment}
+          newCommentAsFileList={state.newCommentAsFileList}
+          disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+          availableStatusList={state.config.availableStatuses}
+          wysiwyg={state.timelineWysiwyg}
+          onChangeNewComment={this.handleChangeNewComment}
+          onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+          onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+          onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+          onClickWysiwygBtn={this.handleToggleWysiwyg}
+          onClickRevisionBtn={this.handleClickShowRevision}
+          shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+          isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+          key='Timeline'
+          invalidMentionList={state.invalidMentionList}
+          onClickCancelSave={this.handleCancelSave}
+          onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+          onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+          showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          workspaceId={state.content.workspace_id}
+          onClickTranslateComment={comment => props.handleTranslateComment(
+            comment,
+            state.content.workspace_id,
+            state.translationTargetLanguageCode,
+            this.setState.bind(this)
+          )}
+          onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+          onClickEditComment={this.handleClickEditComment}
+          onClickDeleteComment={this.handleClickDeleteComment}
+          onClickOpenFileComment={this.handleClickOpenFileComment}
+          translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+          translationTargetLanguageCode={state.translationTargetLanguageCode}
+          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+        />
+      ) : null
+    }
+    const tag = {
+      id: 'tag',
+      label: props.t('Tags'),
+      icon: 'fas fa-tag',
+      children: (
+        <TagList
+          apiUrl={state.config.apiUrl}
+          workspaceId={state.content.workspace_id}
+          contentId={state.content.content_id}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+        />
+      )
+    }
+    return [timelineObject, tag]
+  }
+
   render () {
     const { props, state } = this
 
@@ -861,95 +940,65 @@ export class HtmlDocument extends React.Component {
 
     const displayTranslatedText = (
       state.mode !== APP_FEATURE_MODE.EDIT &&
-        state.translationState === TRANSLATION_STATE.TRANSLATED
+      state.translationState === TRANSLATION_STATE.TRANSLATED
     )
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
-        <PopinFixedHeader
-          customClass={`${state.config.slug}`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
-          rawTitle={state.content.label}
+        <PopinFixedContent
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
           componentTitle={<div>{state.content.label}</div>}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          content={state.content}
+          config={state.config}
+          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          disableChangeTitle={!state.content.is_editable}
+          headerButtons={[
+            {
+              icon: 'fas fa-plus-circle',
+              label: props.t('Edit'),
+              key: props.t('Edit'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'newVersionButton'
+            }
+          ]}
+          isRefreshNeeded={state.showRefreshWarning}
+          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          disableChangeTitle={!state.content.is_editable}
-        />
-
-        <PopinFixedOption
-          customColor={state.config.hexcolor}
-          customClass={`${state.config.slug}`}
-          i18n={i18n}
-        >
-          <div>
-            <ToolBar>
-              <FavoriteButton
-                favoriteState={props.isContentInFavoriteList(state.content, state)
-                  ? FAVORITE_STATE.FAVORITE
-                  : FAVORITE_STATE.NOT_FAVORITE}
-                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-              />
-              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <NewVersionBtn
-                  customColor={state.config.hexcolor}
-                  onClickNewVersionBtn={this.handleClickNewVersion}
-                  disabled={state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable}
-                  label={props.t('Edit')}
-                  icon='fas fa-plus-circle'
-                />
-              )}
-
-              {state.mode === APP_FEATURE_MODE.REVISION && (
-                <IconButton
-                  customClass='wsContentGeneric__option__menu__lastversion html-document__lastversionbtn btn'
-                  color={state.config.hexcolor}
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickLastVersion}
-                  icon='fas fa-history'
-                  text={props.t('Last version')}
-                  title={props.t('Last version')}
-                />
-              )}
-
-              {state.showRefreshWarning && (
-                <RefreshWarningMessage
-                  tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                  onClickRefresh={this.handleClickRefresh}
-                />
-              )}
-            </ToolBar>
-            <AppContentRightMenu
-              apiUrl={state.config.apiUrl}
-              content={state.content}
-              availableStatuses={state.config.availableStatuses}
-              appMode={state.mode}
-              loggedUser={state.loggedUser}
-              hexcolor={state.config.hexcolor}
-              onChangeStatus={this.handleChangeStatus}
-              onClickArchive={this.handleClickArchive}
-              onClickDelete={this.handleClickDelete}
-            />
-          </div>
-        </PopinFixedOption>
-
-        <PopinFixedContent
-          customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          favoriteState={props.isContentInFavoriteList(state.content, state)
+            ? FAVORITE_STATE.FAVORITE
+            : FAVORITE_STATE.NOT_FAVORITE}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          showReactions
+          actionList={[{
+            icon: 'far fa-trash-alt',
+            label: props.t('Delete'),
+            onClick: this.handleClickDelete,
+            showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+            disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
+            dataCy: 'popinListItem__delete'
+          }
+          ]}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
+            editionAuthor={state.editionAuthor}
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
             apiUrl={state.config.apiUrl}
@@ -958,8 +1007,6 @@ export class HtmlDocument extends React.Component {
             onClickCloseEditMode={this.handleCloseNewVersion}
             disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleClickSaveDocument}
-            version={state.content.number}
-            lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
             onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
@@ -989,59 +1036,14 @@ export class HtmlDocument extends React.Component {
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickRefresh={this.handleClickRefresh}
+            onClickLastVersion={this.handleClickLastVersion}
           />
 
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            menuItemList={[{
-              id: 'timeline',
-              label: props.t('Timeline'),
-              icon: 'fas fa-history',
-              children: state.config.apiUrl ? (
-                <Timeline
-                  customClass={`${state.config.slug}__contentpage__timeline`}
-                  customColor={state.config.hexcolor}
-                  loggedUser={state.loggedUser}
-                  memberList={state.config.workspace.memberList}
-                  timelineData={state.timeline}
-                  newComment={state.newComment}
-                  newCommentAsFileList={state.newCommentAsFileList}
-                  apiUrl={state.config.apiUrl}
-                  disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-                  availableStatusList={state.config.availableStatuses}
-                  wysiwyg={state.timelineWysiwyg}
-                  onChangeNewComment={this.handleChangeNewComment}
-                  onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                  onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-                  onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-                  onClickWysiwygBtn={this.handleToggleWysiwyg}
-                  onClickRevisionBtn={this.handleClickShowRevision}
-                  shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-                  isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-                  searchForMentionInQuery={this.searchForMentionInQuery}
-                  onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-                  onClickCancelSave={this.handleCancelSave}
-                  onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-                  showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-                  invalidMentionList={state.invalidMentionList}
-                  workspaceId={state.content.workspace_id}
-                  onClickTranslateComment={comment => props.handleTranslateComment(
-                    comment,
-                    state.content.workspace_id,
-                    state.translationTargetLanguageCode,
-                    this.setState.bind(this)
-                  )}
-                  onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-                  onClickEditComment={this.handleClickEditComment}
-                  onClickDeleteComment={this.handleClickDeleteComment}
-                  onClickOpenFileComment={this.handleClickOpenFileComment}
-                  translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
-                  translationTargetLanguageCode={state.translationTargetLanguageCode}
-                  onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-                />
-              ) : null
-            }]}
+            menuItemList={this.getMenuItemList()}
           />
         </PopinFixedContent>
       </PopinFixed>

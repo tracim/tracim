@@ -17,6 +17,7 @@ import {
 } from './action.async.js'
 
 export const PAGE = {
+  CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,
   HOME: '/ui',
   WORKSPACE: {
     ROOT: '/ui/workspaces',
@@ -365,9 +366,9 @@ export const APP_FEATURE_MODE = {
   REVISION: 'revision'
 }
 
-export const updateTLMAuthor = author => {
-  return author
-    ? { ...author, is_from_system_admin: false }
+export const updateTLMUser = (user, isAdmin) => {
+  return user
+    ? { ...user, is_from_system_admin: false }
     : {
       allowed_space: 0,
       auth_type: 'internal',
@@ -379,7 +380,7 @@ export const updateTLMAuthor = author => {
       is_from_system_admin: true,
       lang: 'en',
       profile: 'administrators',
-      public_name: i18n.t('System Administrator'),
+      public_name: isAdmin ? i18n.t('System Administrator') : i18n.t('Unknown'),
       timezone: '',
       user_id: 0,
       username: ''
@@ -684,7 +685,12 @@ export const createSpaceTree = spaceList => {
 
 export const naturalCompareLabels = (itemA, itemB, lang) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA.label.localeCompare(itemB.label, lang, { numeric: true })
+  return naturalCompare(itemA, itemB, lang, 'label')
+}
+
+export const naturalCompare = (itemA, itemB, lang, field) => {
+  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
+  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {
@@ -793,3 +799,27 @@ export const getCoverBaseUrl = (apiUrl, userId) => `${apiUrl}/users/${userId}/co
 export const getFileDownloadUrl = (apiUrl, workspaceId, contentId, filename) => `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}?force_download=1`
 
 export const htmlToText = (domParser, htmlString) => domParser.parseFromString(htmlString, 'text/html').documentElement.textContent
+
+export const addExternalLinksIcons = (htmlString) => {
+  const doc = getDocumentFromHTMLString(htmlString)
+  const locationUrl = new URL(window.location.toString())
+  for (const link of doc.getElementsByTagName('a')) {
+    const url = new URL(link.href)
+    if (url.origin === locationUrl.origin) continue
+    const icon = doc.createElement('i')
+    icon.className = 'fas fa-external-link-alt'
+    icon.style = 'margin-inline-start: 5px;'
+    link.appendChild(icon)
+  }
+  return doc.body.innerHTML
+}
+
+export const getDocumentFromHTMLString = (htmlString) => {
+  const doc = new DOMParser().parseFromString(htmlString, 'text/html')
+
+  if (doc.documentElement.tagName === 'parsererror') {
+    throw new Error('Cannot parse string: ' + doc.documentElement.textContent)
+  }
+
+  return doc
+}

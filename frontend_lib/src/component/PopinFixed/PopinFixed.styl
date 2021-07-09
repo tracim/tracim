@@ -4,58 +4,55 @@
   position fixed
   top headerHeight
   right 0
-  width 70%
-  max-width calc(100% - 345px) // 300px sidebar with + 45px btn toggle sidebar
-  height 100%
-  border 1px solid grey
+  width 100%
+  height "calc(100% - %s)" % headerHeight
   background-color lightGrey
-  box-shadow shadow-right
-  z-index 20
+  z-index 9
+  &.sidebarVisible
+    max-width "calc(100% - %s)" % sidebarWidth
   &.visible
     visibility visible
   &__header
     display flex
     align-items center
-    padding 15px 10px
-    height 62px
+    margin 5px 10px 5px 30px
+    height 60px
+    border-bottom 1px solid mediumGrey
     & > *
       margin-right 5px
+    &__actions
+      &::after
+        display none
     &__icon
       margin-right 10px
-      font-size 22px
-      color white
+      font-size fontSizeTitle
     &__title
       margin-right 10px
       border-radius 5px
-      width 100%
-      color white
+      flex 2
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
+      font-size fontSizeMedium
+      font-weight bold
+      & > div
+        text-overflow ellipsis
+        overflow hidden
       & > input
         padding-left 5px
-    &__edittitle
-      border 1px solid transparent
-      border-radius 5px
-      padding 2px 8px
-      color white
-      font-size 17px
-      .fa-pencil-alt
-        color offWhite
+    &__reactions
+      flex 1
+      height 100%
+      & > .EmojiReactions
+        flex-wrap wrap-reverse
     &__close
-      border 1px solid white
       border-radius 5px
       padding 3px 7px
       & > i
-        color white
-        font-size 20px
+        font-size fontSizeMedium
+        vertical-align middle
   &__option
-    border-bottom 1px solid grey
-    padding 6px 10px
-    height 58px
-    background-color offWhite
     &__menu
-      height 100%
       & > div
         display flex
         flex-flow row
@@ -75,9 +72,9 @@
         & > i
           margin-right 10px
           color darkGrey
-          font-size 22px
+          font-size fontSizeMedium
       &__action
-        font-size 18px
+        font-size fontSizeMedium
         background-color transparent
         border none
         cursor pointer
@@ -86,9 +83,8 @@
   &__content
     display flex
     flex-wrap wrap
-    // 209 = wsContentGeneric:top wsContentGeneric__header:height - wsContentGeneric__option:height
     width 200% // to allow transform translateX of right part
-    height calc(100% - 209px)
+    height 100%
     &__state
       width 100%
       padding 5px 15px
@@ -96,12 +92,28 @@
       background-color #fbe294
     &__left
       transition width 0.4s ease
-      width 25%
+      width 30%
       height 100%
+      &__top
+        display flex
+        align-items center
+        color lightDarkGrey
+        font-size fontSizeSmall
+        padding 5px 10px
+        margin-inline-start 20px
+        & .breadcrumbs
+          margin-inline-end auto
+          overflow auto
+        &__version
+          margin-left auto
+          display flex
+        &__lastversion
+          margin-left 15px
+          font-weight bold
     &__right
       display flex
       transition width 0.4s ease
-      width 25%
+      width 20%
       height 100%
       &__content
         width calc(100% - 65px) // 65px is the width of the rightPart header
@@ -109,14 +121,13 @@
         &__title
           margin 10px 15px
           padding 10px
-          font-size 20px
+          font-size fontSizeMedium
       &__header
         display flex
         flex-direction column
         width 65px
         background-color mediumGrey
-        font-size 20px
-        color darkGrey
+        font-size fontSizeMedium
         cursor pointer
         &__icon
           cursor pointer
@@ -188,6 +199,9 @@ responsiveColumnStyle()
   responsiveColumnStyle()
 
 @media (min-width: min-md) and (max-width: max-md)
+  .headerBtn
+    & span
+      display none
   .wsContentGeneric
     &__content
       overflow-Y auto
@@ -204,6 +218,9 @@ responsiveColumnStyle()
   responsiveColumnStyle()
 
 @media (min-width: min-sm) and (max-width: max-sm)
+  .headerBtn
+    & span
+      display none
   .wsContentGeneric
     width 100%
     max-width 100%
@@ -223,10 +240,15 @@ responsiveColumnStyle()
   responsiveColumnStyle()
 
 @media (max-width: max-xs)
+  .headerBtn
+    & span
+      display none
   .wsContentGeneric
     width 100%
     max-width 100%
     top headerHeight
+    &.sidebarVisible
+      max-width 100%
     &__option
       display none
     &__content

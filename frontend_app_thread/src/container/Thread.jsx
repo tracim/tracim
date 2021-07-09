@@ -5,6 +5,8 @@ import { debug } from '../debug.js'
 import {
   appContentFactory,
   addAllResourceI18n,
+  Breadcrumbs,
+  BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
   handleFetchResult,
@@ -12,10 +14,8 @@ import {
   PAGE,
   PopinFixed,
   PopinFixedHeader,
-  PopinFixedOption,
   PopinFixedContent,
   Timeline,
-  AppContentRightMenu,
   CUSTOM_EVENT,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -31,9 +31,9 @@ import {
   getFileChildContent,
   permissiveNumberEqual,
   getDefaultTranslationState,
-  FavoriteButton,
   FAVORITE_STATE,
-  ToolBar
+  ROLE,
+  SelectStatus
 } from 'tracim_frontend_lib'
 import {
   getThreadContent,
@@ -50,6 +50,7 @@ export class Thread extends React.Component {
 
     this.state = {
       appName: 'thread',
+      breadcrumbsList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -292,6 +293,13 @@ export class Thread extends React.Component {
           breadcrumbs: contentBreadcrumbsList
         }
       })
+      const space = {
+        link: PAGE.WORKSPACE.DASHBOARD(content.workspace_id),
+        label: this.state.config.workspace.label,
+        type: BREADCRUMBS_TYPE.CORE,
+        isALink: true
+      }
+      this.setState({ breadcrumbsList: [space, ...contentBreadcrumbsList] })
     } catch (e) {
       console.error('Error in app thread, count not build breadcrumbs', e)
     }
@@ -320,8 +328,8 @@ export class Thread extends React.Component {
     this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.state.content.workspace_id)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
   handleClickValidateNewCommentBtn = async () => {
@@ -473,100 +481,116 @@ export class Thread extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}
           disableChangeTitle={!state.content.is_editable}
+          actionList={[
+            {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
+            }
+          ]}
+          showReactions
+          apiUrl={state.config.apiUrl}
+          loggedUser={state.loggedUser}
+          content={state.content}
+          favoriteState={props.isContentInFavoriteList(state.content, state)
+            ? FAVORITE_STATE.FAVORITE
+            : FAVORITE_STATE.NOT_FAVORITE}
+          onClickAddToFavoriteList={() => props.addContentToFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
+          onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
+            state.content, state.loggedUser, this.setState.bind(this)
+          )}
         />
 
-        <PopinFixedOption
-          customClass={`${state.config.slug}__contentpage`}
-          customColor={state.config.hexcolor}
-          i18n={i18n}
-        >
-          <div>
-            <ToolBar>
-              <FavoriteButton
-                favoriteState={props.isContentInFavoriteList(state.content, state)
-                  ? FAVORITE_STATE.FAVORITE
-                  : FAVORITE_STATE.NOT_FAVORITE}
-                onClickAddToFavoriteList={() => props.addContentToFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
-                onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
-                  state.content, state.loggedUser, this.setState.bind(this)
-                )}
+        <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
+          <div className='thread__contentpage'>
+            {/* INFO - G.B. - 20210616 - Since the thread component behaves a bit differently than the others it was preferable to put
+            Breadcrumbs and SelectStatus here directly than to adapt the PopinFixedContent component to cover thread as well. */}
+            <div className='thread__contentpage__top'>
+              <Breadcrumbs
+                root={{
+                  link: PAGE.HOME,
+                  label: '',
+                  icon: 'fas fa-home',
+                  type: BREADCRUMBS_TYPE.CORE,
+                  isALink: true
+                }}
+                breadcrumbsList={state.breadcrumbsList}
               />
-              {state.showRefreshWarning && (
-                <RefreshWarningMessage
-                  tooltip={this.props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
-                  onClickRefresh={this.handleClickRefresh}
+
+              {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
+                <SelectStatus
+                  selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
+                  availableStatus={state.config.availableStatuses}
+                  onChangeStatus={this.handleChangeStatus}
+                  disabled={state.content.is_archived || state.content.is_deleted}
                 />
               )}
-            </ToolBar>
-            <AppContentRightMenu
-              apiUrl={state.config.apiUrl}
-              onChangeStatus={this.handleChangeStatus}
-              content={state.content}
-              availableStatuses={state.config.availableStatuses}
-              loggedUser={state.loggedUser}
-              hexcolor={state.config.hexcolor}
-              onClickArchive={this.handleClickArchive}
-              onClickDelete={this.handleClickDelete}
-            />
-          </div>
-        </PopinFixedOption>
-
-        <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
+            </div>
+            {state.showRefreshWarning && (
+              <RefreshWarningMessage
+                tooltip={props.t('The content has been modified by {{author}}', { author: state.editionAuthor, interpolation: { escapeValue: false } })}
+                onClickRefresh={this.handleClickRefresh}
+              />
+            )}
+            {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
             https://github.com/tracim/tracim/issues/1840 */}
-          {state.config.apiUrl ? (
-            <Timeline
-              customClass={`${state.config.slug}__contentpage`}
-              customColor={state.config.hexcolor}
-              loggedUser={state.loggedUser}
-              memberList={state.config.workspace && state.config.workspace.memberList}
-              apiUrl={state.config.apiUrl}
-              timelineData={state.timeline}
-              newComment={state.newComment}
-              newCommentAsFileList={state.newCommentAsFileList}
-              disableComment={!state.content.is_editable}
-              availableStatusList={state.config.availableStatuses}
-              wysiwyg={state.timelineWysiwyg}
-              onChangeNewComment={this.handleChangeNewComment}
-              onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-              onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-              onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-              onClickWysiwygBtn={this.handleToggleWysiwyg}
-              allowClickOnRevision={false}
-              onClickRevisionBtn={() => {}}
-              shouldScrollToBottom
-              isArchived={state.content.is_archived}
-              onClickRestoreArchived={this.handleClickRestoreArchive}
-              isDeleted={state.content.is_deleted}
-              onClickRestoreDeleted={this.handleClickRestoreDelete}
-              isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
-              deprecatedStatus={state.config.availableStatuses[3]}
-              showTitle={false}
-              invalidMentionList={state.invalidMentionList}
-              isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-              onClickCancelSave={this.handleCancelSave}
-              onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-              onInitWysiwyg={this.handleInitWysiwyg}
-              workspaceId={state.content.workspace_id}
-              showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-              searchForMentionInQuery={this.searchForMentionInQuery}
-              onClickTranslateComment={comment => props.handleTranslateComment(
-                comment,
-                state.content.workspace_id,
-                state.translationTargetLanguageCode,
-                this.setState.bind(this)
-              )}
-              onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-              onClickEditComment={this.handleClickEditComment}
-              onClickDeleteComment={this.handleClickDeleteComment}
-              onClickOpenFileComment={this.handleClickOpenFileComment}
-              translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
-              translationTargetLanguageCode={state.translationTargetLanguageCode}
-              onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-            />
-          ) : null}
+            {state.config.apiUrl ? (
+              <Timeline
+                customClass={`${state.config.slug}__contentpage`}
+                customColor={state.config.hexcolor}
+                loggedUser={state.loggedUser}
+                memberList={state.config.workspace && state.config.workspace.memberList}
+                apiUrl={state.config.apiUrl}
+                timelineData={state.timeline}
+                newComment={state.newComment}
+                newCommentAsFileList={state.newCommentAsFileList}
+                disableComment={!state.content.is_editable}
+                availableStatusList={state.config.availableStatuses}
+                wysiwyg={state.timelineWysiwyg}
+                onChangeNewComment={this.handleChangeNewComment}
+                onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+                onClickWysiwygBtn={this.handleToggleWysiwyg}
+                allowClickOnRevision={false}
+                onClickRevisionBtn={() => { }}
+                shouldScrollToBottom
+                isArchived={state.content.is_archived}
+                onClickRestoreArchived={this.handleClickRestoreArchive}
+                isDeleted={state.content.is_deleted}
+                onClickRestoreDeleted={this.handleClickRestoreDelete}
+                isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+                deprecatedStatus={state.config.availableStatuses[3]}
+                showTitle={false}
+                invalidMentionList={state.invalidMentionList}
+                isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+                onClickCancelSave={this.handleCancelSave}
+                onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+                onInitWysiwyg={this.handleInitWysiwyg}
+                workspaceId={state.content.workspace_id}
+                showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+                searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+                onClickTranslateComment={comment => props.handleTranslateComment(
+                  comment,
+                  state.content.workspace_id,
+                  state.translationTargetLanguageCode,
+                  this.setState.bind(this)
+                )}
+                onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                onClickEditComment={this.handleClickEditComment}
+                onClickDeleteComment={this.handleClickDeleteComment}
+                onClickOpenFileComment={this.handleClickOpenFileComment}
+                translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                translationTargetLanguageCode={state.translationTargetLanguageCode}
+                onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+              />
+            ) : null}
+          </div>
         </PopinFixedContent>
       </PopinFixed>
     )

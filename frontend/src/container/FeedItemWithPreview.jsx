@@ -190,8 +190,8 @@ export class FeedItemWithPreview extends React.Component {
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
-  searchForMentionInQuery = async (query) => {
-    return await this.props.searchForMentionInQuery(query, this.props.workspaceId)
+  searchForMentionOrLinkInQuery = async (query) => {
+    return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
   }
 
   handleTranslateComment = () => {
@@ -426,7 +426,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickCancelSave={this.handleCancelSave}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
                 onClickSaveAnyway={this.handleClickValidateAnyway}
-                searchForMentionInQuery={this.searchForMentionInQuery}
+                searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
                 workspaceId={props.workspaceId}
                 onClickTranslateComment={(
                   comment => handleTranslateComment(

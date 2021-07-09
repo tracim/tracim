@@ -14,7 +14,7 @@ describe('<CommentTextArea />', () => {
     disableComment: false,
     id: 'autoCompleteInputId',
     t: key => key,
-    searchForMentionInQuery: () => []
+    searchForMentionOrLinkInQuery: () => []
   }
 
   const wrapper = shallow(
@@ -127,7 +127,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to false', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
@@ -139,7 +139,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to true', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
@@ -151,7 +151,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to false', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
@@ -163,7 +163,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to true', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
@@ -175,7 +175,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to true', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
@@ -187,7 +187,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to true', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(true)
           })
         })
@@ -199,7 +199,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to false', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
@@ -217,7 +217,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to false', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })
@@ -229,7 +229,7 @@ describe('<CommentTextArea />', () => {
           })
 
           it('should have the state isAutoCompleteActivated set to false', () => {
-            wrapper.instance().searchForMentionCandidate()
+            wrapper.instance().searchForMentionOrLinkCandidate()
             expect(wrapper.state('isAutoCompleteActivated')).to.equal(false)
           })
         })

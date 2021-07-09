@@ -21,6 +21,7 @@ from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import IndexingError
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -54,6 +55,8 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.tag import Tag
+from tracim_backend.models.tag import TagOnContent
 from tracim_backend.views.search_api.schemas import AdvancedContentSearchQuery
 
 FILE_PIPELINE_ID = "attachment"
@@ -262,6 +265,7 @@ class ESSearchApi(SearchApi):
             )
             for comment in content_in_context.comments
         ]
+        tags = [content_tag.tag.tag_name for content_tag in content.tags]
         indexed_content = IndexedContent(
             content_namespace=content_in_context.content_namespace,
             content_id=content_in_context.content_id,
@@ -289,6 +293,8 @@ class ESSearchApi(SearchApi):
             path=path,
             comments=comments,
             comment_count=len(comments),
+            tags=tags,
+            tag_count=len(tags),
             author=author,
             last_modifier=last_modifier,
             archived_through_parent_id=content_in_context.archived_through_parent_id,
@@ -366,7 +372,7 @@ class ESSearchApi(SearchApi):
             owner_id=workspace.owner_id,
             member_ids=member_ids,
             member_count=len(member_ids),
-            content_count=capi.get_all_query(workspace=workspace).count(),
+            content_count=capi.get_all_query(workspaces=[workspace]).count(),
         )
         indexed_workspace.meta.id = workspace.workspace_id
         workspace_index_alias = self._get_index_parameters(IndexedWorkspace).alias
@@ -499,6 +505,9 @@ class ESSearchApi(SearchApi):
                 ]
             )
 
+        if ContentSearchField.TAGS in search_fields:
+            es_search_fields.extend(["tags^5", "tags.text^3"])
+
         if ContentSearchField.RAW_CONTENT in search_fields:
             es_search_fields.extend(
                 [
@@ -611,6 +620,9 @@ class ESSearchApi(SearchApi):
         if modified_range:
             search = search.filter("range", modified=modified_range)
 
+        if search_parameters.tags:
+            search = search.filter("terms", tags=search_parameters.tags)
+
         search.aggs.bucket("content_types", "terms", field="content_type")
         search.aggs.bucket(
             "workspace_names", "terms", field="workspace.label.{}".format(EXACT_FIELD)
@@ -627,11 +639,11 @@ class ESSearchApi(SearchApi):
             "file_extensions", "terms", field="file_extension.{}".format(EXACT_FIELD)
         )
         search.aggs.bucket("statuses", "terms", field="status")
+        search.aggs.bucket("tags", "terms", field="tags")
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
         search.aggs.metric("modified_from", "min", field="modified")
         search.aggs.metric("modified_to", "max", field="modified")
-
         res = search.execute()
         return res
 
@@ -934,7 +946,7 @@ class ESContentIndexer:
             show_archived=True,
         )
         try:
-            self.index_contents(content_api.get_all_query(workspace=workspace), context)
+            self.index_contents(content_api.get_all_query(workspaces=[workspace]), context)
         except IndexingError:
             logger.exception(
                 self,
@@ -967,6 +979,19 @@ class ESContentIndexer:
                     user.user_id
                 ),
             )
+
+    @hookimpl
+    def on_content_tag_created(self, content_tag: TagOnContent, context: TracimContext) -> None:
+        self.index_contents([content_tag.content], context)
+
+    @hookimpl
+    def on_content_tag_deleted(self, content_tag: TagOnContent, context: TracimContext) -> None:
+        self.index_contents([content_tag.content], context)
+
+    @hookimpl
+    def on_tag_modified(self, tag: Tag, context: TracimContext) -> None:
+        tag_lib = TagLib(context.dbsession)
+        self.index_contents(tag_lib.get_contents(tag), context)
 
     def index_contents(self, contents: typing.List[Content], context: TracimContext) -> None:
         if context.app_config.JOBS__PROCESSING_MODE == CFG.CST.ASYNC:
