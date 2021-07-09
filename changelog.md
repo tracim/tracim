@@ -19,7 +19,7 @@ For end users:
    horizontally, to put the focus on the content. The header and the toolbar have been merged and the specific color
    in the header is now only used for the icon.
  - The valitity time of the password reset link is given in the reset password email sent when users forget their passwords
- - The autocompletion popup for mentions (and now, for links) is now correctly positionned even when the text being
+ - The autocompletion popup for mentions (and now, for links) is now correctly positioned even when the text being
    edited is scrolled.
 
 For administrators:
