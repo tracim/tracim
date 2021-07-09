@@ -26,10 +26,10 @@ For administrators:
  - More robust previews. Some office documents take a lot of time and resources to preview. There is now a timeout for
    previews of documents generated using LibreOffice to limit issues that can arise from this problem. For this reason,
    previews of spreadsheets are now disabled by default.
- - Easier database creation (feature for administrators): when creating a database with `tracimcli db init`,
+ - Easier database creation: when creating a database with `tracimcli db init`,
    the command now automatically stamps `head`, which, until now, required to run a dedicated command. It is now
    a bit easier to install a new database when installing Tracim.
- - Migration to MinIO (feature for administrators). Instances using standard storage can now be easily be migrated
+ - Migration to MinIO. Instances using standard storage can now be easily be migrated
    to MinIO using the new command `tracimcli db migrate-storage`.
  - Limitation of simultaneous online users: administrators can now limit how many simultaneous users are using a Tracim
    instance. If the limit is reached, user loading tracim will be shown an error message telling them to contact
