@@ -42,3 +42,4 @@ jsconfig.json
 # emacs save files
 \#*
 .\#*
+.python-version

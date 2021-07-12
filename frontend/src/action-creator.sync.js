@@ -194,14 +194,16 @@ export const resetAppliedFilter = (searchType) => ({ type: `${RESET}/${APPLIED_F
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'
 export const NOTIFICATION = 'Notification'
-export const NOTIFICATION_NOT_READ_COUNT = 'NotificationNotReadCounter'
+export const UNREAD_MENTION_COUNT = 'UnreadMentionCount'
+export const UNREAD_NOTIFICATION_COUNT = 'UnreadNotificationCount'
 export const setNotificationList = notificationList => ({ type: `${SET}/${NOTIFICATION_LIST}`, notificationList })
 export const appendNotificationList = notificationList => ({ type: `${APPEND}/${NOTIFICATION_LIST}`, notificationList })
 export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION}`, notification })
 export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATION}`, notificationId })
 export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
-export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })
+export const setUnreadMentionCount = (count) => ({ type: `${SET}/${UNREAD_MENTION_COUNT}`, count })
+export const setUnreadNotificationCount = (count) => ({ type: `${SET}/${UNREAD_NOTIFICATION_COUNT}`, count })
 
 export const ACCESSIBLE_WORKSPACE_LIST = `${WORKSPACE}/AccessibleList`
 export const ACCESSIBLE_WORKSPACE = `${WORKSPACE}/Accessible`
