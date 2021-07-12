@@ -38,5 +38,9 @@ describe('Publications', () => {
     it('should show text as comment', () => {
       cy.contains('.comment__body__content__text', exampleText).should('be.visible')
     })
+
+    it('should have a download attribute in the preview', () => {
+      cy.get('.feedItem__preview a').should('have.attr', 'download')
+    })
   })
 })
