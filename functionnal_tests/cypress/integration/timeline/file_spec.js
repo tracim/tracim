@@ -45,4 +45,18 @@ describe('Timeline', () => {
       cy.url().should('include', '/contents/file')
     })
   })
+
+  // INFO - G.B. - 2021-07-13 - The file name is based in time, so we use wait to be sure
+  // that we have at least a second between files
+  it('should be able to publish multiple times the same file', () => {
+    cy.wait(1000)
+    cy.get(addFileButton).click()
+    cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
+    cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
+      .get('[data-cy=popup__createcontent__form__button]')
+      .click()
+    cy.contains(submitButton, 'Send').click()
+
+    cy.get('.comment').should('have.length.gt', 1)
+  })
 })
