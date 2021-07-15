@@ -19,6 +19,10 @@ describe('Publications page', () => {
     })
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   it('should have emoji reaction button', () => {
     cy.get('.EmojiReactionButton__buttonpicker')
       .should('be.enabled')
@@ -50,10 +54,11 @@ describe('Publications page', () => {
       cy.contains('.feedItem__publication__body__content__text', text)
       cy.get('.feedItemHeader__actionMenu__item[title="Edit"]').click()
       cy.get('.editCommentPopup__title').should('be.visible')
-      cy.assertTinyMCEContent(text)
-      cy.typeInTinyMCE(`${text}!`)
-      cy.contains('.iconbutton__text_with_icon', 'Send').click()
-      cy.contains('.feedItem__publication__body__content__text', `${text}!`)
+      cy.waitForTinyMCELoaded().then(() => {
+        cy.typeInTinyMCE(`${text}!`)
+        cy.contains('.iconbutton__text_with_icon', 'Send').click()
+        cy.contains('.feedItem__publication__body__content__text', `${text}!`)
+      })
     })
 
     it('should be able to open as a content', () => {

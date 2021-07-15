@@ -19,6 +19,10 @@ describe('Publications', () => {
     })
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   it('A translation button should be visible', () => {
     cy.get('[data-cy=commentTranslateButton]').click()
     cy.contains('.feedItem__publication', 'en')

@@ -30,6 +30,10 @@ describe('Publications', () => {
     })
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   describe('publish a file', () => {
     it('should show image as preview', () => {
       cy.get('.feedItem__preview__image img').should('be.visible')

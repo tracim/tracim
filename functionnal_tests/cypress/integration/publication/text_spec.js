@@ -50,6 +50,10 @@ describe('Publications', () => {
       })
     })
 
+    afterEach(() => {
+      cy.cancelXHR()
+    })
+
     it('should show the first message as preview for simple edition', function () {
       cy.get(publicationInput).type(exampleText)
       cy.contains(publishButton, 'Publish').click()
