@@ -6,7 +6,8 @@ const threadTitle = 'TitleThread'
 let threadId
 
 let workspaceId
-let commentText
+let commentInputText
+let commentDisplayedText
 
 const commentAreaInput = '.timeline__texteditor__textinput #wysiwygTimelineComment'
 
@@ -19,7 +20,8 @@ describe('In a comment', () => {
       workspaceId = workspace.workspace_id
       cy.createHtmlDocument(noteTitle, workspaceId).then(note => {
         noteId = note.content_id
-        commentText = `This is a comment #${noteId} that has a link`
+        commentInputText = `This is a comment #${noteId} that has a link`
+        commentDisplayedText = `This is a comment ${noteTitle} that has a link`
       })
       cy.createThread(threadTitle, workspaceId).then(thread => {
         threadId = thread.content_id
@@ -35,8 +37,8 @@ describe('In a comment', () => {
     })
     cy.get(commentAreaInput)
       .should('be.visible')
-      .type(commentText)
-    cy.contains(commentAreaInput, commentText)
+      .type(commentInputText)
+    cy.contains(commentAreaInput, commentInputText)
     cy.get('.timeline__texteditor__submit__btn')
       .click()
   })
@@ -46,9 +48,9 @@ describe('In a comment', () => {
   })
 
   describe('send a comment with a link', () => {
-    it('should have the text and the a tag with the id', () => {
-      cy.contains('.comment__body__content__text', commentText)
-      cy.contains('.comment__body__content__text a', noteId)
+    it('should have the text and the a tag with the title', () => {
+      cy.contains('.comment__body__content__text', commentDisplayedText)
+      cy.contains('.comment__body__content__text a', noteTitle)
     })
 
     it('should redirect to content if clicked', () => {
