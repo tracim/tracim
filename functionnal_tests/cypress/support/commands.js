@@ -1,12 +1,6 @@
 import 'cypress-wait-until'
 import 'cypress-file-upload'
 
-const userFixtures = {
-  administrators: 'defaultAdmin',
-  'trusted-users': '',
-  users: 'baseUser'
-}
-
 let LOGIN_URL = '/api/auth/login'
 
 Cypress.Commands.add('loginAs', (role = 'administrators') => {
@@ -133,8 +127,16 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
 // @babel/polyfill loaded and crash when using something from tracim_frontend_lib
 // https://github.com/tracim/tracim/issues/2041
 Cypress.Commands.add('waitForTinyMCELoaded', () => {
-  cy.document().then($doc => {
-    return new Cypress.Promise(resolve => { // Cypress will wait for this Promise to resolve
+  let isTinyMCEActive = false
+
+  cy.window().its('tinyMCE').its('activeEditor').then(activeEditor => {
+    if (activeEditor.getContent()) isTinyMCEActive = true
+  })
+
+  cy.document().then( $doc => {
+    return isTinyMCEActive
+      ? true
+      : new Cypress.Promise(resolve => { // Cypress will wait for this Promise to resolve
       const onTinyMceLoaded = () => {
         $doc.removeEventListener('tinymceLoaded', onTinyMceLoaded) // cleanup
         resolve() // resolve and allow Cypress to continue
