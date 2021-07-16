@@ -804,12 +804,20 @@ export const addExternalLinksIcons = (htmlString) => {
   const doc = getDocumentFromHTMLString(htmlString)
   const locationUrl = new URL(window.location.toString())
   for (const link of doc.getElementsByTagName('a')) {
-    const url = new URL(link.href)
-    if (url.origin === locationUrl.origin) continue
-    const icon = doc.createElement('i')
-    icon.className = 'fas fa-external-link-alt'
-    icon.style = 'margin-inline-start: 5px;'
-    link.appendChild(icon)
+    let url
+    try {
+      url = new URL(link.href)
+    } catch (e) {
+      url = link.href
+      console.error('Error in url constructor', e)
+    }
+
+    if (url.origin && url.origin !== locationUrl.origin) {
+      const icon = doc.createElement('i')
+      icon.className = 'fas fa-external-link-alt'
+      icon.style = 'margin-inline-start: 5px;'
+      link.appendChild(icon)
+    }
   }
   return doc.body.innerHTML
 }
