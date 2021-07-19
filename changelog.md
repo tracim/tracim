@@ -1,4 +1,4 @@
-# 3.8.2 / 2021-07-19
+# 3.9.1 / 2021-07-19
 
 This stabilisation release fixes a frontend crash that happens when anchor elements with an empty or inexistent href
 attribute end up in publications, notes or comments. Any user of Tracim 3.9 is strongly encouraged to update. Releases
