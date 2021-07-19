@@ -1,12 +1,21 @@
+# 3.8.2 / 2021-07-19
+
+This stabilisation release fixes a frontend crash that happens when anchor elements with an empty or inexistent href
+attribute end up in publications, notes or comments. Any user of Tracim 3.9 is strongly encouraged to update. Releases
+prior to Tracim 3.9 are not affected by this crash.
+
+### Fixed Issues
+ - Frontend: [#4805](https://github.com/tracim/tracim/issues/4805)
+
 # 3.9.0 / 2021-07-09
 
 ### New Features
 
 For end users:
- - Links to Tracim contents. A user can now create a link to other Tracim contents in comments and notes. An autocompletion popup
-   will help the user create the link as soon as they type `#` and then a word in the title of the content, or
-   its id. The created link will display the title of the document, and will have a specific color showing it is
-   an internal link in notes.
+ - Links to Tracim contents. A user can now create a link to other Tracim contents in comments and notes. An
+   autocompletion popup will help the user create the link as soon as they type `#` and then a word in the title
+   of the content, or its id. The created link will display the title of the document, and will have a specific color
+   showing it is an internal link in notes.
  - Tags on contents (notes and files). Tagging is done in the new tab between the area that shows the
    content and the timeline. Tags can be added and removed there. They are per space (spaces have different sets of
    tags). Tags of a space can be listed and managed in the space settings that a user can find in the dashboard.
@@ -16,7 +25,7 @@ For end users:
  - Revamped app appearance (size and headers). Formerly, apps showing notes, topics and files didn't take the whole
    space vertically and horizontally. They also had both a header and a toolbar.
    The space and screen estate is now better used. Apps now take as much space as possible, both vertically and
-   horizontally, and the header and the toolbar have been merged to put the focus on the content. 
+   horizontally, and the header and the toolbar have been merged to put the focus on the content.
  - The valitity time of the password reset link is given in the reset password email sent when users forget their passwords
  - The autocompletion popup for mentions (and now, for links) is now correctly positioned even when the text being
    edited is scrolled.
