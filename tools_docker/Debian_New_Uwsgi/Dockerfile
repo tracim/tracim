@@ -62,7 +62,6 @@ RUN \
         # Preview generator optionals dependencies
         ffmpeg \
         xvfb \
-        ufraw-batch \
         inkscape \
         libreoffice
 FROM pg_dep_${PG_DEP} AS pg_dep
