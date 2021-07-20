@@ -10,7 +10,7 @@ ARG DB_DEP="full"
 ####
 
 # level 1 : base
-FROM debian:bullseye-slim AS base
+FROM debian:bullseye AS base
 RUN \
     apt update \
     && apt upgrade -qy \
