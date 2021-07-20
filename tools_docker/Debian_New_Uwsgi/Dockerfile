@@ -138,7 +138,9 @@ FROM db_install_${DB_DEP} as db_install
 FROM db_install as pg_install_minimal
 FROM db_install as pg_install_full
 RUN \
-    python3 -m pip install -r requirements-full-preview-generator.txt
+    # Go in backend folder
+    cd /tracim/backend \
+    && python3 -m pip install -r requirements-full-preview-generator.txt
 # end of all stages:
 from pg_install_${PG_DEP} as backend
 
