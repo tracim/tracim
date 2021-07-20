@@ -199,13 +199,13 @@ jobs:
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
-      name: "Backend: Postgresql MySQL 8"
+      name: "Backend: MySQL 8"
       env:
         - DB=mysql
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend
       <<: *_backend_test
-      name: "Backend: Postgresql MariaDB"
+      name: "Backend: MariaDB"
       env:
         - DB=mariadb
       if: commit_message !~ /(\[skip ci pytest\])/
