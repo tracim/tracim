@@ -7,7 +7,10 @@ from hapic.processor.main import ProcessValidationError
 
 
 class TracimProcessor(MarshmallowProcessor):
-    """Patched hapic processor that return error when dump data is not correct"""
+    """
+    Patched hapic processor that returns an error when dump data is not correct.
+    See https://github.com/algoo/hapic/issues/211 for more info.
+    """
 
     def dump(self, data: typing.Any) -> typing.Any:
         """
