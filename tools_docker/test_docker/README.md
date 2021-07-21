@@ -67,7 +67,7 @@ pytest test_docker
 Tests can now be started:
 
 ```sh
-pytest test_docker
+pytest test_dockers.py
 ```
 
 It will check in the Docker container if all the Tracim services are correctly running after launching the Tracim, Collabora and ElasticSearch Docker containers.
@@ -82,7 +82,7 @@ If you have correctly set up `dns-proxy-server`, tracim should be available with
 
 for semi manual test, its better to do this:
 ```sh
-pytest -m test_all_in_one_step test_docker
+pytest -m test_all_in_one_step test_dockers.py
 ```
 
 ## Configuration file
