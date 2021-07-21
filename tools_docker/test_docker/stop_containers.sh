@@ -5,7 +5,6 @@ stop_and_remove_container() {
     docker container stop "$container_name"
     docker container rm "$container_name"
 }
-^
 stop_and_remove_container tracim.test
 stop_and_remove_container elasticsearch.test
 stop_and_remove_container collabora.test
