@@ -19,7 +19,8 @@ RUN \
         libfile-mimeinfo-perl \
         libimage-exiftool-perl \
         locales \
-        python3
+        python3 \
+        iproute2
 
 # level 2: debug tools
 FROM base as debug_dep_minimal
@@ -32,7 +33,6 @@ RUN \
        httpie \
        wget \
        curl \
-       iproute2 \
        htop \
        nano \
        strace \
