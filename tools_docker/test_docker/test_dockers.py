@@ -178,7 +178,6 @@ def test_existing_packages(tracim):
     assert tracim.package('python3').is_installed
     assert tracim.package('libreoffice').is_installed
     assert tracim.package('qpdf').is_installed
-    assert tracim.package('ufraw-batch').is_installed
     assert tracim.package("libimage-exiftool-perl").is_installed
     assert tracim.package("libfile-mimeinfo-perl").is_installed
     assert tracim.pip_package.get_packages().get('tracim-backend')
