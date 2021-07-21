@@ -219,7 +219,7 @@ COPY --from=backend /tracim /tracim
 # Tracim code: frontend
 COPY --from=frontend /tracim/frontend/dist /tracim/frontend/dist
 # backend translation
-COPY --from=frontend /tracim/backend/tracim_backend/locale /tracim/backend/tracim_backend/llocale
+COPY --from=frontend /tracim/backend/tracim_backend/locale /tracim/backend/tracim_backend/locale
 # backend dependencies installed through pip
 COPY --from=backend /usr/local /usr/local
 

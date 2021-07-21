@@ -82,6 +82,7 @@ def test_default_file_created(tracim):
     assert tracim.file("tracim/backend/tracim_backend/locale/en/backend.json").is_file
     assert tracim.file("tracim/backend/tracim_backend/locale/fr/backend.json").is_file
     assert tracim.file("tracim/backend/tracim_backend/locale/pt/backend.json").is_file
+    assert tracim.file("tracim/backend/tracim_backend/locale/de/backend.json").is_file
 
     assert tracim.file("/etc/tracim/apache2.conf").is_file
     assert tracim.file("/etc/apache2/sites-available/tracim.conf").is_symlink
