@@ -31,6 +31,8 @@ RUN \
         nodejs \
         python3-dev \
         python3-pip \
+        python3-distutils \
+        python3-apt \
         python3-venv
 
 # Clone repo

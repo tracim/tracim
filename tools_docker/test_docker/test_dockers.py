@@ -12,25 +12,25 @@ def test_apache_running(tracim):
     apache2 = tracim.service("apache2")
     assert apache2.is_running
     assert apache2.is_enabled
-    assert tracim.socket("tcp://80").is_listening
+    assert tracim.socket("tcp://0.0.0.0:80").is_listening
 
 
 def test_uwsgi_running(tracim):
     uwsgi = tracim.service("uwsgi")
     assert uwsgi.is_running
     assert uwsgi.is_enabled
-    assert tracim.socket("tcp://8080").is_listening
+    assert tracim.socket("tcp://0.0.0.0:8080").is_listening
 
 
 def test_webdav_running(tracim):
-    assert tracim.socket("tcp://3030").is_listening
+    assert tracim.socket("tcp://0.0.0.0:3030").is_listening
 
 
 def test_caldav_running(tracim):
     assert tracim.socket("tcp://127.0.0.1:5232").is_listening
 
 def test_pushpin_running(tracim):
-    assert tracim.socket("tcp://127.0.0.1:7999").is_listening
+    assert tracim.socket("tcp://0.0.0.0:7999").is_listening
     assert tracim.socket("tcp://127.0.0.1:5561").is_listening
     assert tracim.process.get(user="pushpin", comm='pushpin')
 

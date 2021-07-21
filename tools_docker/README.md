@@ -251,6 +251,11 @@ you to either use buildx or buildkit. In this doc, we will use buildx as it's kn
 docker buildx build -t algoo/tracim:minimal . --build-arg PG_DEP=minimal --build-arg ENCRYPTION_DEP=minimal --build-arg DB_DEP=minimal
 ```
 
+full version:
+```
+docker buildx build -t algoo/tracim:maximal . --build-arg PG_DEP=full --build-arg ENCRYPTION_DEP=full --build-arg DB_DEP=full
+```
+
 ### ARM build
 
 To test it on your own AMD64 machine, you first need to activate or install buildx feature of
