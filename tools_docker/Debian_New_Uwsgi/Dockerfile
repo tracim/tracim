@@ -24,7 +24,7 @@ RUN cat /packages/base_packages.list > packages.list
 RUN cat /packages/pg_minimal_packages.list >> packages.list
 RUN if [ "$DEBUG_DEP" = "full" ]; then cat /packages/debug_packages.list >> packages.list ; fi
 RUN if [ "$ENCRYPTION_DEP" = "full" ]; then cat /packages/encryption_packages.list >> packages.list ; fi
-RUN if [ "$PG_DEP" = "full" ]; then cat /packages/encryption_packages.list >> packages.list ; fi
+RUN if [ "$PG_DEP" = "full" ]; then cat /packages/pg_full_packages.list >> packages.list ; fi
 RUN \
     apt update \
     && apt upgrade -qy \
