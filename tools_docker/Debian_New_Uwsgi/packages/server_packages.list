@@ -1,0 +1,10 @@
+mongrel2-core
+apache2
+gnupg
+libapache2-mod-proxy-uwsgi
+postgresql-client
+pushpin
+redis-server
+supervisor
+uwsgi
+uwsgi-plugin-python3

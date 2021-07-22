@@ -1,0 +1,3 @@
+apt-transport-https
+software-properties-common
+gnupg2

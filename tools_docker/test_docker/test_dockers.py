@@ -77,28 +77,48 @@ def test_users(tracim):
 
 
 def test_default_file_created(tracim):
+    # config files
     assert tracim.file("/etc/tracim/development.ini").is_file
     assert tracim.file("/tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf").is_file
+    assert tracim.file("/etc/tracim/apache2.conf").is_file
+    assert tracim.file("/etc/apache2/sites-available/tracim.conf").is_symlink
+    assert tracim.file("/etc/apache2/sites-enabled/tracim.conf").is_symlink
+    assert tracim.file("/etc/tracim/tracim_web.ini").is_file
+    assert tracim.file("/etc/uwsgi/apps-available/tracim_web.ini").is_symlink
+    assert tracim.file("/etc/uwsgi/apps-enabled/tracim_web.ini").is_symlink
+
+    # Trad
     assert tracim.file("tracim/backend/tracim_backend/locale/en/backend.json").is_file
     assert tracim.file("tracim/backend/tracim_backend/locale/fr/backend.json").is_file
     assert tracim.file("tracim/backend/tracim_backend/locale/pt/backend.json").is_file
     assert tracim.file("tracim/backend/tracim_backend/locale/de/backend.json").is_file
 
-    assert tracim.file("/etc/tracim/apache2.conf").is_file
-    assert tracim.file("/etc/apache2/sites-available/tracim.conf").is_symlink
-    assert tracim.file("/etc/apache2/sites-enabled/tracim.conf").is_symlink
-
-    assert tracim.file("/etc/tracim/tracim_web.ini").is_file
-    assert tracim.file("/etc/uwsgi/apps-available/tracim_web.ini").is_symlink
-    assert tracim.file("/etc/uwsgi/apps-enabled/tracim_web.ini").is_symlink
-
+    # Branding dir
     assert tracim.file("/etc/tracim/branding/color.json").is_file
-    assert tracim.file("/etc/tracim/branding/tracim-logo.png").is_file
+    assert tracim.file("/etc/tracim/branding/manifest.json").is_file
+    assert tracim.file("/etc/tracim/branding/welcome-simple.html").is_file
+    assert tracim.file("/etc/tracim/branding/welcome-simple.css").is_file
+    assert tracim.file("/etc/tracim/branding/welcome-simple-text.html").is_file
+    assert tracim.file("/etc/tracim/branding/welcome-simple-bg.jpg").is_file
+    assert tracim.file("/etc/tracim/branding/images").is_directory
+    assert tracim.file("/etc/tracim/branding/images/tracim-logo.png").is_file
+    assert tracim.file("/etc/tracim/branding/images/safari-pinned-tab-icon.svg").is_file
+    assert tracim.file("/etc/tracim/branding/images/favicon").is_file
+    sizes = [
+        '120x120','128x128', '144x144', "152x152", "180x180",
+        "192x192", "384x384", "512x512", "72x72", "96x96"
+    ]
+    for size in sizes:
+        assert tracim.file(
+            "/etc/tracim/branding/images/wa-tracim-logo-{size}.png".format(size=size)
+        ).is_file
     assert tracim.file("/tracim/frontend/dist/assets/branding").is_directory
 
+    # Plugins
     assert tracim.file("/etc/tracim/plugins").is_directory
     assert tracim.file("/etc/tracim/custom_toolbox").is_directory
 
+    # Logs
     assert tracim.file("/var/tracim/logs").is_directory
     assert tracim.file("/var/tracim/logs/tracim_web.log").is_file
     assert tracim.file("/var/tracim/logs/tracim_webdav.log").is_file
@@ -180,13 +200,19 @@ def test_existing_packages(tracim):
     assert tracim.package('qpdf').is_installed
     assert tracim.package("libimage-exiftool-perl").is_installed
     assert tracim.package("libfile-mimeinfo-perl").is_installed
-    assert tracim.pip_package.get_packages().get('tracim-backend')
     assert tracim.package('fuse').is_installed
     assert tracim.package('gocryptfs').is_installed
+    assert tracim.package('python3-pip').is_installed
+    assert tracim.pip_package.get_packages().get('tracim-backend')
 
-def test_removed_packages(tracim):
+def test_not_installed_packages(tracim):
+    """
+    These package are use for build only, they should not been there at the end of
+    building process
+    """
     assert not tracim.package('curl').is_installed
     assert not tracim.package('nodejs').is_installed
+    assert not tracim.package('npm').is_installed
     assert not tracim.package('python3-dev').is_installed
     assert not tracim.package('build-essential').is_installed
 
@@ -229,6 +255,6 @@ def test_all(tracim, capsys):
     test_caldav_config_available(tracim)
     test_removed_files(tracim)
     test_existing_packages(tracim)
-    test_removed_packages(tracim)
+    test_not_installed_packages(tracim)
     test_tracimcli_access(tracim, capsys)
     test_gocryptfs_mount(tracim, capsys)

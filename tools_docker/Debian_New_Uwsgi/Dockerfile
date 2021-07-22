@@ -9,75 +9,40 @@ ARG DB_DEP="full"
 # Base image for installing some base dependencies
 ####
 
-# level 1 : base
-FROM debian:bullseye AS base
+FROM debian:bullseye AS base_install
+ARG TAG=""
+ARG BRANCH=""
+ARG REPO="https://github.com/tracim/tracim.git"
+ARG PG_DEP
+ARG DEBUG_DEP
+ARG ENCRYPTION_DEP
+ARG DB_DEP
+RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
+    then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
+COPY packages /packages
+RUN cat /packages/base_packages.list > packages.list
+RUN cat /packages/pg_minimal_packages.list >> packages.list
+RUN echo "$DEBUG_DEP"
+RUN if [ "$DEBUG_DEP" = "full" ]; then cat /packages/debug_packages.list >> packages.list ; fi
+RUN if [ "$ENCRYPTION_DEP" = "full" ]; then cat /packages/encryption_packages.list >> packages.list ; fi
+RUN if [ "$PG_DEP" = "full" ]; then cat /packages/encryption_packages.list >> packages.list ; fi
+RUN cat packages.list
 RUN \
     apt update \
     && apt upgrade -qy \
-    && apt install -qy \
-        git \
-        libfile-mimeinfo-perl \
-        libimage-exiftool-perl \
-        locales \
-        python3 \
-        iproute2
+    && xargs -a packages.list apt install -qy --no-install-recommends
+# Clone repo
+RUN \
+    get_source_from_github() { \
+    if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
+    then git clone -b $TAG --single-branch "$REPO" tracim; \
+    elif ([ "$TAG" = "" ] && [ "$BRANCH" != "" ]); \
+    then git clone "$REPO" tracim && cd tracim/ && git checkout $BRANCH && cd -; \
+    else git clone "$REPO" tracim; \
+    fi \
+    } \
+    && get_source_from_github $TAG $BRANCH
 
-# level 2: debug tools
-FROM base as debug_dep_minimal
-FROM base as debug_dep_full
-RUN \
-    apt update \
-    && apt upgrade -qy \
-    && apt install -qy\
-       vim \
-       httpie \
-       wget \
-       curl \
-       htop \
-       nano \
-       strace \
-       ncdu \
-       lsof \
-       traceroute \
-       whois \
-       inetutils-ping
-FROM debug_dep_${DEBUG_DEP} as debug_dep
-
-# level 3 : Preview-Gen Dep stage
-FROM debug_dep as pg_dep_minimal
-RUN \
-    apt update \
-    && apt upgrade -qy \
-    && apt install -qy \
-    # Preview generator dependencies
-    ghostscript \
-    imagemagick \
-    qpdf \
-    poppler-utils
-FROM pg_dep_minimal as pg_dep_full
-RUN \
-    apt update \
-    && apt upgrade -qy \
-    && apt install -qy \
-        # Preview generator optionals dependencies
-        ffmpeg \
-        xvfb \
-        inkscape \
-        libreoffice
-FROM pg_dep_${PG_DEP} AS pg_dep
-
-# level 4 : Encryption stage
-FROM pg_dep as encryption_dep_minimal
-FROM pg_dep as encryption_dep_full
-RUN \
-    apt update \
-    && apt upgrade -qy \
-    && apt install -qy \
-    # Encryption
-      gocryptfs \
-      fuse
-# end of all stages:
-FROM encryption_dep_${ENCRYPTION_DEP} as base_install
 
 
 ###
@@ -91,31 +56,8 @@ FROM encryption_dep_${ENCRYPTION_DEP} as base_install
 
 # level 1 : base builder
 FROM base_install AS base_backend
-ARG TAG=""
-ARG BRANCH=""
-ARG REPO="https://github.com/tracim/tracim.git"
-RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
-    then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
 # Install required packages
-RUN apt install -qy \
-        build-essential \
-        libjpeg-dev \
-        libmagickwand-dev \
-        libpq-dev \
-        python3-dev \
-        python3-pip \
-        python3-venv
-# Clone repo
-RUN \
-    get_source_from_github() { \
-    if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
-    then git clone -b $TAG --single-branch "$REPO" tracim; \
-    elif ([ "$TAG" = "" ] && [ "$BRANCH" != "" ]); \
-    then git clone "$REPO" tracim && cd tracim/ && git checkout $BRANCH && cd -; \
-    else git clone "$REPO" tracim; \
-    fi \
-    } \
-    && get_source_from_github $TAG $BRANCH
+RUN xargs -a /packages/install_backend_packages.list apt install -qy
 RUN \
 # Go in backend folder
     cd /tracim/backend \
@@ -153,19 +95,11 @@ from pg_install_${PG_DEP} as backend
 # - setup backend translation
 # - build frontend
 ####
-FROM debian:stretch AS frontend
-COPY --from=base_backend /tracim /tracim
-RUN \
-    apt update \
-    && apt install -qy \
-    curl \
-    build-essential \
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt install -qy nodejs
-# install translation
+FROM node:12-buster AS frontend
+COPY --from=base_install /tracim /tracim
 RUN \
     cd /tracim/backend \
-    npm install "i18next-conv@<8" -g \
+    && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh
 # Install frontend
 RUN \
@@ -192,22 +126,9 @@ ENV LC_ALL C.UTF-8
 ENV ENABLE_GOCRYPTFS_ENCRYPTION=0
 ENV DOCKER_SCRIPT_DIR="/tracim/tools_docker/Debian_New_Uwsgi"
 RUN printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999\nPackage: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
-    && apt install -qy \
-        apt-transport-https \
-        software-properties-common \
-        gnupg2 \
+    && xargs -a /packages/server_apt_http_packages.list apt install -qy --no-install-recommends \
     && apt update \
-    && apt install -qy \
-        mongrel2-core \
-        apache2 \
-        gnupg \
-        libapache2-mod-proxy-uwsgi \
-        postgresql-client \
-        pushpin \
-        redis-server \
-        supervisor \
-        uwsgi \
-        uwsgi-plugin-python3 \
+    && xargs -a /packages/server_packages.list apt install -qy --no-install-recommends \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Do not show apache version
