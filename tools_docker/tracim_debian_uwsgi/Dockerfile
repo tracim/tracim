@@ -22,7 +22,7 @@ ARG DB_DEP
 RUN apt update \
    && apt upgrade -qy \
    && apt install git -qy --no-install-recommends \
-   && apt autoremove \
+   && apt autoremove -qy \
    && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
 
  # Clone repo
@@ -60,7 +60,7 @@ RUN \
     apt update \
     && apt upgrade -qy \
     && xargs -a packages.list apt install -qy --no-install-recommends\
-    && apt autoremove \
+    && apt autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
 
 
@@ -152,7 +152,7 @@ RUN printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999\nPackage: c
     && xargs -a $PACKAGE_DIR/server_apt_http_packages.list apt install -qy --no-install-recommends \
     && apt update \
     && xargs -a $PACKAGE_DIR/server_packages.list apt install -qy --no-install-recommends \
-    && apt autoremove \
+    && apt autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
 # Remove default conf about apache2
     && rm /etc/apache2/sites-enabled/000-default.conf \
