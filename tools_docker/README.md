@@ -201,10 +201,16 @@ rm ~/tracim/secret/password.txt
 
 ### Build images
 
+The build process as been improved to permit diffent build. To avoid building unwanted stage, we recommand
+you to either use buildx or buildkit. In this doc, we will use buildx as it's known to work for multi-arch.
+buildx is based on buildkit and improve also build performance.
+
+note: if you are using a recent version of docker you should have either buildx by default or you need to install it manually : https://github.com/docker/buildx#docker
+
 To build image
 
     cd tools_docker/tracim_debian_uwsgi
-    docker build -t algoo/tracim:latest .
+    docker buildx build -t algoo/tracim:latest .
 
 #### With Custom Branch or Tag
 
@@ -213,16 +219,16 @@ To build image
 You can build with specific branch
 
     cd tools_docker/tracim_debian_uwsgi
-    docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
+    docker buildx build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
 
-Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
+Ex: `docker buildx build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
 
 You can also build image with specific tag (This build is make just with necessary files: no other branch available)
 
     cd tools_docker/tracim_debian_uwsgi
-    docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
+    docker buildx build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
 
-Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
+Ex: `docker buildx build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`
 
 #### With Custom Repository
 
@@ -230,6 +236,23 @@ By default, the Docker image is built from the main repository of Tracim. To clo
 
 Ex: `docker build --build-arg REPO="https://github.com/<me>/tracim.git" -t algoo/tracim:myrepo .`
 
+#### With local dir/archive file
+
+It's also possible to pass a local dir or an archive file of tracim permitting
+to test docker image without pushing anything online.
+
+The procedure is similar for dir and archive but to avoid adding unneeded stuff
+to your docker image we do recommend to use git archive.
+
+example with git archive:
+
+```bash
+# At root of the repository
+git archive -o latest.tar.gz HEAD
+mv latest.tar.gz tools_docker/tracim_debian_uwsgi
+cd tools_docker/tracim_debian_uwsgi
+docker buildx build --build-arg REPOSITORY_TYPE=local --build-arg LOCAL_REPO_DIR=latest.tar.gz -t algoo/tracim:myrepo . 
+```
 
 #### Multiarch Minimal Build (Experimental):
 
@@ -252,8 +275,6 @@ docker buildx build -t algoo/tracim:maximal . --build-arg PG_DEP=full --build-ar
 To test it on your own AMD64 machine, you first need to activate or install buildx feature of
 docker and install qemu-user-static.
 see also: https://medium.com/@artur.klauser/building-multi-architecture-docker-images-with-buildx-27d80f7e2408
-
-note: if you are using a recent version of docker you should have either buildx by default or you need to install it manually : https://github.com/docker/buildx#docker
 
 then do:
 ```

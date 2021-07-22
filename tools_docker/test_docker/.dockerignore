@@ -1,0 +1,44 @@
+.idea/
+frontend/dist/app/
+frontend/dist/tracim.app.entry.js
+frontend/dist/asset/tracim/tracim.vendor.bundle.js
+frontend/dist/assets/custom_toolbox/
+frontend/dist/assets/branding/
+
+color.json
+/backend/venv3.7/
+backend/env
+*~
+
+#ignore file or folder about cypress tests
+functionnal_tests/cypress.json
+functionnal_tests/node_modules/
+functionnal_tests/cypress/videos
+functionnal_tests/cypress/screenshots
+
+#ignore preview files as it is by default in backend folder
+previews
+
+#ignore yarn
+.yarn
+.yarnrc
+.yarnrc.yml
+node_modules
+
+# vscode and mypy
+.vscode/
+.mypy_cache/
+
+#ignore dev.js files
+/frontend*/dist/*.dev.js
+
+/tools_docker/test_docker/tracim.env
+/tools_docker/test_docker/test_config.env
+tools_docker/test_docker/__pycache__
+
+# tide & projectile for emacs
+jsconfig.json
+.projectile
+# emacs save files
+\#*
+.\#*
