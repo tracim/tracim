@@ -61,6 +61,7 @@ describe('Publications', () => {
     })
 
     it('should show the first message as preview for advanced edition', function () {
+      cy.get(publicationInput).type('!')
       cy.get('.publications__publishArea__buttons__left__advancedEdition').click()
       cy.waitForTinyMCELoaded().then(() => {
         cy.typeInTinyMCE(exampleText)
