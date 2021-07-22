@@ -147,13 +147,10 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 
 #### Running with gocryptfs encryption (Experimental !)
 
-Warning: This is an experimental docker image,
-the new feature from this docker will maybe be merged to the standard docker or removed.
 
 Warning: content should be migratable from gocryptfs-encrypted to plain dir and also in the other side, but
 this was not tested. For previews, there is no need to migrate data, so you can just start with a plain new dir.
-
-This need the new specific Debian_New_Uwsgi docker (see build section).
+.
 Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
 
 Note: with this new docker, all tracimcli and alembic command should be runned as
@@ -206,13 +203,7 @@ rm ~/tracim/secret/password.txt
 
 To build image
 
-    cd tools_docker/Debian_Uwsgi
-    docker build -t algoo/tracim:latest .
-
-
-To build encryption-enabled (gocryptfs based) image (experimental):
-
-    cd tools_docker/Debian_New_Uwsgi
+    cd tools_docker/tracim_debian_uwsgi
     docker build -t algoo/tracim:latest .
 
 #### With Custom Branch or Tag
@@ -221,14 +212,14 @@ To build encryption-enabled (gocryptfs based) image (experimental):
 
 You can build with specific branch
 
-    cd tools_docker/Debian_Uwsgi
+    cd tools_docker/tracim_debian_uwsgi
     docker build --build-arg BRANCH="<branch_name>" -t algoo/tracim:<version_name> .
 
 Ex: `docker build --build-arg BRANCH="feature/new_app" -t algoo/tracim:test_branch .`
 
 You can also build image with specific tag (This build is make just with necessary files: no other branch available)
 
-    cd tools_docker/Debian_Uwsgi
+    cd tools_docker/tracim_debian_uwsgi
     docker build --build-arg TAG="<tag_name>" -t algoo/tracim:<tag_name> .
 
 Ex: `docker build --build-arg TAG="release_02.00.00" -t algoo/tracim:release_02.00.00 .`

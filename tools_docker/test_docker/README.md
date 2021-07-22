@@ -41,7 +41,7 @@ docker network create -d bridge tracim-test-net
 ```sh
 # build docker image
 BRANCH=develop
-cd tools_docker/Debian_Uwsgi
+cd tools_docker/tracim_debian_uwsgi
 docker build --build-arg BRANCH=$BRANCH -t algoo/tracim:test .
 cd ../..
 # build elasticsearch image

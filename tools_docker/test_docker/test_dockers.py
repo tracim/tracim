@@ -60,8 +60,8 @@ def test_tracim_dirs_exists(tracim):
 
 
 def test_docker_scripts_exists(tracim):
-    assert tracim.file("/tracim/tools_docker/Debian_Uwsgi/check_env_vars.sh").is_file
-    assert tracim.file("/tracim/tools_docker/Debian_Uwsgi/common.sh").is_file
+    assert tracim.file("/tracim/tools_docker/tracim_debian_uwsgi/check_env_vars.sh").is_file
+    assert tracim.file("/tracim/tools_docker/tracim_debian_uwsgi/common.sh").is_file
 
 
 def test_users(tracim):
@@ -79,7 +79,7 @@ def test_users(tracim):
 def test_default_file_created(tracim):
     # config files
     assert tracim.file("/etc/tracim/development.ini").is_file
-    assert tracim.file("/tracim/tools_docker/Debian_Uwsgi/supervisord_tracim.conf").is_file
+    assert tracim.file("/tracim/tools_docker/tracim_debian_uwsgi/supervisord_tracim.conf").is_file
     assert tracim.file("/etc/tracim/apache2.conf").is_file
     assert tracim.file("/etc/apache2/sites-available/tracim.conf").is_symlink
     assert tracim.file("/etc/apache2/sites-enabled/tracim.conf").is_symlink

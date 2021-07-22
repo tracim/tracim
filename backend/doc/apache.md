@@ -72,7 +72,7 @@ You need also to make changes in [TRACIM_PATH]/backend/development.ini on line `
   - replace `localhost` by your domain
   - replace `7999` by `80` (if you don't want to use port 80, you need to change listen port also in apache configuration)
 
-If you want to used browser cache policy, an exemple is visible [here](https://github.com/tracim/tracim/blob/develop/tools_docker/Debian_Uwsgi/apache2.conf.sample).
+If you want to used browser cache policy, an exemple is visible [here](https://github.com/tracim/tracim/blob/develop/tools_docker/tracim_debian_uwsgi/apache2.conf.sample).
 :warning: This line `RequestHeader edit "If-None-Match" '^"((.*)-(gzip|br))"$' '"$1", "$2"'` is make to solved apache2 issue visible [here](https://bz.apache.org/bugzilla/show_bug.cgi?id=45023#c26)
 In this case you need also to make sure you used cache token feature available in development.ini
 

@@ -122,7 +122,7 @@ ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV ENABLE_GOCRYPTFS_ENCRYPTION=0
-ENV DOCKER_SCRIPT_DIR="/tracim/tools_docker/Debian_New_Uwsgi"
+ENV DOCKER_SCRIPT_DIR="/tracim/tools_docker/tracim_debian_uwsgi"
 RUN printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999\nPackage: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
     && xargs -a /packages/server_apt_http_packages.list apt install -qy --no-install-recommends \
     && apt update \
@@ -145,12 +145,12 @@ COPY --from=backend /usr/local /usr/local
 # Force pushpin config
 RUN mv /etc/pushpin/pushpin.conf /etc/pushpin/pushin.conf.default \
     && mv /etc/pushpin/routes /etc/pushpin/routes.default \
-    && cp tracim/tools_docker/Debian_New_Uwsgi/pushpin_config/routes /etc/pushpin/routes \
+    && cp tracim/tools_docker/tracim_debian_uwsgi/pushpin_config/routes /etc/pushpin/routes \
     && chmod 644 /etc/pushpin/routes \
-    && cp tracim/tools_docker/Debian_New_Uwsgi/pushpin_config/pushpin.conf /etc/pushpin/pushpin.conf \
+    && cp tracim/tools_docker/tracim_debian_uwsgi/pushpin_config/pushpin.conf /etc/pushpin/pushpin.conf \
     && chmod 644 /etc/pushpin/routes
 
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80
 
-CMD ["/bin/bash","/tracim/tools_docker/Debian_New_Uwsgi/entrypoint.sh"]
+CMD ["/bin/bash","/tracim/tools_docker/tracim_debian_uwsgi/entrypoint.sh"]
