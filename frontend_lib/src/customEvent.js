@@ -1,5 +1,6 @@
 export const CUSTOM_EVENT = {
   HIDE_SIDEBAR: 'hideSidebar',
+  TRACIM_LIVE_MESSAGE_ERROR: 'TracimLiveMessageError',
   TRACIM_LIVE_MESSAGE_STATUS_CHANGED: 'TracimLiveMessageStatusChanged',
   TRACIM_LIVE_MESSAGE: 'TracimLiveMessage',
   ADD_FLASH_MSG: 'addFlashMsg',

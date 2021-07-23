@@ -104,7 +104,7 @@ Example with SQLite:
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-Exemple with SQlite, email notifications and some small customisations:
+Example with SQlite, email notifications and some small customisations:
 
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_EMAIL__NOTIFICATION__ACTIVATED=True \
@@ -120,9 +120,9 @@ Exemple with SQlite, email notifications and some small customisations:
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-With this exemple, Tracim is now accessible on my network and I can send notification by email when content change.
+With this example, Tracim is now accessible on my network and I can send notification by email when content change.
 
-Exemple to use Tracim with ElasticSearch: (you need to start elasticsearch first)
+Example to use Tracim with ElasticSearch: (you need to start elasticsearch first)
 
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_SEARCH__ENGINE=elasticsearch \
@@ -132,7 +132,7 @@ Exemple to use Tracim with ElasticSearch: (you need to start elasticsearch first
                -p 8080:80 \
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
-Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasticsearch-ingest image first and start this image before Tracim)
+Example to use Tracim with ElasticSearch-ingest: (you need to create your elasticsearch-ingest image first and start this image before Tracim)
 
     docker run -e DATABASE_TYPE=sqlite \
                -e TRACIM_SEARCH__ENGINE=elasticsearch \
@@ -150,8 +150,8 @@ Exemple to use Tracim with ElasticSearch-ingest: (you need to create your elasti
 
 Warning: content should be migratable from gocryptfs-encrypted to plain dir and also in the other side, but
 this was not tested. For previews, there is no need to migrate data, so you can just start with a plain new dir.
-.
-Exemple with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
+
+Example with basic instance of Tracim (local usage with webdav and caldav) with encrypted storage:
 
 Note: with this new docker, all tracimcli and alembic command should be runned as
 user www-data, example:
@@ -251,7 +251,7 @@ example with git archive:
 git archive -o latest.tar.gz HEAD
 mv latest.tar.gz tools_docker/tracim_debian_uwsgi
 cd tools_docker/tracim_debian_uwsgi
-docker buildx build --build-arg REPOSITORY_TYPE=local --build-arg LOCAL_REPO_DIR=latest.tar.gz -t algoo/tracim:myrepo . 
+docker buildx build --build-arg REPOSITORY_TYPE=local --build-arg LOCAL_REPO_DIR=latest.tar.gz -t algoo/tracim:myrepo .
 ```
 
 #### Multiarch Minimal Build (Experimental):

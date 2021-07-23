@@ -15,6 +15,7 @@ describe('Workspace upload property', () => {
   beforeEach(() => {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+    cy.contains('.userstatus__role__text', 'Space manager')
   })
 
   afterEach(() => {

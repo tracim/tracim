@@ -4,7 +4,7 @@
 
 Most settings in Tracim are configurable using both the INI configuration file and environment variables.
 
-### Tracim fully supported variables:
+### Tracim fully supported variables
 
 You can set those parameters in INI configuration file (see `config_file_name`) or
 environnement variable (see `env_var_name`).
@@ -311,6 +311,7 @@ To allow other computers to access to this website, listen to "*" instead of loc
     ...
     listen = *:6534
 
+
 ## Database Path
 
 To configure a database, you need to provide a valid sqlalchemy url:
@@ -323,7 +324,6 @@ to know more about this, see [sqlalchemy documentation](http://docs.sqlalchemy.o
 
 Be careful, while SQLAlchemy supports many kind of Database, support from Tracim is **not** guaranteed.
 Tracim officially supports SQLite, PostgreSQL and MySQL.
-
 
 
 ## Debugging and Log
@@ -562,3 +562,28 @@ ui.spaces.creation.parent_space_choice.visible = False
 ```
 
 By default, this parameter is set to `True`.
+
+## User online status and limitation
+
+You may limit the number of online users on your instance. If the maximum is
+reached, an error message will be shown to users opening a Tracim page.
+By default, no limitation is enforced (value: 0).
+
+```
+limitation.maximum_online_users = 0
+```
+
+A customized message can be shown to the user using the following parameter:
+
+```
+limitation.maximum_online_users_message = We suggest you contact your manager to upgrade your offer:<br /><b>Leslie Doe</b>, <a href="tel:+336123456789">+336123456789</a>, <a href="mailto:leslie.doe@example.org">leslie.doe@example.org</a>
+```
+
+The delay in seconds after which a user is considered offline after closing the
+last browser tab can be tweaked with the following setting.
+NOTE: this setting is experimental and may be removed without notice in a
+later version of Tracim.
+
+```
+user.online_timeout = 10
+```

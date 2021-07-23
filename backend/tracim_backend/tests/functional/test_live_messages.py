@@ -1,5 +1,8 @@
 import contextlib
 import json
+import os
+import subprocess
+import sys
 import typing
 
 import pytest
@@ -7,11 +10,23 @@ import requests
 import sseclient
 import transaction
 
+from tracim_backend.config import CFG
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
+from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
+
+
+def expect_line_containing(text: bytes, file) -> None:
+    """
+    Returns when a line containing text in the given file is found
+    """
+    while True:
+        line = file.readline()
+        if text in line:
+            return
 
 
 def html_document(
@@ -76,6 +91,20 @@ def small_html_document_c(workspace_api_factory, content_api_factory, session) -
     return small_html_document(workspace_api_factory, content_api_factory, session, "C")
 
 
+@pytest.fixture
+def connection_monitor_process():
+    backend_path = os.path.dirname(__file__) + "/../../../"
+    env = {"TRACIM_CONF_PATH": backend_path + "tests_config_user_status_connection_monitor.ini"}
+    env.update(os.environ)
+    p = subprocess.Popen(
+        [sys.executable, backend_path + "daemons/user_connection_state_monitor.py"],
+        env=env,
+        stderr=subprocess.PIPE,
+    )
+    yield p
+    p.terminate()
+
+
 def put_document(doc):
     update_user_request = requests.put(
         "http://localhost:7999/api/workspaces/{}/html-documents/{}/status".format(
@@ -110,20 +139,25 @@ def one_thread(content_api_factory, content_type_list, workspace_api_factory, se
 
 @contextlib.contextmanager
 def messages_stream_client(
+    user_id: int = 1,
+    login: str = "admin@admin.admin",
+    password: typing.Optional[str] = "admin@admin.admin",
     after_event_id: int = 0,
+    skip_first_event: bool = True,
 ) -> typing.Generator[typing.Iterable, None, None]:
     headers = {"Accept": "text/event-stream"}
     query = "?after_event_id={}".format(after_event_id) if after_event_id else ""
     response = requests.get(
-        "http://localhost:7999/api/users/1/live_messages{}".format(query),
-        auth=("admin@admin.admin", "admin@admin.admin"),
+        "http://localhost:7999/api/users/{}/live_messages{}".format(user_id, query),
+        auth=(login, password),
         stream=True,
         headers=headers,
     )
+    assert response.status_code == 200, response.json()
     client = sseclient.SSEClient(response)
     client_events = client.events()
-    # INFO - G.M - 2020-06-29 - Skip first event
-    next(client_events)
+    if skip_first_event:
+        next(client_events)
     yield client_events
     response.close()
 
@@ -167,6 +201,68 @@ class TestLiveMessages(object):
             event = next(client_events)
         assert json.loads(event.data) == {"test_message": "example"}
         assert event.event == "message"
+
+    @pytest.mark.pushpin
+    def test_api__user_live_messages_endpoint_with_GRIP_proxy__err__too_many_online_users(
+        self,
+        pushpin,
+        app_config: CFG,
+        bob_user: User,
+        admin_user: User,
+        session,
+        connection_monitor_process,
+    ):
+        # NOTE - RJ - 2021-07-07
+        # This test does the following:
+        # - run the user connection state monitor daemon using config tests_config_user_status_connection_monitor.ini
+        # - waits for it to be connected to Pushpin
+        # - connects to the admin live messages
+        # - checks that it works
+        # - connects to the bob live messages
+        # - checks that it does not work (number of simultaneous users = 1)
+        # - disconnects from the admin live messages
+        # - connects to the bob live messages
+        # - checks that it works
+
+        expect_line_containing(b"Connected to ", connection_monitor_process.stderr)
+        with messages_stream_client(skip_first_event=False) as client_events:
+            event = next(client_events)
+            assert event.event == "stream-open"
+            expect_line_containing(
+                b"Set connection status of user %d to online" % admin_user.user_id,
+                connection_monitor_process.stderr,
+            )
+            with messages_stream_client(
+                user_id=bob_user.user_id,
+                login=bob_user.email,
+                password="password",
+                skip_first_event=False,
+            ) as bob_events:
+                bob_event = next(bob_events)
+                assert bob_event.event == "stream-error"
+                assert json.loads(bob_event.data) == {
+                    "code": ErrorCode.TOO_MANY_ONLINE_USERS.value,
+                    "message": "Too many users online (1/1)",
+                }
+
+                with pytest.raises(StopIteration):
+                    next(bob_events)
+
+            client_events.close()
+
+            expect_line_containing(
+                b"Set connection status of user %d to offline" % admin_user.user_id,
+                connection_monitor_process.stderr,
+            )
+
+        with messages_stream_client(
+            user_id=bob_user.user_id,
+            login=bob_user.email,
+            password="password",
+            skip_first_event=False,
+        ) as bob_events:
+            bob_event = next(bob_events)
+            assert bob_event.event == "stream-open"
 
     @pytest.mark.pushpin
     @pytest.mark.parametrize("config_section", [{"name": "functional_live_test"}], indirect=True)

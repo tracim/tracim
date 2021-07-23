@@ -96,6 +96,11 @@ basic_setup.session_secret = change_this_value_please!
 # control_uri for GRIP protocol reverse-proxy (PushPin)
 # this is the base url used for publishing new events to reverse-proxy.
 ; live_messages.control_zmq_uri = tcp://localhost:5563
+# stats socket uri for GRIP protocol reverse-proxy (PushPin)
+# this is the base url used for listening to events related to connection to the
+# reverse-proxy. If you are running pushpin using the docker-compose, set this
+# parameter to tcp://localhost:5564
+; live_messages.stats_zmq_uri = ipc:///var/run/pushpin/pushpin-stats
 # do tracim block until publishing is complete or not
 # by default it will be False if jobs.processing_mode is sync and True if processing_mode is async
 # as sync publishing is done during the HTTP request
@@ -195,6 +200,15 @@ workspace.join.max_messages_history_count = -1
 ## default allowed space for new user if not provided in bytes, 0 mean no space
 ## limit. Limit is on the sum of sizes of owned by user space.
 ; limitation.user_default_allowed_space = 0
+
+# maximum count of simulteanously online users, 0 means unlimited and is the default value.
+; limitation.maximum_online_users = 0
+
+# The customized error message shown to the user when the limit is reached.
+# Empty by default. HTML is allowed.
+; limitation.maximum_online_users_message =
+# For instance:
+# limitation.maximum_online_users_message = We suggest you contact your manager to upgrade your offer:<br /><b>Leslie Doe</b>, <a href="tel:+336123456789">+336123456789</a>, <a href="mailto:leslie.doe@example.org">leslie.doe@example.org</a>
 
 ####
 # STORAGE
@@ -360,6 +374,13 @@ api.key = %(basic_setup.api_key)s
 ## Allow people to register/create an account themselves without authentication.
 ## The profile of those users will be user.default_profile
 ; user.self_registration.enabled = False
+
+# The delay in seconds after which a user is considered offline after all
+# connections to live messages are closed.
+# NOTE: this setting is experimental and may be removed without notice in a
+# later version of Tracim.
+
+; user.online_timeout = 10
 
 ## enable or disable filter on known user, if True, user cannot see at all informations about
 ## member with no common space. If False, it can access to these informations.

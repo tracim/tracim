@@ -3,6 +3,12 @@ import { author } from './fixture/author.js'
 
 const nock = require('nock')
 
+const mockGetContentWithoutWorkspaceId200 = (apiUrl, contentId) => {
+  return nock(apiUrl)
+    .get(`/contents/${contentId}`)
+    .reply(200, content)
+}
+
 const mockPutContent200 = (apiUrl, workspaceId, contentId, appSlug, newLabel, newRawContent) => {
   return nock(apiUrl)
     .put(`/workspaces/${workspaceId}/${appSlug}s/${contentId}`, {
@@ -113,6 +119,7 @@ const mockGetWhoamiFailure = (apiUrl) => {
 }
 
 export {
+  mockGetContentWithoutWorkspaceId200,
   mockPutContent200,
   mockPostContentComment200,
   mockPutContentStatus204,

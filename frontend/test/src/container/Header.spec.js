@@ -9,13 +9,11 @@ import {
   USER,
   USER_DISCONNECTED
 } from '../../../src/action-creator.sync.js'
-import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
   restoreHistoryCallBack,
   isFunction
 } from '../../hocMock/helper'
 import { shallow } from 'enzyme'
-import { mockPostUserLogout204 } from '../../apiMock'
 
 describe('In <Header />', () => {
   const setUserDisconnectedCallBack = sinon.spy()
@@ -70,15 +68,6 @@ describe('In <Header />', () => {
         setUserDisconnectedCallBack,
         setUserLangCallBack
       ])
-    })
-
-    describe('handleClickLogout', () => {
-      it('should call setUserDisconnectedCallBack', (done) => {
-        mockPostUserLogout204(FETCH_CONFIG.apiUrl)
-        headerInstance.handleClickLogout().then(() => {
-          expect(setUserDisconnectedCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
     })
 
     describe('handleChangeLang', () => {

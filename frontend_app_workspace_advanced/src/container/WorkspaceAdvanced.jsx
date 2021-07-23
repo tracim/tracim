@@ -21,11 +21,13 @@ import {
   PAGE,
   SPACE_TYPE,
   PopinFixedRightPartContent,
+  ROLE,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
+  tinymceAutoCompleteHandleSelectionChange,
+  TagList
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -111,7 +113,7 @@ export class WorkspaceAdvanced extends React.Component {
   // Custom Event Handlers
   handleShowApp = data => {
     console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(this.state.config.slug), data)
-    this.props.appContentCustomEventHandlerShowApp(data.content, this.state.content, this.setState.bind(this), () => {})
+    this.props.appContentCustomEventHandlerShowApp(data.content, this.state.content, this.setState.bind(this), () => { })
   }
 
   handleHideApp = data => {
@@ -231,7 +233,9 @@ export class WorkspaceAdvanced extends React.Component {
     console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
-    this.loadSubscriptionRequestList()
+    if (this.state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) {
+      this.loadSubscriptionRequestList()
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -326,7 +330,7 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     let newDescription
     try {
-      newDescription = handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent())
+      newDescription = await handleLinksBeforeSave(tinymce.get(WORKSPACE_DESCRIPTION_TEXTAREA_ID).getContent(), state.config.apiUrl)
       // RJ - NOTE - 2021-06-24
       // We are using tinymce's getContent() method and not
       // state.content.description here because it has an outdated
@@ -766,12 +770,33 @@ export class WorkspaceAdvanced extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-
-    if (state.content.access_type === SPACE_TYPE.onRequest.slug) {
-      return [memberlistObject, subscriptionObject, functionalitesObject]
-    } else {
-      return [memberlistObject, functionalitesObject]
+    const tagList = {
+      id: 'tag',
+      label: props.t('Tags'),
+      icon: 'fas fa-tag',
+      children: (
+        <TagList
+          apiUrl={state.config.apiUrl}
+          workspaceId={state.content.workspace_id}
+          contentId={state.content.content_id}
+          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+        />
+      )
     }
+
+    const menuItemList = [memberlistObject]
+    const isWorkspaceManager = state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id
+    if (state.content.access_type === SPACE_TYPE.onRequest.slug && isWorkspaceManager) {
+      menuItemList.push(subscriptionObject)
+    }
+
+    if (isWorkspaceManager) {
+      menuItemList.push(functionalitesObject)
+    }
+
+    menuItemList.push(tagList)
+
+    return menuItemList
   }
 
   render () {
@@ -793,9 +818,11 @@ export class WorkspaceAdvanced extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
           disableChangeTitle={false}
+          showChangeTitleButton={state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id}
         >
           <WorkspaceAdvancedConfiguration
             apiUrl={state.config.apiUrl}
+            isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id}
             textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             autoCompleteItemList={state.autoCompleteItemList}

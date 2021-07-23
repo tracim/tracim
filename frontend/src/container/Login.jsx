@@ -137,7 +137,7 @@ class Login extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    props.dispatch(setHeadTitle(props.t('Login')))
+    props.dispatch(setHeadTitle(props.t('Log in')))
   }
 
   handleChangeRememberMe = e => {
