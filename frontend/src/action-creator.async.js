@@ -1185,7 +1185,7 @@ export const getAdvancedSearchResult = (
       if (searchFacets.statuses && searchFacets.statuses.length > 0) queryParameterList.push(`statuses=${encodeArrayAsURIComponent(searchFacets.statuses)}`)
       if (searchFacets.content_types && searchFacets.content_types.length > 0) queryParameterList.push(`content_types=${encodeArrayAsURIComponent(searchFacets.content_types)}`)
       if (searchFacets.file_extensions && searchFacets.file_extensions.length > 0) queryParameterList.push(`file_extensions=${encodeArrayAsURIComponent(searchFacets.file_extensions)}`)
-      if (searchFacets.author__public_names && searchFacets.author_public_names.length > 0) queryParameterList.push(`author__public_names=${encodeArrayAsURIComponent(searchFacets.author__public_names)}`)
+      if (searchFacets.author__public_names && searchFacets.author__public_names.length > 0) queryParameterList.push(`author__public_names=${encodeArrayAsURIComponent(searchFacets.author__public_names)}`)
       if (searchFacets.tags && searchFacets.tags.length > 0) queryParameterList.push(`tags=${encodeArrayAsURIComponent(searchFacets.tags)}`)
     }
   }
