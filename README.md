@@ -1,4 +1,4 @@
-# Hello Tracim
+# Hello
 
 ![logo_tracim](logo_tracim.png)
 
