@@ -55,6 +55,8 @@ _install_backend: &_install_backend
     # as the default docker credential helper requires a X11 display which is not present in Travis
     - sudo dpkg -r --ignore-depends=golang-docker-credential-helpers golang-docker-credential-helpers
     - docker login -u algooci -p $DOCKER_PW
+    # INFO - S.G - 2021-07-29 - By default travis provides node 10
+    - nvm install 14
   install:
     - cd $TRAVIS_BUILD_DIR/backend
     - pip install -r "requirements-build.txt"
@@ -185,7 +187,7 @@ jobs:
     # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
     - stage: frontend
       name: Frontend unit tests
-      # By default travis provides node 10
+      # NOTE - S.G. - 2021-07-29 - By default travis provides node 10
       before_install:
         - nvm install 14
       install:
@@ -198,9 +200,6 @@ jobs:
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: frontend
       name: Functional tests using Cypress
-      # By default travis provides node 10
-      before_install:
-        - nvm install 14
       <<: *_install_full_tracim
       env:
         - NO_VIRTUAL_ENV="1"
