@@ -185,6 +185,8 @@ jobs:
     # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
     - stage: frontend
       name: Frontend unit tests
+      before_install:
+        - nvm install 14
       install:
         - ./install_frontend_dependencies.sh
         - ./build_full_frontend.sh
@@ -195,6 +197,8 @@ jobs:
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: frontend
       name: Functional tests using Cypress
+      before_install:
+        - nvm install 14
       <<: *_install_full_tracim
       env:
         - NO_VIRTUAL_ENV="1"
