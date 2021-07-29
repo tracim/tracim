@@ -185,6 +185,7 @@ jobs:
     # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
     - stage: frontend
       name: Frontend unit tests
+      # By default travis provides node 10
       before_install:
         - nvm install 14
       install:
@@ -197,6 +198,7 @@ jobs:
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: frontend
       name: Functional tests using Cypress
+      # By default travis provides node 10
       before_install:
         - nvm install 14
       <<: *_install_full_tracim
