@@ -1,3 +1,11 @@
+# 3.9.2 / 2021-07-30
+
+Fix installation process (broken due to the last version of Yarn).
+
+### Fixed Issues
+- Backend/Docker: [#4830](https://github.com/tracim/tracim/issues/4830)
+
+
 # 3.9.1 / 2021-07-19
 
 This stabilisation release fixes a frontend crash that happens when anchor elements with an empty or inexistent href
@@ -6,6 +14,7 @@ prior to Tracim 3.9 are not affected by this crash.
 
 ### Fixed Issues
  - Frontend: [#4805](https://github.com/tracim/tracim/issues/4805)
+
 
 # 3.9.0 / 2021-07-09
 
