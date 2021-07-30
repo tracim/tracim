@@ -127,7 +127,7 @@ function install_npm_and_nodejs {
 
         log "Installing npm..."
         $SUDO apt install -y curl && loggood "Successfully installed curl" || logerror "Failed to install curl"
-        curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
+        curl -sL https://deb.nodesource.com/setup_14.x | $SUDOCURL bash -
         $SUDO apt update
         $SUDO apt install -y nodejs && loggood "Successfully installed nodejs" || logerror "Failed to install nodejs"
 
