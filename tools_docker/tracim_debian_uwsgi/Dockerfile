@@ -117,7 +117,7 @@ from pg_install_${PG_DEP} as backend
 # - setup backend translation
 # - build frontend
 ####
-FROM node:12-buster AS frontend
+FROM node:14-buster AS frontend
 COPY --from=base_install /tracim /tracim
 RUN \
     cd /tracim/backend \
