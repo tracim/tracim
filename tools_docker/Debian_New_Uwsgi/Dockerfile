@@ -21,7 +21,7 @@ RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
 # Install required packages
 RUN \
     apt install -qy curl \
-    # Node.JS 10
+    # Node.JS 14
     && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt install -qy \
         build-essential \
