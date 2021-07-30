@@ -1,7 +1,6 @@
 # 3.9.2 / 2021-07-30
 
-This stabilisation release fixes an issue with the build docker process. It is no more possible to build docker images
-of oldest Tracim versions (due to the last version of Yarn).
+Fix installation process (broken due to the last version of Yarn).
 
 ### Fixed Issues
 - Docker: [#4830](https://github.com/tracim/tracim/issues/4830)
