@@ -131,7 +131,7 @@ function install_npm_and_nodejs {
         $SUDO apt update
         $SUDO apt install -y nodejs && loggood "Successfully installed nodejs" || logerror "Failed to install nodejs"
 
-        log "Checking whether Node 10+ is installed..."
+        log "Checking whether Node 14+ is installed..."
         NODE_MAJOR_VERSION=$(node -v | sed -E 's/v([0-9]+)\..+/\1/g')
         if [ $? = "0" ]; then
             if  [ "$NODE_MAJOR_VERSION" -ge "10" ] ; then
