@@ -134,7 +134,7 @@ function install_npm_and_nodejs {
         log "Checking whether Node 14+ is installed..."
         NODE_MAJOR_VERSION=$(node -v | sed -E 's/v([0-9]+)\..+/\1/g')
         if [ $? = "0" ]; then
-            if  [ "$NODE_MAJOR_VERSION" -ge "10" ] ; then
+            if  [ "$NODE_MAJOR_VERSION" -ge "14" ] ; then
                 loggood "Node $NODE_MAJOR_VERSION is correctly installed"
 
                 NPM_VERSION="$(npm -v 2> /dev/null)"
