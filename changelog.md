@@ -3,7 +3,7 @@
 Fix installation process (broken due to the last version of Yarn).
 
 ### Fixed Issues
-- Docker: [#4830](https://github.com/tracim/tracim/issues/4830)
+- Backend/Docker: [#4830](https://github.com/tracim/tracim/issues/4830)
 
 
 # 3.9.1 / 2021-07-19
