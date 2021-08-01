@@ -159,7 +159,7 @@ jobs:
       if: commit_message !~ /(\[skip ci pytest\])/
 
     # INFO - G.M - 2019-04-25 - Stage: Backend ###
-    - stage: backend
+    - stage: backend/frontend
       <<: *_backend_test
       env:
         - DB=sqlite
@@ -169,23 +169,23 @@ jobs:
         - cat .coverage
         - coveralls
       if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
+    - stage: backend/frontend
       <<: *_backend_test
       env:
         - DB=postgresql
       if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
+    - stage: backend/frontend
       <<: *_backend_test
       env:
         - DB=mysql
       if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
+    - stage: backend/frontend
       <<: *_backend_test
       env:
         - DB=mariadb
       if: commit_message !~ /(\[skip ci pytest\])/
     # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
-    - stage: frontend
+    - stage: backend/frontend
       name: Frontend unit tests
       # NOTE - S.G. - 2021-07-29 - By default travis provides node 10
       before_install:
@@ -198,7 +198,7 @@ jobs:
         - ./run_frontend_unit_test.sh
       if: commit_message !~ /(\[skip ci unit_test\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
-    - stage: frontend
+    - stage: backend/frontend
       name: Functional tests using Cypress
       <<: *_install_full_tracim
       env:
