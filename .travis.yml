@@ -114,50 +114,6 @@ _backend_test: &_backend_test
 
 jobs:
   include:
-    # TODO BS 2018-10-12: Re-enable this test when setup.py list deps as strict
-    #  - stage: quick-tests
-    #    name: Check requirement.txt
-    #    python: "3.5"
-    #    addons:
-    #    services:
-    #    before_install:
-    #      - cd backend
-    #    install:
-    #      - pip install -r "requirements-build.txt"
-    #      - pip install pip-tools
-    #    before_script:
-    #      - mv requirements.txt requirements_from_source.txt
-    #    script:
-    #      - pip-compile
-    #      - diff -u requirements.txt requirements_from_source.txt
-    #    after_success: true
-
-    # INFO - G.M - 2019-04-25 - Stage: Static tests ###
-    - stage: static-tests
-      name: flake8
-      install:
-        - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
-      script:
-        - flake8 --version
-        - flake8 $TRAVIS_BUILD_DIR/backend
-
-    # INFO - G.M - 2019-04-25 - Stage: Quick Tests ###
-    - stage: quick-tests
-      name: "Python: 3.6"
-      <<: *_backend_quick_test
-      python: "3.6"
-      if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: quick-tests
-      name: "Python: 3.5"
-      <<: *_backend_quick_test
-      python: "3.5"
-      if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: quick-tests
-      name: "Python: 3.7"
-      <<: *_backend_quick_test
-      python: "3.7"
-      if: commit_message !~ /(\[skip ci pytest\])/
-
     # INFO - G.M - 2019-04-25 - Stage: Backend ###
     - stage: backend/frontend
       <<: *_backend_test
@@ -211,8 +167,4 @@ jobs:
       if: commit_message !~ /(\[skip ci cypress\])/
 
 stages:
-  - static-tests
-  - quick-tests
-  - backend
-  - frontend
-  - functional
+  - backend/frontend
