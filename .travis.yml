@@ -114,7 +114,6 @@ _backend_test: &_backend_test
 
 jobs:
   include:
-    # INFO - G.M - 2019-04-25 - Stage: Backend ###
     - stage: backend/frontend
       <<: *_backend_test
       env:
@@ -140,10 +139,7 @@ jobs:
       env:
         - DB=mariadb
       if: commit_message !~ /(\[skip ci pytest\])/
-    # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
     - stage: backend/frontend
-      name: Frontend unit tests
-      # NOTE - S.G. - 2021-07-29 - By default travis provides node 10
       before_install:
         - nvm install 14
       install:
@@ -153,9 +149,7 @@ jobs:
         - cd "$TRAVIS_BUILD_DIR"
         - ./run_frontend_unit_test.sh
       if: commit_message !~ /(\[skip ci unit_test\])/
-    # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: backend/frontend
-      name: Functional tests using Cypress
       <<: *_install_full_tracim
       env:
         - NO_VIRTUAL_ENV="1"
@@ -165,6 +159,11 @@ jobs:
       script:
         - ./run_dev_backend.sh cypress run
       if: commit_message !~ /(\[skip ci cypress\])/
+    - stage: backend/frontend
+      <<: *_backend_test
+      env:
+        - DB=mariadb
+      if: commit_message !~ /(\[skip ci pytest\])/
 
 stages:
   - backend/frontend
