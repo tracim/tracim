@@ -140,29 +140,9 @@ jobs:
         - DB=mariadb
       if: commit_message !~ /(\[skip ci pytest\])/
     - stage: backend/frontend
-      before_install:
-        - nvm install 14
-      install:
-        - ./install_frontend_dependencies.sh
-        - ./build_full_frontend.sh
-      script:
-        - cd "$TRAVIS_BUILD_DIR"
-        - ./run_frontend_unit_test.sh
-      if: commit_message !~ /(\[skip ci unit_test\])/
-    - stage: backend/frontend
-      <<: *_install_full_tracim
-      env:
-        - NO_VIRTUAL_ENV="1"
-        - TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/organization/schema.json
-        - TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/organization/ui.json
-        - TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH=$TRAVIS_BUILD_DIR/backend/tracim_backend/templates/user_custom_properties/organization/locale
-      script:
-        - ./run_dev_backend.sh cypress run
-      if: commit_message !~ /(\[skip ci cypress\])/
-    - stage: backend/frontend
       <<: *_backend_test
       env:
-        - DB=mariadb
+        - DB=mongodb
       if: commit_message !~ /(\[skip ci pytest\])/
 
 stages:
