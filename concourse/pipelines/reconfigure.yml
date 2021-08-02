@@ -10,12 +10,12 @@ resources:
   icon: github
   # No need to check frequently as the resource will be checked by the github webhook
   check_every: never
-  webhook_token: ((tracim-github-webhook-token))
+  webhook_token: ((tracim:github-webhook-token))
   source:
     # Do not launch the CI for Tracim's github forks
     disable_forks: true
     repository: tracim/tracim
-    access_token: ((tracim-github-access-token))
+    access_token: ((tracim:github-access-token))
 
 - name: develop
   type: git
