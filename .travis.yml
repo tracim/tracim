@@ -157,6 +157,19 @@ jobs:
       <<: *_backend_quick_test
       python: "3.7"
       if: commit_message !~ /(\[skip ci pytest\])/
+    # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
+    - stage: quick-tests/static-tests/backend/frontend
+      name: Frontend unit tests
+      # NOTE - S.G. - 2021-07-29 - By default travis provides node 10
+      before_install:
+        - nvm install 14
+      install:
+        - ./install_frontend_dependencies.sh
+        - ./build_full_frontend.sh
+      script:
+        - cd "$TRAVIS_BUILD_DIR"
+        - ./run_frontend_unit_test.sh
+      if: commit_message !~ /(\[skip ci unit_test\])/
 
     # INFO - G.M - 2019-04-25 - Stage: Backend ###
     - stage: quick-tests/static-tests/backend/frontend
@@ -189,19 +202,6 @@ jobs:
         - DB=mariadb
       if: commit_message !~ /(\[skip ci pytest\])/
 
-    # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
-    - stage: quick-tests/static-tests/backend/frontend
-      name: Frontend unit tests
-      # NOTE - S.G. - 2021-07-29 - By default travis provides node 10
-      before_install:
-        - nvm install 14
-      install:
-        - ./install_frontend_dependencies.sh
-        - ./build_full_frontend.sh
-      script:
-        - cd "$TRAVIS_BUILD_DIR"
-        - ./run_frontend_unit_test.sh
-      if: commit_message !~ /(\[skip ci unit_test\])/
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: quick-tests/static-tests/backend/frontend
       name: Functional tests using Cypress
