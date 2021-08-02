@@ -17,12 +17,25 @@ resources:
     disable_forks: true
     repository: tracim/tracim
     access_token: ((github-access-token))
+- name: pipelines-and-tasks
+  type: git
+  icon: github
+  check_every: 24h
+  source:
+    uri: https://github.com/tracim/tracim.git
+    # FIXME: this should be develop when the initial PR is accepted.
+    branch: misc/4828__concourse_pipeline
+    paths:
+      - concourse
 
 jobs:
 - name: reconfigure-prs
   plan:
-    - get: pull-requests
-      trigger: true
+    - in_parallel:
+        - get: pull-requests
+          trigger: true
+        - get: pipeline-and-tasks
+          trigger: true
     - load_var: pull_requests
       file: pull-requests/prs.json
     - across:
@@ -30,7 +43,7 @@ jobs:
         values: ((.:pull_requests))
         max_in_flight: all
       set_pipeline: pull-requests
-      file: pull-requests/concourse/pipelines/pull-request.yml
+      file: pipeline-and-tasks/concourse/pipelines/pull-request.yml
       instance_vars:
         number: ((.:pr.number))
       vars:
