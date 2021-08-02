@@ -15,6 +15,12 @@ resources:
     number: ((number))
 
 jobs:
+- name: reconfigure-self
+  plan:
+  - get: pull-request
+    trigger: true
+  - set_pipeline: self
+    file: pull-request/concourse/pipelines/pull-request.yml
 - name: test
   plan:
   - get: pull-request
@@ -27,7 +33,7 @@ jobs:
     get_params:
       skip_download: true
   - task: backend-lint
-    file: pull-request/tasks/test.yml
+    file: pull-request/concourse/tasks/test.yml
     input_mapping:
       tracim: pull-request
     vars:
