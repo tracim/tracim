@@ -21,6 +21,9 @@ jobs:
     trigger: true
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
+  - vars:
+      github-webhook-token: ((github-webhook-token))
+      github-access-token: ((github-access-token))
 - name: test
   passed: [reconfigure-self]
   plan:
