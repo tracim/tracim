@@ -4,8 +4,7 @@ _update_status: &_update_status
     skip_download: true
 
 _update_status_params: &_update_status_params
-  params:
-    path: pull-request
+  path: pull-request
 
 resource_types:
 - name: pull-request
