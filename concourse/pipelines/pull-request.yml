@@ -42,7 +42,6 @@ jobs:
       tracim: pull-request
     vars:
       path: tracim/concourse/scripts/backend-lint
-      args: []
   on_success:
     put: pull-request
     params:

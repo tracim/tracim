@@ -9,4 +9,3 @@ inputs:
 run:
   dir: tracim
   path: ((path))
-  args: ((args))
