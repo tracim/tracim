@@ -1,0 +1,12 @@
+---
+platform: linux
+image_resource:
+  type: registry-image
+  source:
+    repository: python/3.6.14-slim-stretch
+inputs:
+  - name: tracim
+run:
+  dir: tracim
+  path: ((path))
+  args: ((args))

@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+cd backend
+pip install -r requirements-devtool.txt
+flake8 --version
+flake8

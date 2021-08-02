@@ -26,18 +26,13 @@ jobs:
       status: pending
     get_params:
       skip_download: true
-  - task: noop-test
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source: {repository: alpine/git, tag: latest}
-      inputs:
-        - name: pull-request
-      run:
-        path: /usr/bin/echo
-        args:
-          - "TEST PLAYED"
+  - task: backend-lint
+    file: pull-request/tasks/test.yml
+    input_mapping:
+      tracim: pull-request
+    vars:
+      path: tracim/concourse/scripts/backend-lint
+      args: []
   on_success:
     put: pull-request
     params:
@@ -56,6 +51,13 @@ jobs:
     put: pull-request
     params:
       path: pr
-      status: failure
+      status: error
+    get_params:
+      skip_download: true
+  on_abort:
+    put: pull-request
+    params:
+      path: pr
+      status: error
     get_params:
       skip_download: true
