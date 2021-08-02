@@ -41,7 +41,7 @@ jobs:
     input_mapping:
       tracim: pull-request
     vars:
-      path: tracim/concourse/scripts/backend-lint
+      path: concourse/scripts/backend-lint
   on_success:
     put: pull-request
     params:
