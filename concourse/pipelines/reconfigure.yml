@@ -41,14 +41,23 @@ jobs:
       passed: [reconfigure-self-from-pr]
     - load_var: pull_requests
       file: pull-requests/prs.json
-    - across:
-        - var: pr
-          values: ((.:pull_requests))
-          max_in_flight: all
-      set_pipeline: prs
-      file: pull-requests/pipelines/pull-request.yml
-      instance_vars:
-        number: ((.:pr.number))
+    - task:
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: {repository: alpine/git, tag: latest}
+        run:
+          path: /usr/bin/cat
+          args: ["pull-requests/prs.json"]
+    # - across:
+    #     - var: pr
+    #       values: ((.:pull_requests))
+    #       max_in_flight: all
+    #   set_pipeline: prs
+    #   file: pull-requests/pipelines/pull-request.yml
+    #   instance_vars:
+    #     number: ((.:pr.number))
 # - name: configure-self-from-develop
 #   plan:
 #     - get: develop
