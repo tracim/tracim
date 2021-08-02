@@ -84,7 +84,7 @@ jobs:
     - var: python_version
       values: ["3.5", "3.6", "3.7"]
       max_in_flight: all
-    task: backend-quick-tests_((python_version))
+    task: backend-quick-tests_((.:python_version))
     privileged: true
     file: pull-request/concourse/tasks/test.yml
     input_mapping:
