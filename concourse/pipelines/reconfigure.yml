@@ -26,14 +26,7 @@ resources:
 #     branch: develop
 
 jobs:
-# Update this pipeline each time it is executed
-- name: reconfigure-self-from-prs
-  plan:
-    - get: pull-requests
-      trigger: true
-    - set_pipeline: self
-      file: pull-request/pipelines/reconfigure.yml
-# Update the tests pipeline when executed
+# Manage the PR pipelines
 - name: reconfigure-prs
   plan:
     - load_var: pull_requests

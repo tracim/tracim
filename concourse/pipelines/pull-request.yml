@@ -13,6 +13,7 @@ resources:
     access_token: ((tracim:github-access-token))
     number: ((number))
 
+jobs:
 - name: test
   plan:
   - get: pull-request
