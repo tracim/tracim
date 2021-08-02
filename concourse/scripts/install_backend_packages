@@ -1,0 +1,17 @@
+# !/bin/bash
+set -e
+
+apt-get update
+apt-get install -qy \
+        libreoffice \
+        imagemagick \
+        libmagickwand-dev \
+        ghostscript \
+        libfile-mimeinfo-perl \
+        poppler-utils \
+        qpdf \
+        ffmpeg \
+        ufraw-batch \
+        libldap2-dev \
+        libsasl2-dev \
+        libimage-exiftool-perl

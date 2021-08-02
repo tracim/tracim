@@ -2,6 +2,7 @@
 set -e
 
 source $(dirname $0)/install_docker
+source $(dirname $0)/install_backend_packages
 cd backend
 pip install -r requirements.txt -r requirements-test.txt
 docker-compose up -d redis
