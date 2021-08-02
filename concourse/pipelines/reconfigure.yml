@@ -30,7 +30,7 @@ jobs:
         values: ((.:pull_requests))
         max_in_flight: all
       set_pipeline: pull-requests
-      file: pull-requests/pipelines/pull-request.yml
+      file: pull-requests/concourse/pipelines/pull-request.yml
       instance_vars:
         number: ((.:pr.number))
       vars:
