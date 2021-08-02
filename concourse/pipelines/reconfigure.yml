@@ -39,8 +39,8 @@ jobs:
     - get: pull-requests
       trigger: true
       passed: [reconfigure-self-from-pr]
-    - load_var: pull_requests
-      file: pull-requests/prs.json
+#    - load_var: pull_requests
+#      file: pull-requests/prs.json
     - task:
         config:
           platform: linux
