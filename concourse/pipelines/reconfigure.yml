@@ -2,13 +2,13 @@ resource_types:
 - name: pull-request
   type: docker-image
   source:
-    repository: teliaoss/github-pr-resource
+    repository: aoldershaw/github-pr-resource
 
 resources:
-- name: pull-request
+- name: pull-requests
   type: pull-request
   icon: github
-  # No need to check frequently as the resource will be checked by the github webhook
+  # No need to check as the resource will be checked by the github webhook
   check_every: never
   webhook_token: ((tracim:github-webhook-token))
   source:
@@ -17,40 +17,48 @@ resources:
     repository: tracim/tracim
     access_token: ((tracim:github-access-token))
 
-- name: develop
-  type: git
-  icon: github
-  check_every: 24h
-  source:
-    uri: https://github.com/tracim/tracim.git
-    branch: develop
+# - name: develop
+#   type: git
+#   icon: github
+#   check_every: 24h
+#   source:
+#     uri: https://github.com/tracim/tracim.git
+#     branch: develop
 
 jobs:
 # Update this pipeline each time it is executed
-- name: configure-self-from-pr
+- name: reconfigure-self-from-prs
   plan:
-    - get: pull-request
+    - get: pull-requests
       trigger: true
     - set_pipeline: self
-      file: pull-request/pipelines/tracim.yml
-- name: configure-self-from-develop
-  plan:
-    - get: develop
-      trigger: true
-    - set_pipeline: self
-      file: develop/pipelines/tracim.yml
+      file: pull-request/pipelines/reconfigure.yml
 # Update the tests pipeline when executed
-- name: configure-tests-from-pr
+- name: reconfigure-prs
   plan:
-    - get: pull-request
+    - get: pull-requests
       trigger: true
-      passed: [configure-self-from-pr]
-    - set_pipeline: tracim-tests
-      file: pull-request/pipelines/tests.yml
-- name: configure-tests-from-develop
-  plan:
-    - get: develop
-      trigger: true
-      passed: [configure-self-from-develop]
-    - set_pipeline: tracim-tests
-      file: develop/pipelines/tests.yml
+      passed: [reconfigure-self-from-pr]
+    - load_var: pull_requests
+      file: pull-requests/prs.json
+    - across:
+        - var: pr
+          values: ((.:pull_requests))
+          max_in_flight: all
+      set_pipeline: prs
+      file: pull-requests/pipelines/pull-request.yml
+      instance_vars:
+        number: ((.:pr.number))
+# - name: configure-self-from-develop
+#   plan:
+#     - get: develop
+#       trigger: true
+#     - set_pipeline: self
+#       file: develop/pipelines/tracim.yml
+# - name: configure-tests-from-develop
+#   plan:
+#     - get: develop
+#       trigger: true
+#       passed: [configure-self-from-develop]
+#     - set_pipeline: tracim-tests
+#       file: develop/pipelines/tests.yml

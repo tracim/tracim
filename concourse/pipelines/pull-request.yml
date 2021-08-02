@@ -1,0 +1,52 @@
+resource_types:
+- name: pull-request
+  type: registry-image
+  source:
+    repository: aoldershaw/github-pr-resource
+
+resources:
+- name: pull-request
+  type: pull-request
+  webhook_token: ((tracim:github-webhook-token))
+  source:
+    repository: tracim/tracim
+    access_token: ((tracim:github-access-token))
+    number: ((number))
+
+- name: test
+  plan:
+  - get: pull-request
+    trigger: true
+  - put: pull-request-status
+    resource: pull-request
+    params:
+      path: pull-request
+      status: pending
+    get_params:
+      skip_download: true
+  - task: noop-test
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: alpine/git, tag: latest}
+      inputs:
+        - name: pr
+      run:
+        path: /usr/bin/echo
+        args:
+          - "TEST PLAYED"
+  on_success:
+    put: pull-request
+    params:
+      path: pr
+      status: success
+    get_params:
+      skip_download: true
+  on_failure:
+    put: pull-request
+    params:
+      path: pr
+      status: failure
+    get_params:
+      skip_download: true
