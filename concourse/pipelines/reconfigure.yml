@@ -41,11 +41,11 @@ jobs:
       passed: [reconfigure-self-from-prs]
     - load_var: pull_requests
       file: pull-requests/prs.json
-    # - across:
-    #     - var: pr
-    #       values: ((.:pull_requests))
-    #       max_in_flight: all
-    #   set_pipeline: prs
-    #   file: pull-requests/pipelines/pull-request.yml
-    #   instance_vars:
-    #     number: ((.:pr.number))
+    - across:
+        - var: pr
+          values: ((.:pull_requests))
+          max_in_flight: all
+      set_pipeline: prs
+      file: pull-requests/pipelines/pull-request.yml
+      instance_vars:
+        number: ((.:pr.number))
