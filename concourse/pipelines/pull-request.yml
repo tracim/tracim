@@ -7,10 +7,10 @@ resource_types:
 resources:
 - name: pull-request
   type: pull-request
-  webhook_token: ((tracim:github-webhook-token))
+  webhook_token: ((github-webhook-token))
   source:
     repository: tracim/tracim
-    access_token: ((tracim:github-access-token))
+    access_token: ((github-access-token))
     number: ((number))
 
 jobs:
