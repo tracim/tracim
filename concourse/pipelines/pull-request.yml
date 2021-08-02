@@ -1,3 +1,12 @@
+_update_status: &_update_status
+  resource: pull-request
+  get_params:
+    skip_download: true
+
+_update_status_params: &_update_status_params
+  params:
+    path: pull-request
+
 resource_types:
 - name: pull-request
   type: registry-image
@@ -30,12 +39,10 @@ jobs:
     passed: [reconfigure-self]
     trigger: true
   - put: pull-request-status
-    resource: pull-request
+    <<: *_update_status
     params:
-      path: pull-request
+      <<: *_update_status_params
       status: pending
-    get_params:
-      skip_download: true
   - task: backend-lint
     file: pull-request/concourse/tasks/test.yml
     input_mapping:
@@ -43,30 +50,28 @@ jobs:
     vars:
       path: concourse/scripts/backend-lint
   on_success:
-    put: pull-request
+    put: pull-request-success
+    <<: *_update_status
     params:
-      path: pr
+      <<: *_update_status_params
       status: success
     get_params:
       skip_download: true
   on_failure:
-    put: pull-request
+    put: pull-request-failure
+    <<: *_update_status
     params:
-      path: pr
+      <<: *_update_status_params
       status: failure
-    get_params:
-      skip_download: true
   on_error:
-    put: pull-request
+    put: pull-request-error
+    <<: *_update_status
     params:
-      path: pr
+      <<: *_update_status_params
       status: error
-    get_params:
-      skip_download: true
   on_abort:
-    put: pull-request
+    put: pull-request-abort
+    <<: *_update_status
     params:
-      path: pr
+      <<: *_update_status_params
       status: error
-    get_params:
-      skip_download: true
