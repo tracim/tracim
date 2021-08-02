@@ -42,7 +42,7 @@ jobs:
       - var: pr
         values: ((.:pull_requests))
         max_in_flight: all
-      set_pipeline: pull-requests
+      set_pipeline: tracim-pull-requests
       file: pipelines-and-tasks/concourse/pipelines/pull-request.yml
       instance_vars:
         number: ((.:pr.number))
