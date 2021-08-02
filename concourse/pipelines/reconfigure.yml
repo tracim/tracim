@@ -39,17 +39,8 @@ jobs:
     - get: pull-requests
       trigger: true
       passed: [reconfigure-self-from-pr]
-#    - load_var: pull_requests
-#      file: pull-requests/prs.json
-    - task:
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source: {repository: alpine/git, tag: latest}
-        run:
-          path: /usr/bin/cat
-          args: ["pull-requests/prs.json"]
+    - load_var: pull_requests
+      file: pull-requests/prs.json
     # - across:
     #     - var: pr
     #       values: ((.:pull_requests))
@@ -58,16 +49,3 @@ jobs:
     #   file: pull-requests/pipelines/pull-request.yml
     #   instance_vars:
     #     number: ((.:pr.number))
-# - name: configure-self-from-develop
-#   plan:
-#     - get: develop
-#       trigger: true
-#     - set_pipeline: self
-#       file: develop/pipelines/tracim.yml
-# - name: configure-tests-from-develop
-#   plan:
-#     - get: develop
-#       trigger: true
-#       passed: [configure-self-from-develop]
-#     - set_pipeline: tracim-tests
-#       file: develop/pipelines/tests.yml
