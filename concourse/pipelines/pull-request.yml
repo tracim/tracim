@@ -7,6 +7,7 @@ resource_types:
 resources:
 - name: pull-request
   type: pull-request
+  check_every: 30s
   webhook_token: ((github-webhook-token))
   source:
     repository: tracim/tracim
