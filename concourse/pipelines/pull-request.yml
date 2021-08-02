@@ -78,7 +78,7 @@ jobs:
     input_mapping:
       tracim: pull-request
     vars:
-      python_version: 3.6
+      python_version: "3.6"
       path: concourse/scripts/backend-lint
   - across:
     - var: python_version
