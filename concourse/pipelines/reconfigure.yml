@@ -34,7 +34,7 @@ jobs:
     - in_parallel:
         - get: pull-requests
           trigger: true
-        - get: pipeline-and-tasks
+        - get: pipelines-and-tasks
           trigger: true
     - load_var: pull_requests
       file: pull-requests/prs.json
@@ -43,7 +43,7 @@ jobs:
         values: ((.:pull_requests))
         max_in_flight: all
       set_pipeline: pull-requests
-      file: pipeline-and-tasks/concourse/pipelines/pull-request.yml
+      file: pipelines-and-tasks/concourse/pipelines/pull-request.yml
       instance_vars:
         number: ((.:pr.number))
       vars:
