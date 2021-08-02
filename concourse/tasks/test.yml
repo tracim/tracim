@@ -4,7 +4,7 @@ image_resource:
   type: registry-image
   source:
     repository: python
-    tag: 3.6.14-slim-stretch
+    tag: ((python_version))-slim-stretch
 inputs:
   - name: tracim
 run:

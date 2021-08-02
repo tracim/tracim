@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+source ./install_docker
+cd backend
+pip install -r requirements.txt -r requirements-test.txt
+docker-compose up -d redis
+pytest --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
