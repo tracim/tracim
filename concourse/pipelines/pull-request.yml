@@ -32,7 +32,7 @@ jobs:
         type: registry-image
         source: {repository: alpine/git, tag: latest}
       inputs:
-        - name: pr
+        - name: pull-request
       run:
         path: /usr/bin/echo
         args:
