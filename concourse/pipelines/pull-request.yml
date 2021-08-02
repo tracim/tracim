@@ -22,6 +22,7 @@ jobs:
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
 - name: test
+  passed: [reconfigure-self]
   plan:
   - get: pull-request
     trigger: true
