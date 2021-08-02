@@ -38,7 +38,7 @@ jobs:
   plan:
     - get: pull-requests
       trigger: true
-      passed: [reconfigure-self-from-pr]
+      passed: [reconfigure-self-from-prs]
     - load_var: pull_requests
       file: pull-requests/prs.json
     # - across:
