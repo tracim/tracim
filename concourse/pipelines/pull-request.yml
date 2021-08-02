@@ -51,3 +51,10 @@ jobs:
       status: failure
     get_params:
       skip_download: true
+  on_error:
+    put: pull-request
+    params:
+      path: pr
+      status: failure
+    get_params:
+      skip_download: true
