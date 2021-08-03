@@ -2,8 +2,8 @@
 set -e
 
 source $(dirname $0)/install_docker
-# source $(dirname $0)/install_backend_packages
+source $(dirname $0)/install_backend_packages
 cd backend
-# pip install -r requirements.txt -r requirements-test.txt
+pip install -r requirements.txt -r requirements-test.txt
 docker-compose up -d redis
-# pytest --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
+pytest --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
