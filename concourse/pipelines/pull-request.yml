@@ -130,6 +130,8 @@ jobs:
       passed: [backend-tests, frontend-tests]
       trigger: true
     - task: end-to-end-cypress-tests
+      # needed for docker during tests
+      privileged: true
       file: pull-request/concourse/tasks/test.yml
       input_mapping:
         tracim: pull-request
