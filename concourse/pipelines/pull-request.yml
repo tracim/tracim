@@ -133,6 +133,8 @@ jobs:
         path: concourse/scripts/end-to-end-cypress-tests
         python_version: "3.6.14"
         database: ""
+      params:
+        NO_VIRTUAL_ENV: "1"
   on_success:
     put: pull-request-success
     <<: *_update_status

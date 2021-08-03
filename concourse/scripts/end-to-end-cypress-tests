@@ -7,6 +7,8 @@ source "$(dirname $0)/create_backend_dirs"
 cd backend
 pip install -r requirements.txt
 python setup.py develop
+cp development.ini.sample development.ini
+tracimcli db init -d
 cd -
 ./setup_functionnal_tests.sh root
 ./install_frontend_dependencies.sh
