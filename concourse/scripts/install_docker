@@ -13,7 +13,7 @@ apt-get install -qy docker-ce docker-ce-cli containerd.io
 
 # Prepare docker to run in another docker
 # TODO S.G - 2021-08-03 - put this in a prepared docker image
-curl https://github.com/taylorsilva/dcind/blob/main/docker-lib.sh
+curl https://raw.githubusercontent.com/taylorsilva/dcind/main/docker-lib.sh
 source ./docker-lib.sh
 start_docker
 
