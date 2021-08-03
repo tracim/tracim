@@ -54,13 +54,13 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
+  - get: pull-request
+    trigger: true
   - put: pull-request-pending
     <<: *_update_status
     params:
       <<: *_update_status_params
       status: pending
-  - get: pull-request
-    trigger: true
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
     vars:
