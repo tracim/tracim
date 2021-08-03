@@ -13,8 +13,6 @@ _update_pull_request_status: &_update_pull_request_status
     params:
       <<: *_update_status_params
       status: success
-    get_params:
-      skip_download: true
   on_failure:
     put: pull-request-failure
     <<: *_update_status
@@ -56,7 +54,7 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
-  - put: pull-request-status
+  - put: pull-request-pending
     <<: *_update_status
     params:
       <<: *_update_status_params
