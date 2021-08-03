@@ -6,6 +6,7 @@ shift
 # FIXME: find a way to include pyenv in the PATH during image build !!!
 export PATH=/root/.pyenv/bin/:$PATH
 eval "$(pyenv init -)"
+pyenv versions
 pyenv shell "$python_version"
 python --version
 echo "PIP: $(which pip) PIP3: $(which pip3)"
