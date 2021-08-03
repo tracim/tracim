@@ -3,7 +3,7 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: algoo-ci/tracim
+    repository: algooci/tracim
 inputs:
   - name: tracim
 run:
