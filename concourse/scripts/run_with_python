@@ -4,5 +4,7 @@ set -e
 python_version=$1
 shift
 # FIXME: find a way to include pyenv in the PATH during image build !!!
-/root/.pyenv/bin/pyenv shell "$python_version"
+export PATH=/root/.pyenv/bin/:$PATH
+eval "$(pyenv init -)"
+pyenv shell "$python_version"
 "$@"
