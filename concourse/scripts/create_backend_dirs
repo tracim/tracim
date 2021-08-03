@@ -1,0 +1,7 @@
+# !/bin/bash
+set -e
+
+backend_dir=$(dirname $0)/../../backend/
+
+source "${backend_dir}/create_test_storage_dir.sh" "$backend_dir"
+cp -r frontend/dist/assets/branding.sample frontend/dist/assets/branding
