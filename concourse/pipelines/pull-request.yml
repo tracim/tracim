@@ -107,7 +107,7 @@ jobs:
   plan:
     - get: pull-request
       passed: [reconfigure-self]
-      trigger: true
+      trigger: false
     - task: frontend-unit-tests
       file: pull-request/concourse/tasks/test.yml
       input_mapping:
@@ -121,7 +121,7 @@ jobs:
 - name: end-to-end-tests
   plan:
     - get: pull-request
-      passed: [backend-tests, frontend-tests]
+      passed: [backend-tests]
       trigger: true
     - task: end-to-end-cypress-tests
       # needed for docker during tests
