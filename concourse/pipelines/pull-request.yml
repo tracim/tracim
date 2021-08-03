@@ -73,16 +73,16 @@ jobs:
     params:
       <<: *_update_status_params
       status: pending
-  - task: backend-lint
-    file: pull-request/concourse/tasks/test.yml
-    input_mapping:
-      tracim: pull-request
-    vars:
-      python_version: "3.6"
-      path: concourse/scripts/backend-lint
+  # - task: backend-lint
+  #   file: pull-request/concourse/tasks/test.yml
+  #   input_mapping:
+  #     tracim: pull-request
+  #   vars:
+  #     python_version: "3.6"
+  #     path: concourse/scripts/backend-lint
   - across:
     - var: python_version
-      values: ["3.5", "3.6", "3.7"]
+      values: ["3.5"] # , "3.6", "3.7"]
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
     privileged: true
