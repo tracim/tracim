@@ -7,4 +7,6 @@ shift
 export PATH=/root/.pyenv/bin/:$PATH
 eval "$(pyenv init -)"
 pyenv shell "$python_version"
+python --version
+echo "PIP: $(which pip) PIP3: $(which pip3)"
 "$@"
