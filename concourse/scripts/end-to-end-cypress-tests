@@ -1,9 +1,9 @@
 #!/bin/bash
 set -e
 
-source $(dirname $0)/install_docker
-source $(dirname $0)/install_backend_packages
-source $(dirname $0)/create_backend_dirs
+source "$(dirname $0)/install_docker"
+source "$(dirname $0)/install_backend_packages"
+source "$(dirname $0)/create_backend_dirs"
 cd backend
 pip install -r requirements.txt
 python setup.py develop
