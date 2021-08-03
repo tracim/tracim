@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+python_version=$1
+shift
+
+pyenv shell "$python_version"
+"$@"

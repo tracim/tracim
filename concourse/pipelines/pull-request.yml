@@ -6,13 +6,7 @@ _update_status: &_update_status
 _update_status_params: &_update_status_params
   path: pull-request
 
-_update_pull_request_status: &_update_pull_request_status
-  on_success:
-    put: pull-request-success
-    <<: *_update_status
-    params:
-      <<: *_update_status_params
-      status: success
+_update_pull_request_status_failures: &_update_pull_request_status_failures
   on_failure:
     put: pull-request-failure
     <<: *_update_status
@@ -76,12 +70,12 @@ jobs:
   #   input_mapping:
   #     tracim: pull-request
   #   vars:
-  #     python_version: "3.6"
+  #     python_version: "3.6.14"
   #     path: concourse/scripts/backend-lint
   #     database: ""
   - across:
     - var: python_version
-      values: [] # ["3.5" , "3.6", "3.7"]
+      values: [] # ["3.5.10" , "3.6.14", "3.7.11"]
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
     # needed for docker during tests
@@ -104,9 +98,10 @@ jobs:
     input_mapping:
       tracim: pull-request
     vars:
-      python_version: "3.6"
+      python_version: "3.6.14"
       path: concourse/scripts/backend-full-tests
       database: ((.:database))
+  <<: *_update_pull_request_status_failures
 
 - name: frontend-tests
   plan:
@@ -119,8 +114,9 @@ jobs:
         tracim: pull-request
       vars:
         path: concourse/scripts/frontend-unit-tests
-        python_version: "3.6"
+        python_version: "3.6.14"
         database: ""
+  <<: *_update_pull_request_status_failures
 
 - name: end-to-end-tests
   plan:
@@ -135,6 +131,12 @@ jobs:
         tracim: pull-request
       vars:
         path: concourse/scripts/end-to-end-cypress-tests
-        python_version: "3.6"
+        python_version: "3.6.14"
         database: ""
-  <<: *_update_pull_request_status
+  on_success:
+    put: pull-request-success
+    <<: *_update_status
+    params:
+      <<: *_update_status_params
+      status: success
+  <<: *_update_pull_request_status_failures

@@ -3,11 +3,10 @@ platform: linux
 image_resource:
   type: registry-image
   source:
-    repository: python
-    tag: ((python_version))-stretch
+    repository: algoo-ci/tracim
 inputs:
   - name: tracim
 run:
   dir: tracim
-  path: ((path))
-  args: [((database))]
+  path: concourse/scripts/run_with_python
+  args: [((python_version)), ((path)), ((database))]

@@ -11,4 +11,7 @@ cd -
 ./setup_functionnal_tests.sh root
 ./install_frontend_dependencies.sh
 ./build_full_frontend.sh
+# Prepare docker to run in another docker
+source "$(dirname 0)/docker-lib.sh"
+start_docker
 ./run_dev_backend.sh cypress run

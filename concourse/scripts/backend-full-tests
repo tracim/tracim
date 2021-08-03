@@ -9,5 +9,8 @@ source $(dirname $0)/create_backend_dirs
 cd backend
 pip install $(for r in requirements*.txt; do echo "-r $r"; done)
 python setup.py develop
+# Prepare docker to run in another docker
+source "$(dirname 0)/docker-lib.sh"
+start_docker
 docker-compose up -d
 pytest --database="$database"
