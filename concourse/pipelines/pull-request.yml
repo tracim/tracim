@@ -82,9 +82,10 @@ jobs:
   #     path: concourse/scripts/backend-lint
   - across:
     - var: python_version
-      values: ["3.5"] # , "3.6", "3.7"]
+      values: [] # ["3.5" , "3.6", "3.7"]
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
+    # needed for docker during tests
     privileged: true
     file: pull-request/concourse/tasks/test.yml
     input_mapping:
@@ -92,4 +93,19 @@ jobs:
     vars:
       python_version: ((.:python_version))
       path: concourse/scripts/backend-quick-tests
+  - across:
+    - var: database
+      values: ["sqlite"]
+      max_in_flight: all
+    task: backend-full-tests_((.:database))
+    # needed for docker during tests
+    privileged: true
+    file: pull-request/concourse/tasks/test.yml
+    input_mapping:
+      tracim: pull-request
+    vars:
+      python_version: "3.6"
+      path: concourse/scripts/backend-full-tests
+      args: "[((.:database))]"
+
   <<: *_update_pull_request_status
