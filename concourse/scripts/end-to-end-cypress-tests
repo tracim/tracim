@@ -1,13 +1,14 @@
 #!/bin/bash
 set -e
 
-database=${1:all}
-
 source $(dirname $0)/install_docker
 source $(dirname $0)/install_backend_packages
 source $(dirname $0)/create_backend_dirs
 cd backend
-pip install $(for r in requirements*.txt; do echo "-r $r"; done)
+pip install -r requirements.txt
 python setup.py develop
-docker-compose up -d
-pytest --database="$database"
+cd -
+./setup_functionnal_tests.sh root
+./install_frontend_dependencies.sh
+./build_full_frontend.sh
+./run_dev_backend.sh cypress run

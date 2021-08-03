@@ -97,7 +97,7 @@ jobs:
       database: sqlite
   - across:
     - var: database
-      values: ["sqlite"]
+      values: [] # ["sqlite", "postgresql", "mysql", "mariadb"]
       max_in_flight: all
     task: backend-full-tests_((.:database))
     # needed for docker during tests
@@ -111,3 +111,31 @@ jobs:
       database: ((.:database))
 
   <<: *_update_pull_request_status
+
+- name: frontend-tests
+  plan:
+    - get: pull-request
+      passed: [reconfigure-self]
+      trigger: true
+    - task: frontend-unit-tests
+      file: pull-request/concourse/tasks/test.yml
+      input_mapping:
+        tracim: pull-request
+      vars:
+        path: concourse/scripts/frontend-unit-tests
+        python_version: "3.6"
+        database: ""
+
+- name: end-to-end-tests
+  plan:
+    - get: pull-request
+      passed: [backend-tests, frontend-tests]
+      trigger: true
+    - task: end-to-end-cypress-tests
+      file: pull-request/concourse/tasks/test.yml
+      input_mapping:
+        tracim: pull-request
+      vars:
+        path: concourse/scripts/end-to-end-cypress-tests
+        python_version: "3.6"
+        database: ""
