@@ -80,7 +80,7 @@ jobs:
   #   vars:
   #     python_version: "3.6"
   #     path: concourse/scripts/backend-lint
-  #     args: "[]"
+  #     database: ""
   - across:
     - var: python_version
       values: [] # ["3.5" , "3.6", "3.7"]
@@ -94,7 +94,7 @@ jobs:
     vars:
       python_version: ((.:python_version))
       path: concourse/scripts/backend-quick-tests
-      args: "[]"
+      database: sqlite
   - across:
     - var: database
       values: ["sqlite"]
@@ -108,6 +108,6 @@ jobs:
     vars:
       python_version: "3.6"
       path: concourse/scripts/backend-full-tests
-      args: "((.:database))"
+      database: ((.:database))
 
   <<: *_update_pull_request_status
