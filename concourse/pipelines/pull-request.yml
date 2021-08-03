@@ -56,6 +56,11 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
+  - put: pull-request-status
+    <<: *_update_status
+    params:
+      <<: *_update_status_params
+      status: pending
   - get: pull-request
     trigger: true
   - set_pipeline: self
@@ -68,11 +73,6 @@ jobs:
   - get: pull-request
     passed: [reconfigure-self]
     trigger: true
-  - put: pull-request-status
-    <<: *_update_status
-    params:
-      <<: *_update_status_params
-      status: pending
   # - task: backend-lint
   #   file: pull-request/concourse/tasks/test.yml
   #   input_mapping:
@@ -110,8 +110,6 @@ jobs:
       path: concourse/scripts/backend-full-tests
       database: ((.:database))
 
-  <<: *_update_pull_request_status
-
 - name: frontend-tests
   plan:
     - get: pull-request
@@ -139,3 +137,4 @@ jobs:
         path: concourse/scripts/end-to-end-cypress-tests
         python_version: "3.6"
         database: ""
+  <<: *_update_pull_request_status
