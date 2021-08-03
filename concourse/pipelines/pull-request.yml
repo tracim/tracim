@@ -63,7 +63,7 @@ jobs:
     vars:
       github-webhook-token: ((github-webhook-token))
       github-access-token: ((github-access-token))
-- name: backend-test
+- name: backend-tests
   plan:
   - get: pull-request
     passed: [reconfigure-self]
@@ -80,6 +80,7 @@ jobs:
   #   vars:
   #     python_version: "3.6"
   #     path: concourse/scripts/backend-lint
+  #     args: "[]"
   - across:
     - var: python_version
       values: [] # ["3.5" , "3.6", "3.7"]
@@ -93,6 +94,7 @@ jobs:
     vars:
       python_version: ((.:python_version))
       path: concourse/scripts/backend-quick-tests
+      args: "[]"
   - across:
     - var: database
       values: ["sqlite"]
