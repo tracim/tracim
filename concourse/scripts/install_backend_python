@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+which pyenv || (echo "need pyenv installed" && exit 1)
+echo "Path is now: $PATH" && exit 1
+cd backend
+for version in $@; do
+  pyenv install "$version"
+  pyenv shell "$version"
+  pip install $(for r in requirements*.txt; do echo "-r $r"; done)
+done
