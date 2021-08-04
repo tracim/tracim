@@ -78,8 +78,6 @@ jobs:
       values: ["3.5.10" , "3.6.14", "3.7.11"]
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
-    # needed for docker during tests
-    privileged: true
     file: pull-request/concourse/tasks/test.yml
     input_mapping:
       tracim: pull-request
@@ -92,8 +90,6 @@ jobs:
       values: ["sqlite", "postgresql", "mysql", "mariadb"]
       max_in_flight: all
     task: backend-full-tests_((.:database))
-    # needed for docker during tests
-    privileged: true
     file: pull-request/concourse/tasks/test.yml
     input_mapping:
       tracim: pull-request
@@ -124,8 +120,6 @@ jobs:
       passed: [backend-tests, frontend-tests]
       trigger: true
     - task: end-to-end-cypress-tests
-      # needed for docker during tests
-      privileged: true
       file: pull-request/concourse/tasks/test.yml
       input_mapping:
         tracim: pull-request
