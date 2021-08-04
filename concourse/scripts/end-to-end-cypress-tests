@@ -7,6 +7,8 @@ source "$(dirname $0)/create_backend_dirs"
 cd backend
 pip install -r requirements.txt
 python setup.py develop
+# Update pyenv shims so that tracimcli is found
+pyenv rehash
 cp development.ini.sample development.ini
 tracimcli db init -d
 cd -
