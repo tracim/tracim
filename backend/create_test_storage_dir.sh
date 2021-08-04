@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Create all test_storage_dir subtree needed for running test
-DEFAULTDIR=$(realpath "${1-.}/test_storage_dir")
+DEFAULTDIR=$(realpath "${1-./test_storage_dir}")
 # Main in bottom
 
 YELLOW='\033[1;33m'
