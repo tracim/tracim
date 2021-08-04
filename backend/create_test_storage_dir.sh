@@ -35,9 +35,8 @@ function create_dir(){
 function create_require_dirs {
     log "create requires directories"
     create_dir "test_storage" $DEFAULTDIR
-    create_dir "session" "$DEFAULTDIR/sessions"
-    create_dir "sessions_data" "$DEFAULTDIR/sessions/sessions_data"
-    create_dir "sessions_lock" "$DEFAULTDIR/sessions/sessions_lock"
+    create_dir "sessions_data" "$DEFAULTDIR/sessions_data"
+    create_dir "sessions_lock" "$DEFAULTDIR/sessions_lock"
     create_dir "depot" "$DEFAULTDIR/depot"
     create_dir "preview" "$DEFAULTDIR/previews"
     create_dir "radicale_storage" "$DEFAULTDIR/radicale_storage"
