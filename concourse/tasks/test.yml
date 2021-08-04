@@ -12,9 +12,6 @@ image_resource:
     repository: algooci/tracim
 inputs:
   - name: tracim
-# needed for docker during tests
-# TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
-privileged: true
 run:
   dir: tracim
   path: concourse/scripts/run_test_script
