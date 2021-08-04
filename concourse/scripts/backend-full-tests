@@ -3,9 +3,9 @@ set -e
 
 database=${1:all}
 
-source $(dirname $0)/install_docker
-source $(dirname $0)/install_backend_packages
-source $(dirname $0)/create_backend_dirs
+"$(dirname $0)"/install_docker
+"$(dirname $0)"/install_backend_packages
+"$(dirname $0)"/create_backend_dirs test_storage_dir
 cd backend
 pip install $(for r in requirements*.txt; do echo "-r $r"; done)
 python setup.py develop
