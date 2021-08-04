@@ -65,17 +65,17 @@ jobs:
   - get: pull-request
     passed: [reconfigure-self]
     trigger: true
-  # - task: backend-lint
-  #   file: pull-request/concourse/tasks/test.yml
-  #   input_mapping:
-  #     tracim: pull-request
-  #   vars:
-  #     python_version: "3.6.14"
-  #     path: concourse/scripts/backend-lint
-  #     database: ""
+  - task: backend-lint
+    file: pull-request/concourse/tasks/test.yml
+    input_mapping:
+      tracim: pull-request
+    vars:
+      python_version: "3.6.14"
+      path: concourse/scripts/backend-lint
+      database: ""
   - across:
     - var: python_version
-      values: [] # ["3.5.10" , "3.6.14", "3.7.11"]
+      values: ["3.5.10" , "3.6.14", "3.7.11"]
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
     # needed for docker during tests
@@ -89,7 +89,7 @@ jobs:
       database: sqlite
   - across:
     - var: database
-      values: [] # ["sqlite", "postgresql", "mysql", "mariadb"]
+      values: ["sqlite", "postgresql", "mysql", "mariadb"]
       max_in_flight: all
     task: backend-full-tests_((.:database))
     # needed for docker during tests
@@ -107,7 +107,7 @@ jobs:
   plan:
     - get: pull-request
       passed: [reconfigure-self]
-      trigger: false
+      trigger: true
     - task: frontend-unit-tests
       file: pull-request/concourse/tasks/test.yml
       input_mapping:
@@ -121,7 +121,7 @@ jobs:
 - name: end-to-end-tests
   plan:
     - get: pull-request
-      passed: [backend-tests]
+      passed: [backend-tests, frontend-tests]
       trigger: true
     - task: end-to-end-cypress-tests
       # needed for docker during tests
@@ -133,8 +133,6 @@ jobs:
         path: concourse/scripts/end-to-end-cypress-tests
         python_version: "3.6.14"
         database: ""
-      params:
-        NO_VIRTUAL_ENV: "1"
   on_success:
     put: pull-request-success
     <<: *_update_status
