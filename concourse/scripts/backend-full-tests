@@ -5,8 +5,8 @@ database=${1:all}
 
 "$(dirname $0)"/install_docker
 "$(dirname $0)"/install_backend_packages
+"$(dirname $0)"/create_backend_dirs backend/test_storage_dir
 cd backend
-"$(dirname $0)"/create_backend_dirs test_storage_dir
 pip install $(for r in requirements*.txt; do echo "-r $r"; done)
 python setup.py develop
 docker-compose up -d
