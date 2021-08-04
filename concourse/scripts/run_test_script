@@ -11,6 +11,6 @@ pyenv shell "$python_version"
 # Prepare docker to run in another docker
 source "$(dirname $0)/docker-lib.sh"
 # TODO - S.G. - 2021-08-04 - parametrize the registry mirror
-start_docker "" "172.17.0.1:5000"
+start_docker "" "http://172.17.0.1:5000"
 echo "Running $@ using $(python --version)"
 $@
