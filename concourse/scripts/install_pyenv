@@ -1,17 +1,22 @@
 #!/bin/bash
 set -e
 
+# dependencies needed to build python
 apt-get update
 apt-get install -qy git \
         make build-essential libssl-dev zlib1g-dev \
         libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
         libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+
 git clone https://github.com/pyenv/pyenv.git "${HOME}/.pyenv"
-touch "${HOME}/.bashrc"
+
 cat >> "${HOME}/.bashrc" <<EOF
 export PATH="${HOME}/.pyenv/bin:$PATH"
 eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 EOF
-exec "${SHELL}"
+cat "${HOME}/.bashrc" >> "${HOME}/.profile"
+
+eval "$(pyenv init --path)"
 echo "Path is now: $PATH, shell is $SHELL"
+exit 0

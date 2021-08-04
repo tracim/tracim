@@ -14,4 +14,5 @@ apt-get install -qy \
         ufraw-batch \
         libldap2-dev \
         libsasl2-dev \
-        libimage-exiftool-perl
+        libimage-exiftool-perl \
+        libpq-dev

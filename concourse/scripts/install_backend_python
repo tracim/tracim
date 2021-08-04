@@ -1,11 +1,17 @@
 #!/bin/bash
 set -e
 
-which pyenv || (echo "need pyenv installed" && exit 1)
-echo "Path is now: $PATH" && exit 1
+command -v pyenv || (echo "need pyenv installed" && exit 1)
+# TODO: this shouldn't be necessary here…
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
 cd backend
 for version in $@; do
   pyenv install "$version"
   pyenv shell "$version"
-  pip install $(for r in requirements*.txt; do echo "-r $r"; done)
+  pip install -r requirements-build.txt
+  pip install -r requirements.txt
+  pip install -r requirements-test.txt
+  pip install -r requirements-storage-s3.txt
+  pip install $(for r in requirements-db*.txt; do echo "-r $r"; done)
 done
