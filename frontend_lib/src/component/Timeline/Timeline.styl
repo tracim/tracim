@@ -12,18 +12,18 @@
     margin-bottom 0
     padding-bottom 0
   &__title
-    margin 10px 15px
-    padding 10px
+    margin standardSpacing 15px
+    padding standardSpacing
     font-size 20px
   &__messagelist
     flex 1 1 auto
     margin-bottom 0
-    padding 10px
+    padding standardSpacing
     overflow-y auto
     overflow-x visible
     &__item
       position relative
-      margin 10px 0
+      margin standardSpacing 0
       width 100%
       & + .revision
         border none
@@ -35,10 +35,10 @@
   &__texteditor
     position relative
     flex 0 1 auto
-    margin 10px
+    margin standardSpacing
     &__mentions
       font-weight bold
-      margin 10px 0
+      margin standardSpacing 0
     &__autocomplete
       position absolute
       width 100%
@@ -50,7 +50,7 @@
         margin 5px 20px
         background-color grey
       &__item
-        padding 1px 10px
+        padding 1px standardSpacing
         cursor pointer
         &__active
           background-color grey-hover
@@ -66,7 +66,7 @@
       display flex
       align-items flex-start
       justify-content flex-end
-      margin-top 10px
+      margin-top standardSpacing
       height 42px
     &__advancedtext
       width 100%
