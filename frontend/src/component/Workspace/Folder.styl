@@ -109,7 +109,7 @@ folderopen()
     &__name
       flex 1
       width 0 // INFO - CH - 2019-07-04 - this allows the text-overflow ellipsis
-      margin 0 15px 0 0
+      margin 0 borderSpacing 0 0
       padding 5px
       white-space nowrap
       text-overflow ellipsis
@@ -142,14 +142,14 @@ folderopen()
         padding 0
     &__status
       flex-grow 0
-      padding 0 15px
+      padding 0 borderSpacing
       width 180px
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .folder
     &__header
       &__button__addbtn__text
-        margin-right 15px
+        margin-right borderSpacing
       &__status
         display none
 
@@ -158,12 +158,12 @@ folderopen()
     &__header
       &__name
         &__icon
-          padding 14px 15px
+          padding 14px borderSpacing
           font-size 20px
         &__text
           font-size 15px
       &__button__addbtn__text
-        margin-right 15px
+        margin-right borderSpacing
       &__status
         display none
       &__button__addbtn__text
