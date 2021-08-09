@@ -6,12 +6,12 @@
   height 100%
   width 100%
   &__title
-    font-size mediumTitle
+    font-size fontSizeTitle
     margin-bottom 25px
   &__close
     position absolute
     right 20px
-    font-size mediumTitle
+    font-size fontSizeTitle
     z-index 1
     & > i
       cursor pointer
@@ -26,7 +26,7 @@
         margin 0 0 0 0
       .name__adminmsg
         margin standardSpacing 0 standardSpacing 0
-        font-size 14px
+        font-size fontSizeMetadata
       .autocomplete
         position absolute
         width 300px
@@ -53,21 +53,21 @@
             height 45px
             border-radius 50%
           &__icon
-            font-size 28px
+            font-size bigIconSize
           &__name
             margin-left 15px
             overflow hidden
             text-overflow ellipsis
             white-space nowrap
             &__username
-              font-size small
+              font-size fontSizeMetadata
               color grey
               overflow hidden
               text-overflow ellipsis
             &__unknownuser
               &__msg
                 color grey
-                font-size 12px
+                font-size fontSizeMetadata
     .name__input
       border 1px solid grey
       border-radius 10px

@@ -6,7 +6,7 @@
   &__title
     padding standardSpacing
     border-bottom 1px solid grey
-    font-size mediumTitle
+    font-size fontSizeTitle
     font-weight 400
   &__field
     padding standardSpacing
@@ -55,7 +55,7 @@
         justify-content space-between
         align-items center
         border-bottom 1px solid grey
-        padding 0 borderSpacing
+        padding 0 standardSpacing
         height 65px
         &__avatar
           margin-right 25px
@@ -65,7 +65,7 @@
           text-overflow ellipsis
           white-space nowrap
           &__username
-            font-size small
+            font-size fontSizeMetadata
             overflow hidden
             text-overflow ellipsis
         &__role
@@ -77,7 +77,7 @@
             width 100%
             &__icon
               width 25px
-              margin-right borderSpacing
+              margin-right standardSpacing
             &::after
               display flex
               margin-left auto
@@ -97,11 +97,11 @@
                 white-space normal
         &__delete
           width 16px
-          font-size mediumTitle
+          font-size fontSizeTitle
           cursor pointer
     &__adduser
       border-bottom 2px solid grey
-      padding borderSpacing
+      padding standardSpacing
       &__button
         display flex
         align-items center
@@ -119,16 +119,16 @@
           height 50px
           cursor pointer
           &__icon
-            font-size 25px
+            font-size bigIconSize
         &__text
-          font-size 18px
+          font-size fontSizeStandard
           cursor pointer
     &__title
-      padding 17px borderSpacing
+      padding 17px standardSpacing
   &__optionalfunctionalities
     padding-top standardSpacing
     &__title
-      padding 7px borderSpacing 17px
+      padding 7px standardSpacing 17px
     &__content
       padding-left 20px
   &__subscriptionRequests

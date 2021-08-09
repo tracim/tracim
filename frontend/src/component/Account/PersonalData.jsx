@@ -63,8 +63,6 @@ export class PersonalData extends React.Component {
           )}
         </div>
 
-        <div className='personaldata__text ml-2 ml-sm-0' />
-
         <form className='personaldata__form'>
           <div className='d-flex align-items-center flex-wrap mb-4'>
             <label>

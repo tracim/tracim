@@ -7,7 +7,7 @@
   align-items center
   &__type
     &__content
-      font-size mainTitle
+      font-size fontSizeTitle
       color fontColor
       display flex
       flex-direction column
@@ -15,9 +15,9 @@
       width 90px
       place-content center
       & > span
-        font-size smallTitle
+        font-size fontSizeMetadata
     &__header
-      margin borderSpacing 25px
+      margin standardSpacing 25px
   &__name
     padding 0px 5px
     white-space nowrap
@@ -34,7 +34,7 @@
     flex 1
     margin-inline-end 25px
     & > *
-      font-size smallTitle
+      font-size fontSizeMetadata
     & > i
       margin-inline-start 5px
 
@@ -42,7 +42,7 @@
   .advancedSearchSpace
     &__type
       &__header
-        margin borderSpacing standardSpacing
+        margin standardSpacing standardSpacing
       &__content
         width 50px
         & > span

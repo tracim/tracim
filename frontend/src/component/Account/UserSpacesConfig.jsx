@@ -174,11 +174,9 @@ export class UserSpacesConfig extends React.Component {
 
     return (
       <div className='account__userpreference__setting__spacename'>
-        <div className='spaceconfig__sectiontitle subTitle ml-2 ml-sm-0'>
+        <div className='spaceconfig__sectiontitle subTitle'>
           {props.t('Spaces')}
         </div>
-
-        <div className='spaceconfig__text ml-2 ml-sm-0' />
 
         {(entries.length
           ? (

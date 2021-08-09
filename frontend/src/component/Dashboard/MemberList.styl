@@ -17,11 +17,11 @@
     &__item
       display flex
       border-bottom 1px solid grey
-      padding standardSpacing borderSpacing
+      padding standardSpacing standardSpacing
       &:hover
         background-color grey-hover
       &__avatar
-        margin-right mediumTitle
+        margin-right fontSizeTitle
         & > img
           width 50px
           height 50px
@@ -34,27 +34,27 @@
           overflow hidden
           white-space nowrap
           &__name
-            font-size mediumTitle
+            font-size fontSizeTitle
             text-overflow ellipsis
             overflow hidden
           &__username
-            font-size 14px
+            font-size fontSizeMetadata
             color mediumDarkGrey
             text-overflow ellipsis
             overflow hidden
         &__role
-          font-size 14px
+          font-size fontSizeMetadata
           color mediumDarkGrey
           margin auto 5px
       &__delete
-        font-size mediumTitle
+        font-size fontSizeTitle
         color darkGrey
         cursor pointer
       &__last
         border none
   &__btnadd
     border-bottom 2px solid grey
-    padding borderSpacing
+    padding standardSpacing
     &__button
       display flex
       align-items center
@@ -72,9 +72,9 @@
         height 50px
         cursor pointer
         &__icon
-          font-size 25px
+          font-size bigIconSize
       &__text
-        font-size 18px
+        font-size fontSizeStandard
         cursor pointer
 
 

@@ -13,16 +13,16 @@
     display none
   &__type
     &__content
-      font-size mainTitle
+      font-size fontSizeTitle
       display flex
       flex-direction column
       align-items center
       width 90px
       place-content center
       & > span
-        font-size smallTitle
+        font-size fontSizeMetadata
     &__header
-      margin borderSpacing 25px
+      margin standardSpacing 25px
       text-align center
       align-self center
   &__name_path
@@ -44,7 +44,7 @@
     align-self center
     flex 1
     &.timedEvent
-      margin-left borderSpacing
+      margin-left standardSpacing
       margin-right standardSpacing
       overflow hidden
   &__information
@@ -59,7 +59,7 @@
       min-width 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
       padding-right standardSpacing
     & > *
-      font-size smallTitle
+      font-size fontSizeMetadata
     & > i
       margin-inline-end 5px
       margin-inline-start 2px
@@ -72,7 +72,7 @@
   .advancedSearchContent
     &__type
       &__header
-        margin borderSpacing standardSpacing
+        margin standardSpacing standardSpacing
       &__content
         width 50px
         & > span
@@ -106,7 +106,7 @@
       display none
     &__typeAndTitle
       display unset
-      padding borderSpacing 5px
+      padding standardSpacing 5px
       flex 2
   .content__header
     & .advancedSearchContent

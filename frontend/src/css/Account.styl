@@ -3,34 +3,10 @@
 .nomarginlabel
   margin-bottom 0
 
-settingText()
-  margin 15px 0
-  font-size 18px
-
 .table tr:nth-child(even) // @fixme Côme - 2018/09/13 - refactor this rule, it should not impact the whole project
   background-color lightGrey
 
 .account
-  &.pageContentGeneric
-    padding 0
-  &__userinformation
-    display flex
-    justify-content center
-    align-items center
-    flex-wrap wrap
-    padding 25px
-    font-size 18px
-    &__wrapper
-      flex-direction column
-    &__avatar
-      margin-right 50px
-      img
-        width 150px
-        height 150px
-    &__name
-      font-size 22px
-    &__company
-      font-size mediumTitle
   &__delimiter
     position relative
     top 3px
@@ -40,57 +16,13 @@ settingText()
     display flex
     padding 25px
     width 100%
-    &__menu
-      margin-right 30px
-      border-radius 10px
-      padding 0
-      width 20%
-      min-height 600px
-      background-color offWhite
-      &__list
-        width 100%
-        margin-bottom 20px
-        &__close
-          display none
-          justify-content flex-end
-          margin standardSpacing 0 15px 0
-          font-size mediumTitle
-          cursor pointer
-        &__item
-          margin-top standardSpacing
-          font-weight 500
-          font-size 18px
-          cursor pointer
-          &:hover
-            background-color lightGrey
-          &.active
-            background-color thirdColor
-            color white
     &__setting
       border-radius 10px
       padding 20px
       width 80%
       min-height 600px
       background-color offWhite
-      .agenda
-        &__text
-          settingText()
-        &__link
-          display inline-block
-          border 1px solid grey
-          border-radius 5px
-          padding standardSpacing 25px
-      .timezone
-        &__text
-          settingText()
-        &__time
-          margin 15px 0 30px 0
-          &__select
-            max-width 300px
       .spaceconfig
-        &__text
-          settingText()
-          margin-bottom 30px
         &__table
           border 1px solid lightGrey
           &__role
