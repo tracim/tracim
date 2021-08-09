@@ -11,6 +11,7 @@
   "{{author}} commented on {{content}} in {{space}}": "{{author}} comentou em {{content}} em {{space}}",
   "{{author}} mentioned you in {{content}} in {{space}}": "{{author}} mencionou-o no {{content}} em {{space}}",
   "{{author}} mentioned you in a comment in {{content}} in {{space}}": "{{author}} mencionou-o num comentário do {{content}} em {{space}}",
+  "{{author}} mentioned everyone in a comment in {{content}} in {{space}}": "{{author}} mencionou todos num comentário em {{{content}} em {{space}}",
   "{{author}} updated {{content}} in {{space}}": "{{author}} actualizou {{content}} em {{space}}",
   "{{author}} changed the status of {{content}} in {{space}}": "{{author}} modificou o status de {{content}} em {{space}}",
   "{{author}} reacted to {{content}} with {{reaction}}": "{{author}} reagiu a {{content}} com {{reaction}}",

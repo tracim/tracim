@@ -10,6 +10,7 @@
   "{{author}} modified your role in {{space}}": "{{author}} hat Ihre Rolle im {{space}} geändert",
   "{{author}} modified {{user}}'s role in {{space}}": "{{author}} hat die Rolle von {{user}} im {{space}} geändert",
   "{{author}} mentioned you in a comment in {{content}} in {{space}}": "{{author}} hat Sie in einem Kommentar in {{content}} in {{space}}",
+  "{{author}} mentioned everyone in a comment in {{content}} in {{space}}": "{{author}} erwähnte alle in einem Kommentar zu {{content}} in {{space}}",
   "{{author}} mentioned you in {{content}} in {{space}}": "{{author}} hat Sie im {{content}} im {{space}}",
   "{{author}} created {{content}} in {{space}}": "{{author}} erstellte {{content}} im {{space}}",
   "Account Settings": "Kontoeinstellungen",
