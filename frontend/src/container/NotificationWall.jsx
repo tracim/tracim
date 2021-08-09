@@ -184,16 +184,14 @@ export class NotificationWall extends React.Component {
     }
 
     if (entityType === TLM_ENTITY.MENTION && eventType === TLM_EVENT.CREATED) {
-      if (notification.content.type === CONTENT_TYPE.COMMENT) {
-        const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
-        const mentionEveryone = props.t('{{author}} mentioned everyone in a comment in {{content}} in {{space}}', i18nOpts)
-        const mentionYou = props.t('{{author}} mentioned you in a comment in {{content}} in {{space}}', i18nOpts)
-        return {
-          icon: 'far fa-comment',
-          title: props.t('Mention'),
-          text: groupMention ? mentionEveryone : mentionYou,
-          url: this.linkToComment(notification)
-        }
+      const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
+      const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}} in {{space}}', i18nOpts)
+      const mentionYou = props.t('{{author}} mentioned you in {{content}} in {{space}}', i18nOpts)
+      return {
+        icon: 'fas fa-at',
+        title: props.t('Mention'),
+        text: groupMention ? mentionEveryone : mentionYou,
+        url: contentUrl
       }
     }
 
