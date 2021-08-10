@@ -215,7 +215,6 @@ export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
       context.fillStyle = hasUnreadMention ? '#dc3545' : '#3F9FF7'
       context.fill()
 
-
       // INFO - GM - 2020/08/18 - Replace the favicon
       if (!favicon.getAttribute(originalHrefAttribute)) favicon.setAttribute(originalHrefAttribute, favicon.href)
       favicon.href = canvas.toDataURL('image/png')
