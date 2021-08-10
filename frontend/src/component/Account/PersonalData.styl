@@ -2,12 +2,11 @@
 
 .personaldata
   &__form
-    margin 25px 0
     &__txtinput
       width 300px
       border-width 1px
       border-style solid
-      border-radius 5px
+      border-radius borderRadiusStandard
       &[placeholder]
         white-space nowrap
         overflow hidden
@@ -15,18 +14,18 @@
       &:disabled
         cursor not-allowed
       &.withAdminMsg
-        margin-right 20px
+        margin-right standardSpacing
       &__info
-        margin 5px
+        margin textSpacing
         &__icon
-          margin-right 5px
+          margin-right textSpacing
       &__msgerror
         width 300px
         font-size fontSizeMetadata
         text-align right
         color errorRed
         &__icon
-          margin-right 5px
+          margin-right textSpacing
       &__msginfo
         width 300px
         font-size fontSizeMetadata
@@ -35,4 +34,4 @@
       vertical-align top
       border-width 1px
       border-style solid
-      border-radius 5px
+      border-radius borderRadiusStandard
