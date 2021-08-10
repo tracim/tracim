@@ -135,6 +135,7 @@ describe('Reactions', function () {
       cy.contains(`${container} ${emojiCounterClassName}`, '1')
 
       cy.get(`${container} ${emojiButtonClassName}`).first().click()
+      cy.contains(`${container} ${emojiValueClassName}`, '😀')
       cy.contains(`${container} ${emojiCounterClassName}`, '2')
 
       cy.get(`${container} ${emojiButtonClassName}`).first().click()
