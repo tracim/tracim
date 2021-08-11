@@ -86,18 +86,18 @@ export class Password extends React.Component {
 
     return (
       <div className='account__userpreference__setting__personaldata'>
-        <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
+        <div className='personaldata__sectiontitle subTitle'>
           {(props.displayAdminInfo
             ? props.t('Change the password')
             : props.t('Change my password')
           )}
         </div>
 
-        <div className='personaldata__text ml-2 ml-sm-0' />
+        <div className='personaldata__text' />
 
-        <form className='personaldata__form mr-5'>
+        <form className='personaldata__form'>
           {props.displayAdminInfo === false && (
-            <div className='d-flex align-items-center flex-wrap mb-4'>
+            <div>
               <label>
                 {props.t('Current password:')}
                 <input
@@ -112,7 +112,7 @@ export class Password extends React.Component {
             </div>
           )}
 
-          <div className='d-flex align-items-center flex-wrap mb-4'>
+          <div>
             <label>
               {props.t('New password:')}
               <input
@@ -125,7 +125,7 @@ export class Password extends React.Component {
             </label>
           </div>
 
-          <div className='align-items-center flex-wrap mb-4'>
+          <div>
             <label>
               {props.t('Repeat new password:')}
               <input
@@ -137,12 +137,12 @@ export class Password extends React.Component {
               />
             </label>
           </div>
-          <div className=' d-flex align-items-center flex-wrap mb-4'>
+          <div>
             {props.displayAdminInfo && state.newPassword !== '' && (
               <label>
                 {props.t("Administrator's password:")}
                 <input
-                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3'
+                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control'
                   type='password'
                   value={state.checkAdminPassword}
                   onChange={this.handleChangeCheckAdminPassword}

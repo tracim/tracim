@@ -15,7 +15,7 @@
   &__header
     display flex
     align-items center
-    margin 5px 10px 5px 30px
+    margin 5px standardSpacing 5px 30px
     height 60px
     border-bottom 1px solid mediumGrey
     & > *
@@ -24,16 +24,16 @@
       &::after
         display none
     &__icon
-      margin-right 10px
-      font-size fontSizeTitle
+      margin-right standardSpacing
+      font-size titleFontSize
     &__title
-      margin-right 10px
+      margin-right standardSpacing
       border-radius 5px
       flex 2
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
-      font-size fontSizeMedium
+      font-size titleFontSize
       font-weight bold
       & > div
         text-overflow ellipsis
@@ -49,7 +49,7 @@
       border-radius 5px
       padding 3px 7px
       & > i
-        font-size fontSizeMedium
+        font-size titleFontSize
         vertical-align middle
   &__option
     &__menu
@@ -70,11 +70,11 @@
         border-width 1px
         border-style solid
         & > i
-          margin-right 10px
+          margin-right standardSpacing
           color darkGrey
-          font-size fontSizeMedium
+          font-size titleFontSize
       &__action
-        font-size fontSizeMedium
+        font-size titleFontSize
         background-color transparent
         border none
         cursor pointer
@@ -98,8 +98,8 @@
         display flex
         align-items center
         color lightDarkGrey
-        font-size fontSizeSmall
-        padding 5px 10px
+        font-size metadataFontSize
+        padding 5px standardSpacing
         margin-inline-start 20px
         & .breadcrumbs
           margin-inline-end auto
@@ -119,15 +119,15 @@
         width calc(100% - 65px) // 65px is the width of the rightPart header
         overflow-y auto
         &__title
-          margin 10px 15px
-          padding 10px
-          font-size fontSizeMedium
+          margin standardSpacing 15px
+          padding standardSpacing
+          font-size titleFontSize
       &__header
         display flex
         flex-direction column
         width 65px
         background-color mediumGrey
-        font-size fontSizeMedium
+        font-size titleFontSize
         cursor pointer
         &__icon
           cursor pointer
@@ -167,7 +167,7 @@ responsiveColumnStyle()
         transform none
         border-left-width 0
         margin-left 5px
-        padding 10px
+        padding standardSpacing
         width 65px
         border-top 5px solid
         & > i

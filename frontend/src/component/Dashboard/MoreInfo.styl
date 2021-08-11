@@ -1,9 +1,11 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
 .moreinfo
   display flex
   justify-content space-between
   flex-wrap wrap
   &__webdav
-    margin 0 15px 40px 0
+    margin 0 standardSpacing 40px 0
     &__btn
       width 300px
     &__information
@@ -27,8 +29,8 @@
 @media (max-width: max-xs)
 
   .moreinfo
-    margin-left 15px
+    margin-left standardSpacing
     &__webdav
-      margin-left 10px
+      margin-left standardSpacing
       &__information
         width 350px

@@ -27,12 +27,33 @@ zIndexOverHeader = 50
 headerHeight = 61px // INFO - CH - 2019-04-19 - the total header height. Used to calculate height of layout like height: "calc(100% - %s)" % headerHeight
 sidebarWidth = 300px
 
-fontSizeTitle = 25px
-fontSizeMedium = 20px
-fontSizeSmall = 14px
+// INFO - GB - 2021-08-10 - The constants below indicate the three possible font size levels
+// titleFontSize : should be used for titles (that have high priority and need a highlight)
+// standardFontSize : is the default font size and everything that is not high or low priority should be at this size
+// metadataFontSize : should be used for meta data, i.e. used when it is not information of the content but about the
+// content (that have high priority and need a highlight)
+
+titleFontSize = 20px
+standardFontSize = 16px
+metadataFontSize = 14px
+
 listItemHeight = 5px
 popupWidth = 420px
-bigIconSize = 30px
+bigIconSize = 20px
+
+standardBorderRadius = 5px
+
+/*************************/
+/**** SPACING ****/
+
+// INFO - GB - 2021-08-10 - The constants below indicate the three possible spacings
+// pageSpacing : is the space around the page
+// standardFontSize : is the default space and everything that does not have a specific space should have this one around
+// textSpacing : X is the space between something and its associated text, for example, the space between an icon and its text
+
+pageSpacing = 30px
+standardSpacing = 10px
+textSpacing = 5px
 
 /*************************/
 /**** BOX SHADOW ****/

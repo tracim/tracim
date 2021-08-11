@@ -2,7 +2,7 @@
 
 .comment
   border-radius 5px
-  padding 10px
+  padding standardSpacing
   border 1px solid grey
   background-color offWhite
   display flex
@@ -17,7 +17,7 @@
     flex-direction row
 
     .avatar-wrapper
-      margin-inline-end 10px
+      margin-inline-end standardSpacing
 
     &__content
       flex 1
@@ -37,13 +37,13 @@
       &__header
         display flex
         flex-direction row
-        margin-bottom 10px
-        font-size 12px
+        margin-bottom standardSpacing
+        font-size metadataFontSize
         &__meta
           flex 1
           &__author
             overflow-wrap anywhere
-            font-size 16px
+            font-size standardFontSize
             &:hover
               text-decoration underline
         &__actions
@@ -55,5 +55,5 @@
             color fontColor
   &__footer
     display flex
-    margin-top 10px
+    margin-top standardSpacing
     justify-content space-between

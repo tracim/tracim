@@ -4,21 +4,21 @@
   margin-bottom 15px
   border-radius 10px
   &__title
-    padding 10px 0 25px 10px
+    padding standardSpacing 0 25px standardSpacing
     border-bottom 1px solid grey
-    font-size 20px
+    font-size titleFontSize
     font-weight 400
   &__field
-    padding 10px
+    padding standardSpacing
   &__bottom
-    padding 10px
+    padding standardSpacing
 
 .folder_advanced
   height 100%
   overflow-y auto
   overflow-x hidden
   &-content
-    padding 10px 10px 0 10px
+    padding standardSpacing standardSpacing 0 standardSpacing
   &__content
     &__state
       display flex
@@ -37,13 +37,13 @@
     &__btnupload
       margin auto 0
     &__form
-      padding 10px 0
+      padding standardSpacing 0
       &__type
         display flex
         align-items center
         padding 3px 13px
         cursor pointer
-        font-size 16px
+        font-size standardFontSize
         &:hover
           background-color lightGrey
         &__icon

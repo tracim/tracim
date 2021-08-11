@@ -60,7 +60,7 @@ folderopen()
     align-items center
     margin-left -30px
     border-bottom 0
-    padding 10px 0
+    padding standardSpacing 0
     background-color lightGrey
     cursor pointer
     &:hover
@@ -90,7 +90,7 @@ folderopen()
         border-color lightGrey transparent transparent transparent
     &__dragHandle
       position absolute
-      padding 0 10px
+      padding 0 standardSpacing
     & .dragHandle
       display none
     &:hover > .dragHandle
@@ -103,13 +103,13 @@ folderopen()
     &__icon
       flex-grow 0
       padding 0 25px
-      font-size 30px
+      font-size bigIconSize
       color darkGrey
       text-align center
     &__name
       flex 1
       width 0 // INFO - CH - 2019-07-04 - this allows the text-overflow ellipsis
-      margin 0 15px 0 0
+      margin 0 standardSpacing 0 0
       padding 5px
       white-space nowrap
       text-overflow ellipsis
@@ -142,28 +142,22 @@ folderopen()
         padding 0
     &__status
       flex-grow 0
-      padding 0 15px
+      padding 0 standardSpacing
       width 180px
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .folder
     &__header
       &__button__addbtn__text
-        margin-right 15px
+        margin-right standardSpacing
       &__status
         display none
 
 @media (max-width: max-xs)
   .folder
     &__header
-      &__name
-        &__icon
-          padding 14px 15px
-          font-size 20px
-        &__text
-          font-size 15px
       &__button__addbtn__text
-        margin-right 15px
+        margin-right standardSpacing
       &__status
         display none
       &__button__addbtn__text

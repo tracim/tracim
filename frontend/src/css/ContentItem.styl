@@ -1,10 +1,12 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
 .content
   position relative
   &__item
-    padding 10px 0
+    padding standardSpacing 0
   &__type
-    padding 0 25px
-    font-size 30px
+    padding 0 standardSpacing
+    font-size bigIconSize
     text-align center
   &__dragPreview
     display flex
@@ -28,7 +30,7 @@
     &__text
       margin-left 15px
     &__icon
-      font-size 20px
+      font-size titleFontSize
   & .dragHandle
     display none
   &:hover > .dragHandle
