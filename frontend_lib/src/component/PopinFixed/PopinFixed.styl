@@ -15,9 +15,9 @@
   &__header
     display flex
     align-items center
-    margin 5px standardSpacing 5px 30px
     height 60px
     border-bottom 1px solid mediumGrey
+    padding standardSpacing pageSpacing
     & > *
       margin-right 5px
     &__actions
@@ -28,7 +28,7 @@
       font-size titleFontSize
     &__title
       margin-right standardSpacing
-      border-radius 5px
+      border-radius textSpacing
       flex 2
       text-overflow ellipsis
       overflow hidden
@@ -99,8 +99,7 @@
         align-items center
         color lightDarkGrey
         font-size metadataFontSize
-        padding 5px standardSpacing
-        margin-inline-start 20px
+        padding standardSpacing
         & .breadcrumbs
           margin-inline-end auto
           overflow auto

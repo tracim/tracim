@@ -39,25 +39,23 @@
         margin-inline-end standardSpacing
       & .btn .fa-fw
         margin-inline-end textSpacing
-      &__agenda
-        & .btn
-          color fontColor
+      &__agenda .btn
+        color fontColor
       &__specificBtn:empty
         display none
 
 @media (max-width: max-md)
-  .header
-    &__menu
-      &.navbar-collapse
-        position fixed
-        left 0
-        top "calc(%s - 1px)" % headerHeight
-        width 100%
-        background-color lightGrey
-        border-bottom 1px solid grey
-      &__rightside
-        flex-wrap wrap
-        padding-inline-start 0
-        & li
-          margin-inline-end standardSpacing
-          margin-bottom standardSpacing
+  .header__menu
+    &.navbar-collapse
+      position fixed
+      left 0
+      top "calc(%s - 1px)" % headerHeight
+      width 100%
+      background-color lightGrey
+      border-bottom 1px solid grey
+    &__rightside
+      flex-wrap wrap
+      padding-inline-start 0
+      & li
+        margin-inline-end standardSpacing
+        margin-bottom standardSpacing

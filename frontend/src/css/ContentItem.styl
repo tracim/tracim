@@ -1,7 +1,14 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
+border-style = 1px solid grey
 .content
   position relative
+  border border-style
+  border-bottom 0px
+  background-color offWhite
+  &.item-last
+    border-bottom border-style
+    margin-bottom standardSpacing
   &__item
     padding standardSpacing 0
   &__type
@@ -16,14 +23,13 @@
     overflow hidden
     text-overflow ellipsis
   &__name
-    padding 5px
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
     color fontColor
   &__status
     flex-grow 0
-    width 180px
+    width 165px
     padding 0 15px
     text-align center
     font-weight normal

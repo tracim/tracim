@@ -4,11 +4,9 @@ import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
-
 import { BREADCRUMBS_TYPE, PAGE } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 
-require('./PageTitle.styl')
 
 export class PageTitle extends React.Component {
   constructor (props) {

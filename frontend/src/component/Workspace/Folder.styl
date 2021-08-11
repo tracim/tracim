@@ -11,17 +11,6 @@ border-style = 1px solid grey
   border-bottom 0
 .folder:not(.active).item-last
   border-bottom border-style
-.content
-  border border-style
-  border-bottom 0px
-  background-color offWhite
-  &.item-last
-    border-bottom border-style
-// @Info: the very last line of file or folder has it's border bottom added in js
-// -----------------------------------------------------
-
-// .folder > .folder__content > .file, .folder > .folder__content > .extandedaction
-//   padding-right 7px
 
 folderclose()
   height 0
@@ -102,15 +91,13 @@ folderopen()
       width 0 // INFO - CH - 2019-06-06 - this allows the text-overflow ellipsis
     &__icon
       flex-grow 0
-      padding 0 25px
+      padding 0 standardSpacing
       font-size bigIconSize
       color darkGrey
       text-align center
     &__name
       flex 1
       width 0 // INFO - CH - 2019-07-04 - this allows the text-overflow ellipsis
-      margin 0 standardSpacing 0 0
-      padding 5px
       white-space nowrap
       text-overflow ellipsis
       overflow hidden
@@ -129,9 +116,9 @@ folderopen()
         margin auto 0
         cursor pointer
         &:hover > .folder__header__name__addbtn__text
-          color white
+          color offWhite
         &__text
-          margin-right 40px
+          margin-right standardSpacing
           &::after
             margin-left 20px
           &-desktop
@@ -143,7 +130,7 @@ folderopen()
     &__status
       flex-grow 0
       padding 0 standardSpacing
-      width 180px
+      width 165px
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .folder

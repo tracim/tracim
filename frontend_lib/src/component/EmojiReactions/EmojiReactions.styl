@@ -13,11 +13,9 @@
   height 100%
 
 .EmojiReactionButton__button, .EmojiReactionButton__buttonpicker
-  min-height 26px
   background transparent
-  border-radius 3px
+  border-radius standardBorderRadius
   white-space pre
-  margin 2px
   &:not(:disabled)
     cursor pointer
 
@@ -48,9 +46,8 @@
 .EmojiReactionButton__buttonpicker
   color grey
   border 1px solid transparent
-  padding 0 5.5px
   &.active
-    background-color mediumDarkGrey
+    color fontColor
     border 1px solid mediumDarkGrey
 
 .EmojiReactionButton__button:hover:not(.highlighted):not(:disabled), .EmojiReactionButton__buttonpicker:hover:not(.active):not(:disabled)

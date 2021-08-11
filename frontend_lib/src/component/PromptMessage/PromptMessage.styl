@@ -1,15 +1,18 @@
+@import '../../css/Variable.styl'
+
 .promptMessage
   display flex
   align-items center
   justify-content space-between
-  margin 5px 5px 15px
-  padding 5px 15px
+  margin 0 standardSpacing standardSpacing
+  padding textSpacing
   background-color #fee498
-  border-radius 10px
+  border-radius standardBorderRadius
   &__msg > i
-    margin-right 8px
+    margin-right textSpacing
   &__btn
     cursor pointer
+    padding 0 standardSpacing
     &.link
       border none
       background-color transparent
