@@ -40,6 +40,16 @@ import {
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
 
+function shortDate (date) {
+  const secondsElapsed = Date.now() - new Date(date).getTime()
+  if (secondsElapsed < 60000) return Math.round(secondsElapsed / 1000) + ' sec'
+  if (secondsElapsed < 3600000) return Math.round(secondsElapsed / 60000) + ' min'
+  if (secondsElapsed < 3600000 * 24) return Math.round(secondsElapsed / 3600000) + ' h'
+  if (secondsElapsed < 3600000 * 24 * 30) return Math.round(secondsElapsed / (3600000 * 24)) + ' j'
+  if (secondsElapsed < 3600000 * 24 * 365) return Math.round(secondsElapsed / (3600000 * 24 * 30)) + ' m'
+  return Math.round(secondsElapsed / (3600000 * 24 * 365)) + ' a'
+}
+
 export class NotificationWall extends React.Component {
   handleClickNotification = async (e, notificationId, notificationDetails) => {
     const { props } = this
@@ -467,18 +477,25 @@ export class NotificationWall extends React.Component {
                       user={notification.author}
                       style={{ marginRight: '5px' }}
                     />
-                    <span
+                    <span className='notification__list__item__text__content'
                       dangerouslySetInnerHTML={{
                         __html: (
                           notificationDetails.text + ' ' +
                           `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
-                            escapeHtml(displayDistanceDate(notification.created, props.user.lang)) +
                           '</span>'
                         )
                       }}
                     />
                   </div>
-                  {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
+                  <div className='notification__list__item__meta'>
+                    <span className='notification__list__item__meta__date'
+                          title={formatAbsoluteDate(notification.created, props.user.lang)}>
+                      {shortDate(notification.created)}
+                    </span>
+                  </div>
+                  <div className='notification__list__item__circle__wrapper'>
+                    {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
+                  </div>
                 </Link>
               </ListItemWrapper>
             )
