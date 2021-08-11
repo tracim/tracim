@@ -477,5 +477,12 @@
   "alex.doe@jco.co": "alex.muller@alm.de",
   "In order to finish your sign in, please read the following usage conditions and accept them": "Um Ihre Anmeldung abzuschließen, lesen Sie bitte die folgenden Nutzungsbedingungen und akzeptieren Sie diese",
   "Unknown content": "Unbekannter Inhalt",
-  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "Ihr Link für das Zurücksetzen des Passworts ist abgelaufen, Sie können eines erneuern, indem Sie <1>diesem Link</1> folgen."
+  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "Ihr Link für das Zurücksetzen des Passworts ist abgelaufen, Sie können eines erneuern, indem Sie <1>diesem Link</1> folgen.",
+  "sec": "Sek",
+  "min": "Min",
+  "hr": "Std",
+  "d": "T",
+  "w": "W",
+  "mth": "M",
+  "y": "J"
 }

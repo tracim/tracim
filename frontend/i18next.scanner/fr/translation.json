@@ -476,5 +476,12 @@
   "alex.doe@jco.co": "alix.martin@alm.fr",
   "In order to finish your sign in, please read the following usage conditions and accept them": "Pour finaliser votre connexion, merci de prendre connaissance des conditions d'utilisation et de les valider",
   "Unknown content": "Contenu inconnu",
-  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "Votre lien de ré-initialisation de mot de passe a expiré, vous pouvez le regénérer en suivant <1>ce lien</1>."
+  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "Votre lien de ré-initialisation de mot de passe a expiré, vous pouvez le regénérer en suivant <1>ce lien</1>.",
+  "sec": "sec",
+  "min": "min",
+  "hr": "h",
+  "d": "j",
+  "w": "sem",
+  "mth": "m",
+  "y": "an"
 }

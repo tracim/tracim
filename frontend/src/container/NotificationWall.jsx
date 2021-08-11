@@ -23,7 +23,6 @@ import {
   AVATAR_SIZE,
   CONTENT_TYPE,
   PROFILE,
-  displayDistanceDate,
   GenericButton,
   ListItemWrapper,
   PopinFixedHeader,
@@ -40,17 +39,20 @@ import {
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
 
-function shortDate (date) {
-  const secondsElapsed = Date.now() - new Date(date).getTime()
-  if (secondsElapsed < 60000) return Math.round(secondsElapsed / 1000) + ' sec'
-  if (secondsElapsed < 3600000) return Math.round(secondsElapsed / 60000) + ' min'
-  if (secondsElapsed < 3600000 * 24) return Math.round(secondsElapsed / 3600000) + ' h'
-  if (secondsElapsed < 3600000 * 24 * 30) return Math.round(secondsElapsed / (3600000 * 24)) + ' j'
-  if (secondsElapsed < 3600000 * 24 * 365) return Math.round(secondsElapsed / (3600000 * 24 * 30)) + ' m'
-  return Math.round(secondsElapsed / (3600000 * 24 * 365)) + ' a'
-}
-
 export class NotificationWall extends React.Component {
+  shortDate = date => {
+    const { props } = this
+
+    const msElapsed = Date.now() - new Date(date).getTime()
+    if (msElapsed < 60000) return Math.round(msElapsed / 1000) + ' ' + props.t('sec')
+    if (msElapsed < 3600000) return Math.round(msElapsed / 60000) + ' ' + props.t('min')
+    if (msElapsed < 3600000 * 24) return Math.round(msElapsed / 3600000) + ' ' + props.t('hr')
+    if (msElapsed < 3600000 * 24 * 7) return Math.round(msElapsed / (3600000 * 24)) + ' ' + props.t('d')
+    if (msElapsed < 3600000 * 24 * 30) return Math.round(msElapsed / (3600000 * 24 * 7)) + ' ' + props.t('w')
+    if (msElapsed < 3600000 * 24 * 365) return Math.round(msElapsed / (3600000 * 24 * 20)) + ' ' + props.t('mth')
+    return Math.round(msElapsed / (3600000 * 24 * 365)) + ' ' + props.t(' y')
+  }
+
   handleClickNotification = async (e, notificationId, notificationDetails) => {
     const { props } = this
 
@@ -488,11 +490,11 @@ export class NotificationWall extends React.Component {
                     />
                   </div>
                   <div className='notification__list__item__meta'>
-                    <span 
+                    <span
                       className='notification__list__item__meta__date'
                       title={formatAbsoluteDate(notification.created, props.user.lang)}
                      >
-                      {shortDate(notification.created)}
+                      {this.shortDate(notification.created)}
                     </span>
                   </div>
                   <div className='notification__list__item__circle__wrapper'>
