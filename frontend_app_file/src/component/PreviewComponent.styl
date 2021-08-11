@@ -12,7 +12,7 @@
     display flex
     align-items center
     justify-content space-between
-    margin 15px 10px
+    margin 15px standardSpacing
     padding 5px 15px
     background-color #fee498
     border-radius 10px
@@ -26,10 +26,10 @@
     display flex
     justify-content space-evenly
     margin 0 auto
-    padding-top 10px
+    padding-top standardSpacing
     width 250px
     &__icon
-      font-size 20px
+      font-size titleFontSize
       cursor pointer
       color fontColor
   &__fileimg
@@ -47,13 +47,13 @@
       &-icon
         font-size bigIconSize
       &-msg
-        margin-top 10px
+        margin-top standardSpacing
         word-break break-word
     &.previewAvailable
       cursor pointer
   &__navigationButton
     margin 0 5px
-    font-size 20px
+    font-size titleFontSize
     cursor pointer
     &:focus
       box-shadow 0 0 0 0
@@ -62,7 +62,7 @@
     position absolute
     right 5px
     bottom 5px
-    font-size 13px
+    font-size metadataFontSize
   &__filepreview
     display flex
     height calc(100% - 53px) // 53px => height of dloption

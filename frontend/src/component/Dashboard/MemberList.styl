@@ -1,10 +1,10 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .memberlist
-  margin-top 10px
+  margin-top standardSpacing
   &__header
     font-weight bold
-    margin-bottom 10px
+    margin-bottom standardSpacing
 
   &__wrapper
     position relative
@@ -17,11 +17,11 @@
     &__item
       display flex
       border-bottom 1px solid grey
-      padding 10px 15px
+      padding standardSpacing standardSpacing
       &:hover
         background-color grey-hover
       &__avatar
-        margin-right 20px
+        margin-right titleFontSize
         & > img
           width 50px
           height 50px
@@ -34,27 +34,27 @@
           overflow hidden
           white-space nowrap
           &__name
-            font-size 20px
+            font-size titleFontSize
             text-overflow ellipsis
             overflow hidden
           &__username
-            font-size 14px
+            font-size metadataFontSize
             color mediumDarkGrey
             text-overflow ellipsis
             overflow hidden
         &__role
-          font-size 14px
+          font-size metadataFontSize
           color mediumDarkGrey
           margin auto 5px
       &__delete
-        font-size 20px
+        font-size titleFontSize
         color darkGrey
         cursor pointer
       &__last
         border none
   &__btnadd
     border-bottom 2px solid grey
-    padding 15px
+    padding standardSpacing
     &__button
       display flex
       align-items center
@@ -72,9 +72,9 @@
         height 50px
         cursor pointer
         &__icon
-          font-size 25px
+          font-size bigIconSize
       &__text
-        font-size 18px
+        font-size standardFontSize
         cursor pointer
 
 
@@ -95,7 +95,7 @@
     margin 50px 0
     width 100%
     &__title
-      margin-left 10px
+      margin-left standardSpacing
     &__wrapper
       height auto
     &__list

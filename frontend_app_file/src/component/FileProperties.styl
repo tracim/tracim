@@ -2,11 +2,11 @@
 
 .fileProperties
   width calc(100% - 65px) // 65px is the width of the rightPart header
-  padding 10px
+  padding standardSpacing
   overflow-x auto
   &__title
-    margin 10px 15px
-    font-size 20px
+    margin standardSpacing 15px
+    font-size titleFontSize
   &__content
       width 100%
       overflow-X hidden
@@ -19,7 +19,7 @@
         &__description
           font-weight bold
           &__text
-            margin 10px 0
+            margin standardSpacing 0
           &__editiondesc
             margin 20px 0
             textarea
@@ -35,7 +35,7 @@
               &__validate:hover
                 color white
         &__btndesc
-          margin-top 10px
+          margin-top standardSpacing
           margin-left auto
 
 // MEDIAQUERIES
