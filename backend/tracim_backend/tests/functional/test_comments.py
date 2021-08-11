@@ -27,8 +27,9 @@ class TestCommentsEndpoint(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 3
-        comment = res.json_body[0]
+        items = res.json_body["items"]
+        assert len(items) == 3
+        comment = items[0]
         assert comment["content_id"] == 18
         assert comment["parent_id"] == 7
         assert comment["parent_content_type"] == "thread"
@@ -45,7 +46,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]["public_name"] == "Global manager"
         assert comment["author"]["username"] == "TheAdmin"
 
-        comment = res.json_body[1]
+        comment = items[1]
         assert comment["content_id"] == 19
         assert comment["parent_id"] == 7
         assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"
@@ -58,7 +59,7 @@ class TestCommentsEndpoint(object):
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
 
-        comment = res.json_body[2]
+        comment = items[2]
         assert comment["content_id"] == 20
         assert comment["parent_id"] == 7
         assert (
@@ -271,28 +272,10 @@ class TestCommentsEndpoint(object):
         delete comment (user is workspace_manager and owner)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 3
-        comment = res.json_body[0]
-        assert comment["content_id"] == 18
-        assert comment["parent_id"] == 7
-        assert (
-            comment["raw_content"]
-            == "<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>"
-        )
-        assert comment["author"]
-        assert comment["author"]["user_id"] == 1
-        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
-        assert comment["author"]["public_name"] == "Global manager"
-        assert comment["author"]["username"] == "TheAdmin"
-        # TODO - G.M - 2018-06-179 - better check for datetime
-        assert comment["created"]
-
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/18", status=204)
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 2
-        assert not [content for content in res.json_body if content["content_id"] == 18]
+        assert len(res.json_body["items"]) == 2
+        assert not [content for content in res.json_body["items"] if content["content_id"] == 18]
 
     def test_api__delete_content_comment__ok_200__user_is_workspace_manager(
         self, web_testapp
@@ -301,25 +284,10 @@ class TestCommentsEndpoint(object):
         delete comment (user is workspace_manager)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 3
-        comment = res.json_body[1]
-        assert comment["content_id"] == 19
-        assert comment["parent_id"] == 7
-        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"
-        assert comment["author"]
-        assert comment["author"]["user_id"] == 3
-        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
-        assert comment["author"]["public_name"] == "Bob i."
-        assert comment["author"]["username"] == "TheBobi"
-        # TODO - G.M - 2018-06-179 - better check for datetime
-        assert comment["created"]
-
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/19", status=204)
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 2
-        assert not [content for content in res.json_body if content["content_id"] == 19]
+        assert len(res.json_body["items"]) == 2
+        assert not [content for content in res.json_body["items"] if content["content_id"] == 19]
 
     def test_api__delete_content_comment__ok_200__user_is_owner_and_content_manager(
         self, web_testapp
@@ -328,25 +296,10 @@ class TestCommentsEndpoint(object):
         delete comment (user is content-manager and owner)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 3
-        comment = res.json_body[1]
-        assert comment["content_id"] == 19
-        assert comment["parent_id"] == 7
-        assert comment["raw_content"] == "<p>What about Apple Pie? There are Awesome!</p>"
-        assert comment["author"]
-        assert comment["author"]["user_id"] == 3
-        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
-        assert comment["author"]["public_name"] == "Bob i."
-        assert comment["author"]["username"] == "TheBobi"
-        # TODO - G.M - 2018-06-179 - better check for datetime
-        assert comment["created"]
-
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/19", status=204)
         res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 2
-        assert not [content for content in res.json_body if content["content_id"] == 19]
+        assert len(res.json_body["items"]) == 2
+        assert not [content for content in res.json_body["items"] if content["content_id"] == 19]
 
     def test_api__delete_content_comment__err_403__user_is_content_manager(
         self, web_testapp
@@ -355,23 +308,6 @@ class TestCommentsEndpoint(object):
         delete comment (user is content-manager)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 3
-        comment = res.json_body[2]
-        assert comment["content_id"] == 20
-        assert comment["parent_id"] == 7
-        assert (
-            comment["raw_content"] == "<p>You are right, but Kouign-amann are clearly better.</p>"
-        )
-        assert comment["author"]
-        assert comment["author"]["user_id"] == 4
-        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
-        assert comment["author"]["public_name"] == "John Reader"
-        assert comment["author"]["username"] is None
-        # TODO - G.M - 2018-06-179 - better check for datetime
-        assert comment["created"]
-
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
@@ -384,23 +320,6 @@ class TestCommentsEndpoint(object):
         delete comment (user is reader and owner)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 3
-        comment = res.json_body[2]
-        assert comment["content_id"] == 20
-        assert comment["parent_id"] == 7
-        assert (
-            comment["raw_content"] == "<p>You are right, but Kouign-amann are clearly better.</p>"
-        )
-        assert comment["author"]
-        assert comment["author"]["user_id"] == 4
-        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
-        assert comment["author"]["public_name"] == "John Reader"
-        assert comment["author"]["username"] is None
-        # TODO - G.M - 2018-06-179 - better check for datetime
-        assert comment["created"]
-
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body
@@ -411,23 +330,6 @@ class TestCommentsEndpoint(object):
         delete comment (user is reader)
         """
         web_testapp.authorization = ("Basic", ("bob@fsf.local", "foobarbaz"))
-        res = web_testapp.get("/api/workspaces/2/contents/7/comments", status=200)
-        assert len(res.json_body) == 3
-        comment = res.json_body[2]
-        assert comment["content_id"] == 20
-        assert comment["parent_id"] == 7
-        assert (
-            comment["raw_content"] == "<p>You are right, but Kouign-amann are clearly better.</p>"
-        )
-        assert comment["author"]
-        assert comment["author"]["user_id"] == 4
-        # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
-        assert comment["author"]["public_name"] == "John Reader"
-        assert comment["author"]["username"] is None
-        # TODO - G.M - 2018-06-179 - better check for datetime
-        assert comment["created"]
-
         res = web_testapp.delete("/api/workspaces/2/contents/7/comments/20", status=403)
         assert res.json_body
         assert "code" in res.json_body

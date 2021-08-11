@@ -13,6 +13,8 @@ from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
+from sqlakeyset import Page
+from sqlakeyset import get_page
 import sqlalchemy
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -23,6 +25,7 @@ from sqlalchemy import inspect
 from sqlalchemy import text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Query
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -53,6 +56,7 @@ from tracim_backend.models.mixins import TrashableMixin
 from tracim_backend.models.mixins import UpdateDateMixin
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.types import TracimUploadedFileField
+from tracim_backend.models.utils import get_sort_expression
 
 
 class WorkspaceAccessType(enum.Enum):
@@ -409,6 +413,15 @@ class ContentNamespaces(str, enum.Enum):
     CONTENT = "content"
     UPLOAD = "upload"
     PUBLICATION = "publication"
+
+
+class ContentSortOrder(str, enum.Enum):
+    LABEL_ASC = "label:asc"
+    MODIFIED_ASC = "modified:asc"
+    LABEL_DESC = "label:desc"
+    MODIFIED_DESC = "modified:desc"
+    CREATED_ASC = "created:asc"
+    CREATED_DESC = "created:desc"
 
 
 class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
@@ -1163,7 +1176,7 @@ class Content(DeclarativeBase):
         self.current_revision = new_rev
         return new_rev
 
-    def get_valid_children(self, content_types: List[str] = None) -> List["Content"]:
+    def get_valid_children(self, content_types: List[str] = None) -> Query:
         query = self.children.filter(ContentRevisionRO.is_deleted == False).filter(  # noqa: E712
             ContentRevisionRO.is_archived == False  # noqa: E712
         )
@@ -1237,8 +1250,35 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(self) -> List["Content"]:
-        return self.get_valid_children(content_types=[content_type_list.Comment.slug])
+    def get_comments(
+        self,
+        page_token: Optional[str] = None,
+        count: Optional[int] = None,
+        sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
+    ) -> Page:
+        query = self.get_valid_children(content_types=[content_type_list.Comment.slug])
+        sort_clause = get_sort_expression(sort_order, Content)
+        query = query.order_by(sort_clause)
+        if count:
+            return get_page(query, per_page=count, page=page_token or False)
+        return Page(query.all())
+
+    def get_revisions(
+        self,
+        page_token: Optional[str] = None,
+        count: Optional[int] = None,
+        sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
+    ) -> Page:
+        query = (
+            object_session(self)
+            .query(ContentRevisionRO)
+            .filter(ContentRevisionRO.content_id == self.content_id)
+        )
+        sort_clause = get_sort_expression(sort_order, ContentRevisionRO)
+        query = query.order_by(sort_clause)
+        if count:
+            return get_page(query, per_page=count, page=page_token or False)
+        return Page(query.all())
 
     def get_first_comment(self) -> "Content":
         return self.get_comments().first()

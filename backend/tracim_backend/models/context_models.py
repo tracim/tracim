@@ -34,6 +34,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import ContentSortOrder
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -546,13 +547,6 @@ class PageQuery(object):
     def __init__(self, force_download: int = 0, page: int = 1) -> None:
         self.force_download = force_download
         self.page = page
-
-
-class ContentSortOrder(str, enum.Enum):
-    LABEL_ASC = "label:asc"
-    MODIFIED_ASC = "modified:asc"
-    LABEL_DESC = "label:desc"
-    MODIFIED_DESC = "modified:desc"
 
 
 class ContentFilter(object):

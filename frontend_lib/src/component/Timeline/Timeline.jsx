@@ -18,6 +18,7 @@ import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrappe
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import EditCommentPopup from './EditCommentPopup.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -151,6 +152,9 @@ export class Timeline extends React.Component {
           shouldScrollToBottom={props.shouldScrollToBottom}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
+          {props.canFetchMoreTimelineItems() && (
+            <IconButton onClick={props.onClickShowMoreTimelineItems} text={props.t('Show older items')} />
+          )}
           {props.timelineData.map(content => {
             switch (content.timelineType) {
               case TIMELINE_TYPE.COMMENT:
@@ -369,7 +373,8 @@ Timeline.propTypes = {
   onClickTranslateComment: PropTypes.func.isRequired,
   onClickRestoreComment: PropTypes.func.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  onClickShowMoreTimelineItems: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -404,5 +409,6 @@ Timeline.defaultProps = {
   onClickDeleteComment: () => {},
   onClickRestoreComment: content => { },
   onClickEditComment: () => {},
-  onClickOpenFileComment: () => {}
+  onClickOpenFileComment: () => {},
+  onClickShowMoreTimelineItems: () => {}
 }

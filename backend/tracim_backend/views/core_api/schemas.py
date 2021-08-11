@@ -47,7 +47,6 @@ from tracim_backend.models.context_models import ContentAndUserPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
-from tracim_backend.models.context_models import ContentSortOrder
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
@@ -96,6 +95,7 @@ from tracim_backend.models.context_models import WorkspacePath
 from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentNamespaces
+from tracim_backend.models.data import ContentSortOrder
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
@@ -241,6 +241,43 @@ class RFCEmail(ValidatedField, String):
         if value is None:
             return None
         return RFCEmailValidator(error=self.error_messages["invalid"])(value)
+
+
+class BasePaginatedQuerySchema(marshmallow.Schema):
+    """Base query parameters for a paginated query"""
+
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=strictly_positive_int_validator,
+        missing=DEFAULT_NB_ITEM_PAGINATION,
+        default=DEFAULT_NB_ITEM_PAGINATION,
+        allow_none=False,
+    )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first" "elements",
+        validate=page_token_validator,
+        missing=None,
+    )
+
+
+class BaseOptionalPaginatedQuerySchema(marshmallow.Schema):
+    """Base query parameter for an API which allows pagination
+    but returns all the results by default."""
+
+    count = marshmallow.fields.Int(
+        example=10,
+        validate=positive_int_validator,
+        missing=0,
+        default=0,
+        allow_none=False,
+        description="Allows to paginate the results in combination with page_token, by default all results are returned",
+    )
+    page_token = marshmallow.fields.String(
+        description="token of the page wanted, if not provided get first elements",
+        validate=page_token_validator,
+        missing=None,
+        default=None,
+    )
 
 
 class BasePaginatedSchemaPage(marshmallow.Schema):
@@ -984,7 +1021,7 @@ class PageQuerySchema(FileQuerySchema):
         return PageQuery(**data)
 
 
-class FilterContentQuerySchema(marshmallow.Schema):
+class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="0,4,5",
@@ -1053,18 +1090,6 @@ class FilterContentQuerySchema(marshmallow.Schema):
         ContentSortOrder,
         missing=ContentSortOrder.LABEL_ASC,
         description="Order of the returned contents, default is to sort by labels",
-    )
-    count = marshmallow.fields.Int(
-        example=10,
-        validate=positive_int_validator,
-        missing=0,
-        default=0,
-        allow_none=False,
-        description="Allows to paginate the results in combination with page_token, by default all results are returned",
-    )
-    page_token = marshmallow.fields.String(
-        description="token of the page wanted, if not provided get first elements",
-        validate=page_token_validator,
     )
 
     @post_load
@@ -1735,6 +1760,10 @@ class RevisionSchema(ContentDigestSchema):
     )
 
 
+class RevisionPageSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(RevisionSchema(many=True))
+
+
 class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
 
@@ -1960,22 +1989,6 @@ class TranslationQuerySchema(FileQuerySchema):
         return TranslationQuery(**data)
 
 
-class BasePaginatedQuerySchema(marshmallow.Schema):
-    """Base query parameters for a paginated query"""
-
-    count = marshmallow.fields.Int(
-        example=10,
-        validate=strictly_positive_int_validator,
-        missing=DEFAULT_NB_ITEM_PAGINATION,
-        default=DEFAULT_NB_ITEM_PAGINATION,
-        allow_none=False,
-    )
-    page_token = marshmallow.fields.String(
-        description="token of the page wanted, if not provided get first" "elements",
-        validate=page_token_validator,
-    )
-
-
 class GetLiveMessageQuerySchema(BasePaginatedQuerySchema):
     """Possible query parameters for the GET messages endpoint."""
 
@@ -2143,3 +2156,15 @@ class AboutUserSchema(UserDigestSchema):
         description="count of spaces where this user authored at least one content revision",
         validate=positive_int_validator,
     )
+
+
+class CommentsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
+    sort = EnumField(
+        ContentSortOrder,
+        missing=ContentSortOrder.CREATED_ASC,
+        description="Order of the returned contents, default is to sort by creation date, older first",
+    )
+
+
+class CommentsPageSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(CommentSchema, many=True)

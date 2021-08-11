@@ -89,7 +89,7 @@ import {
   LIVE_MESSAGE_ERROR_CODE
 } from './LiveMessageManager.js'
 
-import { appContentFactory } from './appContentFactory.js'
+import { appContentFactory, TIMELINE_ITEM_COUNT_PER_PAGE } from './appContentFactory.js'
 
 import {
   createFileUpload,
@@ -266,6 +266,7 @@ export {
 
 export {
   appContentFactory,
+  TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
   buildContentPathBreadcrumbs,

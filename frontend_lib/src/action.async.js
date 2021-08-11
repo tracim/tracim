@@ -33,11 +33,18 @@ export const putComment = (apiUrl, workspaceId, contentId, commentId, newComment
     raw_content: newComment
   })
 
-export const getContentComment = (apiUrl, workspaceId, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
+export const getContentComment = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'created:asc') => {
+  const url = `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments?page_token=${pageToken}&count=${count}&sort=${sort}`
+  return baseFetch('GET', url)
+}
 
-export const getFileChildContent = (apiUrl, workspaceId, contentId) => {
-  const queryParam = `parent_ids=${contentId}&content_type=file&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}`
+export const getFileChildContent = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'created:asc') => {
+  const queryParam = (
+    `parent_ids=${contentId}` +
+      '&content_type=file' +
+      `&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}` +
+      `&page_token=${pageToken}&count=${count}&sort=${sort}`
+  )
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
 }
 

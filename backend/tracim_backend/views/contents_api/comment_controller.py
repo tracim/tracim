@@ -19,10 +19,12 @@ from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_translation_service_enabled
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import CommentSchema
+from tracim_backend.views.core_api.schemas import CommentsPageQuerySchema
+from tracim_backend.views.core_api.schemas import CommentsPageSchema
 from tracim_backend.views.core_api.schemas import CommentsPathFilenameSchema
 from tracim_backend.views.core_api.schemas import CommentsPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
@@ -51,7 +53,7 @@ class CommentController(Controller):
     @hapic.output_body(CommentSchema())
     def content_comment(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get one comments related to a content
+        Get one comment related to a content
         """
 
         # login = hapic_data.body
@@ -100,7 +102,8 @@ class CommentController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @check_right(is_reader)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(CommentSchema(many=True))
+    @hapic.input_query(CommentsPageQuerySchema())
+    @hapic.output_body(CommentsPageSchema())
     def content_comments(self, context, request: TracimRequest, hapic_data=None):
         """
         Get all comments related to a content in asc order (first is the oldest)
@@ -116,8 +119,13 @@ class CommentController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        comments = content.get_comments().order_by(ContentRevisionRO.created)
-        return [api.get_content_in_context(comment) for comment in comments]
+        comments_page = content.get_comments(
+            page_token=hapic_data.query["page_token"],
+            count=hapic_data.query["count"],
+            sort_order=hapic_data.query["sort"],
+        )
+        comments = [api.get_content_in_context(comment) for comment in comments_page]
+        return PaginatedObject(comments_page, comments)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS])
     @hapic.handle_exception(EmptyCommentContentNotAllowed, HTTPStatus.BAD_REQUEST)
