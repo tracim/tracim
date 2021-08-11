@@ -3,14 +3,14 @@
 .adminWorkspace
   &__createworkspace
     &__btncreate
-      margin 25px 15px
+      margin 25px standardSpacing
   &__description
     margin 25px 0
-    font-size 20px
+    font-size titleFontSize
   &__delimiter
     margin 65px auto
   &__table
-    margin 25px 15px
+    margin 25px standardSpacing
     &__delete
       display flex
       align-items center
@@ -50,7 +50,7 @@
     align-items center
     margin 25px 0
     &__emailstate
-      margin-left 15px
+      margin-left standardSpacing
       color fontColor
     &__form
       border 1px solid grey
@@ -60,21 +60,21 @@
         .userData
           &__text
             font-weight bold
-            margin-top 10px
+            margin-top standardSpacing
             margin-bottom 0px
           &__input
             width 300px
             &__username
               &__errorMsg
                 width 300px
-                font-size small
+                font-size metadataFontSize
                 text-align right
                 color errorRed
               &__errorIcon
                 margin-right 5px
               &__errorInfo
                 width 300px
-                font-size small
+                font-size metadataFontSize
                 text-align right
           &__info
             color grey
@@ -101,7 +101,7 @@
               display flex
               align-items center
               margin-bottom 0px
-              margin-top 10px
+              margin-top standardSpacing
               cursor pointer
               &__content
                 &__description
@@ -150,9 +150,9 @@
       &__type
         text-align center
         & i
-          font-size 25px
+          font-size titleFontSize
         & .label
-          font-size 15px
+          font-size standardSpacing
       &__sharedSpace
         width 15%
       &__description

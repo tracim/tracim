@@ -13,16 +13,16 @@
     display none
   &__type
     &__content
-      font-size fontSizeTitle
+      font-size titleFontSize
       display flex
       flex-direction column
       align-items center
       width 90px
       place-content center
       & > span
-        font-size fontSizeSmall
+        font-size metadataFontSize
     &__header
-      margin 15px 25px
+      margin standardSpacing 25px
       text-align center
       align-self center
   &__name_path
@@ -44,8 +44,8 @@
     align-self center
     flex 1
     &.timedEvent
-      margin-left 15px
-      margin-right 10px
+      margin-left standardSpacing
+      margin-right standardSpacing
       overflow hidden
   &__information
     color fontColor
@@ -57,9 +57,9 @@
     &__comments
       display inline-block
       min-width 5em // RJ - 2020-02-23 - needed for alignment. should allow hundreds of comments
-      padding-right 10px
+      padding-right standardSpacing
     & > *
-      font-size fontSizeSmall
+      font-size metadataFontSize
     & > i
       margin-inline-end 5px
       margin-inline-start 2px
@@ -72,7 +72,7 @@
   .advancedSearchContent
     &__type
       &__header
-        margin 15px 10px
+        margin standardSpacing standardSpacing
       &__content
         width 50px
         & > span
@@ -81,7 +81,7 @@
       overflow hidden
       text-overflow ellipsis
     &__name_path
-      padding-inline-start 10px
+      padding-inline-start standardSpacing
   .timedEvent.advancedSearchContent__modification
     & .timedEvent__operation
       display none
@@ -106,7 +106,7 @@
       display none
     &__typeAndTitle
       display unset
-      padding 15px 5px
+      padding standardSpacing 5px
       flex 2
   .content__header
     & .advancedSearchContent

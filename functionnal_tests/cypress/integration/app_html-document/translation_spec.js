@@ -18,20 +18,20 @@ describe('App HTML Document', function () {
     cy.get('[data-cy="popup__createcontent__form__button"]').click()
   })
 
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   it('should have translations', () => {
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__editTitle"]').contains('Edit title')
+    cy.contains('[data-cy="newVersionButton"]', 'Edit')
 
     cy.changeLanguage('fr')
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__editTitle"]').contains('Modifier le titre')
+    cy.contains('[data-cy="newVersionButton"]', 'Modifier')
 
     cy.changeLanguage('pt')
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__editTitle"]').contains('Editar o título')
+    cy.contains('[data-cy="newVersionButton"]', 'Editar')
 
     cy.changeLanguage('de')
-    cy.get('[data-cy="dropdownContentButton"]').click()
-    cy.get('[data-cy="popinListItem__editTitle"]').contains('Titel bearbeiten')
+    cy.contains('[data-cy="newVersionButton"]', 'Bearbeiten')
   })
 })

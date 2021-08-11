@@ -33,15 +33,14 @@
       min-height listItemHeight
       align-items center
       &__icon
-        font-size 23px
-        margin 10px
+        font-size bigIconSize
+        margin standardSpacing
         display inline-block
         width 30px
        &__text
         flex 1
         display flex
-        padding-right 5px
-        font-size fontSizeSmall
+        font-size metadataFontSize
         word-break break-word
         align-items center
       &__meta
@@ -50,11 +49,15 @@
         display flex
         flex-direction column
         align-items flex-end
-        font-size fontSizeSmall
+        font-size metadataFontSize
+        word-break break-word
       &__circle
-        margin-left auto
-        margin-right 5px
+        &__wrapper
+          margin 0
+          min-width 1em
+          text-align center
         font-size 8px
+        transition 300ms font-size color
         color lightBlue
       &.itemRead
         color lightDarkGrey

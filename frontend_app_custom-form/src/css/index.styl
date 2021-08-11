@@ -1,4 +1,3 @@
-
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .custom-form
@@ -11,15 +10,15 @@
         color white
   &__lastversionbtn
     & > i
-      font-size 20px
+      font-size titleFontSize
   .selectStatus
-    margin-right 15px
+    margin-right standardSpacing
   &__contentpage
     width 100%
     &__left
       &__wrapper
         height 100%
-        padding 10px 10px 0
+        padding standardSpacing standardSpacing 0
         overflow-y auto
     &__content
       height calc(100% - 130px)
@@ -33,8 +32,8 @@
         display flex
         align-items center
         justify-content space-between
-        margin-bottom 15px
-        padding 5px 15px
+        margin-bottom standardSpacing
+        padding 5px standardSpacing
         background-color #fee498
         border-radius 10px
         &__msg > i
@@ -55,10 +54,10 @@
         text-align right
         opacity 0.7
       &__lastversion
-        margin-left 15px
+        margin-left standardSpacing
         font-weight bold
       &__text
-        font-size 14px
+        font-size metadataFontSize
       &__edition
         display none
     &__messagelist
@@ -75,9 +74,9 @@
           color white
           font-size 17px
           & > i
-            margin-right 10px
+            margin-right standardSpacing
             color darkGrey
-            font-size 20px
+            font-size titleFontSize
         &__date
           color fontColor
           font-size 17px
@@ -141,7 +140,7 @@ i
         &__wrapper
           padding 0
       &__content
-        margin 10px
+        margin standardSpacing
       &__textnote
         margin 0
 
@@ -152,6 +151,6 @@ i
         &__wrapper
           padding 0
       &__content
-        margin 10px
+        margin standardSpacing
       &__textnote
         margin 0

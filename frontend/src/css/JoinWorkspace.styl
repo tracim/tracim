@@ -4,7 +4,7 @@
   &__content__workspaceList
     display flex
     flex-direction column
-    margin-top 10px
+    margin-top standardSpacing
     border-bottom 1px solid grey
 
     & > *:first-child
@@ -19,8 +19,8 @@
       border-bottom 0
       display flex
       flex-direction row
-      padding-top 10px
-      padding-bottom 10px
+      padding-top standardSpacing
+      padding-bottom standardSpacing
       align-items center
       line-height 1.5
       height 60px
@@ -34,13 +34,13 @@
         background-color grey-hover
 
       & > *
-        margin-left 10px
+        margin-left standardSpacing
         flex auto
 
       // buttons "column"
       & > *:last-child
         flex 0 0 220px
-        margin-right 10px
+        margin-right standardSpacing
         text-align center
 
       // type "column"
@@ -58,4 +58,4 @@
           text-overflow ellipsis
 
       &__description
-        font-size fontSizeSmall
+        font-size metadataFontSize

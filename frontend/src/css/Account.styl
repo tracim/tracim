@@ -1,181 +1,44 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
 .nomarginlabel
   margin-bottom 0
-
-settingText()
-  margin 15px 0
-  font-size 18px
 
 .table tr:nth-child(even) // @fixme Côme - 2018/09/13 - refactor this rule, it should not impact the whole project
   background-color lightGrey
 
 .account
-  &.pageContentGeneric
-    padding 0
-  &__userinformation
-    display flex
-    justify-content center
-    align-items center
-    flex-wrap wrap
-    padding 25px
-    font-size 18px
-    &__wrapper
-      flex-direction column
-    &__avatar
-      margin-right 50px
-      img
-        width 150px
-        height 150px
-    &__name
-      font-size 22px
-    &__company
-      font-size 20px
   &__delimiter
-    position relative
-    top 3px
     margin auto
-    z-index 3
   &__userpreference
     display flex
-    padding 25px
-    width 100%
-    &__menu
-      margin-right 30px
-      border-radius 10px
-      padding 0
-      width 20%
-      min-height 600px
-      background-color offWhite
-      &__list
-        width 100%
-        margin-bottom 20px
-        &__close
-          display none
-          justify-content flex-end
-          margin 10px 0 15px 0
-          font-size 20px
-          cursor pointer
-        &__item
-          margin-top 10px
-          font-weight 500
-          font-size 18px
-          cursor pointer
-          &:hover
-            background-color lightGrey
-          &.active
-            background-color thirdColor
-            color white
+    padding-top standardSpacing
     &__setting
-      border-radius 10px
-      padding 20px
+      border-radius standardBorderRadius
+      padding standardSpacing
       width 80%
-      min-height 600px
+      min-height 500px
       background-color offWhite
-      .agenda
-        &__text
-          settingText()
-        &__link
-          display inline-block
-          border 1px solid grey
-          border-radius 5px
-          padding 10px 25px
-      .timezone
-        &__text
-          settingText()
-        &__time
-          margin 15px 0 30px 0
-          &__select
-            max-width 300px
       .spaceconfig
-        &__text
-          settingText()
-          margin-bottom 30px
         &__table
-          border 1px solid lightGrey
           &__role
             display flex
             align-items center
             &__icon
-              margin-right 10px
+              margin-inline-end textSpacing
+      & .agendaInfo__header
+        font-weight normal
+        font-size titleFontSize
+        margin 0
 
-// MEDIAQUERIES
 
-@media (min-width: min-md) and (max-width: max-md)
-
-  .account .pageContentGeneric
-    min-height 100%
-
+@media (max-width: max-md)
   .account
     &__userpreference
-      display block
-      padding 25px
+      flex-direction column
       .menusubcomponent
-        display flex
-        flex-direction column
-        align-items flex-start
-        justify-content flex-start
-        margin-bottom 50px
+        margin-inline-end 0
+        margin-bottom standardSpacing
         width 100%
         min-height auto
-        &__header
-          display flex
-          flex-direction row-reverse
-          align-items center
-          justify-content flex-end
-          width 100%
       &__setting
-        position relative
-        width 100%
-
-@media (min-width: min-sm) and (max-width: max-sm)
-
-  .account .pageContentGeneric
-    min-height 100%
-
-  .account
-    &__userpreference
-      display block
-      padding 25px
-      .menusubcomponent
-        display flex
-        flex-direction column
-        align-items flex-start
-        justify-content flex-start
-        margin-bottom 50px
-        width 100%
-        min-height auto
-        &__header
-          display flex
-          flex-direction row-reverse
-          align-items center
-          justify-content flex-end
-          width 100%
-      &__setting
-        position relative
-        width 100%
-
-@media (max-width: max-xs)
-
-  .account .pageContentGeneric
-    min-height 100%
-
-  .account
-    &__userpreference
-      display block
-      padding 25px 0
-      .menusubcomponent
-        display flex
-        flex-direction column
-        align-items flex-start
-        justify-content flex-start
-        margin-bottom 50px
-        width 100%
-        min-height auto
-        &__header
-          display flex
-          flex-direction row-reverse
-          align-items center
-          justify-content flex-end
-          width 100%
-      &__setting
-        position relative
         width 100%
