@@ -212,7 +212,7 @@ export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
       )
       // FIXME - GM - 2020/08/18 - Replace this hardcoded values to webpack variables
       // https://github.com/tracim/tracim/issues/2098
-      context.fillStyle = hasUnreadMention ? '#dc3545' : '#3F9FF7'
+      context.fillStyle = hasUnreadMention ? '#ff8a00' : '#3F9FF7'
       context.fill()
 
       // INFO - GM - 2020/08/18 - Replace the favicon
