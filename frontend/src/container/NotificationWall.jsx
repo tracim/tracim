@@ -488,8 +488,10 @@ export class NotificationWall extends React.Component {
                     />
                   </div>
                   <div className='notification__list__item__meta'>
-                    <span className='notification__list__item__meta__date'
-                          title={formatAbsoluteDate(notification.created, props.user.lang)}>
+                    <span 
+                      className='notification__list__item__meta__date'
+                      title={formatAbsoluteDate(notification.created, props.user.lang)}
+                     >
                       {shortDate(notification.created)}
                     </span>
                   </div>
