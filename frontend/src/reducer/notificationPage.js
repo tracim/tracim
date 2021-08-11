@@ -50,6 +50,7 @@ export const serializeNotification = notification => {
 }
 
 export default function notificationPage (state = defaultNotificationsObject, action) {
+  const mentionCreated = 'mention.created'
   switch (action.type) {
     case `${SET}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
@@ -68,7 +69,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
 
     case `${ADD}/${NOTIFICATION}`: {
       const notification = serializeNotification(action.notification)
-      const newUnreadMentionCount = notification.type === 'mention.created' ? state.unreadMentionCount + 1 : state.unreadMentionCount
+      const newUnreadMentionCount = notification.type === mentionCreated ? state.unreadMentionCount + 1 : state.unreadMentionCount
       return {
         ...state,
         list: uniqBy([
@@ -83,7 +84,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${READ}/${NOTIFICATION}`: {
       const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
       if (!notification) return state
-      const newUnreadMentionCount = notification.type === 'mention.created' ? state.unreadMentionCount - 1 : state.unreadMentionCount
+      const newUnreadMentionCount = notification.type === mentionCreated ? state.unreadMentionCount - 1 : state.unreadMentionCount
       return {
         ...state,
         list: state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no),
