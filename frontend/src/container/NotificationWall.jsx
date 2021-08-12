@@ -471,7 +471,9 @@ export class NotificationWall extends React.Component {
                   }
                   key={notification.id}
                 >
-                  <span className='notification__list__item__icon'>{icon}</span>
+                  <span className='notification__list__item__icon'>
+                    {icon}
+                  </span>
                   <div className='notification__list__item__text'>
                     <Avatar
                       size={AVATAR_SIZE.MINI}
