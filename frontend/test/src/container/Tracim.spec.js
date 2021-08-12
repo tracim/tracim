@@ -247,15 +247,15 @@ describe('<Tracim />', () => {
         })
       })
 
-      describe('The unreadNotificationCount has been updated', () => {
-        describe('prevUnreadNotificationCount = 0 && unreadNotificationCount = 5', () => {
+      describe('The unreadMentionCount has been updated', () => {
+        describe('prevUnreadNotificationCount = 0 && unreadMentionCount = 5', () => {
           const newNotificationNotReadCount = 5
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                unreadNotificationCount: newNotificationNotReadCount
+                unreadMentionCount: newNotificationNotReadCount
               }
             })
           })
@@ -267,20 +267,16 @@ describe('<Tracim />', () => {
           it('should set the new document title', () => {
             expect(global.document.title).to.equal(`(${newNotificationNotReadCount}) ${props.system.headTitle}`)
           })
-
-          it('should draw on favicon by calling canvas.getContext()', () => {
-            expect(getContextSpy.calledOnce).to.equal(true)
-          })
         })
 
-        describe('prevUnreadNotificationCount = 5 && unreadNotificationCount = 101', () => {
+        describe('prevUnreadMentionCount = 5 && unreadMentionCount = 101', () => {
           const newNotificationNotReadCount = 101
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                unreadNotificationCount: newNotificationNotReadCount
+                unreadMentionCount: newNotificationNotReadCount
               }
             })
           })
@@ -317,11 +313,6 @@ describe('<Tracim />', () => {
 
           it('should set the new document title', () => {
             expect(global.document.title).to.equal(props.system.headTitle)
-          })
-
-          it('should draw on favicon by calling canvas.getContext()', () => {
-            expect(dummyElement.href).to.equal(dummyElement.getAttribute())
-            expect(getContextSpy.calledOnce).to.equal(false)
           })
         })
       })
