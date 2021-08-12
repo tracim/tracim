@@ -13,11 +13,17 @@ export const NotificationButton = props => {
       >
         <i className='far fa-fw fa-bell' />
         {props.t('Notifications')}
-        {props.notificationNotReadCount > 0 && (
+        {props.unreadMentionCount > 0 && (
           <div
-            className='notificationButton__count'
+            className='notificationButton__mention'
           >
-            {props.notificationNotReadCount > 99 ? '99+' : props.notificationNotReadCount}
+            {props.unreadMentionCount > 99 ? '99+' : props.unreadMentionCount}
+          </div>
+        )}
+        {props.unreadMentionCount === 0 && props.unreadNotificationCount > 0 && (
+          <div
+            className='notificationButton__notification'
+          >
           </div>
         )}
       </button>
@@ -27,11 +33,12 @@ export const NotificationButton = props => {
 export default translate()(NotificationButton)
 
 NotificationButton.propTypes = {
-  notificationNotReadCount: PropTypes.number,
+  unreadMentionCount: PropTypes.number,
   onClickNotification: PropTypes.func
 }
 
 NotificationButton.defaultProps = {
-  notificationNotReadCount: 0,
+  unreadMentionCount: 0,
+  unreadNotificationCount: 0,
   onClickNotification: () => {}
 }
