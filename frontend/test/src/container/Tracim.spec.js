@@ -247,15 +247,15 @@ describe('<Tracim />', () => {
         })
       })
 
-      describe('The notificationNotReadCount has been updated', () => {
-        describe('prevNotificationNotReadCount = 0 && notificationNotReadCount = 5', () => {
+      describe('The unreadNotificationCount has been updated', () => {
+        describe('prevUnreadNotificationCount = 0 && unreadNotificationCount = 5', () => {
           const newNotificationNotReadCount = 5
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                notificationNotReadCount: newNotificationNotReadCount
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
@@ -273,14 +273,14 @@ describe('<Tracim />', () => {
           })
         })
 
-        describe('prevNotificationNotReadCount = 5 && notificationNotReadCount = 101', () => {
+        describe('prevUnreadNotificationCount = 5 && unreadNotificationCount = 101', () => {
           const newNotificationNotReadCount = 101
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                notificationNotReadCount: newNotificationNotReadCount
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
@@ -299,14 +299,14 @@ describe('<Tracim />', () => {
           })
         })
 
-        describe('prevNotificationNotReadCount = 5 && notificationNotReadCount = 0', () => {
+        describe('prevUnreadNotificationCount = 5 && unreadNotificationCount = 0', () => {
           const newNotificationNotReadCount = 0
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                notificationNotReadCount: newNotificationNotReadCount
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
