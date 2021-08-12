@@ -471,9 +471,7 @@ export class NotificationWall extends React.Component {
                   }
                   key={notification.id}
                 >
-                  <span className='notification__list__item__icon'>
-                    {icon}
-                  </span>
+                  <span className='notification__list__item__icon'>{icon}</span>
                   <div className='notification__list__item__text'>
                     <Avatar
                       size={AVATAR_SIZE.MINI}
@@ -481,7 +479,8 @@ export class NotificationWall extends React.Component {
                       user={notification.author}
                       style={{ marginRight: '5px' }}
                     />
-                    <span className='notification__list__item__text__content'
+                    <span
+                      className='notification__list__item__text__content'
                       dangerouslySetInnerHTML={{
                         __html: (
                           notificationDetails.text + ' ' +
