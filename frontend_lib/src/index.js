@@ -67,6 +67,7 @@ import {
 } from './helper.js'
 
 import {
+  GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleInvalidMentionInComment,
@@ -400,6 +401,7 @@ export {
   getContentComment,
   getFileChildContent,
   addExternalLinksIcons,
+  GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,
