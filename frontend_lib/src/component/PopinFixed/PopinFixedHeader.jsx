@@ -206,7 +206,7 @@ class PopinFixedHeader extends React.Component {
         )}
 
         <div
-          className={classnames('wsContentGeneric__header__close', `${customClass}__header__close iconBtn`)}
+          className={classnames('wsContentGeneric__header__close', `${customClass}__header__close`)}
           onClick={onClickCloseBtn}
           data-cy='popinFixed__header__button__close'
           title={t('Close')}

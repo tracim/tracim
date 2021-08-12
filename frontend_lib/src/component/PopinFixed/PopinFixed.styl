@@ -20,9 +20,12 @@
     padding standardSpacing pageSpacing
     & > *
       margin-right 5px
-    &__actions
+    &__actions button
+      padding 0
       &::after
         display none
+      & i
+        margin 0
     &__icon
       margin-right standardSpacing
       font-size titleFontSize
@@ -45,9 +48,11 @@
       height 100%
       & > .EmojiReactions
         flex-wrap wrap-reverse
+      & .EmojiReactionButton__buttonpicker
+        color fontColor
     &__close
-      border-radius 5px
-      padding 3px 7px
+      border-radius standardBorderRadius
+      cursor pointer
       & > i
         font-size titleFontSize
         vertical-align middle
@@ -99,7 +104,7 @@
         align-items center
         color lightDarkGrey
         font-size metadataFontSize
-        padding standardSpacing
+        padding pageSpacing pageSpacing standardSpacing
         & .breadcrumbs
           margin-inline-end auto
           overflow auto

@@ -15,7 +15,6 @@
       min-height 400px
   &__lastversionbtn
     cursor pointer
-    margin-right standardSpacing
     & > i
       font-size titleFontSize
   &__contentpage, &__contentpage__edition
@@ -23,6 +22,7 @@
     &__option
       display flex
       justify-content flex-end
+      margin 0 pageSpacing
     &__left
       &__wrapper
         height "calc(100% - %s)" % (2 * headerHeight) // INFO - G.B. - 20210623 - app header + tracim header
@@ -33,7 +33,7 @@
       &__left
         background-color offWhite
     &__textnote
-      padding 0 standardSpacing
+      padding 0 pageSpacing
       flex 1
       overflow-y auto
       &__text
