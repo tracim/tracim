@@ -133,7 +133,7 @@ jobs:
     #    after_success: true
 
     # INFO - G.M - 2019-04-25 - Stage: Static tests ###
-    - stage: static-tests
+    - stage: quick-tests/static-tests/backend/frontend
       name: flake8
       install:
         - pip install -r $TRAVIS_BUILD_DIR/backend/requirements-devtool.txt
@@ -142,50 +142,24 @@ jobs:
         - flake8 $TRAVIS_BUILD_DIR/backend
 
     # INFO - G.M - 2019-04-25 - Stage: Quick Tests ###
-    - stage: quick-tests
+    - stage: quick-tests/static-tests/backend/frontend
       name: "Python: 3.6"
       <<: *_backend_quick_test
       python: "3.6"
       if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: quick-tests
+    - stage: quick-tests/static-tests/backend/frontend
       name: "Python: 3.5"
       <<: *_backend_quick_test
       python: "3.5"
       if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: quick-tests
+    - stage: quick-tests/static-tests/backend/frontend
       name: "Python: 3.7"
       <<: *_backend_quick_test
       python: "3.7"
       if: commit_message !~ /(\[skip ci pytest\])/
 
-    # INFO - G.M - 2019-04-25 - Stage: Backend ###
-    - stage: backend
-      <<: *_backend_test
-      env:
-        - DB=sqlite
-        - COVERAGE=1
-      after_success:
-        - cd $TRAVIS_BUILD_DIR
-        - cat .coverage
-        - coveralls
-      if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
-      <<: *_backend_test
-      env:
-        - DB=postgresql
-      if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
-      <<: *_backend_test
-      env:
-        - DB=mysql
-      if: commit_message !~ /(\[skip ci pytest\])/
-    - stage: backend
-      <<: *_backend_test
-      env:
-        - DB=mariadb
-      if: commit_message !~ /(\[skip ci pytest\])/
-    # INFO - C.H - 2019-07-03 - Stage: Frontend unit  tests ###
-    - stage: frontend
+    # INFO - C.H - 2019-07-03 - Stage: Frontend unit tests ###
+    - stage: quick-tests/static-tests/backend/frontend
       name: Frontend unit tests
       # NOTE - S.G. - 2021-07-29 - By default travis provides node 10
       before_install:
@@ -197,8 +171,36 @@ jobs:
         - cd "$TRAVIS_BUILD_DIR"
         - ./run_frontend_unit_test.sh
       if: commit_message !~ /(\[skip ci unit_test\])/
+
+    # INFO - G.M - 2019-04-25 - Stage: Backend ###
+    - stage: quick-tests/static-tests/backend/frontend
+      <<: *_backend_test
+      env:
+        - DB=sqlite
+        - COVERAGE=1
+      after_success:
+        - cd $TRAVIS_BUILD_DIR
+        - cat .coverage
+        - coveralls
+      if: commit_message !~ /(\[skip ci pytest\])/
+    - stage: quick-tests/static-tests/backend/frontend
+      <<: *_backend_test
+      env:
+        - DB=postgresql
+      if: commit_message !~ /(\[skip ci pytest\])/
+    - stage: quick-tests/static-tests/backend/frontend
+      <<: *_backend_test
+      env:
+        - DB=mysql
+      if: commit_message !~ /(\[skip ci pytest\])/
+    - stage: quick-tests/static-tests/backend/frontend
+      <<: *_backend_test
+      env:
+        - DB=mariadb
+      if: commit_message !~ /(\[skip ci pytest\])/
+
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
-    - stage: frontend
+    - stage: quick-tests/static-tests/backend/frontend
       name: Functional tests using Cypress
       <<: *_install_full_tracim
       env:
@@ -211,8 +213,4 @@ jobs:
       if: commit_message !~ /(\[skip ci cypress\])/
 
 stages:
-  - static-tests
-  - quick-tests
-  - backend
-  - frontend
-  - functional
+  - quick-tests/static-tests/backend/frontend
