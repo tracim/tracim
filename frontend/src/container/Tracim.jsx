@@ -390,7 +390,7 @@ export class Tracim extends React.Component {
       document.title = newHeadTitle
     }
 
-    if ((hasUnreadMentionCountChanged && (prevUnreadMentionCount + unreadMentionCount === 0)) || (hasUnreadNotificationCountChanged && (prevUnreadNotificationCount + unreadNotificationCount) === 0)) {
+    if (hasUnreadMentionCountChanged || hasUnreadNotificationCountChanged) {
       toggleFavicon(unreadNotificationCount > 0, unreadMentionCount > 0)
     }
   }

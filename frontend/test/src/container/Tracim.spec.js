@@ -248,14 +248,16 @@ describe('<Tracim />', () => {
       })
 
       describe('The unreadMentionCount has been updated', () => {
-        describe('prevUnreadNotificationCount = 0 && unreadMentionCount = 5', () => {
-          const newNotificationNotReadCount = 5
+        describe('unreadNotificationCount = 6 && unreadMentionCount = 5', () => {
+          const newMentionNotReadCount = 5
+          const newNotificationNotReadCount = 6
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                unreadMentionCount: newNotificationNotReadCount
+                unreadMentionCount: newMentionNotReadCount,
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
@@ -265,18 +267,24 @@ describe('<Tracim />', () => {
           })
 
           it('should set the new document title', () => {
-            expect(global.document.title).to.equal(`(${newNotificationNotReadCount}) ${props.system.headTitle}`)
+            expect(global.document.title).to.equal(`(${newMentionNotReadCount}) ${props.system.headTitle}`)
+          })
+
+          it('should draw on favicon by calling canvas.getContext()', () => {
+            expect(getContextSpy.called).to.equal(true)
           })
         })
 
-        describe('prevUnreadMentionCount = 5 && unreadMentionCount = 101', () => {
-          const newNotificationNotReadCount = 101
+        describe('unreadNotificationCount = 102 && unreadMentionCount = 101', () => {
+          const newNotificationNotReadCount = 102
+          const newMentionNotReadCount = 101
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                unreadMentionCount: newNotificationNotReadCount
+                unreadMentionCount: newMentionNotReadCount,
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
@@ -291,7 +299,7 @@ describe('<Tracim />', () => {
           })
 
           it('should draw on favicon by calling canvas.getContext()', () => {
-            expect(getContextSpy.calledOnce).to.equal(false)
+            expect(getContextSpy.called).to.equal(true)
           })
         })
 
@@ -313,6 +321,11 @@ describe('<Tracim />', () => {
 
           it('should set the new document title', () => {
             expect(global.document.title).to.equal(props.system.headTitle)
+          })
+
+          it('should draw on favicon by calling canvas.getContext()', () => {
+            expect(dummyElement.href).to.equal(dummyElement.getAttribute())
+            expect(getContextSpy.calledOnce).to.equal(false)
           })
         })
       })
