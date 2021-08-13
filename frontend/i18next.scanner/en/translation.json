@@ -476,5 +476,12 @@
   "alex.doe@jco.co": "alex.doe@jco.co",
   "In order to finish your sign in, please read the following usage conditions and accept them": "In order to finish your sign in, please read the following usage conditions and accept them",
   "Unknown content": "Unknown content",
-  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "Your reset password link has expired, you can regenerate one by following <1>this link</1>."
+  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "Your reset password link has expired, you can regenerate one by following <1>this link</1>.",
+  "sec": "sec",
+  "min": "min",
+  "hr": "hr",
+  "d": "d",
+  "w": "w",
+  "mth": "mth",
+  "y": "y"
 }
