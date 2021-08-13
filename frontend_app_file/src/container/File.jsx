@@ -910,48 +910,52 @@ export class File extends React.Component {
       label: props.t('Timeline'),
       icon: 'fa-history',
       children: state.config.apiUrl ? (
-        <Timeline
-          customClass={`${state.config.slug}__contentpage`}
-          customColor={state.config.hexcolor}
-          apiUrl={state.config.apiUrl}
-          loggedUser={state.loggedUser}
-          timelineData={state.timeline}
-          memberList={state.config.workspace.memberList}
-          newComment={state.newComment}
-          newCommentAsFileList={state.newCommentAsFileList}
-          disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-          availableStatusList={state.config.availableStatuses}
-          wysiwyg={state.timelineWysiwyg}
-          onChangeNewComment={this.handleChangeNewComment}
-          onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-          onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-          onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-          onClickWysiwygBtn={this.handleToggleWysiwyg}
-          onClickRevisionBtn={this.handleClickShowRevision}
-          shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-          isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-          key='Timeline'
-          invalidMentionList={state.invalidMentionList}
-          onClickCancelSave={this.handleCancelSave}
-          onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-          onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-          showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-          workspaceId={state.content.workspace_id}
-          onClickTranslateComment={comment => props.handleTranslateComment(
-            comment,
-            state.content.workspace_id,
-            state.translationTargetLanguageCode,
-            this.setState.bind(this)
-          )}
-          onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-          onClickEditComment={this.handleClickEditComment}
-          onClickDeleteComment={this.handleClickDeleteComment}
-          onClickOpenFileComment={this.handleClickOpenFileComment}
-          translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
-          translationTargetLanguageCode={state.translationTargetLanguageCode}
-          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Timeline')}
+        >
+          <Timeline
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            apiUrl={state.config.apiUrl}
+            loggedUser={state.loggedUser}
+            timelineData={state.timeline}
+            memberList={state.config.workspace.memberList}
+            newComment={state.newComment}
+            newCommentAsFileList={state.newCommentAsFileList}
+            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
+            wysiwyg={state.timelineWysiwyg}
+            onChangeNewComment={this.handleChangeNewComment}
+            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+            onClickWysiwygBtn={this.handleToggleWysiwyg}
+            onClickRevisionBtn={this.handleClickShowRevision}
+            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+            isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+            key='Timeline'
+            invalidMentionList={state.invalidMentionList}
+            onClickCancelSave={this.handleCancelSave}
+            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+            onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+            workspaceId={state.content.workspace_id}
+            onClickTranslateComment={comment => props.handleTranslateComment(
+              comment,
+              state.content.workspace_id,
+              state.translationTargetLanguageCode,
+              this.setState.bind(this)
+            )}
+            onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+            onClickEditComment={this.handleClickEditComment}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickOpenFileComment={this.handleClickOpenFileComment}
+            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            translationTargetLanguageCode={state.translationTargetLanguageCode}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+          />
+        </PopinFixedRightPartContent>
       ) : null
     }
     const tag = {
