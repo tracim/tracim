@@ -476,5 +476,12 @@
   "alex.doe@jco.co": "carmo.dasilva@cds.pt",
   "In order to finish your sign in, please read the following usage conditions and accept them": "Para terminar a sua sessão, por favor leia as seguintes condições de utilização e aceite-as",
   "Unknown content": "Conteúdo desconhecido",
-  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "A ligação da sua senha de reinicialização expirou, pode regenerar uma nova clicando <1>nesta ligação</1>."
+  "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "A ligação da sua senha de reinicialização expirou, pode regenerar uma nova clicando <1>nesta ligação</1>.",
+  "sec": "seg",
+  "min": "min",
+  "hr": "h",
+  "d": "d",
+  "w": "sem",
+  "mth": "m",
+  "y": "a"
 }

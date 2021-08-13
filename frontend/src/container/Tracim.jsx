@@ -390,7 +390,7 @@ export class Tracim extends React.Component {
       document.title = newHeadTitle
     }
 
-    if ((hasUnreadMentionCountChanged && (prevUnreadMentionCount + unreadMentionCount === 0)) || (hasUnreadNotificationCountChanged && (prevUnreadNotificationCount + unreadNotificationCount) === 0)) {
+    if (hasUnreadMentionCountChanged || hasUnreadNotificationCountChanged) {
       toggleFavicon(unreadNotificationCount > 0, unreadMentionCount > 0)
     }
   }
@@ -422,8 +422,7 @@ export class Tracim extends React.Component {
       <div className='tracim fullWidthFullHeight'>
         <Header
           onClickNotification={this.handleClickNotificationButton}
-          unreadMentionCount={props.notificationPage.unreadMentionCount}
-          unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+          notificationNotReadCount={props.notificationPage.unreadNotificationCount}
         />
         {state.displayConnectionError && (
           <FlashMessage
