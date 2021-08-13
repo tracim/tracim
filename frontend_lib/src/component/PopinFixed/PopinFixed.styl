@@ -15,22 +15,23 @@
   &__header
     display flex
     align-items center
-    height 60px
+    height headerHeight
     border-bottom 1px solid mediumGrey
     padding standardSpacing pageSpacing
     & > *
-      margin-right 5px
-    &__actions button
-      padding 0
+      margin-inline-end standardSpacing
+    &__actions
+      & .dropdownMenuButton
+        padding 0
       &::after
         display none
       & i
         margin 0
+    &__close
+      margin 0
     &__icon
-      margin-right standardSpacing
       font-size titleFontSize
     &__title
-      margin-right standardSpacing
       border-radius textSpacing
       flex 2
       text-overflow ellipsis
@@ -50,6 +51,7 @@
         flex-wrap wrap-reverse
       & .EmojiReactionButton__buttonpicker
         color fontColor
+        padding 0
     &__close
       border-radius standardBorderRadius
       cursor pointer
@@ -123,9 +125,11 @@
         width calc(100% - 65px) // 65px is the width of the rightPart header
         overflow-y auto
         &__title
-          margin standardSpacing 15px
+          height headerHeight
           padding standardSpacing
           font-size titleFontSize
+          display flex
+          align-items center
       &__header
         display flex
         flex-direction column

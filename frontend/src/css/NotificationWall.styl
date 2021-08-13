@@ -16,11 +16,6 @@
   transition 0.5s
   & .iconbutton
     font-size metadataFontSize
-  &__header
-    & > *
-      margin-inline-end standardSpacing
-    &__close
-      margin 0
   &__list
     flex-grow 2
     overflow auto
@@ -34,7 +29,6 @@
       align-items center
       &__icon
         font-size bigIconSize
-        margin-inline-end standardSpacing
         display inline-block
         width 30px
       &__text
@@ -78,9 +72,8 @@
     width 100%
 
 @media (max-width: max-lg)
-  .notification
-    & .btn
-      & > .genericButton__label
-        display none
-      & > .genericButton__icon
-        margin 0px
+  .notification .btn
+    & > .genericButton__label
+      display none
+    & > .genericButton__icon
+      margin 0px

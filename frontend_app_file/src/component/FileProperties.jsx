@@ -33,9 +33,6 @@ export class FileProperties extends React.Component {
 
     return (
       <div className='fileProperties'>
-        <div className='fileProperties__title'>
-          {props.t('Properties')}
-        </div>
         <div className='fileProperties__content'>
           <div className='fileProperties__content__detail'>
             <div className='fileProperties__content__detail__item'>

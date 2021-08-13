@@ -35,9 +35,6 @@ class ShareDownloadManagement extends React.Component {
     return (
       <>
         <div className='shareDownload__management__header'>
-          <div className='shareDownload__title'>
-            {props.t('{{label}} share', { label: props.label, interpolation: { escapeValue: false } })}
-          </div>
           {props.userRoleIdInWorkspace >= ROLE.contentManager.id &&
             <button
               className='shareDownload__btn btn highlightBtn'
@@ -70,7 +67,7 @@ class ShareDownloadManagement extends React.Component {
           )}
 
         {shareLinkList.length <= 0 &&
-          <div className='m-auto'>{props.t('No share link has been created yet')}</div>}
+          <div>{props.t('No share link has been created yet')}</div>}
       </>
     )
   }

@@ -111,12 +111,6 @@ export class Timeline extends React.Component {
 
     return (
       <div className={classnames('timeline')}>
-        {props.showTitle && (
-          <div className='timeline__title'>
-            {props.t('Timeline')}
-          </div>
-        )}
-
         <div className='timeline__warning'>
           {props.isDeprecated && !props.isArchived && !props.isDeleted && (
             <PromptMessage
@@ -360,7 +354,6 @@ Timeline.propTypes = {
   onClickCancelSave: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickSaveAnyway: PropTypes.func,
-  showTitle: PropTypes.bool,
   searchForMentionOrLinkInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
   onClickEditComment: PropTypes.func,
@@ -397,7 +390,6 @@ Timeline.defaultProps = {
   isDeleted: false,
   onClickCancelSave: () => { },
   onClickSaveAnyway: () => { },
-  showTitle: true,
   searchForMentionOrLinkInQuery: () => { },
   showInvalidMentionPopup: false,
   onClickTranslateComment: content => { },

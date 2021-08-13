@@ -171,10 +171,6 @@ class TagList extends React.Component {
 
     return (
       <div className='tagList' data-cy='tag_list'>
-        <div className='tagList__header'>
-          {props.t('Tags')}
-        </div>
-
         <div className='tagList__wrapper'>
           {!isReadOnlyMode && (
             <NewTagForm

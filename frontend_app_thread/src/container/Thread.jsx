@@ -566,7 +566,6 @@ export class Thread extends React.Component {
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
                 deprecatedStatus={state.config.availableStatuses[3]}
-                showTitle={false}
                 invalidMentionList={state.invalidMentionList}
                 isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                 onClickCancelSave={this.handleCancelSave}

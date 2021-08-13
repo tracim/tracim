@@ -3,18 +3,13 @@
 .timeline
   display flex
   flex-direction column
-  width calc(100% - 65px) // 65px is the width of the rightPart header
-  height 100%
+  height "calc(100% - %s)" % headerHeight
   & p:first-child
     margin-top 0
     padding-top 0
   & p:last-child
     margin-bottom 0
     padding-bottom 0
-  &__title
-    height headerHeight
-    padding 0 pageSpacing
-    font-size titleFontSize
   &__messagelist
     flex 1 1 auto
     margin-bottom 0
@@ -123,7 +118,6 @@ columnTimeline()
         align-items center
         transform none
         width 100%
-
 
 @media (min-width: min-lg) and (max-width: max-lg)
   columnTimeline()

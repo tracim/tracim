@@ -6,34 +6,13 @@
 
 .previewcomponent
   position relative
-  height 100%
+  height calc(100% - 118px)
   overflow-x hidden
-  &__state
-    display flex
-    align-items center
-    justify-content space-between
-    margin 15px standardSpacing
-    padding 5px 15px
-    background-color #fee498
-    border-radius 10px
-    &__msg > i
-      margin-right 8px
-    &__btnrestore
-      cursor pointer
-      & > i
-        margin-right 8px
-  &__dloption
-    display flex
-    justify-content space-evenly
-    margin 0 auto
-    padding-top standardSpacing
-    width 250px
-    &__icon
-      font-size titleFontSize
-      cursor pointer
-      color fontColor
+  display flex
+  width 100%
+  align-items center
+  justify-content center
   &__fileimg
-    height calc(100% - 53px) // 53px => height of dloption
     display flex
     flex-direction column
     justify-content center
@@ -65,4 +44,3 @@
     font-size metadataFontSize
   &__filepreview
     display flex
-    height calc(100% - 53px) // 53px => height of dloption

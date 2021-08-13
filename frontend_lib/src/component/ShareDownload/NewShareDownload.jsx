@@ -115,7 +115,7 @@ export class NewShareDownload extends React.Component {
 
                 <button
                   type='button'
-                  className='shareDownload__password__icon'
+                  className='shareDownload__password__icon shareDownload__password__icon__random'
                   key='randomSharePassword'
                   title={props.t('Generate random password')}
                   style={{ ':hover': { color: props.hexcolor } }}
@@ -137,9 +137,9 @@ export class NewShareDownload extends React.Component {
             </div>
           )}
 
-        <div className='d-flex mt-3'>
+        <div className='shareDownload__buttons'>
           <button
-            className='shareDownload__cancel btn outlineTextBtn'
+            className='shareDownload__buttons__cancel btn outlineTextBtn'
             key='cancelNewShare'
             onClick={props.onClickCancelButton}
             style={{
@@ -153,7 +153,7 @@ export class NewShareDownload extends React.Component {
           </button>
 
           <button
-            className='shareDownload__newBtn btn highlightBtn'
+            className='shareDownload__buttons__newBtn btn highlightBtn'
             key='newShareDownload'
             onClick={() => props.onClickNewShare(state.isPasswordActive)}
             disabled={props.shareEmails === '' || (state.isPasswordActive && props.sharePassword === '')}
