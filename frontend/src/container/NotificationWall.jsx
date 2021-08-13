@@ -22,9 +22,9 @@ import {
 import {
   AVATAR_SIZE,
   CONTENT_TYPE,
+  IconButton,
   PROFILE,
   displayDistanceDate,
-  GenericButton,
   ListItemWrapper,
   PopinFixedHeader,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
@@ -420,11 +420,11 @@ export class NotificationWall extends React.Component {
           componentTitle={<div>{props.t('Notifications')}</div>}
           onClickCloseBtn={props.onCloseNotificationWall}
         >
-          <GenericButton
-            customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+          <IconButton
+            mode='dark'
             onClick={this.handleClickMarkAllAsRead}
-            label={props.t('Mark all as read')}
-            faIcon='far fa-envelope-open'
+            icon='far fa-envelope-open'
+            text={props.t('Mark all as read')}
             dataCy='markAllAsReadButton'
           />
         </PopinFixedHeader>
@@ -481,11 +481,11 @@ export class NotificationWall extends React.Component {
 
           {props.notificationPage.hasNextPage &&
             <div className='notification__footer'>
-              <GenericButton
-                customClass='btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+              <IconButton
+                mode='dark'
                 onClick={this.handleClickSeeMore}
-                label={props.t('See more')}
-                faIcon='fas fa-chevron-down'
+                icon='fas fa-chevron-down'
+                text={props.t('See more')}
               />
             </div>}
         </div>

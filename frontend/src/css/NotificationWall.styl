@@ -6,7 +6,6 @@
   right 0
   width 40%
   height "calc(100% - %s)" % headerHeight
-  border-left 1px solid grey
   background-color offWhite
   box-shadow shadow-right
   z-index 26
@@ -15,11 +14,13 @@
   max-width 600px
   overflow hidden
   transition 0.5s
+  & .iconbutton
+    font-size metadataFontSize
   &__header
-    & div
-      color fontColor
-    &__close i
-      color fontColor
+    & > *
+      margin-inline-end standardSpacing
+    &__close
+      margin 0
   &__list
     flex-grow 2
     overflow auto
@@ -29,23 +30,23 @@
       color fontColor
       font-weight normal
       background-color veryLightGrey
-      padding 5px
-      min-height listItemHeight
+      padding standardSpacing
       align-items center
       &__icon
         font-size bigIconSize
-        margin standardSpacing
+        margin-inline-end standardSpacing
         display inline-block
         width 30px
       &__text
         display flex
-        padding-left 5px
         padding-right standardSpacing
-        font-size metadataFontSize
         word-break break-word
+        & .contentTitle__highlight
+          text-decoration underline
+        & .documentTitle__highlight
+          font-weight bold
       &__circle
         margin-left auto
-        margin-right 5px
         font-size 8px
         color lightBlue
       &.itemRead
@@ -60,17 +61,9 @@
     top 0
   &__footer
     border-top 1px solid grey
-    padding 5px
+    padding standardSpacing
     justify-content center
-    width 100%
     display flex
-
-.contentTitle
-  &__highlight
-    text-decoration underline
-.documentTitle
-  &__highlight
-    font-weight bold
 
 // INFO - MB - 20200204 - overrides ListItemWrapper styles because .content is used in many places
 .notification > .notification__list > .content
