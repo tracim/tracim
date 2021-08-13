@@ -50,13 +50,43 @@ const notification = {
   user: serialize(globalManagerFromApi, serializeUserProps)
 }
 
+const TLMMention = {
+  created: '2020-07-23T12:44:50Z',
+  event_id: 523,
+  event_type: 'mention.created',
+  fields: {
+    author: globalManagerFromApi,
+    workspace: firstWorkspaceFromApi,
+    user: globalManagerFromApi
+  },
+  read: null
+}
+
+const mention = {
+  author: {
+    publicName: globalManagerFromApi.public_name,
+    userId: globalManagerFromApi.user_id,
+    hasAvatar: false,
+    hasCover: false
+  },
+  content: null,
+  created: '2020-07-23T12:44:50Z',
+  id: 523,
+  type: 'mention.created',
+  workspace: serialize(firstWorkspaceFromApi, serializeWorkspaceListProps),
+  read: null,
+  subscription: null,
+  user: serialize(globalManagerFromApi, serializeUserProps)
+}
+
 describe('reducer notificationPage.js', () => {
   describe('actions', () => {
     const initialState = {
       list: [],
       hasNextPage: false,
       nextPageToken: '',
-      notificationNotReadCount: 0
+      unreadNotificationCount: 0,
+      unreadMentionCount: 0
     }
 
     describe(`${SET}/${NOTIFICATION_LIST}`, () => {
@@ -69,25 +99,40 @@ describe('reducer notificationPage.js', () => {
 
     describe(`${ADD}/${NOTIFICATION}`, () => {
       const listOfNotification = notificationPage(initialState, addNotification(TLM))
+      const listOfMention = notificationPage(initialState, addNotification(TLMMention))
 
       it('should return the list of notification added from the object passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification], notificationNotReadCount: 1 })
+        expect(listOfNotification).to.deep.equal({
+          ...initialState,
+          list: [notification],
+          unreadMentionCount: 0,
+          unreadNotificationCount: 1
+        })
+      })
+
+      it('should return the list of mentions', () => {
+        expect(listOfMention).to.deep.equal({
+          ...initialState,
+          list: [mention],
+          unreadMentionCount: 1,
+          unreadNotificationCount: 1
+        })
       })
     })
 
     describe(`${READ}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], notificationNotReadCount: 1 }, readNotification(notification.id))
+      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotification(notification.id))
 
       it('should return the list of objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], notificationNotReadCount: 0 })
+        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
       })
     })
 
     describe(`${READ}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], notificationNotReadCount: 1 }, readNotificationList())
+      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotificationList())
 
       it('should return the list of objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], notificationNotReadCount: 0 })
+        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
       })
     })
 
