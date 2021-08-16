@@ -21,10 +21,7 @@ export const NotificationButton = props => {
           </div>
         )}
         {props.unreadMentionCount === 0 && props.unreadNotificationCount > 0 && (
-          <div
-            className='notificationButton__notification'
-          >
-          </div>
+          <div className='notificationButton__notification' />
         )}
       </button>
     </div>
@@ -33,6 +30,7 @@ export const NotificationButton = props => {
 export default translate()(NotificationButton)
 
 NotificationButton.propTypes = {
+  unreadMentionCount: PropTypes.number,
   unreadMentionCount: PropTypes.number,
   onClickNotification: PropTypes.func
 }
