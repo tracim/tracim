@@ -31,7 +31,7 @@ export default translate()(NotificationButton)
 
 NotificationButton.propTypes = {
   unreadMentionCount: PropTypes.number,
-  unreadMentionCount: PropTypes.number,
+  unreadNotificationCount: PropTypes.number,
   onClickNotification: PropTypes.func
 }
 
