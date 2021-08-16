@@ -85,6 +85,9 @@ describe('Check notification dot', () => {
           .click()
         cy.logout()
 
+        cy.get('.loginpage__main__header__title')
+        .should('be.visible')
+
         cy.login(defaultAdmin)
         cy.fixture('baseWorkspace').as('workspace').then(workspace => {
           workspaceId = workspace.workspace_id
