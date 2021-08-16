@@ -35,54 +35,68 @@ describe('Notification button at header', () => {
 })
 
 describe('Check notification dot', () => {
-  const allowedUserList = [
-    defaultAdmin,
-    baseUser
-  ]
-  for (const user of allowedUserList) {
-    describe(`As ${user.username} sending ${baseUser.username} a global notification`, () => {
-      beforeEach(function () {
-        cy.resetDB()
-        cy.setupBaseDB()
-        cy.login(user)
+  describe('Creating a thread', () => {
+    beforeEach(function () {
+      cy.resetDB()
+      cy.setupBaseDB()
+      cy.login(baseUser)
+      cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+        workspaceId = workspace.workspace_id
+        cy.createThread(threadTitle, workspaceId).then(note => {
+          threadId = note.content_id
+          cy.visitPage({
+            pageName: PAGES.CONTENT_OPEN,
+            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+          })
+        })
+        cy.contains('.menuprofil__dropdown__name', baseUser.public_name)
+      })
+    })
+
+    describe(`As ${baseUser.username} sending ${defaultAdmin.username} a notifications`, () => {
+      it('create a general notifiation', () => {
+        cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+          .should('be.visible')
+          .type(comment)
+        cy.get('.timeline__texteditor__submit__btn')
+          .should('be.visible')
+          .click()
+        cy.logout()
+
+        cy.login(defaultAdmin)
         cy.fixture('baseWorkspace').as('workspace').then(workspace => {
           workspaceId = workspace.workspace_id
-        cy.createThread(threadTitle, workspaceId).then(note => threadId = note.content_id)
+          cy.visitPage({
+            pageName: PAGES.CONTENT_OPEN,
+            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+          })
         })
+        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
+        cy.get('.notificationButton__notification')
+          .should('be.visible')
       })
 
-      beforeEach(function () {
-        cy.loginAs('users')
-        cy.visitPage({
-          pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
-        })
-      })
+      it('create a mention notifiation', () => {
+        cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+          .should('be.visible')
+          .type(commentAll)
+        cy.get('.timeline__texteditor__submit__btn')
+          .should('be.visible')
+          .click()
+        cy.logout()
 
-      describe('an invalid mention in the comment in simple edition mode', () => {
-        it('should open a popup that contains this mention', () => {
-          cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
-            .should('be.visible')
-            .type(comment)
-          cy.get('.timeline__texteditor__submit__btn')
-            .should('be.visible')
-            .click()
-          // cy.contains('.timeline__texteditor__mentions', '@nothing')
+        cy.login(defaultAdmin)
+        cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+          workspaceId = workspace.workspace_id
+          cy.visitPage({
+            pageName: PAGES.CONTENT_OPEN,
+            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+          })
         })
+        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
+        cy.get('.notificationButton__mention')
+          .should('be.visible')
       })
-    }
-  )}
-
-  it('User should see a notification', function () {
-    cy.logout()
-    cy.loginAs('administrators')
-    cy.visitPage({
-      pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
     })
-    // cy.get('[data-cy=revision_data_2]').within(() => {
-    //   cy.get('.revision__data__infos__author').contains('Global manager').should('be.visible')
-    // })
   })
-
 })
