@@ -2,10 +2,10 @@
 
 .formBlock
   margin-bottom standardSpacing
-  border-radius 10px
+  border-radius standardBorderRadius
   &__title
     padding standardSpacing
-    border-bottom 1px solid grey
+    border-bottom borderStyle
     font-size titleFontSize
     font-weight 400
   &__field
@@ -54,7 +54,7 @@
         display flex
         justify-content space-between
         align-items center
-        border-bottom 1px solid grey
+        border-bottom borderStyle
         padding 0 standardSpacing
         height 65px
         &__avatar
@@ -82,7 +82,7 @@
               display flex
               margin-left auto
             &.bordered
-              border 1px solid grey
+              border borderStyle
               border-radius standardSpacing
           .subdropdown
             width 250px

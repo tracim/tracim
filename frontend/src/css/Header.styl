@@ -11,7 +11,7 @@
   & .navbar
     padding 10px
     z-index 30 // INFO - CH - 2019-04-18 - higher than .wsContentGeneric and lower than caldavzap fullscreen
-    border-bottom 1px solid grey
+    border-bottom borderStyle
     height 61px
     background-color lightGrey
   &__logo
@@ -52,7 +52,7 @@
       top "calc(%s - 1px)" % headerHeight
       width 100%
       background-color lightGrey
-      border-bottom 1px solid grey
+      border-bottom borderStyle
     &__rightside
       flex-wrap wrap
       padding-inline-start 0

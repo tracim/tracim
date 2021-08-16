@@ -17,11 +17,15 @@
     align-items center
     height headerHeight
     border-bottom 1px solid mediumGrey
-    padding standardSpacing pageSpacing
+    margin 0 pageSpacing
+    &__edittitle
+      padding 0
+    & > .favoriteButton
+      margin 0
     & > *
       margin-inline-end standardSpacing
     &__actions
-      & .dropdownMenuButton
+      &.dropdownMenuButton
         padding 0
       &::after
         display none
@@ -32,7 +36,6 @@
     &__icon
       font-size titleFontSize
     &__title
-      border-radius textSpacing
       flex 2
       text-overflow ellipsis
       overflow hidden
@@ -43,7 +46,9 @@
         text-overflow ellipsis
         overflow hidden
       & > input
-        padding-left 5px
+        padding-left textSpacing
+        border-radius standardBorderRadius
+        border borderStyle
     &__reactions
       flex 1
       height 100%
@@ -95,7 +100,7 @@
     &__state
       width 100%
       padding 5px 15px
-      border-radius 10px
+      border-radius standardBorderRadius
       background-color #fbe294
     &__left
       transition width 0.4s ease
@@ -152,6 +157,8 @@
             text-align center
             cursor pointer
             margin auto 0 15px
+  & .headerBtn
+    margin-inline-end 0
 
 .rightPartClose
   .wsContentGeneric__content

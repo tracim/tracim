@@ -7,7 +7,6 @@ import { isMobile } from 'react-device-detect'
 import { BREADCRUMBS_TYPE, PAGE } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 
-
 export class PageTitle extends React.Component {
   constructor (props) {
     super(props)

@@ -8,7 +8,7 @@
 
   &__wrapper
     position relative
-    border 1px solid grey
+    border borderStyle
     background-color offWhite
   &__list
     margin 0
@@ -16,7 +16,7 @@
     list-style none
     &__item
       display flex
-      border-bottom 1px solid grey
+      border-bottom borderStyle
       padding standardSpacing
       align-items center
       &:hover
@@ -55,7 +55,7 @@
       &__last
         border none
   &__btnadd
-    border-bottom 1px solid grey
+    border-bottom borderStyle
     padding standardSpacing
     &__button
       display flex
@@ -104,6 +104,6 @@
       height auto
       overflow-Y visible
       &__item:nth-last-child(1)
-        border-bottom 1px solid grey
+        border-bottom borderStyle
     &__btnadd
       border-top 0

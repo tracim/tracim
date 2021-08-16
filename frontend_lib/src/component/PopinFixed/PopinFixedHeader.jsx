@@ -116,7 +116,7 @@ class PopinFixedHeader extends React.Component {
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
           <button
-            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
+            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
             onClick={this.handleClickUndoChangeTitleBtn}
             disabled={disableChangeTitle}
           >
@@ -126,7 +126,7 @@ class PopinFixedHeader extends React.Component {
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
           <button
-            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle iconBtn`)}
+            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
             onClick={this.handleClickChangeTitleBtn}
             disabled={disableChangeTitle}
           >

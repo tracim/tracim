@@ -3,7 +3,7 @@
 .comment
   padding standardSpacing
   border-radius standardBorderRadius
-  border 1px solid grey
+  border borderStyle
   background-color offWhite
   display flex
   flex-direction column
@@ -47,7 +47,7 @@
             font-size standardFontSize
             &:hover
               text-decoration underline
-        &__actions button
+        &__actions.dropdownMenuButton
           padding 0
           color grey
           &::after

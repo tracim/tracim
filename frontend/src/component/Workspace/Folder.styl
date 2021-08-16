@@ -2,15 +2,15 @@
 
 // -----------------------------------------------------
 // border management for Workspace container
-border-style = 1px solid grey
+
 .folder__header
-  border border-style
+  border borderStyle
 .folder + .content, .content + .content
   border-bottom 0
 .folder__content > .content, .folder__content > .folder
   border-bottom 0
 .folder:not(.active).item-last
-  border-bottom border-style
+  border-bottom borderStyle
 
 folderclose()
   height 0
@@ -24,7 +24,7 @@ folderopen()
   transition opacity 0.3s
 
 .folder
-  padding-left 30px
+  padding-left 20px
   & > .folder__header
     folderopen()
     &:hover
@@ -47,7 +47,7 @@ folderopen()
     position relative
     display flex
     align-items center
-    margin-left -30px
+    margin-left -20px
     border-bottom 0
     padding standardSpacing 0
     background-color lightGrey
@@ -63,19 +63,19 @@ folderopen()
     &__triangleborder
       display none
       position absolute
-      bottom -25px
+      bottom -16px
       left -1px
       border-style solid
-      border-width 25px 30px 0 30px
+      border-width 16px 21px 0 21px
       border-color grey transparent transparent transparent
       z-index 1
       &__triangle
         display none
         position absolute
-        top -26px
-        left -30px
+        top -16px
+        left -20px
         border-style solid
-        border-width 25px 30px 0 30px
+        border-width 15px 20px 0 20px
         border-color lightGrey transparent transparent transparent
     &__dragHandle
       position absolute

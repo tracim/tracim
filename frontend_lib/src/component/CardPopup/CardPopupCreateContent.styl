@@ -16,13 +16,13 @@
   width 100%
   .cardPopup__container
     border 0
-    border-radius 10px
+    border-radius standardBorderRadius
     width popupWidth
     background lightGrey
     box-shadow shadow-all
   &__header
-    border-top-right-radius 10px
-    border-top-left-radius 10px
+    border-top-right-radius standardBorderRadius
+    border-top-left-radius standardBorderRadius
     width 100%
     height 8px
   .createcontent
@@ -39,8 +39,8 @@
     &__form
       &__input
         width 100%
-        border 1px solid grey
-        border-radius 5px
+        border borderStyle
+        border-radius standardBorderRadius
         margin-bottom 25px
         padding 5px
       &__button

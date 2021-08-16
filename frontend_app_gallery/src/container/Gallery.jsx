@@ -809,7 +809,7 @@ export class Gallery extends React.Component {
                     reactModalProps={{ parentSelector: () => this.reactImageLightBoxModalRoot }}
                     toolbarButtons={[(
                       <button
-                        className='btn iconBtn'
+                        className='btn'
                         onClick={() => this.onClickSlickPlay(!state.autoPlay)}
                         title={state.autoPlay ? props.t('Pause') : props.t('Play')}
                         data-cy='gallery__action__button__lightbox__auto__play'
@@ -819,7 +819,7 @@ export class Gallery extends React.Component {
                       </button>
                     ), (
                       <button
-                        className='btn iconBtn'
+                        className='btn'
                         onClick={() => this.setState((prevState) => ({ fullscreen: !prevState.fullscreen }))}
                         title={state.fullscreen ? props.t('Disable fullscreen') : props.t('Enable fullscreen')}
                         data-cy='gallery__action__button__lightbox__fullscreen'
@@ -829,7 +829,7 @@ export class Gallery extends React.Component {
                       </button>
                     ), (
                       <button
-                        className='btn iconBtn'
+                        className='btn'
                         onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.LEFT)}
                         title={props.t('Rotate 90° left')}
                         data-cy='gallery__action__button__lightbox__rotation__left'
@@ -839,7 +839,7 @@ export class Gallery extends React.Component {
                       </button>
                     ), (
                       <button
-                        className='btn iconBtn gallery__action__button__lightbox__rotation__right'
+                        className='btn gallery__action__button__lightbox__rotation__right'
                         onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.RIGHT)}
                         title={props.t('Rotate 90° right')}
                         key='btn_rotate_right'
@@ -848,7 +848,7 @@ export class Gallery extends React.Component {
                       </button>
                     ), (
                       <a
-                        className='btn iconBtn gallery__action__button__lightbox__openRawContent'
+                        className='btn gallery__action__button__lightbox__openRawContent'
                         title={props.t('Open raw file')}
                         href={this.getRawFileUrlSelectedFile()}
                         target='_blank'

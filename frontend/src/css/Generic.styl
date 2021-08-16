@@ -98,7 +98,7 @@ div.mce-statusbar
     margin-bottom 30px
     border-width 1px
     border-style solid
-    border-radius 10px
+    border-radius standardBorderRadius
     padding standardSpacing 25px
     cursor pointer
     &:hover
@@ -107,16 +107,16 @@ div.mce-statusbar
       margin-right 20px
       font-size bigIconSize
   &__info
-    border 1px solid grey
-    border-radius 10px
+    border borderStyle
+    border-radius standardBorderRadius
     padding 15px 25px
     &__text
       margin-bottom 35px
     &__link
       display inline-block
       margin-bottom 15px
-      border 1px solid grey
-      border-radius 10px
+      border borderStyle
+      border-radius standardBorderRadius
       padding 15px
 
 .notched // Côme - 2018/09/27 - this class requires a border-color to be defined (eg. with primaryColorBorder)
