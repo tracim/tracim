@@ -420,6 +420,7 @@ export class NotificationWall extends React.Component {
 
   render () {
     const { props } = this
+    // const escapedWorkspaceLabel = entityType.WORKSPACE ? escapeHtml(entityType.WORKSPACE.label) : ''
 
     if (!props.notificationPage.list) return null
 
@@ -492,6 +493,12 @@ export class NotificationWall extends React.Component {
                     >
                       {this.shortDate(notification.created)}
                     </span>
+                    {/* {((relatedNotifications.length === 1 && notification.workspace) || notificationDetails.spaces) && (
+                      <span className='notification__list__item__meta__space'>
+                        {relatedNotifications.length === 1 ? notification.workspace.label : notificationDetails.spaces}
+                      </span>
+                    )} */}
+                    <span>{notification.workspace.label}</span>
                   </div>
                   <div className='notification__list__item__circle__wrapper'>
                     {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
