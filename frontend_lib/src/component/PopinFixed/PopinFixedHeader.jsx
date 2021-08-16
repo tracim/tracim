@@ -2,7 +2,12 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { ROLE } from '../../helper.js'
+import {
+  BREADCRUMBS_TYPE,
+  PAGE,
+  ROLE
+} from '../../helper.js'
+import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
@@ -93,46 +98,62 @@ class PopinFixedHeader extends React.Component {
 
     return (
       <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
-        <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-          <i className={`${faIcon}`} title={rawTitle} style={{ color: customColor }} />
+        <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
+          <div className='wsContentGeneric__header__titleWrapper'>
+            <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
+              <i className={`${faIcon}`} title={rawTitle} style={{ color: customColor }} />
+            </div>
+
+            <div
+              className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
+              title={rawTitle}
+            >
+              {state.editTitle
+                ? (
+                  <input
+                    className='wsContentGeneric__header__title__editiontitle editiontitle'
+                    value={state.editTitleValue}
+                    onChange={this.handleChangeTitle}
+                    onKeyDown={this.handleInputKeyPress}
+                    autoFocus
+                  />
+                )
+                : componentTitle}
+              {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
+                <button
+                  className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
+                  onClick={this.handleClickUndoChangeTitleBtn}
+                  disabled={disableChangeTitle}
+                >
+                  <i className='fas fa-undo' title={t('Undo change in title')} />
+                </button>
+              )}
+
+              {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
+                <button
+                  className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
+                  onClick={this.handleClickChangeTitleBtn}
+                  disabled={disableChangeTitle}
+                >
+                  <i className='fas fa-check' title={t('Validate the title')} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {props.breadcrumbsList.length > 0 && (
+            <Breadcrumbs
+              root={{
+                link: PAGE.HOME,
+                label: '',
+                icon: 'fas fa-home',
+                type: BREADCRUMBS_TYPE.CORE,
+                isALink: true
+              }}
+              breadcrumbsList={props.breadcrumbsList}
+            />
+          )}
         </div>
-
-        <div
-          className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
-          title={rawTitle}
-        >
-          {state.editTitle
-            ? (
-              <input
-                className='wsContentGeneric__header__title__editiontitle editiontitle'
-                value={state.editTitleValue}
-                onChange={this.handleChangeTitle}
-                onKeyDown={this.handleInputKeyPress}
-                autoFocus
-              />
-            )
-            : componentTitle}
-        </div>
-
-        {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
-          <button
-            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
-            onClick={this.handleClickUndoChangeTitleBtn}
-            disabled={disableChangeTitle}
-          >
-            <i className='fas fa-undo' title={t('Undo change in title')} />
-          </button>
-        )}
-
-        {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
-          <button
-            className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
-            onClick={this.handleClickChangeTitleBtn}
-            disabled={disableChangeTitle}
-          >
-            <i className='fas fa-check' title={t('Validate the title')} />
-          </button>
-        )}
 
         {showReactions && (
           <div className='wsContentGeneric__header__reactions'>
@@ -223,6 +244,7 @@ export default translate()(PopinFixedHeader)
 PopinFixedHeader.propTypes = {
   faIcon: PropTypes.string.isRequired,
   onClickCloseBtn: PropTypes.func.isRequired,
+  breadcrumbsList: PropTypes.array,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   headerButtons: PropTypes.array,
@@ -243,6 +265,7 @@ PopinFixedHeader.propTypes = {
 }
 
 PopinFixedHeader.defaultProps = {
+  breadcrumbsList: [],
   customClass: '',
   customColor: '',
   headerButtons: [],

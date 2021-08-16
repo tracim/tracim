@@ -2,15 +2,14 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import SelectStatus from '../Input/SelectStatus/SelectStatus.jsx'
 import {
   APP_FEATURE_MODE,
-  BREADCRUMBS_TYPE,
-  PAGE,
   ROLE
 } from '../../helper.js'
+import TranslateButton from '../Button/TranslateButton.jsx'
 import PopinFixedHeader from './PopinFixedHeader.jsx'
+import { TRANSLATION_STATE } from '../../translation.js'
 
 class PopinFixedContent extends React.Component {
   constructor (props) {
@@ -38,6 +37,7 @@ class PopinFixedContent extends React.Component {
         >
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
             <PopinFixedHeader
+              breadcrumbsList={props.breadcrumbsList}
               customClass={props.customClass}
               customColor={props.config.hexcolor}
               faIcon={props.config.faIcon}
@@ -59,17 +59,18 @@ class PopinFixedContent extends React.Component {
               showChangeTitleButton={props.showChangeTitleButton}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
-              {props.breadcrumbsList.length > 0 && (
-                <Breadcrumbs
-                  root={{
-                    link: PAGE.HOME,
-                    label: '',
-                    icon: 'fas fa-home',
-                    type: BREADCRUMBS_TYPE.CORE,
-                    isALink: true
-                  }}
-                  breadcrumbsList={props.breadcrumbsList}
-                />
+              {props.showTranslateButton && (
+                <div className='html-document__contentpage__textnote__top'>
+                  <TranslateButton
+                    translationState={props.translationState}
+                    targetLanguageList={props.translationTargetLanguageList}
+                    targetLanguageCode={props.translationTargetLanguageCode}
+                    onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+                    onClickTranslate={props.onClickTranslateDocument}
+                    onClickRestore={props.onClickRestoreDocument}
+                    dataCy='htmlDocumentTranslateButton'
+                  />
+                </div>
               )}
 
               {!!props.lastVersion &&
@@ -159,7 +160,14 @@ PopinFixedContent.propTypes = {
   onClickRemoveFromFavoriteList: PropTypes.func,
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
-  showReactions: PropTypes.bool
+  showReactions: PropTypes.bool,
+  showTranslateButton: PropTypes.bool,
+  onClickTranslateDocument: PropTypes.func,
+  onClickRestoreDocument: PropTypes.func,
+  onChangeTranslationTargetLanguageCode: PropTypes.func,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object),
+  translationTargetLanguageCode: PropTypes.string,
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }
 
 PopinFixedContent.defaultProps = {
@@ -194,5 +202,6 @@ PopinFixedContent.defaultProps = {
   onClickRemoveFromFavoriteList: () => {},
   onValidateChangeTitle: () => {},
   showChangeTitleButton: true,
-  showReactions: false
+  showReactions: false,
+  showTranslateButton: false
 }

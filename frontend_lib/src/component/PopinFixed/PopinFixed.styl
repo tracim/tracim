@@ -18,8 +18,13 @@
     height headerHeight
     border-bottom 1px solid mediumGrey
     margin 0 pageSpacing
+    &__titleWithBreadcrumbs
+      flex 2
+    &__titleWrapper
+      display flex
     &__edittitle
       padding 0
+      margin-inline-start standardSpacing
     & > .favoriteButton
       margin 0
     & > *
@@ -35,6 +40,7 @@
       margin 0
     &__icon
       font-size titleFontSize
+      margin-inline-end standardSpacing
     &__title
       flex 2
       text-overflow ellipsis
@@ -111,7 +117,7 @@
         align-items center
         color lightDarkGrey
         font-size metadataFontSize
-        padding pageSpacing pageSpacing standardSpacing
+        padding standardSpacing pageSpacing 0
         & .breadcrumbs
           margin-inline-end auto
           overflow auto

@@ -109,7 +109,6 @@ export class MemberActivity extends React.Component {
           size={AVATAR_SIZE.SMALL}
           user={newestMessage.fields.user}
           apiUrl={FETCH_CONFIG.apiUrl}
-          style={{ marginRight: '5px' }}
         />
         <div className='memberActivity__title'>
           {this.getText()}

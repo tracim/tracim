@@ -1001,6 +1001,13 @@ export class HtmlDocument extends React.Component {
             dataCy: 'popinListItem__delete'
           }
           ]}
+          showTranslateButton={state.mode === APP_FEATURE_MODE.VIEW || state.mode === APP_FEATURE_MODE.REVISION}
+          translationState={state.translationState}
+          translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+          translationTargetLanguageCode={state.translationTargetLanguageCode}
+          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+          onClickTranslateDocument={this.handleTranslateDocument}
+          onClickRestoreDocument={this.handleRestoreDocument}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
@@ -1039,12 +1046,6 @@ export class HtmlDocument extends React.Component {
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleSaveHtmlDocument}
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
-            onClickTranslateDocument={this.handleTranslateDocument}
-            onClickRestoreDocument={this.handleRestoreDocument}
-            translationState={state.translationState}
-            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
-            translationTargetLanguageCode={state.translationTargetLanguageCode}
-            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
           />

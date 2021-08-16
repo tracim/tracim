@@ -23,7 +23,6 @@
   border-width 1px
   border-style solid
   font-size metadataFontSize
-  padding 3px
   margin-inline-end textSpacing
 
   &:not(.highlighted)
@@ -46,10 +45,9 @@
 
 .EmojiReactionButton__buttonpicker
   color grey
-  border 1px solid transparent
+  border none
   &.active
     color fontColor
-    border 1px solid mediumDarkGrey
 
 .EmojiReactionButton__button:hover:not(.highlighted):not(:disabled), .EmojiReactionButton__buttonpicker:hover:not(.active):not(:disabled)
   color fontColor
