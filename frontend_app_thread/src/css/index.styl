@@ -18,19 +18,22 @@
   .thread
     &__contentpage
       width 100%
-      height 100%
       &__top
         display flex
         justify-content flex-end
-        padding standardSpacing
+        padding standardSpacing pageSpacing 0
       &__messagelist
-        padding-left standardSpacing
-        padding-right standardSpacing
+        padding-left pageSpacing
+        padding-right pageSpacing
       &__content
         width 100%
-        height "calc(100% - %s)" % headerHeight
       &__texteditor
-        flex 0 0 auto
+        margin 0 pageSpacing pageSpacing
+      &__header
+        & .favoriteButton .iconbutton__icon
+          margin-inline-end standardSpacing
+        & .wsContentGeneric__header__actions .fa-fw
+          margin 0
 
 @media (min-width: min-sm) and (max-width: max-lg)
   .thread

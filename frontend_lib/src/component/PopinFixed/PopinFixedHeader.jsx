@@ -119,26 +119,26 @@ class PopinFixedHeader extends React.Component {
                   />
                 )
                 : componentTitle}
-              {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
-                <button
-                  className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
-                  onClick={this.handleClickUndoChangeTitleBtn}
-                  disabled={disableChangeTitle}
-                >
-                  <i className='fas fa-undo' title={t('Undo change in title')} />
-                </button>
-              )}
-
-              {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
-                <button
-                  className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
-                  onClick={this.handleClickChangeTitleBtn}
-                  disabled={disableChangeTitle}
-                >
-                  <i className='fas fa-check' title={t('Validate the title')} />
-                </button>
-              )}
             </div>
+            {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
+              <button
+                className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
+                onClick={this.handleClickUndoChangeTitleBtn}
+                disabled={disableChangeTitle}
+              >
+                <i className='fas fa-undo' title={t('Undo change in title')} />
+              </button>
+            )}
+
+            {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
+              <button
+                className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
+                onClick={this.handleClickChangeTitleBtn}
+                disabled={disableChangeTitle}
+              >
+                <i className='fas fa-check' title={t('Validate the title')} />
+              </button>
+            )}
           </div>
 
           {props.breadcrumbsList.length > 0 && (

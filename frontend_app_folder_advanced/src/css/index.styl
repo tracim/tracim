@@ -1,24 +1,11 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-.formBlock
-  margin-bottom 15px
-  border-radius standardBorderRadius
-  &__title
-    padding standardSpacing 0 25px standardSpacing
-    border-bottom borderStyle
-    font-size titleFontSize
-    font-weight 400
-  &__field
-    padding standardSpacing
-  &__bottom
-    padding standardSpacing
-
 .folder_advanced
   height 100%
   overflow-y auto
   overflow-x hidden
   &-content
-    padding standardSpacing standardSpacing 0 standardSpacing
+    padding standardSpacing pageSpacing
   &__content
     &__state
       display flex
@@ -41,20 +28,7 @@
       &__type
         display flex
         align-items center
-        padding 3px 13px
+        padding 0 0 standardSpacing
         cursor pointer
-        font-size standardFontSize
-        &:hover
-          background-color lightGrey
         &__icon
-          margin 0 5px 0 0
-  &__header
-    display flex
-    &__deleteButton
-      margin-left auto
-
-.folder
-  &__contentpage
-    &__content
-      width 100%
-      height auto
+          margin-inline-end textSpacing

@@ -51,10 +51,11 @@
           background-color grey-hover
     &__textinput
       width 100%
+      min-height 80px
       & > textarea
         border-radius standardBorderRadius
-        border 1.5px solid grey
-        padding 5px
+        border borderStyle
+        padding textSpacing
         height 80px
         width 100%
     &__wrapper
@@ -82,6 +83,7 @@
             color mediumDarkGrey
     &__submit
       display flex
+      align-items center
       &__btn
         display inline-block
         cursor pointer

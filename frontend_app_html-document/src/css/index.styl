@@ -1,7 +1,6 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .html-document
-  height "calc(100% - %s)" % headerHeight
   &__header
     &__editionmode
       display none
@@ -25,10 +24,11 @@
       margin 0 pageSpacing
     &__left
       &__wrapper
-        height "calc(100% - %s)" % (2 * headerHeight) // INFO - G.B. - 20210623 - app header + tracim header
+        height "calc(100% - %s)" % (headerHeight + standardSpacing)
         overflow-y auto
         display flex
         flex-direction column
+        margin-top standardSpacing
     &__content
       &__left
         background-color offWhite
