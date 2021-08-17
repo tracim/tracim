@@ -913,7 +913,7 @@ class TestHtmlDocuments(object):
         "workspace_id": 2,
         "revision_id": 6,
         "revision_type": "creation",
-        "number": 1,
+        "version_number": 1,
         "comment_ids": [],
     }
 
@@ -931,7 +931,7 @@ class TestHtmlDocuments(object):
         "workspace_id": 2,
         "revision_id": 7,
         "revision_type": "edition",
-        "number": 2,
+        "version_number": 2,
         "comment_ids": [],
     }
 
@@ -949,7 +949,7 @@ class TestHtmlDocuments(object):
         "workspace_id": 2,
         "revision_id": 27,
         "revision_type": "edition",
-        "number": 3,
+        "version_number": 3,
         "comment_ids": [],
     }
 

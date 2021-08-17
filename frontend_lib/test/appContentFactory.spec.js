@@ -1,12 +1,15 @@
 import React from 'react'
 import { expect } from 'chai'
 import sinon from 'sinon'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import { appContentFactory } from '../src/appContentFactory.js'
 import { status } from './fixture/status.js'
+import { commentTlm } from './fixture/tracimLiveMessage/commentTlm.js'
+import { user } from './fixture/user.js'
 import { commentList as fixtureCommentList } from './fixture/contentCommentList.js'
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
+import { defaultDebug } from '../src/debug.js'
 import {
   mockGetMyselfKnownMember200,
   mockPutContent200,
@@ -33,7 +36,9 @@ describe('appContentFactory.js', () => {
 
   const DummyComponent = () => <div>I'm empty</div>
   const WrappedDummyComponent = appContentFactory(DummyComponent)
-  const wrapper = shallow(<WrappedDummyComponent />)
+  const root = mount(<WrappedDummyComponent data={defaultDebug} />)
+  // INFO - 2021-08-17 - S.G. - get the first child as the root is in fact a TracimComponent() HOC.
+  const wrapper = root.childAt(0)
 
   const fakeContent = {
     ...content,
@@ -51,7 +56,10 @@ describe('appContentFactory.js', () => {
 
   describe('The wrapped component', () => {
     it('should have all the new props', () => {
-      expect(wrapper.props()).to.have.all.keys(
+      expect(wrapper.childAt(0).props()).to.include.keys(
+        'registerCustomEventHandlerList',
+        'registerGlobalLiveMessageHandler',
+        'registerLiveMessageHandlerList',
         'setApiUrl',
         'appContentCustomEventHandlerShowApp',
         'appContentCustomEventHandlerHideApp',
@@ -67,7 +75,6 @@ describe('appContentFactory.js', () => {
         'appContentSaveNewComment',
         'appContentRemoveCommentAsFile',
         'appContentChangeStatus',
-        'addCommentToTimeline',
         'appContentArchive',
         'appContentDelete',
         'appContentRestoreArchive',
@@ -81,7 +88,12 @@ describe('appContentFactory.js', () => {
         'loadFavoriteContentList',
         'removeContentFromFavoriteList',
         'removeCommentFromTimeline',
-        'updateCommentOnTimeline'
+        'updateCommentOnTimeline',
+        'canFetchMoreTimelineItems',
+        'fetchTimelineItems',
+        'isLastTimelineItemCurrentToken',
+        'resetTimeline',
+        'timeline'
       )
     })
   })
@@ -561,29 +573,27 @@ describe('appContentFactory.js', () => {
           fields: {
             content: {
               ...commentTlm,
-              parent_id: contentHtmlDocument.htmlDocument.content_id,
+              parent_id: fakeContent.content_id,
               content_id: 9
             }
           }
         }
-        props.addCommentToTimeline.resetHistory()
-        wrapper.instance().handleContentCommentCreated(tlmData)
-        expect(props.addCommentToTimeline.calledOnce).to.equal(true)
+        wrapper.instance().handleChildContentCreated(tlmData)
+        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.exist
       })
 
       it('should not update the timeline if the tlm is not related to the current content', () => {
-        const tlmDataOtherContent = {
+        const tlmData = {
           fields: {
             content: {
               ...commentTlm,
-              parent_id: contentHtmlDocument.htmlDocument.content_id + 1,
+              parent_id: fakeContent.content_id + 1,
               content_id: 12
             }
           }
         }
-        props.addCommentToTimeline.resetHistory()
-        wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
-        expect(props.addCommentToTimeline.calledOnce).to.equal(false)
+        wrapper.instance().handleChildContentCreated(tlmData)
+        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.not.exist
       })
     })
 
