@@ -553,4 +553,53 @@ describe('appContentFactory.js', () => {
       expect(commentAndRevisionMergedList.length).to.equal(commentList.length + revisionList.length)
     })
   })
+
+  describe('TLM handlers', () => {
+    describe('handleContentCommentCreated', () => {
+      it('should update the timeline if the tlm is related to the current content', () => {
+        const tlmData = {
+          fields: {
+            content: {
+              ...commentTlm,
+              parent_id: contentHtmlDocument.htmlDocument.content_id,
+              content_id: 9
+            }
+          }
+        }
+        props.addCommentToTimeline.resetHistory()
+        wrapper.instance().handleContentCommentCreated(tlmData)
+        expect(props.addCommentToTimeline.calledOnce).to.equal(true)
+      })
+
+      it('should not update the timeline if the tlm is not related to the current content', () => {
+        const tlmDataOtherContent = {
+          fields: {
+            content: {
+              ...commentTlm,
+              parent_id: contentHtmlDocument.htmlDocument.content_id + 1,
+              content_id: 12
+            }
+          }
+        }
+        props.addCommentToTimeline.resetHistory()
+        wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
+        expect(props.addCommentToTimeline.calledOnce).to.equal(false)
+      })
+    })
+
+    describe('handleUserModified', () => {
+      describe('If the user is the author of a revision or comment', () => {
+        it('should update the timeline with the data of the user', () => {
+          const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
+          wrapper.instance().handleUserModified(tlmData)
+
+          const listPublicNameOfAuthor = wrapper.state('timeline')
+                                                .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
+                                                .map(timelineItem => timelineItem.author.public_name)
+          const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
+          expect(isNewName).to.be.equal(true)
+        })
+      })
+    })
+  })
 })

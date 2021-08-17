@@ -372,7 +372,7 @@ export class HtmlDocument extends React.Component {
           ...resHtmlDocument.body,
           raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
             ? localStorageRawContent
-            : rawContentBeforeEdit
+            : rawContentBeforeEdit,
         },
         newComment: localStorageComment || '',
         rawContentBeforeEdit: rawContentBeforeEdit,
