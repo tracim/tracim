@@ -28,34 +28,23 @@
     color fontColor
   &__status
     flex-grow 0
-    width 165px
-    padding 0 15px
-    text-align center
-    font-weight normal
-    &__text
-      margin-left 15px
+    width 140px
+    padding 0 standardSpacing
+    display flex
+    color fontColor
+    align-items center
     &__icon
-      font-size titleFontSize
+      font-size bigIconSize
   & .dragHandle
     display none
   &:hover > .dragHandle
     display block
 
-//MEDIAQUERIES
-
-@media (min-width: max-xs) and (max-width: max-lg)
-  .content
-    &__name__icons
-        margin-top 5px
-
 @media (max-width: max-xs)
   .content
     &__header__status
-      visibility hidden
-    &__name__text
-      width 200px
+      display none
     &__status
-      width 70px
-      &__icon
-        display flex
-        justify-content flex-end
+      width auto
+      &__text
+        display none
