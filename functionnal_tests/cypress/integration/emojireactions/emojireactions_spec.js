@@ -130,6 +130,7 @@ describe('Reactions', function () {
     it('should allow creating and deleting reactions', () => {
       cy.loginAs('users')
       cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
+      cy.contains('.menuprofil__dropdown__name', 'John Doe')
 
       cy.contains(`${container} ${emojiValueClassName}`, '😀')
       cy.contains(`${container} ${emojiCounterClassName}`, '1')
