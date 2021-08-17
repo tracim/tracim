@@ -31,9 +31,9 @@ const Revision = props => {
         )
       }}
     >
-      <span className='revision__data' data-cy={`revision_data_${props.number}`}>
+      <span className='revision__data' data-cy={`revision_data_${props.versionNumber}`}>
 
-        <span className='revision__data__nb'>{props.number}</span>
+        <span className='revision__data__nb'>{props.versionNumber}</span>
 
         <i title={label} className={`fa-fw ${revisionType.faIcon} revision__data__icon`} />
 
@@ -56,7 +56,7 @@ export default translate()(Radium(Revision))
 Revision.propTypes = {
   customClass: PropTypes.string,
   allowClickOnRevision: PropTypes.bool,
-  number: PropTypes.number,
+  versionNumber: PropTypes.number,
   authorPublicName: PropTypes.string,
   status: PropTypes.string,
   createdFormated: PropTypes.string,
@@ -68,7 +68,7 @@ Revision.propTypes = {
 Revision.defaultProps = {
   customClass: '',
   allowClickOnRevision: false,
-  number: 0,
+  versionNumber: 0,
   authorPublicName: '',
   status: '',
   createdFormated: '',

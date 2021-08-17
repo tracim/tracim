@@ -642,6 +642,16 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     def is_readonly(self) -> bool:
         return False
 
+    @property
+    def version_number(self) -> int:
+        return (
+            object_session(self)
+            .query(ContentRevisionRO.revision_id)
+            .filter(ContentRevisionRO.revision_id <= self.revision_id)
+            .filter(ContentRevisionRO.content_id == self.content_id)
+            .count()
+        )
+
     def get_status(self) -> ContentStatus:
         try:
             return content_status_list.get_one_by_slug(self.status)
@@ -1259,11 +1269,13 @@ class Content(DeclarativeBase):
     ) -> Page:
         """Get the comments of this Content in pages."""
         query = self.get_valid_children(content_types=[content_type_list.Comment.slug])
-        # INFO - 2021/08/16 - S.G. : remove the sort clause as
+        # INFO - 2021-08-16 - S.G. : remove the sort clause as
         # get_valid_children calls children which always sorts by id.
         query = query.order_by(None)
         sort_clause = get_sort_expression(sort_order, Content)
         query = query.order_by(sort_clause)
+        # INFO - 2021-08-17 - S.G. - Always add a sort on the content id
+        # in order to differenciate between comments with the same creation/modification date.
         query = query.order_by(Content.id.asc())
         if count:
             return get_page(query, per_page=count, page=page_token or False)
@@ -1291,7 +1303,7 @@ class Content(DeclarativeBase):
             # Without the generated query is
             #  SELECT ..., tbl_row_count FROM content_revisions, Q
             # which is incorrect
-            .label("number")
+            .label("version_number")
         )
         query = (
             object_session(self)
@@ -1300,11 +1312,17 @@ class Content(DeclarativeBase):
         )
         sort_clause = get_sort_expression(sort_order, ContentRevisionRO, {"modified": "updated"})
         query = query.order_by(sort_clause)
+        # INFO - 2021-08-17 - S.G. - Always add a sort on the revision id
+        # in order to differenciate between revisions with the same modification date.
         query = query.order_by(ContentRevisionRO.revision_id.asc())
         if count:
             query = get_page(query, per_page=count, page=page_token or False)
             return query
         return Page(query.all())
+
+    @property
+    def version_number(self) -> int:
+        return self.revision.version_number
 
     def get_first_comment(self) -> "Content":
         return self.get_comments().first()

@@ -534,8 +534,6 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
     ...revisionObject
   } = data.content
 
-  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision').length
-
   return [
     ...timeline,
     {
@@ -549,7 +547,6 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
       comment_ids: [],
       created: displayDistanceDate(data.content.modified, lang),
       created_raw: data.content.modified,
-      number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
       timelineType: TIMELINE_TYPE.REVISION

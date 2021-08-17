@@ -372,7 +372,7 @@ export class HtmlDocument extends React.Component {
           ...resHtmlDocument.body,
           raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
             ? localStorageRawContent
-            : rawContentBeforeEdit,
+            : rawContentBeforeEdit
         },
         newComment: localStorageComment || '',
         rawContentBeforeEdit: rawContentBeforeEdit,
@@ -656,7 +656,6 @@ export class HtmlDocument extends React.Component {
           ...previousState.content,
           label: revision.label,
           raw_content: revision.raw_content,
-          number: revision.number,
           status: revision.status,
           current_revision_id: revision.revision_id,
           is_archived: previousState.is_archived, // archived and delete should always be taken from last version
@@ -883,6 +882,8 @@ export class HtmlDocument extends React.Component {
     )
 
     const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
+    const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
+    const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
 
     return (
       <PopinFixed
@@ -910,7 +911,8 @@ export class HtmlDocument extends React.Component {
             }
           ]}
           isRefreshNeeded={state.showRefreshWarning}
-          lastVersion={(revisionList[revisionList.length - 1] || { number: 0 }).number}
+          contentVersionNumber={contentVersionNumber}
+          lastVersion={lastVersionNumber}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}

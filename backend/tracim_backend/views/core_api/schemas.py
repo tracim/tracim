@@ -1708,6 +1708,10 @@ class ContentSchema(ContentDigestSchema):
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
     )
+    version_number = marshmallow.fields.Int(
+        description="Version number of the content, starting at 1 and incremented by 1 for each revision",
+        validate=strictly_positive_int_validator,
+    )
 
 
 class FileInfoAbstractSchema(marshmallow.Schema):
@@ -1754,10 +1758,10 @@ class RevisionSchema(ContentDigestSchema):
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
     )
-    number = marshmallow.fields.Int(
+    version_number = marshmallow.fields.Int(
         example=123,
         validate=strictly_positive_int_validator,
-        description="number of the revision in the list, starting at 1",
+        description="version of the revision, starting at 1 and incremented by 1 for each revision",
         allow_none=True,
     )
 

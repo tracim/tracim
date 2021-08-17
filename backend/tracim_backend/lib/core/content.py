@@ -161,10 +161,18 @@ class ContentApi(object):
         return ContentInContext(content, self._session, self._config, self._user)
 
     def get_revision_in_context(
-        self, revision: ContentRevisionRO, number: int
+        self, revision: ContentRevisionRO, version_number: typing.Optional[int]
     ) -> RevisionInContext:
+        """Create a contextual objet from the given revision.
+
+        The possibility to give the version_number is an optimization when returning
+        several revisions (like in the xxx/revisions APIs).
+        If not given revision.version_number is used.
+        """
         # TODO - G.M - 2018-06-173 - create revision in context object
-        return RevisionInContext(revision, self._session, self._config, self._user, number=number)
+        return RevisionInContext(
+            revision, self._session, self._config, self._user, version_number=version_number
+        )
 
     def get_canonical_query(self) -> Query:
         """

@@ -85,7 +85,7 @@ class PopinFixedContent extends React.Component {
                       'Version #{{versionNumber}}', {
                         versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
                           ? props.lastVersion
-                          : props.content.number
+                          : props.contentVersionNumber
                       }
                     )}
                     {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
@@ -159,7 +159,8 @@ PopinFixedContent.propTypes = {
   onClickRemoveFromFavoriteList: PropTypes.func,
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
-  showReactions: PropTypes.bool
+  showReactions: PropTypes.bool,
+  contentVersionNumber: PropTypes.number
 }
 
 PopinFixedContent.defaultProps = {
@@ -176,9 +177,9 @@ PopinFixedContent.defaultProps = {
   content: {
     is_archived: false,
     is_deleted: false,
-    number: 0,
     status: ''
   },
+  contentVersionNumber: 0,
   customClass: '',
   disableChangeTitle: false,
   favoriteState: '',

@@ -1533,6 +1533,10 @@ class ContentInContext(object):
             for component in self.content.content_path
         ]
 
+    @property
+    def version_number(self) -> int:
+        return self.content.version_number
+
 
 class RevisionInContext(object):
     """
@@ -1545,14 +1549,14 @@ class RevisionInContext(object):
         dbsession: Session,
         config: CFG,
         user: User = None,
-        number: Optional[int] = None,
+        version_number: Optional[int] = None,
     ) -> None:
         assert content_revision is not None
         self.revision = content_revision
         self.dbsession = dbsession
         self.config = config
         self._user = user
-        self.number = number
+        self._version_number = version_number
 
     # Default
     @property
@@ -1825,6 +1829,10 @@ class RevisionInContext(object):
         :return: complete filename with both label and file extension part
         """
         return core_convert_file_name_to_display(self.revision.file_name)
+
+    @property
+    def version_number(self) -> int:
+        return self._version_number or self.revision.version_number
 
 
 class PaginatedObject(object):

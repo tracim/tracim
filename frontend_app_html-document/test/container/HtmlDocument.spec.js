@@ -106,13 +106,6 @@ describe('<HtmlDocument />', () => {
             expect(wrapper.state('showRefreshWarning')).to.equal(true)
             expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.EDIT)
           })
-
-          it('should display the right version number', () => {
-            wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision').length
-            wrapper.instance().handleContentModified(tlmData)
-            expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
-          })
         })
 
         describe('modify a content not related to another content', () => {
@@ -149,13 +142,6 @@ describe('<HtmlDocument />', () => {
           it('should be deleted correctly', () => {
             wrapper.instance().handleContentDeletedOrRestore(tlmData)
             expect(wrapper.state('newContent').is_deleted).to.equal(true)
-          })
-
-          it('should display the right version number', () => {
-            wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision').length
-            wrapper.instance().handleContentModified(tlmData)
-            expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
           })
         })
 

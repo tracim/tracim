@@ -194,7 +194,7 @@ export class Timeline extends React.Component {
                     revisionType={content.revision_type}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={content.created}
-                    number={content.number}
+                    versionNumber={content.version_number}
                     status={props.availableStatusList.find(status => status.slug === content.status)}
                     authorPublicName={content.author.public_name}
                     allowClickOnRevision={props.allowClickOnRevision}
