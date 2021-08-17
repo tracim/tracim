@@ -31,8 +31,9 @@
       object-fit fill
 
   &__mainBar
-    height 70px
-    padding-left 30px
+    height headerHeight
+    padding-left pageSpacing
+    padding-right pageSpacing
     background-color offWhite
     display flex
     &__avatar
@@ -41,7 +42,7 @@
         display none
       &__big
         position relative
-        top -15px
+        top -20px
       &__changeBtn
         position absolute
         bottom -15px
@@ -54,8 +55,10 @@
       margin-left standardSpacing
       font-size titleFontSize
       align-self center
+      flex 1
       &__wrapper
         width calc(100% - 130px) // INFO - MB - 2021-05-06 - the total width minus the avatar width (100px) and its margin (30px) on the ProfileMainbar
+        display flex
       &__user
         display flex
         &__name

@@ -177,11 +177,11 @@ export const sortContentList = (workspaceContents, lang) => {
   return workspaceContents.sort((a, b) => compareContents(a, b, lang))
 }
 
-export const toggleFavicon = (hasNewNotification) => {
+export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'
 
   document.getElementsByClassName('tracim__favicon').forEach(favicon => {
-    if (!hasNewNotification) {
+    if (!(hasUnreadNotification || hasUnreadMention)) {
       favicon.href = favicon.getAttribute(originalHrefAttribute)
       favicon.removeAttribute(originalHrefAttribute)
       return
@@ -212,7 +212,7 @@ export const toggleFavicon = (hasNewNotification) => {
       )
       // FIXME - GM - 2020/08/18 - Replace this hardcoded values to webpack variables
       // https://github.com/tracim/tracim/issues/2098
-      context.fillStyle = '#3F9FF7'
+      context.fillStyle = hasUnreadMention ? '#ff8a00' : '#3F9FF7'
       context.fill()
 
       // INFO - GM - 2020/08/18 - Replace the favicon

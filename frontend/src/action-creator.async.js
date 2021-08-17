@@ -21,7 +21,6 @@ import {
   newFlashMessage,
   NOTIFICATION,
   NOTIFICATION_LIST,
-  NOTIFICATION_NOT_READ_COUNT,
   PUBLICATION_THREAD,
   SEARCHED_STRING,
   setRedirectLogin,
@@ -62,7 +61,8 @@ import {
   CUSTOM_PROPERTIES_SCHEMA,
   USER_PUBLIC_PROFILE,
   FAVORITE_LIST,
-  FAVORITE
+  FAVORITE,
+  UNREAD_NOTIFICATION_COUNT
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -951,9 +951,11 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
   })
 }
 
-export const getUserMessagesSummary = userId => dispatch => {
+export const getUserMessagesSummary = (userId, includeEventTypeList = []) => dispatch => {
+  const url = `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`
+  const includeEventTypeListParam = includeEventTypeList.length > 0 ? `&include_event_types=${includeEventTypeList.join(',')}` : ''
   const fetchGetMessages = fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`,
+    url: `${url}${includeEventTypeListParam}`,
     param: {
       credentials: 'include',
       headers: {
@@ -961,7 +963,7 @@ export const getUserMessagesSummary = userId => dispatch => {
       },
       method: 'GET'
     },
-    actionName: NOTIFICATION_NOT_READ_COUNT,
+    actionName: UNREAD_NOTIFICATION_COUNT,
     dispatch
   })
 

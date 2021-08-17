@@ -32,16 +32,30 @@
         display inline-block
         width 30px
       &__text
+        flex 1
         display flex
-        padding-right standardSpacing
+        font-size metadataFontSize
+        word-break break-word
+        align-items center
+      &__meta
+        padding-right textSpacing
+        color lightDarkGrey
+        display flex
+        flex-direction column
+        align-items flex-end
+        font-size metadataFontSize
         word-break break-word
         & .contentTitle__highlight
           text-decoration underline
         & .documentTitle__highlight
           font-weight bold
       &__circle
-        margin-left auto
+        &__wrapper
+          margin 0
+          min-width 1em
+          text-align center
         font-size 8px
+        transition 300ms font-size color
         color lightBlue
       &.itemRead
         color lightDarkGrey

@@ -24,7 +24,6 @@ import {
   CONTENT_TYPE,
   IconButton,
   PROFILE,
-  displayDistanceDate,
   ListItemWrapper,
   PopinFixedHeader,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
@@ -42,6 +41,19 @@ import {
 import { escape as escapeHtml } from 'lodash'
 
 export class NotificationWall extends React.Component {
+  shortDate = date => {
+    const { props } = this
+
+    const msElapsed = Date.now() - new Date(date).getTime()
+    if (msElapsed < 60000) return Math.round(msElapsed / 1000) + ' ' + props.t('sec')
+    if (msElapsed < 3600000) return Math.round(msElapsed / 60000) + ' ' + props.t('min')
+    if (msElapsed < 3600000 * 24) return Math.round(msElapsed / 3600000) + ' ' + props.t('hr')
+    if (msElapsed < 3600000 * 24 * 7) return Math.round(msElapsed / (3600000 * 24)) + ' ' + props.t('d')
+    if (msElapsed < 3600000 * 24 * 30) return Math.round(msElapsed / (3600000 * 24 * 7)) + ' ' + props.t('w')
+    if (msElapsed < 3600000 * 24 * 365) return Math.round(msElapsed / (3600000 * 24 * 20)) + ' ' + props.t('mth')
+    return Math.round(msElapsed / (3600000 * 24 * 365)) + ' ' + props.t(' y')
+  }
+
   handleClickNotification = async (e, notificationId, notificationDetails) => {
     const { props } = this
 
@@ -463,17 +475,27 @@ export class NotificationWall extends React.Component {
                       style={{ marginRight: '5px' }}
                     />
                     <span
+                      className='notification__list__item__text__content'
                       dangerouslySetInnerHTML={{
                         __html: (
                           notificationDetails.text + ' ' +
                           `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
-                            escapeHtml(displayDistanceDate(notification.created, props.user.lang)) +
                           '</span>'
                         )
                       }}
                     />
                   </div>
-                  {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
+                  <div className='notification__list__item__meta'>
+                    <span
+                      className='notification__list__item__meta__date'
+                      title={formatAbsoluteDate(notification.created, props.user.lang)}
+                    >
+                      {this.shortDate(notification.created)}
+                    </span>
+                  </div>
+                  <div className='notification__list__item__circle__wrapper'>
+                    {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
+                  </div>
                 </Link>
               </ListItemWrapper>
             )
