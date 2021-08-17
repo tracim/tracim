@@ -899,6 +899,60 @@ class TestHtmlDocuments(object):
     endpoint
     """
 
+    FIRST_REVISION = {
+        "content_type": "html-document",
+        "content_id": 6,
+        "is_archived": False,
+        "is_deleted": False,
+        "is_editable": False,
+        "label": "Tiramisu Recipes!!!",
+        "parent_id": 3,
+        "show_in_ui": True,
+        "slug": "tiramisu-recipes",
+        "status": "open",
+        "workspace_id": 2,
+        "revision_id": 6,
+        "revision_type": "creation",
+        "number": 1,
+        "comment_ids": [],
+    }
+
+    SECOND_REVISION = {
+        "content_type": "html-document",
+        "content_id": 6,
+        "is_archived": False,
+        "is_deleted": False,
+        "is_editable": False,
+        "label": "Tiramisu Recipes!!!",
+        "parent_id": 3,
+        "show_in_ui": True,
+        "slug": "tiramisu-recipes",
+        "status": "open",
+        "workspace_id": 2,
+        "revision_id": 7,
+        "revision_type": "edition",
+        "number": 2,
+        "comment_ids": [],
+    }
+
+    THIRD_REVISION = {
+        "content_type": "html-document",
+        "content_id": 6,
+        "is_archived": False,
+        "is_deleted": False,
+        "is_editable": True,
+        "label": "Tiramisu Recipe",
+        "parent_id": 3,
+        "show_in_ui": True,
+        "slug": "tiramisu-recipe",
+        "status": "open",
+        "workspace_id": 2,
+        "revision_id": 27,
+        "revision_type": "edition",
+        "number": 3,
+        "comment_ids": [],
+    }
+
     def test_api__get_html_document__ok_200__legacy_slug(
         self, web_testapp, session_factory
     ) -> None:
@@ -1352,86 +1406,41 @@ class TestHtmlDocuments(object):
         assert revision["author"]["public_name"] == "Global manager"
         assert revision["author"]["username"] == "TheAdmin"
 
-    def test_api__get_html_document_revisions__ok_200__nominal_case(self, web_testapp) -> None:
+    @pytest.mark.parametrize(
+        "query, expected_item_count, first_revision, last_revision",
+        [
+            ("", 3, FIRST_REVISION, THIRD_REVISION,),
+            ("?count=2", 2, FIRST_REVISION, SECOND_REVISION,),
+            ("?sort=modified:desc", 3, THIRD_REVISION, FIRST_REVISION,),
+            ("?sort=modified:desc&count=2", 2, THIRD_REVISION, SECOND_REVISION,),
+        ],
+    )
+    def test_api__get_html_document_revisions__ok_200__nominal_cases(
+        self,
+        web_testapp,
+        query: str,
+        expected_item_count: int,
+        first_revision: dict,
+        last_revision: dict,
+    ) -> None:
         """
-        Get one html document of a content
+        Get the revisions of an HTML document.
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get("/api/workspaces/2/html-documents/6/revisions", status=200)
-        revisions = res.json_body
-        assert len(revisions) == 3
+        res = web_testapp.get(
+            "/api/workspaces/2/html-documents/6/revisions{}".format(query), status=200
+        )
+        revisions = res.json_body["items"]
+        assert len(revisions) == expected_item_count
         revision = revisions[0]
-        assert revision["content_type"] == "html-document"
-        assert revision["content_id"] == 6
-        assert revision["is_archived"] is False
-        assert revision["is_deleted"] is False
-        assert revision["is_editable"] is False
-        assert revision["label"] == "Tiramisu Recipes!!!"
-        assert revision["parent_id"] == 3
-        assert revision["show_in_ui"] is True
-        assert revision["slug"] == "tiramisu-recipes"
-        assert revision["status"] == "open"
-        assert revision["workspace_id"] == 2
-        assert revision["revision_id"] == 6
-        assert revision["revision_type"] == "creation"
+        for key, value in first_revision.items():
+            assert revision[key] == value, key
         assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
-        # TODO - G.M - 2018-06-173 - check date format
-        assert revision["created"]
-        assert revision["author"]
-        assert revision["author"]["user_id"] == 1
-        assert revision["author"]["has_avatar"] is False
-        assert revision["author"]["public_name"] == "Global manager"
-        assert revision["author"]["username"] == "TheAdmin"
-        revision = revisions[1]
-        assert revision["content_type"] == "html-document"
-        assert revision["content_id"] == 6
-        assert revision["is_archived"] is False
-        assert revision["is_deleted"] is False
-        assert revision["is_editable"] is False
-        assert revision["label"] == "Tiramisu Recipes!!!"
-        assert revision["parent_id"] == 3
-        assert revision["show_in_ui"] is True
-        assert revision["slug"] == "tiramisu-recipes"
-        assert revision["status"] == "open"
-        assert revision["workspace_id"] == 2
-        assert revision["revision_id"] == 7
-        assert revision["revision_type"] == "edition"
+
+        revision = revisions[-1]
+        for key, value in last_revision.items():
+            assert revision[key] == value, key
         assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
-        # TODO - G.M - 2018-06-173 - check date format
-        assert revision["created"]
-        assert revision["author"]
-        assert revision["author"]["user_id"] == 1
-        assert revision["author"]["has_avatar"] is False
-        assert revision["author"]["public_name"] == "Global manager"
-        assert revision["author"]["username"] == "TheAdmin"
-        revision = revisions[2]
-        assert revision["content_type"] == "html-document"
-        assert revision["content_id"] == 6
-        assert revision["is_archived"] is False
-        assert revision["is_deleted"] is False
-        assert revision["is_editable"] is True
-        assert revision["label"] == "Tiramisu Recipe"
-        assert revision["parent_id"] == 3
-        assert revision["show_in_ui"] is True
-        assert revision["slug"] == "tiramisu-recipe"
-        assert revision["status"] == "open"
-        assert revision["workspace_id"] == 2
-        assert revision["revision_id"] == 27
-        assert revision["revision_type"] == "edition"
-        assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
-        # TODO - G.M - 2018-06-173 - check date format
-        assert revision["created"]
-        assert revision["author"]
-        assert revision["author"]["user_id"] == 3
-        assert revision["author"]["has_avatar"] is False
-        assert revision["author"]["public_name"] == "Bob i."
-        assert revision["file_extension"] == ".document.html"
 
     def test_api__set_html_document_status__ok_200__nominal_case(self, web_testapp) -> None:
         """

@@ -1,6 +1,5 @@
 # coding=utf-8
 from io import BytesIO
-import typing
 
 from hapic.data import HapicFile
 from pyramid.config import Configurator
@@ -30,8 +29,8 @@ from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import BaseOptionalPaginatedQuerySchema
 from tracim_backend.views.core_api.schemas import ContentModifySchema
+from tracim_backend.views.core_api.schemas import ContentRevisionsPageQuerySchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import FilePathSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
@@ -235,7 +234,7 @@ class HTMLDocumentController(Controller):
     @check_right(is_reader)
     @check_right(is_html_document_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_query(BaseOptionalPaginatedQuerySchema())
+    @hapic.input_query(ContentRevisionsPageQuerySchema())
     @hapic.output_body(RevisionPageSchema())
     def get_html_document_revisions(
         self, context, request: TracimRequest, hapic_data=None
@@ -253,9 +252,13 @@ class HTMLDocumentController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         revisions_page = content.get_revisions(
-            page_token=hapic_data.query["page_token"], count=hapic_data.query["count"]
+            page_token=hapic_data.query["page_token"],
+            count=hapic_data.query["count"],
+            sort_order=hapic_data.query["sort"],
         )
-        revisions = [api.get_revision_in_context(revision) for revision in revisions_page]
+        revisions = [
+            api.get_revision_in_context(revision, number) for revision, number in revisions_page
+        ]
         return PaginatedObject(revisions_page, revisions)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])

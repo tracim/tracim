@@ -160,9 +160,11 @@ class ContentApi(object):
     def get_content_in_context(self, content: Content) -> ContentInContext:
         return ContentInContext(content, self._session, self._config, self._user)
 
-    def get_revision_in_context(self, revision: ContentRevisionRO) -> RevisionInContext:
+    def get_revision_in_context(
+        self, revision: ContentRevisionRO, number: int
+    ) -> RevisionInContext:
         # TODO - G.M - 2018-06-173 - create revision in context object
-        return RevisionInContext(revision, self._session, self._config, self._user)
+        return RevisionInContext(revision, self._session, self._config, self._user, number=number)
 
     def get_canonical_query(self) -> Query:
         """

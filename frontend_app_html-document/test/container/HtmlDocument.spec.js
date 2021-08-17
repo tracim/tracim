@@ -20,7 +20,7 @@ debug.config.apiUrl = 'http://unit.test:6543/api'
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
     content: contentHtmlDocument.htmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },
@@ -141,7 +141,7 @@ describe('<HtmlDocument />', () => {
 
           it('should display the right version number', () => {
             wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision').length
             wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
           })
@@ -185,7 +185,7 @@ describe('<HtmlDocument />', () => {
 
           it('should display the right version number', () => {
             wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision').length
             wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
           })

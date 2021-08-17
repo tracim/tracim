@@ -26,6 +26,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Query
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
@@ -1256,9 +1257,14 @@ class Content(DeclarativeBase):
         count: Optional[int] = None,
         sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
     ) -> Page:
+        """Get the comments of this Content in pages."""
         query = self.get_valid_children(content_types=[content_type_list.Comment.slug])
+        # INFO - 2021/08/16 - S.G. : remove the sort clause as
+        # get_valid_children calls children which always sorts by id.
+        query = query.order_by(None)
         sort_clause = get_sort_expression(sort_order, Content)
         query = query.order_by(sort_clause)
+        query = query.order_by(Content.id.asc())
         if count:
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
@@ -1269,15 +1275,35 @@ class Content(DeclarativeBase):
         count: Optional[int] = None,
         sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
     ) -> Page:
+        """Get the revisions of this Content in pages."""
+        ContentRevisionROForNumber = aliased(ContentRevisionRO)
+        number_subquery = (
+            object_session(self)
+            .query(ContentRevisionROForNumber.revision_id)
+            .filter(ContentRevisionROForNumber.revision_id <= ContentRevisionRO.revision_id)
+            .filter(ContentRevisionROForNumber.content_id == ContentRevisionRO.content_id)
+            .correlate(ContentRevisionRO)
+            .subquery()
+            .count()
+            # NOTE - 2021/08/16 - S.G. - the label() transforms the query in a scalar subquery
+            # which is properly generated as
+            #  SELECT ..., Q FROM content_revisions
+            # Without the generated query is
+            #  SELECT ..., tbl_row_count FROM content_revisions, Q
+            # which is incorrect
+            .label("number")
+        )
         query = (
             object_session(self)
-            .query(ContentRevisionRO)
+            .query(ContentRevisionRO, number_subquery)
             .filter(ContentRevisionRO.content_id == self.content_id)
         )
-        sort_clause = get_sort_expression(sort_order, ContentRevisionRO)
+        sort_clause = get_sort_expression(sort_order, ContentRevisionRO, {"modified": "updated"})
         query = query.order_by(sort_clause)
+        query = query.order_by(ContentRevisionRO.revision_id.asc())
         if count:
-            return get_page(query, per_page=count, page=page_token or False)
+            query = get_page(query, per_page=count, page=page_token or False)
+            return query
         return Page(query.all())
 
     def get_first_comment(self) -> "Content":

@@ -552,8 +552,7 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
       number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: TIMELINE_TYPE.REVISION,
-      hasBeenRead: isTokenClient
+      timelineType: TIMELINE_TYPE.REVISION
     }
   ]
 }
@@ -580,7 +579,7 @@ export const serialize = (objectToSerialize, propertyMap) => {
 
 export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
-  return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+  return timeline.filter(t => t.timelineType === 'revision').length
 }
 
 export const MINIMUM_CHARACTERS_USERNAME = 3

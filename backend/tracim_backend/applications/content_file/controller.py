@@ -612,8 +612,8 @@ class FileController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        revisions = content.revisions
-        return [api.get_revision_in_context(revision) for revision in revisions]
+        revisions = content.get_revisions()
+        return [api.get_revision_in_context(revision, number) for revision, number in revisions]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)

@@ -19,7 +19,7 @@ describe('<Thread />', () => {
   const props = {
     setApiUrl: () => {},
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
 

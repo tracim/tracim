@@ -2,7 +2,6 @@
 import base64
 import cgi
 from datetime import datetime
-import enum
 from typing import Dict
 from typing import Generic
 from typing import List
@@ -1546,12 +1545,14 @@ class RevisionInContext(object):
         dbsession: Session,
         config: CFG,
         user: User = None,
+        number: Optional[int] = None,
     ) -> None:
         assert content_revision is not None
         self.revision = content_revision
         self.dbsession = dbsession
         self.config = config
         self._user = user
+        self.number = number
 
     # Default
     @property

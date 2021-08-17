@@ -852,7 +852,6 @@ export class File extends React.Component {
 
     this.setState(prev => ({
       content: newObjectContent,
-      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
     }))

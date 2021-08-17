@@ -48,9 +48,12 @@ export function TracimComponent (WrappedComponent) {
 
     execLiveMessageHandler = ({ detail: { type, data } }) => {
       const typeHandler = this.liveMessageHandlerList[type]
+      const typeWithoutSubType = type.split('.').slice(0, 2).join('.')
+      const typeWithoutSubTypeHandler = this.liveMessageHandlerList[typeWithoutSubType]
       const hasGlobalHandler = this.globalLiveMessageHandlerList.length > 0
-      if (typeHandler || hasGlobalHandler) data.fields.author = updateTLMUser(data.fields.author, true)
+      if (typeHandler || typeWithoutSubTypeHandler || hasGlobalHandler) data.fields.author = updateTLMUser(data.fields.author, true)
       if (typeHandler) typeHandler(data)
+      if (typeWithoutSubTypeHandler) typeWithoutSubTypeHandler(data)
       if (hasGlobalHandler) {
         for (const handler of this.globalLiveMessageHandlerList) {
           handler(data)

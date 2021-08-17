@@ -1747,16 +1747,18 @@ class RevisionSchema(ContentDigestSchema):
     revision_type = StrippedString(
         example=ActionDescription.CREATION, validate=action_description_validator
     )
-    created = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="Content creation date"
-    )
-    author = marshmallow.fields.Nested(UserDigestSchema)
     description = StrippedString(
         required=True, description="raw text or html description of the content"
     )
     raw_content = StrippedString(
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
+    )
+    number = marshmallow.fields.Int(
+        example=123,
+        validate=strictly_positive_int_validator,
+        description="number of the revision in the list, starting at 1",
+        allow_none=True,
     )
 
 
@@ -2168,3 +2170,11 @@ class CommentsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
 
 class CommentsPageSchema(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(CommentSchema, many=True)
+
+
+class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
+    sort = EnumField(
+        ContentSortOrder,
+        missing=ContentSortOrder.MODIFIED_ASC,
+        description="Order of the returned revisions, default is to sort by modification (e.g. creation of the revision) date, older first",
+    )

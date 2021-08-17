@@ -13,7 +13,8 @@ import {
   TIMELINE_TYPE,
   CONTENT_TYPE,
   permissiveNumberEqual,
-  getOrCreateSessionClientToken
+  getOrCreateSessionClientToken,
+  addRevisionFromTLM
 } from './helper.js'
 
 import {
@@ -72,7 +73,6 @@ export const TIMELINE_ITEM_COUNT_PER_PAGE = 15
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
 export function appContentFactory (WrappedComponent) {
-  // FIXME : TracimComponent(AppContentFactory)
   class AppContentFactory extends React.Component {
     apiUrl = null
 
@@ -100,8 +100,13 @@ export function appContentFactory (WrappedComponent) {
       this.sessionClientToken = getOrCreateSessionClientToken()
 
       props.registerLiveMessageHandlerList([
-        //{ entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentCreated }
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
     }
 
@@ -118,17 +123,70 @@ export function appContentFactory (WrappedComponent) {
       // Not a child of our content
       if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
-      const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-      const newTimeline = this.addChildContentToTimeline(
+      const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
+      this.addChildContentToTimeline(
         tlm.fields.content,
-        state.timeline,
         state.loggedUser,
-        createdByLoggedUser,
+        isFromCurrentToken,
         getDefaultTranslationState(state.config.system.config)
       )
-      this.setState({
-        timeline: newTimeline,
-        isLastTimelineItemCurrentToken: createdByLoggedUser
+    }
+
+    handleChildContentDeleted = (tlm) => {
+      const { state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+      this.setState(prevState => {
+        const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.content.content_id)
+        const timeline = wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length)
+        return { timeline, wholeTimeline }
+      })
+    }
+
+    handleContentCommentModified = (tlm) => {
+      const { props, state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+      this.setState(prevState => {
+        const wholeTimeline = props.updateCommentOnTimeline(
+          tlm.fields.content,
+          prevState.wholeTimeline,
+          prevState.loggedUser.username
+        )
+        const timeline = wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length)
+        return { wholeTimeline, timeline }
+      })
+    }
+
+    handleUserModified = tlm => {
+      this.setState(prevState => {
+        const wholeTimeline = prevState.wholeTimeline.map(
+          timelineItem => timelineItem.author.user_id === tlm.fields.user.user_id
+            ? { ...timelineItem, author: tlm.fields.user }
+            : timelineItem
+        )
+        const timeline = wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length)
+        return { wholeTimeline, timeline }
+      })
+    }
+
+    handleContentModified = (tlm) => {
+      // Not our content
+      const { state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+
+      this.setState(prevState => {
+        const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
+        const wholeTimeline = addRevisionFromTLM(
+          tlm.fields,
+          prevState.wholeTimeline,
+          prevState.loggedUser.lang,
+          isFromCurrentToken
+        )
+
+        return {
+          timeline: wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length),
+          wholeTimeline,
+          isLastTimelineItemCurrentToken: isFromCurrentToken
+        }
       })
     }
 
@@ -628,12 +686,11 @@ export function appContentFactory (WrappedComponent) {
       created: displayDistanceDate(content.created, loggedUser.lang)
     })
 
-    buildTimelineItemRevision = (revision, loggedUser, number) => ({
+    buildTimelineItemRevision = (revision, loggedUser) => ({
       ...revision,
       created_raw: revision.created,
       created: displayDistanceDate(revision.created, loggedUser.lang),
-      timelineType: TIMELINE_TYPE.REVISION,
-      number: number
+      timelineType: TIMELINE_TYPE.REVISION
     })
 
     buildTimelineFromCommentAndRevision = (
@@ -641,7 +698,7 @@ export function appContentFactory (WrappedComponent) {
     ) => {
       const timelineCommentList = commentList.map(c => this.buildTimelineItemComment(c, loggedUser, initialCommentTranslationState))
       const timelineCommentAsFileList = commentAsFileList.map(c => this.buildTimelineItemCommentAsFile(c, loggedUser))
-      const timelineRevisionList = revisionList.map((r, i) => this.buildTimelineItemRevision(r, loggedUser, i + 1))
+      const timelineRevisionList = revisionList.map((r, i) => this.buildTimelineItemRevision(r, loggedUser))
 
       const fullTimeline = [
         ...timelineCommentList,
@@ -668,10 +725,13 @@ export function appContentFactory (WrappedComponent) {
         return await handleFetchResult(await fetchPromise)
       }
 
+      // Get the newest comments, files and revisions from the paginated backend API
       const [commentsResponse, filesResponse, revisionsResponse] = await Promise.all([
         fetchResult(getContentComment(this.apiUrl, workspaceId, contentId, state.commentPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
         fetchResult(getFileChildContent(this.apiUrl, workspaceId, contentId, state.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
-        fetchResult(getContentRevision(this.apiUrl, workspaceId, contentId, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc'))
+        // INFO - 2021/08/17 - S.G. - the order is done with "modified" for revisions as the "created" field is the creation
+        // date of the content, not of a revision (and thus is the same for all revisions of a content).
+        fetchResult(getContentRevision(this.apiUrl, workspaceId, contentId, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
       ])
 
       if (!commentsResponse.apiResponse.ok && !filesResponse.apiResponse.ok && !revisionsResponse.apiResponse.ok) {
@@ -689,7 +749,7 @@ export function appContentFactory (WrappedComponent) {
       )
 
       this.setState((prevState) => {
-        const wholeTimeline = [...newTimeline, ...prevState.wholeTimeline]
+        const wholeTimeline = sortTimelineByDate([...newTimeline, ...prevState.wholeTimeline])
         const timelineStartIndex = Math.max(wholeTimeline.length - itemCount, 0)
         return {
           commentPageToken: commentsResponse.body.next_page_token,
@@ -782,12 +842,19 @@ export function appContentFactory (WrappedComponent) {
     }
 
     // INFO - CH - 20210318 - This function can add comment and file
-    addChildContentToTimeline = (comment, timeline, loggedUser, hasBeenRead, initialCommentTranslationState) => {
-      const commentForTimeline = comment.content_type === TIMELINE_TYPE.COMMENT
+    addChildContentToTimeline = (comment, loggedUser, isFromCurrentToken, initialCommentTranslationState) => {
+      const timelineItem = comment.content_type === TIMELINE_TYPE.COMMENT
         ? this.buildTimelineItemComment(comment, loggedUser, initialCommentTranslationState)
         : this.buildTimelineItemCommentAsFile(comment, loggedUser)
-
-      return sortTimelineByDate([...timeline, commentForTimeline])
+      this.setState(prevState => {
+        const wholeTimeline = sortTimelineByDate([...prevState.wholeTimeline, timelineItem])
+        const timeline = sortTimelineByDate([...prevState.timeline, timelineItem])
+        return {
+          timeline,
+          wholeTimeline,
+          isLastTimelineItemCurrentToken: isFromCurrentToken
+        }
+      })
     }
 
     updateCommentOnTimeline = (comment, timeline, loggedUserUsername) => {
@@ -803,10 +870,6 @@ export function appContentFactory (WrappedComponent) {
         : timelineItem
       )
       return newTimeline
-    }
-
-    removeCommentFromTimeline = (commentId, timeline) => {
-      return timeline.filter(timelineItem => timelineItem.content_id !== commentId)
     }
 
     onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
