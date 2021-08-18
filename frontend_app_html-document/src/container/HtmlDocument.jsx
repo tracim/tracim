@@ -203,7 +203,7 @@ export class HtmlDocument extends React.Component {
   async componentDidMount () {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
     await this.loadContent()
-    await this.loadTimeline()
+    await props.loadTimeline(getHtmlDocRevision)
     this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
@@ -218,7 +218,7 @@ export class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       await this.loadContent()
-      await this.loadTimeline()
+      await props.loadTimeline(getHtmlDocRevision)
       this.reloadContentWysiwyg()
     }
 
@@ -390,33 +390,9 @@ export class HtmlDocument extends React.Component {
     this.setState({ oldInvalidMentionList: oldInvalidMentionList })
   }
 
-  loadTimeline = async () => {
-    const { state, props } = this
-    props.resetTimeline()
-    await props.fetchTimelineItems(
-      state.content.content_id,
-      state.content.workspace_id,
-      TIMELINE_ITEM_COUNT_PER_PAGE,
-      {
-        loggedUser: state.loggedUser,
-        systemConfig: state.config.system.config,
-        getContentRevision: getHtmlDocRevision
-      }
-    )
-  }
-
-  handleFetchMoreTimelineItems = async () => {
-    const { state, props } = this
-    await props.fetchTimelineItems(
-      state.content.content_id,
-      state.content.workspace_id,
-      props.timeline.length + TIMELINE_ITEM_COUNT_PER_PAGE,
-      {
-        loggedUser: state.loggedUser,
-        initialTranslationState: getDefaultTranslationState(state.config.system.config),
-        getContentRevision: getHtmlDocRevision
-      }
-    )
+  handleLoadMoreTimelineItems = async () => {
+    const { props } = this
+    await props.loadMoreTimelineItems(getHtmlDocRevision)
   }
 
   handleClickBtnCloseApp = () => {
@@ -850,8 +826,8 @@ export class HtmlDocument extends React.Component {
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
           translationTargetLanguageCode={state.translationTargetLanguageCode}
           onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-          onClickShowMoreTimelineItems={this.handleFetchMoreTimelineItems}
-          canFetchMoreTimelineItems={props.canFetchMoreTimelineItems}
+          onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+          canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
         />
       ) : null
     }

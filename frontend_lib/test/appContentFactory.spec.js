@@ -87,10 +87,10 @@ describe('appContentFactory.js', () => {
         'isContentInFavoriteList',
         'loadFavoriteContentList',
         'removeContentFromFavoriteList',
-        'removeCommentFromTimeline',
         'updateCommentOnTimeline',
-        'canFetchMoreTimelineItems',
-        'fetchTimelineItems',
+        'loadTimeline',
+        'canLoadMoreTimelineItems',
+        'loadMoreTimelineItems',
         'isLastTimelineItemCurrentToken',
         'resetTimeline',
         'timeline'

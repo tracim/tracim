@@ -152,7 +152,7 @@ export class Timeline extends React.Component {
           shouldScrollToBottom={props.shouldScrollToBottom}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
-          {props.canFetchMoreTimelineItems() && (
+          {props.canLoadMoreTimelineItems() && (
             <IconButton onClick={props.onClickShowMoreTimelineItems} text={props.t('Show older items')} />
           )}
           {props.timelineData.map(content => {
@@ -374,7 +374,8 @@ Timeline.propTypes = {
   onClickRestoreComment: PropTypes.func.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  onClickShowMoreTimelineItems: PropTypes.func
+  onClickShowMoreTimelineItems: PropTypes.func,
+  canLoadMoreTimelineItems: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -410,5 +411,6 @@ Timeline.defaultProps = {
   onClickRestoreComment: content => { },
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
-  onClickShowMoreTimelineItems: () => {}
+  onClickShowMoreTimelineItems: () => {},
+  canLoadMoreTimelineItems: () => false
 }

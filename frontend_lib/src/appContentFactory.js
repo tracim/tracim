@@ -709,13 +709,15 @@ export function appContentFactory (WrappedComponent) {
       return sortTimelineByDate(fullTimeline)
     }
 
-    fetchTimelineItems = async (contentId, workspaceId, itemCount, { loggedUser, initialTranslationState, getContentRevision }) => {
+    loadMoreTimelineItems = async (getContentRevision) => {
       const { props, state } = this
 
-      if (state.wholeTimeline.length >= itemCount) {
+      const newItemCount = state.timeline.length + TIMELINE_ITEM_COUNT_PER_PAGE
+
+      if (state.wholeTimeline.length >= newItemCount) {
         this.setState(prevState => {
           return {
-            timeline: prevState.wholeTimeline.slice(prevState.wholeTimeline.length - itemCount)
+            timeline: prevState.wholeTimeline.slice(prevState.wholeTimeline.length - newItemCount)
           }
         })
         return
@@ -727,11 +729,11 @@ export function appContentFactory (WrappedComponent) {
 
       // Get the newest comments, files and revisions from the paginated backend API
       const [commentsResponse, filesResponse, revisionsResponse] = await Promise.all([
-        fetchResult(getContentComment(this.apiUrl, workspaceId, contentId, state.commentPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
-        fetchResult(getFileChildContent(this.apiUrl, workspaceId, contentId, state.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
+        fetchResult(getContentComment(this.apiUrl, state.content.workspace_id, state.content.content_id, state.commentPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
+        fetchResult(getFileChildContent(this.apiUrl, state.content.workspace_id, state.content.content_id, state.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
         // INFO - 2021/08/17 - S.G. - the order is done with "modified" for revisions as the "created" field is the creation
         // date of the content, not of a revision (and thus is the same for all revisions of a content).
-        fetchResult(getContentRevision(this.apiUrl, workspaceId, contentId, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
+        fetchResult(getContentRevision(this.apiUrl, state.content.workspace_id, state.content.content_id, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
       ])
 
       if (!commentsResponse.apiResponse.ok && !filesResponse.apiResponse.ok && !revisionsResponse.apiResponse.ok) {
@@ -744,13 +746,13 @@ export function appContentFactory (WrappedComponent) {
         commentsResponse.body.items,
         filesResponse.body.items,
         revisionsResponse.body.items,
-        loggedUser,
-        initialTranslationState
+        state.loggedUser,
+        getDefaultTranslationState(state.config.system.config)
       )
 
       this.setState((prevState) => {
         const wholeTimeline = sortTimelineByDate([...newTimeline, ...prevState.wholeTimeline])
-        const timelineStartIndex = Math.max(wholeTimeline.length - itemCount, 0)
+        const timelineStartIndex = Math.max(wholeTimeline.length - newItemCount, 0)
         return {
           commentPageToken: commentsResponse.body.next_page_token,
           hasMoreComments: commentsResponse.body.has_next,
@@ -777,7 +779,13 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    canFetchMoreTimelineItems = () => {
+    loadTimeline = async (getContentRevision) => {
+      const { props } = this
+      this.resetTimeline()
+      await this.loadMoreTimelineItems(getContentRevision)
+    }
+
+    canLoadMoreTimelineItems = () => {
       const { state } = this
       return (
         state.wholeTimeline.length > state.timeline.length ||
@@ -958,12 +966,12 @@ export function appContentFactory (WrappedComponent) {
           addContentToFavoriteList={this.addContentToFavoriteList}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
-          removeCommentFromTimeline={this.removeCommentFromTimeline}
           updateCommentOnTimeline={this.updateCommentOnTimeline}
           timeline={this.state.timeline}
-          fetchTimelineItems={this.fetchTimelineItems}
+          loadTimeline={this.loadTimeline}
+          loadMoreTimelineItems={this.loadMoreTimelineItems}
           resetTimeline={this.resetTimeline}
-          canFetchMoreTimelineItems={this.canFetchMoreTimelineItems}
+          canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
           isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}
         />
       )
