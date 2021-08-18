@@ -1,16 +1,11 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .adminWorkspace
-  &__createworkspace
-    &__btncreate
-      margin 25px standardSpacing
   &__description
-    margin 25px 0
+    margin standardSpacing 0
     font-size titleFontSize
   &__delimiter
-    margin 65px auto
-  &__table
-    margin 25px standardSpacing
+    margin pageSpacing auto
     &__delete
       display flex
       align-items center
@@ -41,21 +36,20 @@
       text-overflow ellipsis
       overflow hidden
     & th
-      height 75px
       vertical-align middle
   &__description
-    margin-bottom 40px
+    margin-bottom standardSpacing
   &__adduser
     display flex
     align-items center
-    margin 25px 0
     &__emailstate
       margin-left standardSpacing
       color fontColor
     &__form
+      margin-top standardSpacing
       border borderStyle
       border-radius standardBorderRadius
-      padding 20px
+      padding 0 standardSpacing standardSpacing
       &__userData
         .userData
           &__text
@@ -71,7 +65,7 @@
                 text-align right
                 color errorRed
               &__errorIcon
-                margin-right 5px
+                margin-right textSpacing
               &__errorInfo
                 width 300px
                 font-size metadataFontSize
@@ -79,7 +73,7 @@
           &__info
             color grey
             &__icon
-              margin 0 5px
+              margin 0 textSpacing
           &__email
             &__info
               background-color transparent
@@ -93,10 +87,10 @@
       &__profile
         .profile
           &__text
-            margin 20px 0
+            margin-top standardSpacing
             font-weight bold
           &__list
-            margin 25px 0
+            margin standardSpacing 0
             &__item
               display flex
               align-items center
@@ -109,14 +103,13 @@
                 & > input
                   cursor pointer
   &__delimiter
-    margin 50px auto
+    margin pageSpacing auto
   &__table
-    margin-bottom 100px
     &__tr
       &:hover, &:nth-child(even):hover
         background-color grey-hover
       &.user-deactivated
-        color #bbb
+        color grey
       &__td-link
         & > a
           color fontColor
@@ -125,11 +118,11 @@
         &:not(:hover)
           color inherit
         & > i
-          margin-right 5px
+          margin-right textSpacing
     &__active
       width 17%
     &__profile
-      width 70px // 70px it's the size of avatar's profile
+      width 62px // 62px it's the size of avatar's profile
     &__fullName
       width 18%
     &__useername

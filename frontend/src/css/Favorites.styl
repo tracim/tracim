@@ -4,12 +4,12 @@
 .favoritesHeader
   display flex
   width 100%
-  height 65px
+  height 60px
   justify-content space-between
   align-items center
 
   &__type
-    width 90px
+    width 75px
     text-align center
   &__title
     flex 2
@@ -22,7 +22,7 @@
     flex 1
   &__favoriteButton
     text-align center
-    width 90px
+    width 75px
 
 .unavailableContent
   &__name_warning
@@ -39,11 +39,11 @@
     &__favoriteButton
       font-size titleFontSize
       text-align center
-      width 90px
+      width 75px
     &__link
       // NOTE S.G. - 2021-03-31 - Leave space for the favorite button
-      // 90px == favorite button column width
-      width calc(100% - 90px)
+      // 75px == favorite button column width
+      width calc(100% - 75px)
 
 @media (max-width: max-lg)
   .favoritesHeader
