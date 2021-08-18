@@ -30,7 +30,7 @@
       font-weight normal
       background-color veryLightGrey
       padding 5px
-      min-height listItemHeight
+      min-height 60px
       align-items center
       &__icon
         font-size bigIconSize
@@ -38,7 +38,7 @@
         display inline-block
         width 30px
       &__text
-        flex 1
+        flex 2
         display flex
         font-size metadataFontSize
         word-break break-word
@@ -46,11 +46,14 @@
       &__meta
         padding-right textSpacing
         color lightDarkGrey
-        display flex
-        flex-direction column
-        align-items flex-end
+        flex 1
+        overflow hidden
         font-size metadataFontSize
-        word-break break-word
+        white-space nowrap
+        text-align right
+        &__space
+          text-overflow ellipsis
+          overflow hidden
       &__circle
         &__wrapper
           margin 0
@@ -63,6 +66,10 @@
         color lightDarkGrey
         background-color offWhite
         opacity 0.8
+      &.isMention:not(.itemRead)
+        background warningOrangeOpacity
+      &.isMention.itemRead
+        background warningOrangeOpacity
       &:hover
         background-color grey-hover
         color inherit
@@ -70,6 +77,9 @@
     height 0
     top 0
   &__footer
+    position absolute
+    bottom 0
+    background-color offWhite
     border-top 1px solid grey
     padding 5px
     justify-content center
@@ -83,9 +93,9 @@
   &__highlight
     font-weight bold
 
-// INFO - MB - 20200204 - overrides ListItemWrapper styles because .content is used in many places
+// INFO - MB - 20210204 - overrides ListItemWrapper styles because .content is used in many places
 .notification > .notification__list > .content
-  border-left none
+  border none
 
 @media (min-width: min-md) and (max-width: max-md)
   .notification
