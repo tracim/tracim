@@ -97,6 +97,8 @@ describe('Check notification dot', () => {
           })
         })
         cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
+        cy.get('.notificationButton__btn')
+          .should('be.visible')
         cy.get('.notificationButton__mention')
           .should('be.visible')
       })
