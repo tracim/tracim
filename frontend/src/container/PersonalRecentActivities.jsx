@@ -25,8 +25,6 @@ import {
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 import { getWorkspaceMemberList } from '../action-creator.async.js'
 
-require('../css/RecentActivities.styl')
-
 export class PersonalRecentActivities extends React.Component {
   constructor (props) {
     super(props)

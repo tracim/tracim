@@ -37,8 +37,6 @@ import {
 import ContentListItem from '../component/ContentListItem.jsx'
 import ContentType from '../component/ContentType.jsx'
 
-require('../css/Favorites.styl')
-
 const FavoritesHeader = translate()(props => {
   return (
     <div className='favoritesHeader content__header'>
