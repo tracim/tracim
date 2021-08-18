@@ -421,7 +421,6 @@ export class NotificationWall extends React.Component {
 
   render () {
     const { props } = this
-    // const escapedWorkspaceLabel = entityType.WORKSPACE ? escapeHtml(entityType.WORKSPACE.label) : ''
 
     if (!props.notificationPage.list) return null
 
