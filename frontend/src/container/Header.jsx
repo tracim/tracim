@@ -144,7 +144,8 @@ export class Header extends React.Component {
               {props.user.logged && (
                 <li className='header__menu__rightside__notification nav-item'>
                   <NotificationButton
-                    notificationNotReadCount={props.notificationNotReadCount}
+                    unreadMentionCount={props.unreadMentionCount}
+                    unreadNotificationCount={props.unreadNotificationCount}
                     onClickNotification={props.onClickNotification}
                   />
                 </li>

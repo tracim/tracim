@@ -128,6 +128,7 @@ describe('Reactions', function () {
 
     const container = '.feedItemFooter__right'
     it('should allow creating and deleting reactions', () => {
+      cy.logout()
       cy.loginAs('users')
       cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
       cy.contains('.menuprofil__dropdown__name', 'John Doe')

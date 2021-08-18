@@ -422,7 +422,8 @@ export class Tracim extends React.Component {
       <div className='tracim fullWidthFullHeight'>
         <Header
           onClickNotification={this.handleClickNotificationButton}
-          notificationNotReadCount={props.notificationPage.unreadNotificationCount}
+          unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+          unreadMentionCount={props.notificationPage.unreadMentionCount}
         />
         {state.displayConnectionError && (
           <FlashMessage
