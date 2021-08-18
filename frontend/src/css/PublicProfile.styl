@@ -79,19 +79,17 @@
     display flex
     & > div
       overflow-wrap anywhere
-      font-weight bold
       background-color offWhite
       height max-content
       min-height 300px
-      border 1px grey solid
+      border borderStyle
       border-radius standardBorderRadius
-      padding 20px
-      margin-bottom standardSpacing
+      padding standardSpacing
     &__information
-      margin 30px 0 30px 30px
+      margin pageSpacing 0 pageSpacing pageSpacing
       width 30%
     &__page
-      margin 30px
+      margin pageSpacing pageSpacing pageSpacing standardSpacing
       width 70%
     &__loading
       background-color veryLightGrey
@@ -101,8 +99,6 @@
     position absolute
     top 0
     right 0
-    padding 5px 8px
-
 
 @media (max-width: max-sm)
   .profile

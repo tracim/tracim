@@ -36,7 +36,7 @@
     &__list
       padding standardSpacing
     &__info
-      margin-left 5px
+      margin-left textSpacing
       color grey
       padding 0
     &__bottom
@@ -55,9 +55,9 @@
         align-items center
         border-bottom borderStyle
         padding 0 standardSpacing
-        height 65px
+        height 60px
         &__avatar
-          margin-right 25px
+          margin-right standardSpacing
         &__name
           flex 1
           overflow hidden
@@ -99,7 +99,7 @@
           font-size titleFontSize
           cursor pointer
     &__adduser
-      border-bottom 2px solid grey
+      border-bottom borderStyle
       padding standardSpacing
       &__button
         display flex
@@ -110,7 +110,7 @@
           display flex
           justify-content center
           align-items center
-          margin-right 20px
+          margin-right standardSpacing
           border-width 2px
           border-style dashed
           border-radius 50%
@@ -122,14 +122,6 @@
         &__text
           font-size standardFontSize
           cursor pointer
-    &__title
-      padding 17px standardSpacing
-  &__optionalfunctionalities
-    padding-top standardSpacing
-    &__title
-      padding 7px standardSpacing 17px
-    &__content
-      padding-left 20px
   &__subscriptionRequests
     & .dropdown
       width 180px
@@ -137,10 +129,11 @@
       max-width 170px
       flex 1
     &__button
+      margin-left auto
       &:hover
         color offWhite
     &__empty
-      margin 25px
+      margin standardSpacing
     &__userInfo
       width calc(100% - 180px)
 .workspace_advanced__popup
