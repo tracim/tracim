@@ -134,24 +134,24 @@ export function appContentFactory (WrappedComponent) {
 
     handleChildContentDeleted = (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
-        const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.content.content_id)
-        const timeline = wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length)
+        const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
+        const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
         return { timeline, wholeTimeline }
       })
     }
 
     handleContentCommentModified = (tlm) => {
-      const { props, state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+      const { state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
-        const wholeTimeline = props.updateCommentOnTimeline(
+        const wholeTimeline = this.updateCommentOnTimeline(
           tlm.fields.content,
           prevState.wholeTimeline,
           prevState.loggedUser.username
         )
-        const timeline = wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length)
+        const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length + 1)
         return { wholeTimeline, timeline }
       })
     }
@@ -163,14 +163,14 @@ export function appContentFactory (WrappedComponent) {
             ? { ...timelineItem, author: tlm.fields.user }
             : timelineItem
         )
-        const timeline = wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length)
+        const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length)
         return { wholeTimeline, timeline }
       })
     }
 
     handleContentModified = (tlm) => {
-      // Not our content
       const { state } = this
+      // Not our content
       if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
 
       this.setState(prevState => {
@@ -183,7 +183,7 @@ export function appContentFactory (WrappedComponent) {
         )
 
         return {
-          timeline: wholeTimeline.slice(wholeTimeline.length - prevState.timeline.length),
+          timeline: this.getTimeline(wholeTimeline, prevState.timeline.length + 1),
           wholeTimeline,
           isLastTimelineItemCurrentToken: isFromCurrentToken
         }
@@ -717,7 +717,7 @@ export function appContentFactory (WrappedComponent) {
       if (state.wholeTimeline.length >= newItemCount) {
         this.setState(prevState => {
           return {
-            timeline: prevState.wholeTimeline.slice(prevState.wholeTimeline.length - newItemCount)
+            timeline: this.getTimeline(state.wholeTimeline, newItemCount)
           }
         })
         return
@@ -752,7 +752,6 @@ export function appContentFactory (WrappedComponent) {
 
       this.setState((prevState) => {
         const wholeTimeline = sortTimelineByDate([...newTimeline, ...prevState.wholeTimeline])
-        const timelineStartIndex = Math.max(wholeTimeline.length - newItemCount, 0)
         return {
           commentPageToken: commentsResponse.body.next_page_token,
           hasMoreComments: commentsResponse.body.has_next,
@@ -761,7 +760,7 @@ export function appContentFactory (WrappedComponent) {
           revisionPageToken: revisionsResponse.body.next_page_token,
           hasMoreRevisions: revisionsResponse.body.has_next,
           wholeTimeline,
-          timeline: wholeTimeline.slice(timelineStartIndex)
+          timeline: this.getTimeline(wholeTimeline, newItemCount)
         }
       })
     }
@@ -780,9 +779,14 @@ export function appContentFactory (WrappedComponent) {
     }
 
     loadTimeline = async (getContentRevision) => {
-      const { props } = this
       this.resetTimeline()
       await this.loadMoreTimelineItems(getContentRevision)
+    }
+
+    getTimeline = (wholeTimeline, itemCount) => {
+      // INFO - 2021-08-18 - S.G. - timeline is a view of the last "itemCount" items of wholeTimeline.
+      const timelineStartIndex = Math.max(wholeTimeline.length - itemCount, 0)
+      return wholeTimeline.slice(timelineStartIndex)
     }
 
     canLoadMoreTimelineItems = () => {

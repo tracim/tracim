@@ -126,8 +126,8 @@ export const getWorkspaceContentList = (apiUrl, workspaceId) =>
 export const putFileIsDeleted = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`)
 
-export const getFileRevision = (apiUrl, workspaceId, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`)
+export const getFileRevision = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'modified:asc') =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions?page_token=${pageToken}&count=${count}&sort=${sort}`)
 
 export const getUrlPreview = (apiUrl, url) =>
   baseFetch('GET', `${apiUrl}/url-preview?url=${encodeURIComponent(url)}`)

@@ -42,8 +42,7 @@ import {
   handleTranslateHtmlContent,
   getDefaultTranslationState,
   FAVORITE_STATE,
-  addExternalLinksIcons,
-  TIMELINE_ITEM_COUNT_PER_PAGE
+  addExternalLinksIcons
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -201,6 +200,7 @@ export class HtmlDocument extends React.Component {
   }
 
   async componentDidMount () {
+    const { props } = this
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
     await this.loadContent()
     await props.loadTimeline(getHtmlDocRevision)
