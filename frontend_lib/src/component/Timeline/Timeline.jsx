@@ -153,7 +153,13 @@ export class Timeline extends React.Component {
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
           {props.canLoadMoreTimelineItems() && (
-            <IconButton onClick={props.onClickShowMoreTimelineItems} text={props.t('Show older items')} />
+            <IconButton
+              onClick={props.onClickShowMoreTimelineItems}
+              text={props.t('See more')}
+              icon='fas fa-chevron-up'
+              dataCy='showMoreTimelineItemsBtn'
+              customClass='timeline__messagelist__showMoreButton'
+            />
           )}
           {props.timelineData.map(content => {
             switch (content.timelineType) {
