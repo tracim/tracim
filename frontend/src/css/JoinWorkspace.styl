@@ -8,7 +8,11 @@
     & > *:first-child
       border none
       background-color transparent
-
+      padding 0
+      height auto
+      margin-bottom standardSpacing
+      &:hover
+        background-color transparent
       & > *:last-child
         text-align left
 
@@ -44,6 +48,8 @@
       // type "column"
       & > *:first-child
         flex 0 0 60px
+        margin 0
+        text-align center
 
       &__title_description
         display flex

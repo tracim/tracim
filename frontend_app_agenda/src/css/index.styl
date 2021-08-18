@@ -8,7 +8,7 @@
 .pageWrapperGeneric.agendaPage
   height 100%
 .pageContentGeneric.agendaPage
-  height calc(100% - 135px)
+  height "calc(100% - %s)" % headerHeight
 
 .agendaPage
   &__warningMessage
@@ -20,3 +20,7 @@
   .agendaPage
     &__warningMessage
       top 20px
+
+@media (max-width: max-sm)
+  .pageContentGeneric.agendaPage
+    padding standardSpacing

@@ -8,6 +8,7 @@ import {
   buildHeadTitle,
   CUSTOM_EVENT,
   PAGE,
+  PageContent,
   PageTitle,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -86,15 +87,17 @@ export class PersonalRecentActivities extends React.Component {
           iconTooltip={props.t('Recent activities')}
           breadcrumbsList={props.breadcrumbs}
         />
-        <ActivityList
-          activity={props.activity}
-          onRefreshClicked={props.onRefreshClicked}
-          onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
-          onCopyLinkClicked={props.onCopyLinkClicked}
-          onEventClicked={props.onEventClicked}
-          showRefresh={props.showRefresh}
-          workspaceList={props.workspaceList}
-        />
+        <PageContent>
+          <ActivityList
+            activity={props.activity}
+            onRefreshClicked={props.onRefreshClicked}
+            onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
+            onCopyLinkClicked={props.onCopyLinkClicked}
+            onEventClicked={props.onEventClicked}
+            showRefresh={props.showRefresh}
+            workspaceList={props.workspaceList}
+          />
+        </PageContent>
       </div>
     )
   }

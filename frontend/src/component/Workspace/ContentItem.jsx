@@ -43,7 +43,7 @@ class ContentItem extends React.Component {
           <DragHandle
             connectDragSource={props.connectDragSource}
             title={props.t('Move this content')}
-            style={{ top: '18px', left: '-2px', padding: '0 7px' }}
+            style={{ top: '18px', left: '-5px', padding: '0 5px' }}
           />
         )}
 

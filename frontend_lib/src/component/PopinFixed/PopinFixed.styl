@@ -19,7 +19,8 @@
     border-bottom 1px solid mediumGrey
     margin 0 pageSpacing
     &__titleWithBreadcrumbs
-      flex 2
+      flex 3
+      overflow hidden
     &__titleWrapper
       display flex
       align-items center
@@ -28,15 +29,17 @@
       margin-inline-start standardSpacing
     & > .favoriteButton
       margin 0
+      & .iconbutton__icon
+        margin 0
     & > *
       margin-inline-end standardSpacing
     &__actions
       &.dropdownMenuButton
         padding 0
+        & i
+          margin 0
       &::after
         display none
-      & i
-        margin 0
     &__close
       margin 0
     &__icon

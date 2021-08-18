@@ -13,7 +13,7 @@
   &__messagelist
     flex 1 1 auto
     margin-bottom 0
-    padding standardSpacing
+    padding standardSpacing standardSpacing 0
     overflow-y auto
     overflow-x visible
     &__item
@@ -22,6 +22,8 @@
       width 100%
       & + .revision
         border none
+      &:last-child
+        margin-bottom 0
   &__warning
       position absolute
       width calc(100% - 20px)
@@ -62,21 +64,13 @@
       display flex
       align-items flex-start
       justify-content flex-end
-      margin-top standardSpacing
+      margin-top textSpacing
       height 42px
     &__advancedtext
       width 100%
-      margin-right 15px
       &__btn
         width max-content
-        border none
-        background-color transparent
-        color mediumDarkGrey
-        cursor pointer
         font-size metadataFontSize
-        &:hover
-          color darkGrey
-          text-decoration underline
         &:disabled
           cursor not-allowed
           &:hover
@@ -84,12 +78,6 @@
     &__submit
       display flex
       align-items center
-      &__btn
-        display inline-block
-        cursor pointer
-        &__icon
-          display inline-block
-          margin-left 20px
 
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result

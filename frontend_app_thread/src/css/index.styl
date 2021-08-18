@@ -18,6 +18,7 @@
   .thread
     &__contentpage
       width 100%
+      height calc(100% - 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
       &__top
         display flex
         justify-content flex-end
@@ -28,14 +29,13 @@
       &__content
         width 100%
       &__texteditor
-        margin 0 pageSpacing pageSpacing
+        margin standardSpacing pageSpacing
       &__header
         & .favoriteButton .iconbutton__icon
           margin-inline-end standardSpacing
         & .wsContentGeneric__header__actions .fa-fw
           margin 0
 
-@media (min-width: min-sm) and (max-width: max-lg)
-  .thread
-    .thread__contentpage__content
-      height calc(100% - 145px)
+@media (max-width: max-xs)
+  .thread .timeline
+    height "calc(100vh - %s)" % headerHeight

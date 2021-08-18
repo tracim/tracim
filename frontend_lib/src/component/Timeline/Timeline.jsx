@@ -18,6 +18,7 @@ import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrappe
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import EditCommentPopup from './EditCommentPopup.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 const color = require('color')
@@ -259,17 +260,17 @@ export class Timeline extends React.Component {
 
             <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
               <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__texteditor__advancedtext')}>
-                <button
-                  type='button'
-                  className={classnames(
+                <IconButton
+                  customClass={classnames(
                     `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
                   )}
-                  onClick={props.onClickWysiwygBtn}
                   disabled={props.disableComment}
+                  text={props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
+                  onClick={props.onClickWysiwygBtn}
+                  intent='link'
+                  mode='light'
                   key='timeline__comment__advancedtext'
-                >
-                  {props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
-                </button>
+                />
 
                 <div>
                   <DisplayFileToUpload
@@ -289,28 +290,18 @@ export class Timeline extends React.Component {
                     onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
                   />
                 </div>
-
-                <button
-                  type='button'
-                  className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn btn highlightBtn')}
-                  onClick={props.onClickValidateNewCommentBtn}
+                <IconButton
+                  color={props.customColor}
+                  customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
                   disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
-                  style={{
-                    backgroundColor: props.customColor,
-                    color: '#fdfdfd',
-                    ':hover': {
-                      backgroundColor: color(props.customColor).darken(0.15).hex()
-                    }
-                  }}
+                  icon='far fa-paper-plane'
+                  intent='primary'
+                  mode='light'
+                  onClick={props.onClickValidateNewCommentBtn}
+                  text={props.t('Send')}
+                  type='button'
                   key='timeline__comment__send'
-                >
-                  {props.t('Send')}
-                  <div
-                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}
-                  >
-                    <i className='far fa-paper-plane' />
-                  </div>
-                </button>
+                />
               </div>
             </div>
           </form>
