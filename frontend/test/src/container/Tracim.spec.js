@@ -322,11 +322,6 @@ describe('<Tracim />', () => {
           it('should set the new document title', () => {
             expect(global.document.title).to.equal(props.system.headTitle)
           })
-
-          it('should draw on favicon by calling canvas.getContext()', () => {
-            expect(dummyElement.href).to.equal(dummyElement.getAttribute())
-            expect(getContextSpy.calledOnce).to.equal(false)
-          })
         })
       })
     })

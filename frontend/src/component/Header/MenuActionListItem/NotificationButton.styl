@@ -3,15 +3,24 @@
 .notificationButton
   &__btn
     position relative
-  &__count
+  &__notification
     position absolute
     top -7px
     right -7px
-    height 20px
-    width 20px
+    height notificationCircleSize
+    width notificationCircleSize
+    line-height 20px
+    border-radius 50%
+    background-color lightBlue
+  &__mention
+    position absolute
+    top -7px
+    right -7px
+    height mentionCircleSize
+    width mentionCircleSize
     line-height 20px
     border-radius 50%
     font-size metadataFontSize
-    background-color lightBlue
-    color white
     font-weight bold
+    background-color warningOrange
+    color white

@@ -1,4 +1,14 @@
 import { PAGES } from '../../support/urls_commands'
+import baseUser from '../../fixtures/baseUser.json'
+import baseWorkspace from '../../fixtures/baseWorkspace.json'
+import defaultAdmin from '../../fixtures/defaultAdmin.json'
+
+
+const threadTitle = 'Title'
+const commentAll = 'sending a mention to @all'
+const comment = 'sending a regular notification'
+let threadId
+let workspaceId
 
 describe('Notification button at header', () => {
   before(function () {
@@ -21,5 +31,77 @@ describe('Notification button at header', () => {
     cy.get('.notification__header__title').contains('Notifications')
     cy.get('.notificationButton').click()
     cy.get('.notification__header__title').contains('Notifications').should('not.be.visible')
+  })
+})
+
+describe('Check notification dot', () => {
+  describe('Creating a thread', () => {
+    beforeEach(function () {
+      cy.resetDB()
+      cy.setupBaseDB()
+      cy.login(baseUser)
+      cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+        workspaceId = workspace.workspace_id
+        cy.createThread(threadTitle, workspaceId).then(note => {
+          threadId = note.content_id
+          cy.visitPage({
+            pageName: PAGES.CONTENT_OPEN,
+            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+          })
+        })
+        cy.contains('.menuprofil__dropdown__name', baseUser.public_name)
+      })
+    })
+
+    describe(`As ${baseUser.username} sending ${defaultAdmin.username} a notifications`, () => {
+      it('create a general notifiation', () => {
+        cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+          .should('be.visible')
+          .type(comment)
+        cy.get('.timeline__texteditor__submit__btn')
+          .should('be.visible')
+          .click()
+        cy.logout()
+
+        cy.login(defaultAdmin)
+        cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+          workspaceId = workspace.workspace_id
+          cy.visitPage({
+            pageName: PAGES.CONTENT_OPEN,
+            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+          })
+        })
+        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
+        cy.get('.notificationButton__notification')
+          .should('be.visible')
+      })
+
+      it('create a mention notifiation', () => {
+        cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+          .should('be.visible')
+          .type(commentAll)
+        cy.get('.timeline__texteditor__submit__btn')
+          .should('be.visible')
+          .click()
+        cy.logout()
+
+        cy.get('.loginpage__main__header__title')
+        .should('be.visible')
+
+        cy.login(defaultAdmin)
+        cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+          workspaceId = workspace.workspace_id
+          cy.visitPage({
+            pageName: PAGES.CONTENT_OPEN,
+            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+          })
+        })
+        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
+        cy.get('.notificationButton__btn')
+          .should('be.visible')
+        cy.get('.notificationButton__mention')
+          .should('be.visible')
+      })
+    })
   })
 })
