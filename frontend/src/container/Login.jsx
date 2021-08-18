@@ -27,7 +27,8 @@ import {
   setUserConfiguration,
   setUserLang,
   setWorkspaceListMemberList,
-  setNotificationNotReadCounter,
+  setUnreadMentionCount,
+  setUnreadNotificationCount,
   setNotificationList,
   setNextPage,
   setHeadTitle,
@@ -388,11 +389,16 @@ class Login extends React.Component {
   loadNotificationNotRead = async (userId) => {
     const { props } = this
 
-    const fetchNotificationNotRead = await props.dispatch(getUserMessagesSummary(userId))
+    const fetchUnreadMentionCount = await props.dispatch(getUserMessagesSummary(userId, ['mention.created']))
+    switch (fetchUnreadMentionCount.status) {
+      case 200: props.dispatch(setUnreadMentionCount(fetchUnreadMentionCount.json.unread_messages_count)); break
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread mention number')))
+    }
 
-    switch (fetchNotificationNotRead.status) {
-      case 200: props.dispatch(setNotificationNotReadCounter(fetchNotificationNotRead.json.unread_messages_count)); break
-      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
+    const fetchUnreadMessageCount = await props.dispatch(getUserMessagesSummary(userId))
+    switch (fetchUnreadMessageCount.status) {
+      case 200: props.dispatch(setUnreadNotificationCount(fetchUnreadMessageCount.json.unread_messages_count)); break
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread mention number')))
     }
   }
 

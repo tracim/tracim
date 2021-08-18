@@ -247,15 +247,17 @@ describe('<Tracim />', () => {
         })
       })
 
-      describe('The notificationNotReadCount has been updated', () => {
-        describe('prevNotificationNotReadCount = 0 && notificationNotReadCount = 5', () => {
-          const newNotificationNotReadCount = 5
+      describe('The unreadMentionCount has been updated', () => {
+        describe('unreadNotificationCount = 6 && unreadMentionCount = 5', () => {
+          const newMentionNotReadCount = 5
+          const newNotificationNotReadCount = 6
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                notificationNotReadCount: newNotificationNotReadCount
+                unreadMentionCount: newMentionNotReadCount,
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
@@ -265,22 +267,24 @@ describe('<Tracim />', () => {
           })
 
           it('should set the new document title', () => {
-            expect(global.document.title).to.equal(`(${newNotificationNotReadCount}) ${props.system.headTitle}`)
+            expect(global.document.title).to.equal(`(${newMentionNotReadCount}) ${props.system.headTitle}`)
           })
 
           it('should draw on favicon by calling canvas.getContext()', () => {
-            expect(getContextSpy.calledOnce).to.equal(true)
+            expect(getContextSpy.called).to.equal(true)
           })
         })
 
-        describe('prevNotificationNotReadCount = 5 && notificationNotReadCount = 101', () => {
-          const newNotificationNotReadCount = 101
+        describe('unreadNotificationCount = 102 && unreadMentionCount = 101', () => {
+          const newNotificationNotReadCount = 102
+          const newMentionNotReadCount = 101
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                notificationNotReadCount: newNotificationNotReadCount
+                unreadMentionCount: newMentionNotReadCount,
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
@@ -295,18 +299,18 @@ describe('<Tracim />', () => {
           })
 
           it('should draw on favicon by calling canvas.getContext()', () => {
-            expect(getContextSpy.calledOnce).to.equal(false)
+            expect(getContextSpy.called).to.equal(true)
           })
         })
 
-        describe('prevNotificationNotReadCount = 5 && notificationNotReadCount = 0', () => {
+        describe('prevUnreadNotificationCount = 5 && unreadNotificationCount = 0', () => {
           const newNotificationNotReadCount = 0
 
           before(() => {
             wrapper.setProps({
               notificationPage: {
                 ...props.notificationPage,
-                notificationNotReadCount: newNotificationNotReadCount
+                unreadNotificationCount: newNotificationNotReadCount
               }
             })
           })
@@ -317,11 +321,6 @@ describe('<Tracim />', () => {
 
           it('should set the new document title', () => {
             expect(global.document.title).to.equal(props.system.headTitle)
-          })
-
-          it('should draw on favicon by calling canvas.getContext()', () => {
-            expect(dummyElement.href).to.equal(dummyElement.getAttribute())
-            expect(getContextSpy.calledOnce).to.equal(false)
           })
         })
       })
