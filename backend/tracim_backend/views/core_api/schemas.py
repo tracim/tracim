@@ -1774,6 +1774,10 @@ class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
     pass
 
 
+class FileRevisionPageSchema(BasePaginatedSchemaPage):
+    items = marshmallow.fields.Nested(FileRevisionSchema(many=True))
+
+
 class CollaborativeDocumentEditionConfigSchema(marshmallow.Schema):
     software = marshmallow.fields.String()
     supported_file_types = marshmallow.fields.List(

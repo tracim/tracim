@@ -2192,7 +2192,7 @@ class TestFiles(object):
         res = web_testapp.get(
             "/api/workspaces/1/files/{}/revisions".format(test_file.content_id), status=200
         )
-        revisions = res.json_body
+        revisions = res.json_body["items"]
         assert len(revisions) == 1
         revision = revisions[0]
         assert revision["content_type"] == "file"
@@ -2221,6 +2221,7 @@ class TestFiles(object):
         assert revision["size"] == len(b"Test file")
         assert revision["page_nb"] == 1
         assert revision["has_pdf_preview"] is True
+        assert revision["version_number"] == 1
 
     def test_api__set_file_status__ok_200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -4478,7 +4479,7 @@ class TestThreads(object):
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/2/threads/7/revisions", status=200)
-        revisions = res.json_body
+        revisions = res.json_body["items"]
         assert len(revisions) == 2
         revision = revisions[0]
         assert revision["content_type"] == "thread"
@@ -4575,7 +4576,7 @@ class TestThreads(object):
         res = web_testapp.get(
             "/api/workspaces/1/threads/{}/revisions".format(test_thread.content_id), status=200
         )
-        revisions = res.json_body
+        revisions = res.json_body["items"]
         assert len(revisions) == 6
         for revision in revisions:
             assert revision["content_type"] == "thread"
