@@ -84,11 +84,11 @@ export function appContentFactory (WrappedComponent) {
         loggedUser: param.loggedUser,
         content: param.content,
         revisionPageToken: '',
-        hasMoreRevisions: true,
+        hasMoreRevisions: false,
         commentPageToken: '',
-        hasMoreComments: true,
+        hasMoreComments: false,
         filePageToken: '',
-        hasMoreFiles: true,
+        hasMoreFiles: false,
         // INFO - SG - 2021-08-10 - timeline is the portion of wholeTimeline which
         // is visible to the wrapped component through props.timeline.
         // wholeTimeline can contain more elements as the timeline is paginated
