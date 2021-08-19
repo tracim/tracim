@@ -12,13 +12,29 @@ const CardPopup = props => {
       style={props.customStyle}
     >
       <div className='cardPopup__container'>
-        <div className={classnames(props.customHeaderClass, 'cardPopup__header')} style={{ backgroundColor: props.customColor }} />
+        <div className={classnames(props.customHeaderClass, 'cardPopup__border')} style={{ backgroundColor: props.customColor }} />
 
-        {props.hideCloseBtn === false && (
-          <div className='cardPopup__close'>
-            <CloseButton onClick={props.onClose} />
-          </div>
-        )}
+        <div className='cardPopup__header'>
+          {props.label && (
+            <div className='cardPopup__header__title'>
+              <div className='cardPopup__header__title__icon'>
+                <i
+                  className={`${props.faIcon}`}
+                  style={{ color: props.customColor }}
+                  title={props.label}
+                />
+              </div>
+
+              {props.label}
+            </div>
+          )}
+
+          {props.hideCloseBtn === false && (
+            <div className='cardPopup__header__close'>
+              <CloseButton onClick={props.onClose} />
+            </div>
+          )}
+        </div>
 
         <div className='cardPopup__body'>
           {props.children}
@@ -43,7 +59,7 @@ CardPopup.defaultProps = {
   customClass: 'defaultCustomClass',
   customHeaderClass: '',
   customColor: '',
-  onClose: () => {},
+  onClose: () => { },
   hideCloseBtn: false,
   customStyle: {}
 }

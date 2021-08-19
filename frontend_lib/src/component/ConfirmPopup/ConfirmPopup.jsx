@@ -12,10 +12,12 @@ const ConfirmPopup = (props) => (
     customHeaderClass={props.customColor !== '' ? '' : 'primaryColorBg'}
     customColor={props.customColor !== '' ? props.customColor : ''}
     onClose={props.onClose || props.onCancel}
+    label={props.t('Are you sure?')}
+    faIcon={props.confirmIcon || 'far fa-fw fa-question-circle'}
   >
     <div className='confirm_popup__body'>
       <div className='confirm_popup__body__msg'>
-        {props.msg || props.t('Are you sure?')}
+        {props.msg}
       </div>
       <div className='confirm_popup__body__btn'>
         <IconButton

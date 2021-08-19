@@ -276,9 +276,9 @@ export class Favorites extends React.Component {
               </PageContent>
             )
             : (
-              <span className='favorites__no_favorite'>
+              <div className='pageContentGeneric favorites__no_favorite'>
                 {props.t('You did not add any content as favorite yet.')}
-              </span>
+              </div>
             )}
         </PageWrapper>
       </div>

@@ -195,21 +195,10 @@ export class PopupCreateWorkspace extends React.Component {
         customClass='newSpace'
         customColor={state.config.hexcolor}
         onClose={this.handleClose}
+        faIcon={`fas fa-${state.config.faIcon}`}
+        label={props.t('New space')}
       >
         <div className='newSpace__menu'>
-          <div className='newSpace__title'>
-            <div className='newSpace__title__icon'>
-              <i
-                className={`fas fa-${state.config.faIcon}`}
-                style={{ color: state.config.hexcolor }}
-                title={props.t('New space')}
-              />
-            </div>
-            <div className='newSpace__title__name' style={{ color: state.config.hexcolor }}>
-              {props.t('New space')}
-            </div>
-          </div>
-
           {state.isFirstStep
             ? (
               <>
