@@ -17,7 +17,7 @@
     &__item__preview
       &__content
         height 125px
-        margin 16px
+        margin standardSpacing
         display flex
         align-items center
         cursor pointer
@@ -34,9 +34,9 @@
     height 100%
     &__content
       height 100%
-      display: block
+      display block
       &__image
-        padding 8px
+        padding standardSpacing
         justify-content center
         align-items center
         display flex
@@ -69,7 +69,7 @@
       font-size bigIconSize
     &:hover
       background-color rgba(0, 0, 0, 0.1)
-      border-radius 1standardBorderRadius
+      border-radius standardBorderRadius
     &.arrownext
       right -20px
     &.arrowprev
@@ -79,16 +79,13 @@
   &-scrollView
     height 100%
     overflow-y auto
+    & .pageContentGeneric
+      padding pageSpacing 0
   &__action__button
     text-align center
     & button
-      margin 5px
-    & i
-      margin-left standardSpacing
+      margin-inline-end standardSpacing
     &__lightbox
-      &__rotation
-        &__right > i
-          transform scaleX(-1)
       &__openRawContent
         // INFO - GM - 2019-11-29 - Copy the style of lightbox button because it is a <a> tag
         margin 2px
@@ -100,8 +97,6 @@
         background-color rgba(0, 0, 0, 0.5)
         &:hover
           color #FFFFFF
-    &__rotation__right > i
-      transform scaleX(-1)
   &__delete__file__popup
     & .cardPopup__container
       width 400px
@@ -110,8 +105,8 @@
       &__btn
         display flex
         justify-content flex-end
-        .btn:first-child
-          margin-right 15px
+        & > .iconbutton
+          margin-inline-start standardSpacing
   &__noContent
     text-align center
     font-size titleFontSize
@@ -126,7 +121,7 @@
   &__mouse__listener
     width 100vw
     height 100vh
-    position: fixed
+    position fixed
     z-index 31
     top 0
     left 0
@@ -170,8 +165,8 @@
   height 100%
 
 .carousel__main .slick-track
-  // INFO - GM - 2019-01-20 - 375px is the size of others elements which aren't responsive (header, app header, thumbnails...)
-  height calc(100vh - 375px)
+  // INFO - GM - 2019-01-20 - 391px is the size of others elements which aren't responsive (header, app header, thumbnails...)
+  height calc(100vh - 391px)
 
 // MEDIAQUERIES
 
@@ -179,8 +174,8 @@
   .gallery
     &__action__button
       & i
-        margin-left: 0
-      &__text
+        margin 0
+      & .iconbutton__text_with_icon
         display none
       &__lightbox__openRawContent
         height 30px

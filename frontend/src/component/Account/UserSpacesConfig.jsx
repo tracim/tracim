@@ -207,6 +207,7 @@ export class UserSpacesConfig extends React.Component {
                       ? props.t('Remove from space')
                       : props.t('Leave space')
                   }
+                  confirmIcon='fa-fw fas fa-sign-out-alt'
                 />
               ))}
             </div>

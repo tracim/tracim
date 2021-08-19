@@ -4,6 +4,7 @@ import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
   buildFilePreviewUrl,
+  IconButton,
   removeExtensionOfFilename,
   getFolderContentList,
   getWorkspaceDetail,
@@ -732,42 +733,36 @@ export class Gallery extends React.Component {
 
           <PageContent>
             <div className='gallery__action__button'>
-              <button
-                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__play'
+              <IconButton
+                customClass='gallery__action__button__play'
                 onClick={() => this.onClickSlickPlay(!state.autoPlay)}
-                data-cy='gallery__action__button__auto__play'
-              >
-                <span className='gallery__action__button__text'>
-                  {state.autoPlay ? props.t('Pause') : props.t('Play')}
-                </span>
-                <i className={classnames('fa-fw fas', state.autoPlay ? 'fa-pause' : 'fa-play')} />
-              </button>
+                dataCy='gallery__action__button__auto__play'
+                text={state.autoPlay ? props.t('Pause') : props.t('Play')}
+                icon={`fas ${state.autoPlay ? 'fa-pause' : 'fa-play'}`}
+              />
 
-              <button
-                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__left'
+              <IconButton
+                customClass='gallery__action__button__rotation__left'
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.LEFT)}
-              >
-                <span className='gallery__action__button__text'>{props.t('Rotate 90° left')}</span>
-                <i className='fa-fw fas fa-undo' />
-              </button>
+                text={props.t('Rotate 90° left')}
+                icon='fas fa-undo'
+              />
 
-              <button
-                className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__rotation__right'
+              <IconButton
+                customClass='gallery__action__button__rotation__right'
                 onClick={() => this.rotateImg(state.displayedPictureIndex, DIRECTION.RIGHT)}
-              >
-                <span className='gallery__action__button__text'>{props.t('Rotate 90° right')}</span>
-                <i className='fa-fw fas fa-undo' />
-              </button>
+                text={props.t('Rotate 90° right')}
+                icon='fas fa-redo'
+              />
 
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-                <button
-                  className='btn outlineTextBtn nohover primaryColorBorder gallery__action__button__delete'
+                <IconButton
+                  customClass='gallery__action__button__delete'
+                  dataCy='gallery__action__button__delete'
                   onClick={this.handleOpenDeleteFilePopup}
-                  data-cy='gallery__action__button__delete'
-                >
-                  <span className='gallery__action__button__text'>{props.t('Delete')}</span>
-                  <i className='far fa-fw fa-trash-alt' />
-                </button>
+                  text={props.t('Delete')}
+                  icon='far fa-trash-alt'
+                />
               )}
             </div>
 
@@ -844,7 +839,7 @@ export class Gallery extends React.Component {
                         title={props.t('Rotate 90° right')}
                         key='btn_rotate_right'
                       >
-                        <i className='fa-fw fas fa-undo' />
+                        <i className='fa-fw fas fa-redo' />
                       </button>
                     ), (
                       <a
@@ -873,22 +868,21 @@ export class Gallery extends React.Component {
               >
                 <div className='gallery__delete__file__popup__body'>
                   <div className='gallery__delete__file__popup__body__btn'>
-                    <button
-                      type='button'
-                      className='btn outlineTextBtn primaryColorBorder primaryColorFont nohover'
+                    <IconButton
                       onClick={this.handleCloseDeleteFilePopup}
-                    >
-                      {props.t('Cancel')}
-                    </button>
+                      text={props.t('Cancel')}
+                      icon='fas fa-times'
+                    />
 
-                    <button
-                      type='button'
-                      className='btn highlightBtn primaryColorBg primaryColorDarkenBgHover'
+                    <IconButton
+                      customClass='gallery__delete__file__popup__body__btn__delete'
+                      intent='primary'
+                      mode='light'
                       onClick={() => this.deleteFile(this.state.displayedPictureIndex)}
-                      data-cy='gallery__delete__file__popup__body__btn__delete'
-                    >
-                      {props.t('Delete')}
-                    </button>
+                      dataCy='gallery__delete__file__popup__body__btn__delete'
+                      text={props.t('Delete')}
+                      icon='far fa-trash-alt'
+                    />
                   </div>
                 </div>
               </CardPopup>

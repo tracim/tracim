@@ -211,7 +211,9 @@ export class Timeline extends React.Component {
               </>
             }
             confirmLabel={props.t('Edit')}
+            confirmIcon='far fa-fw fa-edit'
             cancelLabel={props.t('Validate anyway')}
+            cancelIcon='fas fa-fw fa-check'
           />
         )}
 
@@ -232,7 +234,6 @@ export class Timeline extends React.Component {
             customColor={props.customColor}
             confirmLabel={props.t('Delete')}
             confirmIcon='far fa-trash-alt'
-            cancelIcon='fas fa-times'
             onConfirm={this.handleClickValidateDeleteComment}
             onCancel={this.handleToggleDeleteCommentPopup}
           />

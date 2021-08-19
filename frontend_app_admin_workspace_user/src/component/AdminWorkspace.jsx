@@ -22,17 +22,18 @@ const AdminWorkspace = props => {
       />
 
       <PageContent parentClass='adminWorkspace'>
-        <div className='adminWorkspace__btnnewworkspace'>
-          <button
-            className='adminWorkspace__btnnewworkspace__btn btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
-            onClick={props.onClickNewWorkspace}
-          >
-            {props.t('Create a space')}
-          </button>
-        </div>
-
         <div className='adminWorkspace__description'>
           {props.t('List of every spaces')}
+        </div>
+
+        <div className='adminWorkspace__btnnewworkspace'>
+          <IconButton
+            customClass='adminWorkspace__btnnewworkspace__btn'
+            intent='secondary'
+            onClick={props.onClickNewWorkspace}
+            text={props.t('Create a space')}
+            icon='fas fa-plus'
+          />
         </div>
 
         <Delimiter customClass='adminWorkspace__delimiter' />

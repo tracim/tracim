@@ -214,6 +214,7 @@ class TagList extends React.Component {
           {!!state.workspaceTagToDeleteId && (
             <ConfirmPopup
               confirmLabel={props.t('Delete')}
+              confirmIcon='far fa-fw fa-trash-alt'
               onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
               onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
             />

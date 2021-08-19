@@ -1,7 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import { PromptMessage } from 'tracim_frontend_lib'
+import { IconButton, PromptMessage } from 'tracim_frontend_lib'
 
 const color = require('color')
 
@@ -78,36 +78,27 @@ export class FileProperties extends React.Component {
                   )}
 
                   <div className='fileProperties__content__detail__description__editiondesc__btn'>
-                    <button
-                      type='button'
-                      className='fileProperties__content__detail__description__editiondesc__btn__cancel btn highlightBtn'
+                    <IconButton
+                      customClass='fileProperties__content__detail__description__editiondesc__btn__cancel'
+                      color={props.color}
+                      intent='secondary'
                       onClick={this.handleToggleFormNewDescription}
+                      icon='fas fa-times'
+                      text={props.t('Cancel')}
                       key='cancelBtn'
-                      style={{
-                        backgroundColor: props.color,
-                        ':hover': {
-                          backgroundColor: color(props.color).darken(0.15).hex()
-                        }
-                      }}
-                    >
-                      {props.t('Cancel')}
-                    </button>
+                    />
 
-                    <button
-                      type='button'
-                      className='fileProperties__content__detail__description__editiondesc__btn__validate btn highlightBtn'
-                      onClick={this.handleClickValidateNewDescription}
-                      key='validateBtn'
-                      style={{
-                        backgroundColor: props.color,
-                        ':hover': {
-                          backgroundColor: color(props.color).darken(0.15).hex()
-                        }
-                      }}
+                    <IconButton
+                      customClass='fileProperties__content__detail__description__editiondesc__btn__validate'
+                      color={props.color}
                       disabled={props.disableChangeDescription}
-                    >
-                      {props.t('Validate')}
-                    </button>
+                      intent='primary'
+                      mode='light'
+                      onClick={this.handleClickValidateNewDescription}
+                      icon='fas fa-check'
+                      text={props.t('Validate')}
+                      key='validateBtn'
+                    />
                   </div>
                 </form>
               )
@@ -119,20 +110,16 @@ export class FileProperties extends React.Component {
             )}
 
             {props.displayChangeDescriptionBtn && !state.displayFormNewDescription && (
-              <button
-                type='button'
-                className='fileProperties__content__detail__btndesc btn highlightBtn'
-                onClick={this.handleToggleFormNewDescription}
-                style={{
-                  backgroundColor: props.color,
-                  ':hover': {
-                    backgroundColor: color(props.color).darken(0.15).hex()
-                  }
-                }}
+              <IconButton
+                customClass='fileProperties__content__detail__btndesc'
+                color={props.color}
                 disabled={props.disableChangeDescription}
-              >
-                {props.t('Change description')}
-              </button>
+                intent='primary'
+                mode='light'
+                onClick={this.handleToggleFormNewDescription}
+                icon='fas fa-edit'
+                text={props.t('Change description')}
+              />
             )}
           </div>
         </div>

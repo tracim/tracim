@@ -23,7 +23,7 @@ const ConfirmPopup = (props) => (
         <IconButton
           customClass='confirm_popup__body__btn__item'
           color={props.customColor ? props.customColor : undefined}
-          icon={props.cancelIcon}
+          icon={props.cancelIcon || 'fas fa-fw fa-cancel'}
           text={props.cancelLabel || props.t('Cancel')}
           title={props.cancelLabel || props.t('Cancel')}
           type='button'
@@ -37,7 +37,7 @@ const ConfirmPopup = (props) => (
         <IconButton
           customClass='confirm_popup__body__btn__item'
           color={props.customColor ? props.customColor : undefined}
-          icon={props.confirmIcon}
+          icon={props.confirmIcon || 'fas fa-fw fa-check'}
           text={props.confirmLabel || props.t('Confirm')}
           title={props.confirmLabel || props.t('Confirm')}
           type='button'
