@@ -116,8 +116,6 @@ export class NotificationWall extends React.Component {
         : ''
     )
 
-    const escapedWorkspaceLabel = notification.workspace ? escapeHtml(notification.workspace.label) : ''
-
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
