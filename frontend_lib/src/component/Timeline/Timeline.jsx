@@ -21,7 +21,6 @@ import EditCommentPopup from './EditCommentPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
-const color = require('color')
 
 export class Timeline extends React.Component {
   constructor (props) {

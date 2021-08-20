@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import {
   Delimiter,
+  IconButton,
   PageWrapper,
   PageTitle,
   PageContent,

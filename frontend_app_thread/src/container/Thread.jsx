@@ -5,7 +5,6 @@ import { debug } from '../debug.js'
 import {
   appContentFactory,
   addAllResourceI18n,
-  Breadcrumbs,
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,

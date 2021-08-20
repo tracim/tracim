@@ -13,8 +13,6 @@ import {
   RefreshWarningMessage
 } from 'tracim_frontend_lib'
 
-const color = require('color')
-
 export class FileComponent extends React.Component {
   componentDidUpdate (prevProps) {
     const { props } = this

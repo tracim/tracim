@@ -3,8 +3,6 @@ import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { IconButton, PromptMessage } from 'tracim_frontend_lib'
 
-const color = require('color')
-
 require('./FileProperties.styl')
 
 export class FileProperties extends React.Component {

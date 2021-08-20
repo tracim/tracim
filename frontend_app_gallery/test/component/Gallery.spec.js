@@ -101,33 +101,6 @@ describe('<Gallery />', () => {
   const wrapper = shallow(<GalleryWithoutHOC {...props} t={tradKey => tradKey} />)
   wrapper.setState(stateMock)
 
-  describe('static design', () => {
-    describe('rotation buttons', () => {
-      it('should rotate the right image when rotation buttons are clicked', () => {
-        const displayedPictureIndex = 1
-        wrapper.setState({ imagePreviewList: stateMock.imagePreviewList, displayedPictureIndex })
-        wrapper.find('.gallery__action__button > button.gallery__action__button__rotation__left').simulate('click')
-        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(270)
-        wrapper.find('.gallery__action__button > button.gallery__action__button__rotation__right').simulate('click')
-        expect(wrapper.state().imagePreviewList[displayedPictureIndex].rotationAngle).to.equal(0)
-      })
-    })
-
-    describe('play button', () => {
-      it('should start the slideshow when the button play is clicked', () => {
-        wrapper.find('.gallery__action__button__play').simulate('click')
-        expect(wrapper.find('.gallery__action__button__play').children('i')).prop('className').include('fas fa-pause')
-        expect(wrapper.state().autoPlay).to.be.a('object')
-      })
-
-      it('should stop the slideshow when the button pause is clicked', () => {
-        wrapper.find('.gallery__action__button__play').simulate('click')
-        expect(wrapper.find('.gallery__action__button__play').children('i')).prop('className').include('fas fa-play')
-        expect(wrapper.state().autoPlay).to.be.a('null')
-      })
-    })
-  })
-
   describe('functions tests', () => {
     describe('getPreviousImageUrl()', () => {
       it('should return the previous imagePreview when filSelected > 0', () => {
