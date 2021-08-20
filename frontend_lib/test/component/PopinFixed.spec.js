@@ -37,8 +37,8 @@ describe('<PopinFixed />', () => {
     <PopinFixed
       {...props}
     >
-      <PopinFixedHeader />
-      <PopinFixedContent>
+      <PopinFixedHeader {...props} />
+      <PopinFixedContent {...props}>
         <div>test</div>
       </PopinFixedContent>
     </PopinFixed>
