@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom'
 import { workspaceConfig } from '../../../util/helper.js'
 import { DropdownMenu, PAGE } from 'tracim_frontend_lib'
 
-require('./AdminLink.styl')
-
 const AdminLink = props => {
   return (
     <DropdownMenu

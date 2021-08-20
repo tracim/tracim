@@ -8,6 +8,7 @@ import {
   buildHeadTitle,
   CUSTOM_EVENT,
   PAGE,
+  PageContent,
   PageTitle,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -24,8 +25,6 @@ import {
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 import { getWorkspaceMemberList } from '../action-creator.async.js'
-
-require('../css/RecentActivities.styl')
 
 export class PersonalRecentActivities extends React.Component {
   constructor (props) {
@@ -88,15 +87,17 @@ export class PersonalRecentActivities extends React.Component {
           iconTooltip={props.t('Recent activities')}
           breadcrumbsList={props.breadcrumbs}
         />
-        <ActivityList
-          activity={props.activity}
-          onRefreshClicked={props.onRefreshClicked}
-          onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
-          onCopyLinkClicked={props.onCopyLinkClicked}
-          onEventClicked={props.onEventClicked}
-          showRefresh={props.showRefresh}
-          workspaceList={props.workspaceList}
-        />
+        <PageContent>
+          <ActivityList
+            activity={props.activity}
+            onRefreshClicked={props.onRefreshClicked}
+            onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
+            onCopyLinkClicked={props.onCopyLinkClicked}
+            onEventClicked={props.onEventClicked}
+            showRefresh={props.showRefresh}
+            workspaceList={props.workspaceList}
+          />
+        </PageContent>
       </div>
     )
   }

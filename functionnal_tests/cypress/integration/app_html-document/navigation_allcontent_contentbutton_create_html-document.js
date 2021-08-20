@@ -17,9 +17,9 @@ describe('navigate :: workspace > create_new > html-document', function () {
     const title = 'document1'
     cy.get('.cardPopup__container').should('be.visible')
     cy.get('.cardPopup__container .cardPopup__header').should('be.visible')
-    cy.get('.cardPopup__container .cardPopup__close').should('be.visible')
+    cy.get('.cardPopup__container .cardPopup__header__close').should('be.visible')
     cy.get('.cardPopup__container .cardPopup__body').should('be.visible')
-    cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('be.visible')
+    cy.get('.cardPopup__container .cardPopup__header__title').should('be.visible')
     cy
       .get('.cardPopup__container .createcontent .createcontent__form__input')
       .type(title)
@@ -27,7 +27,7 @@ describe('navigate :: workspace > create_new > html-document', function () {
       .get('.cardPopup__container .createcontent .createcontent__form__input')
       .should('have.attr', 'value', title)
       .should('have.attr', 'placeholder')
-    cy.get('.cardPopup__container .cardPopup__close button').click()
-    cy.get('.cardPopup__container .createcontent .createcontent__contentname').should('not.be.visible')
+    cy.get('.cardPopup__container .cardPopup__header__close button').click()
+    cy.get('.cardPopup__container .cardPopup__header__title').should('not.be.visible')
   })
 })

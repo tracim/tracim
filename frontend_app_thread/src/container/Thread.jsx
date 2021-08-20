@@ -5,7 +5,6 @@ import { debug } from '../debug.js'
 import {
   appContentFactory,
   addAllResourceI18n,
-  Breadcrumbs,
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
@@ -504,6 +503,7 @@ export class Thread extends React.Component {
           onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
             state.content, state.loggedUser, this.setState.bind(this)
           )}
+          breadcrumbsList={state.breadcrumbsList}
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
@@ -511,17 +511,6 @@ export class Thread extends React.Component {
             {/* INFO - G.B. - 20210616 - Since the thread component behaves a bit differently than the others it was preferable to put
             Breadcrumbs and SelectStatus here directly than to adapt the PopinFixedContent component to cover thread as well. */}
             <div className='thread__contentpage__top'>
-              <Breadcrumbs
-                root={{
-                  link: PAGE.HOME,
-                  label: '',
-                  icon: 'fas fa-home',
-                  type: BREADCRUMBS_TYPE.CORE,
-                  isALink: true
-                }}
-                breadcrumbsList={state.breadcrumbsList}
-              />
-
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -566,7 +555,6 @@ export class Thread extends React.Component {
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
                 deprecatedStatus={state.config.availableStatuses[3]}
-                showTitle={false}
                 invalidMentionList={state.invalidMentionList}
                 isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
                 onClickCancelSave={this.handleCancelSave}

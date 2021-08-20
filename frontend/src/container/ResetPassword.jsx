@@ -7,7 +7,6 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
-import Button from '../component/common/Input/Button.jsx'
 import {
   postResetPassword,
   getConfig
@@ -18,7 +17,7 @@ import {
   setConfig,
   setHeadTitle
 } from '../action-creator.sync.js'
-import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, IconButton, PAGE } from 'tracim_frontend_lib'
 
 const qs = require('query-string')
 
@@ -164,15 +163,14 @@ export class ResetPassword extends React.Component {
                 maxLength={512}
               />
 
-              <div className='d-flex align-items-end'>
-                <Button
-                  htmlType='button'
-                  bootstrapType=''
-                  customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover resetpassword__card__body__btnsubmit ml-auto'
-                  label={props.t('Validate')}
-                  onClick={this.handleClickSubmit}
-                />
-              </div>
+              <IconButton
+                customClass='resetpassword__card__body__btnsubmit'
+                intent='primary'
+                mode='light'
+                text={props.t('Validate')}
+                onClick={this.handleClickSubmit}
+                icon='fas fa-check'
+              />
             </div>
           </CardBody>
         </Card>

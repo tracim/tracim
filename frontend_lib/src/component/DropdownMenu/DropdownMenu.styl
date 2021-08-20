@@ -28,10 +28,15 @@
       color fontColor
       text-decoration none
   & i
-    margin-right standardSpacing
+    margin-right textSpacing
   &:hover:not(:active)
     background-color grey-hover
 
 .dropdownMenuButton.btn
   display flex
   align-items center
+  padding standardSpacing
+  & i
+    margin-right textSpacing
+  &::after
+    margin-right textSpacing

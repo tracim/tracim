@@ -1,12 +1,9 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 .notification
   position fixed
   top headerHeight
   right 0
   width 40%
   height "calc(100% - %s)" % headerHeight
-  border-left 1px solid grey
   background-color offWhite
   box-shadow shadow-right
   z-index 26
@@ -15,11 +12,8 @@
   max-width 600px
   overflow hidden
   transition 0.5s
-  &__header
-    & div
-      color fontColor
-    &__close i
-      color fontColor
+  & .iconbutton
+    font-size metadataFontSize
   &__list
     flex-grow 2
     overflow auto
@@ -29,12 +23,11 @@
       color fontColor
       font-weight normal
       background-color veryLightGrey
-      padding 5px
+      padding standardSpacing
       min-height 60px
       align-items center
       &__icon
         font-size bigIconSize
-        margin standardSpacing
         display inline-block
         width 30px
       &__text
@@ -77,14 +70,15 @@
     height 0
     top 0
   &__footer
+    border-top borderStyle
+    padding standardSpacing
     position absolute
     bottom 0
     background-color offWhite
-    border-top 1px solid grey
-    padding 5px
     justify-content center
-    width 100%
     display flex
+  &__header__title
+    font-weight normal
 
 .contentTitle
   &__highlight
@@ -106,9 +100,8 @@
     width 100%
 
 @media (max-width: max-lg)
-  .notification
-    & .btn
-      & > .genericButton__label
-        display none
-      & > .genericButton__icon
-        margin 0px
+  .notification .btn
+    & > .genericButton__label
+      display none
+    & > .genericButton__icon
+      margin 0px

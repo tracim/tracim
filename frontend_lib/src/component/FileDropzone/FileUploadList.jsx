@@ -23,7 +23,7 @@ export const FileUploadList = (props) => {
             </div>
 
             <button
-              className='iconBtn primaryColorFontHover'
+              className='transparentButton primaryColorFontHover'
               onClick={() => props.onDeleteFile(fileUpload)}
               title={props.t('Delete')}
               disabled={props.deleteFileDisabled}

@@ -8,16 +8,17 @@
   flex-direction column
   align-items center
   width 100%
-  height calc(100% - 67px) // 67px => buttons size with margin
+  height "calc(100% - %s)" % headerHeight
   &__text
-    margin-bottom 25px
+    margin-bottom standardSpacing
     width 100%
-    height calc(100% - 67px) // 67px => buttons size with margin
+    height calc(100% - 50px) // 50px => buttons size with margin
   &__button
-    margin-top 25px
+    margin-top standardSpacing
     width 100%
     text-align right
     &__cancel
       cursor pointer
+      margin-inline-end standardSpacing
     &__submit
       cursor pointer

@@ -61,6 +61,7 @@ describe('Check notification dot', () => {
         cy.get('.timeline__texteditor__submit__btn')
           .should('be.visible')
           .click()
+        cy.contains('.thread__contentpage__comment', comment)
         cy.logout()
 
         cy.login(defaultAdmin)
@@ -83,6 +84,7 @@ describe('Check notification dot', () => {
         cy.get('.timeline__texteditor__submit__btn')
           .should('be.visible')
           .click()
+        cy.contains('.thread__contentpage__comment', commentAll)
         cy.logout()
 
         cy.get('.loginpage__main__header__title')

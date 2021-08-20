@@ -164,31 +164,32 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should render a long note with the visual overflow', () => {
+        const longText = `<pre>
+          A long text.
+          This morning, I was writing Cypress tests.
+          They would fail randomly, you know?
+          Business as usual.
+          Not only my tests were failing, but tests others wrote too.
+          I was beginning to feel desperate.
+          this.skip() was looking at me, amused.
+          ‘I am strong though’, I said to myself.
+          And then, I saw a Light.
+          A Voice, out of nowhere, began to speak!
+          It was starting to save me. To tell me how to fix the Holy Tests.
+          ‘It is easy’, It was saying. ‘The trick is that’
+          And the Voice stopped speaking. The Light went away.
+          I went back to the Holy Randomly Failing Tests.
+          After a few hours,
+          Just when I was about to give up,
+          I realized:
+          My test was just missing a few text lines.
+          So here I am,
+          Writing the final piece.
+        </pre>`.repeat(3)
         cy.updateHtmlDocument(
           contentId,
           workspaceId,
-          `<pre>
-            A long text.
-            This morning, I was writing Cypress tests.
-            They would fail randomly, you know?
-            Business as usual.
-            Not only my tests were failing, but tests others wrote too.
-            I was beginning to feel desperate.
-            this.skip() was looking at me, amused.
-            ‘I am strong though’, I said to myself.
-            And then, I saw a Light.
-            A Voice, out of nowhere, began to speak!
-            It was starting to save me. To tell me how to fix the Holy Tests.
-            ‘It is easy’, It was saying. ‘The trick is that’
-            And the Voice stopped speaking. The Light went away.
-            I went back to the Holy Randomly Failing Tests.
-            After a few hours,
-            Just when I was about to give up,
-            I realized:
-            My test was just missing a few text lines.
-            So here I am,
-            Writing the final piece.
-          </pre>`,
+          longText,
           'The Holy Tests'
         )
 

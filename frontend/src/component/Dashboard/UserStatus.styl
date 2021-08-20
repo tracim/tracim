@@ -5,9 +5,8 @@
     display flex
     align-items center
     justify-content center
-    margin-bottom standardSpacing
     &__icon
-      margin 0 5px
+      margin 0 textSpacing
     &__text
       font-weight bold
   &__informations
@@ -16,7 +15,7 @@
     font-size metadataFontSize
     width 100%
     &__notification
-      margin 5px auto 0
+      margin textSpacing auto 0
       cursor pointer
       & .btnswitch
         justify-content center
@@ -32,9 +31,6 @@
   .userstatus
     &__role
       justify-content flex-start
-      margin-inline-start standardSpacing
-      &__text
-        font-weight normal
     &__informations
       &__notification
         display flex

@@ -10,30 +10,35 @@
   z-index 20
   &__container
     border 0
-    border-radius 10px
+    border-radius standardBorderRadius
     width 800px
     background lightGrey
     box-shadow shadow-all
-  &__header
-    border-top-right-radius 10px
-    border-top-left-radius 10px
+  &__border
+    border-top-right-radius standardBorderRadius
+    border-top-left-radius standardBorderRadius
     width 100%
-    height 8px
-  &__close
+    height standardSpacing
+  &__header
     display flex
-    justify-content flex-end
-    padding 5px 15px 5px 5px
+    justify-content space-between
+    padding pageSpacing
+    align-items center
+    &__title
+      display flex
+      font-size titleFontSize
+      &__icon
+        margin-inline-end standardSpacing
+    &__close
+      margin-inline-start auto
   &__body
     display flex
     align-items center
-    padding standardSpacing 15px 15px 15px
-    &__icon
-      padding 0 30px
-      font-size bigIconSize
-    &__text
-      &__title
-        font-size titleFontSize
-        font-weight 600
-      &__message
-        padding-right 20px
-        font-weight 500
+    padding 0 pageSpacing pageSpacing
+
+@media (max-width: max-xs)
+  .cardPopup
+    &__header
+      padding standardSpacing
+    &__body
+      padding 0 standardSpacing standardSpacing

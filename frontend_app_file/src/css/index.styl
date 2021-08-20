@@ -1,7 +1,6 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .file
-  height "calc(100% - %s)" % headerHeight
   &__header
     &__editionmode
       display none
@@ -16,7 +15,7 @@
         padding 8px 15px
         border-width 1px
         border-style solid
-        border-radius 5px
+        border-radius standardBorderRadius
         background-color transparent
         cursor pointer
         & > i

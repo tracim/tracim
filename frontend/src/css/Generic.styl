@@ -1,5 +1,3 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 a
   &:hover, &:link, &:visited
     text-decoration none
@@ -23,7 +21,7 @@ a
       color inherit
 
 .highlightBtn
-  padding standardSpacing 25px
+  padding standardSpacing
   color offWhite
   cursor pointer
   &:disabled
@@ -32,7 +30,6 @@ a
 .iconBtn
   border-color transparent
   background-color transparent
-  margin 2px
   padding 5px
   cursor pointer
   &:disabled
@@ -41,7 +38,7 @@ a
 div.mce-fullscreen
   z-index 1050
   &.mce-container
-    top 61px
+    top headerHeight
 // INFO - GM - 2020/03/20 - Custom css to make TinyMCE fill its 100% height container
 // Solution inspired originally by these answers: https://stackoverflow.com/questions/19861838/tinymce-4-and-100-height-within-containing-element?answertab=votes#tab-top
 /*Editing container*/
@@ -91,6 +88,7 @@ div.mce-statusbar
 
 .subTitle
   font-size titleFontSize
+  margin-bottom standardSpacing
 
 .genericBtnInfoDashboard
   &__btn
@@ -98,7 +96,7 @@ div.mce-statusbar
     margin-bottom 30px
     border-width 1px
     border-style solid
-    border-radius 10px
+    border-radius standardBorderRadius
     padding standardSpacing 25px
     cursor pointer
     &:hover
@@ -107,16 +105,16 @@ div.mce-statusbar
       margin-right 20px
       font-size bigIconSize
   &__info
-    border 1px solid grey
-    border-radius 10px
+    border borderStyle
+    border-radius standardBorderRadius
     padding 15px 25px
     &__text
       margin-bottom 35px
     &__link
       display inline-block
       margin-bottom 15px
-      border 1px solid grey
-      border-radius 10px
+      border borderStyle
+      border-radius standardBorderRadius
       padding 15px
 
 .notched // Côme - 2018/09/27 - this class requires a border-color to be defined (eg. with primaryColorBorder)

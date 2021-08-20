@@ -53,10 +53,10 @@ describe('Publications page', () => {
     it('should be able to edit publication', () => {
       cy.contains('.feedItem__publication__body__content__text', text)
       cy.get('.feedItemHeader__actionMenu__item[title="Edit"]').click()
-      cy.get('.editCommentPopup__title').should('be.visible')
+      cy.get('.cardPopup__header__title').should('be.visible')
       cy.waitForTinyMCELoaded().then(() => {
         cy.typeInTinyMCE(`${text}!`)
-        cy.contains('.iconbutton__text_with_icon', 'Send').click()
+        cy.contains('.editCommentPopup__buttons .iconbutton', 'Send').click()
         cy.contains('.feedItem__publication__body__content__text', `${text}!`)
       })
     })

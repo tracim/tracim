@@ -2,12 +2,11 @@
 
 .formBlock
   margin-bottom standardSpacing
-  border-radius 10px
+  border-radius standardBorderRadius
   &__title
     padding standardSpacing
-    border-bottom 1px solid grey
+    border-bottom borderStyle
     font-size titleFontSize
-    font-weight 400
   &__field
     padding standardSpacing
   &__bottom
@@ -37,7 +36,7 @@
     &__list
       padding standardSpacing
     &__info
-      margin-left 5px
+      margin-left textSpacing
       color grey
       padding 0
     &__bottom
@@ -54,11 +53,11 @@
         display flex
         justify-content space-between
         align-items center
-        border-bottom 1px solid grey
+        border-bottom borderStyle
         padding 0 standardSpacing
-        height 65px
+        height 60px
         &__avatar
-          margin-right 25px
+          margin-right standardSpacing
         &__name
           flex 1
           overflow hidden
@@ -82,7 +81,7 @@
               display flex
               margin-left auto
             &.bordered
-              border 1px solid grey
+              border borderStyle
               border-radius standardSpacing
           .subdropdown
             width 250px
@@ -100,7 +99,7 @@
           font-size titleFontSize
           cursor pointer
     &__adduser
-      border-bottom 2px solid grey
+      border-bottom borderStyle
       padding standardSpacing
       &__button
         display flex
@@ -111,7 +110,7 @@
           display flex
           justify-content center
           align-items center
-          margin-right 20px
+          margin-right standardSpacing
           border-width 2px
           border-style dashed
           border-radius 50%
@@ -123,14 +122,6 @@
         &__text
           font-size standardFontSize
           cursor pointer
-    &__title
-      padding 17px standardSpacing
-  &__optionalfunctionalities
-    padding-top standardSpacing
-    &__title
-      padding 7px standardSpacing 17px
-    &__content
-      padding-left 20px
   &__subscriptionRequests
     & .dropdown
       width 180px
@@ -138,10 +129,11 @@
       max-width 170px
       flex 1
     &__button
+      margin-left auto
       &:hover
         color offWhite
     &__empty
-      margin 25px
+      margin standardSpacing
     &__userInfo
       width calc(100% - 180px)
 .workspace_advanced__popup

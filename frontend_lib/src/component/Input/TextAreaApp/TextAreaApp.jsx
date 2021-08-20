@@ -19,7 +19,7 @@ export const TextAreaApp = props =>
     <div className={`${props.customClass}__button editionmode__button`}>
       <button
         type='button'
-        className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
+        className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn`}
         onClick={props.onClickCancelBtn}
         tabIndex='1'
         style={{

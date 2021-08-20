@@ -158,6 +158,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
                   onConfirm={props.onClickValidatePopupDeleteWorkspace}
                   onCancel={props.onClickClosePopupDeleteWorkspace}
                   confirmLabel={props.t('Delete')}
+                  confirmIcon='far fa-fw fa-trash-alt'
                 />
               )}
             </div>

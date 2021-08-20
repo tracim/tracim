@@ -3,10 +3,15 @@
 .feedItemFooter
   display flex
   &__left
-    flex 1
-  &__left, &__right
-    padding standardSpacing
     display flex
     align-items center
+    flex 1
+    & .translateButton .iconbutton
+      padding standardSpacing 0 standardSpacing standardSpacing
+  &__right
+    display flex
+    align-items center
+    & .EmojiReactionButton__buttonpicker
+      padding standardSpacing standardSpacing standardSpacing 0
   &__comments
     margin-inline-start standardSpacing

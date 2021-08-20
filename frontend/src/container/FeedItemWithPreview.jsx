@@ -420,7 +420,6 @@ export class FeedItemWithPreview extends React.Component {
                 onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-                showTitle={false}
                 timelineData={this.getTimelineData()}
                 wysiwyg={state.timelineWysiwyg}
                 onClickCancelSave={this.handleCancelSave}

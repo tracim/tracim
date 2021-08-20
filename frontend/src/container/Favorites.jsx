@@ -37,8 +37,6 @@ import {
 import ContentListItem from '../component/ContentListItem.jsx'
 import ContentType from '../component/ContentType.jsx'
 
-require('../css/Favorites.styl')
-
 const FavoritesHeader = translate()(props => {
   return (
     <div className='favoritesHeader content__header'>
@@ -278,9 +276,9 @@ export class Favorites extends React.Component {
               </PageContent>
             )
             : (
-              <span className='favorites__no_favorite'>
+              <div className='pageContentGeneric favorites__no_favorite'>
                 {props.t('You did not add any content as favorite yet.')}
-              </span>
+              </div>
             )}
         </PageWrapper>
       </div>

@@ -55,7 +55,6 @@ export const Checkbox = props =>
         className='checkboxCustom__checked'
         style={{
           ...style.checked,
-          ...(props.disabled ? style.disabled : {}),
           ...props.styleCheck
         }}
       >✓
