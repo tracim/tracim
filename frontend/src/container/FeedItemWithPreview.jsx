@@ -25,9 +25,9 @@ import {
   getDefaultTranslationState,
   PAGE,
   Comment,
-  Timeline,
-  TracimComponent
+  Timeline
 } from 'tracim_frontend_lib'
+import { getFileRevision } from '../../../frontend_lib/src/action.async.js'
 
 export class FeedItemWithPreview extends React.Component {
   constructor (props) {
@@ -64,6 +64,13 @@ export class FeedItemWithPreview extends React.Component {
         ? getDefaultTranslationState(props.system.config)
         : TRANSLATION_STATE.DISABLED
     )
+  }
+
+  componentDidMount () {
+    const { props } = this
+    if (props.showTimeline) {
+      props.loadTimeline()
+    }
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -421,7 +428,7 @@ export class FeedItemWithPreview extends React.Component {
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 showTitle={false}
-                timelineData={this.getTimelineData()}
+                timelineData={props.timeline}
                 wysiwyg={state.timelineWysiwyg}
                 onClickCancelSave={this.handleCancelSave}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
@@ -453,7 +460,7 @@ export class FeedItemWithPreview extends React.Component {
 }
 
 const mapStateToProps = ({ system, user, currentWorkspace, workspaceList }) => ({ system, user, currentWorkspace, workspaceList })
-const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
+const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(connect(mapStateToProps)(FeedItemWithPreview))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
 })

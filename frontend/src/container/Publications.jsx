@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
   formatAbsoluteDate,
-  appContentFactory,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CommentTextArea,
@@ -69,7 +68,7 @@ const wysiwygId = 'wysiwygTimelineCommentPublication'
 export class Publications extends React.Component {
   constructor (props) {
     super(props)
-    props.setApiUrl(FETCH_CONFIG.apiUrl)
+//    props.setApiUrl(FETCH_CONFIG.apiUrl)
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
@@ -81,11 +80,11 @@ export class Publications extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommented }
+//      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented },
+  //    { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
+    //  { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
+//      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
+//      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommented }
     ])
 
     // NOTE - SG - 2021-03-25 - This will be set to the DOM element
@@ -348,6 +347,7 @@ export class Publications extends React.Component {
   }
 
   getCommentList = async (publicationId, publicationContentType) => {
+    return
     const { props } = this
     const workspaceId = props.match.params.idws
 
@@ -362,7 +362,7 @@ export class Publications extends React.Component {
     }
 
     const commentList = props.buildTimelineFromCommentAndRevision(
-      resComment.body,
+      resComment.body.items,
       resCommentAsFile.body.items,
       [], // INFO - CH - 20210324 - this is supposed to be the revision list which we don't have for publications
       props.user,
@@ -596,6 +596,7 @@ export class Publications extends React.Component {
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
             commentList={publication.commentList}
             content={publication}
+            data={{ content: { content_id: publication.id, workspace_id: publication.workspaceId }, config: { system: props.system }, loggedUser: props.user}}
             customColor={publicationColor}
             key={`publication_${publication.id}`}
             ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
@@ -717,6 +718,7 @@ const mapStateToProps = ({
   breadcrumbs,
   currentWorkspace,
   publicationList,
-  user
-}) => ({ breadcrumbs, currentWorkspace, publicationList, user })
-export default connect(mapStateToProps)(withRouter(translate()(appContentFactory(TracimComponent(Publications)))))
+  user,
+  system
+}) => ({ breadcrumbs, currentWorkspace, publicationList, user, system })
+export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(Publications))))
