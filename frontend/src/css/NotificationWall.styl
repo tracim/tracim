@@ -24,18 +24,20 @@
       font-weight normal
       background-color veryLightGrey
       padding standardSpacing
-      min-height 60px
+      height 60px
       align-items center
-      &__icon
-        font-size bigIconSize
-        display inline-block
-        width 30px
       &__text
-        flex 2
+        flex 4
         display flex
-        font-size metadataFontSize
         word-break break-word
         align-items center
+        &__content
+          line-height standardFontSize
+          max-height 2*standardFontSize
+          overflow hidden
+          text-overflow ellipsis
+        & .avatar
+          margin-inline-end standardSpacing
       &__meta
         padding-right textSpacing
         color lightDarkGrey
@@ -77,8 +79,10 @@
     background-color offWhite
     justify-content center
     display flex
-  &__header__title
-    font-weight normal
+  &__header
+    min-height headerHeight
+    &__title
+      font-weight normal
 
 .contentTitle
   &__highlight
