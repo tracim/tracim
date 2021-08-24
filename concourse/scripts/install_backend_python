@@ -1,10 +1,7 @@
 #!/bin/bash
 set -e
-
+source "$HOME/.bashrc"
 command -v pyenv || (echo "need pyenv installed" && exit 1)
-# TODO: this shouldn't be necessary here…
-eval "$(pyenv init --path)"
-eval "$(pyenv init -)"
 cd backend
 for version in $@; do
   pyenv install "$version"

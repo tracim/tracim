@@ -11,7 +11,6 @@ apt-get install -qy \
         poppler-utils \
         qpdf \
         ffmpeg \
-        ufraw-batch \
         libldap2-dev \
         libsasl2-dev \
         libimage-exiftool-perl \

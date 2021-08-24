@@ -1,11 +1,9 @@
 #!/bin/bash
 set -e
 
+source "$HOME/.bashrc"
 python_version=$1
 shift
-# FIXME: find a way to include pyenv in the PATH during image build !!!
-export PATH=/root/.pyenv/shims:/root/.pyenv/bin/:$PATH
-eval "$(pyenv init -)"
 pyenv shell "$python_version"
 
 # Prepare docker to run in another docker
