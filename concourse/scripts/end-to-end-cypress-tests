@@ -1,9 +1,13 @@
 #!/bin/bash
 set -e
 
+python_version=${1:-3.6.14}
+
 "$(dirname $0)"/install_docker
 "$(dirname $0)"/install_backend_packages
 "$(dirname $0)"/create_backend_dirs backend
+source "$HOME/.bashrc"
+pyenv shell $python_version
 cd backend
 pip install -r requirements.txt
 python setup.py develop
@@ -13,6 +17,6 @@ cp development.ini.sample development.ini
 tracimcli db init -d
 cd -
 ./setup_functionnal_tests.sh root
-./install_frontend_dependencies.sh
+./install_frontend_dependencies.sh root
 ./build_full_frontend.sh
 NO_VIRTUAL_ENV=1 ./run_dev_backend.sh cypress run

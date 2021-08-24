@@ -9,6 +9,7 @@ for version in $@; do
   pip install -r requirements-build.txt
   pip install -r requirements.txt
   pip install -r requirements-test.txt
+  pip install -r requirements-devtool.txt
   pip install -r requirements-storage-s3.txt
   pip install $(for r in requirements-db*.txt; do echo "-r $r"; done)
 done

@@ -1,9 +1,16 @@
 #!/bin/bash
 set -e
 
-database=${1:all}
+python_version=${1:-3.6.14}
+database=${2:-all}
+
+source "$HOME/.bashrc"
+pyenv shell "$python_version"
 
 "$(dirname $0)"/install_docker
+source "$(dirname $0)/docker-lib.sh"
+start_docker
+
 "$(dirname $0)"/install_backend_packages
 "$(dirname $0)"/create_backend_dirs backend/test_storage_dir
 cd backend
