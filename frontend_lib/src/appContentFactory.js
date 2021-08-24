@@ -121,7 +121,7 @@ export function appContentFactory (WrappedComponent) {
     handleChildContentCreated = (tlm) => {
       const { state } = this
       // Not a child of our content
-      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
       const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
       this.addChildContentToTimeline(
@@ -134,7 +134,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleChildContentDeleted = (tlm) => {
       const { state } = this
-      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
@@ -144,7 +144,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleContentCommentModified = (tlm) => {
       const { state } = this
-      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = this.updateCommentOnTimeline(
           tlm.fields.content,
@@ -727,22 +727,16 @@ export function appContentFactory (WrappedComponent) {
         return await handleFetchResult(await fetchPromise)
       }
 
-      const timelineFetchList = [
+      // Get the newest comments, files and revisions from the paginated backend API
+      const [commentsResponse, filesResponse, revisionsResponse] = await Promise.all([
         fetchResult(getContentComment(this.apiUrl, state.content.workspace_id, state.content.content_id, state.commentPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
-        fetchResult(getFileChildContent(this.apiUrl, state.content.workspace_id, state.content.content_id, state.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc'))
-      ]
-      if (getContentRevision) {
+        fetchResult(getFileChildContent(this.apiUrl, state.content.workspace_id, state.content.content_id, state.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
         // INFO - 2021/08/17 - S.G. - the order is done with "modified" for revisions as the "created" field is the creation
         // date of the content, not of a revision (and thus is the same for all revisions of a content).
-        timelineFetchList.push(
-          fetchResult(getContentRevision(this.apiUrl, state.content.workspace_id, state.content.content_id, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
-        )
-      }
+        fetchResult(getContentRevision(this.apiUrl, state.content.workspace_id, state.content.content_id, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
+      ])
 
-      // Get the newest comments, files and revisions from the paginated backend API
-      const [commentsResponse, filesResponse, revisionsResponse] = await Promise.all(timelineFetchList)
-
-      if (!commentsResponse.apiResponse.ok && !filesResponse.apiResponse.ok && revisionsResponse && !revisionsResponse.apiResponse.ok) {
+      if (!commentsResponse.apiResponse.ok && !filesResponse.apiResponse.ok && !revisionsResponse.apiResponse.ok) {
         sendGlobalFlashMessage(props.t('Error while loading timeline'))
         console.log('Error loading timeline', 'comments', commentsResponse, 'revisions', revisionsResponse, 'files', filesResponse)
         return
@@ -751,7 +745,7 @@ export function appContentFactory (WrappedComponent) {
       const newTimeline = this.buildTimelineFromCommentAndRevision(
         commentsResponse.body.items,
         filesResponse.body.items,
-        revisionsResponse ? revisionsResponse.body.items : [],
+        revisionsResponse.body.items,
         state.loggedUser,
         getDefaultTranslationState(state.config.system.config)
       )
@@ -763,8 +757,8 @@ export function appContentFactory (WrappedComponent) {
           hasMoreComments: commentsResponse.body.has_next,
           filePageToken: filesResponse.body.next_page_token,
           hasMoreFiles: filesResponse.body.has_next,
-          revisionPageToken: revisionsResponse ? revisionsResponse.body.next_page_token : '',
-          hasMoreRevisions: revisionsResponse ? revisionsResponse.body.has_next : false,
+          revisionPageToken: revisionsResponse.body.next_page_token,
+          hasMoreRevisions: revisionsResponse.body.has_next,
           wholeTimeline,
           timeline: this.getTimeline(wholeTimeline, newItemCount)
         }
