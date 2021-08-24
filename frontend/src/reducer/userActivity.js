@@ -11,6 +11,7 @@ import { setActivityEventList } from '../util/activity.js'
 
 const defaultUserActivityState = {
   list: [],
+  loaded: false,
   hasNextPage: true,
   nextPageToken: null
 }
@@ -20,7 +21,7 @@ const userActivity = (state = defaultUserActivityState, action) => {
     case `${RESET}/${USER_ACTIVITY}`:
       return defaultUserActivityState
     case `${SET}/${USER_ACTIVITY}/${LIST}`:
-      return { ...state, list: action.activityList }
+      return { ...state, list: action.activityList, loaded: true }
     case `${SET}/${USER_ACTIVITY}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
     case `${SET}/${USER_ACTIVITY}/${EVENT_LIST}`:

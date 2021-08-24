@@ -5275,10 +5275,7 @@ class TestWorkspaceContents(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
         my_file_path = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/path".format(
-                workspace.workspace_id, my_file.content_id
-            ),
-            status=200,
+            "/api/contents/{}/path".format(my_file.content_id), status=200,
         ).json_body
         assert len(my_file_path["items"]) == 3
         assert my_file_path["items"][0]["content_id"] == first_dir.content_id
@@ -5294,10 +5291,7 @@ class TestWorkspaceContents(object):
         assert my_file_path["items"][2]["content_type"] == "html-document"
 
         my_file_path = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/path".format(
-                workspace.workspace_id, second_dir.content_id
-            ),
-            status=200,
+            "/api/contents/{}/path".format(second_dir.content_id), status=200,
         ).json_body
         assert len(my_file_path["items"]) == 2
         assert my_file_path["items"][0]["content_id"] == first_dir.content_id
@@ -5309,10 +5303,7 @@ class TestWorkspaceContents(object):
         assert my_file_path["items"][1]["content_type"] == "folder"
 
         my_file_path = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/path".format(
-                workspace.workspace_id, another_content.content_id
-            ),
-            status=200,
+            "/api/contents/{}/path".format(another_content.content_id), status=200,
         ).json_body
         assert len(my_file_path["items"]) == 1
         assert my_file_path["items"][0]["content_id"] == another_content.content_id

@@ -11,6 +11,7 @@ import { setActivityEventList } from '../util/activity.js'
 
 const defaultWorkspaceActivityState = {
   list: [],
+  loaded: false,
   hasNextPage: true,
   nextPageToken: null
 }
@@ -20,7 +21,7 @@ const workspaceActivity = (state = defaultWorkspaceActivityState, action) => {
     case `${RESET}/${WORKSPACE_ACTIVITY}`:
       return defaultWorkspaceActivityState
     case `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`:
-      return { ...state, list: action.activityList }
+      return { ...state, list: action.activityList, loaded: true }
     case `${SET}/${WORKSPACE_ACTIVITY}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
     case `${SET}/${WORKSPACE_ACTIVITY}/${EVENT_LIST}`:

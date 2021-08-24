@@ -4,7 +4,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getWorkspaceContent,
+  getContent,
   getContentPath
 } from 'tracim_frontend_lib'
 
@@ -41,8 +41,14 @@ const getCommentList = async (content, apiUrl) => {
  * Can return null if a the content is not accessible anymore: as messages are an history,
  * the content can be inaccessible when calling this function.
  * This function assumes that the list is ordered from newest to oldest.
+ * If workspaceId is not null, Activities from other workspaces will be filtered out
  */
-const createContentActivity = async (activityParams, messageList, apiUrl) => {
+const createContentActivity = async (activityParams, messageList, workspaceId, apiUrl) => {
+  // INFO - RJ - 2021-08-23
+  // Beware, a content may have been moved to another workspace or deleted, so
+  // the workspace field of the messages might be outdated or the content
+  // inaccessible. This should be kept in mind while working on this code
+
   const newestMessage = messageList[0]
 
   let content = newestMessage.fields.content
@@ -54,18 +60,14 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     const parentContentType = content.parent_content_type
     const parentId = content.parent_id
     if (!(parentContentType && parentId)) return null
-    const response = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      `${parentContentType}s`,
-      parentId
-    ))
+    const response = await handleFetchResult(await getContent(apiUrl, parentId))
     if (!response.apiResponse.ok) return null
     content = response.body
+    if (workspaceId && content.workspace_id !== workspaceId) return null
   }
 
   const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, newestMessage.fields.workspace.workspace_id, content.content_id)
+    await getContentPath(apiUrl, content.content_id)
   )
   if (!fetchGetContentPath.apiResponse.ok) return null
 
@@ -106,10 +108,10 @@ const getActivityParams = (message) => {
   return null
 }
 
-const createActivity = async (activityParams, activityMessageList, apiUrl) => {
+const createActivity = async (activityParams, activityMessageList, workspaceId, apiUrl) => {
   switch (activityParams.entityType) {
     case TLM_ET.CONTENT:
-      return await createContentActivity(activityParams, activityMessageList, apiUrl)
+      return await createContentActivity(activityParams, activityMessageList, workspaceId, apiUrl)
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
     default:
@@ -130,10 +132,10 @@ const groupMessageListByActivityId = (messageList) => {
   return activityMap
 }
 
-const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
+const createActivityListFromActivityMap = async (activityMap, workspaceId, apiUrl) => {
   const activityCreationList = []
   for (const { params, list } of activityMap.values()) {
-    activityCreationList.push(createActivity(params, list, apiUrl))
+    activityCreationList.push(createActivity(params, list, workspaceId, apiUrl))
   }
   // NOTE - SG - 2020-11-19 - remove the null activities (can happen with content activities)
   return (await Promise.all(activityCreationList)).filter(i => i)
@@ -145,7 +147,7 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
  * Activities are returned in newest to oldest order.
  * INFO - SG - 2020-11-12 - this function assumes that the message list is already ordered from newest to oldest.
  */
-export const mergeWithActivityList = async (messageList, activityList, apiUrl) => {
+export const mergeWithActivityList = async (messageList, activityList, workspaceId, apiUrl) => {
   const activityMap = groupMessageListByActivityId(messageList)
 
   for (const activity of activityList) {
@@ -154,7 +156,7 @@ export const mergeWithActivityList = async (messageList, activityList, apiUrl) =
     }
   }
 
-  const newActivityList = await createActivityListFromActivityMap(activityMap, apiUrl)
+  const newActivityList = await createActivityListFromActivityMap(activityMap, workspaceId, apiUrl)
   return [...activityList, ...newActivityList]
 }
 
@@ -204,7 +206,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
   if (!activityParams) return activityList
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
-    const activity = await createActivity(activityParams, [message], apiUrl)
+    const activity = await createActivity(activityParams, [message], null, apiUrl)
     return activity ? [activity, ...activityList] : activityList
   }
   const oldActivity = activityList[activityIndex]
