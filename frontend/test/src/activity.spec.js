@@ -7,7 +7,7 @@ import {
 } from 'tracim_frontend_lib'
 import { mergeWithActivityList, addMessageToActivityList } from '../../src/util/activity.js'
 
-import { mockGetContentComments200, mockGetContent400, mockGetContentPath200 } from '../apiMock.js'
+import { mockGetContentComments200, mockGetContent400, mockGetContentPath200, mockGetContentPath400 } from '../apiMock.js'
 
 const createMessage = (eventId, entityType, coreEventType, subEntityType, fields) => {
   return {
@@ -112,6 +112,23 @@ describe('In activity.js module', () => {
       expect(mock.isDone()).to.equal(true)
       expect(mockContentPath.isDone()).to.equal(true)
       expect(resultActivityList).to.be.deep.equal(fixtureActivityList)
+    })
+
+    it('ignore comments from other workspaces', async () => {
+      const mockContentPath = mockGetContentPath400(apiUrl, 1337)
+      const resultActivityList = await mergeWithActivityList([
+        createMessage(3, TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT, {
+          author: foo,
+          content: {
+            parent_content_type: 'file',
+            parent_id: fileContent.content_id,
+            content_id: 1337
+          },
+          workspace: workspace
+        })
+      ], [], workspace.workspace_id + 1, apiUrl)
+      expect(mockContentPath.isDone()).to.equal(true)
+      expect(resultActivityList).to.be.deep.equal([])
     })
 
     it('should ignore comment messages which cannot retrieve their parent content', async () => {
