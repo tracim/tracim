@@ -9,6 +9,7 @@ eval "$(pyenv init -)"
 pyenv shell "$python_version"
 
 # Prepare docker to run in another docker
+export SKIP_PRIVILEGED="true"
 source "$(dirname $0)/docker-lib.sh"
 # TODO - S.G. - 2021-08-04 - parametrize the registry mirror
 start_docker "" "http://172.17.0.1:5000"
