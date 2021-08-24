@@ -81,7 +81,6 @@ class Folder extends React.Component {
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
-              style={{ top: '18px', left: '-2px', padding: '0 7px' }}
             />
           )}
 
