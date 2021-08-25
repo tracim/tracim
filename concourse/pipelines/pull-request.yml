@@ -1,30 +1,27 @@
-_update_status: &_update_status
+# YAML definitions re-used in plans
+pending_status_notification: &pending_status_notification
+  put: tracim-status-update
   resource: pull-request
-  get_params:
-    skip_download: true
+  inputs: [pull-request]
+  params: {path: pull-request, status: pending, context: $BUILD_JOB_NAME}
+  get_params: {skip_download: true}
 
-_update_status_params: &_update_status_params
-  path: pull-request
-
-_update_pull_request_status_failures: &_update_pull_request_status_failures
+status_notifications: &status_notifications
+  on_success:
+    put: pull-request
+    inputs: [pull-requests]
+    params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
   on_failure:
-    put: pull-request-failure
-    <<: *_update_status
-    params:
-      <<: *_update_status_params
-      status: failure
-  on_error:
-    put: pull-request-error
-    <<: *_update_status
-    params:
-      <<: *_update_status_params
-      status: error
+    put: pull-request
+    inputs: [pull-request]
+    params: {path: pull-request, status: failure, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
   on_abort:
-    put: pull-request-abort
-    <<: *_update_status
-    params:
-      <<: *_update_status_params
-      status: error
+    put: pull-request
+    inputs: [pull-request]
+    params: {path: pull-request, status: error, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
 
 resource_types:
 - name: pull-request
@@ -52,113 +49,106 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
+  - *pending_status_notification
   - get: pull-request
     trigger: true
-  - put: pull-request-pending
-    <<: *_update_status
-    params:
-      <<: *_update_status_params
-      status: pending
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
     vars:
       github-webhook-token: ((github-webhook-token))
       github-access-token: ((github-access-token))
+
 - name: backend-tests
+  <<: *status_notifications
   plan:
-  - get: pull-request
-    passed: [reconfigure-self]
-    trigger: true
+  - in_parallel:
+    - get: pull-request
+      passed: [reconfigure-self]
+      trigger: true
+    - get: test-image
 
   - task: backend-lint
-    platform: linux
     image: test-image
-    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
-    privileged: true
-    inputs:
-      - name: pull-request
-    run:
-      dir: pull-request
-      path: concourse/scripts/backend-lint
+    config:
+      platform: linux
+      inputs:
+        - name: pull-request
+      run:
+        dir: pull-request
+        path: concourse/scripts/backend-lint
 
   - across:
     - var: python_version
       values: ["3.5.10" , "3.6.14", "3.7.11"]
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
-    platform: linux
     image: test-image
     # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
     privileged: true
-    inputs:
-      - name: pull-request
-    vars:
-      python_version: ((.:python_version))
-    run:
-      dir: pull-request
-      path: concourse/scripts/backend-quick-tests
-      args:
-        - ((python_version))
+    config:
+      platform: linux
+      inputs:
+        - name: pull-request
+      run:
+        dir: pull-request
+        path: concourse/scripts/backend-quick-tests
+        args:
+          - ((.:python_version))
 
   - across:
     - var: database
       values: ["sqlite", "postgresql", "mysql", "mariadb"]
       max_in_flight: all
     task: backend-full-tests_((.:database))
-    platform: linux
     image: test-image
     # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
     privileged: true
-    inputs:
-      - name: pull-request
-    vars:
-      database: ((.:database))
-    run:
-      dir: pull-request
-      path: concourse/scripts/backend-full-tests
-      args:
-        - ((database))
-
-  <<: *_update_pull_request_status_failures
+    config:
+      platform: linux
+      inputs:
+        - name: pull-request
+      run:
+        dir: pull-request
+        path: concourse/scripts/backend-full-tests
+        args:
+          - ((.:database))
 
 - name: frontend-tests
+  <<: *status_notifications
   plan:
+  - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
       trigger: true
-    - task: frontend-unit-tests
+    - get: test-image
+
+  - task: frontend-unit-tests
+    image: test-image
+    config:
       platform: linux
-      image: test-image
-      # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
-      privileged: true
       inputs:
         - name: pull-request
       run:
         dir: pull-request
         path: concourse/scripts/frontend-unit-tests
-  <<: *_update_pull_request_status_failures
 
 - name: end-to-end-tests
+  <<: *status_notifications
   plan:
+  - in_parallel:
     - get: pull-request
-      passed: [backend-tests, frontend-tests]
+      passed: [reconfigure-self]
       trigger: true
-    - task: end-to-end-cypress-tests
+    - get: test-image
+  - task: end-to-end-cypress-tests
+    image: test-image
+    # needed for docker during tests
+    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
+    privileged: true
+    config:
       platform: linux
-      image: test-image
-      # needed for docker during tests
-      # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
-      privileged: true
       inputs:
         - name: pull-request
       run:
         dir: pull-request
         path: concourse/scripts/end-to-end-cypress-tests
-
-  on_success:
-    put: pull-request-success
-    <<: *_update_status
-    params:
-      <<: *_update_status_params
-      status: success
-  <<: *_update_pull_request_status_failures
