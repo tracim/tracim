@@ -4,6 +4,9 @@ set -e
 python_version=${1:-3.6.14}
 
 "$(dirname $0)"/install_docker
+source "$(dirname $0)/docker-lib.sh"
+start_docker
+
 "$(dirname $0)"/install_backend_packages
 "$(dirname $0)"/create_backend_dirs backend
 source "$HOME/.bashrc"
@@ -15,6 +18,7 @@ python setup.py develop
 pyenv rehash
 cp development.ini.sample development.ini
 tracimcli db init -d
+
 cd -
 ./setup_functionnal_tests.sh root
 ./install_frontend_dependencies.sh root
