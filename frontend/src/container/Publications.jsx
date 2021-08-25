@@ -55,6 +55,7 @@ import {
   setHeadTitle,
   setFirstComment,
   setPublicationList,
+  setPublicationNextPage,
   setWorkspaceDetail,
   setWorkspaceMemberList,
   updatePublication,
@@ -160,7 +161,7 @@ export class Publications extends React.Component {
 
   handleContentCommentModified = (data) => {
     const { props } = this
-    const parentPublication = props.publicationList.find(publication => publication.id === data.fields.content.parent_id)
+    const parentPublication = props.publicationList.list.find(publication => publication.id === data.fields.content.parent_id)
 
     if (!parentPublication) return
 
@@ -179,14 +180,11 @@ export class Publications extends React.Component {
 
   handleContentCommentDeleted = (data) => {
     const { props } = this
-    const parentPublication = props.publicationList.find(publication => publication.id === data.fields.content.parent_id)
+    const parentPublication = props.publicationList.list.find(publication => publication.id === data.fields.content.parent_id)
 
     if (!parentPublication) return
 
-    const newTimeline = props.removeCommentFromTimeline(
-      data.fields.content.content_id,
-      parentPublication.commentList || []
-    )
+    const newTimeline = (parentPublication.commentList || []).filter(it => it.content_id !== data.fields.content.content_id)
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
@@ -215,10 +213,10 @@ export class Publications extends React.Component {
 
   handleContentCommented = (data) => {
     const { props } = this
-    const lastPublicationId = props.publicationList[props.publicationList.length - 1]
-      ? props.publicationList[props.publicationList.length - 1].id
+    const lastPublicationId = props.publicationList.list[props.publicationList.length - 1]
+      ? props.publicationList.list[props.publicationList.list.length - 1].id
       : undefined
-    const parentPublication = props.publicationList.find(publication => publication.id === data.fields.content.parent_id)
+    const parentPublication = props.publicationList.list.find(publication => publication.id === data.fields.content.parent_id)
 
     // INFO - G.B. - 2021-03-19 - First check if the comment was made in a publication, then check if
     // this publication doesn't have a loaded comment list, if there is the case we load the whole list
@@ -230,10 +228,10 @@ export class Publications extends React.Component {
       return
     }
 
-    const hasBeenRead = true
-    const newTimeline = props.addCommentToTimeline(
-      data.fields.content, parentPublication.commentList, props.user, hasBeenRead, TRANSLATION_STATE.DISABLED
+    const timelineItem = props.buildChildContentTimelineItem(
+      data.fields.content, parentPublication.commentList, props.user, TRANSLATION_STATE.DISABLED
     )
+    const newTimeline = [...parentPublication.commentList, timelineItem]
 
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
     props.dispatch(updatePublication({
@@ -254,7 +252,7 @@ export class Publications extends React.Component {
 
     props.dispatch(updatePublication(data.fields.content))
 
-    const lastPublicationId = props.publicationList[props.publicationList.length - 1].id
+    const lastPublicationId = props.publicationList.list[props.publicationList.list.length - 1].id
     if (data.fields.content.content_id !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
@@ -341,6 +339,7 @@ export class Publications extends React.Component {
       case 200: {
         fetchGetPublicationList.json.items.forEach(publication => this.getCommentList(publication.content_id, publication.content_type))
         props.dispatch(setPublicationList(fetchGetPublicationList.json.items))
+        props.dispatch(setPublicationNextPage(fetchGetPublicationList.json.has_next, fetchGetPublicationList.json.next_page_token))
         break
       }
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning')); break
@@ -362,7 +361,7 @@ export class Publications extends React.Component {
     }
 
     const commentList = props.buildTimelineFromCommentAndRevision(
-      resComment.body,
+      resComment.body.items,
       resCommentAsFile.body.items,
       [], // INFO - CH - 20210324 - this is supposed to be the revision list which we don't have for publications
       props.user,
@@ -572,7 +571,7 @@ export class Publications extends React.Component {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     const currentPublicationId = Number(props.match.params.idcts || 0)
-    const isPublicationListEmpty = props.publicationList.length === 0
+    const isPublicationListEmpty = props.publicationList.list.length === 0
     return (
       <ScrollToBottomWrapper
         customClass='publications'
@@ -590,7 +589,7 @@ export class Publications extends React.Component {
           </div>
         )}
 
-        {props.publicationList.map(publication =>
+        {props.publicationList.list.map(publication =>
           <FeedItemWithPreview
             contentAvailable
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}

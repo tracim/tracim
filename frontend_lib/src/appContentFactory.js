@@ -78,7 +78,7 @@ export function appContentFactory (WrappedComponent) {
 
     constructor (props) {
       super(props)
-      const param = props.data || {}
+      const param = props.data || { content: {} }
       this.state = {
         config: param.config,
         loggedUser: param.loggedUser,
@@ -853,11 +853,16 @@ export function appContentFactory (WrappedComponent) {
       return autoCompleteItemList
     }
 
+    buildChildContentTimelineItem = (content, loggedUser, initialCommentTranslationState) => {
+      const timelineItem = content.content_type === TIMELINE_TYPE.COMMENT
+        ? this.buildTimelineItemComment(content, loggedUser, initialCommentTranslationState)
+        : this.buildTimelineItemCommentAsFile(content, loggedUser)
+      return timelineItem
+    }
+
     // INFO - CH - 20210318 - This function can add comment and file
-    addChildContentToTimeline = (comment, loggedUser, isFromCurrentToken, initialCommentTranslationState) => {
-      const timelineItem = comment.content_type === TIMELINE_TYPE.COMMENT
-        ? this.buildTimelineItemComment(comment, loggedUser, initialCommentTranslationState)
-        : this.buildTimelineItemCommentAsFile(comment, loggedUser)
+    addChildContentToTimeline = (content, loggedUser, isFromCurrentToken, initialCommentTranslationState) => {
+      const timelineItem = this.buildChildContentTimelineItem(content, loggedUser, initialCommentTranslationState)
       this.setState(prevState => {
         const wholeTimeline = sortTimelineByDate([...prevState.wholeTimeline, timelineItem])
         const timeline = sortTimelineByDate([...prevState.timeline, timelineItem])
@@ -970,6 +975,7 @@ export function appContentFactory (WrappedComponent) {
           addContentToFavoriteList={this.addContentToFavoriteList}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
+          buildChildContentTimelineItem={this.buildChildContentTimelineItem}
           updateCommentOnTimeline={this.updateCommentOnTimeline}
           timeline={this.state.timeline}
           loadTimeline={this.loadTimeline}

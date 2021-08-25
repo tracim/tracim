@@ -7,7 +7,8 @@ import {
   REMOVE,
   SET,
   UPDATE,
-  WORKSPACE_PUBLICATION_LIST
+  WORKSPACE_PUBLICATION_LIST,
+  NEXT_PAGE
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
@@ -24,51 +25,76 @@ function uniqByContentId (array) {
   return uniqBy(array, 'id')
 }
 
-const defaultPublicationList = []
+const defaultPublicationPage = {
+  list: [],
+  nextPageToken: '',
+  hasNextPage: false
+}
 
-export default function publicationList (state = defaultPublicationList, action) {
+export default function publicationList (state = defaultPublicationPage, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_PUBLICATION_LIST}`:
-      return uniqByContentId(sortByModifiedDate(
-        action.publicationList.map(publication => serialize(publication, serializeContentProps))
-      ))
+      return {
+        ...state,
+        list: uniqByContentId(sortByModifiedDate(
+          action.publicationList.map(publication => serialize(publication, serializeContentProps))
+        ))
+      }
 
     case `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}`:
-      return uniqByContentId(sortByModifiedDate(state))
+      return {
+        ...state,
+        list: uniqByContentId(sortByModifiedDate(state.list))
+      }
 
     case `${UPDATE}/${PUBLICATION}`: {
       const serializedPublication = action.publication.content_id
         ? serialize(action.publication, serializeContentProps)
         : action.publication
-      return uniqByContentId(state.map(publication => serializedPublication.id === publication.id
-        ? {
-          ...serializedPublication,
-          commentList: publication.commentList
-        }
-        : publication
-      ))
+      const list = uniqByContentId(state.list.map(publication => serializedPublication.id === publication.id
+                                             ? {
+                                               ...serializedPublication,
+                                               commentList: publication.commentList
+                                             }
+                                             : publication
+
+                                            ))
+      return { ...state, list }
     }
 
     case `${REMOVE}/${PUBLICATION}`:
-      return state.filter(publication => action.publicationId !== publication.id)
+      return {
+        ...state,
+        list: state.filter(publication => action.publicationId !== publication.id)
+      }
 
     case `${APPEND}/${PUBLICATION}`: {
       const newPublicationList = state
       newPublicationList.push(serialize(action.publication, serializeContentProps))
-      return uniqByContentId(newPublicationList)
+      return {
+        ...state,
+        list: uniqByContentId(newPublicationList)
+      }
     }
 
-    case `${SET}/${PUBLICATION}/${COMMENT_LIST}`:
-      return uniqByContentId(state.map(publication => action.publicationId === publication.id
-        ? { ...publication, commentList: action.commentList }
+    case `${SET}/${PUBLICATION}/${COMMENT_LIST}`: {
+      const list = uniqByContentId(state.list.map(publication => action.publicationId === publication.id
+                                             ? { ...publication, commentList: action.commentList }
         : publication
       ))
+      return { ...state, list }
+    }
 
-    case `${SET}/${COMMENT}`:
-      return uniqByContentId(state.map(publication => action.publicationId === publication.id
+    case `${SET}/${COMMENT}`: {
+      const list = uniqByContentId(state.list.map(publication => action.publicationId === publication.id
         ? { ...publication, firstComment: action.comment }
         : publication
       ))
+      return { ...state, list }
+    }
+
+    case `${SET}/${WORKSPACE_PUBLICATION_LIST}/${NEXT_PAGE}`:
+      return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
 
     default:
       return state
