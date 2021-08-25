@@ -165,7 +165,7 @@ const ActivityList = (props) => {
           ? activities
           : (
             <div className='activityList__placeholder'>
-              {props.activity.loaded ? props.t('No activity') : props.t('Loading recent activities…')}
+              {props.activity.hasNextPage ? props.t('Loading recent activities…') : props.t('No activity')}
             </div>
           )
         )}

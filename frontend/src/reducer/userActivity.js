@@ -21,7 +21,7 @@ const userActivity = (state = defaultUserActivityState, action) => {
     case `${RESET}/${USER_ACTIVITY}`:
       return defaultUserActivityState
     case `${SET}/${USER_ACTIVITY}/${LIST}`:
-      return { ...state, list: action.activityList, loaded: true }
+      return { ...state, list: action.activityList }
     case `${SET}/${USER_ACTIVITY}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
     case `${SET}/${USER_ACTIVITY}/${EVENT_LIST}`:

@@ -11,7 +11,6 @@ import { setActivityEventList } from '../util/activity.js'
 
 const defaultWorkspaceActivityState = {
   list: [],
-  loaded: false,
   hasNextPage: true,
   nextPageToken: null
 }
