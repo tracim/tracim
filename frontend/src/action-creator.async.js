@@ -1216,9 +1216,9 @@ export const getAdvancedSearchResult = (
   })
 }
 
-export const getPublicationList = (workspaceId) => dispatch => {
+export const getPublicationPage = (workspaceId, count = 0, pageToken = '') => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0&count=${count}&page_token=${pageToken}&sort=modified:desc`,
     param: {
       credentials: 'include',
       headers: {

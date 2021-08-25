@@ -41,6 +41,15 @@ export default function publicationList (state = defaultPublicationPage, action)
         ))
       }
 
+    case `${APPEND}/${WORKSPACE_PUBLICATION_LIST}`: {
+      const serializedPublicationList = action.publicationList.map(
+        publication => serialize(publication, serializeContentProps)
+      )
+      return {
+        ...state,
+        list: uniqByContentId(sortByModifiedDate([...state.list, ...serializedPublicationList]))
+      }
+    }
     case `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}`:
       return {
         ...state,
@@ -69,7 +78,7 @@ export default function publicationList (state = defaultPublicationPage, action)
       }
 
     case `${APPEND}/${PUBLICATION}`: {
-      const newPublicationList = state
+      const newPublicationList = state.list
       newPublicationList.push(serialize(action.publication, serializeContentProps))
       return {
         ...state,

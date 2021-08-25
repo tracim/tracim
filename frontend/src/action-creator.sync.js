@@ -246,6 +246,7 @@ export const PUBLICATION_THREAD = `${PUBLICATION}/Thread`
 export const COMMENT = 'Comment'
 export const COMMENT_LIST = `${COMMENT}List`
 export const setPublicationList = (publicationList) => ({ type: `${SET}/${WORKSPACE_PUBLICATION_LIST}`, publicationList })
+export const appendPublicationList = (publicationList) => ({ type: `${APPEND}/${WORKSPACE_PUBLICATION_LIST}`, publicationList })
 export const setPublicationNextPage = (hasNextPage, nextPageToken) => ({
   type: `${SET}/${WORKSPACE_PUBLICATION_LIST}/${NEXT_PAGE}`,
   hasNextPage,

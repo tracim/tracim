@@ -157,9 +157,9 @@ describe('<Publications />', () => {
     })
   })
 
-  describe('getPublicationList()', () => {
+  describe('getPublicationPage()', () => {
     it('should call setPublicationList()', (done) => {
-      PublicationsInstance.getPublicationList(publicationTLM).then(() => {
+      PublicationsInstance.getPublicationPage(publicationTLM).then(() => {
         expect(setPublicationListCallBack.called).to.equal(true)
       }).then(done, done)
     })

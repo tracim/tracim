@@ -40,7 +40,7 @@ import {
   publicationColor
 } from '../util/helper.js'
 import {
-  getPublicationList,
+  getPublicationPage,
   getWorkspaceDetail,
   getWorkspaceMemberList,
   postThreadPublication,
@@ -59,13 +59,16 @@ import {
   setWorkspaceDetail,
   setWorkspaceMemberList,
   updatePublication,
-  updatePublicationList
+  updatePublicationList,
+  appendPublicationList
 } from '../action-creator.sync.js'
 
 import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
 const wysiwygId = 'wysiwygTimelineCommentPublication'
+
+const PUBLICATION_ITEM_COUNT_PER_PAGE = 3
 
 export class Publications extends React.Component {
   constructor (props) {
@@ -110,7 +113,7 @@ export class Publications extends React.Component {
     this.loadWorkspaceDetail()
     this.setHeadTitle()
     this.buildBreadcrumbs()
-    this.getPublicationList()
+    this.getPublicationPage()
     if (this.props.currentWorkspace.memberList.length === 0) this.loadMemberList()
     this.gotToCurrentPublication()
   }
@@ -132,7 +135,7 @@ export class Publications extends React.Component {
       this.loadWorkspaceDetail()
       this.setHeadTitle()
       this.buildBreadcrumbs()
-      this.getPublicationList()
+      this.getPublicationPage()
     }
 
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
@@ -331,14 +334,15 @@ export class Publications extends React.Component {
     props.dispatch(setHeadTitle(headTitle))
   }
 
-  getPublicationList = async () => {
+  getPublicationPage = async (pageToken = '') => {
     const { props } = this
     const workspaceId = props.match.params.idws
-    const fetchGetPublicationList = await props.dispatch(getPublicationList(workspaceId))
+    const fetchGetPublicationList = await props.dispatch(getPublicationPage(workspaceId, PUBLICATION_ITEM_COUNT_PER_PAGE, pageToken))
     switch (fetchGetPublicationList.status) {
       case 200: {
         fetchGetPublicationList.json.items.forEach(publication => this.getCommentList(publication.content_id, publication.content_type))
-        props.dispatch(setPublicationList(fetchGetPublicationList.json.items))
+        const reduxAction = pageToken.length > 0 ? appendPublicationList : setPublicationList
+        props.dispatch(reduxAction(fetchGetPublicationList.json.items))
         props.dispatch(setPublicationNextPage(fetchGetPublicationList.json.has_next, fetchGetPublicationList.json.next_page_token))
         break
       }
@@ -587,6 +591,16 @@ export class Publications extends React.Component {
           <div className='publications__empty'>
             {props.t('This space does not have any publication yet, create the first publication using the area at the bottom of the page.')}
           </div>
+        )}
+
+        {props.publicationList.hasNextPage && (
+          <IconButton
+            text={props.t('See more')}
+            icon='fas fa-chevron-up'
+            dataCy='showMorePublicationItemsBtn'
+            customClass='publications__showMoreButton'
+            onClick={() => this.getPublicationPage(props.publicationList.nextPageToken)}
+          />
         )}
 
         {props.publicationList.list.map(publication =>
