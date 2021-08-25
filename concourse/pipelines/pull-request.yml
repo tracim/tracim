@@ -44,9 +44,9 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
-  - *pending_status_notification
   - get: pull-request
     trigger: true
+  - *pending_status_notification
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
     vars:
