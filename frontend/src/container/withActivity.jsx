@@ -180,9 +180,10 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           nextPageToken = activitiesParams.nextPageToken
           props.dispatch(setActivityList(activityList))
           props.dispatch(setActivityNextPage(hasNextPage, nextPageToken))
-        } catch {
+        } catch (e) {
           this.changingActivityList = false
           this.loadActivitiesPromise = null
+          console.error(e);
           return
         }
         this.loadActivitiesPromise = null
@@ -249,7 +250,6 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         activityList = await mergeWithActivityList(
           messageListResponse.json.items,
           activityList,
-          workspaceId,
           FETCH_CONFIG.apiUrl
         )
         activityList = activityList.filter(this.activityDisplayFilter)
