@@ -11,7 +11,6 @@ import { setActivityEventList } from '../util/activity.js'
 
 const defaultUserActivityState = {
   list: [],
-  loaded: false,
   hasNextPage: true,
   nextPageToken: null
 }
