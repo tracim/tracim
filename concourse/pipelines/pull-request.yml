@@ -6,12 +6,7 @@ pending_status_notification: &pending_status_notification
   params: {path: pull-request, status: pending, context: $BUILD_JOB_NAME}
   get_params: {skip_download: true}
 
-status_notifications: &status_notifications
-  on_success:
-    put: pull-request
-    inputs: [pull-requests]
-    params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
-    get_params: {skip_download: true}
+failure_status_notifications: &failure_status_notifications
   on_failure:
     put: pull-request
     inputs: [pull-request]
@@ -59,7 +54,7 @@ jobs:
       github-access-token: ((github-access-token))
 
 - name: backend-tests
-  <<: *status_notifications
+  <<: *failure_status_notifications
   plan:
   - in_parallel:
     - get: pull-request
@@ -114,7 +109,7 @@ jobs:
           - ((.:database))
 
 - name: frontend-tests
-  <<: *status_notifications
+  <<: *failure_status_notifications
   plan:
   - in_parallel:
     - get: pull-request
@@ -133,11 +128,16 @@ jobs:
         path: concourse/scripts/frontend-unit-tests
 
 - name: end-to-end-tests
-  <<: *status_notifications
+  <<: *failure_status_notifications
+  on_success:
+    put: pull-request
+    inputs: [pull-requests]
+    params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
   plan:
   - in_parallel:
     - get: pull-request
-      passed: [reconfigure-self]
+      passed: [backend-tests, frontend-tests]
       trigger: true
     - get: test-image
   - task: end-to-end-cypress-tests
