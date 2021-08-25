@@ -203,7 +203,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
   if (!activityParams) return activityList
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
-    const activity = await createActivity(activityParams, [message], null, apiUrl)
+    const activity = await createActivity(activityParams, [message], apiUrl)
     return activity ? [activity, ...activityList] : activityList
   }
   const oldActivity = activityList[activityIndex]

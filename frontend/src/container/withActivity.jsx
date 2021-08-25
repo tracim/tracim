@@ -183,7 +183,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         } catch (e) {
           this.changingActivityList = false
           this.loadActivitiesPromise = null
-          console.error(e);
+          console.error(e)
           return
         }
         this.loadActivitiesPromise = null
