@@ -49,36 +49,34 @@ export const serializeNotification = notification => {
   }
 }
 
-const hasSameAuthor = (author1, author2, author3 = {}) => {
-  if (!(author1 && author2)) return false
-  if (Object.keys(author3).length === 0) return author1.userId === author2.userId
-  if (author3) return author1.userId === author2.userId && author2.userId === author3.userId
-  return false
+const hasSameAuthor = authorList => {
+  if (authorList.some(author => !author)) return false
+  return authorList.every((author, index) => {
+    if (index === 0) return true
+    return author.userId === authorList[index - 1].userId
+  })
 }
 
-const hasSameWorkspace = (workspace1, workspace2, workspace3 = {}) => {
-  if (!(workspace1 && workspace2)) return false
-  if (Object.keys(workspace3).length === 0) return workspace1.id === workspace2.id
-  if (workspace3) return workspace1.id === workspace2.id && workspace2.id === workspace3.id
-  return false
+const hasSameWorkspace = workspaceList => {
+  if (workspaceList.some(workspace => !workspace)) return false
+  return workspaceList.every((workspace, index) => {
+    if (index === 0) return true
+    return workspace.id === workspaceList[index - 1].id
+  })
 }
 
-const hasSameContent = (content1, type1, content2, type2, content3 = {}, type3) => {
-  if (!(content1 && content2)) return false
-  const content1Id = type1.includes('comment')
-    ? content1.parentId
-    : content1.id
-  const content2Id = type2.includes('comment')
-    ? content2.parentId
-    : content2.id
-  if (Object.keys(content3).length === 0) return content1Id === content2Id
-  if (content3) {
-    const content3Id = type3.includes('comment')
-      ? content3.parentId
-      : content3.id
-    return content1Id === content2Id && content2Id === content3Id
-  }
-  return false
+const hasSameContent = notificationList => {
+  if (notificationList.some(notification => !notification.content)) return false
+  return notificationList.every((notification, index) => {
+    if (index === 0) return true
+    const previousContentId = notificationList[index - 1].type.includes('comment')
+      ? notificationList[index - 1].content.parentId
+      : notificationList[index - 1].content.id
+    const contentId = notification.type.includes('comment')
+      ? notification.content.parentId
+      : notification.content.id
+    return contentId === previousContentId
+  })
 }
 
 const groupNotificationListWithTwoCriteria = (notificationList) => {
@@ -96,18 +94,13 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
 
     if (previousNotificationInNewList.groupType) {
       const isGroupedByContent = previousNotificationInNewList.groupType.includes('content') &&
-        hasSameContent(
-          notification.content,
-          notification.type,
-          previousNotificationInNewList.content,
-          previousNotificationInNewList.type
-        )
+        hasSameContent([notification, previousNotificationInNewList])
 
       const isGroupedByWorkspace = previousNotificationInNewList.groupType.includes('workspace') &&
-        hasSameWorkspace(notification.workspace, previousNotificationInNewList.workspace)
+        hasSameWorkspace([notification.workspace, previousNotificationInNewList.workspace])
 
       const isGroupedByAuthor = previousNotificationInNewList.groupType.includes('author') &&
-        hasSameAuthor(notification.author, previousNotificationInNewList.author)
+        hasSameAuthor([notification.author, previousNotificationInNewList.author])
 
       if (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace)) {
         previousNotificationInNewList.group.push(notification)
@@ -118,16 +111,9 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
         const previousNotification = notificationList[index - 1]
         const beforePreviousNotification = notificationList[index - 2]
 
-        const isGroupedByAuthor = hasSameAuthor(notification.author, previousNotification.author, beforePreviousNotification.author)
-        const isGroupedByWorkspace = hasSameWorkspace(notification.workspace, previousNotification.workspace, beforePreviousNotification.workspace)
-        const isGroupedByContent = hasSameContent(
-          notification.content,
-          notification.type,
-          previousNotification.content,
-          previousNotification.type,
-          beforePreviousNotification.content,
-          beforePreviousNotification.type
-        )
+        const isGroupedByAuthor = hasSameAuthor([notification.author, previousNotification.author, beforePreviousNotification.author])
+        const isGroupedByWorkspace = hasSameWorkspace([notification.workspace, previousNotification.workspace, beforePreviousNotification.workspace])
+        const isGroupedByContent = hasSameContent([notification, previousNotification, beforePreviousNotification])
 
         if (
           isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace) &&
@@ -138,7 +124,7 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
           newNotificationList.push({
             ...notification,
             read: beforePreviousNotification.read && previousNotification.read && notification.read,
-            groupType: `group${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`,
+            groupType: `twoCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`,
             group: [beforePreviousNotification, previousNotification, notification]
           })
           indexInNewList--
@@ -150,7 +136,72 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
     indexInNewList++
     newNotificationList.push(notification)
   })
-  console.log('newNotificationList', newNotificationList)
+  console.log(groupNotificationListWithOneCriteria(newNotificationList))
+}
+
+const groupNotificationListWithOneCriteria = (notificationList) => {
+  const newNotificationList = []
+  let indexInNewList = 0
+  // debugger
+  notificationList.forEach((notification, index) => {
+    if (index < 5 || notification.type.includes('mention')) {
+      indexInNewList++
+      newNotificationList.push(notification)
+      return
+    }
+
+    const previousNotificationInNewList = newNotificationList[indexInNewList - 1]
+
+    if (previousNotificationInNewList.groupType) {
+      if (previousNotificationInNewList.groupType.startsWith('twoCriteriaGroup')) {
+        indexInNewList++
+        newNotificationList.push(notification)
+      } else {
+        const isGroupedByContent = previousNotificationInNewList.groupType.includes('content') &&
+          hasSameContent([notification, previousNotificationInNewList])
+
+        const isGroupedByWorkspace = previousNotificationInNewList.groupType.includes('workspace') &&
+          hasSameWorkspace([notification.workspace, previousNotificationInNewList.workspace])
+
+        const isGroupedByAuthor = previousNotificationInNewList.groupType.includes('author') &&
+          hasSameAuthor([notification.author, previousNotificationInNewList.author])
+
+        if (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace) {
+          previousNotificationInNewList.group.push(notification)
+          return
+        }
+      }
+    } else {
+      if (!newNotificationList.slice(index - 5, index - 1).some(notification => notification.groupType)) {
+        const previousNotificationList = newNotificationList.slice(index - 5, index)
+        const isGroupedByAuthor = hasSameAuthor([notification.author, ...previousNotificationList.map(notification => notification.author)])
+        const isGroupedByWorkspace = hasSameWorkspace([notification.workspace, ...previousNotificationList.map(notification => notification.workspace)])
+        const isGroupedByContent = hasSameContent([notification, ...previousNotificationList])
+
+        if (
+          (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace) &&
+          (!previousNotificationList.some(notification => notification.type.includes('mention')))
+        ) {
+          newNotificationList.pop()
+          newNotificationList.pop()
+          newNotificationList.pop()
+          newNotificationList.pop()
+          newNotificationList.pop()
+          newNotificationList.push({
+            ...notification,
+            groupType: `oneCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`,
+            group: [notification, ...previousNotificationList]
+          })
+          indexInNewList = indexInNewList - 4
+          return
+        }
+      }
+    }
+
+    indexInNewList++
+    newNotificationList.push(notification)
+  })
+  return newNotificationList
 }
 
 export default function notificationPage (state = defaultNotificationsObject, action) {
