@@ -3,19 +3,19 @@ pending_status_notification: &pending_status_notification
   put: tracim-status-update
   resource: pull-request
   inputs: [pull-request]
-  params: {path: pull-request, status: pending, context: "linting & tests"}
+  params: {path: pull-request, status: pending}
   get_params: {skip_download: true}
 
 failure_status_notifications: &failure_status_notifications
   on_failure:
     put: pull-request
     inputs: [pull-request]
-    params: {path: pull-request, status: failure, context: $BUILD_JOB_NAME}
+    params: {path: pull-request, status: failure, description: "$BUILD_JOB_NAME failed"}
     get_params: {skip_download: true}
   on_abort:
     put: pull-request
     inputs: [pull-request]
-    params: {path: pull-request, status: error, context: $BUILD_JOB_NAME}
+    params: {path: pull-request, status: error, description: "$BUILD_JOB_NAME was aborted"}
     get_params: {skip_download: true}
 
 resource_types:
