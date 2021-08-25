@@ -3,7 +3,7 @@ pending_status_notification: &pending_status_notification
   put: tracim-status-update
   resource: pull-request
   inputs: [pull-request]
-  params: {path: pull-request, status: pending, context: $BUILD_JOB_NAME}
+  params: {path: pull-request, status: pending, context: "linting & tests"}
   get_params: {skip_download: true}
 
 failure_status_notifications: &failure_status_notifications
@@ -46,7 +46,9 @@ jobs:
   plan:
   - get: pull-request
     trigger: true
+
   - *pending_status_notification
+
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
     vars:
@@ -106,6 +108,7 @@ jobs:
         dir: pull-request
         path: concourse/scripts/backend-full-tests
         args:
+          - "3.7.11"
           - ((.:database))
 
 - name: frontend-tests
@@ -129,17 +132,12 @@ jobs:
 
 - name: end-to-end-tests
   <<: *failure_status_notifications
-  on_success:
-    put: pull-request
-    inputs: [pull-requests]
-    params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
-    get_params: {skip_download: true}
   plan:
   - in_parallel:
     - get: pull-request
-      passed: [backend-tests, frontend-tests]
       trigger: true
     - get: test-image
+
   - task: end-to-end-cypress-tests
     image: test-image
     # needed for docker during tests
@@ -152,3 +150,15 @@ jobs:
       run:
         dir: pull-request
         path: concourse/scripts/end-to-end-cypress-tests
+
+- name: notify-pull-request-success
+  <<: *failure_status_notifications
+  on_success:
+    put: pull-request
+    inputs: [pull-requests]
+    params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
+  plan:
+    - get: pull-request
+      trigger: true
+      passed: [backend-tests, frontend-tests, end-to-end-tests]
