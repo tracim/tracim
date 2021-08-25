@@ -20,7 +20,7 @@ const workspaceActivity = (state = defaultWorkspaceActivityState, action) => {
     case `${RESET}/${WORKSPACE_ACTIVITY}`:
       return defaultWorkspaceActivityState
     case `${SET}/${WORKSPACE_ACTIVITY}/${LIST}`:
-      return { ...state, list: action.activityList, loaded: true }
+      return { ...state, list: action.activityList }
     case `${SET}/${WORKSPACE_ACTIVITY}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }
     case `${SET}/${WORKSPACE_ACTIVITY}/${EVENT_LIST}`:
