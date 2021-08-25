@@ -53,7 +53,7 @@ export function TracimComponent (WrappedComponent) {
       const hasGlobalHandler = this.globalLiveMessageHandlerList.length > 0
       if (typeHandler || typeWithoutSubTypeHandler || hasGlobalHandler) data.fields.author = updateTLMUser(data.fields.author, true)
       if (typeHandler) typeHandler(data)
-      if (typeWithoutSubTypeHandler) typeWithoutSubTypeHandler(data)
+      if (typeWithoutSubTypeHandler && type !== typeWithoutSubType) typeWithoutSubTypeHandler(data)
       if (hasGlobalHandler) {
         for (const handler of this.globalLiveMessageHandlerList) {
           handler(data)

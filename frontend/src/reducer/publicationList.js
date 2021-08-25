@@ -61,13 +61,12 @@ export default function publicationList (state = defaultPublicationPage, action)
         ? serialize(action.publication, serializeContentProps)
         : action.publication
       const list = uniqByContentId(state.list.map(publication => serializedPublication.id === publication.id
-                                             ? {
-                                               ...serializedPublication,
-                                               commentList: publication.commentList
-                                             }
-                                             : publication
-
-                                            ))
+        ? {
+          ...serializedPublication,
+          commentList: publication.commentList
+        }
+        : publication
+      ))
       return { ...state, list }
     }
 
@@ -88,7 +87,7 @@ export default function publicationList (state = defaultPublicationPage, action)
 
     case `${SET}/${PUBLICATION}/${COMMENT_LIST}`: {
       const list = uniqByContentId(state.list.map(publication => action.publicationId === publication.id
-                                             ? { ...publication, commentList: action.commentList }
+        ? { ...publication, commentList: action.commentList }
         : publication
       ))
       return { ...state, list }
