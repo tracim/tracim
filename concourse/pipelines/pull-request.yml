@@ -1,22 +1,32 @@
-# YAML definitions re-used in plans
+## YAML definitions re-used in plans
+
+# plan step to put the current job name as pending in github's PR
 pending_status_notification: &pending_status_notification
   put: tracim-status-update
   resource: pull-request
   inputs: [pull-request]
-  params: {path: pull-request, status: pending}
+  params: {path: pull-request, status: pending, context: $BUILD_JOB_NAME}
   get_params: {skip_download: true}
 
-failure_status_notifications: &failure_status_notifications
+# sync job statuses as success/failure/error in github's PR.
+status_notifications: &status_notifications
+  on_success:
+    put: pull-request
+    inputs: [pull-requests]
+    params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
+    get_params: {skip_download: true}
   on_failure:
     put: pull-request
     inputs: [pull-request]
-    params: {path: pull-request, status: failure, description: "$BUILD_JOB_NAME failed"}
+    params: {path: pull-request, status: failure, context: $BUILD_JOB_NAME}
     get_params: {skip_download: true}
   on_abort:
     put: pull-request
     inputs: [pull-request]
-    params: {path: pull-request, status: error, description: "$BUILD_JOB_NAME was aborted"}
+    params: {path: pull-request, status: error, context: $BUILD_JOB_NAME}
     get_params: {skip_download: true}
+## END YAML definitions
+
 
 resource_types:
 - name: pull-request
@@ -25,6 +35,7 @@ resource_types:
     repository: aoldershaw/github-pr-resource
 
 resources:
+# the github's pull-request
 - name: pull-request
   type: pull-request
   check_every: 30s
@@ -36,18 +47,25 @@ resources:
     repository: tracim/tracim
     access_token: ((github-access-token))
     number: ((number))
+# docker image used for running tests.
 - name: test-image
   type: registry-image
   source:
     repository: algooci/tracim
 
+
+# Pipeline jobs:
+# 1. update this pipeline if the PR's file has changed
+# 2. run backend (lint -> quick tests -> full tests) checks
+#    run frontend (lint + unit tests) checks
+#    run end-to-end (cypress) checks
+#    All of these in parallel.
+# Each check has its own status in the github's PR.
 jobs:
 - name: reconfigure-self
   plan:
   - get: pull-request
     trigger: true
-
-  - *pending_status_notification
 
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
@@ -56,8 +74,10 @@ jobs:
       github-access-token: ((github-access-token))
 
 - name: backend-tests
-  <<: *failure_status_notifications
+  <<: *status_notifications
   plan:
+  - *pending_status_notification
+
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
@@ -112,8 +132,11 @@ jobs:
           - ((.:database))
 
 - name: frontend-tests
-  <<: *failure_status_notifications
+  <<: *status_notifications
+
   plan:
+  - *pending_status_notification
+
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
@@ -131,8 +154,10 @@ jobs:
         path: concourse/scripts/frontend-unit-tests
 
 - name: end-to-end-tests
-  <<: *failure_status_notifications
+  <<: *status_notifications
   plan:
+  - *pending_status_notification
+
   - in_parallel:
     - get: pull-request
       trigger: true
@@ -150,15 +175,3 @@ jobs:
       run:
         dir: pull-request
         path: concourse/scripts/end-to-end-cypress-tests
-
-- name: notify-pull-request-success
-  <<: *failure_status_notifications
-  on_success:
-    put: pull-request
-    inputs: [pull-requests]
-    params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
-    get_params: {skip_download: true}
-  plan:
-    - get: pull-request
-      trigger: true
-      passed: [backend-tests, frontend-tests, end-to-end-tests]
