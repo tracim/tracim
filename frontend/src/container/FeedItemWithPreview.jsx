@@ -360,7 +360,6 @@ export class FeedItemWithPreview extends React.Component {
                   author={commentToShow.author}
                   loggedUser={loggedUser}
                   createdRaw={commentToShow.created_raw}
-                  createdDistance={commentToShow.created}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent

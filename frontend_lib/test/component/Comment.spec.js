@@ -8,15 +8,13 @@ import { TRANSLATION_STATE } from '../../src/translation.js'
 describe('<Comment />', () => {
   const props = {
     apiUrl: '',
-    createdRaw: 'date',
+    createdRaw: 0,
     customClass: 'randomCustomClass',
     customColor: '#252525',
     author: { public_name: 'randomAuthor' },
     isPublication: false,
     loggedUser: { public_name: 'randomUser' },
     text: 'randomText',
-    createdFormated: 'randomCreatedFormated',
-    createdDistance: 'randomCreatedDistance',
     contentId: 1337,
     workspaceId: 42,
     apiContent: {
@@ -56,10 +54,6 @@ describe('<Comment />', () => {
 
     it(`should display the author ${props.author.public_name} of the comment`, () => {
       expect(wrapper.find(`span.${props.customClass}__body__content__header__meta__author`)).to.have.text().equal(props.author.public_name)
-    })
-
-    it(`should display the created Distance ${props.createdDistance} of the comment`, () => {
-      expect(wrapper.find(`div.${props.customClass}__body__content__header__meta__date`)).to.have.text().equal(props.createdDistance)
     })
 
     it(`should display the text ${props.text} of the comment`, () => {

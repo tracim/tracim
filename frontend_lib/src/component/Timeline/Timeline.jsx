@@ -6,7 +6,7 @@ import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import { ROLE, formatAbsoluteDate, TIMELINE_TYPE } from '../../helper.js'
+import { ROLE, formatAbsoluteDate, displayDistanceDate, TIMELINE_TYPE } from '../../helper.js'
 import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
@@ -19,6 +19,7 @@ import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import EditCommentPopup from './EditCommentPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import Loading from '../Loading/Loading.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -145,7 +146,7 @@ export class Timeline extends React.Component {
           shouldScrollToBottom={props.shouldScrollToBottom}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
-          {props.timelineData.map(content => {
+          {props.loading ? <Loading /> : props.timelineData.map(content => {
             switch (content.timelineType) {
               case TIMELINE_TYPE.COMMENT:
               case TIMELINE_TYPE.COMMENT_AS_FILE:
@@ -161,7 +162,6 @@ export class Timeline extends React.Component {
                     author={content.author}
                     loggedUser={props.loggedUser}
                     createdRaw={content.created_raw}
-                    createdDistance={content.created}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
@@ -183,7 +183,7 @@ export class Timeline extends React.Component {
                     customColor={props.customColor}
                     revisionType={content.revision_type}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
-                    createdDistance={content.created}
+                    createdDistance={displayDistanceDate(content.created_raw, props.loggedUser.lang)}
                     number={content.number}
                     status={props.availableStatusList.find(status => status.slug === content.status)}
                     authorPublicName={content.author.public_name}

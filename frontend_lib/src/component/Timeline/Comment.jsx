@@ -15,6 +15,7 @@ import {
   ROLE,
   CONTENT_TYPE,
   formatAbsoluteDate,
+  displayDistanceDate,
   addExternalLinksIcons
 } from '../../helper.js'
 
@@ -33,6 +34,7 @@ const Comment = props => {
   }
 
   const createdFormated = formatAbsoluteDate(props.createdRaw, props.loggedUser.lang)
+  const createdDistance = displayDistanceDate(props.createdRaw, props.loggedUser.lang)
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
 
@@ -72,7 +74,7 @@ const Comment = props => {
                     className={classnames(`${props.customClass}__body__content__header__meta__date`, 'comment__body__content__header__meta__date')}
                     title={createdFormated}
                   >
-                    {props.createdDistance}
+                    {createdDistance}
                   </div>
                 </div>
 
@@ -184,8 +186,7 @@ Comment.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
   text: PropTypes.string,
-  createdRaw: PropTypes.string,
-  createdDistance: PropTypes.string.isRequired,
+  createdRaw: PropTypes.string.isRequired,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
   onClickEditComment: PropTypes.func,
@@ -199,7 +200,6 @@ Comment.propTypes = {
 }
 
 Comment.defaultProps = {
-  createdRaw: '',
   customClass: '',
   text: '',
   fromMe: false,

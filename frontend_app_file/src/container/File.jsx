@@ -88,6 +88,8 @@ export class File extends React.Component {
       newComment: '',
       newCommentAsFileList: [],
       newContent: {},
+      loadingContent: true,
+      loadingTimeline: true,
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -164,7 +166,6 @@ export class File extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
     )
-    this.loadTimeline()
   }
 
   handleContentModified = (data) => {
@@ -268,7 +269,7 @@ export class File extends React.Component {
       ) || ''
     })
 
-    await this.loadContent(pageToLoad)
+    this.loadContent(pageToLoad)
     this.loadTimeline()
     if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
@@ -315,6 +316,7 @@ export class File extends React.Component {
   loadContent = async (pageToLoad = null) => {
     const { state, props } = this
 
+    this.setState({ loadingContent: true })
     const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
     switch (response.apiResponse.status) {
@@ -322,6 +324,7 @@ export class File extends React.Component {
         const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
         const pageForPreview = pageToLoad || state.fileCurrentPage
         this.setState({
+          loadingContent: false,
           content: {
             ...response.body,
             filenameNoExtension: filenameNoExtension,
@@ -351,6 +354,8 @@ export class File extends React.Component {
   loadTimeline = async () => {
     const { props, state } = this
 
+    this.setState({ loadingTimeline: true })
+
     const [resComment, resCommentAsFile, resRevision] = await Promise.all([
       handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
       handleFetchResult(await getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
@@ -375,7 +380,7 @@ export class File extends React.Component {
       getDefaultTranslationState(state.config.system.config)
     )
 
-    this.setState({ timeline: revisionWithComment })
+    this.setState({ timeline: revisionWithComment, loadingTimeline: false })
   }
 
   loadShareLinkList = async () => {
@@ -915,6 +920,7 @@ export class File extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            loading={state.loadingTimeline}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             apiUrl={state.config.apiUrl}
@@ -1117,6 +1123,7 @@ export class File extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          loading={state.loadingContent}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
