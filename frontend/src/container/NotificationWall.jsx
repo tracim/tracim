@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -16,11 +15,9 @@ import {
   setNextPage
 } from '../action-creator.sync.js'
 import {
-  FETCH_CONFIG,
   CONTENT_NAMESPACE
 } from '../util/helper.js'
 import {
-  AVATAR_SIZE,
   CONTENT_TYPE,
   IconButton,
   PROFILE,
@@ -33,11 +30,11 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   GROUP_MENTION_TRANSLATION_LIST,
   TracimComponent,
-  Avatar,
-  formatAbsoluteDate,
   PAGE
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
+import NotificationItem from './NotificationItem.jsx'
+import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export class NotificationWall extends React.Component {
   shortDate = date => {
@@ -413,57 +410,26 @@ export class NotificationWall extends React.Component {
 
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
-            const notificationDetails = this.getNotificationDetails(notification)
-            if (Object.keys(notificationDetails).length === 0) return
-
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
                 read={false}
                 key={notification.id}
               >
-                <Link
-                  to={notificationDetails.url || '#'}
-                  onClick={(e) => this.handleClickNotification(e, notification.id, notificationDetails)}
-                  className={classnames('notification__list__item',
-                    { itemRead: notification.read, isMention: notificationDetails.isMention }
+                {notification.groupType
+                  ? (
+                    <GroupedNotificationItem
+                      onClickNotification={this.handleClickNotification}
+                      shortDate={this.shortDate}
+                      notification={notification}
+                    />
+                  ) : (
+                    <NotificationItem
+                      onClickNotification={this.handleClickNotification}
+                      notification={notification}
+                      shortDate={this.shortDate}
+                    />
                   )}
-                  key={notification.id}
-                >
-                  <div className='notification__list__item__text'>
-                    <Avatar
-                      size={AVATAR_SIZE.SMALL}
-                      apiUrl={FETCH_CONFIG.apiUrl}
-                      user={notification.author}
-                    />
-                    <span
-                      className='notification__list__item__text__content'
-                      dangerouslySetInnerHTML={{
-                        __html: (
-                          notificationDetails.text + ' ' +
-                          `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
-                          '</span>'
-                        )
-                      }}
-                    />
-                  </div>
-                  <div className='notification__list__item__meta'>
-                    <div
-                      className='notification__list__item__meta__date'
-                      title={formatAbsoluteDate(notification.created, props.user.lang)}
-                    >
-                      {this.shortDate(notification.created)}
-                    </div>
-                    <div className='notification__list__item__meta__space'>
-                      {(notification.workspace &&
-                        notification.workspace.label
-                      )}
-                    </div>
-                  </div>
-                  <div className='notification__list__item__circle__wrapper'>
-                    {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
-                  </div>
-                </Link>
               </ListItemWrapper>
             )
           })}

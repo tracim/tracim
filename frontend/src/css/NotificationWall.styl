@@ -38,6 +38,22 @@
           text-overflow ellipsis
         & .avatar
           margin-inline-end standardSpacing
+        &__avatars
+          width 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          margin-inline-end standardSpacing
+          &__second
+            position absolute
+            top 20px
+            left 20px // INFO - GB - 2021-08-26 - 20px is two authors avatar's size
+        &__usersAvatar
+          min-width 30px
+          min-height 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          display flex
+          border-radius 50%
+          margin-inline-end standardSpacing
+          align-items center
+          justify-content center
+          background-color lightDarkGrey
       &__meta
         padding-right textSpacing
         color lightDarkGrey

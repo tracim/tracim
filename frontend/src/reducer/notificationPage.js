@@ -104,6 +104,7 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
 
       if (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace)) {
         previousNotificationInNewList.group.push(notification)
+        previousNotificationInNewList.groupType = `twoCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`
         return
       }
     } else {
@@ -119,10 +120,12 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
           isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace) &&
             (!previousNotification.type.includes('mention') && !beforePreviousNotification.type.includes('mention'))
         ) {
+          const authorList = uniqBy([beforePreviousNotification.author, previousNotification.author, notification.author], 'userId')
           newNotificationList.pop()
           newNotificationList.pop()
           newNotificationList.push({
             ...notification,
+            author: authorList,
             read: beforePreviousNotification.read && previousNotification.read && notification.read,
             groupType: `twoCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`,
             group: [beforePreviousNotification, previousNotification, notification]
@@ -136,15 +139,15 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
     indexInNewList++
     newNotificationList.push(notification)
   })
-  console.log(groupNotificationListWithOneCriteria(newNotificationList))
+  return groupNotificationListWithOneCriteria(newNotificationList)
 }
 
 const groupNotificationListWithOneCriteria = (notificationList) => {
   const newNotificationList = []
   let indexInNewList = 0
-  // debugger
+
   notificationList.forEach((notification, index) => {
-    if (index < 5 || notification.type.includes('mention')) {
+    if (index < 5 || notification.type.includes('mention') || notification.groupType) {
       indexInNewList++
       newNotificationList.push(notification)
       return
@@ -156,6 +159,7 @@ const groupNotificationListWithOneCriteria = (notificationList) => {
       if (previousNotificationInNewList.groupType.startsWith('twoCriteriaGroup')) {
         indexInNewList++
         newNotificationList.push(notification)
+        return
       } else {
         const isGroupedByContent = previousNotificationInNewList.groupType.includes('content') &&
           hasSameContent([notification, previousNotificationInNewList])
@@ -168,12 +172,14 @@ const groupNotificationListWithOneCriteria = (notificationList) => {
 
         if (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace) {
           previousNotificationInNewList.group.push(notification)
+          previousNotificationInNewList.groupType = `oneCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`
           return
         }
       }
     } else {
-      if (!newNotificationList.slice(index - 5, index - 1).some(notification => notification.groupType)) {
-        const previousNotificationList = newNotificationList.slice(index - 5, index)
+      if (indexInNewList >= 5 &&
+        !newNotificationList.slice(indexInNewList - 5, indexInNewList - 1).some(notification => notification.groupType)) {
+        const previousNotificationList = newNotificationList.slice(indexInNewList - 5, indexInNewList)
         const isGroupedByAuthor = hasSameAuthor([notification.author, ...previousNotificationList.map(notification => notification.author)])
         const isGroupedByWorkspace = hasSameWorkspace([notification.workspace, ...previousNotificationList.map(notification => notification.workspace)])
         const isGroupedByContent = hasSameContent([notification, ...previousNotificationList])
@@ -182,6 +188,10 @@ const groupNotificationListWithOneCriteria = (notificationList) => {
           (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace) &&
           (!previousNotificationList.some(notification => notification.type.includes('mention')))
         ) {
+          const authorList = uniqBy([
+            notification.author,
+            ...previousNotificationList.map(notification => notification.author)
+          ], 'userId')
           newNotificationList.pop()
           newNotificationList.pop()
           newNotificationList.pop()
@@ -189,6 +199,7 @@ const groupNotificationListWithOneCriteria = (notificationList) => {
           newNotificationList.pop()
           newNotificationList.push({
             ...notification,
+            author: authorList,
             groupType: `oneCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`,
             group: [notification, ...previousNotificationList]
           })
@@ -210,8 +221,8 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${SET}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
         .map(no => (serializeNotification(no)))
-      groupNotificationListWithTwoCriteria(notificationList)
-      return { ...state, list: uniqBy(notificationList, 'id') }
+      const groupedNotificationList = groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id'))
+      return { ...state, list: groupedNotificationList }
     }
 
     case `${APPEND}/${NOTIFICATION_LIST}`: {
