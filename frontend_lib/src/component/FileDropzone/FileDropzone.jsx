@@ -22,7 +22,7 @@ export const FileDropzone = props => {
       style={{}} // to reset default style
       inputProps={{ 'data-cy': 'filecontent__form_input_file' }}
     >
-      <div className='filecontent__form mb-4' drop='true'>
+      <div className='filecontent__form' drop='true'>
         {(() => {
           switch (props.preview) {
             case FILE_PREVIEW_STATE.NO_FILE:
