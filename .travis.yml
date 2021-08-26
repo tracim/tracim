@@ -1,7 +1,4 @@
 ---
-branches:
-  except:
-    - misc/4828__concourse_pipeline
 env:
   global:
     - DB=sqlite
