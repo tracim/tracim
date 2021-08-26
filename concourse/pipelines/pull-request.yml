@@ -76,13 +76,14 @@ jobs:
 - name: backend-tests
   <<: *status_notifications
   plan:
-  - *pending_status_notification
 
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
       trigger: true
     - get: test-image
+
+  - *pending_status_notification
 
   - task: backend-lint
     image: test-image
@@ -135,13 +136,14 @@ jobs:
   <<: *status_notifications
 
   plan:
-  - *pending_status_notification
 
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
       trigger: true
     - get: test-image
+
+  - *pending_status_notification
 
   - task: frontend-unit-tests
     image: test-image
@@ -156,12 +158,13 @@ jobs:
 - name: end-to-end-tests
   <<: *status_notifications
   plan:
-  - *pending_status_notification
-
   - in_parallel:
     - get: pull-request
+      passed: [reconfigure-self]
       trigger: true
     - get: test-image
+
+  - *pending_status_notification
 
   - task: end-to-end-cypress-tests
     image: test-image
