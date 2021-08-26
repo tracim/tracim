@@ -12,7 +12,7 @@ pending_status_notification: &pending_status_notification
 status_notifications: &status_notifications
   on_success:
     put: pull-request
-    inputs: [pull-requests]
+    inputs: [pull-request]
     params: {path: pull-request, status: success, context: $BUILD_JOB_NAME}
     get_params: {skip_download: true}
   on_failure:
