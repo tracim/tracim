@@ -20,17 +20,17 @@ import {
 import {
   CONTENT_TYPE,
   IconButton,
+  GROUP_MENTION_TRANSLATION_LIST,
   PROFILE,
   ListItemWrapper,
-  PopinFixedHeader,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
   SUBSCRIPTION_TYPE,
   NUMBER_RESULTS_BY_PAGE,
-  GROUP_MENTION_TRANSLATION_LIST,
-  TracimComponent,
-  PAGE
+  PAGE,
+  PopinFixedHeader,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
 import NotificationItem from './NotificationItem.jsx'
@@ -126,7 +126,7 @@ export class NotificationWall extends React.Component {
         ? (
           isPublication
             ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.id)
-            : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id)
+            : PAGE.CONTENT(notification.content.id)
         )
         : ''
     )
@@ -296,8 +296,7 @@ export class NotificationWall extends React.Component {
       // INFO - GB - 2020-12-29 - MODIFIED.accepted and DELETED events do not make notifications
 
       if (props.user.userId === notification.subscription.author.userId) {
-        // RJ - 2020-10-19 - NOTE
-        // TLM_EVENT.CREATED notifications should not be shown, or even received
+        // INFO - RJ - 2020-10-19 - TLM_EVENT.CREATED notifications should not be shown, or even received
         // assuming that the author of a subscription is always the concerned user
         if (eventType === TLM_EVENT.MODIFIED) {
           if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) return {}
@@ -416,18 +415,20 @@ export class NotificationWall extends React.Component {
                 read={false}
                 key={notification.id}
               >
-                {notification.groupType
+                {notification.group
                   ? (
                     <GroupedNotificationItem
                       onClickNotification={this.handleClickNotification}
                       shortDate={this.shortDate}
                       notification={notification}
+                      getNotificationDetails={this.getNotificationDetails}
                     />
                   ) : (
                     <NotificationItem
                       onClickNotification={this.handleClickNotification}
                       notification={notification}
                       shortDate={this.shortDate}
+                      getNotificationDetails={this.getNotificationDetails}
                     />
                   )}
               </ListItemWrapper>

@@ -32,14 +32,15 @@
         word-break break-word
         align-items center
         &__content
-          line-height standardFontSize
-          max-height 2*standardFontSize
+          line-height standardFontSize + 1
+          max-height 2*standardFontSize + 1
           overflow hidden
           text-overflow ellipsis
         & .avatar
           margin-inline-end standardSpacing
         &__avatars
           width 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          height 30px
           margin-inline-end standardSpacing
           &__second
             position absolute
@@ -101,9 +102,6 @@
       font-weight normal
 
 .contentTitle
-  &__highlight
-    font-weight bold
-.documentTitle
   &__highlight
     font-weight bold
 
