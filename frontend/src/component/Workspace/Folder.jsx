@@ -7,7 +7,7 @@ import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
 import DragHandle from '../DragHandle.jsx'
-import { DropdownMenu, PAGE, ROLE } from 'tracim_frontend_lib'
+import { DropdownMenu, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
   sortContentList,
@@ -98,6 +98,7 @@ class Folder extends React.Component {
 
             <div className='folder__header__name'>
               {props.folderData.label}
+              {props.loading && <>&nbsp;<Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /></>}
             </div>
           </div>
 
@@ -297,6 +298,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDrop
 export default translate()(FolderContainer)
 
 Folder.propTypes = {
+  loading: PropTypes.bool,
   folderData: PropTypes.object,
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,

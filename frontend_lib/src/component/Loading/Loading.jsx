@@ -7,9 +7,9 @@ import Icon from '../Icon/Icon.jsx'
 const Loading = (props) => (
   <div className='loading'>
     <div className='loading__icon'>
-      <Icon icon='fas fa-spin fa-spinner' title='' />
+      <Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} />
     </div>
-    <div className='loading__text'>{props.t('Loading...')}</div>
+    <div className='loading__text'>{props.t('Loading…')}</div>
   </div>
 )
 

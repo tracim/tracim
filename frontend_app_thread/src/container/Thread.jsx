@@ -245,6 +245,8 @@ export class Thread extends React.Component {
   loadContent = async () => {
     const { state } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
     this.setState({ loadingContent: true })
 
     const response = await handleFetchResult(
@@ -265,6 +267,8 @@ export class Thread extends React.Component {
   loadTimeline = async () => {
     const { props, state } = this
 
+    // RJ - 2021-08-07 the state is set before the awaits, and is therefore not redundant
+    // with the setState at the end of the function
     this.setState({ loadingTimeline: true })
 
     const fetchResultThreadComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)

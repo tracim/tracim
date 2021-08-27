@@ -104,7 +104,7 @@ class PopinFixedHeader extends React.Component {
             <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
               <i className={`${faIcon}`} title={rawTitle} style={{ color: customColor }} />
             </div>
-            {props.loading ? <Icon icon='fas fa-spin fa-spinner' title='' /> : (
+            {props.loading ? <Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /> : (
               <>
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}

@@ -316,6 +316,8 @@ export class File extends React.Component {
   loadContent = async (pageToLoad = null) => {
     const { state, props } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
     this.setState({ loadingContent: true })
     const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
@@ -354,6 +356,8 @@ export class File extends React.Component {
   loadTimeline = async () => {
     const { props, state } = this
 
+    // RJ - 2021-08-07 the state is set before the awaits, and is therefore not redundant
+    // with the setState at the end of the function
     this.setState({ loadingTimeline: true })
 
     const [resComment, resCommentAsFile, resRevision] = await Promise.all([

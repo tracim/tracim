@@ -112,6 +112,7 @@
   "pending": "anhängig",
   "rejected": "abgelehnt",
   "accepted": "akzeptiert",
+  "Loading…": "Laden…",
   "A content with same name already exists": "Ein Inhalt mit gleichem Namen existiert bereits",
   "Error while saving the title": "Ein Inhalt mit gleichem Namen existiert bereits",
   "You are trying to mention an invalid user": "A content with the same name already exists",

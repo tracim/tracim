@@ -380,6 +380,8 @@ export class HtmlDocument extends React.Component {
 
     const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
     this.setState({ loadingContent: true, mode: APP_FEATURE_MODE.VIEW })
 
     const resHtmlDocument = await handleFetchResult(await fetchResultHtmlDocument)
@@ -453,6 +455,8 @@ export class HtmlDocument extends React.Component {
     const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
 
+    // RJ - 2021-08-07 the state is set before the awaits, and is therefore not redundant
+    // with the setState at the end of the function
     this.setState({ loadingTimeline: true })
 
     const [resComment, resCommentAsFile, resRevision] = await Promise.all([
