@@ -84,6 +84,7 @@ folderopen()
       display none
     &:hover > .dragHandle
       display block
+      padding 0 textSpacing
     &__dragPreview
       display flex
       align-items center
@@ -91,7 +92,7 @@ folderopen()
       width 0 // INFO - CH - 2019-06-06 - this allows the text-overflow ellipsis
     &__icon
       flex-grow 0
-      padding 0 standardSpacing
+      padding 0 standardSpacing 0 pageSpacing
       font-size bigIconSize
       color darkGrey
       text-align center
