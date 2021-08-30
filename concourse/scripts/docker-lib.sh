@@ -5,6 +5,8 @@ LOG_FILE=${LOG_FILE:-/tmp/docker.log}
 SKIP_PRIVILEGED=${SKIP_PRIVILEGED:-false}
 STARTUP_TIMEOUT=${STARTUP_TIMEOUT:-20}
 DOCKER_DATA_ROOT=${DOCKER_DATA_ROOT:-/scratch/docker}
+# IP address used to discover which interface will route to internet
+IP_FOR_WAN_INTERFACE=8.8.8.8
 
 sanitize_cgroups() {
   mkdir -p /sys/fs/cgroup
@@ -71,7 +73,7 @@ start_docker() {
     fi
   fi
 
-  local mtu=$(cat /sys/class/net/$(ip route get 8.8.8.8|awk '{ print $5 }')/mtu)
+  local mtu=$(cat /sys/class/net/$(ip route get $IP_FOR_WAN_INTERFACE|awk '{ print $5 }')/mtu)
   local server_args="--mtu ${mtu}"
   local registry=""
 
@@ -87,7 +89,7 @@ start_docker() {
   trap stop_docker EXIT
 
   try_start() {
-    dockerd --data-root $DOCKER_DATA_ROOT ${server_args} >$LOG_FILE 2>&1 &
+    dockerd --data-root "$DOCKER_DATA_ROOT" ${server_args} > "$LOG_FILE" 2>&1 &
     echo $! > /tmp/docker.pid
 
     sleep 1
