@@ -110,6 +110,8 @@ export class Timeline extends React.Component {
       return null
     }
 
+    const disableComment = props.disableComment || props.loading
+
     return (
       <div className={classnames('timeline')}>
         <div className='timeline__warning'>
@@ -251,7 +253,7 @@ export class Timeline extends React.Component {
                 apiUrl={props.apiUrl}
                 onChangeNewComment={props.onChangeNewComment}
                 newComment={props.newComment}
-                disableComment={props.disableComment}
+                disableComment={disableComment}
                 wysiwyg={props.wysiwyg}
                 searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
                 onInitWysiwyg={props.onInitWysiwyg}
@@ -264,7 +266,7 @@ export class Timeline extends React.Component {
                   customClass={classnames(
                     `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
                   )}
-                  disabled={props.disableComment}
+                  disabled={disableComment}
                   text={props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                   onClick={props.onClickWysiwygBtn}
                   intent='link'
@@ -286,14 +288,14 @@ export class Timeline extends React.Component {
                   <AddFileToUploadButton
                     workspaceId={props.workspaceId}
                     color={props.customColor}
-                    disabled={props.disableComment}
+                    disabled={disableComment}
                     onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
                   />
                 </div>
                 <IconButton
                   color={props.customColor}
                   customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
-                  disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
+                  disabled={disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
                   icon='far fa-paper-plane'
                   intent='primary'
                   mode='light'

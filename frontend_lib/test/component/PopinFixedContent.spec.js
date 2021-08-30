@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import { APP_FEATURE_MODE } from '../../src/helper.js'
@@ -42,13 +43,14 @@ describe('<PopinFixedContent />', () => {
   const Children = () => <div><h1>Random title</h1>I am the first children of PopinFixedContent</div>
   const Children2 = () => <div><h1>Random title2</h1>I am the second children of PopinFixedContent</div>
 
+  const PopinFixedContentWithHOC = withRouterMock(PopinFixedContent)
+
   const wrapper = mount(
-    <PopinFixedContent
-      {...props}
-    >
+    <PopinFixedContentWithHOC {...props}>
       <Children />
       <Children2 />
-    </PopinFixedContent>
+    </PopinFixedContentWithHOC>,
+    { wrappingComponent: RouterMock }
   )
 
   describe('Static design', () => {
@@ -62,13 +64,11 @@ describe('<PopinFixedContent />', () => {
 
     describe('if appMode is revision', () => {
       const wrapper = mount(
-        <PopinFixedContent
-          {...props}
-          appMode={APP_FEATURE_MODE.REVISION}
-        >
+        <PopinFixedContentWithHOC {...props} appMode={APP_FEATURE_MODE.REVISION}>
           <Children />
           <Children2 />
-        </PopinFixedContent>
+        </PopinFixedContentWithHOC>,
+        { wrappingComponent: RouterMock }
       )
 
       it(`should display the version number ${props.content.number}`, () =>

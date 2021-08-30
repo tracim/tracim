@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
@@ -33,7 +34,7 @@ export const Breadcrumbs = props => {
   }
 
   return (
-    <ul className='breadcrumbs'>
+    <ul className={classnames('breadcrumbs', { hidden: props.hidden })}>
       {props.root && (props.root.isALink
         ? (
           <li key='root'>
@@ -75,6 +76,7 @@ export const Breadcrumbs = props => {
 export default Breadcrumbs
 
 Breadcrumbs.propTypes = {
+  hidden: PropTypes.bool,
   root: PropTypes.object,
   breadcrumbsList: PropTypes.array.isRequired,
   keepLastBreadcrumbAsLink: PropTypes.bool

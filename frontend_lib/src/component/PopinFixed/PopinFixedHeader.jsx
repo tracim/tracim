@@ -145,18 +145,17 @@ class PopinFixedHeader extends React.Component {
             )}
           </div>
 
-          {!props.loading && props.breadcrumbsList.length > 0 && (
-            <Breadcrumbs
-              root={{
-                link: PAGE.HOME,
-                label: '',
-                icon: 'fas fa-home',
-                type: BREADCRUMBS_TYPE.CORE,
-                isALink: true
-              }}
-              breadcrumbsList={props.breadcrumbsList}
-            />
-          )}
+          <Breadcrumbs
+            hidden={props.loading || !props.breadcrumbsList.length}
+            root={{
+              link: PAGE.HOME,
+              label: '',
+              icon: 'fas fa-home',
+              type: BREADCRUMBS_TYPE.CORE,
+              isALink: true
+            }}
+            breadcrumbsList={props.breadcrumbsList}
+          />
         </div>
 
         {!props.loading && showReactions && (

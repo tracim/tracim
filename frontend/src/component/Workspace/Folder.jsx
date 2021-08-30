@@ -97,7 +97,7 @@ class Folder extends React.Component {
             </div>
 
             <div className='folder__header__name'>
-              {props.folderData.label}
+              <span>{props.folderData.label}</span>
               {props.loading && <>&nbsp;<Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /></>}
             </div>
           </div>

@@ -186,7 +186,7 @@ Comment.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
   text: PropTypes.string,
-  createdRaw: PropTypes.string.isRequired,
+  createdRaw: PropTypes.number.isRequired,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
   onClickEditComment: PropTypes.func,
