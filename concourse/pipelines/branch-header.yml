@@ -1,0 +1,81 @@
+# This pipeline "header" defines a pipeline which will build and test Tracim sources.
+# It requires a ((branch)), ((source_check_interval)) and ((github-access-token)) variables when used.
+# It should be concatenated with "build-jobs.yml" to produce a complete pipeline.
+
+## YAML definitions re-used in plans
+
+# plan step to put the current job name as pending in github's commit status
+pending_status_notification: &pending_status_notification
+  put: tracim-status-update
+  resource: tracim-source
+  inputs: [tracim-source]
+  params: {state: pending}
+
+# sync job statuses as success/failure/error in github's commit status
+status_notifications: &status_notifications
+  on_success:
+    put: github-status-update
+    inputs: [tracim-source]
+    params: {state: success}
+  on_failure:
+    put: tracim-source
+    inputs: [tracim-source]
+    params: {state: failure}
+  on_abort:
+    put: tracim-source
+    inputs: [tracim-source]
+    params: {state: error}
+## END YAML definitions
+
+
+resource_types:
+- name: cogito
+  type: registry-image
+  source:
+    repository: pix4d/cogito
+
+resources:
+# the github's tracim-source
+- name: tracim-source
+  type: git
+  source:
+    uri: git@github.com:tracim/tracim
+    branch: ((branch))
+
+# docker image used for running tests.
+- name: test-image
+  type: registry-image
+  source:
+    repository: algooci/tracim
+
+# resource to update github's commit status
+- name: github-status-update
+  type: cogito
+  source:
+    repo: tracim/tracim
+    owner: meerkat-bot
+    access_token: ((github-access-token))
+
+
+# Pipeline jobs:
+# - run backend (lint -> quick tests -> full tests) checks
+# - run frontend (lint + unit tests) checks
+# - run end-to-end (cypress) checks
+#    All of these in parallel.
+# Each check has its own status in the github's commit.
+jobs:
+- name: reconfigure-self
+  plan:
+    - get: tracim-source
+      trigger: true
+
+    - task: build-pipeline
+      image: test-image
+      vars:
+        - pipeline: branch
+      file: tracim-source/concourse/tasks/build-pipeline.yml
+
+    - set_pipeline: self
+      file: pipeline/branch.yml
+      vars:
+        github-access-token: ((github-access-token))
