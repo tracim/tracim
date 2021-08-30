@@ -14,7 +14,7 @@ source "$script_dir/docker-lib.sh"
 start_docker
 
 "$script_dir/install_backend_packages"
-"$script_dir/create_backend_dirs backend/test_storage_dir"
+"$script_dir/create_backend_dirs" backend/test_storage_dir
 cd backend
 pip install $(for r in requirements*.txt; do echo "-r $r"; done)
 python setup.py develop
