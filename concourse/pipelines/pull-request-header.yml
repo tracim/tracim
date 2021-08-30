@@ -71,7 +71,7 @@ jobs:
   - task: build-pipeline
     image: test-image
     vars:
-      - pipeline: pull-request
+      pipeline: pull-request
     file: tracim-source/concourse/tasks/build-pipeline.yml
 
   - set_pipeline: self

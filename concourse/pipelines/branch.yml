@@ -72,7 +72,7 @@ jobs:
     - task: build-pipeline
       image: test-image
       vars:
-        - pipeline: branch
+        pipeline: branch
       file: tracim-source/concourse/tasks/build-pipeline.yml
 
     - set_pipeline: self
