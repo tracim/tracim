@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+source "$HOME/.bashrc"
+command -v pyenv || (echo "need pyenv installed" && exit 1)
+cd backend
+for version in $@; do
+  pyenv install "$version"
+  pyenv shell "$version"
+  pip install -r requirements-build.txt
+  pip install -r requirements.txt
+  pip install -r requirements-test.txt
+  pip install -r requirements-storage-s3.txt
+  pip install $(for r in requirements-db*.txt; do echo "-r $r"; done)
+  # Special case for devtools as they aren't supported with python 3.5
+  if "$version" != "3.5.10"; then
+    pip install -r requirements-devtool.txt
+  fi
+done
