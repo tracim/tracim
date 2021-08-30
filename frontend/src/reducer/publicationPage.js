@@ -31,7 +31,7 @@ const defaultPublicationPage = {
   hasNextPage: false
 }
 
-export default function publicationList (state = defaultPublicationPage, action) {
+export default function publicationPage (state = defaultPublicationPage, action) {
   switch (action.type) {
     case `${SET}/${WORKSPACE_PUBLICATION_LIST}`:
       return {

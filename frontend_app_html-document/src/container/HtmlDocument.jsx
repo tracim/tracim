@@ -204,7 +204,7 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
     await this.loadContent()
     await props.loadTimeline(getHtmlDocRevision)
-    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
+    props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async componentDidUpdate (prevProps, prevState) {

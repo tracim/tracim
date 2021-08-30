@@ -30,7 +30,8 @@ import {
   CONTENT_TYPE,
   AddFileToUploadButton,
   DisplayFileToUpload,
-  getFileDownloadUrl
+  getFileDownloadUrl,
+  NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
 import {
   CONTENT_NAMESPACE,
@@ -68,7 +69,7 @@ import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
 const wysiwygId = 'wysiwygTimelineCommentPublication'
 
-const PUBLICATION_ITEM_COUNT_PER_PAGE = 3
+const PUBLICATION_ITEM_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 
 export class Publications extends React.Component {
   constructor (props) {
@@ -164,7 +165,7 @@ export class Publications extends React.Component {
 
   handleContentCommentModified = (data) => {
     const { props } = this
-    const parentPublication = props.publicationList.list.find(publication => publication.id === data.fields.content.parent_id)
+    const parentPublication = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
 
     if (!parentPublication) return
 
@@ -183,7 +184,7 @@ export class Publications extends React.Component {
 
   handleContentCommentDeleted = (data) => {
     const { props } = this
-    const parentPublication = props.publicationList.list.find(publication => publication.id === data.fields.content.parent_id)
+    const parentPublication = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
 
     if (!parentPublication) return
 
@@ -216,10 +217,10 @@ export class Publications extends React.Component {
 
   handleContentCommented = (data) => {
     const { props } = this
-    const lastPublicationId = props.publicationList.list[props.publicationList.length - 1]
-      ? props.publicationList.list[props.publicationList.list.length - 1].id
+    const lastPublicationId = props.publicationPage.list[props.publicationPage.list.length - 1]
+      ? props.publicationPage.list[props.publicationPage.list.length - 1].id
       : undefined
-    const parentPublication = props.publicationList.list.find(publication => publication.id === data.fields.content.parent_id)
+    const parentPublication = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
 
     // INFO - G.B. - 2021-03-19 - First check if the comment was made in a publication, then check if
     // this publication doesn't have a loaded comment list, if there is the case we load the whole list
@@ -255,7 +256,7 @@ export class Publications extends React.Component {
 
     props.dispatch(updatePublication(data.fields.content))
 
-    const lastPublicationId = props.publicationList.list[props.publicationList.list.length - 1].id
+    const lastPublicationId = props.publicationPage.list[props.publicationPage.list.length - 1].id
     if (data.fields.content.content_id !== lastPublicationId) this.setState({ showReorderButton: true })
   }
 
@@ -346,7 +347,11 @@ export class Publications extends React.Component {
         props.dispatch(setPublicationNextPage(fetchGetPublicationList.json.has_next, fetchGetPublicationList.json.next_page_token))
         break
       }
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning')); break
+      default: {
+        console.error('FUCK', fetchGetPublicationList)
+        props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning'))
+      }
+      break
     }
   }
 
@@ -575,7 +580,7 @@ export class Publications extends React.Component {
     const { props, state } = this
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     const currentPublicationId = Number(props.match.params.idcts || 0)
-    const isPublicationListEmpty = props.publicationList.list.length === 0
+    const isPublicationListEmpty = props.publicationPage.list.length === 0
     return (
       <ScrollToBottomWrapper
         customClass='publications'
@@ -593,17 +598,17 @@ export class Publications extends React.Component {
           </div>
         )}
 
-        {props.publicationList.hasNextPage && (
+        {props.publicationPage.hasNextPage && (
           <IconButton
             text={props.t('See more')}
             icon='fas fa-chevron-up'
             dataCy='showMorePublicationItemsBtn'
             customClass='publications__showMoreButton'
-            onClick={() => this.getPublicationPage(props.publicationList.nextPageToken)}
+            onClick={() => this.getPublicationPage(props.publicationPage.nextPageToken)}
           />
         )}
 
-        {props.publicationList.list.map(publication =>
+        {props.publicationPage.list.map(publication =>
           <FeedItemWithPreview
             contentAvailable
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
@@ -729,7 +734,7 @@ export class Publications extends React.Component {
 const mapStateToProps = ({
   breadcrumbs,
   currentWorkspace,
-  publicationList,
+  publicationPage,
   user
-}) => ({ breadcrumbs, currentWorkspace, publicationList, user })
+}) => ({ breadcrumbs, currentWorkspace, publicationPage, user })
 export default connect(mapStateToProps)(withRouter(translate()(appContentFactory(TracimComponent(Publications)))))

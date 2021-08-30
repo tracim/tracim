@@ -201,15 +201,15 @@ const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
     .reply(204, true)
 }
 
-const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments) => {
+const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments, query = '?page_token=&count=0&sort=created:asc') => {
   return nock(apiUrl)
-    .get(`/workspaces/${workspaceId}/contents/${contentId}/comments`)
+    .get(`/workspaces/${workspaceId}/contents/${contentId}/comments${query}`)
     .reply(200, comments)
 }
 
-const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, files) => {
+const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, files, pageQuery = '&page_token=&count=0&sort=created:asc') => {
   return nock(apiUrl)
-    .get(`/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file&namespaces_filter=content,publication`)
+    .get(`/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file&namespaces_filter=content,publication${pageQuery}`)
     .reply(200, files)
 }
 
@@ -231,10 +231,11 @@ const mockGetContentPath200 = (apiUrl, workspaceId, contentId, contentPath) => {
     .reply(200, { items: contentPath })
 }
 
-const mockGetPublicationList200 = (apiUrl, workspaceId, publicationList) => {
+const mockGetPublicationList200 =( apiUrl, workspaceId, publicationList, pageToken = '') => {
+  console.error('FOBOBOBOB')
   return nock(apiUrl)
-    .get(`/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`)
-    .reply(200, { items: publicationList })
+    .get(`/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0&count=15&page_token=${pageToken}&sort=modified:desc`)
+    .reply(200, { items: publicationList, next_page_token: 'pageToken', has_next_page: true })
 }
 
 const mockPostThreadPublication204 = (apiUrl, workspaceId) => {

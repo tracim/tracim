@@ -517,6 +517,8 @@ export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => {
     // INFO - CH - 20210322 - since we don't have the millisecond from backend, content created at the same second
     // may very happen. So we sort on revision_id in that case. This isn't ideal
+    // As the aim is to have a stable sort revision_id is used since it is different for every timeline item.
+    // This would not be the case for content_id as it is the same for every revision item.
     if (a.created_raw === b.created_raw) return parseInt(a.revision_id) - parseInt(b.revision_id)
     return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
   })

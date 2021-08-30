@@ -70,6 +70,22 @@ import { TracimComponent } from './tracimComponent.js'
 
 export const TIMELINE_ITEM_COUNT_PER_PAGE = 15
 
+const DEFAULT_TIMELINE_STATE = {
+  // INFO - SG - 2021-08-10 - timeline is the portion of wholeTimeline which
+  // is visible to the wrapped component through props.timeline.
+  // wholeTimeline can contain more elements as the timeline is paginated
+  // and comes from 3 different APIs (comments, child files, revisions)
+  timeline: [],
+  wholeTimeline: [],
+  commentPageToken: '',
+  hasMoreComments: true,
+  revisionPageToken: '',
+  hasMoreRevisions: true,
+  filePageToken: '',
+  hasMoreFiles: true,
+  isLastTimelineItemCurrentToken: false
+}
+
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
 export function appContentFactory (WrappedComponent) {
@@ -83,19 +99,7 @@ export function appContentFactory (WrappedComponent) {
         config: param.config,
         loggedUser: param.loggedUser,
         content: param.content,
-        revisionPageToken: '',
-        hasMoreRevisions: false,
-        commentPageToken: '',
-        hasMoreComments: false,
-        filePageToken: '',
-        hasMoreFiles: false,
-        // INFO - SG - 2021-08-10 - timeline is the portion of wholeTimeline which
-        // is visible to the wrapped component through props.timeline.
-        // wholeTimeline can contain more elements as the timeline is paginated
-        // and comes from 3 different APIs (comments, child files, revisions)
-        timeline: [],
-        wholeTimeline: [],
-        isLastTimelineItemCurrentToken: false
+        ...DEFAULT_TIMELINE_STATE
       }
       this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -736,9 +740,9 @@ export function appContentFactory (WrappedComponent) {
         fetchResult(getContentRevision(this.apiUrl, state.content.workspace_id, state.content.content_id, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
       ])
 
-      if (!commentsResponse.apiResponse.ok && !filesResponse.apiResponse.ok && !revisionsResponse.apiResponse.ok) {
+      if (!commentsResponse.apiResponse.ok || !filesResponse.apiResponse.ok || !revisionsResponse.apiResponse.ok) {
         sendGlobalFlashMessage(props.t('Error while loading timeline'))
-        console.log('Error loading timeline', 'comments', commentsResponse, 'revisions', revisionsResponse, 'files', filesResponse)
+        console.error('Error loading timeline', 'comments:', commentsResponse, 'revisions:', revisionsResponse, 'files:', filesResponse)
         return
       }
 
@@ -765,18 +769,7 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    resetTimeline = () => {
-      this.setState({
-        timeline: [],
-        wholeTimeline: [],
-        commentPageToken: '',
-        hasMoreComments: true,
-        revisionPageToken: '',
-        hasMoreRevisions: true,
-        filePageToken: '',
-        hasMoreFiles: true
-      })
-    }
+    resetTimeline = () => this.setState(DEFAULT_TIMELINE_STATE)
 
     loadTimeline = async (getContentRevision) => {
       this.resetTimeline()
