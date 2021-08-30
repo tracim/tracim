@@ -9,6 +9,7 @@ import {
   AVATAR_SIZE,
   formatAbsoluteDate,
   Icon,
+  PAGE,
   TLM_SUB_TYPE as TLM_SUB,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -21,26 +22,33 @@ export class GroupedNotificationItem extends React.Component {
     let escapedAuthor = ''
     let escapedContentLabel = ''
 
+    const numberOfContributionTypes = uniqBy(notification.group, 'type').length
+    const numberOfWorkspaces = uniqBy(notification.group.map(notification => notification.workspace), 'id').length
+    const numberOfContents = uniqBy(notification.group.map(notification => {
+      return notification.content.type === TLM_SUB.COMMENT
+        ? notification.content.parentId
+        : notification.content.id
+    })).length
+
     if (notification.author) {
       if (notification.author.length === 1) escapedAuthor = escapeHtml(notification.author[0].publicName)
       if (notification.author.length === 2) {
         escapedAuthor = `${escapeHtml(notification.author[0].publicName)} ${t('and')} ${escapeHtml(notification.author[1].publicName)}`
       }
-      if (notification.author.length >= 2) {
+      if (notification.author.length > 2) {
         escapedAuthor = `${escapeHtml(notification.author[0].publicName)} ${t('and {{numberOfAuthors}} other people', { numberOfAuthors: notification.author.length - 1 })
           }`
       }
     }
 
-    if (notification.type.includes('content')) {
-      escapedContentLabel = escapeHtml(notification.group[0].content === TLM_SUB.COMMENT
-        ? notification.group[0].content.parentLabel
-        : notification.group[0].content.label
-      )
+    if (notification.group.some(notification => notification.content)) {
+      escapedContentLabel = numberOfContents > 1
+        ? t('{{numberOfContents}} contents', { numberOfContents: numberOfContents })
+        : escapeHtml(notification.group[0].content.type === TLM_SUB.COMMENT
+          ? notification.group[0].content.parentLabel
+          : notification.group[0].content.label
+        )
     }
-
-    const numberOfContibuitionTypes = uniqBy(notification.group, 'type').length
-    const numberOfWorkspaces = uniqBy(notification.group.map(notification => notification.workspace), 'id').length
 
     const escapedUser = notification.user ? escapeHtml(notification.user.publicName) : ''
 
@@ -48,31 +56,34 @@ export class GroupedNotificationItem extends React.Component {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
       content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
-      numberOfContibuitionTypes: numberOfContibuitionTypes,
+      numberOfContribution: notification.group.length,
       numberOfWorkspaces: numberOfWorkspaces,
       interpolation: { escapeValue: false }
     }
 
-    if (numberOfContibuitionTypes > 1) {
+    if (numberOfContributionTypes > 1) {
       return {
         text: numberOfWorkspaces > 1
-          ? t('{{author}} made {{numberOfContibuitionTypes}} contributions in {{numberOfWorkspaces}} spaces', i18nOpts)
-          : t('{{author}} made {{numberOfContibuitionTypes}} contributions', i18nOpts),
-        url: '',
-        emptyUrlMsg: '',
+          ? t('{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces', i18nOpts)
+          : t('{{author}} made {{numberOfContribution}} contributions', i18nOpts),
+        url: numberOfContents === 1 ? PAGE.CONTENT(notification.group[0].content.id) : undefined,
         msgType: 'warning'
       }
     } else {
       const userList = uniqBy(notification.group.map(notification => notification.user), 'userId')
-      return getNotificationDetails({
+
+      const notificationDetails = getNotificationDetails({
         ...notification.group[0],
         author: { publicName: escapedAuthor },
-        content: { ...notification.group[0].content, label: escapedContentLabel },
+        content: { ...notification.group[0].content, label: escapedContentLabel, parentLabel: escapedContentLabel },
         type: notification.group[0].type,
         user: userList.length > 1
           ? { publicName: t('{{numberOfUsers}} user', { numberOfUsers: userList.length }) }
           : notification.group[0].user
       })
+      console.log(numberOfContents, notificationDetails)
+      if (numberOfContents !== 1) notificationDetails.url = undefined
+      return notificationDetails
     }
   }
 
@@ -83,6 +94,8 @@ export class GroupedNotificationItem extends React.Component {
     if (Object.keys(notificationDetails).length === 0) return null
     const numberOfWorkspaces = uniqBy(notification.group.map(notification => notification.workspace), 'id').length
     const numberOfAuthors = notification.author.length
+
+    // TODO - GIULIA - read, click grouped not content, last prio; make notification func simpler
 
     return (
       <Link

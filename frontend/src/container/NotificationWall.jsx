@@ -380,7 +380,7 @@ export class NotificationWall extends React.Component {
     return (
       notification.content.parentContentNamespace === CONTENT_NAMESPACE.PUBLICATION
         ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.parentId)
-        : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+        : PAGE.CONTENT(notification.content.parentId)
     )
   }
 
@@ -418,7 +418,7 @@ export class NotificationWall extends React.Component {
                 {notification.group
                   ? (
                     <GroupedNotificationItem
-                      onClickNotification={this.handleClickNotification}
+                      onClickNotification={() => {}}
                       shortDate={this.shortDate}
                       notification={notification}
                       getNotificationDetails={this.getNotificationDetails}
