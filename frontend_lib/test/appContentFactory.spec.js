@@ -625,27 +625,54 @@ describe('appContentFactory.js', () => {
     const testCases = [
       {
         description: 'empty',
-        commentPage: { items: [] },
-        fileChildPage: { items: [] },
-        revisionPage: { items: [] },
+        commentPage: { items: [], has_next: false, next_page_token: '' },
+        fileChildPage: { items: [], has_next: false, next_page_token: '' },
+        revisionPage: { items: [], has_next: false, next_page_token: '' },
         expectedTimelineLength: 0,
-        expectedWholeTimelineLength: 0
+        expectedWholeTimelineLength: 0,
+        canLoadMoreItems: false
       },
       {
         description: 'less than 15 items',
-        commentPage: { items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
-        fileChildPage: { items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
-        revisionPage: { items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        commentPage: {
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          has_next: false,
+          next_page_token: ''
+        },
+        fileChildPage: {
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          has_next: false,
+          next_page_token: ''
+        },
+        revisionPage: {
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          has_next: true,
+          next_page_token: 'token'
+        },
         expectedTimelineLength: 12,
-        expectedWholeTimelineLength: 12
+        expectedWholeTimelineLength: 12,
+        canLoadMoreItems: true
       },
       {
         description: 'more than 15 items',
-        commentPage: { items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
-        fileChildPage: { items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
-        revisionPage: { items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        commentPage: {
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          has_next: false,
+          next_page_token: ''
+        },
+        fileChildPage: {
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          has_next: false,
+          next_page_token: ''
+        },
+        revisionPage: {
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          has_next: false,
+          next_page_token: ''
+        },
         expectedTimelineLength: 15,
-        expectedWholeTimelineLength: 30
+        expectedWholeTimelineLength: 30,
+        canLoadMoreItems: true
       }
     ]
 
@@ -680,6 +707,7 @@ describe('appContentFactory.js', () => {
         expect(getContentRevisionMock.isDone()).to.be.true
         expect(wrapper.instance().state.timeline.length).to.be.equal(testCase.expectedTimelineLength)
         expect(wrapper.instance().state.wholeTimeline.length).to.be.equal(testCase.expectedWholeTimelineLength)
+        expect(wrapper.instance().canLoadMoreTimelineItems()).to.be.equal(testCase.canLoadMoreItems)
       })
     }
 
