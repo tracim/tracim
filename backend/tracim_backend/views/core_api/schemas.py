@@ -1744,9 +1744,6 @@ class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
 
 
 class RevisionSchema(ContentDigestSchema):
-    comment_ids = marshmallow.fields.List(
-        marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
-    )
     revision_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
     revision_type = StrippedString(
         example=ActionDescription.CREATION, validate=action_description_validator

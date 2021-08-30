@@ -545,8 +545,6 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
         avatar_url: data.author.avatar_url,
         user_id: data.author.user_id
       },
-      commentList: [], // INFO - GB - 2020-05-29 For now it is not possible to get commentList and comment_ids via TLM message, and since such properties are not used, we leave them empty.
-      comment_ids: [],
       created: displayDistanceDate(data.content.modified, lang),
       created_raw: data.content.modified,
       revision_id: data.content.current_revision_id,

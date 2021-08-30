@@ -716,8 +716,6 @@ class TestFolder(object):
         assert revision["revision_id"]
         assert revision["revision_type"] == "creation"
         assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision["created"]
         assert revision["author"]
@@ -741,8 +739,6 @@ class TestFolder(object):
         assert revision["revision_id"]
         assert revision["revision_type"] == "edition"
         assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision["created"]
         assert revision["author"]
@@ -768,8 +764,6 @@ class TestFolder(object):
         assert revision["revision_id"]
         assert revision["revision_type"] == "archiving"
         assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision["created"]
         assert revision["author"]
@@ -793,8 +787,6 @@ class TestFolder(object):
         assert revision["revision_id"]
         assert revision["revision_type"] == "unarchiving"
         assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision["created"]
         assert revision["author"]
@@ -914,7 +906,6 @@ class TestHtmlDocuments(object):
         "revision_id": 6,
         "revision_type": "creation",
         "version_number": 1,
-        "comment_ids": [],
     }
 
     SECOND_REVISION = {
@@ -932,7 +923,6 @@ class TestHtmlDocuments(object):
         "revision_id": 7,
         "revision_type": "edition",
         "version_number": 2,
-        "comment_ids": [],
     }
 
     THIRD_REVISION = {
@@ -950,7 +940,6 @@ class TestHtmlDocuments(object):
         "revision_id": 27,
         "revision_type": "edition",
         "version_number": 3,
-        "comment_ids": [],
     }
 
     def test_api__get_html_document__ok_200__legacy_slug(
@@ -1398,7 +1387,6 @@ class TestHtmlDocuments(object):
         assert revision["revision_id"] == test_html_document.revision_id
         assert revision["revision_type"] == "edition"
         assert revision["sub_content_types"]
-        assert revision["comment_ids"] == []
         assert revision["created"]
         assert revision["author"]
         assert revision["author"]["user_id"] == 1
@@ -2208,8 +2196,6 @@ class TestFiles(object):
         assert revision["workspace_id"] == 1
         assert revision["revision_id"]
         assert revision["sub_content_types"]
-        # TODO - G.M - 2018-06-173 - Test with real comments
-        assert revision["comment_ids"] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision["created"]
         assert revision["author"]
@@ -4496,7 +4482,6 @@ class TestThreads(object):
         assert revision["revision_id"] == 8
         assert revision["sub_content_types"]
         assert revision["revision_type"] == "creation"
-        assert revision["comment_ids"] == [18, 19, 20]
         # TODO - G.M - 2018-06-173 - check date format
         assert revision["created"]
         assert revision["author"]
@@ -4521,7 +4506,6 @@ class TestThreads(object):
         assert revision["revision_id"] == 26
         assert revision["revision_type"] == "edition"
         assert revision["sub_content_types"]
-        assert revision["comment_ids"] == []
         # TODO - G.M - 2018-06-173 - check date format
         assert revision["created"]
         assert revision["author"]

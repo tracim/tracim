@@ -278,7 +278,6 @@ describe('helper.js', () => {
       {
         author: author,
         commentList: [],
-        comment_ids: [],
         created: 'One minute ago',
         created_raw: '2020-05-23T12:00:01',
         version_number: 1,
@@ -289,7 +288,6 @@ describe('helper.js', () => {
       {
         author: author,
         commentList: [],
-        comment_ids: [],
         created: 'One minute ago',
         created_raw: '2020-05-23T12:00:01',
         version_number: 0,
