@@ -61,11 +61,9 @@ export class EditCommentPopup extends React.Component {
         customClass='editCommentPopup'
         customColor={props.customColor}
         onClose={props.onClickClose}
+        label={props.t('Edit comment')}
+        faIcon='far fa-fw fa-edit'
       >
-        <span className='editCommentPopup__title'>
-          {props.t('Edit comment')}
-        </span>
-
         <CommentTextArea
           apiUrl={props.apiUrl}
           id={wysiwygId}

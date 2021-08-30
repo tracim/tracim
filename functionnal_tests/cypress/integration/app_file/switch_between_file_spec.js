@@ -42,7 +42,7 @@ describe('App File', () => {
         cy.get('[data-cy="revision_data_2"]')
           .click()
 
-        cy.get('.file__contentpage__content__left__top .breadcrumbs__item')
+        cy.get('.file__contentpage__header .breadcrumbs__item')
           .its('length')
           .should('eq', 3)
         cy.get('.breadcrumbs__item').last().contains(fileTitle_2)
@@ -73,7 +73,7 @@ describe('App File', () => {
         cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
-        cy.get('.file__contentpage__content__left__top > ul > li.breadcrumbs__item.primaryColorFont.primaryColorFontDarkenHover')
+        cy.get('.file__contentpage__header ul > li.breadcrumbs__item.primaryColorFont.primaryColorFontDarkenHover')
           .click()
 
         cy.get('[data-cy="popinFixed"]')

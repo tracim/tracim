@@ -1,81 +1,79 @@
 @import "../../css/Variable.styl"
 
 .shareDownload
-  flex-direction column
-  width calc(100% - 65px) // 65px is the width of the rightPart header
-  height 100%
-  min-height 260px
-  overflow auto
-  margin-bottom standardSpacing
-  &__new
-    padding standardSpacing
+  padding 0 standardSpacing
   &__management
     &__header
       display flex
-      justify-content space-between
-      padding 15px 20px
-  &__title
-    font-size titleFontSize
+      justify-content flex-end
+      margin-bottom standardSpacing
   &__btn
     margin auto 0
   &__email
-    padding 5px 0px
+    padding standardSpacing 0px
     display flex
+    &__input
+      font-size standardFontSize
     &__icon
       background-color transparent
       border none
       cursor pointer
       margin auto
       color mediumDarkGrey
+      padding-inline-start standardSpacing
+      padding-inline-end 0
       &:focus
         box-shadow 0 0 0 0
         border 0 none
         outline 0
   &__password
-    padding 5px 0px
     display flex
     flex-direction column
     &__active
       display flex
+      margin-bottom standardSpacing
     &__wrapper
       display flex
       flex-grow 2
       border-width 1px
       border-style solid
-      border-radius .25rem
+      border-radius standardBorderRadius
       border-color lightgray
       background-color white
-      padding-left 5px
+      padding-left standardSpacing
       & > i
         margin auto
         color grey
     &__input
       border none
+      font-size standardFontSize
     &__icon
       background-color transparent
       border none
       cursor pointer
+      padding-inline-end standardSpacing
+      padding-inline-start textSpacing
+      &__random
+        padding-inline-end 0
+        padding-inline-start standardSpacing
       &:focus
         border 0 none
         outline 0
     &__link
       color mediumDarkGrey
-      text-decoration underline
       margin-left auto
-      padding-right 35px
       cursor pointer
       &:hover
         color fontColor
-  &__cancel
-    margin-right 15px
-    margin-left auto
-  &__newBtn
-    margin-right 30px
+        text-decoration underline
+  &__buttons
+    display flex
+    margin-top standardSpacing
+    &__cancel
+      margin-right standardSpacing
+      margin-left auto
   &__emailWarning
-    text-align center
-    margin-top 20px
-
-// MEDIAQUERIES
+    margin-top standardSpacing
 
 @media (min-width: min-xs) and (max-width: max-lg)
   .shareDownload

@@ -775,12 +775,16 @@ export class WorkspaceAdvanced extends React.Component {
       label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
-        <TagList
-          apiUrl={state.config.apiUrl}
-          workspaceId={state.content.workspace_id}
-          contentId={state.content.content_id}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Tags')}
+        >
+          <TagList
+            apiUrl={state.config.apiUrl}
+            workspaceId={state.content.workspace_id}
+            contentId={state.content.content_id}
+            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          />
+        </PopinFixedRightPartContent>
       )
     }
 

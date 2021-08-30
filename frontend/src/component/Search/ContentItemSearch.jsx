@@ -44,15 +44,17 @@ export const ContentItemSearch = props => {
       </div>
 
       <div
-        className='content__status d-sm-flex justify-content-between align-items-center'
-        style={{ color: status.hexcolor }}
+        className='content__status'
         title={props.t(status.label)}
       >
-        <div className='content__status__text d-none d-sm-block'>
-          {props.t(status.label)}
-        </div>
         <div className='content__status__icon'>
-          <i className={`fa-fw ${status.faIcon}`} />
+          <i
+            className={`fa-fw ${status.faIcon}`}
+            style={{ color: status.hexcolor }}
+          />
+        </div>
+        <div className='content__status__text'>
+          {props.t(status.label)}
         </div>
       </div>
     </Link>

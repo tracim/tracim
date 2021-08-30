@@ -3,22 +3,17 @@
 .timeline
   display flex
   flex-direction column
-  width calc(100% - 65px) // 65px is the width of the rightPart header
-  height 100%
+  height "calc(100% - %s)" % headerHeight
   & p:first-child
     margin-top 0
     padding-top 0
   & p:last-child
     margin-bottom 0
     padding-bottom 0
-  &__title
-    margin standardSpacing 15px
-    padding standardSpacing
-    font-size titleFontSize
   &__messagelist
     flex 1 1 auto
     margin-bottom 0
-    padding standardSpacing
+    padding standardSpacing standardSpacing 0
     overflow-y auto
     overflow-x visible
     > .ScrollToBottomContents
@@ -34,6 +29,8 @@
       width 100%
       & + .revision
         border none
+      &:last-child
+        margin-bottom 0
   &__warning
       position absolute
       width calc(100% - 20px)
@@ -50,8 +47,8 @@
       position absolute
       width 100%
       background-color offWhite
-      border-radius 5px
       font-size metadataFontSize
+      border-radius standardBorderRadius
       &__delimiter
         height 2px
         margin 5px 20px
@@ -63,43 +60,31 @@
           background-color grey-hover
     &__textinput
       width 100%
+      min-height 80px
       & > textarea
-        border-radius 5px
-        border 1.5px solid grey
-        padding 5px
+        border-radius standardBorderRadius
+        border borderStyle
+        padding textSpacing
         height 80px
         width 100%
     &__wrapper
       display flex
       align-items flex-start
       justify-content flex-end
-      margin-top standardSpacing
+      margin-top textSpacing
       height 42px
     &__advancedtext
       width 100%
-      margin-right 15px
       &__btn
         width max-content
-        border none
-        background-color transparent
-        color mediumDarkGrey
-        cursor pointer
         font-size metadataFontSize
-        &:hover
-          color darkGrey
-          text-decoration underline
         &:disabled
           cursor not-allowed
           &:hover
             color mediumDarkGrey
     &__submit
       display flex
-      &__btn
-        display inline-block
-        cursor pointer
-        &__icon
-          display inline-block
-          margin-left 20px
+      align-items center
 
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result
@@ -130,7 +115,6 @@ columnTimeline()
         align-items center
         transform none
         width 100%
-
 
 @media (min-width: min-lg) and (max-width: max-lg)
   columnTimeline()

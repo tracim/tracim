@@ -4,7 +4,11 @@ import { Popover, PopoverBody } from 'reactstrap'
 import { isMobile } from 'react-device-detect'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
 import InputTextArea from '../common/Input/InputTextArea.jsx'
-import { FileDropzone, FileUploadList } from 'tracim_frontend_lib'
+import {
+  IconButton,
+  FileDropzone,
+  FileUploadList
+} from 'tracim_frontend_lib'
 
 class UploadForm extends React.Component {
   constructor (props) {
@@ -104,14 +108,15 @@ class UploadForm extends React.Component {
             customTitle={props.t('Attached files')}
           />
 
-          <button
-            type='button'
-            className='guestupload__card__form__right__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
-            onClick={props.onClickSend}
+          <IconButton
+            customClass='guestupload__card__form__right__btn'
+            intent='primary'
+            mode='light'
             disabled={this.sendButtonIsDisabled()}
-          >
-            {props.t('Send')} <i className='far fa-fw fa-paper-plane' />
-          </button>
+            onClick={props.onClickSend}
+            icon='far fa-paper-plane'
+            text={props.t('Send')}
+          />
         </div>
       </form>
     )

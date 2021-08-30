@@ -13,8 +13,6 @@ import {
   RefreshWarningMessage
 } from 'tracim_frontend_lib'
 
-const color = require('color')
-
 export class FileComponent extends React.Component {
   componentDidUpdate (prevProps) {
     const { props } = this
@@ -80,7 +78,7 @@ export class FileComponent extends React.Component {
         <div className='file__contentpage__option'>
           {props.mode === APP_FEATURE_MODE.REVISION && (
             <IconButton
-              customClass='wsContentGeneric__option__menu__lastversion file__lastversionbtn btn'
+              customClass='wsContentGeneric__option__menu__lastversion file__lastversionbtn'
               color={props.customColor}
               intent='primary'
               mode='light'
@@ -180,29 +178,25 @@ export class FileComponent extends React.Component {
             />
 
             <div className='file__contentpage__dropzone__btn'>
-              <button
-                type='button'
-                className='file__contentpage__dropzone__btn__cancel btn outlineTextBtn nohover'
-                style={{ borderColor: props.customColor }}
+              <IconButton
+                customClass='file__contentpage__dropzone__btn__cancel'
+                color={props.customColor}
+                intent='secondary'
                 onClick={props.onClickDropzoneCancel}
-              >
-                {props.t('Cancel')}
-              </button>
+                icon='fas fa-times'
+                text={props.t('Cancel')}
+              />
 
-              <button
-                type='button'
-                className='file__contentpage__dropzone__btn__validate btn highlightBtn'
-                style={{
-                  backgroundColor: props.customColor,
-                  ':hover': {
-                    backgroundColor: color(props.customColor).darken(0.15).hex()
-                  }
-                }}
-                onClick={props.onClickDropzoneValidate}
+              <IconButton
+                customClass='file__contentpage__dropzone__btn__validate'
+                color={props.customColor}
                 disabled={props.newFile === ''}
-              >
-                {props.t('Validate')}
-              </button>
+                intent='primary'
+                mode='light'
+                onClick={props.onClickDropzoneValidate}
+                icon='fas fa-check'
+                text={props.t('Validate')}
+              />
             </div>
           </div>
         )}

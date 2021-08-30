@@ -1,5 +1,3 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 .profile
   &__text__loading
     background-color lightGrey
@@ -31,8 +29,9 @@
       object-fit fill
 
   &__mainBar
-    height 70px
-    padding-left 30px
+    height headerHeight
+    padding-left pageSpacing
+    padding-right pageSpacing
     background-color offWhite
     display flex
     &__avatar
@@ -41,7 +40,7 @@
         display none
       &__big
         position relative
-        top -15px
+        top -20px
       &__changeBtn
         position absolute
         bottom -15px
@@ -54,8 +53,10 @@
       margin-left standardSpacing
       font-size titleFontSize
       align-self center
+      flex 1
       &__wrapper
         width calc(100% - 130px) // INFO - MB - 2021-05-06 - the total width minus the avatar width (100px) and its margin (30px) on the ProfileMainbar
+        display flex
       &__user
         display flex
         &__name
@@ -78,19 +79,17 @@
     display flex
     & > div
       overflow-wrap anywhere
-      font-weight bold
       background-color offWhite
       height max-content
       min-height 300px
-      border 1px grey solid
-      border-radius 5px
-      padding 20px
-      margin-bottom standardSpacing
+      border borderStyle
+      border-radius standardBorderRadius
+      padding standardSpacing
     &__information
-      margin 30px 0 30px 30px
+      margin pageSpacing 0 pageSpacing pageSpacing
       width 30%
     &__page
-      margin 30px
+      margin pageSpacing pageSpacing pageSpacing standardSpacing
       width 70%
     &__loading
       background-color veryLightGrey
@@ -100,8 +99,6 @@
     position absolute
     top 0
     right 0
-    padding 5px 8px
-
 
 @media (max-width: max-sm)
   .profile

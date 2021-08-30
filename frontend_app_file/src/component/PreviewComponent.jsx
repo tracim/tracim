@@ -153,7 +153,7 @@ export class PreviewComponent extends React.Component {
           {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
             <button
               type='button'
-              className='previewcomponent__navigationButton btn iconBtn'
+              className='previewcomponent__navigationButton btn transparentButton'
               onClick={props.onClickNextPage}
               style={{ ':hover': { color: props.color } }}
               title={props.t('Next page')}

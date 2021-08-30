@@ -212,7 +212,7 @@ export class Sidebar extends React.Component {
               </nav>
             </div>
 
-            <div className='sidebar__footer mb-2'>
+            <div className='sidebar__footer'>
               <div className='sidebar__footer__buttons'>
                 {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
                   <IconButton
@@ -234,13 +234,13 @@ export class Sidebar extends React.Component {
                   />
                 )}
               </div>
-              <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
+              <div className='sidebar__footer__text'>
                 {TRACIM_APP_VERSION}
               </div>
-              <div className='sidebar__footer__text whiteFontColor d-flex align-items-end justify-content-center'>
+              <div className='sidebar__footer__text'>
                 Copyright - 2013 - 2021
                 <div className='sidebar__footer__text__link'>
-                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer' className='ml-3'>tracim.fr</a>
+                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
                 </div>
               </div>
             </div>

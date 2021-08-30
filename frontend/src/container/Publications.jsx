@@ -347,11 +347,9 @@ export class Publications extends React.Component {
         props.dispatch(setPublicationNextPage(fetchGetPublicationList.json.has_next, fetchGetPublicationList.json.next_page_token))
         break
       }
-      default: {
-        console.error('FUCK', fetchGetPublicationList)
+      default:
         props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning'))
-      }
-      break
+        break
     }
   }
 
@@ -652,7 +650,9 @@ export class Publications extends React.Component {
               </>
             }
             confirmLabel={props.t('Edit')}
+            confirmIcon='far fa-fw fa-edit'
             cancelLabel={props.t('Validate anyway')}
+            cancelIcon='fas fa-fw fa-check'
           />
         )}
 

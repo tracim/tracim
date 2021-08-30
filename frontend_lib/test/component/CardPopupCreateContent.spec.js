@@ -32,28 +32,12 @@ describe('<CardPopupCreateContent />', () => {
   )
 
   describe('Static design', () => {
-    it(`should display "${props.label}"`, () =>
-      expect(wrapper.find('.createcontent__contentname__title')).to.have.text().equal(props.label)
-    )
-
     it(`.createcontent__form__button.btn should have the customColor "${props.customColor}"`, () => {
       expect(wrapper.find('.createcontent__form__button.btn').prop('style').borderColor).to.equal(props.customColor)
     })
 
-    it(`.${props.faIcon} should have the customColor "${props.customColor}"`, () =>
-      expect(wrapper.find(`.${props.faIcon}`).prop('style').color).to.equal(props.customColor)
-    )
-
-    it(`.createcontent__contentname__title should have the customColor "${props.customColor}"`, () =>
-      expect(wrapper.find('.createcontent__contentname__title').prop('style').color).to.equal(props.customColor)
-    )
-
     it(`.createcontent__form__button.btn should have the customColor "${props.customColor}"`, () =>
       expect(wrapper.find('.createcontent__form__button.btn').prop('style').backgroundColor).to.equal(props.customColor)
-    )
-
-    it(`should display the icon "${props.faIcon}"`, () =>
-      expect(wrapper.find(`i.${props.faIcon}`)).to.have.lengthOf(1)
     )
 
     it('CardPopup should have the good custom style', () =>

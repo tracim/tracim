@@ -21,7 +21,6 @@ import EditCommentPopup from './EditCommentPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
-const color = require('color')
 
 export class Timeline extends React.Component {
   constructor (props) {
@@ -112,12 +111,6 @@ export class Timeline extends React.Component {
 
     return (
       <div className={classnames('timeline')}>
-        {props.showTitle && (
-          <div className='timeline__title'>
-            {props.t('Timeline')}
-          </div>
-        )}
-
         <div className='timeline__warning'>
           {props.isDeprecated && !props.isArchived && !props.isDeleted && (
             <PromptMessage
@@ -226,7 +219,9 @@ export class Timeline extends React.Component {
               </>
             }
             confirmLabel={props.t('Edit')}
+            confirmIcon='far fa-fw fa-edit'
             cancelLabel={props.t('Validate anyway')}
+            cancelIcon='fas fa-fw fa-check'
           />
         )}
 
@@ -247,7 +242,6 @@ export class Timeline extends React.Component {
             customColor={props.customColor}
             confirmLabel={props.t('Delete')}
             confirmIcon='far fa-trash-alt'
-            cancelIcon='fas fa-times'
             onConfirm={this.handleClickValidateDeleteComment}
             onCancel={this.handleToggleDeleteCommentPopup}
           />
@@ -275,17 +269,17 @@ export class Timeline extends React.Component {
 
             <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
               <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__texteditor__advancedtext')}>
-                <button
-                  type='button'
-                  className={classnames(
+                <IconButton
+                  customClass={classnames(
                     `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
                   )}
-                  onClick={props.onClickWysiwygBtn}
                   disabled={props.disableComment}
+                  text={props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
+                  onClick={props.onClickWysiwygBtn}
+                  intent='link'
+                  mode='light'
                   key='timeline__comment__advancedtext'
-                >
-                  {props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
-                </button>
+                />
 
                 <div>
                   <DisplayFileToUpload
@@ -305,28 +299,18 @@ export class Timeline extends React.Component {
                     onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
                   />
                 </div>
-
-                <button
-                  type='button'
-                  className={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn btn highlightBtn')}
-                  onClick={props.onClickValidateNewCommentBtn}
+                <IconButton
+                  color={props.customColor}
+                  customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
                   disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
-                  style={{
-                    backgroundColor: props.customColor,
-                    color: '#fdfdfd',
-                    ':hover': {
-                      backgroundColor: color(props.customColor).darken(0.15).hex()
-                    }
-                  }}
+                  icon='far fa-paper-plane'
+                  intent='primary'
+                  mode='light'
+                  onClick={props.onClickValidateNewCommentBtn}
+                  text={props.t('Send')}
+                  type='button'
                   key='timeline__comment__send'
-                >
-                  {props.t('Send')}
-                  <div
-                    className={classnames(`${props.customClass}__texteditor__submit__btn__icon`, 'timeline__texteditor__submit__btn__icon')}
-                  >
-                    <i className='far fa-paper-plane' />
-                  </div>
-                </button>
+                />
               </div>
             </div>
           </form>
@@ -370,7 +354,6 @@ Timeline.propTypes = {
   onClickCancelSave: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickSaveAnyway: PropTypes.func,
-  showTitle: PropTypes.bool,
   searchForMentionOrLinkInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
   onClickEditComment: PropTypes.func,
@@ -409,7 +392,6 @@ Timeline.defaultProps = {
   isDeleted: false,
   onClickCancelSave: () => { },
   onClickSaveAnyway: () => { },
-  showTitle: true,
   searchForMentionOrLinkInQuery: () => { },
   showInvalidMentionPopup: false,
   onClickTranslateComment: content => { },

@@ -43,6 +43,7 @@ import {
   putMyselfFileRead,
   putUserConfiguration,
   FAVORITE_STATE,
+  PopinFixedRightPartContent,
   TagList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
@@ -813,50 +814,54 @@ export class File extends React.Component {
       label: props.t('Timeline'),
       icon: 'fa-history',
       children: state.config.apiUrl ? (
-        <Timeline
-          customClass={`${state.config.slug}__contentpage`}
-          customColor={state.config.hexcolor}
-          apiUrl={state.config.apiUrl}
-          loggedUser={state.loggedUser}
-          timelineData={props.timeline}
-          memberList={state.config.workspace.memberList}
-          newComment={state.newComment}
-          newCommentAsFileList={state.newCommentAsFileList}
-          disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-          availableStatusList={state.config.availableStatuses}
-          wysiwyg={state.timelineWysiwyg}
-          onChangeNewComment={this.handleChangeNewComment}
-          onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-          onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-          onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-          onClickWysiwygBtn={this.handleToggleWysiwyg}
-          onClickRevisionBtn={this.handleClickShowRevision}
-          shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-          isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
-          key='Timeline'
-          invalidMentionList={state.invalidMentionList}
-          onClickCancelSave={this.handleCancelSave}
-          onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-          onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-          showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-          workspaceId={state.content.workspace_id}
-          onClickTranslateComment={comment => props.handleTranslateComment(
-            comment,
-            state.content.workspace_id,
-            state.translationTargetLanguageCode,
-            this.setState.bind(this)
-          )}
-          onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-          onClickEditComment={this.handleClickEditComment}
-          onClickDeleteComment={this.handleClickDeleteComment}
-          onClickOpenFileComment={this.handleClickOpenFileComment}
-          translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
-          translationTargetLanguageCode={state.translationTargetLanguageCode}
-          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-          onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-          canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Timeline')}
+        >
+          <Timeline
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            apiUrl={state.config.apiUrl}
+            loggedUser={state.loggedUser}
+            timelineData={props.timeline}
+            memberList={state.config.workspace.memberList}
+            newComment={state.newComment}
+            newCommentAsFileList={state.newCommentAsFileList}
+            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
+            wysiwyg={state.timelineWysiwyg}
+            onChangeNewComment={this.handleChangeNewComment}
+            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+            onClickWysiwygBtn={this.handleToggleWysiwyg}
+            onClickRevisionBtn={this.handleClickShowRevision}
+            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
+            key='Timeline'
+            invalidMentionList={state.invalidMentionList}
+            onClickCancelSave={this.handleCancelSave}
+            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+            onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+            workspaceId={state.content.workspace_id}
+            onClickTranslateComment={comment => props.handleTranslateComment(
+              comment,
+              state.content.workspace_id,
+              state.translationTargetLanguageCode,
+              this.setState.bind(this)
+            )}
+            onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+            onClickEditComment={this.handleClickEditComment}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickOpenFileComment={this.handleClickOpenFileComment}
+            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            translationTargetLanguageCode={state.translationTargetLanguageCode}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+          />
+        </PopinFixedRightPartContent>
       ) : null
     }
     const tag = {
@@ -864,12 +869,16 @@ export class File extends React.Component {
       label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
-        <TagList
-          apiUrl={state.config.apiUrl}
-          workspaceId={state.content.workspace_id}
-          contentId={state.content.content_id}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Tags')}
+        >
+          <TagList
+            apiUrl={state.config.apiUrl}
+            workspaceId={state.content.workspace_id}
+            contentId={state.content.content_id}
+            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          />
+        </PopinFixedRightPartContent>
       )
     }
     const propertiesObject = {
@@ -877,22 +886,26 @@ export class File extends React.Component {
       label: props.t('Properties'),
       icon: 'fa-info-circle',
       children: (
-        <FileProperties
-          color={state.config.hexcolor}
-          fileType={state.content.mimetype}
-          fileSize={displayFileSize(state.content.size)}
-          filePageNb={state.content.page_nb}
-          activesShares={state.content.actives_shares}
-          creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
-          creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
-          lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-          lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
-          description={state.content.description}
-          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
-          disableChangeDescription={!state.content.is_editable}
-          onClickValidateNewDescription={this.handleClickValidateNewDescription}
-          key='FileProperties'
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Properties')}
+        >
+          <FileProperties
+            color={state.config.hexcolor}
+            fileType={state.content.mimetype}
+            fileSize={displayFileSize(state.content.size)}
+            filePageNb={state.content.page_nb}
+            activesShares={state.content.actives_shares}
+            creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+            creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
+            lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
+            lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
+            description={state.content.description}
+            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
+            disableChangeDescription={!state.content.is_editable}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            key='FileProperties'
+          />
+        </PopinFixedRightPartContent>
       )
     }
 
@@ -905,21 +918,25 @@ export class File extends React.Component {
           label: props.t('Share'),
           icon: 'fa-share-alt',
           children: (
-            <ShareDownload
-              label={props.t(state.config.label)}
-              hexcolor={state.config.hexcolor}
-              shareEmails={state.shareEmails}
-              onChangeEmails={this.handleChangeEmails}
-              onKeyDownEnter={this.handleKeyDownEnter}
-              sharePassword={state.sharePassword}
-              onChangePassword={this.handleChangePassword}
-              shareLinkList={state.shareLinkList}
-              onClickDeleteShareLink={this.handleClickDeleteShareLink}
-              onClickNewShare={this.handleClickNewShare}
-              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-              emailNotifActivated={state.config.system.config.email_notification_activated}
-              key='ShareDownload'
-            />
+            <PopinFixedRightPartContent
+              label={props.t('Share')}
+            >
+              <ShareDownload
+                label={props.t(state.config.label)}
+                hexcolor={state.config.hexcolor}
+                shareEmails={state.shareEmails}
+                onChangeEmails={this.handleChangeEmails}
+                onKeyDownEnter={this.handleKeyDownEnter}
+                sharePassword={state.sharePassword}
+                onChangePassword={this.handleChangePassword}
+                shareLinkList={state.shareLinkList}
+                onClickDeleteShareLink={this.handleClickDeleteShareLink}
+                onClickNewShare={this.handleClickNewShare}
+                userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                emailNotifActivated={state.config.system.config.email_notification_activated}
+                key='ShareDownload'
+              />
+            </PopinFixedRightPartContent>
           )
         },
         propertiesObject

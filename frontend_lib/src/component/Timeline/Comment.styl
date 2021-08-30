@@ -1,9 +1,9 @@
 @import '../../css/Variable.styl'
 
 .comment
-  border-radius 5px
   padding standardSpacing
-  border 1px solid grey
+  border-radius standardBorderRadius
+  border borderStyle
   background-color offWhite
   display flex
   flex-direction column
@@ -36,6 +36,7 @@
 
       &__header
         display flex
+        align-items center
         flex-direction row
         margin-bottom standardSpacing
         font-size metadataFontSize
@@ -46,7 +47,7 @@
             font-size standardFontSize
             &:hover
               text-decoration underline
-        &__actions
+        &__actions.dropdownMenuButton
           padding 0
           color grey
           &::after

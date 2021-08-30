@@ -43,7 +43,6 @@ class ContentItem extends React.Component {
           <DragHandle
             connectDragSource={props.connectDragSource}
             title={props.t('Move this content')}
-            style={{ top: '18px', left: '-2px', padding: '0 7px' }}
           />
         )}
 
@@ -61,7 +60,7 @@ class ContentItem extends React.Component {
               title={props.t(props.contentType.label)}
               style={{
                 color: props.contentType.hexcolor,
-                padding: props.isShared ? '0 15px' : '0 25px'
+                paddingRight: props.isShared ? 'unset' : '10px'
               }}
             >
               {(props.isShared
@@ -113,15 +112,17 @@ class ContentItem extends React.Component {
           )}
 
           <div
-            className='content__status d-sm-flex justify-content-between align-items-center'
-            style={{ color: status.hexcolor }}
+            className='content__status'
             title={props.t(status.label)}
           >
-            <div className='content__status__text d-none d-sm-block'>
-              {props.t(status.label)}
-            </div>
             <div className='content__status__icon'>
-              <i className={`fa-fw ${status.faIcon}`} />
+              <i
+                className={`fa-fw ${status.faIcon}`}
+                style={{ color: status.hexcolor }}
+              />
+            </div>
+            <div className='content__status__text'>
+              {props.t(status.label)}
             </div>
           </div>
         </Link>

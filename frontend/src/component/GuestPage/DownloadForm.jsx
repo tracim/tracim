@@ -8,6 +8,7 @@ import {
 } from '../../action-creator.async.js'
 import {
   handleFetchResult,
+  IconButton,
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
@@ -116,12 +117,14 @@ class DownloadForm extends React.Component {
         </form>
         <div className='d-flex'>
           {/* INFO - G.B. - 2019-08-22 - This button should be always outside the form, to not trigger the submit. */}
-          <button
-            className='btn highlightBtn primaryColorBg primaryColorBgDarkenHover guestdownload__card__form__right__btn'
+          <IconButton
+            customClass='guestdownload__card__form__right__btn'
+            intent='primary'
+            mode='light'
             onClick={this.handleSubmit}
-          >
-            {props.t('Download')}
-          </button>
+            text={props.t('Download')}
+            icon='fas fa-download'
+          />
         </div>
       </div>
     )

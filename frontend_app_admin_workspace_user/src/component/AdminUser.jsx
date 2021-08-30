@@ -4,6 +4,7 @@ import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
 import {
   Delimiter,
+  IconButton,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -117,13 +118,14 @@ export class AdminUser extends React.Component {
           </div>
 
           <div className='adminUser__adduser'>
-            <button
-              className='adminUser__adduser__button btn outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-              data-cy='adminUser__adduser__button'
+            <IconButton
+              customClass='adminUser__adduser__button'
+              dataCy='adminUser__adduser__button'
+              intent='secondary'
               onClick={this.handleToggleAddUser}
-            >
-              {props.t('Create a user')}
-            </button>
+              text={props.t('Create a user')}
+              icon='fas fa-user-plus'
+            />
 
             <div className='adminUser__adduser__emailstate'>
               {!props.emailNotifActivated && (

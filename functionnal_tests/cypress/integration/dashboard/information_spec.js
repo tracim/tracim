@@ -23,7 +23,6 @@ describe('Dashboard', () => {
   })
 
   it('should show the description', () => {
-    cy.contains('.dashboard__workspace__subtitle', 'About this space')
     cy.contains('.dashboard__workspace__detail__description', workspaceTest.description)
   })
 

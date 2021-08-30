@@ -522,9 +522,6 @@ export class Dashboard extends React.Component {
             <PageContent>
               <div className='dashboard__workspace'>
                 <div className='dashboard__workspace__content'>
-
-                  <h3 className='dashboard__workspace__subtitle'>{props.t('About this space')}</h3>
-
                   <div className='dashboard__workspace__detail'>
                     {(description
                       ? (

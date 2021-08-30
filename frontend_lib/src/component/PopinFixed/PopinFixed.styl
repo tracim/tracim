@@ -15,20 +15,36 @@
   &__header
     display flex
     align-items center
-    margin 5px standardSpacing 5px 30px
-    height 60px
+    height headerHeight
     border-bottom 1px solid mediumGrey
+    margin 0 pageSpacing
+    &__titleWithBreadcrumbs
+      flex 3
+      overflow hidden
+    &__titleWrapper
+      display flex
+      align-items center
+    &__edittitle
+      padding 0
+      margin-inline-start standardSpacing
+    & > .favoriteButton
+      margin 0 textSpacing
+      & .iconbutton__icon
+        margin 0
     & > *
-      margin-right 5px
+      margin-inline-end standardSpacing
     &__actions
+      &.dropdownMenuButton
+        padding 0
+        margin 0
+        & i
+          margin 0
       &::after
         display none
     &__icon
-      margin-right standardSpacing
       font-size titleFontSize
+      margin-inline-end standardSpacing
     &__title
-      margin-right standardSpacing
-      border-radius 5px
       flex 2
       text-overflow ellipsis
       overflow hidden
@@ -39,15 +55,21 @@
         text-overflow ellipsis
         overflow hidden
       & > input
-        padding-left 5px
+        padding-left textSpacing
+        border-radius standardBorderRadius
+        border borderStyle
     &__reactions
       flex 1
       height 100%
       & > .EmojiReactions
         flex-wrap wrap-reverse
+      & .EmojiReactionButton__buttonpicker
+        color fontColor
+        padding 0
     &__close
-      border-radius 5px
-      padding 3px 7px
+      margin-inline-start standardSpacing
+      margin-inline-end 0
+      cursor pointer
       & > i
         font-size titleFontSize
         vertical-align middle
@@ -88,7 +110,7 @@
     &__state
       width 100%
       padding 5px 15px
-      border-radius 10px
+      border-radius standardBorderRadius
       background-color #fbe294
     &__left
       transition width 0.4s ease
@@ -99,8 +121,8 @@
         align-items center
         color lightDarkGrey
         font-size metadataFontSize
-        padding 5px standardSpacing
-        margin-inline-start 20px
+        padding standardSpacing pageSpacing 0
+        justify-content flex-end
         & .breadcrumbs
           margin-inline-end auto
           overflow auto
@@ -119,9 +141,11 @@
         width calc(100% - 65px) // 65px is the width of the rightPart header
         overflow-y auto
         &__title
-          margin standardSpacing 15px
+          height headerHeight
           padding standardSpacing
           font-size titleFontSize
+          display flex
+          align-items center
       &__header
         display flex
         flex-direction column
@@ -144,6 +168,8 @@
             text-align center
             cursor pointer
             margin auto 0 15px
+  & .headerBtn
+    margin-inline-end 0
 
 .rightPartClose
   .wsContentGeneric__content

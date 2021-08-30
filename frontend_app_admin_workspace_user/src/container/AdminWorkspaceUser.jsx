@@ -616,6 +616,7 @@ export class AdminWorkspaceUser extends React.Component {
             onCancel={this.handleClosePopupDeleteWorkspace}
             onConfirm={this.handleDeleteWorkspace}
             confirmLabel={props.t('Delete')}
+            confirmIcon='far fa-fw fa-trash-alt'
           />
         )}
       </div>

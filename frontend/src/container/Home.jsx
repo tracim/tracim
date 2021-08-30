@@ -14,6 +14,7 @@ import {
 import {
   CUSTOM_EVENT,
   CardPopup,
+  IconButton,
   TracimComponent,
   checkUsernameValidity,
   ALLOWED_CHARACTERS_USERNAME,
@@ -210,6 +211,8 @@ export class Home extends React.Component {
                 customClass='homepage__usernamePopup'
                 customHeaderClass='primaryColorBg'
                 onClose={this.handleClickCloseUsernamePopup}
+                label={props.t('Set your username')}
+                faIcon='fas fa-fw fa-at'
               >
                 <div className='homepage__usernamePopup__body'>
                   <div className='homepage__usernamePopup__body__title'>
@@ -275,14 +278,15 @@ export class Home extends React.Component {
                     </div>
                   )}
 
-                  <button
-                    type='button'
-                    className='homepage__usernamePopup__body__btn btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
-                    onClick={this.handleClickConfirmUsernamePopup}
+                  <IconButton
+                    customClass='homepage__usernamePopup__body__btn'
                     disabled={this.disableConfirmButton()}
-                  >
-                    {props.t('Confirm')}
-                  </button>
+                    icon='fas fa-check'
+                    intent='primary'
+                    mode='light'
+                    text={props.t('Confirm')}
+                    onClick={this.handleClickConfirmUsernamePopup}
+                  />
                 </div>
               </CardPopup>
             )}

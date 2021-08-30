@@ -1,12 +1,9 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 .notification
   position fixed
   top headerHeight
   right 0
   width 40%
   height "calc(100% - %s)" % headerHeight
-  border-left 1px solid grey
   background-color offWhite
   box-shadow shadow-right
   z-index 26
@@ -15,11 +12,8 @@
   max-width 600px
   overflow hidden
   transition 0.5s
-  &__header
-    & div
-      color fontColor
-    &__close i
-      color fontColor
+  & .iconbutton
+    font-size metadataFontSize
   &__list
     flex-grow 2
     overflow auto
@@ -28,17 +22,16 @@
       display flex
       color fontColor
       font-weight normal
-      background-color veryLightGrey
-      padding 5px
-      min-height listItemHeight
+      background-color lightBlueOpacity
+      padding standardSpacing
+      min-height 60px
       align-items center
       &__icon
         font-size bigIconSize
-        margin standardSpacing
         display inline-block
         width 30px
       &__text
-        flex 1
+        flex 2
         display flex
         font-size metadataFontSize
         word-break break-word
@@ -46,11 +39,15 @@
       &__meta
         padding-right textSpacing
         color lightDarkGrey
-        display flex
-        flex-direction column
-        align-items flex-end
+        flex 1
+        overflow hidden
         font-size metadataFontSize
-        word-break break-word
+        white-space nowrap
+        text-align right
+        &__space
+          text-overflow ellipsis
+          overflow hidden
+          font-weight bold
       &__circle
         &__wrapper
           margin 0
@@ -63,29 +60,36 @@
         color lightDarkGrey
         background-color offWhite
         opacity 0.8
+      &.isMention:not(.itemRead)
+        background lightOrange
+      &.isMention.itemRead
+        background lightOrangeOpacity
       &:hover
-        background-color grey-hover
         color inherit
   &__wallClose
     height 0
     top 0
   &__footer
-    border-top 1px solid grey
-    padding 5px
+    border-top borderStyle
+    padding standardSpacing
+    position sticky
+    bottom 0
+    background-color offWhite
     justify-content center
-    width 100%
     display flex
+  &__header__title
+    font-weight normal
 
 .contentTitle
   &__highlight
-    text-decoration underline
+    font-weight bold
 .documentTitle
   &__highlight
     font-weight bold
 
-// INFO - MB - 20200204 - overrides ListItemWrapper styles because .content is used in many places
+// INFO - MB - 20210204 - overrides ListItemWrapper styles because .content is used in many places
 .notification > .notification__list > .content
-  border-left none
+  border none
 
 @media (min-width: min-md) and (max-width: max-md)
   .notification
@@ -96,9 +100,8 @@
     width 100%
 
 @media (max-width: max-lg)
-  .notification
-    & .btn
-      & > .genericButton__label
-        display none
-      & > .genericButton__icon
-        margin 0px
+  .notification .btn
+    & > .genericButton__label
+      display none
+    & > .genericButton__icon
+      margin 0px

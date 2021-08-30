@@ -70,7 +70,7 @@ class WorkspaceListItem extends React.Component {
   render () {
     const { props, state } = this
     const INDENT_WIDTH = 20
-    const BASE_MARGIN = 15
+    const BASE_MARGIN = 20
 
     return (
       <li

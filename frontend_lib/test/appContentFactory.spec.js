@@ -10,6 +10,7 @@ import { commentList as fixtureCommentList } from './fixture/contentCommentList.
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
 import { defaultDebug } from '../src/debug.js'
+import { baseFetch } from '../src/action.async.js'
 import {
   mockGetMyselfKnownMember200,
   mockPutContent200,
@@ -18,7 +19,10 @@ import {
   mockPutContentArchive204,
   mockPutContentDelete204,
   mockPutContentArchiveRestore204,
-  mockPutContentDeleteRestore204
+  mockPutContentDeleteRestore204,
+  mockGetContentComments200,
+  mockGetFileChildContent200,
+  mockGetContentRevisions200
 } from './apiMock.js'
 import { generateLocalStorageContentId } from '../src/localStorage.js'
 
@@ -610,6 +614,81 @@ describe('appContentFactory.js', () => {
           expect(isNewName).to.be.equal(true)
         })
       })
+    })
+  })
+
+  describe('Timeline pagination', () => {
+    const getContentRevisionFunc = (apiUrl, workspaceId, contentId, pageToken, count, sort) => {
+      return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${fakeContent.content_type}/${contentId}/revisions?page_token=${pageToken}&count=${count}&sort=${sort}`)
+    }
+
+    const testCases = [
+      {
+        description: 'empty',
+        commentPage: { items: [] },
+        fileChildPage: { items: [] },
+        revisionPage: { items: [] },
+        expectedTimelineLength: 0,
+        expectedWholeTimelineLength: 0
+      },
+      {
+        description: 'less than 15 items',
+        commentPage: { items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        fileChildPage: { items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        revisionPage: { items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        expectedTimelineLength: 12,
+        expectedWholeTimelineLength: 12
+      },
+      {
+        description: 'more than 15 items',
+        commentPage: { items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        fileChildPage: { items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        revisionPage: { items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }) },
+        expectedTimelineLength: 15,
+        expectedWholeTimelineLength: 30
+      }
+    ]
+
+    for (const testCase of testCases) {
+      const getCommentsMock = mockGetContentComments200(
+        fakeApiUrl,
+        fakeContent.workspace_id,
+        fakeContent.content_id,
+        testCase.commentPage,
+        '?page_token=&count=15&sort=created:desc'
+      )
+      const getFileChildMock = mockGetFileChildContent200(
+        fakeApiUrl,
+        fakeContent.workspace_id,
+        fakeContent.content_id,
+        testCase.fileChildPage,
+        '&page_token=&count=15&sort=created:desc'
+      )
+      const getContentRevisionMock = mockGetContentRevisions200(
+        fakeApiUrl,
+        fakeContent.workspace_id,
+        fakeContent.content_type,
+        fakeContent.content_id,
+        testCase.revisionPage,
+        '?page_token=&count=15&sort=modified:desc'
+      )
+      it(`should fetch items and set the timeline state(${testCase.description})`, async () => {
+        wrapper.instance().resetTimeline()
+        await wrapper.instance().loadMoreTimelineItems(getContentRevisionFunc)
+        expect(getCommentsMock.isDone()).to.be.true
+        expect(getFileChildMock.isDone()).to.be.true
+        expect(getContentRevisionMock.isDone()).to.be.true
+        expect(wrapper.instance().state.timeline.length).to.be.equal(testCase.expectedTimelineLength)
+        expect(wrapper.instance().state.wholeTimeline.length).to.be.equal(testCase.expectedWholeTimelineLength)
+      })
+    }
+
+    it('should not fetch items if enough are available', async () => {
+      const wholeTimeline = Array(15).fill().map((_, index) => { timelineType: 'revision' })
+      wrapper.instance().resetTimeline()
+      wrapper.instance().state.wholeTimeline = wholeTimeline
+      await wrapper.instance().loadMoreTimelineItems(getContentRevisionFunc)
+      expect(wrapper.instance().state.timeline.length).to.be.equal(wholeTimeline.length)
     })
   })
 })
