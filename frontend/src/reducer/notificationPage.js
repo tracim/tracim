@@ -12,6 +12,7 @@ import {
   UPDATE,
   USER_DISCONNECTED
 } from '../action-creator.sync.js'
+import { GROUP_NOTIFICATION_CRITERIA } from '../util/helper.js'
 import { serialize } from 'tracim_frontend_lib'
 import { serializeContentProps } from './workspaceContentList.js'
 import { serializeWorkspaceListProps } from './workspaceList.js'
@@ -83,13 +84,13 @@ const hasSameContent = notificationList => {
 const belongsToGroup = (notification, groupedNotification, numberOfCriteria = 2) => {
   if (!groupedNotification.group) return false
 
-  const isGroupedByContent = groupedNotification.type.includes('content') &&
+  const isGroupedByContent = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT) &&
     hasSameContent([notification, groupedNotification])
 
-  const isGroupedByWorkspace = groupedNotification.type.includes('workspace') &&
+  const isGroupedByWorkspace = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.WORKSPACE) &&
     hasSameWorkspace([notification.workspace, groupedNotification.group[0].workspace])
 
-  const isGroupedByAuthor = groupedNotification.type.includes('author') &&
+  const isGroupedByAuthor = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.AUTHOR) &&
     hasSameAuthor([notification.author, groupedNotification.group[0].author])
 
   if ((numberOfCriteria === 2 &&
@@ -98,7 +99,10 @@ const belongsToGroup = (notification, groupedNotification, numberOfCriteria = 2)
   ) {
     groupedNotification.group.push(notification)
     groupedNotification.type =
-      `${numberOfCriteria === 2 ? 'twoCriteriaGroup' : 'oneCriteriaGroup'}${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`
+      `${numberOfCriteria === 2 ? 'twoCriteriaGroup' : 'oneCriteriaGroup'}${
+        isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${
+          isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${
+            isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
     return true
   }
 }
@@ -143,7 +147,10 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
           newNotificationList.push({
             author: authorList,
             id: notification.id,
-            type: `twoCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`,
+            type: `twoCriteriaGroup${
+              isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${
+                isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${
+                  isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`,
             group: [notification, ...previousNotificationList]
           })
           indexInNewList = indexInNewList - (numberOfNotificationsToGroup - 2)
@@ -205,7 +212,10 @@ const groupNotificationListWithOneCriteria = (notificationList) => {
           newNotificationList.push({
             author: authorList,
             id: notification.id,
-            type: `oneCriteriaGroup${isGroupedByContent ? '.content' : ''}${isGroupedByAuthor ? '.author' : ''}${isGroupedByWorkspace ? '.workspace' : ''}`,
+            type: `oneCriteriaGroup${
+              isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${
+                isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${
+                  isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`,
             group: [notification, ...previousNotificationList]
           })
           indexInNewList = indexInNewList - (numberOfNotificationsToGroup - 2)

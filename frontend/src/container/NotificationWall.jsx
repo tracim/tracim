@@ -33,7 +33,7 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
-import NotificationItem from './NotificationItem.jsx'
+import NotificationItem from '../component/NotificationItem.jsx'
 import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export class NotificationWall extends React.Component {
@@ -430,7 +430,6 @@ export class NotificationWall extends React.Component {
                       getNotificationDetails={this.getNotificationDetails}
                       notification={notification}
                       onClickNotification={this.handleClickNotification}
-                      onCloseNotificationWall={props.onCloseNotificationWall}
                       shortDate={this.shortDate}
                     />
                   ) : (
@@ -439,6 +438,7 @@ export class NotificationWall extends React.Component {
                       notification={notification}
                       onClickNotification={this.handleClickNotification}
                       shortDate={this.shortDate}
+                      user={props.user}
                     />
                   )}
               </ListItemWrapper>

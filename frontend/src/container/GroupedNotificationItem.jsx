@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import { FETCH_CONFIG } from '../util/helper.js'
+import {
+  FETCH_CONFIG,
+  GROUP_NOTIFICATION_CRITERIA
+} from '../util/helper.js'
 import {
   Avatar,
   AVATAR_SIZE,
@@ -104,7 +107,7 @@ export class GroupedNotificationItem extends React.Component {
   handleClickGroupedNotification = (e, notification) => {
     const { props } = this
 
-    if (notification.type.includes('content')) {
+    if (notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)) {
       notification.group.forEach(notification => props.onClickNotification(e, notification.id, {
         url: PAGE.CONTENT(notification.content.type === TLM_SUB.COMMENT
           ? notification.content.parentId
