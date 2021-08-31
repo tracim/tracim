@@ -12,6 +12,7 @@ const ListItemWrapper = props => {
       }
       title={props.label}
       id={props.id}
+      ref={props.connectDragSource}
       data-cy={props.dataCy}
     >
       {props.children}
@@ -25,6 +26,7 @@ ListItemWrapper.propTypes = {
   customClass: PropTypes.string,
   label: PropTypes.string,
   contentType: PropTypes.object,
+  connectDragSource: PropTypes.func,
   isLast: PropTypes.bool,
   read: PropTypes.bool,
   id: PropTypes.string,

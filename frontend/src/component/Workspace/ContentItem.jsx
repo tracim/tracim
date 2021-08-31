@@ -27,24 +27,27 @@ class ContentItem extends React.Component {
     }
 
     const dropStyle = {
-      opacity: props.isDragging ? 0.5 : 1
+      // opacity: props.isDragging ? 0.5 : 1
     }
+
+    const dragRole = props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : false
 
     return (
       <ListItemWrapper
         label={props.label}
         read={props.read}
+        connectDragSource={props.connectDragSource}
         contentType={props.contentType}
         isLast={props.isLast}
         key={props.id}
         id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.contentId}`}
+        ref={props.connectDragPreview}
       >
-        {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
+        {/* {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
           <DragHandle
             connectDragSource={props.connectDragSource}
-            title={props.t('Move this content')}
           />
-        )}
+        )} */}
 
         <Link
           to={props.urlContent}
@@ -53,7 +56,6 @@ class ContentItem extends React.Component {
         >
           <div
             className='content__dragPreview'
-            ref={props.connectDragPreview}
           >
             <div
               className='content__type'
@@ -74,7 +76,7 @@ class ContentItem extends React.Component {
                   />
                 )
                 : (
-                  <i className={`fa-fw ${props.faIcon}`} />
+                  <i className={props.isDragging ? 'fas fa-arrows-alt' : `fa-fw ${props.faIcon}`} />
                 )
               )}
             </div>
