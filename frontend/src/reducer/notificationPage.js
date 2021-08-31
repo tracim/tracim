@@ -5,10 +5,11 @@ import {
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
-  SET,
   READ,
+  SET,
   UNREAD_MENTION_COUNT,
   UNREAD_NOTIFICATION_COUNT,
+  UPDATE,
   USER_DISCONNECTED
 } from '../action-creator.sync.js'
 import { serialize } from 'tracim_frontend_lib'
@@ -248,13 +249,22 @@ export default function notificationPage (state = defaultNotificationsObject, ac
           newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([notification, ...state.list], 'id'))
         }
       }
-
       return {
         ...state,
         list: newNotificationList,
         unreadMentionCount: newUnreadMentionCount,
         unreadNotificationCount: state.unreadNotificationCount + 1
       }
+    }
+
+    case `${UPDATE}/${NOTIFICATION}`: {
+      const index = state.list.findIndex(notification => notification.id === action.notificationId)
+      const newNotificationList = [
+        ...state.list.slice(0, index),
+        ...action.notificationList,
+        ...state.list.slice(index + 1, state.list.length)
+      ]
+      return { ...state, list: newNotificationList }
     }
 
     case `${READ}/${NOTIFICATION}`: {

@@ -115,8 +115,17 @@ export class NotificationWall extends React.Component {
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
-      content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
+      content: `<span title='${escapedContentLabel}' class=${notification.numberOfContents > 1
+        ? ''
+        : 'contentTitle__highlight'
+      }>${escapedContentLabel}</span>`,
       interpolation: { escapeValue: false }
+    }
+
+    if (notification.numberOfWorkspaces > 1) {
+      i18nOpts.workspace = `<span title='${notification.numberOfWorkspaces}'>${
+        props.t('in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
+      }</span>`
     }
 
     const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
@@ -137,14 +146,14 @@ export class NotificationWall extends React.Component {
           if (contentType === TLM_SUB.COMMENT) {
             return {
               title: props.t('Comment_noun'),
-              text: props.t('{{author}} commented on {{content}}', i18nOpts),
+              text: props.t('{{author}} commented on {{content}} {{workspace}}', i18nOpts),
               url: this.linkToComment(notification)
             }
           }
 
           return {
             title: isPublication ? props.t('New publication') : props.t('New content'),
-            text: props.t('{{author}} created {{content}}', i18nOpts),
+            text: props.t('{{author}} created {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
@@ -152,28 +161,28 @@ export class NotificationWall extends React.Component {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
               title: props.t('Status updated'),
-              text: props.t('{{author}} changed the status of {{content}}', i18nOpts),
+              text: props.t('{{author}} changed the status of {{content}} {{workspace}}', i18nOpts),
               url: contentUrl
             }
           }
 
           return {
             title: isPublication ? props.t('Publication updated') : props.t('Content updated'),
-            text: props.t('{{author}} updated {{content}}', i18nOpts),
+            text: props.t('{{author}} updated {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.DELETED: {
           return {
             title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
-            text: props.t('{{author}} deleted {{content}}', i18nOpts),
+            text: props.t('{{author}} deleted {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.UNDELETED: {
           return {
             title: isPublication ? props.t('Publication restored') : props.t('Content restored'),
-            text: props.t('{{author}} restored {{content}}', i18nOpts),
+            text: props.t('{{author}} restored {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
@@ -187,7 +196,7 @@ export class NotificationWall extends React.Component {
       return {
         title: props.t('Mention'),
         text: groupMention ? mentionEveryone : mentionYou,
-        url: contentUrl,
+        url: PAGE.CONTENT(notification.content.parentId),
         isMention: true
       }
     }
@@ -418,17 +427,18 @@ export class NotificationWall extends React.Component {
                 {notification.group
                   ? (
                     <GroupedNotificationItem
-                      onClickNotification={() => {}}
-                      shortDate={this.shortDate}
-                      notification={notification}
                       getNotificationDetails={this.getNotificationDetails}
+                      notification={notification}
+                      onClickNotification={this.handleClickNotification}
+                      onCloseNotificationWall={props.onCloseNotificationWall}
+                      shortDate={this.shortDate}
                     />
                   ) : (
                     <NotificationItem
-                      onClickNotification={this.handleClickNotification}
-                      notification={notification}
-                      shortDate={this.shortDate}
                       getNotificationDetails={this.getNotificationDetails}
+                      notification={notification}
+                      onClickNotification={this.handleClickNotification}
+                      shortDate={this.shortDate}
                     />
                   )}
               </ListItemWrapper>
