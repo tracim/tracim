@@ -66,8 +66,10 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
-    - get: tracim-source
-      trigger: true
+    - in_parallel:
+      - get: tracim-source
+        trigger: true
+      - get: test-image
 
     - task: build-pipeline
       image: test-image

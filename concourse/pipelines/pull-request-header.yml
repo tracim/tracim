@@ -65,17 +65,19 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
-  - get: tracim-source
-    trigger: true
+    - in_parallel:
+      - get: tracim-source
+        trigger: true
+      - get: test-image
 
-  - task: build-pipeline
-    image: test-image
-    vars:
-      pipeline: pull-request
-    file: tracim-source/concourse/tasks/build-pipeline.yml
+    - task: build-pipeline
+      image: test-image
+      vars:
+        pipeline: pull-request
+      file: tracim-source/concourse/tasks/build-pipeline.yml
 
-  - set_pipeline: self
-    file: pipeline/pull-request.yml
-    vars:
-      github-webhook-token: ((github-webhook-token))
-      github-access-token: ((github-access-token))
+    - set_pipeline: self
+      file: pipeline/pull-request.yml
+      vars:
+        github-webhook-token: ((github-webhook-token))
+        github-access-token: ((github-access-token))
