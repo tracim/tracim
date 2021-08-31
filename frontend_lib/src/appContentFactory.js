@@ -496,7 +496,6 @@ export function appContentFactory (WrappedComponent) {
       ...content,
       timelineType: TIMELINE_TYPE.COMMENT,
       created_raw: content.created,
-      created: displayDistanceDate(content.created, loggedUser.lang),
       raw_content: addClassToMentionsOfUser(content.raw_content, loggedUser.username),
       translatedRawContent: null,
       translationState: initialCommentTranslationState

@@ -17,6 +17,7 @@ import {
   handleFetchResult,
   handleInvalidMentionInComment,
   IconButton,
+  Loading,
   PAGE,
   ROLE,
   ROLE_LIST,
@@ -266,6 +267,10 @@ export class Publications extends React.Component {
   loadWorkspaceDetail = async () => {
     const { props } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
+    this.setState({ loading: true })
+
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
       case 200:
@@ -284,6 +289,7 @@ export class Publications extends React.Component {
         ))
         break
     }
+    this.setState({ loading: false })
   }
 
   handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
@@ -573,6 +579,7 @@ export class Publications extends React.Component {
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     const currentPublicationId = Number(props.match.params.idcts || 0)
     const isPublicationListEmpty = props.publicationList.length === 0
+
     return (
       <ScrollToBottomWrapper
         customClass='publications'
@@ -584,13 +591,15 @@ export class Publications extends React.Component {
           breadcrumbs={props.breadcrumbs}
         />
 
-        {isPublicationListEmpty && (
+        {state.loading && <Loading />}
+
+        {!state.loading && isPublicationListEmpty && (
           <div className='publications__empty'>
             {props.t('This space does not have any publication yet, create the first publication using the area at the bottom of the page.')}
           </div>
         )}
 
-        {props.publicationList.map(publication =>
+        {!state.loading && props.publicationList.map(publication =>
           <FeedItemWithPreview
             contentAvailable
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
@@ -610,7 +619,7 @@ export class Publications extends React.Component {
           />
         )}
 
-        {state.showReorderButton && (
+        {!state.loading && state.showReorderButton && (
           <IconButton
             customClass='publications__reorder'
             text={props.t('Reorder')}
@@ -620,7 +629,7 @@ export class Publications extends React.Component {
           />
         )}
 
-        {state.showInvalidMentionPopupInComment && (
+        {!state.loading && state.showInvalidMentionPopupInComment && (
           <ConfirmPopup
             onConfirm={this.handleCancelSave}
             onClose={this.handleCancelSave}
@@ -640,7 +649,7 @@ export class Publications extends React.Component {
           />
         )}
 
-        {state.showEditPopup && (
+        {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             comment={state.commentToEdit.raw_content}

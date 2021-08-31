@@ -6,7 +6,12 @@ import classnames from 'classnames'
 import ContentItem from './ContentItem.jsx'
 import Folder from './Folder.jsx'
 import { SHARE_FOLDER_ID } from '../../util/helper.js'
-import { ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
+import {
+  ROLE,
+  DropdownMenu,
+  Loading,
+  PAGE
+} from 'tracim_frontend_lib'
 
 require('./Folder.styl')
 
@@ -90,7 +95,7 @@ class ShareFolder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {folderContentList.map((content, index) => content.type === 'folder'
+          {props.loading ? <Loading /> : (folderContentList.map((content, index) => content.type === 'folder'
             ? (
               <Folder
                 availableApp={props.availableApp}
@@ -139,7 +144,7 @@ class ShareFolder extends React.Component {
                 key={content.id}
               />
             )
-          )}
+          ))}
         </div>
       </div>
     )
@@ -149,6 +154,7 @@ class ShareFolder extends React.Component {
 export default translate()(withRouter(ShareFolder))
 
 ShareFolder.propTypes = {
+  loading: PropTypes.bool,
   folderData: PropTypes.object,
   app: PropTypes.array,
   lang: PropTypes.string,
