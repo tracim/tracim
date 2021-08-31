@@ -14,7 +14,7 @@
 # - run end-to-end (cypress) checks
 # All of these in parallel.
 - name: backend-tests
-  <<: *status_notifications
+#  <<: *status_notifications
   plan:
 
   - in_parallel:
@@ -23,7 +23,7 @@
       trigger: true
     - get: test-image
 
-  - *pending_status_notification
+#  - *pending_status_notification
 
   - task: backend-lint
     image: test-image
@@ -73,7 +73,7 @@
           - ((.:database))
 
 - name: frontend-tests
-  <<: *status_notifications
+#  <<: *status_notifications
 
   plan:
 
@@ -83,7 +83,7 @@
       trigger: true
     - get: test-image
 
-  - *pending_status_notification
+#  - *pending_status_notification
 
   - task: frontend-unit-tests
     image: test-image
@@ -96,7 +96,7 @@
         path: concourse/scripts/frontend-unit-tests
 
 - name: end-to-end-tests
-  <<: *status_notifications
+#  <<: *status_notifications
   plan:
   - in_parallel:
     - get: tracim-source
@@ -104,7 +104,7 @@
       trigger: true
     - get: test-image
 
-  - *pending_status_notification
+#  - *pending_status_notification
 
   - task: end-to-end-cypress-tests
     image: test-image

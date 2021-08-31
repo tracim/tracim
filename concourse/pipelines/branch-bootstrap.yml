@@ -1,6 +1,6 @@
-# This pipeline "header" defines a pipeline which will build and test Tracim sources.
-# It requires a ((branch)), ((source_check_interval)) and ((github-access-token)) variables when used.
-# It should be concatenated with "build-jobs.yml" to produce a complete pipeline.
+# This pipeline bootstraps a pipeline which will build and test Tracim sources on a specified branch.
+# It requires a ((branch)), ((github-access-token)) variables when used.
+# It will use "build-jobs.yml" to produce a complete pipeline.
 
 ## YAML definitions re-used in plans
 
@@ -39,7 +39,7 @@ resources:
 - name: tracim-source
   type: git
   source:
-    uri: git@github.com:tracim/tracim
+    uri: https://github.com/tracim/tracim.git
     branch: ((branch))
 
 # docker image used for running tests.
@@ -49,12 +49,20 @@ resources:
     repository: algooci/tracim
 
 # resource to update github's commit status
-- name: github-status-update
-  type: cogito
+#- name: github-status-update
+#  type: cogito
+#  source:
+ #   repo: tracim/tracim
+ #   owner: meerkat-bot
+ #   access_token: ((github-access-token))
+
+# timer used to trigger a build
+- name: periodic-build
+  type: time
   source:
-    repo: tracim/tracim
-    owner: meerkat-bot
-    access_token: ((github-access-token))
+    interval: 24h
+    start: 3:00 AM
+    stop: 4:00 AM
 
 
 # Pipeline jobs:
@@ -68,8 +76,9 @@ jobs:
   plan:
     - in_parallel:
       - get: tracim-source
-        trigger: true
       - get: test-image
+      - get: periodic-build
+        trigger: true
 
     - task: build-pipeline
       image: test-image
@@ -81,3 +90,4 @@ jobs:
       file: pipeline/branch.yml
       vars:
         github-access-token: ((github-access-token))
+        branch: ((branch))

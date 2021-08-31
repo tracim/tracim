@@ -5,11 +5,8 @@ inputs:
 outputs:
   - name: pipeline
 run:
-  path: /bin/sh
+  path: tracim-source/concourse/scripts/build-pipeline
   args:
-    - -c
-    - |
-      cat
-      tracim-source/concourse/pipelines/((pipeline))-header.yml
-      tracim-source/concourse/pipelines/build-jobs.iyml
-      > pipeline/((pipeline)).yml
+    - tracim-source/concourse/pipelines/((pipeline))-bootstrap.yml
+    - tracim-source/concourse/pipelines/build-jobs.yml
+    - pipeline/((pipeline)).yml

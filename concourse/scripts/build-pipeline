@@ -1,0 +1,7 @@
+#!/bin/sh
+
+bootstrap=$1
+jobs=$2
+output=$3
+
+cat $1 $2 > $output

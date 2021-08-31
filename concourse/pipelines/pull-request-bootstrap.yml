@@ -1,6 +1,6 @@
-# This pipeline "header" defines a pipeline which will build and test a Tracim pull-request.
-# It requires a ((github-webhook-token)) and a ((github-access-torken)) variables when used.
-# It should be concatenated with "build-jobs.yml" to produce a complete pipeline.
+# This pipeline boostraps another pipeline which will build and test a Tracim pull-request.
+# It requires a ((github-webhook-token)) and a ((github-access-token)) variables when used.
+# It will use "build-jobs.yml" to produce a complete pipeline.
 
 ## YAML definitions re-used in plans
 
