@@ -17,7 +17,7 @@ describe('<PopinFixedContent />', () => {
     config: {
       hexcolor: '',
       faIcon: '',
-      apiUrl: ''
+      apiUrl: 'http://fake.url/api'
     },
     content: {
       is_archived: false,

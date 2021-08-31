@@ -38,14 +38,14 @@ describe('<PopinFixed />', () => {
   const PopinFixedWithHOC = withRouterMock(PopinFixed)
 
   const wrapper = mount(
-    <PopinFixed
+    <PopinFixedWithHOC
       {...props}
     >
       <PopinFixedHeader {...props} />
       <PopinFixedContent {...props}>
         <div>test</div>
       </PopinFixedContent>
-    </PopinFixed>,
+    </PopinFixedWithHOC>,
     { wrappingComponent: RouterMock }
   )
 

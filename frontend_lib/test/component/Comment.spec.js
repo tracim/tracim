@@ -5,13 +5,15 @@ import { mount } from 'enzyme'
 import Comment from '../../src/component/Timeline/Comment.jsx'
 import { TRANSLATION_STATE } from '../../src/translation.js'
 
+const nock = require('nock')
+
 describe('<Comment />', () => {
   const props = {
-    apiUrl: '',
-    createdRaw: 0,
+    apiUrl: 'http://fake.url/api',
+    created: '0',
     customClass: 'randomCustomClass',
     customColor: '#252525',
-    author: { public_name: 'randomAuthor' },
+    author: { public_name: 'randomAuthor', user_id: 1, username: 'admin' },
     isPublication: false,
     loggedUser: { public_name: 'randomUser' },
     text: 'randomText',
@@ -36,7 +38,13 @@ describe('<Comment />', () => {
     onChangeTargetLanguageCode: () => {}
   }
 
+  function mockReactions () {
+    nock(props.apiUrl).get(`/workspaces/${props.workspaceId}/contents/${props.contentId}/reactions`).reply(200, [])
+  }
+
   const CommentWithHOC = withRouterMock(Comment)
+
+  mockReactions()
   const wrapper = mount(<CommentWithHOC {...props} />, { wrappingComponent: RouterMock })
 
   describe('Static design', () => {
@@ -61,17 +69,17 @@ describe('<Comment />', () => {
     })
 
     it('should have the className "sent" when it is your comment', () => {
-      wrapper.setProps({ fromMe: true })
+      mockReactions()
+      const wrapper = mount(<CommentWithHOC {...props} fromMe />, { wrappingComponent: RouterMock })
       expect(wrapper.find(`div.${props.customClass}.sent`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${props.customClass}.received`)).to.have.lengthOf(0)
-      wrapper.setProps({ fromMe: props.fromMe })
     })
 
     it('should have the className "received" when it is your comment', () => {
-      wrapper.setProps({ fromMe: false })
+      mockReactions()
+      const wrapper = mount(<CommentWithHOC {...props} fromMe={false} />, { wrappingComponent: RouterMock })
       expect(wrapper.find(`div.${props.customClass}.received`)).to.have.lengthOf(1)
       expect(wrapper.find(`div.${props.customClass}.sent`)).to.have.lengthOf(0)
-      wrapper.setProps({ fromMe: props.fromMe })
     })
   })
 })

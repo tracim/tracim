@@ -33,8 +33,8 @@ const Comment = props => {
     borderColor: props.customColor
   }
 
-  const createdFormated = formatAbsoluteDate(props.createdRaw, props.loggedUser.lang)
-  const createdDistance = displayDistanceDate(props.createdRaw, props.loggedUser.lang)
+  const createdFormated = formatAbsoluteDate(props.created, props.loggedUser.lang)
+  const createdDistance = displayDistanceDate(props.created, props.loggedUser.lang)
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
 
@@ -186,7 +186,7 @@ Comment.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
   text: PropTypes.string,
-  createdRaw: PropTypes.number.isRequired,
+  created: PropTypes.string.isRequired,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
   onClickEditComment: PropTypes.func,
