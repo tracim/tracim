@@ -9,7 +9,6 @@ import {
   mockPutHtmlDocumentRead200,
   mockPutUserConfiguration204
 } from '../apiMock.js'
-import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 import { HtmlDocument } from '../../src/container/HtmlDocument.jsx'
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentHtmlDocument from '../fixture/content/contentHtmlDocument.js'

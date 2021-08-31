@@ -196,12 +196,11 @@ export class File extends React.Component {
       newContent: {
         ...prev.content,
         ...data.fields.content
-        },
+      },
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: clientToken !== data.fields.client_token,
       mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode
     }))
-    return
   }
 
   async componentDidMount () {
@@ -848,10 +847,9 @@ export class File extends React.Component {
             onClickTranslateComment={comment => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
-              state.translationTargetLanguageCode,
-              this.setState.bind(this)
+              state.translationTargetLanguageCode
             )}
-            onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+            onClickRestoreComment={props.handleRestoreComment}
             onClickEditComment={this.handleClickEditComment}
             onClickDeleteComment={this.handleClickDeleteComment}
             onClickOpenFileComment={this.handleClickOpenFileComment}

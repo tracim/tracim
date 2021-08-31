@@ -488,10 +488,9 @@ export class Thread extends React.Component {
                 onClickTranslateComment={comment => props.handleTranslateComment(
                   comment,
                   state.content.workspace_id,
-                  state.translationTargetLanguageCode,
-                  this.setState.bind(this)
+                  state.translationTargetLanguageCode
                 )}
-                onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                onClickRestoreComment={props.handleRestoreComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}

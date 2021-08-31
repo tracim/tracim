@@ -579,7 +579,7 @@ describe('appContentFactory.js', () => {
           }
         }
         wrapper.instance().handleChildContentCreated(tlmData)
-        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.exist
+        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.exist // eslint-disable-line
       })
 
       it('should not update the timeline if the tlm is not related to the current content', () => {
@@ -593,7 +593,7 @@ describe('appContentFactory.js', () => {
           }
         }
         wrapper.instance().handleChildContentCreated(tlmData)
-        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.not.exist
+        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.not.exist // eslint-disable-line
       })
     })
 
@@ -604,8 +604,8 @@ describe('appContentFactory.js', () => {
           wrapper.instance().handleUserModified(tlmData)
 
           const listPublicNameOfAuthor = wrapper.state('timeline')
-                                                .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
-                                                .map(timelineItem => timelineItem.author.public_name)
+            .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
+            .map(timelineItem => timelineItem.author.public_name)
           const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
           expect(isNewName).to.be.equal(true)
         })
@@ -631,17 +631,17 @@ describe('appContentFactory.js', () => {
       {
         description: 'less than 15 items',
         commentPage: {
-          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
           has_next: false,
           next_page_token: ''
         },
         fileChildPage: {
-          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
           has_next: false,
           next_page_token: ''
         },
         revisionPage: {
-          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
           has_next: true,
           next_page_token: 'token'
         },
@@ -652,17 +652,17 @@ describe('appContentFactory.js', () => {
       {
         description: 'more than 15 items',
         commentPage: {
-          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
           has_next: false,
           next_page_token: ''
         },
         fileChildPage: {
-          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
           has_next: false,
           next_page_token: ''
         },
         revisionPage: {
-          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00`} }),
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
           has_next: false,
           next_page_token: ''
         },
@@ -698,9 +698,9 @@ describe('appContentFactory.js', () => {
       it(`should fetch items and set the timeline state(${testCase.description})`, async () => {
         wrapper.instance().resetTimeline()
         await wrapper.instance().loadMoreTimelineItems(getContentRevisionFunc)
-        expect(getCommentsMock.isDone()).to.be.true
-        expect(getFileChildMock.isDone()).to.be.true
-        expect(getContentRevisionMock.isDone()).to.be.true
+        expect(getCommentsMock.isDone()).to.be.true  // eslint-disable-line
+        expect(getFileChildMock.isDone()).to.be.true  // eslint-disable-line
+        expect(getContentRevisionMock.isDone()).to.be.true  // eslint-disable-line
         expect(wrapper.instance().state.timeline.length).to.be.equal(testCase.expectedTimelineLength)
         expect(wrapper.instance().state.wholeTimeline.length).to.be.equal(testCase.expectedWholeTimelineLength)
         expect(wrapper.instance().canLoadMoreTimelineItems()).to.be.equal(testCase.canLoadMoreItems)
@@ -708,7 +708,7 @@ describe('appContentFactory.js', () => {
     }
 
     it('should not fetch items if enough are available', async () => {
-      const wholeTimeline = Array(15).fill().map((_, index) => { timelineType: 'revision' })
+      const wholeTimeline = (new Array(15)).fill().map(() => { return { timelineType: 'revision' } })
       wrapper.instance().resetTimeline()
       wrapper.instance().state.wholeTimeline = wholeTimeline
       await wrapper.instance().loadMoreTimelineItems(getContentRevisionFunc)

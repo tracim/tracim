@@ -84,7 +84,7 @@ describe('Favorites', function () {
   })
 
   for (const app of ['file', 'html-document', 'thread', 'folder']) {
-    describe('Favorite button in apps', () => {
+    describe(`Favorite button in app ${app}`, () => {
       beforeEach(() => {
         cy.loginAs('administrators')
         cy.visitPage({

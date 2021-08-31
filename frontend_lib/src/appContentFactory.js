@@ -882,13 +882,15 @@ export function appContentFactory (WrappedComponent) {
       return newTimeline
     }
 
-    onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
-      setState(previousState => {
+    onHandleTranslateComment = async (comment, workspaceId, lang) => {
+      this.setState(previousState => {
+        const wholeTimeline = this.replaceComment(
+          { ...comment, translationState: TRANSLATION_STATE.PENDING },
+          previousState.wholeTimeline
+        )
         return {
-          timeline: this.replaceComment(
-            { ...comment, translationState: TRANSLATION_STATE.PENDING },
-            previousState.timeline
-          )
+          wholeTimeline,
+          timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
         }
       })
       const response = await getCommentTranslated(
@@ -901,38 +903,47 @@ export function appContentFactory (WrappedComponent) {
       const errorMessage = getTranslationApiErrorMessage(response)
       if (errorMessage) {
         sendGlobalFlashMessage(errorMessage, 'warning')
-        setState(previousState => {
+        this.setState(previousState => {
+          const wholeTimeline = this.replaceComment(
+            { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
+            previousState.wholeTimeline
+          )
           return {
-            timeline: this.replaceComment(
-              { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
-              previousState.timeline
-            )
+            wholeTimeline,
+            timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
           }
         })
         return
       }
       const translatedRawContent = await response.text()
-      setState(previousState => {
+      this.setState(previousState => {
+        const wholeTimeline = this.replaceComment(
+          {
+            ...comment,
+            translatedRawContent,
+            translationState: TRANSLATION_STATE.TRANSLATED
+          },
+          previousState.wholeTimeline
+        )
         return {
-          timeline: this.replaceComment(
-            {
-              ...comment,
-              translatedRawContent,
-              translationState: TRANSLATION_STATE.TRANSLATED
-            },
-            previousState.timeline
-          )
+          wholeTimeline,
+          timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
         }
       })
     }
 
-    onHandleRestoreComment = (comment, setState) => {
-      setState(previousState => {
+    onHandleRestoreComment = (comment) => {
+      this.setState(previousState => {
+        const wholeTimeline = this.replaceComment(
+          {
+            ...comment,
+            translationState: TRANSLATION_STATE.UNTRANSLATED
+          },
+          previousState.wholeTimeline
+        )
         return {
-          timeline: this.replaceComment(
-            { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
-            previousState.timeline
-          )
+          wholeTimeline,
+          timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
         }
       })
     }

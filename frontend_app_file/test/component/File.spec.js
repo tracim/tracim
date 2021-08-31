@@ -14,7 +14,6 @@ import {
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentFile from '../fixture/content/contentFile.js'
 import { debug } from '../../src/debug.js'
-import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
 debug.config.apiUrl = 'http://unit.test:6543/api'
 

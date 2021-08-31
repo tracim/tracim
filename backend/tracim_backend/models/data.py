@@ -1324,8 +1324,11 @@ class Content(DeclarativeBase):
     def version_number(self) -> int:
         return self.revision.version_number
 
-    def get_first_comment(self) -> "Content":
-        return self.get_comments().first()
+    def get_first_comment(self) -> Optional["Content"]:
+        try:
+            return self.get_comments()[0]
+        except IndexError:
+            return None
 
     def get_last_comment_from(self, user: User) -> Optional["Content"]:
         # TODO - Make this more efficient

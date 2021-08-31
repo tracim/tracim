@@ -203,13 +203,13 @@ export class HtmlDocument extends React.Component {
   async componentDidMount () {
     const { props } = this
     console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
-    await this.loadContent()
-    await props.loadTimeline(getHtmlDocRevision)
+    this.loadContent()
+    props.loadTimeline(getHtmlDocRevision)
     props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    const { state } = this
+    const { props, state } = this
 
     const becameVisible = !prevState.isVisible && state.isVisible
 
@@ -820,10 +820,9 @@ export class HtmlDocument extends React.Component {
             onClickTranslateComment={comment => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
-              state.translationTargetLanguageCode,
-              this.setState.bind(this)
+              state.translationTargetLanguageCode
             )}
-            onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+            onClickRestoreComment={props.handleRestoreComment}
             onClickEditComment={this.handleClickEditComment}
             onClickDeleteComment={this.handleClickDeleteComment}
             onClickOpenFileComment={this.handleClickOpenFileComment}

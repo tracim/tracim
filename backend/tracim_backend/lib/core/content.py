@@ -161,7 +161,7 @@ class ContentApi(object):
         return ContentInContext(content, self._session, self._config, self._user)
 
     def get_revision_in_context(
-        self, revision: ContentRevisionRO, version_number: typing.Optional[int]
+        self, revision: ContentRevisionRO, version_number: typing.Optional[int] = None
     ) -> RevisionInContext:
         """Create a contextual objet from the given revision.
 

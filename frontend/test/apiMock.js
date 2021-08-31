@@ -231,8 +231,7 @@ const mockGetContentPath200 = (apiUrl, workspaceId, contentId, contentPath) => {
     .reply(200, { items: contentPath })
 }
 
-const mockGetPublicationList200 =( apiUrl, workspaceId, publicationList, pageToken = '') => {
-  console.error('FOBOBOBOB')
+const mockGetPublicationList200 = (apiUrl, workspaceId, publicationList, pageToken = '') => {
   return nock(apiUrl)
     .get(`/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0&count=15&page_token=${pageToken}&sort=modified:desc`)
     .reply(200, { items: publicationList, next_page_token: 'pageToken', has_next_page: true })
