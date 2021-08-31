@@ -4,7 +4,7 @@ import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import { appContentFactory } from '../src/appContentFactory.js'
 import { status } from './fixture/status.js'
-import { commentList as fixtureCommentList } from './fixture/contentCommentList.js'
+import { commentList } from './fixture/contentCommentList.js'
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
 import {
@@ -534,7 +534,6 @@ describe('appContentFactory.js', () => {
       username: 'foo',
       lang: 'en'
     }
-    const commentList = fixtureCommentList
     const fileChildContentList = []
     const revisionList = fixtureRevisionList.map((revision, i) => ({
       ...revision,

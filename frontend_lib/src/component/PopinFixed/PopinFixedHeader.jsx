@@ -10,6 +10,7 @@ import {
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import Icon from '../Icon/Icon.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
 
@@ -103,59 +104,61 @@ class PopinFixedHeader extends React.Component {
             <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
               <i className={`fa-fw ${faIcon}`} title={rawTitle} style={{ color: customColor }} />
             </div>
+            {props.loading ? <Icon icon='fa-fw fas fa-spin fa-spinner' title={props.t('Loading…')} /> : (
+              <>
+                <div
+                  className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
+                  title={rawTitle}
+                >
+                  {state.editTitle
+                    ? (
+                      <input
+                        className='wsContentGeneric__header__title__editiontitle editiontitle'
+                        value={state.editTitleValue}
+                        onChange={this.handleChangeTitle}
+                        onKeyDown={this.handleInputKeyPress}
+                        autoFocus
+                      />
+                    )
+                    : componentTitle}
+                </div>
+                {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
+                  <button
+                    className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
+                    onClick={this.handleClickUndoChangeTitleBtn}
+                    disabled={disableChangeTitle}
+                  >
+                    <i className='fa-fw fas fa-undo' title={t('Undo change in title')} />
+                  </button>
+                )}
 
-            <div
-              className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
-              title={rawTitle}
-            >
-              {state.editTitle
-                ? (
-                  <input
-                    className='wsContentGeneric__header__title__editiontitle editiontitle'
-                    value={state.editTitleValue}
-                    onChange={this.handleChangeTitle}
-                    onKeyDown={this.handleInputKeyPress}
-                    autoFocus
-                  />
-                )
-                : componentTitle}
-            </div>
-            {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
-              <button
-                className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
-                onClick={this.handleClickUndoChangeTitleBtn}
-                disabled={disableChangeTitle}
-              >
-                <i className='fa-fw fas fa-undo' title={t('Undo change in title')} />
-              </button>
-            )}
-
-            {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
-              <button
-                className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
-                onClick={this.handleClickChangeTitleBtn}
-                disabled={disableChangeTitle}
-              >
-                <i className='fa-fw fas fa-check' title={t('Validate the title')} />
-              </button>
+                {userRoleIdInWorkspace >= ROLE.contributor.id && showChangeTitleButton && state.editTitle && (
+                  <button
+                    className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}
+                    onClick={this.handleClickChangeTitleBtn}
+                    disabled={disableChangeTitle}
+                  >
+                    <i className='fa-fw fas fa-check' title={t('Validate the title')} />
+                  </button>
+                )}
+              </>
             )}
           </div>
 
-          {props.breadcrumbsList.length > 0 && (
-            <Breadcrumbs
-              root={{
-                link: PAGE.HOME,
-                label: '',
-                icon: 'fa-fw fas fa-home',
-                type: BREADCRUMBS_TYPE.CORE,
-                isALink: true
-              }}
-              breadcrumbsList={props.breadcrumbsList}
-            />
-          )}
+          <Breadcrumbs
+            hidden={props.loading || !props.breadcrumbsList.length}
+            root={{
+              link: PAGE.HOME,
+              label: '',
+              icon: 'fa-fw fas fa-home',
+              type: BREADCRUMBS_TYPE.CORE,
+              isALink: true
+            }}
+            breadcrumbsList={props.breadcrumbsList}
+          />
         </div>
 
-        {showReactions && (
+        {!props.loading && showReactions && (
           <div className='wsContentGeneric__header__reactions'>
             <EmojiReactions
               apiUrl={apiUrl}
@@ -166,7 +169,7 @@ class PopinFixedHeader extends React.Component {
           </div>
         )}
 
-        {favoriteState && (
+        {!props.loading && favoriteState && (
           <FavoriteButton
             favoriteState={favoriteState}
             onClickAddToFavoriteList={onClickAddToFavoriteList}
@@ -174,7 +177,7 @@ class PopinFixedHeader extends React.Component {
           />
         )}
 
-        {filteredHeaderButtons.map((action) =>
+        {!props.loading && filteredHeaderButtons.map((action) =>
           <IconButton
             disabled={action.disabled}
             icon={action.icon}
@@ -188,9 +191,9 @@ class PopinFixedHeader extends React.Component {
           />
         )}
 
-        {props.children}
+        {!props.loading && props.children}
 
-        {filteredActionList.length > 0 && (
+        {!props.loading && filteredActionList.length > 0 && (
           <DropdownMenu
             buttonCustomClass='wsContentGeneric__header__actions'
             buttonIcon='fa-fw fas fa-ellipsis-v'
@@ -242,6 +245,7 @@ class PopinFixedHeader extends React.Component {
 export default translate()(PopinFixedHeader)
 
 PopinFixedHeader.propTypes = {
+  loading: PropTypes.bool,
   faIcon: PropTypes.string.isRequired,
   onClickCloseBtn: PropTypes.func.isRequired,
   breadcrumbsList: PropTypes.array,
@@ -265,6 +269,7 @@ PopinFixedHeader.propTypes = {
 }
 
 PopinFixedHeader.defaultProps = {
+  loading: false,
   breadcrumbsList: [],
   customClass: '',
   customColor: '',

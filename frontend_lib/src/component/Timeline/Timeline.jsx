@@ -6,7 +6,7 @@ import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../../i18n.js'
-import { ROLE, formatAbsoluteDate, TIMELINE_TYPE } from '../../helper.js'
+import { ROLE, formatAbsoluteDate, displayDistanceDate, TIMELINE_TYPE } from '../../helper.js'
 import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
@@ -19,6 +19,7 @@ import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import EditCommentPopup from './EditCommentPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import Loading from '../Loading/Loading.jsx'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -109,6 +110,8 @@ export class Timeline extends React.Component {
       return null
     }
 
+    const disableComment = props.disableComment || props.loading
+
     return (
       <div className={classnames('timeline')}>
         <div className='timeline__warning'>
@@ -145,7 +148,7 @@ export class Timeline extends React.Component {
           shouldScrollToBottom={props.shouldScrollToBottom}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
-          {props.timelineData.map(content => {
+          {props.loading ? <Loading /> : props.timelineData.map(content => {
             switch (content.timelineType) {
               case TIMELINE_TYPE.COMMENT:
               case TIMELINE_TYPE.COMMENT_AS_FILE:
@@ -160,8 +163,7 @@ export class Timeline extends React.Component {
                     workspaceId={Number(props.workspaceId)}
                     author={content.author}
                     loggedUser={props.loggedUser}
-                    createdRaw={content.created_raw}
-                    createdDistance={content.created}
+                    created={content.created_raw || content.created}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
@@ -183,7 +185,7 @@ export class Timeline extends React.Component {
                     customColor={props.customColor}
                     revisionType={content.revision_type}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
-                    createdDistance={content.created}
+                    createdDistance={displayDistanceDate(content.created_raw, props.loggedUser.lang)}
                     number={content.number}
                     status={props.availableStatusList.find(status => status.slug === content.status)}
                     authorPublicName={content.author.public_name}
@@ -251,7 +253,7 @@ export class Timeline extends React.Component {
                 apiUrl={props.apiUrl}
                 onChangeNewComment={props.onChangeNewComment}
                 newComment={props.newComment}
-                disableComment={props.disableComment}
+                disableComment={disableComment}
                 wysiwyg={props.wysiwyg}
                 searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
                 onInitWysiwyg={props.onInitWysiwyg}
@@ -264,7 +266,7 @@ export class Timeline extends React.Component {
                   customClass={classnames(
                     `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
                   )}
-                  disabled={props.disableComment}
+                  disabled={disableComment}
                   text={props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                   onClick={props.onClickWysiwygBtn}
                   intent='link'
@@ -286,14 +288,14 @@ export class Timeline extends React.Component {
                   <AddFileToUploadButton
                     workspaceId={props.workspaceId}
                     color={props.customColor}
-                    disabled={props.disableComment}
+                    disabled={disableComment}
                     onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
                   />
                 </div>
                 <IconButton
                   color={props.customColor}
                   customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
-                  disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
+                  disabled={disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
                   icon='far fa-paper-plane'
                   intent='primary'
                   mode='light'
