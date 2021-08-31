@@ -126,9 +126,6 @@ export class GroupedNotificationItem extends React.Component {
     const readStatus = notification.group.map(notification => notification.read)
       .reduce((acc, current) => acc && current)
 
-    // TODO - GIULIA - last prio; make notification func simpler
-    // BUG ? - update contribution number
-
     return (
       <Link
         to={notificationDetails.url || '#'}
