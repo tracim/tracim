@@ -207,7 +207,7 @@ export class HtmlDocument extends React.Component {
   }
 
   componentDidUpdate (prevProps, prevState) {
-    const { props, state } = this
+    const { state } = this
 
     const becameVisible = !prevState.isVisible && state.isVisible
 

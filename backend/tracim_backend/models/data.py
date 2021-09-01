@@ -424,6 +424,10 @@ class ContentSortOrder(str, enum.Enum):
     CREATED_ASC = "created:asc"
     CREATED_DESC = "created:desc"
 
+    @property
+    def is_asc(self) -> bool:
+        return self.value.endswith(":asc")
+
 
 class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     """
@@ -1276,7 +1280,11 @@ class Content(DeclarativeBase):
         query = query.order_by(sort_clause)
         # INFO - 2021-08-17 - S.G. - Always add a sort on the content id
         # in order to differenciate between comments with the same creation/modification date.
-        query = query.order_by(Content.id.asc())
+        if sort_order.is_asc:
+            id_sort_clause = Content.id.asc()
+        else:
+            id_sort_clause = Content.id.desc()
+        query = query.order_by(id_sort_clause)
         if count:
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
@@ -1314,7 +1322,11 @@ class Content(DeclarativeBase):
         query = query.order_by(sort_clause)
         # INFO - 2021-08-17 - S.G. - Always add a sort on the revision id
         # in order to differenciate between revisions with the same modification date.
-        query = query.order_by(ContentRevisionRO.revision_id.asc())
+        if sort_order.is_asc:
+            revision_id_sort_clause = ContentRevisionRO.revision_id.asc()
+        else:
+            revision_id_sort_clause = ContentRevisionRO.revision_id.desc()
+        query = query.order_by(revision_id_sort_clause)
         if count:
             query = get_page(query, per_page=count, page=page_token or False)
             return query

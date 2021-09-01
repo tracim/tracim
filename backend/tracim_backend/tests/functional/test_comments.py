@@ -55,7 +55,7 @@ class TestCommentsEndpoint(object):
             ("?count=2&sort=created:desc", newest_comment, 2),
         ],
     )
-    def test_api__get_contents_comments__ok_200__nominal_cases(
+    def test_api__get_content_comments__ok_200__nominal_cases(
         self, web_testapp, query: str, first_comment: dict, comment_count: int
     ) -> None:
         """
