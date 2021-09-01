@@ -167,7 +167,7 @@ export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
-  contentAvailable: PropTypes.bool.isRequired,
+  contentAvailable: PropTypes.bool,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   isPublication: PropTypes.bool.isRequired,

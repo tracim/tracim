@@ -80,6 +80,7 @@ export class File extends React.Component {
       newComment: '',
       newCommentAsFileList: [],
       newContent: {},
+      loadingContent: true,
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -219,8 +220,9 @@ export class File extends React.Component {
       ) || ''
     })
 
-    await this.loadContent(pageToLoad)
+    this.loadContent(pageToLoad)
     props.loadTimeline(getFileRevision)
+
     if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
@@ -266,6 +268,9 @@ export class File extends React.Component {
   loadContent = async (pageToLoad = null) => {
     const { state, props } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
+    this.setState({ loadingContent: true })
     const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
     switch (response.apiResponse.status) {
@@ -273,6 +278,7 @@ export class File extends React.Component {
         const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
         const pageForPreview = pageToLoad || state.fileCurrentPage
         this.setState({
+          loadingContent: false,
           content: {
             ...response.body,
             filenameNoExtension: filenameNoExtension,
@@ -817,6 +823,7 @@ export class File extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             apiUrl={state.config.apiUrl}
@@ -1024,6 +1031,7 @@ export class File extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          loading={state.loadingContent}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}

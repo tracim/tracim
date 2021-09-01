@@ -51,6 +51,7 @@ export class Thread extends React.Component {
       content: param.content,
       newComment: '',
       newCommentAsFileList: [],
+      loading: false,
       newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
@@ -142,7 +143,7 @@ export class Thread extends React.Component {
     this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
-  async updateTimelineAndContent () {
+  updateTimelineAndContent () {
     const { props } = this
     this.setState({
       newComment: getLocalStorageItem(
@@ -152,7 +153,7 @@ export class Thread extends React.Component {
       ) || ''
     })
 
-    await this.loadContent()
+    this.loadContent()
     props.loadTimeline(getThreadRevision)
   }
 
@@ -209,11 +210,16 @@ export class Thread extends React.Component {
   loadContent = async () => {
     const { state } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
+    this.setState({ loadingContent: true })
+
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
     this.setState({
-      content: response.body
+      content: response.body,
+      loadingContent: false
     })
     this.setHeadTitle(response.body.label)
     this.buildBreadcrumbs(response.body)
@@ -393,6 +399,7 @@ export class Thread extends React.Component {
     return (
       <PopinFixed customClass={state.config.slug} customColor={state.config.hexcolor}>
         <PopinFixedHeader
+          loading={state.loadingContent}
           customClass={`${state.config.slug}__contentpage`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
@@ -452,6 +459,7 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
+                loading={props.loadingTimeline}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={state.config.hexcolor}
                 loggedUser={state.loggedUser}

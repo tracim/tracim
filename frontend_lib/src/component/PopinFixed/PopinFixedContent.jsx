@@ -10,6 +10,7 @@ import {
 import TranslateButton from '../Button/TranslateButton.jsx'
 import PopinFixedHeader from './PopinFixedHeader.jsx'
 import { TRANSLATION_STATE } from '../../translation.js'
+import Loading from '../Loading/Loading.jsx'
 
 class PopinFixedContent extends React.Component {
   constructor (props) {
@@ -27,6 +28,7 @@ class PopinFixedContent extends React.Component {
 
   render () {
     const { props } = this
+
     return props.children.length === 2
       ? (
         <div className={classnames(
@@ -37,6 +39,7 @@ class PopinFixedContent extends React.Component {
         >
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
             <PopinFixedHeader
+              loading={props.loading}
               breadcrumbsList={props.breadcrumbsList}
               customClass={props.customClass}
               customColor={props.config.hexcolor}
@@ -59,61 +62,64 @@ class PopinFixedContent extends React.Component {
               showChangeTitleButton={props.showChangeTitleButton}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
-              {props.showTranslateButton && (
-                <div className='html-document__contentpage__textnote__top'>
-                  <TranslateButton
-                    translationState={props.translationState}
-                    targetLanguageList={props.translationTargetLanguageList}
-                    targetLanguageCode={props.translationTargetLanguageCode}
-                    onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
-                    onClickTranslate={props.onClickTranslateDocument}
-                    onClickRestore={props.onClickRestoreDocument}
-                    dataCy='htmlDocumentTranslateButton'
-                  />
-                </div>
-              )}
+              {!props.loading && (
+                <>
+                  {props.showTranslateButton && (
+                    <div className='html-document__contentpage__textnote__top'>
+                      <TranslateButton
+                        translationState={props.translationState}
+                        targetLanguageList={props.translationTargetLanguageList}
+                        targetLanguageCode={props.translationTargetLanguageCode}
+                        onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+                        onClickTranslate={props.onClickTranslateDocument}
+                        onClickRestore={props.onClickRestoreDocument}
+                        dataCy='htmlDocumentTranslateButton'
+                      />
+                    </div>
+                  )}
 
-              {!!props.lastVersion &&
-                (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
-                (
-                  <div
-                    className={classnames(
-                      'wsContentGeneric__content__left__top__version',
-                      `${props.customClass}__content__left__top__version`
-                    )}
-                  >
-                    {props.t(
-                      'Version #{{versionNumber}}', {
-                        versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                          ? props.lastVersion
-                          : props.contentVersionNumber
-                      }
-                    )}
-                    {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
-                      <div
-                        className={classnames(
-                          'wsContentGeneric__content__left__top__lastversion',
-                          `${props.customClass}__content__left__top__lastversion`
-                        )}
-                      >
-                        ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                      </div>
-                    )}
-                    &nbsp;-&nbsp;
-                  </div>
-                )}
+                  {props.lastVersion &&
+                   (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
+                   (
+                     <div
+                       className={classnames(
+                         'wsContentGeneric__content__left__top__version',
+                         `${props.customClass}__content__left__top__version`
+                       )}
+                     >
+                       {props.t(
+                         'Version #{{versionNumber}}', {
+                           versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                             ? props.lastVersion
+                             : props.contentVersionNumber
+                         }
+                       )}
+                       {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                         <div
+                           className={classnames(
+                             'wsContentGeneric__content__left__top__lastversion',
+                             `${props.customClass}__content__left__top__lastversion`
+                           )}
+                         >
+                           ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
+                         </div>
+                       )}
+                       &nbsp;-&nbsp;
+                     </div>
+                   )}
 
-              {props.availableStatuses.length > 0 && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
-                <SelectStatus
-                  selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
-                  availableStatus={props.availableStatuses}
-                  onChangeStatus={props.onChangeStatus}
-                  disabled={props.appMode === APP_FEATURE_MODE.REVISION || props.content.is_archived || props.content.is_deleted}
-                />
+                  {props.availableStatuses.length > 0 && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
+                    <SelectStatus
+                      selectedStatus={props.availableStatuses.find(s => s.slug === props.content.status)}
+                      availableStatus={props.availableStatuses}
+                      onChangeStatus={props.onChangeStatus}
+                      disabled={props.appMode === APP_FEATURE_MODE.REVISION || props.content.is_archived || props.content.is_deleted}
+                    />
+                  )}
+                </>
               )}
             </div>
-
-            {this.props.children[0]}
+            {props.loading ? <Loading /> : props.children[0]}
           </div>
 
           {React.cloneElement(props.children[1], {
@@ -123,9 +129,13 @@ class PopinFixedContent extends React.Component {
         </div>
       )
       : (
-        <div className={classnames('wsContentGeneric__content', `${props.customClass}__content`)}>
-          {props.children}
-        </div>
+        props.loading
+          ? <Loading />
+          : (
+            <div className={classnames('wsContentGeneric__content', `${props.customClass}__content`)}>
+              {props.children}
+            </div>
+          )
       )
   }
 }
@@ -133,6 +143,7 @@ class PopinFixedContent extends React.Component {
 export default translate()(PopinFixedContent)
 
 PopinFixedContent.propTypes = {
+  loading: PropTypes.bool,
   actionList: PropTypes.array,
   appMode: PropTypes.string,
   availableStatuses: PropTypes.array,
@@ -172,6 +183,7 @@ PopinFixedContent.propTypes = {
 }
 
 PopinFixedContent.defaultProps = {
+  loading: false,
   actionList: [],
   appMode: APP_FEATURE_MODE.VIEW,
   availableStatuses: [],

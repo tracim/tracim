@@ -77,6 +77,7 @@ export class HtmlDocument extends React.Component {
       newComment: '',
       newCommentAsFileList: [],
       newContent: {},
+      loadingContent: true,
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
@@ -182,9 +183,8 @@ export class HtmlDocument extends React.Component {
   handleAllAppChangeLanguage = data => {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
-    this.reloadContentWysiwyg()
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
-    this.loadContent()
+    this.reloadContentWysiwyg()
   }
 
   reloadContentWysiwyg () {
@@ -200,15 +200,13 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     const { props } = this
-    console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
     this.loadContent()
-    props.loadTimeline(getHtmlDocRevision)
     props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
     const becameVisible = !prevState.isVisible && state.isVisible
@@ -218,8 +216,7 @@ export class HtmlDocument extends React.Component {
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
-      await this.loadContent()
-      await props.loadTimeline(getHtmlDocRevision)
+      this.loadContent()
       this.reloadContentWysiwyg()
     }
 
@@ -335,26 +332,16 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  loadContent = async () => {
+  loadHtmlDocument = async () => {
     const { state } = this
 
+    this.setState({ loadingContent: true, mode: APP_FEATURE_MODE.VIEW })
     const resHtmlDocument = await handleFetchResult(await getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     const localStorageComment = getLocalStorageItem(
       state.appName,
       resHtmlDocument.body,
       LOCAL_STORAGE_FIELD.COMMENT
     )
-
-    // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
-    // see https://github.com/tracim/tracim/issues/1206
-    // @fixme Côme - 2018/12/04 - this might not be a great idea
-    const modeToRender = (
-      resHtmlDocument.body.current_revision_type === 'creation' && // if current revision is creation
-      state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && // if user has EDIT authorization
-      resHtmlDocument.body.raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
-    )
-      ? APP_FEATURE_MODE.EDIT
-      : APP_FEATURE_MODE.VIEW
 
     const localStorageRawContent = getLocalStorageItem(
       state.appName,
@@ -366,6 +353,21 @@ export class HtmlDocument extends React.Component {
     const rawContentWithExternalLinkIcons = addExternalLinksIcons(resHtmlDocument.body.raw_content)
 
     const rawContentBeforeEdit = addClassToMentionsOfUser(rawContentWithExternalLinkIcons, state.loggedUser.username)
+
+    // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
+    // see https://github.com/tracim/tracim/issues/1206
+    // @fixme Côme - 2018/12/04 - this might not be a great idea
+    const modeToRender = (
+      resHtmlDocument.body.current_revision_type === 'creation' && // if content has only one revision
+      state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && // if user has EDIT authorization
+      resHtmlDocument.body.raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
+    )
+      ? APP_FEATURE_MODE.EDIT
+      : APP_FEATURE_MODE.VIEW
+
+    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
+    const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
+
     this.setState(previousState => {
       return {
         mode: modeToRender,
@@ -378,17 +380,23 @@ export class HtmlDocument extends React.Component {
         newComment: localStorageComment || '',
         rawContentBeforeEdit: rawContentBeforeEdit,
         translationState: getDefaultTranslationState(previousState.config.system.config),
-        translatedRawContent: null
+        translatedRawContent: null,
+        oldInvalidMentionList: oldInvalidMentionList,
+        loadingContent: false
       }
     })
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
+    this.reloadContentWysiwyg()
+
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
-    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
-    const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
-    this.setState({ oldInvalidMentionList: oldInvalidMentionList })
+  }
+
+  loadContent = async () => {
+    this.loadHtmlDocument()
+    this.props.loadTimeline(getHtmlDocRevision)
   }
 
   handleLoadMoreTimelineItems = async () => {
@@ -790,6 +798,7 @@ export class HtmlDocument extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage__timeline`}
             customColor={state.config.hexcolor}
             apiUrl={state.config.apiUrl}
@@ -875,6 +884,7 @@ export class HtmlDocument extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          loading={state.loadingContent}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}

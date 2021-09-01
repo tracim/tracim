@@ -24,6 +24,7 @@ import {
   ROLE_LIST,
   PageWrapper,
   PageContent,
+  Loading,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
@@ -80,6 +81,7 @@ export class WorkspaceContent extends React.Component {
       workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
       appOpenedType: false,
       contentLoaded: false,
+      loadingShareFolder: true,
       shareFolder: {
         isOpen: (qs.parse(props.location.search).share_folder || '') === '1'
       }
@@ -139,7 +141,7 @@ export class WorkspaceContent extends React.Component {
     if (!this.state.appOpenedType) this.setHeadTitle(this.getFilterName(qs.parse(this.props.location.search).type))
   }
 
-  async componentDidMount () {
+  componentDidMount () {
     const { props } = this
 
     console.log('%c<WorkspaceContent> componentDidMount', 'color: #c17838')
@@ -153,8 +155,7 @@ export class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = props.match.params.idws
 
-    this.loadAllWorkspaceContent(wsToLoad, true)
-    this.loadWorkspaceDetail()
+    this.loadAllWorkspaceContent(wsToLoad, true, true)
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -186,11 +187,9 @@ export class WorkspaceContent extends React.Component {
       this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
     }
 
-    if (hasWorkspaceIdChanged) this.loadWorkspaceDetail()
-
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
-      this.setState({ workspaceIdInUrl: workspaceId })
-      this.loadAllWorkspaceContent(workspaceId, false)
+      this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: false })
+      this.loadAllWorkspaceContent(workspaceId, false, hasWorkspaceIdChanged)
     } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
   }
 
@@ -198,7 +197,11 @@ export class WorkspaceContent extends React.Component {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
   }
 
-  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false) => {
+  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false, shouldLoadDetails = false) => {
+    if (shouldLoadDetails) {
+      this.loadWorkspaceDetail()
+    }
+
     try {
       await this.loadContentList(workspaceId)
       await this.loadShareFolderContent(workspaceId)
@@ -231,7 +234,6 @@ export class WorkspaceContent extends React.Component {
 
   loadWorkspaceDetail = async () => {
     const { props } = this
-
     const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
     switch (fetchWorkspaceDetail.status) {
       case 200:
@@ -460,6 +462,8 @@ export class WorkspaceContent extends React.Component {
     )
   }
 
+  getLoadingFolderKey = folderId => `loadingFolder${folderId}`
+
   handleToggleFolderOpen = async folderId => {
     const { props, state } = this
     const folder = props.workspaceContentList.contentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.contentList.find(c => c.id === folderId)
@@ -470,6 +474,9 @@ export class WorkspaceContent extends React.Component {
 
     if (isFolderPreviousStateOpen) return
 
+    const loadingFolderKey = this.getLoadingFolderKey(folderId)
+    this.setState({ [loadingFolderKey]: true })
+
     const fetchContentList = folder.parentId === SHARE_FOLDER_ID
       ? await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
       : await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
@@ -477,6 +484,7 @@ export class WorkspaceContent extends React.Component {
     if (fetchContentList.status === 200) {
       props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json.items))
     }
+    this.setState({ [loadingFolderKey]: false })
   }
 
   getContentParentList = (content, contentList) => {
@@ -575,7 +583,9 @@ export class WorkspaceContent extends React.Component {
 
   loadShareFolderContent = async workspaceId => {
     const { props } = this
+    let ret = false
 
+    this.setState({ loadingShareFolder: true })
     const folderIdToOpen = this.getFolderIdToOpenInUrl(props.location.search)
     const response = await props.dispatch(getShareFolderContentList(workspaceId))
 
@@ -586,12 +596,15 @@ export class WorkspaceContent extends React.Component {
           : file
         )
         props.dispatch(setWorkspaceShareFolderContentList(publicSharedContentList, folderIdToOpen, parseInt(workspaceId)))
-        return true
+        ret = true
+        break
       }
       default:
         this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
-        return false
     }
+
+    this.setState({ loadingShareFolder: false })
+    return ret
   }
 
   handleClickShareFolder = async () => {
@@ -748,6 +761,7 @@ export class WorkspaceContent extends React.Component {
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
                   <ShareFolder
+                    loading={state.loadingShareFolder}
                     workspaceId={state.workspaceIdInUrl}
                     availableApp={createContentAvailableApp}
                     isOpen={state.shareFolder.isOpen}
@@ -769,16 +783,17 @@ export class WorkspaceContent extends React.Component {
                     contentType={contentType}
                     readStatusList={currentWorkspace.contentReadStatusList}
                     rootContentList={rootContentList}
-                    isLast={isWorkspaceEmpty || isFilteredWorkspaceEmpty}
+                    isLast={!state.contentLoaded || isWorkspaceEmpty || isFilteredWorkspaceEmpty}
                     t={t}
                   />
                 )}
 
-                {((state.contentLoaded && (isWorkspaceEmpty || isFilteredWorkspaceEmpty))
+                {state.contentLoaded && ((isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
                   : rootContentList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
                     ? (
                       <Folder
+                        loading={state[this.getLoadingFolderKey(content.id)]}
                         availableApp={createContentAvailableApp}
                         folderData={content}
                         lang={props.user.lang}
@@ -843,7 +858,7 @@ export class WorkspaceContent extends React.Component {
                   )
                 )}
 
-                {userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
+                {state.contentLoaded && userRoleIdInWorkspace >= ROLE.contributor.id && workspaceContentList.length >= 10 && (
                   <DropdownCreateButton
                     folderId={null}
                     onClickCreateContent={this.handleClickCreateContent}
@@ -854,6 +869,7 @@ export class WorkspaceContent extends React.Component {
             </PageContent>
           </PageWrapper>
         </div>
+        {!state.contentLoaded && <Loading />}
       </div>
     )
   }

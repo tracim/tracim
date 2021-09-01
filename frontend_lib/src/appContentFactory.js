@@ -83,7 +83,8 @@ const DEFAULT_TIMELINE_STATE = {
   hasMoreRevisions: true,
   filePageToken: '',
   hasMoreFiles: true,
-  isLastTimelineItemCurrentToken: false
+  isLastTimelineItemCurrentToken: false,
+  loadingTimeline: false
 }
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
@@ -623,7 +624,6 @@ export function appContentFactory (WrappedComponent) {
       ...content,
       timelineType: TIMELINE_TYPE.COMMENT,
       created_raw: content.created,
-      created: displayDistanceDate(content.created, loggedUser.lang),
       raw_content: addClassToMentionsOfUser(content.raw_content, loggedUser.username),
       translatedRawContent: null,
       translationState: initialCommentTranslationState
@@ -764,7 +764,13 @@ export function appContentFactory (WrappedComponent) {
 
     loadTimeline = async (getContentRevision) => {
       this.resetTimeline()
-      await this.loadMoreTimelineItems(getContentRevision)
+      this.setState({ loadingTimeline: true })
+      try {
+        await this.loadMoreTimelineItems(getContentRevision)
+      }
+      finally {
+        this.setState({ loadingTimeline: false })
+      }
     }
 
     getTimeline = (wholeTimeline, itemCount) => {
@@ -978,6 +984,7 @@ export function appContentFactory (WrappedComponent) {
           resetTimeline={this.resetTimeline}
           canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
           isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}
+          loadingTimeline={this.state.loadingTimeline}
         />
       )
     }

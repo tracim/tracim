@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import PopinFixed from '../../src/component/PopinFixed/PopinFixed'
@@ -10,6 +11,7 @@ describe('<PopinFixed />', () => {
   const props = {
     customClass: 'randomCustomClass',
     visible: false,
+    faIcon: 'fa-file',
     style: {
       color: 'yellow'
     },
@@ -33,15 +35,18 @@ describe('<PopinFixed />', () => {
     showReactions: false
   }
 
+  const PopinFixedWithHOC = withRouterMock(PopinFixed)
+
   const wrapper = mount(
-    <PopinFixed
+    <PopinFixedWithHOC
       {...props}
     >
       <PopinFixedHeader {...props} />
       <PopinFixedContent {...props}>
         <div>test</div>
       </PopinFixedContent>
-    </PopinFixed>
+    </PopinFixedWithHOC>,
+    { wrappingComponent: RouterMock }
   )
 
   describe('Static design', () => {

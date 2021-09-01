@@ -4,9 +4,7 @@ import sinon from 'sinon'
 import { mount } from 'enzyme'
 import { appContentFactory } from '../src/appContentFactory.js'
 import { status } from './fixture/status.js'
-import { commentTlm } from './fixture/tracimLiveMessage/commentTlm.js'
-import { user } from './fixture/user.js'
-import { commentList as fixtureCommentList } from './fixture/contentCommentList.js'
+import { commentList } from './fixture/contentCommentList.js'
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
 import { defaultDebug } from '../src/debug.js'
@@ -550,7 +548,6 @@ describe('appContentFactory.js', () => {
       username: 'foo',
       lang: 'en'
     }
-    const commentList = fixtureCommentList
     const fileChildContentList = []
     const revisionList = fixtureRevisionList
     let commentAndRevisionMergedList = []
