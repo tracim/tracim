@@ -20,6 +20,7 @@ describe('<Thread />', () => {
     setApiUrl: () => {},
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
     addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
+    loadTimeline: () => {},
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
 
