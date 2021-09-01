@@ -6,7 +6,6 @@ import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
-import DragHandle from '../DragHandle.jsx'
 import { DropdownMenu, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
@@ -64,29 +63,23 @@ class Folder extends React.Component {
         })}
         data-cy={`folder_${props.folderData.id}`}
         id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.folderData.id}`}
+        ref={props.connectDropTarget}
       >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
           className='folder__header align-items-center'
           onClick={(e) => props.onClickFolder(e, props.folderData.id)}
-          ref={props.connectDropTarget}
           title={props.folderData.label}
+          ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragPreview : undefined}
         >
           <div className='folder__header__triangleborder'>
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
 
-          {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-            <DragHandle
-              connectDragSource={props.connectDragSource}
-              title={props.t('Move this folder')}
-            />
-          )}
-
           <div
             className='folder__header__dragPreview'
-            ref={props.connectDragPreview}
+            ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : undefined}
           >
             <div
               className='folder__header__icon'

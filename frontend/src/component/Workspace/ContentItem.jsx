@@ -8,7 +8,6 @@ import {
   DRAG_AND_DROP
 } from '../../util/helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
-import DragHandle from '../DragHandle.jsx'
 import {
   ROLE,
   FilenameWithExtension,
@@ -34,17 +33,13 @@ class ContentItem extends React.Component {
       <ListItemWrapper
         label={props.label}
         read={props.read}
+        connectDragSource={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : undefined}
         contentType={props.contentType}
         isLast={props.isLast}
         key={props.id}
         id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.contentId}`}
+        ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragPreview : undefined}
       >
-        {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-          <DragHandle
-            connectDragSource={props.connectDragSource}
-            title={props.t('Move this content')}
-          />
-        )}
 
         <Link
           to={props.urlContent}
@@ -53,7 +48,6 @@ class ContentItem extends React.Component {
         >
           <div
             className='content__dragPreview'
-            ref={props.connectDragPreview}
           >
             <div
               className='content__type'
@@ -74,7 +68,7 @@ class ContentItem extends React.Component {
                   />
                 )
                 : (
-                  <i className={`fa-fw ${props.faIcon}`} />
+                  <i className={props.isDragging ? 'fas fa-arrows-alt' : `fa-fw ${props.faIcon}`} />
                 )
               )}
             </div>
