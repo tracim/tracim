@@ -119,6 +119,7 @@
   "pending": "en attente",
   "rejected": "refusée",
   "accepted": "acceptée",
+  "Loading…": "Chargement…",
   "A content with same name already exists": "Un contenu ayant le même nom existe déjà",
   "Error while saving the title": "Erreur pendant la sauvegarde du titre",
   "You are trying to mention an invalid user": "Vous essayez de mentionner un utilisateur non valide",

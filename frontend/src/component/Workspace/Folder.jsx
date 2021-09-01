@@ -90,7 +90,8 @@ class Folder extends React.Component {
             </div>
 
             <div className='folder__header__name'>
-              {props.folderData.label}
+              <span>{props.folderData.label}</span>
+              {props.loading && <>&nbsp;<Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /></>}
             </div>
           </div>
 
@@ -290,6 +291,7 @@ const FolderContainer = DragSource(DRAG_AND_DROP.CONTENT_ITEM, folderDragAndDrop
 export default translate()(FolderContainer)
 
 Folder.propTypes = {
+  loading: PropTypes.bool,
   folderData: PropTypes.object,
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,

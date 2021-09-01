@@ -1,4 +1,5 @@
 import React from 'react'
+import { withRouterMock, RouterMock } from '../hocMock/withRouter'
 import { expect } from 'chai'
 import { mount } from 'enzyme'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
@@ -22,10 +23,11 @@ describe('<PopinFixedHeader />', () => {
     showChangeTitleButton: true
   }
 
+  const PopinFixedHeaderWithHOC = withRouterMock(PopinFixedHeader)
+
   const wrapper = mount(
-    <PopinFixedHeader
-      {...props}
-    />
+    <PopinFixedHeaderWithHOC {...props} />,
+    { wrappingComponent: RouterMock }
   )
 
   describe('Static design', () => {
@@ -48,12 +50,7 @@ describe('<PopinFixedHeader />', () => {
   })
 
   describe('Intern function', () => {
-    const wrapperWithoutHoc = mount(
-      <PopinFixedHeader.WrappedComponent
-        {...props}
-        t={key => key}
-      />
-    )
+    const wrapperWithoutHoc = wrapper.find('PopinFixedHeader')
 
     it('handleChangeTitle() should change the state title', () => {
       const e = { target: { value: 'testTitle' } }

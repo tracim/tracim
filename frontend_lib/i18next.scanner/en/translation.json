@@ -119,6 +119,7 @@
   "pending": "pending",
   "rejected": "rejected",
   "accepted": "accepted",
+  "Loading…": "Loading…",
   "A content with same name already exists": "A content with same name already exists",
   "Error while saving the title": "Error while saving the title",
   "You are trying to mention an invalid user": "You are trying to mention an invalid user",
