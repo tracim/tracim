@@ -129,7 +129,7 @@ const addNewNotificationGroup = (notification, newNotificationList, indexInNewLi
 }
 
 const belongsToGroup = (notification, groupedNotification, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
-  if (!groupedNotification.group) return false
+  if (!groupedNotification || !groupedNotification.group) return false
 
   const isGroupedByContent = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT) &&
     hasSameContent([notification, groupedNotification])

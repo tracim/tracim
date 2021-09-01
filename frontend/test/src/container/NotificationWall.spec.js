@@ -80,10 +80,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
         }))
           .to.deep.equal({
-            icon: 'far fa-comments',
-            text: '{{author}} commented on {{content}}',
+            text: '{{author}} commented on {{content}} {{workspace}}',
             title: 'Comment_noun',
-            url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.parentContentType}/${baseNotification.content.parentId}`
+            url: `/ui/contents/${baseNotification.content.parentId}`
           })
       })
 
@@ -93,10 +92,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'fas fa-magic',
-            text: '{{author}} created {{content}}',
+            text: '{{author}} created {{content}} {{workspace}}',
             title: 'New content',
-            url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
+            url: `/ui/contents/${baseNotification.content.id}`
           })
       })
 
@@ -106,10 +104,9 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            icon: 'fas fa-history',
-            text: '{{author}} updated {{content}}',
+            text: '{{author}} updated {{content}} {{workspace}}',
             title: 'Content updated',
-            url: `/ui/workspaces/${baseNotification.workspace.id}/contents/${baseNotification.content.type}/${baseNotification.content.id}`
+            url: `/ui/contents/${baseNotification.content.id}`
           })
       })
 
@@ -120,7 +117,6 @@ describe('<NotificationWall />', () => {
           user: user
         }))
           .to.deep.equal({
-            icon: 'fas fa-user-plus',
             text: '{{author}} added you to a space',
             title: 'New access',
             url: `/ui/workspaces/${baseNotification.workspace.id}/dashboard`

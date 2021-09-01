@@ -12,7 +12,9 @@ import {
   readNotificationList,
   SET,
   setNextPage,
-  setNotificationList
+  setNotificationList,
+  UPDATE,
+  updateNotification
 } from '../../../src/action-creator.sync.js'
 import notificationPage from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
@@ -120,6 +122,14 @@ describe('reducer notificationPage.js', () => {
       })
     })
 
+    describe(`${UPDATE}/${NOTIFICATION}`, () => {
+      const listOfNotification = notificationPage(initialState, updateNotification(notification.id, [notification, notification]))
+
+      it('should return the list of notification with the notification replaced by the list', () => {
+        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, notification] })
+      })
+    })
+
     describe(`${READ}/${NOTIFICATION}`, () => {
       const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotification(notification.id))
 
@@ -153,3 +163,37 @@ describe('reducer notificationPage.js', () => {
     })
   })
 })
+
+/* TODO
+describe('serializeNotification', () => {
+
+})
+
+describe('hasSameAuthor', () => {
+
+})
+
+describe('hasSameWorkspace', () => {
+
+})
+
+describe('hasSameContent', () => {
+
+})
+
+describe('addNewNotificationGroup', () => {
+
+})
+
+describe('belongsToGroup', () => {
+
+})
+
+describe('groupNotificationListWithTwoCriteria', () => {
+
+})
+
+describe('groupNotificationListWithOneCriteria', () => {
+
+})
+*/
