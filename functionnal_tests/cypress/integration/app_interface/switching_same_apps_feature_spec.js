@@ -70,6 +70,8 @@ describe('Hot switching between the same app', () => {
         cy.get('.notificationButton__btn')
           .click('left')
 
+        cy.get('.notification__list__item').first().click()
+
         cy.contains(aThirdFileTitle)
           .click('left')
 
@@ -88,6 +90,8 @@ describe('Hot switching between the same app', () => {
         cy.get('.notificationButton__btn')
           .click('left')
 
+        cy.get('.notification__list__item').first().click()
+
         cy.contains(aThirdHtmlDocTitle)
           .click('left')
 
@@ -105,6 +109,8 @@ describe('Hot switching between the same app', () => {
 
         cy.get('.notificationButton__btn')
           .click('left')
+
+        cy.get('.notification__list__item').first().click()
 
         cy.contains(aThirdThreadTitle)
           .click('left')
