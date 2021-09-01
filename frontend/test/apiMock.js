@@ -204,13 +204,13 @@ const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
 const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments, query = '?page_token=&count=0&sort=created:asc') => {
   return nock(apiUrl)
     .get(`/workspaces/${workspaceId}/contents/${contentId}/comments${query}`)
-    .reply(200, comments)
+    .reply(200, { items: comments, has_next: false, next_page_token: '' })
 }
 
 const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, files, pageQuery = '&page_token=&count=0&sort=created:asc') => {
   return nock(apiUrl)
     .get(`/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file&namespaces_filter=content,publication${pageQuery}`)
-    .reply(200, files)
+    .reply(200, { items: files, has_next: false, next_page_token: '' })
 }
 
 const mockGetContent200 = (apiUrl, contentId, content) => {

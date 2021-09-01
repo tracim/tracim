@@ -718,15 +718,6 @@ export function appContentFactory (WrappedComponent) {
 
       const newItemCount = state.timeline.length + TIMELINE_ITEM_COUNT_PER_PAGE
 
-      if (state.wholeTimeline.length >= newItemCount) {
-        this.setState(prevState => {
-          return {
-            timeline: this.getTimeline(state.wholeTimeline, newItemCount)
-          }
-        })
-        return
-      }
-
       const fetchResult = async (fetchPromise) => {
         return await handleFetchResult(await fetchPromise)
       }
