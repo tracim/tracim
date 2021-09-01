@@ -27,7 +27,7 @@ class ContentItem extends React.Component {
     }
 
     const dropStyle = {
-      // opacity: props.isDragging ? 0.5 : 1
+      opacity: props.isDragging ? 0.5 : 1
     }
 
     const dragRole = props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : false

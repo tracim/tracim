@@ -64,7 +64,9 @@ class Folder extends React.Component {
         })}
         data-cy={`folder_${props.folderData.id}`}
         id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.folderData.id}`}
+        ref={props.connectDragPreview}
       >
+
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
@@ -77,16 +79,16 @@ class Folder extends React.Component {
             <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
           </div>
 
-          {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
+          {/* {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
             <DragHandle
               connectDragSource={props.connectDragSource}
               title={props.t('Move this folder')}
             />
-          )}
+          )} */}
 
           <div
             className='folder__header__dragPreview'
-            ref={props.connectDragPreview}
+            ref={props.connectDragSource}
           >
             <div
               className='folder__header__icon'
