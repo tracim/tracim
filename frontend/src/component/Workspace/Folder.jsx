@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
-import { DropdownMenu, PAGE, ROLE } from 'tracim_frontend_lib'
+import { DropdownMenu, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
   sortContentList,
