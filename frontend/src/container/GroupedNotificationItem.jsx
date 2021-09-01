@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
+import PropTypes from 'prop-types'
 import {
   FETCH_CONFIG,
   GROUP_NOTIFICATION_CRITERIA
@@ -199,3 +200,10 @@ export class GroupedNotificationItem extends React.Component {
 
 const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
+
+GroupedNotificationItem.propTypes = {
+  getNotificationDetails: PropTypes.func.isRequired,
+  notification: PropTypes.object.isRequired,
+  onClickNotification: PropTypes.func.isRequired,
+  shortDate: PropTypes.func.isRequired
+}

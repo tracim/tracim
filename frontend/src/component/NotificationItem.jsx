@@ -2,9 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import {
-  FETCH_CONFIG
-} from '../util/helper.js'
+import PropTypes from 'prop-types'
+import { FETCH_CONFIG } from '../util/helper.js'
 import {
   Avatar,
   AVATAR_SIZE,
@@ -66,4 +65,10 @@ const NotificationItem = props => {
 }
 export default translate()(TracimComponent(NotificationItem))
 
-// TODO - Add proptypes
+NotificationItem.propTypes = {
+  getNotificationDetails: PropTypes.func.isRequired,
+  notification: PropTypes.object.isRequired,
+  onClickNotification: PropTypes.func.isRequired,
+  shortDate: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired
+}
