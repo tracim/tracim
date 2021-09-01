@@ -32,8 +32,8 @@ const defaultNotificationsObject = {
 }
 
 const NUMBER_OF_CRITERIA = {
-  ONE: 'oneCriteriaGroup',
-  TWO: 'twoCriteriaGroup'
+  ONE: 1,
+  TWO: 2
 }
 
 // FIXME - GB - 2020-07-30 - We can't use the global serializer in this case because it doesn't handle nested object
@@ -61,7 +61,7 @@ export const serializeNotification = notification => {
   }
 }
 
-const hasSameAuthor = authorList => {
+export const hasSameAuthor = authorList => {
   if (authorList.some(author => !author)) return false
   return authorList.every((author, index) => {
     if (index === 0) return true
@@ -69,7 +69,7 @@ const hasSameAuthor = authorList => {
   })
 }
 
-const hasSameWorkspace = workspaceList => {
+export const hasSameWorkspace = workspaceList => {
   if (workspaceList.some(workspace => !workspace)) return false
   return workspaceList.every((workspace, index) => {
     if (index === 0) return true
@@ -77,7 +77,7 @@ const hasSameWorkspace = workspaceList => {
   })
 }
 
-const hasSameContent = notificationList => {
+export const hasSameContent = notificationList => {
   if (notificationList.some(notification => !notification.content)) return false
   return notificationList.every((notification, index) => {
     if (index === 0) return true
@@ -128,7 +128,7 @@ const addNewNotificationGroup = (notification, newNotificationList, indexInNewLi
   }
 }
 
-const belongsToGroup = (notification, groupedNotification, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
+export const belongsToGroup = (notification, groupedNotification, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
   if (!groupedNotification || !groupedNotification.group) return false
 
   const isGroupedByContent = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT) &&
@@ -151,7 +151,7 @@ const belongsToGroup = (notification, groupedNotification, numberOfCriteria = NU
   }
 }
 
-const groupNotificationListWithTwoCriteria = (notificationList) => {
+export const groupNotificationListWithTwoCriteria = (notificationList) => {
   const numberOfNotificationsToGroup = 3
   const newNotificationList = []
   let indexInNewList = 0
@@ -185,7 +185,7 @@ const groupNotificationListWithTwoCriteria = (notificationList) => {
   return groupNotificationListWithOneCriteria(newNotificationList)
 }
 
-const groupNotificationListWithOneCriteria = (notificationList) => {
+export const groupNotificationListWithOneCriteria = (notificationList) => {
   const numberOfNotificationsToGroup = 6
   const newNotificationList = []
   let indexInNewList = 0
