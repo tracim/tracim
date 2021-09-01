@@ -765,9 +765,7 @@ export const htmlCodeToDocumentFragment = (htmlCode) => {
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const workspaceId = content.workspace_id || content.workspaceId
   const contentId = content.content_id || content.contentId
-  const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, workspaceId, contentId)
-  )
+  const fetchGetContentPath = await handleFetchResult(await getContentPath(apiUrl, contentId))
 
   switch (fetchGetContentPath.apiResponse.status) {
     case 200:

@@ -4,7 +4,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getWorkspaceContent,
+  getContent,
   getContentPath
 } from 'tracim_frontend_lib'
 
@@ -43,6 +43,10 @@ const getCommentList = async (content, apiUrl) => {
  * This function assumes that the list is ordered from newest to oldest.
  */
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
+  // INFO - RJ - 2021-08-23
+  // Beware, a content may have been moved to another workspace or deleted, so
+  // the workspace field of the messages might be outdated or the content
+  // inaccessible. This should be kept in mind while working on this code
   const newestMessage = messageList[0]
 
   let content = newestMessage.fields.content
@@ -54,24 +58,19 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     const parentContentType = content.parent_content_type
     const parentId = content.parent_id
     if (!(parentContentType && parentId)) return null
-    const response = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      `${parentContentType}s`,
-      parentId
-    ))
+    const response = await handleFetchResult(await getContent(apiUrl, parentId))
     if (!response.apiResponse.ok) return null
     content = response.body
   }
 
   const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, newestMessage.fields.workspace.workspace_id, content.content_id)
+    await getContentPath(apiUrl, content.content_id)
   )
+
   if (!fetchGetContentPath.apiResponse.ok) return null
 
   const contentPath = fetchGetContentPath.body.items
   const commentList = await getCommentList(content, apiUrl)
-
   return {
     ...activityParams,
     eventList: [],

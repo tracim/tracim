@@ -5275,10 +5275,7 @@ class TestWorkspaceContents(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
         my_file_path = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/path".format(
-                workspace.workspace_id, my_file.content_id
-            ),
-            status=200,
+            "/api/contents/{}/path".format(my_file.content_id), status=200,
         ).json_body
         assert len(my_file_path["items"]) == 3
         assert my_file_path["items"][0]["content_id"] == first_dir.content_id
@@ -5294,10 +5291,7 @@ class TestWorkspaceContents(object):
         assert my_file_path["items"][2]["content_type"] == "html-document"
 
         my_file_path = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/path".format(
-                workspace.workspace_id, second_dir.content_id
-            ),
-            status=200,
+            "/api/contents/{}/path".format(second_dir.content_id), status=200,
         ).json_body
         assert len(my_file_path["items"]) == 2
         assert my_file_path["items"][0]["content_id"] == first_dir.content_id
@@ -5309,15 +5303,62 @@ class TestWorkspaceContents(object):
         assert my_file_path["items"][1]["content_type"] == "folder"
 
         my_file_path = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/path".format(
-                workspace.workspace_id, another_content.content_id
-            ),
-            status=200,
+            "/api/contents/{}/path".format(another_content.content_id), status=200,
         ).json_body
         assert len(my_file_path["items"]) == 1
         assert my_file_path["items"][0]["content_id"] == another_content.content_id
         assert my_file_path["items"][0]["label"] == another_content.label
         assert my_file_path["items"][0]["content_type"] == "html-document"
+
+    def test_api__get_content_path__ok__400__user_not_in_workspace(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        admin_user,
+        role_api_factory,
+        content_api_factory,
+        web_testapp,
+        content_type_list,
+    ):
+        workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
+        api = content_api_factory.get()
+        first_dir = api.create(
+            content_type_list.Folder.slug, workspace, None, "First Dir", "", True
+        )
+        # create another content to prevent false positive:
+        # - non linear id result for path.
+        # - not catch all function.
+        another_content = api.create(
+            content_type_list.Page.slug, workspace, None, "Another Content", "", True
+        )
+
+        second_dir = api.create(
+            content_type_list.Folder.slug, workspace, first_dir, "Second Content", "", True
+        )
+
+        my_file = api.create(
+            content_type_list.Page.slug, workspace, second_dir, "my file", "", True,
+        )
+        user_api = user_api_factory.get()
+        profile = Profile.USER
+        user_api.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+
+        res = web_testapp.get("/api/contents/{}/path".format(my_file.content_id), status=400)
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
+        web_testapp.get("/api/contents/{}/path".format(second_dir.content_id), status=400)
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
+        web_testapp.get("/api/contents/{}/path".format(another_content.content_id), status=400)
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
 
 @pytest.mark.usefixtures("base_fixture")

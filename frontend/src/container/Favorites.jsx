@@ -167,11 +167,7 @@ export class Favorites extends React.Component {
       if (!favorite.content) return null
       // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
       // hence the snake-case properties
-      const response = await getContentPath(
-        FETCH_CONFIG.apiUrl,
-        favorite.content.workspace_id,
-        favorite.content_id
-      )
+      const response = await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
       if (!response.ok) return []
 
       const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
