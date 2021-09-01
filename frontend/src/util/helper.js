@@ -104,6 +104,12 @@ export const ANCHOR_NAMESPACE = {
   workspaceItem: 'workspaceItem'
 }
 
+export const GROUP_NOTIFICATION_CRITERIA = {
+  AUTHOR: 'author',
+  CONTENT: 'content',
+  WORKSPACE: 'workspace'
+}
+
 // Côme - 2018/08/02 - shouldn't this come from api ?
 export const workspaceConfig = {
   slug: 'workspace',

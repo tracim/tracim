@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -16,29 +15,26 @@ import {
   setNextPage
 } from '../action-creator.sync.js'
 import {
-  FETCH_CONFIG,
   CONTENT_NAMESPACE
 } from '../util/helper.js'
 import {
-  AVATAR_SIZE,
   CONTENT_TYPE,
   IconButton,
+  GROUP_MENTION_TRANSLATION_LIST,
   PROFILE,
   ListItemWrapper,
-  PopinFixedHeader,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
   SUBSCRIPTION_TYPE,
   NUMBER_RESULTS_BY_PAGE,
-  GROUP_MENTION_TRANSLATION_LIST,
-  TracimComponent,
-  Avatar,
-  ComposedIcon,
-  formatAbsoluteDate,
-  PAGE
+  PAGE,
+  PopinFixedHeader,
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
+import NotificationItem from '../component/NotificationItem.jsx'
+import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export class NotificationWall extends React.Component {
   shortDate = date => {
@@ -116,11 +112,22 @@ export class NotificationWall extends React.Component {
         : ''
     )
 
+    const numberOfContents = notification.numberOfContents || 1
+
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
-      content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
+      content: `<span title='${escapedContentLabel}' class='${numberOfContents === 1
+        ? 'contentTitle__highlight'
+        : ''
+      }'>${escapedContentLabel}</span>`,
       interpolation: { escapeValue: false }
+    }
+
+    if (notification.numberOfWorkspaces > 1) {
+      i18nOpts.workspace = `<span title='${notification.numberOfWorkspaces}'>${
+        props.t('in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
+      }</span>`
     }
 
     const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
@@ -130,62 +137,54 @@ export class NotificationWall extends React.Component {
         ? (
           isPublication
             ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.id)
-            : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.type, notification.content.id)
+            : PAGE.CONTENT(notification.content.id)
         )
         : ''
     )
 
     if (entityType === TLM_ENTITY.CONTENT) {
-      const publicationIcon = isPublication ? 'fas fa-stream+' : ''
-
       switch (eventType) {
         case TLM_EVENT.CREATED: {
           if (contentType === TLM_SUB.COMMENT) {
             return {
-              icon: 'far fa-comments',
               title: props.t('Comment_noun'),
-              text: props.t('{{author}} commented on {{content}}', i18nOpts),
+              text: props.t('{{author}} commented on {{content}} {{workspace}}', i18nOpts),
               url: this.linkToComment(notification)
             }
           }
 
           return {
-            icon: publicationIcon + 'fas fa-magic',
             title: isPublication ? props.t('New publication') : props.t('New content'),
-            text: props.t('{{author}} created {{content}}', i18nOpts),
+            text: props.t('{{author}} created {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
-              icon: publicationIcon + 'fas fa-random',
               title: props.t('Status updated'),
-              text: props.t('{{author}} changed the status of {{content}}', i18nOpts),
+              text: props.t('{{author}} changed the status of {{content}} {{workspace}}', i18nOpts),
               url: contentUrl
             }
           }
 
           return {
-            icon: publicationIcon + 'fas fa-history',
             title: isPublication ? props.t('Publication updated') : props.t('Content updated'),
-            text: props.t('{{author}} updated {{content}}', i18nOpts),
+            text: props.t('{{author}} updated {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.DELETED: {
           return {
-            icon: publicationIcon + 'fas fa-times',
             title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
-            text: props.t('{{author}} deleted {{content}}', i18nOpts),
+            text: props.t('{{author}} deleted {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.UNDELETED: {
           return {
-            icon: publicationIcon + 'fas fa-undo',
             title: isPublication ? props.t('Publication restored') : props.t('Content restored'),
-            text: props.t('{{author}} restored {{content}}', i18nOpts),
+            text: props.t('{{author}} restored {{content}} {{workspace}}', i18nOpts),
             url: contentUrl
           }
         }
@@ -197,10 +196,9 @@ export class NotificationWall extends React.Component {
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
       return {
-        icon: 'fas fa-at',
         title: props.t('Mention'),
         text: groupMention ? mentionEveryone : mentionYou,
-        url: contentUrl,
+        url: PAGE.CONTENT(notification.content.parentId),
         isMention: true
       }
     }
@@ -217,25 +215,21 @@ export class NotificationWall extends React.Component {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
           ...details,
-          icon: 'fas fa-user-plus',
           title: props.t('Account created'),
           text: props.t("{{author}} created <b>{{user}}</b>'s account", i18nOpts)
         }
         case TLM_EVENT.MODIFIED: return {
           ...details,
-          icon: 'fas fa-user+fas fa-history',
           title: props.t('Account updated'),
           text: props.t("{{author}} modified <b>{{user}}</b>'s account", i18nOpts)
         }
         case TLM_EVENT.DELETED: return {
           ...details,
-          icon: 'fas fa-user-times',
           title: props.t('Account deleted'),
           text: props.t("{{author}} deleted <b>{{user}}</b>'s account", i18nOpts)
         }
         case TLM_EVENT.UNDELETED: return {
           ...details,
-          icon: 'fas fa-user+fas fa-undo',
           title: props.t('Account restored'),
           text: props.t("{{author}} restored <b>{{user}}</b>'s account", i18nOpts)
         }
@@ -258,14 +252,12 @@ export class NotificationWall extends React.Component {
             }
           }
           return {
-            icon: 'fas fa-user-plus',
             title: props.t('New access'),
             text: notificationText,
             url: dashboardUrl
           }
         }
         case TLM_EVENT.MODIFIED: return {
-          icon: 'far fa-user+fas fa-history',
           title: props.t('Status updated'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} modified your role in a space', i18nOpts)
@@ -273,7 +265,6 @@ export class NotificationWall extends React.Component {
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'fas fa-user-times',
           title: props.t('Access removed'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} removed you from a space', i18nOpts)
@@ -286,25 +277,21 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE) {
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'fas fa-users+fas fa-plus',
           title: props.t('New space'),
           text: props.t('{{author}} created a space', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.MODIFIED: return {
-          icon: 'fas fa-users+fas fa-history',
           title: props.t('Space updated'),
           text: props.t('{{author}} modified a space', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'fas fa-users+fas fa-times',
           title: props.t('Space deleted'),
           text: props.t('{{author}} deleted a space', i18nOpts),
           url: dashboardUrl
         }
         case TLM_EVENT.UNDELETED: return {
-          icon: 'fas fa-users+fas fa-undo',
           title: props.t('Space restored'),
           text: props.t('{{author}} restored a space', i18nOpts),
           url: dashboardUrl
@@ -320,14 +307,12 @@ export class NotificationWall extends React.Component {
       // INFO - GB - 2020-12-29 - MODIFIED.accepted and DELETED events do not make notifications
 
       if (props.user.userId === notification.subscription.author.userId) {
-        // RJ - 2020-10-19 - NOTE
-        // TLM_EVENT.CREATED notifications should not be shown, or even received
+        // INFO - RJ - 2020-10-19 - TLM_EVENT.CREATED notifications should not be shown, or even received
         // assuming that the author of a subscription is always the concerned user
         if (eventType === TLM_EVENT.MODIFIED) {
           if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) return {}
           if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
             return {
-              icon: SUBSCRIPTION_TYPE.rejected.faIcon,
               title: props.t('Access removed'),
               text: props.t('{{author}} rejected your access to a space', i18nOpts),
               url: subscriptionPageURL,
@@ -338,7 +323,6 @@ export class NotificationWall extends React.Component {
       } else {
         switch (eventType) {
           case TLM_EVENT.CREATED: return {
-            icon: SUBSCRIPTION_TYPE.pending.faIcon,
             title: props.t('Requested access'),
             text: props.t('{{author}} requested access to a space', i18nOpts),
             url: dashboardUrl
@@ -347,7 +331,6 @@ export class NotificationWall extends React.Component {
             if (notification.subscription.state === SUBSCRIPTION_TYPE.accepted.slug) return {}
             if (notification.subscription.state === SUBSCRIPTION_TYPE.rejected.slug) {
               return {
-                icon: SUBSCRIPTION_TYPE.rejected.faIcon,
                 title: props.t('Access removed'),
                 text: props.t('{{author}} rejected access a space for <b>{{user}}</b>', i18nOpts),
                 url: defaultEmptyUrlMsg
@@ -356,7 +339,6 @@ export class NotificationWall extends React.Component {
 
             if (notification.subscription.state === SUBSCRIPTION_TYPE.pending.slug) {
               return {
-                icon: SUBSCRIPTION_TYPE.pending.faIcon,
                 title: props.t('Requested access'),
                 text: props.t('{{author}} requested access to a space', i18nOpts),
                 url: dashboardUrl
@@ -372,13 +354,11 @@ export class NotificationWall extends React.Component {
 
       switch (eventType) {
         case TLM_EVENT.CREATED: return {
-          icon: 'far fa-smile+fas fa-plus',
           title: props.t('Reaction created'),
           text: props.t('{{author}} reacted to {{content}} with {{reaction}}', i18nOpts),
           url: contentUrl
         }
         case TLM_EVENT.DELETED: return {
-          icon: 'far fa-smile+fas fa-times',
           title: props.t('Reaction deleted'),
           text: props.t('{{author}} removed their reaction {{reaction}} to {{content}}', i18nOpts),
           url: contentUrl
@@ -387,7 +367,6 @@ export class NotificationWall extends React.Component {
     }
 
     return {
-      icon: 'fas fa-bell',
       text: `${escapedAuthor} ${notification.type}`,
       url: contentUrl,
       emptyUrlMsg: defaultEmptyUrlMsg,
@@ -412,7 +391,7 @@ export class NotificationWall extends React.Component {
     return (
       notification.content.parentContentNamespace === CONTENT_NAMESPACE.PUBLICATION
         ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.parentId)
-        : PAGE.WORKSPACE.CONTENT(notification.workspace.id, notification.content.parentContentType, notification.content.parentId)
+        : PAGE.CONTENT(notification.content.parentId)
     )
   }
 
@@ -441,65 +420,29 @@ export class NotificationWall extends React.Component {
 
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
-            const notificationDetails = this.getNotificationDetails(notification)
-            if (Object.keys(notificationDetails).length === 0) return
-            const icons = notificationDetails.icon.split('+')
-            const icon = (
-              icons.length === 1
-                ? <i title={notificationDetails.title} className={`fa-fw ${icons[0]}`} />
-                : <ComposedIcon titleIcon={notificationDetails.title} mainIcon={icons[0]} smallIcon={icons[1]} />
-            )
-
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
                 read={false}
                 key={notification.id}
               >
-                <Link
-                  to={notificationDetails.url || '#'}
-                  onClick={(e) => this.handleClickNotification(e, notification.id, notificationDetails)}
-                  className={classnames('notification__list__item',
-                    { itemRead: notification.read, isMention: notificationDetails.isMention }
+                {notification.group
+                  ? (
+                    <GroupedNotificationItem
+                      getNotificationDetails={this.getNotificationDetails}
+                      notification={notification}
+                      onClickNotification={this.handleClickNotification}
+                      shortDate={this.shortDate}
+                    />
+                  ) : (
+                    <NotificationItem
+                      getNotificationDetails={this.getNotificationDetails}
+                      notification={notification}
+                      onClickNotification={this.handleClickNotification}
+                      shortDate={this.shortDate}
+                      user={props.user}
+                    />
                   )}
-                  key={notification.id}
-                >
-                  <span className='notification__list__item__icon'>{icon}</span>
-                  <div className='notification__list__item__text'>
-                    <Avatar
-                      size={AVATAR_SIZE.MINI}
-                      apiUrl={FETCH_CONFIG.apiUrl}
-                      user={notification.author}
-                      style={{ marginRight: '5px' }}
-                    />
-                    <span
-                      className='notification__list__item__text__content'
-                      dangerouslySetInnerHTML={{
-                        __html: (
-                          notificationDetails.text + ' ' +
-                          `<span title='${escapeHtml(formatAbsoluteDate(notification.created, props.user.lang))}'>` +
-                          '</span>'
-                        )
-                      }}
-                    />
-                  </div>
-                  <div className='notification__list__item__meta'>
-                    <div
-                      className='notification__list__item__meta__date'
-                      title={formatAbsoluteDate(notification.created, props.user.lang)}
-                    >
-                      {this.shortDate(notification.created)}
-                    </div>
-                    <div className='notification__list__item__meta__space'>
-                      {(notification.workspace &&
-                        notification.workspace.label
-                      )}
-                    </div>
-                  </div>
-                  <div className='notification__list__item__circle__wrapper'>
-                    {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
-                  </div>
-                </Link>
               </ListItemWrapper>
             )
           })}

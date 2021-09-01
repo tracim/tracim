@@ -13,7 +13,9 @@ import {
   checkEmailValidity,
   PAGE,
   putUserConfiguration,
-  serialize
+  serialize,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -389,7 +391,9 @@ class Login extends React.Component {
   loadNotificationNotRead = async (userId) => {
     const { props } = this
 
-    const fetchUnreadMentionCount = await props.dispatch(getUserMessagesSummary(userId, ['mention.created']))
+    const fetchUnreadMentionCount = await props.dispatch(getUserMessagesSummary(userId, [
+      `${TLM_ET.MENTION}.${TLM_CET.CREATED}`
+    ]))
     switch (fetchUnreadMentionCount.status) {
       case 200: props.dispatch(setUnreadMentionCount(fetchUnreadMentionCount.json.unread_messages_count)); break
       default: props.dispatch(newFlashMessage(props.t('Error loading unread mention number')))

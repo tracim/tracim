@@ -11,15 +11,15 @@ describe('Profile', () => {
 
   it('should have translations', () => {
     cy.changeLanguage('en')
-    cy.get('.breadcrumbs').contains('profile').should('be.visible')
+    cy.contains('.breadcrumbs', 'profile').should('be.visible')
 
     cy.changeLanguage('fr')
-    cy.get('.breadcrumbs').contains('Profil').should('be.visible')
+    cy.contains('.breadcrumbs', 'Profil').should('be.visible')
 
     cy.changeLanguage('pt')
-    cy.get('.breadcrumbs').contains('Perfil').should('be.visible')
+    cy.contains('.breadcrumbs', 'Perfil').should('be.visible')
 
     cy.changeLanguage('de')
-    cy.get('.breadcrumbs').contains('Profil').should('be.visible')
+    cy.contains('.breadcrumbs', 'Profil').should('be.visible')
   })
 })

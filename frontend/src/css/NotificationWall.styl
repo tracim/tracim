@@ -24,18 +24,37 @@
       font-weight normal
       background-color lightBlueOpacity
       padding standardSpacing
-      min-height 60px
+      height 60px
       align-items center
-      &__icon
-        font-size bigIconSize
-        display inline-block
-        width 30px
       &__text
-        flex 2
+        flex 4
         display flex
-        font-size metadataFontSize
         word-break break-word
         align-items center
+        &__content
+          line-height standardFontSize + 1
+          max-height 2*standardFontSize + 1
+          overflow hidden
+          text-overflow ellipsis
+        & .avatar
+          margin-inline-end standardSpacing
+        &__avatars
+          width 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          height 30px
+          margin-inline-end standardSpacing
+          &__second
+            position absolute
+            top 20px
+            left 20px // INFO - GB - 2021-08-26 - 20px is two authors avatar's size
+        &__usersAvatar
+          min-width 30px
+          min-height 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          display flex
+          border-radius 50%
+          margin-inline-end standardSpacing
+          align-items center
+          justify-content center
+          background-color lightDarkGrey
       &__meta
         padding-right textSpacing
         color lightDarkGrey
@@ -77,13 +96,12 @@
     background-color offWhite
     justify-content center
     display flex
-  &__header__title
-    font-weight normal
+  &__header
+    min-height headerHeight
+    &__title
+      font-weight normal
 
 .contentTitle
-  &__highlight
-    font-weight bold
-.documentTitle
   &__highlight
     font-weight bold
 

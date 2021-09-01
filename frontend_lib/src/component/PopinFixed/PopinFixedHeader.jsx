@@ -102,9 +102,9 @@ class PopinFixedHeader extends React.Component {
         <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
           <div className='wsContentGeneric__header__titleWrapper'>
             <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-              <i className={`${faIcon}`} title={rawTitle} style={{ color: customColor }} />
+              <i className={`fa-fw ${faIcon}`} title={rawTitle} style={{ color: customColor }} />
             </div>
-            {props.loading ? <Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /> : (
+            {props.loading ? <Icon icon='fa-fw fas fa-spin fa-spinner' title={props.t('Loading…')} /> : (
               <>
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
@@ -128,7 +128,7 @@ class PopinFixedHeader extends React.Component {
                     onClick={this.handleClickUndoChangeTitleBtn}
                     disabled={disableChangeTitle}
                   >
-                    <i className='fas fa-undo' title={t('Undo change in title')} />
+                    <i className='fa-fw fas fa-undo' title={t('Undo change in title')} />
                   </button>
                 )}
 
@@ -138,7 +138,7 @@ class PopinFixedHeader extends React.Component {
                     onClick={this.handleClickChangeTitleBtn}
                     disabled={disableChangeTitle}
                   >
-                    <i className='fas fa-check' title={t('Validate the title')} />
+                    <i className='fa-fw fas fa-check' title={t('Validate the title')} />
                   </button>
                 )}
               </>
@@ -150,7 +150,7 @@ class PopinFixedHeader extends React.Component {
             root={{
               link: PAGE.HOME,
               label: '',
-              icon: 'fas fa-home',
+              icon: 'fa-fw fas fa-home',
               type: BREADCRUMBS_TYPE.CORE,
               isALink: true
             }}
@@ -196,7 +196,7 @@ class PopinFixedHeader extends React.Component {
         {!props.loading && filteredActionList.length > 0 && (
           <DropdownMenu
             buttonCustomClass='wsContentGeneric__header__actions'
-            buttonIcon='fas fa-ellipsis-v'
+            buttonIcon='fa-fw fas fa-ellipsis-v'
             buttonTooltip={t('Actions')}
             buttonDataCy='dropdownContentButton'
           >
@@ -210,7 +210,7 @@ class PopinFixedHeader extends React.Component {
                   title={action.label}
                   key={action.label}
                 >
-                  <i className={`fa-fw ${action.icon}`} />
+                  <i className={`fa-fw fa-fw ${action.icon}`} />
                   {action.label}
                 </a>
               ) : (
@@ -235,7 +235,7 @@ class PopinFixedHeader extends React.Component {
           data-cy='popinFixed__header__button__close'
           title={t('Close')}
         >
-          <i className='fas fa-times' />
+          <i className='fa-fw fas fa-times' />
         </div>
       </div>
     )
