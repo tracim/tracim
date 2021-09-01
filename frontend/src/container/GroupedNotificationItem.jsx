@@ -107,7 +107,7 @@ export class GroupedNotificationItem extends React.Component {
 
   handleClickGroupedNotification = (e, notification) => {
     const { props } = this
-
+    // INFO - GB - 2021-09-01 - A grouped notification is only updated on click if it's not grouped by content, in this case it just redirects to the content
     if (notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)) {
       notification.group.forEach(notification => props.onClickNotification(e, notification.id, {
         url: PAGE.CONTENT(notification.content.type === TLM_SUB.COMMENT
