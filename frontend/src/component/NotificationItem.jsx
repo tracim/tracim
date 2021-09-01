@@ -37,8 +37,7 @@ const NotificationItem = props => {
           dangerouslySetInnerHTML={{
             __html: (
               notificationDetails.text + ' ' +
-              `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'>` +
-              '</span>'
+              `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'\\>`
             )
           }}
         />

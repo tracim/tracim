@@ -279,7 +279,7 @@
   "Your username": "Votre identifiant",
   "Your username has been set": "Votre identifiant a été défini",
   "Unknown space": "Espace inconnu",
-  "Error loading unread mention number": "Erreur lors du chargement du nombre des mentions non lues",
+  "Error loading unread mention number": "Erreur lors du chargement du nombre de mentions non lues",
   "{{author}} created <b>{{user}}</b>'s account": "{{author}} a créé le compte de <b>{{user}}</b>",
   "{{author}} modified <b>{{user}}</b>'s account": "{{author}} a mis à jour le compte de <b>{{user}}</b>",
   "{{author}} deleted <b>{{user}}</b>'s account": "{{author}} a supprimé le compte de <b>{{user}}</b>",

@@ -61,19 +61,15 @@ export const serializeNotification = notification => {
   }
 }
 
-export const hasSameAuthor = authorList => {
-  if (authorList.some(author => !author)) return false
-  return authorList.every((author, index) => {
-    if (index === 0) return true
-    return author.userId === authorList[index - 1].userId
+const hasSameAuthor = authorList => {
+  return !authorList.some((author, index) => {
+    return !author || (index && author.userId !== authorList[index - 1].userId)
   })
 }
 
 export const hasSameWorkspace = workspaceList => {
-  if (workspaceList.some(workspace => !workspace)) return false
-  return workspaceList.every((workspace, index) => {
-    if (index === 0) return true
-    return workspace.id === workspaceList[index - 1].id
+  return !workspaceList.some((workspace, index) => {
+    return !workspace || (index && workspace.id !== workspaceList[index - 1].id)
   })
 }
 

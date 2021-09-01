@@ -33,22 +33,22 @@ export class GroupedNotificationItem extends React.Component {
           : notification.content.id
       })).length
 
-    let escapedAuthor = ''
+    let escapedAuthorList = ''
     if (notification.author) {
-      if (notification.author.length === 1) escapedAuthor = escapeHtml(notification.author[0].publicName)
-      if (notification.author.length === 2) {
-        escapedAuthor = `${escapeHtml(notification.author[0].publicName)} ${t('and')} ${escapeHtml(notification.author[1].publicName)}`
-      }
-      if (notification.author.length > 2) {
-        escapedAuthor = `${escapeHtml(notification.author[0].publicName)} ${t('and {{numberOfAuthors}} other people', { numberOfAuthors: notification.author.length - 1 })
-          }`
+      if (notification.author.length === 1) {
+        escapedAuthorList = escapeHtml(notification.author[0].publicName)
+      } else if (notification.author.length === 2) {
+        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${t('and')} ${escapeHtml(notification.author[1].publicName)}`
+      } else {
+        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${t('and {{numberOfAuthors}} other people', { numberOfAuthors: notification.author.length - 1 })}`
       }
     }
 
     let escapedContentLabel = ''
     if (notification.group.some(notification => notification.content)) {
-      if (numberOfContents > 1) escapedContentLabel = t('{{numberOfContents}} contents', { numberOfContents: numberOfContents })
-      else {
+      if (numberOfContents > 1) {
+        escapedContentLabel = t('{{numberOfContents}} contents', { numberOfContents: numberOfContents })
+      } else {
         const content = notification.group.find(notification => notification.content).content
         escapedContentLabel = escapeHtml(content.type === TLM_SUB.COMMENT
           ? content.parentLabel
@@ -59,12 +59,12 @@ export class GroupedNotificationItem extends React.Component {
 
     const userList = uniqBy(notification.group.map(notification => notification.user), 'userId')
     const escapedUser = userList.length > 1
-      ? { publicName: t('{{numberOfUsers}} user', { numberOfUsers: userList.length }) }
+      ? t('{{numberOfUsers}} user', { numberOfUsers: userList.length })
       : escapeHtml(notification.group[0].user.publicName)
 
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
-      author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
+      author: `<span title='${escapedAuthorList}'>${escapedAuthorList}</span>`,
       content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
       numberOfContribution: notification.group.length,
       numberOfWorkspaces: numberOfWorkspaces,
@@ -92,7 +92,7 @@ export class GroupedNotificationItem extends React.Component {
     } else {
       const notificationDetails = getNotificationDetails({
         ...notification.group[0],
-        author: { publicName: escapedAuthor },
+        author: { publicName: escapedAuthorList },
         content: { ...notification.group[0].content, label: escapedContentLabel, parentLabel: escapedContentLabel },
         numberOfWorkspaces: numberOfWorkspaces,
         numberOfContents: numberOfContents,
@@ -100,7 +100,7 @@ export class GroupedNotificationItem extends React.Component {
         user: { ...notification.group[0].user, publicName: escapedUser }
       })
 
-      if (numberOfContents !== 1) notificationDetails.url = undefined
+      if (numberOfContents !== 1) delete notificationDetails.url
       return notificationDetails
     }
   }
@@ -170,8 +170,7 @@ export class GroupedNotificationItem extends React.Component {
             dangerouslySetInnerHTML={{
               __html: (
                 notificationDetails.text + ' ' +
-                `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'>` +
-                '</span>'
+                `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'\\>`
               )
             }}
           />

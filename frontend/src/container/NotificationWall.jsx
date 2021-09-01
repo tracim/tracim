@@ -112,13 +112,15 @@ export class NotificationWall extends React.Component {
         : ''
     )
 
+    const numberOfContents = notification.numberOfContents || 1
+
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
-      content: `<span title='${escapedContentLabel}' class=${notification.numberOfContents > 1
-        ? ''
-        : 'contentTitle__highlight'
-      }>${escapedContentLabel}</span>`,
+      content: `<span title='${escapedContentLabel}' class='${numberOfContents === 1
+        ? 'contentTitle__highlight'
+        : ''
+      }'>${escapedContentLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
