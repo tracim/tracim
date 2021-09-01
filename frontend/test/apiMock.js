@@ -201,16 +201,16 @@ const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
     .reply(204, true)
 }
 
-const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments) => {
+const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments, query = '?page_token=&count=0&sort=created:asc') => {
   return nock(apiUrl)
-    .get(`/workspaces/${workspaceId}/contents/${contentId}/comments`)
-    .reply(200, comments)
+    .get(`/workspaces/${workspaceId}/contents/${contentId}/comments${query}`)
+    .reply(200, { items: comments, has_next: false, next_page_token: '' })
 }
 
-const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, files) => {
+const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, files, pageQuery = '&page_token=&count=0&sort=created:asc') => {
   return nock(apiUrl)
-    .get(`/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file&namespaces_filter=content,publication`)
-    .reply(200, files)
+    .get(`/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file&namespaces_filter=content,publication${pageQuery}`)
+    .reply(200, { items: files, has_next: false, next_page_token: '' })
 }
 
 const mockGetContent200 = (apiUrl, contentId, content) => {
@@ -231,10 +231,10 @@ const mockGetContentPath200 = (apiUrl, contentId, contentPath) => {
     .reply(200, { items: contentPath })
 }
 
-const mockGetPublicationList200 = (apiUrl, workspaceId, publicationList) => {
+const mockGetPublicationList200 = (apiUrl, workspaceId, publicationList, pageToken = '') => {
   return nock(apiUrl)
-    .get(`/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`)
-    .reply(200, { items: publicationList })
+    .get(`/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0&count=15&page_token=${pageToken}&sort=modified:desc`)
+    .reply(200, { items: publicationList, next_page_token: 'pageToken', has_next_page: true })
 }
 
 const mockPostThreadPublication204 = (apiUrl, workspaceId) => {

@@ -10,7 +10,7 @@ describe('<Revision />', () => {
   const props = {
     customClass: 'randomCustomClass',
     allowClickOnRevision: false,
-    number: 0,
+    versionNumber: 0,
     authorPublicName: 'randomAuthorPublicName',
     status: 'randomStatus',
     createdFormated: 'randomCreatedFormated',
@@ -28,8 +28,8 @@ describe('<Revision />', () => {
       expect(wrapper.find(`div.${props.customClass}__messagelist__version`)).to.have.lengthOf(1)
     })
 
-    it(`the span ".revision__data__nb" should contains "${props.number}"`, () => {
-      expect(wrapper.find('span.revision__data__nb')).to.have.text().contains(props.number)
+    it(`the span ".revision__data__nb" should contains "${props.versionNumber}"`, () => {
+      expect(wrapper.find('span.revision__data__nb')).to.have.text().contains(props.versionNumber)
     })
 
     it(`the span ".revision__data__infos__created" should contains "${props.createdDistance}"`, () => {

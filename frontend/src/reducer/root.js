@@ -14,7 +14,7 @@ import system from './system.js'
 import searchResult from './searchResult.js'
 import notificationPage from './notificationPage.js'
 import accessibleWorkspaceList from './accessibleWorkspaceList.js'
-import publicationList from './publicationList.js'
+import publicationPage from './publicationPage.js'
 import workspaceSubscriptionList from './workspaceSubscriptionList.js'
 import workspaceActivity from './workspaceActivity.js'
 import userActivity from './userActivity.js'
@@ -40,7 +40,7 @@ const rootReducer = combineReducers({
   spaceSearch: searchResult(ADVANCED_SEARCH_TYPE.SPACE),
   notificationPage,
   accessibleWorkspaceList,
-  publicationList,
+  publicationPage,
   workspaceSubscriptionList,
   workspaceActivity,
   userActivity,

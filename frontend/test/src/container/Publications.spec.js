@@ -34,6 +34,7 @@ describe('<Publications />', () => {
   const setCommentListToPublicationCallBack = sinon.spy()
   const setHeadTitleCallBack = sinon.spy()
   const setPublicationListCallBack = sinon.spy()
+  const appendPublicationListCallBack = sinon.spy()
 
   const dispatchCallBack = (param) => {
     if (isFunction(param)) {
@@ -48,6 +49,7 @@ describe('<Publications />', () => {
       case `${SET}/${HEAD_TITLE}`: setHeadTitleCallBack(); break
       case `${SET}/${PUBLICATION}/${COMMENT_LIST}`: setCommentListToPublicationCallBack(); break
       case `${SET}/${WORKSPACE_PUBLICATION_LIST}`: setPublicationListCallBack(); break
+      case `${APPEND}/${WORKSPACE_PUBLICATION_LIST}`: appendPublicationListCallBack(); break
       default:
         return param
     }
@@ -56,19 +58,24 @@ describe('<Publications />', () => {
   const props = {
     addCommentToTimeline: () => {},
     buildTimelineFromCommentAndRevision: () => [],
+    buildChildContentTimelineItem: () => [],
     dispatch: dispatchCallBack,
     setApiUrl: () => {},
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
     currentWorkspace: firstWorkspace,
-    publicationList: [
-      content,
-      {
-        ...content,
-        id: 9,
-        commentList: []
-      }
-    ],
+    publicationPage: {
+      list: [
+        content,
+        {
+          ...content,
+          id: 9,
+          commentList: []
+        }
+      ],
+      nextPageToken: '',
+      hasNextPage: true
+    },
     match: {
       params: {
         idws: 1
@@ -79,7 +86,7 @@ describe('<Publications />', () => {
   }
 
   const wrapper = shallow(<Publications {...props} />)
-  const PublicationsInstance = wrapper.instance()
+  const publicationInstance = wrapper.instance()
 
   const publicationTLM = {
     fields: {
@@ -93,21 +100,18 @@ describe('<Publications />', () => {
     }
   }
 
-  mockGetPublicationList200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, [])
-  mockGetContentComments200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
-  mockGetFileChildContent200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
   mockPostThreadPublication204(FETCH_CONFIG.apiUrl, props.currentWorkspace.id)
 
   describe('handleContentCreatedOrRestored()', () => {
     it('should call appendPublication()', () => {
-      PublicationsInstance.handleContentCreatedOrRestored(publicationTLM)
+      publicationInstance.handleContentCreatedOrRestored(publicationTLM)
       expect(appendPublicationCallBack.called).to.equal(true)
     })
   })
 
   describe('handleContentCommented()', () => {
     it('should call setCommentListToPublication()', () => {
-      PublicationsInstance.handleContentCommented({
+      publicationInstance.handleContentCommented({
         ...publicationTLM,
         fields: {
           ...publicationTLM.fields,
@@ -118,7 +122,7 @@ describe('<Publications />', () => {
     })
 
     it('should call updatePublication()', () => {
-      PublicationsInstance.handleContentCommented({
+      publicationInstance.handleContentCommented({
         ...publicationTLM,
         fields: {
           ...publicationTLM.fields,
@@ -131,43 +135,55 @@ describe('<Publications />', () => {
 
   describe('handleContentModified()', () => {
     it('should call updatePublication()', () => {
-      PublicationsInstance.handleContentModified(publicationTLM)
+      publicationInstance.handleContentModified(publicationTLM)
       expect(updatePublicationCallBack.called).to.equal(true)
     })
   })
 
   describe('handleContentDeleted()', () => {
     it('should call removePublication()', () => {
-      PublicationsInstance.handleContentDeleted(publicationTLM)
+      publicationInstance.handleContentDeleted(publicationTLM)
       expect(removePublicationCallBack.called).to.equal(true)
     })
   })
 
   describe('buildBreadcrumbs()', () => {
     it('should call setBreadcrumbs()', () => {
-      PublicationsInstance.buildBreadcrumbs(publicationTLM)
+      publicationInstance.buildBreadcrumbs()
       expect(setBreadcrumbsCallBack.called).to.equal(true)
     })
   })
 
   describe('setHeadTitle()', () => {
     it('should call setHeadTitle()', () => {
-      PublicationsInstance.setHeadTitle(publicationTLM)
+      publicationInstance.setHeadTitle()
       expect(setHeadTitleCallBack.called).to.equal(true)
     })
   })
 
-  describe('getPublicationList()', () => {
-    it('should call setPublicationList()', (done) => {
-      PublicationsInstance.getPublicationList(publicationTLM).then(() => {
+  describe('getPublicationPage()', () => {
+    it('should call setPublicationList() when no token is given', (done) => {
+      mockGetPublicationList200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, [])
+      mockGetContentComments200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
+      mockGetFileChildContent200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
+      publicationInstance.getPublicationPage().then(() => {
         expect(setPublicationListCallBack.called).to.equal(true)
+      }).then(done, done)
+    })
+
+    it('should call appendPublicationList() when a token is given', (done) => {
+      mockGetPublicationList200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, [], 'pageToken')
+      mockGetContentComments200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
+      mockGetFileChildContent200(FETCH_CONFIG.apiUrl, props.currentWorkspace.id, content.id, [])
+      publicationInstance.getPublicationPage('pageToken').then(() => {
+        expect(appendPublicationListCallBack.called).to.equal(true)
       }).then(done, done)
     })
   })
 
   describe('getCommentList()', () => {
     it('should call setCommentListToPublication()', (done) => {
-      PublicationsInstance.getCommentList(
+      publicationInstance.getCommentList(
         content.id,
         publicationTLM.fields.content.content_namespace
       ).then(() => {
@@ -178,7 +194,7 @@ describe('<Publications />', () => {
 
   describe('handleChangeNewPublication()', () => {
     it('should update newComment state', () => {
-      PublicationsInstance.handleChangeNewPublication({ target: { value: 'a' } })
+      publicationInstance.handleChangeNewPublication({ target: { value: 'a' } })
       expect(wrapper.state('newComment')).to.equal('a')
     })
   })
@@ -186,20 +202,20 @@ describe('<Publications />', () => {
   describe('handleCancelSave()', () => {
     it('should set showInvalidMentionPopupInComment state to false if it is false', () => {
       wrapper.setState({ showInvalidMentionPopupInComment: false })
-      PublicationsInstance.handleCancelSave()
+      publicationInstance.handleCancelSave()
       expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
     })
 
     it('should set showInvalidMentionPopupInComment state to false if it is true', () => {
       wrapper.setState({ showInvalidMentionPopupInComment: true })
-      PublicationsInstance.handleCancelSave()
+      publicationInstance.handleCancelSave()
       expect(wrapper.state('showInvalidMentionPopupInComment')).to.equal(false)
     })
   })
 
   describe('handleClickValidateAnyway()', () => {
     it('should call appendPublication()', (done) => {
-      PublicationsInstance.handleClickValidateAnyway().then(() => {
+      publicationInstance.handleClickValidateAnyway().then(() => {
         expect(appendPublicationCallBack.called).to.equal(true)
       }).then(done, done)
     })

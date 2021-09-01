@@ -148,6 +148,15 @@ export class Timeline extends React.Component {
           shouldScrollToBottom={props.shouldScrollToBottom}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
+          {!props.loading && props.canLoadMoreTimelineItems() && (
+            <IconButton
+              onClick={props.onClickShowMoreTimelineItems}
+              text={props.t('See more')}
+              icon='fas fa-chevron-up'
+              dataCy='showMoreTimelineItemsBtn'
+              customClass='timeline__messagelist__showMoreButton'
+            />
+          )}
           {props.loading ? <Loading /> : props.timelineData.map(content => {
             switch (content.timelineType) {
               case TIMELINE_TYPE.COMMENT:
@@ -186,7 +195,7 @@ export class Timeline extends React.Component {
                     revisionType={content.revision_type}
                     createdFormated={formatAbsoluteDate(content.created_raw, props.loggedUser.lang)}
                     createdDistance={displayDistanceDate(content.created_raw, props.loggedUser.lang)}
-                    number={content.number}
+                    versionNumber={content.version_number}
                     status={props.availableStatusList.find(status => status.slug === content.status)}
                     authorPublicName={content.author.public_name}
                     allowClickOnRevision={props.allowClickOnRevision}
@@ -355,7 +364,9 @@ Timeline.propTypes = {
   onClickTranslateComment: PropTypes.func.isRequired,
   onClickRestoreComment: PropTypes.func.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired
+  translationTargetLanguageCode: PropTypes.string.isRequired,
+  onClickShowMoreTimelineItems: PropTypes.func,
+  canLoadMoreTimelineItems: PropTypes.func
 }
 
 Timeline.defaultProps = {
@@ -389,5 +400,7 @@ Timeline.defaultProps = {
   onClickDeleteComment: () => {},
   onClickRestoreComment: content => { },
   onClickEditComment: () => {},
-  onClickOpenFileComment: () => {}
+  onClickOpenFileComment: () => {},
+  onClickShowMoreTimelineItems: () => {},
+  canLoadMoreTimelineItems: () => false
 }

@@ -2,7 +2,6 @@
 import base64
 import cgi
 from datetime import datetime
-import enum
 from typing import Dict
 from typing import Generic
 from typing import List
@@ -34,6 +33,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import ContentSortOrder
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -546,13 +546,6 @@ class PageQuery(object):
     def __init__(self, force_download: int = 0, page: int = 1) -> None:
         self.force_download = force_download
         self.page = page
-
-
-class ContentSortOrder(str, enum.Enum):
-    LABEL_ASC = "label:asc"
-    MODIFIED_ASC = "modified:asc"
-    LABEL_DESC = "label:desc"
-    MODIFIED_DESC = "modified:desc"
 
 
 class ContentFilter(object):
@@ -1540,6 +1533,10 @@ class ContentInContext(object):
             for component in self.content.content_path
         ]
 
+    @property
+    def version_number(self) -> int:
+        return self.content.version_number
+
 
 class RevisionInContext(object):
     """
@@ -1552,12 +1549,14 @@ class RevisionInContext(object):
         dbsession: Session,
         config: CFG,
         user: User = None,
+        version_number: Optional[int] = None,
     ) -> None:
         assert content_revision is not None
         self.revision = content_revision
         self.dbsession = dbsession
         self.config = config
         self._user = user
+        self._version_number = version_number
 
     # Default
     @property
@@ -1673,38 +1672,6 @@ class RevisionInContext(object):
             return sorted_next_revisions[0]
         else:
             return None
-
-    @property
-    def comment_ids(self) -> List[int]:
-        """
-        Get list of ids of all current revision related comments
-        :return: list of comments ids
-        """
-        comments = self.revision.node.get_comments()
-        # INFO - G.M - 2018-06-177 - Get comments more recent than revision.
-        revision_comments = [
-            comment
-            for comment in comments
-            if comment.created > self.revision.updated
-            or comment.first_revision.revision_id > self.revision.revision_id
-        ]
-        if self.next_revision:
-            # INFO - G.M - 2018-06-177 - if there is a revision more recent
-            # than current remove comments from theses rev (comments older
-            # than next_revision.)
-            revision_comments = [
-                comment
-                for comment in revision_comments
-                if comment.created <= self.next_revision.updated
-                or comment.first_revision.revision_id <= self.next_revision.revision_id
-            ]
-        sorted_revision_comments = sorted(
-            revision_comments, key=lambda revision: revision.revision_id
-        )
-        comment_ids = []
-        for comment in sorted_revision_comments:
-            comment_ids.append(comment.content_id)
-        return comment_ids
 
     # Context-related
     @property
@@ -1830,6 +1797,10 @@ class RevisionInContext(object):
         :return: complete filename with both label and file extension part
         """
         return core_convert_file_name_to_display(self.revision.file_name)
+
+    @property
+    def version_number(self) -> int:
+        return self._version_number or self.revision.version_number
 
 
 class PaginatedObject(object):

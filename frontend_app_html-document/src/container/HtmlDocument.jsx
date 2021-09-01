@@ -4,7 +4,6 @@ import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
   addAllResourceI18n,
-  addRevisionFromTLM,
   APP_FEATURE_MODE,
   appContentFactory,
   BREADCRUMBS_TYPE,
@@ -12,7 +11,6 @@ import {
   buildHeadTitle,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  getCurrentContentVersionNumber,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
   handleFetchResult,
@@ -27,7 +25,6 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
@@ -37,13 +34,10 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
   removeLocalStorageItem,
-  getContentComment,
-  getFileChildContent,
   handleMentionsBeforeSave,
   handleLinksBeforeSave,
   addClassToMentionsOfUser,
   putUserConfiguration,
-  permissiveNumberEqual,
   TRANSLATION_STATE,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
@@ -51,7 +45,6 @@ import {
   addExternalLinksIcons,
   PopinFixedRightPartContent
 } from 'tracim_frontend_lib'
-import { debug } from '../debug.js'
 import {
   getHtmlDocContent,
   getHtmlDocRevision,
@@ -64,7 +57,7 @@ export class HtmlDocument extends React.Component {
   constructor (props) {
     super(props)
 
-    const param = props.data || debug
+    const param = props.data
     props.setApiUrl(param.config.apiUrl)
     this.state = {
       appName: 'html-document',
@@ -81,17 +74,14 @@ export class HtmlDocument extends React.Component {
         props.t('Write a note')
       ],
       rawContentBeforeEdit: '',
-      timeline: [],
       newComment: '',
       newCommentAsFileList: [],
       newContent: {},
-      loadingTimeline: true,
       loadingContent: true,
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
-      isLastTimelineItemCurrentToken: false,
       isAutoCompleteActivated: false,
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
@@ -118,15 +108,8 @@ export class HtmlDocument extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
-      // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore }
     ])
   }
 
@@ -145,13 +128,11 @@ export class HtmlDocument extends React.Component {
       ...prev,
       content: clientToken === data.fields.client_token
         ? newContentObject
-        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+        : prev.content,
       newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: clientToken !== data.fields.client_token,
-      rawContentBeforeEdit: newContentObject.raw_content,
-      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
-      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      rawContentBeforeEdit: newContentObject.raw_content
     }))
     if (clientToken === data.fields.client_token) {
       this.setHeadTitle(newContentObject.label)
@@ -159,44 +140,19 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleContentCommentCreated = (tlm) => {
-    const { props, state } = this
-    // Not a comment for our content
-    if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
-
-    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
-    this.setState({
-      timeline: newTimeline,
-      isLastTimelineItemCurrentToken: createdByLoggedUser
-    })
-  }
-
   handleContentDeletedOrRestore = data => {
     const { state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
 
-    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
     this.setState(prev => ({
       ...prev,
-      content: clientToken === data.fields.client_token
+      content: this.sessionClientToken === data.fields.client_token
         ? { ...prev.content, ...data.fields.content }
-        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+        : prev.content,
       newContent: { ...prev.content, ...data.fields.content },
       editionAuthor: data.fields.author.public_name,
-      showRefreshWarning: clientToken !== data.fields.client_token,
-      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, data.fields.client_token === this.sessionClientToken),
-      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      showRefreshWarning: this.sessionClientToken !== data.fields.client_token
     }))
-  }
-
-  handleUserModified = data => {
-    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.fields.user.user_id
-      ? { ...timelineItem, author: data.fields.user }
-      : timelineItem
-    )
-
-    this.setState({ timeline: newTimeline })
   }
 
   // Custom Event Handlers
@@ -245,9 +201,9 @@ export class HtmlDocument extends React.Component {
   }
 
   componentDidMount () {
-    console.log('%c<HtmlDocument> did mount', `color: ${this.state.config.hexcolor}`)
+    const { props } = this
     this.loadContent()
-    this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
+    props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -261,6 +217,7 @@ export class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.loadContent()
+      this.reloadContentWysiwyg()
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && (becameVisible || prevState.mode !== APP_FEATURE_MODE.EDIT)) {
@@ -378,14 +335,8 @@ export class HtmlDocument extends React.Component {
   loadHtmlDocument = async () => {
     const { state } = this
 
-    const fetchResultHtmlDocument = getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-
-    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
-    // with the setState at the end of the function
     this.setState({ loadingContent: true, mode: APP_FEATURE_MODE.VIEW })
-
-    const resHtmlDocument = await handleFetchResult(await fetchResultHtmlDocument)
-
+    const resHtmlDocument = await handleFetchResult(await getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
     const localStorageComment = getLocalStorageItem(
       state.appName,
       resHtmlDocument.body,
@@ -428,7 +379,6 @@ export class HtmlDocument extends React.Component {
         },
         newComment: localStorageComment || '',
         rawContentBeforeEdit: rawContentBeforeEdit,
-        isLastTimelineItemCurrentToken: false,
         translationState: getDefaultTranslationState(previousState.config.system.config),
         translatedRawContent: null,
         oldInvalidMentionList: oldInvalidMentionList,
@@ -446,45 +396,12 @@ export class HtmlDocument extends React.Component {
 
   loadContent = async () => {
     this.loadHtmlDocument()
-    this.loadAndBuildTimeline()
+    this.props.loadTimeline(getHtmlDocRevision)
   }
 
-  loadAndBuildTimeline = async () => {
-    const { props, state } = this
-    const fetchResultComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultRevision = getHtmlDocRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-
-    // RJ - 2021-08-07 the state is set before the awaits, and is therefore not redundant
-    // with the setState at the end of the function
-    this.setState({ loadingTimeline: true })
-
-    const [resComment, resCommentAsFile, resRevision] = await Promise.all([
-      handleFetchResult(await fetchResultComment),
-      handleFetchResult(await fetchResultFileChildContent),
-      handleFetchResult(await fetchResultRevision)
-    ])
-
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
-      resComment.body,
-      resCommentAsFile.body.items,
-      resRevision.body,
-      state.loggedUser,
-      getDefaultTranslationState(state.config.system.config)
-    )
-
-    this.setState({
-      timeline: revisionWithComment,
-      loadingTimeline: false
-    })
-  }
-
-  loadTimeline = () => {
-    // INFO - CH - 2019-01-03 - this function must exists to match app content interface. Although it isn't used here because
-    // we need some timeline data to initialize the app in loadContent(). So the timeline generation is handled by loadContent()
-    // The data required to initialize is the number of revisions and whether the first revision has raw_content === '' or not
-    // this is used to know whether we should open the app in EDIT or VIEW mode. See modeToRender in function loadContent()
-    return true
+  handleLoadMoreTimelineItems = async () => {
+    const { props } = this
+    await props.loadMoreTimelineItems(getHtmlDocRevision)
   }
 
   handleClickBtnCloseApp = () => {
@@ -706,9 +623,9 @@ export class HtmlDocument extends React.Component {
   // }
 
   handleClickShowRevision = revision => {
-    const { state } = this
+    const { state, props } = this
 
-    const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
+    const revisionArray = props.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
 
     if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
@@ -724,7 +641,6 @@ export class HtmlDocument extends React.Component {
           ...previousState.content,
           label: revision.label,
           raw_content: revision.raw_content,
-          number: revision.number,
           status: revision.status,
           current_revision_id: revision.revision_id,
           is_archived: previousState.is_archived, // archived and delete should always be taken from last version
@@ -760,7 +676,6 @@ export class HtmlDocument extends React.Component {
     this.setState(previousState => {
       return {
         content: newObjectContent,
-        timeline: previousState.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
         mode: APP_FEATURE_MODE.VIEW,
         showRefreshWarning: false,
         translatedRawContent: null,
@@ -847,28 +762,6 @@ export class HtmlDocument extends React.Component {
     ))
   }
 
-  handleContentCommentModified = (data) => {
-    const { props, state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
-    const newTimeline = props.updateCommentOnTimeline(
-      data.fields.content,
-      state.timeline,
-      state.loggedUser.username
-    )
-    this.setState({ timeline: newTimeline })
-  }
-
-  handleContentCommentDeleted = (data) => {
-    const { props, state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
-
-    const newTimeline = props.removeCommentFromTimeline(
-      data.fields.content.content_id,
-      state.timeline
-    )
-    this.setState({ timeline: newTimeline })
-  }
-
   handleTranslateDocument = () => {
     const { state } = this
     handleTranslateHtmlContent(
@@ -905,12 +798,12 @@ export class HtmlDocument extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
-            loading={state.loadingTimeline}
+            loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage__timeline`}
             customColor={state.config.hexcolor}
             apiUrl={state.config.apiUrl}
             loggedUser={state.loggedUser}
-            timelineData={state.timeline}
+            timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
             newComment={state.newComment}
             newCommentAsFileList={state.newCommentAsFileList}
@@ -924,7 +817,7 @@ export class HtmlDocument extends React.Component {
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-            isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
             key='Timeline'
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
@@ -936,16 +829,17 @@ export class HtmlDocument extends React.Component {
             onClickTranslateComment={comment => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
-              state.translationTargetLanguageCode,
-              this.setState.bind(this)
+              state.translationTargetLanguageCode
             )}
-            onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+            onClickRestoreComment={props.handleRestoreComment}
             onClickEditComment={this.handleClickEditComment}
             onClickDeleteComment={this.handleClickDeleteComment}
             onClickOpenFileComment={this.handleClickOpenFileComment}
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
           />
         </PopinFixedRightPartContent>
       ) : null
@@ -979,6 +873,11 @@ export class HtmlDocument extends React.Component {
       state.mode !== APP_FEATURE_MODE.EDIT &&
       state.translationState === TRANSLATION_STATE.TRANSLATED
     )
+
+    const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
+    const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
+    const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
+
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -1006,7 +905,8 @@ export class HtmlDocument extends React.Component {
             }
           ]}
           isRefreshNeeded={state.showRefreshWarning}
-          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          contentVersionNumber={contentVersionNumber}
+          lastVersion={lastVersionNumber}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}
@@ -1090,4 +990,4 @@ export class HtmlDocument extends React.Component {
   }
 }
 
-export default translate()(Radium(appContentFactory(TracimComponent(HtmlDocument))))
+export default translate()(Radium(appContentFactory(HtmlDocument)))

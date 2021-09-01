@@ -14,7 +14,6 @@ import {
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentFile from '../fixture/content/contentFile.js'
 import { debug } from '../../src/debug.js'
-import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
 debug.config.apiUrl = 'http://unit.test:6543/api'
 
@@ -22,14 +21,16 @@ describe('<File />', () => {
   const props = {
     setApiUrl: () => { },
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
     registerLiveMessageHandlerList: () => { },
     registerCustomEventHandlerList: () => { },
     i18n: {},
     content: contentFile,
     t: key => key,
     isContentInFavoriteList: () => false,
-    loadFavoriteContentList: () => {}
+    loadFavoriteContentList: () => {},
+    data: debug,
+    timeline: []
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()
@@ -51,50 +52,6 @@ describe('<File />', () => {
 
   describe('TLM Handlers', () => {
     describe('eventType content', () => {
-      describe('handleContentCreated', () => {
-        describe('Create a new comment', () => {
-          it('should call addCommentToTimeline', () => {
-            const tlmData = {
-              fields: {
-                author: {
-                  avatar_url: null,
-                  public_name: 'Global manager',
-                  user_id: 1
-                },
-                content: {
-                  ...commentTlm,
-                  parent_id: contentFile.file.content_id,
-                  content_id: 9
-                }
-              }
-            }
-            wrapper.instance().handleContentCommentCreated(tlmData)
-            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
-          })
-        })
-
-        describe('Create a comment not related to the current file', () => {
-          const tlmData = {
-            fields: {
-              content: {
-                ...commentTlm,
-                parent_id: contentFile.file.content_id + 1,
-                content_id: 12
-              }
-            }
-          }
-          let oldTimelineLength = 0
-
-          before(() => {
-            oldTimelineLength = wrapper.state('timeline').length
-            wrapper.instance().handleContentCommentCreated(tlmData)
-          })
-
-          it('should not modify the timeline', () => {
-            expect(wrapper.state('timeline').length).to.equal(oldTimelineLength)
-          })
-        })
-      })
       describe('handleContentModified', () => {
         describe('Modify the fileName of the current content', () => {
           const tlmData = {
@@ -119,9 +76,6 @@ describe('<File />', () => {
 
           it('should be updated with the content modified', () => {
             expect(wrapper.state('newContent').filename).to.equal(tlmData.fields.content.filename)
-          })
-          it('should have the new revision in the timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].filename).to.equal(tlmData.fields.content.filename)
           })
           it('should have called buildBreadcrumbs()', () => {
             expect(buildBreadcrumbsSpy.calledOnce).to.equal(true)
@@ -148,9 +102,6 @@ describe('<File />', () => {
 
           it('should be updated with the content modified', () => {
             expect(wrapper.state('newContent').description).to.equal(tlmData.fields.content.description)
-          })
-          it('should have the new revision in the timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].description).to.equal(tlmData.fields.content.description)
           })
         })
 
@@ -242,9 +193,6 @@ describe('<File />', () => {
           it('should be deleted correctly', () => {
             expect(wrapper.state('newContent').is_deleted).to.equal(true)
           })
-          it('should have the new revision in the timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(true)
-          })
         })
 
         describe('Delete a content which is not the current one', () => {
@@ -290,9 +238,6 @@ describe('<File />', () => {
           it('should be restored correctly', () => {
             expect(wrapper.state('newContent').is_deleted).to.equal(false)
           })
-          it('should have the new revision in the timeline', () => {
-            expect(wrapper.state('timeline')[wrapper.state('timeline').length - 1].is_deleted).to.equal(false)
-          })
         })
 
         describe('Restore a content which is not the current one', () => {
@@ -313,23 +258,6 @@ describe('<File />', () => {
 
           it('should not be restored', () => {
             expect(wrapper.state('content').is_deleted).to.equal(true)
-          })
-        })
-      })
-    })
-
-    describe('eventType user', () => {
-      describe('handleUserModified', () => {
-        describe('If the user is the author of a revision or comment', () => {
-          it('should update the timeline with the data of the user', () => {
-            const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
-            wrapper.instance().handleUserModified(tlmData)
-
-            const listPublicNameOfAuthor = wrapper.state('timeline')
-              .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
-              .map(timelineItem => timelineItem.author.public_name)
-            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
-            expect(isNewName).to.be.equal(true)
           })
         })
       })

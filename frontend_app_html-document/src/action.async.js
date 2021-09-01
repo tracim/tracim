@@ -6,8 +6,8 @@ export const getHtmlDocContent = (apiUrl, workspaceId, contentId) =>
 export const getHtmlDocComment = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
 
-export const getHtmlDocRevision = (apiUrl, workspaceId, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions`)
+export const getHtmlDocRevision = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'modified:asc') =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}/revisions?page_token=${pageToken}&count=${count}&sort=${sort}`)
 
 export const putHtmlDocContent = (apiUrl, workspaceId, contentId, label, newContent) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/html-documents/${contentId}`, {

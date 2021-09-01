@@ -37,6 +37,24 @@ const mockPostContentComment200 = (apiUrl, workspaceId, contentId, newComment, c
     })
 }
 
+const mockGetContentComments200 = (apiUrl, workspaceId, contentId, commentPage, query = '?page_token=&count=0&sort=created:asc') => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents/${contentId}/comments${query}`)
+    .reply(200, commentPage)
+}
+
+const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, filePage, pageQuery = '&page_token=&count=0&sort=created:asc') => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents?parent_ids=${contentId}&content_type=file&namespaces_filter=content,publication${pageQuery}`)
+    .reply(200, filePage)
+}
+
+const mockGetContentRevisions200 = (apiUrl, workspaceId, contentType, contentId, revisionPage, query = '?page_token=&count=0&sort=created:asc') => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/${contentType}/${contentId}/revisions${query}`)
+    .reply(200, revisionPage)
+}
+
 const mockPutContentStatus204 = (apiUrl, workspaceId, contentId, appSlug, newStatusSlug) => {
   return nock(apiUrl)
     .put(`/workspaces/${workspaceId}/${appSlug}s/${contentId}/status`, {
@@ -134,5 +152,8 @@ export {
   mockGetUsernameAvailability500,
   mockGetWhoami,
   mockGetWhoamiWithDelay,
-  mockGetWhoamiFailure
+  mockGetWhoamiFailure,
+  mockGetContentComments200,
+  mockGetFileChildContent200,
+  mockGetContentRevisions200
 }

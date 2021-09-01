@@ -78,33 +78,35 @@ class PopinFixedContent extends React.Component {
                     </div>
                   )}
 
-                  {props.lastVersion && (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) && (
-                    <div
-                      className={classnames(
-                        'wsContentGeneric__content__left__top__version',
-                        `${props.customClass}__content__left__top__version`
-                      )}
-                    >
-                      {props.t(
-                        'Version #{{versionNumber}}', {
-                          versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
-                            ? props.lastVersion
-                            : props.content.number
-                        }
-                      )}
-                      {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
-                        <div
-                          className={classnames(
-                            'wsContentGeneric__content__left__top__lastversion',
-                            `${props.customClass}__content__left__top__lastversion`
-                          )}
-                        >
-                          ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
-                        </div>
-                      )}
-                      &nbsp;-&nbsp;
-                    </div>
-                  )}
+                  {props.lastVersion &&
+                   (props.appMode === APP_FEATURE_MODE.VIEW || props.appMode === APP_FEATURE_MODE.REVISION) &&
+                   (
+                     <div
+                       className={classnames(
+                         'wsContentGeneric__content__left__top__version',
+                         `${props.customClass}__content__left__top__version`
+                       )}
+                     >
+                       {props.t(
+                         'Version #{{versionNumber}}', {
+                           versionNumber: props.appMode === APP_FEATURE_MODE.VIEW && !props.isRefreshNeeded
+                             ? props.lastVersion
+                             : props.contentVersionNumber
+                         }
+                       )}
+                       {(props.appMode === APP_FEATURE_MODE.REVISION || props.isRefreshNeeded) && (
+                         <div
+                           className={classnames(
+                             'wsContentGeneric__content__left__top__lastversion',
+                             `${props.customClass}__content__left__top__lastversion`
+                           )}
+                         >
+                           ({props.t('latest version: {{versionNumber}}', { versionNumber: props.lastVersion })})
+                         </div>
+                       )}
+                       &nbsp;-&nbsp;
+                     </div>
+                   )}
 
                   {props.availableStatuses.length > 0 && props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
                     <SelectStatus
@@ -170,6 +172,7 @@ PopinFixedContent.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
   showReactions: PropTypes.bool,
+  contentVersionNumber: PropTypes.number,
   showTranslateButton: PropTypes.bool,
   onClickTranslateDocument: PropTypes.func,
   onClickRestoreDocument: PropTypes.func,
@@ -194,9 +197,9 @@ PopinFixedContent.defaultProps = {
   content: {
     is_archived: false,
     is_deleted: false,
-    number: 0,
     status: ''
   },
+  contentVersionNumber: 0,
   customClass: '',
   disableChangeTitle: false,
   favoriteState: '',

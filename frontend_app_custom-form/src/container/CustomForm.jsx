@@ -225,10 +225,6 @@ class CustomForm extends React.Component {
         created_raw: r.created,
         created: displayDistanceDate(r.created, loggedUser.lang),
         timelineType: 'revision',
-        commentList: r.comment_ids.map(ci => ({
-          timelineType: 'comment',
-          ...resCommentWithProperDate.find(c => c.content_id === ci)
-        })),
         number: i + 1
       }))
       .reduce((acc, rev) => [

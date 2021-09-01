@@ -269,7 +269,8 @@ describe('helper.js', () => {
       content: {
         modified: '2020-05-23T12:00:01',
         current_revision_id: 2,
-        current_revision_type: 'MODIFICATION'
+        current_revision_type: 'MODIFICATION',
+        version_number: 42
       }
     }
 
@@ -277,10 +278,9 @@ describe('helper.js', () => {
       {
         author: author,
         commentList: [],
-        comment_ids: [],
         created: 'One minute ago',
         created_raw: '2020-05-23T12:00:01',
-        number: 1,
+        version_number: 1,
         revision_id: 1,
         revision_type: 'CREATION',
         timelineType: 'revision'
@@ -288,10 +288,9 @@ describe('helper.js', () => {
       {
         author: author,
         commentList: [],
-        comment_ids: [],
         created: 'One minute ago',
         created_raw: '2020-05-23T12:00:01',
-        number: 0,
+        version_number: 0,
         revision_id: 1,
         revision_type: 'CREATION',
         timelineType: 'comment'
@@ -301,9 +300,6 @@ describe('helper.js', () => {
     const lastRevisionObject = timeline[timeline.length - 1]
     it('should add a new revision object to the end of the given list', () => {
       expect(lastRevisionObject.revision_id).to.be.equal(2)
-    })
-    it('should set a revision number to revision count + 1', () => {
-      expect(lastRevisionObject.number).to.be.equal(2)
     })
   })
 

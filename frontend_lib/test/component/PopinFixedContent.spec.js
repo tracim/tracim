@@ -9,6 +9,7 @@ describe('<PopinFixedContent />', () => {
   const props = {
     customClass: 'randomCustomClass',
     lastVersion: 1337,
+    contentVersionNumber: 42,
     appMode: APP_FEATURE_MODE.VIEW,
     actionList: [],
     availableStatuses: [],
@@ -22,7 +23,6 @@ describe('<PopinFixedContent />', () => {
     content: {
       is_archived: false,
       is_deleted: false,
-      number: 42,
       status: ''
     },
     disableChangeTitle: false,
@@ -71,8 +71,8 @@ describe('<PopinFixedContent />', () => {
         { wrappingComponent: RouterMock }
       )
 
-      it(`should display the version number ${props.content.number}`, () =>
-        expect(wrapper.find('div.wsContentGeneric__content__left__top__version')).to.have.text().contains(props.content.number)
+      it(`should display the version number ${props.contentVersionNumber}`, () =>
+        expect(wrapper.find('div.wsContentGeneric__content__left__top__version')).to.have.text().contains(props.contentVersionNumber)
       )
       it(`should display the last version number ${props.lastVersion}`, () =>
         expect(wrapper.find('.wsContentGeneric__content__left__top__lastversion')).to.have.text().contains(props.lastVersion)

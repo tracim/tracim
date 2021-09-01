@@ -502,7 +502,7 @@ class WorkspaceController(Controller):
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
         )
-        paged_contents = content_api.get_all(
+        contents_page = content_api.get_all(
             parent_ids=content_filter.parent_ids,
             complete_path_to_id=content_filter.complete_path_to_id,
             workspaces=[request.current_workspace],
@@ -515,8 +515,8 @@ class WorkspaceController(Controller):
             count=content_filter.count,
             page_token=content_filter.page_token,
         )
-        contents = [content_api.get_content_in_context(content) for content in paged_contents]
-        return PaginatedObject(paged_contents, contents)
+        contents = [content_api.get_content_in_context(content) for content in contents_page]
+        return PaginatedObject(contents_page, contents)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)

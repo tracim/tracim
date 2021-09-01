@@ -516,8 +516,10 @@ export const TIMELINE_TYPE = {
 export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => {
     // INFO - CH - 20210322 - since we don't have the millisecond from backend, content created at the same second
-    // may very happen. So we sort on content_id in that case. This isn't ideal
-    if (a.created_raw === b.created_raw) return parseInt(a.content_id) - parseInt(b.content_id)
+    // may very happen. So we sort on revision_id in that case. This isn't ideal
+    // As the aim is to have a stable sort revision_id is used since it is different for every timeline item.
+    // This would not be the case for content_id as it is the same for every revision item.
+    if (a.created_raw === b.created_raw) return parseInt(a.revision_id) - parseInt(b.revision_id)
     return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
   })
 }
@@ -534,8 +536,6 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
     ...revisionObject
   } = data.content
 
-  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision').length
-
   return [
     ...timeline,
     {
@@ -545,15 +545,11 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
         avatar_url: data.author.avatar_url,
         user_id: data.author.user_id
       },
-      commentList: [], // INFO - GB - 2020-05-29 For now it is not possible to get commentList and comment_ids via TLM message, and since such properties are not used, we leave them empty.
-      comment_ids: [],
       created: displayDistanceDate(data.content.modified, lang),
       created_raw: data.content.modified,
-      number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: TIMELINE_TYPE.REVISION,
-      hasBeenRead: isTokenClient
+      timelineType: TIMELINE_TYPE.REVISION
     }
   ]
 }
@@ -580,7 +576,7 @@ export const serialize = (objectToSerialize, propertyMap) => {
 
 export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
-  return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+  return timeline.filter(t => t.timelineType === 'revision').length
 }
 
 export const MINIMUM_CHARACTERS_USERNAME = 3

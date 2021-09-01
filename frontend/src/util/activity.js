@@ -32,7 +32,7 @@ const createSingleMessageActivity = (activityParams, messageList) => {
 
 const getCommentList = async (content, apiUrl) => {
   const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
-  return response.apiResponse.status === 200 ? response.body : []
+  return response.apiResponse.status === 200 ? response.body.items : []
 }
 
 /**

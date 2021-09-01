@@ -10,7 +10,7 @@ import {
   mockPutMyselfThreadRead200
 } from '../apiMock.js'
 import { contentThread } from '../fixture/contentThread.js'
-import { commentTlm, author, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
+import { author } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 import { debug } from '../../src/debug.js'
 
 debug.config.apiUrl = 'http://unit.test:6543/api'
@@ -19,7 +19,8 @@ describe('<Thread />', () => {
   const props = {
     setApiUrl: () => {},
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
+    loadTimeline: () => {},
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
 
@@ -30,7 +31,9 @@ describe('<Thread />', () => {
     },
     t: key => key,
     isContentInFavoriteList: () => false,
-    loadFavoriteContentList: () => {}
+    loadFavoriteContentList: () => {},
+    data: debug,
+    timeline: []
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()
@@ -51,94 +54,10 @@ describe('<Thread />', () => {
 
   describe('TLM Handlers', () => {
     describe('eventType content', () => {
-      const baseCommentTlm = {
-        author: author,
-        content: commentTlm
-      }
       const baseRevisionTlm = {
         author: author,
         content: contentThread.thread
       }
-
-      describe('handleCommentCreated', () => {
-        const tlmData = {
-          fields: {
-            ...baseCommentTlm,
-            content: {
-              ...commentTlm,
-              parent_id: contentThread.thread.content_id,
-              content_id: 9,
-              created: '2022-06-09T10:28:43.511Z'
-            }
-          }
-        }
-
-        before(() => {
-          props.addCommentToTimeline.resetHistory()
-          wrapper.instance().handleCommentCreated(tlmData)
-        })
-
-        it('should have called addCommentToTimeline', () => {
-          expect(props.addCommentToTimeline.calledOnce).to.equal(true)
-        })
-
-        // TODO - CH - 2020-06-05 - need to use the real buildTimelineFromCommentAndRevision function (not mocked)
-        // see https://github.com/tracim/tracim/issues/3143
-        // describe('Create 2 comments received in the wrong time order', () => {
-        //   const tlmData1 = {
-        //     content: {
-        //       ...commentTlm,
-        //       parent_id: contentThread.thread.content_id,
-        //       content_id: 10,
-        //       created: '2020-05-22T14:02:02Z'
-        //     }
-        //   }
-        //
-        //   const tlmData2 = {
-        //     content: {
-        //       ...commentTlm,
-        //       parent_id: contentThread.thread.content_id,
-        //       content_id: 11,
-        //       created: '2020-05-22T14:02:05Z'
-        //     }
-        //   }
-        //
-        //   before(function () {
-        //     wrapper.instance().handleCommentCreated(tlmData2)
-        //     wrapper.instance().handleCommentCreated(tlmData1)
-        //   })
-        //
-        //   const timelineLength = wrapper.state('timeline').length
-        //   it('should have correctly order the timeline with the last comment created at the end', () => {
-        //     expect(wrapper.state('timeline')[timelineLength - 1].content_id).to.equal(tlmData2.content.content_id)
-        //   })
-        //   it('should have correctly order the timeline with the second last comment created not at the end', () => {
-        //     expect(wrapper.state('timeline')[timelineLength - 2].content_id).to.equal(tlmData1.content.content_id)
-        //   })
-        // })
-
-        describe('Create a comment not related to the current thread', () => {
-          const tlmData = {
-            fields: {
-              ...baseCommentTlm,
-              content: {
-                ...baseCommentTlm.content,
-                parent_id: contentThread.thread.content_id + 1,
-                content_id: 12
-              }
-            }
-          }
-
-          before(() => {
-            props.addCommentToTimeline.resetHistory()
-            wrapper.instance().handleCommentCreated(tlmData)
-          })
-
-          it('should not call addCommentToTimeline', () => {
-            expect(props.addCommentToTimeline.calledOnce).to.equal(false)
-          })
-        })
-      })
 
       describe('handleContentChanged', () => {
         describe('Modify the label of the current content', () => {
@@ -296,23 +215,6 @@ describe('<Thread />', () => {
 
           it('should not update the state', () => {
             expect(wrapper.state('content').is_deleted).to.equal(true)
-          })
-        })
-      })
-    })
-
-    describe('eventType user', () => {
-      describe('handleUserModified', () => {
-        describe('If the user is the author of a revision or comment', () => {
-          it('should update the timeline with the data of the user', () => {
-            const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
-            wrapper.instance().handleUserModified(tlmData)
-
-            const listPublicNameOfAuthor = wrapper.state('timeline')
-              .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
-              .map(timelineItem => timelineItem.author.public_name)
-            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
-            expect(isNewName).to.be.equal(true)
           })
         })
       })

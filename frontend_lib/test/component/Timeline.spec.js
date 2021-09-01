@@ -49,7 +49,9 @@ describe('<Timeline />', () => {
     workspaceId: 1,
     translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
     translationTargetLanguageCode: 'en',
-    onChangeTranslationTargetLanguageCode: () => {}
+    onChangeTranslationTargetLanguageCode: () => {},
+    fetchMoreTimelineItems: () => {},
+    canFetchMoreTimelineItems: () => false
   }
 
   const TimelineWithHOC = withRouterMock(Timeline)
