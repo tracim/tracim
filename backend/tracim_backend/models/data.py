@@ -32,6 +32,7 @@ from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.sql import func
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
@@ -1297,14 +1298,12 @@ class Content(DeclarativeBase):
     ) -> Page:
         """Get the revisions of this Content in pages."""
         ContentRevisionROForNumber = aliased(ContentRevisionRO)
+        session = object_session(self)
         number_subquery = (
-            object_session(self)
-            .query(ContentRevisionROForNumber.revision_id)
+            session.query(func.count(ContentRevisionROForNumber.revision_id))
             .filter(ContentRevisionROForNumber.revision_id <= ContentRevisionRO.revision_id)
             .filter(ContentRevisionROForNumber.content_id == ContentRevisionRO.content_id)
             .correlate(ContentRevisionRO)
-            .subquery()
-            .count()
             # NOTE - 2021/08/16 - S.G. - the label() transforms the query in a scalar subquery
             # which is properly generated as
             #  SELECT ..., Q FROM content_revisions
@@ -1313,10 +1312,8 @@ class Content(DeclarativeBase):
             # which is incorrect
             .label("version_number")
         )
-        query = (
-            object_session(self)
-            .query(ContentRevisionRO, number_subquery)
-            .filter(ContentRevisionRO.content_id == self.content_id)
+        query = session.query(ContentRevisionRO, number_subquery).filter(
+            ContentRevisionRO.content_id == self.content_id
         )
         sort_clause = get_sort_expression(sort_order, ContentRevisionRO, {"modified": "updated"})
         query = query.order_by(sort_clause)
