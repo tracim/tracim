@@ -5351,9 +5351,14 @@ class TestWorkspaceContents(object):
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
 
-        web_testapp.get("/api/contents/{}/path".format(my_file.content_id), status=400)
+        res = web_testapp.get("/api/contents/{}/path".format(my_file.content_id), status=400)
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
         web_testapp.get("/api/contents/{}/path".format(second_dir.content_id), status=400)
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
         web_testapp.get("/api/contents/{}/path".format(another_content.content_id), status=400)
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
 
 
 @pytest.mark.usefixtures("base_fixture")
