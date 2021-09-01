@@ -5,6 +5,8 @@ import { mount } from 'enzyme'
 import { appContentFactory } from '../src/appContentFactory.js'
 import { status } from './fixture/status.js'
 import { commentList } from './fixture/contentCommentList.js'
+import { commentTlm } from './fixture/tracimLiveMessage/commentTlm.js'
+import { user } from './fixture/user.js'
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
 import { defaultDebug } from '../src/debug.js'
@@ -703,13 +705,5 @@ describe('appContentFactory.js', () => {
         expect(wrapper.instance().canLoadMoreTimelineItems()).to.be.equal(testCase.canLoadMoreItems)
       })
     }
-
-    it('should not fetch items if enough are available', async () => {
-      const wholeTimeline = (new Array(15)).fill().map(() => { return { timelineType: 'revision' } })
-      wrapper.instance().resetTimeline()
-      wrapper.instance().state.wholeTimeline = wholeTimeline
-      await wrapper.instance().loadMoreTimelineItems(getContentRevisionFunc)
-      expect(wrapper.instance().state.timeline.length).to.be.equal(wholeTimeline.length)
-    })
   })
 })

@@ -767,8 +767,7 @@ export function appContentFactory (WrappedComponent) {
       this.setState({ loadingTimeline: true })
       try {
         await this.loadMoreTimelineItems(getContentRevision)
-      }
-      finally {
+      } finally {
         this.setState({ loadingTimeline: false })
       }
     }
