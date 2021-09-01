@@ -57,6 +57,7 @@ export class Thread extends React.Component {
       timeline: [],
       newComment: '',
       newCommentAsFileList: [],
+      loading: false,
       newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
@@ -128,7 +129,6 @@ export class Thread extends React.Component {
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
-    this.loadTimeline()
   }
 
   handleContentChanged = data => {
@@ -179,7 +179,7 @@ export class Thread extends React.Component {
     this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
-  async updateTimelineAndContent () {
+  updateTimelineAndContent () {
     this.setState({
       newComment: getLocalStorageItem(
         this.state.appName,
@@ -188,7 +188,7 @@ export class Thread extends React.Component {
       ) || ''
     })
 
-    await this.loadContent()
+    this.loadContent()
     this.loadTimeline()
   }
 
@@ -245,12 +245,17 @@ export class Thread extends React.Component {
   loadContent = async () => {
     const { state } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
+    this.setState({ loadingContent: true })
+
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
     this.setState({
       content: response.body,
-      isLastTimelineItemCurrentToken: false
+      isLastTimelineItemCurrentToken: false,
+      loadingContent: false
     })
     this.setHeadTitle(response.body.label)
     this.buildBreadcrumbs(response.body)
@@ -261,6 +266,10 @@ export class Thread extends React.Component {
 
   loadTimeline = async () => {
     const { props, state } = this
+
+    // RJ - 2021-08-07 the state is set before the awaits, and is therefore not redundant
+    // with the setState at the end of the function
+    this.setState({ loadingTimeline: true })
 
     const fetchResultThreadComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
@@ -280,7 +289,7 @@ export class Thread extends React.Component {
       getDefaultTranslationState(state.config.system.config)
     )
 
-    this.setState({ timeline: revisionWithComment })
+    this.setState({ timeline: revisionWithComment, loadingTimeline: false })
   }
 
   buildBreadcrumbs = async content => {
@@ -471,6 +480,7 @@ export class Thread extends React.Component {
     return (
       <PopinFixed customClass={state.config.slug} customColor={state.config.hexcolor}>
         <PopinFixedHeader
+          loading={state.loadingContent}
           customClass={`${state.config.slug}__contentpage`}
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
@@ -530,6 +540,7 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
+                loading={state.loadingTimeline}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={state.config.hexcolor}
                 loggedUser={state.loggedUser}

@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+
+source "$HOME/.bashrc"
+python_version=${1:-3.6.14}
+pyenv shell "$python_version"
+
+cd backend
+pip install -r requirements-devtool.txt
+flake8 --version
+flake8

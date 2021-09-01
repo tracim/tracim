@@ -92,16 +92,22 @@ folderopen()
       width 0 // INFO - CH - 2019-06-06 - this allows the text-overflow ellipsis
     &__icon
       flex-grow 0
-      padding 0 pageSpacing
+      padding 0 standardSpacing 0 pageSpacing
       font-size bigIconSize
       color darkGrey
       text-align center
     &__name
-      flex 1
-      width 0 // INFO - CH - 2019-07-04 - this allows the text-overflow ellipsis
-      white-space nowrap
-      text-overflow ellipsis
+      display flex
       overflow hidden
+      align-items center
+      flex 1
+      white-space nowrap
+      span
+        flex 1
+        text-overflow ellipsis
+        overflow hidden
+      i
+        margin-right: 1ex
       color darkGrey
       font-weight bold
       ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name

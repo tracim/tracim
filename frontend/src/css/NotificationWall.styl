@@ -22,7 +22,7 @@
       display flex
       color fontColor
       font-weight normal
-      background-color veryLightGrey
+      background-color lightBlueOpacity
       padding standardSpacing
       min-height 60px
       align-items center
@@ -47,6 +47,7 @@
         &__space
           text-overflow ellipsis
           overflow hidden
+          font-weight bold
       &__circle
         &__wrapper
           margin 0
@@ -60,11 +61,10 @@
         background-color offWhite
         opacity 0.8
       &.isMention:not(.itemRead)
-        background warningOrangeOpacity
+        background lightOrange
       &.isMention.itemRead
-        background warningOrangeOpacity
+        background lightOrangeOpacity
       &:hover
-        background-color grey-hover
         color inherit
   &__wallClose
     height 0

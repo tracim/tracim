@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+script_dir="$(realpath $(dirname $0))"
+backend_dir="$script_dir/../../backend"
+root_dir="${1}"
+"${backend_dir}"/create_test_storage_dir.sh "$root_dir"
+cp -r frontend/dist/assets/branding.sample frontend/dist/assets/branding
