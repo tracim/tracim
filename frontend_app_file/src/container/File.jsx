@@ -151,7 +151,6 @@ export class File extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
     )
-    props.loadTimeline(getFileRevision)
   }
 
   handleContentModified = (data) => {
@@ -221,7 +220,7 @@ export class File extends React.Component {
     })
 
     this.loadContent(pageToLoad)
-    props.loadTimeline(getFileRevision)
+    props.loadTimeline(getFileRevision, this.state.content)
 
     if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }

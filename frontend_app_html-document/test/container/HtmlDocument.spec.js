@@ -25,6 +25,7 @@ describe('<HtmlDocument />', () => {
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
     loadFavoriteContentList: () => { },
+    loadTimeline: () => { },
     setApiUrl: () => { },
     t: key => key,
     isContentInFavoriteList: () => false,
