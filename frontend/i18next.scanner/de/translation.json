@@ -486,7 +486,7 @@
   "and": "und",
   "and {{numberOfAuthors}} other people": "und {{numberOfAuthors}} andere Leute",
   "{{numberOfContents}} contents": "{{numberOfContents}} Inhalte",
-  "{{numberOfUsers}} user": "{{numberOfUsers}} Benutzer",
+  "{{numberOfUsers}} users": "{{numberOfUsers}} Benutzer",
   "{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces": "{{author}} hat {{numberOfContribution}} Beiträge in {{numberOfWorkspaces}} Bereichen geleistet",
   "{{author}} made {{numberOfContribution}} contributions on {{content}}": "{{author}} hat {{numberOfContribution}} Beiträge zu {{content}} geleistet",
   "{{author}} made {{numberOfContribution}} contributions": "{{author}} hat {{numberOfContribution}} Beiträge geleistet",

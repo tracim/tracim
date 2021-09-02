@@ -6,7 +6,7 @@
   "{{author}} reacted to {{content}} with {{reaction}}": "{{author}} reagiu a {{content}} com {{reaction}}",
   "{{author}} removed their reaction {{reaction}} to {{content}}": "{{author}} eliminou sua reacção {{reaction}} a {{content}}",
   "{{numberOfContents}} contents": "{{numberOfContents}} conteúdos",
-  "{{numberOfUsers}} user": "{{numberOfUsers}} utilizadores",
+  "{{numberOfUsers}} users": "{{numberOfUsers}} utilizadores",
   "and": "e",
   "and {{numberOfAuthors}} other people": "e {{numberOfAuthors}} outras pessoas",
   "in {{numberOfWorkspaces}} spaces": "em {{numberOfWorkspaces}} espaços",

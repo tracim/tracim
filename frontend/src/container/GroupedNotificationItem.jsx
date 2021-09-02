@@ -58,9 +58,9 @@ export class GroupedNotificationItem extends React.Component {
     }
 
     const userList = uniqBy(notification.group.map(notification => notification.user), 'userId')
-    const escapedUser = userList.length > 1
-      ? t('{{numberOfUsers}} user', { numberOfUsers: userList.length })
-      : escapeHtml(notification.group[0].user.publicName)
+    const escapedUser = userList.length === 1 && userList[0]
+      ? escapeHtml(userList[0].publicName)
+      : t('{{numberOfUsers}} users', { numberOfUsers: userList.length })
 
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
