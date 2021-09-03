@@ -155,19 +155,32 @@ class EventApi:
         related_to_content_ids: Optional[List[int]] = None,
         include_not_sent: bool = False,
     ) -> Query:
-        event_query = self._session.query(Event.event_id)
+        query = self._session.query(Message).join(Event)
         if workspace_ids:
-            event_query = event_query.filter(Event.workspace_id.in_(workspace_ids))
+            query = query.filter(Event.workspace_id.in_(workspace_ids))
         if related_to_content_ids:
-            event_query = event_query.filter(
+            query = query.filter(
                 or_(
                     Event.content["content_id"].as_integer().in_(related_to_content_ids),
                     Event.content["parent_id"].as_integer().in_(related_to_content_ids),
                 )
             )
+        if not include_not_sent:
+            query = query.filter(Message.sent != None)  # noqa: E711
+        if event_id:
+            query = query.filter(Message.event_id == event_id)
+        if user_id:
+            query = query.filter(Message.receiver_id == user_id)
+        if read_status == ReadStatus.READ:
+            query = query.filter(Message.read != null())
+        elif read_status == ReadStatus.UNREAD:
+            query = query.filter(Message.read == null())
+        else:
+            # ALL doesn't need any filtering and is the only other handled case
+            assert read_status == ReadStatus.ALL
 
-        event_query = self._filter_event_types(event_query, include_event_types, False)
-        event_query = self._filter_event_types(event_query, exclude_event_types, True)
+        query = self._filter_event_types(query, include_event_types, False)
+        query = self._filter_event_types(query, exclude_event_types, True)
 
         if exclude_author_ids:
             for author_id in exclude_author_ids:
@@ -177,34 +190,16 @@ class EventApi:
                 # know whether a JSON field is null. However, this does not work on
                 # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
 
-                event_query = event_query.filter(
+                query = query.filter(
                     or_(
                         cast(Event.author, String) == text("'null'"),
                         Event.author["user_id"].as_integer() != author_id,
                     )
                 )
 
-        message_query = self._session.query(Message).join(
-            Event, Message.event_id.in_(event_query.subquery())
-        )
-
-        if not include_not_sent:
-            message_query = message_query.filter(Message.sent != None)  # noqa: E711
-        if event_id:
-            message_query = message_query.filter(Message.event_id == event_id)
-        if user_id:
-            message_query = message_query.filter(Message.receiver_id == user_id)
-        if read_status == ReadStatus.READ:
-            message_query = message_query.filter(Message.read != null())
-        elif read_status == ReadStatus.UNREAD:
-            message_query = message_query.filter(Message.read == null())
-        else:
-            # ALL doesn't need any filtering and is the only other handled case
-            assert read_status == ReadStatus.ALL
-
         if after_event_id:
-            message_query = message_query.filter(Message.event_id > after_event_id)
-        return message_query
+            query = query.filter(Message.event_id > after_event_id)
+        return query
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
         try:
