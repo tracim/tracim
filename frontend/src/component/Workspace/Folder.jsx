@@ -54,118 +54,122 @@ class Folder extends React.Component {
         (a.slug === HACK_COLLABORA_CONTENT_TYPE(props.contentType).slug && props.folderData.subContentTypeList.includes('file'))
       )
 
+    const isActive = props.folderData.isOpen && folderContentList.length > 0
+
     return (
       <div
         className={classnames('folder', {
-          active: props.folderData.isOpen && folderContentList.length > 0,
+          active: isActive,
           'item-last': props.isLast,
           read: true // props.readStatusList.includes(props.folderData.id) // Côme - 2018/11/27 - need to decide what we do for folder read status. See tracim/tracim #1189
         })}
         data-cy={`folder_${props.folderData.id}`}
         id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.folderData.id}`}
-        ref={props.connectDropTarget}
       >
         <div
           // Côme - 2018/11/06 - the .primaryColorBorderLightenHover is used by folder__header__triangleborder and folder__header__triangleborder__triangle
           // since they have the border-top-color: inherit on hover
-          className='folder__header align-items-center'
           onClick={(e) => props.onClickFolder(e, props.folderData.id)}
           title={props.folderData.label}
-          ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragPreview : undefined}
+          ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDropTarget : undefined}
         >
-          <div className='folder__header__triangleborder'>
-            <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
-          </div>
-
           <div
-            className='folder__header__dragPreview'
-            ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : undefined}
+            className='folder__header align-items-center'
+            ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragPreview : undefined}
           >
+
+            <div className={classnames('folder__header__triangleborder', { open: isActive })}>
+              <div className='folder__header__triangleborder__triangle primaryColorFontLighten' />
+            </div>
             <div
-              className='folder__header__icon'
-              title={props.t('Folder')}
-              style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
+              className='folder__header__dragPreview'
+              ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : undefined}
             >
-              <i className={classnames('fa-fw', this.calculateIcon())} />
-            </div>
+              <div
+                className='folder__header__icon'
+                title={props.t('Folder')}
+                style={{ color: props.contentType.find(c => c.slug === 'folder').hexcolor }}
+              >
+                <i className={props.isDragging ? 'fas fa-arrows-alt' : classnames('fa-fw', this.calculateIcon())} />
+              </div>
 
-            <div className='folder__header__name'>
-              <span>{props.folderData.label}</span>
-              {props.loading && <>&nbsp;<Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /></>}
-            </div>
-          </div>
-
-          <div className='folder__header__button'>
-            <div className='folder__header__button__addbtn'>
-              {props.userRoleIdInWorkspace >= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
-                <DropdownMenu
-                  buttonOpts={
-                    <span>
-                      <span className='folder__header__button__addbtn__text-desktop'>
-                        {`${props.t('Create in folder')}...`}
-                      </span>
-                      <span className='folder__header__button__addbtn__text-responsive'>
-                        <i className='folder__header__button__addbtn__text-responsive__iconplus fas fa-plus' />
-                      </span>
-                    </span>
-                  }
-                  buttonTooltip={props.t('Create in folder')}
-                  buttonCustomClass='folder__header__button__addbtn__text outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
-                  isButton
-                >
-                  {folderAvailableApp.map(app =>
-                    <button
-                      className='transparentButton'
-                      onClick={e => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        props.onClickCreateContent(e, props.folderData.id, app.slug)
-                      }}
-                      key={`${props.folderData.id}__${app.slug}`}
-                    >
-                      <i
-                        className={`fa-fw ${app.faIcon}`}
-                        style={{ color: app.hexcolor }}
-                      />
-                      {props.t(app.creationLabel)}
-                    </button>
-                  )}
-                </DropdownMenu>
-              )}
-
-              <div className='d-none d-md-flex' title={props.t('Actions')}>
-                <BtnExtandedAction
-                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                  onClickExtendedAction={{
-                    edit: {
-                      callback: e => props.onClickExtendedAction.edit(e, props.folderData),
-                      label: props.t('Edit'),
-                      allowedRoleId: ROLE.contentManager.id
-                    },
-                    download: {
-                      callback: e => props.onClickExtendedAction.download(e, props.folderData),
-                      label: props.t('Download'),
-                      allowedRoleId: ROLE.reader.id
-                    },
-                    archive: {
-                      callback: e => props.onClickExtendedAction.archive(e, props.folderData),
-                      label: props.t('Archive'),
-                      allowedRoleId: ROLE.contentManager.id
-                    },
-                    delete: {
-                      callback: e => props.onClickExtendedAction.delete(e, props.folderData),
-                      label: props.t('Delete'),
-                      allowedRoleId: ROLE.contentManager.id
-                    }
-                  }}
-                  folderData={props.folderData}
-                />
+              <div className='folder__header__name'>
+                <span>{props.folderData.label}</span>
+                {props.loading && <>&nbsp;<Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /></>}
               </div>
             </div>
+
+            <div className='folder__header__button'>
+              <div className='folder__header__button__addbtn'>
+                {props.userRoleIdInWorkspace >= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
+                  <DropdownMenu
+                    buttonOpts={
+                      <span>
+                        <span className='folder__header__button__addbtn__text-desktop'>
+                          {`${props.t('Create in folder')}...`}
+                        </span>
+                        <span className='folder__header__button__addbtn__text-responsive'>
+                          <i className='folder__header__button__addbtn__text-responsive__iconplus fas fa-plus' />
+                        </span>
+                      </span>
+                    }
+                    buttonTooltip={props.t('Create in folder')}
+                    buttonCustomClass='folder__header__button__addbtn__text outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
+                    isButton
+                  >
+                    {folderAvailableApp.map(app =>
+                      <button
+                        className='transparentButton'
+                        onClick={e => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          props.onClickCreateContent(e, props.folderData.id, app.slug)
+                        }}
+                        key={`${props.folderData.id}__${app.slug}`}
+                      >
+                        <i
+                          className={`fa-fw ${props.faIcon}`}
+                          style={{ color: app.hexcolor }}
+                        />
+                        {props.t(app.creationLabel)}
+                      </button>
+                    )}
+                  </DropdownMenu>
+                )}
+
+                <div className='d-none d-md-flex' title={props.t('Actions')}>
+                  <BtnExtandedAction
+                    userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+                    onClickExtendedAction={{
+                      edit: {
+                        callback: e => props.onClickExtendedAction.edit(e, props.folderData),
+                        label: props.t('Edit'),
+                        allowedRoleId: ROLE.contentManager.id
+                      },
+                      download: {
+                        callback: e => props.onClickExtendedAction.download(e, props.folderData),
+                        label: props.t('Download'),
+                        allowedRoleId: ROLE.reader.id
+                      },
+                      archive: {
+                        callback: e => props.onClickExtendedAction.archive(e, props.folderData),
+                        label: props.t('Archive'),
+                        allowedRoleId: ROLE.contentManager.id
+                      },
+                      delete: {
+                        callback: e => props.onClickExtendedAction.delete(e, props.folderData),
+                        label: props.t('Delete'),
+                        allowedRoleId: ROLE.contentManager.id
+                      }
+                    }}
+                    folderData={props.folderData}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className='folder__header__status' />
           </div>
-
-          <div className='folder__header__status' />
-
         </div>
 
         <div className='folder__content'>

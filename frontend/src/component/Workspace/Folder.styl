@@ -25,23 +25,18 @@ folderopen()
 
 .folder
   padding-left 20px
-  & > .folder__header
+  .folder__header
     folderopen()
     &:hover
       background-color grey-hover
-  & > .folder__content
+  > .folder__content
     folderclose()
     & > .file, > .folder
       folderclose()
   &.active
-    & > .folder__header
-      .folder__header__triangleborder
-        display block
-        &__triangle
-          display block
-    & > .folder__content
+    > .folder__content
       folderopen()
-      & > .file, > .folder
+      > .file, > .folder
         folderopen()
   &__header
     position relative
@@ -77,6 +72,10 @@ folderopen()
         border-style solid
         border-width 15px 20px 0 20px
         border-color lightGrey transparent transparent transparent
+      &.open
+        display block
+        .folder__header__triangleborder__triangle
+          display block
     &__dragHandle
       position absolute
       padding 0 standardSpacing
@@ -110,7 +109,7 @@ folderopen()
         margin-right: 1ex
       color darkGrey
       font-weight bold
-      ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name
+      ^[0].read > div > ^[1] &, ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name
         font-weight normal
     &__content
       position relative
