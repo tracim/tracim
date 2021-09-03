@@ -199,7 +199,12 @@ class EventApi:
 
         if after_event_id:
             query = query.filter(Message.event_id > after_event_id)
-        return query
+        # HACK - G.M - 2021-09-03 - Subquery hack:
+        # This hack change the way the query is made without changing the result,
+        # It as been (slightly) empirically tested to give better performance result on postgresql
+        # 13 dues to wrong guess from postgresql.
+        main_query = self._session.query(query.subquery())
+        return main_query
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
         try:
