@@ -49,8 +49,6 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getLoggedUserCalendar,
-  getWorkspaceDetail,
   getWorkspaceMemberList,
   getMyselfWorkspaceList,
   getNotificationList,
@@ -63,7 +61,6 @@ import {
 import {
   newFlashMessage,
   removeFlashMessage,
-  setWorkspaceAgendaUrl,
   setConfig,
   setAppList,
   setContentTypeList,
@@ -71,9 +68,7 @@ import {
   setNotificationList,
   setUserConfiguration,
   setUserConnected,
-  setWorkspaceDetail,
   setWorkspaceList,
-  setWorkspaceMemberList,
   setBreadcrumbs,
   appendBreadcrumbs,
   setWorkspaceListMemberList,
@@ -95,74 +90,9 @@ import PublicProfile from './PublicProfile.jsx'
 import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
+import WorkspacePage from './WorkspacePage.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
-
-const WorkspacePage = connect(({ appList }) => ({ appList }))(translate()(class extends React.Component {
-  constructor (props) {
-    super(props)
-    this.updateCurrentWorkspace()
-  }
-
-  async updateCurrentWorkspace () {
-    await Promise.all([this.loadMemberList(), this.loadWorkspaceDetail()])
-  }
-
-  async loadMemberList () {
-    const { props } = this
-
-    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.workspaceId))
-    switch (fetchWorkspaceMemberList.status) {
-      case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
-    }
-  }
-
-  async loadCalendarDetail () {
-    const { props } = this
-
-    const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
-    switch (fetchCalendar.status) {
-      case 200: {
-        const currentWorkspaceId = parseInt(props.workspaceId)
-        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || { agenda_url: '' }).agenda_url
-        this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
-        break
-      }
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
-    }
-  }
-
-  async loadWorkspaceDetail () {
-    const { props } = this
-
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.workspaceId))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
-          this.loadCalendarDetail()
-        }
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
-    }
-  }
-
-  componentDidUpdate (prevProps) {
-    const newWorkspaceId = Number(this.props.workspaceId)
-    const oldWorkspaceId = Number(prevProps.workspaceId)
-    if (newWorkspaceId !== oldWorkspaceId) {
-      this.updateCurrentWorkspace()
-    }
-  }
-
-  render = () => this.props.children
-}))
 
 export class Tracim extends React.Component {
   constructor (props) {
@@ -565,7 +495,7 @@ export class Tracim extends React.Component {
           <Route
             path='/ui/workspaces/:idws?'
             render={({ match }) => (
-              <WorkspacePage workspaceId={match.params.idws}>
+              <WorkspacePage workspaceId={match.params.idws} history={props.history}>
                 <Route
                   exact
                   path={PAGE.WORKSPACE.ROOT}
