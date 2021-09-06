@@ -8,9 +8,9 @@ const publicationLabel = 'publication'
 
 describe('In recent activities', () => {
   before(function () {
+    this.skip()
     cy.resetDB()
     cy.setupBaseDB()
-    this.skip()
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
