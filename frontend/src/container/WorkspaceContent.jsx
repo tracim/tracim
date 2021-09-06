@@ -38,26 +38,22 @@ import {
   getSubFolderShareContentList,
   getShareFolderContentList,
   getContentPathList,
-  getWorkspaceMemberList,
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
   putFolderRead,
-  putContentItemMove,
-  getWorkspaceDetail
+  putContentItemMove
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
   setWorkspaceContentList,
   setWorkspaceFolderContentList,
   setWorkspaceShareFolderContentList,
-  setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen,
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  setWorkspaceDetail,
   setHeadTitle
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
@@ -155,7 +151,7 @@ export class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = props.match.params.idws
 
-    this.loadAllWorkspaceContent(wsToLoad, true, true)
+    this.loadAllWorkspaceContent(wsToLoad, true)
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -197,11 +193,7 @@ export class WorkspaceContent extends React.Component {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
   }
 
-  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false, shouldLoadDetails = false) => {
-    if (shouldLoadDetails) {
-      this.loadWorkspaceDetail()
-    }
-
+  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false) => {
     try {
       await this.loadContentList(workspaceId)
       await this.loadShareFolderContent(workspaceId)
@@ -229,21 +221,6 @@ export class WorkspaceContent extends React.Component {
 
     if (props.currentWorkspace.label) {
       props.dispatch(setHeadTitle(buildHeadTitle([filterName, props.currentWorkspace.label])))
-    }
-  }
-
-  loadWorkspaceDetail = async () => {
-    const { props } = this
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
     }
   }
 
@@ -287,7 +264,6 @@ export class WorkspaceContent extends React.Component {
         )
     )
 
-    const wsMember = await props.dispatch(getWorkspaceMemberList(workspaceId))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
 
     switch (fetchContentList.status) {
@@ -324,12 +300,6 @@ export class WorkspaceContent extends React.Component {
         props.history.push(PAGE.HOME)
         throw new Error('Error while loading content list')
       }
-    }
-
-    switch (wsMember.status) {
-      case 200: props.dispatch(setWorkspaceMemberList(wsMember.json)); break
-      case 401: break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading members list'), 'warning'))
     }
 
     switch (wsReadStatus.status) {

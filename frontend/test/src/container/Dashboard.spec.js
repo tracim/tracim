@@ -55,7 +55,7 @@ describe('<Dashboard />', () => {
     user: user,
     contentType: contentType,
     appList: appList,
-    curWs: {
+    currentWorkspace: {
       ...firstWorkspace,
       recentActivityList: []
     },

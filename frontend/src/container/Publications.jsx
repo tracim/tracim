@@ -43,8 +43,6 @@ import {
 } from '../util/helper.js'
 import {
   getPublicationPage,
-  getWorkspaceDetail,
-  getWorkspaceMemberList,
   postThreadPublication,
   postPublicationFile
 } from '../action-creator.async.js'
@@ -58,8 +56,6 @@ import {
   setFirstComment,
   setPublicationList,
   setPublicationNextPage,
-  setWorkspaceDetail,
-  setWorkspaceMemberList,
   updatePublication,
   updatePublicationList,
   appendPublicationList
@@ -112,11 +108,9 @@ export class Publications extends React.Component {
   }
 
   componentDidMount () {
-    this.loadWorkspaceDetail()
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.getPublicationPage()
-    if (this.props.currentWorkspace.memberList.length === 0) this.loadMemberList()
     this.gotToCurrentPublication()
   }
 
@@ -134,7 +128,6 @@ export class Publications extends React.Component {
   componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
     if (prevProps.match.params.idws !== props.match.params.idws) {
-      this.loadWorkspaceDetail()
       this.setHeadTitle()
       this.buildBreadcrumbs()
       this.getPublicationPage()
@@ -143,8 +136,6 @@ export class Publications extends React.Component {
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
       globalThis.tinymce.remove(`#${wysiwygId}`)
     }
-
-    if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
 
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
       this.gotToCurrentPublication()
@@ -264,34 +255,6 @@ export class Publications extends React.Component {
   handleContentDeleted = (data) => {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     this.props.dispatch(removePublication(data.fields.content.content_id))
-  }
-
-  loadWorkspaceDetail = async () => {
-    const { props } = this
-
-    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
-    // with the setState at the end of the function
-    this.setState({ loading: true })
-
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        this.setHeadTitle()
-        this.buildBreadcrumbs()
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default:
-        props.dispatch(newFlashMessage(
-          `${props.t('An error has happened while getting')} ${props.t('space detail')}`,
-          'warning'
-        ))
-        break
-    }
-    this.setState({ loading: false })
   }
 
   handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
@@ -539,17 +502,6 @@ export class Publications extends React.Component {
     const { props } = this
     handleClickCopyLink(content)
     props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
-  }
-
-  loadMemberList = async () => {
-    const { props } = this
-
-    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.match.params.idws))
-    switch (fetchWorkspaceMemberList.status) {
-      case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
-    }
   }
 
   handleClickReorder = () => {
