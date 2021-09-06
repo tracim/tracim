@@ -15,8 +15,6 @@ import {
   ComposedIcon
 } from 'tracim_frontend_lib'
 
-// run cypress test
-
 class ContentItem extends React.Component {
   render () {
     const { props } = this
