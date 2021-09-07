@@ -1,3 +1,5 @@
+// 2021-09-06 - MB - Unstable test. See : https://github.com/tracim/tracim/issues/4905
+
 import { PAGES } from '../../support/urls_commands'
 
 let workspaceId
@@ -6,6 +8,7 @@ const publicationLabel = 'publication'
 
 describe('In recent activities', () => {
   before(function () {
+    this.skip()
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
