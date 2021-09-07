@@ -49,13 +49,13 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
+  getWorkspaceMemberList,
   getMyselfWorkspaceList,
   getNotificationList,
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
   getUserMessagesSummary,
-  getWorkspaceMemberList,
   getAccessibleWorkspaces
 } from '../action-creator.async.js'
 import {
@@ -90,6 +90,7 @@ import PublicProfile from './PublicProfile.jsx'
 import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
+import WorkspacePage from './WorkspacePage.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 
@@ -493,8 +494,8 @@ export class Tracim extends React.Component {
 
           <Route
             path='/ui/workspaces/:idws?'
-            render={() =>
-              <>
+            render={({ match }) => (
+              <WorkspacePage workspaceId={match.params.idws} history={props.history}>
                 <Route
                   exact
                   path={PAGE.WORKSPACE.ROOT}
@@ -552,7 +553,8 @@ export class Tracim extends React.Component {
                   path={PAGE.WORKSPACE.AGENDA(':idws')}
                   render={() => <AppFullscreenRouter />}
                 />
-              </>}
+              </WorkspacePage>
+            )}
           />
 
           <Route path={PAGE.ACCOUNT} render={() => <Account />} />

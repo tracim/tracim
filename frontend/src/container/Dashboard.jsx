@@ -21,21 +21,15 @@ import {
   addExternalLinksIcons
 } from 'tracim_frontend_lib'
 import {
-  getWorkspaceDetail,
-  getWorkspaceMemberList,
   getMyselfKnownMember,
   getSubscriptions,
   postWorkspaceMember,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify,
-  getLoggedUserCalendar
+  putMyselfWorkspaceDoNotify
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  setWorkspaceDetail,
-  setWorkspaceMemberList,
   updateUserWorkspaceSubscriptionNotif,
-  setWorkspaceAgendaUrl,
   setBreadcrumbs,
   setHeadTitle
 } from '../action-creator.sync.js'
@@ -60,9 +54,6 @@ export class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws
-        ? parseInt(props.match.params.idws)
-        : null, // this is used to avoid handling the parseInt every time
       advancedDashboardOpenedId: null,
       newMember: {
         id: '',
@@ -82,7 +73,6 @@ export class Dashboard extends React.Component {
     }
 
     props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.REFRESH_DASHBOARD_MEMBER_LIST, handler: this.handleRefreshDashboardMemberList },
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
@@ -93,23 +83,19 @@ export class Dashboard extends React.Component {
     ])
   }
 
-  handleRefreshDashboardMemberList = () => this.loadMemberList()
-
   handleAllAppChangeLanguage = () => {
     this.buildBreadcrumbs()
     this.setHeadTitle()
   }
 
   handleWorkspaceModified = data => {
-    if (this.props.curWs.id !== data.fields.workspace.workspace_id) return
+    if (this.props.currentWorkspace.id !== data.fields.workspace.workspace_id) return
     this.setHeadTitle()
     this.buildBreadcrumbs()
   }
 
   async componentDidMount () {
     this.setHeadTitle()
-    await this.loadWorkspaceDetail()
-    this.loadMemberList()
     this.loadNewRequestNumber()
     this.buildBreadcrumbs()
   }
@@ -117,12 +103,11 @@ export class Dashboard extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { props } = this
 
-    if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
+    if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
 
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
     this.setState({
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
       advancedDashboardOpenedId: null,
       displayNewMemberForm: false,
       newMember: {
@@ -134,8 +119,6 @@ export class Dashboard extends React.Component {
         isEmail: false
       }
     })
-    await this.loadWorkspaceDetail()
-    this.loadMemberList()
     this.loadNewRequestNumber()
     this.buildBreadcrumbs()
   }
@@ -145,56 +128,10 @@ export class Dashboard extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  loadWorkspaceDetail = async () => {
-    const { props } = this
-
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
-          this.loadCalendarDetail()
-        }
-        this.setHeadTitle()
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
-    }
-  }
-
-  loadCalendarDetail = async () => {
-    const { props } = this
-
-    const fetchCalendar = await props.dispatch(getLoggedUserCalendar())
-    switch (fetchCalendar.status) {
-      case 200: {
-        const currentWorkspaceId = parseInt(props.match.params.idws)
-        const currentWorkspaceAgendaUrl = (fetchCalendar.json.find(a => a.workspace_id === currentWorkspaceId) || { agenda_url: '' }).agenda_url
-        this.props.dispatch(setWorkspaceAgendaUrl(currentWorkspaceAgendaUrl))
-        break
-      }
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('agenda details')}`, 'warning')); break
-    }
-  }
-
-  loadMemberList = async () => {
-    const { props } = this
-
-    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.match.params.idws))
-    switch (fetchWorkspaceMemberList.status) {
-      case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
-    }
-  }
-
   loadNewRequestNumber = async () => {
     const { props } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
     if (userRoleIdInWorkspace < ROLE.workspaceManager.id) return
 
     const fetchGetWorkspaceSubscriptions = await props.dispatch(getSubscriptions(props.currentWorkspace.id))
@@ -225,18 +162,18 @@ export class Dashboard extends React.Component {
     const { props } = this
 
     const headTitle = buildHeadTitle(
-      [props.t('Dashboard'), props.curWs.label]
+      [props.t('Dashboard'), props.currentWorkspace.label]
     )
     props.dispatch(setHeadTitle(headTitle))
   }
 
   buildBreadcrumbs = () => {
-    const { props, state } = this
+    const { props } = this
 
     const breadcrumbsList = [{
-      link: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
+      link: PAGE.WORKSPACE.DASHBOARD(props.currentWorkspace.id),
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.curWs.label,
+      label: props.currentWorkspace.label,
       isALink: true
     }, {
       link: '',
@@ -258,7 +195,7 @@ export class Dashboard extends React.Component {
 
   handleSearchUser = async personalDataToSearch => {
     const { props } = this
-    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.curWs.id))
+    const fetchUserKnownMemberList = await props.dispatch(getMyselfKnownMember(personalDataToSearch, props.currentWorkspace.id))
     switch (fetchUserKnownMemberList.status) {
       case 200: this.setState({ searchedKnownMemberList: fetchUserKnownMemberList.json }); break
       default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('known members list')}`, 'warning')); break
@@ -327,7 +264,7 @@ export class Dashboard extends React.Component {
       this.setState({ newMember: { ...state.newMember, id: newMemberInKnownMemberList.user_id } })
     }
 
-    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.curWs.id, {
+    const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.currentWorkspace.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
       email: state.newMember.isEmail ? state.newMember.personalData : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
@@ -382,7 +319,7 @@ export class Dashboard extends React.Component {
   handleClickRemoveMember = async memberId => {
     const { props } = this
 
-    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.curWs.id, memberId))
+    const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.currentWorkspace.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
         props.dispatch(newFlashMessage(props.t('Member removed'), 'info'))
@@ -404,30 +341,30 @@ export class Dashboard extends React.Component {
           creationLabel: ''
         },
         props.user,
-        findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST),
-        { ...props.curWs, workspace_id: props.curWs.id }
+        findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST),
+        { ...props.currentWorkspace, workspace_id: props.currentWorkspace.id }
       )
     } else {
-      props.dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), { workspace_id: props.curWs.id })
+      props.dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), { workspace_id: props.currentWorkspace.id })
     }
 
-    this.setState({ advancedDashboardOpenedId: props.curWs.id })
+    this.setState({ advancedDashboardOpenedId: props.currentWorkspace.id })
   }
 
   handleClickAddNotification = async () => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, true))
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, true))
     switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.curWs.id, true)); break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, true)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
 
   handleClickRemoveNotification = async () => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.curWs.id, false))
+    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, false))
     switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.curWs.id, false)); break
+      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, false)); break
       default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
     }
   }
@@ -435,16 +372,16 @@ export class Dashboard extends React.Component {
   render () {
     const { props, state } = this
 
-    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.curWs.memberList, ROLE_LIST)
+    const userRoleIdInWorkspace = findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST)
 
     // INFO - GB - 2019-08-29 - these filters are made temporarily by the frontend, but may change to have all the intelligence in the backend
     // https://github.com/tracim/tracim/issues/2326
     let contentTypeButtonList = []
-    if (props.curWs.publicationEnabled) {
+    if (props.currentWorkspace.publicationEnabled) {
       contentTypeButtonList.push({
         slug: 'publications',
         creationLabel: props.t('Publish some information'),
-        route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
+        route: PAGE.WORKSPACE.PUBLICATIONS(props.currentWorkspace.id),
         hexcolor: publicationColor,
         faIcon: 'fas fa-stream'
       })
@@ -453,7 +390,7 @@ export class Dashboard extends React.Component {
     contentTypeButtonList = contentTypeButtonList.concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === ROLE.contributor.id ? app.slug !== 'contents/folder' : true)
-        .filter(app => app.slug === 'agenda' ? props.curWs.agendaEnabled : true)
+        .filter(app => app.slug === 'agenda' ? props.currentWorkspace.agendaEnabled : true)
         .filter(app => app.slug !== 'contents/share_folder')
         .filter(app => app.slug !== 'share_content')
         .filter(app => app.slug !== 'upload_permission')
@@ -481,9 +418,9 @@ export class Dashboard extends React.Component {
 
           const route = (() => {
             switch (app.slug) {
-              case 'agenda': return PAGE.WORKSPACE.AGENDA(props.curWs.id)
-              case 'gallery': return PAGE.WORKSPACE.GALLERY(props.curWs.id)
-              default: return `${PAGE.WORKSPACE.NEW(props.curWs.id, slugWithHACK)}?parent_id=null`
+              case 'agenda': return PAGE.WORKSPACE.AGENDA(props.currentWorkspace.id)
+              case 'gallery': return PAGE.WORKSPACE.GALLERY(props.currentWorkspace.id)
+              default: return `${PAGE.WORKSPACE.NEW(props.currentWorkspace.id, slugWithHACK)}?parent_id=null`
             }
           })()
 
@@ -502,20 +439,20 @@ export class Dashboard extends React.Component {
     // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
     contentTypeButtonList.push({
       slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overridden but it avoid a unique key warning
-      ...props.curWs.sidebarEntryList.find(se => se.slug === 'contents/all'),
+      ...props.currentWorkspace.sidebarEntryList.find(se => se.slug === 'contents/all'),
       creationLabel: props.t('Explore contents'),
-      route: PAGE.WORKSPACE.CONTENT_LIST(props.curWs.id),
+      route: PAGE.WORKSPACE.CONTENT_LIST(props.currentWorkspace.id),
       hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
     })
 
-    const description = addExternalLinksIcons(props.curWs.description.trim())
+    const description = addExternalLinksIcons(props.currentWorkspace.description.trim())
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
           <PageWrapper customClass='dashboard'>
             <TabBar
-              currentSpace={props.curWs}
+              currentSpace={props.currentWorkspace}
               breadcrumbs={props.breadcrumbs}
             />
 
@@ -544,17 +481,17 @@ export class Dashboard extends React.Component {
                       />
                     </div>
                   </div>
-                  {props.curWs && props.curWs.id && <WorkspaceRecentActivities workspaceId={props.curWs.id} />}
+                  {props.currentWorkspace && props.currentWorkspace.id && <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />}
                 </div>
 
                 <div className='dashboard__workspace__rightMenu'>
                   <UserStatus
                     user={props.user}
-                    curWs={props.curWs}
+                    currentWorkspace={props.currentWorkspace}
                     displayNotifBtn={props.system.config.email_notification_activated}
                     displaySubscriptionRequestsInformation={
                       userRoleIdInWorkspace >= ROLE.workspaceManager.id &&
-                      props.curWs.accessType === SPACE_TYPE.onRequest.slug
+                      props.currentWorkspace.accessType === SPACE_TYPE.onRequest.slug
                     }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
                     onClickToggleNotifBtn={this.handleToggleNotifBtn}
@@ -586,7 +523,7 @@ export class Dashboard extends React.Component {
                     customClass='dashboard__memberlist'
                     loggedUser={props.user}
                     apiUrl={FETCH_CONFIG.apiUrl}
-                    memberList={props.curWs.memberList}
+                    memberList={props.currentWorkspace.memberList}
                     roleList={ROLE_LIST}
                     searchedKnownMemberList={state.searchedKnownMemberList}
                     autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
@@ -611,12 +548,12 @@ export class Dashboard extends React.Component {
                     t={props.t}
                   />
 
-                  {props.appList.some(a => a.slug === 'agenda') && props.curWs.agendaEnabled && (
+                  {props.appList.some(a => a.slug === 'agenda') && props.currentWorkspace.agendaEnabled && (
                     <AgendaInfo
                       customClass='dashboard__section'
                       introText={props.t('Use this link to integrate this agenda to your')}
                       caldavText={props.t('CalDAV compatible software')}
-                      agendaUrl={props.curWs.agendaUrl}
+                      agendaUrl={props.currentWorkspace.agendaUrl}
                     />
                   )}
 
@@ -639,6 +576,6 @@ export class Dashboard extends React.Component {
 }
 
 const mapStateToProps = ({ breadcrumbs, user, contentType, appList, currentWorkspace, system }) => ({
-  breadcrumbs, user, contentType, appList, curWs: currentWorkspace, system
+  breadcrumbs, user, contentType, appList, currentWorkspace, system
 })
 export default connect(mapStateToProps)(withRouter(appFactory(translate()(TracimComponent(Dashboard)))))
