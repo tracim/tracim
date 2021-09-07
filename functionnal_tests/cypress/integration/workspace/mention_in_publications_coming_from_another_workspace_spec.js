@@ -1,6 +1,6 @@
 import { PAGES as p } from '../../support/urls_commands'
 
-describe('Scroll to active content when refreshing the page', () => {
+describe('Mentions in publications', () => {
   let workspaceId1
   let workspaceId2
   let otherUserName
