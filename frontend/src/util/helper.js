@@ -177,8 +177,6 @@ export const CONTENT_NAMESPACE = {
   PUBLICATION: 'publication'
 }
 
-export const publicationColor = '#661F98'
-
 export const sortContentList = (workspaceContents, lang) => {
   return workspaceContents.sort((a, b) => compareContents(a, b, lang))
 }

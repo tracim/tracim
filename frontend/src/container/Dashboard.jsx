@@ -10,6 +10,7 @@ import {
   PageContent,
   IconButton,
   BREADCRUMBS_TYPE,
+  COLORS,
   CUSTOM_EVENT,
   ROLE,
   ROLE_LIST,
@@ -42,7 +43,6 @@ import {
 import appFactory from '../util/appFactory.js'
 import {
   FETCH_CONFIG,
-  publicationColor,
   findUserRoleIdInWorkspace
 } from '../util/helper.js'
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
@@ -445,7 +445,7 @@ export class Dashboard extends React.Component {
         slug: 'publications',
         creationLabel: props.t('Publish some information'),
         route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
-        hexcolor: publicationColor,
+        hexcolor: COLORS.PUBLICATION,
         faIcon: 'fas fa-stream'
       })
     }

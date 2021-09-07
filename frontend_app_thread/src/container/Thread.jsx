@@ -28,6 +28,7 @@ import {
   getOrCreateSessionClientToken,
   FAVORITE_STATE,
   ROLE,
+  COLORS,
   SelectStatus
 } from 'tracim_frontend_lib'
 import {
@@ -399,8 +400,7 @@ export class Thread extends React.Component {
   render () {
     const { props, state } = this
     const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
-    const publicationColor = '#661F98'
-    const color = isPublication ? publicationColor : state.config.hexcolor
+    const color = isPublication ? COLORS.PUBLICATION : state.config.hexcolor
 
     if (!state.isVisible) return null
 
@@ -410,7 +410,7 @@ export class Thread extends React.Component {
           loading={state.loadingContent}
           customClass={`${state.config.slug}__contentpage`}
           customColor={color}
-          faIcon={isPublication ? 'fas fa-stream': state.config.faIcon}
+          faIcon={isPublication ? 'fas fa-stream' : state.config.faIcon}
           rawTitle={state.content.label}
           componentTitle={<div>{state.content.label}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}

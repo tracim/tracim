@@ -21,6 +21,7 @@ import {
   PAGE,
   ROLE,
   ROLE_LIST,
+  COLORS,
   ScrollToBottomWrapper,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -38,8 +39,7 @@ import {
   CONTENT_NAMESPACE,
   FETCH_CONFIG,
   findUserRoleIdInWorkspace,
-  handleClickCopyLink,
-  publicationColor
+  handleClickCopyLink
 } from '../util/helper.js'
 import {
   getPublicationPage,
@@ -621,7 +621,7 @@ export class Publications extends React.Component {
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
             commentList={publication.commentList}
             content={publication}
-            customColor={publicationColor}
+            customColor={COLORS.PUBLICATION}
             key={`publication_${publication.id}`}
             ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
             memberList={props.currentWorkspace.memberList}
@@ -669,7 +669,7 @@ export class Publications extends React.Component {
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             comment={state.commentToEdit.raw_content}
-            customColor={publicationColor}
+            customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}
             onClickValidate={this.handleClickValidateEdit}
             onClickClose={() => this.setState({ showEditPopup: false })}
@@ -704,7 +704,7 @@ export class Publications extends React.Component {
                   <DisplayFileToUpload
                     fileList={state.newCommentAsFileList}
                     onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                    color={publicationColor}
+                    color={COLORS.PUBLICATION}
                   />
                 </div>
               </div>
@@ -713,7 +713,7 @@ export class Publications extends React.Component {
                 <div>
                   <AddFileToUploadButton
                     workspaceId={props.currentWorkspace.id}
-                    color={publicationColor}
+                    color={COLORS.PUBLICATION}
                     disabled={state.newCommentAsFileList.length > 0}
                     multipleFiles={false}
                     onValidateCommentFileToUpload={this.handleAddCommentAsFile}
@@ -722,7 +722,7 @@ export class Publications extends React.Component {
 
                 <IconButton
                   customClass='publications__publishArea__buttons__submit'
-                  color={publicationColor}
+                  color={COLORS.PUBLICATION}
                   disabled={state.newComment === '' && state.newCommentAsFileList.length === 0}
                   intent='primary'
                   mode='light'
