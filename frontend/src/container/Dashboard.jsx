@@ -54,9 +54,6 @@ export class Dashboard extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws
-        ? parseInt(props.match.params.idws)
-        : null, // this is used to avoid handling the parseInt every time
       advancedDashboardOpenedId: null,
       newMember: {
         id: '',
@@ -106,12 +103,11 @@ export class Dashboard extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     const { props } = this
 
-    if (!prevProps.match || !props.match || prevProps.match.params.idws === props.match.params.idws) return
+    if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
 
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP) // to unmount advanced workspace
     this.setState({
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null,
       advancedDashboardOpenedId: null,
       displayNewMemberForm: false,
       newMember: {
@@ -172,10 +168,10 @@ export class Dashboard extends React.Component {
   }
 
   buildBreadcrumbs = () => {
-    const { props, state } = this
+    const { props } = this
 
     const breadcrumbsList = [{
-      link: PAGE.WORKSPACE.DASHBOARD(state.workspaceIdInUrl),
+      link: PAGE.WORKSPACE.DASHBOARD(props.currentWorkspace.id),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.currentWorkspace.label,
       isALink: true

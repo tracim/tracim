@@ -94,6 +94,7 @@ export class Publications extends React.Component {
     // of the current publication coming from the URL (if any)
     this.currentPublicationRef = React.createRef()
     this.state = {
+      loading: true,
       commentToEdit: {},
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
@@ -107,11 +108,13 @@ export class Publications extends React.Component {
     }
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
-    this.getPublicationPage()
-    this.gotToCurrentPublication()
+    if (this.props.currentWorkspace.id) {
+      await this.getPublicationPage()
+      this.gotToCurrentPublication()
+    }
   }
 
   gotToCurrentPublication () {
@@ -125,12 +128,13 @@ export class Publications extends React.Component {
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
-    if (prevProps.match.params.idws !== props.match.params.idws) {
+    if (prevProps.currentWorkspace.id !== props.currentWorkspace.id) {
       this.setHeadTitle()
       this.buildBreadcrumbs()
-      this.getPublicationPage()
+      await this.getPublicationPage()
+      this.gotToCurrentPublication()
     }
 
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
@@ -273,7 +277,7 @@ export class Publications extends React.Component {
 
   buildBreadcrumbs = () => {
     const { props } = this
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
     const publicationId = props.match.params.idcts
     const myLink = publicationId
       ? PAGE.WORKSPACE.PUBLICATION(workspaceId, publicationId)
@@ -306,7 +310,8 @@ export class Publications extends React.Component {
 
   getPublicationPage = async (pageToken = '') => {
     const { props } = this
-    const workspaceId = props.match.params.idws
+    this.setState({ loading: true })
+    const workspaceId = props.currentWorkspace.id
     const fetchGetPublicationList = await props.dispatch(getPublicationPage(workspaceId, PUBLICATION_ITEM_COUNT_PER_PAGE, pageToken))
     switch (fetchGetPublicationList.status) {
       case 200: {
@@ -320,11 +325,12 @@ export class Publications extends React.Component {
         props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning'))
         break
     }
+    this.setState({ loading: false })
   }
 
   getCommentList = async (publicationId, publicationContentType) => {
     const { props } = this
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
 
     const [resComment, resCommentAsFile] = await Promise.all([
       handleFetchResult(await getContentComment(FETCH_CONFIG.apiUrl, workspaceId, publicationId)),
@@ -413,7 +419,7 @@ export class Publications extends React.Component {
   saveThreadPublication = async () => {
     const { props, state } = this
 
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
     const fetchPostPublication = await props.dispatch(postThreadPublication(workspaceId, publicationName))
@@ -442,7 +448,7 @@ export class Publications extends React.Component {
   processSaveFilePublication = async () => {
     const { props, state } = this
 
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
     if (state.newCommentAsFileList.length !== 1) return
@@ -510,7 +516,7 @@ export class Publications extends React.Component {
   }
 
   searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.props.match.params.idws)
+    return await this.props.searchForMentionOrLinkInQuery(query, this.props.currentWorkspace.id)
   }
 
   getPreviewLinkParameters = (publication) => {
