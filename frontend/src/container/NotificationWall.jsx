@@ -132,15 +132,7 @@ export class NotificationWall extends React.Component {
 
     const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
 
-    const contentUrl = (
-      notification.content
-        ? (
-          isPublication
-            ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.id)
-            : PAGE.CONTENT(notification.content.id)
-        )
-        : ''
-    )
+    const contentUrl = notification.content ? PAGE.CONTENT(notification.content.id) : ''
 
     if (entityType === TLM_ENTITY.CONTENT) {
       switch (eventType) {
@@ -388,11 +380,7 @@ export class NotificationWall extends React.Component {
   }
 
   linkToComment (notification) {
-    return (
-      notification.content.parentContentNamespace === CONTENT_NAMESPACE.PUBLICATION
-        ? PAGE.WORKSPACE.PUBLICATION(notification.workspace.id, notification.content.parentId)
-        : PAGE.CONTENT(notification.content.parentId)
-    )
+    return PAGE.CONTENT(notification.content.parentId)
   }
 
   render () {
