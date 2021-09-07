@@ -531,7 +531,8 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={[PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts'), PAGE.WORKSPACE.PUBLICATIONS(':idws')]}
+                  exact
+                  path={PAGE.WORKSPACE.PUBLICATIONS(':idws')}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Publications />
@@ -594,6 +595,7 @@ export class Tracim extends React.Component {
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
           <Route path={PAGE.JOIN_WORKSPACE} component={JoinWorkspace} />
           <Route path={PAGE.CONTENT(':idcts')} component={ContentRedirection} />
+          <Route path={PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts')} component={ContentRedirection} />
 
           {/* the 3 divs below must stay here so that they always exist in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />
