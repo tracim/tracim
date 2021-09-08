@@ -203,7 +203,7 @@ class EventApi:
         # This hack change the way the query is made without changing the result,
         # It as been (slightly) empirically tested to give better performance result on postgresql
         # 13 dues to wrong guess from postgresql.
-        main_query = self._session.query(Message).select_entity_from(query.subquery())
+        main_query = self._session.query(query.subquery())
         return main_query
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
