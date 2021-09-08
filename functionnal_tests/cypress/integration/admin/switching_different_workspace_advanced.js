@@ -3,6 +3,7 @@ import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 describe('Switching between workspaces advanced', () => {
   let workspaceId
+  let workspaceLabel
 
   before(function () {
     cy.resetDB()
@@ -10,6 +11,7 @@ describe('Switching between workspaces advanced', () => {
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
+      workspaceLabel = workspace.label
     })
   })
 
@@ -24,9 +26,12 @@ describe('Switching between workspaces advanced', () => {
   describe('Open and close the workspace advanced app in the dashboard', () => {
     it('should be able to re-open it', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
+      cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
+
+      cy.contains('.workspace_advanced__contentpage__header__title', workspaceLabel)
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('[data-cy="popinFixed__header__button__close"]')
@@ -39,6 +44,8 @@ describe('Switching between workspaces advanced', () => {
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('.wsContentGeneric__header.workspace_advanced__contentpage__header')
         .should('be.visible')
+
+      cy.contains('.workspace_advanced__contentpage__header__title', workspaceLabel)
     })
   })
 

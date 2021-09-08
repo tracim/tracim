@@ -114,11 +114,11 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
 
-      // FIXME - GB - 2021-09-08 - The ternary below is needed because appContentFactory is used by
+      // FIXME - GB - 2021-09-08 - The condition below is needed because appContentFactory is used by
       // frontend components (Publications and FeedItemWithPreview).
       // Inside the frontend the user is called user and in the apps it is called loggedUser.
       // Issue to refactor this behavior: https://github.com/tracim/tracim/issues/749
-      const lang = param.loggedUser ? param.loggedUser.lang : props.user.lang
+      const lang = (param.loggedUser || props.user) ? (param.loggedUser || props.user).lang : 'en'
       i18n.changeLanguage(lang)
     }
 
