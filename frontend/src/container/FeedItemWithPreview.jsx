@@ -40,6 +40,7 @@ export class FeedItemWithPreview extends React.Component {
 
     this.state = {
       invalidMentionList: [],
+      commentsShown: false,
       newComment: '',
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
@@ -286,6 +287,12 @@ export class FeedItemWithPreview extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  handleClickToggleComments = () => {
+    const { props } = this
+    this.setState({ commentsShown: !this.state.commentsShown })
+    console.log( props.commentList )
+  }
+
   render () {
     const { props, state } = this
 
@@ -372,6 +379,7 @@ export class FeedItemWithPreview extends React.Component {
                   translationTargetLanguageList={props.system.config.translation_service__target_languages}
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                  toggleCommentList={this.handleClickToggleComments}
                 />
               )
               : (
@@ -398,7 +406,7 @@ export class FeedItemWithPreview extends React.Component {
                 </div>
               )
             )}
-            {props.showTimeline && (
+            {props.showTimeline && state.commentsShown && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
                 customClass='feedItem__timeline'

@@ -169,6 +169,17 @@ const Comment = props => {
             contentId={props.contentId}
             workspaceId={props.workspaceId}
           />
+
+          {props.isPublication && (
+            <IconButton
+              key={1}
+              text={'Show comments'}
+              onClick={props.toggleCommentList}
+              intent='link'
+              mode='light'
+              // dataCy={props.dataCy ? `${props.dataCy}__language__${language.code}` : null}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -196,7 +207,8 @@ Comment.propTypes = {
   onClickRestore: PropTypes.func.isRequired,
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  toggleCommentList: PropTypes.func
 }
 
 Comment.defaultProps = {
