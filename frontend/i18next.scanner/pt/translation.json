@@ -492,7 +492,5 @@
   "{{author}} modified their account": "{{author}} modificou a sua conta",
   "{{author}} deleted their account": "{{author}} apagou a sua conta",
   "{{author}} restored their account": "{{author}} restaurou a sua conta",
-  "{{author}} added themself to a space": "{{author}} adicionou-se a um espaço",
-  "{{author}} modified their role in a space": "{{author}} modificou a sua função num espaço",
-  "{{author}} removed themself from a space": "{{author}} retirou-se de um espaço"
+  "{{author}} modified their role in a space": "{{author}} modificou a sua função num espaço"
 }
