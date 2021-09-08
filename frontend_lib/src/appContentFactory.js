@@ -118,7 +118,7 @@ export function appContentFactory (WrappedComponent) {
       // frontend components (Publications and FeedItemWithPreview).
       // Inside the frontend the user is called user and in the apps it is called loggedUser.
       // Issue to refactor this behavior: https://github.com/tracim/tracim/issues/749
-      const lang = (param.loggedUser || props.user) ? (param.loggedUser || props.user).lang : 'en'
+      const lang = (param.loggedUser || props.user || { lang: 'en' }).lang
       i18n.changeLanguage(lang)
     }
 

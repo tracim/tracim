@@ -27,6 +27,7 @@ describe('Switching between workspaces advanced', () => {
     it('should be able to re-open it', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
       cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
+
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
