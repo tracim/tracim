@@ -15,7 +15,6 @@ from typing import Union
 from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
-from sqlalchemy import cast
 from sqlalchemy import event as sqlalchemy_event
 from sqlalchemy import inspect
 from sqlalchemy import not_
@@ -24,8 +23,6 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.expression import text
-from sqlalchemy.types import String
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FILE_TYPE
@@ -161,8 +158,8 @@ class EventApi:
         if related_to_content_ids:
             query = query.filter(
                 or_(
-                    Event.content["content_id"].as_integer().in_(related_to_content_ids),
-                    Event.content["parent_id"].as_integer().in_(related_to_content_ids),
+                    Event.content_id.in_(related_to_content_ids),
+                    Event.parent_id.in_(related_to_content_ids),
                 )
             )
         if not include_not_sent:
@@ -191,11 +188,8 @@ class EventApi:
                 # PostgreSQL. See https://github.com/sqlalchemy/sqlalchemy/issues/5575
 
                 query = query.filter(
-                    or_(
-                        cast(Event.author, String) == text("'null'"),
-                        Event.author["user_id"].as_integer() != author_id,
-                    )
-                )
+                    or_(Event.author_id != author_id, Event.author_id == None)
+                )  # noqa: E711
 
         if after_event_id:
             query = query.filter(Message.event_id > after_event_id)
@@ -314,6 +308,9 @@ class EventApi:
             entity_subtype=entity_subtype,
             fields=fields,
             workspace_id=fields.get("workspace", {}).get("workspace_id"),
+            content_id=fields.get("content", {}).get("content_id"),
+            parent_id=fields.get("content", {}).get("parent_id"),
+            author_id=fields.get("author", {}).get("user_id") if fields.get("author", {}) else None,
         )
         context.dbsession.add(event)
         context.pending_events.append(event)

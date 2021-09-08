@@ -25,6 +25,7 @@ def create_events_and_messages(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.CREATED,
             fields={"example": "hello", "author": {"user_id": 1}},
+            author_id=1,
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -38,6 +39,7 @@ def create_events_and_messages(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.MODIFIED,
             fields={"example": "bar", "author": {"user_id": 2}},
+            author_id=2,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -46,6 +48,7 @@ def create_events_and_messages(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.MODIFIED,
             fields={"example": "event without author", "author": None},
+            author_id=None,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -73,6 +76,7 @@ def create_workspace_messages(
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 1}, "workspace": {"workspace_id": 1}},
             workspace_id=1,
+            author_id=1,
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -87,6 +91,7 @@ def create_workspace_messages(
             operation=tracim_event.OperationType.MODIFIED,
             fields={"author": {"user_id": 2}, "workspace": {"workspace_id": 2}},
             workspace_id=2,
+            author_id=2,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -121,6 +126,8 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 1}, "content": {"content_id": 1, "parent_id": None}},
+            content_id=1,
+            author_id=1,
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -134,6 +141,9 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 2}, "content": {"content_id": 2, "parent_id": 1}},
+            author_id=2,
+            content_id=2,
+            parent_id=1,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -142,6 +152,8 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.WORKSPACE,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 2}, "content": {"content_id": 3, "parent_id": None}},
+            author_id=2,
+            content_id=3,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -150,6 +162,9 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 2}, "content": {"content_id": 4, "parent_id": 3}},
+            author_id=2,
+            content_id=4,
+            parent_id=3,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))

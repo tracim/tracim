@@ -158,6 +158,9 @@ class Event(CreationDateMixin, DeclarativeBase):
     # INFO - SG - 2021-05-05
     # duplicated from fields.workspace.workspace_id to ease indexing of this value
     workspace_id = Column(Integer, default=None)
+    author_id = Column(Integer, default=None)
+    content_id = Column(Integer, default=None)
+    parent_id = Column(Integer, default=None)
 
     @property
     def event_type(self) -> str:
