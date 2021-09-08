@@ -631,6 +631,7 @@ export class Publications extends React.Component {
             onClickEdit={() => this.handleClickEdit(publication)}
             showTimeline
             workspaceId={Number(publication.workspaceId)}
+            user={props.user}
             {...this.getPreviewLinkParameters(publication)}
           />
         )}

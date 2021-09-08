@@ -98,7 +98,7 @@ export function appContentFactory (WrappedComponent) {
       const param = props.data || { content: {} }
       this.state = {
         config: param.config,
-        loggedUser: param.loggedUser,
+        loggedUser: param.loggedUser || props.user,
         content: param.content,
         ...DEFAULT_TIMELINE_STATE
       }
@@ -113,6 +113,13 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
+
+      // FIXME - GB - 2021-09-08 - The ternary below is needed because appContentFactory is used by
+      // frontend components (Publications and FeedItemWithPreview).
+      // Inside the frontend the user is called user and in the apps it is called loggedUser.
+      // Issue to refactor this behavior: https://github.com/tracim/tracim/issues/749
+      const lang = param.loggedUser ? param.loggedUser.lang : props.user.lang
+      i18n.changeLanguage(lang)
     }
 
     checkApiUrl = () => {
