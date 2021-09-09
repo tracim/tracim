@@ -41,6 +41,7 @@ export class FeedItemWithPreview extends React.Component {
     this.state = {
       invalidMentionList: [],
       commentsShown: false,
+      commentText: '',
       newComment: '',
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
@@ -67,6 +68,19 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 
+  displayCommentText () {
+    const { props } = this
+    this.setState({
+      commentText: props.commentList.length > 0
+        ? `${props.t('Afficher le fil de discussions')} (${props.commentList.length})`
+        : 'Commenter'
+    })
+  }
+
+  componentDidMount () {
+    return this.displayCommentText()
+  }
+
   componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
@@ -79,6 +93,14 @@ export class FeedItemWithPreview extends React.Component {
 
     if (props.showTimeline && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
       globalThis.tinymce.remove(this.getWysiwygId(props.content.id))
+    }
+
+    if (prevProps.commentList.length !== props.commentList.length) {
+      this.setState({
+        commentText: props.commentList.length > 0
+          ? `Afficher le fil de discussions (${props.commentList.length})`
+          : 'Commenter'
+      })
     }
   }
 
@@ -288,9 +310,10 @@ export class FeedItemWithPreview extends React.Component {
   }
 
   handleClickToggleComments = () => {
-    const { props } = this
-    this.setState({ commentsShown: !this.state.commentsShown })
-    console.log( props.commentList )
+    this.setState(previousState => ({
+      commentsShown: !previousState.commentsShown,
+      commentText: previousState.commentsShown ? this.displayCommentText() : 'Masquer'
+    }))
   }
 
   render () {
@@ -380,6 +403,8 @@ export class FeedItemWithPreview extends React.Component {
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                   toggleCommentList={this.handleClickToggleComments}
+                  commentText={state.commentText}
+                  showTimeline={props.showTimeline}
                 />
               )
               : (
@@ -505,7 +530,7 @@ FeedItemWithPreview.defaultProps = {
   lastModifier: {},
   memberList: [],
   modifiedDate: '',
-  onClickEdit: () => {},
+  onClickEdit: () => { },
   reactionList: [],
   showTimeline: false,
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
