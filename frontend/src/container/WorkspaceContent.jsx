@@ -46,6 +46,7 @@ import {
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
+  readContentNotification,
   setWorkspaceContentList,
   setWorkspaceFolderContentList,
   setWorkspaceShareFolderContentList,
@@ -305,6 +306,10 @@ export class WorkspaceContent extends React.Component {
       case 200: props.dispatch(setWorkspaceReadStatusList(wsReadStatus.json)); break
       case 401: break
       default: props.dispatch(newFlashMessage(props.t('Error while loading read status list'), 'warning'))
+    }
+
+    if (this.state.appOpenedType) {
+      // TODO readContentNotification + API
     }
 
     this.setState({ contentLoaded: true })

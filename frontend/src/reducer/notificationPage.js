@@ -2,6 +2,7 @@ import { uniqBy } from 'lodash'
 import {
   ADD,
   APPEND,
+  CONTENT,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
@@ -280,10 +281,31 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     }
 
     case `${READ}/${NOTIFICATION_LIST}`: {
-      const notificationList = state.list.map(notification => (
-        { ...notification, read: true }
-      ))
+      const notificationList = state.list.map(notification => notification.group
+        ? { ...notification, group: notification.group.map(notification => ({ ...notification, read: true })) }
+        : { ...notification, read: true }
+      )
       return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
+    }
+
+    case `${READ}/${CONTENT}/${NOTIFICATION}`: {
+      const newNotificationList = state.list.map(notification => {
+        if (notification.group) {
+          return {
+            ...notification,
+            group: notification.group.map(notification => (
+              notification.content && notification.content.id === action.contentId
+                ? { ...notification, read: true }
+                : notification
+            ))
+          }
+        }
+        return notification.content && notification.content.id === action.contentId
+          ? { ...notification, read: true }
+          : notification
+      })
+
+      return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
     }
 
     case `${SET}/${NEXT_PAGE}`:
