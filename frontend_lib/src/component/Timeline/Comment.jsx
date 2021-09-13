@@ -16,8 +16,7 @@ import {
   CONTENT_TYPE,
   formatAbsoluteDate,
   displayDistanceDate,
-  addExternalLinksIcons,
-  publicationColor
+  addExternalLinksIcons
 } from '../../helper.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'
@@ -174,12 +173,10 @@ const Comment = props => {
           {props.isPublication && props.showTimeline && (
             <IconButton
               text={props.commentText}
-              color={'#661F98'}
-              icon={'far fa-comment'}
-              onClick={props.toggleCommentList}
-              intent='secondary'
-              mode='dark'
-              // dataCy={props.dataCy ? `${props.dataCy}__language__${language.code}` : null}
+              icon='far fa-comment'
+              onClick={props.onClickToggleCommentList}
+              customClass='buttonComments'
+              dataCy={props.dataCy ? `${props.dataCy}__language__${language.code}` : null}
             />
           )}
         </div>
@@ -210,7 +207,7 @@ Comment.propTypes = {
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  toggleCommentList: PropTypes.func,
+  onClickToggleCommentList: PropTypes.func,
   commentText: PropTypes.string.isRequired
 }
 

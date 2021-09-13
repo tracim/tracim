@@ -68,19 +68,6 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 
-  displayCommentText () {
-    const { props } = this
-    this.setState({
-      commentText: props.commentList.length > 0
-        ? `${props.t('Afficher le fil de discussions')} (${props.commentList.length})`
-        : 'Commenter'
-    })
-  }
-
-  componentDidMount () {
-    return this.displayCommentText()
-  }
-
   componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
 
@@ -93,14 +80,6 @@ export class FeedItemWithPreview extends React.Component {
 
     if (props.showTimeline && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
       globalThis.tinymce.remove(this.getWysiwygId(props.content.id))
-    }
-
-    if (prevProps.commentList.length !== props.commentList.length) {
-      this.setState({
-        commentText: props.commentList.length > 0
-          ? `Afficher le fil de discussions (${props.commentList.length})`
-          : 'Commenter'
-      })
     }
   }
 
@@ -311,9 +290,21 @@ export class FeedItemWithPreview extends React.Component {
 
   handleClickToggleComments = () => {
     this.setState(previousState => ({
-      commentsShown: !previousState.commentsShown,
-      commentText: previousState.commentsShown ? this.displayCommentText() : 'Masquer'
+      commentsShown: !previousState.commentsShown
     }))
+  }
+
+  getCommentText = () => {
+    const { props, state } = this
+    if (props.commentList.length > 0) {
+      return state.commentsShown
+        ? `${props.t('Masquer la discussion')}`
+        : `${props.t('Afficher la discussion')} (${props.commentList.length})`
+    } else {
+      return state.commentsShown
+        ? `${props.t('Masquer')}`
+        : `${props.t('Commenter')}`
+    }
   }
 
   render () {
@@ -402,8 +393,8 @@ export class FeedItemWithPreview extends React.Component {
                   translationTargetLanguageList={props.system.config.translation_service__target_languages}
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-                  toggleCommentList={this.handleClickToggleComments}
-                  commentText={state.commentText}
+                  onClickToggleCommentList={this.handleClickToggleComments}
+                  commentText={this.getCommentText()}
                   showTimeline={props.showTimeline}
                 />
               )
