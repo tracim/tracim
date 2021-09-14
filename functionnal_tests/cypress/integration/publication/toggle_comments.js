@@ -17,7 +17,7 @@ describe('Publications page', () => {
     })
   })
 
-  it('should have translations', () => {
+  it("should change button's label according to its state", () => {
     cy.get('#wysiwygTimelineCommentPublication').type(text)
     cy.contains(publishButton, 'Publish').click()
 
