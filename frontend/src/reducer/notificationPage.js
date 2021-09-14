@@ -78,7 +78,7 @@ export const hasSameContent = notificationList => {
   if (notificationList.some(notification => !notification.content)) return false
   return notificationList.every((notification, index) => {
     if (index === 0) return true
-    return getContentId(notification) === getContentId(notificationList[index - 1])
+    return getMainContentId(notification) === getMainContentId(notificationList[index - 1])
   })
 }
 
@@ -216,7 +216,7 @@ export const groupNotificationListWithOneCriteria = (notificationList) => {
   return newNotificationList
 }
 
-function getContentId (notification) {
+function getMainContentId (notification) {
   return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ET.MENTION)
     ? notification.content.parentId
     : notification.content.id
@@ -297,7 +297,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
             ...notification,
             group: notification.group.map(notification => {
               if (!notification.content) return notification
-              if (getContentId(notification) === action.contentId) {
+              if (getMainContentId(notification) === action.contentId) {
                 if (!notification.read) {
                   if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
                   unreadNotificationCount--
@@ -309,7 +309,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
           }
         } else {
           if (!notification.content) return notification
-          if (getContentId(notification) === action.contentId) {
+          if (getMainContentId(notification) === action.contentId) {
             if (!notification.read) {
               if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
               unreadNotificationCount--
