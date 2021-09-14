@@ -8,8 +8,7 @@ import {
   ROLE_LIST,
   TRANSLATION_STATE,
   TranslateButton,
-  EmojiReactions,
-  IconButton
+  EmojiReactions
 } from 'tracim_frontend_lib'
 import { FETCH_CONFIG, findUserRoleIdInWorkspace } from '../../util/helper.js'
 

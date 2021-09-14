@@ -41,7 +41,7 @@ export class FeedItemWithPreview extends React.Component {
     this.state = {
       invalidMentionList: [],
       commentsShown: false,
-      commentText: '',
+      discussionToggleButtonLabel: '',
       newComment: '',
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
@@ -294,7 +294,7 @@ export class FeedItemWithPreview extends React.Component {
     }))
   }
 
-  getCommentText = () => {
+  getDiscussionToggleButtonLabel = () => {
     const { props, state } = this
     if (props.commentList.length > 0) {
       return state.commentsShown
@@ -394,7 +394,7 @@ export class FeedItemWithPreview extends React.Component {
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                   onClickToggleCommentList={this.handleClickToggleComments}
-                  commentText={this.getCommentText()}
+                  discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
                   showTimeline={props.showTimeline}
                 />
               )

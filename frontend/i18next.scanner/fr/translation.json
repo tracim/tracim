@@ -491,6 +491,6 @@
   "in {{numberOfWorkspaces}} spaces": "dans {{numberOfWorkspaces}} espaces",
   "Hide discussion": "Masquer la discussion",
   "Show discussion": "Afficher la discussion",
-  "Hide": "Masquer",
+  "Hide comment area": "Masquer la zone de commentaires",
   "Comment": "Commenter"
 }

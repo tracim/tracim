@@ -172,7 +172,7 @@ const Comment = props => {
 
           {props.isPublication && props.showTimeline && (
             <IconButton
-              text={props.commentText}
+              text={props.discussionToggleButtonLabel}
               icon='far fa-comment'
               onClick={props.onClickToggleCommentList}
               customClass='buttonComments'
@@ -208,7 +208,7 @@ Comment.propTypes = {
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   onClickToggleCommentList: PropTypes.func,
-  commentText: PropTypes.string.isRequired
+  discussionToggleButtonLabel: PropTypes.string.isRequired
 }
 
 Comment.defaultProps = {
@@ -216,7 +216,7 @@ Comment.defaultProps = {
   text: '',
   fromMe: false,
   translationState: TRANSLATION_STATE.DISABLED,
-  commentText: 'Comment',
+  discussionToggleButtonLabel: 'Comment',
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
   onClickDeleteComment: () => {}
