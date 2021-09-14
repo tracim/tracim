@@ -40,7 +40,7 @@ export class FeedItemWithPreview extends React.Component {
 
     this.state = {
       invalidMentionList: [],
-      commentsShown: false,
+      isDiscussionDisplayed: false,
       discussionToggleButtonLabel: '',
       newComment: '',
       translatedRawContent: '',
@@ -290,18 +290,18 @@ export class FeedItemWithPreview extends React.Component {
 
   handleClickToggleComments = () => {
     this.setState(previousState => ({
-      commentsShown: !previousState.commentsShown
+      isDiscussionDisplayed: !previousState.isDiscussionDisplayed
     }))
   }
 
   getDiscussionToggleButtonLabel = () => {
     const { props, state } = this
     if (props.commentList.length > 0) {
-      return state.commentsShown
+      return state.isDiscussionDisplayed
         ? props.t('Hide discussion')
         : `${props.t('Show discussion')} (${props.commentList.length})`
     } else {
-      return state.commentsShown
+      return state.isDiscussionDisplayed
         ? props.t('Hide comment area')
         : props.t('Comment')
     }
@@ -422,7 +422,7 @@ export class FeedItemWithPreview extends React.Component {
                 </div>
               )
             )}
-            {props.showTimeline && state.commentsShown && (
+            {props.showTimeline && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
                 customClass='feedItem__timeline'
