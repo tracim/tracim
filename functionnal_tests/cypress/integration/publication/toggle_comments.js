@@ -23,7 +23,6 @@ describe('Publications page', () => {
 
     cy.contains('.buttonComments', 'Commenter').should('be.visible').click()
 
-    cy.contains('.buttonComments', 'Masquer').should('be.visible')
-    cy.contains('.buttonComments', 'Masquer').click()
+    cy.contains('.buttonComments', 'Masquer').should('be.visible').click()
   })
 })
