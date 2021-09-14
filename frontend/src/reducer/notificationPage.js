@@ -78,13 +78,7 @@ export const hasSameContent = notificationList => {
   if (notificationList.some(notification => !notification.content)) return false
   return notificationList.every((notification, index) => {
     if (index === 0) return true
-    const previousContentId = notificationList[index - 1].type.includes(CONTENT_TYPE.COMMENT)
-      ? notificationList[index - 1].content.parentId
-      : notificationList[index - 1].content.id
-    const contentId = notification.type.includes(CONTENT_TYPE.COMMENT)
-      ? notification.content.parentId
-      : notification.content.id
-    return contentId === previousContentId
+    return getContentId(notification) === getContentId(notificationList[index - 1])
   })
 }
 
@@ -222,6 +216,12 @@ export const groupNotificationListWithOneCriteria = (notificationList) => {
   return newNotificationList
 }
 
+function getContentId (notification) {
+  return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ET.MENTION)
+    ? notification.content.parentId
+    : notification.content.id
+}
+
 export default function notificationPage (state = defaultNotificationsObject, action) {
   switch (action.type) {
     case `${SET}/${NOTIFICATION_LIST}`: {
@@ -289,23 +289,37 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     }
 
     case `${READ}/${CONTENT}/${NOTIFICATION}`: {
+      let unreadMentionCount = state.unreadMentionCount
+      let unreadNotificationCount = state.unreadNotificationCount
       const newNotificationList = state.list.map(notification => {
         if (notification.group) {
           return {
             ...notification,
-            group: notification.group.map(notification => (
-              notification.content && notification.content.id === action.contentId
-                ? { ...notification, read: true }
-                : notification
-            ))
+            group: notification.group.map(notification => {
+              if (!notification.content) return notification
+              if (getContentId(notification) === action.contentId) {
+                if (!notification.read) {
+                  if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
+                  unreadNotificationCount--
+                }
+                return { ...notification, read: true }
+              }
+              return notification
+            })
           }
+        } else {
+          if (!notification.content) return notification
+          if (getContentId(notification) === action.contentId) {
+            if (!notification.read) {
+              if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
+              unreadNotificationCount--
+            }
+            return { ...notification, read: true }
+          }
+          return notification
         }
-        return notification.content && notification.content.id === action.contentId
-          ? { ...notification, read: true }
-          : notification
       })
-
-      return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
+      return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount, unreadNotificationCount }
     }
 
     case `${SET}/${NEXT_PAGE}`:
