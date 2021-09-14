@@ -21,8 +21,7 @@ describe('Publications page', () => {
     cy.get('#wysiwygTimelineCommentPublication').type(text)
     cy.contains(publishButton, 'Publish').click()
 
-    cy.contains('.buttonComments', 'Commenter').should('be.visible')
-    cy.contains('.buttonComments', 'Commenter').click()
+    cy.contains('.buttonComments', 'Commenter').should('be.visible').click()
 
     cy.contains('.buttonComments', 'Masquer').should('be.visible')
     cy.contains('.buttonComments', 'Masquer').click()
