@@ -201,8 +201,6 @@
   "Error while loading the notification list": "Error while loading the notification list",
   "Error while loading the user configuration": "Error while loading the user configuration",
   "Error while marking the notification as read": "Error while marking the notification as read",
-  "Move this content": "Move this content",
-  "Move this folder": "Move this folder",
   "A content with same name already exists": "A content with same name already exists",
   "The destination folder doesn't allow this content type": "The destination folder doesn't allow this content type",
   ", create the first content of that type by clicking on the button 'Create'": ", create the first content of that type by clicking on the button 'Create'",
@@ -490,5 +488,9 @@
   "{{author}} made {{numberOfContribution}} contributions on {{content}}": "{{author}} made {{numberOfContribution}} contributions on {{content}}",
   "{{author}} made {{numberOfContribution}} contributions": "{{author}} made {{numberOfContribution}} contributions",
   "Set your username": "Set your username",
-  "in {{numberOfWorkspaces}} spaces": "in {{numberOfWorkspaces}} spaces"
+  "in {{numberOfWorkspaces}} spaces": "in {{numberOfWorkspaces}} spaces",
+  "Hide discussion": "Hide discussion",
+  "Show discussion": "Show discussion",
+  "Hide": "Hide",
+  "Comment": "Comment"
 }

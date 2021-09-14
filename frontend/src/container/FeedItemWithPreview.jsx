@@ -298,12 +298,12 @@ export class FeedItemWithPreview extends React.Component {
     const { props, state } = this
     if (props.commentList.length > 0) {
       return state.commentsShown
-        ? `${props.t('Masquer la discussion')}`
-        : `${props.t('Afficher la discussion')} (${props.commentList.length})`
+        ? `${props.t('Hide discussion')}`
+        : `${props.t('Show discussion')} (${props.commentList.length})`
     } else {
       return state.commentsShown
-        ? `${props.t('Masquer')}`
-        : `${props.t('Commenter')}`
+        ? `${props.t('Hide')}`
+        : `${props.t('Comment')}`
     }
   }
 
