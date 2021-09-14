@@ -302,8 +302,8 @@ export class FeedItemWithPreview extends React.Component {
         : `${props.t('Show discussion')} (${props.commentList.length})`
     } else {
       return state.commentsShown
-        ? `${props.t('Hide')}`
-        : `${props.t('Comment')}`
+        ? props.t('Hide comment area')
+        : props.t('Comment')
     }
   }
 
