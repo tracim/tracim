@@ -1,26 +1,41 @@
-import re
-
 from marshmallow import ValidationError
-from marshmallow.validate import Email
+from marshmallow.validate import Validator
 
 
-class TracimEmailValidator(Email):
-    """ Special Email Validator who accept email from subdomain"""
+class TracimEmailValidator(Validator):
+    """
+    Special Email Validator who accept email from subdomain
+    - check existing "@".
+    - check if both part are not empty.
+    - refuse special characters that cause issue with rfc style address parsing used
+    in frontend and backend like "<" and ";"
+    """
 
-    USER_REGEX = re.compile(
-        r"(^[-!#$%&'*+/=?^`{}|~\w]+(\.[-!#$%&'*+/=?^`{}|~\w]+)*\Z"  # dot-atom
-        # quoted-string
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]' r'|\\[\001-\011\013\014\016-\177])*"\Z)',
-        re.IGNORECASE | re.UNICODE,
-    )
+    FORBIDDEN_CHARS = ["<", ">", ",", ";", "\n"]
 
-    DOMAIN_REGEX = re.compile(
-        # domain
-        r"(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.?)+" r"(?:[A-Z]{2,6}|[A-Z0-9-]{2,})\Z"
-        # literal form, ipv4 address (SMTP 4.1.3)
-        r"|^\[(25[0-5]|2[0-4]\d|[0-1]?\d?\d)" r"(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\]\Z",
-        re.IGNORECASE | re.UNICODE,
-    )
+    default_message = "Not a valid email address."
+
+    def __init__(self, error=None):
+        self.error = error or self.default_message
+
+    def _format_error(self, value):
+        return self.error.format(input=value)
+
+    def __call__(self, value):
+        message = self._format_error(value)
+
+        if not value or "@" not in value:
+            raise ValidationError(message)
+
+        for forbidden_char in self.FORBIDDEN_CHARS:
+            if forbidden_char in value:
+                raise ValidationError(message)
+
+        user_part, domain_part = value.rsplit("@", 1)
+        if not user_part or not domain_part:
+            raise ValidationError(message)
+
+        return value
 
 
 class RFCEmailValidator(TracimEmailValidator):
