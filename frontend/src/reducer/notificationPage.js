@@ -61,7 +61,7 @@ export const serializeNotification = notification => {
   }
 }
 
-const hasSameAuthor = authorList => {
+export const hasSameAuthor = authorList => {
   return !authorList.some((author, index) => {
     return !author || (index && author.userId !== authorList[index - 1].userId)
   })
