@@ -449,13 +449,12 @@ export const parserStringToList = (string, separatorList = [',', ';', '\n']) => 
   return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
 }
 
-// INFO - GB - 2019-07-31 - This function check if the email has three parts arranged like somethig@something.somethig
+// INFO - GB - 2019-07-31 - This function check if the email has two parts arranged like somethig@something
 export const checkEmailValidity = email => {
   const parts = email.split('@')
-  if (parts.length !== 2) return false
+  if (parts.length < 2) return false
 
-  const domainParts = parts[1].split('.')
-  return domainParts.length === 2
+  return parts[0] !== '' && parts[1] !== ''
 }
 
 export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) => {
