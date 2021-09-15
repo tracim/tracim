@@ -211,8 +211,6 @@
   "Error while loading the notification list": "Erro ao fazer upload da lista de notificações",
   "Error while loading the user configuration": "Erro ao carregar a configuração do utilizador",
   "Error while marking the notification as read": "Erro ao definir a notificação como lida",
-  "Move this content": "Mover este conteúdo",
-  "Move this folder": "Mover esta pasta",
   "A content with same name already exists": "Um conteúdo com o mesmo nome já existe",
   "The destination folder doesn't allow this content type": "A pasta de destino não permite este tipo de conteúdo",
   ", create the first content of that type by clicking on the button 'Create'": ", crie o primeiro conteúdo desse tipo clicando no botão 'Criar'",
@@ -490,5 +488,9 @@
   "{{author}} rejected your access to a space": "{{author}} rejeitou seu acesso a um espaço",
   "{{author}} rejected access a space for <b>{{user}}</b>": "{{author}} rejeitou o acesso a um espaço para <b>{{user}}</b>",
   "{{author}} requested access to a space": "{{author}} solicitou acesso a um espaço",
-  "Tags": "Etiquetas"
+  "Tags": "Etiquetas",
+  "Hide discussion": "Ocultar discussão",
+  "Show discussion": "Ver discussão",
+  "Hide comment area": "Ocultar área de comentário",
+  "Comment": "Comentar"
 }

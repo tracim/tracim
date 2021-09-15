@@ -207,8 +207,6 @@
   "Error while loading the notification list": "Erreur lors du chargement de la liste des notifications",
   "Error while loading the user configuration": "Erreur lors du chargement de la configuration utilisateur",
   "Error while marking the notification as read": "Erreur au moment de marquer la notification comme lue",
-  "Move this content": "Déplacer ce contenu",
-  "Move this folder": "Déplacer ce dossier",
   "A content with same name already exists": "Un contenu avec le même nom existe déjà",
   "The destination folder doesn't allow this content type": "Le dossier de destination n'autorise pas ce type de contenu",
   ", create the first content of that type by clicking on the button 'Create'": ", créez le premier contenu de ce type en cliquant sur le bouton 'Créer'",
@@ -490,5 +488,9 @@
   "{{author}} made {{numberOfContribution}} contributions on {{content}}": "{{author}} a fait {{numberOfContribution}} contributions dans {{content}}",
   "{{author}} made {{numberOfContribution}} contributions": "{{author}} a fait {{numberOfContribution}} contributions",
   "Set your username": "Définissez votre identifiant",
-  "in {{numberOfWorkspaces}} spaces": "dans {{numberOfWorkspaces}} espaces"
+  "in {{numberOfWorkspaces}} spaces": "dans {{numberOfWorkspaces}} espaces",
+  "Hide discussion": "Masquer la discussion",
+  "Show discussion": "Afficher la discussion",
+  "Hide comment area": "Masquer la zone de commentaires",
+  "Comment": "Commenter"
 }
