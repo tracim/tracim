@@ -1,5 +1,3 @@
-import re
-
 from marshmallow import ValidationError
 from marshmallow.validate import Validator
 
@@ -13,7 +11,7 @@ class TracimEmailValidator(Validator):
     in frontend and backend like "<" and ";"
     """
 
-    DOMAIN_REGEX = USER_REGEX = re.compile(r"[^<>,;\n]+")
+    FORBIDDEN_CHARS = ["<", ">", ",", ";", "\n"]
 
     default_message = "Not a valid email address."
 
@@ -29,11 +27,12 @@ class TracimEmailValidator(Validator):
         if not value or "@" not in value:
             raise ValidationError(message)
 
-        user_part, domain_part = value.rsplit("@", 1)
+        for forbidden_char in self.FORBIDDEN_CHARS:
+            if forbidden_char in value:
+                raise ValidationError(message)
 
-        if not self.USER_REGEX.fullmatch(user_part):
-            raise ValidationError(message)
-        if not self.DOMAIN_REGEX.fullmatch(domain_part):
+        user_part, domain_part = value.rsplit("@", 1)
+        if not user_part or not domain_part:
             raise ValidationError(message)
 
         return value
