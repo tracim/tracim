@@ -13,8 +13,7 @@ class TracimEmailValidator(Validator):
     in frontend and backend like "<" and ";"
     """
 
-    USER_REGEX = re.compile(r"^[^<>,;\n]+$")
-    DOMAIN_REGEX = re.compile(r"^[^<>,;\n]+$")
+    DOMAIN_REGEX = USER_REGEX = re.compile(r"[^<>,;\n]+")
 
     default_message = "Not a valid email address."
 
@@ -32,11 +31,12 @@ class TracimEmailValidator(Validator):
 
         user_part, domain_part = value.rsplit("@", 1)
 
-        if not self.USER_REGEX.match(user_part):
+        if not self.USER_REGEX.fullmatch(user_part):
             raise ValidationError(message)
-        if self.DOMAIN_REGEX.match(domain_part):
-            return value
-        raise ValidationError(message)
+        if not self.DOMAIN_REGEX.fullmatch(domain_part):
+            raise ValidationError(message)
+
+        return value
 
 
 class RFCEmailValidator(TracimEmailValidator):
