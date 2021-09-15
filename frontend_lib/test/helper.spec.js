@@ -550,6 +550,38 @@ describe('helper.js', () => {
       expect(checkEmailValidity('something@')).to.equal(false)
     })
 
+    it('should return false if the first part has a comma', () => {
+      expect(checkEmailValidity('somet,hing@something')).to.equal(false)
+    })
+
+    it('should return false if the first part has a semicolon', () => {
+      expect(checkEmailValidity('somet;hing@something')).to.equal(false)
+    })
+
+    it('should return false if the first part has a >', () => {
+      expect(checkEmailValidity('somet>hing@something')).to.equal(false)
+    })
+
+    it('should return false if the first part has a <', () => {
+      expect(checkEmailValidity('somet<hing@something')).to.equal(false)
+    })
+
+    it('should return false if the second part has a comma', () => {
+      expect(checkEmailValidity('something@somet,hing')).to.equal(false)
+    })
+
+    it('should return false if the second part has a semicolon', () => {
+      expect(checkEmailValidity('something@somet;hing')).to.equal(false)
+    })
+
+    it('should return false if the second part has a >', () => {
+      expect(checkEmailValidity('something@somet>hing')).to.equal(false)
+    })
+
+    it('should return false if the second part has a <', () => {
+      expect(checkEmailValidity('something@somet<hing')).to.equal(false)
+    })
+
     it('should return false if the string has only an @', () => {
       expect(checkEmailValidity('@')).to.equal(false)
     })

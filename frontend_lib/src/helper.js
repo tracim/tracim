@@ -449,11 +449,15 @@ export const parserStringToList = (string, separatorList = [',', ';', '\n']) => 
   return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
 }
 
-// INFO - GB - 2019-07-31 - This function checks if the string looks like an email (username@domain) with a non empty username and a non-empty domain
+// INFO - GB - 2021-09-15 - This function checks if the string looks like an email (username@domain)
+// with a non empty username and a non-empty domain and without <, >, comma or semicolon
 export const checkEmailValidity = email => {
   const firstPart = email.substr(0, email.lastIndexOf('@'))
   const secondPart = email.substr(email.lastIndexOf('@') + 1)
-  return firstPart !== '' && secondPart !== ''
+  return firstPart !== '' && !firstPart.includes(',') && !firstPart.includes(';') &&
+    !firstPart.includes('>') && !firstPart.includes('<') &&
+    secondPart !== '' && !secondPart.includes(',') && !secondPart.includes(';') &&
+    !secondPart.includes('>') && !secondPart.includes('<')
 }
 
 export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) => {
