@@ -607,7 +607,7 @@ class TestMessages(object):
         ).json_body.get("items")
         assert len(message_dicts) == 3
         for message in message_dicts:
-            assert message.get("content", {}).get("content_id") != 1
+            assert message["fields"].get("content", {}).get("content_id") != 1
 
         web_testapp.put("/api/users/1/messages/read?parent_ids=1", status=204)
 
@@ -616,7 +616,7 @@ class TestMessages(object):
         ).json_body.get("items")
         assert len(message_dicts) == 2
         for message in message_dicts:
-            assert message.get("content", {}).get("parent_id") != 1
+            assert message["fields"].get("content", {}).get("parent_id") != 1
 
         web_testapp.put("/api/users/1/messages/read?content_ids=3,4", status=204)
 
