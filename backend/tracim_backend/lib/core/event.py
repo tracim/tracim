@@ -154,6 +154,8 @@ class EventApi:
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
         include_not_sent: bool = False,
+        content_ids: Optional[List[int]] = None,
+        parent_ids: Optional[List[int]] = None,
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
@@ -165,6 +167,20 @@ class EventApi:
                     Event.content["parent_id"].as_integer().in_(related_to_content_ids),
                 )
             )
+        elif parent_ids and content_ids:
+            query = query.filter(
+                or_(
+                    Event.content["content_id"].as_integer().in_(content_ids),
+                    Event.content["parent_id"].as_integer().in_(parent_ids),
+                )
+            )
+        elif content_ids:
+            query = query.filter(Event.content["content_id"].as_integer().in_(content_ids))
+        elif parent_ids:
+            query = query.filter(Event.content["parent_id"].as_integer().in_(parent_ids))
+        else:
+            pass
+
         if not include_not_sent:
             query = query.filter(Message.sent != None)  # noqa: E711
         if event_id:
@@ -225,8 +241,18 @@ class EventApi:
         self._session.flush()
         return message
 
-    def mark_user_messages_as_read(self, user_id: int) -> List[Message]:
-        unread_messages = self._base_query(read_status=ReadStatus.UNREAD, user_id=user_id).all()
+    def mark_user_messages_as_read(
+        self,
+        user_id: int,
+        parent_ids: typing.Optional[List[int]] = None,
+        content_ids: typing.Optional[List[int]] = None,
+    ) -> List[Message]:
+        unread_messages = self._base_query(
+            read_status=ReadStatus.UNREAD,
+            user_id=user_id,
+            parent_ids=parent_ids,
+            content_ids=content_ids,
+        ).all()
         for message in unread_messages:
             message.read = datetime.utcnow()
             self._session.add(message)

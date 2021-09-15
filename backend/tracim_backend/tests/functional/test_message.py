@@ -586,6 +586,41 @@ class TestMessages(object):
         ).json_body.get("items")
         assert len(message_dicts) == 3
 
+    def test_api__read_content_related_messages__ok_204__nominal_case(
+        self, session, web_testapp
+    ) -> None:
+        """
+        Read all unread messages
+        """
+        create_content_messages(session, unread=True, sent_date=datetime.datetime.utcnow())
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 4
+
+        web_testapp.put("/api/users/1/messages/read?content_ids=1", status=204)
+
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 3
+
+        web_testapp.put("/api/users/1/messages/read?parent_ids=1", status=204)
+
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 2
+
+        web_testapp.put("/api/users/1/messages/read?content_ids=3,4", status=204)
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 0
+
     def test_api__read_message__err_400__message_does_not_exist(self, session, web_testapp) -> None:
         """
         Read one message error message does not exist

@@ -81,6 +81,7 @@ from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
 from tracim_backend.models.context_models import UserInfos
+from tracim_backend.models.context_models import UserMessagesMarkAsReadQuery
 from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserPicturePath
 from tracim_backend.models.context_models import UserPreviewPicturePath
@@ -2047,6 +2048,25 @@ class PathSuffixSchema(marshmallow.Schema):
         default="",
         example="/workspaces/1/notifications/activate",
     )
+
+
+class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
+    content_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of content_ids to check for marking event as read",
+    )
+    parent_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of parent_ids to check for marking event as read",
+    )
+
+    @post_load
+    def user_message_mark_as_read_query(
+        self, data: typing.Dict[str, typing.Any]
+    ) -> UserMessagesMarkAsReadQuery:
+        return UserMessagesMarkAsReadQuery(**data)
 
 
 class UserMessagesSummaryQuerySchema(marshmallow.Schema):
