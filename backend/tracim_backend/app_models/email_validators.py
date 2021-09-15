@@ -9,10 +9,12 @@ class TracimEmailValidator(Validator):
     Special Email Validator who accept email from subdomain
     - check existing "@".
     - check if both part are not empty.
+    - refuse special characters that cause issue with rfc style address parsing used
+    in frontend and backend like "<" and ";"
     """
 
-    USER_REGEX = re.compile(r".+")
-    DOMAIN_REGEX = re.compile(r".+")
+    USER_REGEX = re.compile(r"^[^<>,;\n]+$")
+    DOMAIN_REGEX = re.compile(r"^[^<>,;\n]+$")
 
     default_message = "Not a valid email address."
 
