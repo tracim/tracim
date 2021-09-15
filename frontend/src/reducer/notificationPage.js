@@ -291,33 +291,25 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${READ}/${CONTENT}/${NOTIFICATION}`: {
       let unreadMentionCount = state.unreadMentionCount
       let unreadNotificationCount = state.unreadNotificationCount
+      const markNotificationAsRead = (notification) => {
+        if (!notification.content) return notification
+        if (getMainContentId(notification) === action.contentId) {
+          if (!notification.read) {
+            if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
+            unreadNotificationCount--
+          }
+          return { ...notification, read: true }
+        }
+        return notification
+      }
+
       const newNotificationList = state.list.map(notification => {
         if (notification.group) {
           return {
             ...notification,
-            group: notification.group.map(notification => {
-              if (!notification.content) return notification
-              if (getMainContentId(notification) === action.contentId) {
-                if (!notification.read) {
-                  if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
-                  unreadNotificationCount--
-                }
-                return { ...notification, read: true }
-              }
-              return notification
-            })
+            group: notification.group.map(notification => markNotificationAsRead(notification))
           }
-        } else {
-          if (!notification.content) return notification
-          if (getMainContentId(notification) === action.contentId) {
-            if (!notification.read) {
-              if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
-              unreadNotificationCount--
-            }
-            return { ...notification, read: true }
-          }
-          return notification
-        }
+        } else return markNotificationAsRead(notification)
       })
       return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount, unreadNotificationCount }
     }

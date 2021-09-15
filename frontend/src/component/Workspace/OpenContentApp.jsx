@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import appFactory from '../../util/appFactory.js'
 import { findUserRoleIdInWorkspace } from '../../util/helper.js'
-import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { ROLE_LIST, CUSTOM_EVENT, CONTENT_TYPE } from 'tracim_frontend_lib'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 import { newFlashMessage, readContentNotification } from '../../action-creator.sync.js'
 import { putContentNotificationAsRead } from '../../action-creator.async.js'
@@ -44,9 +44,10 @@ export class OpenContentApp extends React.Component {
 
     console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
-    const fetchPutContentNotificationAsRead = await dispatch(putContentNotificationAsRead(user.userId, contentToOpen.content_id))
+    const parentId = contentToOpen.type === CONTENT_TYPE.FOLDER ? null : contentToOpen.content_id
+    const fetchPutContentNotificationAsRead = await dispatch(putContentNotificationAsRead(user.userId, contentToOpen.content_id, parentId))
     switch (fetchPutContentNotificationAsRead.status) {
-      case 200:
+      case 204:
         dispatch(readContentNotification(contentToOpen.content_id))
         break
       default: dispatch(newFlashMessage(t('Error while marking the notification as read'), 'warning'))
