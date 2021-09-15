@@ -785,7 +785,7 @@ class UserController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserMessagesMarkAsReadQuerySchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_all_user_messages_as_read(
+    def set_user_messages_as_read(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
@@ -1529,7 +1529,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/read",
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(self.set_all_user_messages_as_read, route_name="read_messages")
+        configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
 
         # read all unread messages for user
         configurator.add_route(

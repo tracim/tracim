@@ -178,8 +178,6 @@ class EventApi:
             query = query.filter(Event.content["content_id"].as_integer().in_(content_ids))
         elif parent_ids:
             query = query.filter(Event.content["parent_id"].as_integer().in_(parent_ids))
-        else:
-            pass
 
         if not include_not_sent:
             query = query.filter(Message.sent != None)  # noqa: E711
