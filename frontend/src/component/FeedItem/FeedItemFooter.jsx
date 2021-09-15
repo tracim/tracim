@@ -62,7 +62,6 @@ export class FeedItemFooter extends React.Component {
               icon='far fa-comment'
               onClick={props.onClickToggleCommentList}
               customClass='buttonComments'
-              dataCy={props.dataCy ? `${props.dataCy}__language__${language.code}` : null}
             />
           )}
         </div>
