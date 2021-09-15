@@ -418,6 +418,10 @@ export class FeedItemWithPreview extends React.Component {
                     translationTargetLanguageCode={state.translationTargetLanguageCode}
                     onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                     content={props.content}
+                    onClickToggleCommentList={this.handleClickToggleComments}
+                    discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                    showTimeline={props.showTimeline}
+                    isPublication={props.isPublication}
                   />
                 </div>
               )

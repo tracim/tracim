@@ -8,7 +8,8 @@ import {
   ROLE_LIST,
   TRANSLATION_STATE,
   TranslateButton,
-  EmojiReactions
+  EmojiReactions,
+  IconButton
 } from 'tracim_frontend_lib'
 import { FETCH_CONFIG, findUserRoleIdInWorkspace } from '../../util/helper.js'
 
@@ -55,6 +56,15 @@ export class FeedItemFooter extends React.Component {
             contentId={content.id}
             workspaceId={workspaceId}
           />
+          {props.isPublication && props.showTimeline && (
+            <IconButton
+              text={props.discussionToggleButtonLabel}
+              icon='far fa-comment'
+              onClick={props.onClickToggleCommentList}
+              customClass='buttonComments'
+              dataCy={props.dataCy ? `${props.dataCy}__language__${language.code}` : null}
+            />
+          )}
         </div>
       </div>
     )
@@ -71,5 +81,8 @@ FeedItemFooter.propTypes = {
   content: PropTypes.object.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
+  discussionToggleButtonLabel: PropTypes.string.isRequired,
+  onClickToggleCommentList: PropTypes.func,
+  isPublication: PropTypes.bool.isRequired
 }
