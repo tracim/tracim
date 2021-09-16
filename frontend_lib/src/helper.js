@@ -449,8 +449,10 @@ export const parserStringToList = (string, separatorList = [',', ';', '\n']) => 
   return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
 }
 
-// INFO - GB - 2021-09-15 - This function checks if the string looks like an email (username@domain)
+// INFO - GB - 2021-09-16 - This function checks if the string looks like an email (username@domain)
 // with a non empty username and a non-empty domain and without <, >, new line, comma or semicolon
+// Warning: These rules are the same in frontend and should be keep synchronised. If you change the rules
+// here, you shoul adapt the class TracimEmailValidator in tracim/backend/tracim_backend/app_models/email_validators.py
 export const checkEmailValidity = email => {
   const firstPart = email.substr(0, email.lastIndexOf('@'))
   const secondPart = email.substr(email.lastIndexOf('@') + 1)
