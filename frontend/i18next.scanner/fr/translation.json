@@ -488,6 +488,11 @@
   "{{author}} made {{numberOfContribution}} contributions": "{{author}} a fait {{numberOfContribution}} contributions",
   "Set your username": "Définissez votre identifiant",
   "in {{numberOfWorkspaces}} spaces": "dans {{numberOfWorkspaces}} espaces",
+  "{{author}} created their account": "{{author}} a créé son compte",
+  "{{author}} modified their account": "{{author}} a modifié son compte",
+  "{{author}} deleted their account": "{{author}} a supprimé son compte",
+  "{{author}} restored their account": "{{author}} a restauré son compte",
+  "{{author}} modified their role in a space": "{{author}} a modifié son rôle dans un espace"
   "Hide discussion": "Masquer la discussion",
   "Show discussion": "Afficher la discussion",
   "Hide comment area": "Masquer la zone de commentaires",

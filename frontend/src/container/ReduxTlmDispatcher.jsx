@@ -36,6 +36,10 @@ import {
 } from '../action-creator.async.js'
 import { cloneDeep } from 'lodash'
 
+// INFO - RJ - 2021-09-08 - we remove the star from the excluded types since we
+// use startsWith on notification types to check whether the type is excluded
+const EXCLUDED_NOTIFICATION_TYPE_PREFIXES = GLOBAL_excludedNotifications.map(type => type.replace(/\*$/, ''))
+
 // INFO - CH - 2020-06-16 - this file is a component that render null because that way, it can use the TracimComponent
 // HOC like apps would do. It also allow using connect() from redux which adds the props dispatch().
 export class ReduxTlmDispatcher extends React.Component {
@@ -98,7 +102,7 @@ export class ReduxTlmDispatcher extends React.Component {
   handleNotification = data => {
     if (
       this.props.user.userId !== data.fields.author.user_id &&
-      !GLOBAL_excludedNotifications.some(type => data.event_type.startsWith(type))
+      !EXCLUDED_NOTIFICATION_TYPE_PREFIXES.some(type => data.event_type.startsWith(type))
     ) {
       this.props.dispatch(addNotification(data))
     }

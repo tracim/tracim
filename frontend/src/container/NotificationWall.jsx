@@ -204,26 +204,51 @@ export class NotificationWall extends React.Component {
         msgType: 'info'
       }
 
-      switch (eventType) {
-        case TLM_EVENT.CREATED: return {
-          ...details,
-          title: props.t('Account created'),
-          text: props.t("{{author}} created <b>{{user}}</b>'s account", i18nOpts)
+      if (notification.author.userId === notification.user.userId) {
+        switch (eventType) {
+          case TLM_EVENT.CREATED: return {
+            ...details,
+            title: props.t('Account created'),
+            text: props.t('{{author}} created their account', i18nOpts)
+          }
+          case TLM_EVENT.MODIFIED: return {
+            ...details,
+            title: props.t('Account updated'),
+            text: props.t('{{author}} modified their account', i18nOpts)
+          }
+          case TLM_EVENT.DELETED: return {
+            ...details,
+            title: props.t('Account deleted'),
+            text: props.t('{{author}} deleted their account', i18nOpts)
+          }
+          case TLM_EVENT.UNDELETED: return {
+            ...details,
+            title: props.t('Account restored'),
+            text: props.t('{{author}} restored their account', i18nOpts)
+          }
         }
-        case TLM_EVENT.MODIFIED: return {
-          ...details,
-          title: props.t('Account updated'),
-          text: props.t("{{author}} modified <b>{{user}}</b>'s account", i18nOpts)
-        }
-        case TLM_EVENT.DELETED: return {
-          ...details,
-          title: props.t('Account deleted'),
-          text: props.t("{{author}} deleted <b>{{user}}</b>'s account", i18nOpts)
-        }
-        case TLM_EVENT.UNDELETED: return {
-          ...details,
-          title: props.t('Account restored'),
-          text: props.t("{{author}} restored <b>{{user}}</b>'s account", i18nOpts)
+      } else {
+        switch (eventType) {
+          case TLM_EVENT.CREATED: return {
+            ...details,
+            title: props.t('Account created'),
+            text: props.t("{{author}} created <b>{{user}}</b>'s account", i18nOpts)
+          }
+          case TLM_EVENT.MODIFIED: return {
+            ...details,
+            title: props.t('Account updated'),
+            text: props.t("{{author}} modified <b>{{user}}</b>'s account", i18nOpts)
+          }
+          case TLM_EVENT.DELETED: return {
+            ...details,
+            title: props.t('Account deleted'),
+            text: props.t("{{author}} deleted <b>{{user}}</b>'s account", i18nOpts)
+          }
+          case TLM_EVENT.UNDELETED: return {
+            ...details,
+            title: props.t('Account restored'),
+            text: props.t("{{author}} restored <b>{{user}}</b>'s account", i18nOpts)
+          }
         }
       }
     }
@@ -233,19 +258,15 @@ export class NotificationWall extends React.Component {
     if (entityType === TLM_ENTITY.SHAREDSPACE_MEMBER) {
       switch (eventType) {
         case TLM_EVENT.CREATED: {
-          let notificationText
-          if (props.user.userId === notification.user.userId) {
-            notificationText = props.t('{{author}} added you to a space', i18nOpts)
-          } else {
-            if (notification.author.userId === notification.user.userId) {
-              notificationText = props.t('{{author}} joined a space', i18nOpts)
-            } else {
-              notificationText = props.t('{{author}} added <b>{{user}}</b> to a space', i18nOpts)
-            }
-          }
           return {
             title: props.t('New access'),
-            text: notificationText,
+            text: props.user.userId === notification.user.userId
+              ? props.t('{{author}} added you to a space', i18nOpts)
+              : (
+                notification.author.userId === notification.user.userId
+                  ? props.t('{{author}} joined a space', i18nOpts)
+                  : props.t('{{author}} added <b>{{user}}</b> to a space', i18nOpts)
+              ),
             url: dashboardUrl
           }
         }
@@ -253,14 +274,22 @@ export class NotificationWall extends React.Component {
           title: props.t('Status updated'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} modified your role in a space', i18nOpts)
-            : props.t("{{author}} modified <b>{{user}}</b>'s role in a space", i18nOpts),
+            : (
+              notification.author.userId === notification.user.userId
+                ? props.t('{{author}} modified their role in a space', i18nOpts)
+                : props.t("{{author}} modified <b>{{user}}</b>'s role in a space", i18nOpts)
+            ),
           url: dashboardUrl
         }
         case TLM_EVENT.DELETED: return {
           title: props.t('Access removed'),
           text: props.user.userId === notification.user.userId
             ? props.t('{{author}} removed you from a space', i18nOpts)
-            : props.t('{{author}} removed <b>{{user}}</b> from a space', i18nOpts),
+            : (
+              notification.author.userId === notification.user.userId
+                ? props.t('{{author}} removed themself from a space', i18nOpts)
+                : props.t('{{author}} removed <b>{{user}}</b> from a space', i18nOpts)
+            ),
           url: dashboardUrl
         }
       }
