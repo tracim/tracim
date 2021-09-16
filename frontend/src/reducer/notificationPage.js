@@ -2,6 +2,7 @@ import { uniqBy } from 'lodash'
 import {
   ADD,
   APPEND,
+  CONTENT,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
@@ -77,13 +78,7 @@ export const hasSameContent = notificationList => {
   if (notificationList.some(notification => !notification.content)) return false
   return notificationList.every((notification, index) => {
     if (index === 0) return true
-    const previousContentId = notificationList[index - 1].type.includes(CONTENT_TYPE.COMMENT)
-      ? notificationList[index - 1].content.parentId
-      : notificationList[index - 1].content.id
-    const contentId = notification.type.includes(CONTENT_TYPE.COMMENT)
-      ? notification.content.parentId
-      : notification.content.id
-    return contentId === previousContentId
+    return getMainContentId(notification) === getMainContentId(notificationList[index - 1])
   })
 }
 
@@ -221,6 +216,12 @@ export const groupNotificationListWithOneCriteria = (notificationList) => {
   return newNotificationList
 }
 
+function getMainContentId (notification) {
+  return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ET.MENTION)
+    ? notification.content.parentId
+    : notification.content.id
+}
+
 export default function notificationPage (state = defaultNotificationsObject, action) {
   switch (action.type) {
     case `${SET}/${NOTIFICATION_LIST}`: {
@@ -280,10 +281,37 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     }
 
     case `${READ}/${NOTIFICATION_LIST}`: {
-      const notificationList = state.list.map(notification => (
-        { ...notification, read: true }
-      ))
+      const notificationList = state.list.map(notification => notification.group
+        ? { ...notification, group: notification.group.map(notification => ({ ...notification, read: true })) }
+        : { ...notification, read: true }
+      )
       return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
+    }
+
+    case `${READ}/${CONTENT}/${NOTIFICATION}`: {
+      let unreadMentionCount = state.unreadMentionCount
+      let unreadNotificationCount = state.unreadNotificationCount
+      const markNotificationAsRead = (notification) => {
+        if (!notification.content) return notification
+        if (getMainContentId(notification) === action.contentId) {
+          if (!notification.read) {
+            if (notification.type.includes(TLM_ET.MENTION)) unreadMentionCount--
+            unreadNotificationCount--
+          }
+          return { ...notification, read: true }
+        }
+        return notification
+      }
+
+      const newNotificationList = state.list.map(notification => {
+        if (notification.group) {
+          return {
+            ...notification,
+            group: notification.group.map(notification => markNotificationAsRead(notification))
+          }
+        } else return markNotificationAsRead(notification)
+      })
+      return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount, unreadNotificationCount }
     }
 
     case `${SET}/${NEXT_PAGE}`:

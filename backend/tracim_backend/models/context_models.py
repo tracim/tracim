@@ -789,6 +789,14 @@ class LiveMessageQuery(BasePaginatedQuery):
         self.related_to_content_ids = string_to_list(related_to_content_ids, ",", int)
 
 
+class UserMessagesMarkAsReadQuery(object):
+    def __init__(
+        self, content_ids: str = "", parent_ids: str = "",
+    ):
+        self.content_ids = string_to_list(content_ids, ",", int)
+        self.parent_ids = string_to_list(parent_ids, ",", int)
+
+
 class UserMessagesSummaryQuery(object):
     """
     Message summary query model

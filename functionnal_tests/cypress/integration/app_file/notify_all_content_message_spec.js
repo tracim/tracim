@@ -1,5 +1,3 @@
-/*
-FIXME - RJ - 2021-03-04 - Unstable test. See https://github.com/tracim/tracim/issues/4239
 import { PAGES as p } from '../../support/urls_commands'
 
 const fileTitle = 'FileTitle'
@@ -37,15 +35,17 @@ describe('In File', () => {
     })
 
     const languageTestCases = [
-      { code: 'en', label: 'English', mentionContains: '@all Please' },
-      { code: 'fr', label: 'Français', mentionContains: '@tous Veuillez' },
-      { code: 'pt', label: 'Português', mentionContains: '@todos reparem' }
+      { code: 'en', label: 'English', mentionContains: '@all Please', buttonLabel: 'click here', timeline: 'Timeline' },
+      { code: 'fr', label: 'Français', mentionContains: '@tous Veuillez', buttonLabel: 'cliquez ici', timeline: 'Historique'  },
+      { code: 'pt', label: 'Português', mentionContains: '@todos reparem', buttonLabel: 'clique aqui', timeline: 'Linha cronológica'  }
     ]
 
     for (const testCase of languageTestCases) {
       describe('clicking on "notify all" message', () => {
         it(`should send a comment with a translated @all mention (${testCase.code})`, () => {
+          cy.get('.wsContentGeneric__content__right__content__title').should('be.visible')
           cy.changeLanguage(testCase.code)
+          cy.contains('.wsContentGeneric__content__right__content__title', testCase.timeline)
           cy.get('[data-cy=popin_right_part_properties]').should('be.visible').click()
           cy.get('.fileProperties__content__detail__btndesc').should('be.visible').click()
           cy.contains('.dropdownlang__dropdown__btnlanguage', testCase.label)
@@ -53,11 +53,10 @@ describe('In File', () => {
           cy.get('.fileProperties__content__detail__description__editiondesc__btn__validate').should('not.be.disabled').click()
           cy.get('[data-cy=popin_right_part_timeline]').should('not.be.disabled').click()
           cy.get('.promptMessage').should('be.visible')
-          cy.get('.buttonLink').click()
-          cy.contains('.file__contentpage__body__text', testCase.mentionContains).should('be.visible')
+          cy.contains('.buttonLink', testCase.buttonLabel).click()
+          cy.contains('.file__contentpage__comment__body__content__text', testCase.mentionContains).should('be.visible')
         })
       })
     }
   })
 })
-*/

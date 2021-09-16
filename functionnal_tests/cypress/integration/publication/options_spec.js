@@ -31,6 +31,7 @@ describe('Publications page', () => {
   })
 
   it('should be possible to comment a publication', () => {
+    cy.contains('.buttonComments', 'Comment').should('be.visible').click()
     cy.get('#wysiwygTimelineComment1')
       .should('be.visible')
       .type(text)

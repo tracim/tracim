@@ -493,4 +493,8 @@
   "{{author}} deleted their account": "{{author}} hat sein Konto gelöscht",
   "{{author}} restored their account": "{{author}} hat sein Konto wiederhergestellt",
   "{{author}} modified their role in a space": "{{author}} hat seine Rolle in einem Bereich geändert"
+  "Hide discussion": "Diskussion ausblenden",
+  "Show discussion": "Diskussion ausblenden",
+  "Hide comment area": "Kommentarbereich ausblenden",
+  "Comment": "Kommentieren"
 }

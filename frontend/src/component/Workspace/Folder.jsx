@@ -128,7 +128,7 @@ class Folder extends React.Component {
                         key={`${props.folderData.id}__${app.slug}`}
                       >
                         <i
-                          className={`fa-fw ${props.faIcon}`}
+                          className={`fa-fw ${app.faIcon}`}
                           style={{ color: app.hexcolor }}
                         />
                         {props.t(app.creationLabel)}

@@ -493,4 +493,8 @@
   "{{author}} deleted their account": "{{author}} apagou a sua conta",
   "{{author}} restored their account": "{{author}} restaurou a sua conta",
   "{{author}} modified their role in a space": "{{author}} modificou a sua função num espaço"
+  "Hide discussion": "Ocultar discussão",
+  "Show discussion": "Ver discussão",
+  "Hide comment area": "Ocultar área de comentário",
+  "Comment": "Comentar"
 }

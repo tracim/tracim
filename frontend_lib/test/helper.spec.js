@@ -1,6 +1,7 @@
 import { expect } from 'chai'
 import {
   buildFilePreviewUrl,
+  checkEmailValidity,
   createSpaceTree,
   convertBackslashNToBr,
   handleFetchResult,
@@ -533,6 +534,64 @@ describe('helper.js', () => {
       ).to.equal(
         "http://unit.test//workspaces/1/files/2/revisions/3/preview/jpg/640x480/Captures%20%2F%20d'%C3%A9cran%20(n%C2%B01).jpg?page=4"
       )
+    })
+  })
+
+  describe('checkEmailValidity()', () => {
+    it('should return true if the string has two not-empty parts with an @ between', () => {
+      expect(checkEmailValidity('something@something')).to.equal(true)
+    })
+
+    it('should return false if the string has only the second part and an @', () => {
+      expect(checkEmailValidity('@something')).to.equal(false)
+    })
+
+    it('should return false if the string has only the first part and an @', () => {
+      expect(checkEmailValidity('something@')).to.equal(false)
+    })
+
+    it('should return false if the first part has a comma', () => {
+      expect(checkEmailValidity('somet,hing@something')).to.equal(false)
+    })
+
+    it('should return false if the first part has a semicolon', () => {
+      expect(checkEmailValidity('somet;hing@something')).to.equal(false)
+    })
+
+    it('should return false if the first part has a >', () => {
+      expect(checkEmailValidity('somet>hing@something')).to.equal(false)
+    })
+
+    it('should return false if the first part has a <', () => {
+      expect(checkEmailValidity('somet<hing@something')).to.equal(false)
+    })
+
+    it('should return false if the second part has a comma', () => {
+      expect(checkEmailValidity('something@somet,hing')).to.equal(false)
+    })
+
+    it('should return false if the second part has a semicolon', () => {
+      expect(checkEmailValidity('something@somet;hing')).to.equal(false)
+    })
+
+    it('should return false if the second part has a >', () => {
+      expect(checkEmailValidity('something@somet>hing')).to.equal(false)
+    })
+
+    it('should return false if the second part has a <', () => {
+      expect(checkEmailValidity('something@somet<hing')).to.equal(false)
+    })
+
+    it('should return false if the string has only an @', () => {
+      expect(checkEmailValidity('@')).to.equal(false)
+    })
+
+    it('should return false if the string has no @', () => {
+      expect(checkEmailValidity('something')).to.equal(false)
+    })
+
+    it('should return true if the string has two not-empty parts with an @ between even if multiples @', () => {
+      expect(checkEmailValidity('something@something@something')).to.equal(true)
     })
   })
 })

@@ -4,10 +4,12 @@ import {
   addNotification,
   APPEND,
   appendNotificationList,
+  CONTENT,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
   READ,
+  readContentNotification,
   readNotification,
   readNotificationList,
   SET,
@@ -141,6 +143,22 @@ describe('reducer notificationPage.js', () => {
 
       it('should return the list of objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
+      })
+    })
+
+    describe(`${READ}/${CONTENT}/${NOTIFICATION}`, () => {
+      const notificationWithContent = {
+        ...notification,
+        content: { label: 'test', id: 5 }
+      }
+      const listOfNotification = notificationPage(
+        { ...initialState, list: [notificationWithContent], unreadNotificationCount: 1 },
+        readContentNotification(5)
+      )
+
+      it('should return the list of objects with read set as true and counts as 0', () => {
+        expect(listOfNotification).to.deep.equal(
+          { ...initialState, list: [{ ...notificationWithContent, read: true }], unreadNotificationCount: 0 })
       })
     })
 
