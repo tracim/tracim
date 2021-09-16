@@ -11,6 +11,10 @@ class TracimEmailValidator(Validator):
     in frontend and backend like "<" and ";"
     """
 
+    # INFO - G.M - 2021-09-16 - These rules are the same in frontend and should be keep synchronised
+    # Adapt the function checkEmailValidity in tracim/frontend_lib/src/helper.js if you change the
+    # rules there
+
     FORBIDDEN_CHARS = ["<", ">", ",", ";", "\n"]
 
     default_message = "Not a valid email address."
