@@ -454,6 +454,7 @@ export const parserStringToList = (string, separatorList = [',', ';', '\n']) => 
 // Warning: These rules are the same in frontend and should be keep synchronised. If you change the rules
 // here, you shoul adapt the class TracimEmailValidator in tracim/backend/tracim_backend/app_models/email_validators.py
 export const checkEmailValidity = email => {
+  if (email.includes('<') && email.includes('>')) email = email.substring(email.indexOf('<') + 1, email.lastIndexOf('>'))
   const firstPart = email.substr(0, email.lastIndexOf('@'))
   const secondPart = email.substr(email.lastIndexOf('@') + 1)
   return firstPart !== '' && secondPart !== '' && !/[,;<>\n]/.test(email)
