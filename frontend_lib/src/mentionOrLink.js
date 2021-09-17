@@ -9,8 +9,8 @@ export const MENTION_ID_PREFIX = 'mention-'
 export const MENTION_CLASS = 'mention'
 export const MENTION_ME_CLASS = 'mention-me'
 export const MENTION_TAG_NAME = 'span'
-export const MENTION_REGEX = /(>?)@([a-zA-Z0-9\-_]+)(?=\s|$|<)/
-export const MENTION_REGEX_GLOBAL = /(>?)@([a-zA-Z0-9\-_]+)(?=\s|$|<)/g
+export const MENTION_REGEX = /@([a-zA-Z0-9\-_]+)(?=\s|$)/
+export const MENTION_REGEX_GLOBAL = /@([a-zA-Z0-9\-_]+)(?=\s|$)/g
 export const GROUP_MENTION_LIST = [
   {
     mention: 'all',
