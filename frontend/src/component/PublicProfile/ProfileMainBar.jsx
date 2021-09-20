@@ -65,6 +65,15 @@ export const ProfileMainBar = props => {
               </div>
               <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
             </div>
+              <IconButton
+                title={props.t('Appeler')}
+                text={props.t('Appeler')}
+                icon='fas fa-phone'
+                onClick={props.displayCallPopup} // ici mettre le state
+                customClass='profile__mainBar__callBtn'
+                // intent='pins'
+                // dataCy='profile_avatar_changeBtn'
+              />
           </div>
         )
         : (
@@ -81,7 +90,8 @@ ProfileMainBar.propTypes = {
   breadcrumbsList: PropTypes.array,
   displayedUser: PropTypes.object,
   onChangeAvatarClick: PropTypes.func.isRequired,
-  changeAvatarEnabled: PropTypes.bool
+  changeAvatarEnabled: PropTypes.bool,
+  displayCallPopup: PropTypes.func
 }
 
 ProfileMainBar.defaultProps = {

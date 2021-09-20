@@ -11,7 +11,8 @@ import {
   PROFILE,
   IconButton,
   getAvatarBaseUrl,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  CardPopup
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -122,7 +123,8 @@ export class PublicProfile extends React.Component {
       informationDataSchema: {},
       personalPageDataSchema: {},
       dataSchemaObject: {},
-      displayUploadPopup: undefined
+      displayUploadPopup: undefined,
+      displayCallPopup: undefined
     }
 
     props.registerCustomEventHandlerList([
@@ -384,6 +386,26 @@ export class PublicProfile extends React.Component {
 
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
+  displayCallPopup = () => {
+    this.setState({ displayCallPopup: true })
+  }
+
+  handleCloseDeleteFilePopup = () => {
+    this.setState({ displayCallPopup: false })
+  }
+
+  openCallWindow = () => {
+    // TLM
+    // link to call
+    console.log('calling')
+  }
+
+  cancelCall = () => {
+    // TLM
+    // link to call
+    console.log('cancel')
+  }
+
   render () {
     const { props, state } = this
 
@@ -426,6 +448,40 @@ export class PublicProfile extends React.Component {
             />
           )}
 
+            {state.displayCallPopup && (
+              <CardPopup
+                customClass='gallery__delete__file__popup'
+                customHeaderClass='primaryColorBg'
+                onClose={this.handleCloseDeleteFilePopup}
+                label={props.t('Appel en cours...')}
+                faIcon='fas fa-phone'
+              >
+                <div className='gallery__delete__file__popup__body'>
+                  <div>User a reçu votre appel de 10h. S'il est accepté, l'appel s'ouvrira automatiquement</div>
+                  <br/>
+                  <div className='gallery__delete__file__popup__body__btn'>
+                    <IconButton
+                      onClick={this.cancelCall}
+                      text={props.t(`Annuler l'appel`)}
+                      icon='fas fa-phone-slash'
+                    />
+
+                    <IconButton
+                      // customClass='gallery__delete__file__popup__body__btn__delete'
+                      intent='primary'
+                      mode='light'
+                      onClick={this.openCallWindow()}
+                      dataCy='gallery__delete__file__popup__body__btn__delete'
+                      text={props.t(`Ouvrir l'appel`)}
+                      icon='fas fa-phone'
+                      // color={'#2f7d30'} // mettre la variable
+                      color={GLOBAL_primaryColor}
+                    />
+                  </div>
+                </div>
+              </CardPopup>
+            )}
+
           <CoverImage
             displayedUser={state.displayedUser}
             changeEnabled={isPublicProfileEditable}
@@ -440,6 +496,7 @@ export class PublicProfile extends React.Component {
             breadcrumbsList={props.breadcrumbs}
             onChangeAvatarClick={this.handleChangeAvatarClick}
             changeAvatarEnabled={isPublicProfileEditable}
+            displayCallPopup={this.displayCallPopup}
           />
 
           <div className='profile__content'>
