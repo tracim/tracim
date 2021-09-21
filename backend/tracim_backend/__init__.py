@@ -68,6 +68,7 @@ from tracim_backend.views.core_api.system_controller import SystemController
 from tracim_backend.views.core_api.tag_controller import TagController
 from tracim_backend.views.core_api.url_preview_controller import URLPreviewController
 from tracim_backend.views.core_api.user_controller import UserController
+from tracim_backend.views.core_api.usercall import UserCallController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
@@ -301,6 +302,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     tag_controller = TagController()
     url_preview_controller = URLPreviewController()
     favorite_content_controller = FavoriteContentController()
+    user_call_controller = UserCallController()
     configurator.include(session_controller.bind, route_prefix=BASE_API)
     configurator.include(system_controller.bind, route_prefix=BASE_API)
     configurator.include(user_controller.bind, route_prefix=BASE_API)
@@ -312,6 +314,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(tag_controller.bind, route_prefix=BASE_API)
     configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
     configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
+    configurator.include(user_call_controller.bind, route_prefix=BASE_API)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():

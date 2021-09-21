@@ -854,6 +854,24 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 ## all next lines are not directly concerned by syntax explain in beggining of this file.
 
+####
+# UserCall service
+####
+
+# This feature allows to call other users by using a third-party call service.
+
+; user_call.enabled = False
+
+## User call provider, currently only "jitsi" is supported
+; user_call.provider =
+# example:
+# user_call.provider = jitsi
+
+## Jitsi configuration parameters
+; user_call.jitsi_url =
+# example:
+; user_call.jitsi_url = https://meet.jit.si
+
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #
 ##############################
