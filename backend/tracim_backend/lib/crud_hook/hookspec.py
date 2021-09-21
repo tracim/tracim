@@ -1,6 +1,7 @@
 from tracim_backend.lib.core.plugins import hookspec
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
+from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
@@ -20,6 +21,7 @@ class DatabaseCrudHookSpec:
     - Reaction
     - Tag
     - TagOnContent
+    - UserCall
     """
 
     @hookspec
@@ -128,4 +130,16 @@ class DatabaseCrudHookSpec:
 
     @hookspec
     def on_content_tag_deleted(self, content_tag: TagOnContent, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_user_call_created(self, user_call: UserCall, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_user_call_modified(self, user_call: UserCall, context: TracimContext) -> None:
+        ...
+
+    @hookspec
+    def on_user_call_deleted(self, user_call: UserCall, context: TracimContext) -> None:
         ...

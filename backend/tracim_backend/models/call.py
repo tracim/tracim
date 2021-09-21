@@ -2,7 +2,6 @@ import enum
 import typing
 
 from sqlalchemy import Column
-from sqlalchemy import DateTime
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -15,6 +14,11 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.mixins import CreationDateMixin
 from tracim_backend.models.mixins import UpdateDateMixin
+
+
+class UserCallProvider(enum.Enum):
+    NONE = ""
+    JITSI = "jitsi"
 
 
 class UserCallState(enum.Enum):
@@ -30,8 +34,6 @@ class UserCallState(enum.Enum):
 
     # Caller state changes
     CANCELLED = "cancelled"
-
-    # Leftover
     UNANSWERED = "unanswered"
 
 

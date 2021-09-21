@@ -1,22 +1,18 @@
-import enum
 import hashlib
 import typing
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import literal
 
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import User
 from tracim_backend.models.call import UserCall
+from tracim_backend.models.call import UserCallProvider
 from tracim_backend.models.call import UserCallState
 from tracim_backend.models.tracim_session import TracimSession
 
 if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
-
-
-class UserCallProvider(enum.Enum):
-    NONE = ""
-    JITSI = "jitsi"
 
 
 class UserCallLib:
@@ -26,7 +22,8 @@ class UserCallLib:
         self._user = current_user
 
     def create(self, callee_id: int) -> UserCall:
-        call = UserCall(caller_id=self._user.user_id, callee_id=callee_id)
+        user_api = UserApi(session=self._session, config=self._config, current_user=self._user)
+        call = UserCall(caller=self._user, callee=user_api.get_one(callee_id))
         call.url = self._create_call_url(call)
         self._session.add(call)
         self._session.flush()
@@ -58,7 +55,6 @@ class UserCallLib:
 
         if state:
             query = query.filter(UserCall.state == state)
-        breakpoint()
         return query.order_by(UserCall.id).all()
 
     def get_one(self, user_id: int, call_id: int) -> UserCall:
@@ -76,7 +72,9 @@ class UserCallLib:
         assert self._config.USER_CALL__ENABLED
         assert self._config.USER_CALL__PROVIDER == UserCallProvider.JITSI
         base_url = self._config.USER_CALL__JITSI_URL
+        # Sort the ids so that the generated hash is always the same for a pair of ids.
+        sorted_ids = sorted((call.caller_id, call.callee_id))
         h = hashlib.sha256()
-        h.update(str(call.caller_id).encode())
-        h.update(str(call.callee_id).encode())
-        return "{}-{}".format(base_url, h.hexdigest())
+        for user_id in sorted_ids:
+            h.update(str(user_id).encode())
+        return "{}/tracim-{}".format(base_url, h.hexdigest())

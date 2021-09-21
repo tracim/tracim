@@ -19,7 +19,6 @@ from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
-from tracim_backend.lib.core.usercall import UserCallProvider
 from tracim_backend.lib.translate.providers import TRANSLATION_SERVICE_CLASSES
 from tracim_backend.lib.translate.providers import TranslationProvider
 from tracim_backend.lib.utils.app import TracimApplication
@@ -37,6 +36,7 @@ from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.call import UserCallProvider
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import WorkspaceAccessType
 
