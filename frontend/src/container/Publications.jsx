@@ -317,7 +317,7 @@ export class Publications extends React.Component {
       {
         link: myLink,
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Publications'),
+        label: props.t('News'),
         isALink: false
       }
     ]
@@ -328,7 +328,7 @@ export class Publications extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     const headTitle = buildHeadTitle(
-      [props.t('Publications'), props.currentWorkspace.label]
+      [props.t('News'), props.currentWorkspace.label]
     )
     props.dispatch(setHeadTitle(headTitle))
   }

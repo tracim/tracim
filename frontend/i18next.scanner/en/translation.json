@@ -423,7 +423,6 @@
   "Recent activities": "Recent activities",
   "Loading recent activities…": "Loading recent activities…",
   "undeleted": "restored",
-  "Publications": "Publications",
   "Reaction created": "Reaction created",
   "{{author}} reacted to {{content}} with {{reaction}}": "{{author}} reacted to {{content}} with {{reaction}}",
   "Reaction deleted": "Reaction deleted",
@@ -459,7 +458,6 @@
   "copied": "copied",
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Download {{filename}}": "Download {{filename}}",
-  "Show in publications": "Show in publications",
   "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page.",
   "Open as content": "Open as content",
   "New full name:": "New full name:",
@@ -472,5 +470,7 @@
   "Current password:": "Current password:",
   "Alex Doe": "Alex Doe",
   "alex.doe@jco.co": "alex.doe@jco.co",
-  "In order to finish your sign in, please read the following usage conditions and accept them": "In order to finish your sign in, please read the following usage conditions and accept them"
+  "In order to finish your sign in, please read the following usage conditions and accept them": "In order to finish your sign in, please read the following usage conditions and accept them",
+  "Show in news": "Show in news",
+  "News": "News"
 }

@@ -427,15 +427,15 @@ export class WorkspaceAdvanced extends React.Component {
     switch (fetchTogglePublicationEnabled.apiResponse.status) {
       case 200:
         this.sendGlobalFlashMessage(
-          newPublicationEnabledValue ? props.t('Publications activated') : props.t('Publications deactivated'),
+          newPublicationEnabledValue ? props.t('News activated') : props.t('News deactivated'),
           'info'
         )
         break
       default:
         this.sendGlobalFlashMessage(
           newPublicationEnabledValue
-            ? props.t('Error while activating publications')
-            : props.t('Error while deactivating publications'),
+            ? props.t('Error while activating news')
+            : props.t('Error while deactivating news'),
           'warning'
         )
     }
