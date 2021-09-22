@@ -441,7 +441,7 @@ export class Dashboard extends React.Component {
     let contentTypeButtonList = []
     if (props.curWs.publicationEnabled) {
       contentTypeButtonList.push({
-        slug: 'publications',
+        slug: 'news',
         creationLabel: props.t('Publish some information'),
         route: PAGE.WORKSPACE.PUBLICATIONS(props.curWs.id),
         hexcolor: publicationColor,
