@@ -862,15 +862,15 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 
 ; call.enabled = False
 
-## Call provider, currently only "jitsi" is supported
+## Call provider, currently only "jitsi_meet" is supported
 ; call.provider =
 # example:
-# call.provider = jitsi
+# call.provider = jitsi_meet
 
-## Jitsi configuration parameters
-; call.jitsi_url =
+## Jitsi Meet configuration parameters
+; call.jitsi_meet.url =
 # example:
-; call.jitsi_url = https://meet.jit.si
+; call.jitsi_meet.url = https://meet.jit.si
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #

@@ -18,7 +18,7 @@ from tracim_backend.models.mixins import UpdateDateMixin
 
 class CallProvider(enum.Enum):
     NONE = ""
-    JITSI = "jitsi"
+    JITSI_MEET = "jitsi_meet"
 
 
 class UserCallState(enum.Enum):

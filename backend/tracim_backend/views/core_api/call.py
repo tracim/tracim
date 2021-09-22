@@ -51,7 +51,26 @@ class CallController(Controller):
     @hapic.input_path(UserIdCallIdPathSchema())
     @hapic.input_body(UpdateUserCallStateSchema())
     @hapic.output_body(UserCallSchema())
-    def update_call_state(self, context, request: TracimRequest, hapic_data=None) -> UserCall:
+    def update_incoming_call_state(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> UserCall:
+        """
+        Update the state of a call.
+        """
+        call_lib = CallLib(
+            session=request.dbsession, config=request.app_config, current_user=request.current_user
+        )
+        return call_lib.update_call_state(hapic_data.path["call_id"], hapic_data.body["state"])
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.handle_exception(UserCallTransitionNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.input_path(UserIdCallIdPathSchema())
+    @hapic.input_body(UpdateUserCallStateSchema())
+    @hapic.output_body(UserCallSchema())
+    def update_outgoing_call_state(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> UserCall:
         """
         Update the state of a call.
         """
@@ -81,6 +100,24 @@ class CallController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)
+    @hapic.input_path(UserIdCallIdPathSchema())
+    @hapic.output_body(UserCallSchema())
+    def get_incoming_call(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ListItemsObject[UserCall]:
+        """
+        Get one (incoming or outgoing) call.
+        """
+        call_lib = CallLib(
+            session=request.dbsession, config=request.app_config, current_user=request.current_user
+        )
+        call = call_lib.get_one(
+            user_id=request.candidate_user.user_id, call_id=hapic_data.path["call_id"]
+        )
+        return call
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
+    @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(GetUserCallsQuerySchema())
     @hapic.output_body(UserCallsSchema())
@@ -98,6 +135,24 @@ class CallController(Controller):
         )
         return ListItemsObject(calls)
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdCallIdPathSchema())
+    @hapic.output_body(UserCallSchema())
+    def get_outgoing_call(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ListItemsObject[UserCall]:
+        """
+        Get one (incoming or outgoing) call.
+        """
+        call_lib = CallLib(
+            session=request.dbsession, config=request.app_config, current_user=request.current_user
+        )
+        call = call_lib.get_one(
+            user_id=request.candidate_user.user_id, call_id=hapic_data.path["call_id"]
+        )
+        return call
+
     def bind(self, configurator: Configurator) -> None:
         configurator.add_route(
             "create_call", "/users/{user_id}/outgoing_calls", request_method="POST",
@@ -109,14 +164,28 @@ class CallController(Controller):
             "/users/{user_id}/outgoing_calls/{call_id}/state",
             request_method="PUT",
         )
-        configurator.add_view(self.update_call_state, route_name="update_outgoing_call_state")
+        configurator.add_view(
+            self.update_outgoing_call_state, route_name="update_outgoing_call_state"
+        )
 
         configurator.add_route(
             "update_incoming_call_state",
             "/users/{user_id}/incoming_calls/{call_id}/state",
             request_method="PUT",
         )
-        configurator.add_view(self.update_call_state, route_name="update_incoming_call_state")
+        configurator.add_view(
+            self.update_incoming_call_state, route_name="update_incoming_call_state"
+        )
+
+        configurator.add_route(
+            "get_incoming_call", "/users/{user_id}/incoming_calls/{call_id}", request_method="GET",
+        )
+        configurator.add_view(self.get_incoming_call, route_name="get_incoming_call")
+
+        configurator.add_route(
+            "get_outgoing_call", "/users/{user_id}/outgoing_calls/{call_id}", request_method="GET",
+        )
+        configurator.add_view(self.get_outgoing_call, route_name="get_outgoing_call")
 
         configurator.add_route(
             "get_incoming_calls", "/users/{user_id}/incoming_calls", request_method="GET",

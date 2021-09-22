@@ -902,7 +902,7 @@ class CFG(object):
         prefix = "call"
         self.CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
         self.CALL__PROVIDER = CallProvider(self.get_raw_config("{}.provider".format(prefix), ""))
-        self.CALL__JITSI_URL = self.get_raw_config("{}.jitsi_url".format(prefix))
+        self.CALL__JITSI_MEET__URL = self.get_raw_config("{}.jitsi_meet.url".format(prefix))
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 

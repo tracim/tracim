@@ -73,8 +73,8 @@ class CallLib:
 
     def _create_call_url(self, call: UserCall) -> str:
         assert self._config.CALL__ENABLED
-        assert self._config.CALL__PROVIDER == CallProvider.JITSI
-        base_url = self._config.CALL__JITSI_URL
+        assert self._config.CALL__PROVIDER == CallProvider.JITSI_MEET
+        base_url = self._config.CALL__JITSI_MEET__URL
         # Sort the ids so that the generated hash is always the same for a pair of ids.
         sorted_ids = sorted((call.caller.user_id, call.callee.user_id))
         h = hashlib.sha256()

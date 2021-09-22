@@ -48,7 +48,7 @@ def three_users(
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_test_with_call"}], indirect=True)
-class TestUserCallEndpoint(object):
+class TestUserCallEndpoint:
     """
     Tests for /api/users/{user_id}/outgoing_calls and /api/users/{user_id}/incoming_calls
     endpoints
@@ -73,6 +73,44 @@ class TestUserCallEndpoint(object):
         url = "/api/users/{user_id}/outgoing_calls{query}"
         res = web_testapp.get(url.format(user_id=user.user_id, query=query), status=200,)
         assert len(res.json["items"]) == expected_item_count
+
+    @pytest.mark.parametrize("user_index,call_type", [(0, "outgoing_calls"), (1, "incoming_calls")])
+    def test_api__get_call__ok_200__nominal_cases(
+        self,
+        web_testapp,
+        two_calls: typing.Tuple[UserCall, UserCall],
+        three_users: typing.Tuple[User, User, User],
+        app_config: CFG,
+        user_index: int,
+        call_type: str,
+    ) -> None:
+        user = three_users[user_index]
+        (call_1, _) = two_calls
+        web_testapp.authorization = ("Basic", (user.username, "password"))
+        url = "/api/users/{user_id}/{call_type}/{call_id}"
+        res = web_testapp.get(
+            url.format(user_id=user.user_id, call_type=call_type, call_id=call_1.call_id),
+            status=200,
+        )
+        assert res.json["call_id"] == 1
+        assert res.json["callee"] == {
+            "has_avatar": False,
+            "has_cover": False,
+            "public_name": "Riyad Faisal",
+            "user_id": 3,
+            "username": "riyad",
+        }
+        assert res.json["caller"] == {
+            "has_avatar": False,
+            "has_cover": False,
+            "public_name": "bob",
+            "user_id": 2,
+            "username": "bob",
+        }
+        assert res.json["state"] == "accepted"
+        assert res.json["url"].startswith(app_config.CALL__JITSI_MEET__URL)
+        assert "created" in res.json
+        assert "modified" in res.json
 
     @pytest.mark.parametrize(
         "user_index,query,expected_item_count",
@@ -125,7 +163,7 @@ class TestUserCallEndpoint(object):
             "username": "bob",
         }
         assert res.json["state"] == "in_progress"
-        assert res.json["url"].startswith(app_config.CALL__JITSI_URL)
+        assert res.json["url"].startswith(app_config.CALL__JITSI_MEET__URL)
         assert "created" in res.json
         assert "modified" in res.json
 
