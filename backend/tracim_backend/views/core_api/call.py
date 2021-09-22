@@ -1,9 +1,8 @@
-import typing
-
 from pyramid.config import Configurator
 
+from tracim_backend.exceptions import UserCallTransitionNotAllowed
 from tracim_backend.extensions import hapic
-from tracim_backend.lib.core.usercall import UserCallLib
+from tracim_backend.lib.core.call import CallLib
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.request import TracimRequest
@@ -31,7 +30,7 @@ SWAGGER_TAG__USER_CALL_ENDPOINTS = generate_documentation_swagger_tag(
 )
 
 
-class UserCallController(Controller):
+class CallController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
@@ -41,13 +40,14 @@ class UserCallController(Controller):
         """
         Create a new call for the user given in the body.
         """
-        user_call_lib = UserCallLib(
+        call_lib = CallLib(
             session=request.dbsession, config=request.app_config, current_user=request.current_user
         )
-        return user_call_lib.create(hapic_data.body["callee_id"])
+        return call_lib.create(hapic_data.body["callee_id"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)
+    @hapic.handle_exception(UserCallTransitionNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UserIdCallIdPathSchema())
     @hapic.input_body(UpdateUserCallStateSchema())
     @hapic.output_body(UserCallSchema())
@@ -55,10 +55,10 @@ class UserCallController(Controller):
         """
         Update the state of a call.
         """
-        user_call_lib = UserCallLib(
+        call_lib = CallLib(
             session=request.dbsession, config=request.app_config, current_user=request.current_user
         )
-        return user_call_lib.update_call_state(hapic_data.path["call_id"], hapic_data.body["state"])
+        return call_lib.update_call_state(hapic_data.path["call_id"], hapic_data.body["state"])
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)
@@ -71,10 +71,10 @@ class UserCallController(Controller):
         """
         Get the list of incoming calls.
         """
-        user_call_lib = UserCallLib(
+        call_lib = CallLib(
             session=request.dbsession, config=request.app_config, current_user=request.current_user
         )
-        calls = user_call_lib.get_all(
+        calls = call_lib.get_all(
             user_id=request.candidate_user.user_id, state=hapic_data.query["state"], caller=False
         )
         return ListItemsObject(calls)
@@ -90,10 +90,10 @@ class UserCallController(Controller):
         """
         Get the list of outgoing calls.
         """
-        user_call_lib = UserCallLib(
+        call_lib = CallLib(
             session=request.dbsession, config=request.app_config, current_user=request.current_user
         )
-        calls = user_call_lib.get_all(
+        calls = call_lib.get_all(
             user_id=request.candidate_user.user_id, state=hapic_data.query["state"], caller=True
         )
         return ListItemsObject(calls)

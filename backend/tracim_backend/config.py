@@ -36,7 +36,7 @@ from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
-from tracim_backend.models.call import UserCallProvider
+from tracim_backend.models.call import CallProvider
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import WorkspaceAccessType
 
@@ -348,8 +348,8 @@ class CFG(object):
         self._load_content_security_policy_config()
         self.log_config_header("Translation Service config parameters:")
         self._load_translation_service_config()
-        self.log_config_header("User video call config parameters:")
-        self._load_user_call_config()
+        self.log_config_header("Call config parameters:")
+        self._load_call_config()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -898,13 +898,11 @@ class CFG(object):
         except ValueError:
             raise ConfigurationError("The value of {}.target_languages is malformed".format(prefix))
 
-    def _load_user_call_config(self) -> None:
-        prefix = "user_call"
-        self.USER_CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
-        self.USER_CALL__PROVIDER = UserCallProvider(
-            self.get_raw_config("{}.provider".format(prefix), "")
-        )
-        self.USER_CALL__JITSI_URL = self.get_raw_config("{}.jitsi_url".format(prefix))
+    def _load_call_config(self) -> None:
+        prefix = "call"
+        self.CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
+        self.CALL__PROVIDER = CallProvider(self.get_raw_config("{}.provider".format(prefix), ""))
+        self.CALL__JITSI_URL = self.get_raw_config("{}.jitsi_url".format(prefix))
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 

@@ -1931,6 +1931,7 @@ class ConfigSchema(marshmallow.Schema):
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
     limitation__maximum_online_users_message = marshmallow.fields.String()
+    call__enabled = marshmallow.fields.Bool()
 
 
 class ConditionFileSchema(marshmallow.Schema):
@@ -2221,14 +2222,17 @@ class CreateUserCallSchema(marshmallow.Schema):
 
 
 class UserCallSchema(marshmallow.Schema):
+    call_id = marshmallow.fields.Integer(example=32, description="Id of the call")
     caller = marshmallow.fields.Nested(UserDigestSchema, description="User who initiated the call")
     callee = marshmallow.fields.Nested(UserDigestSchema, description="User who has been called")
     state = EnumField(UserCallState)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Date of creation of the call"
     )
-    modified = marshmallow.fields.DateTime(
-        format=DATETIME_FORMAT, description="date of last modification of the call."
+    updated = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description="date of last modification of the call.",
+        dump_to="modified",
     )
     url = marshmallow.fields.URL()
 

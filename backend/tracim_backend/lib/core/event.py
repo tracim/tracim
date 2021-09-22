@@ -844,6 +844,7 @@ class EventBuilder:
         current_user = context.safe_current_user()
         fields = {
             Event.USER_CALL_FIELD: EventApi.user_call_schema.dump(user_call).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(user_call.callee).data,
         }
         event_api = EventApi(current_user, context.dbsession, self._config)
         event_api.create_event(

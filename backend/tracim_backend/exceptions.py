@@ -662,3 +662,7 @@ class WorkspaceFeatureDisabled(TracimException):
 
 class TooManyOnlineUsersError(TracimException):
     error_code = ErrorCode.TOO_MANY_ONLINE_USERS
+
+
+class UserCallTransitionNotAllowed(TracimException):
+    error_code = ErrorCode.USER_CALL_TRANSITION_NOT_ALLOWED

@@ -78,6 +78,7 @@ class ConfigModel(object):
         user__self_registration__enabled: bool,
         ui__spaces__creation__parent_space_choice__visible: bool,
         limitation__maximum_online_users_message: str,
+        call__enabled: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -97,6 +98,7 @@ class ConfigModel(object):
             ui__spaces__creation__parent_space_choice__visible
         )
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
+        self.call__enabled = call__enabled
 
 
 class ErrorCodeModel(object):

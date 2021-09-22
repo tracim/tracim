@@ -4,10 +4,11 @@ import typing
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import literal
 
+from tracim_backend.exceptions import UserCallTransitionNotAllowed
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import User
+from tracim_backend.models.call import CallProvider
 from tracim_backend.models.call import UserCall
-from tracim_backend.models.call import UserCallProvider
 from tracim_backend.models.call import UserCallState
 from tracim_backend.models.tracim_session import TracimSession
 
@@ -15,7 +16,7 @@ if typing.TYPE_CHECKING:
     from tracim_backend.config import CFG
 
 
-class UserCallLib:
+class CallLib:
     def __init__(self, session: TracimSession, config: "CFG", current_user: User) -> None:
         self._session = session
         self._config = config
@@ -30,13 +31,15 @@ class UserCallLib:
         return call
 
     def update_call_state(self, call_id: int, state: UserCallState) -> UserCall:
-        call = self.get_one(call_id)
+        call = self.get_one(self._user.user_id, call_id)
         if call.state != UserCallState.IN_PROGRESS:
-            raise Exception("Cannot change the state of a call if it is not in progress")
-        if state != UserCallState.CANCELLED and self._user.user_id == call.caller_id:
-            raise Exception("Only callee can change state to {}".format(state))
-        if state == UserCallState.CANCELLED and self._user.user_id == call.callee_id:
-            raise Exception("Only caller can change state to {}".format(state))
+            raise UserCallTransitionNotAllowed(
+                "Cannot change the state of a call if it is not in progress"
+            )
+        if state not in UserCall.CALLER_STATES and self._user.user_id == call.caller_id:
+            raise UserCallTransitionNotAllowed("Only callee can change state to {}".format(state))
+        if state not in UserCall.CALLEE_STATES and self._user.user_id == call.callee_id:
+            raise UserCallTransitionNotAllowed("Only caller can change state to {}".format(state))
         call.state = state
         self._session.flush()
         return call
@@ -55,13 +58,13 @@ class UserCallLib:
 
         if state:
             query = query.filter(UserCall.state == state)
-        return query.order_by(UserCall.id).all()
+        return query.order_by(UserCall.call_id).all()
 
     def get_one(self, user_id: int, call_id: int) -> UserCall:
         try:
             return (
                 self._session.query(UserCall)
-                .filter(UserCall.id == call_id)
+                .filter(UserCall.call_id == call_id)
                 .filter(literal(user_id).in_(UserCall.user_ids))
                 .one()
             )
@@ -69,11 +72,11 @@ class UserCallLib:
             raise Exception("BOO!!!!")
 
     def _create_call_url(self, call: UserCall) -> str:
-        assert self._config.USER_CALL__ENABLED
-        assert self._config.USER_CALL__PROVIDER == UserCallProvider.JITSI
-        base_url = self._config.USER_CALL__JITSI_URL
+        assert self._config.CALL__ENABLED
+        assert self._config.CALL__PROVIDER == CallProvider.JITSI
+        base_url = self._config.CALL__JITSI_URL
         # Sort the ids so that the generated hash is always the same for a pair of ids.
-        sorted_ids = sorted((call.caller_id, call.callee_id))
+        sorted_ids = sorted((call.caller.user_id, call.callee.user_id))
         h = hashlib.sha256()
         for user_id in sorted_ids:
             h.update(str(user_id).encode())

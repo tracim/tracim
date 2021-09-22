@@ -60,6 +60,7 @@ from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.core_api.account_controller import AccountController
+from tracim_backend.views.core_api.call import CallController
 from tracim_backend.views.core_api.favorite_content_controller import FavoriteContentController
 from tracim_backend.views.core_api.reaction_controller import ReactionController
 from tracim_backend.views.core_api.reset_password_controller import ResetPasswordController
@@ -68,7 +69,6 @@ from tracim_backend.views.core_api.system_controller import SystemController
 from tracim_backend.views.core_api.tag_controller import TagController
 from tracim_backend.views.core_api.url_preview_controller import URLPreviewController
 from tracim_backend.views.core_api.user_controller import UserController
-from tracim_backend.views.core_api.usercall import UserCallController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
@@ -302,7 +302,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     tag_controller = TagController()
     url_preview_controller = URLPreviewController()
     favorite_content_controller = FavoriteContentController()
-    user_call_controller = UserCallController()
+    call_controller = CallController()
     configurator.include(session_controller.bind, route_prefix=BASE_API)
     configurator.include(system_controller.bind, route_prefix=BASE_API)
     configurator.include(user_controller.bind, route_prefix=BASE_API)
@@ -314,7 +314,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(tag_controller.bind, route_prefix=BASE_API)
     configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
     configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
-    configurator.include(user_call_controller.bind, route_prefix=BASE_API)
+    configurator.include(call_controller.bind, route_prefix=BASE_API)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():

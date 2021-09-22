@@ -16,7 +16,7 @@ from tracim_backend.models.mixins import CreationDateMixin
 from tracim_backend.models.mixins import UpdateDateMixin
 
 
-class UserCallProvider(enum.Enum):
+class CallProvider(enum.Enum):
     NONE = ""
     JITSI = "jitsi"
 
@@ -39,7 +39,16 @@ class UserCallState(enum.Enum):
 
 class UserCall(CreationDateMixin, UpdateDateMixin, DeclarativeBase):
     __tablename__ = "user_calls"
-    id = Column(Integer, Sequence("seq__usercall__id"), autoincrement=True, primary_key=True)
+
+    CALLER_STATES = (UserCallState.CANCELLED, UserCallState.UNANSWERED)
+    CALLEE_STATES = (
+        UserCallState.ACCEPTED,
+        UserCallState.REJECTED,
+        UserCallState.DECLINED,
+        UserCallState.POSTPONED,
+    )
+
+    call_id = Column(Integer, Sequence("seq__usercall__id"), autoincrement=True, primary_key=True)
     caller_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     caller = relationship(User, remote_side=[User.user_id], foreign_keys=[caller_id])
     callee_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
@@ -54,6 +63,6 @@ class UserCall(CreationDateMixin, UpdateDateMixin, DeclarativeBase):
         return (self.caller_id, self.callee_id)
 
     def __repr__(self):
-        return "<UserCall: caller_id=%s, callee_id=%s, state=%s, url=%s>".format(
+        return "<UserCall: caller_id={}, callee_id={}, state={}, url={}>".format(
             self.caller_id, self.callee_id, self.state, self.url
         )
