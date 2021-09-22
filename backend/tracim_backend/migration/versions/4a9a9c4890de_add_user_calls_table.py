@@ -44,7 +44,7 @@ def upgrade():
         sa.ForeignKeyConstraint(
             ["caller_id"], ["users.user_id"], name=op.f("fk_user_calls_caller_id_users")
         ),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk_user_calls")),
+        sa.PrimaryKeyConstraint("call_id", name=op.f("pk_user_calls")),
     )
     # ### end Alembic commands ###
 
