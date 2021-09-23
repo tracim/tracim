@@ -177,7 +177,6 @@
   "Your account's password cannot be changed, please contact an administrator": "Your account's password cannot be changed, please contact an administrator",
   "An error has happened, please try again": "An error has happened, please try again",
   "Explore contents": "Explore contents",
-  "Publish some information": "Publish some information",
   "Open the agenda": "Open the agenda",
   "Agenda": "Agenda",
   "Error while loading your agenda": "Error while loading your agenda",
@@ -472,5 +471,6 @@
   "Show in news": "Show in news",
   "News": "News",
   "News of {{author}} on {{date}}": "News of {{author}} on {{date}}",
-  "Error while saving new news": "Error while saving new news"
+  "Error while saving new news": "Error while saving new news",
+  "Publish some news": "Publish some news"
 }

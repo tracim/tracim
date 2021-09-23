@@ -347,7 +347,6 @@
   "Search filters": "Suchfilter",
   "No results for the search terms:": "Keine Ergebnisse zu den Suchbegriffen:",
   "new requests": "neue Anfragen",
-  "Publish some information": "Publikation schreiben",
   "About this space": "Über diesen Bereich",
   "This space doesn't have a description yet.": "Dieser Bereich hat noch keine Beschreibung.",
   "Space settings": "Bereichseinstellungen",
@@ -472,5 +471,6 @@
   "Show in news": "In Nachrichten anzeigen",
   "News": "Nachrichten",
   "News of {{author}} on {{date}}": "Nachricht von {{author}} am {{date}}",
-  "Error while saving new news": "Fehler beim Speichern eine neue Nachricht"
+  "Error while saving new news": "Fehler beim Speichern eine neue Nachricht",
+  "Publish some news": "Nachricht schreiben"
 }
