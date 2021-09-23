@@ -69,7 +69,7 @@ export const ProfileMainBar = props => {
                 title={props.t('Appeler')}
                 text={props.t('Appeler')}
                 icon='fas fa-phone'
-                onClick={props.displayCallPopup} // ici mettre le state
+                onClick={props.onClickDisplayCallPopup} // ici mettre le state createNewCall
                 customClass='profile__mainBar__callBtn'
                 // intent='pins'
                 // dataCy='profile_avatar_changeBtn'
@@ -91,7 +91,7 @@ ProfileMainBar.propTypes = {
   displayedUser: PropTypes.object,
   onChangeAvatarClick: PropTypes.func.isRequired,
   changeAvatarEnabled: PropTypes.bool,
-  displayCallPopup: PropTypes.func
+  onClickDisplayCallPopup: PropTypes.func // voir avec boolean
 }
 
 ProfileMainBar.defaultProps = {

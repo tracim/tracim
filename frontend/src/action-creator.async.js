@@ -27,6 +27,7 @@ import {
   setUserDisconnected,
   USAGE_CONDITIONS,
   USER,
+  USER_CALL,
   USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
@@ -1362,4 +1363,20 @@ export const logoutUser = (history) => async (dispatch) => {
   } else {
     dispatch(newFlashMessage(i18n.t('Disconnection error', 'danger')))
   }
+}
+
+export const postCreateUserCall = (callerId, calleeId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/outgoing_calls`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: { callee_id: calleeId }
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
 }

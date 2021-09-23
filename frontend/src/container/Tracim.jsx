@@ -448,6 +448,37 @@ export class Tracim extends React.Component {
           onRemoveFlashMessage={this.handleRemoveFlashMessage}
           t={props.t}
         />
+
+        {/* ici afficher popup avec conditions d'affichage */}
+
+           {/* <div className='callpopup__body'>
+                  <div>Léo Bernard vous appelle - 10h30</div>
+                  <br/>
+                  <div className='call__popup__body__btn'>
+                    <IconButton
+                      onClick={this.cancelCall}
+                      text={props.t(`Refuser`)}
+                      icon='fas fa-phone-slash'
+                    />
+                    <IconButton
+                      onClick={this.cancelCall}
+                      text={props.t(`Je répondrai plus tard`)}
+                      icon='far fa-clock'
+                    />
+
+                    <IconButton
+                      // customClass='gallery__delete__file__popup__body__btn__delete'
+                      intent='primary'
+                      mode='light'
+                      onClick={this.openCallWindow}
+                      dataCy='gallery__delete__file__popup__body__btn__delete'
+                      text={props.t(`Ouvrir l'appel`)}
+                      icon='fas fa-phone'
+                      // color={'#2f7d30'} // mettre la variable
+                      color={GLOBAL_primaryColor}
+                    />
+                  </div>
+                </div> */}
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>

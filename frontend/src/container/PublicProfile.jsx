@@ -12,22 +12,25 @@ import {
   IconButton,
   getAvatarBaseUrl,
   getCoverBaseUrl,
-  CardPopup
+  CardPopup,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
   setBreadcrumbs,
   setHeadTitle,
   updateUserProfileAvatarName,
-  updateUserProfileCoverName
+  updateUserProfileCoverName,
 } from '../action-creator.sync.js'
 import {
   getAboutUser,
   getCustomPropertiesSchema,
   getCustomPropertiesUiSchema,
   getUserCustomPropertiesDataSchema,
-  putUserCustomPropertiesDataSchema
-} from '../action-creator.async'
+  putUserCustomPropertiesDataSchema,
+  postCreateUserCall
+} from '../action-creator.async.js'
 import { serializeUserProps } from '../reducer/user.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
@@ -114,6 +117,8 @@ export class PublicProfile extends React.Component {
   constructor (props) {
     super(props)
 
+    // props register live message handler list
+
     this.state = {
       displayedUser: undefined,
       coverImageUrl: undefined,
@@ -124,12 +129,43 @@ export class PublicProfile extends React.Component {
       personalPageDataSchema: {},
       dataSchemaObject: {},
       displayUploadPopup: undefined,
-      displayCallPopup: undefined
+      displayCallPopup: false,
+      userCall: undefined // à mettre dans tracim.jsx ?
     }
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallModified },
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCallCreated }
+    ])
+  }
+
+  handleUserCallModified = (data) => { // quoi mettre dans data ?
+    this.setState({ userCall: cancelled })
+  }
+
+  handleUserCallCreated = (data) => {
+    console.log("TLM handleUserCallCreated", data)
+    // pourquoi ne pas fusionner avec la fonction handleClickCallButton ?
+  }
+
+  // faire un shéma avec des séquences d'action
+
+  // createCall = async () => {
+  //   this.setState({ displayCallPopup: true }) // renommer plus explicitement pour dire qu'on appelle
+  //   const fetchPostCreateUserCall = await props.dispatch(postCreateUserCall(props.user.id, state.displayedUser.id))
+  //   // fetchPostCreateUserCall.status
+  //   // fetchPostCreateUserCall.json
+  //   // gérer le retour
+  // }
+
+  handleClickCallButton = async () => {
+    const { props, state } = this
+    this.setState({ displayCallPopup: true }) // userCall: in_progress // renommer plus explicitement pour dire qu'on appelle
+    await props.dispatch(postCreateUserCall(props.userId, state.displayedUser.id))
   }
 
   handleAllAppChangeLanguage = data => {
@@ -386,10 +422,6 @@ export class PublicProfile extends React.Component {
 
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
-  displayCallPopup = () => {
-    this.setState({ displayCallPopup: true })
-  }
-
   handleCloseDeleteFilePopup = () => {
     this.setState({ displayCallPopup: false })
   }
@@ -397,13 +429,16 @@ export class PublicProfile extends React.Component {
   openCallWindow = () => {
     // TLM
     // link to call
-    console.log('calling')
+    // console.log('calling')
+    window.open("https://meet.jit.si/tracim"); // lien qui est dans le TLM
+    // mettre dnas le state l'url qui correspond au call
   }
 
-  cancelCall = () => {
+  handleUserCancelCall = () => {
     // TLM
-    // link to call
+    // cancel call
     console.log('cancel')
+    this.setState({ displayCallPopup: false })
   }
 
   render () {
@@ -450,7 +485,7 @@ export class PublicProfile extends React.Component {
 
             {state.displayCallPopup && (
               <CardPopup
-                customClass='gallery__delete__file__popup'
+                customClass=''
                 customHeaderClass='primaryColorBg'
                 onClose={this.handleCloseDeleteFilePopup}
                 label={props.t('Appel en cours...')}
@@ -470,11 +505,11 @@ export class PublicProfile extends React.Component {
                       // customClass='gallery__delete__file__popup__body__btn__delete'
                       intent='primary'
                       mode='light'
-                      onClick={this.openCallWindow()}
+                      onClick={this.handleClickCallButton}
                       dataCy='gallery__delete__file__popup__body__btn__delete'
                       text={props.t(`Ouvrir l'appel`)}
                       icon='fas fa-phone'
-                      // color={'#2f7d30'} // mettre la variable
+                      // color={'#2f7d30'} // mettre la variable // createCall
                       color={GLOBAL_primaryColor}
                     />
                   </div>
@@ -496,7 +531,7 @@ export class PublicProfile extends React.Component {
             breadcrumbsList={props.breadcrumbs}
             onChangeAvatarClick={this.handleChangeAvatarClick}
             changeAvatarEnabled={isPublicProfileEditable}
-            displayCallPopup={this.displayCallPopup}
+            onClickDisplayCallPopup={this.handleClickCallButton} // fonction
           />
 
           <div className='profile__content'>
