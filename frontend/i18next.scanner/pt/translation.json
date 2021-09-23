@@ -429,7 +429,6 @@
   "undeleted": "restaurado",
   "Error while saving the comment": "Erro ao salvar o comentário",
   "publication list": "lista de publicações",
-  "Error while saving new publication": "Erro ao salvar a nova publicação",
   "Reorder": "Reordenar",
   "Your text contains mentions that do not match any member of this space:": "O seu texto contém menções que não correspondem a nenhum membro deste espaço:",
   "Validate anyway": "Validar de qualquer forma",
@@ -438,7 +437,6 @@
   "About this space": "Sobre o Espaço",
   "Space settings": "Definições do espaço",
   "Publish": "Publicar",
-  "Publication of {{author}} on {{date}}": "Publicação de {{author}} em {{date}}",
   "new requests": "novos pedidos",
   "This space doesn't have a description yet.": "Este espaço ainda não tem uma descrição.",
   "Publication": "Publicação",
@@ -472,5 +470,7 @@
   "alex.doe@jco.co": "carmo.dasilva@cds.pt",
   "In order to finish your sign in, please read the following usage conditions and accept them": "Para terminar a sua sessão, por favor leia as seguintes condições de utilização e aceite-as",
   "Show in news": "Mostrar nas notícias",
-  "News": "Notícias"
+  "News": "Notícias",
+  "News of {{author}} on {{date}}": "Notícia de {{author}} em {{date}}",
+  "Error while saving new news": "Erro ao salvar a nova notícia"
 }

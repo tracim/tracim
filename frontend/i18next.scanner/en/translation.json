@@ -429,7 +429,6 @@
   "{{author}} removed their reaction {{reaction}} to {{content}}": "{{author}} removed their reaction {{reaction}} to {{content}}",
   "Error while saving the comment": "Error while saving the comment",
   "publication list": "publication list",
-  "Error while saving new publication": "Error while saving new publication",
   "Reorder": "Reorder",
   "Your text contains mentions that do not match any member of this space:": "Your text contains mentions that do not match any member of this space:",
   "Validate anyway": "Validate anyway",
@@ -439,7 +438,6 @@
   "This space doesn't have a description yet.": "This space doesn't have a description yet.",
   "Space settings": "Space settings",
   "Publish": "Publish",
-  "Publication of {{author}} on {{date}}": "Publication of {{author}} on {{date}}",
   "new requests": "new requests",
   "Publication": "Publication",
   "Your role:": "Your role:",
@@ -472,5 +470,7 @@
   "alex.doe@jco.co": "alex.doe@jco.co",
   "In order to finish your sign in, please read the following usage conditions and accept them": "In order to finish your sign in, please read the following usage conditions and accept them",
   "Show in news": "Show in news",
-  "News": "News"
+  "News": "News",
+  "News of {{author}} on {{date}}": "News of {{author}} on {{date}}",
+  "Error while saving new news": "Error while saving new news"
 }

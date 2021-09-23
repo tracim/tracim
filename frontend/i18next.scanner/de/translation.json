@@ -395,8 +395,6 @@
   "Recent activities": "Neueste Aktivitäten",
   "publication list": "Publikationsliste",
   "Error loading publication comments": "Fehler beim Laden von Publikationskommentaren",
-  "Publication of {{author}} on {{date}}": "Publikation von {{author}} am {{date}}",
-  "Error while saving new publication": "Fehler beim Speichern einer neuen Publikation",
   "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Dieser Bereich hat noch keine Publikation, erstellen Sie die erste Publikation über den Bereich unten auf der Seite.",
   "Reorder": "Ordnen",
   "Your text contains mentions that do not match any member of this space:": "Ihr Text enthält Erwähnungen, die mit keinem Mitglied dieses Bereichs übereinstimmen:",
@@ -472,5 +470,7 @@
   "alex.doe@jco.co": "alex.muller@alm.de",
   "In order to finish your sign in, please read the following usage conditions and accept them": "Um Ihre Anmeldung abzuschließen, lesen Sie bitte die folgenden Nutzungsbedingungen und akzeptieren Sie diese",
   "Show in news": "In Nachrichten anzeigen",
-  "News": "Nachrichten"
+  "News": "Nachrichten",
+  "News of {{author}} on {{date}}": "Nachricht von {{author}} am {{date}}",
+  "Error while saving new news": "Fehler beim Speichern eine neue Nachricht"
 }
