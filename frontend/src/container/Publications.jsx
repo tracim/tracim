@@ -317,7 +317,7 @@ export class Publications extends React.Component {
       {
         link: myLink,
         type: BREADCRUMBS_TYPE.CORE,
-        label: props.t('Publications'),
+        label: props.t('News'),
         isALink: false
       }
     ]
@@ -328,7 +328,7 @@ export class Publications extends React.Component {
   setHeadTitle = () => {
     const { props } = this
     const headTitle = buildHeadTitle(
-      [props.t('Publications'), props.currentWorkspace.label]
+      [props.t('News'), props.currentWorkspace.label]
     )
     props.dispatch(setHeadTitle(headTitle))
   }
@@ -428,7 +428,7 @@ export class Publications extends React.Component {
   buildPublicationName = (authorName, userLang) => {
     const { props } = this
 
-    return props.t('Publication of {{author}} on {{date}}', {
+    return props.t('News of {{author}} on {{date}}', {
       author: authorName,
       date: formatAbsoluteDate(new Date(), userLang),
       interpolation: { escapeValue: false }
@@ -444,7 +444,7 @@ export class Publications extends React.Component {
     const fetchPostPublication = await props.dispatch(postThreadPublication(workspaceId, publicationName))
 
     if (fetchPostPublication.status !== 200) {
-      props.dispatch(newFlashMessage(`${props.t('Error while saving new publication')}`, 'warning'))
+      props.dispatch(newFlashMessage(`${props.t('Error while saving new news')}`, 'warning'))
       return
     }
 

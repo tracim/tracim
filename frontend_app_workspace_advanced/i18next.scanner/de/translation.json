@@ -51,8 +51,8 @@
   "Request rejected": "Anfrage abgelehnt",
   "There are no requests yet.": "Es sind noch keine Anfragen vorhanden.",
   "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Dies ist die Rolle, die Mitglieder standardmäßig haben, wenn sie Ihrem Bereich beitreten (nur für offene Bereiche und Bereiche auf Anfrage).",
-  "Publications activated": "Publikationen aktiviert",
-  "Publications deactivated": "Publikationen deaktiviert",
-  "Error while activating publications": "Fehler beim Aktivieren von Publikationen",
-  "Error while deactivating publications": "Fehler beim Deaktivieren von Publikationen"
+  "News activated": "Nachrichten aktiviert",
+  "News deactivated": "Nachrichten deaktiviert",
+  "Error while activating news": "Fehler beim Aktivieren von Nachrichten",
+  "Error while deactivating news": "Fehler beim Deaktivieren von Nachrichten"
 }

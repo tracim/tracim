@@ -22,7 +22,7 @@ RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
 RUN \
     apt install -qy curl \
     # Node.JS 10
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt install -qy \
         build-essential \
         libjpeg-dev \
