@@ -163,9 +163,10 @@ export class PublicProfile extends React.Component {
   // }
 
   handleClickCallButton = async () => {
+
     const { props, state } = this
     this.setState({ displayCallPopup: true }) // userCall: in_progress // renommer plus explicitement pour dire qu'on appelle
-    await props.dispatch(postCreateUserCall(props.userId, state.displayedUser.id))
+    await props.dispatch(postCreateUserCall(props.user.userId, state.displayedUser.userId))
   }
 
   handleAllAppChangeLanguage = data => {
@@ -428,10 +429,12 @@ export class PublicProfile extends React.Component {
 
   openCallWindow = () => {
     // TLM
-    // link to call
-    // console.log('calling')
-    window.open("https://meet.jit.si/tracim"); // lien qui est dans le TLM
+    console.log('calling')
+    // window.open("https://meet.jit.si/tracim"); // lien qui est dans le TLM
     // mettre dnas le state l'url qui correspond au call
+    window.open(url) //     url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/outgoing_calls`,
+    // console.log('appel')
+    // await props.dispatch(postCreateUserCall(props.userId, state.displayedUser.id))
   }
 
   handleUserCancelCall = () => {
@@ -505,7 +508,7 @@ export class PublicProfile extends React.Component {
                       // customClass='gallery__delete__file__popup__body__btn__delete'
                       intent='primary'
                       mode='light'
-                      onClick={this.handleClickCallButton}
+                      onClick={this.openCallWindow}
                       dataCy='gallery__delete__file__popup__body__btn__delete'
                       text={props.t(`Ouvrir l'appel`)}
                       icon='fas fa-phone'

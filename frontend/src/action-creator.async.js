@@ -1374,7 +1374,7 @@ export const postCreateUserCall = (callerId, calleeId) => dispatch => {
         ...FETCH_CONFIG.headers
       },
       method: 'POST',
-      body: { callee_id: calleeId }
+      body: JSON.stringify({ callee_id: calleeId })
     },
     actionName: USER_CALL,
     dispatch
