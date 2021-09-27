@@ -100,7 +100,9 @@ export class Tracim extends React.Component {
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
       displayConnectionError: false,
-      isNotificationWallOpen: false
+      isNotificationWallOpen: false,
+      displayCallPopup: false,
+      userCallList: []
     }
 
     this.liveMessageManager = new LiveMessageManager()
@@ -124,6 +126,31 @@ export class Tracim extends React.Component {
       { name: CUSTOM_EVENT.USER_CONNECTED, handler: this.handleUserConnected },
       { name: CUSTOM_EVENT.USER_DISCONNECTED, handler: this.handleUserDisconnected }
     ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallModified },
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCallCreated }
+    ])
+  }
+
+
+  handleUserCallCreated = (tlm) => {
+    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
+    const changeState = prevState => {
+      const userCallList = [tlm.fields.user_call, ...prevState.userCallList]
+      return { userCallList }
+    }
+      console.log("tlm handleUserCallCreated", tlm)
+      this.setState(changeState)
+  }
+
+  handleUserCallModified = (tlm) => {
+    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
+      this.setState({ userCallList: tlm.fields.user_call })
+
+    if (tlm.fields.user_call.state === "accepted") {
+      window.open(tlm.fields.user_call.url)
+    }
   }
 
   handleClickLogout = async () => {
@@ -449,36 +476,39 @@ export class Tracim extends React.Component {
           t={props.t}
         />
 
-        {/* ici afficher popup avec conditions d'affichage */}
+          {/* ici afficher popup avec conditions d'affichage */}
+        {state.displayCallPopup && (
+          <div className='callpopup__body'>
+            <div>Léo Bernard vous appelle - 10h30</div>
+              <br/>
+              <div className='call__popup__body__btn'>
+                <IconButton
+                  onClick={this.cancelCall}
+                  text={props.t(`Refuser`)}
+                  icon='fas fa-phone-slash'
+                />
+                <IconButton
+                  onClick={this.cancelCall}
+                  text={props.t(`Je répondrai plus tard`)}
+                  icon='far fa-clock'
+                />
 
-           {/* <div className='callpopup__body'>
-                  <div>Léo Bernard vous appelle - 10h30</div>
-                  <br/>
-                  <div className='call__popup__body__btn'>
-                    <IconButton
-                      onClick={this.cancelCall}
-                      text={props.t(`Refuser`)}
-                      icon='fas fa-phone-slash'
-                    />
-                    <IconButton
-                      onClick={this.cancelCall}
-                      text={props.t(`Je répondrai plus tard`)}
-                      icon='far fa-clock'
-                    />
+                <IconButton
+                  // customClass='gallery__delete__file__popup__body__btn__delete'
+                  intent='primary'
+                  mode='light'
+                  onClick={this.openCallWindow}
+                  dataCy='gallery__delete__file__popup__body__btn__delete'
+                  text={props.t(`Ouvrir l'appel`)}
+                  icon='fas fa-phone'
+                  // color={'#2f7d30'} // mettre la variable
+                  color={GLOBAL_primaryColor}
+                />
+              </div>
+          </div>
+        )}
 
-                    <IconButton
-                      // customClass='gallery__delete__file__popup__body__btn__delete'
-                      intent='primary'
-                      mode='light'
-                      onClick={this.openCallWindow}
-                      dataCy='gallery__delete__file__popup__body__btn__delete'
-                      text={props.t(`Ouvrir l'appel`)}
-                      icon='fas fa-phone'
-                      // color={'#2f7d30'} // mettre la variable
-                      color={GLOBAL_primaryColor}
-                    />
-                  </div>
-                </div> */}
+
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>

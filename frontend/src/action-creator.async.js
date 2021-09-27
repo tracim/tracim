@@ -1380,3 +1380,35 @@ export const postCreateUserCall = (callerId, calleeId) => dispatch => {
     dispatch
   })
 }
+
+export const putSetOutgoingUserCallState = (callerId, callId, userCallState) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/outgoing_calls/${callId}/state`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({ state: userCallState })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
+
+export const postGetUserCall = (callerId, calleeId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${calleeId}/incoming_calls`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({ callee_id: calleeId })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
