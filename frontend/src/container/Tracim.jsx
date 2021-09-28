@@ -137,6 +137,8 @@ export class Tracim extends React.Component {
   handleUserCallCreated = (tlm) => {
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
     const changeState = prevState => {
+      // console.log(prevState.userCallList, 'prevState.userCallList')
+      console.log('user_call', user_call)
       const userCallList = [tlm.fields.user_call, ...prevState.userCallList]
       return { userCallList }
     }
@@ -144,12 +146,31 @@ export class Tracim extends React.Component {
       this.setState(changeState)
   }
 
+  openCallWindow = () => {
+    const { state } = this
+    console.log('calling')
+    window.open(state.userCallList[0].url)
+  }
+
+  rejectCall = (tlm) => {
+    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
+      this.setState({
+        userCallList: "rejected"
+      })
+  }
+
   handleUserCallModified = (tlm) => {
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-      this.setState({ userCallList: tlm.fields.user_call })
-
+      const changeState = prevState => {
+        // console.log(prevState.userCallList, 'prevState.userCallList')
+        const userCallList = [tlm.fields.user_call, ...prevState.userCallList]
+        return { userCallList }
+      }
+        console.log("tlm handleUserCallCreated", tlm)
+        this.setState(changeState)
+    
     if (tlm.fields.user_call.state === "accepted") {
-      window.open(tlm.fields.user_call.url)
+      window.open(tlm.fields.user_call.url) // ??
     }
   }
 
@@ -477,35 +498,42 @@ export class Tracim extends React.Component {
         />
 
           {/* ici afficher popup avec conditions d'affichage */}
-        {state.displayCallPopup && (
-          <div className='callpopup__body'>
-            <div>Léo Bernard vous appelle - 10h30</div>
-              <br/>
-              <div className='call__popup__body__btn'>
-                <IconButton
-                  onClick={this.cancelCall}
-                  text={props.t(`Refuser`)}
-                  icon='fas fa-phone-slash'
-                />
-                <IconButton
-                  onClick={this.cancelCall}
-                  text={props.t(`Je répondrai plus tard`)}
-                  icon='far fa-clock'
-                />
+        {state.userCallList.length > 0 && (
+          <CardPopup
+            customClass=''
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleClickCancelButton}
+              label={props.t('Léo Bernard vous appelle - 10h30')}
+              faIcon='fas fa-phone'
+          >
+            {/* <div className='callpopup__body'> */}
+                <br/>
+                <div className='call__popup__body__btn'>
+                  <IconButton
+                    onClick={this.rejectCall}
+                    text={props.t(`Refuser`)}
+                    icon='fas fa-phone-slash'
+                  />
+                  <IconButton
+                    onClick={this.declineCall}
+                    text={props.t(`Je répondrai plus tard`)}
+                    icon='far fa-clock'
+                  />
 
-                <IconButton
-                  // customClass='gallery__delete__file__popup__body__btn__delete'
-                  intent='primary'
-                  mode='light'
-                  onClick={this.openCallWindow}
-                  dataCy='gallery__delete__file__popup__body__btn__delete'
-                  text={props.t(`Ouvrir l'appel`)}
-                  icon='fas fa-phone'
-                  // color={'#2f7d30'} // mettre la variable
-                  color={GLOBAL_primaryColor}
-                />
-              </div>
-          </div>
+                  <IconButton
+                    // customClass='gallery__delete__file__popup__body__btn__delete'
+                    intent='primary'
+                    mode='light'
+                    onClick={this.openCallWindow}
+                    dataCy='gallery__delete__file__popup__body__btn__delete'
+                    text={props.t(`Ouvrir l'appel`)}
+                    icon='fas fa-phone'
+                    // color={'#2f7d30'} // mettre la variable
+                    color={GLOBAL_primaryColor}
+                  />
+                </div>
+            {/* </div> */}
+          </CardPopup>
         )}
 
 
