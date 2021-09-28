@@ -102,7 +102,7 @@ export class Tracim extends React.Component {
       displayConnectionError: false,
       isNotificationWallOpen: false,
       displayCallPopup: false,
-      userCallList: []
+      userCallee: undefined
     }
 
     this.liveMessageManager = new LiveMessageManager()
@@ -135,42 +135,31 @@ export class Tracim extends React.Component {
 
 
   handleUserCallCreated = (tlm) => {
-    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-    const changeState = prevState => {
-      // console.log(prevState.userCallList, 'prevState.userCallList')
-      console.log('user_call', user_call)
-      const userCallList = [tlm.fields.user_call, ...prevState.userCallList]
-      return { userCallList }
-    }
+    if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
       console.log("tlm handleUserCallCreated", tlm)
-      this.setState(changeState)
+      this.setState({ userCallee: tlm.fields.user_call})
   }
+
 
   openCallWindow = () => {
     const { state } = this
     console.log('calling')
-    window.open(state.userCallList[0].url)
+    window.open(state.userCallee.url)
   }
 
-  rejectCall = (tlm) => {
-    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-      this.setState({
-        userCallList: "rejected"
-      })
+  rejectCall = async () => {
+
+    const { props, state } = this
+    await props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCallee.call_id, 'rejected')) // préciser à quoi correspond cancelled, ou déclarer un objet avec userCall.state
   }
 
+// besoin de ça ?
   handleUserCallModified = (tlm) => {
-    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-      const changeState = prevState => {
-        // console.log(prevState.userCallList, 'prevState.userCallList')
-        const userCallList = [tlm.fields.user_call, ...prevState.userCallList]
-        return { userCallList }
-      }
-        console.log("tlm handleUserCallCreated", tlm)
-        this.setState(changeState)
-    
+    if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
+    this.setState({ userCallee: tlm.fields.user_call })
+
     if (tlm.fields.user_call.state === "accepted") {
-      window.open(tlm.fields.user_call.url) // ??
+      window.open(tlm.fields.user_call.url)
     }
   }
 
@@ -498,7 +487,7 @@ export class Tracim extends React.Component {
         />
 
           {/* ici afficher popup avec conditions d'affichage */}
-        {state.userCallList.length > 0 && (
+        {state.userCallee && (
           <CardPopup
             customClass=''
               customHeaderClass='primaryColorBg'

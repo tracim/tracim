@@ -167,7 +167,7 @@ export class PublicProfile extends React.Component {
 
   handleUserCallModified = (tlm) => {
     if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
-      this.setState({ userCall: tlm.fields.user_call })
+    this.setState({ userCall: tlm.fields.user_call })
 
     if (tlm.fields.user_call.state === "accepted") {
       window.open(tlm.fields.user_call.url)
