@@ -44,7 +44,19 @@ class EmailAddress(object):
     def __init__(self, label: str, email: str, force_angle_bracket=False):
         self.label = label
         self.email = email
+        self.idna_email = self._encode_idna(email)
         self.force_angle_bracket = force_angle_bracket
+
+    def _encode_idna_part(self, part: str):
+        return ".".join([p.encode("idna").decode("ascii") for p in part.split(".")])
+
+    def _encode_idna(self, email: str):
+        username, domain = [self._encode_idna_part(part) for part in email.rsplit("@", 1)]
+
+        username = self._encode_idna_part(username)
+        domain = self._encode_idna_part(domain)
+
+        return username + "@" + domain
 
     @classmethod
     def from_rfc_email_address(cls, rfc_email: str) -> "EmailAddress":
@@ -54,10 +66,10 @@ class EmailAddress(object):
     @property
     def address(self):
         if self.label:
-            return formataddr((self.label, self.email))
+            return formataddr((self.label, self.idna_email))
         if self.force_angle_bracket and self.email and self.email[0] != "<":
-            return "<{}>".format(self.email)
-        return self.email
+            return "<{}>".format(self.idna_email)
+        return self.idna_email
 
     @property
     def domain(self):
