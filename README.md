@@ -3,7 +3,7 @@
 ![logo_tracim](logo_tracim.png)
 
 develop branch status:
-[![Build Status](https://travis-ci.com/tracim/tracim.svg?branch=develop)](https://travis-ci.com/tracim/tracim)
+[![Build Status](https://app.travis-ci.com/tracim/tracim.svg?branch=develop)](https://app.travis-ci.com/tracim/tracim)
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
 
