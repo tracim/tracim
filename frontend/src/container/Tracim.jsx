@@ -56,7 +56,8 @@ import {
   getUserIsConnected,
   putUserLang,
   getUserMessagesSummary,
-  getAccessibleWorkspaces
+  getAccessibleWorkspaces,
+  putSetIncomingUserCallState
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -135,28 +136,28 @@ export class Tracim extends React.Component {
 
 
   handleUserCallCreated = (tlm) => {
-    if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
+    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
       console.log("tlm handleUserCallCreated", tlm)
       this.setState({ userCallee: tlm.fields.user_call})
   }
 
 
   openCallWindow = () => {
-    const { state } = this
+    const { state, props } = this
     console.log('calling')
-    window.open(state.userCallee.url)
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCallee.call_id, 'accepted')) // préciser à quoi correspond cancelled, ou déclarer un objet avec userCall.state
   }
 
-  rejectCall = async () => {
+  rejectCall = () => {
 
     const { props, state } = this
-    await props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCallee.call_id, 'rejected')) // préciser à quoi correspond cancelled, ou déclarer un objet avec userCall.state
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCallee.call_id, 'rejected')) // préciser à quoi correspond cancelled, ou déclarer un objet avec userCall.state
+    console.log("reject call")
   }
 
-// besoin de ça ?
   handleUserCallModified = (tlm) => {
-    if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
-    this.setState({ userCallee: tlm.fields.user_call })
+    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
+    this.setState({ userCallee: undefined })
 
     if (tlm.fields.user_call.state === "accepted") {
       window.open(tlm.fields.user_call.url)
@@ -492,7 +493,7 @@ export class Tracim extends React.Component {
             customClass=''
               customHeaderClass='primaryColorBg'
               onClose={this.handleClickCancelButton}
-              label={props.t('Léo Bernard vous appelle - 10h30')}
+              label={props.t(`${props.user.username} vous appelle - 10h30`)}
               faIcon='fas fa-phone'
           >
             {/* <div className='callpopup__body'> */}

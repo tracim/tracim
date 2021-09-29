@@ -59,6 +59,7 @@ const POPUP_DISPLAY_STATE = {
 }
 const AVATAR_IMAGE_DIMENSIONS = '100x100'
 const COVER_IMAGE_DIMENSIONS = '1300x150'
+const UNANSWERED_CALL_TIMEOUT = 20000
 
 const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
@@ -131,7 +132,8 @@ export class PublicProfile extends React.Component {
       personalPageDataSchema: {},
       dataSchemaObject: {},
       displayUploadPopup: undefined,
-      userCall: undefined
+      userCall: undefined,
+      unansweredCallTimeoutId: -1
     }
 
     props.registerCustomEventHandlerList([
@@ -144,18 +146,6 @@ export class PublicProfile extends React.Component {
     ])
   }
 
-
-  // faire un shéma avec des séquences d'action
-
-  // createCall = async () => {
-    //   this.setState({ displayCallPopup: true }) // renommer plus explicitement pour dire qu'on appelle
-    //   const fetchPostCreateUserCall = await props.dispatch(postCreateUserCall(props.user.id, state.displayedUser.id))
-    //   // fetchPostCreateUserCall.status
-    //   // fetchPostCreateUserCall.json
-    //   // gérer le retour
-    // }
-
-
     handleUserCallCreated = (tlm) => {
 
     if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
@@ -163,12 +153,11 @@ export class PublicProfile extends React.Component {
       this.setState({ userCall: tlm.fields.user_call})
     }
 
-
-
   handleUserCallModified = (tlm) => {
-    if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
-    this.setState({ userCall: tlm.fields.user_call })
-
+    const { props, state } = this
+    if (tlm.fields.user_call.caller.user_id !== props.user.userId) return
+    clearTimeout(state.unansweredCallTimeoutId)
+    this.setState({ userCall: tlm.fields.user_call, unansweredCallTimeoutId: -1 })
     if (tlm.fields.user_call.state === "accepted") {
       window.open(tlm.fields.user_call.url)
     }
@@ -185,6 +174,12 @@ export class PublicProfile extends React.Component {
 
     const { props, state } = this
     await props.dispatch(postCreateUserCall(props.user.userId, state.displayedUser.userId))
+    const setUserCallUnanswered = () => {
+      const { props, state } = this
+      props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, 'unanswered')) // préciser à quoi correspond cancelled, ou déclarer un objet avec userCall.state
+    }
+    const id  = setTimeout(setUserCallUnanswered, UNANSWERED_CALL_TIMEOUT)
+    this.setState({ unansweredCallTimeoutId: id })
   }
 
   handleAllAppChangeLanguage = data => {
@@ -447,9 +442,7 @@ export class PublicProfile extends React.Component {
 
   openCallWindow = () => {
     const { state } = this
-    console.log('calling')
     window.open(state.userCall.url)
-    // await props.dispatch(postCreateUserCall(props.userId, state.displayedUser.id))
   }
 
   render () {
