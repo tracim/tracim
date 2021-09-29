@@ -32,6 +32,7 @@ import {
   LIVE_MESSAGE_STATUS,
   LIVE_MESSAGE_ERROR_CODE,
   PAGE,
+  USER_CALL_STATE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
@@ -103,7 +104,7 @@ export class Tracim extends React.Component {
       displayConnectionError: false,
       isNotificationWallOpen: false,
       displayCallPopup: false,
-      userCallee: undefined
+      userCall: undefined
     }
 
     this.liveMessageManager = new LiveMessageManager()
@@ -134,32 +135,31 @@ export class Tracim extends React.Component {
     ])
   }
 
-
   handleUserCallCreated = (tlm) => {
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-      console.log("tlm handleUserCallCreated", tlm)
-      this.setState({ userCallee: tlm.fields.user_call})
+    this.setState({ userCall: tlm.fields.user_call })
   }
 
-
-  openCallWindow = () => {
+  handleClickOpenCallWindow = () => {
     const { state, props } = this
-    console.log('calling')
-    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCallee.call_id, 'accepted')) // préciser à quoi correspond cancelled, ou déclarer un objet avec userCall.state
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
   }
 
-  rejectCall = () => {
-
+  handleClickRejectCall = () => {
     const { props, state } = this
-    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCallee.call_id, 'rejected')) // préciser à quoi correspond cancelled, ou déclarer un objet avec userCall.state
-    console.log("reject call")
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.REJECTED))
+  }
+
+  handleClickDeclineCall = () => {
+    const { props, state } = this
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.DECLINED))
   }
 
   handleUserCallModified = (tlm) => {
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-    this.setState({ userCallee: undefined })
+    this.setState({ userCall: undefined })
 
-    if (tlm.fields.user_call.state === "accepted") {
+    if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
       window.open(tlm.fields.user_call.url)
     }
   }
@@ -487,45 +487,41 @@ export class Tracim extends React.Component {
           t={props.t}
         />
 
-          {/* ici afficher popup avec conditions d'affichage */}
-        {state.userCallee && (
+        {state.userCall && (
           <CardPopup
             customClass=''
-              customHeaderClass='primaryColorBg'
-              onClose={this.handleClickCancelButton}
-              label={props.t(`${props.user.username} vous appelle - 10h30`)}
-              faIcon='fas fa-phone'
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClickDeclineCall}
+            label={props.t('{{username}} is calling you', { username: props.user.username })}
+            faIcon='fas fa-phone'
           >
-            {/* <div className='callpopup__body'> */}
-                <br/>
-                <div className='call__popup__body__btn'>
-                  <IconButton
-                    onClick={this.rejectCall}
-                    text={props.t(`Refuser`)}
-                    icon='fas fa-phone-slash'
-                  />
-                  <IconButton
-                    onClick={this.declineCall}
-                    text={props.t(`Je répondrai plus tard`)}
-                    icon='far fa-clock'
-                  />
+            <div className='callpopup__body'>
+              <br />
+              <div className='callpopup__body__btn'>
+                <IconButton
+                  onClick={this.handleClickRejectCall}
+                  text={props.t('Decline')}
+                  icon='fas fa-phone-slash'
+                />
+                <IconButton
+                  onClick={this.handleClickDeclineCall}
+                  text={props.t('I\'ll answer later')}
+                  icon='far fa-clock'
+                />
 
-                  <IconButton
-                    // customClass='gallery__delete__file__popup__body__btn__delete'
-                    intent='primary'
-                    mode='light'
-                    onClick={this.openCallWindow}
-                    dataCy='gallery__delete__file__popup__body__btn__delete'
-                    text={props.t(`Ouvrir l'appel`)}
-                    icon='fas fa-phone'
-                    // color={'#2f7d30'} // mettre la variable
-                    color={GLOBAL_primaryColor}
-                  />
-                </div>
-            {/* </div> */}
+                <IconButton
+                  intent='primary'
+                  mode='light'
+                  onClick={this.handleClickOpenCallWindow}
+                  dataCy='gallery__delete__file__popup__body__btn__delete'
+                  text={props.t('Open call')}
+                  icon='fas fa-phone'
+                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                />
+              </div>
+            </div>
           </CardPopup>
         )}
-
 
         <ReduxTlmDispatcher />
 
