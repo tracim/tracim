@@ -1,4 +1,8 @@
 ## YAML definitions re-used in plans
+definitions:
+  main_python_version: &main_python_version "3.6.14"
+  python_versions: &python_versions ["3.5.10" , "3.6.14", "3.7.11"]
+  databases: &databases ["sqlite", "postgresql", "mysql", "mariadb"]
 
 # plan step to put the current job name as pending in github's PR
 pending_status_notification: &pending_status_notification
@@ -87,6 +91,7 @@ jobs:
       github-access-token: ((github-access-token))
       concourse-bot-user: ((concourse-bot-user))
       concourse-bot-password: ((concourse-bot-password))
+      docker-registry: ((docker-registry))
     instance_vars:
       number: ((number))
 
@@ -114,7 +119,7 @@ jobs:
 
   - across:
     - var: python_version
-      values: ["3.5.10" , "3.6.14", "3.7.11"]
+      values: *python_versions
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
     image: test-image
@@ -129,10 +134,11 @@ jobs:
         path: concourse/scripts/backend-quick-tests
         args:
           - ((.:python_version))
+          - ((docker-registry))
 
   - across:
     - var: database
-      values: ["sqlite", "postgresql", "mysql", "mariadb"]
+      values: *databases
       max_in_flight: all
     task: backend-full-tests_((.:database))
     image: test-image
@@ -146,8 +152,9 @@ jobs:
         dir: pull-request
         path: concourse/scripts/backend-full-tests
         args:
-          - "3.7.11"
+          - *main_python_version
           - ((.:database))
+          - ((docker-registry))
 
 - name: frontend-tests
   <<: *status_notifications
@@ -195,3 +202,6 @@ jobs:
       run:
         dir: pull-request
         path: concourse/scripts/end-to-end-cypress-tests
+        args:
+          - *main_python_version
+          - ((docker-registry))
