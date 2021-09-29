@@ -2,7 +2,7 @@
 set -e
 
 python_version=${1:-3.6.14}
-docker_registry=${3-""}
+docker_registry=${2-""}
 source "$HOME/.bashrc"
 pyenv shell "$python_version"
 
