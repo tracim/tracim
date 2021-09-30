@@ -490,7 +490,7 @@ export class PublicProfile extends React.Component {
             >
               <div className='gallery__delete__file__popup__body'>
                 <div className='callpopup__text'>
-                  {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: props.user.username })}
+                  {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: state.displayedUser.publicName })}
                 </div>
 
                 <div className='gallery__delete__file__popup__body__btn'>
@@ -538,7 +538,7 @@ export class PublicProfile extends React.Component {
               label={props.t('Call failed')}
               faIcon='fas fa-phone-slash'
             >
-              <div>{props.t('The call with {{username}} failed', { username: props.user.username })}</div>
+              <div>{props.t('The call with {{username}} failed', { username: state.displayedUser.publicName })}</div>
               <IconButton
                 // customClass='gallery__delete__file__popup__body__btn__delete'
                 intent='primary'

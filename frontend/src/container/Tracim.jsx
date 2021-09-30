@@ -492,7 +492,7 @@ export class Tracim extends React.Component {
             customClass=''
             customHeaderClass='primaryColorBg'
             onClose={this.handleClickRejectCall}
-            label={props.t('{{username}} is calling you', { username: props.user.username })}
+            label={props.t('{{username}} is calling you', { username: state.userCall.caller.username })}
             faIcon='fas fa-phone'
           >
             <div className='callpopup__body'>
