@@ -491,7 +491,7 @@ export class Tracim extends React.Component {
           <CardPopup
             customClass=''
             customHeaderClass='primaryColorBg'
-            onClose={this.handleClickDeclineCall}
+            onClose={this.handleClickRejectCall}
             label={props.t('{{username}} is calling you', { username: props.user.username })}
             faIcon='fas fa-phone'
           >

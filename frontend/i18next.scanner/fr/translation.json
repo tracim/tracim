@@ -507,8 +507,8 @@
   "I'll answer later": "Je répondrai plus tard",
   "Call": "Appeler",
   "{{username}} has received your call. If accepted, the call will open automatically.": "{{name}} a reçu votre appel. S'il est accepté, l'appel s'ouvrira automatiquement.",
-  "Call declined by {{username}}": "Appel refusé par {{username}}",
-  "{{username}} will call you later": "{{username}} vous appellera plus tard",
+  "Call declined by {{username}}": "Appel décliné par {{username}}",
+  "{{username}} will call you back later": "{{username}} vous appellera plus tard",
   "The call with {{username}} failed": "L'appel avec {{username}} a échoué.",
   "{{username}} is calling you": "{{username}} vous appelle"
 }

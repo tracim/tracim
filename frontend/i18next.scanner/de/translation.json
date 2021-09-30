@@ -508,7 +508,7 @@
   "Call": "Anrufen",
   "{{username}} has received your call. If accepted, the call will open automatically.": "{{username}} hat Ihren Anruf erhalten. Wenn Sie den Anruf annehmen, wird es automatisch geöffnet.",
   "Call declined by {{username}}": "Anruf abgelehnt von {{username}}",
-  "{{username}} will call you later": "{{username}} wird Sie später anrufen",
+  "{{username}} will call you back later": "{{username}} wird Sie später anrufen",
   "The call with {{username}} failed": "Der Aufruf mit {{username}} ist fehlgeschlagen",
   "{{username}} is calling you": "{{username}} ruft Sie an"
 }

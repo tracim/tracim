@@ -508,7 +508,7 @@
   "Call": "Call",
   "{{username}} has received your call. If accepted, the call will open automatically.": "{{username}} has received your call. If accepted, the call will open automatically.",
   "Call declined by {{username}}": "Call declined by {{username}}",
-  "{{username}} will call you later": "{{username}} will call you later",
+  "{{username}} will call you back later": "{{username}} will call you back later",
   "The call with {{username}} failed": "The call with {{username}} failed",
   "{{username}} is calling you": "{{username}} is calling you"
 }
