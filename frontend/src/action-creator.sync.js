@@ -53,6 +53,8 @@ export const USER_PROFILE_COVER_NAME = `${USER}/ProfileCoverName`
 export const updateUserProfileAvatarName = newAvatarName => ({ type: `${SET}/${USER_PROFILE_AVATAR_NAME}`, newAvatarName })
 export const updateUserProfileCoverName = newCoverName => ({ type: `${SET}/${USER_PROFILE_COVER_NAME}`, newCoverName })
 
+export const USER_CALL = `${USER}/outgoing_calls`
+
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`

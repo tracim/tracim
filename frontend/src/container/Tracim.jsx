@@ -32,6 +32,7 @@ import {
   LIVE_MESSAGE_STATUS,
   LIVE_MESSAGE_ERROR_CODE,
   PAGE,
+  USER_CALL_STATE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
@@ -56,7 +57,8 @@ import {
   getUserIsConnected,
   putUserLang,
   getUserMessagesSummary,
-  getAccessibleWorkspaces
+  getAccessibleWorkspaces,
+  putSetIncomingUserCallState
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -100,7 +102,9 @@ export class Tracim extends React.Component {
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
       displayConnectionError: false,
-      isNotificationWallOpen: false
+      isNotificationWallOpen: false,
+      displayCallPopup: false,
+      userCall: undefined
     }
 
     this.liveMessageManager = new LiveMessageManager()
@@ -124,6 +128,40 @@ export class Tracim extends React.Component {
       { name: CUSTOM_EVENT.USER_CONNECTED, handler: this.handleUserConnected },
       { name: CUSTOM_EVENT.USER_DISCONNECTED, handler: this.handleUserDisconnected }
     ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallModified },
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCallCreated }
+    ])
+  }
+
+  handleUserCallCreated = (tlm) => {
+    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
+    this.setState({ userCall: tlm.fields.user_call })
+  }
+
+  handleClickOpenCallWindow = () => {
+    const { state, props } = this
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
+  }
+
+  handleClickRejectCall = () => {
+    const { props, state } = this
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.REJECTED))
+  }
+
+  handleClickDeclineCall = () => {
+    const { props, state } = this
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.DECLINED))
+  }
+
+  handleUserCallModified = (tlm) => {
+    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
+    this.setState({ userCall: undefined })
+
+    if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+      window.open(tlm.fields.user_call.url)
+    }
   }
 
   handleClickLogout = async () => {
@@ -448,6 +486,43 @@ export class Tracim extends React.Component {
           onRemoveFlashMessage={this.handleRemoveFlashMessage}
           t={props.t}
         />
+
+        {state.userCall && (
+          <CardPopup
+            customClass=''
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClickRejectCall}
+            label={props.t('{{username}} is calling you', { username: props.user.username })}
+            faIcon='fas fa-phone'
+          >
+            <div className='callpopup__body'>
+
+              <div className='callpopup__body__btn'>
+                <IconButton
+                  onClick={this.handleClickRejectCall}
+                  text={props.t('Decline')}
+                  icon='fas fa-phone-slash'
+                />
+                <IconButton
+                  onClick={this.handleClickDeclineCall}
+                  text={props.t('I\'ll answer later')}
+                  icon='far fa-clock'
+                />
+
+                <IconButton
+                  intent='primary'
+                  mode='light'
+                  onClick={this.handleClickOpenCallWindow}
+                  dataCy='gallery__delete__file__popup__body__btn__delete'
+                  text={props.t('Open call')}
+                  icon='fas fa-phone'
+                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                />
+              </div>
+            </div>
+          </CardPopup>
+        )}
+
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>

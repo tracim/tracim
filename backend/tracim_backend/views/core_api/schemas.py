@@ -42,6 +42,7 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.call import UserCallState
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import CommentPathFilename
@@ -1930,6 +1931,7 @@ class ConfigSchema(marshmallow.Schema):
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
     limitation__maximum_online_users_message = marshmallow.fields.String()
+    call__enabled = marshmallow.fields.Bool()
 
 
 class ConditionFileSchema(marshmallow.Schema):
@@ -2213,3 +2215,45 @@ class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
         missing=ContentSortOrder.MODIFIED_ASC,
         description="Order of the returned revisions, default is to sort by modification (e.g. creation of the revision) date, older first",
     )
+
+
+class CreateUserCallSchema(marshmallow.Schema):
+    callee_id = marshmallow.fields.Integer(description="Id of the user to call", example=42)
+
+
+class UserCallSchema(marshmallow.Schema):
+    call_id = marshmallow.fields.Integer(example=32, description="Id of the call")
+    caller = marshmallow.fields.Nested(UserDigestSchema, description="User who initiated the call")
+    callee = marshmallow.fields.Nested(UserDigestSchema, description="User who has been called")
+    state = EnumField(UserCallState)
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Date of creation of the call"
+    )
+    updated = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description="date of last modification of the call.",
+        dump_to="modified",
+    )
+    url = marshmallow.fields.URL()
+
+
+class UserIdCallIdPathSchema(UserIdPathSchema):
+    call_id = marshmallow.fields.Integer(example=42, description="Id of the call to update")
+
+
+class GetUserCallsQuerySchema(marshmallow.Schema):
+    state = EnumField(
+        UserCallState,
+        missing=None,
+        default=None,
+        required=False,
+        description="If given, only return calls with the given state",
+    )
+
+
+class UserCallsSchema(marshmallow.Schema):
+    items = marshmallow.fields.Nested(UserCallSchema(many=True))
+
+
+class UpdateUserCallStateSchema(marshmallow.Schema):
+    state = EnumField(UserCallState, description="New call state")
