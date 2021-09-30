@@ -66,7 +66,7 @@ export const ProfileMainBar = props => {
               </div>
               <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
             </div>
-            { props.system.config.call__enabled && props.user.userId !== props.displayedUser.userId && (
+            {props.system.config.call__enabled && props.user.userId !== props.displayedUser.userId && (
               <IconButton
                 title={props.t('Call')}
                 text={props.t('Call')}

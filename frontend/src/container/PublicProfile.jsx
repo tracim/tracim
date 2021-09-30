@@ -59,7 +59,7 @@ const POPUP_DISPLAY_STATE = {
 }
 const AVATAR_IMAGE_DIMENSIONS = '100x100'
 const COVER_IMAGE_DIMENSIONS = '1300x150'
-const UNANSWERED_CALL_TIMEOUT = 200000
+const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
@@ -119,8 +119,6 @@ const PopupUploadImage = translate()((props) => {
 export class PublicProfile extends React.Component {
   constructor (props) {
     super(props)
-
-    // props register live message handler list
 
     this.state = {
       displayedUser: undefined,
@@ -435,7 +433,7 @@ export class PublicProfile extends React.Component {
     this.setState({ userCall: undefined })
   }
 
-  openCallWindow = () => {
+  onClickOpenCallWindow = () => {
     const { state } = this
     window.open(state.userCall.url)
   }
@@ -491,8 +489,10 @@ export class PublicProfile extends React.Component {
               faIcon='fas fa-phone'
             >
               <div className='gallery__delete__file__popup__body'>
-                <div>{props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: props.user.username })}</div>
-                <br />
+                <div className='callpopup__text'>
+                  {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: props.user.username })}
+                </div>
+
                 <div className='gallery__delete__file__popup__body__btn'>
                   <IconButton
                     onClick={this.handleClickCancelButton}
@@ -503,8 +503,7 @@ export class PublicProfile extends React.Component {
                   <IconButton
                     intent='primary'
                     mode='light'
-                    onClick={props.onClickDisplayCallPopup}
-                    dataCy='gallery__delete__file__popup__body__btn__delete'
+                    onClick={this.onClickOpenCallWindow}
                     text={props.t('Open call')}
                     icon='fas fa-phone'
                     color={GLOBAL_primaryColor} // eslint-disable-line camelcase
@@ -527,7 +526,7 @@ export class PublicProfile extends React.Component {
               customClass='callpopup__body'
               customHeaderClass='primaryColorBg'
               onClose={this.handleClosePopup}
-              label={props.t('{{username}} will call you later', { username: props.user.username })}
+              label={props.t('{{username}} will call you back later', { username: props.user.username })}
               faIcon='fas fa-phone-slash'
             />
           )}
@@ -557,7 +556,7 @@ export class PublicProfile extends React.Component {
               customClass='callpopup__body'
               customHeaderClass='primaryColorBg'
               onClose={this.handleClosePopup}
-              label={props.t('{{username}} will call you later', { username: props.user.username })}
+              label={props.t('{{username}} will call you back later', { username: props.user.username })}
               faIcon='fas fa-phone-slash'
             />
           )}
@@ -575,7 +574,7 @@ export class PublicProfile extends React.Component {
             breadcrumbsList={props.breadcrumbs}
             onChangeAvatarClick={this.handleChangeAvatarClick}
             changeAvatarEnabled={isPublicProfileEditable}
-            onClickDisplayCallPopup={this.handleClickCallButton} // fonction
+            onClickDisplayCallPopup={this.handleClickCallButton}
           />
 
           <div className='profile__content'>

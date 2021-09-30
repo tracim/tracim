@@ -508,7 +508,7 @@
   "Call": "Chamar",
   "{{username}} has received your call. If accepted, the call will open automatically.": "{{username}} recebeu a sua chamada. Se for aceite, a chamada será aberta automaticamente.",
   "Call declined by {{username}}": "Chamada declinada por {{username}}",
-  "{{username}} will call you later": "{{username}} telefonar-lhe-á mais tarde",
+  "{{username}} will call you back later": "{{username}} telefonar-lhe-á mais tarde",
   "The call with {{username}} failed": "A chamada das {{username}} falhou.",
   "{{username}} is calling you": "{{username}} está a chamar-lhe"
 }
