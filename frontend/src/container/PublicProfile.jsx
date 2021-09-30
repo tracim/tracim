@@ -572,7 +572,7 @@ export class PublicProfile extends React.Component {
             breadcrumbsList={props.breadcrumbs}
             onChangeAvatarClick={this.handleChangeAvatarClick}
             changeAvatarEnabled={isPublicProfileEditable}
-            onClickDisplayCallPopup={this.handleClickCallButton} // fonction
+            onClickDisplayCallPopup={this.handleClickCallButton}
           />
 
           <div className='profile__content'>
