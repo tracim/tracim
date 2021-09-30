@@ -502,7 +502,6 @@ export class PublicProfile extends React.Component {
                     intent='primary'
                     mode='light'
                     onClick={props.onClickDisplayCallPopup}
-                    dataCy='gallery__delete__file__popup__body__btn__delete'
                     text={props.t('Open call')}
                     icon='fas fa-phone'
                     color={GLOBAL_primaryColor} // eslint-disable-line camelcase
