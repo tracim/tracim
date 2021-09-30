@@ -433,7 +433,7 @@ export class PublicProfile extends React.Component {
     this.setState({ userCall: undefined })
   }
 
-  openCallWindow = () => {
+  onClickOpenCallWindow = () => {
     const { state } = this
     window.open(state.userCall.url)
   }
@@ -489,8 +489,10 @@ export class PublicProfile extends React.Component {
               faIcon='fas fa-phone'
             >
               <div className='gallery__delete__file__popup__body'>
-                <div>{props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: props.user.username })}</div>
-                <br />
+                <div className='callpopup__text'>
+                  {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: props.user.username })}
+                </div>
+
                 <div className='gallery__delete__file__popup__body__btn'>
                   <IconButton
                     onClick={this.handleClickCancelButton}
@@ -501,7 +503,7 @@ export class PublicProfile extends React.Component {
                   <IconButton
                     intent='primary'
                     mode='light'
-                    onClick={props.onClickDisplayCallPopup}
+                    onClick={this.onClickOpenCallWindow}
                     text={props.t('Open call')}
                     icon='fas fa-phone'
                     color={GLOBAL_primaryColor} // eslint-disable-line camelcase

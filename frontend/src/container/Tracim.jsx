@@ -496,7 +496,7 @@ export class Tracim extends React.Component {
             faIcon='fas fa-phone'
           >
             <div className='callpopup__body'>
-              <br />
+
               <div className='callpopup__body__btn'>
                 <IconButton
                   onClick={this.handleClickRejectCall}
