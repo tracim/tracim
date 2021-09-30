@@ -11,7 +11,11 @@ import {
   PROFILE,
   IconButton,
   getAvatarBaseUrl,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  CardPopup,
+  USER_CALL_STATE,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -25,8 +29,10 @@ import {
   getCustomPropertiesSchema,
   getCustomPropertiesUiSchema,
   getUserCustomPropertiesDataSchema,
-  putUserCustomPropertiesDataSchema
-} from '../action-creator.async'
+  putUserCustomPropertiesDataSchema,
+  postCreateUserCall,
+  putSetOutgoingUserCallState
+} from '../action-creator.async.js'
 import { serializeUserProps } from '../reducer/user.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
@@ -53,6 +59,7 @@ const POPUP_DISPLAY_STATE = {
 }
 const AVATAR_IMAGE_DIMENSIONS = '100x100'
 const COVER_IMAGE_DIMENSIONS = '1300x150'
+const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
@@ -122,12 +129,50 @@ export class PublicProfile extends React.Component {
       informationDataSchema: {},
       personalPageDataSchema: {},
       dataSchemaObject: {},
-      displayUploadPopup: undefined
+      displayUploadPopup: undefined,
+      userCall: undefined,
+      unansweredCallTimeoutId: -1
     }
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallModified },
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCallCreated }
+    ])
+  }
+
+    handleUserCallCreated = (tlm) => {
+      if (tlm.fields.user_call.caller.user_id !== this.props.user.userId) return
+      this.setState({ userCall: tlm.fields.user_call })
+    }
+
+  handleUserCallModified = (tlm) => {
+    const { props, state } = this
+    if (tlm.fields.user_call.caller.user_id !== props.user.userId) return
+    clearTimeout(state.unansweredCallTimeoutId)
+    this.setState({ userCall: tlm.fields.user_call, unansweredCallTimeoutId: -1 })
+    if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+      window.open(tlm.fields.user_call.url)
+    }
+  }
+
+  handleClickCancelButton = async () => {
+    const { props, state } = this
+    await props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.CANCELLED))
+  }
+
+  handleClickCallButton = async () => {
+    const { props, state } = this
+    await props.dispatch(postCreateUserCall(props.user.userId, state.displayedUser.userId))
+    const setUserCallUnanswered = () => {
+      const { props, state } = this
+      props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.UNANSWERED))
+    }
+    const id = setTimeout(setUserCallUnanswered, UNANSWERED_CALL_TIMEOUT)
+    this.setState({ unansweredCallTimeoutId: id })
   }
 
   handleAllAppChangeLanguage = data => {
@@ -384,6 +429,15 @@ export class PublicProfile extends React.Component {
 
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
+  handleClosePopup = () => {
+    this.setState({ userCall: undefined })
+  }
+
+  onClickOpenCallWindow = () => {
+    const { state } = this
+    window.open(state.userCall.url)
+  }
+
   render () {
     const { props, state } = this
 
@@ -426,6 +480,86 @@ export class PublicProfile extends React.Component {
             />
           )}
 
+          {state.userCall && state.userCall.state === USER_CALL_STATE.IN_PROGRESS && (
+            <CardPopup
+              customClass=''
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleClickCancelButton}
+              label={props.t('Call in progress...')}
+              faIcon='fas fa-phone'
+            >
+              <div className='gallery__delete__file__popup__body'>
+                <div className='callpopup__text'>
+                  {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: state.displayedUser.publicName })}
+                </div>
+
+                <div className='gallery__delete__file__popup__body__btn'>
+                  <IconButton
+                    onClick={this.handleClickCancelButton}
+                    text={props.t('Cancel the call')}
+                    icon='fas fa-phone-slash'
+                  />
+
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    onClick={this.onClickOpenCallWindow}
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                  />
+                </div>
+              </div>
+            </CardPopup>
+          )}
+          {state.userCall && state.userCall.state === USER_CALL_STATE.REJECTED && (
+            <CardPopup
+              customClass='callpopup__body'
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleClosePopup}
+              label={props.t('Call declined by {{username}}', { username: props.user.username })}
+              faIcon='fas fa-phone-slash'
+            />
+          )}
+          {state.userCall && state.userCall.state === USER_CALL_STATE.DECLINED && (
+            <CardPopup
+              customClass='callpopup__body'
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleClosePopup}
+              label={props.t('{{username}} will call you back later', { username: props.user.username })}
+              faIcon='fas fa-phone-slash'
+            />
+          )}
+          {state.userCall && state.userCall.state === USER_CALL_STATE.UNANSWERED && (
+            <CardPopup
+              customClass='callpopup__body'
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleClosePopup}
+              label={props.t('Call failed')}
+              faIcon='fas fa-phone-slash'
+            >
+              <div>{props.t('The call with {{username}} failed', { username: state.displayedUser.publicName })}</div>
+              <IconButton
+                // customClass='gallery__delete__file__popup__body__btn__delete'
+                intent='primary'
+                mode='light'
+                onClick={this.handleClickCallButton}
+                dataCy='gallery__delete__file__popup__body__btn__delete'
+                text={props.t('Try again')}
+                icon='fas fa-phone'
+                color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+              />
+            </CardPopup>
+          )}
+          {state.userCall && state.userCall.state === USER_CALL_STATE.DECLINED && (
+            <CardPopup
+              customClass='callpopup__body'
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleClosePopup}
+              label={props.t('{{username}} will call you back later', { username: props.user.username })}
+              faIcon='fas fa-phone-slash'
+            />
+          )}
           <CoverImage
             displayedUser={state.displayedUser}
             changeEnabled={isPublicProfileEditable}
@@ -440,6 +574,7 @@ export class PublicProfile extends React.Component {
             breadcrumbsList={props.breadcrumbs}
             onChangeAvatarClick={this.handleChangeAvatarClick}
             changeAvatarEnabled={isPublicProfileEditable}
+            onClickDisplayCallPopup={this.handleClickCallButton}
           />
 
           <div className='profile__content'>

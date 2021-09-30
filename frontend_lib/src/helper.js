@@ -828,3 +828,12 @@ export const getDocumentFromHTMLString = (htmlString) => {
 
   return doc
 }
+
+export const USER_CALL_STATE = {
+  IN_PROGRESS: 'in_progress',
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected',
+  DECLINED: 'declined',
+  CANCELLED: 'cancelled',
+  UNANSWERED: 'unanswered'
+}

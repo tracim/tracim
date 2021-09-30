@@ -496,5 +496,19 @@
   "Hide discussion": "Hide discussion",
   "Show discussion": "Show discussion",
   "Hide comment area": "Hide comment area",
-  "Comment": "Comment"
+  "Comment": "Comment",
+  "{{author}} removed themself from a space": "{{author}} removed themself from a space",
+  "Call in progress...": "Call in progress...",
+  "Cancel the call": "Cancel the call",
+  "Open call": "Open call",
+  "Call failed": "Call failed",
+  "Try again": "Try again",
+  "Decline": "Decline",
+  "I'll answer later": "I'll answer later",
+  "Call": "Call",
+  "{{username}} has received your call. If accepted, the call will open automatically.": "{{username}} has received your call. If accepted, the call will open automatically.",
+  "Call declined by {{username}}": "Call declined by {{username}}",
+  "{{username}} will call you back later": "{{username}} will call you back later",
+  "The call with {{username}} failed": "The call with {{username}} failed",
+  "{{username}} is calling you": "{{username}} is calling you"
 }
