@@ -666,3 +666,7 @@ class TooManyOnlineUsersError(TracimException):
 
 class UserCallTransitionNotAllowed(TracimException):
     error_code = ErrorCode.USER_CALL_TRANSITION_NOT_ALLOWED
+
+
+class UserCallNotFound(NotFound):
+    error_code = ErrorCode.USER_CALL_NOT_FOUND

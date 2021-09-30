@@ -1,5 +1,6 @@
 from pyramid.config import Configurator
 
+from tracim_backend.exceptions import UserCallNotFound
 from tracim_backend.exceptions import UserCallTransitionNotAllowed
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.call import CallLib
@@ -100,6 +101,7 @@ class CallController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)
+    @hapic.handle_exception(UserCallNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UserIdCallIdPathSchema())
     @hapic.output_body(UserCallSchema())
     def get_incoming_call(
@@ -137,6 +139,7 @@ class CallController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CALL_ENDPOINTS])
     @check_right(has_personal_access)
+    @hapic.handle_exception(UserCallNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_path(UserIdCallIdPathSchema())
     @hapic.output_body(UserCallSchema())
     def get_outgoing_call(

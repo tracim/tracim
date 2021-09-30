@@ -4,6 +4,7 @@ import typing
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import literal
 
+from tracim_backend.exceptions import UserCallNotFound
 from tracim_backend.exceptions import UserCallTransitionNotAllowed
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.models.auth import User
@@ -69,7 +70,9 @@ class CallLib:
                 .one()
             )
         except NoResultFound:
-            raise Exception("BOO!!!!")
+            raise UserCallNotFound(
+                "Call of id {} for user {} doesn't exist".format(call_id, user_id)
+            )
 
     def _create_call_url(self, call: UserCall) -> str:
         assert self._config.CALL__ENABLED
