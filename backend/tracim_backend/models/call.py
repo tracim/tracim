@@ -27,14 +27,14 @@ class UserCallState(enum.Enum):
     IN_PROGRESS = "in_progress"
 
     # Callee state changes
-    ACCEPTED = "accepted"
-    REJECTED = "rejected"
-    DECLINED = "declined"
-    POSTPONED = "postponed"
+    ACCEPTED = "accepted"  # when the callee accepts the call
+    REJECTED = "rejected"  # when the called closes the call
+    DECLINED = "declined"  # when the callee refuses the call
+    POSTPONED = "postponed"  # when the callee answers "call you later"
 
     # Caller state changes
-    CANCELLED = "cancelled"
-    UNANSWERED = "unanswered"
+    CANCELLED = "cancelled"  # when the caller cancels the call
+    UNANSWERED = "unanswered"  # when the called doesn't answer the call after some time
 
 
 class UserCall(CreationDateMixin, UpdateDateMixin, DeclarativeBase):
