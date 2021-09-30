@@ -120,8 +120,6 @@ export class PublicProfile extends React.Component {
   constructor (props) {
     super(props)
 
-    // props register live message handler list
-
     this.state = {
       displayedUser: undefined,
       coverImageUrl: undefined,
