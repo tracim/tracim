@@ -59,7 +59,7 @@ const POPUP_DISPLAY_STATE = {
 }
 const AVATAR_IMAGE_DIMENSIONS = '100x100'
 const COVER_IMAGE_DIMENSIONS = '1300x150'
-const UNANSWERED_CALL_TIMEOUT = 200000
+const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
