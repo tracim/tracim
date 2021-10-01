@@ -517,7 +517,7 @@ export class PublicProfile extends React.Component {
               customClass='callpopup__body'
               customHeaderClass='primaryColorBg'
               onClose={this.handleClosePopup}
-              label={props.t('Call declined by {{username}}', { username: props.user.username })}
+              label={props.t('Call declined by {{username}}', { username: state.userCall.callee.public_name })}
               faIcon='fas fa-phone-slash'
             />
           )}
@@ -526,7 +526,7 @@ export class PublicProfile extends React.Component {
               customClass='callpopup__body'
               customHeaderClass='primaryColorBg'
               onClose={this.handleClosePopup}
-              label={props.t('{{username}} will call you back later', { username: props.user.username })}
+              label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
               faIcon='fas fa-phone-slash'
             />
           )}
@@ -538,7 +538,7 @@ export class PublicProfile extends React.Component {
               label={props.t('Call failed')}
               faIcon='fas fa-phone-slash'
             >
-              <div>{props.t('The call with {{username}} failed', { username: state.displayedUser.publicName })}</div>
+              <div>{props.t('The call with {{username}} failed', { username: state.userCall.callee.public_name })}</div>
               <IconButton
                 // customClass='gallery__delete__file__popup__body__btn__delete'
                 intent='primary'
@@ -556,7 +556,7 @@ export class PublicProfile extends React.Component {
               customClass='callpopup__body'
               customHeaderClass='primaryColorBg'
               onClose={this.handleClosePopup}
-              label={props.t('{{username}} will call you back later', { username: props.user.username })}
+              label={props.t('{{username}} will call you back later', { username: state.userCall.callee.username })}
               faIcon='fas fa-phone-slash'
             />
           )}
