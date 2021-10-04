@@ -62,7 +62,7 @@ export const serializeNotification = notification => {
   }
 }
 
-function sortByCreatedDate (arrayToSort) {
+export function sortByCreatedDate (arrayToSort) {
   return arrayToSort.sort(function (a, b) {
     if (a.created < b.created) return 1
     if (a.created > b.created) return -1
