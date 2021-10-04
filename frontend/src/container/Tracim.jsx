@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
+import { isEqual } from 'lodash'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -28,6 +29,7 @@ import {
   CardPopup,
   IconButton,
   TracimComponent,
+  buildHeadTitle,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
   LIVE_MESSAGE_ERROR_CODE,
@@ -107,6 +109,7 @@ export class Tracim extends React.Component {
       userCall: undefined
     }
 
+    this.audioCall = new Audio('/assets/branding/phone-incoming-call.oga')
     this.liveMessageManager = new LiveMessageManager()
 
     // NOTE - S.G. - Unconditionally hide the original welcome element
@@ -136,8 +139,21 @@ export class Tracim extends React.Component {
   }
 
   handleUserCallCreated = (tlm) => {
+    const { props } = this
+    const bell = '🔔'
+    const isMainTab = this.liveMessageManager.eventSource !== null
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
     this.setState({ userCall: tlm.fields.user_call })
+    if (!isMainTab) return
+    this.audioCall.play()
+    this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
+  }
+
+  handleSetHeadTitle = (data, titlePrefix = '') => {
+    const { props } = this
+
+    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.SET_HEAD_TITLE, data)
+    props.dispatch(setHeadTitle(data.title, titlePrefix))
   }
 
   handleClickOpenCallWindow = () => {
@@ -148,11 +164,15 @@ export class Tracim extends React.Component {
   handleClickRejectCall = () => {
     const { props, state } = this
     props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.REJECTED))
+    this.audioCall.pause()
+    this.handleSetHeadTitle({ title: props.system.headTitle })
   }
 
   handleClickDeclineCall = () => {
     const { props, state } = this
     props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.DECLINED))
+    this.audioCall.pause()
+    this.handleSetHeadTitle({ title: props.system.headTitle })
   }
 
   handleUserCallModified = (tlm) => {
@@ -234,11 +254,6 @@ export class Tracim extends React.Component {
     this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
   }
 
-  handleSetHeadTitle = data => {
-    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.SET_HEAD_TITLE, data)
-    this.props.dispatch(setHeadTitle(data.title))
-  }
-
   handleUserDisconnected = () => {
     this.setState({ isNotificationWallOpen: false })
   }
@@ -280,7 +295,7 @@ export class Tracim extends React.Component {
 
   componentDidUpdate (prevProps) {
     this.handleHeadTitleAndFavicon(
-      prevProps.system.headTitle,
+      prevProps.system.titleArgs,
       prevProps.notificationPage.unreadNotificationCount,
       prevProps.notificationPage.unreadMentionCount
     )
@@ -416,17 +431,17 @@ export class Tracim extends React.Component {
     }
   }
 
-  handleHeadTitleAndFavicon = (prevHeadTitle, prevUnreadNotificationCount, prevUnreadMentionCount) => {
+  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount) => {
     const { props } = this
 
-    const hasHeadTitleChanged = prevHeadTitle !== props.system.headTitle
+    const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
     const unreadMentionCount = props.notificationPage.unreadMentionCount
     const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount
     const unreadNotificationCount = props.notificationPage.unreadNotificationCount
     const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount
 
-    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.headTitle !== '') {
-      let newHeadTitle = props.system.headTitle
+    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs.length > 0) {
+      let newHeadTitle = buildHeadTitle(props.system.titleArgs)
       if (unreadMentionCount > 0) {
         newHeadTitle = `(${unreadMentionCount > 99 ? '99+' : unreadMentionCount}) ${newHeadTitle}`
       }

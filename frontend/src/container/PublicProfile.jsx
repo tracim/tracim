@@ -540,7 +540,6 @@ export class PublicProfile extends React.Component {
             >
               <div>{props.t('The call with {{username}} failed', { username: state.userCall.callee.public_name })}</div>
               <IconButton
-                // customClass='gallery__delete__file__popup__body__btn__delete'
                 intent='primary'
                 mode='light'
                 onClick={this.handleClickCallButton}
