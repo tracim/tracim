@@ -220,6 +220,12 @@ export class SearchFilterMenu extends React.Component {
 
     const currentSearch = props.currentSearch
 
+    const checkedFilterFieldIdList = SEARCH_FIELDS[props.searchType]
+      .filter(field => (
+        currentSearch.appliedFilters.searchFieldList && currentSearch.appliedFilters.searchFieldList.includes(field.id)
+      ))
+      .map(field => field.id)
+
     return (
       <div className='searchFilterMenu'>
         <div className='searchFilterMenu__title'>
@@ -241,9 +247,7 @@ export class SearchFilterMenu extends React.Component {
 
         <div className='searchFilterMenu__content'>
           <CheckboxFilter
-            appliedFilterList={SEARCH_FIELDS[props.searchType].filter(field => (
-              currentSearch.appliedFilters.searchFieldList && currentSearch.appliedFilters.searchFieldList.includes(field.id)
-            ))}
+            checkedFilterIdList={checkedFilterFieldIdList}
             filterList={SEARCH_FIELDS[props.searchType]}
             label={props.t('Only search in')}
             onChangeSearchFacets={(value) => props.onClickSearchField(SEARCH_FIELDS[props.searchType].find(field => field.id === value))}
