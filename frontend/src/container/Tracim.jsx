@@ -184,10 +184,12 @@ export class Tracim extends React.Component {
 
   handleUserCallModified = (tlm) => {
     const { props } = this
+    const isMainTab = this.liveMessageManager.eventSource !== null
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
     this.setState({ userCall: undefined })
 
     if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+      if (!isMainTab) return
       window.open(tlm.fields.user_call.url)
     }
 

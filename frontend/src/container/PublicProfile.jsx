@@ -151,10 +151,12 @@ export class PublicProfile extends React.Component {
 
   handleUserCallModified = (tlm) => {
     const { props, state } = this
+    const isMainTab = this.liveMessageManager.eventSource !== null
     if (tlm.fields.user_call.caller.user_id !== props.user.userId) return
     clearTimeout(state.unansweredCallTimeoutId)
     this.setState({ userCall: tlm.fields.user_call, unansweredCallTimeoutId: -1 })
     if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+      if (!isMainTab) return
       window.open(tlm.fields.user_call.url)
     }
   }
@@ -435,6 +437,8 @@ export class PublicProfile extends React.Component {
 
   onClickOpenCallWindow = () => {
     const { state } = this
+    const isMainTab = this.liveMessageManager.eventSource !== null
+    if (!isMainTab) return
     window.open(state.userCall.url)
   }
 
