@@ -313,7 +313,7 @@ export class FeedItemWithPreview extends React.Component {
     let previewTitle = ''
     if (props.inRecentActivities) {
       previewTitle = props.isPublication
-        ? props.t('Show in publications')
+        ? props.t('Show in news')
         : props.t('Open_action')
     } else {
       if (props.previewLinkType !== LINK_TYPE.NONE) {

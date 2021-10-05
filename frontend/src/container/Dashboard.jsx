@@ -379,8 +379,8 @@ export class Dashboard extends React.Component {
     let contentTypeButtonList = []
     if (props.currentWorkspace.publicationEnabled) {
       contentTypeButtonList.push({
-        slug: 'publications',
-        creationLabel: props.t('Publish some information'),
+        slug: 'news',
+        creationLabel: props.t('Publish some news'),
         route: PAGE.WORKSPACE.PUBLICATIONS(props.currentWorkspace.id),
         hexcolor: COLORS.PUBLICATION,
         faIcon: 'fas fa-stream'
