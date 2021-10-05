@@ -433,7 +433,7 @@ export class PublicProfile extends React.Component {
     this.setState({ userCall: undefined })
   }
 
-  onClickOpenCallWindow = () => {
+  handleClickOpenCallWindow = () => {
     const { state } = this
     window.open(state.userCall.url)
   }
@@ -503,7 +503,7 @@ export class PublicProfile extends React.Component {
                   <IconButton
                     intent='primary'
                     mode='light'
-                    onClick={this.onClickOpenCallWindow}
+                    onClick={this.handleClickOpenCallWindow}
                     text={props.t('Open call')}
                     icon='fas fa-phone'
                     color={GLOBAL_primaryColor} // eslint-disable-line camelcase
