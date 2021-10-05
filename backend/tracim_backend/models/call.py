@@ -40,6 +40,8 @@ class UserCallState(enum.Enum):
 class UserCall(CreationDateMixin, UpdateDateMixin, DeclarativeBase):
     __tablename__ = "user_calls"
 
+    URL_MAX_LENGTH = 1024
+
     CALLER_STATES = (UserCallState.CANCELLED, UserCallState.UNANSWERED)
     CALLEE_STATES = (
         UserCallState.ACCEPTED,
@@ -56,7 +58,7 @@ class UserCall(CreationDateMixin, UpdateDateMixin, DeclarativeBase):
     state = Column(
         Enum(UserCallState), nullable=False, server_default=UserCallState.IN_PROGRESS.name,
     )
-    url = Column(String, nullable=False)
+    url = Column(String(length=URL_MAX_LENGTH), nullable=False)
 
     @hybrid_property
     def user_ids(self) -> typing.Tuple[int, int]:
