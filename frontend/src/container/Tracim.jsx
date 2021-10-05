@@ -109,7 +109,7 @@ export class Tracim extends React.Component {
       userCall: undefined
     }
 
-    this.audioCall = new Audio('/assets/branding/phone-incoming-call.oga')
+    this.audioCall = new Audio('/assets/branding/data_sounds_ringtones_Solarium.ogg')
     this.liveMessageManager = new LiveMessageManager()
 
     // NOTE - S.G. - Unconditionally hide the original welcome element
@@ -145,9 +145,14 @@ export class Tracim extends React.Component {
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
     this.setState({ userCall: tlm.fields.user_call })
     if (!isMainTab) return
-    this.audioCall.play()
     this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
+    this.audioCall.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    }, false);
+    this.audioCall.play();
   }
+
 
   handleSetHeadTitle = (data, titlePrefix = '') => {
     const { props } = this
@@ -159,6 +164,8 @@ export class Tracim extends React.Component {
   handleClickOpenCallWindow = () => {
     const { state, props } = this
     props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
+    this.audioCall.pause()
+    this.handleSetHeadTitle({ title: props.system.headTitle })
   }
 
   handleClickRejectCall = () => {
@@ -176,12 +183,17 @@ export class Tracim extends React.Component {
   }
 
   handleUserCallModified = (tlm) => {
+    const { props } = this
     if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
     this.setState({ userCall: undefined })
 
     if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
       window.open(tlm.fields.user_call.url)
     }
+
+    if (tlm.fields.user_call.state === USER_CALL_STATE.CANCELLED) {
+      this.audioCall.pause()
+      this.handleSetHeadTitle({ title: props.system.headTitle })    }
   }
 
   handleClickLogout = async () => {
@@ -507,7 +519,7 @@ export class Tracim extends React.Component {
             customClass=''
             customHeaderClass='primaryColorBg'
             onClose={this.handleClickRejectCall}
-            label={props.t('{{username}} is calling you', { username: state.userCall.caller.username })}
+            label={props.t('{{username}} is calling you', { username: state.userCall.caller.public_name })}
             faIcon='fas fa-phone'
           >
             <div className='callpopup__body'>

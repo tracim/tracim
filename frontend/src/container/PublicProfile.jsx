@@ -555,7 +555,7 @@ export class PublicProfile extends React.Component {
               customClass='callpopup__body'
               customHeaderClass='primaryColorBg'
               onClose={this.handleClosePopup}
-              label={props.t('{{username}} will call you back later', { username: state.userCall.callee.username })}
+              label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
               faIcon='fas fa-phone-slash'
             />
           )}
