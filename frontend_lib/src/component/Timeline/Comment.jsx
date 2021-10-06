@@ -173,6 +173,7 @@ const Comment = props => {
           {props.isPublication && props.showTimeline && (
             <IconButton
               text={props.discussionToggleButtonLabel}
+              textMobile={`(${props.threadLength})`}
               icon='far fa-comment'
               onClick={props.onClickToggleCommentList}
               customClass='buttonComments'
@@ -207,7 +208,8 @@ Comment.propTypes = {
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   onClickToggleCommentList: PropTypes.func,
-  discussionToggleButtonLabel: PropTypes.string.isRequired
+  discussionToggleButtonLabel: PropTypes.string.isRequired,
+  threadLength: PropTypes.number
 }
 
 Comment.defaultProps = {
@@ -216,6 +218,7 @@ Comment.defaultProps = {
   fromMe: false,
   translationState: TRANSLATION_STATE.DISABLED,
   discussionToggleButtonLabel: 'Comment',
+  threadLength: 0,
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
   onClickDeleteComment: () => {}

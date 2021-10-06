@@ -37,13 +37,27 @@ const IconButton = props => {
           }}
         />
       )}
-      {props.text && <span className={props.icon ? 'iconbutton__text_with_icon' : 'iconbutton__text'}>{props.text}</span>}
+
+      {props.text && (
+        <span
+          className={`${props.icon ? 'iconbutton__text_with_icon':''} iconbutton__label`}>
+          {props.text}
+        </span>
+      )}
+
+      {props.textMobile && (
+        <span
+          className={`${props.icon ? 'iconbutton__text_with_icon':''} iconbutton__label-mobile`}>
+          {props.textMobile}
+        </span>
+      )}
     </button>
   )
 }
 
 IconButton.propTypes = {
   text: PropTypes.string,
+  textMobile: PropTypes.string,
   icon: PropTypes.string,
   iconColor: PropTypes.string,
   title: PropTypes.string,
@@ -59,6 +73,7 @@ IconButton.propTypes = {
 
 IconButton.defaultProps = {
   text: undefined,
+  textMobile: '',
   icon: undefined,
   iconColor: undefined,
   onClick: undefined,

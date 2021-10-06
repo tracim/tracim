@@ -395,6 +395,7 @@ export class FeedItemWithPreview extends React.Component {
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                   onClickToggleCommentList={this.handleClickToggleComments}
                   discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                  threadLength={props.commentList.length}
                   showTimeline={props.showTimeline}
                 />
               )
