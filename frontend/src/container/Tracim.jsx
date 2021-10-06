@@ -142,15 +142,21 @@ export class Tracim extends React.Component {
     const { props } = this
     const bell = '🔔'
     const isMainTab = this.liveMessageManager.eventSource !== null
-    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-    this.setState({ userCall: tlm.fields.user_call })
-    if (!isMainTab) return
-    this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
-    this.audioCall.addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-    }, false);
-    this.audioCall.play();
+
+    if (tlm.fields.user_call.callee.user_id === this.props.user.userId) {
+      this.setState({ userCall: tlm.fields.user_call })
+      this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
+      if (!isMainTab) return
+      this.audioCall.addEventListener('ended', function() {
+          this.currentTime = 0
+          this.play()
+      }, false)
+      this.audioCall.play()
+    }
+
+    if (tlm.fields.user_call.caller.user_id === this.props.user.userId) {
+      this.setState({ userCall: tlm.fields.user_call })
+    }
   }
 
 
@@ -183,19 +189,35 @@ export class Tracim extends React.Component {
   }
 
   handleUserCallModified = (tlm) => {
-    const { props } = this
+    const { props, state } = this
     const isMainTab = this.liveMessageManager.eventSource !== null
-    if (tlm.fields.user_call.callee.user_id !== this.props.user.userId) return
-    this.setState({ userCall: undefined })
+    if (tlm.fields.user_call.callee.user_id === props.user.userId) {
+      this.setState({ userCall: undefined })
 
-    if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
-      if (!isMainTab) return
-      window.open(tlm.fields.user_call.url)
+      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+        if (!isMainTab) return
+        window.open(tlm.fields.user_call.url)
+      }
     }
+    if (tlm.fields.user_call.caller.user_id === props.user.userId) {
+      if (tlm.fields.user_call.state === USER_CALL_STATE.CANCELLED) {
+        this.audioCall.pause()
+        this.handleSetHeadTitle({ title: props.system.headTitle })
+      }
+      clearTimeout(state.unansweredCallTimeoutId)
+      this.setState({ userCall: tlm.fields.user_call, unansweredCallTimeoutId: -1 })
+      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+        if (!isMainTab) return
+        window.open(tlm.fields.user_call.url)
+      }
+    }
+  }
 
-    if (tlm.fields.user_call.state === USER_CALL_STATE.CANCELLED) {
-      this.audioCall.pause()
-      this.handleSetHeadTitle({ title: props.system.headTitle })    }
+  onClickOpenCallWindow = () => {
+    const { state } = this
+    const isMainTab = this.liveMessageManager.eventSource !== null
+    if (!isMainTab) return
+    window.open(state.userCall.url)
   }
 
   handleClickLogout = async () => {
@@ -516,7 +538,7 @@ export class Tracim extends React.Component {
           t={props.t}
         />
 
-        {state.userCall && (
+        {state.userCall && (state.userCall.callee.user_id === props.user.userId) && (
           <CardPopup
             customClass=''
             customHeaderClass='primaryColorBg'
@@ -551,6 +573,39 @@ export class Tracim extends React.Component {
             </div>
           </CardPopup>
         )}
+
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.IN_PROGRESS && (
+            <CardPopup
+              customClass=''
+              customHeaderClass='primaryColorBg'
+              onClose={this.handleClickCancelButton}
+              label={props.t('Call in progress...')}
+              faIcon='fas fa-phone'
+            >
+              <div className='gallery__delete__file__popup__body'>
+                <div className='callpopup__text'>
+                  {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: state.userCall.caller.public_name })}
+                </div>
+
+                <div className='gallery__delete__file__popup__body__btn'>
+                  <IconButton
+                    onClick={this.handleClickCancelButton}
+                    text={props.t('Cancel the call')}
+                    icon='fas fa-phone-slash'
+                  />
+
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    onClick={this.onClickOpenCallWindow}
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                  />
+                </div>
+              </div>
+            </CardPopup>
+          )}
 
         <ReduxTlmDispatcher />
 
