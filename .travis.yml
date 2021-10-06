@@ -147,12 +147,6 @@ jobs:
       <<: *_backend_quick_test
       python: "3.6"
       if: commit_message !~ /(\[skip ci pytest\])/
-    # FIXME - G.M - 2021-07-07 - Disable python 3.5 for now
-    #    - stage: quick-tests
-    #      name: "Python: 3.5"
-    #      <<: *_backend_quick_test
-    #      python: "3.5"
-    #      if: commit_message !~ /(\[skip ci pytest\])/
     - stage: quick-tests
       name: "Python: 3.7"
       <<: *_backend_quick_test

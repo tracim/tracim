@@ -1,6 +1,7 @@
 frontend*
 !frontend/*.sample
 backend/*
+!backend/update_i18n_json_file.sh
 !backend/requirements*.txt
 functionnal_tests
 !functionnal_tests/*.sample

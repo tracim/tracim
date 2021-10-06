@@ -12,7 +12,7 @@ for version in $@; do
   pip install -r requirements-storage-s3.txt
   pip install $(for r in requirements-db*.txt; do echo "-r $r"; done)
   # Special case for devtools as they aren't supported with python 3.5
-  if "$version" != "3.5.10"; then
+  if [ "$version" != "3.5.10" ]; then
     pip install -r requirements-devtool.txt
   fi
 done
