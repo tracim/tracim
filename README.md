@@ -30,14 +30,6 @@ Then visit http://localhost:8080 and log in:
 
 For advanced docker-based usage, look at the full [Tracim Docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker),
 
-## License
-
-Tracim is distributed under the terms of 3 distinct licenses:
-
-- AGPLv3 for the Agenda application (`frontend_app_agenda` folder)
-- LGPL for other frontend parts (`frontend` and `frontend_xxx` folders)
-- MIT License for the rest (backend stuff, functionnal tests, docker recipe, documentation, etc).
-
 ## Contribute
 
 In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
