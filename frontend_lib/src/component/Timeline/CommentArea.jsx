@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import AutoComplete from '../Input/AutoComplete/AutoComplete'
@@ -10,6 +11,9 @@ import {
   tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
 import { LOCAL_STORAGE_FIELD, setLocalStorageItem } from '../../localStorage.js'
+import AddFileToUploadButton from './AddFileToUploadButton.jsx'
+import DisplayFileToUpload from './DisplayFileToUpload.jsx'
+import IconButton from '../Button/IconButton.jsx'
 
 const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
 
@@ -232,37 +236,93 @@ export class CommentArea extends React.Component {
     }
 
     return (
-      <>
-        {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
-          <AutoComplete
-            autoCompleteItemList={state.autoCompleteItemList}
-            style={props.disableAutocompletePosition ? {} : style}
-            apiUrl={props.apiUrl}
-            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            onClickAutoCompleteItem={(m) => props.wysiwyg
-              ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this))
-              : this.handleClickAutoCompleteItem(m)}
-            delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+      <form className={`${props.customClass}__texteditor`}>
+        <div
+          className={classnames(
+            `${props.customClass}__texteditor__textinput`,
+            'timeline__texteditor__textinput'
+          )}
+        >
+          {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
+            <AutoComplete
+              autoCompleteItemList={state.autoCompleteItemList}
+              style={props.disableAutocompletePosition ? {} : style}
+              apiUrl={props.apiUrl}
+              autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+              onClickAutoCompleteItem={(m) => props.wysiwyg
+                ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this))
+                : this.handleClickAutoCompleteItem(m)}
+              delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+            />
+          )}
+          <textarea
+            id={props.id}
+            className={props.customClass}
+            placeholder={props.t('Your message...')}
+            value={props.newComment}
+            onChange={props.wysiwyg ? () => { } : props.onChangeNewComment}
+            disabled={props.disableComment}
+            onKeyDown={this.handleInputKeyDown}
+            ref={ref => {
+              this.textAreaRef = ref
+              if (ref && this.commentCursorPos > -1) {
+                ref.selectionStart = ref.selectionEnd = this.commentCursorPos
+                ref.focus()
+                this.commentCursorPos = -1
+              }
+            }}
           />
+        </div>
+
+        {!props.hideSendButtonAndOptions && (
+          <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
+            <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__texteditor__advancedtext')}>
+              <IconButton
+                customClass={classnames(
+                  `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
+                )}
+                disabled={props.disableComment}
+                text={props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
+                onClick={props.onClickWysiwygBtn}
+                intent='link'
+                mode='light'
+                key='timeline__comment__advancedtext'
+              />
+
+              <div>
+                <DisplayFileToUpload
+                  fileList={props.newCommentAsFileList}
+                  onRemoveCommentAsFile={props.onRemoveCommentAsFile}
+                  color={props.customColor}
+                />
+              </div>
+            </div>
+
+            <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
+              <div>
+                <AddFileToUploadButton
+                  workspaceId={props.workspaceId}
+                  color={props.customColor}
+                  disabled={props.disableComment}
+                  onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
+                />
+              </div>
+              <IconButton
+                color={props.customColor}
+                customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
+                disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
+                icon='far fa-paper-plane'
+                intent='primary'
+                mode='light'
+                onClick={props.onClickValidateNewCommentBtn}
+                text={props.t('Send')}
+                type='button'
+                key='timeline__comment__send'
+              />
+            </div>
+          </div>
         )}
-        <textarea
-          id={props.id}
-          className={props.customClass}
-          placeholder={props.t('Your message...')}
-          value={props.newComment}
-          onChange={props.wysiwyg ? () => {} : props.onChangeNewComment}
-          disabled={props.disableComment}
-          onKeyDown={this.handleInputKeyDown}
-          ref={ref => {
-            this.textAreaRef = ref
-            if (ref && this.commentCursorPos > -1) {
-              ref.selectionStart = ref.selectionEnd = this.commentCursorPos
-              ref.focus()
-              this.commentCursorPos = -1
-            }
-          }}
-        />
-      </>
+      </form>
     )
   }
 }
@@ -279,7 +339,8 @@ CommentArea.propTypes = {
   wysiwyg: PropTypes.bool,
   searchForMentionOrLinkInQuery: PropTypes.func,
   customClass: PropTypes.string,
-  onInitWysiwyg: PropTypes.func
+  onInitWysiwyg: PropTypes.func,
+  hideSendButtonAndOptions: PropTypes.bool
 }
 
 CommentArea.defaultProps = {
@@ -288,8 +349,9 @@ CommentArea.defaultProps = {
   customClass: '',
   id: '',
   newComment: '',
-  onChangeNewComment: () => {},
+  onChangeNewComment: () => { },
   wysiwyg: false,
-  searchForMentionOrLinkInQuery: () => {},
-  onInitWysiwyg: () => {}
+  searchForMentionOrLinkInQuery: () => { },
+  onInitWysiwyg: () => { },
+  hideSendButtonAndOptions: false
 }

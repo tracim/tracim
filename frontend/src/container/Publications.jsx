@@ -647,6 +647,7 @@ export class Publications extends React.Component {
               searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
               wysiwyg={state.publicationWysiwyg}
               disableAutocompletePosition
+              hideSendButtonAndOptions
             />
 
             <div className='publications__publishArea__buttons'>

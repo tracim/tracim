@@ -66,6 +66,7 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
+          hideSendButtonAndOptions
           id={wysiwygId}
           newComment={state.newComment}
           onChangeNewComment={this.handleChangeNewComment}
