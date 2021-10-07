@@ -69,7 +69,7 @@ const wysiwygId = 'wysiwygTimelineCommentPublication'
 const PUBLICATION_ITEM_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 
 export class Publications extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     props.setApiUrl(FETCH_CONFIG.apiUrl)
     props.registerCustomEventHandlerList([
@@ -637,63 +637,26 @@ export class Publications extends React.Component {
         )}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
-          <div className='publications__publishArea'>
-            <CommentArea
-              apiUrl={FETCH_CONFIG.apiUrl}
-              id={wysiwygId}
-              newComment={state.newComment}
-              onChangeNewComment={this.handleChangeNewPublication}
-              onInitWysiwyg={this.handleInitPublicationWysiwyg}
-              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-              wysiwyg={state.publicationWysiwyg}
-              disableAutocompletePosition
-              hideSendButtonAndOptions
-            />
-
-            <div className='publications__publishArea__buttons'>
-              <div className='publications__publishArea__buttons__left'>
-                <IconButton
-                  customClass='publications__publishArea__buttons__left__advancedEdition'
-                  intent='link'
-                  mode='light'
-                  onClick={this.handleToggleWysiwyg}
-                  text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
-                />
-
-                <div>
-                  <DisplayFileToUpload
-                    fileList={state.newCommentAsFileList}
-                    onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                    color={COLORS.PUBLICATION}
-                  />
-                </div>
-              </div>
-
-              <div className='publications__publishArea__buttons__right'>
-                <div>
-                  <AddFileToUploadButton
-                    workspaceId={props.currentWorkspace.id}
-                    color={COLORS.PUBLICATION}
-                    disabled={state.newCommentAsFileList.length > 0}
-                    multipleFiles={false}
-                    onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-                  />
-                </div>
-
-                <IconButton
-                  customClass='publications__publishArea__buttons__submit'
-                  color={COLORS.PUBLICATION}
-                  disabled={state.newComment === '' && state.newCommentAsFileList.length === 0}
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickPublish}
-                  icon='far fa-paper-plane'
-                  text={props.t('Publish')}
-                  title={props.t('Publish')}
-                />
-              </div>
-            </div>
-          </div>
+          <CommentArea
+            apiUrl={FETCH_CONFIG.apiUrl}
+            id={wysiwygId}
+            newComment={state.newComment}
+            onChangeNewComment={this.handleChangeNewPublication}
+            onInitWysiwyg={this.handleInitPublicationWysiwyg}
+            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+            wysiwyg={state.publicationWysiwyg}
+            disableAutocompletePosition
+            customClass='publications__publishArea'
+            customColor={COLORS.PUBLICATION}
+            onClickWysiwygBtn={this.handleToggleWysiwyg}
+            newCommentAsFileList={state.newCommentAsFileList}
+            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
+            workspaceId={props.currentWorkspace.id}
+            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+            onClickValidateNewCommentBtn={this.handleClickPublish}
+            multipleFiles={false}
+          // TODO GIULIA Allow Publish as button label {props.t('Publish')} and update .stylus
+          />
         )}
       </ScrollToBottomWrapper>
     )

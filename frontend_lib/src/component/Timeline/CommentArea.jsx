@@ -305,6 +305,7 @@ export class CommentArea extends React.Component {
                   color={props.customColor}
                   disabled={props.disableComment}
                   onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
+                  multipleFiles={props.multipleFiles}
                 />
               </div>
               <IconButton
@@ -340,7 +341,8 @@ CommentArea.propTypes = {
   searchForMentionOrLinkInQuery: PropTypes.func,
   customClass: PropTypes.string,
   onInitWysiwyg: PropTypes.func,
-  hideSendButtonAndOptions: PropTypes.bool
+  hideSendButtonAndOptions: PropTypes.bool,
+  multipleFiles: PropTypes.bool
 }
 
 CommentArea.defaultProps = {
@@ -353,5 +355,6 @@ CommentArea.defaultProps = {
   wysiwyg: false,
   searchForMentionOrLinkInQuery: () => { },
   onInitWysiwyg: () => { },
-  hideSendButtonAndOptions: false
+  hideSendButtonAndOptions: false,
+  multipleFiles: true
 }
