@@ -1,10 +1,10 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { CommentTextArea } from '../../src/component/Timeline/CommentTextArea.jsx'
+import { CommentArea } from '../../src/component/Timeline/CommentArea.jsx'
 import sinon from 'sinon'
 
-describe('<CommentTextArea />', () => {
+describe('<CommentArea />', () => {
   const onChangeNewCommentSpy = sinon.spy()
 
   const props = {
@@ -18,7 +18,7 @@ describe('<CommentTextArea />', () => {
   }
 
   const wrapper = shallow(
-    <CommentTextArea
+    <CommentArea
       {...props}
     />
   )

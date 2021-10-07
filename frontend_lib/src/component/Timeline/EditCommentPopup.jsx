@@ -7,7 +7,7 @@ import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
-import CommentTextArea from './CommentTextArea.jsx'
+import CommentArea from './CommentArea.jsx'
 
 // require('./EditCommentPopup.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -64,7 +64,7 @@ export class EditCommentPopup extends React.Component {
         label={props.t('Edit comment')}
         faIcon='far fa-fw fa-edit'
       >
-        <CommentTextArea
+        <CommentArea
           apiUrl={props.apiUrl}
           id={wysiwygId}
           newComment={state.newComment}

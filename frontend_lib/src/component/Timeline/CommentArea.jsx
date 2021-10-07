@@ -9,6 +9,7 @@ import {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
+import { LOCAL_STORAGE_FIELD, setLocalStorageItem } from '../../localStorage.js'
 
 const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
 
@@ -20,7 +21,7 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
-export class CommentTextArea extends React.Component {
+export class CommentArea extends React.Component {
   constructor (props) {
     super(props)
 
@@ -197,6 +198,21 @@ export class CommentTextArea extends React.Component {
     )
   }
 
+  handleChangeNewComment = e => { // TODO GIULIA Olhar todas chamadas pra passar o content e o workspace id e content type, add o state do comment tb, ver se ele nao é usado em outros lugares
+    const { props } = this
+
+    const newComment = e.target.value
+    this.setState({ newComment: newComment })
+
+    setLocalStorageItem(
+      props.contentType,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.COMMENT,
+      newComment
+    )
+  }
+
   render () {
     const { props, state } = this
 
@@ -251,9 +267,9 @@ export class CommentTextArea extends React.Component {
   }
 }
 
-export default translate()(CommentTextArea)
+export default translate()(CommentArea)
 
-CommentTextArea.propTypes = {
+CommentArea.propTypes = {
   id: PropTypes.string.isRequired,
   apiUrl: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
@@ -266,7 +282,7 @@ CommentTextArea.propTypes = {
   onInitWysiwyg: PropTypes.func
 }
 
-CommentTextArea.defaultProps = {
+CommentArea.defaultProps = {
   disableAutocompletePosition: false,
   disableComment: false,
   customClass: '',

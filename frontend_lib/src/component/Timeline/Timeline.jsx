@@ -12,7 +12,7 @@ import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { TracimComponent } from '../../tracimComponent.js'
-import CommentTextArea from './CommentTextArea.jsx'
+import CommentArea from './CommentArea.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrapper.jsx'
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
@@ -257,7 +257,7 @@ export class Timeline extends React.Component {
                 'timeline__texteditor__textinput'
               )}
             >
-              <CommentTextArea
+              <CommentArea
                 id={`wysiwygTimelineComment${props.id}`}
                 apiUrl={props.apiUrl}
                 onChangeNewComment={props.onChangeNewComment}

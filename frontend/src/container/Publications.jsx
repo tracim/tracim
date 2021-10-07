@@ -7,7 +7,7 @@ import {
   appContentFactory,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
-  CommentTextArea,
+  CommentArea,
   ConfirmPopup,
   CUSTOM_EVENT,
   EditCommentPopup,
@@ -638,7 +638,7 @@ export class Publications extends React.Component {
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='publications__publishArea'>
-            <CommentTextArea
+            <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
               id={wysiwygId}
               newComment={state.newComment}
