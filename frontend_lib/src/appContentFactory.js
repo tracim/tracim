@@ -367,7 +367,8 @@ export function appContentFactory (WrappedComponent) {
 
       setLocalStorageItem(
         appSlug,
-        content,
+        content.content_id,
+        content.workspace_id,
         LOCAL_STORAGE_FIELD.COMMENT,
         newComment
       )

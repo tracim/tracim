@@ -393,7 +393,7 @@ class CustomForm extends React.Component {
     const newComment = e.target.value
     this.setState({ newComment })
 
-    setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.COMMENT, newComment)
+    setLocalStorageItem(this.state.appName, this.state.content.content_id, this.state.content.workspace_id, LOCAL_STORAGE_FIELD.COMMENT, newComment)
   }
 
   handleClickValidateNewCommentBtn = async () => {
