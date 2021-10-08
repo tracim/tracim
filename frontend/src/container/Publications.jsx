@@ -259,18 +259,6 @@ export class Publications extends React.Component {
     this.props.dispatch(removePublication(data.fields.content.content_id))
   }
 
-  handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      `#${wysiwygId}`,
-      this.props.user.lang,
-      this.handleChangeNewPublication,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   handleToggleWysiwyg = () => this.setState(prev => ({ publicationWysiwyg: !prev.publicationWysiwyg }))
 
   buildBreadcrumbs = () => {
@@ -643,7 +631,7 @@ export class Publications extends React.Component {
             customColor={COLORS.PUBLICATION}
             id={wysiwygId}
             newComment={state.newComment}
-            onInitWysiwyg={this.handleInitPublicationWysiwyg}
+            wysiwygId={`#${wysiwygId}`}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             wysiwyg={state.publicationWysiwyg}
             disableAutocompletePosition

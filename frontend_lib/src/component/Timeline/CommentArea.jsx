@@ -43,22 +43,22 @@ export class CommentArea extends React.Component {
   componentDidMount () {
     const { props } = this
     if (props.wysiwyg) {
-      props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
+      this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
     }
   }
 
   async componentDidUpdate (prevProps, prevState) {
     if (!prevProps.wysiwyg && this.props.wysiwyg) {
-      this.props.onInitWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
+      this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
     }
 
-    if (!this.props.wysiwyg && prevProps.newComment !== this.props.newComment) {
+    if (!this.props.wysiwyg && prevState.newComment !== this.state.newComment) {
       this.searchForMentionOrLinkCandidate()
     }
   }
 
   searchForMentionOrLinkCandidate = async () => {
-    const mentionOrLinkCandidate = this.getMentionOrLinkCandidate(this.props.newComment)
+    const mentionOrLinkCandidate = this.getMentionOrLinkCandidate(this.state.newComment)
     if (mentionOrLinkCandidate === undefined) {
       if (this.state.isAutoCompleteActivated) this.setState({ isAutoCompleteActivated: false })
       return
@@ -155,7 +155,7 @@ export class CommentArea extends React.Component {
 
     this.commentCursorPos = textBegin.length
 
-    this.props.onChangeNewComment({ target: { value: textBegin + textEnd } })
+    this.handleChangeNewComment({ target: { value: textBegin + textEnd } })
 
     this.setState({
       isAutoCompleteActivated: false,
@@ -224,6 +224,18 @@ export class CommentArea extends React.Component {
     props.onClickValidateNewCommentBtn(state.newComment)
   }
 
+  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
+    globalThis.wysiwyg(
+      this.props.wysiwygId,
+      this.props.lang,
+      this.handleChangeNewComment,
+      handleTinyMceInput,
+      handleTinyMceKeyDown,
+      handleTinyMceKeyUp,
+      handleTinyMceSelectionChange
+    )
+  }
+
   render () {
     const { props, state } = this
 
@@ -242,6 +254,7 @@ export class CommentArea extends React.Component {
       })
     }
 
+    // TODO GIULIA fix files
     return (
       <form className={`${props.customClass}__texteditor`}>
         <div
@@ -341,13 +354,11 @@ CommentArea.propTypes = {
   id: PropTypes.string.isRequired,
   apiUrl: PropTypes.string.isRequired,
   newComment: PropTypes.string.isRequired,
-  onChangeNewComment: PropTypes.func.isRequired,
   disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   wysiwyg: PropTypes.bool,
   searchForMentionOrLinkInQuery: PropTypes.func,
   customClass: PropTypes.string,
-  onInitWysiwyg: PropTypes.func,
   hideSendButtonAndOptions: PropTypes.bool,
   multipleFiles: PropTypes.bool
 }
@@ -358,10 +369,8 @@ CommentArea.defaultProps = {
   customClass: '',
   id: '',
   newComment: '',
-  onChangeNewComment: () => { },
   wysiwyg: false,
   searchForMentionOrLinkInQuery: () => { },
-  onInitWysiwyg: () => { },
   hideSendButtonAndOptions: false,
   multipleFiles: true
 }

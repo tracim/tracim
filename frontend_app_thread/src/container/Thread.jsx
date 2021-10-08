@@ -176,18 +176,6 @@ export class Thread extends React.Component {
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
@@ -498,7 +486,7 @@ export class Thread extends React.Component {
                 isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
                 onClickCancelSave={this.handleCancelSave}
                 onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-                onInitWysiwyg={this.handleInitWysiwyg}
+                wysiwygId='#wysiwygTimelineComment'
                 workspaceId={state.content.workspace_id}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}

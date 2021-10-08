@@ -36,18 +36,6 @@ export class EditCommentPopup extends React.Component {
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, true)
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      wysiwygIdSelector,
-      this.props.loggedUserLanguage,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   handleChangeNewComment = e => this.setState({ newComment: e.target.value })
 
   searchForMentionOrLinkInQuery = async (query) => {
@@ -71,8 +59,8 @@ export class EditCommentPopup extends React.Component {
           contentType={CONTENT_TYPE.COMMENT}
           hideSendButtonAndOptions
           id={wysiwygId}
-          newComment={state.newComment}
-          onInitWysiwyg={this.handleInitWysiwyg}
+          newComment={state.newComment} // TODO GIULIA Ver pq o comment inicial nao ta funcionando
+          wysiwygId={wysiwygIdSelector}
           searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           lang={props.loggedUserLanguage}
           workspaceId={props.workspaceId}

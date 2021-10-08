@@ -259,7 +259,7 @@ export class Timeline extends React.Component {
               disableComment={disableComment}
               wysiwyg={props.wysiwyg}
               searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-              onInitWysiwyg={props.onInitWysiwyg}
+              wysiwygId={props.wysiwygId}
               customClass={props.customClass}
               customColor={props.customColor}
               onClickWysiwygBtn={props.onClickWysiwygBtn}
@@ -268,6 +268,7 @@ export class Timeline extends React.Component {
               workspaceId={props.workspaceId}
               onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
               onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
+              lang={props.loggedUser.lang}
             />
           </div>
         )}
@@ -294,7 +295,6 @@ Timeline.propTypes = {
   isDeprecated: PropTypes.bool,
   loggedUser: PropTypes.object.isRequired,
   memberList: PropTypes.array,
-  onInitWysiwyg: PropTypes.func,
   wysiwyg: PropTypes.bool,
   onClickWysiwygBtn: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
@@ -333,7 +333,6 @@ Timeline.defaultProps = {
   id: '',
   isDeprecated: false,
   memberList: [],
-  onInitWysiwyg: () => { },
   timelineData: [],
   wysiwyg: false,
   onClickWysiwygBtn: () => { },

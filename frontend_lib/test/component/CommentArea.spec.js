@@ -5,12 +5,9 @@ import { CommentArea } from '../../src/component/Timeline/CommentArea.jsx'
 import sinon from 'sinon'
 
 describe('<CommentArea />', () => {
-  const onChangeNewCommentSpy = sinon.spy()
-
   const props = {
     newComment: '',
     apiUrl: '/',
-    onChangeNewComment: onChangeNewCommentSpy,
     disableComment: false,
     id: 'autoCompleteInputId',
     t: key => key,
@@ -94,22 +91,6 @@ describe('<CommentArea />', () => {
             expect(wrapper.state('autoCompleteCursorPosition')).to.equal(1)
             expect(preventDefaultSpy.calledOnce).to.equal(true)
           })
-        })
-      })
-    })
-
-    describe('handleClickAutoCompleteItem()', () => {
-      describe('call this function to add a mention @all', () => {
-        before(() => {
-          wrapper.setProps({ newComment: '@al' })
-          wrapper.setState({ autoCompleteCursorPosition: 0, autoCompleteItemList: [{ mention: 'all', detail: 'notify all' }] })
-          wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 4 }
-        })
-
-        it('should call props.onChangeNewComment with the right mention', () => {
-          onChangeNewCommentSpy.resetHistory()
-          wrapper.instance().handleClickAutoCompleteItem({ mention: 'all', detail: 'notify all' })
-          expect(onChangeNewCommentSpy.calledOnceWith({ target: { value: '@all ' } })).to.equal(true)
         })
       })
     })
@@ -234,13 +215,6 @@ describe('<CommentArea />', () => {
           })
         })
       })
-    })
-  })
-
-  describe('Handlers', () => {
-    it('onChangeNewCommentSpy should be called when comment is changing', () => {
-      wrapper.find(`#${props.id}`).simulate('change')
-      expect(onChangeNewCommentSpy.called).to.equal(true)
     })
   })
 })

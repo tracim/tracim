@@ -232,18 +232,6 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   handleTinyMceInput = (e, position) => {
     tinymceAutoCompleteHandleInput(
       e,
@@ -824,7 +812,7 @@ export class HtmlDocument extends React.Component {
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+            wysiwygId='#wysiwygTimelineComment'
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}

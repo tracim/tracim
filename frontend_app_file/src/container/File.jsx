@@ -847,7 +847,7 @@ export class File extends React.Component {
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+            wysiwygId='#wysiwygTimelineComment'
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
@@ -950,18 +950,6 @@ export class File extends React.Component {
     } else {
       return [timelineObject, tag, propertiesObject]
     }
-  }
-
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
   }
 
   handleCloseNotifyAllMessage = async () => {

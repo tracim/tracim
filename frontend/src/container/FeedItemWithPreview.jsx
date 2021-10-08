@@ -97,18 +97,6 @@ export class FeedItemWithPreview extends React.Component {
     }
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      this.getWysiwygId(this.props.content.id),
-      this.props.i18n.language,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -443,7 +431,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickEditComment={this.handleClickEditComment}
                 onClickValidateNewCommentBtn={this.handleClickSend}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
-                onInitWysiwyg={this.handleInitWysiwyg}
+                wysiwygId={this.getWysiwygId(props.content.id)}
                 onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
