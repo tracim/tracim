@@ -37,7 +37,7 @@ def upgrade():
         ),
         sa.Column("created", sa.DateTime(), nullable=False),
         sa.Column("updated", sa.DateTime(), nullable=False),
-        sa.Column("url", sa.String(), nullable=False),
+        sa.Column("url", sa.String(length=1024), nullable=False),
         sa.ForeignKeyConstraint(
             ["callee_id"], ["users.user_id"], name=op.f("fk_user_calls_callee_id_users")
         ),

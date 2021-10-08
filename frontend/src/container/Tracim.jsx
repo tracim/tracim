@@ -170,11 +170,18 @@ export class Tracim extends React.Component {
     props.dispatch(setHeadTitle(data.title, titlePrefix))
   }
 
-  handleClickOpenCallWindow = () => {
+  handleClickOpenCallWindowCallee = () => {
     const { state, props } = this
     props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
     this.handleSetHeadTitle({ title: props.system.headTitle })
     this.audioCall.pause()
+  }
+
+  handleClickOpenCallWindowCaller = () => {
+    const { state } = this
+    const isMainTab = this.liveMessageManager.eventSource !== null
+    if (!isMainTab) return
+    window.open(state.userCall.url)
   }
 
   handleClickRejectCall = () => {
@@ -232,13 +239,6 @@ export class Tracim extends React.Component {
         window.open(tlm.fields.user_call.url)
       }
     }
-  }
-
-  onClickOpenCallWindow = () => {
-    const { state } = this
-    const isMainTab = this.liveMessageManager.eventSource !== null
-    if (!isMainTab) return
-    window.open(state.userCall.url)
   }
 
   handleClosePopup = () => {
@@ -605,7 +605,7 @@ export class Tracim extends React.Component {
                 <IconButton
                   intent='primary'
                   mode='light'
-                  onClick={this.handleClickOpenCallWindow}
+                  onClick={this.handleClickOpenCallWindowCallee}
                   text={props.t('Open call')}
                   icon='fas fa-phone'
                   color={GLOBAL_primaryColor} // eslint-disable-line camelcase
@@ -638,7 +638,7 @@ export class Tracim extends React.Component {
                 <IconButton
                   intent='primary'
                   mode='light'
-                  onClick={this.onClickOpenCallWindow}
+                  onClick={this.handleClickOpenCallWindowCaller}
                   text={props.t('Open call')}
                   icon='fas fa-phone'
                   color={GLOBAL_primaryColor} // eslint-disable-line camelcase

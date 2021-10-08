@@ -119,6 +119,7 @@ describe('<Tracim />', () => {
     notificationPage: notificationPage,
     flashMessage: [],
     registerCustomEventHandlerList: () => {},
+    registerLiveMessageHandlerList: () => {},
     dispatch: dispatchCallBack
   }
 
