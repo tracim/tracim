@@ -35,6 +35,7 @@ export class CommentArea extends React.Component {
       isAutoCompleteActivated: false,
       autoCompleteItemList: [],
       autoCompleteCursorPosition: 0,
+      newComment: '',
       tinymcePosition: {}
     }
   }
@@ -138,7 +139,7 @@ export class CommentArea extends React.Component {
     const endSpace = ' '
 
     const charAtCursor = cursorPos - 1
-    const text = this.props.newComment
+    const text = this.state.newComment
     const posAt = text.lastIndexOf(character, charAtCursor)
     let textBegin, textEnd
 
@@ -217,6 +218,12 @@ export class CommentArea extends React.Component {
     )
   }
 
+  handleClickSend = () => {
+    const { props, state } = this
+    this.setState({ newComment: '' })
+    props.onClickValidateNewCommentBtn(state.newComment)
+  }
+
   render () {
     const { props, state } = this
 
@@ -259,8 +266,8 @@ export class CommentArea extends React.Component {
             id={props.id}
             className={props.customClass}
             placeholder={props.t('Your message...')}
-            value={props.newComment}
-            onChange={props.wysiwyg ? () => { } : props.onChangeNewComment}
+            value={state.newComment}
+            onChange={props.wysiwyg ? () => { } : this.handleChangeNewComment}
             disabled={props.disableComment}
             onKeyDown={this.handleInputKeyDown}
             ref={ref => {
@@ -311,11 +318,11 @@ export class CommentArea extends React.Component {
               <IconButton
                 color={props.customColor}
                 customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
-                disabled={props.disableComment || (props.newComment === '' && props.newCommentAsFileList.length === 0)}
+                disabled={props.disableComment || (state.newComment === '' && props.newCommentAsFileList.length === 0)}
                 icon='far fa-paper-plane'
                 intent='primary'
                 mode='light'
-                onClick={props.onClickValidateNewCommentBtn}
+                onClick={this.handleClickSend}
                 text={props.t('Send')}
                 type='button'
                 key='timeline__comment__send'

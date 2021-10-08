@@ -5,6 +5,7 @@ import i18n from '../../i18n.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
+import { CONTENT_TYPE } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import CommentArea from './CommentArea.jsx'
@@ -66,13 +67,15 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
+          contentId={props.commentId}
+          contentType={CONTENT_TYPE.COMMENT}
           hideSendButtonAndOptions
           id={wysiwygId}
           newComment={state.newComment}
-          onChangeNewComment={this.handleChangeNewComment}
           onInitWysiwyg={this.handleInitWysiwyg}
           searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           lang={props.loggedUserLanguage}
+          workspaceId={props.workspaceId}
           wysiwyg
         />
 

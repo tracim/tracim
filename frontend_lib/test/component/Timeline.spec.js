@@ -14,14 +14,12 @@ describe('<Timeline />', () => {
   const onClickRestoreArchivedCallBack = sinon.spy()
   const onClickRestoreDeletedCallBack = sinon.spy()
   const onClickValidateNewCommentBtnCallBack = sinon.spy()
-  const onChangeNewCommentCallBack = sinon.spy()
 
   const props = {
     timelineData: [...revisionList, ...commentList],
     newComment: 'randomNewComment',
     newCommentAsFileList: [],
     apiUrl: '/',
-    onChangeNewComment: onChangeNewCommentCallBack,
     onClickValidateNewCommentBtn: onClickValidateNewCommentBtnCallBack,
     disableComment: false,
     customClass: 'randomCustomClass',

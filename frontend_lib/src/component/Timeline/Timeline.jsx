@@ -229,6 +229,7 @@ export class Timeline extends React.Component {
           <EditCommentPopup
             apiUrl={props.apiUrl}
             comment={state.newComment.raw_content}
+            commentId={state.newComment.content_id}
             customColor={props.customColor}
             loggedUserLanguage={props.loggedUser.lang}
             onClickValidate={this.handleClickValidateEditComment}
@@ -250,9 +251,10 @@ export class Timeline extends React.Component {
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='timeline__texteditor'>
             <CommentArea
+              contentId={props.contentId}
+              contentType={props.contentType}
               id={`wysiwygTimelineComment${props.id}`}
               apiUrl={props.apiUrl}
-              onChangeNewComment={props.onChangeNewComment}
               newComment={props.newComment}
               disableComment={disableComment}
               wysiwyg={props.wysiwyg}
@@ -282,7 +284,6 @@ Timeline.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   newComment: PropTypes.string.isRequired,
   newCommentAsFileList: PropTypes.array.isRequired,
-  onChangeNewComment: PropTypes.func.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
   availableStatusList: PropTypes.array,
   deprecatedStatus: PropTypes.object,

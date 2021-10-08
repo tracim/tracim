@@ -287,26 +287,26 @@ export class Thread extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = async (comment) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
       state.config.workspace && state.config.workspace.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment()
+      this.handleClickValidateAnywayNewComment(comment)
     }
   }
 
-  handleClickValidateAnywayNewComment = () => {
+  handleClickValidateAnywayNewComment = (comment) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
-        state.newComment,
+        comment,
         state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
@@ -467,6 +467,8 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
+                contentId={state.content.content_id}
+                contentType={state.content.content_type}
                 loading={props.loadingTimeline}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={color}
@@ -479,7 +481,6 @@ export class Thread extends React.Component {
                 disableComment={!state.content.is_editable}
                 availableStatusList={state.config.availableStatuses}
                 wysiwyg={state.timelineWysiwyg}
-                onChangeNewComment={this.handleChangeNewComment}
                 onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                 onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                 onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}

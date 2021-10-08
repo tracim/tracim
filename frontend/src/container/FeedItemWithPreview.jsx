@@ -155,20 +155,19 @@ export class FeedItemWithPreview extends React.Component {
     ))
   }
 
-  handleClickSend = () => {
+  handleClickSend = (comment) => {
     const { props, state } = this
-
     if (!handleInvalidMentionInComment(
       props.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnyway()
+      this.handleClickValidateAnyway(comment)
     }
   }
 
-  handleClickValidateAnyway = async () => {
+  handleClickValidateAnyway = async (comment) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -178,7 +177,7 @@ export class FeedItemWithPreview extends React.Component {
           workspace_id: props.content.workspaceId
         },
         state.timelineWysiwyg,
-        state.newComment,
+        comment,
         state.newCommentAsFileList,
         this.setState.bind(this),
         props.content.type,
@@ -432,12 +431,13 @@ export class FeedItemWithPreview extends React.Component {
                 customClass='feedItem__timeline'
                 customColor={props.customColor}
                 id={props.content.id}
+                contentId={props.content.id}
+                contentType={props.content.type}
                 invalidMentionList={state.invalidMentionList}
                 loggedUser={loggedUser}
                 memberList={props.memberList}
                 newComment={state.newComment}
                 newCommentAsFileList={state.newCommentAsFileList}
-                onChangeNewComment={this.handleChangeNewComment}
                 onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}

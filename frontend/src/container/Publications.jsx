@@ -30,8 +30,6 @@ import {
   TRANSLATION_STATE,
   isFileUploadInErrorState,
   CONTENT_TYPE,
-  AddFileToUploadButton,
-  DisplayFileToUpload,
   getFileDownloadUrl,
   NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
@@ -69,7 +67,7 @@ const wysiwygId = 'wysiwygTimelineCommentPublication'
 const PUBLICATION_ITEM_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 
 export class Publications extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     props.setApiUrl(FETCH_CONFIG.apiUrl)
     props.registerCustomEventHandlerList([
@@ -188,16 +186,16 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
-  handleClickPublish = () => {
+  handleClickPublish = (publication) => {
     const { props, state } = this
 
     if (!handleInvalidMentionInComment(
       props.currentWorkspace.memberList,
       state.publicationWysiwyg,
-      state.newComment,
+      publication,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnyway()
+      this.handleClickValidateAnyway(publication)
     }
   }
 
@@ -416,7 +414,7 @@ export class Publications extends React.Component {
     })
   }
 
-  saveThreadPublication = async () => {
+  saveThreadPublication = async (publication) => {
     const { props, state } = this
 
     const workspaceId = props.currentWorkspace.id
@@ -433,7 +431,7 @@ export class Publications extends React.Component {
       props.appContentSaveNewComment(
         fetchPostPublication.json,
         state.publicationWysiwyg,
-        state.newComment,
+        publication,
         [],
         this.setState.bind(this),
         '',
@@ -487,7 +485,7 @@ export class Publications extends React.Component {
     })
   }
 
-  handleClickValidateAnyway = async () => {
+  handleClickValidateAnyway = async (publication) => {
     const { state } = this
 
     if (state.showEditPopup) {
@@ -495,8 +493,8 @@ export class Publications extends React.Component {
       return
     }
 
-    if (state.newComment !== '' && state.newCommentAsFileList.length === 0) {
-      this.saveThreadPublication()
+    if (publication !== '' && state.newCommentAsFileList.length === 0) {
+      this.saveThreadPublication(publication)
     }
 
     if (state.newCommentAsFileList.length > 0) {
@@ -628,6 +626,7 @@ export class Publications extends React.Component {
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             comment={state.commentToEdit.raw_content}
+            commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}
             onClickValidate={this.handleClickValidateEdit}
@@ -639,15 +638,15 @@ export class Publications extends React.Component {
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <CommentArea
             apiUrl={FETCH_CONFIG.apiUrl}
+            contentType={CONTENT_TYPE.THREAD}
+            customClass='publications__publishArea'
+            customColor={COLORS.PUBLICATION}
             id={wysiwygId}
             newComment={state.newComment}
-            onChangeNewComment={this.handleChangeNewPublication}
             onInitWysiwyg={this.handleInitPublicationWysiwyg}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             wysiwyg={state.publicationWysiwyg}
             disableAutocompletePosition
-            customClass='publications__publishArea'
-            customColor={COLORS.PUBLICATION}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             newCommentAsFileList={state.newCommentAsFileList}
             onRemoveCommentAsFile={this.handleRemoveCommentAsFile}

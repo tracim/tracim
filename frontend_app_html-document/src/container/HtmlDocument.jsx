@@ -561,13 +561,13 @@ export class HtmlDocument extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateAnywayNewComment = () => {
+  handleClickValidateAnywayNewComment = (comment) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
-        state.newComment,
+        comment,
         state.newCommentAsFileList,
         this.setState.bind(this),
         state.config.slug,
@@ -578,16 +578,16 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = async (comment) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
       state.config.workspace.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment()
+      this.handleClickValidateAnywayNewComment(comment)
     }
   }
 
@@ -799,6 +799,8 @@ export class HtmlDocument extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            contentId={state.content.content_id}
+            contentType={state.content.content_type}
             loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage__timeline`}
             customColor={state.config.hexcolor}
@@ -811,7 +813,6 @@ export class HtmlDocument extends React.Component {
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
             onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
             onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
