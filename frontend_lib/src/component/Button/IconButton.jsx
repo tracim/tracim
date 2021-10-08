@@ -40,14 +40,14 @@ const IconButton = props => {
 
       {props.text && (
         <span
-          className={`${props.icon ? 'iconbutton__text_with_icon':''} iconbutton__label`}>
+          className={`${props.icon ? 'iconbutton__text_with_icon' : ''} iconbutton__label`}>
           {props.text}
         </span>
       )}
 
       {props.textMobile && (
         <span
-          className={`${props.icon ? 'iconbutton__text_with_icon':''} iconbutton__label-mobile`}>
+          className={`${props.icon ? 'iconbutton__text_with_icon' : ''} iconbutton__label-mobile`}>
           {props.textMobile}
         </span>
       )}
