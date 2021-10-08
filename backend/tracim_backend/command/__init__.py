@@ -27,7 +27,7 @@ class TracimCLI(App):
         )
 
     def initialize_app(self, argv: List[str]) -> None:
-        self.LOG.debug("initialize_app")
+        self.LOG.info("initialize_app: DEBUG is available after initialization")
 
     def prepare_to_run_command(self, cmd: Command) -> None:
         self.LOG.debug("prepare_to_run_command %s", cmd.__class__.__name__)
@@ -67,16 +67,20 @@ class AppContextCommand(Command):
             pass
         except Exception as exc:
             logger.exception(self, exc)
-            print("Something went wrong during command: {}".format(exc))
             raise exc
 
     def _setup_logging(self, parsed_args: Namespace) -> None:
-        if parsed_args.debug:
-            # INFO - G.M - 2019-03-13 - setup logging for config file
-            setup_logging(parsed_args.config_file)
-        else:
-            # INFO - G.M - 2019-03-13 - disable all logging
-            logging.config.dictConfig({"version": 1, "disable_existing_loggers": True})
+
+        # INFO - P.M - 2021-10-08
+        # Format and set every loggers
+        setup_logging(parsed_args.config_file)
+        
+        if not parsed_args.debug:
+            # INFO - P.M - 2021-10-08
+            # Override every loggers
+            for name in logging.root.manager.loggerDict:
+                logging.getLogger(name).setLevel(logging.WARNING)
+            logging.getLogger("tracimcli").setLevel(logging.INFO)
 
     def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
         parser = super(AppContextCommand, self).get_parser(prog_name)
