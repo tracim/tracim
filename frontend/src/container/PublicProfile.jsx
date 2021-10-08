@@ -12,7 +12,6 @@ import {
   IconButton,
   getAvatarBaseUrl,
   getCoverBaseUrl,
-  CardPopup,
   USER_CALL_STATE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
@@ -137,11 +136,20 @@ export class PublicProfile extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallModified },
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCallCreated }
+    ])
   }
 
-  handleClickCancelButton = async () => {
-    const { props, state } = this
-    await props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.CANCELLED))
+  handleUserCallModified = (tlm) => {
+    const { state } = this
+    clearTimeout(state.unansweredCallTimeoutId)
+    this.setState({ unansweredCallTimeoutId: -1, userCall: tlm.fields.user_call })
+  }
+
+  handleUserCallCreated = (tlm) => {
+    this.setState({ userCall: tlm.fields.user_call })
   }
 
   handleClickCallButton = async () => {
@@ -409,12 +417,6 @@ export class PublicProfile extends React.Component {
 
   handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
 
-  handleClosePopup = () => {
-    this.setState({ userCall: undefined })
-  }
-
-
-
   render () {
     const { props, state } = this
 
@@ -457,53 +459,6 @@ export class PublicProfile extends React.Component {
             />
           )}
 
-          {state.userCall && state.userCall.state === USER_CALL_STATE.REJECTED && (
-            <CardPopup
-              customClass='callpopup__body'
-              customHeaderClass='primaryColorBg'
-              onClose={this.handleClosePopup}
-              label={props.t('Call declined by {{username}}', { username: state.userCall.callee.public_name })}
-              faIcon='fas fa-phone-slash'
-            />
-          )}
-          {state.userCall && state.userCall.state === USER_CALL_STATE.DECLINED && (
-            <CardPopup
-              customClass='callpopup__body'
-              customHeaderClass='primaryColorBg'
-              onClose={this.handleClosePopup}
-              label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
-              faIcon='fas fa-phone-slash'
-            />
-          )}
-          {state.userCall && state.userCall.state === USER_CALL_STATE.UNANSWERED && (
-            <CardPopup
-              customClass='callpopup__body'
-              customHeaderClass='primaryColorBg'
-              onClose={this.handleClosePopup}
-              label={props.t('Call failed')}
-              faIcon='fas fa-phone-slash'
-            >
-              <div>{props.t('The call with {{username}} failed', { username: state.userCall.callee.public_name })}</div>
-              <IconButton
-                intent='primary'
-                mode='light'
-                onClick={this.handleClickCallButton}
-                dataCy='gallery__delete__file__popup__body__btn__delete'
-                text={props.t('Try again')}
-                icon='fas fa-phone'
-                color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-              />
-            </CardPopup>
-          )}
-          {state.userCall && state.userCall.state === USER_CALL_STATE.DECLINED && (
-            <CardPopup
-              customClass='callpopup__body'
-              customHeaderClass='primaryColorBg'
-              onClose={this.handleClosePopup}
-              label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
-              faIcon='fas fa-phone-slash'
-            />
-          )}
           <CoverImage
             displayedUser={state.displayedUser}
             changeEnabled={isPublicProfileEditable}
@@ -571,5 +526,5 @@ export class PublicProfile extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user }) => ({ breadcrumbs, user })
+const mapStateToProps = ({ breadcrumbs, user, tlm }) => ({ breadcrumbs, user, tlm })
 export default connect(mapStateToProps)(translate()(TracimComponent(PublicProfile)))
