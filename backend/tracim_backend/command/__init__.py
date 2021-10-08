@@ -71,13 +71,11 @@ class AppContextCommand(Command):
 
     def _setup_logging(self, parsed_args: Namespace) -> None:
 
-        # INFO - P.M - 2021-10-08
-        # Format and set every loggers
+        # INFO - P.M - 2021-10-08 - Format and set every loggers
         setup_logging(parsed_args.config_file)
-        
+
         if not parsed_args.debug:
-            # INFO - P.M - 2021-10-08
-            # Override every loggers
+            # INFO - P.M - 2021-10-08 - Override every loggers
             for name in logging.root.manager.loggerDict:
                 logging.getLogger(name).setLevel(logging.WARNING)
             logging.getLogger("tracimcli").setLevel(logging.INFO)
