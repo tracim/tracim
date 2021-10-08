@@ -46,7 +46,6 @@ export class FeedItemWithPreview extends React.Component {
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
       translationStateByCommentId: {},
-      newCommentAsFileList: [],
       showInvalidMentionPopupInComment: false,
       timelineWysiwyg: false,
       translationTargetLanguageCode: props.user.lang
@@ -143,7 +142,7 @@ export class FeedItemWithPreview extends React.Component {
     ))
   }
 
-  handleClickSend = (comment) => {
+  handleClickSend = (comment, commentAsFileList) => {
     const { props, state } = this
     if (!handleInvalidMentionInComment(
       props.memberList,
@@ -151,11 +150,11 @@ export class FeedItemWithPreview extends React.Component {
       comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnyway(comment)
+      this.handleClickValidateAnyway(comment, commentAsFileList)
     }
   }
 
-  handleClickValidateAnyway = async (comment) => {
+  handleClickValidateAnyway = async (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -166,7 +165,7 @@ export class FeedItemWithPreview extends React.Component {
         },
         state.timelineWysiwyg,
         comment,
-        state.newCommentAsFileList,
+        commentAsFileList,
         this.setState.bind(this),
         props.content.type,
         props.user.username,
@@ -425,7 +424,6 @@ export class FeedItemWithPreview extends React.Component {
                 loggedUser={loggedUser}
                 memberList={props.memberList}
                 newComment={state.newComment}
-                newCommentAsFileList={state.newCommentAsFileList}
                 onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}

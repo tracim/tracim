@@ -78,7 +78,6 @@ export class File extends React.Component {
         props.t('Upload files')
       ],
       newComment: '',
-      newCommentAsFileList: [],
       newContent: {},
       loadingContent: true,
       newFile: '',
@@ -417,7 +416,7 @@ export class File extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async (comment) => {
+  handleClickValidateNewCommentBtn = async (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
@@ -426,18 +425,18 @@ export class File extends React.Component {
       comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment(comment)
+      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
     }
   }
 
-  handleClickValidateAnywayNewComment = (comment) => {
+  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
         comment,
-        state.newCommentAsFileList,
+        commentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -832,7 +831,6 @@ export class File extends React.Component {
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
             newComment={state.newComment}
-            newCommentAsFileList={state.newCommentAsFileList}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}

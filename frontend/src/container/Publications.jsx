@@ -626,6 +626,7 @@ export class Publications extends React.Component {
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <CommentArea
             apiUrl={FETCH_CONFIG.apiUrl}
+            buttonLabel={props.t('Publish')}
             contentType={CONTENT_TYPE.THREAD}
             customClass='publications__publishArea'
             customColor={COLORS.PUBLICATION}
@@ -642,7 +643,6 @@ export class Publications extends React.Component {
             onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             onClickValidateNewCommentBtn={this.handleClickPublish}
             multipleFiles={false}
-          // TODO GIULIA Allow Publish as button label {props.t('Publish')} and update .stylus
           />
         )}
       </ScrollToBottomWrapper>

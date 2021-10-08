@@ -263,7 +263,6 @@ export class Timeline extends React.Component {
               customClass={props.customClass}
               customColor={props.customColor}
               onClickWysiwygBtn={props.onClickWysiwygBtn}
-              newCommentAsFileList={props.newCommentAsFileList}
               onRemoveCommentAsFile={props.onRemoveCommentAsFile}
               workspaceId={props.workspaceId}
               onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
@@ -284,7 +283,6 @@ Timeline.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   newComment: PropTypes.string.isRequired,
-  newCommentAsFileList: PropTypes.array.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
   availableStatusList: PropTypes.array,
   deprecatedStatus: PropTypes.object,

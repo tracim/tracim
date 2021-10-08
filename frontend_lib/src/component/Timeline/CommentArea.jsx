@@ -36,6 +36,7 @@ export class CommentArea extends React.Component {
       autoCompleteItemList: [],
       autoCompleteCursorPosition: 0,
       newComment: '',
+      newCommentAsFileList: [],
       tinymcePosition: {}
     }
   }
@@ -203,7 +204,7 @@ export class CommentArea extends React.Component {
     )
   }
 
-  handleChangeNewComment = e => { // TODO GIULIA Olhar todas chamadas pra passar o content e o workspace id e content type, add o state do comment tb, ver se ele nao é usado em outros lugares
+  handleChangeNewComment = e => {
     const { props } = this
 
     const newComment = e.target.value
@@ -220,8 +221,21 @@ export class CommentArea extends React.Component {
 
   handleClickSend = () => {
     const { props, state } = this
-    this.setState({ newComment: '' })
-    props.onClickValidateNewCommentBtn(state.newComment)
+    props.onClickValidateNewCommentBtn(state.newComment, state.newCommentAsFileList)
+    this.setState({ newComment: '', newCommentAsFileList: [] })
+  }
+
+  handleValidateCommentFileToUpload = (fileToUploadList) => {
+    if (!fileToUploadList.length) return
+    this.setState(prev => {
+      const fileToUploadListWithoutDuplicate = fileToUploadList
+        .filter(fileToAdd =>
+          !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
+        )
+      return {
+        newCommentAsFileList: [...prev.newCommentAsFileList, ...fileToUploadListWithoutDuplicate]
+      }
+    })
   }
 
   handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
@@ -254,7 +268,7 @@ export class CommentArea extends React.Component {
       })
     }
 
-    // TODO GIULIA fix files
+    // TODO GIULIA fix files (onRemoveCommentAsFile) and stylus
     return (
       <form className={`${props.customClass}__texteditor`}>
         <div
@@ -311,7 +325,7 @@ export class CommentArea extends React.Component {
 
               <div>
                 <DisplayFileToUpload
-                  fileList={props.newCommentAsFileList}
+                  fileList={state.newCommentAsFileList}
                   onRemoveCommentAsFile={props.onRemoveCommentAsFile}
                   color={props.customColor}
                 />
@@ -324,19 +338,19 @@ export class CommentArea extends React.Component {
                   workspaceId={props.workspaceId}
                   color={props.customColor}
                   disabled={props.disableComment}
-                  onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
+                  onValidateCommentFileToUpload={this.handleValidateCommentFileToUpload}
                   multipleFiles={props.multipleFiles}
                 />
               </div>
               <IconButton
                 color={props.customColor}
                 customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
-                disabled={props.disableComment || (state.newComment === '' && props.newCommentAsFileList.length === 0)}
+                disabled={props.disableComment || (state.newComment === '' && state.newCommentAsFileList.length === 0)}
                 icon='far fa-paper-plane'
                 intent='primary'
                 mode='light'
                 onClick={this.handleClickSend}
-                text={props.t('Send')}
+                text={props.buttonLabel || props.t('Send')}
                 type='button'
                 key='timeline__comment__send'
               />

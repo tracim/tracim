@@ -52,7 +52,6 @@ export class Thread extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       newComment: '',
-      newCommentAsFileList: [],
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
@@ -275,7 +274,7 @@ export class Thread extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async (comment) => {
+  handleClickValidateNewCommentBtn = async (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
@@ -284,18 +283,18 @@ export class Thread extends React.Component {
       comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment(comment)
+      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
     }
   }
 
-  handleClickValidateAnywayNewComment = (comment) => {
+  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
         comment,
-        state.newCommentAsFileList,
+        commentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -465,7 +464,6 @@ export class Thread extends React.Component {
                 apiUrl={state.config.apiUrl}
                 timelineData={props.timeline}
                 newComment={state.newComment}
-                newCommentAsFileList={state.newCommentAsFileList}
                 disableComment={!state.content.is_editable}
                 availableStatusList={state.config.availableStatuses}
                 wysiwyg={state.timelineWysiwyg}
