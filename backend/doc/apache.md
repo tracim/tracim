@@ -59,7 +59,7 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
     ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:6544
 
     ProxyPassMatch ^/$ uwsgi://127.0.0.1:6544
-    ProxyPassReverse / uwsgi://127.0.0.1:6544
+    ProxyPassReverse / uwsgi://127.0.0.1:6544/
 
     CustomLog /var/log/apache2/apache2-tracim-access.log combined
     ErrorLog /var/log/apache2/apache2-tracim-error.log
