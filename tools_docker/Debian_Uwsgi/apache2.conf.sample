@@ -45,27 +45,27 @@
     # Proxying Caldav
     # Define START_CALDAV
     <IfDefine START_CALDAV>
-        ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081/
-        ProxyPassReverse /agenda uwsgi://127.0.0.1:8081/
+        ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081
+        ProxyPassReverse /agenda uwsgi://127.0.0.1:8081
     </IfDefine>
 
     # Proxying Frontend
-    ProxyPassMatch ^/ui uwsgi://127.0.0.1:8081/
-    ProxyPassReverse /ui uwsgi://127.0.0.1:8081/
+    ProxyPassMatch ^/ui uwsgi://127.0.0.1:8081
+    ProxyPassReverse /ui uwsgi://127.0.0.1:8081
 
     # Proxying Tracim Live Message to Pushpin
     # NOTE: no reverse as ProxyPassMatchReverse does not exist...
     ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
     # Proxying Backend API
-    ProxyPassMatch ^/api uwsgi://127.0.0.1:8081/
-    ProxyPassReverse /api uwsgi://127.0.0.1:8081/
+    ProxyPassMatch ^/api uwsgi://127.0.0.1:8081
+    ProxyPassReverse /api uwsgi://127.0.0.1:8081
 
-    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:8081/
-    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:8081/
+    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:8081
+    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:8081
 
-    ProxyPassMatch ^/$ uwsgi://localhost:8081/
-    ProxyPassReverse / uwsgi://127.0.0.1:8081/
+    ProxyPassMatch ^/$ uwsgi://127.0.0.1:8081
+    ProxyPassReverse / uwsgi://127.0.0.1:8081
 
     CustomLog /var/tracim/logs/apache2-access.log combined
     ErrorLog /var/tracim/logs/apache2-error.log

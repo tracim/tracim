@@ -40,26 +40,26 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
     </Location>
 
     # Proxying Caldav
-    ProxyPassMatch ^/agenda uwsgi://127.0.0.1:6544/
-    ProxyPassReverse /agenda uwsgi://127.0.0.1:6544/
+    ProxyPassMatch ^/agenda uwsgi://127.0.0.1:6544
+    ProxyPassReverse /agenda uwsgi://127.0.0.1:6544
 
     # Proxying Frontend
-    ProxyPassMatch ^/ui uwsgi://127.0.0.1:6544/
-    ProxyPassReverse /ui uwsgi://127.0.0.1:6544/
+    ProxyPassMatch ^/ui uwsgi://127.0.0.1:6544
+    ProxyPassReverse /ui uwsgi://127.0.0.1:6544
 
     # Proxying Tracim Live Message to Pushpin
     # NOTE: no reverse as ProxyPassMatchReverse does not exist...
     ProxyPassMatch ^/api/users/([0-9]+/live_messages)$ http://127.0.0.1:7999/api/users/$1
 
     # Proxying Backend API
-    ProxyPassMatch ^/api uwsgi://127.0.0.1:6544/
-    ProxyPassReverse /api uwsgi://127.0.0.1:6544/
+    ProxyPassMatch ^/api uwsgi://127.0.0.1:6544
+    ProxyPassReverse /api uwsgi://127.0.0.1:6544
 
-    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:6544/
-    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:6544/
+    ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:6544
+    ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:6544
 
-    ProxyPassMatch ^/$ uwsgi://localhost:6544/
-    ProxyPassReverse / uwsgi://127.0.0.1:6544/
+    ProxyPassMatch ^/$ uwsgi://127.0.0.1:6544
+    ProxyPassReverse / uwsgi://127.0.0.1:6544
 
     CustomLog /var/log/apache2/apache2-tracim-access.log combined
     ErrorLog /var/log/apache2/apache2-tracim-error.log
