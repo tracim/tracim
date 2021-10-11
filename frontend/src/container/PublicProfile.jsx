@@ -526,5 +526,5 @@ export class PublicProfile extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, tlm }) => ({ breadcrumbs, user, tlm })
+const mapStateToProps = ({ breadcrumbs, user }) => ({ breadcrumbs, user })
 export default connect(mapStateToProps)(translate()(TracimComponent(PublicProfile)))

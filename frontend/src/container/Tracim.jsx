@@ -114,7 +114,7 @@ export class Tracim extends React.Component {
       unansweredCallTimeoutId: -1
     }
 
-    this.audioCall = new Audio('/assets/branding/data_sounds_ringtones_Solarium.ogg')
+    this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
     this.liveMessageManager = new LiveMessageManager()
 
     // NOTE - S.G. - Unconditionally hide the original welcome element
