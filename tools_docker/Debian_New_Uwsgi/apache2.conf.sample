@@ -64,7 +64,7 @@
     ProxyPassMatch ^/custom_toolbox-assets uwsgi://127.0.0.1:8081
     ProxyPassReverse /custom_toolbox-assets uwsgi://127.0.0.1:8081
 
-    ProxyPassMatch ^/$ uwsgi://127.0.0.1:8081
+    ProxyPassMatch ^/$ uwsgi://127.0.0.1:8081/
     ProxyPassReverse / uwsgi://127.0.0.1:8081/
 
     CustomLog /var/tracim/logs/apache2-access.log combined
