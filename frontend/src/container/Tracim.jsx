@@ -625,7 +625,7 @@ export class Tracim extends React.Component {
           >
             <div className='gallery__delete__file__popup__body'>
               <div className='callpopup__text'>
-                {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: state.userCall.caller.public_name })}
+                {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: state.userCall.callee.public_name })}
               </div>
 
               <div className='gallery__delete__file__popup__body__btn'>
