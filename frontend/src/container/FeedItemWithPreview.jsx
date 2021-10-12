@@ -105,14 +105,6 @@ export class FeedItemWithPreview extends React.Component {
     props.appContentChangeComment(e, props.content, this.setState.bind(this), props.content.slug)
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   handleClickEditComment = (comment) => {
     const { props } = this
     props.appContentEditComment(
@@ -430,7 +422,6 @@ export class FeedItemWithPreview extends React.Component {
                 onClickValidateNewCommentBtn={this.handleClickSend}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
                 wysiwygId={this.getWysiwygId(props.content.id)}
-                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 timelineData={this.getTimelineData()}

@@ -382,14 +382,6 @@ export class Publications extends React.Component {
     )
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
   buildPublicationName = (authorName, userLang) => {
@@ -638,9 +630,7 @@ export class Publications extends React.Component {
             disableAutocompletePosition
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             newCommentAsFileList={state.newCommentAsFileList}
-            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
             workspaceId={props.currentWorkspace.id}
-            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             onClickValidateNewCommentBtn={this.handleClickPublish}
             multipleFiles={false}
           />

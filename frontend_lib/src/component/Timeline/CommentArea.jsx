@@ -43,6 +43,10 @@ export class CommentArea extends React.Component {
 
   componentDidMount () {
     const { props } = this
+    if (props.newComment) {
+      this.setState({ newComment: props.newComment })
+    }
+
     if (props.wysiwyg) {
       this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
     }
@@ -51,7 +55,7 @@ export class CommentArea extends React.Component {
   async componentDidUpdate (prevProps, prevState) {
     if (!prevProps.wysiwyg && this.props.wysiwyg) {
       this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
-    }
+    } //TODO GIULIA Reload content?
 
     if (!this.props.wysiwyg && prevState.newComment !== this.state.newComment) {
       this.searchForMentionOrLinkCandidate()
@@ -250,6 +254,15 @@ export class CommentArea extends React.Component {
     )
   }
 
+  handleRemoveCommentAsFile = (fileToRemove) => {
+    if (!fileToRemove) return
+    this.setState(prev => ({
+      newCommentAsFileList: prev.newCommentAsFileList.filter(
+        commentAsFile => commentAsFile.file.name !== fileToRemove.file.name
+      )
+    }))
+  }
+
   render () {
     const { props, state } = this
 
@@ -267,8 +280,8 @@ export class CommentArea extends React.Component {
         zIndex: state.tinymcePosition.isFullscreen ? 1061 : 20
       })
     }
-
-    // TODO GIULIA fix files (onRemoveCommentAsFile) and stylus
+    console.log('CommentArea', state.newComment)
+    // TODO GIULIA fix stylus/class
     return (
       <form className={`${props.customClass}__texteditor`}>
         <div
@@ -326,7 +339,7 @@ export class CommentArea extends React.Component {
               <div>
                 <DisplayFileToUpload
                   fileList={state.newCommentAsFileList}
-                  onRemoveCommentAsFile={props.onRemoveCommentAsFile}
+                  onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                   color={props.customColor}
                 />
               </div>

@@ -374,28 +374,6 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    appContentAddCommentAsFile = (fileToUploadList, setState) => {
-      if (!fileToUploadList.length) return
-      setState(prev => {
-        const fileToUploadListWithoutDuplicate = fileToUploadList
-          .filter(fileToAdd =>
-            !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
-          )
-        return {
-          newCommentAsFileList: [...prev.newCommentAsFileList, ...fileToUploadListWithoutDuplicate]
-        }
-      })
-    }
-
-    appContentRemoveCommentAsFile = (fileToRemove, setState) => {
-      if (!fileToRemove) return
-      setState(prev => ({
-        newCommentAsFileList: prev.newCommentAsFileList.filter(
-          commentAsFile => commentAsFile.file.name !== fileToRemove.file.name
-        )
-      }))
-    }
-
     saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id) => {
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
@@ -966,10 +944,8 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
-          appContentAddCommentAsFile={this.appContentAddCommentAsFile}
           appContentDeleteComment={this.appContentDeleteComment}
           appContentEditComment={this.appContentEditComment}
-          appContentRemoveCommentAsFile={this.appContentRemoveCommentAsFile}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}

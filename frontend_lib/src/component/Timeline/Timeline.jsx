@@ -255,7 +255,6 @@ export class Timeline extends React.Component {
               contentType={props.contentType}
               id={`wysiwygTimelineComment${props.id}`}
               apiUrl={props.apiUrl}
-              newComment={props.newComment}
               disableComment={disableComment}
               wysiwyg={props.wysiwyg}
               searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
@@ -263,9 +262,7 @@ export class Timeline extends React.Component {
               customClass={props.customClass}
               customColor={props.customColor}
               onClickWysiwygBtn={props.onClickWysiwygBtn}
-              onRemoveCommentAsFile={props.onRemoveCommentAsFile}
               workspaceId={props.workspaceId}
-              onValidateCommentFileToUpload={props.onValidateCommentFileToUpload}
               onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
               lang={props.loggedUser.lang}
             />
