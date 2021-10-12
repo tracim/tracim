@@ -411,14 +411,25 @@ export default translate()(CommentArea)
 CommentArea.propTypes = {
   id: PropTypes.string.isRequired,
   apiUrl: PropTypes.string.isRequired,
-  newComment: PropTypes.string.isRequired,
+  newComment: PropTypes.string,
   disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   wysiwyg: PropTypes.bool,
   searchForMentionOrLinkInQuery: PropTypes.func,
   customClass: PropTypes.string,
   hideSendButtonAndOptions: PropTypes.bool,
-  multipleFiles: PropTypes.bool
+  multipleFiles: PropTypes.bool,
+  contentType: PropTypes.string,
+  contentId: PropTypes.number,
+  workspaceId: PropTypes.number,
+  wysiwygIdSelector: PropTypes.string,
+  lang: PropTypes.string,
+  onClickCancelSave: PropTypes.func,
+  onClickSaveAnyway: PropTypes.func,
+  onClickValidateNewCommentBtn: PropTypes.func,
+  invalidMentionList: PropTypes.array,
+  showInvalidMentionPopup: PropTypes.bool,
+  onClickWysiwygBtn: PropTypes.func
 }
 
 CommentArea.defaultProps = {
@@ -430,5 +441,16 @@ CommentArea.defaultProps = {
   wysiwyg: false,
   searchForMentionOrLinkInQuery: () => { },
   hideSendButtonAndOptions: false,
-  multipleFiles: true
+  multipleFiles: true,
+  contentType: '',
+  contentId: 0,
+  workspaceId: 0,
+  wysiwygIdSelector: '',
+  lang: 'en',
+  onClickCancelSave: () => { },
+  onClickSaveAnyway: () => { },
+  onClickValidateNewCommentBtn: () => { },
+  invalidMentionList: [],
+  showInvalidMentionPopup: false,
+  onClickWysiwygBtn: () => { }
 }

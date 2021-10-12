@@ -279,7 +279,6 @@ Timeline.propTypes = {
   invalidMentionList: PropTypes.array,
   shouldScrollToBottom: PropTypes.bool,
   isLastTimelineItemCurrentToken: PropTypes.bool,
-  rightPartOpen: PropTypes.bool,
   isArchived: PropTypes.bool,
   onClickRestoreArchived: PropTypes.func,
   isDeleted: PropTypes.bool,
@@ -296,7 +295,10 @@ Timeline.propTypes = {
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
   onClickShowMoreTimelineItems: PropTypes.func,
-  canLoadMoreTimelineItems: PropTypes.func
+  canLoadMoreTimelineItems: PropTypes.func,
+  contentId: PropTypes.number,
+  contentType: PropTypes.string,
+  wysiwygIdSelector: PropTypes.string
 }
 
 Timeline.defaultProps = {
@@ -318,7 +320,6 @@ Timeline.defaultProps = {
   invalidMentionList: [],
   shouldScrollToBottom: true,
   isLastTimelineItemCurrentToken: false,
-  rightPartOpen: false,
   isArchived: false,
   isDeleted: false,
   onClickCancelSave: () => { },
@@ -331,5 +332,8 @@ Timeline.defaultProps = {
   onClickEditComment: () => { },
   onClickOpenFileComment: () => { },
   onClickShowMoreTimelineItems: () => { },
-  canLoadMoreTimelineItems: () => false
+  canLoadMoreTimelineItems: () => false,
+  contentId: 0,
+  contentType: '',
+  wysiwygIdSelector: ''
 }

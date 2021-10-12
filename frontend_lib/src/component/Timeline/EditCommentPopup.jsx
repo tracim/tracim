@@ -99,12 +99,14 @@ EditCommentPopup.propTypes = {
   apiUrl: PropTypes.string,
   customColor: PropTypes.string,
   loggedUserLanguage: PropTypes.string,
-  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  commentId: PropTypes.number
 }
 
 EditCommentPopup.defaultProps = {
   apiUrl: '',
   customColor: undefined,
   loggedUserLanguage: 'en',
-  workspaceId: undefined
+  workspaceId: undefined,
+  commentId: 0
 }
