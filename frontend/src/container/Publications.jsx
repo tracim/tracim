@@ -590,27 +590,28 @@ export class Publications extends React.Component {
         )}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
-          <CommentArea
-            apiUrl={FETCH_CONFIG.apiUrl}
-            buttonLabel={props.t('Publish')}
-            contentType={CONTENT_TYPE.THREAD}
-            customClass='publications__publishArea'
-            customColor={COLORS.PUBLICATION}
-            id={wysiwygId}
-            wysiwygIdSelector={`#${wysiwygId}`}
-            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-            wysiwyg={state.publicationWysiwyg}
-            disableAutocompletePosition
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            workspaceId={props.currentWorkspace.id}
-            onClickValidateNewCommentBtn={this.handleClickPublish}
-            multipleFiles={false}
-            onClickSaveAnyway={this.handleClickValidateAnyway}
-            invalidMentionList={state.invalidMentionList}
-            showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
-            onClickCancelSave={this.handleCancelSave}
-            lang={props.user.lang}
-          />
+          <div className='publishAreaContainer'>
+            <CommentArea
+              apiUrl={FETCH_CONFIG.apiUrl}
+              buttonLabel={props.t('Publish')}
+              contentType={CONTENT_TYPE.THREAD}
+              customColor={COLORS.PUBLICATION}
+              id={wysiwygId}
+              wysiwygIdSelector={`#${wysiwygId}`}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+              wysiwyg={state.publicationWysiwyg}
+              disableAutocompletePosition
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              workspaceId={props.currentWorkspace.id}
+              onClickValidateNewCommentBtn={this.handleClickPublish}
+              multipleFiles={false}
+              onClickSaveAnyway={this.handleClickValidateAnyway}
+              invalidMentionList={state.invalidMentionList}
+              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
+              onClickCancelSave={this.handleCancelSave}
+              lang={props.user.lang}
+            />
+          </div>
         )}
       </ScrollToBottomWrapper>
     )
