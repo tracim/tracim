@@ -615,26 +615,28 @@ export class Publications extends React.Component {
           />
         )}
 
-        {userRoleIdInWorkspace >= ROLE.contributor.id && (
-          <CommentArea
-            apiUrl={FETCH_CONFIG.apiUrl}
-            buttonLabel={props.t('Publish')}
-            contentType={CONTENT_TYPE.THREAD}
-            customClass='publications__publishArea'
-            customColor={COLORS.PUBLICATION}
-            id={wysiwygId}
-            newComment={state.newComment}
-            wysiwygId={`#${wysiwygId}`}
-            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-            wysiwyg={state.publicationWysiwyg}
-            disableAutocompletePosition
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            newCommentAsFileList={state.newCommentAsFileList}
-            workspaceId={props.currentWorkspace.id}
-            onClickValidateNewCommentBtn={this.handleClickPublish}
-            multipleFiles={false}
-          />
-        )}
+        <div className="publishAreaContainer">
+          {userRoleIdInWorkspace >= ROLE.contributor.id && (
+            <CommentArea
+              apiUrl={FETCH_CONFIG.apiUrl}
+              buttonLabel={props.t('Publish')}
+              contentType={CONTENT_TYPE.THREAD}
+              // customClass='publications__publishArea'
+              customColor={COLORS.PUBLICATION}
+              id={wysiwygId}
+              newComment={state.newComment}
+              wysiwygId={`#${wysiwygId}`}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+              wysiwyg={state.publicationWysiwyg}
+              disableAutocompletePosition
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              newCommentAsFileList={state.newCommentAsFileList}
+              workspaceId={props.currentWorkspace.id}
+              onClickValidateNewCommentBtn={this.handleClickPublish}
+              multipleFiles={false}
+            />
+          )}
+        </div>
       </ScrollToBottomWrapper>
     )
   }
