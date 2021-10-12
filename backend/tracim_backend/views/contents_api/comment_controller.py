@@ -1,4 +1,6 @@
 # coding=utf-8
+from http import HTTPStatus
+
 from pyramid.config import Configurator
 import transaction
 
@@ -32,12 +34,6 @@ from tracim_backend.views.core_api.schemas import SetCommentSchema
 from tracim_backend.views.core_api.schemas import TranslationQuerySchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__CONTENT_COMMENT_SECTION = "Comments"
 SWAGGER_TAG__CONTENT_COMMENT_ENDPOINTS = generate_documentation_swagger_tag(

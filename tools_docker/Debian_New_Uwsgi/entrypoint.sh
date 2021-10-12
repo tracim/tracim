@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+docker_script_dir=$(realpath $(dirname "$0"))
 
 # Default values
 CONFIG_FILE_IS_NEW=0
@@ -49,7 +50,7 @@ function alembic_as_user {
 
 # Check environment variables
 log "Checking of docker env var"
-/bin/bash "$DOCKER_SCRIPT_DIR/check_env_vars.sh"
+/bin/bash "$docker_script_dir/check_env_vars.sh"
 if [ ! "$?" = 0 ]; then
     logerror "invalid env var"
     exit 1
@@ -57,20 +58,21 @@ fi
 loggood "check of docker env var success"
 
 # Execute common tasks
-/bin/bash "$DOCKER_SCRIPT_DIR/common.sh"
+/bin/bash "$docker_script_dir/common.sh"
 if [ ! "$?" = 0 ]; then
     exit 1
 fi
 
 if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
     log "Activation of Encryption"
-    /bin/bash "$DOCKER_SCRIPT_DIR/encryption.sh"
+    /bin/bash "$script_dir/encryption.sh"
     if [ ! "$?" = 0 ]; then
         logerror "Encryption activation Failed !"
         exit 1
     fi
     loggood "Encryption activated"
 fi
+
 # Create file with all docker variable about TRACIM parameter
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 # Add variable for using xvfb with uwsgi
@@ -173,7 +175,7 @@ service zurl start # tracim live messages (TLMs) sending
 service redis-server start  # async jobs (for mails and TLMs)
 service apache2 restart
 log "Run supervisord"
-supervisord -c "$DOCKER_SCRIPT_DIR/supervisord_tracim.conf"
+supervisord -c "$docker_script_dir/supervisord_tracim.conf"
 # Activate daemon for reply by email
 if [ "$REPLY_BY_EMAIL" = "1" ];then
     log "start mail fetcher"

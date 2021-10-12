@@ -1,4 +1,5 @@
 # coding=utf-8
+from http import HTTPStatus
 from io import BytesIO
 
 from hapic.data import HapicFile
@@ -35,12 +36,6 @@ from tracim_backend.views.core_api.schemas import RevisionPageSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__CONTENT_THREAD_SECTION = "Threads"
 SWAGGER_TAG__CONTENT_THREAD_ENDPOINTS = generate_documentation_swagger_tag(

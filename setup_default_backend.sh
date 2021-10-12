@@ -1,6 +1,7 @@
 #!/bin/bash
 
 script_dir=$(realpath $(dirname "$0"))
+DEFAULTDIR=${DEFAULTDIR:-$script_dir}
 
 # Main in bottom
 
@@ -39,7 +40,7 @@ function install_backend_system_dep {
     log "Installing system package dependencies for the backend..."
     system_package_dir="$script_dir/system_packages/debian/"
     $SUDO apt update
-    PACKAGE_LIST=$(cat "$system_package_dir/base_packages.list" "$system_package_dir/backend_packages.list" "$system_package_dir/optional_preview_packages.list")
+    PACKAGE_LIST=$(cat "${system_package_dir}/build_backend_packages.list" "${system_package_dir}/run_backend_packages.list" "${system_package_dir}/optional_preview_packages.list")
     $SUDO apt install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
 }
 
@@ -165,7 +166,7 @@ function translate_email {
 ############################################
 
 # Check if running as root
-if [ "$EUID" -ne 0 ]
+if [ "$EUID" -eq 0 ]; then
     SUDO=""
     SUDOCURL=""
 else

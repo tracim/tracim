@@ -43,7 +43,7 @@ OS compatibility (tested with Python >= 3.6.14):
   - Bullseye (11)
 - Ubuntu:
   - Bionic (18.04)
-  - xxx (20.04)
+  - Focal (20.04)
 
 ### Get the source code
 

@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import json
 import typing
 
@@ -118,12 +119,6 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__USER_ENDPOINTS = "Users"
 
