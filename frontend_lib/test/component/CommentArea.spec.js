@@ -95,7 +95,7 @@ describe('<CommentArea />', () => {
       })
     })
 
-    describe('loadAutoComplete() (Note: "|" is the cursor position)', () => {
+    describe('searchForMentionOrLinkCandidate() (Note: "|" is the cursor position)', () => {
       describe('when isAutoCompleteActivated is false', () => {
         before(() => {
           wrapper.setState({ isAutoCompleteActivated: false })
@@ -103,7 +103,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "newComment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'newComment' })
+            wrapper.setState({ newComment: 'newComment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 10 }
           })
 
@@ -115,7 +115,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "@newComment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@newComment' })
+            wrapper.setState({ newComment: '@newComment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 11 }
           })
 
@@ -127,7 +127,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "mail@domain|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'mail@domain' })
+            wrapper.setState({ newComment: 'mail@domain' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 11 }
           })
 
@@ -139,7 +139,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "@new @Comment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@new @Comment' })
+            wrapper.setState({ newComment: '@new @Comment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 13 }
           })
 
@@ -151,7 +151,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "mail @domain|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'mail @domain' })
+            wrapper.setState({ newComment: 'mail @domain' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
@@ -163,7 +163,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "@|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@' })
+            wrapper.setState({ newComment: '@' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 1 }
           })
 
@@ -175,7 +175,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '' })
+            wrapper.setState({ newComment: '' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 0 }
           })
 
@@ -193,7 +193,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "@newComment |"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@newComment ' })
+            wrapper.setState({ newComment: '@newComment ' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
@@ -205,7 +205,7 @@ describe('<CommentArea />', () => {
 
         describe('new comment: "y@newComment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'y@newComment' })
+            wrapper.setState({ newComment: 'y@newComment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 

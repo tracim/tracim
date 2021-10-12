@@ -13,13 +13,11 @@ describe('<Timeline />', () => {
   const onClickRevisionBtnCallBack = sinon.spy()
   const onClickRestoreArchivedCallBack = sinon.spy()
   const onClickRestoreDeletedCallBack = sinon.spy()
-  const onClickValidateNewCommentBtnCallBack = sinon.spy()
 
   const props = {
     timelineData: [...revisionList, ...commentList],
     newComment: 'randomNewComment',
     apiUrl: '/',
-    onClickValidateNewCommentBtn: onClickValidateNewCommentBtnCallBack,
     disableComment: false,
     customClass: 'randomCustomClass',
     customColor: 'red',
@@ -67,11 +65,6 @@ describe('<Timeline />', () => {
     it('onClickWysiwygBtnCallBack should be called when the advancedText button is clicked', () => {
       wrapper.find(`.${props.customClass}__texteditor__advancedtext__btn`).simulate('click')
       expect(onClickWysiwygBtnCallBack.called).to.equal(true)
-    })
-
-    it('onClickValidateNewCommentBtnCallBack should be called when the submit button is clicked', () => {
-      wrapper.find(`.${props.customClass}__texteditor__submit__btn`).simulate('click')
-      expect(onClickValidateNewCommentBtnCallBack.called).to.equal(true)
     })
   })
 })
