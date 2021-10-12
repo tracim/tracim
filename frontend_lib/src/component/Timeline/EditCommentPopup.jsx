@@ -58,7 +58,7 @@ export class EditCommentPopup extends React.Component {
           hideSendButtonAndOptions
           id={wysiwygId}
           newComment={state.newComment}
-          wysiwygId={wysiwygIdSelector}
+          wysiwygIdSelector={wysiwygIdSelector}
           searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           lang={props.loggedUserLanguage}
           workspaceId={props.workspaceId}

@@ -62,7 +62,7 @@ export class Timeline extends React.Component {
     this.setState({ showEditCommentPopup: true, newComment: comment })
   }
 
-  handleClickValidateEditComment = async (comment) => {
+  handleClickValidateEditComment = (comment) => {
     const { props } = this
     if (!handleInvalidMentionInComment(
       props.memberList,
@@ -100,8 +100,6 @@ export class Timeline extends React.Component {
 
   render () {
     const { props, state } = this
-    const invalidMentionList = props.invalidMentionList.length ? props.invalidMentionList : state.invalidMentionList
-    const showInvalidMentionPopup = props.showInvalidMentionPopup || state.showInvalidMentionPopupInComment
 
     if (!Array.isArray(props.timelineData)) {
       console.log('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
@@ -205,26 +203,6 @@ export class Timeline extends React.Component {
           })}
         </ScrollToBottomWrapper>
 
-        {showInvalidMentionPopup && (
-          <ConfirmPopup
-            onConfirm={this.handleCloseInvalidMentionPopup}
-            onClose={this.handleCloseInvalidMentionPopup}
-            onCancel={this.handleValidateInvalidMentionPopup}
-            msg={
-              <>
-                {props.t('Your text contains mentions that do not match any member of this space:')}
-                <div className='timeline__texteditor__mentions'>
-                  {invalidMentionList.join(', ')}
-                </div>
-              </>
-            }
-            confirmLabel={props.t('Edit')}
-            confirmIcon='far fa-fw fa-edit'
-            cancelLabel={props.t('Validate anyway')}
-            cancelIcon='fas fa-fw fa-check'
-          />
-        )}
-
         {state.showEditCommentPopup && (
           <EditCommentPopup
             apiUrl={props.apiUrl}
@@ -258,13 +236,17 @@ export class Timeline extends React.Component {
               disableComment={disableComment}
               wysiwyg={props.wysiwyg}
               searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-              wysiwygId={props.wysiwygId}
+              wysiwygIdSelector={props.wysiwygIdSelector}
               customClass={props.customClass}
               customColor={props.customColor}
               onClickWysiwygBtn={props.onClickWysiwygBtn}
               workspaceId={props.workspaceId}
               onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
               lang={props.loggedUser.lang}
+              invalidMentionList={props.invalidMentionList}
+              showInvalidMentionPopup={props.showInvalidMentionPopup}
+              onClickSaveAnyway={props.onClickSaveAnyway}
+              onClickCancelSave={props.onClickCancelSave}
             />
           </div>
         )}

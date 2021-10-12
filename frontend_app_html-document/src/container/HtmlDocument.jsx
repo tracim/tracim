@@ -557,7 +557,7 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleClickValidateNewCommentBtn = async (comment, commentAsFileList) => {
+  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
@@ -567,7 +567,9 @@ export class HtmlDocument extends React.Component {
       this.setState.bind(this)
     )) {
       this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -800,7 +802,7 @@ export class HtmlDocument extends React.Component {
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            wysiwygId='#wysiwygTimelineComment'
+            wysiwygIdSelector='#wysiwygTimelineComment'
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}

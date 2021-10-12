@@ -8,7 +8,6 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CommentArea,
-  ConfirmPopup,
   CUSTOM_EVENT,
   EditCommentPopup,
   getContentComment,
@@ -97,8 +96,6 @@ export class Publications extends React.Component {
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
-      newComment: '',
-      newCommentAsFileList: [],
       publicationWysiwyg: false,
       showEditPopup: false,
       showInvalidMentionPopupInComment: false,
@@ -186,7 +183,7 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
-  handleClickPublish = (publication) => {
+  handleClickPublish = (publication, publicationAsFileList) => {
     const { props, state } = this
 
     if (!handleInvalidMentionInComment(
@@ -195,8 +192,10 @@ export class Publications extends React.Component {
       publication,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnyway(publication)
+      this.handleClickValidateAnyway(publication, publicationAsFileList)
+      return true
     }
+    return false
   }
 
   handleContentCreatedOrRestored = (data) => {
@@ -351,12 +350,12 @@ export class Publications extends React.Component {
     this.setState({ showEditPopup: true, commentToEdit: publication.firstComment })
   }
 
-  handleClickValidateEdit = async (comment) => {
+  handleClickValidateEdit = (publication) => {
     const { props } = this
     if (!handleInvalidMentionInComment(
       props.currentWorkspace.memberList,
       true,
-      comment,
+      publication,
       this.setState.bind(this)
     )) {
       this.handleClickValidateAnywayEdit()
@@ -423,30 +422,29 @@ export class Publications extends React.Component {
     }
   }
 
-  processSaveFilePublication = async () => {
+  processSaveFilePublication = async (publication, publicationAsFileList) => {
     const { props, state } = this
 
     const workspaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
-    if (state.newCommentAsFileList.length !== 1) return
+    if (publicationAsFileList.length !== 1) return
 
-    const fileToUpload = state.newCommentAsFileList[0]
+    const fileToUpload = publicationAsFileList[0]
     const fetchPostPublicationFile = await props.dispatch(postPublicationFile(workspaceId, fileToUpload, publicationName))
 
     const isUploadInError = isFileUploadInErrorState(fetchPostPublicationFile)
     if (isUploadInError) {
       props.dispatch(newFlashMessage(fetchPostPublicationFile.errorMessage, 'warning'))
-      this.setState({ newCommentAsFileList: [fetchPostPublicationFile] })
       return
     }
 
-    if (state.newComment !== '') {
+    if (publication !== '') {
       try {
         await props.appContentSaveNewComment(
           fetchPostPublicationFile.responseJson,
           state.publicationWysiwyg,
-          state.newComment,
+          publication,
           [],
           this.setState.bind(this),
           fetchPostPublicationFile.responseJson.slug,
@@ -459,13 +457,9 @@ export class Publications extends React.Component {
     }
 
     if (state.publicationWysiwyg) globalThis.tinymce.get(wysiwygId).setContent('')
-    this.setState({
-      newComment: '',
-      newCommentAsFileList: []
-    })
   }
 
-  handleClickValidateAnyway = async (publication) => {
+  handleClickValidateAnyway = async (publication, publicationAsFileList) => {
     const { state } = this
 
     if (state.showEditPopup) {
@@ -473,12 +467,12 @@ export class Publications extends React.Component {
       return
     }
 
-    if (publication !== '' && state.newCommentAsFileList.length === 0) {
+    if (publication !== '' && publicationAsFileList.length === 0) {
       this.saveThreadPublication(publication)
     }
 
-    if (state.newCommentAsFileList.length > 0) {
-      this.processSaveFilePublication()
+    if (publicationAsFileList.length > 0) {
+      this.processSaveFilePublication(publication, publicationAsFileList)
     }
   }
 
@@ -582,26 +576,6 @@ export class Publications extends React.Component {
           />
         )}
 
-        {!state.loading && state.showInvalidMentionPopupInComment && (
-          <ConfirmPopup
-            onConfirm={this.handleCancelSave}
-            onClose={this.handleCancelSave}
-            onCancel={this.handleClickValidateAnyway}
-            msg={
-              <>
-                {props.t('Your text contains mentions that do not match any member of this space:')}
-                <div className='timeline__texteditor__mentions'>
-                  {state.invalidMentionList.join(', ')}
-                </div>
-              </>
-            }
-            confirmLabel={props.t('Edit')}
-            confirmIcon='far fa-fw fa-edit'
-            cancelLabel={props.t('Validate anyway')}
-            cancelIcon='fas fa-fw fa-check'
-          />
-        )}
-
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
@@ -623,16 +597,19 @@ export class Publications extends React.Component {
             customClass='publications__publishArea'
             customColor={COLORS.PUBLICATION}
             id={wysiwygId}
-            newComment={state.newComment}
-            wysiwygId={`#${wysiwygId}`}
+            wysiwygIdSelector={`#${wysiwygId}`}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             wysiwyg={state.publicationWysiwyg}
             disableAutocompletePosition
             onClickWysiwygBtn={this.handleToggleWysiwyg}
-            newCommentAsFileList={state.newCommentAsFileList}
             workspaceId={props.currentWorkspace.id}
             onClickValidateNewCommentBtn={this.handleClickPublish}
             multipleFiles={false}
+            onClickSaveAnyway={this.handleClickValidateAnyway}
+            invalidMentionList={state.invalidMentionList}
+            showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
+            onClickCancelSave={this.handleCancelSave}
+            lang={props.user.lang}
           />
         )}
       </ScrollToBottomWrapper>

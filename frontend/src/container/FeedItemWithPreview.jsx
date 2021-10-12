@@ -143,7 +143,9 @@ export class FeedItemWithPreview extends React.Component {
       this.setState.bind(this)
     )) {
       this.handleClickValidateAnyway(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
   handleClickValidateAnyway = async (comment, commentAsFileList) => {

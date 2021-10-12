@@ -14,6 +14,7 @@ import { LOCAL_STORAGE_FIELD, setLocalStorageItem } from '../../localStorage.js'
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 
 const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
 
@@ -220,12 +221,6 @@ export class CommentArea extends React.Component {
     )
   }
 
-  handleClickSend = () => {
-    const { props, state } = this
-    props.onClickValidateNewCommentBtn(state.newComment, state.newCommentAsFileList)
-    this.setState({ newComment: '', newCommentAsFileList: [] })
-  }
-
   handleValidateCommentFileToUpload = (fileToUploadList) => {
     if (!fileToUploadList.length) return
     this.setState(prev => {
@@ -241,7 +236,7 @@ export class CommentArea extends React.Component {
 
   handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
     globalThis.wysiwyg(
-      this.props.wysiwygId,
+      this.props.wysiwygIdSelector,
       this.props.lang,
       this.handleChangeNewComment,
       handleTinyMceInput,
@@ -260,8 +255,28 @@ export class CommentArea extends React.Component {
     }))
   }
 
+  handleCloseInvalidMentionPopup = () => {
+    const { props } = this
+    props.onClickCancelSave()
+  }
+
+  handleValidateInvalidMentionPopup = () => {
+    const { props, state } = this
+    console.log('sdajdioajiosd', state.newComment, state.newCommentAsFileList)
+    props.onClickSaveAnyway(state.newComment, state.newCommentAsFileList)
+    this.setState({ newComment: '', newCommentAsFileList: [] })
+  }
+
+  handleClickSend = () => {
+    const { props, state } = this
+    if (props.onClickValidateNewCommentBtn(state.newComment, state.newCommentAsFileList)) {
+      this.setState({ newComment: '', newCommentAsFileList: [] })
+    }
+  }
+
   render () {
     const { props, state } = this
+    const invalidMentionList = props.invalidMentionList || []
 
     const style = {
       transform: 'translateY(-100%)',
@@ -277,10 +292,29 @@ export class CommentArea extends React.Component {
         zIndex: state.tinymcePosition.isFullscreen ? 1061 : 20
       })
     }
-    console.log('CommentArea', state.newComment)
-    // TODO GIULIA fix stylus/class
+
     return (
       <form className={`${props.customClass}__texteditor`}>
+        {props.showInvalidMentionPopup && (
+          <ConfirmPopup
+            onConfirm={props.onClickCancelSave}
+            onClose={props.onClickCancelSave}
+            onCancel={this.handleValidateInvalidMentionPopup}
+            msg={
+              <>
+                {props.t('Your text contains mentions that do not match any member of this space:')}
+                <div className='timeline__texteditor__mentions'>
+                  {invalidMentionList.join(', ')}
+                </div>
+              </>
+            }
+            confirmLabel={props.t('Edit')}
+            confirmIcon='far fa-fw fa-edit'
+            cancelLabel={props.t('Validate anyway')}
+            cancelIcon='fas fa-fw fa-check'
+          />
+        )}
+
         <div
           className={classnames(
             `${props.customClass}__texteditor__textinput`,

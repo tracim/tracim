@@ -266,7 +266,7 @@ export class Thread extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async (comment, commentAsFileList) => {
+  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
@@ -276,7 +276,9 @@ export class Thread extends React.Component {
       this.setState.bind(this)
     )) {
       this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
   handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
@@ -474,7 +476,7 @@ export class Thread extends React.Component {
                 isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
                 onClickCancelSave={this.handleCancelSave}
                 onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-                wysiwygId='#wysiwygTimelineComment'
+                wysiwygIdSelector='#wysiwygTimelineComment'
                 workspaceId={state.content.workspace_id}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
