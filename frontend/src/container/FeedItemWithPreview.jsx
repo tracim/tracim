@@ -421,6 +421,7 @@ export class FeedItemWithPreview extends React.Component {
                     content={props.content}
                     onClickToggleCommentList={this.handleClickToggleComments}
                     discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                    discussionToggleButtonLabelMobile={props.commentList.length > 0 ? props.commentList.length : ''}
                     showTimeline={props.showTimeline}
                     isPublication={props.isPublication}
                   />

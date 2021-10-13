@@ -59,6 +59,7 @@ export class FeedItemFooter extends React.Component {
           {props.isPublication && props.showTimeline && (
             <IconButton
               text={props.discussionToggleButtonLabel}
+              textMobile={props.discussionToggleButtonLabelMobile}
               icon='far fa-comment'
               onClick={props.onClickToggleCommentList}
               customClass='buttonComments'
@@ -82,6 +83,11 @@ FeedItemFooter.propTypes = {
   translationTargetLanguageCode: PropTypes.string.isRequired,
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   discussionToggleButtonLabel: PropTypes.string.isRequired,
+  discussionToggleButtonLabelMobile: PropTypes.string,
   onClickToggleCommentList: PropTypes.func,
   isPublication: PropTypes.bool.isRequired
+}
+
+FeedItemFooter.defaultProps = {
+  discussionToggleButtonLabelMobile: ''
 }
