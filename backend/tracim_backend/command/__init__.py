@@ -70,7 +70,6 @@ class AppContextCommand(Command):
             raise exc
 
     def _setup_logging(self, parsed_args: Namespace) -> None:
-
         # INFO - P.M - 2021-10-08 - Format and set every loggers
         setup_logging(parsed_args.config_file)
 
