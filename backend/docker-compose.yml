@@ -43,7 +43,7 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: user
       POSTGRES_PASSWORD: secret
-    command: postgres -c fsync=off -c shared_preload_libraries=pg_stat_statements
+    command: postgres -c fsync=off -c full_page_writes=off -c synchronous_commit=OFF -c shared_preload_libraries=pg_stat_statements
   mysql:
     image: mysql:8.0
     ports:
