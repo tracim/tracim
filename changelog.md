@@ -105,6 +105,11 @@ For administrators:
   tracimcli index-create
   tracimcli index-populate
   ```
+# 3.8.3 / 2021-09-23
+
+### Fixed Issues
+
+- UX: [#4950](https://github.com/tracim/tracim/issues/4950)
 
 
 # 3.8.2 / 2021-05-27

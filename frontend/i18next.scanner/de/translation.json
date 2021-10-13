@@ -443,6 +443,7 @@
   "Alex Doe": "Alex Müller",
   "alex.doe@jco.co": "alex.muller@alm.de",
   "In order to finish your sign in, please read the following usage conditions and accept them": "Um Ihre Anmeldung abzuschließen, lesen Sie bitte die folgenden Nutzungsbedingungen und akzeptieren Sie diese",
+<<<<<<< HEAD
   "Unknown content": "Unbekannter Inhalt",
   "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "Ihr Link für das Zurücksetzen des Passworts ist abgelaufen, Sie können eines erneuern, indem Sie <1>diesem Link</1> folgen.",
   "sec": "Sek",
@@ -511,4 +512,11 @@
   "News": "Nachrichten",
   "News of {{author}} on {{date}}": "Nachricht von {{author}} am {{date}}",
   "Error while saving new news": "Fehler beim Speichern eine neue Nachricht"
+=======
+  "Show in news": "In Nachrichten anzeigen",
+  "News": "Nachrichten",
+  "News of {{author}} on {{date}}": "Nachricht von {{author}} am {{date}}",
+  "Error while saving new news": "Fehler beim Speichern eine neue Nachricht",
+  "Publish some news": "Nachricht schreiben"
+>>>>>>> 56fc06a2d4a521edae0bcdc53b0abc3a42cbe394
 }
