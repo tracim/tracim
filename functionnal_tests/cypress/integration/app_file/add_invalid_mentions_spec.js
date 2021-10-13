@@ -61,7 +61,7 @@ describe('In a file', function () {
       cy.get('[data-cy=confirm_popup__button_cancel]')
         .should('be.visible')
         .click()
-      cy.contains('.commentArea__textinput', commentContent)
+      cy.contains('.comment__body__content__text', commentContent)
     })
   })
 

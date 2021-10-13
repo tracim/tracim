@@ -94,7 +94,7 @@ describe('In a note', function () {
       cy.get('[data-cy=confirm_popup__button_cancel]')
         .should('be.visible')
         .click()
-      cy.contains('.commentArea__textinput', noteContent)
+      cy.contains('.comment__body__content__text', noteContent)
     })
   })
 

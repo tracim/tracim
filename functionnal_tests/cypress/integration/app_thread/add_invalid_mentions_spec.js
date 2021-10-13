@@ -58,7 +58,7 @@ describe('In a thread', function () {
       cy.get('[data-cy=confirm_popup__button_cancel]')
         .should('be.visible')
         .click()
-      cy.contains('.commentArea__textinput', commentContent)
+      cy.contains('.comment__body__content__text', commentContent)
     })
   })
 
@@ -82,13 +82,13 @@ describe('In a thread', function () {
         .click()
       cy.waitForTinyMCELoaded()
         .then(() => cy.typeInTinyMCE(commentContent))
-      cy.get('.commentArea__submit__btn')
+      cy.get('.confirm_popup__button_confirm')
         .should('be.visible')
         .click()
       cy.get('[data-cy=confirm_popup__button_confirm]')
         .should('be.visible')
         .click()
-      cy.contains('.commentArea__textinput', commentContent)
+      cy.contains('.thread__contentpage', commentContent)
     })
 
     it('should save the document if user clicks at "Validate anyway" in the popup', () => {
@@ -103,7 +103,7 @@ describe('In a thread', function () {
       cy.get('[data-cy=confirm_popup__button_cancel]')
         .should('be.visible')
         .click()
-      cy.contains('.commentArea__textinput', commentContent)
+      cy.contains('.thread__contentpage', commentContent)
     })
   })
 })
