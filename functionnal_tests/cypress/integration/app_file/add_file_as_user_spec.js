@@ -6,6 +6,7 @@ context('Add file(s) with PopupCreateFile', function () {
   const pngFile = 'artikodin.png'
 
   before(function () {
+    this.skip() // FIXME - MB - 2021-10-13 - Unstable test, see https://github.com/tracim/tracim/issues/4995
     cy.resetDB()
     cy.setupBaseDB()
     cy.fixture('baseWorkspace').then(workspace => {
