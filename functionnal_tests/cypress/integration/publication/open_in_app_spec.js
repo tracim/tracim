@@ -20,7 +20,7 @@ describe('Open publications in the thread app', () => {
         })
 
         cy.get('#wysiwygTimelineCommentPublication').type(' @' + user.username + '  ')
-        cy.get('.publications__publishArea__buttons__submit').click()
+        cy.get('.commentArea__submit__btn').click()
         cy.get('.feedItem__publication__body__content').should('be.visible')
         cy.clearCookies()
         cy.login(baseOtherUser)

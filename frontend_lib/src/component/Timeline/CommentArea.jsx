@@ -396,6 +396,7 @@ export class CommentArea extends React.Component {
                 text={props.buttonLabel || props.t('Send')}
                 type='button'
                 key='commentArea__comment__send'
+                dataCy='commentArea__comment__send'
               />
             </div>
           </div>
