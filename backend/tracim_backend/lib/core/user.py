@@ -8,6 +8,7 @@ import typing as typing
 
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
+from marshmallow import ValidationError
 from pyramid_ldap3 import Connector
 from sqlakeyset import Page
 from sqlakeyset import get_page
@@ -21,6 +22,7 @@ from sqlalchemy.sql.expression import cast
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.email_validators import TracimEmailValidator
 from tracim_backend.app_models.validator import TracimValidator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -834,14 +836,11 @@ class UserApi(object):
         - check format
         - futur active check for email ? (dns based ?)
         """
-        # TODO - G.M - 2018-07-05 - find a better way to check email
-        if not email:
+        try:
+            TracimEmailValidator()(email)
+            return True
+        except ValidationError:
             return False
-
-        if len(email.split("@")) != 2:
-            return False
-
-        return True
 
     def _check_username_correctness(self, username: str) -> bool:
         if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:

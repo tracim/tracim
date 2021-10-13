@@ -27,6 +27,7 @@ import {
   setUserDisconnected,
   USAGE_CONDITIONS,
   USER,
+  USER_CALL,
   USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
@@ -1362,4 +1363,68 @@ export const logoutUser = (history) => async (dispatch) => {
   } else {
     dispatch(newFlashMessage(i18n.t('Disconnection error', 'danger')))
   }
+}
+
+export const postCreateUserCall = (callerId, calleeId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/outgoing_calls`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({ callee_id: calleeId })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
+
+export const putSetOutgoingUserCallState = (callerId, callId, userCallState) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/outgoing_calls/${callId}/state`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({ state: userCallState })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
+
+export const putSetIncomingUserCallState = (callerId, callId, userCallState) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/incoming_calls/${callId}/state`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({ state: userCallState })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
+
+export const postGetUserCall = (callerId, calleeId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${calleeId}/incoming_calls`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({ callee_id: calleeId })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
 }

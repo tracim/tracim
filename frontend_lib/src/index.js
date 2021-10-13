@@ -63,7 +63,8 @@ import {
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
   htmlToText,
-  addExternalLinksIcons
+  addExternalLinksIcons,
+  USER_CALL_STATE
 } from './helper.js'
 
 import {
@@ -334,6 +335,7 @@ export {
   PROFILE_LIST,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
+  USER_CALL_STATE,
   ACCESSIBLE_SPACE_TYPE_LIST,
   SUBSCRIPTION_TYPE,
   SUBSCRIPTION_TYPE_LIST,

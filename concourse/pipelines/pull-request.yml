@@ -1,4 +1,8 @@
 ## YAML definitions re-used in plans
+definitions:
+  main_python_version: &main_python_version "3.6.14"
+  python_versions: &python_versions ["3.5.10" , "3.6.14", "3.7.11"]
+  databases: &databases ["sqlite", "postgresql", "mysql", "mariadb"]
 
 # plan step to put the current job name as pending in github's PR
 pending_status_notification: &pending_status_notification
@@ -33,6 +37,11 @@ resource_types:
   type: registry-image
   source:
     repository: aoldershaw/github-pr-resource
+- name: abort-running-builds
+  type: registry-image
+  source:
+    repository: algooci/abort-running-builds-resource
+
 
 resources:
 # the github's pull-request
@@ -47,16 +56,22 @@ resources:
     repository: tracim/tracim
     access_token: ((github-access-token))
     number: ((number))
-# docker image used for running tests.
 - name: test-image
   type: registry-image
   source:
     repository: algooci/tracim
+# resource used to abort the running builds before starting our test jobs
+- name: abort-running-builds
+  type: abort-running-builds
+  source:
+    username: ((concourse-bot-user))
+    password: ((concourse-bot-password))
 
 
 # Pipeline jobs:
 # 1. update this pipeline if the PR's file has changed
-# 2. run backend (lint -> quick tests -> full tests) checks
+# 2. abort any running build matching the current PR
+# 3. run backend (lint -> quick tests -> full tests) checks
 #    run frontend (lint + unit tests) checks
 #    run end-to-end (cypress) checks
 #    All of these in parallel.
@@ -67,11 +82,18 @@ jobs:
   - get: pull-request
     trigger: true
 
+  - put: abort-running-builds
+
   - set_pipeline: self
     file: pull-request/concourse/pipelines/pull-request.yml
     vars:
       github-webhook-token: ((github-webhook-token))
       github-access-token: ((github-access-token))
+      concourse-bot-user: ((concourse-bot-user))
+      concourse-bot-password: ((concourse-bot-password))
+      docker-registry: ((docker-registry))
+    instance_vars:
+      number: ((number))
 
 - name: backend-tests
   <<: *status_notifications
@@ -97,11 +119,11 @@ jobs:
 
   - across:
     - var: python_version
-      values: ["3.5.10" , "3.6.14", "3.7.11"]
+      values: *python_versions
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
     image: test-image
-    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
+    # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?
     privileged: true
     config:
       platform: linux
@@ -112,14 +134,15 @@ jobs:
         path: concourse/scripts/backend-quick-tests
         args:
           - ((.:python_version))
+          - ((docker-registry))
 
   - across:
     - var: database
-      values: ["sqlite", "postgresql", "mysql", "mariadb"]
+      values: *databases
       max_in_flight: all
     task: backend-full-tests_((.:database))
     image: test-image
-    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
+    # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?
     privileged: true
     config:
       platform: linux
@@ -129,8 +152,9 @@ jobs:
         dir: pull-request
         path: concourse/scripts/backend-full-tests
         args:
-          - "3.7.11"
+          - *main_python_version
           - ((.:database))
+          - ((docker-registry))
 
 - name: frontend-tests
   <<: *status_notifications
@@ -169,7 +193,7 @@ jobs:
   - task: end-to-end-cypress-tests
     image: test-image
     # needed for docker during tests
-    # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
+    # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?
     privileged: true
     config:
       platform: linux
@@ -178,3 +202,6 @@ jobs:
       run:
         dir: pull-request
         path: concourse/scripts/end-to-end-cypress-tests
+        args:
+          - *main_python_version
+          - ((docker-registry))

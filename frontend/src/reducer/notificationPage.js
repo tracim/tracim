@@ -62,6 +62,14 @@ export const serializeNotification = notification => {
   }
 }
 
+export function sortByCreatedDate (arrayToSort) {
+  return arrayToSort.sort(function (a, b) {
+    if (a.created < b.created) return 1
+    if (a.created > b.created) return -1
+    return 0
+  })
+}
+
 export const hasSameAuthor = authorList => {
   return !authorList.some((author, index) => {
     return !author || (index && author.userId !== authorList[index - 1].userId)
@@ -108,12 +116,14 @@ const addNewNotificationGroup = (notification, newNotificationList, indexInNewLi
       ], 'userId')
 
       for (let i = 0; i < (numberOfNotificationsToGroup - 1); i++) newNotificationList.pop()
+      const notificationGroupList = sortByCreatedDate([notification, ...previousNotificationList])
 
       newNotificationList.push({
         author: authorList,
+        created: notificationGroupList[0].created,
         id: notification.id,
         type: `${numberOfCriteria}${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`,
-        group: [notification, ...previousNotificationList]
+        group: notificationGroupList
       })
     }
   }
@@ -138,6 +148,7 @@ export const belongsToGroup = (notification, groupedNotification, numberOfCriter
     groupedNotification.group.push(notification)
     groupedNotification.type =
       `${numberOfCriteria}${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
+    groupedNotification.created = notification.created
     return true
   }
 }
@@ -227,14 +238,14 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${SET}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
         .map(notification => (serializeNotification(notification)))
-      const groupedNotificationList = groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id'))
+      const groupedNotificationList = sortByCreatedDate(groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id')))
       return { ...state, list: groupedNotificationList }
     }
 
     case `${APPEND}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
         .map(notification => (serializeNotification(notification)))
-      const groupedNotificationList = groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id'))
+      const groupedNotificationList = sortByCreatedDate(groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id')))
       return {
         ...state,
         list: [...state.list, ...groupedNotificationList]
@@ -252,7 +263,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
       return {
         ...state,
-        list: newNotificationList,
+        list: sortByCreatedDate(newNotificationList),
         unreadMentionCount: newUnreadMentionCount,
         unreadNotificationCount: state.unreadNotificationCount + 1
       }
