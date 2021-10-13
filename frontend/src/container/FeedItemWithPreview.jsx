@@ -375,6 +375,7 @@ export class FeedItemWithPreview extends React.Component {
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                   onClickToggleCommentList={this.handleClickToggleComments}
                   discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                  threadLength={props.commentList.length}
                   showTimeline={props.showTimeline}
                 />
               )
@@ -400,6 +401,7 @@ export class FeedItemWithPreview extends React.Component {
                     content={props.content}
                     onClickToggleCommentList={this.handleClickToggleComments}
                     discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                    discussionToggleButtonLabelMobile={props.commentList.length > 0 ? props.commentList.length : ''}
                     showTimeline={props.showTimeline}
                     isPublication={props.isPublication}
                   />
