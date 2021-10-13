@@ -440,6 +440,7 @@ export class NotificationWall extends React.Component {
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
+                isFirst={i === 0}
                 read={false}
                 key={notification.id}
               >

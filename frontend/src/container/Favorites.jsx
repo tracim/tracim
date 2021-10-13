@@ -70,6 +70,7 @@ const UnavailableContent = translate()(props => {
       read
       contentType={props.contentTypeInfo}
       isLast={props.isLast}
+      isFirst={props.isFirst}
       customClass='unavailableContent contentListItem'
     >
       <ContentType
@@ -219,6 +220,7 @@ export class Favorites extends React.Component {
       />
     )
     const isLast = index === props.favoriteList.length - 1
+    const isFirst = index === 0
     if (!favorite.content) {
       const contentTypeInfo = props.contentType.find(info => info.slug === favorite.originalType)
       return (
@@ -227,6 +229,7 @@ export class Favorites extends React.Component {
           label={favorite.originalLabel}
           key={favorite.contentId}
           isLast={isLast}
+          isFirst={isFirst}
         >
           {favoriteButton}
         </UnavailableContent>
@@ -240,6 +243,7 @@ export class Favorites extends React.Component {
         userLang={props.user.lang}
         key={favorite.contentId}
         isLast={isLast}
+        isFirst={isFirst}
         breadcrumbsList={state.contentBreadcrumbsList[index]}
         commentsCount={state.contentCommentsCountList[index]}
         customClass='favorites__item'
