@@ -459,7 +459,7 @@ export class Publications extends React.Component {
     if (state.publicationWysiwyg) globalThis.tinymce.get(wysiwygId).setContent('')
   }
 
-  handleClickValidateAnyway = async (publication, publicationAsFileList) => {
+  handleClickValidateAnyway = async (publication, publicationAsFileList = []) => {
     const { state } = this
 
     if (state.showEditPopup) {
