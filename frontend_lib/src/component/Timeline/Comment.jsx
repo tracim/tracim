@@ -173,7 +173,7 @@ const Comment = props => {
           {props.isPublication && props.showTimeline && (
             <IconButton
               text={props.discussionToggleButtonLabel}
-              textMobile={`(${props.threadLength})`}
+              textMobile={props.threadLength > 0 ? props.threadLength : ''}
               icon='far fa-comment'
               onClick={props.onClickToggleCommentList}
               customClass='buttonComments'
