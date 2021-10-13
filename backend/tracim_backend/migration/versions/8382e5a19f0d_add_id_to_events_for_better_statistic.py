@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "8382e5a19f0d"
-down_revision = "94893551ad7c"
+down_revision = "4677d955d247"
 
 events = sa.Table(
     "events",
