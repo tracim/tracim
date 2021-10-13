@@ -198,6 +198,7 @@ jobs:
       env:
         - DB=mariadb
       if: commit_message !~ /(\[skip ci pytest\])/
+
     # INFO - G.M - 2019-04-25 - Stage: Functional Test ###
     - stage: quick-tests/static-tests/backend/frontend
       name: Functional tests using Cypress
