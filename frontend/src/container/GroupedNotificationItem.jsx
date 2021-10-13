@@ -180,7 +180,7 @@ export class GroupedNotificationItem extends React.Component {
             className='notification__list__item__meta__date'
             title={formatAbsoluteDate(notification.created, user.lang)}
           >
-            {props.shortDate(notification.group[notification.group.length - 1].created)}
+            {props.shortDate(notification.created)}
           </div>
           <div className='notification__list__item__meta__space'>
             {(numberOfWorkspaces === 1 && notification.group[0].workspace &&

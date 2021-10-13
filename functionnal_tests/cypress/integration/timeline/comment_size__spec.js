@@ -11,7 +11,7 @@ const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attr
 const commentArea = '.comment__body'
 const commentText = '.comment__body__content__text'
 const cancelDocBtn = '.html-document__editionmode__cancel'
-const submitBtn = '.timeline__texteditor__submit__btn'
+const submitBtn = '.commentArea__submit__btn'
 const commentField = '#wysiwygTimelineComment'
 
 describe('Add a new comment', () => {

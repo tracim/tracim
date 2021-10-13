@@ -1,3 +1,17 @@
+.callpopup
+  width 300px
+  &__text
+    margin-bottom standardSpacing
+  &__body
+    width 100%
+    &__btn
+      margin textSpacing standardSpacing
+      display flex
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+
 .profile
   &__text__loading
     background-color lightGrey
@@ -34,6 +48,8 @@
     padding-right pageSpacing
     background-color offWhite
     display flex
+    &__callBtn
+      margin 6px
     &__avatar
       position relative
       &__medium

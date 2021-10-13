@@ -17,9 +17,9 @@ describe('Dashboard button list', () => {
     cy.get('button[title="Lancer une discussion"]').contains('Lancer une discussion')
 
     cy.changeLanguage('pt')
-    cy.get('button[title="Começar uma discussão').contains('Começar uma discussão')
+    cy.get('button[title="Começar uma discussão"]').contains('Começar uma discussão')
 
     cy.changeLanguage('de')
-    cy.get('button[title="Começar uma discussão').contains('Diskussion beginnen')
+    cy.get('button[title="Diskussion beginnen"]').contains('Diskussion beginnen')
   })
 })

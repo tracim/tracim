@@ -115,3 +115,8 @@ These parameters can also be changed with an environment variable as described i
 
 NB: there are no restrictions on the type of file you can add, but we suggest using a format
 supported by browsers. These files it will be accessible through links.
+
+### Change Audio file
+
+The original audio track used here for 'incoming-call.ogg' is 'data_sounds_ringtones_Solarium.ogg', it was found in Android's repository : https://android.googlesource.com/platform/frameworks/base.git which is licenced under Apache 2.0.
+If you want to change it, choose another audio file and change it's name, or change the variable.

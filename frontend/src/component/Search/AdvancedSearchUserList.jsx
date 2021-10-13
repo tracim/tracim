@@ -34,6 +34,7 @@ export const AdvancedSearchUserList = props => {
           read
           contentType={searchItem}
           isLast={index === props.userSearch.resultList.length - 1}
+          isFirst={index === 0}
           key={searchItem.userId}
         >
           <Link

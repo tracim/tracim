@@ -63,7 +63,8 @@ import {
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
   htmlToText,
-  addExternalLinksIcons
+  addExternalLinksIcons,
+  USER_CALL_STATE
 } from './helper.js'
 
 import {
@@ -112,7 +113,7 @@ import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
-import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+import CommentArea from './component/Timeline/CommentArea.jsx'
 import EditCommentPopup from './component/Timeline/EditCommentPopup.jsx'
 
 import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
@@ -272,7 +273,7 @@ export {
   addRevisionFromTLM,
   AVATAR_SIZE,
   buildContentPathBreadcrumbs,
-  CommentTextArea,
+  CommentArea,
   AddFileToUploadButton,
   DisplayFileToUpload,
   createSpaceTree,
@@ -334,6 +335,7 @@ export {
   PROFILE_LIST,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
+  USER_CALL_STATE,
   ACCESSIBLE_SPACE_TYPE_LIST,
   SUBSCRIPTION_TYPE,
   SUBSCRIPTION_TYPE_LIST,

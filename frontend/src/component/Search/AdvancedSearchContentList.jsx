@@ -68,6 +68,7 @@ export const AdvancedSearchContentList = props => {
             read
             contentType={searchItem.contentType}
             isLast={index === resultList.length - 1}
+            isFirst={index === 0}
             key={searchItem.contentId}
           >
             <Link

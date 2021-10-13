@@ -17,9 +17,9 @@ export function removeLocalStorageItem (contentType, content, field) {
   )
 }
 
-export function setLocalStorageItem (contentType, content, field, value) {
+export function setLocalStorageItem (contentType, contentId, workspaceId, field, value) {
   localStorage.setItem(
-    generateLocalStorageContentId(content.workspace_id, content.content_id, contentType, field),
+    generateLocalStorageContentId(workspaceId, contentId, contentType, field),
     value
   )
 }

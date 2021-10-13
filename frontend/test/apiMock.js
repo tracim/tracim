@@ -201,6 +201,13 @@ const mockPutAllNotificationAsRead204 = (apiUrl, userId) => {
     .reply(204, true)
 }
 
+const mockPutContentNotificationAsRead204 = (apiUrl, userId, contentId, parentId = null) => {
+  const parentIdQuery = parentId ? `&parent_ids=${parentId}` : ''
+  return nock(apiUrl)
+    .put(`/users/${userId}/messages/read?content_ids=${contentId}${parentIdQuery}`)
+    .reply(204, true)
+}
+
 const mockGetContentComments200 = (apiUrl, workspaceId, contentId, comments, query = '?page_token=&count=0&sort=created:asc') => {
   return nock(apiUrl)
     .get(`/workspaces/${workspaceId}/contents/${contentId}/comments${query}`)
@@ -262,6 +269,7 @@ export {
   mockMyselfWorkspaceDoNotify204,
   mockPostUserLogout204,
   mockPutAllNotificationAsRead204,
+  mockPutContentNotificationAsRead204,
   mockPutContentItemMove200,
   mockPutContentItemMove400,
   mockPutUserWorkspaceDoNotify204,

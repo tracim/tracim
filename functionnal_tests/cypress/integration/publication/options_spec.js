@@ -1,6 +1,7 @@
 import { PAGES } from '../../support/urls_commands'
 
-const publishButton = '.publications__publishArea__buttons__submit'
+const publishButton = '.commentArea__submit__btn'
+const sendButton = '[data-cy=commentArea__comment__send]'
 const text = 'Hello, world'
 
 describe('Publications page', () => {
@@ -35,7 +36,7 @@ describe('Publications page', () => {
     cy.get('#wysiwygTimelineComment1')
       .should('be.visible')
       .type(text)
-    cy.get('.timeline__texteditor__submit__btn')
+    cy.contains(sendButton, 'Send')
       .should('be.enabled')
       .click()
     cy.contains('.feedItem__publication__messagelist__item .comment__body__content__text', text)

@@ -11,7 +11,10 @@ import {
   PROFILE,
   IconButton,
   getAvatarBaseUrl,
-  getCoverBaseUrl
+  getCoverBaseUrl,
+  USER_CALL_STATE,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -25,8 +28,10 @@ import {
   getCustomPropertiesSchema,
   getCustomPropertiesUiSchema,
   getUserCustomPropertiesDataSchema,
-  putUserCustomPropertiesDataSchema
-} from '../action-creator.async'
+  putUserCustomPropertiesDataSchema,
+  postCreateUserCall,
+  putSetOutgoingUserCallState
+} from '../action-creator.async.js'
 import { serializeUserProps } from '../reducer/user.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
@@ -53,6 +58,7 @@ const POPUP_DISPLAY_STATE = {
 }
 const AVATAR_IMAGE_DIMENSIONS = '100x100'
 const COVER_IMAGE_DIMENSIONS = '1300x150'
+const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
@@ -122,12 +128,39 @@ export class PublicProfile extends React.Component {
       informationDataSchema: {},
       personalPageDataSchema: {},
       dataSchemaObject: {},
-      displayUploadPopup: undefined
+      displayUploadPopup: undefined,
+      userCall: undefined,
+      unansweredCallTimeoutId: -1
     }
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallModified },
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCallCreated }
+    ])
+  }
+
+  handleUserCallModified = (tlm) => {
+    const { state } = this
+    clearTimeout(state.unansweredCallTimeoutId)
+    this.setState({ unansweredCallTimeoutId: -1, userCall: tlm.fields.user_call })
+  }
+
+  handleUserCallCreated = (tlm) => {
+    this.setState({ userCall: tlm.fields.user_call })
+  }
+
+  handleClickCallButton = async () => {
+    const { props, state } = this
+    await props.dispatch(postCreateUserCall(props.user.userId, state.displayedUser.userId))
+    const setUserCallUnanswered = () => {
+      const { props, state } = this
+      props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.UNANSWERED))
+    }
+    const id = setTimeout(setUserCallUnanswered, UNANSWERED_CALL_TIMEOUT)
+    this.setState({ unansweredCallTimeoutId: id })
   }
 
   handleAllAppChangeLanguage = data => {
@@ -440,6 +473,7 @@ export class PublicProfile extends React.Component {
             breadcrumbsList={props.breadcrumbs}
             onChangeAvatarClick={this.handleChangeAvatarClick}
             changeAvatarEnabled={isPublicProfileEditable}
+            onClickDisplayCallPopup={this.handleClickCallButton}
           />
 
           <div className='profile__content'>

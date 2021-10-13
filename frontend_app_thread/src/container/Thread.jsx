@@ -52,7 +52,6 @@ export class Thread extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       newComment: '',
-      newCommentAsFileList: [],
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
@@ -176,18 +175,6 @@ export class Thread extends React.Component {
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
@@ -275,39 +262,33 @@ export class Thread extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   searchForMentionOrLinkInQuery = async (query) => {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
       state.config.workspace && state.config.workspace.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment()
+      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
-  handleClickValidateAnywayNewComment = () => {
+  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
-        state.newComment,
-        state.newCommentAsFileList,
+        comment,
+        commentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -467,6 +448,8 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
+                contentId={state.content.content_id}
+                contentType={state.content.content_type}
                 loading={props.loadingTimeline}
                 customClass={`${state.config.slug}__contentpage`}
                 customColor={color}
@@ -475,13 +458,9 @@ export class Thread extends React.Component {
                 apiUrl={state.config.apiUrl}
                 timelineData={props.timeline}
                 newComment={state.newComment}
-                newCommentAsFileList={state.newCommentAsFileList}
                 disableComment={!state.content.is_editable}
                 availableStatusList={state.config.availableStatuses}
                 wysiwyg={state.timelineWysiwyg}
-                onChangeNewComment={this.handleChangeNewComment}
-                onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                 onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
                 allowClickOnRevision={false}
@@ -497,7 +476,7 @@ export class Thread extends React.Component {
                 isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
                 onClickCancelSave={this.handleCancelSave}
                 onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-                onInitWysiwyg={this.handleInitWysiwyg}
+                wysiwygIdSelector='#wysiwygTimelineComment'
                 workspaceId={state.content.workspace_id}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}

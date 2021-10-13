@@ -6,7 +6,9 @@ describe('Space settings in reader mode', () => {
   const flashMessageClass = '.flashmessage__container__content__text__paragraph'
   const flashMessageText = 'Your tag has been created'
 
-  before(() => {
+  before(function  () {
+    this.skip() // MB - 2021-10-11 - unstable test, see issue : https://github.com/tracim/tracim/issues/4995
+
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
@@ -34,7 +36,7 @@ describe('Space settings in reader mode', () => {
   })
 
   beforeEach(() => {
-    cy.loginAs('administrators')
+  cy.loginAs('administrators')
     cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
     cy.contains('.userstatus__role__text', 'Reader')
     cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })

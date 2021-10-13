@@ -36,6 +36,7 @@ class ContentItem extends React.Component {
         connectDragSource={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : undefined}
         contentType={props.contentType}
         isLast={props.isLast}
+        isFirst={props.isFirst}
         key={props.id}
         id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.contentId}`}
         ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragPreview : undefined}

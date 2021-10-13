@@ -2,8 +2,8 @@ import { PAGES } from '../../support/urls_commands'
 import { SELECTORS } from '../../support/generic_selector_commands'
 
 const publicationInput = '#wysiwygTimelineCommentPublication'
-const publishButton = '.publications__publishArea__buttons__submit'
-const addFileButton = '.publications__publishArea__buttons__right .AddFileToCommentButton'
+const publishButton = '.commentArea__submit__btn'
+const addFileButton = '.AddFileToCommentButton'
 
 const pngFile = 'artikodin.png'
 const fileName = 'file_exemple1'

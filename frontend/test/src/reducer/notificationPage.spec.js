@@ -23,7 +23,8 @@ import notificationPage, {
   hasSameAuthor,
   hasSameContent,
   hasSameWorkspace,
-  serializeNotification
+  serializeNotification,
+  sortByCreatedDate
 } from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
@@ -298,5 +299,11 @@ describe('belongsToGroup', () => {
 
   it('should return false if groupedNotification has no group', () => {
     expect(belongsToGroup(defaultElement, {}, 2)).to.be.equal(false)
+  })
+})
+
+describe('sortByCreatedDate', () => {
+  it('should return the array sorted by created', () => {
+    expect(sortByCreatedDate([{ created: 5 }, { created: 2 }, { created: 9 }])).to.deep.equal([{ created: 9 }, { created: 5 }, { created: 2 }])
   })
 })

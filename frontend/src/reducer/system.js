@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash'
 import {
   APP_LIST,
   CONTENT_TYPE_LIST,
@@ -7,7 +8,6 @@ import {
   LOGIN,
   HEAD_TITLE
 } from '../action-creator.sync.js'
-import { buildHeadTitle } from 'tracim_frontend_lib'
 
 export const defaultSystem = {
   redirectLogin: '',
@@ -15,6 +15,7 @@ export const defaultSystem = {
   appListLoaded: false,
   contentTypeListLoaded: false,
   config: {},
+  titleArgs: [],
   headTitle: ''
 }
 
@@ -36,9 +37,10 @@ export function system (state = defaultSystem, action) {
       return { ...state, config: action.config }
 
     case `${SET}/${HEAD_TITLE}`: {
-      const newHeadTitle = buildHeadTitle([action.headTitle, state.config.instance_name])
-      if (newHeadTitle === state.headTitle || !state.config.instance_name) return state
-      return { ...state, headTitle: newHeadTitle }
+      const titleArgs = action.titlePrefix === '' ? [action.headTitle, state.config.instance_name] : [action.titlePrefix, action.headTitle, state.config.instance_name]
+
+      if (isEqual(titleArgs, state.titleArgs)) return state
+      return { ...state, titleArgs, headTitle: action.headTitle }
     }
 
     default:

@@ -53,6 +53,8 @@ export const USER_PROFILE_COVER_NAME = `${USER}/ProfileCoverName`
 export const updateUserProfileAvatarName = newAvatarName => ({ type: `${SET}/${USER_PROFILE_AVATAR_NAME}`, newAvatarName })
 export const updateUserProfileCoverName = newCoverName => ({ type: `${SET}/${USER_PROFILE_COVER_NAME}`, newCoverName })
 
+export const USER_CALL = `${USER}/outgoing_calls`
+
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
@@ -155,7 +157,7 @@ export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
 
 export const HEAD_TITLE = 'HeadTitle'
-export const setHeadTitle = headTitle => ({ type: `${SET}/${HEAD_TITLE}`, headTitle })
+export const setHeadTitle = (headTitle, titlePrefix = '') => ({ type: `${SET}/${HEAD_TITLE}`, headTitle, titlePrefix })
 
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })

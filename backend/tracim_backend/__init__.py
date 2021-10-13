@@ -312,6 +312,13 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(tag_controller.bind, route_prefix=BASE_API)
     configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
     configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
+    if app_config.CALL__ENABLED:
+        # NOTE - 2021-09-22 - S.G - importing here so that hapic only discover those routes
+        # when CALL_ENABLED is True.
+        from tracim_backend.views.core_api.call import CallController
+
+        call_controller = CallController()
+        configurator.include(call_controller.bind, route_prefix=BASE_API)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():
