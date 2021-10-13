@@ -35,11 +35,11 @@ describe('Mentions in publications', () => {
       cy.window().then((win) => {
         cy.get('#wysiwygTimelineCommentPublication').type(`${win.location.origin}/ui/workspaces/${workspaceId2}/publications`)
       })
-      cy.get('.publications__publishArea__buttons__submit').click()
+      cy.get('.commentArea__submit__btn').click()
       cy.get('.feedItem__publication__body__content a').click()
       cy.get('.publications__empty').should('be.visible')
       cy.get('#wysiwygTimelineCommentPublication').type('@' + otherUserName)
-      cy.get('.publications__publishArea__buttons__submit').click()
+      cy.get('.commentArea__submit__btn').click()
       cy.get('.feedItem__publication__body__content').contains('@' + otherUserName)
       // INFO - RJ - 2021-09-07 - The logic here is that an invalid mention message would prevent
       // posting and make the test fail

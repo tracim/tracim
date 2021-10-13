@@ -12,7 +12,7 @@ let fileId
 let workspaceId
 
 const linkChar = '#'
-const commentAreaInput = '.timeline__texteditor__textinput #wysiwygTimelineComment'
+const commentAreaInput = '.commentArea__textinput #wysiwygTimelineComment'
 
 describe('A comment in simple edition', () => {
   before(() => {

@@ -1,6 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 
-const publishButton = '.publications__publishArea__buttons__submit'
+const publishButton = '.commentArea__submit__btn'
 const text = 'Hello, world'
 
 describe('Publications', () => {

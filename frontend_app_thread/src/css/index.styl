@@ -19,6 +19,11 @@
     &__contentpage
       width 100%
       height calc(100% - 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
+      & .timeline__texteditor
+        margin 0
+      & .commentArea
+        &__textinput > textarea
+          height 80px
       &__top
         display flex
         justify-content flex-end
@@ -38,4 +43,4 @@
 
 @media (max-width: max-xs)
   .thread .timeline
-    height "calc(100vh - %s)" % headerHeight
+    height "calc(100vh - %s)" % (headerHeight * 2 + 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
