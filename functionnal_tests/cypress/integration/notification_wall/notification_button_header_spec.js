@@ -55,10 +55,10 @@ describe('Check notification dot', () => {
 
     describe(`As ${baseUser.username} sending ${defaultAdmin.username} a notifications`, () => {
       it('create a general notifiation', () => {
-        cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+        cy.get('.commentArea__textinput #wysiwygTimelineComment')
           .should('be.visible')
           .type(comment)
-        cy.get('.timeline__texteditor__submit__btn')
+        cy.get('.commentArea__submit__btn')
           .should('be.visible')
           .click()
         cy.contains('.thread__contentpage__comment', comment)
@@ -78,10 +78,10 @@ describe('Check notification dot', () => {
       })
 
       it('create a mention notifiation', () => {
-        cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+        cy.get('.commentArea__textinput #wysiwygTimelineComment')
           .should('be.visible')
           .type(commentAll)
-        cy.get('.timeline__texteditor__submit__btn')
+        cy.get('.commentArea__submit__btn')
           .should('be.visible')
           .click()
         cy.contains('.thread__contentpage__comment', commentAll)

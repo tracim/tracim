@@ -17,11 +17,9 @@
     margin-block-end standardSpacing
   &__reorder
     margin auto auto standardSpacing
-  &__publishArea
-    display flex
-    flex-direction column
-    margin-top auto
-    padding 0 pageSpacing pageSpacing
+  .publishAreaContainer
+    margin 0 pageSpacing
+    padding-bottom pageSpacing
     & textarea
       border borderStyle
       border-radius standardBorderRadius
@@ -34,30 +32,12 @@
       order 2
     & .autocomplete
       order 1
-    &__buttons
-      display flex
-      justify-content space-between
-      margin-top standardSpacing
-      order 3
-      > :last-child
-        margin-inline-start auto
-      &__submit .iconbutton__icon
-        margin-inline-end 8px
-      &__left
-        &__advancedEdition
-          margin-inline-end auto
-          font-size metadataFontSize
-      &__right
-        display flex
 
-.publishAreaContainer
-  margin 0 standardSpacing
 
 @media (max-width: max-xs)
   .publications
     > .ScrollToBottomContents > .tabBar
       margin-bottom standardSpacing
-    &__publishArea
+    .publishAreaContainer
+      margin 0
       padding 0 standardSpacing standardSpacing
-      &__buttons__left__advancedEdition
-        display none

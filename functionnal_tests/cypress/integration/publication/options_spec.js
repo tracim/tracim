@@ -35,7 +35,7 @@ describe('Publications page', () => {
     cy.get('#wysiwygTimelineComment1')
       .should('be.visible')
       .type(text)
-    cy.get('.timeline__texteditor__submit__btn')
+    cy.get('.commentArea__submit__btn')
       .should('be.enabled')
       .click()
     cy.contains('.feedItem__publication__messagelist__item .comment__body__content__text', text)

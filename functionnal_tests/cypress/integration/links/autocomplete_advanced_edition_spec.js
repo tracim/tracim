@@ -39,7 +39,7 @@ describe.skip('A comment in advanced edition', () => {
       pageName: PAGES.CONTENT_OPEN,
       params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
     })
-    cy.get('.timeline__texteditor__advancedtext__btn')
+    cy.get('.commentArea__advancedtext__btn')
       .should('be.visible')
       .click()
   })

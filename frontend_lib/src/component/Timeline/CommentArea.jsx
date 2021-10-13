@@ -262,7 +262,6 @@ export class CommentArea extends React.Component {
 
   handleValidateInvalidMentionPopup = () => {
     const { props, state } = this
-    console.log('sdajdioajiosd', state.newComment, state.newCommentAsFileList)
     props.onClickSaveAnyway(state.newComment, state.newCommentAsFileList)
     this.setState({ newComment: '', newCommentAsFileList: [] })
   }
@@ -303,7 +302,7 @@ export class CommentArea extends React.Component {
             msg={
               <>
                 {props.t('Your text contains mentions that do not match any member of this space:')}
-                <div className='timeline__texteditor__mentions'>
+                <div className='commentArea__mentions'>
                   {invalidMentionList.join(', ')}
                 </div>
               </>
@@ -318,7 +317,7 @@ export class CommentArea extends React.Component {
         <div
           className={classnames(
             `${props.customClass}__texteditor__textinput`,
-            'timeline__texteditor__textinput'
+            'commentArea__textinput'
           )}
         >
           {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
@@ -353,18 +352,18 @@ export class CommentArea extends React.Component {
         </div>
 
         {!props.hideSendButtonAndOptions && (
-          <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'timeline__texteditor__wrapper')}>
-            <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'timeline__texteditor__advancedtext')}>
+          <div className={classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')}>
+            <div className={classnames(`${props.customClass}__texteditor__advancedtext`, 'commentArea__advancedtext')}>
               <IconButton
                 customClass={classnames(
-                  `${props.customClass}__texteditor__advancedtext__btn timeline__texteditor__advancedtext__btn`
+                  `${props.customClass}__texteditor__advancedtext__btn commentArea__advancedtext__btn`
                 )}
                 disabled={props.disableComment}
                 text={props.wysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
                 onClick={props.onClickWysiwygBtn}
                 intent='link'
                 mode='light'
-                key='timeline__comment__advancedtext'
+                key='commentArea__comment__advancedtext'
               />
 
               <div>
@@ -376,7 +375,7 @@ export class CommentArea extends React.Component {
               </div>
             </div>
 
-            <div className={classnames(`${props.customClass}__texteditor__submit`, 'timeline__texteditor__submit')}>
+            <div className={classnames(`${props.customClass}__texteditor__submit`, 'commentArea__submit')}>
               <div>
                 <AddFileToUploadButton
                   workspaceId={props.workspaceId}
@@ -388,7 +387,7 @@ export class CommentArea extends React.Component {
               </div>
               <IconButton
                 color={props.customColor}
-                customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'timeline__texteditor__submit__btn')}
+                customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'commentArea__submit__btn')}
                 disabled={props.disableComment || (state.newComment === '' && state.newCommentAsFileList.length === 0)}
                 icon='far fa-paper-plane'
                 intent='primary'
@@ -396,7 +395,7 @@ export class CommentArea extends React.Component {
                 onClick={this.handleClickSend}
                 text={props.buttonLabel || props.t('Send')}
                 type='button'
-                key='timeline__comment__send'
+                key='commentArea__comment__send'
               />
             </div>
           </div>

@@ -9,7 +9,7 @@ let workspaceId
 let commentInputText
 let commentDisplayedText
 
-const commentAreaInput = '.timeline__texteditor__textinput #wysiwygTimelineComment'
+const commentAreaInput = '.commentArea__textinput #wysiwygTimelineComment'
 
 describe('In a comment', () => {
   before(() => {
@@ -39,7 +39,7 @@ describe('In a comment', () => {
       .should('be.visible')
       .type(commentInputText)
     cy.contains(commentAreaInput, commentInputText)
-    cy.get('.timeline__texteditor__submit__btn')
+    cy.get('.commentArea__submit__btn')
       .click()
   })
 

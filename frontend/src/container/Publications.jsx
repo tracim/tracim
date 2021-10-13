@@ -596,6 +596,7 @@ export class Publications extends React.Component {
               buttonLabel={props.t('Publish')}
               contentType={CONTENT_TYPE.THREAD}
               customColor={COLORS.PUBLICATION}
+              customClass='publishArea'
               id={wysiwygId}
               wysiwygIdSelector={`#${wysiwygId}`}
               searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}

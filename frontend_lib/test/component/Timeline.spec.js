@@ -54,9 +54,9 @@ describe('<Timeline />', () => {
 
   describe('Static design', () => {
     it('The advanced mode button should be disabled when disableComment is true', () => {
-      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('disabled')).to.equal(false)
+      expect(wrapper.find('.commentArea__advancedtext__btn').prop('disabled')).to.equal(false)
       wrapper.setProps({ disableComment: true })
-      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('disabled')).to.equal(true)
+      expect(wrapper.find('.commentArea__advancedtext__btn').prop('disabled')).to.equal(true)
       wrapper.setProps({ disableComment: false })
     })
   })
