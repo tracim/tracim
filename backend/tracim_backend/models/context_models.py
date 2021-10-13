@@ -78,6 +78,7 @@ class ConfigModel(object):
         user__self_registration__enabled: bool,
         ui__spaces__creation__parent_space_choice__visible: bool,
         limitation__maximum_online_users_message: str,
+        call__enabled: bool,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -97,6 +98,7 @@ class ConfigModel(object):
             ui__spaces__creation__parent_space_choice__visible
         )
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
+        self.call__enabled = call__enabled
 
 
 class ErrorCodeModel(object):
@@ -787,6 +789,14 @@ class LiveMessageQuery(BasePaginatedQuery):
         self.workspace_ids = string_to_list(workspace_ids, ",", int)
         self.include_not_sent = bool(include_not_sent)
         self.related_to_content_ids = string_to_list(related_to_content_ids, ",", int)
+
+
+class UserMessagesMarkAsReadQuery(object):
+    def __init__(
+        self, content_ids: str = "", parent_ids: str = "",
+    ):
+        self.content_ids = string_to_list(content_ids, ",", int)
+        self.parent_ids = string_to_list(parent_ids, ",", int)
 
 
 class UserMessagesSummaryQuery(object):

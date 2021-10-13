@@ -394,9 +394,9 @@ export class HtmlDocument extends React.Component {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
-  loadContent = async () => {
+  loadContent = () => {
     this.loadHtmlDocument()
-    this.props.loadTimeline(getHtmlDocRevision)
+    this.props.loadTimeline(getHtmlDocRevision, this.state.content)
   }
 
   handleLoadMoreTimelineItems = async () => {

@@ -449,13 +449,15 @@ export const parserStringToList = (string, separatorList = [',', ';', '\n']) => 
   return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
 }
 
-// INFO - GB - 2019-07-31 - This function check if the email has three parts arranged like somethig@something.somethig
+// INFO - GB - 2021-09-16 - This function checks if the string looks like an email (username@domain)
+// with a non empty username and a non-empty domain and without <, >, new line, comma or semicolon
+// Warning: These rules are the same in frontend and should be keep synchronised. If you change the rules
+// here, you shoul adapt the class TracimEmailValidator in tracim/backend/tracim_backend/app_models/email_validators.py
 export const checkEmailValidity = email => {
-  const parts = email.split('@')
-  if (parts.length !== 2) return false
-
-  const domainParts = parts[1].split('.')
-  return domainParts.length === 2
+  if (email.includes('<') && email.includes('>')) email = email.substring(email.indexOf('<') + 1, email.lastIndexOf('>'))
+  const firstPart = email.substr(0, email.lastIndexOf('@'))
+  const secondPart = email.substr(email.lastIndexOf('@') + 1)
+  return firstPart !== '' && secondPart !== '' && !/[,;<>\n]/.test(email)
 }
 
 export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) => {
@@ -825,4 +827,13 @@ export const getDocumentFromHTMLString = (htmlString) => {
   }
 
   return doc
+}
+
+export const USER_CALL_STATE = {
+  IN_PROGRESS: 'in_progress',
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected',
+  DECLINED: 'declined',
+  CANCELLED: 'cancelled',
+  UNANSWERED: 'unanswered'
 }

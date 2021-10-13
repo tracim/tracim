@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
+import { isEqual } from 'lodash'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -28,10 +29,12 @@ import {
   CardPopup,
   IconButton,
   TracimComponent,
+  buildHeadTitle,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
   LIVE_MESSAGE_ERROR_CODE,
   PAGE,
+  USER_CALL_STATE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
@@ -49,14 +52,17 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
+  getWorkspaceMemberList,
   getMyselfWorkspaceList,
   getNotificationList,
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
   getUserMessagesSummary,
-  getWorkspaceMemberList,
-  getAccessibleWorkspaces
+  getAccessibleWorkspaces,
+  putSetIncomingUserCallState,
+  putSetOutgoingUserCallState,
+  postCreateUserCall
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -90,8 +96,10 @@ import PublicProfile from './PublicProfile.jsx'
 import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
+import WorkspacePage from './WorkspacePage.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
+const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 export class Tracim extends React.Component {
   constructor (props) {
@@ -99,9 +107,14 @@ export class Tracim extends React.Component {
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
       displayConnectionError: false,
-      isNotificationWallOpen: false
+      isNotificationWallOpen: false,
+      displayCallPopup: false,
+      displayedUserId: 0,
+      userCall: undefined,
+      unansweredCallTimeoutId: -1
     }
 
+    this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
     this.liveMessageManager = new LiveMessageManager()
 
     // NOTE - S.G. - Unconditionally hide the original welcome element
@@ -123,6 +136,130 @@ export class Tracim extends React.Component {
       { name: CUSTOM_EVENT.USER_CONNECTED, handler: this.handleUserConnected },
       { name: CUSTOM_EVENT.USER_DISCONNECTED, handler: this.handleUserDisconnected }
     ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallModified },
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCallCreated }
+    ])
+  }
+
+  handleUserCallCreated = (tlm) => {
+    const { props } = this
+    const bell = '🔔'
+    const isMainTab = this.liveMessageManager.eventSource !== null
+
+    if (tlm.fields.user_call.callee.user_id === props.user.userId) {
+      this.setState({ userCall: tlm.fields.user_call })
+      this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
+      if (!isMainTab) return
+      this.audioCall.addEventListener('ended', function () {
+        this.currentTime = 0
+        this.play()
+      }, false)
+      this.audioCall.play()
+    }
+
+    if (tlm.fields.user_call.caller.user_id === props.user.userId) {
+      this.setState({ userCall: tlm.fields.user_call })
+    }
+  }
+
+  handleSetHeadTitle = (data, titlePrefix = '') => {
+    const { props } = this
+    console.log('%c<Tracim> Custom event SETHEADTITLE', 'color: #28a745', CUSTOM_EVENT.SET_HEAD_TITLE, data)
+    props.dispatch(setHeadTitle(data.title, titlePrefix))
+  }
+
+  handleClickOpenCallWindowCallee = () => {
+    const { state, props } = this
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
+    this.handleSetHeadTitle({ title: props.system.headTitle })
+    this.audioCall.pause()
+  }
+
+  handleClickOpenCallWindowCaller = () => {
+    const { state } = this
+    const isMainTab = this.liveMessageManager.eventSource !== null
+    if (!isMainTab) return
+    window.open(state.userCall.url)
+  }
+
+  handleClickRejectCall = () => {
+    const { props, state } = this
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.REJECTED))
+    this.handleSetHeadTitle({ title: props.system.headTitle })
+    this.audioCall.pause()
+  }
+
+  handleClickDeclineCall = () => {
+    const { props, state } = this
+    props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.DECLINED))
+    this.audioCall.pause()
+    this.handleSetHeadTitle({ title: props.system.headTitle })
+  }
+
+  handleUserCallModified = (tlm) => {
+    const { props, state } = this
+    const isMainTab = this.liveMessageManager.eventSource !== null
+    if (tlm.fields.user_call.callee.user_id === props.user.userId) {
+      this.setState({ userCall: undefined })
+
+      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+        this.handleSetHeadTitle({ title: props.system.headTitle })
+        this.audioCall.pause()
+        if (!isMainTab) return
+        window.open(tlm.fields.user_call.url)
+      }
+      if (tlm.fields.user_call.state === (USER_CALL_STATE.CANCELLED)) {
+        this.audioCall.pause()
+        this.handleSetHeadTitle({ title: props.system.headTitle })
+      }
+      if (tlm.fields.user_call.state === USER_CALL_STATE.REJECTED) {
+        this.audioCall.pause()
+        this.handleSetHeadTitle({ title: props.system.headTitle })
+      }
+      if (tlm.fields.user_call.state === USER_CALL_STATE.DECLINED) {
+        this.audioCall.pause()
+        this.handleSetHeadTitle({ title: props.system.headTitle })
+      }
+      if (tlm.fields.user_call.state === USER_CALL_STATE.UNANSWERED) {
+        this.audioCall.pause()
+        this.handleSetHeadTitle({ title: props.system.headTitle })
+      }
+    }
+    if (tlm.fields.user_call.caller.user_id === props.user.userId) {
+      clearTimeout(state.unansweredCallTimeoutId)
+      this.setState({
+        userCall: tlm.fields.user_call,
+        displayedUserId: tlm.fields.user_call.callee.user_id,
+        unansweredCallTimeoutId: -1
+      })
+      if (tlm.fields.user_call.state === USER_CALL_STATE.ACCEPTED) {
+        if (!isMainTab) return
+        window.open(tlm.fields.user_call.url)
+      }
+    }
+  }
+
+  handleClosePopup = () => {
+    this.setState({ userCall: undefined })
+  }
+
+  handleClickRetryButton = async () => {
+    const { props, state } = this
+    await props.dispatch(postCreateUserCall(props.user.userId, state.displayedUserId))
+    const setUserCallUnanswered = () => {
+      const { props, state } = this
+      props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.UNANSWERED))
+    }
+    const id = setTimeout(setUserCallUnanswered, UNANSWERED_CALL_TIMEOUT)
+    this.setState({ unansweredCallTimeoutId: id })
+  }
+
+  handleClickCancelButton = async () => {
+    const { props, state } = this
+    await props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.CANCELLED))
+    this.audioCall.pause()
   }
 
   handleClickLogout = async () => {
@@ -195,11 +332,6 @@ export class Tracim extends React.Component {
     this.props.dispatch(appendBreadcrumbs(data.breadcrumbs))
   }
 
-  handleSetHeadTitle = data => {
-    console.log('%c<Tracim> Custom event', 'color: #28a745', CUSTOM_EVENT.SET_HEAD_TITLE, data)
-    this.props.dispatch(setHeadTitle(data.title))
-  }
-
   handleUserDisconnected = () => {
     this.setState({ isNotificationWallOpen: false })
   }
@@ -241,7 +373,7 @@ export class Tracim extends React.Component {
 
   componentDidUpdate (prevProps) {
     this.handleHeadTitleAndFavicon(
-      prevProps.system.headTitle,
+      prevProps.system.titleArgs,
       prevProps.notificationPage.unreadNotificationCount,
       prevProps.notificationPage.unreadMentionCount
     )
@@ -377,17 +509,17 @@ export class Tracim extends React.Component {
     }
   }
 
-  handleHeadTitleAndFavicon = (prevHeadTitle, prevUnreadNotificationCount, prevUnreadMentionCount) => {
+  handleHeadTitleAndFavicon = (prevHeadTitleArgs, prevUnreadNotificationCount, prevUnreadMentionCount) => {
     const { props } = this
 
-    const hasHeadTitleChanged = prevHeadTitle !== props.system.headTitle
+    const hasHeadTitleChanged = !isEqual(prevHeadTitleArgs, props.system.titleArgs)
     const unreadMentionCount = props.notificationPage.unreadMentionCount
     const hasUnreadMentionCountChanged = unreadMentionCount !== prevUnreadMentionCount
     const unreadNotificationCount = props.notificationPage.unreadNotificationCount
     const hasUnreadNotificationCountChanged = unreadNotificationCount !== prevUnreadNotificationCount
 
-    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.headTitle !== '') {
-      let newHeadTitle = props.system.headTitle
+    if ((hasHeadTitleChanged || hasUnreadMentionCountChanged) && props.system.titleArgs.length > 0) {
+      let newHeadTitle = buildHeadTitle(props.system.titleArgs)
       if (unreadMentionCount > 0) {
         newHeadTitle = `(${unreadMentionCount > 99 ? '99+' : unreadMentionCount}) ${newHeadTitle}`
       }
@@ -447,6 +579,126 @@ export class Tracim extends React.Component {
           onRemoveFlashMessage={this.handleRemoveFlashMessage}
           t={props.t}
         />
+
+        {state.userCall && (state.userCall.callee.user_id === props.user.userId) && (
+          <CardPopup
+            customClass=''
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClickRejectCall}
+            label={props.t('{{username}} is calling you', { username: state.userCall.caller.public_name })}
+            faIcon='fas fa-phone'
+          >
+            <div className='callpopup__body'>
+
+              <div className='callpopup__body__btn'>
+                <IconButton
+                  onClick={this.handleClickRejectCall}
+                  text={props.t('Decline')}
+                  icon='fas fa-phone-slash'
+                />
+                <IconButton
+                  onClick={this.handleClickDeclineCall}
+                  text={props.t('I\'ll answer later')}
+                  icon='far fa-clock'
+                />
+
+                <IconButton
+                  intent='primary'
+                  mode='light'
+                  onClick={this.handleClickOpenCallWindowCallee}
+                  text={props.t('Open call')}
+                  icon='fas fa-phone'
+                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                />
+              </div>
+            </div>
+          </CardPopup>
+        )}
+
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.IN_PROGRESS && (
+          <CardPopup
+            customClass=''
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClickCancelButton}
+            label={props.t('Call in progress...')}
+            faIcon='fas fa-phone'
+          >
+            <div className='gallery__delete__file__popup__body'>
+              <div className='callpopup__text'>
+                {props.t('{{username}} has received your call. If accepted, the call will open automatically.', { username: state.userCall.callee.public_name })}
+              </div>
+
+              <div className='gallery__delete__file__popup__body__btn'>
+                <IconButton
+                  onClick={this.handleClickCancelButton}
+                  text={props.t('Cancel the call')}
+                  icon='fas fa-phone-slash'
+                />
+
+                <IconButton
+                  intent='primary'
+                  mode='light'
+                  onClick={this.handleClickOpenCallWindowCaller}
+                  text={props.t('Open call')}
+                  icon='fas fa-phone'
+                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                />
+              </div>
+            </div>
+          </CardPopup>
+        )}
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.REJECTED && (
+          <CardPopup
+            customClass='callpopup__body'
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClosePopup}
+            label={props.t('Call declined by {{username}}', { username: state.userCall.callee.public_name })}
+            faIcon='fas fa-phone-slash'
+          />
+        )}
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.DECLINED && (
+          <CardPopup
+            customClass='callpopup__body'
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClosePopup}
+            label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
+            faIcon='fas fa-phone-slash'
+          />
+        )}
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.UNANSWERED && (
+          <CardPopup
+            customClass='callpopup__body'
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClosePopup}
+            label={props.t('Call failed')}
+            faIcon='fas fa-phone-slash'
+          >
+            <div className='callpopup__text'>
+              {props.t('The call with {{username}} failed', { username: state.userCall.callee.public_name })}
+            </div>
+
+            <div className='gallery__delete__file__popup__body__btn'>
+              <IconButton
+                intent='primary'
+                mode='light'
+                onClick={this.handleClickRetryButton}
+                text={props.t('Try again')}
+                icon='fas fa-phone'
+                color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+              />
+            </div>
+          </CardPopup>
+        )}
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.DECLINED && (
+          <CardPopup
+            customClass='callpopup__body'
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClosePopup}
+            label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
+            faIcon='fas fa-phone-slash'
+          />
+        )}
+
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>
@@ -493,8 +745,8 @@ export class Tracim extends React.Component {
 
           <Route
             path='/ui/workspaces/:idws?'
-            render={() =>
-              <>
+            render={({ match }) => (
+              <WorkspacePage workspaceId={match.params.idws} history={props.history}>
                 <Route
                   exact
                   path={PAGE.WORKSPACE.ROOT}
@@ -531,7 +783,8 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
-                  path={[PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts'), PAGE.WORKSPACE.PUBLICATIONS(':idws')]}
+                  exact
+                  path={PAGE.WORKSPACE.PUBLICATIONS(':idws')}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
                       <Publications />
@@ -552,7 +805,8 @@ export class Tracim extends React.Component {
                   path={PAGE.WORKSPACE.AGENDA(':idws')}
                   render={() => <AppFullscreenRouter />}
                 />
-              </>}
+              </WorkspacePage>
+            )}
           />
 
           <Route path={PAGE.ACCOUNT} render={() => <Account />} />
@@ -594,6 +848,7 @@ export class Tracim extends React.Component {
           <Route path={PAGE.GUEST_DOWNLOAD(':token')} component={GuestDownload} />
           <Route path={PAGE.JOIN_WORKSPACE} component={JoinWorkspace} />
           <Route path={PAGE.CONTENT(':idcts')} component={ContentRedirection} />
+          <Route path={PAGE.WORKSPACE.PUBLICATION(':idws', ':idcts')} component={ContentRedirection} />
 
           {/* the 3 divs below must stay here so that they always exist in the DOM regardless of the route */}
           <div id='appFullscreenContainer' />

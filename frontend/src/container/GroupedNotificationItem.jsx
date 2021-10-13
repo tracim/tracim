@@ -58,9 +58,9 @@ export class GroupedNotificationItem extends React.Component {
     }
 
     const userList = uniqBy(notification.group.map(notification => notification.user), 'userId')
-    const escapedUser = userList.length > 1
-      ? t('{{numberOfUsers}} user', { numberOfUsers: userList.length })
-      : escapeHtml(notification.group[0].user.publicName)
+    const escapedUser = userList.length === 1 && userList[0]
+      ? escapeHtml(userList[0].publicName)
+      : t('{{numberOfUsers}} users', { numberOfUsers: userList.length })
 
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
@@ -180,7 +180,7 @@ export class GroupedNotificationItem extends React.Component {
             className='notification__list__item__meta__date'
             title={formatAbsoluteDate(notification.created, user.lang)}
           >
-            {props.shortDate(notification.group[notification.group.length - 1].created)}
+            {props.shortDate(notification.created)}
           </div>
           <div className='notification__list__item__meta__space'>
             {(numberOfWorkspaces === 1 && notification.group[0].workspace &&

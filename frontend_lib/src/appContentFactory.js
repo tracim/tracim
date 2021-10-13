@@ -84,7 +84,7 @@ const DEFAULT_TIMELINE_STATE = {
   filePageToken: '',
   hasMoreFiles: true,
   isLastTimelineItemCurrentToken: false,
-  loadingTimeline: false
+  loadingTimeline: true
 }
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
@@ -98,7 +98,7 @@ export function appContentFactory (WrappedComponent) {
       const param = props.data || { content: {} }
       this.state = {
         config: param.config,
-        loggedUser: param.loggedUser,
+        loggedUser: param.loggedUser || props.user,
         content: param.content,
         ...DEFAULT_TIMELINE_STATE
       }
@@ -113,6 +113,13 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
+
+      // FIXME - GB - 2021-09-08 - The condition below is needed because appContentFactory is used by
+      // frontend components (Publications and FeedItemWithPreview).
+      // Inside the frontend the user is called user and in the apps it is called loggedUser.
+      // Issue to refactor this behavior: https://github.com/tracim/tracim/issues/749
+      const lang = (param.loggedUser || props.user || { lang: 'en' }).lang
+      i18n.changeLanguage(lang)
     }
 
     checkApiUrl = () => {
@@ -242,7 +249,7 @@ export function appContentFactory (WrappedComponent) {
 
     // CH - 2019-31-12 - This event is used to reload all app data. It's not supposed to handle content id change
     appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline) => {
-      await loadContent()
+      loadContent()
       loadTimeline()
     }
 
@@ -713,10 +720,12 @@ export function appContentFactory (WrappedComponent) {
       return sortTimelineByDate(fullTimeline)
     }
 
-    loadMoreTimelineItems = async (getContentRevision) => {
+    loadMoreTimelineItems = async (getContentRevision, newContent = null) => {
       const { props, state } = this
 
-      const newItemCount = state.timeline.length + TIMELINE_ITEM_COUNT_PER_PAGE
+      const content = newContent || state.content
+      const curState = newContent ? DEFAULT_TIMELINE_STATE : state
+      const newItemCount = curState.timeline.length + TIMELINE_ITEM_COUNT_PER_PAGE
 
       const fetchResult = async (fetchPromise) => {
         return await handleFetchResult(await fetchPromise)
@@ -724,11 +733,11 @@ export function appContentFactory (WrappedComponent) {
 
       // Get the newest comments, files and revisions from the paginated backend API
       const [commentsResponse, filesResponse, revisionsResponse] = await Promise.all([
-        fetchResult(getContentComment(this.apiUrl, state.content.workspace_id, state.content.content_id, state.commentPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
-        fetchResult(getFileChildContent(this.apiUrl, state.content.workspace_id, state.content.content_id, state.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
+        fetchResult(getContentComment(this.apiUrl, content.workspace_id, content.content_id, curState.commentPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
+        fetchResult(getFileChildContent(this.apiUrl, content.workspace_id, content.content_id, curState.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
         // INFO - 2021/08/17 - S.G. - the order is done with "modified" for revisions as the "created" field is the creation
         // date of the content, not of a revision (and thus is the same for all revisions of a content).
-        fetchResult(getContentRevision(this.apiUrl, state.content.workspace_id, state.content.content_id, state.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
+        fetchResult(getContentRevision(this.apiUrl, content.workspace_id, content.content_id, curState.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
       ])
 
       if (!commentsResponse.apiResponse.ok || !filesResponse.apiResponse.ok || !revisionsResponse.apiResponse.ok) {
@@ -755,6 +764,7 @@ export function appContentFactory (WrappedComponent) {
           revisionPageToken: revisionsResponse.body.next_page_token,
           hasMoreRevisions: revisionsResponse.body.has_next,
           wholeTimeline,
+          content,
           timeline: this.getTimeline(wholeTimeline, newItemCount)
         }
       })
@@ -762,11 +772,10 @@ export function appContentFactory (WrappedComponent) {
 
     resetTimeline = () => this.setState(DEFAULT_TIMELINE_STATE)
 
-    loadTimeline = async (getContentRevision) => {
+    loadTimeline = async (getContentRevision, content) => {
       this.resetTimeline()
-      this.setState({ loadingTimeline: true })
       try {
-        await this.loadMoreTimelineItems(getContentRevision)
+        await this.loadMoreTimelineItems(getContentRevision, content)
       } finally {
         this.setState({ loadingTimeline: false })
       }

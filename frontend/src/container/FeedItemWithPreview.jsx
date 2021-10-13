@@ -40,6 +40,8 @@ export class FeedItemWithPreview extends React.Component {
 
     this.state = {
       invalidMentionList: [],
+      isDiscussionDisplayed: false,
+      discussionToggleButtonLabel: '',
       newComment: '',
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
@@ -286,6 +288,25 @@ export class FeedItemWithPreview extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  handleClickToggleComments = () => {
+    this.setState(previousState => ({
+      isDiscussionDisplayed: !previousState.isDiscussionDisplayed
+    }))
+  }
+
+  getDiscussionToggleButtonLabel = () => {
+    const { props, state } = this
+    if (props.commentList.length > 0) {
+      return state.isDiscussionDisplayed
+        ? props.t('Hide discussion')
+        : `${props.t('Show discussion')} (${props.commentList.length})`
+    } else {
+      return state.isDiscussionDisplayed
+        ? props.t('Hide comment area')
+        : props.t('Comment')
+    }
+  }
+
   render () {
     const { props, state } = this
 
@@ -372,6 +393,9 @@ export class FeedItemWithPreview extends React.Component {
                   translationTargetLanguageList={props.system.config.translation_service__target_languages}
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                  onClickToggleCommentList={this.handleClickToggleComments}
+                  discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                  showTimeline={props.showTimeline}
                 />
               )
               : (
@@ -394,11 +418,15 @@ export class FeedItemWithPreview extends React.Component {
                     translationTargetLanguageCode={state.translationTargetLanguageCode}
                     onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                     content={props.content}
+                    onClickToggleCommentList={this.handleClickToggleComments}
+                    discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                    showTimeline={props.showTimeline}
+                    isPublication={props.isPublication}
                   />
                 </div>
               )
             )}
-            {props.showTimeline && (
+            {props.showTimeline && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
                 customClass='feedItem__timeline'
@@ -497,7 +525,7 @@ FeedItemWithPreview.defaultProps = {
   lastModifier: {},
   memberList: [],
   modifiedDate: '',
-  onClickEdit: () => {},
+  onClickEdit: () => { },
   reactionList: [],
   showTimeline: false,
   previewLinkType: LINK_TYPE.OPEN_IN_APP,

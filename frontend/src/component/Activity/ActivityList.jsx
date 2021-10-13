@@ -24,13 +24,8 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
     const [entityType, coreEventType, subEntityType] = activity.newestMessage.event_type.split('.')
     const isPublication = activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
     const openInAppLink = PAGE.WORKSPACE.CONTENT(activity.content.workspace_id, activity.content.content_type, activity.content.content_id)
-    const openAsPublicationLink = PAGE.WORKSPACE.PUBLICATION(activity.content.workspace_id, activity.content.content_id)
-    const titleLink = isPublication
-      ? openAsPublicationLink
-      : openInAppLink
-    const previewLink = isPublication
-      ? openAsPublicationLink
-      : openInAppLink
+    const titleLink = openInAppLink
+    const previewLink = openInAppLink
     return activity.content.content_type === CONTENT_TYPE.FOLDER
       ? (
         <ContentWithoutPreviewActivity
@@ -132,9 +127,9 @@ const ActivityList = (props) => {
   const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
     if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
         !activity.newestMessage.fields.workspace) return true
-    const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
-    if (!currentWorkspace) return true
-    return currentWorkspace.publicationEnabled
+    const activityWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
+    if (!activityWorkspace) return true
+    return activityWorkspace.publicationEnabled
   }
 
   const activityDisplayFilter = (activity) => {

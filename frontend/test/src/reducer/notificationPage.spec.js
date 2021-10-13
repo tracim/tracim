@@ -4,10 +4,12 @@ import {
   addNotification,
   APPEND,
   appendNotificationList,
+  CONTENT,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
   READ,
+  readContentNotification,
   readNotification,
   readNotificationList,
   SET,
@@ -21,7 +23,8 @@ import notificationPage, {
   hasSameAuthor,
   hasSameContent,
   hasSameWorkspace,
-  serializeNotification
+  serializeNotification,
+  sortByCreatedDate
 } from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
@@ -141,6 +144,22 @@ describe('reducer notificationPage.js', () => {
 
       it('should return the list of objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
+      })
+    })
+
+    describe(`${READ}/${CONTENT}/${NOTIFICATION}`, () => {
+      const notificationWithContent = {
+        ...notification,
+        content: { label: 'test', id: 5 }
+      }
+      const listOfNotification = notificationPage(
+        { ...initialState, list: [notificationWithContent], unreadNotificationCount: 1 },
+        readContentNotification(5)
+      )
+
+      it('should return the list of objects with read set as true and counts as 0', () => {
+        expect(listOfNotification).to.deep.equal(
+          { ...initialState, list: [{ ...notificationWithContent, read: true }], unreadNotificationCount: 0 })
       })
     })
 
@@ -280,5 +299,11 @@ describe('belongsToGroup', () => {
 
   it('should return false if groupedNotification has no group', () => {
     expect(belongsToGroup(defaultElement, {}, 2)).to.be.equal(false)
+  })
+})
+
+describe('sortByCreatedDate', () => {
+  it('should return the array sorted by created', () => {
+    expect(sortByCreatedDate([{ created: 5 }, { created: 2 }, { created: 9 }])).to.deep.equal([{ created: 9 }, { created: 5 }, { created: 2 }])
   })
 })

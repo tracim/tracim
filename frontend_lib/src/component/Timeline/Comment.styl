@@ -1,5 +1,12 @@
 @import '../../css/Variable.styl'
 
+.buttonComments
+  border 1px solid transparent
+  color lightDarkGrey
+  &:hover
+    border 1px solid publicationColor
+    color fontColor
+
 .comment
   padding standardSpacing
   border-radius standardBorderRadius
@@ -58,3 +65,11 @@
     display flex
     margin-top standardSpacing
     justify-content space-between
+
+@media (max-width: max-xs)
+  .iconbutton__text_with_icon
+    display none
+  .buttonComments
+    margin-left textSpacing
+    > .iconbutton__icon
+      margin 0px

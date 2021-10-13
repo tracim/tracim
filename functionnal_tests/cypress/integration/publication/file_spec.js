@@ -40,6 +40,7 @@ describe('Publications', () => {
     })
 
     it('should show text as comment', () => {
+      cy.contains('.buttonComments', 'Comment').should('be.visible').click()
       cy.contains('.comment__body__content__text', exampleText).should('be.visible')
     })
 

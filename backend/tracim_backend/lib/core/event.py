@@ -47,6 +47,7 @@ from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
+from tracim_backend.models.call import UserCall
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentRevisionRO
@@ -71,6 +72,7 @@ from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import TagSchema
+from tracim_backend.views.core_api.schemas import UserCallSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
@@ -98,6 +100,7 @@ class EventApi:
     event_schema = EventSchema()
     workspace_user_role_schema = WorkspaceMemberDigestSchema()
     workspace_subscription_schema = WorkspaceSubscriptionSchema()
+    user_call_schema = UserCallSchema()
 
     def __init__(self, current_user: Optional[User], session: TracimSession, config: CFG) -> None:
         self._current_user = current_user
@@ -151,6 +154,8 @@ class EventApi:
         workspace_ids: Optional[List[int]] = None,
         related_to_content_ids: Optional[List[int]] = None,
         include_not_sent: bool = False,
+        content_ids: Optional[List[int]] = None,
+        parent_ids: Optional[List[int]] = None,
     ) -> Query:
         query = self._session.query(Message).join(Event)
         if workspace_ids:
@@ -162,6 +167,18 @@ class EventApi:
                     Event.parent_id.in_(related_to_content_ids),
                 )
             )
+        elif parent_ids and content_ids:
+            query = query.filter(
+                or_(
+                    Event.content["content_id"].as_integer().in_(content_ids),
+                    Event.content["parent_id"].as_integer().in_(parent_ids),
+                )
+            )
+        elif content_ids:
+            query = query.filter(Event.content["content_id"].as_integer().in_(content_ids))
+        elif parent_ids:
+            query = query.filter(Event.content["parent_id"].as_integer().in_(parent_ids))
+
         if not include_not_sent:
             query = query.filter(Message.sent != None)  # noqa: E711
         if event_id:
@@ -219,8 +236,18 @@ class EventApi:
         self._session.flush()
         return message
 
-    def mark_user_messages_as_read(self, user_id: int) -> List[Message]:
-        unread_messages = self._base_query(read_status=ReadStatus.UNREAD, user_id=user_id).all()
+    def mark_user_messages_as_read(
+        self,
+        user_id: int,
+        parent_ids: typing.Optional[List[int]] = None,
+        content_ids: typing.Optional[List[int]] = None,
+    ) -> List[Message]:
+        unread_messages = self._base_query(
+            read_status=ReadStatus.UNREAD,
+            user_id=user_id,
+            parent_ids=parent_ids,
+            content_ids=content_ids,
+        ).all()
         for message in unread_messages:
             message.read = datetime.utcnow()
             self._session.add(message)
@@ -680,6 +707,18 @@ class EventBuilder:
     def on_content_tag_deleted(self, content_tag: TagOnContent, context: TracimContext) -> None:
         self._create_content_tag_event(OperationType.DELETED, content_tag, context)
 
+    @hookimpl
+    def on_user_call_created(self, user_call: UserCall, context: TracimContext) -> None:
+        self._create_user_call_event(OperationType.CREATED, user_call, context)
+
+    @hookimpl
+    def on_user_call_modified(self, user_call: UserCall, context: TracimContext) -> None:
+        self._create_user_call_event(OperationType.MODIFIED, user_call, context)
+
+    @hookimpl
+    def on_user_call_deleted(self, user_call: UserCall, context: TracimContext) -> None:
+        self._create_user_call_event(OperationType.DELETED, user_call, context)
+
     def _create_subscription_event(
         self, operation: OperationType, subscription: WorkspaceSubscription, context: TracimContext
     ) -> None:
@@ -795,6 +834,23 @@ class EventBuilder:
             context=context,
         )
 
+    def _create_user_call_event(
+        self, operation: OperationType, user_call: UserCall, context: TracimContext
+    ) -> None:
+        """Create an event for a user call operation (create/update/delete)."""
+        current_user = context.safe_current_user()
+        fields = {
+            Event.USER_CALL_FIELD: EventApi.user_call_schema.dump(user_call).data,
+            Event.USER_FIELD: EventApi.user_schema.dump(user_call.callee).data,
+        }
+        event_api = EventApi(current_user, context.dbsession, self._config)
+        event_api.create_event(
+            entity_type=EntityType.USER_CALL,
+            operation=operation,
+            additional_fields=fields,
+            context=context,
+        )
+
     def _has_just_been_deleted(self, obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
         """Check that an object has been deleted since it has been queried from database."""
         if obj.is_deleted:
@@ -886,6 +942,13 @@ def _get_content_event_receiver_ids(event: Event, session: TracimSession, config
     return set(workspace_members)
 
 
+def _get_user_call_event_receiver_ids(
+    event: Event, session: TracimSession, config: CFG
+) -> Set[int]:
+
+    return {event.user_call["caller"]["user_id"], event.user_call["callee"]["user_id"]}
+
+
 GetReceiverIdsCallable = Callable[[Event, TracimSession, CFG], Iterable[int]]
 
 
@@ -903,6 +966,7 @@ class BaseLiveMessageBuilder(abc.ABC):
         EntityType.REACTION: _get_content_event_receiver_ids,
         EntityType.TAG: _get_workspace_event_receiver_ids,
         EntityType.CONTENT_TAG: _get_content_event_receiver_ids,
+        EntityType.USER_CALL: _get_user_call_event_receiver_ids,
     }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:

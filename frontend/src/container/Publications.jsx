@@ -21,6 +21,7 @@ import {
   PAGE,
   ROLE,
   ROLE_LIST,
+  COLORS,
   ScrollToBottomWrapper,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -38,13 +39,10 @@ import {
   CONTENT_NAMESPACE,
   FETCH_CONFIG,
   findUserRoleIdInWorkspace,
-  handleClickCopyLink,
-  publicationColor
+  handleClickCopyLink
 } from '../util/helper.js'
 import {
   getPublicationPage,
-  getWorkspaceDetail,
-  getWorkspaceMemberList,
   postThreadPublication,
   postPublicationFile
 } from '../action-creator.async.js'
@@ -58,8 +56,6 @@ import {
   setFirstComment,
   setPublicationList,
   setPublicationNextPage,
-  setWorkspaceDetail,
-  setWorkspaceMemberList,
   updatePublication,
   updatePublicationList,
   appendPublicationList
@@ -98,6 +94,7 @@ export class Publications extends React.Component {
     // of the current publication coming from the URL (if any)
     this.currentPublicationRef = React.createRef()
     this.state = {
+      loading: true,
       commentToEdit: {},
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
@@ -111,13 +108,13 @@ export class Publications extends React.Component {
     }
   }
 
-  componentDidMount () {
-    this.loadWorkspaceDetail()
+  async componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
-    this.getPublicationPage()
-    if (this.props.currentWorkspace.memberList.length === 0) this.loadMemberList()
-    this.gotToCurrentPublication()
+    if (this.props.currentWorkspace.id) {
+      await this.getPublicationPage()
+      this.gotToCurrentPublication()
+    }
   }
 
   gotToCurrentPublication () {
@@ -131,20 +128,18 @@ export class Publications extends React.Component {
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
-    if (prevProps.match.params.idws !== props.match.params.idws) {
-      this.loadWorkspaceDetail()
+    if (prevProps.currentWorkspace.id !== props.currentWorkspace.id) {
       this.setHeadTitle()
       this.buildBreadcrumbs()
-      this.getPublicationPage()
+      await this.getPublicationPage()
+      this.gotToCurrentPublication()
     }
 
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
       globalThis.tinymce.remove(`#${wysiwygId}`)
     }
-
-    if (props.currentWorkspace.memberList.length === 0) this.loadMemberList()
 
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
       this.gotToCurrentPublication()
@@ -266,34 +261,6 @@ export class Publications extends React.Component {
     this.props.dispatch(removePublication(data.fields.content.content_id))
   }
 
-  loadWorkspaceDetail = async () => {
-    const { props } = this
-
-    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
-    // with the setState at the end of the function
-    this.setState({ loading: true })
-
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        this.setHeadTitle()
-        this.buildBreadcrumbs()
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default:
-        props.dispatch(newFlashMessage(
-          `${props.t('An error has happened while getting')} ${props.t('space detail')}`,
-          'warning'
-        ))
-        break
-    }
-    this.setState({ loading: false })
-  }
-
   handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
     globalThis.wysiwyg(
       `#${wysiwygId}`,
@@ -310,7 +277,7 @@ export class Publications extends React.Component {
 
   buildBreadcrumbs = () => {
     const { props } = this
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
     const publicationId = props.match.params.idcts
     const myLink = publicationId
       ? PAGE.WORKSPACE.PUBLICATION(workspaceId, publicationId)
@@ -343,7 +310,8 @@ export class Publications extends React.Component {
 
   getPublicationPage = async (pageToken = '') => {
     const { props } = this
-    const workspaceId = props.match.params.idws
+    this.setState({ loading: true })
+    const workspaceId = props.currentWorkspace.id
     const fetchGetPublicationList = await props.dispatch(getPublicationPage(workspaceId, PUBLICATION_ITEM_COUNT_PER_PAGE, pageToken))
     switch (fetchGetPublicationList.status) {
       case 200: {
@@ -357,11 +325,12 @@ export class Publications extends React.Component {
         props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning'))
         break
     }
+    this.setState({ loading: false })
   }
 
   getCommentList = async (publicationId, publicationContentType) => {
     const { props } = this
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
 
     const [resComment, resCommentAsFile] = await Promise.all([
       handleFetchResult(await getContentComment(FETCH_CONFIG.apiUrl, workspaceId, publicationId)),
@@ -450,7 +419,7 @@ export class Publications extends React.Component {
   saveThreadPublication = async () => {
     const { props, state } = this
 
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
     const fetchPostPublication = await props.dispatch(postThreadPublication(workspaceId, publicationName))
@@ -479,7 +448,7 @@ export class Publications extends React.Component {
   processSaveFilePublication = async () => {
     const { props, state } = this
 
-    const workspaceId = props.match.params.idws
+    const workspaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
     if (state.newCommentAsFileList.length !== 1) return
@@ -541,24 +510,13 @@ export class Publications extends React.Component {
     props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
   }
 
-  loadMemberList = async () => {
-    const { props } = this
-
-    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.match.params.idws))
-    switch (fetchWorkspaceMemberList.status) {
-      case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
-    }
-  }
-
   handleClickReorder = () => {
     this.props.dispatch(updatePublicationList())
     this.setState({ showReorderButton: false })
   }
 
   searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.props.match.params.idws)
+    return await this.props.searchForMentionOrLinkInQuery(query, this.props.currentWorkspace.id)
   }
 
   getPreviewLinkParameters = (publication) => {
@@ -621,7 +579,7 @@ export class Publications extends React.Component {
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
             commentList={publication.commentList}
             content={publication}
-            customColor={publicationColor}
+            customColor={COLORS.PUBLICATION}
             key={`publication_${publication.id}`}
             ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
             memberList={props.currentWorkspace.memberList}
@@ -631,6 +589,7 @@ export class Publications extends React.Component {
             onClickEdit={() => this.handleClickEdit(publication)}
             showTimeline
             workspaceId={Number(publication.workspaceId)}
+            user={props.user}
             {...this.getPreviewLinkParameters(publication)}
           />
         )}
@@ -669,7 +628,7 @@ export class Publications extends React.Component {
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             comment={state.commentToEdit.raw_content}
-            customColor={publicationColor}
+            customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}
             onClickValidate={this.handleClickValidateEdit}
             onClickClose={() => this.setState({ showEditPopup: false })}
@@ -704,7 +663,7 @@ export class Publications extends React.Component {
                   <DisplayFileToUpload
                     fileList={state.newCommentAsFileList}
                     onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                    color={publicationColor}
+                    color={COLORS.PUBLICATION}
                   />
                 </div>
               </div>
@@ -713,7 +672,7 @@ export class Publications extends React.Component {
                 <div>
                   <AddFileToUploadButton
                     workspaceId={props.currentWorkspace.id}
-                    color={publicationColor}
+                    color={COLORS.PUBLICATION}
                     disabled={state.newCommentAsFileList.length > 0}
                     multipleFiles={false}
                     onValidateCommentFileToUpload={this.handleAddCommentAsFile}
@@ -722,7 +681,7 @@ export class Publications extends React.Component {
 
                 <IconButton
                   customClass='publications__publishArea__buttons__submit'
-                  color={publicationColor}
+                  color={COLORS.PUBLICATION}
                   disabled={state.newComment === '' && state.newCommentAsFileList.length === 0}
                   intent='primary'
                   mode='light'

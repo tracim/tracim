@@ -3,7 +3,7 @@
 ![logo_tracim](logo_tracim.png)
 
 develop branch status:
-[![Build Status](https://travis-ci.com/tracim/tracim.svg?branch=develop)](https://travis-ci.com/tracim/tracim)
+[![Build Status](https://app.travis-ci.com/tracim/tracim.svg?branch=develop)](https://app.travis-ci.com/tracim/tracim)
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
 
@@ -29,14 +29,6 @@ Then visit http://localhost:8080 and log in:
 - password: `admin@admin.admin`
 
 For advanced docker-based usage, look at the full [Tracim Docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker),
-
-## License
-
-Tracim is distributed under the terms of 3 distinct licenses:
-
-- AGPLv3 for the Agenda application (`frontend_app_agenda` folder)
-- LGPL for other frontend parts (`frontend` and `frontend_xxx` folders)
-- MIT License for the rest (backend stuff, functionnal tests, docker recipe, documentation, etc).
 
 ## Contribute
 

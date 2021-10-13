@@ -7,6 +7,7 @@ import {
   addAllResourceI18n,
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
@@ -27,6 +28,7 @@ import {
   getOrCreateSessionClientToken,
   FAVORITE_STATE,
   ROLE,
+  COLORS,
   SelectStatus
 } from 'tracim_frontend_lib'
 import {
@@ -107,7 +109,7 @@ export class Thread extends React.Component {
 
   handleReloadAppFeatureData = () => {
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug))
-    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, () => { this.props.loadTimeline(getThreadRevision) })
+    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, () => { this.props.loadTimeline(getThreadRevision, this.state.content) })
   }
 
   handleAllAppChangeLanguage = data => {
@@ -116,7 +118,6 @@ export class Thread extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
-    props.loadTimeline(getThreadRevision)
   }
 
   handleContentChanged = data => {
@@ -154,7 +155,7 @@ export class Thread extends React.Component {
     })
 
     this.loadContent()
-    props.loadTimeline(getThreadRevision)
+    props.loadTimeline(getThreadRevision, this.state.content)
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -250,8 +251,13 @@ export class Thread extends React.Component {
   }
 
   handleClickBtnCloseApp = () => {
-    this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+    const { state } = this
+    const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+    if (isPublication) state.config.history.push(PAGE.WORKSPACE.PUBLICATIONS(state.content.workspace_id))
+    else {
+      this.setState({ isVisible: false })
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+    }
   }
 
   handleLoadMoreTimelineItems = async () => {
@@ -393,16 +399,18 @@ export class Thread extends React.Component {
 
   render () {
     const { props, state } = this
+    const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+    const color = isPublication ? COLORS.PUBLICATION : state.config.hexcolor
 
     if (!state.isVisible) return null
 
     return (
-      <PopinFixed customClass={state.config.slug} customColor={state.config.hexcolor}>
+      <PopinFixed customClass={state.config.slug} customColor={color}>
         <PopinFixedHeader
           loading={state.loadingContent}
           customClass={`${state.config.slug}__contentpage`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
+          customColor={color}
+          faIcon={isPublication ? 'fas fa-stream' : state.config.faIcon}
           rawTitle={state.content.label}
           componentTitle={<div>{state.content.label}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
@@ -461,7 +469,7 @@ export class Thread extends React.Component {
               <Timeline
                 loading={props.loadingTimeline}
                 customClass={`${state.config.slug}__contentpage`}
-                customColor={state.config.hexcolor}
+                customColor={color}
                 loggedUser={state.loggedUser}
                 memberList={state.config.workspace && state.config.workspace.memberList}
                 apiUrl={state.config.apiUrl}

@@ -38,26 +38,22 @@ import {
   getSubFolderShareContentList,
   getShareFolderContentList,
   getContentPathList,
-  getWorkspaceMemberList,
   putWorkspaceContentArchived,
   putWorkspaceContentDeleted,
   getMyselfWorkspaceReadStatusList,
   putFolderRead,
-  putContentItemMove,
-  getWorkspaceDetail
+  putContentItemMove
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
   setWorkspaceContentList,
   setWorkspaceFolderContentList,
   setWorkspaceShareFolderContentList,
-  setWorkspaceMemberList,
   setWorkspaceReadStatusList,
   toggleFolderOpen,
   setWorkspaceContentRead,
   setBreadcrumbs,
   resetBreadcrumbsAppFeature,
-  setWorkspaceDetail,
   setHeadTitle
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
@@ -78,7 +74,6 @@ export class WorkspaceContent extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      workspaceIdInUrl: props.match.params.idws ? parseInt(props.match.params.idws) : null, // this is used to avoid handling the parseInt every time
       appOpenedType: false,
       contentLoaded: false,
       loadingShareFolder: true,
@@ -99,7 +94,7 @@ export class WorkspaceContent extends React.Component {
   // CustomEvent handlers
   handleRefreshContentList = data => {
     console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.REFRESH_CONTENT_LIST, data)
-    this.loadAllWorkspaceContent(this.state.workspaceIdInUrl)
+    this.loadAllWorkspaceContent(this.props.currentWorkspace.id)
   }
 
   handleOpenContentUrl = data => {
@@ -109,17 +104,17 @@ export class WorkspaceContent extends React.Component {
   }
 
   handleCloseApp = data => {
-    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CLOSED, data, this.state.workspaceIdInUrl)
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CLOSED, data, this.props.currentWorkspace.id)
     this.updateUrlTitleBreadcrumbs()
   }
 
   handleHidePopupCreateContent = data => {
-    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, data, this.state.workspaceIdInUrl)
+    console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT, data, this.props.currentWorkspace.id)
     this.updateUrlTitleBreadcrumbs()
   }
 
   updateUrlTitleBreadcrumbs = () => {
-    const { state, props } = this
+    const { props } = this
 
     const contentFolderPath = props.workspaceContentList.contentList.filter(c => c.isOpen).map(c => c.id)
     const folderListInUrl = this.getFolderIdToOpenInUrl(props.location.search)
@@ -129,7 +124,7 @@ export class WorkspaceContent extends React.Component {
       folder_open: [...folderListInUrl, ...contentFolderPath].join(',')
     }
 
-    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) + '?' + qs.stringify(newUrlSearch, { encode: false }))
+    props.history.push(PAGE.WORKSPACE.CONTENT_LIST(props.currentWorkspace.id) + '?' + qs.stringify(newUrlSearch, { encode: false }))
     this.setState({ appOpenedType: false })
 
     this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
@@ -155,7 +150,7 @@ export class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = props.match.params.idws
 
-    this.loadAllWorkspaceContent(wsToLoad, true, true)
+    this.loadAllWorkspaceContent(wsToLoad, true)
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -165,7 +160,7 @@ export class WorkspaceContent extends React.Component {
 
     // console.log('%c<WorkspaceContent> componentDidUpdate', 'color: #c17838', props)
 
-    if (state.workspaceIdInUrl === null) return
+    if (props.currentWorkspace.id === null) return
 
     const workspaceId = parseInt(props.match.params.idws)
     if (isNaN(workspaceId)) return
@@ -181,7 +176,7 @@ export class WorkspaceContent extends React.Component {
     }
 
     // INFO - GM - 2020/03/03 - hide opened app if the current url is /contents
-    if (PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl) === props.location.pathname && state.appOpenedType) {
+    if (PAGE.WORKSPACE.CONTENT_LIST(props.currentWorkspace.id) === props.location.pathname && state.appOpenedType) {
       props.dispatchCustomEvent(CUSTOM_EVENT.HIDE_APP(state.appOpenedType))
       this.setState({ appOpenedType: false })
       this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
@@ -197,11 +192,7 @@ export class WorkspaceContent extends React.Component {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
   }
 
-  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false, shouldLoadDetails = false) => {
-    if (shouldLoadDetails) {
-      this.loadWorkspaceDetail()
-    }
-
+  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false) => {
     try {
       await this.loadContentList(workspaceId)
       await this.loadShareFolderContent(workspaceId)
@@ -232,27 +223,12 @@ export class WorkspaceContent extends React.Component {
     }
   }
 
-  loadWorkspaceDetail = async () => {
-    const { props } = this
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.match.params.idws))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
-    }
-  }
-
   buildBreadcrumbs = () => {
     const { props, state } = this
 
     if (state.appOpenedType) return
 
-    const workspaceId = state.workspaceIdInUrl
+    const workspaceId = props.currentWorkspace.id
     const workspaceLabel = props.t(props.workspaceList.find(ws => ws.id === workspaceId).label)
     const breadcrumbsList = [{
       link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
@@ -260,7 +236,7 @@ export class WorkspaceContent extends React.Component {
       label: workspaceLabel,
       isALink: true
     }, {
-      link: PAGE.WORKSPACE.CONTENT_LIST(state.workspaceIdInUrl),
+      link: PAGE.WORKSPACE.CONTENT_LIST(workspaceId),
       type: BREADCRUMBS_TYPE.CORE,
       label: props.t('Contents'),
       isALink: true
@@ -287,7 +263,6 @@ export class WorkspaceContent extends React.Component {
         )
     )
 
-    const wsMember = await props.dispatch(getWorkspaceMemberList(workspaceId))
     const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
 
     switch (fetchContentList.status) {
@@ -326,12 +301,6 @@ export class WorkspaceContent extends React.Component {
       }
     }
 
-    switch (wsMember.status) {
-      case 200: props.dispatch(setWorkspaceMemberList(wsMember.json)); break
-      case 401: break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading members list'), 'warning'))
-    }
-
     switch (wsReadStatus.status) {
       case 200: props.dispatch(setWorkspaceReadStatusList(wsReadStatus.json)); break
       case 401: break
@@ -359,7 +328,7 @@ export class WorkspaceContent extends React.Component {
   }
 
   handleClickArchiveContentItem = async (e, content) => {
-    const { props, state } = this
+    const { props } = this
 
     e.preventDefault()
     e.stopPropagation()
@@ -367,14 +336,14 @@ export class WorkspaceContent extends React.Component {
     const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(content.workspaceId, content.id))
     switch (fetchPutContentArchived.status) {
       case 204:
-        this.loadContentList(state.workspaceIdInUrl)
+        this.loadContentList(props.currentWorkspace.id)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while archiving content'), 'warning'))
     }
   }
 
   handleClickArchiveShareFolderContentItem = async (e, content) => {
-    const { props, state } = this
+    const { props } = this
 
     e.preventDefault()
     e.stopPropagation()
@@ -382,7 +351,7 @@ export class WorkspaceContent extends React.Component {
     const fetchPutContentArchived = await props.dispatch(putWorkspaceContentArchived(content.workspaceId, content.id))
     switch (fetchPutContentArchived.status) {
       case 204:
-        this.loadShareFolderContent(state.workspaceIdInUrl)
+        this.loadShareFolderContent(props.currentWorkspace.id)
         break
       default: props.dispatch(newFlashMessage(props.t('Error while archiving content'), 'warning'))
     }
@@ -436,7 +405,7 @@ export class WorkspaceContent extends React.Component {
   }
 
   handleClickCreateContent = (e, folderId, contentType) => {
-    const { props, state } = this
+    const { props } = this
 
     const folderOpen = folderId
       ? (props.workspaceContentList.contentList.find(c => c.id === folderId) || { isOpen: false }).isOpen
@@ -458,19 +427,19 @@ export class WorkspaceContent extends React.Component {
     if (folderId && !folderOpen) this.handleToggleFolderOpen(folderId)
 
     props.history.push(
-      `${PAGE.WORKSPACE.NEW(state.workspaceIdInUrl, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`
+      `${PAGE.WORKSPACE.NEW(props.currentWorkspace.id, contentType)}?${qs.stringify(newUrlSearch, { encode: false })}&parent_id=${folderId}`
     )
   }
 
   getLoadingFolderKey = folderId => `loadingFolder${folderId}`
 
   handleToggleFolderOpen = async folderId => {
-    const { props, state } = this
+    const { props } = this
     const folder = props.workspaceContentList.contentList.find(content => content.id === folderId) || props.workspaceShareFolderContentList.contentList.find(c => c.id === folderId)
 
     const isFolderPreviousStateOpen = folder.isOpen
 
-    props.dispatch(toggleFolderOpen(folderId, state.workspaceIdInUrl))
+    props.dispatch(toggleFolderOpen(folderId, props.currentWorkspace.id))
 
     if (isFolderPreviousStateOpen) return
 
@@ -478,11 +447,11 @@ export class WorkspaceContent extends React.Component {
     this.setState({ [loadingFolderKey]: true })
 
     const fetchContentList = folder.parentId === SHARE_FOLDER_ID
-      ? await props.dispatch(getSubFolderShareContentList(state.workspaceIdInUrl, [folderId]))
-      : await props.dispatch(getFolderContentList(state.workspaceIdInUrl, [folderId]))
+      ? await props.dispatch(getSubFolderShareContentList(props.currentWorkspace.id, [folderId]))
+      : await props.dispatch(getFolderContentList(props.currentWorkspace.id, [folderId]))
 
     if (fetchContentList.status === 200) {
-      props.dispatch(setWorkspaceFolderContentList(state.workspaceIdInUrl, folder.id, fetchContentList.json.items))
+      props.dispatch(setWorkspaceFolderContentList(props.currentWorkspace.id, folder.id, fetchContentList.json.items))
     }
     this.setState({ [loadingFolderKey]: false })
   }
@@ -539,8 +508,8 @@ export class WorkspaceContent extends React.Component {
   handleUpdateAppOpenedType = appOpenedType => this.setState({ appOpenedType })
 
   handleSetFolderRead = async folderId => {
-    const { props, state } = this
-    const fetchSetFolderRead = await props.dispatch(putFolderRead(props.user.userId, state.workspaceIdInUrl, folderId))
+    const { props } = this
+    const fetchSetFolderRead = await props.dispatch(putFolderRead(props.user.userId, props.currentWorkspace.id, folderId))
     switch (fetchSetFolderRead.status) {
       case 204: props.dispatch(setWorkspaceContentRead(folderId)); break
       default: console.log(`Error while setting folder ${folderId} read status. fetchSetFolderRead: `, fetchSetFolderRead)
@@ -699,7 +668,7 @@ export class WorkspaceContent extends React.Component {
           {state.contentLoaded && (
             <OpenContentApp
               // automatically open the app for the contentId in url
-              workspaceId={state.workspaceIdInUrl}
+              workspaceId={props.currentWorkspace.id}
               appOpenedType={state.appOpenedType}
               onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
             />
@@ -711,7 +680,7 @@ export class WorkspaceContent extends React.Component {
               component={() => (
                 <OpenShareFolderApp
                   // automatically open the share folder advanced
-                  workspaceId={state.workspaceIdInUrl}
+                  workspaceId={props.currentWorkspace.id}
                   appOpenedType={state.appOpenedType}
                   onUpdateAppOpenedType={this.handleUpdateAppOpenedType}
                 />
@@ -725,7 +694,7 @@ export class WorkspaceContent extends React.Component {
               component={() => (
                 <OpenCreateContentApp
                   // automatically open the popup create content of the app in url
-                  workspaceId={state.workspaceIdInUrl}
+                  workspaceId={props.currentWorkspace.id}
                   appOpenedType={state.appOpenedType}
                 />
               )}
@@ -762,7 +731,7 @@ export class WorkspaceContent extends React.Component {
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
                   <ShareFolder
                     loading={state.loadingShareFolder}
-                    workspaceId={state.workspaceIdInUrl}
+                    workspaceId={props.currentWorkspace.id}
                     availableApp={createContentAvailableApp}
                     isOpen={state.shareFolder.isOpen}
                     lang={props.user.lang}

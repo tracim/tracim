@@ -82,6 +82,7 @@ start_docker() {
   done
 
   if [ -n "$2" ]; then
+    echo "Using registry mirror: $2"
     server_args="${server_args} --registry-mirror $2"
   fi
 

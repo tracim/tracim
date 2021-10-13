@@ -53,6 +53,8 @@ export const USER_PROFILE_COVER_NAME = `${USER}/ProfileCoverName`
 export const updateUserProfileAvatarName = newAvatarName => ({ type: `${SET}/${USER_PROFILE_AVATAR_NAME}`, newAvatarName })
 export const updateUserProfileCoverName = newCoverName => ({ type: `${SET}/${USER_PROFILE_COVER_NAME}`, newCoverName })
 
+export const USER_CALL = `${USER}/outgoing_calls`
+
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
@@ -96,7 +98,7 @@ export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
 export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
 
-// workspace related const bellow is for currentWorkspace
+// workspace related const below is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
 export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPACE_DETAIL}`, workspaceDetail })
 export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WORKSPACE_DETAIL}`, workspaceDetail })
@@ -155,7 +157,7 @@ export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
 
 export const HEAD_TITLE = 'HeadTitle'
-export const setHeadTitle = headTitle => ({ type: `${SET}/${HEAD_TITLE}`, headTitle })
+export const setHeadTitle = (headTitle, titlePrefix = '') => ({ type: `${SET}/${HEAD_TITLE}`, headTitle, titlePrefix })
 
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })
@@ -202,6 +204,7 @@ export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION}`
 export const updateNotification = (notificationId, notificationList) => ({ type: `${UPDATE}/${NOTIFICATION}`, notificationId, notificationList })
 export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATION}`, notificationId })
 export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
+export const readContentNotification = contentId => ({ type: `${READ}/${CONTENT}/${NOTIFICATION}`, contentId })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setUnreadMentionCount = (count) => ({ type: `${SET}/${UNREAD_MENTION_COUNT}`, count })
 export const setUnreadNotificationCount = (count) => ({ type: `${SET}/${UNREAD_NOTIFICATION_COUNT}`, count })

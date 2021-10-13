@@ -4,6 +4,7 @@ import typing
 
 import marshmallow
 from marshmallow import post_load
+from marshmallow.fields import Email
 from marshmallow.fields import Field
 from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
@@ -11,7 +12,8 @@ from marshmallow.validate import OneOf
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
-from tracim_backend.app_models.rfc_email_validator import RFCEmailValidator
+from tracim_backend.app_models.email_validators import RFCEmailValidator
+from tracim_backend.app_models.email_validators import TracimEmailValidator
 from tracim_backend.app_models.validator import action_description_validator
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.app_models.validator import bool_as_int_validator
@@ -40,6 +42,7 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.lib.utils.utils import DEFAULT_NB_ITEM_PAGINATION
 from tracim_backend.lib.utils.utils import string_to_list
 from tracim_backend.models.auth import AuthType
+from tracim_backend.models.call import UserCallState
 from tracim_backend.models.context_models import CommentCreation
 from tracim_backend.models.context_models import CommentPath
 from tracim_backend.models.context_models import CommentPathFilename
@@ -81,6 +84,7 @@ from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
 from tracim_backend.models.context_models import UserFollowQuery
 from tracim_backend.models.context_models import UserInfos
+from tracim_backend.models.context_models import UserMessagesMarkAsReadQuery
 from tracim_backend.models.context_models import UserMessagesSummaryQuery
 from tracim_backend.models.context_models import UserPicturePath
 from tracim_backend.models.context_models import UserPreviewPicturePath
@@ -218,6 +222,20 @@ ExcludeAuthorIdsField = StrippedString(
     example="1,5",
     description="comma separated list of excluded authors",
 )
+
+
+class TracimEmail(Email):
+    def __init__(self, *args, **kwargs):
+        String.__init__(self, *args, **kwargs)
+        # Insert validation into self.validators so that multiple errors can be stored.
+        self.validators = [TracimEmailValidator(error=self.error_messages["invalid"])] + list(
+            self.validators
+        )
+
+    def _validated(self, value):
+        if value is None:
+            return None
+        return TracimEmailValidator(error=self.error_messages["invalid"])(value)
 
 
 class RFCEmail(ValidatedField, String):
@@ -371,7 +389,7 @@ class UserSchema(UserDigestSchema):
     Complete user schema
     """
 
-    email = marshmallow.fields.Email(required=False, example="hello@tracim.fr", allow_none=True)
+    email = TracimEmail(required=False, example="hello@tracim.fr", allow_none=True)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Date of creation of the user account"
     )
@@ -451,9 +469,7 @@ class SetCustomPropertiesSchema(marshmallow.Schema):
 
 
 class SetEmailSchema(LoggedInUserPasswordSchema):
-    email = marshmallow.fields.Email(
-        required=True, example="hello@tracim.fr", validate=user_email_validator
-    )
+    email = TracimEmail(required=True, example="hello@tracim.fr", validate=user_email_validator)
 
     @post_load
     def create_set_email_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -542,7 +558,7 @@ class SetUserAllowedSpaceSchema(marshmallow.Schema):
 
 
 class UserRegistrationSchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
+    email = TracimEmail(
         required=True, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
     )
     username = String(
@@ -580,7 +596,7 @@ class UserRegistrationSchema(marshmallow.Schema):
 
 
 class UserCreationSchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
+    email = TracimEmail(
         required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
     )
     username = String(
@@ -1123,7 +1139,7 @@ class RoleUpdateSchema(marshmallow.Schema):
 class WorkspaceMemberInviteSchema(marshmallow.Schema):
     role = StrippedString(example="contributor", validate=user_role_validator, required=True)
     user_id = marshmallow.fields.Int(example=5, default=None, allow_none=True)
-    user_email = marshmallow.fields.Email(
+    user_email = TracimEmail(
         example="suri@cate.fr", default=None, allow_none=True, validate=user_email_validator
     )
     user_username = StrippedString(
@@ -1145,7 +1161,7 @@ class WorkspaceMemberInviteSchema(marshmallow.Schema):
 
 
 class ResetPasswordRequestSchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
+    email = TracimEmail(
         example="hello@tracim.fr", default=None, allow_none=True, validate=user_email_validator
     )
 
@@ -1165,9 +1181,7 @@ class ResetPasswordRequestSchema(marshmallow.Schema):
 
 
 class ResetPasswordCheckTokenSchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
-        required=True, example="hello@tracim.fr", validate=user_email_validator
-    )
+    email = TracimEmail(required=True, example="hello@tracim.fr", validate=user_email_validator)
     reset_password_token = String(
         description="token to reset password of given user", required=True
     )
@@ -1178,9 +1192,7 @@ class ResetPasswordCheckTokenSchema(marshmallow.Schema):
 
 
 class ResetPasswordModifySchema(marshmallow.Schema):
-    email = marshmallow.fields.Email(
-        required=True, example="hello@tracim.fr", validate=user_email_validator
-    )
+    email = TracimEmail(required=True, example="hello@tracim.fr", validate=user_email_validator)
     reset_password_token = String(
         description="token to reset password of given user", required=True
     )
@@ -1194,7 +1206,7 @@ class ResetPasswordModifySchema(marshmallow.Schema):
 
 class BasicAuthSchema(marshmallow.Schema):
 
-    email = marshmallow.fields.Email(
+    email = TracimEmail(
         example="hello@tracim.fr", required=False, validate=user_email_validator, allow_none=True
     )
     username = String(
@@ -1919,6 +1931,7 @@ class ConfigSchema(marshmallow.Schema):
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
     limitation__maximum_online_users_message = marshmallow.fields.String()
+    call__enabled = marshmallow.fields.Bool()
 
 
 class ConditionFileSchema(marshmallow.Schema):
@@ -2047,6 +2060,25 @@ class PathSuffixSchema(marshmallow.Schema):
         default="",
         example="/workspaces/1/notifications/activate",
     )
+
+
+class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
+    content_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of content_ids to check for marking event as read",
+    )
+    parent_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,4",
+        description="comma separated list of parent_ids to check for marking event as read",
+    )
+
+    @post_load
+    def user_message_mark_as_read_query(
+        self, data: typing.Dict[str, typing.Any]
+    ) -> UserMessagesMarkAsReadQuery:
+        return UserMessagesMarkAsReadQuery(**data)
 
 
 class UserMessagesSummaryQuerySchema(marshmallow.Schema):
@@ -2183,3 +2215,45 @@ class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
         missing=ContentSortOrder.MODIFIED_ASC,
         description="Order of the returned revisions, default is to sort by modification (e.g. creation of the revision) date, older first",
     )
+
+
+class CreateUserCallSchema(marshmallow.Schema):
+    callee_id = marshmallow.fields.Integer(description="Id of the user to call", example=42)
+
+
+class UserCallSchema(marshmallow.Schema):
+    call_id = marshmallow.fields.Integer(example=32, description="Id of the call")
+    caller = marshmallow.fields.Nested(UserDigestSchema, description="User who initiated the call")
+    callee = marshmallow.fields.Nested(UserDigestSchema, description="User who has been called")
+    state = EnumField(UserCallState)
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Date of creation of the call"
+    )
+    updated = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT,
+        description="date of last modification of the call.",
+        dump_to="modified",
+    )
+    url = marshmallow.fields.URL()
+
+
+class UserIdCallIdPathSchema(UserIdPathSchema):
+    call_id = marshmallow.fields.Integer(example=42, description="Id of the call to update")
+
+
+class GetUserCallsQuerySchema(marshmallow.Schema):
+    state = EnumField(
+        UserCallState,
+        missing=None,
+        default=None,
+        required=False,
+        description="If given, only return calls with the given state",
+    )
+
+
+class UserCallsSchema(marshmallow.Schema):
+    items = marshmallow.fields.Nested(UserCallSchema(many=True))
+
+
+class UpdateUserCallStateSchema(marshmallow.Schema):
+    state = EnumField(UserCallState, description="New call state")
