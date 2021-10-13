@@ -15,8 +15,7 @@ const ListItemWrapper = props => {
             'item-first': props.isFirst,
             read: props.read
           },
-          props.customClass
-        )
+          props.customClass)
       }
       title={props.label}
       id={props.id}
