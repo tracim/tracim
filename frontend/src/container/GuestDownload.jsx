@@ -13,6 +13,7 @@ import {
 import {
   displayFileSize,
   handleFetchResult,
+  sendGlobalFlashMessage,
   CUSTOM_EVENT,
   PAGE
 } from 'tracim_frontend_lib'
@@ -68,13 +69,13 @@ class GuestDownload extends React.Component {
         break
       case 400:
         switch (response.body.code) {
-          case 1007: this.sendGlobalFlashMessage(props.t('Error, this link is invalid or has expired')); break
-          default: this.sendGlobalFlashMessage(props.t('Error in the URL')); break
+          case 1007: sendGlobalFlashMessage(props.t('Error, this link is invalid or has expired')); break
+          default: sendGlobalFlashMessage(props.t('Error in the URL')); break
         }
         props.history.push(PAGE.LOGIN)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading file information'))
+        sendGlobalFlashMessage(props.t('Error while loading file information'))
         props.history.push(PAGE.LOGIN)
     }
   }
@@ -86,15 +87,6 @@ class GuestDownload extends React.Component {
       this.setHeadTitle()
     }
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   setHeadTitle = () => {
     const { props } = this

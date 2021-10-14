@@ -8,6 +8,7 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   appContentFactory,
+  sendGlobalFlashMessage,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { postThreadContent } from '../action.async.js'
@@ -69,15 +70,6 @@ class PopupCreateThread extends React.Component {
     }
   })
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   handleValidate = async () => {
     const { props, state } = this
 
@@ -103,11 +95,11 @@ class PopupCreateThread extends React.Component {
       case 400:
         switch (resSave.body.code) {
           case 3002:
-            this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
+            sendGlobalFlashMessage(props.t('A content with the same name already exists'))
             break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating thread'))
+      default: sendGlobalFlashMessage(props.t('Error while creating thread'))
     }
   }
 

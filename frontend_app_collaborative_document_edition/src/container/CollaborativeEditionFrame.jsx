@@ -8,6 +8,7 @@ import {
   buildHeadTitle,
   getFileContent,
   getWorkspaceDetail,
+  sendGlobalFlashMessage,
   PAGE,
   ROLE
 } from 'tracim_frontend_lib'
@@ -129,20 +130,20 @@ export class CollaborativeEditionFrame extends React.Component {
           case 1003:
           // INFO - B.L - 2019.08.06 - content id is not a valid integer
           case 2023: // eslint-disable-line no-fallthrough
-            this.sendGlobalFlashMessage(props.t('Content not found'))
+            sendGlobalFlashMessage(props.t('Content not found'))
             this.redirectTo(props.data.content.workspace_id)
             throw new Error(responseContent.body.message)
           // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
           case 1002:
           // INFO - B.L - 2019.08.06 - workspace id is not a valid integer
           case 2022: // eslint-disable-line no-fallthrough
-            this.sendGlobalFlashMessage(props.t('Space not found'))
+            sendGlobalFlashMessage(props.t('Space not found'))
             this.redirectTo()
             throw new Error(responseContent.body.message)
         }
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Unknown error'))
+        sendGlobalFlashMessage(props.t('Unknown error'))
         this.redirectTo()
         throw new Error('Unknown error')
     }
@@ -154,7 +155,7 @@ export class CollaborativeEditionFrame extends React.Component {
       return
     }
     if (!props.data.config.system.config.collaborative_document_edition) {
-      this.sendGlobalFlashMessage(props.t('Unknown url'))
+      sendGlobalFlashMessage(props.t('Unknown url'))
       this.redirectTo(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
       return
     }
@@ -163,7 +164,7 @@ export class CollaborativeEditionFrame extends React.Component {
     )
 
     if (!softwareFileType) {
-      this.sendGlobalFlashMessage(props.t('You cannot edit this type of file online'))
+      sendGlobalFlashMessage(props.t('You cannot edit this type of file online'))
       this.redirectTo(props.data.content.workspace_id, state.content.content_type, props.data.content.content_id)
       return
     }
@@ -185,15 +186,6 @@ export class CollaborativeEditionFrame extends React.Component {
         break
     }
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   redirectTo = (workspaceId, contentType, contentId) => {
     let url = '/ui'
