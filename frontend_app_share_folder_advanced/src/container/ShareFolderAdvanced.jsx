@@ -134,7 +134,7 @@ export class ShareFolderAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default:
-        sendGlobalFlashMessage(this.props.t('Error while loading list of public upload links'), 'info')
+        sendGlobalFlashMessage(this.props.t('Error while loading list of public upload links'))
     }
   }
 
@@ -159,9 +159,9 @@ export class ShareFolderAdvanced extends React.Component {
         this.loadImportAuthorizationsList()
         break
       case 400:
-        sendGlobalFlashMessage(props.t('Error in the URL'), 'info')
+        sendGlobalFlashMessage(props.t('Error in the URL'))
         break
-      default: sendGlobalFlashMessage(props.t('Error while deleting public upload link'), 'info')
+      default: sendGlobalFlashMessage(props.t('Error while deleting public upload link'))
     }
   }
 
@@ -182,7 +182,7 @@ export class ShareFolderAdvanced extends React.Component {
     uploadEmailList = uploadEmailList.filter(uploadEmail => !invalidEmails.includes(uploadEmail))
 
     if (invalidEmails.length > 0) {
-      sendGlobalFlashMessage(`${props.t('Error, these emails are invalid: ')} ${invalidEmails.join(', ')}`, 'info')
+      sendGlobalFlashMessage(`${props.t('Error, these emails are invalid: ')} ${invalidEmails.join(', ')}`)
     } else {
       const fetchResultPostImportAuthorizations = await handleFetchResult(await postImportAuthorizationsList(
         state.config.apiUrl,
@@ -206,12 +206,12 @@ export class ShareFolderAdvanced extends React.Component {
         case 400:
           switch (fetchResultPostImportAuthorizations.body.code) {
             case 2001:
-              sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'), 'info')
+              sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
               break
-            default: sendGlobalFlashMessage(props.t('Error while creating new public upload link'), 'info')
+            default: sendGlobalFlashMessage(props.t('Error while creating new public upload link'))
           }
           break
-        default: sendGlobalFlashMessage(props.t('Error while creating new public upload link'), 'info')
+        default: sendGlobalFlashMessage(props.t('Error while creating new public upload link'))
       }
     }
   }
@@ -234,7 +234,7 @@ export class ShareFolderAdvanced extends React.Component {
       })
 
       if (invalidEmails.length > 0) {
-        sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`), 'info')
+        sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
       } else {
         this.setState({ uploadEmails: emailList.join('\n') })
       }
