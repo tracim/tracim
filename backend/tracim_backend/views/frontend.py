@@ -146,7 +146,8 @@ class FrontendController(Controller):
 
     def bind(self, configurator: Configurator) -> None:
 
-        configurator.add_notfound_view(self.not_found_view)
+        configurator.add_notfound_view(self.not_found_view, append_slash=True)
+
         # index.html for /index.html and /
         configurator.add_route("root", "/", request_method="GET")
         configurator.add_view(self.index, route_name="root")
