@@ -34,7 +34,7 @@ export const TabBar = props => {
         <Tab
           page={PAGE.WORKSPACE.PUBLICATIONS(props.currentSpace.id)}
           icon='fas fa-fw fa-stream'
-          label={props.t('Publications')}
+          label={props.t('News')}
         />
       )}
 
