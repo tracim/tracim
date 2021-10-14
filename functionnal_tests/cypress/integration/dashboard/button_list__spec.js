@@ -40,7 +40,7 @@ describe('Dashboard button list', () => {
   })
   describe('if publication is enabled', () => {
     it('should show button publication and explore content', () => {
-      cy.get('button[title="Publish some information"]').should('be.visible')
+      cy.get('button[title="Publish some news"]').should('be.visible')
       cy.get('button[title="Explore contents"]').should('be.visible')
     })
   })
@@ -52,10 +52,10 @@ describe('Dashboard button list', () => {
       cy.contains('.workspace_advanced__contentpage__header__title', workspaceTest.label)
 
       cy.get('[data-cy=popin_right_part_optional_functionalities]').click()
-      cy.get('div[title="Publications activated"] > .switch').click()
+      cy.get('div[title="News activated"] > .switch').click()
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceTest.workspace_id } })
 
-      cy.get('button[title="Publish some information"]').should('not.exist')
+      cy.get('button[title="Publish some news"]').should('not.exist')
       cy.get('button[title="Explore contents"]').should('be.visible')
     })
   })

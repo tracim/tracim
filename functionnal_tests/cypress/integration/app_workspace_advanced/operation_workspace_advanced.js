@@ -216,10 +216,10 @@ describe('App Workspace Advanced', function () {
     })
     const testCases = [
       {
-        feature: 'publication',
+        feature: 'news',
         buttonSelector: '[data-cy=publication_enabled]',
-        deactivatedMessage: 'Publications deactivated',
-        activatedMessage: 'Publications activated'
+        deactivatedMessage: 'News deactivated',
+        activatedMessage: 'News activated'
       },
       {
         feature: 'agenda',
