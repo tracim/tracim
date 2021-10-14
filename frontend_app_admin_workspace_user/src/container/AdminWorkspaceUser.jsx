@@ -426,25 +426,25 @@ export class AdminWorkspaceUser extends React.Component {
 
     if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
       sendGlobalFlashMessage(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
-        'warning')
-      return
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+      )
+      return -1
     }
 
     if (!state.config.system.config.email_notification_activated || password !== '') {
       if (password === '') {
         sendGlobalFlashMessage(props.t('Please set a password'))
-        return
+        return -2
       }
 
       if (password.length < 6) {
         sendGlobalFlashMessage(props.t('New password is too short (minimum 6 characters)'))
-        return
+        return -3
       }
 
       if (password.length > 512) {
         sendGlobalFlashMessage(props.t('New password is too long (maximum 512 characters)'))
-        return
+        return -4
       }
     }
 
@@ -460,7 +460,7 @@ export class AdminWorkspaceUser extends React.Component {
             : props.t('User created'),
           'info'
         )
-        return true
+        return 1
       case 400:
         switch (newUserResult.body.code) {
           case 2001:
@@ -476,10 +476,10 @@ export class AdminWorkspaceUser extends React.Component {
           case 2036: sendGlobalFlashMessage(props.t('Email already exists')); break
           default: sendGlobalFlashMessage(props.t('Error while saving new user'))
         }
-        return false
+        return -5
       default:
         sendGlobalFlashMessage(props.t('Error while saving new user'))
-        return false
+        return -6
     }
   }
 
