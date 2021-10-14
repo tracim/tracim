@@ -9,7 +9,7 @@ const fakePreview = {
 const exampleText = 'This is an example'
 
 const publicationInput = '#wysiwygTimelineCommentPublication'
-const publishButton = '.publications__publishArea__buttons__submit'
+const publishButton = '.commentArea__submit__btn'
 
 describe('Publications', () => {
   describe('publish a text', () => {
@@ -62,7 +62,7 @@ describe('Publications', () => {
 
     it('should show the first message as preview for advanced edition', function () {
       cy.get(publicationInput).type('!')
-      cy.get('.publications__publishArea__buttons__left__advancedEdition').click()
+      cy.get('.commentArea__advancedtext__btn').click()
       cy.waitForTinyMCELoaded().then(() => {
         cy.typeInTinyMCE(exampleText)
         cy.contains(publishButton, 'Publish').click()

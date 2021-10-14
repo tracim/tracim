@@ -157,7 +157,7 @@ export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
 
 export const HEAD_TITLE = 'HeadTitle'
-export const setHeadTitle = headTitle => ({ type: `${SET}/${HEAD_TITLE}`, headTitle })
+export const setHeadTitle = (headTitle, titlePrefix = '') => ({ type: `${SET}/${HEAD_TITLE}`, headTitle, titlePrefix })
 
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })

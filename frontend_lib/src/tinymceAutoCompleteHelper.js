@@ -114,7 +114,7 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
 }
 
 // FIXME - RJ - 2020-09-25
-// Duplicate code with CommentTextArea.js
+// Duplicate code with CommentArea.js
 // See https://github.com/tracim/tracim/issues/3639
 export const tinymceAutoCompleteHandleClickItem = (autoCompleteItem, setState) => {
   let character, keyword

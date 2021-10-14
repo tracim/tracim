@@ -1,16 +1,13 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { CommentTextArea } from '../../src/component/Timeline/CommentTextArea.jsx'
+import { CommentArea } from '../../src/component/Timeline/CommentArea.jsx'
 import sinon from 'sinon'
 
-describe('<CommentTextArea />', () => {
-  const onChangeNewCommentSpy = sinon.spy()
-
+describe('<CommentArea />', () => {
   const props = {
     newComment: '',
     apiUrl: '/',
-    onChangeNewComment: onChangeNewCommentSpy,
     disableComment: false,
     id: 'autoCompleteInputId',
     t: key => key,
@@ -18,7 +15,7 @@ describe('<CommentTextArea />', () => {
   }
 
   const wrapper = shallow(
-    <CommentTextArea
+    <CommentArea
       {...props}
     />
   )
@@ -98,23 +95,7 @@ describe('<CommentTextArea />', () => {
       })
     })
 
-    describe('handleClickAutoCompleteItem()', () => {
-      describe('call this function to add a mention @all', () => {
-        before(() => {
-          wrapper.setProps({ newComment: '@al' })
-          wrapper.setState({ autoCompleteCursorPosition: 0, autoCompleteItemList: [{ mention: 'all', detail: 'notify all' }] })
-          wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 4 }
-        })
-
-        it('should call props.onChangeNewComment with the right mention', () => {
-          onChangeNewCommentSpy.resetHistory()
-          wrapper.instance().handleClickAutoCompleteItem({ mention: 'all', detail: 'notify all' })
-          expect(onChangeNewCommentSpy.calledOnceWith({ target: { value: '@all ' } })).to.equal(true)
-        })
-      })
-    })
-
-    describe('loadAutoComplete() (Note: "|" is the cursor position)', () => {
+    describe('searchForMentionOrLinkCandidate() (Note: "|" is the cursor position)', () => {
       describe('when isAutoCompleteActivated is false', () => {
         before(() => {
           wrapper.setState({ isAutoCompleteActivated: false })
@@ -122,7 +103,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "newComment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'newComment' })
+            wrapper.setState({ newComment: 'newComment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 10 }
           })
 
@@ -134,7 +115,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "@newComment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@newComment' })
+            wrapper.setState({ newComment: '@newComment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 11 }
           })
 
@@ -146,7 +127,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "mail@domain|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'mail@domain' })
+            wrapper.setState({ newComment: 'mail@domain' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 11 }
           })
 
@@ -158,7 +139,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "@new @Comment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@new @Comment' })
+            wrapper.setState({ newComment: '@new @Comment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 13 }
           })
 
@@ -170,7 +151,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "mail @domain|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'mail @domain' })
+            wrapper.setState({ newComment: 'mail @domain' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
@@ -182,7 +163,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "@|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@' })
+            wrapper.setState({ newComment: '@' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 1 }
           })
 
@@ -194,7 +175,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '' })
+            wrapper.setState({ newComment: '' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 0 }
           })
 
@@ -212,7 +193,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "@newComment |"', () => {
           before(() => {
-            wrapper.setProps({ newComment: '@newComment ' })
+            wrapper.setState({ newComment: '@newComment ' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
@@ -224,7 +205,7 @@ describe('<CommentTextArea />', () => {
 
         describe('new comment: "y@newComment|"', () => {
           before(() => {
-            wrapper.setProps({ newComment: 'y@newComment' })
+            wrapper.setState({ newComment: 'y@newComment' })
             wrapper.instance().textAreaRef = { ...initialTextAreaRef, selectionStart: 12 }
           })
 
@@ -234,13 +215,6 @@ describe('<CommentTextArea />', () => {
           })
         })
       })
-    })
-  })
-
-  describe('Handlers', () => {
-    it('onChangeNewCommentSpy should be called when comment is changing', () => {
-      wrapper.find(`#${props.id}`).simulate('change')
-      expect(onChangeNewCommentSpy.called).to.equal(true)
     })
   })
 })

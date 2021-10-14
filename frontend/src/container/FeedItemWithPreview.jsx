@@ -46,7 +46,6 @@ export class FeedItemWithPreview extends React.Component {
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
       translationStateByCommentId: {},
-      newCommentAsFileList: [],
       showInvalidMentionPopupInComment: false,
       timelineWysiwyg: false,
       translationTargetLanguageCode: props.user.lang
@@ -97,18 +96,6 @@ export class FeedItemWithPreview extends React.Component {
     }
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      this.getWysiwygId(this.props.content.id),
-      this.props.i18n.language,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -116,14 +103,6 @@ export class FeedItemWithPreview extends React.Component {
   handleChangeNewComment = e => {
     const { props } = this
     props.appContentChangeComment(e, props.content, this.setState.bind(this), props.content.slug)
-  }
-
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
   handleClickEditComment = (comment) => {
@@ -155,20 +134,21 @@ export class FeedItemWithPreview extends React.Component {
     ))
   }
 
-  handleClickSend = () => {
+  handleClickSend = (comment, commentAsFileList) => {
     const { props, state } = this
-
     if (!handleInvalidMentionInComment(
       props.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnyway()
+      this.handleClickValidateAnyway(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
-  handleClickValidateAnyway = async () => {
+  handleClickValidateAnyway = async (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -178,8 +158,8 @@ export class FeedItemWithPreview extends React.Component {
           workspace_id: props.content.workspaceId
         },
         state.timelineWysiwyg,
-        state.newComment,
-        state.newCommentAsFileList,
+        comment,
+        commentAsFileList,
         this.setState.bind(this),
         props.content.type,
         props.user.username,
@@ -395,6 +375,7 @@ export class FeedItemWithPreview extends React.Component {
                   onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                   onClickToggleCommentList={this.handleClickToggleComments}
                   discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                  threadLength={props.commentList.length}
                   showTimeline={props.showTimeline}
                 />
               )
@@ -420,6 +401,7 @@ export class FeedItemWithPreview extends React.Component {
                     content={props.content}
                     onClickToggleCommentList={this.handleClickToggleComments}
                     discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                    discussionToggleButtonLabelMobile={props.commentList.length > 0 ? props.commentList.length : ''}
                     showTimeline={props.showTimeline}
                     isPublication={props.isPublication}
                   />
@@ -432,19 +414,18 @@ export class FeedItemWithPreview extends React.Component {
                 customClass='feedItem__timeline'
                 customColor={props.customColor}
                 id={props.content.id}
+                contentId={props.content.id}
+                contentType={props.content.type}
                 invalidMentionList={state.invalidMentionList}
                 loggedUser={loggedUser}
                 memberList={props.memberList}
                 newComment={state.newComment}
-                newCommentAsFileList={state.newCommentAsFileList}
-                onChangeNewComment={this.handleChangeNewComment}
                 onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickValidateNewCommentBtn={this.handleClickSend}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
-                onInitWysiwyg={this.handleInitWysiwyg}
-                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                wysiwygId={this.getWysiwygId(props.content.id)}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 timelineData={this.getTimelineData()}

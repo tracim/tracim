@@ -78,7 +78,6 @@ export class File extends React.Component {
         props.t('Upload files')
       ],
       newComment: '',
-      newCommentAsFileList: [],
       newContent: {},
       loadingContent: true,
       newFile: '',
@@ -397,14 +396,6 @@ export class File extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
     const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
@@ -417,27 +408,29 @@ export class File extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
       state.config.workspace.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment()
+      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
-  handleClickValidateAnywayNewComment = () => {
+  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
-        state.newComment,
-        state.newCommentAsFileList,
+        comment,
+        commentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -822,6 +815,8 @@ export class File extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            contentId={state.content.content_id}
+            contentType={state.content.content_type}
             loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
@@ -830,13 +825,9 @@ export class File extends React.Component {
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
             newComment={state.newComment}
-            newCommentAsFileList={state.newCommentAsFileList}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
@@ -846,7 +837,7 @@ export class File extends React.Component {
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+            wysiwygIdSelector='#wysiwygTimelineComment'
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
@@ -949,18 +940,6 @@ export class File extends React.Component {
     } else {
       return [timelineObject, tag, propertiesObject]
     }
-  }
-
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
   }
 
   handleCloseNotifyAllMessage = async () => {

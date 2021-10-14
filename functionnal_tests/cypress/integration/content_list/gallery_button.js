@@ -6,6 +6,7 @@ const galleryButton = 'Open the gallery'
 
 describe('In the content list page', () => {
   before(function () {
+    this.skip() // FIXME - MB - 2021-10-11 - unstable test, see issue : https://github.com/tracim/tracim/issues/4995
     cy.resetDB()
     cy.setupBaseDB()
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
@@ -14,6 +15,7 @@ describe('In the content list page', () => {
   })
 
   beforeEach(function () {
+    this.skip() // FIXME - MB - 2021-10-11 - unstable test, see issue : https://github.com/tracim/tracim/issues/4995
     cy.loginAs('administrators')
     cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
   })

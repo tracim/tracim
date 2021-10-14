@@ -7,8 +7,7 @@ import {
   appContentFactory,
   BREADCRUMBS_TYPE,
   buildHeadTitle,
-  CommentTextArea,
-  ConfirmPopup,
+  CommentArea,
   CUSTOM_EVENT,
   EditCommentPopup,
   getContentComment,
@@ -30,8 +29,6 @@ import {
   TRANSLATION_STATE,
   isFileUploadInErrorState,
   CONTENT_TYPE,
-  AddFileToUploadButton,
-  DisplayFileToUpload,
   getFileDownloadUrl,
   NUMBER_RESULTS_BY_PAGE
 } from 'tracim_frontend_lib'
@@ -99,8 +96,6 @@ export class Publications extends React.Component {
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
-      newComment: '',
-      newCommentAsFileList: [],
       publicationWysiwyg: false,
       showEditPopup: false,
       showInvalidMentionPopupInComment: false,
@@ -188,17 +183,19 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
-  handleClickPublish = () => {
+  handleClickPublish = (publication, publicationAsFileList) => {
     const { props, state } = this
 
     if (!handleInvalidMentionInComment(
       props.currentWorkspace.memberList,
       state.publicationWysiwyg,
-      state.newComment,
+      publication,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnyway()
+      this.handleClickValidateAnyway(publication, publicationAsFileList)
+      return true
     }
+    return false
   }
 
   handleContentCreatedOrRestored = (data) => {
@@ -259,18 +256,6 @@ export class Publications extends React.Component {
   handleContentDeleted = (data) => {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     this.props.dispatch(removePublication(data.fields.content.content_id))
-  }
-
-  handleInitPublicationWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      `#${wysiwygId}`,
-      this.props.user.lang,
-      this.handleChangeNewPublication,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ publicationWysiwyg: !prev.publicationWysiwyg }))
@@ -365,12 +350,12 @@ export class Publications extends React.Component {
     this.setState({ showEditPopup: true, commentToEdit: publication.firstComment })
   }
 
-  handleClickValidateEdit = async (comment) => {
+  handleClickValidateEdit = (publication) => {
     const { props } = this
     if (!handleInvalidMentionInComment(
       props.currentWorkspace.memberList,
       true,
-      comment,
+      publication,
       this.setState.bind(this)
     )) {
       this.handleClickValidateAnywayEdit()
@@ -396,14 +381,6 @@ export class Publications extends React.Component {
     )
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
   buildPublicationName = (authorName, userLang) => {
@@ -416,7 +393,7 @@ export class Publications extends React.Component {
     })
   }
 
-  saveThreadPublication = async () => {
+  saveThreadPublication = async (publication) => {
     const { props, state } = this
 
     const workspaceId = props.currentWorkspace.id
@@ -433,7 +410,7 @@ export class Publications extends React.Component {
       props.appContentSaveNewComment(
         fetchPostPublication.json,
         state.publicationWysiwyg,
-        state.newComment,
+        publication,
         [],
         this.setState.bind(this),
         '',
@@ -445,30 +422,29 @@ export class Publications extends React.Component {
     }
   }
 
-  processSaveFilePublication = async () => {
+  processSaveFilePublication = async (publication, publicationAsFileList) => {
     const { props, state } = this
 
     const workspaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
-    if (state.newCommentAsFileList.length !== 1) return
+    if (publicationAsFileList.length !== 1) return
 
-    const fileToUpload = state.newCommentAsFileList[0]
+    const fileToUpload = publicationAsFileList[0]
     const fetchPostPublicationFile = await props.dispatch(postPublicationFile(workspaceId, fileToUpload, publicationName))
 
     const isUploadInError = isFileUploadInErrorState(fetchPostPublicationFile)
     if (isUploadInError) {
       props.dispatch(newFlashMessage(fetchPostPublicationFile.errorMessage, 'warning'))
-      this.setState({ newCommentAsFileList: [fetchPostPublicationFile] })
       return
     }
 
-    if (state.newComment !== '') {
+    if (publication !== '') {
       try {
         await props.appContentSaveNewComment(
           fetchPostPublicationFile.responseJson,
           state.publicationWysiwyg,
-          state.newComment,
+          publication,
           [],
           this.setState.bind(this),
           fetchPostPublicationFile.responseJson.slug,
@@ -481,13 +457,9 @@ export class Publications extends React.Component {
     }
 
     if (state.publicationWysiwyg) globalThis.tinymce.get(wysiwygId).setContent('')
-    this.setState({
-      newComment: '',
-      newCommentAsFileList: []
-    })
   }
 
-  handleClickValidateAnyway = async () => {
+  handleClickValidateAnyway = async (publication, publicationAsFileList = []) => {
     const { state } = this
 
     if (state.showEditPopup) {
@@ -495,12 +467,12 @@ export class Publications extends React.Component {
       return
     }
 
-    if (state.newComment !== '' && state.newCommentAsFileList.length === 0) {
-      this.saveThreadPublication()
+    if (publication !== '' && publicationAsFileList.length === 0) {
+      this.saveThreadPublication(publication)
     }
 
-    if (state.newCommentAsFileList.length > 0) {
-      this.processSaveFilePublication()
+    if (publicationAsFileList.length > 0) {
+      this.processSaveFilePublication(publication, publicationAsFileList)
     }
   }
 
@@ -604,30 +576,11 @@ export class Publications extends React.Component {
           />
         )}
 
-        {!state.loading && state.showInvalidMentionPopupInComment && (
-          <ConfirmPopup
-            onConfirm={this.handleCancelSave}
-            onClose={this.handleCancelSave}
-            onCancel={this.handleClickValidateAnyway}
-            msg={
-              <>
-                {props.t('Your text contains mentions that do not match any member of this space:')}
-                <div className='timeline__texteditor__mentions'>
-                  {state.invalidMentionList.join(', ')}
-                </div>
-              </>
-            }
-            confirmLabel={props.t('Edit')}
-            confirmIcon='far fa-fw fa-edit'
-            cancelLabel={props.t('Validate anyway')}
-            cancelIcon='fas fa-fw fa-check'
-          />
-        )}
-
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             comment={state.commentToEdit.raw_content}
+            commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}
             onClickValidate={this.handleClickValidateEdit}
@@ -637,61 +590,28 @@ export class Publications extends React.Component {
         )}
 
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
-          <div className='publications__publishArea'>
-            <CommentTextArea
+          <div className='publishAreaContainer'>
+            <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
+              buttonLabel={props.t('Publish')}
+              contentType={CONTENT_TYPE.THREAD}
+              customColor={COLORS.PUBLICATION}
+              customClass='publishArea'
               id={wysiwygId}
-              newComment={state.newComment}
-              onChangeNewComment={this.handleChangeNewPublication}
-              onInitWysiwyg={this.handleInitPublicationWysiwyg}
+              wysiwygIdSelector={`#${wysiwygId}`}
               searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
               wysiwyg={state.publicationWysiwyg}
               disableAutocompletePosition
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              workspaceId={props.currentWorkspace.id}
+              onClickValidateNewCommentBtn={this.handleClickPublish}
+              multipleFiles={false}
+              onClickSaveAnyway={this.handleClickValidateAnyway}
+              invalidMentionList={state.invalidMentionList}
+              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
+              onClickCancelSave={this.handleCancelSave}
+              lang={props.user.lang}
             />
-
-            <div className='publications__publishArea__buttons'>
-              <div className='publications__publishArea__buttons__left'>
-                <IconButton
-                  customClass='publications__publishArea__buttons__left__advancedEdition'
-                  intent='link'
-                  mode='light'
-                  onClick={this.handleToggleWysiwyg}
-                  text={state.publicationWysiwyg ? props.t('Simple edition') : props.t('Advanced edition')}
-                />
-
-                <div>
-                  <DisplayFileToUpload
-                    fileList={state.newCommentAsFileList}
-                    onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                    color={COLORS.PUBLICATION}
-                  />
-                </div>
-              </div>
-
-              <div className='publications__publishArea__buttons__right'>
-                <div>
-                  <AddFileToUploadButton
-                    workspaceId={props.currentWorkspace.id}
-                    color={COLORS.PUBLICATION}
-                    disabled={state.newCommentAsFileList.length > 0}
-                    multipleFiles={false}
-                    onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-                  />
-                </div>
-
-                <IconButton
-                  customClass='publications__publishArea__buttons__submit'
-                  color={COLORS.PUBLICATION}
-                  disabled={state.newComment === '' && state.newCommentAsFileList.length === 0}
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickPublish}
-                  icon='far fa-paper-plane'
-                  text={props.t('Publish')}
-                  title={props.t('Publish')}
-                />
-              </div>
-            </div>
           </div>
         )}
       </ScrollToBottomWrapper>
