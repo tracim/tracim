@@ -66,7 +66,7 @@ export class GroupedNotificationItem extends React.Component {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthorList}'>${escapedAuthorList}</span>`,
       content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
-      numberOfContribution: notification.group.length, // this.props.notificationPage.list[0].group.length,
+      numberOfContribution: notification.group.length,
       numberOfWorkspaces: numberOfWorkspaces,
       interpolation: { escapeValue: false }
     }
@@ -197,6 +197,8 @@ export class GroupedNotificationItem extends React.Component {
   }
 }
 
+// INFO - MP - 2021-10-15: notificationPage is required to link the 'notification' attribute
+// given by the parent component to redux
 const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
 export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
 
