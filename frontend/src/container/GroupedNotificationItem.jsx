@@ -66,7 +66,7 @@ export class GroupedNotificationItem extends React.Component {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthorList}'>${escapedAuthorList}</span>`,
       content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
-      numberOfContribution: notification.group.length,
+      numberOfContribution: notification.group.length, // this.props.notificationPage.list[0].group.length,
       numberOfWorkspaces: numberOfWorkspaces,
       interpolation: { escapeValue: false }
     }
@@ -197,7 +197,7 @@ export class GroupedNotificationItem extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
 export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
 
 GroupedNotificationItem.propTypes = {
