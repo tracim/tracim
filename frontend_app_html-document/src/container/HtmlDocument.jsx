@@ -355,8 +355,7 @@ export class HtmlDocument extends React.Component {
     const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
 
-    this.setState(previousState => {
-      return {
+    this.setState(previousState => ({
         mode: modeToRender,
         content: {
           ...resHtmlDocument.body,
@@ -370,14 +369,13 @@ export class HtmlDocument extends React.Component {
         translatedRawContent: null,
         oldInvalidMentionList: oldInvalidMentionList,
         loadingContent: false
-      }
-    })
+    }))
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
-    this.reloadContentWysiwyg()
 
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
+    this.reloadContentWysiwyg()
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
