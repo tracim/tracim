@@ -75,7 +75,6 @@ export class HtmlDocument extends React.Component {
       ],
       rawContentBeforeEdit: '',
       newComment: '',
-      newCommentAsFileList: [],
       newContent: {},
       loadingContent: true,
       timelineWysiwyg: false,
@@ -230,18 +229,6 @@ export class HtmlDocument extends React.Component {
     } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
     }
-  }
-
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
   }
 
   handleTinyMceInput = (e, position) => {
@@ -537,10 +524,11 @@ export class HtmlDocument extends React.Component {
   }
 
   handleChangeText = e => {
+    const { state } = this
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
 
-    setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
+    setLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
   }
 
   handleChangeNewComment = e => {
@@ -548,26 +536,18 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   searchForMentionOrLinkInQuery = async (query) => {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateAnywayNewComment = () => {
+  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
-        state.newComment,
-        state.newCommentAsFileList,
+        comment,
+        commentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -577,17 +557,19 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
       state.config.workspace.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment()
+      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -798,6 +780,8 @@ export class HtmlDocument extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            contentId={state.content.content_id}
+            contentType={state.content.content_type}
             loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage__timeline`}
             customColor={state.config.hexcolor}
@@ -806,13 +790,9 @@ export class HtmlDocument extends React.Component {
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
             newComment={state.newComment}
-            newCommentAsFileList={state.newCommentAsFileList}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
-            onChangeNewComment={this.handleChangeNewComment}
-            onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-            onValidateCommentFileToUpload={this.handleAddCommentAsFile}
             onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
@@ -822,7 +802,7 @@ export class HtmlDocument extends React.Component {
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
             onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
+            wysiwygIdSelector='#wysiwygTimelineComment'
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}

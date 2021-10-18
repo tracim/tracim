@@ -24,6 +24,12 @@
   &__icon
     margin-inline-end 5px
 
+  &__label
+    display inline
+    &-mobile
+      margin-inline-start textSpacing
+      display none
+
   // Intents styling
   &-primary
     background-color var(--primaryColor)
@@ -69,3 +75,10 @@
       background-color offWhite
       &:hover
         background-color lightGrey
+
+@media (min-width: min-xs) && (max-width: max-xs)
+  .iconbutton
+    &__label
+      display none
+      &-mobile
+        display inline

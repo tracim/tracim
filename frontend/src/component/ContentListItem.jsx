@@ -44,6 +44,7 @@ const ContentListItem = (props) => {
       read
       contentType={props.contentTypeInfo}
       isLast={props.isLast}
+      isFirst={props.isFirst}
       customClass={classnames('contentListItem', props.customClass)}
       dataCy={props.dataCy}
     >
@@ -114,6 +115,7 @@ ContentListItem.propTypes = {
   breadcrumbsList: PropTypes.arrayOf(PropTypes.string),
   commentsCount: PropTypes.number,
   isLast: PropTypes.bool,
+  isFirst: PropTypes.bool,
   customClass: PropTypes.string,
   dataCy: PropTypes.string
 }
@@ -122,6 +124,7 @@ ContentListItem.defaultProps = {
   breadcrumbsList: [],
   commentsCount: null,
   isLast: false,
+  isFirst: false,
   customClass: null,
   dataCy: null
 }

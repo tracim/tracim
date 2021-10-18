@@ -8,7 +8,14 @@ const ListItemWrapper = props => {
   return (
     <div
       className={
-        classnames('content', { 'item-last': props.isLast, read: props.read }, props.customClass)
+        classnames(
+          'content',
+          {
+            'item-last': props.isLast,
+            'item-first': props.isFirst,
+            read: props.read
+          },
+          props.customClass)
       }
       title={props.label}
       id={props.id}
@@ -28,6 +35,7 @@ ListItemWrapper.propTypes = {
   contentType: PropTypes.object,
   connectDragSource: PropTypes.func,
   isLast: PropTypes.bool,
+  isFirst: PropTypes.bool,
   read: PropTypes.bool,
   id: PropTypes.string,
   dataCy: PropTypes.string
@@ -37,6 +45,7 @@ ListItemWrapper.defaultProps = {
   label: '',
   customClass: '',
   isLast: false,
+  isFirst: false,
   read: false,
   id: undefined,
   dataCy: null

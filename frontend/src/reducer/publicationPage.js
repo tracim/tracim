@@ -73,7 +73,7 @@ export default function publicationPage (state = defaultPublicationPage, action)
     case `${REMOVE}/${PUBLICATION}`:
       return {
         ...state,
-        list: state.filter(publication => action.publicationId !== publication.id)
+        list: state.list.filter(publication => action.publicationId !== publication.id)
       }
 
     case `${APPEND}/${PUBLICATION}`: {

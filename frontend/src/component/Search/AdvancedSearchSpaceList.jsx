@@ -55,6 +55,7 @@ export const AdvancedSearchSpaceList = props => {
           read
           contentType={searchItem.accessType}
           isLast={index === resultList.length - 1}
+          isFirst={index === 0}
           key={searchItem.workspaceId}
         >
           <Link

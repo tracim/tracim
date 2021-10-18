@@ -3,10 +3,6 @@ import baseWorkspace from '../../fixtures/baseWorkspace.json'
 import baseOtherUser from '../../fixtures/baseOtherUser.json'
 
 describe('Open publications in the thread app', () => {
-  let workspaceId1
-  let workspaceId2
-  let otherUserName
-
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -20,7 +16,7 @@ describe('Open publications in the thread app', () => {
         })
 
         cy.get('#wysiwygTimelineCommentPublication').type(' @' + user.username + '  ')
-        cy.get('.publications__publishArea__buttons__submit').click()
+        cy.get('.commentArea__submit__btn').click()
         cy.get('.feedItem__publication__body__content').should('be.visible')
         cy.clearCookies()
         cy.login(baseOtherUser)
@@ -47,11 +43,11 @@ describe('Open publications in the thread app', () => {
     checkAndCloseThreadApp()
 
     cy.get('.sidebar__content__navigation__item').first().click() // recent activities
-    cy.get('.feedItemHeader__title a').contains('Publication').click()
+    cy.get('.feedItemHeader__title a').contains('News').click()
     checkAndCloseThreadApp()
 
     cy.get('.sidebar__content__navigation__item[href="/ui/recent-activities"]').first().click() // recent activities
-    cy.get('.feedItemHeader__title a').contains('Publication').click()
+    cy.get('.feedItemHeader__title a').contains('News').click()
     checkAndCloseThreadApp()
   })
 })

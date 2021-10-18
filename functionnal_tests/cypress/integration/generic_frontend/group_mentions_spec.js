@@ -25,11 +25,11 @@ describe('At the autocompletion popup', function () {
 
   describe('the group mention (all)', function () {
     it('should be translated in English', function () {
-      cy.get('.timeline__texteditor__advancedtext__btn').should('be.visible')
+      cy.get('.commentArea__advancedtext__btn').should('be.visible')
       cy.changeLanguage('en')
       cy.contains('.dropdownlang__dropdown__btnlanguage', 'English')
-      cy.contains('.timeline__texteditor__advancedtext__btn', 'Advanced edition')
-      cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+      cy.contains('.commentArea__advancedtext__btn', 'Advanced edition')
+      cy.get('.commentArea__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type('@')
       cy.get('.autocomplete').should('be.visible')
@@ -37,11 +37,11 @@ describe('At the autocompletion popup', function () {
     })
 
     it('should be translated in French', function () {
-      cy.get('.timeline__texteditor__advancedtext__btn').should('be.visible')
+      cy.get('.commentArea__advancedtext__btn').should('be.visible')
       cy.changeLanguage('fr')
-      cy.contains('.timeline__texteditor__advancedtext__btn', 'Édition avancée')
+      cy.contains('.commentArea__advancedtext__btn', 'Édition avancée')
       cy.contains('.dropdownlang__dropdown__btnlanguage', 'Français')
-      cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+      cy.get('.commentArea__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type('@')
       cy.get('.autocomplete').should('be.visible')
@@ -49,11 +49,11 @@ describe('At the autocompletion popup', function () {
     })
 
     it('should be translated in Portuguese', function () {
-      cy.get('.timeline__texteditor__advancedtext__btn').should('be.visible')
+      cy.get('.commentArea__advancedtext__btn').should('be.visible')
       cy.changeLanguage('pt')
-      cy.contains('.timeline__texteditor__advancedtext__btn', 'Edição avançada')
+      cy.contains('.commentArea__advancedtext__btn', 'Edição avançada')
       cy.contains('.dropdownlang__dropdown__btnlanguage', 'Português')
-      cy.get('.timeline__texteditor__textinput #wysiwygTimelineComment')
+      cy.get('.commentArea__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type('@')
       cy.contains('.autocomplete__item', '@todos')

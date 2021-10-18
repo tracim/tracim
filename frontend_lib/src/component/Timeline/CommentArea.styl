@@ -1,0 +1,74 @@
+@import '../../css/Variable.styl'
+
+.textarea
+  position relative
+  flex 0 1 auto
+  margin 20px
+  &__autocomplete
+    position absolute
+    width 100%
+    transform translateY(-100%)
+    top 0
+    padding 3px 0
+    background-color offWhite
+    border-radius standardBorderRadius
+    box-shadow shadow-all
+    font-size metadataFontSize
+    &__delimiter
+      height 2px
+      margin 5px 20px
+      background-color grey
+    &__item
+      display flex
+      flex-direction row
+      padding 1px standardSpacing
+      cursor pointer
+      &__active
+        background-color grey-hover
+
+.commentArea
+    &__mentions
+      font-weight bold
+      margin standardSpacing 0
+    &__autocomplete
+      position absolute
+      width 100%
+      background-color offWhite
+      font-size metadataFontSize
+      border-radius standardBorderRadius
+      &__delimiter
+        height 2px
+        margin 5px 20px
+        background-color grey
+      &__item
+        padding 1px standardSpacing
+        cursor pointer
+        &__active
+          background-color grey-hover
+    &__textinput
+      width 100%
+      min-height 80px
+      & > textarea
+        border-radius standardBorderRadius
+        border borderStyle
+        padding textSpacing
+        height 80px
+        width 100%
+    &__wrapper
+      display flex
+      align-items flex-start
+      justify-content flex-end
+      margin-top textSpacing
+      height 42px
+    &__advancedtext
+      width 100%
+      &__btn
+        width max-content
+        font-size metadataFontSize
+        &:disabled
+          cursor not-allowed
+          &:hover
+            color mediumDarkGrey
+    &__submit
+      display flex
+      align-items center
