@@ -337,6 +337,7 @@ class EventApi:
             workspace_id=fields.get("workspace", {}).get("workspace_id"),
             content_id=fields.get("content", {}).get("content_id"),
             parent_id=fields.get("content", {}).get("parent_id"),
+            # INFO - G.M - 2021-01-28 - specific case: author section may be None
             author_id=fields.get("author", {}).get("user_id") if fields.get("author", {}) else None,
         )
         context.dbsession.add(event)
