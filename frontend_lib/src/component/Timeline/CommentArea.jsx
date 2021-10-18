@@ -10,7 +10,11 @@ import {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
-import { LOCAL_STORAGE_FIELD, setLocalStorageItem } from '../../localStorage.js'
+import {
+  getLocalStorageItem,
+  LOCAL_STORAGE_FIELD,
+  setLocalStorageItem
+} from '../../localStorage.js'
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
@@ -48,15 +52,42 @@ export class CommentArea extends React.Component {
     if (props.wysiwyg) {
       this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
     }
+
+    const localStorage = getLocalStorageItem(
+      props.contentType,
+      {
+        content_id: props.contentId,
+        workspace_id: props.workspaceId
+      },
+      LOCAL_STORAGE_FIELD.COMMENT
+    )
+    if (!!localStorage && localStorage !== this.state.newComment) {
+      this.setState({ newComment: localStorage })
+    }
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    if (!prevProps.wysiwyg && this.props.wysiwyg) {
+    const { props } = this
+    if (!prevProps.wysiwyg && props.wysiwyg) {
       this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
     }
 
-    if (!this.props.wysiwyg && prevState.newComment !== this.state.newComment) {
+    if (!props.wysiwyg && prevState.newComment !== this.state.newComment) {
       this.searchForMentionOrLinkCandidate()
+    }
+
+    if (prevProps.contentType !== props.contentType) {
+      const localStorage = getLocalStorageItem(
+        props.contentType,
+        {
+          content_id: props.contentId,
+          workspace_id: props.workspaceId
+        },
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+      if (!!localStorage && localStorage !== this.state.newComment) {
+        this.setState({ newComment: localStorage })
+      }
     }
   }
 
