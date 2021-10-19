@@ -534,7 +534,7 @@ export class Publications extends React.Component {
 
         {!state.loading && isPublicationListEmpty && (
           <div className='publications__empty'>
-            {props.t('This space does not have any publication yet, create the first publication using the area at the bottom of the page.')}
+            {props.t('This space does not have any news yet, create the first news post using the area at the bottom of the page.')}
           </div>
         )}
 
@@ -607,7 +607,7 @@ export class Publications extends React.Component {
               wysiwyg={state.publicationWysiwyg}
               disableAutocompletePosition
               onClickWysiwygBtn={this.handleToggleWysiwyg}
-              workspaceId={props.currentWorkspace.id}
+              workspaceId={parseInt(props.match.params.idws)}
               onClickValidateNewCommentBtn={this.handleClickPublish}
               multipleFiles={false}
               onClickSaveAnyway={this.handleClickValidateAnyway}
