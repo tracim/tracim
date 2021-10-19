@@ -22,7 +22,7 @@ describe('Timeline', () => {
     cy.cancelXHR()
   })
 
-  it('should save the cooment draft', () => {
+  it('should save the comment draft', () => {
     cy.contains('[data-cy=FilenameWithExtension__label]', noteTitle).click()
     cy.get('.editionmode__button__cancel').click()
     cy.get(commentField).type(text)

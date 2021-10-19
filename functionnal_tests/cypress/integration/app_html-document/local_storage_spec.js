@@ -4,7 +4,7 @@ let workspaceId
 const noteTitle = 'Note'
 const text = 'Hello world'
 
-describe('Timeline', () => {
+describe('Notes', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -21,7 +21,7 @@ describe('Timeline', () => {
     cy.cancelXHR()
   })
 
-  it('should save the cooment draft', () => {
+  it('should save the note draft', () => {
     cy.contains('[data-cy=FilenameWithExtension__label]', noteTitle).click()
     cy.waitForTinyMCELoaded()
       .then(() => cy.typeInTinyMCE(text))
