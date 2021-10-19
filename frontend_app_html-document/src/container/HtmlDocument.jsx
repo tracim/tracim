@@ -356,19 +356,19 @@ export class HtmlDocument extends React.Component {
     const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
 
     this.setState(previousState => ({
-        mode: modeToRender,
-        content: {
-          ...resHtmlDocument.body,
-          raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
-            ? localStorageRawContent
-            : rawContentBeforeEdit
-        },
-        newComment: localStorageComment || '',
-        rawContentBeforeEdit: rawContentBeforeEdit,
-        translationState: getDefaultTranslationState(previousState.config.system.config),
-        translatedRawContent: null,
-        oldInvalidMentionList: oldInvalidMentionList,
-        loadingContent: false
+      mode: modeToRender,
+      content: {
+        ...resHtmlDocument.body,
+        raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
+          ? localStorageRawContent
+          : rawContentBeforeEdit
+      },
+      newComment: localStorageComment || '',
+      rawContentBeforeEdit: rawContentBeforeEdit,
+      translationState: getDefaultTranslationState(previousState.config.system.config),
+      translatedRawContent: null,
+      oldInvalidMentionList: oldInvalidMentionList,
+      loadingContent: false
     }))
 
     this.setHeadTitle(resHtmlDocument.body.label)
