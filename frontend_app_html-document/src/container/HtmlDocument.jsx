@@ -933,7 +933,7 @@ export class HtmlDocument extends React.Component {
             disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleClickSaveDocument}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
-            onChangeText={this.handleChangeText}
+            // onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
