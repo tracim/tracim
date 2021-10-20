@@ -69,6 +69,7 @@ describe('TinyMce text editor', function () {
 
       it('the autocompletion should be cancel after press the space bar', function () {
         cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE(' ')
           cy.inputInTinyMCE('@')
           cy.get('.autocomplete').should('be.visible')
           cy.inputInTinyMCE(' ')
@@ -78,13 +79,15 @@ describe('TinyMce text editor', function () {
 
       it('the autocompletion should handle 2 mentions inserted with the autocomplete popup', function () {
         cy.waitForTinyMCELoaded().then(() => {
+          cy.inputInTinyMCE(' ')
           cy.inputInTinyMCE('@jo')
           cy.get('.autocomplete').should('be.visible')
           cy.inputInTinyMCE(' ')
           cy.get('.autocomplete').should('be.not.visible')
+          cy.inputInTinyMCE(' ')
           cy.inputInTinyMCE('@john')
-          cy.get('.autocomplete').contains('@johndoe').click()
-          cy.assertTinyMCEContent('<p>@jo&nbsp;@johndoe&nbsp;</p>')
+          cy.contains('.autocomplete', '@johndoe').click()
+          cy.assertTinyMCEContent('<p>@jo&nbsp;&nbsp;@johndoe&nbsp;</p>')
         })
       })
 
