@@ -183,11 +183,13 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    console.log('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
     this.reloadContentWysiwyg()
   }
 
-  reloadContentWysiwyg () {
+  reloadContentWysiwyg = () => {
     if (!document.getElementById('wysiwygNewVersion') || this.state.mode !== APP_FEATURE_MODE.EDIT) return
+    console.log('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')}/*
     globalThis.tinymce.remove('#wysiwygNewVersion')
     globalThis.wysiwyg('#wysiwygNewVersion',
       this.state.loggedUser.lang,
@@ -198,7 +200,7 @@ export class HtmlDocument extends React.Component {
       this.handleTinyMceSelectionChange
     )
   }
-
+*/
   componentDidMount () {
     const { props } = this
     this.loadContent()
@@ -216,11 +218,13 @@ export class HtmlDocument extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.loadContent()
+      console.log('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE')
       this.reloadContentWysiwyg()
     }
 
     if (state.mode === APP_FEATURE_MODE.EDIT && (becameVisible || prevState.mode !== APP_FEATURE_MODE.EDIT)) {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
+      console.log('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
       this.reloadContentWysiwyg()
     }
 
@@ -231,7 +235,9 @@ export class HtmlDocument extends React.Component {
     }
   }
 
+  /*
   handleTinyMceInput = (e, position) => {
+    console.log('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
     tinymceAutoCompleteHandleInput(
       e,
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
@@ -241,6 +247,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleTinyMceSelectionChange = (e, position) => {
+    console.log('DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
     tinymceAutoCompleteHandleSelectionChange(
       (state) => { this.setState({ ...state, tinymcePosition: position }) },
       this.searchForMentionOrLinkInQuery,
@@ -271,6 +278,7 @@ export class HtmlDocument extends React.Component {
       this.searchForMentionOrLinkInQuery
     )
   }
+  */
 
   componentWillUnmount () {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
@@ -375,6 +383,7 @@ export class HtmlDocument extends React.Component {
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
+    console.log('GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
     this.reloadContentWysiwyg()
 
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
@@ -857,7 +866,7 @@ export class HtmlDocument extends React.Component {
     const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
-
+    console.log('RERENDER HTMLDOCUMENT')
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -957,6 +966,9 @@ export class HtmlDocument extends React.Component {
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
+            lang={state.loggedUser.lang}
+            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+            workspaceId={state.content.workspace_id}
           />
 
           <PopinFixedRightPart

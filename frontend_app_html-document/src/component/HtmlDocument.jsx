@@ -135,33 +135,21 @@ export const HtmlDocument = props => {
         )}
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
-          <div className='html-document__editionmode__container'>
-            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <AutoComplete
-                apiUrl={props.apiUrl}
-                autoCompleteItemList={props.autoCompleteItemList}
-                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                style={{
-                  top: props.tinymcePosition.isSelectionToTheTop ? props.tinymcePosition.bottom : props.tinymcePosition.top,
-                  transform: !props.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none',
-                  position: props.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
-                  zIndex: props.tinymcePosition.isFullscreen ? 1061 : 20
-                }}
-                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-              />
-            )}
-            <TextAreaApp
-              id={props.wysiwygNewVersion}
-              customClass='html-document__editionmode'
-              customColor={props.customColor}
-              onClickCancelBtn={props.onClickCloseEditMode}
-              disableValidateBtn={props.disableValidateBtn}
-              onClickValidateBtn={props.onClickValidateBtn}
-              text={props.text}
-              onChangeText={props.onChangeText}
-            />
-          </div>
+          <TextAreaApp
+            customClass='html-document__editionmode'
+            customColor={props.customColor}
+            disableValidateBtn={props.disableValidateBtn}
+            id={props.wysiwygNewVersion}
+            lang={props.lang}
+            onClickCancelBtn={props.onClickCloseEditMode}
+            onClickValidateBtn={props.onClickValidateBtn}
+            onChangeText={props.onChangeText}
+            searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
+            text={props.text}
+            apiUrl={props.apiUrl}
+            onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+            workspaceId={props.workspaceId}
+          />
         )}
       </div>
     </div>
