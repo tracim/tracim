@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+script_dir="$(realpath $(dirname $0))"
+source "$script_dir/util-lib.sh"
+should_skip "backend" && return 0
+
+
 source "$HOME/.bashrc"
 python_version=${1:-3.6.14}
 pyenv shell "$python_version"

@@ -5,10 +5,12 @@ python_version=${1:-3.6.14}
 database=${2:-all}
 docker_registry=${3:-""}
 
+script_dir="$(realpath $(dirname $0))"
+source "$script_dir/util-lib.sh"
+should_skip "backend" && return 0
+
 source "$HOME/.bashrc"
 pyenv shell "$python_version"
-
-script_dir="$(realpath $(dirname $0))"
 
 "$script_dir/install_docker"
 source "$script_dir/docker-lib.sh"
