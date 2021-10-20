@@ -3,7 +3,7 @@ set -e
 
 script_dir="$(realpath $(dirname $0))"
 source "$script_dir/util-lib.sh"
-should_skip "backend" && return 0
+skip_if_no_changed_file_match "backend"
 
 
 source "$HOME/.bashrc"

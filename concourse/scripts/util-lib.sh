@@ -1,10 +1,10 @@
 
-# return a 0 status code if a changed files summary is available and no changed filename matches
-# the given argument
-should_skip() {
-    if [ -f .git/resource/changed_files ] && $(grep -q $1 .git/resource/changed_files); then
-        echo "Changed files do not match $1"
-        return 0
+# Exits the calling script with a 0 return code if no changed file matches the given arguments
+# Arguments are given to grep so a regex/complex expression is possible.
+# Changed files are read in concourse's resource change_files.
+skip_if_no_changed_file_match() {
+    if [ -f .git/resource/changed_files ] && $(egrep -q $@ .git/resource/changed_files); then
+        echo "Changed files do not match $1, skipping the task."
+        exit 0
     fi
-    return 1
 }
