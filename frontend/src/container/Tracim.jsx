@@ -147,10 +147,10 @@ export class Tracim extends React.Component {
     const { props } = this
     const bell = '🔔'
     const isMainTab = this.liveMessageManager.eventSource !== null
-    const tag = { tag: 'call' }
+    const notificationOptions = { tag: 'call' }
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
-      const notification = new Notification(tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim'), tag)
+      const notification = new Notification(tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim'), notificationOptions)
       this.setState({ userCall: tlm.fields.user_call })
       this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
       if (!isMainTab) return
