@@ -197,9 +197,7 @@ export class GroupedNotificationItem extends React.Component {
   }
 }
 
-// INFO - MP - 2021-10-15: notificationPage is required to link the 'notification' attribute
-// given by the parent component to redux
-const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
+const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
 
 GroupedNotificationItem.propTypes = {
