@@ -404,10 +404,6 @@
   "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
   "publication list": "liste de publications",
   "Reorder": "Réorganiser",
-  "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
-  "Validate anyway": "Valider quand même",
-  "Simple edition": "Édition simple",
-  "Advanced edition": "Édition avancée",
   "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
   "Space settings": "Paramètres de l'espace",
   "Publish": "Publier",
@@ -510,5 +506,6 @@
   "Show in news": "Afficher dans les actualités",
   "News": "Actualités",
   "News of {{author}} on {{date}}": "Actualité de {{author}} le {{date}}",
-  "Error while saving new news": "Erreur lors de l'enregistrement de la nouvelle actualité"
+  "Error while saving new news": "Erreur lors de l'enregistrement de la nouvelle actualité",
+  " is calling you on Tracim": " vous appelle sur Tracim"
 }

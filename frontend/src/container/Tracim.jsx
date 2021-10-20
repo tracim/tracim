@@ -147,8 +147,10 @@ export class Tracim extends React.Component {
     const { props } = this
     const bell = '🔔'
     const isMainTab = this.liveMessageManager.eventSource !== null
+    const tag = { tag: 'call' }
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
+      const notification = new Notification(tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim'), tag)
       this.setState({ userCall: tlm.fields.user_call })
       this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
       if (!isMainTab) return
@@ -157,8 +159,16 @@ export class Tracim extends React.Component {
         this.play()
       }, false)
       this.audioCall.play()
+      if (Notification.permission === 'granted') {
+        return notification
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(function (permission) {
+          if (permission === 'granted') {
+            return notification
+          }
+        })
+      }
     }
-
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       this.setState({ userCall: tlm.fields.user_call })
     }
