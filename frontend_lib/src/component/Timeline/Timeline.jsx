@@ -229,24 +229,25 @@ export class Timeline extends React.Component {
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='timeline__texteditor'>
             <CommentArea
+              apiUrl={props.apiUrl}
               contentId={props.contentId}
               contentType={props.contentType}
-              id={`wysiwygTimelineComment${props.id}`}
-              apiUrl={props.apiUrl}
-              disableComment={disableComment}
-              wysiwyg={props.wysiwyg}
-              searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-              wysiwygIdSelector={props.wysiwygIdSelector}
               customClass={props.customClass}
               customColor={props.customColor}
-              onClickWysiwygBtn={props.onClickWysiwygBtn}
-              workspaceId={props.workspaceId}
-              onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
-              lang={props.loggedUser.lang}
+              disableComment={disableComment}
+              id={`wysiwygTimelineComment${props.id}`}
               invalidMentionList={props.invalidMentionList}
-              showInvalidMentionPopup={props.showInvalidMentionPopup}
-              onClickSaveAnyway={props.onClickSaveAnyway}
+              lang={props.loggedUser.lang}
+              newComment={props.newComment}
               onClickCancelSave={props.onClickCancelSave}
+              onClickSaveAnyway={props.onClickSaveAnyway}
+              onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
+              onClickWysiwygBtn={props.onClickWysiwygBtn}
+              searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
+              showInvalidMentionPopup={props.showInvalidMentionPopup}
+              workspaceId={props.workspaceId}
+              wysiwyg={props.wysiwyg}
+              wysiwygIdSelector={props.wysiwygIdSelector}
             />
           </div>
         )}
