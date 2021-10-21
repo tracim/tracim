@@ -40,6 +40,7 @@ describe('Create tags', () => {
             cy.get(validateButtonClass)
               .should('be.visible')
               .click()
+
             cy.contains(flashMessageClass, flashMessageTextWorkspace)
 
             // INFO - MP - 2021-10-21 - Create the desired content to test on depending of the testing type
@@ -71,7 +72,7 @@ describe('Create tags', () => {
             // POST can respond before the GET. The POST TLM response handler is supposed to display the
             // created tag but the GET that responds afterwards will hide it because it responds an
             // empty list.
-            cy.wait(10000)
+            cy.wait(5000)
           })
         })
 
