@@ -3,6 +3,7 @@ const ROLE_WORKSPACE_MANAGER = 'workspace-manager'
 
 context('Unknown users', function () {
   beforeEach(function () {
+    this.skip() // FIXME MB - 2021-10-21 - Unstable test
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
