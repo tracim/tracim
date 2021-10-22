@@ -49,7 +49,7 @@ const CardPopup = props => {
                 onClick={props.onClose}
                 text={props.t('Close')}
                 icon='fas fa-times'
-                color={GLOBAL_primaryColor}
+                color={GLOBAL_primaryColor} // eslint-disable-line camelcase
               />
             </div>
           )}
