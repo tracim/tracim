@@ -45,11 +45,11 @@
   &__mainBar
     height headerHeight
     padding-left pageSpacing
-    padding-right pageSpacing
     background-color offWhite
     display flex
     &__callBtn
-      margin 6px
+      align-self start
+      margin 10px
     &__avatar
       position relative
       &__medium
@@ -71,8 +71,8 @@
       align-self center
       flex 1
       &__wrapper
-        width calc(100% - 130px) // INFO - MB - 2021-05-06 - the total width minus the avatar width (100px) and its margin (30px) on the ProfileMainbar
         display flex
+        flex-grow 1
       &__user
         display flex
         &__name

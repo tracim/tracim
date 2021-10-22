@@ -73,9 +73,17 @@ export const ProfileMainBar = props => {
                 icon='fas fa-phone'
                 onClick={props.onClickDisplayCallPopup} // ici mettre le state createNewCall
                 customClass='profile__mainBar__callBtn'
-                // intent='pins'
+                // intent='secondary'
                 // dataCy='profile_avatar_changeBtn'
               />
+              // <IconButton
+              //   text={props.t('Change cover')}
+              //   icon='fas fa-upload'
+              //   onClick={props.onChangeCoverClick}
+              //   customClass='profile__cover__changeBtn'
+              //   intent='secondary'
+              //   dataCy='profile_cover_changeBtn'
+              // />
             )}
           </div>
         )
