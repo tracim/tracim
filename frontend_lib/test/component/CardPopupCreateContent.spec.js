@@ -2,6 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import CardPopupCreateContent from '../../src/component/CardPopup/CardPopupCreateContent.jsx'
+import CardPopup from '../../src/component/CardPopup/CardPopup.jsx'
 import sinon from 'sinon'
 require('../../src/component/CardPopup/CardPopupCreateContent.styl')
 
@@ -41,11 +42,11 @@ describe('<CardPopupCreateContent />', () => {
     )
 
     it('CardPopup should have the good custom style', () =>
-      expect(wrapper.find('CardPopup').prop('customStyle')).to.deep.equal(props.customStyle)
+      expect(wrapper.find(CardPopup).prop('customStyle')).to.deep.equal(props.customStyle)
     )
 
     it(`CardPopup should have the good customColor "${props.customColor}"`, () =>
-      expect(wrapper.find('CardPopup').prop('customColor')).to.deep.equal(props.customColor)
+      expect(wrapper.find(CardPopup).prop('customColor')).to.deep.equal(props.customColor)
     )
 
     it(`should display the validate label "${props.btnValidateLabel}"`, () =>
