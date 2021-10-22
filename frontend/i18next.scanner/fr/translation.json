@@ -404,10 +404,6 @@
   "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
   "publication list": "liste de publications",
   "Reorder": "Réorganiser",
-  "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
-  "Validate anyway": "Valider quand même",
-  "Simple edition": "Édition simple",
-  "Advanced edition": "Édition avancée",
   "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
   "Space settings": "Paramètres de l'espace",
   "Publish": "Publier",
@@ -429,7 +425,7 @@
   "copied": "copié",
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Download {{filename}}": "Télécharger {{filename}}",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Cet espace n'a pas encore de publication, créez la première publication en utilisant la zone en bas de la page.",
+  "This space does not have any news yet, create the first news post using the area at the bottom of the page.": "Cet espace n'a pas encore d'actualités, créez la première actualité en utilisant la zone en bas de la page.",
   "Open as content": "Ouvrir en tant que contenu",
   "New full name:": "Nouveau nom complet :",
   "New username:": "Nouvel identifiant :",
@@ -510,5 +506,6 @@
   "Show in news": "Afficher dans les actualités",
   "News": "Actualités",
   "News of {{author}} on {{date}}": "Actualité de {{author}} le {{date}}",
-  "Error while saving new news": "Erreur lors de l'enregistrement de la nouvelle actualité"
+  "Error while saving new news": "Erreur lors de l'enregistrement de la nouvelle actualité",
+  " is calling you on Tracim": " vous appelle sur Tracim"
 }

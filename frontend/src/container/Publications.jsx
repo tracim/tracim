@@ -62,6 +62,9 @@ import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
 const wysiwygId = 'wysiwygTimelineCommentPublication'
+// INFO - G.B. - 2021-10-18 - The value below is used only for local storage, it's a fake id for the
+// publication that is being written but has not been sent yet (i.e. does not have an id)
+const newPublicationId = -5
 
 const PUBLICATION_ITEM_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
 
@@ -531,7 +534,7 @@ export class Publications extends React.Component {
 
         {!state.loading && isPublicationListEmpty && (
           <div className='publications__empty'>
-            {props.t('This space does not have any publication yet, create the first publication using the area at the bottom of the page.')}
+            {props.t('This space does not have any news yet, create the first news post using the area at the bottom of the page.')}
           </div>
         )}
 
@@ -594,6 +597,7 @@ export class Publications extends React.Component {
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
               buttonLabel={props.t('Publish')}
+              contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
               customColor={COLORS.PUBLICATION}
               customClass='publishArea'
@@ -603,7 +607,7 @@ export class Publications extends React.Component {
               wysiwyg={state.publicationWysiwyg}
               disableAutocompletePosition
               onClickWysiwygBtn={this.handleToggleWysiwyg}
-              workspaceId={props.currentWorkspace.id}
+              workspaceId={parseInt(props.match.params.idws)}
               onClickValidateNewCommentBtn={this.handleClickPublish}
               multipleFiles={false}
               onClickSaveAnyway={this.handleClickValidateAnyway}

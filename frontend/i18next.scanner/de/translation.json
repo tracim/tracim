@@ -369,12 +369,8 @@
   "Recent activities": "Neueste Aktivitäten",
   "publication list": "Publikationsliste",
   "Error loading publication comments": "Fehler beim Laden von Publikationskommentaren",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Dieser Bereich hat noch keine Publikation, erstellen Sie die erste Publikation über den Bereich unten auf der Seite.",
+  "This space does not have any news yet, create the first news post using the area at the bottom of the page.": "Dieser Bereich hat noch keine Nachrichten, erstellen Sie die erste Nachricht über den Bereich unten auf der Seite.",
   "Reorder": "Ordnen",
-  "Your text contains mentions that do not match any member of this space:": "Ihr Text enthält Erwähnungen, die mit keinem Mitglied dieses Bereichs übereinstimmen:",
-  "Validate anyway": "Trotzdem validieren",
-  "Simple edition": "Einfache Ausgabe",
-  "Advanced edition": "Erweiterte Ausgabe",
   "Publish": "Publizieren",
   "Full name": "Vollständiger Name",
   "Username": "Benutzername",
@@ -510,5 +506,6 @@
   "Show in news": "In Nachrichten anzeigen",
   "News": "Nachrichten",
   "News of {{author}} on {{date}}": "Nachricht von {{author}} am {{date}}",
-  "Error while saving new news": "Fehler beim Speichern eine neue Nachricht"
+  "Error while saving new news": "Fehler beim Speichern eine neue Nachricht",
+  " is calling you on Tracim": " ruft Sie an auf Tracim"
 }

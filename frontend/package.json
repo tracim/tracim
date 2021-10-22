@@ -113,7 +113,8 @@
       "Image",
       "globalThis",
       "DOMParser",
-      "Audio"
+      "Audio",
+      "Notification"
     ],
     "parser": "babel-eslint",
     "ignore": []

@@ -158,9 +158,13 @@ class Event(CreationDateMixin, DeclarativeBase):
     tag = index_property("fields", TAG_FIELD)
     user_call = index_property("fields", USER_CALL_FIELD)
 
-    # INFO - SG - 2021-05-05
-    # duplicated from fields.workspace.workspace_id to ease indexing of this value
+    # INFO - GM - 2021-09-09
+    # duplicated  ids from JSON column fields to ease indexing (workspace_id is indexed)
+    # and to have database statistics on filter criteria permitting better query performances
     workspace_id = Column(Integer, default=None)
+    author_id = Column(Integer, default=None)
+    content_id = Column(Integer, default=None)
+    parent_id = Column(Integer, default=None)
 
     @property
     def event_type(self) -> str:

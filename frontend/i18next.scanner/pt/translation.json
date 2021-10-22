@@ -413,10 +413,6 @@
   "Error while saving the comment": "Erro ao salvar o comentário",
   "publication list": "lista de publicações",
   "Reorder": "Reordenar",
-  "Your text contains mentions that do not match any member of this space:": "O seu texto contém menções que não correspondem a nenhum membro deste espaço:",
-  "Validate anyway": "Validar de qualquer forma",
-  "Simple edition": "Edição simples",
-  "Advanced edition": "Edição avançada",
   "Space settings": "Definições do espaço",
   "Publish": "Publicar",
   "new requests": "novos pedidos",
@@ -438,7 +434,7 @@
   "copied": "copiado",
   "You have reached your storage limit, you cannot add new files": "Atingiu o limite de depósito, não é possível acrescentar novos ficheiros",
   "Download {{filename}}": "Download {{filename}}",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "Este espaço ainda não tem nenhuma publicação, crie a primeira publicação utilizando a zona na parte de baixo da página.",
+  "This space does not have any news yet, create the first news post using the area at the bottom of the page.": "Este espaço ainda não tem nenhuma notícia, crie a primeira notícia utilizando a zona na parte de baixo da página.",
   "Open as content": "Abrir como conteúdo",
   "New full name:": "Novo nome completo:",
   "New username:": "Novo identificador:",
@@ -510,5 +506,6 @@
   "Show in news": "Mostrar nas notícias",
   "News": "Notícias",
   "News of {{author}} on {{date}}": "Notícia de {{author}} em {{date}}",
-  "Error while saving new news": "Erro ao salvar a nova notícia"
+  "Error while saving new news": "Erro ao salvar a nova notícia",
+  " is calling you on Tracim": " está a chamar-lhe no Tracim"
 }
