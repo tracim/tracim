@@ -1,7 +1,8 @@
 ARG PACKAGE_DIR="/tracim/system_packages/debian"
 ARG REPO="https://github.com/tracim/tracim.git"
-ARG BRANCH
-ARG TAG
+ARG BRANCH=""
+ARG TAG=""
+
 ###
 # Base install stages:
 ####
@@ -87,7 +88,9 @@ ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 ARG PACKAGE_DIR
-RUN printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999\nPackage: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
+# NOTE - 2021-10-21 - S.G. - pin condure (used by pushpin) to a lower priority so that mongrel2 is used instead.
+# This is due to automated tests randomly failing with condure.
+RUN printf "Package: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
     && apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list" "${PACKAGE_DIR}/encryption_packages.list") vim wget curl \
     && apt-get autoremove -qy \
     && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \

@@ -2,7 +2,6 @@
 docker_script_dir=$(realpath $(dirname "$0"))
 
 # Default values
-CONFIG_FILE_IS_NEW=0
 export PYTHON_EGG_CACHE=/tmp
 set -e
 
@@ -48,14 +47,14 @@ function alembic_as_user {
 
 
 
-# Check environment variables
-log "Checking of docker env var"
+# Check database environment variables
+log "Checking of database environment variables"
 /bin/bash "$docker_script_dir/check_env_vars.sh"
 if [ ! "$?" = 0 ]; then
     logerror "invalid env var"
     exit 1
 fi
-loggood "check of docker env var success"
+loggood "check of database environment variables: success"
 
 # Execute common tasks
 /bin/bash "$docker_script_dir/common.sh"
@@ -74,10 +73,13 @@ if [ "$ENABLE_GOCRYPTFS_ENCRYPTION" = "1" ]; then
 fi
 
 # Create file with all docker variable about TRACIM parameter
+# This is needed as uWSGI doesn't get the environment defined here (it is started by service).
 printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 # Add variable for using xvfb with uwsgi
 echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
+log "Ensuring www-data is the owner of /var/tracim files"
 chown www-data:www-data -R /var/tracim
+loggood "Ensuring www-data is the owner of /var/tracim files: success"
 
 log "Checking database"
 case "$DATABASE_TYPE" in
@@ -130,7 +132,7 @@ a2enmod proxy proxy_http proxy_ajp rewrite deflate headers proxy_html dav_fs dav
 
 # Activate or deactivate webdav
 if [ "$START_WEBDAV" = "1" ]; then
-    log "Activation of webdav"
+    log "Creating configuration and enabling webdav"
     if [ ! -L /etc/uwsgi/apps-enabled/tracim_webdav.ini ]; then
         ln -s /etc/uwsgi/apps-available/tracim_webdav.ini /etc/uwsgi/apps-enabled/tracim_webdav.ini
     fi
@@ -143,7 +145,7 @@ else
 fi
 # Activate or deactivate caldav
 if [ "$START_CALDAV" = "1" ]; then
-    log "Activation of caldav"
+    log "Creating configuration and enabling caldav"
     if [ ! -L /etc/uwsgi/apps-enabled/tracim_caldav.ini ]; then
         ln -s /etc/uwsgi/apps-available/tracim_caldav.ini /etc/uwsgi/apps-enabled/tracim_caldav.ini
     fi
@@ -178,7 +180,7 @@ log "Run supervisord"
 supervisord -c "$docker_script_dir/supervisord_tracim.conf"
 # Activate daemon for reply by email
 if [ "$REPLY_BY_EMAIL" = "1" ];then
-    log "start mail fetcher"
+    log "Starting mail fetcher"
     supervisorctl start tracim_mail_fetcher
 fi
 # Start tracim
@@ -187,8 +189,9 @@ set +e
 service uwsgi restart
 set -e
 if [ "$START_CALDAV" = "1" ]; then
-    log "start caldav"
+    log "Synchronizing caldav accounts"
     cd /tracim/backend/
     tracimcli_as_user "caldav sync"
 fi
+log "Tracim ready to use"
 tail -f /var/tracim/logs/tracim_web.log

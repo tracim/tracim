@@ -196,7 +196,6 @@ fi
 
 # Create Tracim required folder
 create_dir /var/tracim/data
-create_dir /var/tracim/assets
 create_dir /var/tracim/data/sessions_data
 create_dir /var/tracim/data/sessions_lock
 create_dir /var/tracim/data/depot
@@ -205,7 +204,7 @@ create_dir /var/tracim/data/radicale_storage
 
 # Create Webdav file/config if not exist and activate it
 if [ "$START_WEBDAV" = "1" ]; then
-    if [ ! -f /etc/tracim/tracim_webdav.ini ];then
+    if [ ! -f /etc/tracim/tracim_webdav.ini ]; then
         cp "$docker_script_dir/uwsgi.ini.sample" /etc/tracim/tracim_webdav.ini
         sed -i "s|^module = .*|module = wsgi.webdav:application|g" /etc/tracim/tracim_webdav.ini
         sed -i "s|^http-socket = .*|http-socket = :3030|g" /etc/tracim/tracim_webdav.ini
