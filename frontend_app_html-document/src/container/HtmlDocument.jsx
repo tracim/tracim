@@ -25,11 +25,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   setLocalStorageItem,
@@ -183,24 +179,8 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
-    console.log('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH')
-    this.reloadContentWysiwyg()
   }
 
-  reloadContentWysiwyg = () => {
-    if (!document.getElementById('wysiwygNewVersion') || this.state.mode !== APP_FEATURE_MODE.EDIT) return
-    console.log('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')}/*
-    globalThis.tinymce.remove('#wysiwygNewVersion')
-    globalThis.wysiwyg('#wysiwygNewVersion',
-      this.state.loggedUser.lang,
-      this.handleChangeText,
-      this.handleTinyMceInput,
-      this.handleTinyMceKeyDown,
-      this.handleTinyMceKeyUp,
-      this.handleTinyMceSelectionChange
-    )
-  }
-*/
   componentDidMount () {
     const { props } = this
     this.loadContent()
@@ -209,24 +189,14 @@ export class HtmlDocument extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
-
-    const becameVisible = !prevState.isVisible && state.isVisible
-
     // console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.loadContent()
-      console.log('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE')
-      this.reloadContentWysiwyg()
     }
 
-    if (state.mode === APP_FEATURE_MODE.EDIT && (becameVisible || prevState.mode !== APP_FEATURE_MODE.EDIT)) {
-      globalThis.tinymce.remove('#wysiwygTimelineComment')
-      console.log('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF')
-      this.reloadContentWysiwyg()
-    }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
       globalThis.tinymce.remove('#wysiwygNewVersion')
@@ -234,51 +204,6 @@ export class HtmlDocument extends React.Component {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
     }
   }
-
-  /*
-  handleTinyMceInput = (e, position) => {
-    console.log('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')
-    tinymceAutoCompleteHandleInput(
-      e,
-      (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  handleTinyMceSelectionChange = (e, position) => {
-    console.log('DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
-    tinymceAutoCompleteHandleSelectionChange(
-      (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  handleTinyMceKeyUp = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyUp(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceKeyDown = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyDown(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      state.autoCompleteCursorPosition,
-      state.autoCompleteItemList,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-  */
 
   componentWillUnmount () {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
@@ -381,9 +306,7 @@ export class HtmlDocument extends React.Component {
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
-    console.log('GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
-    this.reloadContentWysiwyg()
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
 
@@ -929,6 +852,8 @@ export class HtmlDocument extends React.Component {
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
+            contentId={state.content.content_id}
+            contentType={CONTENT_TYPE.HTML_DOCUMENT}
             editionAuthor={state.editionAuthor}
             invalidMentionList={state.invalidMentionList}
             mode={state.mode}
@@ -936,13 +861,13 @@ export class HtmlDocument extends React.Component {
             customColor={state.config.hexcolor}
             wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
-            disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
+            disableValidateBtn={(content) => state.rawContentBeforeEdit === content}
             onClickValidateBtn={this.handleClickSaveDocument}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
-            // onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
+            isVisible={state.isVisible}
             deprecatedStatus={state.config.availableStatuses[3]}
             isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
             // onClickRestoreArchived={this.handleClickRestoreArchive}

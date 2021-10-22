@@ -8,10 +8,18 @@ import {
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleSelectionChange
 } from '../../../tinymceAutoCompleteHelper.js'
+import {
+  getLocalStorageItem,
+  LOCAL_STORAGE_FIELD,
+  setLocalStorageItem
+} from '../../../localStorage.js'
 import AutoComplete from '../AutoComplete/AutoComplete.jsx'
+import IconButton from '../../Button/IconButton.jsx'
+import { APP_FEATURE_MODE } from '../../../helper.js'
+import { TracimComponent } from '../../../tracimComponent.js'
+import { CUSTOM_EVENT } from '../../../customEvent.js'
 
 // require('./TextAreaApp.styl') // see https://github.com/tracim/tracim/issues/1156
-const color = require('color')
 
 export class TextAreaApp extends React.Component {
   constructor (props) {
@@ -24,12 +32,53 @@ export class TextAreaApp extends React.Component {
       autoCompleteItemList: [],
       tinymcePosition: 0
     }
+
+    props.registerCustomEventHandlerList([
+      { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
   }
 
   componentDidMount () {
+    const { props, state } = this
+    this.reloadWysiwyg()
+    const localStorage = getLocalStorageItem(
+      props.contentType,
+      {
+        content_id: props.contentId,
+        workspace_id: props.workspaceId
+      },
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
+    )
+    if (!!localStorage && localStorage !== state.text) {
+      this.setState({ text: localStorage })
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    const { props } = this
+    const becameVisible = !prevProps.isVisible && props.isVisible
+
+    if (props.mode === APP_FEATURE_MODE.EDIT && (becameVisible || prevProps.mode !== APP_FEATURE_MODE.EDIT)) {
+      globalThis.tinymce.remove('#wysiwygTimelineComment')
+      this.reloadWysiwyg()
+    }
+
+    if (prevProps.contentId !== props.contentId) {
+      this.reloadWysiwyg()
+    }
+  }
+
+  handleAllAppChangeLanguage = data => {
+    this.reloadWysiwyg()
+  }
+
+  reloadWysiwyg = () => {
+    const { props } = this
+    if (!document.getElementById(props.id) || props.mode !== APP_FEATURE_MODE.EDIT) return
+    globalThis.tinymce.remove(`#${props.id}`)
     globalThis.wysiwyg(
-      `#${this.props.id}`,
-      this.props.lang,
+      `#${props.id}`,
+      props.lang,
       this.handleChangeText,
       this.handleTinyMceInput,
       this.handleTinyMceKeyDown,
@@ -38,14 +87,13 @@ export class TextAreaApp extends React.Component {
     )
   }
 
-  // TODO GIULIA - localstorage, send/validate, reloadContentWysiwygat HtmlDocument, clean code
+  // TODO GIULIA - clean code
 
   handleChangeText = e => {
-    const { state } = this
+    const { props } = this
     const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
     this.setState({ text: newText })
-
-    // setLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
+    setLocalStorageItem(props.contentType, props.contentId, props.workspaceId, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
   }
 
   handleTinyMceInput = (e, position) => {
@@ -124,56 +172,39 @@ export class TextAreaApp extends React.Component {
           />
 
           <div className={`${props.customClass}__button editionmode__button`}>
-            <button
-              type='button'
-              className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn`}
+            <IconButton
+              color={props.customColor}
+              customClass={`${props.customClass}__cancel editionmode__button__cancel`}
+              icon='fas fa-times'
+              intent='secondary'
+              key='TextAreaApp__cancel'
               onClick={props.onClickCancelBtn}
               tabIndex='1'
-              style={{
-                backgroundColor: '#fdfdfd',
-                color: props.customColor,
-                borderColor: props.customColor,
-                ':hover': {
-                  backgroundColor: props.customColor,
-                  color: '#fdfdfd'
-                }
-              }}
-              key='TextAreaApp__cancel'
-            >
-              {props.t('Cancel')}
-            </button>
+              text={props.t('Cancel')}
+            />
 
-            <button
-              type='button'
-              data-cy='editionmode__button__submit'
-              className={`${props.customClass}__submit editionmode__button__submit btn highlightBtn`}
-              onClick={() => props.onClickValidateBtn(state.text)}
-              disabled={props.disableValidateBtn}
-              tabIndex='0' // TODO GIULIA default value 0
-              style={{
-                backgroundColor: props.customColor,
-                color: '#fdfdfd',
-                borderColor: props.customColor,
-                ':hover': {
-                  backgroundColor: color(props.customColor).darken(0.15).hex()
-                }
-              }}
+            <IconButton
+              color={props.customColor}
+              customClass={`${props.customClass}__submit editionmode__button__submit`}
+              dataCy='editionmode__button__submit'
+              disabled={props.disableValidateBtn(state.text)}
+              icon='fas fa-check'
+              intent='primary'
               key='TextAreaApp__validate'
-            >
-              {props.t('Validate')}
-            </button>
+              mode='light'
+              onClick={() => props.onClickValidateBtn(state.text)}
+              text={props.t('Validate')}
+            />
           </div>
         </form>
       </div>
     )
   }
 }
-
-export default translate()(Radium(TextAreaApp))
+export default translate()(Radium(TracimComponent(TextAreaApp)))
 
 TextAreaApp.propTypes = {
   text: PropTypes.string.isRequired,
-  // onChangeText: PropTypes.func.isRequired,
   onClickCancelBtn: PropTypes.func.isRequired,
   onClickValidateBtn: PropTypes.func.isRequired,
   disableValidateBtn: PropTypes.bool,

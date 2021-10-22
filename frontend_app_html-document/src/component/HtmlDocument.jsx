@@ -2,11 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
-
 import {
   APP_FEATURE_MODE,
   ConfirmPopup,
-  AutoComplete,
   IconButton,
   PromptMessage,
   HTMLContent,
@@ -136,11 +134,15 @@ export const HtmlDocument = props => {
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <TextAreaApp
+            contentId={props.contentId}
+            contentType={props.contentType}
             customClass='html-document__editionmode'
             customColor={props.customColor}
             disableValidateBtn={props.disableValidateBtn}
             id={props.wysiwygNewVersion}
+            isVisible={props.isVisible}
             lang={props.lang}
+            mode={props.mode}
             onClickCancelBtn={props.onClickCloseEditMode}
             onClickValidateBtn={props.onClickValidateBtn}
             onChangeText={props.onChangeText}
@@ -163,7 +165,7 @@ HtmlDocument.propTypes = {
   customColor: PropTypes.string,
   editionAuthor: PropTypes.string,
   wysiwygNewVersion: PropTypes.string,
-  disableValidateBtn: PropTypes.bool,
+  disableValidateBtn: PropTypes.func,
   text: PropTypes.string,
   isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,

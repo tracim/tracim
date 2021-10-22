@@ -28,6 +28,7 @@ const IconButton = props => {
       disabled={props.disabled}
       title={props.title || props.text}
       data-cy={props.dataCy}
+      tabIndex={props.tabIndex}
     >
       {props.icon && (
         <i
@@ -70,7 +71,8 @@ IconButton.propTypes = {
   intent: PropTypes.oneOf(['primary', 'secondary', 'link', 'pins']),
   mode: PropTypes.oneOf(['dark', 'light']),
   customClass: PropTypes.string,
-  dataCy: PropTypes.string
+  dataCy: PropTypes.string,
+  tabIndex: PropTypes.string
 }
 
 IconButton.defaultProps = {
@@ -86,7 +88,8 @@ IconButton.defaultProps = {
   intent: 'secondary',
   customClass: '',
   mode: 'dark',
-  dataCy: undefined
+  dataCy: undefined,
+  tabIndex: '0'
 }
 
 export default IconButton
