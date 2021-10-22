@@ -255,7 +255,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${ADD}/${NOTIFICATION}`: {
       const notification = serializeNotification(action.notification)
       const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount + 1 : state.unreadMentionCount
-      let newNotificationList = state.list
+      let newNotificationList = [...state.list]
       if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
         if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
           newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([notification, ...state.list], 'id'))
