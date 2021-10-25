@@ -69,7 +69,7 @@ printenv |grep TRACIM > /var/tracim/data/tracim_env_variables || true
 echo "DISPLAY=:99.0" >> /var/tracim/data/tracim_env_variables
 
 log "Ensuring www-data is the owner of /var/tracim files"
-find /var/tracim/ ! -user www-data ! -group www-data -exec chown www-data:www-data {} \;
+find /var/tracim/ \( ! -user www-data -o ! -group www-data \) -exec chown www-data:www-data {} \;
 loggood "Ensuring www-data is the owner of /var/tracim files: success"
 
 log "Checking database"
