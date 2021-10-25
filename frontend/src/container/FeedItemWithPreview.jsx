@@ -425,7 +425,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickEditComment={this.handleClickEditComment}
                 onClickValidateNewCommentBtn={this.handleClickSend}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
-                wysiwygId={this.getWysiwygId(props.content.id)}
+                wysiwygIdSelector={this.getWysiwygId(props.content.id)}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 timelineData={this.getTimelineData()}

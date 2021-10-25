@@ -20,7 +20,7 @@ dashboard_menu_entry = WorkspaceMenuEntry(
 )
 publication_menu_entry = WorkspaceMenuEntry(
     slug="publication",
-    label="Publications",
+    label="News",
     route="/ui/workspaces/{workspace_id}/publications",
     hexcolor="#bbbbbb",
     fa_icon="fas fa-stream",
