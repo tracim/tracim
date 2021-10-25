@@ -15,7 +15,7 @@ import {
 } from '../../../localStorage.js'
 import AutoComplete from '../AutoComplete/AutoComplete.jsx'
 import IconButton from '../../Button/IconButton.jsx'
-import { APP_FEATURE_MODE } from '../../../helper.js'
+import { APP_FEATURE_MODE, CONTENT_TYPE } from '../../../helper.js'
 import { TracimComponent } from '../../../tracimComponent.js'
 import { CUSTOM_EVENT } from '../../../customEvent.js'
 
@@ -74,10 +74,10 @@ export class TextAreaApp extends React.Component {
 
   reloadWysiwyg = () => {
     const { props } = this
-    if (!document.getElementById(props.id) || props.mode !== APP_FEATURE_MODE.EDIT) return
-    globalThis.tinymce.remove(`#${props.id}`)
+    if (!document.getElementById(props.elementId) || props.mode !== APP_FEATURE_MODE.EDIT) return
+    globalThis.tinymce.remove(`#${props.elementId}`)
     globalThis.wysiwyg(
-      `#${props.id}`,
+      `#${props.elementId}`,
       props.lang,
       this.handleChangeText,
       this.handleTinyMceInput,
@@ -86,8 +86,6 @@ export class TextAreaApp extends React.Component {
       this.handleTinyMceSelectionChange
     )
   }
-
-  // TODO GIULIA - clean code
 
   handleChangeText = e => {
     const { props } = this
@@ -144,7 +142,7 @@ export class TextAreaApp extends React.Component {
 
   render () {
     const { props, state } = this
-    console.log('RERENDER textareaapp')
+
     return (
       <div className='html-document__editionmode__container'>
         {state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
@@ -164,7 +162,7 @@ export class TextAreaApp extends React.Component {
         )}
         <form className={`${props.customClass} editionmode`}>
           <textarea
-            id={props.id}
+            id={props.elementId}
             className={`${props.customClass}__text editionmode__text`}
             value={state.text}
             onChange={this.handleChangeText}
@@ -204,11 +202,35 @@ export class TextAreaApp extends React.Component {
 export default translate()(Radium(TracimComponent(TextAreaApp)))
 
 TextAreaApp.propTypes = {
-  text: PropTypes.string.isRequired,
+  elementId: PropTypes.string.isRequired,
   onClickCancelBtn: PropTypes.func.isRequired,
   onClickValidateBtn: PropTypes.func.isRequired,
-  disableValidateBtn: PropTypes.bool,
-  id: PropTypes.string,
+  workspaceId: PropTypes.number.isRequired,
+  apiUrl: PropTypes.string,
+  contentId: PropTypes.number,
+  contentType: PropTypes.string,
   customClass: PropTypes.string,
-  customColor: PropTypes.string
+  customColor: PropTypes.string,
+  disableValidateBtn: PropTypes.func,
+  isVisible: PropTypes.bool,
+  lang: PropTypes.string,
+  mode: PropTypes.string,
+  onClickAutoCompleteItem: PropTypes.func,
+  searchForMentionOrLinkInQuery: PropTypes.func,
+  text: PropTypes.string
+}
+
+TextAreaApp.defaultProps = {
+  apiUrl: '/',
+  contentId: 0,
+  contentType: CONTENT_TYPE.HTML_DOCUMENT,
+  customClass: '',
+  customColor: '',
+  disableValidateBtn: () => false,
+  isVisible: true,
+  lang: 'en',
+  mode: APP_FEATURE_MODE.EDIT,
+  onClickAutoCompleteItem: () => { },
+  searchForMentionOrLinkInQuery: () => { },
+  text: ''
 }

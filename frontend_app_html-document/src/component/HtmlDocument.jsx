@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
   ConfirmPopup,
+  CONTENT_TYPE,
   IconButton,
   PromptMessage,
   HTMLContent,
@@ -134,21 +135,20 @@ export const HtmlDocument = props => {
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <TextAreaApp
+            apiUrl={props.apiUrl}
             contentId={props.contentId}
             contentType={props.contentType}
             customClass='html-document__editionmode'
             customColor={props.customColor}
             disableValidateBtn={props.disableValidateBtn}
-            id={props.wysiwygNewVersion}
+            elementId={props.wysiwygNewVersion}
             isVisible={props.isVisible}
             lang={props.lang}
             mode={props.mode}
             onClickCancelBtn={props.onClickCloseEditMode}
             onClickValidateBtn={props.onClickValidateBtn}
-            onChangeText={props.onChangeText}
             searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
             text={props.text}
-            apiUrl={props.apiUrl}
             onClickAutoCompleteItem={props.onClickAutoCompleteItem}
             workspaceId={props.workspaceId}
           />
@@ -162,20 +162,28 @@ export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  workspaceId: PropTypes.number.isRequired,
+  wysiwygNewVersion: PropTypes.string.isRequired,
+  contentId: PropTypes.number,
+  contentType: PropTypes.string,
   customColor: PropTypes.string,
-  editionAuthor: PropTypes.string,
-  wysiwygNewVersion: PropTypes.string,
   disableValidateBtn: PropTypes.func,
+  displayNotifyAllMessage: PropTypes.func,
+  editionAuthor: PropTypes.string,
   text: PropTypes.string,
+  invalidMentionList: PropTypes.array,
   isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,
   isDeprecated: PropTypes.bool,
   deprecatedStatus: PropTypes.object,
   isDraftAvailable: PropTypes.bool,
   isRefreshNeeded: PropTypes.bool,
+  isVisible: PropTypes.bool,
+  lang: PropTypes.string,
   mode: PropTypes.string,
+  onClickAutoCompleteItem: PropTypes.func,
   onClickValidateBtn: PropTypes.func,
-  onChangeText: PropTypes.func,
+  onClickCancelSave: PropTypes.func,
   onClickCloseEditMode: PropTypes.func,
   onClickCloseNotifyAllMessage: PropTypes.func,
   onClickLastVersion: PropTypes.func,
@@ -183,14 +191,42 @@ HtmlDocument.propTypes = {
   onClickRefresh: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
-  onClickShowDraft: PropTypes.func
+  onClickSaveAnyway: PropTypes.func,
+  onClickShowDraft: PropTypes.func,
+  searchForMentionOrLinkInQuery: PropTypes.func,
+  showInvalidMentionPopup: PropTypes.bool
 }
 
 HtmlDocument.defaultProps = {
+  contentId: 0,
+  contentType: CONTENT_TYPE.HTML_DOCUMENT,
   customColor: '#252525',
+  deprecatedStatus: {
+    faIcon: ''
+  },
+  disableValidateBtn: () => false,
   editionAuthor: '',
+  invalidMentionList: [],
+  isArchived: false,
+  isDeleted: false,
+  isDeprecated: false,
+  isDraftAvailable: false,
   isRefreshNeeded: false,
+  isVisible: true,
+  lang: 'en',
   mode: APP_FEATURE_MODE.VIEW,
+  onClickAutoCompleteItem: () => { },
+  onClickCancelSave: () => { },
+  onClickCloseEditMode: () => { },
+  onClickCloseNotifyAllMessage: () => { },
   onClickLastVersion: () => { },
-  onClickRefresh: () => { }
+  onClickNotifyAll: () => { },
+  onClickRefresh: () => { },
+  onClickRestoreArchived: () => { },
+  onClickRestoreDeleted: () => { },
+  onClickSaveAnyway: () => { },
+  onClickShowDraft: () => { },
+  showInvalidMentionPopup: false,
+  searchForMentionOrLinkInQuery: () => { },
+  text: ''
 }

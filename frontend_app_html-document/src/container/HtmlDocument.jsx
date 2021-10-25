@@ -77,9 +77,6 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
-      isAutoCompleteActivated: false,
-      autoCompleteCursorPosition: 0,
-      autoCompleteItemList: [],
       invalidMentionList: [],
       oldInvalidMentionList: [],
       showInvalidMentionPopupInComment: false,
@@ -196,7 +193,6 @@ export class HtmlDocument extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       this.loadContent()
     }
-
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
       globalThis.tinymce.remove('#wysiwygNewVersion')
@@ -786,7 +782,7 @@ export class HtmlDocument extends React.Component {
     const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
-    console.log('RERENDER HTMLDOCUMENT')
+
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -852,22 +848,23 @@ export class HtmlDocument extends React.Component {
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
-            contentId={state.content.content_id}
-            contentType={CONTENT_TYPE.HTML_DOCUMENT}
-            editionAuthor={state.editionAuthor}
-            invalidMentionList={state.invalidMentionList}
-            mode={state.mode}
             apiUrl={state.config.apiUrl}
             customColor={state.config.hexcolor}
+            contentId={state.content.content_id}
+            contentType={CONTENT_TYPE.HTML_DOCUMENT}
+            disableValidateBtn={(content) => state.rawContentBeforeEdit === content}
+            editionAuthor={state.editionAuthor}
+            invalidMentionList={state.invalidMentionList}
+            isVisible={state.isVisible}
+            lang={state.loggedUser.lang}
+            mode={state.mode}
             wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
-            disableValidateBtn={(content) => state.rawContentBeforeEdit === content}
             onClickValidateBtn={this.handleClickSaveDocument}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
-            isVisible={state.isVisible}
             deprecatedStatus={state.config.availableStatuses[3]}
             isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
             // onClickRestoreArchived={this.handleClickRestoreArchive}
@@ -875,10 +872,6 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
-            isAutoCompleteActivated={state.isAutoCompleteActivated}
-            tinymcePosition={state.tinymcePosition}
-            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            autoCompleteItemList={state.autoCompleteItemList}
             onClickAutoCompleteItem={(mention) => tinymceAutoCompleteHandleClickItem(mention, this.setState.bind(this))}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
@@ -888,7 +881,6 @@ export class HtmlDocument extends React.Component {
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
-            lang={state.loggedUser.lang}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
           />
