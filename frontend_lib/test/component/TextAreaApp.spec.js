@@ -14,11 +14,12 @@ describe('<TextAreaApp />', () => {
     text: 'Lorem',
     customClass: 'randomTestClass',
     customColor: '#FFFFFF',
-    id: 'MyId',
+    elementId: 'MyId',
     onChangeText: onChangeTextCallBack,
     onClickCancelBtn: onClickCancelBtnCallBack,
     onClickValidateBtn: onClickValidateBtnCallBack,
-    disableValidateBtn: false
+    disableValidateBtn: () => false,
+    workspaceId: 1
   }
 
   const wrapper = mount(
@@ -46,11 +47,6 @@ describe('<TextAreaApp />', () => {
     it('should call props.onClickCancelBtn when handler onClickCancelBtn is called', () => {
       wrapper.find(`button.${props.customClass}__cancel`).simulate('click')
       expect(onClickCancelBtnCallBack.called).to.equal(true)
-    })
-
-    it('should call props.onChangeText when handler onChangeText is called', () => {
-      wrapper.find(`textarea.${props.customClass}__text`).simulate('change')
-      expect(onChangeTextCallBack.called).to.equal(true)
     })
   })
 })
