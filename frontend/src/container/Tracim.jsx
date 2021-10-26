@@ -706,6 +706,17 @@ export class Tracim extends React.Component {
             </div>
           </CardPopup>
         )}
+        {/* INFO - MB - 2021-10-26: Accepted popup */}
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.ACCEPTED && (
+          <CardPopup
+            customClass='callpopup__body'
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClosePopup}
+            label={props.t('{{username}} has accepted you call. Click on this {{link}} if you have not been redirected.', { username: state.userCall.callee.public_name })}
+            faIcon='fas fa-phone'
+            displayCloseButton
+          />
+        )}
 
         <ReduxTlmDispatcher />
 
