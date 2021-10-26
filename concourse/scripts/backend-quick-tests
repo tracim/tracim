@@ -6,7 +6,7 @@ docker_registry=${2-""}
 
 script_dir="$(realpath $(dirname $0))"
 source "$script_dir/util-lib.sh"
-skip_if_no_changed_file_match "backend"
+skip_if_no_changed_file_match "^(backend|concourse)"
 
 source "$HOME/.bashrc"
 pyenv shell "$python_version"
