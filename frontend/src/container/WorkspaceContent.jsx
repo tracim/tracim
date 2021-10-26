@@ -305,7 +305,7 @@ export class WorkspaceContent extends React.Component {
     // the workspace read status list is intentional. The related endpoint can be slow
     // and making this synchronous makes Tracim feel very slow.
     // The consequence is that the content list will be displayed, and then some contents
-    // will switch from bold to non bold after the read status are received, making the UI
+    // will switch from bold to non bold after the read status list is received, making the UI
     // change maybe somewhat unexpectedly for the user without action, but this is better
     // than making the user wait
     // See https://github.com/tracim/tracim/issues/5009
