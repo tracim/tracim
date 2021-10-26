@@ -62,6 +62,12 @@ See the [Backend README](backend/README.md).
 
 #### Option2: Install backend: Automated script for easy setup
 
+Ensure your shell has an UTF-8 locale (it should be the case for any recent distribution)
+
+    echo $LANG
+
+should return a string like `en_EN.UTF-8`.
+
 This script runs the backend with a simple default configuration: development.ini conf file. It uses
 the default config file, sqlite database, etc.
 
