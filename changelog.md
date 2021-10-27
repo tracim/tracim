@@ -15,7 +15,8 @@
 
 ### Breaking/Important change
 
-- Rewording from "Publications" to "News
+- Some rewording (issue [#4348](https://github.com/tracim/tracim/issues/4348)): // mettre bonne issue
+-   Rewording from `Publications` to `News`
 
 
 # 3.9.2 / 2021-07-30
