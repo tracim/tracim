@@ -1,3 +1,18 @@
+# 3.10.0 / 2021-10-29
+
+### New Features
+
+- 
+
+### Fixed Issues
+[#](https://github.com/tracim/tracim/issues/)
+- : [#](https://github.com/tracim/tracim/issues/)
+
+### Breaking/Important change
+
+
+
+
 # 3.9.2 / 2021-07-30
 
 Fix installation process (broken due to the last version of Yarn).
