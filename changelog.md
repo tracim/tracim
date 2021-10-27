@@ -29,7 +29,8 @@
 [#4826](https://github.com/tracim/tracim/issues/4826),
 [#4882](https://github.com/tracim/tracim/issues/4882),
 [#4929](https://github.com/tracim/tracim/issues/4929),
-[#4950](https://github.com/tracim/tracim/issues/4950)
+[#4950](https://github.com/tracim/tracim/issues/4950),
+[#4969](https://github.com/tracim/tracim/issues/4969)
 - Search: [#4825](https://github.com/tracim/tracim/issues/4825)
 - Email: [#4912](https://github.com/tracim/tracim/issues/4912),
 [#4966](https://github.com/tracim/tracim/issues/4966)
