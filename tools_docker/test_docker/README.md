@@ -13,7 +13,7 @@ for emails and you need to setup dns resolving using a special Docker image)
 ## Prerequisities
 
 - install some python packages:
-`pip install pytest testinfra python-dotenv`
+`pip install pytest pytest-testinfra python-dotenv`
 - build tracim docker image `DOCKER_TRACIM_IMAGE` set in `test_config.env` and [build part of tracim docker doc](../README.md), default
 value is `algoo/tracim:test` which does not exist in dockerhub, adapt `DOCKER_TRACIM_IMAGE` according to the image you decide to test)
 - choose elasticsearch docker image `DOCKER_ELASTICSEARCH_IMAGE` set in`test_config.env`   (we do recommand you to build and use

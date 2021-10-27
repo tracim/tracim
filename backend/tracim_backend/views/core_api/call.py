@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from pyramid.config import Configurator
 
 from tracim_backend.exceptions import UserCallNotFound
@@ -18,12 +20,6 @@ from tracim_backend.views.core_api.schemas import UserCallSchema
 from tracim_backend.views.core_api.schemas import UserCallsSchema
 from tracim_backend.views.core_api.schemas import UserIdCallIdPathSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__USER_CALL_SECTION = "User Calls"
 SWAGGER_TAG__USER_CALL_ENDPOINTS = generate_documentation_swagger_tag(

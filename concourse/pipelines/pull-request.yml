@@ -1,7 +1,7 @@
 ## YAML definitions re-used in plans
 definitions:
-  main_python_version: &main_python_version "3.6.14"
-  python_versions: &python_versions ["3.5.10" , "3.6.14", "3.7.11"]
+  main_python_version: &main_python_version "3.9.6"
+  python_versions: &python_versions ["3.6.14", "3.7.11", "3.8.11", "3.9.6"]
   databases: &databases ["sqlite", "postgresql", "mysql", "mariadb"]
 
 # plan step to put the current job name as pending in github's PR
@@ -59,7 +59,8 @@ resources:
 - name: test-image
   type: registry-image
   source:
-    repository: algooci/tracim
+    # TODO - S.G. - 2021-10-05 - rename this image to algooci/tracim as soon as #4874 PR is merged
+    repository: algooci/tracim-python3.9
 # resource used to abort the running builds before starting our test jobs
 - name: abort-running-builds
   type: abort-running-builds

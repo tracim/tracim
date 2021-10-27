@@ -1,7 +1,8 @@
 from hapic import Hapic
-from hapic import MarshmallowProcessor
 
-hapic = Hapic(processor_class=MarshmallowProcessor)
+from tracim_backend.views.processor import TracimProcessor
+
+hapic = Hapic(processor_class=TracimProcessor)
 
 # TODO - G.M - 2018-08-08 - [GlobalVar] Refactor Global var of tracim_backend
 

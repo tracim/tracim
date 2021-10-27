@@ -1,0 +1,12 @@
+ghostscript
+git
+imagemagick
+iproute2
+libfile-mimeinfo-perl
+libimage-exiftool-perl
+libmagic1
+locales
+poppler-utils
+python3
+python3-pip
+qpdf

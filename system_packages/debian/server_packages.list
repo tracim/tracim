@@ -1,0 +1,13 @@
+apache2
+apt-transport-https
+gnupg
+gnupg2
+libapache2-mod-proxy-uwsgi
+mongrel2-core
+postgresql-client
+pushpin
+redis-server
+software-properties-common
+supervisor
+uwsgi
+uwsgi-plugin-python3
