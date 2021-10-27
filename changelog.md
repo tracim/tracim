@@ -5,13 +5,13 @@
 - Inter-user call feature
 - Rework on the notification wall
 - Rework on the recent activities (opening in an app, comments display, responsiveness...)
-- NOrmalize the interface
+- Normalize the interface
 - Visible alerts in the tracim tabs
 - Pagination of histories and publication ("see more" button)
 
 ### Fixed Issues
 
-- Ux [#3649](https://github.com/tracim/tracim/issues/3649),
+- UX: [#3649](https://github.com/tracim/tracim/issues/3649),
 [#4802](https://github.com/tracim/tracim/issues/4802),
 [#4872](https://github.com/tracim/tracim/issues/4872),
 [#4916](https://github.com/tracim/tracim/issues/4916),
@@ -41,7 +41,7 @@
 [#4837](https://github.com/tracim/tracim/issues/4837),
 [#5009](https://github.com/tracim/tracim/issues/5009)
 - Installation: [#3680](https://github.com/tracim/tracim/issues/3680),
-[#4874](https://github.com/tracim/tracim/issues/4874) 
+[#4874](https://github.com/tracim/tracim/issues/4874)
 - Docker: [#4991](https://github.com/tracim/tracim/issues/4991)
 
 
