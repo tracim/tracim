@@ -10,13 +10,17 @@ ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
 
 COPY . tracim
-WORKDIR tracim
+WORKDIR /tracim
 RUN \
     ./concourse/scripts/install_backend_packages && \
     # needed to install different python versions
-    ./concourse/scripts/install_pyenv && \
+    ./concourse/scripts/install_pyenv
+
+FROM base_install AS main
     # tested python versions
-    ./concourse/scripts/install_backend_python 3.5.10 3.6.14 3.7.11 && \
+
+RUN \
+    ./concourse/scripts/install_backend_python 3.6.14 3.7.11 3.8.11 3.9.6 && \
     # frontend dependencies
     ./install_frontend_dependencies.sh root && \
     # cypress

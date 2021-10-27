@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import typing
 
 from pyramid.config import Configurator
@@ -85,11 +86,6 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ALL_SECTIO
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
 
 SWAGGER_TAG__WORKSPACE_MEMBERS_SECTION = "Members"
 SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_SECTION = "Subscriptions"

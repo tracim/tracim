@@ -263,8 +263,6 @@ export class WorkspaceContent extends React.Component {
         )
     )
 
-    const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
-
     switch (fetchContentList.status) {
       case 200: {
         const contentList = fetchContentList.json.items
@@ -301,13 +299,24 @@ export class WorkspaceContent extends React.Component {
       }
     }
 
+    this.setState({ contentLoaded: true })
+
+    // NOTE - RJ - 2021-10-26 - marking the content list as loaded before getting
+    // the workspace read status list is intentional. The related endpoint can be slow
+    // and making this synchronous makes Tracim feel very slow.
+    // The consequence is that the content list will be displayed, and then some contents
+    // will switch from bold to non bold after the read status list is received, making the UI
+    // change maybe somewhat unexpectedly for the user without action, but this is better
+    // than making the user wait
+    // See https://github.com/tracim/tracim/issues/5009
+
+    const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
+
     switch (wsReadStatus.status) {
       case 200: props.dispatch(setWorkspaceReadStatusList(wsReadStatus.json)); break
       case 401: break
       default: props.dispatch(newFlashMessage(props.t('Error while loading read status list'), 'warning'))
     }
-
-    this.setState({ contentLoaded: true })
   }
 
   handleClickContentItem = content => {
