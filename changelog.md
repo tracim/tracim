@@ -2,7 +2,12 @@
 
 ### New Features
 
-- 
+- Inter-user call feature
+- Rework on the notification wall
+- Rework on the recent activities (opening in an app, comments display, responsiveness...)
+- NOrmalize the interface
+- Visible alerts in the tracim tabs
+- Pagination of histories and publication ("see more" button)
 
 ### Fixed Issues
 [#](https://github.com/tracim/tracim/issues/)
@@ -10,7 +15,7 @@
 
 ### Breaking/Important change
 
-
+- Rewording from "Publications" to "News
 
 
 # 3.9.2 / 2021-07-30
