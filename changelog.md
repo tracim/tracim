@@ -10,8 +10,40 @@
 - Pagination of histories and publication ("see more" button)
 
 ### Fixed Issues
-[#](https://github.com/tracim/tracim/issues/)
-- : [#](https://github.com/tracim/tracim/issues/)
+
+- Ux [#3649](https://github.com/tracim/tracim/issues/3649),
+[#4802](https://github.com/tracim/tracim/issues/4802),
+[#4872](https://github.com/tracim/tracim/issues/4872),
+[#4916](https://github.com/tracim/tracim/issues/4916),
+[#4918](https://github.com/tracim/tracim/issues/4918),
+[#4919](https://github.com/tracim/tracim/issues/4919)
+- App-agenda: [#4558](https://github.com/tracim/tracim/issues/4558)
+- App-file: [#4056](https://github.com/tracim/tracim/issues/4056)
+- App-admin: [#3689](https://github.com/tracim/tracim/issues/3689)
+- Frontend: [#3978](https://github.com/tracim/tracim/issues/3978),
+[#4170](https://github.com/tracim/tracim/issues/4170),
+[#4440](https://github.com/tracim/tracim/issues/4440),
+[#4463](https://github.com/tracim/tracim/issues/4463),
+[#4666](https://github.com/tracim/tracim/issues/4666),
+[#4815](https://github.com/tracim/tracim/issues/4815),
+[#4826](https://github.com/tracim/tracim/issues/4826),
+[#4882](https://github.com/tracim/tracim/issues/4882),
+[#4929](https://github.com/tracim/tracim/issues/4929),
+[#4950](https://github.com/tracim/tracim/issues/4950)
+- Search: [#4825](https://github.com/tracim/tracim/issues/4825)
+- Email: [#4912](https://github.com/tracim/tracim/issues/4912),
+[#4966](https://github.com/tracim/tracim/issues/4966)
+- Backend: [#4296](https://github.com/tracim/tracim/issues/4296),
+[#4352](https://github.com/tracim/tracim/issues/4352),
+[#4784](https://github.com/tracim/tracim/issues/4784)
+- Performance: [#3628](https://github.com/tracim/tracim/issues/3628),
+[#3925](https://github.com/tracim/tracim/issues/3925),
+[#4837](https://github.com/tracim/tracim/issues/4837),
+[#5009](https://github.com/tracim/tracim/issues/5009)
+- Installation: [#3680](https://github.com/tracim/tracim/issues/3680),
+[#4874](https://github.com/tracim/tracim/issues/4874) 
+- Docker: [#4991](https://github.com/tracim/tracim/issues/4991)
+
 
 ### Breaking/Important change
 
