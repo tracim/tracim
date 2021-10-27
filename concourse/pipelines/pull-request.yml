@@ -59,8 +59,7 @@ resources:
 - name: test-image
   type: registry-image
   source:
-    # TODO - S.G. - 2021-10-05 - rename this image to algooci/tracim as soon as #4874 PR is merged
-    repository: algooci/tracim-python3.9
+    repository: algooci/tracim
 # resource used to abort the running builds before starting our test jobs
 - name: abort-running-builds
   type: abort-running-builds
