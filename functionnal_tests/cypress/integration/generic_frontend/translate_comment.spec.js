@@ -24,10 +24,9 @@ describe('Comment translation', function () {
       cy.contains('.html-document__contentpage__timeline__comment__body__content', 'A beautiful comment')
     })
 
-    it('a menu should allow to change the target language', () => {
+    it('a menu should allow to change the target language and translate in one click', () => {
       cy.get('[data-cy=commentTranslateButton__languageMenu]').click()
       cy.get('[data-cy=commentTranslateButton__language__fr]').click()
-      cy.get('[data-cy=commentTranslateButton]').click()
       cy.contains('.html-document__contentpage__timeline__comment__body__content', 'fr')
     })
   })

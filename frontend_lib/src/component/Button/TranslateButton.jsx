@@ -29,7 +29,7 @@ export const TranslateButton = props => {
       <div className={className}>
         <IconButton
           text={props.t('Translate to {{language}}', { language: targetLanguage.display })}
-          onClick={props.onClickTranslate}
+          onClick={() => props.onClickTranslate(props.targetLanguageCode)}
           intent='link'
           mode='light'
           dataCy={props.dataCy}

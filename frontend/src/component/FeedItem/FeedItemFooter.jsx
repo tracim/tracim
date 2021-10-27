@@ -36,7 +36,10 @@ export class FeedItemFooter extends React.Component {
             translationState={props.translationState}
             onClickTranslate={props.onClickTranslate}
             onClickRestore={props.onClickRestore}
-            onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+            onChangeTargetLanguageCode={languageCode => {
+              props.onChangeTranslationTargetLanguageCode(languageCode)
+              props.onClickTranslate(languageCode)
+            }}
             targetLanguageList={props.translationTargetLanguageList}
             targetLanguageCode={props.translationTargetLanguageCode}
             dataCy='commentTranslateButton'

@@ -217,7 +217,7 @@ for (const pageTestCase of activityPages) {
         cy.contains('.feedItem__preview > a', smallContent)
       })
 
-      it('a menu should allow to change the target language', () => {
+      it('a menu should allow to change the target language and translate in one click', () => {
         cy.updateHtmlDocument(
           contentId,
           workspaceId,
@@ -228,7 +228,6 @@ for (const pageTestCase of activityPages) {
         cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
         cy.get('[data-cy=commentTranslateButton__languageMenu]').click()
         cy.get('[data-cy=commentTranslateButton__language__fr]').click()
-        cy.get('[data-cy=commentTranslateButton]').click()
         cy.contains('.feedItem__preview > a', 'fr')
       })
     })

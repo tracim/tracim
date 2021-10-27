@@ -669,14 +669,14 @@ export class HtmlDocument extends React.Component {
     ))
   }
 
-  handleTranslateDocument = () => {
+  handleTranslateDocument = (languageCode = null) => {
     const { state } = this
     handleTranslateHtmlContent(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
       state.content.current_revision_id,
-      state.translationTargetLanguageCode,
+      languageCode || state.translationTargetLanguageCode,
       state.config.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, translationState })
@@ -731,10 +731,10 @@ export class HtmlDocument extends React.Component {
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
-            onClickTranslateComment={comment => props.handleTranslateComment(
+            onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
-              state.translationTargetLanguageCode
+              languageCode || state.translationTargetLanguageCode
             )}
             onClickRestoreComment={props.handleRestoreComment}
             onClickEditComment={this.handleClickEditComment}
