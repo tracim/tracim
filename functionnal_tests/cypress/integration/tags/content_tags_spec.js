@@ -1,8 +1,10 @@
 import { PAGES } from '../../support/urls_commands'
 import { SELECTORS } from '../../support/generic_selector_commands'
 
-describe('Create tags', () => {
-  const fileTitle = 'FileForSwitch'
+// FIIXME - GB - 2021-10-27 - Unstabel test, async problem
+// See https://github.com/tracim/tracim/issues/4995
+describe.skip('Create tags', () => {
+  const fileTitle = 'FileForTags'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
 
@@ -40,23 +42,29 @@ describe('Create tags', () => {
             cy.get(validateButtonClass).click()
             cy.contains(flashMessageClass, flashMessageTextWorkspace)
             if (testedContent === 'file') {
+              cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
+              cy.contains('.userstatus__role__text', 'Space manager')
               cy.createFile(fullFilename, contentType, fileTitle, workspaceId).then(({ content_id: contentId }) => {
                 cy.visitPage({
                   pageName: PAGES.CONTENT_OPEN,
                   params: { workspaceId, contentType: 'file', contentId }
                 })
+                cy.contains('.file__contentpage__header__title', fileTitle)
               })
               cy.get('[data-cy=popin_right_part_tag]').click()
             } else {
               cy.createHtmlDocument('A note', workspaceId).then(({ content_id: contentId }) => {
+                cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
+                cy.contains('.userstatus__role__text', 'Space manager')
                 cy.visitPage({
                   pageName: PAGES.CONTENT_OPEN,
                   params: { workspaceId, contentType: 'html-document', contentId }
                 })
+                cy.contains('.html-document__contentpage__edition__header__title', 'A note')
                 cy.waitForTinyMCELoaded()
-                cy.typeInTinyMCE('Bar')
-                cy.get('[data-cy=editionmode__button__submit]').click()
-                cy.get('[data-cy=popin_right_part_tag]').click()
+                  .then(() => cy.typeInTinyMCE('Bar'))
+                cy.get('[data-cy=editionmode__button__submit]').should('be.visible').click()
+                cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
               })
             }
           })
