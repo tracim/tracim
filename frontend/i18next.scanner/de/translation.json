@@ -507,5 +507,6 @@
   "News": "Nachrichten",
   "News of {{author}} on {{date}}": "Nachricht von {{author}} am {{date}}",
   "Error while saving new news": "Fehler beim Speichern eine neue Nachricht",
-  " is calling you on Tracim": " ruft Sie an auf Tracim"
+  " is calling you on Tracim": " ruft Sie an auf Tracim",
+  "{{author}} called you": "{{author}} hat Sie angerufen"
 }

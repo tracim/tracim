@@ -507,5 +507,6 @@
   "News": "News",
   "News of {{author}} on {{date}}": "News of {{author}} on {{date}}",
   "Error while saving new news": "Error while saving new news",
-  " is calling you on Tracim": " is calling you on Tracim"
+  " is calling you on Tracim": " is calling you on Tracim",
+  "{{author}} called you": "{{author}} called you"
 }
