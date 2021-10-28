@@ -50,7 +50,7 @@
 
 ### Breaking/Important change
 
-- Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
+- Apache: default configuration change. You need to delete your config file `/{TRACIM-DOCKER-VOLUME}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
 :warning: if you not apply this, Tracim can't run correctly. An error message is visible in the web browser about incorrect path.
 - For the call feature on existing installation: New file necessary in the local `branding/` folder (issue [#4970](https://github.com/tracim/tracim/issues/4970)):
 :warning: This manual change is required to use call feature correctly (same change for local installation or docker installation).
