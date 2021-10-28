@@ -52,7 +52,7 @@
 - :warning: Apache default configuration change. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039)
 - Rewording `Publications` to `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
 - Call feature: need modification on existing installation. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039)
-- Configuration file: default configuration change. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039) 
+- Configuration file `developmeent.ini`: default configuration change. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039) 
 - :warning: Python 3.5 support dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Python 3.8 and 3.9 support (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Docker images now rely on Debian Bullseye (11) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
