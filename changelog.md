@@ -50,15 +50,16 @@
 
 - Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
 :warning: if you not apply this, Tracim can't run correctly. An error message is visible in the web browser about incorrect path.
-- On existing installation: Modification necessary in local `branding/` folder if you want to use call feature (issue [#4970](https://github.com/tracim/tracim/issues/4970)). A new file is added in `branding.sample/` folder given as an example in the repository. A manual change is required to run this version (same process for local installation or docker installation):
+- For the call feature on existing installation: New file necessary in the local `branding/` folder (issue [#4970](https://github.com/tracim/tracim/issues/4970)):
+:warning: This manual change is required to use call feature correctly (same change for local installation or docker installation).
     - for Tracim >= 3.8.2
       - You need to add this file `frontend/dist/assets/branding.sample/incoming-call.ogg` in your local `branding/` folder.
-        - If you use tracim directly from repository you just need to execute this:
+        - If you use tracim directly from repository you need to use this:
         ~~~
         TRACIM-INSTALLATION-PATH="/tracim/installation/path"
         cp $TRACIM-INSTALLATION-PATH/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-INSTALLATION-PATH/frontend/dist/assets/branding/incoming-call.ogg 
         ~~~
-        - If you use Tracim with docker, you need to start new version of tracim and when Tracim is running, you need to execute this command to add the file in the default local `branding/` folder:
+        - If you use Tracim with docker, you need to start Tracim 3.10.0 and when Tracim is running, you need to execute this command to add the file in the default local `branding/` folder:
         ~~~
         TRACIM-DOCKER-VOLUME="~/tracim"
         docker cp {container_name}}:/tracim/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-DOCKER-VOLUME/etc/branding/
@@ -71,8 +72,15 @@
 - Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed. We have added `user_call.created (issue [#5029](https://github.com/tracim/tracim/issues/5029)).
   - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
 ~~~
-- Some rewording (issue [#4950](https://github.com/tracim/tracim/issues/4950)):
-  - Rewording from `Publications` to `News`
+- Rewording `Publications` to `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
+- Support of Python 3.5 has been dropped
+- Support of Python 3.8 and 3.9 has been added
+- All new docker images for Tracim version >= 3.9.10 run on Debian Bullseye (11) (All oldest versions run on Debian Stretch (9))
+- More information about supported OS visible directly in the [README](README.md)
+
+### Known Issues
+
+- The RAW previews is no more supported until we fix this (issue [#5008](https://github.com/tracim/tracim/issues/5008)) 
 
 
 # 3.9.2 / 2021-07-30
