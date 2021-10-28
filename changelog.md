@@ -3,11 +3,12 @@
 ### New Features
 
 - Inter-user call feature
-- Rework on the notification wall
-- Rework on the recent activities (opening in an app, comments display, responsiveness...)
+- Improvement on the notification wall
+- Notifications alerts now visible in the browser tabs
+- Performance improvement felt by the user
+- Improvement of news (opening in an application, comments display, responsiveness...)
+- Pagination of histories and news ("see more" button)
 - Normalize the interface
-- Visible alerts in the tracim tabs
-- Pagination of histories and publication ("see more" button)
 
 ### Fixed Issues
 
