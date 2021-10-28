@@ -16,7 +16,8 @@
 [#4872](https://github.com/tracim/tracim/issues/4872),
 [#4916](https://github.com/tracim/tracim/issues/4916),
 [#4918](https://github.com/tracim/tracim/issues/4918),
-[#4919](https://github.com/tracim/tracim/issues/4919)
+[#4919](https://github.com/tracim/tracim/issues/4919),
+[#4951](https://github.com/tracim/tracim/issues/4951)
 - App-agenda: [#4558](https://github.com/tracim/tracim/issues/4558)
 - App-file: [#4056](https://github.com/tracim/tracim/issues/4056)
 - App-admin: [#3689](https://github.com/tracim/tracim/issues/3689)
