@@ -52,6 +52,7 @@
 
 - Apache: default configuration change. You need to delete your config file `/{TRACIM-DOCKER-VOLUME}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
 :warning: if you not apply this, Tracim can't run correctly. An error message can be visible in the web browser about incorrect path.
+- Rewording `Publications` to `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
 - For the call feature on existing installation: New file required in the local `branding/` folder (issue [#4970](https://github.com/tracim/tracim/issues/4970)):
 :warning: This manual change is required to use call feature correctly (same change for local installation or docker installation).
     - For Tracim >= 3.8.2
@@ -74,11 +75,12 @@
 - Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed. We have added `user_call.created (issue [#5029](https://github.com/tracim/tracim/issues/5029)).
   - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
 ~~~
-- Rewording `Publications` to `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
 - Support of Python 3.5 has been dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Support of Python 3.8 and 3.9 has been added (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - All new docker images for Tracim version >= 3.9.10 run on Debian Bullseye (11) (All oldest versions run on Debian Stretch (9)) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - More information about supported OS visible directly in the [README](README.md)
+- Mysql and Mariadb is no more officialy supported. If someone need support for this kind of database, please create issue on Tracim repository. If nobody ask for some support, we remove Mysql and Mariadb in the next major release 3.11.0
+
 
 ### Known Issues
 
