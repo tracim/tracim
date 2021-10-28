@@ -2,13 +2,13 @@
 
 ### New Features
 
-- Inter-user call feature
-- Improvement on the notification wall
-- Notifications alerts now visible in the browser tabs
-- Performance improvement felt by the user
-- Improvement of news (opening in an application, comments display, responsiveness...)
-- Pagination of histories and news ("see more" button)
-- Normalize the interface
+- 1-to-1 visioconferences (based on Jitsi Meet)
+- Notification wall Improvement (notification grouping, design improvment, mentions highlight, etc)
+- Notifications alerts for the calls are now visible in the browser tabs
+- Performance improvement (opening of apps, timelines...)
+- News feature improvment: opening news in dedicated application, thread design, responsiveness...
+- Timeline and news pagination
+- UI normalization work (margins, font size, etc)
 
 ### Fixed Issues
 
@@ -47,44 +47,21 @@
 [#4874](https://github.com/tracim/tracim/issues/4874)
 - Docker: [#4991](https://github.com/tracim/tracim/issues/4991)
 
-
 ### Breaking/Important change
 
-- Apache: default configuration change. You need to delete your config file `/{TRACIM-DOCKER-VOLUME}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
-:warning: if you not apply this, Tracim can't run correctly. An error message can be visible in the web browser about incorrect path.
+- :warning: Apache default configuration change. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039)
 - Rewording `Publications` to `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
-- For the call feature on existing installation: New file required in the local `branding/` folder (issue [#4970](https://github.com/tracim/tracim/issues/4970)):
-:warning: This manual change is required to use call feature correctly (same change for local installation or docker installation).
-    - For Tracim >= 3.8.2
-      - You need to add this file `frontend/dist/assets/branding.sample/incoming-call.ogg` in your local `branding/` folder.
-        - If you use tracim directly from repository you need to use this:
-        ~~~
-        TRACIM-INSTALLATION-PATH="/tracim/installation/path"
-        cp $TRACIM-INSTALLATION-PATH/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-INSTALLATION-PATH/frontend/dist/assets/branding/incoming-call.ogg 
-        ~~~
-        - If you use Tracim with docker, you need to start Tracim 3.10.0 and when Tracim is running, you need to execute this command to add the file in the default local `branding/` folder:
-        ~~~
-        TRACIM-DOCKER-VOLUME="~/tracim"
-        docker cp {container_name}}:/tracim/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-DOCKER-VOLUME/etc/branding/
-        ~~~
-    - For Tracim < 3.8.0
-      - No manual change necessary (look documentation "for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json`" in 3.8.2 section to make sure you have done the modification correctly.)
-
-**Valeur `web.notifications.excluded` ajouté a vérifier (en attente du fix. PR en cours)**
-~~~
-- Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed. We have added `user_call.created (issue [#5029](https://github.com/tracim/tracim/issues/5029)).
-  - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
-~~~
-- Support of Python 3.5 has been dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
-- Support of Python 3.8 and 3.9 has been added (issue [#4874](https://github.com/tracim/tracim/issues/4874))
-- All new docker images for Tracim version >= 3.9.10 run on Debian Bullseye (11) (All oldest versions run on Debian Stretch (9)) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
-- More information about supported OS visible directly in the [README](README.md)
-- Mysql and Mariadb is no more officialy supported. If someone need support for this kind of database, please create issue on Tracim repository. If nobody ask for some support, we remove Mysql and Mariadb in the next major release 3.11.0
-
+- Call feature: need modification on existing installation. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039)
+- Configuration file: default configuration change. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039) 
+- :warning: Python 3.5 support dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Python 3.8 and 3.9 support (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Docker images now rely on Debian Bullseye (11) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Supported OS: see [README](README.md)
+- Mysql and Mariadb are not officially supported anymore. Should anyone require support for those database systems, please create issue on Tracim repository. If nobody requires support, we'll remove Mysql and Mariadb in the next major release 3.11.0
 
 ### Known Issues
 
-- The RAW previews is no more supported until we do fix (issue [#5008](https://github.com/tracim/tracim/issues/5008)) 
+- RAW previews are not supported anymore until we do fix (issue [#5008](https://github.com/tracim/tracim/issues/5008)) 
 
 
 # 3.9.2 / 2021-07-30
