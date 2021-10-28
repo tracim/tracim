@@ -12,6 +12,7 @@ import {
   newFlashMessage,
   setWorkspaceAgendaUrl,
   setWorkspaceDetail,
+  setWorkspaceLoaded,
   setWorkspaceMemberList
 } from '../action-creator.sync.js'
 
@@ -24,17 +25,37 @@ class WorkspacePage extends React.Component {
   }
 
   async updateCurrentWorkspace () {
-    await Promise.all([this.loadMemberList(), this.loadWorkspaceDetail()])
-  }
-
-  async loadMemberList () {
     const { props } = this
 
-    const fetchWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(props.workspaceId))
-    switch (fetchWorkspaceMemberList.status) {
-      case 200: props.dispatch(setWorkspaceMemberList(fetchWorkspaceMemberList.json)); break
-      case 400: break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+    const requestMemberList = props.dispatch(getWorkspaceMemberList(props.workspaceId))
+    const requestWorkspaceDetail = props.dispatch(getWorkspaceDetail(props.workspaceId))
+
+    const [responseMemberList, responseWorkspaceDetail] = await Promise.all([
+      requestMemberList, requestWorkspaceDetail
+    ])
+
+    if (responseMemberList.status === 200 && responseWorkspaceDetail.status === 200) {
+      props.dispatch(setWorkspaceMemberList(responseMemberList.json))
+      props.dispatch(setWorkspaceDetail(responseWorkspaceDetail.json))
+      props.dispatch(setWorkspaceLoaded())
+    } else {
+      switch (responseMemberList.status) {
+        case 200: break
+        case 400: break
+        default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
+      }
+      switch (responseWorkspaceDetail.status) {
+        case 200:
+          if (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled) {
+            this.loadCalendarDetail()
+          }
+          break
+        case 400:
+          props.history.push(PAGE.HOME)
+          props.dispatch(newFlashMessage(props.t('Unknown space')))
+          break
+        default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
+      }
     }
   }
 
@@ -53,39 +74,33 @@ class WorkspacePage extends React.Component {
     }
   }
 
-  async loadWorkspaceDetail () {
-    const { props } = this
-
-    const fetchWorkspaceDetail = await props.dispatch(getWorkspaceDetail(props.workspaceId))
-    switch (fetchWorkspaceDetail.status) {
-      case 200:
-        props.dispatch(setWorkspaceDetail(fetchWorkspaceDetail.json))
-        if (props.appList.some(a => a.slug === 'agenda') && fetchWorkspaceDetail.json.agenda_enabled) {
-          this.loadCalendarDetail()
-        }
-        break
-      case 400:
-        props.history.push(PAGE.HOME)
-        props.dispatch(newFlashMessage(props.t('Unknown space')))
-        break
-      default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('space detail')}`, 'warning')); break
-    }
-  }
-
   componentDidUpdate (prevProps) {
-    const newWorkspaceId = Number(this.props.workspaceId)
+    const { props } = this
+    const newWorkspaceId = Number(props.workspaceId)
     const oldWorkspaceId = Number(prevProps.workspaceId)
-    if (newWorkspaceId !== oldWorkspaceId) {
+    if (
+      newWorkspaceId !== oldWorkspaceId ||
+      prevProps.appList.length !== props.appList.length ||
+      prevProps.contentType.length !== props.contentType.length
+    ) {
       this.updateCurrentWorkspace()
     }
   }
 
-  render = () => this.props.children
+  render = () => {
+    const { props } = this
+    return props.currentWorkspace.workspaceLoaded &&
+      props.appList.length > 0 &&
+      props.contentType.length > 0 &&
+      Number(props.workspaceId) === Number(props.currentWorkspace.id)
+      ? this.props.children
+      : null
+  }
 }
 
 WorkspacePage.propTypes = {
   history: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ appList }) => ({ appList })
+const mapStateToProps = ({ appList, contentType, currentWorkspace }) => ({ appList, contentType, currentWorkspace })
 export default connect(mapStateToProps)(translate()(WorkspacePage))
