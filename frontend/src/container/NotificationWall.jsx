@@ -389,12 +389,13 @@ export class NotificationWall extends React.Component {
 
     if (entityType === TLM_ENTITY.USER_CALL) {
       switch (eventType) {
-        case TLM_EVENT.CREATED: return {
+        case TLM_EVENT.MODIFIED: return {
           title: props.t('{{author}} called you'),
           text: props.t('{{author}} called you', i18nOpts),
           url: PAGE.PUBLIC_PROFILE(notification.author.userId)
         }
-        default: return null
+        default:
+          break
       }
     }
 
