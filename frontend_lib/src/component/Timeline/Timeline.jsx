@@ -175,7 +175,10 @@ export class Timeline extends React.Component {
                     onClickTranslate={() => { props.onClickTranslateComment(content) }}
                     onClickRestore={() => { props.onClickRestoreComment(content) }}
                     translationState={content.translationState}
-                    onChangeTranslationTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+                    onChangeTranslationTargetLanguageCode={languageCode => {
+                      props.onClickTranslateComment(content, languageCode)
+                      props.onChangeTranslationTargetLanguageCode(languageCode)
+                    }}
                     translationTargetLanguageCode={props.translationTargetLanguageCode}
                     translationTargetLanguageList={props.translationTargetLanguageList}
                     onClickEditComment={() => this.handleClickEditComment(content)}

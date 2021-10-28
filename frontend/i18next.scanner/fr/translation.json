@@ -507,5 +507,7 @@
   "News": "Actualités",
   "News of {{author}} on {{date}}": "Actualité de {{author}} le {{date}}",
   "Error while saving new news": "Erreur lors de l'enregistrement de la nouvelle actualité",
-  " is calling you on Tracim": " vous appelle sur Tracim"
+  " is calling you on Tracim": " vous appelle sur Tracim",
+  "{{author}} called you": "{{author}} vous a appelé",
+  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> a accepté votre appel. Si l'appel ne s'est pas ouvert, clickez sur ce <3> lien </3></0> "
 }
