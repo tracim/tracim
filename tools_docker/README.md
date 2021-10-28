@@ -254,6 +254,8 @@ Ex: `docker build --build-arg REPO="https://github.com/<me>/tracim.git" -t algoo
 
 ### ARM64 build (experimental)
 
+The ARM64 build is an experimental build without VTK enabled.
+
 To build image for ARM64 on a AMD64 machine, you need to:
 - install docker buildx: https://docs.docker.com/buildx/working-with-buildx/
 - add `binfmt_misc` multi-arch support (check `tonistiigi/binfmt` docker image in this doc: https://github.com/docker/buildx/#building-multi-platform-images)
@@ -261,6 +263,7 @@ To build image for ARM64 on a AMD64 machine, you need to:
 
 then do:
 ```
+cd tools_docker/Debian_New_Uwsgi_ARM64
 docker buildx build -t algoo/tracim:arm64 . --platform linux/arm64/v8
 ```
 for arm64/aarch64/v8
