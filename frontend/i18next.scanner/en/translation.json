@@ -508,5 +508,6 @@
   "News of {{author}} on {{date}}": "News of {{author}} on {{date}}",
   "Error while saving new news": "Error while saving new news",
   " is calling you on Tracim": " is calling you on Tracim",
-  "{{author}} called you": "{{author}} called you"
+  "{{author}} called you": "{{author}} called you",
+  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> "
 }

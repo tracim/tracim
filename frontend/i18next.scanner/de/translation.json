@@ -508,5 +508,6 @@
   "News of {{author}} on {{date}}": "Nachricht von {{author}} am {{date}}",
   "Error while saving new news": "Fehler beim Speichern eine neue Nachricht",
   " is calling you on Tracim": " ruft Sie an auf Tracim",
-  "{{author}} called you": "{{author}} hat Sie angerufen"
+  "{{author}} called you": "{{author}} hat Sie angerufen",
+  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> hat ihren Anruf angenommen. Falls der Anruf nicht geöffnet wurde, clicken Sie auf diesem <3> Link </3></0>"
 }
