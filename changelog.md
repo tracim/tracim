@@ -51,10 +51,10 @@
 ### Breaking/Important change
 
 - Apache: default configuration change. You need to delete your config file `/{TRACIM-DOCKER-VOLUME}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
-:warning: if you not apply this, Tracim can't run correctly. An error message is visible in the web browser about incorrect path.
-- For the call feature on existing installation: New file necessary in the local `branding/` folder (issue [#4970](https://github.com/tracim/tracim/issues/4970)):
+:warning: if you not apply this, Tracim can't run correctly. An error message can be visible in the web browser about incorrect path.
+- For the call feature on existing installation: New file required in the local `branding/` folder (issue [#4970](https://github.com/tracim/tracim/issues/4970)):
 :warning: This manual change is required to use call feature correctly (same change for local installation or docker installation).
-    - for Tracim >= 3.8.2
+    - For Tracim >= 3.8.2
       - You need to add this file `frontend/dist/assets/branding.sample/incoming-call.ogg` in your local `branding/` folder.
         - If you use tracim directly from repository you need to use this:
         ~~~
@@ -66,7 +66,7 @@
         TRACIM-DOCKER-VOLUME="~/tracim"
         docker cp {container_name}}:/tracim/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-DOCKER-VOLUME/etc/branding/
         ~~~
-    - for Tracim < 3.8.0
+    - For Tracim < 3.8.0
       - No manual change necessary (look `for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json` in 3.8.2 section to make sure you have done the modification correctly if it is necessary)
 
 **Valeur `web.notifications.excluded` ajouté a vérifier (en attente du fix. PR en cours)**
@@ -75,14 +75,14 @@
   - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
 ~~~
 - Rewording `Publications` to `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
-- Support of Python 3.5 has been dropped
-- Support of Python 3.8 and 3.9 has been added
-- All new docker images for Tracim version >= 3.9.10 run on Debian Bullseye (11) (All oldest versions run on Debian Stretch (9))
+- Support of Python 3.5 has been dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Support of Python 3.8 and 3.9 has been added (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- All new docker images for Tracim version >= 3.9.10 run on Debian Bullseye (11) (All oldest versions run on Debian Stretch (9)) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - More information about supported OS visible directly in the [README](README.md)
 
 ### Known Issues
 
-- The RAW previews is no more supported until we fix this (issue [#5008](https://github.com/tracim/tracim/issues/5008)) 
+- The RAW previews is no more supported until we do fix (issue [#5008](https://github.com/tracim/tracim/issues/5008)) 
 
 
 # 3.9.2 / 2021-07-30
