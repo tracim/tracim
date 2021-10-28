@@ -554,13 +554,12 @@ export class Tracim extends React.Component {
     let callLink
 
     if (state.userCall) {
-      console.log(userCallUrl, 'userCallUrl')
       const userCalleeName = state.userCall.callee.public_name
       const userCallUrl = state.userCall.url
       callLink = (
         <Trans>
           <span> {{ userCalleeName }} has accepted your call. If the call has not opened click on this
-            <a href={ userCallUrl } target='_blank' rel='noopener noreferrer'> link </a>
+            <a href={userCallUrl} target='_blank' rel='noopener noreferrer'> link </a>
           </span>&nbsp;
         </Trans>
       )
