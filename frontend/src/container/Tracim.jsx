@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
 import { isEqual } from 'lodash'
@@ -551,6 +551,19 @@ export class Tracim extends React.Component {
 
   render () {
     const { props, state } = this
+    let callLink
+
+    if (state.userCall) {
+      const userCalleeName = state.userCall.callee.public_name
+      const userCallUrl = state.userCall.url
+      callLink = (
+        <Trans>
+          <span> {{ userCalleeName }} has accepted your call. If the call has not opened click on this
+            <a href={userCallUrl} target='_blank' rel='noopener noreferrer'> link </a>
+          </span>&nbsp;
+        </Trans>
+      )
+    }
 
     if (props.user.logged === null) return null // @TODO show loader
 
@@ -705,6 +718,17 @@ export class Tracim extends React.Component {
               />
             </div>
           </CardPopup>
+        )}
+        {/* INFO - MB - 2021-10-26: Accepted popup */}
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.ACCEPTED && (
+          <CardPopup
+            customClass='callpopup__body'
+            customHeaderClass='primaryColorBg'
+            onClose={this.handleClosePopup}
+            label={callLink}
+            faIcon='fas fa-phone'
+            displayCloseButton
+          />
         )}
 
         <ReduxTlmDispatcher />
