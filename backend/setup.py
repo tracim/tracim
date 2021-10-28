@@ -144,6 +144,8 @@ setup(
         ],
         "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
+            # workspace
+            "space_move = tracim_backend.command.space:MoveSpaceCommand",
             # user
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",

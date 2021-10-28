@@ -160,6 +160,32 @@ class WorkspaceApi(object):
             self._session.flush()
         return workspace
 
+    def move_workspace(
+        self,
+        workspace: Workspace,
+        parent_workspace: typing.Optional[Workspace] = None,
+        save_now: bool = False,
+    ):
+        """
+        Move workspace.
+        Be carefull, don't set anything in parent_workspace_id
+        will set Workspace at root without any parent.
+        :param workspace:
+        :param parent_workspace_id:
+        :param save_now:
+        :return:
+        """
+        if parent_workspace:
+            assert parent_workspace.workspace_id != workspace.workspace_id
+            assert parent_workspace.workspace_id > 0
+            workspace.parent_id = parent_workspace.workspace_id
+        else:
+            workspace.parent_id = None
+        workspace.updated = datetime.utcnow()
+        if save_now:
+            self.save(workspace)
+        return workspace
+
     def update_workspace(
         self,
         workspace: Workspace,
