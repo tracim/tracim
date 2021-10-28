@@ -48,8 +48,31 @@
 
 ### Breaking/Important change
 
-- Some rewording (issue [#4348](https://github.com/tracim/tracim/issues/4348)): // mettre bonne issue
--   Rewording from `Publications` to `News`
+- Apache: default configuration change. You need to delete your config file `/{docker-volume}/etc/apache2.conf` (backup your file first) before starting/restarting the docker image
+:warning: if you not apply this, Tracim can't run correctly. An error message is visible in the web browser about incorrect path.
+- On existing installation: Modification necessary in local `branding/` folder if you want to use call feature (issue [#4970](https://github.com/tracim/tracim/issues/4970)). A new file is added in `branding.sample/` folder given as an example in the repository. A manual change is required to run this version (same process for local installation or docker installation):
+    - for Tracim >= 3.8.2
+      - You need to add this file `frontend/dist/assets/branding.sample/incoming-call.ogg` in your local `branding/` folder.
+        - If you use tracim directly from repository you just need to execute this:
+        ~~~
+        TRACIM-INSTALLATION-PATH="/tracim/installation/path"
+        cp $TRACIM-INSTALLATION-PATH/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-INSTALLATION-PATH/frontend/dist/assets/branding/incoming-call.ogg 
+        ~~~
+        - If you use Tracim with docker, you need to start new version of tracim and when Tracim is running, you need to execute this command to add the file in the default local `branding/` folder:
+        ~~~
+        TRACIM-DOCKER-VOLUME="~/tracim"
+        docker cp {container_name}}:/tracim/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-DOCKER-VOLUME/etc/branding/
+        ~~~
+    - for Tracim < 3.8.0
+      - No manual change necessary (look `for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json` in 3.8.2 section to make sure you have done the modification correctly if it is necessary)
+
+**Valeur `web.notifications.excluded` ajouté a vérifier (en attente du fix. PR en cours)**
+~~~
+- Modification of a default value in `development.ini`: the default value for `web.notifications.excluded` has changed. We have added `user_call.created (issue [#5029](https://github.com/tracim/tracim/issues/5029)).
+  - On existing Tracim installations, including the official docker image: you may want to update your `development.ini` configuration file (use this file [development.ini.sample](backend/development.ini.sample) to compare).
+~~~
+- Some rewording (issue [#4950](https://github.com/tracim/tracim/issues/4950)):
+  - Rewording from `Publications` to `News`
 
 
 # 3.9.2 / 2021-07-30
