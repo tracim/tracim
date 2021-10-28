@@ -145,10 +145,12 @@ export const belongsToGroup = (notification, groupedNotification, numberOfCriter
     (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace))) ||
     (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
   ) {
-    groupedNotification.group.push(notification)
+    groupedNotification.group = sortByCreatedDate([notification, ...groupedNotification.group])
     groupedNotification.type =
       `${numberOfCriteria}${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
-    groupedNotification.created = notification.created
+    groupedNotification.created = new Date(notification.created).getTime() < new Date(groupedNotification.created).getTime()
+      ? groupedNotification.created
+      : notification.created
     return true
   }
 }
