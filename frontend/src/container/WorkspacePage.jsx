@@ -38,6 +38,10 @@ class WorkspacePage extends React.Component {
       props.dispatch(setWorkspaceMemberList(responseMemberList.json))
       props.dispatch(setWorkspaceDetail(responseWorkspaceDetail.json))
       props.dispatch(setWorkspaceLoaded())
+
+      if (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled) {
+        this.loadCalendarDetail()
+      }
     } else {
       switch (responseMemberList.status) {
         case 200: break
@@ -45,11 +49,7 @@ class WorkspacePage extends React.Component {
         default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break
       }
       switch (responseWorkspaceDetail.status) {
-        case 200:
-          if (props.appList.some(a => a.slug === 'agenda') && responseWorkspaceDetail.json.agenda_enabled) {
-            this.loadCalendarDetail()
-          }
-          break
+        case 200: break
         case 400:
           props.history.push(PAGE.HOME)
           props.dispatch(newFlashMessage(props.t('Unknown space')))
