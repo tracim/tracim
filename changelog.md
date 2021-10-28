@@ -68,7 +68,7 @@
         docker cp {container_name}}:/tracim/frontend/dist/assets/branding.sample/incoming-call.ogg $TRACIM-DOCKER-VOLUME/etc/branding/
         ~~~
     - For Tracim < 3.8.0
-      - No manual change necessary (look `for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json` in 3.8.2 section to make sure you have done the modification correctly if it is necessary)
+      - No manual change necessary (look documentation "for Tracim < 3.8.0, if you have customized `logo.png` and/or `color.json`" in 3.8.2 section to make sure you have done the modification correctly if it is necessary)
 
 **Valeur `web.notifications.excluded` ajouté a vérifier (en attente du fix. PR en cours)**
 ~~~
