@@ -1,15 +1,11 @@
 import { PAGES } from '../../support/urls_commands'
 
-const fileTitle = 'FileForSearch'
+const fileTitle = 'File share'
 const fullFilename = 'Linux-Free-PNG.png'
 const contentType = 'image/png'
-
-const fileShareTiltle = 'File share'
 const newShareTiltle = 'New share'
 const emptyPhrase = 'No share link has been created yet'
-
 let workspaceId
-let contentId
 
 describe('Open a file', () => {
   beforeEach(function () {
@@ -18,16 +14,11 @@ describe('Open a file', () => {
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
-      cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-        .then(newContent => {
-          contentId = newContent.content_id
+      cy.createFile(fullFilename, contentType, fileTitle, workspaceId).then(() => {
+          cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
+          cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle).click()
+          cy.get('.wsContentGeneric__content__right__header .fa-share-alt').should('be.visible').click()
         })
-    }).then(data => {
-      cy.visitPage({
-        pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
-      })
-      cy.get('.wsContentGeneric__content__right__header .fa-share-alt').should('be.visible').click()
     })
   })
 

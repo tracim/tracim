@@ -16,8 +16,10 @@ describe('Open the share folder advanced', () => {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
-    }).then(promise => {
-      cy.visitPage({ pageName: PAGES.SHARE_FOLDER, params: { workspaceId: workspaceId } })
+    }).then(() => {
+      cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
+      cy.get('.folder__header__button').should('be.visible').click()
+      cy.get('.dropdownMenuItem .fa-pencil-alt').first().should('be.visible').click()
     })
   })
 
