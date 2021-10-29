@@ -1,12 +1,11 @@
-# 3.10.0 / 2021-10-29
+# 4.0.0 / 2021-10-29
 
 ### New Features
 
-- 1-to-1 visioconferences (based on Jitsi Meet)
+- 1-to-1 video calls (based on Jitsi Meet)
 - Notification wall Improvement (notification grouping, design improvment, mentions highlight, etc)
-- Notifications alerts for the calls are now visible in the browser tabs
-- Performance improvement (opening of apps, timelines...)
-- News feature improvment: opening news in dedicated application, thread design, responsiveness...
+- Performance improvement (contents, timelines...)
+- News feature improvment: opening News in dedicated application, thread design, responsiveness...
 - Timeline and news pagination
 - UI normalization work (margins, font size, etc)
 
@@ -49,19 +48,19 @@
 
 ### Breaking/Important change
 
-- :warning: Apache default configuration change. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039)
+- :warning: Apache default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
 - Rewording `Publications` to `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
-- Call feature: need modification on existing installation. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039)
-- Configuration file `developmeent.ini`: default configuration change. See [Migrate to 3.10.0](https://github.com/tracim/tracim/issues/5039) 
+- Video call: need modification on existing installation. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- Configuration file `development.ini`: default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
 - :warning: Python 3.5 support dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Python 3.8 and 3.9 support (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Docker images now rely on Debian Bullseye (11) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
 - Supported OS: see [README](README.md)
-- Mysql and Mariadb are not officially supported anymore. Should anyone require support for those database systems, please create issue on Tracim repository. If nobody requires support, we'll remove Mysql and Mariadb in the next major release 3.11.0
+- Mysql and Mariadb are not officially supported anymore. Should anyone require support for those database systems, please create issue on Tracim repository. If nobody requires support, we'll remove Mysql and Mariadb in the next major release 4.1.0
 
 ### Known Issues
 
-- RAW previews are not supported anymore until we do fix (issue [#5008](https://github.com/tracim/tracim/issues/5008)) 
+- RAW previews are not supported anymore until we do fix (issue [#5008](https://github.com/tracim/tracim/issues/5008))
 
 
 # 3.9.2 / 2021-07-30
