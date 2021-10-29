@@ -10,28 +10,26 @@
   flex 1
   flex-wrap wrap
   overflow auto
-  height 100%
 
 .EmojiReactionButton__button, .EmojiReactionButton__buttonpicker
-  min-height 26px
   background transparent
-  border-radius 3px
+  border-radius standardBorderRadius
   white-space pre
-  margin 2px
   &:not(:disabled)
     cursor pointer
 
 .EmojiReactionButton__button
   border-width 1px
   border-style solid
-  font-size fontSizeSmall
-  padding 1px 4px
+  font-size metadataFontSize
+  margin-inline-end textSpacing
+  padding 3px
 
   &:not(.highlighted)
-    border-color mediumGrey
+    color fontColor
 
   &:hover:not(:disabled)
-    border 1px solid lightDarkGrey
+    color fontColor
 
   &__value
     font-family 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', 'Twemoji Mozilla', 'Noto Color Emoji', 'Android Emoji', sans-serif
@@ -47,11 +45,9 @@
 
 .EmojiReactionButton__buttonpicker
   color grey
-  border 1px solid transparent
-  padding 0 5.5px
+  border none
   &.active
-    background-color mediumDarkGrey
-    border 1px solid mediumDarkGrey
+    color fontColor
 
 .EmojiReactionButton__button:hover:not(.highlighted):not(:disabled), .EmojiReactionButton__buttonpicker:hover:not(.active):not(:disabled)
   color fontColor

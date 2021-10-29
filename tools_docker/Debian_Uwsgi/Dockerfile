@@ -1,80 +1,84 @@
-FROM debian:stretch AS base_install
-RUN \
-    apt update \
-    && apt upgrade -qy \
-    && apt install -qy \
-        git \
-        libfile-mimeinfo-perl \
-        libimage-exiftool-perl \
-        locales \
-        python3
-
-FROM base_install AS builder
-
-ARG TAG=""
-ARG BRANCH=""
+ARG PACKAGE_DIR="/tracim/system_packages/debian"
 ARG REPO="https://github.com/tracim/tracim.git"
+ARG BRANCH=""
+ARG TAG=""
 
-RUN if ([ "$TAG" != "" ] && [ "$BRANCH" != "" ]); \
-    then echo "Its not possible to use ARG TAG and ARG BRANCH in same time." && exit 1;fi
+###
+# Base install stages:
+####
+# Base image for installing some base dependencies
+####
 
-# Install required packages
+FROM debian:bullseye AS base
+ARG REPO
+ARG PACKAGE_DIR
+ARG BRANCH
+ARG TAG
+RUN apt-get update \
+   && apt-get upgrade -qy \
+   && apt-get install apt-utils git -qy
+COPY ./clone_repo.sh /clone_repo.sh
+RUN /clone_repo.sh "${REPO}" "${BRANCH}" "${TAG}"
+RUN rm /clone_repo.sh
+RUN apt-get install -qy --no-install-recommends \
+    $(cat "${PACKAGE_DIR}/run_backend_packages.list") \
+    && apt-get autoremove -qy \
+    && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
+
+
+###
+# Backend install stage
+####
+# Stage which:
+# - installs python dependencies
+# - installs tracim backend
+# - installs optional dependencies
+####
+FROM base AS build_backend
+ARG PACKAGE_DIR
+# required packages for building the backend dependencies
+RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \
+    # Go in backend folder
+    && cd /tracim/backend \
+    # Install backend
+    && pip install --force-reinstall \
+    -r requirements-build.txt \
+    -r requirements.txt \
+    -r requirements-db-postgres.txt \
+    -r requirements-db-mysql.txt \
+    -r requirements-storage-s3.txt \
+    -r requirements-full-preview-generator.txt \
+    -e "."
+
+
+###
+# Frontend build stage
+####
+# Stage which:
+# - installs javascript dependencies
+# - setups backend translation
+# - builds frontend
+####
+FROM node:14-buster AS build_frontend
+COPY --from=base /tracim /tracim
 RUN \
-    apt install -qy curl \
-    # Node.JS 10
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt install -qy \
-        build-essential \
-        libjpeg-dev \
-        libmagickwand-dev \
-        libpq-dev \
-        nodejs \
-        python3-dev \
-        python3-pip \
-        python3-venv
-
-# Clone repo
-RUN \
-    get_source_from_github() { \
-    if ([ "$TAG" != "" ] && [ "$BRANCH" = "" ]); \
-    then git clone -b $TAG --single-branch "$REPO" tracim; \
-    elif ([ "$TAG" = "" ] && [ "$BRANCH" != "" ]); \
-    then git clone "$REPO" tracim && cd tracim/ && git checkout $BRANCH && cd -; \
-    else git clone "$REPO" tracim; \
-    fi \
-    } \
-    && get_source_from_github $TAG $BRANCH
-
-RUN \
-# Go in backend folder
     cd /tracim/backend \
-# Install backend
-    && python3 -m pip install -r requirements-build.txt \
-    && python3 -m pip install -r requirements.txt \
-    && python3 -m pip install -r requirements-full-preview-generator.txt \
-    && python3 -m pip install -r requirements-db-postgres.txt \
-    && python3 -m pip install -r requirements-db-mysql.txt \
-    && python3 -m pip install -r requirements-storage-s3.txt \
-    && python3 -m pip install -e "." \
     && npm install "i18next-conv@<8" -g \
     && ./update_i18n_json_file.sh
-
-RUN \
-# Go in tracim folder
-    cd /tracim/ \
 # Install frontend
+RUN \
+    cd /tracim/ \
     && ./install_frontend_dependencies.sh root \
     && ./build_full_frontend.sh
-
-RUN \
 # Clean frontend installation
+RUN \
     rm -rf /tracim/frontend*/node_modules \
     && rm -rf /tracim/node_modules
 
 
-FROM base_install
+FROM base
 
-MAINTAINER contact@tracim.fr
+LABEL org.opencontainers.image.authors="contact@tracim.fr"
 
 ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
@@ -83,48 +87,27 @@ ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
 ENV LC_ALL C.UTF-8
-
-RUN \
-    printf "Package: pushpin\nPin: version 1.31.*\nPin-Priority: 999\nPackage: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
-    && apt install -qy \
-        apt-transport-https \
-        software-properties-common \
-        gnupg2 \
-    && echo deb https://fanout.jfrog.io/artifactory/debian fanout-stretch main \
-        | tee /etc/apt/sources.list.d/fanout.list \
-    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 \
-        --recv-keys EA01C1E777F95324 \
-    && apt update \
-    && apt install -qy \
-        apache2 \
-        ffmpeg \
-        ghostscript \
-        gnupg \
-        imagemagick \
-        inkscape \
-        libapache2-mod-proxy-uwsgi \
-        libreoffice \
-        poppler-utils \
-        postgresql-client \
-        pushpin \
-        qpdf \
-        redis-server \
-        supervisor \
-        ufraw-batch \
-        uwsgi \
-        uwsgi-plugin-python3 \
-        vim \
-        xvfb \
-# Remove default conf about apache2
+ARG PACKAGE_DIR
+# NOTE - 2021-10-21 - S.G. - pin condure (used by pushpin) to a lower priority so that mongrel2 is used instead.
+# This is due to automated tests randomly failing with condure.
+RUN printf "Package: condure\nPin: version *\nPin-Priority: -1" > /etc/apt/preferences.d/pushpin \
+    && apt-get install -qy $(cat "${PACKAGE_DIR}/server_packages.list" "${PACKAGE_DIR}/optional_preview_packages.list") vim wget curl \
+    && apt-get autoremove -qy \
+    && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/* \
+# Remove default apache2 conf
     && rm /etc/apache2/sites-enabled/000-default.conf \
 # Do not show apache version
     && sed -i "s|ServerTokens OS|ServerTokens Prod|g" /etc/apache2/conf-enabled/security.conf \
     && sed -i "s|ServerSignature On|ServerSignature Off|g" /etc/apache2/conf-enabled/security.conf
 
-# Tracim code (backend & frontend)
-COPY --from=builder /tracim /tracim
+# Tracim code: backend
+COPY --from=build_backend /tracim /tracim
 # backend dependencies installed through pip
-COPY --from=builder /usr/local /usr/local
+COPY --from=build_backend /usr/local /usr/local
+# Tracim code: frontend
+COPY --from=build_frontend /tracim/frontend/dist /tracim/frontend/dist
+# backend translation
+COPY --from=build_frontend /tracim/backend/tracim_backend/locale /tracim/backend/tracim_backend/locale
 
 VOLUME ["/etc/tracim", "/var/tracim"]
 EXPOSE 80

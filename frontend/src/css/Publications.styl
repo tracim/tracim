@@ -1,5 +1,3 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 .publications
   overflow auto
   height 100%
@@ -7,50 +5,39 @@
     height 100%
     display flex
     flex-direction column
+    & > .tabBar
+      margin-bottom pageSpacing
+  &__showMoreButton
+    margin-block-end standardSpacing
+    margin-inline-start auto
+    margin-inline-end auto
   &__empty
-    font-weight bold
-    margin-inline-start 10px
-    margin-top 10px
+    margin 0 pageSpacing
   & .feedItem
-    margin-block-start 15px
-    margin-block-end 15px
+    margin-block-end standardSpacing
   &__reorder
-    margin auto auto 10px
-  &__publishArea
-    display flex
-    flex-direction column
-    margin-top auto
-    padding 10px
+    margin auto auto standardSpacing
+  .publishAreaContainer
+    margin 0 pageSpacing
+    padding-bottom pageSpacing
     & textarea
+      border borderStyle
+      border-radius standardBorderRadius
+      padding textSpacing
       width 100%
       order 2
       &:focus
-        outline-color #661F98
+        outline-color publicationColor
     & .mce-container
       order 2
     & .autocomplete
       order 1
-    &__buttons
-      display flex
-      justify-content space-between
-      margin-top 10px
-      order 3
-      > :last-child
-        margin-inline-start auto
-      &__submit .iconbutton__icon
-        margin-inline-end 8px
-      &__left
-        &__advancedEdition
-          margin-inline-end auto
-          font-size fontSizeSmall
-      &__right
-        display flex
-        & .AddFileToCommentButton
-          padding 3px 6px
+
 
 @media (max-width: max-xs)
   .publications
-    &__publishArea__buttons__advancedEdition
-      display none
-    .pageContentGeneric
-      padding 5px 0
+    > .ScrollToBottomContents > .tabBar
+      margin-bottom standardSpacing
+    .publishAreaContainer
+      margin 0
+      padding 0 standardSpacing standardSpacing

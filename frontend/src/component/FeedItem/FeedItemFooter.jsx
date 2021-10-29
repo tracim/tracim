@@ -8,7 +8,8 @@ import {
   ROLE_LIST,
   TRANSLATION_STATE,
   TranslateButton,
-  EmojiReactions
+  EmojiReactions,
+  IconButton
 } from 'tracim_frontend_lib'
 import { FETCH_CONFIG, findUserRoleIdInWorkspace } from '../../util/helper.js'
 
@@ -35,7 +36,10 @@ export class FeedItemFooter extends React.Component {
             translationState={props.translationState}
             onClickTranslate={props.onClickTranslate}
             onClickRestore={props.onClickRestore}
-            onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+            onChangeTargetLanguageCode={languageCode => {
+              props.onChangeTranslationTargetLanguageCode(languageCode)
+              props.onClickTranslate(languageCode)
+            }}
             targetLanguageList={props.translationTargetLanguageList}
             targetLanguageCode={props.translationTargetLanguageCode}
             dataCy='commentTranslateButton'
@@ -55,6 +59,15 @@ export class FeedItemFooter extends React.Component {
             contentId={content.id}
             workspaceId={workspaceId}
           />
+          {props.isPublication && props.showTimeline && (
+            <IconButton
+              text={props.discussionToggleButtonLabel}
+              textMobile={props.discussionToggleButtonLabelMobile}
+              icon='far fa-comment'
+              onClick={props.onClickToggleCommentList}
+              customClass='buttonComments'
+            />
+          )}
         </div>
       </div>
     )
@@ -71,5 +84,13 @@ FeedItemFooter.propTypes = {
   content: PropTypes.object.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired
+  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
+  discussionToggleButtonLabel: PropTypes.string.isRequired,
+  discussionToggleButtonLabelMobile: PropTypes.string,
+  onClickToggleCommentList: PropTypes.func,
+  isPublication: PropTypes.bool.isRequired
+}
+
+FeedItemFooter.defaultProps = {
+  discussionToggleButtonLabelMobile: ''
 }

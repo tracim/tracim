@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+python_version=${1:-3.6.14}
+docker_registry=${2:-""}
+script_dir="$(realpath $(dirname $0))"
+
+"$script_dir/install_docker"
+source "$script_dir/docker-lib.sh"
+start_docker "" "$docker_registry"
+
+"$script_dir/install_backend_packages"
+"$script_dir/create_backend_dirs" backend
+source "$HOME/.bashrc"
+pyenv shell $python_version
+cd backend
+pip install -r requirements.txt
+python setup.py develop
+# Update pyenv shims so that tracimcli is found
+pyenv rehash
+cp development.ini.sample development.ini
+tracimcli db init -d
+
+cd -
+./setup_functionnal_tests.sh root
+./install_frontend_dependencies.sh root
+./build_full_frontend.sh
+NO_VIRTUAL_ENV=1 ./run_dev_backend.sh cypress run

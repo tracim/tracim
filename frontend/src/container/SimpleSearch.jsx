@@ -225,6 +225,7 @@ export class SimpleSearch extends React.Component {
                     read
                     contentType={props.contentType.find(ct => ct.slug === searchItem.contentType)}
                     isLast={index === props.simpleSearch.resultList.length - 1}
+                    isFirst={index === 0}
                     key={searchItem.contentId}
                   >
                     <ContentItemSearch

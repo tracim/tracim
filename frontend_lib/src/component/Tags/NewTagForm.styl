@@ -1,24 +1,25 @@
 @import '../../css/Variable.styl'
 
 .tagList__form
-  padding 0px 10px
+  padding 0px standardSpacing
   &__title
-    font-size fontSizeMedium
-    margin-bottom 10px
+    font-size titleFontSize
+    margin-bottom standardSpacing
   &__tag
     height 45px
     display flex
     flex-flow column nowrap
     .name__input
-      margin 10px 0 0 0
+      margin standardSpacing 0 0 0
       box-sizing border-box
       width 100%
       flex none
+      font-size standardFontSize
     .autocomplete
       z-index 1
       &__item
-        padding 5px
+        padding textSpacing
   &__submitBtn
-    margin-top 12px
+    margin-top standardSpacing
     display flex
     justify-content flex-end

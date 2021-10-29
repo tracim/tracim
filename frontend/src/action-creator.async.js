@@ -21,13 +21,13 @@ import {
   newFlashMessage,
   NOTIFICATION,
   NOTIFICATION_LIST,
-  NOTIFICATION_NOT_READ_COUNT,
   PUBLICATION_THREAD,
   SEARCHED_STRING,
   setRedirectLogin,
   setUserDisconnected,
   USAGE_CONDITIONS,
   USER,
+  USER_CALL,
   USER_CONFIGURATION,
   USER_CONNECTED,
   USER_EMAIL,
@@ -62,7 +62,8 @@ import {
   CUSTOM_PROPERTIES_SCHEMA,
   USER_PUBLIC_PROFILE,
   FAVORITE_LIST,
-  FAVORITE
+  FAVORITE,
+  UNREAD_NOTIFICATION_COUNT
 } from './action-creator.sync.js'
 import {
   ErrorFlashMessageTemplateHtml,
@@ -938,6 +939,19 @@ export const putNotificationAsRead = (userId, eventId) => dispatch => {
   })
 }
 
+export const putContentNotificationAsRead = (userId, contentId, parentId = null) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read?content_ids=${contentId}${parentId ? `&parent_ids=${parentId}` : ''}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: `${NOTIFICATION}/${CONTENT}`,
+    dispatch
+  })
+}
+
 export const putAllNotificationAsRead = (userId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read`,
@@ -951,9 +965,11 @@ export const putAllNotificationAsRead = (userId) => dispatch => {
   })
 }
 
-export const getUserMessagesSummary = userId => dispatch => {
+export const getUserMessagesSummary = (userId, includeEventTypeList = []) => dispatch => {
+  const url = `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`
+  const includeEventTypeListParam = includeEventTypeList.length > 0 ? `&include_event_types=${includeEventTypeList.join(',')}` : ''
   const fetchGetMessages = fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/summary?exclude_author_ids=${userId}${defaultExcludedEventTypesParam}`,
+    url: `${url}${includeEventTypeListParam}`,
     param: {
       credentials: 'include',
       headers: {
@@ -961,7 +977,7 @@ export const getUserMessagesSummary = userId => dispatch => {
       },
       method: 'GET'
     },
-    actionName: NOTIFICATION_NOT_READ_COUNT,
+    actionName: UNREAD_NOTIFICATION_COUNT,
     dispatch
   })
 
@@ -1185,7 +1201,7 @@ export const getAdvancedSearchResult = (
       if (searchFacets.statuses && searchFacets.statuses.length > 0) queryParameterList.push(`statuses=${encodeArrayAsURIComponent(searchFacets.statuses)}`)
       if (searchFacets.content_types && searchFacets.content_types.length > 0) queryParameterList.push(`content_types=${encodeArrayAsURIComponent(searchFacets.content_types)}`)
       if (searchFacets.file_extensions && searchFacets.file_extensions.length > 0) queryParameterList.push(`file_extensions=${encodeArrayAsURIComponent(searchFacets.file_extensions)}`)
-      if (searchFacets.author__public_names && searchFacets.author_public_names.length > 0) queryParameterList.push(`author__public_names=${encodeArrayAsURIComponent(searchFacets.author__public_names)}`)
+      if (searchFacets.author__public_names && searchFacets.author__public_names.length > 0) queryParameterList.push(`author__public_names=${encodeArrayAsURIComponent(searchFacets.author__public_names)}`)
       if (searchFacets.tags && searchFacets.tags.length > 0) queryParameterList.push(`tags=${encodeArrayAsURIComponent(searchFacets.tags)}`)
     }
   }
@@ -1214,9 +1230,9 @@ export const getAdvancedSearchResult = (
   })
 }
 
-export const getPublicationList = (workspaceId) => dispatch => {
+export const getPublicationPage = (workspaceId, count = 0, pageToken = '') => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0`,
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents?namespaces_filter=publication&parent_ids=0&count=${count}&page_token=${pageToken}&sort=modified:desc`,
     param: {
       credentials: 'include',
       headers: {
@@ -1347,4 +1363,68 @@ export const logoutUser = (history) => async (dispatch) => {
   } else {
     dispatch(newFlashMessage(i18n.t('Disconnection error', 'danger')))
   }
+}
+
+export const postCreateUserCall = (callerId, calleeId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/outgoing_calls`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({ callee_id: calleeId })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
+
+export const putSetOutgoingUserCallState = (callerId, callId, userCallState) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/outgoing_calls/${callId}/state`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({ state: userCallState })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
+
+export const putSetIncomingUserCallState = (callerId, callId, userCallState) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${callerId}/incoming_calls/${callId}/state`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'PUT',
+      body: JSON.stringify({ state: userCallState })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
+}
+
+export const postGetUserCall = (callerId, calleeId) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${calleeId}/incoming_calls`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'POST',
+      body: JSON.stringify({ callee_id: calleeId })
+    },
+    actionName: USER_CALL,
+    dispatch
+  })
 }

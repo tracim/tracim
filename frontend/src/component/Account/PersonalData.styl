@@ -1,16 +1,12 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .personaldata
-  &__text
-    margin 15px 0
-    font-size 18px
   &__form
-    margin 25px 0
     &__txtinput
       width 300px
       border-width 1px
       border-style solid
-      border-radius 5px
+      border-radius standardBorderRadius
       &[placeholder]
         white-space nowrap
         overflow hidden
@@ -18,24 +14,24 @@
       &:disabled
         cursor not-allowed
       &.withAdminMsg
-        margin-right 20px
+        margin-right standardSpacing
       &__info
-        margin 5px
+        margin textSpacing
         &__icon
-          margin-right 5px
+          margin-right textSpacing
       &__msgerror
         width 300px
-        font-size small
+        font-size metadataFontSize
         text-align right
         color errorRed
         &__icon
-          margin-right 5px
+          margin-right textSpacing
       &__msginfo
         width 300px
-        font-size small
+        font-size metadataFontSize
         text-align right
     &__button
       vertical-align top
       border-width 1px
       border-style solid
-      border-radius 5px
+      border-radius standardBorderRadius

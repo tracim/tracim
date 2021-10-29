@@ -1,9 +1,16 @@
 @import '../../css/Variable.styl'
 
+.buttonComments
+  border 1px solid transparent
+  color lightDarkGrey
+  &:hover
+    border 1px solid publicationColor
+    color fontColor
+
 .comment
-  border-radius 5px
-  padding 10px
-  border 1px solid grey
+  padding standardSpacing
+  border-radius standardBorderRadius
+  border borderStyle
   background-color offWhite
   display flex
   flex-direction column
@@ -17,7 +24,7 @@
     flex-direction row
 
     .avatar-wrapper
-      margin-inline-end 10px
+      margin-inline-end standardSpacing
 
     &__content
       flex 1
@@ -36,17 +43,18 @@
 
       &__header
         display flex
+        align-items center
         flex-direction row
-        margin-bottom 10px
-        font-size 12px
+        margin-bottom standardSpacing
+        font-size metadataFontSize
         &__meta
           flex 1
           &__author
             overflow-wrap anywhere
-            font-size 16px
+            font-size standardFontSize
             &:hover
               text-decoration underline
-        &__actions
+        &__actions.dropdownMenuButton
           padding 0
           color grey
           &::after
@@ -55,5 +63,11 @@
             color fontColor
   &__footer
     display flex
-    margin-top 10px
+    margin-top standardSpacing
     justify-content space-between
+
+@media (max-width: max-xs)
+  .buttonComments
+    margin-left textSpacing
+    > .iconbutton__icon
+      margin 0px

@@ -28,6 +28,7 @@ const IconButton = props => {
       disabled={props.disabled}
       title={props.title || props.text}
       data-cy={props.dataCy}
+      tabIndex={props.tabIndex}
     >
       {props.icon && (
         <i
@@ -37,13 +38,29 @@ const IconButton = props => {
           }}
         />
       )}
-      {props.text && <span className={props.icon ? 'iconbutton__text_with_icon' : 'iconbutton__text'}>{props.text}</span>}
+
+      {props.text && (
+        <span
+          className={`${props.icon ? 'iconbutton__text_with_icon' : ''} iconbutton__label`}
+        >
+          {props.text}
+        </span>
+      )}
+
+      {props.textMobile && (
+        <span
+          className={`${props.icon ? 'iconbutton__text_with_icon' : ''} iconbutton__label-mobile`}
+        >
+          {props.textMobile}
+        </span>
+      )}
     </button>
   )
 }
 
 IconButton.propTypes = {
   text: PropTypes.string,
+  textMobile: PropTypes.string,
   icon: PropTypes.string,
   iconColor: PropTypes.string,
   title: PropTypes.string,
@@ -54,11 +71,13 @@ IconButton.propTypes = {
   intent: PropTypes.oneOf(['primary', 'secondary', 'link', 'pins']),
   mode: PropTypes.oneOf(['dark', 'light']),
   customClass: PropTypes.string,
-  dataCy: PropTypes.string
+  dataCy: PropTypes.string,
+  tabIndex: PropTypes.string
 }
 
 IconButton.defaultProps = {
   text: undefined,
+  textMobile: '',
   icon: undefined,
   iconColor: undefined,
   onClick: undefined,
@@ -69,7 +88,8 @@ IconButton.defaultProps = {
   intent: 'secondary',
   customClass: '',
   mode: 'dark',
-  dataCy: undefined
+  dataCy: undefined,
+  tabIndex: '0'
 }
 
 export default IconButton

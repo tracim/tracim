@@ -23,10 +23,8 @@ describe('App Workspace Advanced', function () {
     cy.cancelXHR()
   })
 
-  // FIXME - GB - 16-04-2021 - The test below is unstable. Sometimes waitForTinyMCELoaded() doesn't works
-  // See https://github.com/tracim/tracim/issues/4352
   describe("Changing the workspace's description", () => {
-    it.skip('Should update the description in the dashboard', function () {
+    it('Should update the description in the dashboard', function () {
       cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
         .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
@@ -218,10 +216,10 @@ describe('App Workspace Advanced', function () {
     })
     const testCases = [
       {
-        feature: 'publication',
+        feature: 'news',
         buttonSelector: '[data-cy=publication_enabled]',
-        deactivatedMessage: 'Publications deactivated',
-        activatedMessage: 'Publications activated'
+        deactivatedMessage: 'News deactivated',
+        activatedMessage: 'News activated'
       },
       {
         feature: 'agenda',

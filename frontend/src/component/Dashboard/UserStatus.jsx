@@ -4,7 +4,7 @@ import { BtnSwitch, Icon, ROLE_LIST } from 'tracim_frontend_lib'
 require('./UserStatus.styl')
 
 export const UserStatus = props => {
-  const mySelf = props.curWs.memberList.find(m => m.id === props.user.userId) || { role: '' }
+  const mySelf = props.currentWorkspace.memberList.find(m => m.id === props.user.userId) || { role: '' }
   const myRole = ROLE_LIST.find(r => r.slug === mySelf.role) || { faIcon: '', hexcolor: '', label: '' }
 
   return (

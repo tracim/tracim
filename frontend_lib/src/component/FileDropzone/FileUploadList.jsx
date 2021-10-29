@@ -8,7 +8,7 @@ export const FileUploadList = (props) => {
 
   return (
     <div className='file__upload'>
-      <div className='file__upload__title font-weight-bold'>
+      <div className='file__upload__title'>
         {props.fileUploadList.length > 0
           ? title
           : props.t('You have not yet chosen any files to upload.')}
@@ -23,7 +23,7 @@ export const FileUploadList = (props) => {
             </div>
 
             <button
-              className='iconBtn primaryColorFontHover'
+              className='transparentButton primaryColorFontHover'
               onClick={() => props.onDeleteFile(fileUpload)}
               title={props.t('Delete')}
               disabled={props.deleteFileDisabled}

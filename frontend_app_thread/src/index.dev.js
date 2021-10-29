@@ -17,7 +17,7 @@ manager.openLiveMessageConnection(debug.loggedUser.userId, debug.config.apiUrl)
 
 ReactDOM.render(
   <Router history={history}>
-    <Thread />
+    <Thread data={debug} />
   </Router>
   , document.getElementById('content')
 )

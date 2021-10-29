@@ -20,8 +20,6 @@ import {
 import ActivityList from '../component/Activity/ActivityList.jsx'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
 
-require('../css/RecentActivities.styl')
-
 export class WorkspaceRecentActivities extends React.Component {
   constructor (props) {
     super(props)

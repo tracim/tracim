@@ -1,19 +1,12 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .menuprofil
   margin auto 0
   &__dropdown
-    &__name
-      font-size fontSizeSmall
-      padding 0 5px 0 0
-      & > *
-        margin-right 5px
-        display inline-block
-    &__sub
-      color darkGrey
-      cursor pointer
-      &:focus
-        box-shadow none
+    &__name.btn
+      padding 0
+      & > .avatar-wrapper
+        margin-right textSpacing
     &__setting
       left inherit
       right 0

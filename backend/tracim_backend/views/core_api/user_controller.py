@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import json
 import typing
 
@@ -99,6 +100,7 @@ from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import UserDiskSpaceSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import UserIdSchema
+from tracim_backend.views.core_api.schemas import UserMessagesMarkAsReadQuerySchema
 from tracim_backend.views.core_api.schemas import UserMessagesSummaryQuerySchema
 from tracim_backend.views.core_api.schemas import UserMessagesSummarySchema
 from tracim_backend.views.core_api.schemas import UserPicturePathSchema
@@ -117,12 +119,6 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__USER_ENDPOINTS = "Users"
 
@@ -782,8 +778,9 @@ class UserController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserMessagesMarkAsReadQuerySchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def set_all_user_messages_as_read(
+    def set_user_messages_as_read(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
@@ -791,7 +788,11 @@ class UserController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        event_api.mark_user_messages_as_read(request.candidate_user.user_id)
+        event_api.mark_user_messages_as_read(
+            request.candidate_user.user_id,
+            content_ids=hapic_data.query.content_ids,
+            parent_ids=hapic_data.query.parent_ids,
+        )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
@@ -1523,7 +1524,7 @@ class UserController(Controller):
             "/users/{user_id:\d+}/messages/read",
             request_method="PUT",  # noqa: W605
         )
-        configurator.add_view(self.set_all_user_messages_as_read, route_name="read_messages")
+        configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
 
         # read all unread messages for user
         configurator.add_route(

@@ -2,6 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import CardPopupCreateContent from '../../src/component/CardPopup/CardPopupCreateContent.jsx'
+import CardPopup from '../../src/component/CardPopup/CardPopup.jsx'
 import sinon from 'sinon'
 require('../../src/component/CardPopup/CardPopupCreateContent.styl')
 
@@ -32,36 +33,20 @@ describe('<CardPopupCreateContent />', () => {
   )
 
   describe('Static design', () => {
-    it(`should display "${props.label}"`, () =>
-      expect(wrapper.find('.createcontent__contentname__title')).to.have.text().equal(props.label)
-    )
-
     it(`.createcontent__form__button.btn should have the customColor "${props.customColor}"`, () => {
       expect(wrapper.find('.createcontent__form__button.btn').prop('style').borderColor).to.equal(props.customColor)
     })
-
-    it(`.${props.faIcon} should have the customColor "${props.customColor}"`, () =>
-      expect(wrapper.find(`.${props.faIcon}`).prop('style').color).to.equal(props.customColor)
-    )
-
-    it(`.createcontent__contentname__title should have the customColor "${props.customColor}"`, () =>
-      expect(wrapper.find('.createcontent__contentname__title').prop('style').color).to.equal(props.customColor)
-    )
 
     it(`.createcontent__form__button.btn should have the customColor "${props.customColor}"`, () =>
       expect(wrapper.find('.createcontent__form__button.btn').prop('style').backgroundColor).to.equal(props.customColor)
     )
 
-    it(`should display the icon "${props.faIcon}"`, () =>
-      expect(wrapper.find(`i.${props.faIcon}`)).to.have.lengthOf(1)
-    )
-
     it('CardPopup should have the good custom style', () =>
-      expect(wrapper.find('CardPopup').prop('customStyle')).to.deep.equal(props.customStyle)
+      expect(wrapper.find(CardPopup).prop('customStyle')).to.deep.equal(props.customStyle)
     )
 
     it(`CardPopup should have the good customColor "${props.customColor}"`, () =>
-      expect(wrapper.find('CardPopup').prop('customColor')).to.deep.equal(props.customColor)
+      expect(wrapper.find(CardPopup).prop('customColor')).to.deep.equal(props.customColor)
     )
 
     it(`should display the validate label "${props.btnValidateLabel}"`, () =>

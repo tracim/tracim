@@ -37,8 +37,6 @@ import {
 import ContentListItem from '../component/ContentListItem.jsx'
 import ContentType from '../component/ContentType.jsx'
 
-require('../css/Favorites.styl')
-
 const FavoritesHeader = translate()(props => {
   return (
     <div className='favoritesHeader content__header'>
@@ -72,6 +70,7 @@ const UnavailableContent = translate()(props => {
       read
       contentType={props.contentTypeInfo}
       isLast={props.isLast}
+      isFirst={props.isFirst}
       customClass='unavailableContent contentListItem'
     >
       <ContentType
@@ -169,11 +168,7 @@ export class Favorites extends React.Component {
       if (!favorite.content) return null
       // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
       // hence the snake-case properties
-      const response = await getContentPath(
-        FETCH_CONFIG.apiUrl,
-        favorite.content.workspace_id,
-        favorite.content_id
-      )
+      const response = await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
       if (!response.ok) return []
 
       const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
@@ -225,6 +220,7 @@ export class Favorites extends React.Component {
       />
     )
     const isLast = index === props.favoriteList.length - 1
+    const isFirst = index === 0
     if (!favorite.content) {
       const contentTypeInfo = props.contentType.find(info => info.slug === favorite.originalType)
       return (
@@ -233,6 +229,7 @@ export class Favorites extends React.Component {
           label={favorite.originalLabel}
           key={favorite.contentId}
           isLast={isLast}
+          isFirst={isFirst}
         >
           {favoriteButton}
         </UnavailableContent>
@@ -246,6 +243,7 @@ export class Favorites extends React.Component {
         userLang={props.user.lang}
         key={favorite.contentId}
         isLast={isLast}
+        isFirst={isFirst}
         breadcrumbsList={state.contentBreadcrumbsList[index]}
         commentsCount={state.contentCommentsCountList[index]}
         customClass='favorites__item'
@@ -278,9 +276,9 @@ export class Favorites extends React.Component {
               </PageContent>
             )
             : (
-              <span className='favorites__no_favorite'>
+              <div className='pageContentGeneric favorites__no_favorite'>
                 {props.t('You did not add any content as favorite yet.')}
-              </span>
+              </div>
             )}
         </PageWrapper>
       </div>

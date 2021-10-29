@@ -8,7 +8,6 @@ describe('App File', () => {
   const fullFilename_2 = 'artikodin.png'
   const contentType = 'image/png'
   let workspaceId
-  let firstContentId
   let secondContentId
 
   before(function () {
@@ -19,7 +18,6 @@ describe('App File', () => {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename_1, contentType, fileTitle_1, workspace.workspace_id)
-        .then(newContent => firstContentId = newContent.content_id)
 
       cy.createFile(fullFilename_2, contentType, fileTitle_2, workspaceId)
         .then(newContent => {
@@ -42,10 +40,7 @@ describe('App File', () => {
         cy.get('[data-cy="revision_data_2"]')
           .click()
 
-        cy.get('.file__contentpage__content__left__top .breadcrumbs__item')
-          .its('length')
-          .should('eq', 3)
-        cy.get('.breadcrumbs__item').last().contains(fileTitle_2)
+        cy.contains('.breadcrumbs__item', fileTitle_2)
 
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.visible')
@@ -53,9 +48,7 @@ describe('App File', () => {
         cy.get('.file__contentpage__header__close')
           .click()
 
-        cy.get('.breadcrumbs__item')
-          .its('length')
-          .should('eq', 3)
+        cy.contains('.breadcrumbs__item', 'Contents')
 
         cy.get('[data-cy="popinFixed"]')
           .should('not.be.visible')
@@ -73,7 +66,7 @@ describe('App File', () => {
         cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
-        cy.get('.file__contentpage__content__left__top > ul > li.breadcrumbs__item.primaryColorFont.primaryColorFontDarkenHover')
+        cy.get('.file__contentpage__header ul > li.breadcrumbs__item.primaryColorFont.primaryColorFontDarkenHover')
           .click()
 
         cy.get('[data-cy="popinFixed"]')

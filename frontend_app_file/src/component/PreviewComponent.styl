@@ -6,34 +6,13 @@
 
 .previewcomponent
   position relative
-  height 100%
+  height calc(100% - 118px)
   overflow-x hidden
-  &__state
-    display flex
-    align-items center
-    justify-content space-between
-    margin 15px 10px
-    padding 5px 15px
-    background-color #fee498
-    border-radius 10px
-    &__msg > i
-      margin-right 8px
-    &__btnrestore
-      cursor pointer
-      & > i
-        margin-right 8px
-  &__dloption
-    display flex
-    justify-content space-evenly
-    margin 0 auto
-    padding-top 10px
-    width 250px
-    &__icon
-      font-size 20px
-      cursor pointer
-      color fontColor
+  display flex
+  width 100%
+  align-items center
+  justify-content center
   &__fileimg
-    height calc(100% - 53px) // 53px => height of dloption
     display flex
     flex-direction column
     justify-content center
@@ -47,13 +26,14 @@
       &-icon
         font-size bigIconSize
       &-msg
-        margin-top 10px
+        margin-top standardSpacing
         word-break break-word
     &.previewAvailable
       cursor pointer
   &__navigationButton
-    margin 0 5px
-    font-size 20px
+    margin standardSpacing
+    padding 0
+    font-size titleFontSize
     cursor pointer
     &:focus
       box-shadow 0 0 0 0
@@ -62,7 +42,6 @@
     position absolute
     right 5px
     bottom 5px
-    font-size 13px
+    font-size metadataFontSize
   &__filepreview
     display flex
-    height calc(100% - 53px) // 53px => height of dloption

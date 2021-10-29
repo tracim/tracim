@@ -2,18 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
-
 import {
   APP_FEATURE_MODE,
   ConfirmPopup,
-  AutoComplete,
+  CONTENT_TYPE,
   IconButton,
   PromptMessage,
   HTMLContent,
   RefreshWarningMessage,
   TextAreaApp,
-  TRANSLATION_STATE,
-  TranslateButton
+  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 
 export const HtmlDocument = props => {
@@ -108,17 +106,6 @@ export const HtmlDocument = props => {
         )}
         {(props.mode === APP_FEATURE_MODE.VIEW || props.mode === APP_FEATURE_MODE.REVISION) && (
           <div>
-            <div className='html-document__contentpage__textnote__top'>
-              <TranslateButton
-                translationState={props.translationState}
-                targetLanguageList={props.translationTargetLanguageList}
-                targetLanguageCode={props.translationTargetLanguageCode}
-                onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
-                onClickTranslate={props.onClickTranslateDocument}
-                onClickRestore={props.onClickRestoreDocument}
-                dataCy='htmlDocumentTranslateButton'
-              />
-            </div>
             {/* need try to inject html in stateless component () => <span>{props.text}</span> */}
             <div className={noteClassName}>
               <HTMLContent isTranslated={isTranslated}>{props.text}</HTMLContent>
@@ -140,38 +127,31 @@ export const HtmlDocument = props => {
               </>
             }
             confirmLabel={props.t('Edit')}
+            confirmIcon='far fa-fw fa-edit'
             cancelLabel={props.t('Validate anyway')}
+            cancelIcon='fas fa-fw fa-check'
           />
         )}
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
-          <div className='html-document__editionmode__container'>
-            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <AutoComplete
-                apiUrl={props.apiUrl}
-                autoCompleteItemList={props.autoCompleteItemList}
-                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                style={{
-                  top: props.tinymcePosition.isSelectionToTheTop ? props.tinymcePosition.bottom : props.tinymcePosition.top,
-                  transform: !props.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none',
-                  position: props.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
-                  zIndex: props.tinymcePosition.isFullscreen ? 1061 : 20
-                }}
-                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-              />
-            )}
-            <TextAreaApp
-              id={props.wysiwygNewVersion}
-              customClass='html-document__editionmode'
-              customColor={props.customColor}
-              onClickCancelBtn={props.onClickCloseEditMode}
-              disableValidateBtn={props.disableValidateBtn}
-              onClickValidateBtn={props.onClickValidateBtn}
-              text={props.text}
-              onChangeText={props.onChangeText}
-            />
-          </div>
+          <TextAreaApp
+            apiUrl={props.apiUrl}
+            contentId={props.contentId}
+            contentType={props.contentType}
+            customClass='html-document__editionmode'
+            customColor={props.customColor}
+            disableValidateBtn={props.disableValidateBtn}
+            elementId={props.wysiwygNewVersion}
+            isVisible={props.isVisible}
+            lang={props.lang}
+            mode={props.mode}
+            onClickCancelBtn={props.onClickCloseEditMode}
+            onClickValidateBtn={props.onClickValidateBtn}
+            searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
+            text={props.text}
+            onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+            workspaceId={props.workspaceId}
+          />
         )}
       </div>
     </div>
@@ -182,23 +162,28 @@ export default translate()(HtmlDocument)
 
 HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
-  onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translationTargetLanguageCode: PropTypes.string.isRequired,
+  workspaceId: PropTypes.number.isRequired,
+  wysiwygNewVersion: PropTypes.string.isRequired,
+  contentId: PropTypes.number,
+  contentType: PropTypes.string,
   customColor: PropTypes.string,
+  disableValidateBtn: PropTypes.func,
+  displayNotifyAllMessage: PropTypes.func,
   editionAuthor: PropTypes.string,
-  wysiwygNewVersion: PropTypes.string,
-  disableValidateBtn: PropTypes.bool,
   text: PropTypes.string,
+  invalidMentionList: PropTypes.array,
   isArchived: PropTypes.bool,
   isDeleted: PropTypes.bool,
   isDeprecated: PropTypes.bool,
   deprecatedStatus: PropTypes.object,
   isDraftAvailable: PropTypes.bool,
   isRefreshNeeded: PropTypes.bool,
+  isVisible: PropTypes.bool,
+  lang: PropTypes.string,
   mode: PropTypes.string,
+  onClickAutoCompleteItem: PropTypes.func,
   onClickValidateBtn: PropTypes.func,
-  onChangeText: PropTypes.func,
+  onClickCancelSave: PropTypes.func,
   onClickCloseEditMode: PropTypes.func,
   onClickCloseNotifyAllMessage: PropTypes.func,
   onClickLastVersion: PropTypes.func,
@@ -206,17 +191,42 @@ HtmlDocument.propTypes = {
   onClickRefresh: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
+  onClickSaveAnyway: PropTypes.func,
   onClickShowDraft: PropTypes.func,
-  onClickTranslateDocument: PropTypes.func,
-  onClickRestoreDocument: PropTypes.func,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
+  searchForMentionOrLinkInQuery: PropTypes.func,
+  showInvalidMentionPopup: PropTypes.bool
 }
 
 HtmlDocument.defaultProps = {
+  contentId: 0,
+  contentType: CONTENT_TYPE.HTML_DOCUMENT,
   customColor: '#252525',
+  deprecatedStatus: {
+    faIcon: ''
+  },
+  disableValidateBtn: () => false,
   editionAuthor: '',
+  invalidMentionList: [],
+  isArchived: false,
+  isDeleted: false,
+  isDeprecated: false,
+  isDraftAvailable: false,
   isRefreshNeeded: false,
+  isVisible: true,
+  lang: 'en',
   mode: APP_FEATURE_MODE.VIEW,
+  onClickAutoCompleteItem: () => { },
+  onClickCancelSave: () => { },
+  onClickCloseEditMode: () => { },
+  onClickCloseNotifyAllMessage: () => { },
   onClickLastVersion: () => { },
-  onClickRefresh: () => { }
+  onClickNotifyAll: () => { },
+  onClickRefresh: () => { },
+  onClickRestoreArchived: () => { },
+  onClickRestoreDeleted: () => { },
+  onClickSaveAnyway: () => { },
+  onClickShowDraft: () => { },
+  showInvalidMentionPopup: false,
+  searchForMentionOrLinkInQuery: () => { },
+  text: ''
 }

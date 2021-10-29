@@ -8,7 +8,6 @@ import {
   DRAG_AND_DROP
 } from '../../util/helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
-import DragHandle from '../DragHandle.jsx'
 import {
   ROLE,
   FilenameWithExtension,
@@ -34,18 +33,14 @@ class ContentItem extends React.Component {
       <ListItemWrapper
         label={props.label}
         read={props.read}
+        connectDragSource={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragSource : undefined}
         contentType={props.contentType}
         isLast={props.isLast}
+        isFirst={props.isFirst}
         key={props.id}
         id={`${ANCHOR_NAMESPACE.workspaceItem}:${props.contentId}`}
+        ref={props.userRoleIdInWorkspace >= ROLE.contentManager.id ? props.connectDragPreview : undefined}
       >
-        {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
-          <DragHandle
-            connectDragSource={props.connectDragSource}
-            title={props.t('Move this content')}
-            style={{ top: '18px', left: '-2px', padding: '0 7px' }}
-          />
-        )}
 
         <Link
           to={props.urlContent}
@@ -54,14 +49,13 @@ class ContentItem extends React.Component {
         >
           <div
             className='content__dragPreview'
-            ref={props.connectDragPreview}
           >
             <div
               className='content__type'
               title={props.t(props.contentType.label)}
               style={{
                 color: props.contentType.hexcolor,
-                padding: props.isShared ? '0 15px' : '0 25px'
+                paddingRight: props.isShared ? 'unset' : '10px'
               }}
             >
               {(props.isShared
@@ -75,7 +69,7 @@ class ContentItem extends React.Component {
                   />
                 )
                 : (
-                  <i className={`fa-fw ${props.faIcon}`} />
+                  <i className={props.isDragging ? 'fas fa-arrows-alt' : `fa-fw ${props.faIcon}`} />
                 )
               )}
             </div>
@@ -113,15 +107,17 @@ class ContentItem extends React.Component {
           )}
 
           <div
-            className='content__status d-sm-flex justify-content-between align-items-center'
-            style={{ color: status.hexcolor }}
+            className='content__status'
             title={props.t(status.label)}
           >
-            <div className='content__status__text d-none d-sm-block'>
-              {props.t(status.label)}
-            </div>
             <div className='content__status__icon'>
-              <i className={`fa-fw ${status.faIcon}`} />
+              <i
+                className={`fa-fw ${status.faIcon}`}
+                style={{ color: status.hexcolor }}
+              />
+            </div>
+            <div className='content__status__text'>
+              {props.t(status.label)}
             </div>
           </div>
         </Link>

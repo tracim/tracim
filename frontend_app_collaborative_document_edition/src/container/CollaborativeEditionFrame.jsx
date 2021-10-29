@@ -28,8 +28,8 @@ export class CollaborativeEditionFrame extends React.Component {
       iframeId: props.frameId ? props.frameId : IFRAME_ID,
       iframeStyle: {
         width: '100%',
-        height: 'calc(100% - 61px)',
-        top: 61,
+        height: 'calc(100% - 60px)',
+        top: 60,
         left: 0,
         position: 'fixed',
         zIndex: 25,

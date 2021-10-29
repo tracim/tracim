@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from copy import deepcopy
+from http import HTTPStatus
 import sys
 import warnings
 
@@ -71,11 +72,6 @@ from tracim_backend.views.core_api.user_controller import UserController
 from tracim_backend.views.core_api.workspace_controller import WorkspaceController
 from tracim_backend.views.errors import ErrorSchema
 from tracim_backend.views.frontend import FrontendController
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
 
 # INFO - G.M - 2020-01-08 - disable warning by default
 # useful to avoid apispec error
@@ -312,6 +308,13 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(tag_controller.bind, route_prefix=BASE_API)
     configurator.include(url_preview_controller.bind, route_prefix=BASE_API)
     configurator.include(favorite_content_controller.bind, route_prefix=BASE_API)
+    if app_config.CALL__ENABLED:
+        # NOTE - 2021-09-22 - S.G - importing here so that hapic only discover those routes
+        # when CALL_ENABLED is True.
+        from tracim_backend.views.core_api.call import CallController
+
+        call_controller = CallController()
+        configurator.include(call_controller.bind, route_prefix=BASE_API)
 
     app_lib = ApplicationApi(app_list=app_list)
     for app in app_lib.get_all():

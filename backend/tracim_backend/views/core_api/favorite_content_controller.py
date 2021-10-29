@@ -1,4 +1,5 @@
 # coding=utf-8
+from http import HTTPStatus
 
 from pyramid.config import Configurator
 
@@ -20,12 +21,6 @@ from tracim_backend.views.core_api.schemas import PaginatedFavoriteContentSchema
 from tracim_backend.views.core_api.schemas import UserContentIdPathSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.user_controller import SWAGGER_TAG__USER_CONTENT_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__FAVORITE_SUBSECTION = "Favorites"
 SWAGGER_TAG__USER_CONTENT_FAVORITE_ENDPOINTS = generate_documentation_swagger_tag(

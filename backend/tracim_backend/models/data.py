@@ -13,6 +13,8 @@ from babel.dates import format_timedelta
 from bs4 import BeautifulSoup
 from depot.fields.upload import UploadedFile
 from depot.io.utils import FileIntent
+from sqlakeyset import Page
+from sqlakeyset import get_page
 import sqlalchemy
 from sqlalchemy import Column
 from sqlalchemy import Enum
@@ -23,11 +25,14 @@ from sqlalchemy import inspect
 from sqlalchemy import text
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import Query
+from sqlalchemy.orm import aliased
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.sql import func
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
@@ -53,6 +58,7 @@ from tracim_backend.models.mixins import TrashableMixin
 from tracim_backend.models.mixins import UpdateDateMixin
 from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.types import TracimUploadedFileField
+from tracim_backend.models.utils import get_sort_expression
 
 
 class WorkspaceAccessType(enum.Enum):
@@ -411,6 +417,19 @@ class ContentNamespaces(str, enum.Enum):
     PUBLICATION = "publication"
 
 
+class ContentSortOrder(str, enum.Enum):
+    LABEL_ASC = "label:asc"
+    MODIFIED_ASC = "modified:asc"
+    LABEL_DESC = "label:desc"
+    MODIFIED_DESC = "modified:desc"
+    CREATED_ASC = "created:asc"
+    CREATED_DESC = "created:desc"
+
+    @property
+    def is_asc(self) -> bool:
+        return self.value.endswith(":asc")
+
+
 class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
     """
     Revision of Content. It's immutable, update or delete an existing ContentRevisionRO will throw
@@ -627,6 +646,16 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     @property
     def is_readonly(self) -> bool:
         return False
+
+    @property
+    def version_number(self) -> int:
+        return (
+            object_session(self)
+            .query(ContentRevisionRO.revision_id)
+            .filter(ContentRevisionRO.revision_id <= self.revision_id)
+            .filter(ContentRevisionRO.content_id == self.content_id)
+            .count()
+        )
 
     def get_status(self) -> ContentStatus:
         try:
@@ -1163,7 +1192,7 @@ class Content(DeclarativeBase):
         self.current_revision = new_rev
         return new_rev
 
-    def get_valid_children(self, content_types: List[str] = None) -> List["Content"]:
+    def get_valid_children(self, content_types: List[str] = None) -> Query:
         query = self.children.filter(ContentRevisionRO.is_deleted == False).filter(  # noqa: E712
             ContentRevisionRO.is_archived == False  # noqa: E712
         )
@@ -1237,11 +1266,78 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(self) -> List["Content"]:
-        return self.get_valid_children(content_types=[content_type_list.Comment.slug])
+    def get_comments(
+        self,
+        page_token: Optional[str] = None,
+        count: Optional[int] = None,
+        sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
+    ) -> Page:
+        """Get the comments of this Content in pages."""
+        query = self.get_valid_children(content_types=[content_type_list.Comment.slug])
+        # INFO - 2021-08-16 - S.G. : remove the sort clause as
+        # get_valid_children calls children which always sorts by id.
+        query = query.order_by(None)
+        sort_clause = get_sort_expression(sort_order, Content)
+        query = query.order_by(sort_clause)
+        # INFO - 2021-08-17 - S.G. - Always add a sort on the content id
+        # in order to differenciate between comments with the same creation/modification date.
+        if sort_order.is_asc:
+            id_sort_clause = Content.id.asc()
+        else:
+            id_sort_clause = Content.id.desc()
+        query = query.order_by(id_sort_clause)
+        if count:
+            return get_page(query, per_page=count, page=page_token or False)
+        return Page(query.all())
 
-    def get_first_comment(self) -> "Content":
-        return self.get_comments().first()
+    def get_revisions(
+        self,
+        page_token: Optional[str] = None,
+        count: Optional[int] = None,
+        sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
+    ) -> Page:
+        """Get the revisions of this Content in pages."""
+        ContentRevisionROForNumber = aliased(ContentRevisionRO)
+        session = object_session(self)
+        number_subquery = (
+            session.query(func.count(ContentRevisionROForNumber.revision_id))
+            .filter(ContentRevisionROForNumber.revision_id <= ContentRevisionRO.revision_id)
+            .filter(ContentRevisionROForNumber.content_id == ContentRevisionRO.content_id)
+            .correlate(ContentRevisionRO)
+            # NOTE - 2021/08/16 - S.G. - the label() transforms the query in a scalar subquery
+            # which is properly generated as
+            #  SELECT ..., Q FROM content_revisions
+            # Without the generated query is
+            #  SELECT ..., tbl_row_count FROM content_revisions, Q
+            # which is incorrect
+            .label("version_number")
+        )
+        query = session.query(ContentRevisionRO, number_subquery).filter(
+            ContentRevisionRO.content_id == self.content_id
+        )
+        sort_clause = get_sort_expression(sort_order, ContentRevisionRO, {"modified": "updated"})
+        query = query.order_by(sort_clause)
+        # INFO - 2021-08-17 - S.G. - Always add a sort on the revision id
+        # in order to differenciate between revisions with the same modification date.
+        if sort_order.is_asc:
+            revision_id_sort_clause = ContentRevisionRO.revision_id.asc()
+        else:
+            revision_id_sort_clause = ContentRevisionRO.revision_id.desc()
+        query = query.order_by(revision_id_sort_clause)
+        if count:
+            query = get_page(query, per_page=count, page=page_token or False)
+            return query
+        return Page(query.all())
+
+    @property
+    def version_number(self) -> int:
+        return self.revision.version_number
+
+    def get_first_comment(self) -> Optional["Content"]:
+        try:
+            return self.get_comments()[0]
+        except IndexError:
+            return None
 
     def get_last_comment_from(self, user: User) -> Optional["Content"]:
         # TODO - Make this more efficient

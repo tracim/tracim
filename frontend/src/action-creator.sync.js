@@ -53,6 +53,8 @@ export const USER_PROFILE_COVER_NAME = `${USER}/ProfileCoverName`
 export const updateUserProfileAvatarName = newAvatarName => ({ type: `${SET}/${USER_PROFILE_AVATAR_NAME}`, newAvatarName })
 export const updateUserProfileCoverName = newCoverName => ({ type: `${SET}/${USER_PROFILE_COVER_NAME}`, newCoverName })
 
+export const USER_CALL = `${USER}/outgoing_calls`
+
 export const CONTENT = 'Content'
 export const WORKSPACE = 'Workspace'
 export const WORKSPACE_CONTENT = `${WORKSPACE}/${CONTENT}`
@@ -96,10 +98,13 @@ export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
 export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
 
-// workspace related const bellow is for currentWorkspace
+// workspace related const below is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`
 export const setWorkspaceDetail = workspaceDetail => ({ type: `${SET}/${WORKSPACE_DETAIL}`, workspaceDetail })
 export const updateWorkspaceDetail = workspaceDetail => ({ type: `${UPDATE}/${WORKSPACE_DETAIL}`, workspaceDetail })
+
+export const WORKSPACE_LOADED = `${WORKSPACE}/Loaded`
+export const setWorkspaceLoaded = () => ({ type: `${SET}/${WORKSPACE_LOADED}` })
 
 export const WORKSPACE_MEMBER = `${WORKSPACE}/Member`
 export const WORKSPACE_MEMBER_LIST = `${WORKSPACE_MEMBER}/List`
@@ -155,7 +160,7 @@ export const LANG = 'Lang'
 export const updateLangList = langList => ({ type: `${UPDATE}/${LANG}`, langList })
 
 export const HEAD_TITLE = 'HeadTitle'
-export const setHeadTitle = headTitle => ({ type: `${SET}/${HEAD_TITLE}`, headTitle })
+export const setHeadTitle = (headTitle, titlePrefix = '') => ({ type: `${SET}/${HEAD_TITLE}`, headTitle, titlePrefix })
 
 export const BREADCRUMBS = 'Breadcrumbs'
 export const setBreadcrumbs = newBreadcrumbs => ({ type: `${SET}/${BREADCRUMBS}`, newBreadcrumbs })
@@ -194,14 +199,18 @@ export const resetAppliedFilter = (searchType) => ({ type: `${RESET}/${APPLIED_F
 export const NEXT_PAGE = 'NextPage'
 export const NOTIFICATION_LIST = 'NotificationList'
 export const NOTIFICATION = 'Notification'
-export const NOTIFICATION_NOT_READ_COUNT = 'NotificationNotReadCounter'
+export const UNREAD_MENTION_COUNT = 'UnreadMentionCount'
+export const UNREAD_NOTIFICATION_COUNT = 'UnreadNotificationCount'
 export const setNotificationList = notificationList => ({ type: `${SET}/${NOTIFICATION_LIST}`, notificationList })
 export const appendNotificationList = notificationList => ({ type: `${APPEND}/${NOTIFICATION_LIST}`, notificationList })
 export const addNotification = notification => ({ type: `${ADD}/${NOTIFICATION}`, notification })
+export const updateNotification = (notificationId, notificationList) => ({ type: `${UPDATE}/${NOTIFICATION}`, notificationId, notificationList })
 export const readNotification = notificationId => ({ type: `${READ}/${NOTIFICATION}`, notificationId })
 export const readNotificationList = () => ({ type: `${READ}/${NOTIFICATION_LIST}` })
+export const readContentNotification = contentId => ({ type: `${READ}/${CONTENT}/${NOTIFICATION}`, contentId })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
-export const setNotificationNotReadCounter = (notificationNotReadCount) => ({ type: `${SET}/${NOTIFICATION_NOT_READ_COUNT}`, notificationNotReadCount })
+export const setUnreadMentionCount = (count) => ({ type: `${SET}/${UNREAD_MENTION_COUNT}`, count })
+export const setUnreadNotificationCount = (count) => ({ type: `${SET}/${UNREAD_NOTIFICATION_COUNT}`, count })
 
 export const ACCESSIBLE_WORKSPACE_LIST = `${WORKSPACE}/AccessibleList`
 export const ACCESSIBLE_WORKSPACE = `${WORKSPACE}/Accessible`
@@ -244,6 +253,12 @@ export const PUBLICATION_THREAD = `${PUBLICATION}/Thread`
 export const COMMENT = 'Comment'
 export const COMMENT_LIST = `${COMMENT}List`
 export const setPublicationList = (publicationList) => ({ type: `${SET}/${WORKSPACE_PUBLICATION_LIST}`, publicationList })
+export const appendPublicationList = (publicationList) => ({ type: `${APPEND}/${WORKSPACE_PUBLICATION_LIST}`, publicationList })
+export const setPublicationNextPage = (hasNextPage, nextPageToken) => ({
+  type: `${SET}/${WORKSPACE_PUBLICATION_LIST}/${NEXT_PAGE}`,
+  hasNextPage,
+  nextPageToken
+})
 export const updatePublicationList = () => ({ type: `${UPDATE}/${WORKSPACE_PUBLICATION_LIST}` })
 export const removePublication = (publicationId) => ({ type: `${REMOVE}/${PUBLICATION}`, publicationId })
 export const appendPublication = (publication) => ({ type: `${APPEND}/${PUBLICATION}`, publication })

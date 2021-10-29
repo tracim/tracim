@@ -1,12 +1,9 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 .notification
   position fixed
   top headerHeight
   right 0
   width 40%
   height "calc(100% - %s)" % headerHeight
-  border-left 1px solid grey
   background-color offWhite
   box-shadow shadow-right
   z-index 26
@@ -15,11 +12,8 @@
   max-width 600px
   overflow hidden
   transition 0.5s
-  &__header
-    & div
-      color fontColor
-    &__close i
-      color fontColor
+  & .iconbutton
+    font-size metadataFontSize
   &__list
     flex-grow 2
     overflow auto
@@ -28,53 +22,92 @@
       display flex
       color fontColor
       font-weight normal
-      background-color veryLightGrey
-      padding 5px
-      min-height listItemHeight
+      background-color lightBlueOpacity
+      padding standardSpacing
+      height 60px
       align-items center
-      &__icon
-        font-size 23px
-        margin 10px
-        display inline-block
-        width 30px
       &__text
+        flex 4
         display flex
-        padding-left 5px
-        padding-right 10px
-        font-size fontSizeSmall
-        word-break break-word   
+        word-break break-word
+        align-items center
+        &__content
+          line-height standardFontSize + 1
+          max-height 2*standardFontSize + 1
+          overflow hidden
+          text-overflow ellipsis
+        & .avatar
+          margin-inline-end standardSpacing
+        &__avatars
+          width 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          height 30px
+          margin-inline-end standardSpacing
+          &__second
+            position absolute
+            top 20px
+            left 20px // INFO - GB - 2021-08-26 - 20px is two authors avatar's size
+        &__usersAvatar
+          min-width 30px
+          min-height 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          display flex
+          border-radius 50%
+          margin-inline-end standardSpacing
+          align-items center
+          justify-content center
+          background-color lightDarkGrey
+      &__meta
+        padding-right textSpacing
+        color lightDarkGrey
+        flex 1
+        overflow hidden
+        font-size metadataFontSize
+        white-space nowrap
+        text-align right
+        &__space
+          text-overflow ellipsis
+          overflow hidden
+          font-weight bold
       &__circle
-        margin-left auto
-        margin-right 5px
+        &__wrapper
+          margin 0
+          min-width 1em
+          text-align center
         font-size 8px
+        transition 300ms font-size color
         color lightBlue
       &.itemRead
         color lightDarkGrey
         background-color offWhite
         opacity 0.8
+      &.isMention:not(.itemRead)
+        background lightOrange
+      &.isMention.itemRead
+        background lightOrangeOpacity
       &:hover
-        background-color grey-hover
         color inherit
   &__wallClose
     height 0
     top 0
   &__footer
-    border-top 1px solid grey
-    padding 5px
+    border-top borderStyle
+    padding standardSpacing
+    position sticky
+    bottom 0
+    background-color offWhite
     justify-content center
-    width 100%
     display flex
+  &__header
+    min-height headerHeight
+    &__title
+      font-weight normal
 
 .contentTitle
   &__highlight
-    text-decoration underline
-.documentTitle
-  &__highlight
     font-weight bold
 
-// INFO - MB - 20200204 - overrides ListItemWrapper styles because .content is used in many places
+// INFO - MB - 20210204 - overrides ListItemWrapper styles because .content is used in many places
 .notification > .notification__list > .content
-  border-left none
+  border none
 
 @media (min-width: min-md) and (max-width: max-md)
   .notification
@@ -85,9 +118,8 @@
     width 100%
 
 @media (max-width: max-lg)
-  .notification
-    & .btn
-      & > .genericButton__label
-        display none
-      & > .genericButton__icon
-        margin 0px
+  .notification .btn
+    & > .genericButton__label
+      display none
+    & > .genericButton__icon
+      margin 0px

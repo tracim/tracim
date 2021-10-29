@@ -9,11 +9,21 @@ import { firstWorkspace } from '../../fixture/workspace/firstWorkspace.js'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { connectMock } from '../../hocMock/store'
 import { appList } from '../../hocMock/redux/appList/appList.js'
+import { mockPutContentNotificationAsRead204 } from '../../apiMock.js'
+import { FETCH_CONFIG } from '../../../src/util/helper.js'
+import { isFunction } from '../../hocMock/helper'
 
 describe('<OpenContentApp />', () => {
   const dispatchCustomEventSpy = sinon.spy()
   const onUpdateAppOpenedTypeSpy = sinon.spy()
   const renderAppFeatureSpy = sinon.spy()
+
+  const dispatchMock = p => {
+    if (isFunction(p)) {
+      return p(dispatchMock)
+    }
+    return p
+  }
 
   const props = {
     workspaceId: 1,
@@ -28,7 +38,9 @@ describe('<OpenContentApp />', () => {
         type: 'html-document'
       }
     },
-    onUpdateAppOpenedType: onUpdateAppOpenedTypeSpy
+    onUpdateAppOpenedType: onUpdateAppOpenedTypeSpy,
+    dispatch: dispatchMock,
+    t: s => s
   }
 
   const propsWithOtherContentId = {
@@ -53,47 +65,71 @@ describe('<OpenContentApp />', () => {
       }
     }
   }
+  mockPutContentNotificationAsRead204(FETCH_CONFIG.apiUrl, user.userId, 1, 1).persist()
 
   const mapStateToProps = { contentType, user, currentWorkspace: firstWorkspace }
-  const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps)(OpenContentAppWithoutHOC))
+  const ComponentWithHoc = withRouterMock(connectMock(mapStateToProps, dispatchMock)(OpenContentAppWithoutHOC))
   const wrapper = mount(<ComponentWithHoc {...props} />)
   const wrapperInstance = wrapper.find(OpenContentAppWithoutHOC)
 
   describe('openContentApp()', () => {
-    beforeEach(() => {
-      wrapper.setProps(props)
-      renderAppFeatureSpy.resetHistory()
-      onUpdateAppOpenedTypeSpy.resetHistory()
-      dispatchCustomEventSpy.resetHistory()
+    describe('when the app is already open, other content id', () => {
+      let putNotificationAsReadMock = null
+      before(() => {
+        putNotificationAsReadMock = mockPutContentNotificationAsRead204(FETCH_CONFIG.apiUrl, user.userId, 2, 2)
+        wrapper.setProps(propsWithOtherContentId)
+      })
+      it('should call dispatchCustomEvent to reload content ', () => {
+        expect(dispatchCustomEventSpy.called).to.equal(true)
+        expect(renderAppFeatureSpy.called).to.equal(true)
+        expect(onUpdateAppOpenedTypeSpy.called).to.equal(false)
+        expect(putNotificationAsReadMock.isDone()).to.equal(true)
+      })
+      after(() => {
+        wrapper.setProps(props)
+        renderAppFeatureSpy.resetHistory()
+        onUpdateAppOpenedTypeSpy.resetHistory()
+        dispatchCustomEventSpy.resetHistory()
+      })
     })
 
-    it('should call dispatchCustomEvent to reload content when the app is already open', () => {
-      wrapper.setProps(propsWithOtherContentId)
-
-      expect(dispatchCustomEventSpy.called).to.equal(true)
-      expect(renderAppFeatureSpy.called).to.equal(false)
-      expect(onUpdateAppOpenedTypeSpy.called).to.equal(false)
-
-      dispatchCustomEventSpy.resetHistory()
+    describe('when the app is already open, other content type', () => {
+      let putNotificationAsReadMock = null
+      before(() => {
+        putNotificationAsReadMock = mockPutContentNotificationAsRead204(FETCH_CONFIG.apiUrl, user.userId, 3, 3)
+        wrapper.setProps(propsWithOtherContentType)
+      })
+      it('should call renderAppFeature and onUpdateAppOpenedType to open the new App and load its content', () => {
+        expect(dispatchCustomEventSpy.called).to.equal(true)
+        expect(renderAppFeatureSpy.called).to.equal(true)
+        expect(onUpdateAppOpenedTypeSpy.called).to.equal(true)
+        expect(putNotificationAsReadMock.isDone()).to.equal(true)
+      })
+      after(() => {
+        wrapper.setProps(props)
+        renderAppFeatureSpy.resetHistory()
+        onUpdateAppOpenedTypeSpy.resetHistory()
+        dispatchCustomEventSpy.resetHistory()
+      })
     })
 
-    it('should call renderAppFeature and onUpdateAppOpenedType to open the new App and load its content', () => {
-      wrapper.setProps(propsWithOtherContentType)
+    describe('when the workspaceId is undefined', () => {
+      before(() => {
+        renderAppFeatureSpy.resetHistory()
+        onUpdateAppOpenedTypeSpy.resetHistory()
+        dispatchCustomEventSpy.resetHistory()
+        wrapper.setProps(props)
+      })
+      it('should not call any callback', () => {
+        wrapper.setProps({ workspaceId: undefined })
+        wrapperInstance.instance().openContentApp()
 
-      expect(dispatchCustomEventSpy.called).to.equal(true)
-      expect(renderAppFeatureSpy.called).to.equal(true)
-      expect(onUpdateAppOpenedTypeSpy.called).to.equal(true)
-    })
+        expect(dispatchCustomEventSpy.called).to.equal(false)
+        expect(renderAppFeatureSpy.called).to.equal(false)
+        expect(onUpdateAppOpenedTypeSpy.called).to.equal(false)
 
-    it('should not call any callback when the workspaceId is undefined', () => {
-      wrapper.setProps({ workspaceId: undefined })
-      wrapperInstance.instance().openContentApp()
-
-      expect(dispatchCustomEventSpy.called).to.equal(false)
-      expect(renderAppFeatureSpy.called).to.equal(false)
-      expect(onUpdateAppOpenedTypeSpy.called).to.equal(false)
-
-      wrapper.setProps({ workspaceId: props.workspaceId })
+        wrapper.setProps({ workspaceId: props.workspaceId })
+      })
     })
   })
 })

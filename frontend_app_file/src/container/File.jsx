@@ -34,25 +34,19 @@ import {
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
-  addRevisionFromTLM,
   setupCommonRequestHeaders,
   getOrCreateSessionClientToken,
-  getCurrentContentVersionNumber,
-  getContentComment,
-  getFileChildContent,
   getFileContent,
   getFileRevision,
   PAGE,
   putFileDescription,
   putMyselfFileRead,
   putUserConfiguration,
-  permissiveNumberEqual,
-  getDefaultTranslationState,
   FAVORITE_STATE,
+  PopinFixedRightPartContent,
   TagList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
-import { debug } from '../debug.js'
 import {
   deleteShareLink,
   getShareLinksList,
@@ -66,7 +60,7 @@ export class File extends React.Component {
   constructor (props) {
     super(props)
 
-    const param = props.data || debug
+    const param = props.data
     props.setApiUrl(param.config.apiUrl)
 
     this.state = {
@@ -76,7 +70,6 @@ export class File extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
-      timeline: [],
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -85,8 +78,8 @@ export class File extends React.Component {
         props.t('Upload files')
       ],
       newComment: '',
-      newCommentAsFileList: [],
       newContent: {},
+      loadingContent: true,
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -103,7 +96,6 @@ export class File extends React.Component {
       showRefreshWarning: false,
       editionAuthor: '',
       invalidMentionList: [],
-      isLastTimelineItemCurrentToken: false,
       showInvalidMentionPopupInComment: false,
       translationTargetLanguageCode: param.loggedUser.lang
     }
@@ -124,12 +116,7 @@ export class File extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentCreated },
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored }
     ])
   }
 
@@ -163,14 +150,13 @@ export class File extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
     )
-    this.loadTimeline()
   }
 
   handleContentModified = (data) => {
     const { state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
 
-    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+    const clientToken = this.sessionClientToken
     const filenameNoExtension = removeExtensionOfFilename(data.fields.content.filename)
     const newContentObject = {
       ...state.content,
@@ -184,12 +170,10 @@ export class File extends React.Component {
     this.setState(prev => ({
       content: clientToken === data.fields.client_token
         ? newContentObject
-        : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
+        : prev.content,
       newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
-      showRefreshWarning: clientToken !== data.fields.client_token,
-      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
-      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      showRefreshWarning: clientToken !== data.fields.client_token
     }))
     if (clientToken === data.fields.client_token) {
       this.setHeadTitle(filenameNoExtension)
@@ -197,59 +181,25 @@ export class File extends React.Component {
     }
   }
 
-  handleContentCommentCreated = (tlm) => {
-    const { props, state } = this
-    // Not a comment for our content
-    if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
-
-    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(
-      tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config)
-    )
-    this.setState({
-      timeline: newTimeline,
-      isLastTimelineItemCurrentToken: createdByLoggedUser
-    })
-  }
-
   handleContentDeletedOrRestored = data => {
     const { state } = this
     const isTlmAboutCurrentContent = data.fields.content.content_id === state.content.content_id
-    const isTlmAboutCurrentContentChildren = data.fields.content.parent_id === state.content.content_id
 
-    if (!isTlmAboutCurrentContent && !isTlmAboutCurrentContentChildren) return
+    if (!isTlmAboutCurrentContent) return
 
-    if (isTlmAboutCurrentContent) {
-      const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-      this.setState(prev => ({
-        content: clientToken === data.fields.client_token
-          ? { ...prev.content, ...data.fields.content }
-          : { ...prev.content, number: getCurrentContentVersionNumber(prev.mode, prev.content, prev.timeline) },
-        newContent: {
-          ...prev.content,
-          ...data.fields.content
-        },
-        editionAuthor: data.fields.author.public_name,
-        showRefreshWarning: clientToken !== data.fields.client_token,
-        mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode,
-        timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang, clientToken === data.fields.client_token),
-        isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
-      }))
-      return
-    }
-
-    if (isTlmAboutCurrentContentChildren) {
-      this.handleContentCommentDeleted(data)
-    }
-  }
-
-  handleUserModified = data => {
-    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.fields.user.user_id
-      ? { ...timelineItem, author: data.fields.user }
-      : timelineItem
-    )
-
-    this.setState({ timeline: newTimeline })
+    const clientToken = this.sessionClientToken
+    this.setState(prev => ({
+      content: clientToken === data.fields.client_token
+        ? { ...prev.content, ...data.fields.content }
+        : prev.content,
+      newContent: {
+        ...prev.content,
+        ...data.fields.content
+      },
+      editionAuthor: data.fields.author.public_name,
+      showRefreshWarning: clientToken !== data.fields.client_token,
+      mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode
+    }))
   }
 
   async componentDidMount () {
@@ -259,6 +209,7 @@ export class File extends React.Component {
   }
 
   async updateTimelineAndContent (pageToLoad = null) {
+    const { props } = this
     this.setState({
       newComment: getLocalStorageItem(
         this.state.appName,
@@ -267,8 +218,9 @@ export class File extends React.Component {
       ) || ''
     })
 
-    await this.loadContent(pageToLoad)
-    this.loadTimeline()
+    this.loadContent(pageToLoad)
+    props.loadTimeline(getFileRevision, this.state.content)
+
     if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
@@ -314,6 +266,9 @@ export class File extends React.Component {
   loadContent = async (pageToLoad = null) => {
     const { state, props } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
+    this.setState({ loadingContent: true })
     const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
 
     switch (response.apiResponse.status) {
@@ -321,6 +276,7 @@ export class File extends React.Component {
         const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
         const pageForPreview = pageToLoad || state.fileCurrentPage
         this.setState({
+          loadingContent: false,
           content: {
             ...response.body,
             filenameNoExtension: filenameNoExtension,
@@ -331,8 +287,7 @@ export class File extends React.Component {
               `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
             )
           },
-          mode: APP_FEATURE_MODE.VIEW,
-          isLastTimelineItemCurrentToken: false
+          mode: APP_FEATURE_MODE.VIEW
         })
         this.setHeadTitle(filenameNoExtension)
         this.buildBreadcrumbs(response.body)
@@ -345,36 +300,6 @@ export class File extends React.Component {
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-  }
-
-  loadTimeline = async () => {
-    const { props, state } = this
-
-    const [resComment, resCommentAsFile, resRevision] = await Promise.all([
-      handleFetchResult(await getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
-      handleFetchResult(await getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)),
-      handleFetchResult(await getFileRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
-    ])
-
-    if (
-      resComment.apiResponse.status !== 200 &&
-      resCommentAsFile.apiResponse.status !== 200 &&
-      resRevision.apiResponse.status !== 200
-    ) {
-      this.sendGlobalFlashMessage(props.t('Error while loading timeline'))
-      console.log('Error loading timeline', 'comments', resComment, 'revisions', resRevision)
-      return
-    }
-
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
-      resComment.body,
-      resCommentAsFile.body.items,
-      resRevision.body,
-      state.loggedUser,
-      getDefaultTranslationState(state.config.system.config)
-    )
-
-    this.setState({ timeline: revisionWithComment })
   }
 
   loadShareLinkList = async () => {
@@ -415,6 +340,11 @@ export class File extends React.Component {
     } catch (e) {
       console.error('Error in app file, count not build breadcrumbs', e)
     }
+  }
+
+  handleLoadMoreTimelineItems = async () => {
+    const { props } = this
+    await props.loadMoreTimelineItems(getFileRevision)
   }
 
   handleClickBtnCloseApp = () => {
@@ -466,14 +396,6 @@ export class File extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
     const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
@@ -486,27 +408,29 @@ export class File extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
       state.config.workspace.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment()
+      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
-  handleClickValidateAnywayNewComment = () => {
+  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
-        state.newComment,
-        state.newCommentAsFileList,
+        comment,
+        commentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -567,37 +491,15 @@ export class File extends React.Component {
     ))
   }
 
-  handleContentCommentModified = (data) => {
-    const { props, state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
-    const newTimeline = props.updateCommentOnTimeline(
-      data.fields.content,
-      state.timeline,
-      state.loggedUser.username
-    )
-    this.setState({ timeline: newTimeline })
-  }
-
-  handleContentCommentDeleted = (data) => {
-    const { props, state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
-
-    const newTimeline = props.removeCommentFromTimeline(
-      data.fields.content.content_id,
-      state.timeline
-    )
-    this.setState({ timeline: newTimeline })
-  }
-
   handleClickRestoreDelete = async () => {
     const { props, state } = this
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
   handleClickShowRevision = async revision => {
-    const { state } = this
+    const { state, props } = this
 
-    const revisionArray = state.timeline.filter(t => t.timelineType === 'revision')
+    const revisionArray = props.timeline.filter(t => t.timelineType === 'revision')
     const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
 
     if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
@@ -852,7 +754,6 @@ export class File extends React.Component {
 
     this.setState(prev => ({
       content: newObjectContent,
-      timeline: prev.timeline.map(timelineItem => ({ ...timelineItem, hasBeenRead: true })),
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false
     }))
@@ -910,48 +811,52 @@ export class File extends React.Component {
       label: props.t('Timeline'),
       icon: 'fa-history',
       children: state.config.apiUrl ? (
-        <Timeline
-          customClass={`${state.config.slug}__contentpage`}
-          customColor={state.config.hexcolor}
-          apiUrl={state.config.apiUrl}
-          loggedUser={state.loggedUser}
-          timelineData={state.timeline}
-          memberList={state.config.workspace.memberList}
-          newComment={state.newComment}
-          newCommentAsFileList={state.newCommentAsFileList}
-          disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-          availableStatusList={state.config.availableStatuses}
-          wysiwyg={state.timelineWysiwyg}
-          onChangeNewComment={this.handleChangeNewComment}
-          onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-          onValidateCommentFileToUpload={this.handleAddCommentAsFile}
-          onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-          onClickWysiwygBtn={this.handleToggleWysiwyg}
-          onClickRevisionBtn={this.handleClickShowRevision}
-          shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-          isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
-          key='Timeline'
-          invalidMentionList={state.invalidMentionList}
-          onClickCancelSave={this.handleCancelSave}
-          onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-          onInitWysiwyg={this.handleInitTimelineCommentWysiwyg}
-          showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-          workspaceId={state.content.workspace_id}
-          onClickTranslateComment={comment => props.handleTranslateComment(
-            comment,
-            state.content.workspace_id,
-            state.translationTargetLanguageCode,
-            this.setState.bind(this)
-          )}
-          onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
-          onClickEditComment={this.handleClickEditComment}
-          onClickDeleteComment={this.handleClickDeleteComment}
-          onClickOpenFileComment={this.handleClickOpenFileComment}
-          translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
-          translationTargetLanguageCode={state.translationTargetLanguageCode}
-          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Timeline')}
+        >
+          <Timeline
+            contentId={state.content.content_id}
+            contentType={state.content.content_type}
+            loading={props.loadingTimeline}
+            customClass={`${state.config.slug}__contentpage`}
+            customColor={state.config.hexcolor}
+            apiUrl={state.config.apiUrl}
+            loggedUser={state.loggedUser}
+            timelineData={props.timeline}
+            memberList={state.config.workspace.memberList}
+            newComment={state.newComment}
+            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            availableStatusList={state.config.availableStatuses}
+            wysiwyg={state.timelineWysiwyg}
+            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
+            onClickWysiwygBtn={this.handleToggleWysiwyg}
+            onClickRevisionBtn={this.handleClickShowRevision}
+            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
+            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
+            key='Timeline'
+            invalidMentionList={state.invalidMentionList}
+            onClickCancelSave={this.handleCancelSave}
+            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+            wysiwygIdSelector='#wysiwygTimelineComment'
+            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
+            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+            workspaceId={state.content.workspace_id}
+            onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
+              comment,
+              state.content.workspace_id,
+              languageCode || state.translationTargetLanguageCode
+            )}
+            onClickRestoreComment={props.handleRestoreComment}
+            onClickEditComment={this.handleClickEditComment}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickOpenFileComment={this.handleClickOpenFileComment}
+            translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+            translationTargetLanguageCode={state.translationTargetLanguageCode}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+          />
+        </PopinFixedRightPartContent>
       ) : null
     }
     const tag = {
@@ -959,12 +864,16 @@ export class File extends React.Component {
       label: props.t('Tags'),
       icon: 'fas fa-tag',
       children: (
-        <TagList
-          apiUrl={state.config.apiUrl}
-          workspaceId={state.content.workspace_id}
-          contentId={state.content.content_id}
-          userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Tags')}
+        >
+          <TagList
+            apiUrl={state.config.apiUrl}
+            workspaceId={state.content.workspace_id}
+            contentId={state.content.content_id}
+            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+          />
+        </PopinFixedRightPartContent>
       )
     }
     const propertiesObject = {
@@ -972,22 +881,26 @@ export class File extends React.Component {
       label: props.t('Properties'),
       icon: 'fa-info-circle',
       children: (
-        <FileProperties
-          color={state.config.hexcolor}
-          fileType={state.content.mimetype}
-          fileSize={displayFileSize(state.content.size)}
-          filePageNb={state.content.page_nb}
-          activesShares={state.content.actives_shares}
-          creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
-          creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
-          lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-          lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
-          description={state.content.description}
-          displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
-          disableChangeDescription={!state.content.is_editable}
-          onClickValidateNewDescription={this.handleClickValidateNewDescription}
-          key='FileProperties'
-        />
+        <PopinFixedRightPartContent
+          label={props.t('Properties')}
+        >
+          <FileProperties
+            color={state.config.hexcolor}
+            fileType={state.content.mimetype}
+            fileSize={displayFileSize(state.content.size)}
+            filePageNb={state.content.page_nb}
+            activesShares={state.content.actives_shares}
+            creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+            creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
+            lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
+            lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
+            description={state.content.description}
+            displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
+            disableChangeDescription={!state.content.is_editable}
+            onClickValidateNewDescription={this.handleClickValidateNewDescription}
+            key='FileProperties'
+          />
+        </PopinFixedRightPartContent>
       )
     }
 
@@ -1000,21 +913,25 @@ export class File extends React.Component {
           label: props.t('Share'),
           icon: 'fa-share-alt',
           children: (
-            <ShareDownload
-              label={props.t(state.config.label)}
-              hexcolor={state.config.hexcolor}
-              shareEmails={state.shareEmails}
-              onChangeEmails={this.handleChangeEmails}
-              onKeyDownEnter={this.handleKeyDownEnter}
-              sharePassword={state.sharePassword}
-              onChangePassword={this.handleChangePassword}
-              shareLinkList={state.shareLinkList}
-              onClickDeleteShareLink={this.handleClickDeleteShareLink}
-              onClickNewShare={this.handleClickNewShare}
-              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-              emailNotifActivated={state.config.system.config.email_notification_activated}
-              key='ShareDownload'
-            />
+            <PopinFixedRightPartContent
+              label={props.t('Share')}
+            >
+              <ShareDownload
+                label={props.t(state.config.label)}
+                hexcolor={state.config.hexcolor}
+                shareEmails={state.shareEmails}
+                onChangeEmails={this.handleChangeEmails}
+                onKeyDownEnter={this.handleKeyDownEnter}
+                sharePassword={state.sharePassword}
+                onChangePassword={this.handleChangePassword}
+                shareLinkList={state.shareLinkList}
+                onClickDeleteShareLink={this.handleClickDeleteShareLink}
+                onClickNewShare={this.handleClickNewShare}
+                userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                emailNotifActivated={state.config.system.config.email_notification_activated}
+                key='ShareDownload'
+              />
+            </PopinFixedRightPartContent>
           )
         },
         propertiesObject
@@ -1023,18 +940,6 @@ export class File extends React.Component {
     } else {
       return [timelineObject, tag, propertiesObject]
     }
-  }
-
-  handleInitTimelineCommentWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
   }
 
   handleCloseNotifyAllMessage = async () => {
@@ -1094,12 +999,17 @@ export class File extends React.Component {
 
     if (!state.isVisible) return null
 
+    const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
+    const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
+    const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
+
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          loading={state.loadingContent}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
@@ -1127,7 +1037,8 @@ export class File extends React.Component {
             }
           ]}
           isRefreshNeeded={state.showRefreshWarning}
-          lastVersion={state.timeline.filter(t => t.timelineType === 'revision').length}
+          contentVersionNumber={contentVersionNumber}
+          lastVersion={lastVersionNumber}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}

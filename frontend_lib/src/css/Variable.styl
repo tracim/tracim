@@ -14,9 +14,13 @@ lightGrey = #f0f0f0
 veryLightGrey = #f6f6f6
 errorRed = #dc3545
 warningOrange = #f2a027
+warningOrangeOpacity = #f2a02740
+lightOrange = #FFEDA260
+lightOrangeOpacity = #FFEDA240
 lightBlue = #3F9FF7
+lightBlueOpacity = #3F9FF740
 bootstrapLinkColor = #007bff // This color comes from bootstrap
-
+publicationColor = #661F98
 offWhite = #fdfdfd
 
 zIndexOverHeader = 50
@@ -24,15 +28,44 @@ zIndexOverHeader = 50
 /*************************/
 /**** SIZE ****/
 
-headerHeight = 61px // INFO - CH - 2019-04-19 - the total header height. Used to calculate height of layout like height: "calc(100% - %s)" % headerHeight
+headerHeight = 60px // INFO - CH - 2019-04-19 - the total header height. Used to calculate height of layout like height: "calc(100% - %s)" % headerHeight
 sidebarWidth = 300px
 
-fontSizeTitle = 25px
-fontSizeMedium = 20px
-fontSizeSmall = 14px
-listItemHeight = 5px
+// INFO - GB - 2021-08-10 - The constants below indicate the three possible font size levels
+// titleFontSize: should be used for titles (that have high priority and need a highlight)
+// standardFontSize: is the default font size and everything that is not high or low priority should be at this size
+// metadataFontSize: should be used for meta data, i.e. used when it is not information of the content but about the
+// content (that have high priority and need a highlight)
+
+titleFontSize = 20px
+standardFontSize = 15px
+metadataFontSize = 12px
+
 popupWidth = 420px
-bigIconSize = 30px
+bigIconSize = 20px
+
+/*************************/
+/**** BORDER ****/
+
+standardBorderRadius = 6px
+borderStyle = 1px solid grey
+
+notificationCircleSize = 15px
+mentionCircleSize = 20px
+wallCircleSize = 8px
+
+
+/*************************/
+/**** SPACING ****/
+
+// INFO - GB - 2021-08-10 - The constants below indicate the three possible spacings
+// pageSpacing: is the space around the page
+// standardSpacing: is the default space and everything that does not have a specific space should have this one around
+// textSpacing: is the space between something and its associated text, for example, the space between an icon and its text
+
+pageSpacing = 30px
+standardSpacing = 10px
+textSpacing = 5px
 
 /*************************/
 /**** BOX SHADOW ****/

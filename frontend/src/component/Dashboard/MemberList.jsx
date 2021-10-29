@@ -2,8 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import {
-  NewMemberForm,
+  AVATAR_SIZE,
   Avatar,
+  NewMemberForm,
   ROLE,
   ProfileNavigation
 } from 'tracim_frontend_lib'
@@ -79,6 +80,7 @@ export class MemberList extends React.Component {
                     >
                       <div className='memberlist__list__item__avatar'>
                         <Avatar
+                          size={AVATAR_SIZE.SMALL}
                           user={m}
                           apiUrl={props.apiUrl}
                         />

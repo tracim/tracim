@@ -9,7 +9,6 @@ import {
   mockPutHtmlDocumentRead200,
   mockPutUserConfiguration204
 } from '../apiMock.js'
-import { commentTlm, user } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 import { HtmlDocument } from '../../src/container/HtmlDocument.jsx'
 import { APP_FEATURE_MODE } from 'tracim_frontend_lib'
 import contentHtmlDocument from '../fixture/content/contentHtmlDocument.js'
@@ -20,14 +19,18 @@ debug.config.apiUrl = 'http://unit.test:6543/api'
 describe('<HtmlDocument />', () => {
   const props = {
     buildTimelineFromCommentAndRevision: (commentList, revisionList) => [...commentList, ...revisionList],
-    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser, hasBeenRead) => timeline),
+    addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
     content: contentHtmlDocument.htmlDocument,
     i18n: {},
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
+    loadFavoriteContentList: () => { },
+    loadTimeline: () => { },
     setApiUrl: () => { },
     t: key => key,
-    isContentInFavoriteList: () => false
+    isContentInFavoriteList: () => false,
+    data: debug,
+    timeline: []
   }
   const buildBreadcrumbsSpy = sinon.spy()
   const setHeadTitleSpy = sinon.spy()
@@ -48,40 +51,6 @@ describe('<HtmlDocument />', () => {
 
   describe('TLM handlers', () => {
     describe('eventType content', () => {
-      describe('handleContentCommentCreated', () => {
-        describe('create a new comment', () => {
-          it('should call addCommentToTimeline if is related to the current html-document', () => {
-            const tlmData = {
-              fields: {
-                content: {
-                  ...commentTlm,
-                  parent_id: contentHtmlDocument.htmlDocument.content_id,
-                  content_id: 9
-                }
-              }
-            }
-            props.addCommentToTimeline.resetHistory()
-            wrapper.instance().handleContentCommentCreated(tlmData)
-            expect(props.addCommentToTimeline.calledOnce).to.equal(true)
-          })
-
-          it('should not update the timeline if is not related to the current html-document', () => {
-            const tlmDataOtherContent = {
-              fields: {
-                content: {
-                  ...commentTlm,
-                  parent_id: contentHtmlDocument.htmlDocument.content_id + 1,
-                  content_id: 12
-                }
-              }
-            }
-            props.addCommentToTimeline.resetHistory()
-            wrapper.instance().handleContentCommentCreated(tlmDataOtherContent)
-            expect(props.addCommentToTimeline.calledOnce).to.equal(false)
-          })
-        })
-      })
-
       describe('handleContentModified', () => {
         describe('modify the content name', () => {
           const tlmData = {
@@ -138,13 +107,6 @@ describe('<HtmlDocument />', () => {
             expect(wrapper.state('showRefreshWarning')).to.equal(true)
             expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.EDIT)
           })
-
-          it('should display the right version number', () => {
-            wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
-            wrapper.instance().handleContentModified(tlmData)
-            expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
-          })
         })
 
         describe('modify a content not related to another content', () => {
@@ -181,13 +143,6 @@ describe('<HtmlDocument />', () => {
           it('should be deleted correctly', () => {
             wrapper.instance().handleContentDeletedOrRestore(tlmData)
             expect(wrapper.state('newContent').is_deleted).to.equal(true)
-          })
-
-          it('should display the right version number', () => {
-            wrapper.setState({ mode: APP_FEATURE_MODE.REVISION })
-            const oldRevisionNumber = wrapper.state('timeline').filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
-            wrapper.instance().handleContentModified(tlmData)
-            expect(wrapper.state('content').number).to.equal(oldRevisionNumber)
           })
         })
 
@@ -244,23 +199,6 @@ describe('<HtmlDocument />', () => {
             wrapper.instance().handleContentDeletedOrRestore(tlmData)
 
             expect(wrapper.state('content').is_deleted).to.equal(true)
-          })
-        })
-      })
-    })
-
-    describe('eventType user', () => {
-      describe('handleUserModified', () => {
-        describe('If the user is the author of a revision or comment', () => {
-          it('should update the timeline with the data of the user', () => {
-            const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
-            wrapper.instance().handleUserModified(tlmData)
-
-            const listPublicNameOfAuthor = wrapper.state('timeline')
-              .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
-              .map(timelineItem => timelineItem.author.public_name)
-            const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
-            expect(isNewName).to.be.equal(true)
           })
         })
       })

@@ -1,8 +1,6 @@
-
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .html-document
-  height "calc(100% - %s)" % headerHeight
   &__header
     &__editionmode
       display none
@@ -17,31 +15,35 @@
   &__lastversionbtn
     cursor pointer
     & > i
-      font-size 20px
+      font-size titleFontSize
   &__contentpage, &__contentpage__edition
     width 100%
     &__option
       display flex
       justify-content flex-end
+      margin 0 pageSpacing
     &__left
       &__wrapper
-        height "calc(100% - %s)" % (2 * headerHeight) // INFO - G.B. - 20210623 - app header + tracim header
+        height "calc(100% - %s)" % (headerHeight + standardSpacing)
         overflow-y auto
         display flex
         flex-direction column
+        margin-top standardSpacing
     &__content
       &__left
         background-color offWhite
     &__textnote
-      padding 5px
+      padding 0 pageSpacing pageSpacing
       flex 1
       overflow-y auto
-      background-color offWhite
+      & > .promptMessage
+        margin-inline-end 0
+        margin-inline-start 0
       &__text
-        margin 5px 5px 5px 25px
+        margin-top standardSpacing
       &__mentions
         font-weight bold
-        margin 10px 0
+        margin standardSpacing 0
       &__state
         display flex
         align-items center
@@ -49,7 +51,7 @@
         margin-bottom 15px
         padding 5px 15px
         background-color #fee498
-        border-radius 10px
+        border-radius standardBorderRadius
         &__msg > i
           margin-right 8px
         &__btnrestore
@@ -62,11 +64,9 @@
               color #1a0dab
               text-decoration underline
       &__top
-        margin-bottom 10px
-        margin-inline-start 25px
         display flex
         &__translation
-          font-size fontSizeSmall
+          font-size metadataFontSize
       &__edition
         display none
       &__text_translated
@@ -76,7 +76,7 @@
         color lightDarkGrey
     &__messagelist
       min-height 70px
-      padding 0 20px 10px
+      padding 0 20px standardSpacing
       &__item
         &__content
           color darkGrey
@@ -85,17 +85,17 @@
       // This bit of code doesn't seem to be used anywhere
         &__btn
           padding 5px 25px
-          border-radius 5px
+          border-radius standardBorderRadius
           width 145px
           color white
-          font-size 17px
+          font-size standardFontSize
           & > i
-            margin-right 10px
+            margin-right standardSpacing
             color darkGrey
-            font-size 20px
+            font-size titleFontSize
         &__date
           color fontColor
-          font-size 17px
+          font-size standardFontSize
 
 .messagelistOpen
   .timeline__messagelist

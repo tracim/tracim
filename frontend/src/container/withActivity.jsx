@@ -180,9 +180,10 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           nextPageToken = activitiesParams.nextPageToken
           props.dispatch(setActivityList(activityList))
           props.dispatch(setActivityNextPage(hasNextPage, nextPageToken))
-        } catch {
+        } catch (e) {
           this.changingActivityList = false
           this.loadActivitiesPromise = null
+          console.error(e)
           return
         }
         this.loadActivitiesPromise = null
@@ -227,7 +228,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * Load a batch of activities and merge them into the given list
      * Activities are built by calling /api/users/<user_id>/messages
      * @param {Array} activityList activity list to update
-     * @param {boolean} hasNextPage is there still messages to load
+     * @param {boolean} hasNextPage are there remaining messages to load
      * @param {string} nextPageToken token to get the next page of messages
      * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
      */

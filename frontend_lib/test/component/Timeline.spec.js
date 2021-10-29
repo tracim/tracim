@@ -13,16 +13,11 @@ describe('<Timeline />', () => {
   const onClickRevisionBtnCallBack = sinon.spy()
   const onClickRestoreArchivedCallBack = sinon.spy()
   const onClickRestoreDeletedCallBack = sinon.spy()
-  const onClickValidateNewCommentBtnCallBack = sinon.spy()
-  const onChangeNewCommentCallBack = sinon.spy()
 
   const props = {
     timelineData: [...revisionList, ...commentList],
     newComment: 'randomNewComment',
-    newCommentAsFileList: [],
     apiUrl: '/',
-    onChangeNewComment: onChangeNewCommentCallBack,
-    onClickValidateNewCommentBtn: onClickValidateNewCommentBtnCallBack,
     disableComment: false,
     customClass: 'randomCustomClass',
     customColor: 'red',
@@ -49,7 +44,9 @@ describe('<Timeline />', () => {
     workspaceId: 1,
     translationTargetLanguageList: [{ code: 'fr', display: 'Français' }],
     translationTargetLanguageCode: 'en',
-    onChangeTranslationTargetLanguageCode: () => {}
+    onChangeTranslationTargetLanguageCode: () => {},
+    fetchMoreTimelineItems: () => {},
+    canFetchMoreTimelineItems: () => false
   }
 
   const TimelineWithHOC = withRouterMock(Timeline)
@@ -57,9 +54,9 @@ describe('<Timeline />', () => {
 
   describe('Static design', () => {
     it('The advanced mode button should be disabled when disableComment is true', () => {
-      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('disabled')).to.equal(false)
+      expect(wrapper.find('.commentArea__advancedtext__btn').prop('disabled')).to.equal(false)
       wrapper.setProps({ disableComment: true })
-      expect(wrapper.find('.timeline__texteditor__advancedtext__btn').prop('disabled')).to.equal(true)
+      expect(wrapper.find('.commentArea__advancedtext__btn').prop('disabled')).to.equal(true)
       wrapper.setProps({ disableComment: false })
     })
   })
@@ -68,11 +65,6 @@ describe('<Timeline />', () => {
     it('onClickWysiwygBtnCallBack should be called when the advancedText button is clicked', () => {
       wrapper.find(`.${props.customClass}__texteditor__advancedtext__btn`).simulate('click')
       expect(onClickWysiwygBtnCallBack.called).to.equal(true)
-    })
-
-    it('onClickValidateNewCommentBtnCallBack should be called when the submit button is clicked', () => {
-      wrapper.find(`.${props.customClass}__texteditor__submit__btn`).simulate('click')
-      expect(onClickValidateNewCommentBtnCallBack.called).to.equal(true)
     })
   })
 })

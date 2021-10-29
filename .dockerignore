@@ -1,0 +1,9 @@
+frontend*
+!frontend/*.sample
+backend/*
+!backend/requirements*.txt
+functionnal_tests
+!functionnal_tests/*.sample
+node_modules
+tools_Docker
+.*

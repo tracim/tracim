@@ -1,14 +1,14 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .timedEvent
-  font-size fontSizeSmall
+  font-size metadataFontSize
   white-space nowrap
   display flex
   flex-direction column
-  &__top
+  &__top.btn
     padding 0
     margin 0
-    font-size fontSizeSmall
+    font-size metadataFontSize
     &::after
       display none
     &:hover
@@ -27,7 +27,9 @@
   & .dropdownMenuItem
     cursor auto
     border-bottom 1px solid mediumGrey
-    padding-right 5px
+    align-items flex-end
+    & .timedEvent
+      margin 0
     &:hover
       background-color offWhite
 

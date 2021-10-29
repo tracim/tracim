@@ -225,10 +225,6 @@ class CustomForm extends React.Component {
         created_raw: r.created,
         created: displayDistanceDate(r.created, loggedUser.lang),
         timelineType: 'revision',
-        commentList: r.comment_ids.map(ci => ({
-          timelineType: 'comment',
-          ...resCommentWithProperDate.find(c => c.content_id === ci)
-        })),
         number: i + 1
       }))
       .reduce((acc, rev) => [
@@ -397,17 +393,17 @@ class CustomForm extends React.Component {
     const newComment = e.target.value
     this.setState({ newComment })
 
-    setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.COMMENT, newComment)
+    setLocalStorageItem(this.state.appName, this.state.content.content_id, this.state.content.workspace_id, LOCAL_STORAGE_FIELD.COMMENT, newComment)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = async (comment) => {
     const { props, state } = this
 
     // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
     // see https://github.com/tracim/tracim/issues/1101
     const newCommentForApi = state.timelineWysiwyg
-      ? state.newComment
-      : `<p>${convertBackslashNToBr(state.newComment)}</p>`
+      ? comment
+      : `<p>${convertBackslashNToBr(comment)}</p>`
 
     const fetchResultSaveNewComment = await handleFetchResult(await postCustomFormNewComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id, newCommentForApi))
     switch (fetchResultSaveNewComment.apiResponse.status) {
@@ -668,7 +664,6 @@ class CustomForm extends React.Component {
               disableComment={mode === MODE.REVISION || mode === MODE.EDIT || !content.is_editable}
               availableStatusList={config.availableStatuses}
               wysiwyg={timelineWysiwyg}
-              onChangeNewComment={this.handleChangeNewComment}
               onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               onClickRevisionBtn={this.handleClickShowRevision}

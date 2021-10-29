@@ -55,6 +55,7 @@ export const AdvancedSearchSpaceList = props => {
           read
           contentType={searchItem.accessType}
           isLast={index === resultList.length - 1}
+          isFirst={index === 0}
           key={searchItem.workspaceId}
         >
           <Link
@@ -68,7 +69,6 @@ export const AdvancedSearchSpaceList = props => {
           >
             <div
               className='advancedSearchSpace__type__content'
-              style={{ color: searchItem.accessType.slug !== SPACE_TYPE_LIST.CONFIDENTIAL ? searchItem.accessType.hexcolor : undefined }}
             >
               <Icon
                 icon={`fa-fw ${searchItem.accessType.faIcon}`}

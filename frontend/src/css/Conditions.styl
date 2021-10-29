@@ -1,5 +1,3 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 .conditions
   &__main
     &__wrapper
@@ -10,17 +8,17 @@
       margin-inline-start 40px
       margin-inline-end auto
     &__title
-      font-size fontSizeTitle
+      font-size titleFontSize
       margin-bottom 15%
     &__checkbox
       display flex
       align-items center
-      margin-bottom 10px
+      margin-bottom standardSpacing
       & > a
         overflow hidden
         text-overflow ellipsis
     &__label
-      margin 0px 10px
+      margin 0px standardSpacing
       white-space nowrap
     &__buttons
       display flex
@@ -32,4 +30,4 @@
     &__main
       &__wrapper
         margin-inline-start auto
-        margin-top 10px
+        margin-top standardSpacing

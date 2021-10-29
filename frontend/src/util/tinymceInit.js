@@ -183,7 +183,7 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
           title: 'Fullscreen',
           onclick: function () {
             $editor.focus()
-            const headerHeight = 61 // 61px is Tracim's header height
+            const headerHeight = 60 // 60px is Tracim's header height
             var iframeElement = $editor.getWin()
 
             if (customFullscreen.originalHeight === null) customFullscreen.originalHeight = iframeElement.frameElement.style.height

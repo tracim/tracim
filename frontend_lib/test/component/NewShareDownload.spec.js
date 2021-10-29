@@ -65,12 +65,12 @@ describe('<NewShareDownload />', () => {
     })
 
     it('should call props.onClickCancelButton when handler onClickCancelButton is called', () => {
-      wrapper.find('.shareDownload__cancel').simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
+      wrapper.find('.shareDownload__buttons__cancel').simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
       expect(onClickCancelButtonCallBack.called).to.equal(true)
     })
 
     it('should call props.onClickNewShare when handler onClickNewShare is called', () => {
-      wrapper.find('.shareDownload__newBtn').simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
+      wrapper.find('.shareDownload__buttons__newBtn').simulate('click', { preventDefault: () => {}, stopPropagation: () => {} })
       expect(onClickNewShareCallBack.called).to.equal(true)
     })
   })

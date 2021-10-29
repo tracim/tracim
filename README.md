@@ -3,7 +3,7 @@
 ![logo_tracim](logo_tracim.png)
 
 develop branch status:
-[![Build Status](https://travis-ci.com/tracim/tracim.svg?branch=develop)](https://travis-ci.com/tracim/tracim)
+[![Build Status](https://app.travis-ci.com/tracim/tracim.svg?branch=develop)](https://app.travis-ci.com/tracim/tracim)
 [![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
 
@@ -30,30 +30,22 @@ Then visit http://localhost:8080 and log in:
 
 For advanced docker-based usage, look at the full [Tracim Docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker),
 
-## License
-
-Tracim is distributed under the terms of 3 distinct licenses:
-
-- AGPLv3 for the Agenda application (`frontend_app_agenda` folder)
-- LGPL for other frontend parts (`frontend` and `frontend_xxx` folders)
-- MIT License for the rest (backend stuff, functionnal tests, docker recipe, documentation, etc).
-
 ## Contribute
 
 In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
 
 ## Advanced - Install Tracim from Source
 
-OS compatibility (tested with Python >= 3.5.2):
+OS compatibility (tested with Python >= 3.6.14):
 
 - Debian:
-  - Jessie (8)
-  - Stretch (9)
   - Buster (10)
+  - Bullseye (11)
 - Ubuntu:
-  - Trusty (14.04) - need manual modification to install Tracim, see https://github.com/tracim/tracim/issues/2514
-  - Xenia (16.04)
   - Bionic (18.04)
+  - Focal (20.04)
+
+Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.6 is used.
 
 ### Get the source code
 
@@ -69,6 +61,12 @@ Get the source code from GitHub (you need git):
 See the [Backend README](backend/README.md).
 
 #### Option2: Install backend: Automated script for easy setup
+
+Ensure your shell has an UTF-8 locale (it should be the case for any recent distribution)
+
+    echo $LANG
+
+should return a string like `en_EN.UTF-8`.
 
 This script runs the backend with a simple default configuration: development.ini conf file. It uses
 the default config file, sqlite database, etc.

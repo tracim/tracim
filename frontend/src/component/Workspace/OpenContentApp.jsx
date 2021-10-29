@@ -1,16 +1,20 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import appFactory from '../../util/appFactory.js'
 import { findUserRoleIdInWorkspace } from '../../util/helper.js'
-import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { ROLE_LIST, CUSTOM_EVENT, CONTENT_TYPE } from 'tracim_frontend_lib'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
+import { newFlashMessage, readContentNotification } from '../../action-creator.sync.js'
+import { putContentNotificationAsRead } from '../../action-creator.async.js'
 
 // @FIXME Côme - 2018/07/31 - should this be in a component like AppFeatureManager ?
 export class OpenContentApp extends React.Component {
-  openContentApp = (prevProps = {}) => {
+  openContentApp = async (prevProps = {}) => {
     const {
       appList,
+      dispatch,
       workspaceId,
       appOpenedType,
       user,
@@ -18,7 +22,8 @@ export class OpenContentApp extends React.Component {
       contentType,
       renderAppFeature,
       dispatchCustomEvent,
-      match
+      match,
+      t
     } = this.props
 
     // RJ - 2020-01-13 - NOTE: match.params.idcts can be equal to "new"
@@ -38,6 +43,8 @@ export class OpenContentApp extends React.Component {
     }
 
     console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
+
+    const parentId = contentToOpen.type === CONTENT_TYPE.FOLDER ? null : contentToOpen.content_id
 
     if (prevProps.match && prevProps.match.params.idws && match.params.idws === prevProps.match.params.idws) {
       if (appOpenedType === contentToOpen.type) {
@@ -71,6 +78,13 @@ export class OpenContentApp extends React.Component {
       findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
       contentToOpen
     )
+    const fetchPutContentNotificationAsRead = await dispatch(putContentNotificationAsRead(user.userId, contentToOpen.content_id, parentId))
+    switch (fetchPutContentNotificationAsRead.status) {
+      case 204:
+        dispatch(readContentNotification(contentToOpen.content_id))
+        break
+      default: dispatch(newFlashMessage(t('Error while marking the notification as read'), 'warning'))
+    }
 
     if (contentToOpen.type !== appOpenedType) {
       this.props.onUpdateAppOpenedType(contentToOpen.type)
@@ -102,4 +116,4 @@ const mapStateToProps = ({ appList, user, currentWorkspace, contentType }) => ({
     HACK_COLLABORA_CONTENT_TYPE(contentType)
   ]
 })
-export default withRouter(connect(mapStateToProps)(appFactory(OpenContentApp)))
+export default withRouter(connect(mapStateToProps)(translate()(appFactory(OpenContentApp))))

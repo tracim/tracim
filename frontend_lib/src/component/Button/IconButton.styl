@@ -1,9 +1,9 @@
 @import '../../css/Variable.styl'
 
 .iconbutton
-  padding 10px 15px
+  padding standardSpacing
   cursor pointer
-  border-radius 5px
+  border-radius standardBorderRadius
   border-width 0px
   height auto
   white-space pre
@@ -23,6 +23,12 @@
 
   &__icon
     margin-inline-end 5px
+
+  &__label
+    display inline
+    &-mobile
+      margin-inline-start textSpacing
+      display none
 
   // Intents styling
   &-primary
@@ -69,3 +75,10 @@
       background-color offWhite
       &:hover
         background-color lightGrey
+
+@media (min-width: min-xs) && (max-width: max-xs)
+  .iconbutton
+    &__label
+      display none
+      &-mobile
+        display inline

@@ -8,8 +8,8 @@ export const baseFetch = (method, url, body) =>
     body: body ? JSON.stringify(body) : undefined
   })
 
-export const getContentPath = (apiUrl, workspaceId, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/path`)
+export const getContentPath = (apiUrl, contentId) =>
+  baseFetch('GET', `${apiUrl}/contents/${contentId}/path`)
 
 export const putEditContent = (apiUrl, workspaceId, contentId, appSlug, newTitle, newContent, propertiesToAddToBody) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
@@ -33,11 +33,18 @@ export const putComment = (apiUrl, workspaceId, contentId, commentId, newComment
     raw_content: newComment
   })
 
-export const getContentComment = (apiUrl, workspaceId, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments`)
+export const getContentComment = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'created:asc') => {
+  const url = `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments?page_token=${pageToken}&count=${count}&sort=${sort}`
+  return baseFetch('GET', url)
+}
 
-export const getFileChildContent = (apiUrl, workspaceId, contentId) => {
-  const queryParam = `parent_ids=${contentId}&content_type=file&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}`
+export const getFileChildContent = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'created:asc') => {
+  const queryParam = (
+    `parent_ids=${contentId}` +
+      '&content_type=file' +
+      `&namespaces_filter=${CONTENT_NAMESPACE.CONTENT},${CONTENT_NAMESPACE.PUBLICATION}` +
+      `&page_token=${pageToken}&count=${count}&sort=${sort}`
+  )
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
 }
 
@@ -119,8 +126,8 @@ export const getWorkspaceContentList = (apiUrl, workspaceId) =>
 export const putFileIsDeleted = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/trashed`)
 
-export const getFileRevision = (apiUrl, workspaceId, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions`)
+export const getFileRevision = (apiUrl, workspaceId, contentId, pageToken = '', count = 0, sort = 'modified:asc') =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions?page_token=${pageToken}&count=${count}&sort=${sort}`)
 
 export const getUrlPreview = (apiUrl, url) =>
   baseFetch('GET', `${apiUrl}/url-preview?url=${encodeURIComponent(url)}`)

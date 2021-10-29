@@ -1,7 +1,7 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .advancedSearchUser
-  height 65px
+  height 60px
   width 100%
   display flex
   align-items center
@@ -9,7 +9,7 @@
     &__content
       margin 0px 30px
     &__header
-      margin 15px 20px
+      margin standardSpacing 20px
   &__name
     padding 0px 5px
     white-space nowrap
@@ -26,15 +26,15 @@
     flex 1
     margin-inline-end 25px
     & > *
-      font-size fontSizeSmall
+      font-size metadataFontSize
 
 @media (max-width: max-sm)
   .advancedSearchUser
     &__avatar
       &__header
-        margin 15px 10px
+        margin standardSpacing standardSpacing
       &__content
-        margin 0px 10px
+        margin 0px standardSpacing
 
 @media (max-width: max-xs)
   .advancedSearchUser

@@ -1,23 +1,23 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .advancedSearchSpace
-  height 65px
+  height 60px
   width 100%
   display flex
   align-items center
   &__type
     &__content
-      font-size fontSizeTitle
+      font-size titleFontSize
       color fontColor
       display flex
       flex-direction column
       align-items center
-      width 90px
+      width 80px
       place-content center
       & > span
-        font-size fontSizeSmall
+        font-size metadataFontSize
     &__header
-      margin 15px 25px
+      margin standardSpacing 25px
   &__name
     padding 0px 5px
     white-space nowrap
@@ -34,7 +34,7 @@
     flex 1
     margin-inline-end 25px
     & > *
-      font-size fontSizeSmall
+      font-size metadataFontSize
     & > i
       margin-inline-start 5px
 
@@ -42,7 +42,7 @@
   .advancedSearchSpace
     &__type
       &__header
-        margin 15px 10px
+        margin standardSpacing standardSpacing
       &__content
         width 50px
         & > span

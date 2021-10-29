@@ -32,7 +32,7 @@ export class UserInfo extends React.Component {
     const { props } = this
 
     return (
-      <div className='userinfo mr-5 ml-5 mb-5' data-cy='userinfo'>
+      <div className='userinfo' data-cy='userinfo'>
         <div className='userinfo__avatar' data-cy='userinfo__avatar'>
           <Avatar
             size={AVATAR_SIZE.BIG}
@@ -81,9 +81,9 @@ export class UserInfo extends React.Component {
           )}
 
           {props.user.email && (
-            <div className='userinfo__email d-block mt-3' data-cy='userinfo__email'>
+            <div className='userinfo__email' data-cy='userinfo__email'>
               <i
-                className='far fa-envelope mr-2'
+                className='far fa-fw fa-envelope'
               />
               <a href={`mailto:${props.user.email}`} data-cy='userinfo__email__mailto'>
                 {props.user.email}
@@ -91,9 +91,9 @@ export class UserInfo extends React.Component {
             </div>
           )}
 
-          <div className='userinfo__profile mt-3 mb-3' data-cy='userinfo__profile'>
+          <div className='userinfo__profile' data-cy='userinfo__profile'>
             <i
-              className={`${getUserProfile(props.user.profile).faIcon} mr-2`}
+              className={`fa-fw ${getUserProfile(props.user.profile).faIcon}`}
               style={{ color: getUserProfile(props.user.profile).hexcolor }}
             />
             {props.t(getUserProfile(props.user.profile).label)}

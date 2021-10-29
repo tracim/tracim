@@ -112,7 +112,9 @@
       "XMLHttpRequest",
       "Image",
       "globalThis",
-      "DOMParser"
+      "DOMParser",
+      "Audio",
+      "Notification"
     ],
     "parser": "babel-eslint",
     "ignore": []

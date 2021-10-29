@@ -1,4 +1,5 @@
 # coding=utf-8
+from http import HTTPStatus
 import typing
 
 from pyramid.config import Configurator
@@ -28,12 +29,6 @@ from tracim_backend.views.core_api.schemas import RevisionSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__CONTENT_FOLDER_SECTION = "Folders"
 SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS = generate_documentation_swagger_tag(
@@ -114,8 +109,8 @@ class FolderController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        revisions = content.revisions
-        return [api.get_revision_in_context(revision) for revision in revisions]
+        revisions = content.get_revisions()
+        return [api.get_revision_in_context(revision, number) for revision, number in revisions]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FOLDER_ENDPOINTS])
     @check_right(is_contributor)

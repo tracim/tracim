@@ -1,7 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { Checkbox, RefreshWarningMessage } from 'tracim_frontend_lib'
+import {
+  Checkbox,
+  IconButton,
+  RefreshWarningMessage
+} from 'tracim_frontend_lib'
 
 const FolderAdvanced = props => {
   return (
@@ -13,10 +17,14 @@ const FolderAdvanced = props => {
             {props.t('This folder is archived')}
           </div>
 
-          <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreArchived}>
-            <i className='fas fa-fw fa-archive' />
-            {props.t('Restore')}
-          </button>
+          <IconButton
+            intent='primary'
+            mode='light'
+            onClick={props.onClickRestoreArchived}
+            icon='fas fa-archive'
+            text={props.t('Restore')}
+            customClass='folder_advanced__content__state__btnrestore'
+          />
         </div>
       )}
 
@@ -27,10 +35,14 @@ const FolderAdvanced = props => {
             {props.t('This folder is deleted')}
           </div>
 
-          <button className='folder_advanced__content__state__btnrestore btn' onClick={props.onClickRestoreDeleted}>
-            <i className='far fa-fw fa-trash-alt' />
-            {props.t('Restore')}
-          </button>
+          <IconButton
+            intent='primary'
+            mode='light'
+            onClick={props.onClickRestoreDeleted}
+            icon='fas fa-trash-alt'
+            text={props.t('Restore')}
+            customClass='folder_advanced__content__state__btnrestore'
+          />
         </div>
       )}
 
@@ -57,7 +69,7 @@ const FolderAdvanced = props => {
                 name={app.label}
                 checked={props.folderSubContentType.includes(app.slug)}
                 onClickCheckbox={() => props.onClickApp(app.slug)}
-                styleLabel={{ margin: '0 8px 0 0' }}
+                styleLabel={{ margin: '0 5px 0 0' }}
                 styleCheck={{ top: '-5px' }}
                 disabled={props.isArchived || props.isDeleted}
               />

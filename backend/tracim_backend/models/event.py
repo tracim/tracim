@@ -49,6 +49,7 @@ class EntityType(enum.Enum):
     REACTION = "reaction"
     TAG = "tag"
     CONTENT_TAG = "content_tag"
+    USER_CALL = "user_call"
 
     def __str__(self) -> str:
         return self.value
@@ -132,6 +133,7 @@ class Event(CreationDateMixin, DeclarativeBase):
     SUBSCRIPTION_FIELD = "subscription"
     REACTION_FIELD = "reaction"
     TAG_FIELD = "tag"
+    USER_CALL_FIELD = "user_call"
 
     _ENTITY_SUBTYPE_LENGTH = 100
     __tablename__ = "events"
@@ -154,10 +156,15 @@ class Event(CreationDateMixin, DeclarativeBase):
     client_token = index_property("fields", CLIENT_TOKEN_FIELD)
     reaction = index_property("fields", REACTION_FIELD)
     tag = index_property("fields", TAG_FIELD)
+    user_call = index_property("fields", USER_CALL_FIELD)
 
-    # INFO - SG - 2021-05-05
-    # duplicated from fields.workspace.workspace_id to ease indexing of this value
+    # INFO - GM - 2021-09-09
+    # duplicated  ids from JSON column fields to ease indexing (workspace_id is indexed)
+    # and to have database statistics on filter criteria permitting better query performances
     workspace_id = Column(Integer, default=None)
+    author_id = Column(Integer, default=None)
+    content_id = Column(Integer, default=None)
+    parent_id = Column(Integer, default=None)
 
     @property
     def event_type(self) -> str:

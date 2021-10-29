@@ -1,26 +1,28 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
 .joinWorkspace
   &__content__workspaceList
     display flex
     flex-direction column
-    margin-top 10px
-    border-bottom 1px solid grey
+    margin-top standardSpacing
+    border-bottom borderStyle
 
     & > *:first-child
       border none
       background-color transparent
-
+      padding 0
+      height auto
+      margin-bottom standardSpacing
+      &:hover
+        background-color transparent
       & > *:last-child
         text-align left
 
     &__item
-      border 1px solid grey
+      border borderStyle
       border-bottom 0
       display flex
       flex-direction row
-      padding-top 10px
-      padding-bottom 10px
+      padding-top standardSpacing
+      padding-bottom standardSpacing
       align-items center
       line-height 1.5
       height 60px
@@ -34,18 +36,20 @@
         background-color grey-hover
 
       & > *
-        margin-left 10px
+        margin-left standardSpacing
         flex auto
 
       // buttons "column"
       & > *:last-child
         flex 0 0 220px
-        margin-right 10px
+        margin-right standardSpacing
         text-align center
 
       // type "column"
       & > *:first-child
         flex 0 0 60px
+        margin 0
+        text-align center
 
       &__title_description
         display flex
@@ -58,4 +62,4 @@
           text-overflow ellipsis
 
       &__description
-        font-size fontSizeSmall
+        font-size metadataFontSize

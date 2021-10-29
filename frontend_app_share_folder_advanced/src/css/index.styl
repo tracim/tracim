@@ -4,16 +4,16 @@
   height "calc(100% - %s)" % headerHeight
   &__content
     width 100%
-    padding 10px 0
+    padding standardSpacing 0
     overflow auto
     &__title
       display flex
       justify-content space-between
       align-items center
-      margin 10px 20px
-      padding-bottom 10px
-      border-bottom 1px solid grey
-      font-size 20px
+      margin standardSpacing 20px
+      padding-bottom standardSpacing
+      border-bottom borderStyle
+      font-size titleFontSize
     &__btnupload
       margin auto 0
     &__empty
@@ -28,14 +28,16 @@
       overflow-x hidden
 
 .newUpload
-  padding 10px
+  padding standardSpacing
   width 100%
   &__title
     padding-bottom 22px
   &__email
     margin 0 15px
-    padding 10px
+    padding standardSpacing
     display flex
+    &__input
+      border-radius standardBorderRadius
     &__icon
       background-color transparent
       border none
@@ -48,7 +50,7 @@
         outline 0
   &__password
     margin 0 15px
-    padding 10px
+    padding standardSpacing
     display flex
     flex-direction column
     &__active
@@ -58,7 +60,7 @@
       flex-grow 2
       border-width 1px
       border-style solid
-      border-radius .25rem
+      border-radius standardBorderRadius
       border-color lightgray
       background-color white
       padding-left 5px

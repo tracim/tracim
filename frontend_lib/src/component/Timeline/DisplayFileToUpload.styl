@@ -12,11 +12,11 @@
     align-items center
     padding-inline-start 8px
     cursor pointer
-    font-size fontSizeSmall
+    font-size metadataFontSize
     & > &__iconFile, & > &__text
       margin-inline-end 5px
     & > &__iconFile, & > &__listIcon
-      font-size 16px
+      font-size standardFontSize
     &__listIcon
       color mediumDarkGrey
   &__popover__item
@@ -26,7 +26,7 @@
     padding-bottom 8px
     padding-inline 12px
     &:not(:last-child)
-      border-bottom 1px solid grey
+      border-bottom borderStyle
     & > &__iconFile, & > &__text
       margin-inline-end 5px
     &__iconFile.inError

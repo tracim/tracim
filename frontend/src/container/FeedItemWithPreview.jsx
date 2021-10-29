@@ -40,11 +40,12 @@ export class FeedItemWithPreview extends React.Component {
 
     this.state = {
       invalidMentionList: [],
+      isDiscussionDisplayed: false,
+      discussionToggleButtonLabel: '',
       newComment: '',
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
       translationStateByCommentId: {},
-      newCommentAsFileList: [],
       showInvalidMentionPopupInComment: false,
       timelineWysiwyg: false,
       translationTargetLanguageCode: props.user.lang
@@ -95,18 +96,6 @@ export class FeedItemWithPreview extends React.Component {
     }
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      this.getWysiwygId(this.props.content.id),
-      this.props.i18n.language,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
   getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -114,14 +103,6 @@ export class FeedItemWithPreview extends React.Component {
   handleChangeNewComment = e => {
     const { props } = this
     props.appContentChangeComment(e, props.content, this.setState.bind(this), props.content.slug)
-  }
-
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
   }
 
   handleClickEditComment = (comment) => {
@@ -153,20 +134,21 @@ export class FeedItemWithPreview extends React.Component {
     ))
   }
 
-  handleClickSend = () => {
+  handleClickSend = (comment, commentAsFileList) => {
     const { props, state } = this
-
     if (!handleInvalidMentionInComment(
       props.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnyway()
+      this.handleClickValidateAnyway(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
-  handleClickValidateAnyway = async () => {
+  handleClickValidateAnyway = async (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
@@ -176,8 +158,8 @@ export class FeedItemWithPreview extends React.Component {
           workspace_id: props.content.workspaceId
         },
         state.timelineWysiwyg,
-        state.newComment,
-        state.newCommentAsFileList,
+        comment,
+        commentAsFileList,
         this.setState.bind(this),
         props.content.type,
         props.user.username,
@@ -194,14 +176,14 @@ export class FeedItemWithPreview extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
   }
 
-  handleTranslateComment = () => {
+  handleTranslateComment = (languageCode) => {
     const { props, state } = this
     handleTranslateComment(
       FETCH_CONFIG.apiUrl,
       props.content.workspaceId,
       props.content.id,
       this.getFirstComment().content_id,
-      state.translationTargetLanguageCode,
+      languageCode || state.translationTargetLanguageCode,
       props.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, contentTranslationState: translationState })
@@ -209,14 +191,14 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 
-  handleTranslateHtmlDocument = () => {
+  handleTranslateHtmlDocument = (languageCode = null) => {
     const { props, state } = this
     handleTranslateHtmlContent(
       FETCH_CONFIG.apiUrl,
       props.content.workspaceId,
       props.content.id,
       props.content.currentRevisionId,
-      state.translationTargetLanguageCode,
+      languageCode || state.translationTargetLanguageCode,
       props.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, contentTranslationState: translationState })
@@ -286,13 +268,32 @@ export class FeedItemWithPreview extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  handleClickToggleComments = () => {
+    this.setState(previousState => ({
+      isDiscussionDisplayed: !previousState.isDiscussionDisplayed
+    }))
+  }
+
+  getDiscussionToggleButtonLabel = () => {
+    const { props, state } = this
+    if (props.commentList.length > 0) {
+      return state.isDiscussionDisplayed
+        ? props.t('Hide discussion')
+        : `${props.t('Show discussion')} (${props.commentList.length})`
+    } else {
+      return state.isDiscussionDisplayed
+        ? props.t('Hide comment area')
+        : props.t('Comment')
+    }
+  }
+
   render () {
     const { props, state } = this
 
     let previewTitle = ''
     if (props.inRecentActivities) {
       previewTitle = props.isPublication
-        ? props.t('Show in publications')
+        ? props.t('Show in news')
         : props.t('Open_action')
     } else {
       if (props.previewLinkType !== LINK_TYPE.NONE) {
@@ -359,8 +360,7 @@ export class FeedItemWithPreview extends React.Component {
                   workspaceId={Number(props.workspaceId)}
                   author={commentToShow.author}
                   loggedUser={loggedUser}
-                  createdRaw={commentToShow.created_raw}
-                  createdDistance={commentToShow.created}
+                  created={commentToShow.created || commentToShow.created_raw || commentToShow.createdRaw}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent
@@ -372,7 +372,14 @@ export class FeedItemWithPreview extends React.Component {
                   translationState={state.contentTranslationState}
                   translationTargetLanguageList={props.system.config.translation_service__target_languages}
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
-                  onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                  onChangeTranslationTargetLanguageCode={languageCode => {
+                    this.handleChangeTranslationTargetLanguageCode(languageCode)
+                    this.handleTranslateComment(languageCode)
+                  }}
+                  onClickToggleCommentList={this.handleClickToggleComments}
+                  discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                  threadLength={props.commentList.length}
+                  showTimeline={props.showTimeline}
                 />
               )
               : (
@@ -395,32 +402,35 @@ export class FeedItemWithPreview extends React.Component {
                     translationTargetLanguageCode={state.translationTargetLanguageCode}
                     onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                     content={props.content}
+                    onClickToggleCommentList={this.handleClickToggleComments}
+                    discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
+                    discussionToggleButtonLabelMobile={props.commentList.length > 0 ? props.commentList.length : ''}
+                    showTimeline={props.showTimeline}
+                    isPublication={props.isPublication}
                   />
                 </div>
               )
             )}
-            {props.showTimeline && (
+            {props.showTimeline && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
                 customClass='feedItem__timeline'
                 customColor={props.customColor}
                 id={props.content.id}
+                contentId={props.content.id}
+                contentType={props.content.type}
                 invalidMentionList={state.invalidMentionList}
                 loggedUser={loggedUser}
                 memberList={props.memberList}
                 newComment={state.newComment}
-                newCommentAsFileList={state.newCommentAsFileList}
-                onChangeNewComment={this.handleChangeNewComment}
                 onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickValidateNewCommentBtn={this.handleClickSend}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
-                onInitWysiwyg={this.handleInitWysiwyg}
-                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
+                wysiwygIdSelector={this.getWysiwygId(props.content.id)}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-                showTitle={false}
                 timelineData={this.getTimelineData()}
                 wysiwyg={state.timelineWysiwyg}
                 onClickCancelSave={this.handleCancelSave}
@@ -499,7 +509,7 @@ FeedItemWithPreview.defaultProps = {
   lastModifier: {},
   memberList: [],
   modifiedDate: '',
-  onClickEdit: () => {},
+  onClickEdit: () => { },
   reactionList: [],
   showTimeline: false,
   previewLinkType: LINK_TYPE.OPEN_IN_APP,

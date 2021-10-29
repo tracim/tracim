@@ -1,5 +1,5 @@
 .slowblink
-  animation: blink-animation 2.5s steps(100, start) 2
+  animation blink-animation 2.5s steps(100, start) 2
 @keyframes blink-animation
   to
     opacity 0
@@ -7,31 +7,18 @@
 .header
   width 100%
   & .navbar
-    padding 5px
+    padding standardSpacing
     z-index 30 // INFO - CH - 2019-04-18 - higher than .wsContentGeneric and lower than caldavzap fullscreen
-    border-bottom 1px solid grey
-    min-height 61px
+    border-bottom borderStyle
+    height headerHeight
+    background-color lightGrey
   &__logo
-    padding 0
-    margin-inline-start 5px
     cursor pointer
     &__img
       max-width 150px
       max-height 50px
-  &__breadcrumb
-    width auto
   &__menu
     justify-content flex-end
-    &__list
-      display none
-      margin-left 50px
-      .list__item
-        padding-right 30px
-        &__link
-          color blue
-          font-size 16px
-          &:hover
-            color darkBlue
     &__system
       display flex
       justify-content flex-end
@@ -39,92 +26,34 @@
       height 100%
       &__text
         margin-right 5px
-        font-size 12px
+        font-size metadataFontSize
     &__rightside
       display flex
       justify-content flex-end
-      margin 5px 0
+      margin auto 0
       list-style none
+      align-items center
       & li:not(:last-child)
-        margin-right 10px
-      &__itemsearch
+        margin-inline-end standardSpacing
+      & .btn .fa-fw
+        margin-inline-end textSpacing
+      &__agenda .btn
+        color fontColor
+      &__specificBtn:empty
         display none
-        margin-right 8%
-        width 55%
-        &__search
-          width 100%
-          .search__addonsearch
-            background-color transparent
-            cursor pointer
-      &__itemquestion
-        display none
-        &__btnquestion
-          margin-right 30px
-          .btnquestion__icon
-            color darkGrey
-      &__agenda
-        margin-right 15px
-        & .btn
-          font-size 14px
-          color #212529
-        & .fas
-          margin-right 8px
 
-@media (min-width: min-lg) and (max-width: max-lg)
-  .header
-    &__menu
-      &__rightside
-        display flex
-        justify-content flex-end
-        width 100%
-
-@media (min-width: min-md) and (max-width: max-md)
-  .header
-    &__logo__img
-      margin-left 0
-    &__menu
-      &__rightside
-        flex-wrap wrap
-        width 100%
-
-responsiveNavbarCollapseFixed =
-  position fixed
-  left 0
-  top "calc(%s - 1px)" % headerHeight
-  width 100%
-  background-color #f8f9fa
-  border-bottom 1px solid #ccc
-  padding-right 5px
-
-@media (min-width: min-sm) and (max-width: max-md)
-  .header
-    &__logo__img
-      margin-left 0
-    &__menu
-      &.navbar-collapse
-        {responsiveNavbarCollapseFixed}
-      &__rightside
-        flex-wrap wrap
-        padding-left 0
-        width 100%
-        & li
-          margin 2px 0
-        &__itemquestion
-          display none
-
-@media (max-width: max-xs)
-  .header
-    &__logo__img
-      margin-left 0
-    &__menu
-      &.navbar-collapse
-        {responsiveNavbarCollapseFixed}
-      &__rightside
-        flex-wrap wrap
-        padding-left 0
-        & li
-          margin 2px 0
-        &__itemquestion
-          display none
-      &__system
-        margin-bottom 4px
+@media (max-width: max-md)
+  .header__menu
+    &.navbar-collapse
+      position fixed
+      left 0
+      top "calc(%s - 1px)" % headerHeight
+      width 100%
+      background-color lightGrey
+      border-bottom borderStyle
+    &__rightside
+      flex-wrap wrap
+      padding-inline-start 0
+      & li
+        margin-inline-end standardSpacing
+        margin-bottom standardSpacing

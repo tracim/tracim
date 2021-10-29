@@ -1,10 +1,17 @@
 .content
   position relative
+  border borderStyle
+  background-color offWhite
+  &.item-last
+    border-bottom borderStyle
+    margin-bottom standardSpacing
+  &.item-first
+    border-bottom 0
   &__item
-    padding 10px 0
+    padding standardSpacing 0
   &__type
-    padding 0 25px
-    font-size 30px
+    padding 0 standardSpacing
+    font-size bigIconSize
     text-align center
   &__dragPreview
     display flex
@@ -14,41 +21,29 @@
     overflow hidden
     text-overflow ellipsis
   &__name
-    padding 5px
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
     color fontColor
   &__status
     flex-grow 0
-    width 180px
-    padding 0 15px
-    text-align center
-    font-weight normal
-    &__text
-      margin-left 15px
+    width 140px
+    padding 0 standardSpacing
+    display flex
+    color fontColor
+    align-items center
     &__icon
-      font-size 20px
+      font-size bigIconSize
   & .dragHandle
     display none
   &:hover > .dragHandle
     display block
 
-//MEDIAQUERIES
-
-@media (min-width: max-xs) and (max-width: max-lg)
-  .content
-    &__name__icons
-        margin-top 5px
-
 @media (max-width: max-xs)
   .content
     &__header__status
-      visibility hidden
-    &__name__text
-      width 200px
+      display none
     &__status
-      width 70px
-      &__icon
-        display flex
-        justify-content flex-end
+      width auto
+      &__text
+        display none

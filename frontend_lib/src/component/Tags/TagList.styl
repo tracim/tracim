@@ -1,30 +1,21 @@
 @import '../../css/Variable.styl'
 
 .tagList
-  width calc(100% - 65px)
-  height 100%
-  overflow auto
-  &__header
-    margin 10px 15px
-    padding 10px
-    font-size fontSizeMedium
   &__list
-    margin 10px
+    margin standardSpacing
     padding 0
     list-style none
     text-align center
     &__item
       display flex
-      padding 12px
+      padding standardSpacing
       background-color mediumGrey
-      border-radius 7px 3px 3px 7px
+      border-radius standardBorderRadius
       flex 1
       overflow hidden
-
       // NOTE - RJ - 2021-07-09 positioning puts the item above the triangle
       // allowing the label to be selectable from the start
       position relative
-
       &__info
         text-overflow ellipsis
         overflow hidden
@@ -37,23 +28,23 @@
         top calc(50% - 5px)
         position absolute
         background-color veryLightGrey
-        border-radius 10px
+        border-radius standardBorderRadius
         left 10px
       &__triangleIcon
-        font-size 46px
+        font-size 40px
         transform rotate(58deg)
         transform-origin top
-        margin-right -19px
+        margin-right -14px
         position relative
         left 16px
-        top 17px
+        top 15px
         color mediumGrey
       &__wrapper
         position relative
         display flex
         flex-direction row
-        margin-left 12px
-        margin-bottom 10px
+        margin-left standardSpacing
+        margin-bottom standardSpacing
 
 @media (max-width: max-lg)
   .tagList
@@ -71,4 +62,4 @@
       height auto
     &__list
       height auto
-      overflow-Y auto
+      overflow-y auto

@@ -86,7 +86,7 @@ export const defaultDebug = {
     publicName: 'Global manager',
     username: 'global_manager',
     email: 'osef@algoo.fr',
-    lang: 'fr',
+    lang: 'en',
     avatarUrl: null,
     userRoleIdInWorkspace: ROLE.workspaceManager.id,
     created: '2019-06-03T14:28:14Z',

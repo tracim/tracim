@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
+  IconButton,
   PROFILE_LIST,
   ALLOWED_CHARACTERS_USERNAME
 } from 'tracim_frontend_lib'
@@ -228,16 +229,15 @@ export class AddUserForm extends React.Component {
           </div>
         </div>
         <div className='adminUser__adduser__form__submit'>
-          <button
-            type='button'
-            className='btn highlightBtn primaryColorBg primaryColorBorderDarkenHover primaryColorBgDarkenHover'
-            onClick={this.handleClickAddUser}
-            data-cy='adminUser__adduser__form__submit'
+          <IconButton
+            intent='primary'
+            mode='light'
             disabled={this.isValidateButtonDisabled()}
-          >
-            {props.t('Create the user')}
-            <i className='fas fa-fw fa-check' />
-          </button>
+            onClick={this.handleClickAddUser}
+            icon='fas fa-check'
+            text={props.t('Create the user')}
+            dataCy='adminUser__adduser__form__submit'
+          />
         </div>
       </form>
     )

@@ -5,21 +5,23 @@
   margin 0
   padding 0
   list-style none
-  font-size fontSizeSmall
+  font-size metadataFontSize
+  &.hidden
+    display none
   &__item
     white-space nowrap
     text-overflow ellipsis
     overflow hidden
     &:not(:first-child)::before
       content '>'
-      margin 0 5px
+      margin 0 textSpacing
       color fontColor
     & > a
       color inherit !important
       &:hover
         border-bottom 1px solid
     & i
-        margin-inline-end 5px
+        margin-inline-end textSpacing
     &.root
       white-space nowrap
 

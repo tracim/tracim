@@ -5,9 +5,10 @@ import i18n from '../../i18n.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
+import { CONTENT_TYPE } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
-import CommentTextArea from './CommentTextArea.jsx'
+import CommentArea from './CommentArea.jsx'
 
 // require('./EditCommentPopup.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -35,20 +36,6 @@ export class EditCommentPopup extends React.Component {
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, true)
   }
 
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      wysiwygIdSelector,
-      this.props.loggedUserLanguage,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
-  }
-
-  handleChangeNewComment = e => this.setState({ newComment: e.target.value })
-
   searchForMentionOrLinkInQuery = async (query) => {
     return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
   }
@@ -61,19 +48,20 @@ export class EditCommentPopup extends React.Component {
         customClass='editCommentPopup'
         customColor={props.customColor}
         onClose={props.onClickClose}
+        label={props.t('Edit comment')}
+        faIcon='far fa-fw fa-edit'
       >
-        <span className='editCommentPopup__title'>
-          {props.t('Edit comment')}
-        </span>
-
-        <CommentTextArea
+        <CommentArea
           apiUrl={props.apiUrl}
+          contentId={props.commentId}
+          contentType={CONTENT_TYPE.COMMENT}
+          hideSendButtonAndOptions
           id={wysiwygId}
           newComment={state.newComment}
-          onChangeNewComment={this.handleChangeNewComment}
-          onInitWysiwyg={this.handleInitWysiwyg}
+          wysiwygIdSelector={wysiwygIdSelector}
           searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           lang={props.loggedUserLanguage}
+          workspaceId={props.workspaceId}
           wysiwyg
         />
 
@@ -111,12 +99,14 @@ EditCommentPopup.propTypes = {
   apiUrl: PropTypes.string,
   customColor: PropTypes.string,
   loggedUserLanguage: PropTypes.string,
-  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  commentId: PropTypes.number
 }
 
 EditCommentPopup.defaultProps = {
   apiUrl: '',
   customColor: undefined,
   loggedUserLanguage: 'en',
-  workspaceId: undefined
+  workspaceId: undefined,
+  commentId: 0
 }

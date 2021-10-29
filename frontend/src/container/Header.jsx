@@ -8,7 +8,6 @@ import * as Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
 import DropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
-import Help from '../component/Header/MenuActionListItem/Help.jsx'
 import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import NotificationButton from '../component/Header/MenuActionListItem/NotificationButton.jsx'
 import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
@@ -42,7 +41,7 @@ const qs = require('query-string')
 
 export class Header extends React.Component {
   componentDidMount () {
-    this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', {})
+    this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', { lang: this.props.user.lang })
     i18n.changeLanguage(this.props.user.lang)
   }
 
@@ -71,8 +70,6 @@ export class Header extends React.Component {
       default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); break
     }
   }
-
-  handleClickHelp = () => {}
 
   handleClickLogout = () => {
     this.props.dispatch(logoutUser(this.props.history))
@@ -103,12 +100,12 @@ export class Header extends React.Component {
 
     return (
       <header className='header'>
-        <nav className='navbar navbar-expand-lg navbar-light bg-light'>
+        <nav className='navbar navbar-expand-lg navbar-light'>
           <Logo to={props.user.logged ? PAGE.HOME : PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
 
           <NavbarToggler />
 
-          <div className='header__menu collapse navbar-collapse justify-content-end' id='navbarSupportedContent'>
+          <div className='header__menu collapse navbar-collapse' id='navbarSupportedContent'>
             <ul className='header__menu__rightside'>
               {!unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url)) && !props.system.config.email_notification_activated && (
                 <li className='header__menu__rightside__emailwarning nav-item'>
@@ -147,7 +144,8 @@ export class Header extends React.Component {
               {props.user.logged && (
                 <li className='header__menu__rightside__notification nav-item'>
                   <NotificationButton
-                    notificationNotReadCount={props.notificationNotReadCount}
+                    unreadMentionCount={props.unreadMentionCount}
+                    unreadNotificationCount={props.unreadNotificationCount}
                     onClickNotification={props.onClickNotification}
                   />
                 </li>
@@ -169,10 +167,6 @@ export class Header extends React.Component {
                 langList={props.lang}
                 langActiveId={props.user.lang}
                 onChangeLang={this.handleChangeLang}
-              />
-
-              <Help
-                onClickHelp={this.handleClickHelp}
               />
 
               <MenuProfil

@@ -1,10 +1,23 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
 .feedItemFooter
   display flex
   &__left
-    flex 1
-  &__left, &__right
-    padding 10px
     display flex
     align-items center
+    flex 1
+    & .translateButton .iconbutton
+      padding standardSpacing 0 standardSpacing standardSpacing
+  &__right
+    display flex
+    align-items center
+    & .buttonComments
+       margin 0px standardSpacing standardSpacing 0px
+    & .EmojiReactionButton__buttonpicker
+      padding standardSpacing textSpacing standardSpacing 0
+      margin-bottom standardSpacing
   &__comments
-    margin-inline-start 10px
+    margin-inline-start standardSpacing
+
+.EmojiReactionButton__buttonpicker:focus
+  outline none

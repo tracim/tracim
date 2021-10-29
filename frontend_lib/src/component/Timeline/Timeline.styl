@@ -3,30 +3,34 @@
 .timeline
   display flex
   flex-direction column
-  width calc(100% - 65px) // 65px is the width of the rightPart header
-  height 100%
+  height "calc(100% - %s)" % headerHeight
   & p:first-child
     margin-top 0
     padding-top 0
   & p:last-child
     margin-bottom 0
     padding-bottom 0
-  &__title
-    margin 10px 15px
-    padding 10px
-    font-size 20px
   &__messagelist
     flex 1 1 auto
     margin-bottom 0
-    padding 5px
+    padding standardSpacing standardSpacing 0
     overflow-y auto
     overflow-x visible
+    > .ScrollToBottomContents
+      display flex
+      flex-direction column
+    &__showMoreButton
+      margin-inline-start auto
+      margin-inline-end auto
+      margin-block-end standardSpacing
     &__item
       position relative
-      margin 10px 0
+      margin textSpacing 0
       width 100%
       & + .revision
         border none
+      &:last-child
+        margin-bottom 0
   &__warning
       position absolute
       width calc(100% - 20px)
@@ -35,64 +39,7 @@
   &__texteditor
     position relative
     flex 0 1 auto
-    margin 20px
-    &__mentions
-      font-weight bold
-      margin 10px 0
-    &__autocomplete
-      position absolute
-      width 100%
-      background-color offWhite
-      border-radius 5px
-      font-size 14px
-      &__delimiter
-        height 2px
-        margin 5px 20px
-        background-color grey
-      &__item
-        padding 1px 10px
-        cursor pointer
-        &__active
-          background-color grey-hover
-    &__textinput
-      width 100%
-      & > textarea
-        border-radius 5px
-        border 1.5px solid grey
-        padding 5px
-        height 80px
-        width 100%
-    &__wrapper
-      display flex
-      align-items flex-start
-      justify-content flex-end
-      margin-top 10px
-      height 42px
-    &__advancedtext
-      width 100%
-      margin-right 15px
-      &__btn
-        width max-content
-        border none
-        background-color transparent
-        color mediumDarkGrey
-        cursor pointer
-        font-size fontSizeSmall
-        &:hover
-          color darkGrey
-          text-decoration underline
-        &:disabled
-          cursor not-allowed
-          &:hover
-            color mediumDarkGrey
-    &__submit
-      display flex
-      &__btn
-        display inline-block
-        cursor pointer
-        &__icon
-          display inline-block
-          margin-left 20px
+    margin standardSpacing
 
 .mce-btn-group:not(:first-child)
   border-left none!important //remove the left borders of the wysiwyg for a better aesthetic result
@@ -124,7 +71,6 @@ columnTimeline()
         transform none
         width 100%
 
-
 @media (min-width: min-lg) and (max-width: max-lg)
   columnTimeline()
 
@@ -140,6 +86,6 @@ columnTimeline()
     height 100%
     &__messagelist
       &__version__date
-        font-size 15px
-    &__texteditor__advancedtext__btn
+        font-size metadataFontSize
+    & .commentArea__advancedtext__btn
       display none

@@ -56,29 +56,25 @@ export class PersonalData extends React.Component {
     const { props, state } = this
     return (
       <div className='account__userpreference__setting__personaldata'>
-        <div className='personaldata__sectiontitle subTitle ml-2 ml-sm-0'>
+        <div className='personaldata__sectiontitle subTitle'>
           {(props.displayAdminInfo
             ? props.t('Change the account settings')
             : props.t('Change my account settings')
           )}
         </div>
 
-        <div className='personaldata__text ml-2 ml-sm-0' />
-
         <form className='personaldata__form'>
-          <div className='d-flex align-items-center flex-wrap mb-4'>
-            <label>
-              {props.t('New full name:')}
-              <input
-                className='personaldata__form__txtinput primaryColorBorderLighten form-control'
-                type='text'
-                data-cy='personaldata__form__txtinput__fullname'
-                placeholder={props.userPublicName}
-                value={state.newPublicName}
-                onChange={this.handleChangePublicName}
-              />
-            </label>
-          </div>
+          <label>
+            {props.t('New full name:')}
+            <input
+              className='personaldata__form__txtinput primaryColorBorderLighten form-control'
+              type='text'
+              data-cy='personaldata__form__txtinput__fullname'
+              placeholder={props.userPublicName}
+              value={state.newPublicName}
+              onChange={this.handleChangePublicName}
+            />
+          </label>
 
           <div>
             <label>
@@ -106,7 +102,7 @@ export class PersonalData extends React.Component {
           </div>
 
           {editableUserAuthTypeList.includes(props.userAuthType) && (
-            <div className='d-flex align-items-center flex-wrap mb-4 mt-4'>
+            <div>
               <label>
                 {props.t('New email:')}
                 <input
@@ -122,11 +118,11 @@ export class PersonalData extends React.Component {
           )}
 
           {(state.newEmail !== '' || state.newUsername !== '') && (
-            <div className='align-items-center flex-wrap mb-4'>
+            <div>
               <label>
                 {props.displayAdminInfo ? props.t("Administrator's password:") : props.t('Type your password:')}
                 <input
-                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control mt-3 mt-sm-0'
+                  className='personaldata__form__txtinput checkPassword primaryColorBorderLighten form-control'
                   type='password'
                   value={state.checkPassword}
                   onChange={this.handleChangeCheckPassword}

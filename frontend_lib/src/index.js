@@ -63,10 +63,12 @@ import {
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
   htmlToText,
-  addExternalLinksIcons
+  addExternalLinksIcons,
+  USER_CALL_STATE
 } from './helper.js'
 
 import {
+  GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleInvalidMentionInComment,
@@ -88,7 +90,7 @@ import {
   LIVE_MESSAGE_ERROR_CODE
 } from './LiveMessageManager.js'
 
-import { appContentFactory } from './appContentFactory.js'
+import { appContentFactory, TIMELINE_ITEM_COUNT_PER_PAGE } from './appContentFactory.js'
 
 import {
   createFileUpload,
@@ -111,7 +113,7 @@ import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
-import CommentTextArea from './component/Timeline/CommentTextArea.jsx'
+import CommentArea from './component/Timeline/CommentArea.jsx'
 import EditCommentPopup from './component/Timeline/EditCommentPopup.jsx'
 
 import AddFileToUploadButton from './component/Timeline/AddFileToUploadButton.jsx'
@@ -254,6 +256,8 @@ export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
 export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
 export { default as TagList } from './component/Tags/TagList.jsx'
 export { default as Tag } from './component/Tags/Tag.jsx'
+export { default as Loading } from './component/Loading/Loading.jsx'
+export { default as COLORS } from './colors.js'
 
 export {
   TRANSLATION_STATE,
@@ -265,10 +269,11 @@ export {
 
 export {
   appContentFactory,
+  TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
   buildContentPathBreadcrumbs,
-  CommentTextArea,
+  CommentArea,
   AddFileToUploadButton,
   DisplayFileToUpload,
   createSpaceTree,
@@ -330,6 +335,7 @@ export {
   PROFILE_LIST,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
+  USER_CALL_STATE,
   ACCESSIBLE_SPACE_TYPE_LIST,
   SUBSCRIPTION_TYPE,
   SUBSCRIPTION_TYPE_LIST,
@@ -400,6 +406,7 @@ export {
   getContentComment,
   getFileChildContent,
   addExternalLinksIcons,
+  GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleMentionsBeforeSave,

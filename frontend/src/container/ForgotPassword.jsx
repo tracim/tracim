@@ -6,7 +6,6 @@ import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import InputGroupText from '../component/common/Input/InputGroupText.jsx'
-import Button from '../component/common/Input/Button.jsx'
 import { postForgotPassword, getConfig } from '../action-creator.async.js'
 import {
   newFlashMessage,
@@ -17,6 +16,7 @@ import {
 import {
   CUSTOM_EVENT,
   checkEmailValidity,
+  IconButton,
   PAGE
 } from 'tracim_frontend_lib'
 
@@ -135,20 +135,21 @@ export class ForgotPassword extends React.Component {
               </div>
 
               <div className='forgotpassword__card__body__btn'>
-                <Button
-                  htmlType='button'
-                  bootstrapType=''
-                  customClass='outlineTextBtn nohover forgotpassword__card__body__btncancel btn primaryColorFont primaryColorBorder'
-                  label={props.t('Cancel')}
+                <IconButton
+                  customClass='forgotpassword__card__body__btncancel'
+                  intent='secondary'
                   onClick={this.handleClickCancel}
+                  icon='fas fa-arrow-left'
+                  text={props.t('Cancel')}
                 />
 
-                <Button
-                  htmlType='button'
-                  bootstrapType=''
-                  customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover forgotpassword__card__body__btnsubmit'
-                  label={props.t('Validate')}
+                <IconButton
+                  customClass='forgotpassword__card__body__btnsubmit'
+                  intent='primary'
+                  mode='light'
                   onClick={this.handleClickSubmit}
+                  icon='fas fa-check'
+                  text={props.t('Validate')}
                 />
               </div>
             </div>

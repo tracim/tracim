@@ -1,13 +1,13 @@
+// @ts-nocheck
 import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
-import { debug } from '../debug.js'
 import {
   appContentFactory,
   addAllResourceI18n,
-  Breadcrumbs,
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
@@ -20,19 +20,15 @@ import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   buildHeadTitle,
-  addRevisionFromTLM,
   RefreshWarningMessage,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   getOrCreateSessionClientToken,
-  getContentComment,
-  getFileChildContent,
-  permissiveNumberEqual,
-  getDefaultTranslationState,
   FAVORITE_STATE,
   ROLE,
+  COLORS,
   SelectStatus
 } from 'tracim_frontend_lib'
 import {
@@ -45,7 +41,7 @@ export class Thread extends React.Component {
   constructor (props) {
     super(props)
 
-    const param = props.data || debug
+    const param = props.data
     props.setApiUrl(param.config.apiUrl)
 
     this.state = {
@@ -55,9 +51,8 @@ export class Thread extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
-      timeline: [],
       newComment: '',
-      newCommentAsFileList: [],
+      loading: false,
       newContent: {},
       timelineWysiwyg: false,
       externalTranslationList: [
@@ -70,7 +65,6 @@ export class Thread extends React.Component {
       showRefreshWarning: false,
       editionAuthor: '',
       invalidMentionList: [],
-      isLastTimelineItemCurrentToken: false,
       showInvalidMentionPopupInComment: false,
       translationTargetLanguageCode: param.loggedUser.lang
     }
@@ -90,15 +84,8 @@ export class Thread extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
-      // INFO - CH - 20210322 - handler below is to handle the addition of comment as file
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleCommentCreated },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
-      { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged }
     ])
   }
 
@@ -121,15 +108,15 @@ export class Thread extends React.Component {
 
   handleReloadAppFeatureData = () => {
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_APP_FEATURE_DATA(this.state.config.slug))
-    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, this.loadTimeline)
+    this.props.appContentCustomEventHandlerReloadAppFeatureData(this.loadContent, () => { this.props.loadTimeline(getThreadRevision, this.state.content) })
   }
 
   handleAllAppChangeLanguage = data => {
+    const { props } = this
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-    this.props.appContentCustomEventHandlerAllAppChangeLanguage(
+    props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
-    this.loadTimeline()
   }
 
   handleContentChanged = data => {
@@ -142,36 +129,12 @@ export class Thread extends React.Component {
       content: clientToken === data.fields.client_token ? newContentObject : prev.content,
       newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
-      showRefreshWarning: clientToken !== data.fields.client_token,
-      timeline: addRevisionFromTLM(data.fields, prev.timeline, prev.loggedUser.lang),
-      isLastTimelineItemCurrentToken: data.fields.client_token === this.sessionClientToken
+      showRefreshWarning: clientToken !== data.fields.client_token
     }))
     if (clientToken === data.fields.client_token) {
       this.setHeadTitle(newContentObject.label)
       this.buildBreadcrumbs(newContentObject)
     }
-  }
-
-  handleCommentCreated = (tlm) => {
-    const { props, state } = this
-    // Not a comment for our content
-    if (!permissiveNumberEqual(tlm.fields.content.parent_id !== state.content.content_id)) return
-
-    const createdByLoggedUser = tlm.fields.client_token === this.sessionClientToken
-    const newTimeline = props.addCommentToTimeline(tlm.fields.content, state.timeline, state.loggedUser, createdByLoggedUser, getDefaultTranslationState(state.config.system.config))
-    this.setState({
-      timeline: newTimeline,
-      isLastTimelineItemCurrentToken: createdByLoggedUser
-    })
-  }
-
-  handleUserModified = data => {
-    const newTimeline = this.state.timeline.map(timelineItem => timelineItem.author.user_id === data.fields.user.user_id
-      ? { ...timelineItem, author: data.fields.user }
-      : timelineItem
-    )
-
-    this.setState({ timeline: newTimeline })
   }
 
   componentDidMount () {
@@ -180,7 +143,8 @@ export class Thread extends React.Component {
     this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
-  async updateTimelineAndContent () {
+  updateTimelineAndContent () {
+    const { props } = this
     this.setState({
       newComment: getLocalStorageItem(
         this.state.appName,
@@ -189,8 +153,8 @@ export class Thread extends React.Component {
       ) || ''
     })
 
-    await this.loadContent()
-    this.loadTimeline()
+    this.loadContent()
+    props.loadTimeline(getThreadRevision, this.state.content)
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -209,18 +173,6 @@ export class Thread extends React.Component {
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
     globalThis.tinymce.remove('#wysiwygTimelineComment')
-  }
-
-  handleInitWysiwyg = (handleTinyMceInput, handleTinyMceKeyDown, handleTinyMceKeyUp, handleTinyMceSelectionChange) => {
-    globalThis.wysiwyg(
-      '#wysiwygTimelineComment',
-      this.state.loggedUser.lang,
-      this.handleChangeNewComment,
-      handleTinyMceInput,
-      handleTinyMceKeyDown,
-      handleTinyMceKeyUp,
-      handleTinyMceSelectionChange
-    )
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
@@ -246,42 +198,22 @@ export class Thread extends React.Component {
   loadContent = async () => {
     const { state } = this
 
+    // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
+    // with the setState at the end of the function
+    this.setState({ loadingContent: true })
+
     const response = await handleFetchResult(
       await getThreadContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     )
     this.setState({
       content: response.body,
-      isLastTimelineItemCurrentToken: false
+      loadingContent: false
     })
     this.setHeadTitle(response.body.label)
     this.buildBreadcrumbs(response.body)
 
     await putThreadRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
-  }
-
-  loadTimeline = async () => {
-    const { props, state } = this
-
-    const fetchResultThreadComment = getContentComment(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultFileChildContent = getFileChildContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    const fetchResultRevision = getThreadRevision(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-
-    const [resComment, resCommentAsFile, resRevision] = await Promise.all([
-      handleFetchResult(await fetchResultThreadComment),
-      handleFetchResult(await fetchResultFileChildContent),
-      handleFetchResult(await fetchResultRevision)
-    ])
-
-    const revisionWithComment = props.buildTimelineFromCommentAndRevision(
-      resComment.body,
-      resCommentAsFile.body.items,
-      resRevision.body,
-      state.loggedUser,
-      getDefaultTranslationState(state.config.system.config)
-    )
-
-    this.setState({ timeline: revisionWithComment })
   }
 
   buildBreadcrumbs = async content => {
@@ -306,8 +238,18 @@ export class Thread extends React.Component {
   }
 
   handleClickBtnCloseApp = () => {
-    this.setState({ isVisible: false })
-    GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+    const { state } = this
+    const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+    if (isPublication) state.config.history.push(PAGE.WORKSPACE.PUBLICATIONS(state.content.workspace_id))
+    else {
+      this.setState({ isVisible: false })
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+    }
+  }
+
+  handleLoadMoreTimelineItems = async () => {
+    const { props } = this
+    await props.loadMoreTimelineItems(getThreadRevision)
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -320,39 +262,33 @@ export class Thread extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  handleAddCommentAsFile = fileToUploadList => {
-    this.props.appContentAddCommentAsFile(fileToUploadList, this.setState.bind(this))
-  }
-
-  handleRemoveCommentAsFile = fileToRemove => {
-    this.props.appContentRemoveCommentAsFile(fileToRemove, this.setState.bind(this))
-  }
-
   searchForMentionOrLinkInQuery = async (query) => {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = async () => {
+  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
     const { state } = this
 
     if (!handleInvalidMentionInComment(
       state.config.workspace && state.config.workspace.memberList,
       state.timelineWysiwyg,
-      state.newComment,
+      comment,
       this.setState.bind(this)
     )) {
-      this.handleClickValidateAnywayNewComment()
+      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+      return true
     }
+    return false
   }
 
-  handleClickValidateAnywayNewComment = () => {
+  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
     try {
       props.appContentSaveNewComment(
         state.content,
         state.timelineWysiwyg,
-        state.newComment,
-        state.newCommentAsFileList,
+        comment,
+        commentAsFileList,
         this.setState.bind(this),
         state.config.slug,
         state.loggedUser.username
@@ -419,28 +355,6 @@ export class Thread extends React.Component {
     ))
   }
 
-  handleContentCommentModified = (data) => {
-    const { props, state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
-    const newTimeline = props.updateCommentOnTimeline(
-      data.fields.content,
-      state.timeline,
-      state.loggedUser.username
-    )
-    this.setState({ timeline: newTimeline })
-  }
-
-  handleContentCommentDeleted = (data) => {
-    const { props, state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
-
-    const newTimeline = props.removeCommentFromTimeline(
-      data.fields.content.content_id,
-      state.timeline
-    )
-    this.setState({ timeline: newTimeline })
-  }
-
   handleClickRefresh = () => {
     const { state } = this
 
@@ -466,15 +380,18 @@ export class Thread extends React.Component {
 
   render () {
     const { props, state } = this
+    const isPublication = state.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+    const color = isPublication ? COLORS.PUBLICATION : state.config.hexcolor
 
     if (!state.isVisible) return null
 
     return (
-      <PopinFixed customClass={state.config.slug} customColor={state.config.hexcolor}>
+      <PopinFixed customClass={state.config.slug} customColor={color}>
         <PopinFixedHeader
+          loading={state.loadingContent}
           customClass={`${state.config.slug}__contentpage`}
-          customColor={state.config.hexcolor}
-          faIcon={state.config.faIcon}
+          customColor={color}
+          faIcon={isPublication ? 'fas fa-stream' : state.config.faIcon}
           rawTitle={state.content.label}
           componentTitle={<div>{state.content.label}</div>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
@@ -504,6 +421,7 @@ export class Thread extends React.Component {
           onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
             state.content, state.loggedUser, this.setState.bind(this)
           )}
+          breadcrumbsList={state.breadcrumbsList}
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
@@ -511,17 +429,6 @@ export class Thread extends React.Component {
             {/* INFO - G.B. - 20210616 - Since the thread component behaves a bit differently than the others it was preferable to put
             Breadcrumbs and SelectStatus here directly than to adapt the PopinFixedContent component to cover thread as well. */}
             <div className='thread__contentpage__top'>
-              <Breadcrumbs
-                root={{
-                  link: PAGE.HOME,
-                  label: '',
-                  icon: 'fas fa-home',
-                  type: BREADCRUMBS_TYPE.CORE,
-                  isALink: true
-                }}
-                breadcrumbsList={state.breadcrumbsList}
-              />
-
               {state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && state.config.availableStatuses && (
                 <SelectStatus
                   selectedStatus={state.config.availableStatuses.find(s => s.slug === state.content.status)}
@@ -541,20 +448,19 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
+                contentId={state.content.content_id}
+                contentType={state.content.content_type}
+                loading={props.loadingTimeline}
                 customClass={`${state.config.slug}__contentpage`}
-                customColor={state.config.hexcolor}
+                customColor={color}
                 loggedUser={state.loggedUser}
                 memberList={state.config.workspace && state.config.workspace.memberList}
                 apiUrl={state.config.apiUrl}
-                timelineData={state.timeline}
+                timelineData={props.timeline}
                 newComment={state.newComment}
-                newCommentAsFileList={state.newCommentAsFileList}
                 disableComment={!state.content.is_editable}
                 availableStatusList={state.config.availableStatuses}
                 wysiwyg={state.timelineWysiwyg}
-                onChangeNewComment={this.handleChangeNewComment}
-                onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                onValidateCommentFileToUpload={this.handleAddCommentAsFile}
                 onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
                 allowClickOnRevision={false}
@@ -566,28 +472,28 @@ export class Thread extends React.Component {
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
                 deprecatedStatus={state.config.availableStatuses[3]}
-                showTitle={false}
                 invalidMentionList={state.invalidMentionList}
-                isLastTimelineItemCurrentToken={state.isLastTimelineItemCurrentToken}
+                isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
                 onClickCancelSave={this.handleCancelSave}
                 onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-                onInitWysiwyg={this.handleInitWysiwyg}
+                wysiwygIdSelector='#wysiwygTimelineComment'
                 workspaceId={state.content.workspace_id}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-                onClickTranslateComment={comment => props.handleTranslateComment(
+                onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
                   comment,
                   state.content.workspace_id,
-                  state.translationTargetLanguageCode,
-                  this.setState.bind(this)
+                  languageCode || state.translationTargetLanguageCode
                 )}
-                onClickRestoreComment={comment => props.handleRestoreComment(comment, this.setState.bind(this))}
+                onClickRestoreComment={props.handleRestoreComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
                 translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+                canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
               />
             ) : null}
           </div>

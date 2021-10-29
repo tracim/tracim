@@ -33,8 +33,8 @@ for (const pageTestCase of activityPages) {
           })
         })
         cy.createFile(fileImage, fileType, fileName3, workspaceId)
+        cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
-      cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
     })
 
     afterEach(function () {

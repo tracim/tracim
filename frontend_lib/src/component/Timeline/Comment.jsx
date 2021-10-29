@@ -15,6 +15,7 @@ import {
   ROLE,
   CONTENT_TYPE,
   formatAbsoluteDate,
+  displayDistanceDate,
   addExternalLinksIcons
 } from '../../helper.js'
 
@@ -32,7 +33,8 @@ const Comment = props => {
     borderColor: props.customColor
   }
 
-  const createdFormated = formatAbsoluteDate(props.createdRaw, props.loggedUser.lang)
+  const createdFormated = formatAbsoluteDate(props.created, props.loggedUser.lang)
+  const createdDistance = displayDistanceDate(props.created, props.loggedUser.lang)
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
 
@@ -72,7 +74,7 @@ const Comment = props => {
                     className={classnames(`${props.customClass}__body__content__header__meta__date`, 'comment__body__content__header__meta__date')}
                     title={createdFormated}
                   >
-                    {props.createdDistance}
+                    {createdDistance}
                   </div>
                 </div>
 
@@ -167,6 +169,16 @@ const Comment = props => {
             contentId={props.contentId}
             workspaceId={props.workspaceId}
           />
+
+          {props.isPublication && props.showTimeline && (
+            <IconButton
+              text={props.discussionToggleButtonLabel}
+              textMobile={props.threadLength > 0 ? props.threadLength : ''}
+              icon='far fa-comment'
+              onClick={props.onClickToggleCommentList}
+              customClass='buttonComments'
+            />
+          )}
         </div>
       </div>
     </div>
@@ -184,8 +196,7 @@ Comment.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
   text: PropTypes.string,
-  createdRaw: PropTypes.string,
-  createdDistance: PropTypes.string.isRequired,
+  created: PropTypes.string.isRequired,
   fromMe: PropTypes.bool,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
   onClickEditComment: PropTypes.func,
@@ -195,15 +206,19 @@ Comment.propTypes = {
   onClickRestore: PropTypes.func.isRequired,
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onClickToggleCommentList: PropTypes.func,
+  discussionToggleButtonLabel: PropTypes.string.isRequired,
+  threadLength: PropTypes.number
 }
 
 Comment.defaultProps = {
-  createdRaw: '',
   customClass: '',
   text: '',
   fromMe: false,
   translationState: TRANSLATION_STATE.DISABLED,
+  discussionToggleButtonLabel: 'Comment',
+  threadLength: 0,
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
   onClickDeleteComment: () => {}

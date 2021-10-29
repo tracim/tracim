@@ -171,10 +171,6 @@ class TagList extends React.Component {
 
     return (
       <div className='tagList' data-cy='tag_list'>
-        <div className='tagList__header'>
-          {props.t('Tags')}
-        </div>
-
         <div className='tagList__wrapper'>
           {!isReadOnlyMode && (
             <NewTagForm
@@ -218,6 +214,7 @@ class TagList extends React.Component {
           {!!state.workspaceTagToDeleteId && (
             <ConfirmPopup
               confirmLabel={props.t('Delete')}
+              confirmIcon='far fa-fw fa-trash-alt'
               onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
               onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
             />

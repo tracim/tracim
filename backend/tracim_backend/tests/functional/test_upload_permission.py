@@ -563,9 +563,9 @@ class TestGuestUploadEndpoints(object):
             ),
             status=200,
         )
-        res = res.json_body
-        assert len(res) == 1
-        comment_result = res[0]
+        comments = res.json_body["items"]
+        assert len(comments) == 1
+        comment_result = comments[0]
         assert comment_result["raw_content"] == "Message from toto: hello folk !"
         assert comment_result["parent_id"] == image_content_id
         assert comment_result["author"]["user_id"] == admin_user.user_id
@@ -731,9 +731,9 @@ class TestGuestUploadEndpoints(object):
             ),
             status=200,
         )
-        res = res.json_body
-        assert len(res) == 1
-        comment_result = res[0]
+        comments = res.json_body["items"]
+        assert len(comments) == 1
+        comment_result = comments[0]
         assert comment_result["raw_content"] == "Message from toto: hello folk !"
         assert comment_result["parent_id"] == image_content_id
         assert comment_result["author"]["user_id"] == admin_user.user_id
@@ -811,9 +811,9 @@ class TestGuestUploadEndpoints(object):
             ),
             status=200,
         )
-        res = res.json_body
-        assert len(res) == 1
-        comment_result = res[0]
+        comments = res.json_body["items"]
+        assert len(comments) == 1
+        comment_result = comments[0]
         assert comment_result["raw_content"] == "Uploaded by toto."
         assert comment_result["parent_id"] == image_content_id
         assert comment_result["author"]["user_id"] == admin_user.user_id

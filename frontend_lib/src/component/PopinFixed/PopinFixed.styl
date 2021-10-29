@@ -15,41 +15,62 @@
   &__header
     display flex
     align-items center
-    margin 5px 10px 5px 30px
-    height 60px
+    height headerHeight
     border-bottom 1px solid mediumGrey
+    margin 0 pageSpacing
+    &__titleWithBreadcrumbs
+      flex 3
+      overflow hidden
+    &__titleWrapper
+      display flex
+      align-items center
+    &__edittitle
+      padding 0
+      margin-inline-start standardSpacing
+    & > .favoriteButton
+      margin 0 textSpacing
+      & .iconbutton__icon
+        margin 0
     & > *
-      margin-right 5px
+      margin-inline-end standardSpacing
     &__actions
+      &.dropdownMenuButton
+        padding 0
+        margin 0
+        & i
+          margin 0
       &::after
         display none
     &__icon
-      margin-right 10px
-      font-size fontSizeTitle
+      font-size titleFontSize
+      margin-inline-end standardSpacing
     &__title
-      margin-right 10px
-      border-radius 5px
       flex 2
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
-      font-size fontSizeMedium
+      font-size titleFontSize
       font-weight bold
       & > div
         text-overflow ellipsis
         overflow hidden
       & > input
-        padding-left 5px
+        padding-left textSpacing
+        border-radius standardBorderRadius
+        border borderStyle
     &__reactions
       flex 1
-      height 100%
       & > .EmojiReactions
         flex-wrap wrap-reverse
+      & .EmojiReactionButton__buttonpicker
+        color fontColor
+        padding 0
     &__close
-      border-radius 5px
-      padding 3px 7px
+      margin-inline-start standardSpacing
+      margin-inline-end 0
+      cursor pointer
       & > i
-        font-size fontSizeMedium
+        font-size titleFontSize
         vertical-align middle
   &__option
     &__menu
@@ -70,11 +91,11 @@
         border-width 1px
         border-style solid
         & > i
-          margin-right 10px
+          margin-right standardSpacing
           color darkGrey
-          font-size fontSizeMedium
+          font-size titleFontSize
       &__action
-        font-size fontSizeMedium
+        font-size titleFontSize
         background-color transparent
         border none
         cursor pointer
@@ -88,7 +109,7 @@
     &__state
       width 100%
       padding 5px 15px
-      border-radius 10px
+      border-radius standardBorderRadius
       background-color #fbe294
     &__left
       transition width 0.4s ease
@@ -98,9 +119,9 @@
         display flex
         align-items center
         color lightDarkGrey
-        font-size fontSizeSmall
-        padding 5px 10px
-        margin-inline-start 20px
+        font-size metadataFontSize
+        padding standardSpacing pageSpacing 0
+        justify-content flex-end
         & .breadcrumbs
           margin-inline-end auto
           overflow auto
@@ -119,15 +140,17 @@
         width calc(100% - 65px) // 65px is the width of the rightPart header
         overflow-y auto
         &__title
-          margin 10px 15px
-          padding 10px
-          font-size fontSizeMedium
+          height headerHeight
+          padding standardSpacing
+          font-size titleFontSize
+          display flex
+          align-items center
       &__header
         display flex
         flex-direction column
         width 65px
         background-color mediumGrey
-        font-size fontSizeMedium
+        font-size titleFontSize
         cursor pointer
         &__icon
           cursor pointer
@@ -144,6 +167,13 @@
             text-align center
             cursor pointer
             margin auto 0 15px
+        .loading
+          flex 1
+          display flex
+          &__text
+            flex 1
+  & .headerBtn
+    margin-inline-end 0
 
 .rightPartClose
   .wsContentGeneric__content
@@ -167,7 +197,7 @@ responsiveColumnStyle()
         transform none
         border-left-width 0
         margin-left 5px
-        padding 10px
+        padding standardSpacing
         width 65px
         border-top 5px solid
         & > i

@@ -17,7 +17,9 @@ describe('Switching between tabs', () => {
 
   const testCases = [
     { from: 'Dashboard', to: 'Contents', fromPage: p.DASHBOARD, toPagePathEnd: 'contents' },
-    { from: 'Contents', to: 'Dashboard', fromPage: p.CONTENTS, toPagePathEnd: 'dashboard' }
+    { from: 'Contents', to: 'Dashboard', fromPage: p.CONTENTS, toPagePathEnd: 'dashboard' },
+    { from: 'Dashboard', to: 'News', fromPage: p.DASHBOARD, toPagePathEnd: 'publications' },
+    { from: 'Contents', to: 'News', fromPage: p.CONTENTS, toPagePathEnd: 'publications' }
   ]
 
   for (const testCase of testCases) {
@@ -26,7 +28,6 @@ describe('Switching between tabs', () => {
       cy.visitPage({ pageName: fromPage, params: { workspaceId: workspaceId } })
       cy.contains('.pageTitleGeneric__title__label', workspaceLabel)
       cy.contains('.tab', to).click()
-      cy.contains('.breadcrumbs__item', to)
       cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/${toPagePathEnd}`)
     })
   }

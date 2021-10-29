@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function connectMock (mapStateToProps) {
+export function connectMock (mapStateToProps, dispatchMock = null) {
   return function (WrappedComponent) {
     return class connectMock extends React.Component {
       render () {
@@ -10,7 +10,7 @@ export function connectMock (mapStateToProps) {
             {...mapStateToProps}
             getState={() => {}}
             subscribe={() => {}}
-            dispatch={() => {}}
+            dispatch={dispatchMock || (() => {})}
           />
         )
       }

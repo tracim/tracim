@@ -102,6 +102,7 @@ describe('Account page', () => {
         .find('.personaldata__form .personaldata__form__button')
         .should('have.attr', 'type', 'button')
     })
+
     it('should have password field visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__password] > .menusubcomponent__list__item__link')
@@ -110,20 +111,14 @@ describe('Account page', () => {
         .find('.personaldata__sectiontitle')
         .should('be.visible')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(1) .personaldata__form__txtinput')
+        .find('.personaldata__form__txtinput[type=password]')
+        .should('have.length', 3)
+      cy.contains('.personaldata__form label', 'Current password:')
         .should('be.visible')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(1) .personaldata__form__txtinput')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(2) .personaldata__form__txtinput')
+      cy.contains('.personaldata__form label', 'New password:')
         .should('be.visible')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(2) .personaldata__form__txtinput')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(3) .personaldata__form__txtinput')
+      cy.contains('.personaldata__form label', 'Repeat new password:')
         .should('be.visible')
-      cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('.mr-5 div:nth-child(3) .personaldata__form__txtinput')
     })
 
     it('should have a specific icon for validate button', () => {
@@ -131,7 +126,7 @@ describe('Account page', () => {
         .find('.iconbutton__icon')
         .should('have.class', 'fa-check')
     })
-    
+
     it('should have agenda field visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('[data-cy=menusubcomponent__list__agenda]')

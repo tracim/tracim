@@ -1,4 +1,6 @@
 # coding=utf-8
+from http import HTTPStatus
+
 from hapic.data import HapicData
 from pyramid.config import Configurator
 from pyramid.security import forget
@@ -20,11 +22,6 @@ from tracim_backend.views.core_api.schemas import LoginOutputHeaders
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import UserSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__AUTHENTICATION_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
 
 
 class SessionController(Controller):

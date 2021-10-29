@@ -6,13 +6,13 @@ from setuptools import setup
 requires = [
     # pyramid
     "plaster_pastedeploy",
-    "pyramid >= 1.9a",
+    "pyramid <2.0",
     "pyramid_debugtoolbar",
     "pyramid_retry",
     "waitress",
     # Database
     "pyramid_tm",
-    "SQLAlchemy",
+    "SQLAlchemy<1.4.0",
     "transaction",
     "zope.sqlalchemy",
     "alembic",
@@ -27,21 +27,21 @@ requires = [
     # CLI
     "cliff",
     # Webdav
-    "wsgidav",
+    "wsgidav<3.0.0",
     "PyYAML",
     # others
     "filedepot>=0.8.0",
     "babel",
     "python-slugify",
-    "preview-generator>=0.23",
+    "preview-generator>=0.25",
     "colour",
     "python-dateutil",
     "gitpython",
     # mail-notifier
     "mako",
     "lxml",
-    "redis<3.0.0",
-    "rq",
+    "redis>=3.5.3",
+    "rq>=1.9.0",
     "html2text",
     # mail-fetcher
     "markdown",
@@ -51,7 +51,9 @@ requires = [
     "beautifulsoup4",
     # auth
     "pyramid_multiauth",
-    "beaker",
+    # beaker 1.11 is broken: fix does exist but no new release since:
+    # https://github.com/bbangert/beaker/commit/889d3055a4ca31b55a0b0681b00f2973b3250d88
+    "beaker<1.11.0",
     "pyramid_beaker",
     "pyramid_ldap3",
     # frontend file serve
@@ -60,7 +62,7 @@ requires = [
     "Babel",
     "requests",
     # caldav support
-    "radicale",
+    "radicale<3.0.0",
     "caldav",
     # search support
     "elasticsearch",
@@ -77,6 +79,8 @@ requires = [
     "pyzmq",
     "jsonschema",
     "webpreview",
+    # importlib
+    "importlib_metadata",
 ]
 
 tests_require = [

@@ -1,11 +1,23 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+.callpopup
+  width 300px
+  &__text
+    margin-bottom standardSpacing
+  &__body
+    width 100%
+    &__btn
+      margin textSpacing standardSpacing
+      display flex
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
 
 .profile
   &__text__loading
     background-color lightGrey
     height 20px
     width 200px
-    margin 10px
+    margin standardSpacing
   &__cover
     height 150px
     width 100%
@@ -17,13 +29,13 @@
     position relative
     &__changeBtn
       position absolute
-      bottom 10px
-      right 10px
+      bottom standardSpacing
+      right pageSpacing
       background-color offWhite
       &:hover
         background-color lightGrey
     &__loading
-      margin 10px
+      margin standardSpacing
     &__image
       width 100%
       height 100%
@@ -31,17 +43,20 @@
       object-fit fill
 
   &__mainBar
-    height 70px
-    padding-left 30px
+    height headerHeight
+    padding-left pageSpacing
     background-color offWhite
     display flex
+    &__callBtn
+      align-self start
+      margin standardSpacing pageSpacing standardSpacing
     &__avatar
       position relative
       &__medium
         display none
       &__big
         position relative
-        top -15px
+        top -20px
       &__changeBtn
         position absolute
         bottom -15px
@@ -51,11 +66,13 @@
         & .iconbutton__icon
           margin 0px
     &__info
-      margin-left 10px
-      font-size fontSizeTitle
+      margin-left standardSpacing
+      font-size titleFontSize
       align-self center
+      flex 1
       &__wrapper
-        width calc(100% - 130px) // INFO - MB - 2021-05-06 - the total width minus the avatar width (100px) and its margin (30px) on the ProfileMainbar
+        display flex
+        flex-grow 1
       &__user
         display flex
         &__name
@@ -69,7 +86,7 @@
           &__wrapper
             max-width 50%
             display inline-flex
-            font-size 18px
+            font-size standardFontSize
             align-items center
           &__separator
             margin 0px 5px
@@ -78,30 +95,26 @@
     display flex
     & > div
       overflow-wrap anywhere
-      font-weight bold
       background-color offWhite
       height max-content
       min-height 300px
-      border 1px grey solid
-      border-radius 5px
-      padding 20px
-      margin-bottom 10px
+      border borderStyle
+      border-radius standardBorderRadius
+      padding standardSpacing
     &__information
-      margin 30px 0 30px 30px
+      margin pageSpacing 0 pageSpacing pageSpacing
       width 30%
     &__page
-      margin 30px
+      margin pageSpacing pageSpacing pageSpacing standardSpacing
       width 70%
     &__loading
       background-color veryLightGrey
       height 200px
-      margin 10px
+      margin standardSpacing
   &__customForm__submit
     position absolute
     top 0
     right 0
-    padding 5px 8px
-
 
 @media (max-width: max-sm)
   .profile
@@ -112,14 +125,14 @@
 
     &__mainBar
       height 50px
-      padding-left 10px
+      padding-left standardSpacing
       &__avatar
         &__big
           display none
         &__medium
           display unset
       &__info
-        font-size fontSizeMedium
+        font-size titleFontSize
         & .breadcrumbs
           display none
         &__user
@@ -127,7 +140,7 @@
           flex-direction column
           width 100%
           &__username
-            font-size fontSizeSmall
+            font-size metadataFontSize
             &__separator
               display none
 
@@ -136,10 +149,10 @@
       & > div
         font-weight normal
         min-height 150px
-        padding 10px
+        padding standardSpacing
       &__information
-        margin 20px 10px
+        margin 20px standardSpacing
         width calc(100% - 20px)
       &__page
-        margin 0px 10px
+        margin 0px standardSpacing
         width calc(100% - 20px)

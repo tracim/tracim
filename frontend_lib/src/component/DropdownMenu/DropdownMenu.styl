@@ -8,7 +8,7 @@
 .dropdownMenu
   padding 0
   &__image
-    margin-right 5px
+    margin-right standardSpacing
     width 20px
     height 15px
     vertical-align middle
@@ -16,8 +16,9 @@
 .dropdownMenuItem
   padding 0
   cursor pointer
+  font-size standardFontSize
   & > *
-    padding 10px
+    padding standardSpacing
     width 100%
     height 100%
     display flex
@@ -27,10 +28,16 @@
       color fontColor
       text-decoration none
   & i
-    margin-right 10px
+    margin-right textSpacing
   &:hover:not(:active)
     background-color grey-hover
 
 .dropdownMenuButton.btn
   display flex
   align-items center
+  padding standardSpacing
+  height 100%
+  & i
+    margin-right textSpacing
+  &::after
+    margin-right textSpacing

@@ -1,12 +1,96 @@
+# 4.0.0 / 2021-10-29
+
+### New Features
+
+- 1-to-1 video calls based on Jitsi Meet
+- Notification wall improvements: notification grouping, design improvement, mention highlight, etc
+- Performance improvements: loading of contents, timelines...
+- News feature improvements: opening News in a dedicated application, thread design, responsiveness...
+- Timeline and news pagination
+- UI normalization work: margins, font size, etc
+
+### Fixed Issues
+
+- UX: [#3649](https://github.com/tracim/tracim/issues/3649),
+[#4802](https://github.com/tracim/tracim/issues/4802),
+[#4872](https://github.com/tracim/tracim/issues/4872),
+[#4916](https://github.com/tracim/tracim/issues/4916),
+[#4918](https://github.com/tracim/tracim/issues/4918),
+[#4919](https://github.com/tracim/tracim/issues/4919),
+[#4951](https://github.com/tracim/tracim/issues/4951)
+- App-agenda: [#4558](https://github.com/tracim/tracim/issues/4558)
+- App-file: [#4056](https://github.com/tracim/tracim/issues/4056)
+- App-admin: [#3689](https://github.com/tracim/tracim/issues/3689)
+- Frontend: [#3978](https://github.com/tracim/tracim/issues/3978),
+[#4170](https://github.com/tracim/tracim/issues/4170),
+[#4440](https://github.com/tracim/tracim/issues/4440),
+[#4463](https://github.com/tracim/tracim/issues/4463),
+[#4666](https://github.com/tracim/tracim/issues/4666),
+[#4815](https://github.com/tracim/tracim/issues/4815),
+[#4826](https://github.com/tracim/tracim/issues/4826),
+[#4882](https://github.com/tracim/tracim/issues/4882),
+[#4929](https://github.com/tracim/tracim/issues/4929),
+[#4950](https://github.com/tracim/tracim/issues/4950),
+[#4969](https://github.com/tracim/tracim/issues/4969)
+- Search: [#4825](https://github.com/tracim/tracim/issues/4825)
+- Email: [#4912](https://github.com/tracim/tracim/issues/4912),
+[#4966](https://github.com/tracim/tracim/issues/4966)
+- Backend: [#4296](https://github.com/tracim/tracim/issues/4296),
+[#4352](https://github.com/tracim/tracim/issues/4352),
+[#4784](https://github.com/tracim/tracim/issues/4784)
+- Performance: [#3628](https://github.com/tracim/tracim/issues/3628),
+[#3925](https://github.com/tracim/tracim/issues/3925),
+[#4837](https://github.com/tracim/tracim/issues/4837),
+[#5009](https://github.com/tracim/tracim/issues/5009)
+- Installation: [#3680](https://github.com/tracim/tracim/issues/3680),
+[#4874](https://github.com/tracim/tracim/issues/4874)
+- Docker: [#4991](https://github.com/tracim/tracim/issues/4991)
+
+### Breaking/Important change
+
+- :warning: Apache default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- Video calls: requires a modification on existing installations. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- Configuration file `development.ini`: default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- :warning: Python 3.5 support dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Python 3.8 and 3.9 support (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Docker images now rely on Debian Bullseye (11) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Supported OS: see [README](README.md)
+- MySQL and MariaDB are not officially supported anymore (issue [#5043](https://github.com/tracim/tracim/issues/5043))
+- `Publications` are now named `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
+
+### Known Issues
+
+- RAW image previews are broken (issue [#5008](https://github.com/tracim/tracim/issues/5008))
+- Notification call issue (issue [#5044](https://github.com/tracim/tracim/issues/5044))
+
+
+# 3.9.2 / 2021-07-30
+
+Fix installation process (broken due to the last version of Yarn).
+
+### Fixed Issues
+- Backend/Docker: [#4830](https://github.com/tracim/tracim/issues/4830)
+
+
+# 3.9.1 / 2021-07-19
+
+This stabilisation release fixes a frontend crash that happens when anchor elements with an empty or inexistent href
+attribute end up in publications, notes or comments. Any user of Tracim 3.9 is strongly encouraged to update. Releases
+prior to Tracim 3.9 are not affected by this crash.
+
+### Fixed Issues
+ - Frontend: [#4805](https://github.com/tracim/tracim/issues/4805)
+
+
 # 3.9.0 / 2021-07-09
 
 ### New Features
 
 For end users:
- - Links to Tracim contents. A user can now create a link to other Tracim contents in comments and notes. An autocompletion popup
-   will help the user create the link as soon as they type `#` and then a word in the title of the content, or
-   its id. The created link will display the title of the document, and will have a specific color showing it is
-   an internal link in notes.
+ - Links to Tracim contents. A user can now create a link to other Tracim contents in comments and notes. An
+   autocompletion popup will help the user create the link as soon as they type `#` and then a word in the title
+   of the content, or its id. The created link will display the title of the document, and will have a specific color
+   showing it is an internal link in notes.
  - Tags on contents (notes and files). Tagging is done in the new tab between the area that shows the
    content and the timeline. Tags can be added and removed there. They are per space (spaces have different sets of
    tags). Tags of a space can be listed and managed in the space settings that a user can find in the dashboard.
@@ -16,7 +100,7 @@ For end users:
  - Revamped app appearance (size and headers). Formerly, apps showing notes, topics and files didn't take the whole
    space vertically and horizontally. They also had both a header and a toolbar.
    The space and screen estate is now better used. Apps now take as much space as possible, both vertically and
-   horizontally, and the header and the toolbar have been merged to put the focus on the content. 
+   horizontally, and the header and the toolbar have been merged to put the focus on the content.
  - The valitity time of the password reset link is given in the reset password email sent when users forget their passwords
  - The autocompletion popup for mentions (and now, for links) is now correctly positioned even when the text being
    edited is scrolled.
@@ -87,6 +171,13 @@ For administrators:
   tracimcli index-create
   tracimcli index-populate
   ```
+
+
+# 3.8.3 / 2021-09-23
+
+### Fixed Issues
+
+- UX: [#4950](https://github.com/tracim/tracim/issues/4950)
 
 
 # 3.8.2 / 2021-05-27

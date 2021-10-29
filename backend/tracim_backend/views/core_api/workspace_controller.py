@@ -1,3 +1,4 @@
+from http import HTTPStatus
 import typing
 
 from pyramid.config import Configurator
@@ -85,11 +86,6 @@ from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ALL_SECTIO
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ARCHIVE_AND_RESTORE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
 
 SWAGGER_TAG__WORKSPACE_MEMBERS_SECTION = "Members"
 SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_SECTION = "Subscriptions"
@@ -502,7 +498,7 @@ class WorkspaceController(Controller):
             show_deleted=content_filter.show_deleted,
             show_active=content_filter.show_active,
         )
-        paged_contents = content_api.get_all(
+        contents_page = content_api.get_all(
             parent_ids=content_filter.parent_ids,
             complete_path_to_id=content_filter.complete_path_to_id,
             workspaces=[request.current_workspace],
@@ -515,8 +511,8 @@ class WorkspaceController(Controller):
             count=content_filter.count,
             page_token=content_filter.page_token,
         )
-        contents = [content_api.get_content_in_context(content) for content in paged_contents]
-        return PaginatedObject(paged_contents, contents)
+        contents = [content_api.get_content_in_context(content) for content in contents_page]
+        return PaginatedObject(contents_page, contents)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
@@ -569,8 +565,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
     def get_content_from_workspace(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Convenient route allowing to get detail about a content without to known routes associated to its content type.
-        This route generate a HTTP 302 with the right url
+        Convenient route allowing to get detail about a content without knowing routes associated to its content type.
+        This route generates a HTTP 302 with the right url
         """
         content = request.current_content
         content_type = content_type_list.get_one_by_slug(content.type).slug
@@ -589,8 +585,8 @@ class WorkspaceController(Controller):
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
     def get_content(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Convenient route allowing to get detail about a content without to known routes associated to its content type.
-        This route generate a HTTP 302 with the right url
+        Convenient route allowing to get detail about a content without knowing routes associated to its content type.
+        This route generates a HTTP 302 with the right url
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
@@ -611,23 +607,34 @@ class WorkspaceController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(ContentIdPathSchema())
     @hapic.output_body(ContentPathInfoSchema())
     def get_content_path(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
         Get Content Path : return all hierarchy of content from workspace root to content
         """
+        content = request.current_content
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
-        content = api.get_one(
-            content_id=hapic_data.path.content_id,
-            content_type=content_type_list.Any_SLUG,
-            workspace=request.current_workspace,
-        )
         return ListItemsObject(
             [api.get_content_in_context(path_content) for path_content in content.content_path]
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.FOUND)
+    def get_workspace_content_path(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        DEPRECATED. Here for retro-compatibility. get_content_path formerly required providing the
+        workspace id. This route 302-redirects to the right URL.
+        """
+        content = request.current_content
+        raise HTTPFound(
+            "{base_url}contents/{content_id}/path".format(
+                base_url=BASE_API, content_id=content.content_id,
+            )
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
@@ -915,11 +922,20 @@ class WorkspaceController(Controller):
             "/workspaces/{workspace_id}/subscriptions/{user_id}/reject",
             request_method="PUT",
         )
+
         configurator.add_view(self.reject_subscription, route_name="reject_subscription")
+
         # Content path
         configurator.add_route(
-            "get_content_path",
+            "get_content_path", "/contents/{content_id}/path", request_method="GET",
+        )
+        configurator.add_view(self.get_content_path, route_name="get_content_path")
+
+        configurator.add_route(
+            "get_workspace_content_path",
             "/workspaces/{workspace_id}/contents/{content_id}/path",
             request_method="GET",
         )
-        configurator.add_view(self.get_content_path, route_name="get_content_path")
+        configurator.add_view(
+            self.get_workspace_content_path, route_name="get_workspace_content_path"
+        )

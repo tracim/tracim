@@ -4,43 +4,26 @@
   display flex
   justify-content center
   align-items center
-  flex-wrap wrap
-  padding 20px
-  font-size 18px
-  &__wrapper
-    flex-direction column
-    max-width 100%
+  margin-bottom standardSpacing
   &__avatar
-    margin-right 50px
-    img
-      width 100px
-      height 100px
+    margin-inline-end standardSpacing
   &__name
     overflow hidden
     text-overflow ellipsis
-    font-size fontSizeTitle
+    font-size titleFontSize
     font-weight bold
-    span
-      padding-inline-end 10px
-  &__email > a
-    overflow hidden
-    text-overflow ellipsis
-    color fontColor
-    &:hover
-      text-decoration underline
+  &__email
+    margin textSpacing 0
+    & > a
+      overflow hidden
+      text-overflow ellipsis
+      color fontColor
+      &:hover
+        text-decoration underline
+    & > i
+      margin-inline-end textSpacing
   &__username
     overflow hidden
     text-overflow ellipsis
-    span
-      padding-inline-end 10px
-
-@media (max-width: max-xs)
-  .hamburger-box
-    width 45px
-    height 22px
-
-  .userinfo
-    &__avatar
-      margin 0 0 20px 0
-    &__wrapper
-      text-align center
+  &__profile > i
+      margin-inline-end textSpacing

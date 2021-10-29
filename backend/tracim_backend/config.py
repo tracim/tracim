@@ -36,6 +36,7 @@ from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.call import CallProvider
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import WorkspaceAccessType
 
@@ -347,6 +348,8 @@ class CFG(object):
         self._load_content_security_policy_config()
         self.log_config_header("Translation Service config parameters:")
         self._load_translation_service_config()
+        self.log_config_header("Call config parameters:")
+        self._load_call_config()
 
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
@@ -410,7 +413,7 @@ class CFG(object):
         )
         self.WEB__NOTIFICATIONS__EXCLUDED = self.get_raw_config(
             "web.notifications.excluded",
-            "user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*",
+            "user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*",
         )
 
         # base url of the frontend
@@ -894,6 +897,23 @@ class CFG(object):
             ]
         except ValueError:
             raise ConfigurationError("The value of {}.target_languages is malformed".format(prefix))
+
+    def _load_call_config(self) -> None:
+        prefix = "call"
+        self.CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
+        raw_call_provider = self.get_raw_config("{}.provider".format(prefix), "")
+        self.CALL__PROVIDER = CallProvider(raw_call_provider)
+        if self.CALL__ENABLED:
+            self.check_mandatory_param(
+                "CALL__PROVIDER", raw_call_provider, when_str="when call is enabled",
+            )
+        self.CALL__JITSI_MEET__URL = self.get_raw_config("{}.jitsi_meet.url".format(prefix))
+        if self.CALL__ENABLED and self.CALL__PROVIDER == CallProvider.JITSI_MEET:
+            self.check_mandatory_param(
+                "CALL__JITSI_MEET__URL",
+                self.CALL__JITSI_MEET__URL,
+                when_str="when call provider is jitsi_meet",
+            )
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 

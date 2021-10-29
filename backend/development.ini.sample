@@ -477,13 +477,13 @@ website.usage_conditions =
 ### Notifications ###
 # Comma-separated events listed in this setting are not displayed in recent activities and notifications to the user.
 # Possible events are in the form ENTITY_TYPE.EVENT_TYPE or ENTITY_TYPE.EVENT_TYPE.CONTENT_TYPE where:
-# ENTITY_TYPE  = user | workspace | content | mention | workspace_member
+# ENTITY_TYPE  = user_call | user | workspace | content | mention | workspace_member
 # EVENT_TYPE   = created | modified | deleted | undeleted
 # CONTENT_TYPE = html-document | file | thread | folder | comment
 # To include all notifications, use web.notifications.excluded = ""
 # To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
 # will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
-; web.notifications.excluded = user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*
+; web.notifications.excluded = user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*
 
 ### UI Customization
 # These parameters configure the user interface without affecting the backend proper
@@ -853,6 +853,24 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # translation_service.systran.api_key = your-systran-api-key
 
 ## all next lines are not directly concerned by syntax explain in beggining of this file.
+
+####
+# Call service
+####
+
+# This feature allows to call other users by using a third-party call service.
+
+; call.enabled = False
+
+## Call provider, currently only "jitsi_meet" is supported
+; call.provider =
+# example:
+# call.provider = jitsi_meet
+
+## Jitsi Meet configuration parameters
+; call.jitsi_meet.url =
+# example:
+; call.jitsi_meet.url = https://meet.jit.si
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #

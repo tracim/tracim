@@ -4,10 +4,10 @@
   display flex
   flex-direction row
   justify-content space-between
-
+  align-items center
   &__icon
     font-size bigIconSize
-    margin-right 10px
+    margin-right standardSpacing
   &__title
     margin-right auto
     white-space nowrap
@@ -18,22 +18,23 @@
       color inherit
       &:hover
         text-decoration underline fontColor
-
   &__right
-    margin-left 10px
+    margin-left standardSpacing
     text-align right
     align-items flex-end
   &__unavailable
     font-style italic
   &__actionMenu
-    padding 0
-    margin-left 10px
+    &.dropdownMenuButton
+      padding 0 standardSpacing
+      & i
+        width auto
+        margin 0
     &::after
       display none
     &__item
-      padding 10px
+      padding standardSpacing
       border none
-      font-size fontSizeSmall
       & .iconbutton__text
         padding 0
 

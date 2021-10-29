@@ -1,8 +1,6 @@
-
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .file
-  height "calc(100% - %s)" % headerHeight
   &__header
     &__editionmode
       display none
@@ -10,17 +8,18 @@
       color white
   &__lastversionbtn
     cursor pointer
+    margin-right standardSpacing
   &__option
     &__menu
       &__addversion
         padding 8px 15px
         border-width 1px
         border-style solid
-        border-radius 5px
+        border-radius standardBorderRadius
         background-color transparent
         cursor pointer
         & > i
-          margin-left 10px
+          margin-left standardSpacing
   &__contentpage
     width 100%
     &__option
@@ -51,7 +50,7 @@
     &__rightContent
       width 100%
     &__messagelist
-      padding 0 20px 10px
+      padding 0 standardSpacing standardSpacing
   &__previewVideo
     position fixed
     top 0
@@ -102,19 +101,18 @@
         width calc(100% - 30px) // 30px => margin
       &__wrapper
         width calc(100% - 30px) // 30px => margin
-        .timeline
-          &__texteditor
-            &__simpletext
-              display inline-flex
-              width 60%
-            &__submit
-              display inline-flex
-              margin 10px 0
-              &__btn
-                display flex
-                margin-left 35px
-                &__icon
-                  margin-left 15px
+        .commentArea
+          &__simpletext
+            display inline-flex
+            width 60%
+          &__submit
+            display inline-flex
+            margin standardSpacing 0
+            &__btn
+              display flex
+              margin-left 35px
+              &__icon
+                margin-left 15px
       &__statewrapper
         padding 0
 
@@ -164,17 +162,16 @@
         width 100%
       &__wrapper
         width calc(100% - 30px) // 30px => margin
-        .timeline
-          &__texteditor
-            &__simpletext
-              display inline-flex
-              width 60%
-              margin-right 0
-            &__submit
-              display inline-flex
-              margin 10px 0
-              &__btn
-                display flex
-                margin-left 10px
-                &__icon
-                  margin-left 15px
+        .commentArea
+          &__simpletext
+            display inline-flex
+            width 60%
+            margin-right 0
+          &__submit
+            display inline-flex
+            margin standardSpacing 0
+            &__btn
+              display flex
+              margin-left standardSpacing
+              &__icon
+                margin-left 15px

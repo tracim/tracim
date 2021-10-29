@@ -1,6 +1,6 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-tabWidth = 185 //185px
+tabWidth = 160 //160px
 
 .tabBar
   display flex
@@ -19,13 +19,13 @@ tabWidth = 185 //185px
           display none
 
 .tab
-  border-bottom 1px solid grey
+  border-bottom borderStyle
   width (tabWidth)px
   display flex
   align-items center
   justify-content center
-  border-left 1px solid grey
-  padding-top 5px
+  border-left borderStyle
+  padding 5px standardSpacing
   color fontColor
   &__active
     padding-top 0px
@@ -34,7 +34,7 @@ tabWidth = 185 //185px
     border-bottom 1px solid transparent
     background-color veryLightGrey
   .fas, .far
-    margin-right 10px
+    margin-right textSpacing
   // INFO - GB - 2020-11-20 - The style below should be specific to tachometer-alt icon.
   // See https://github.com/tracim/tracim/issues/3863
   .fa-tachometer-alt

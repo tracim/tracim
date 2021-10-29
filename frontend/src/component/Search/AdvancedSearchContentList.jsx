@@ -68,6 +68,7 @@ export const AdvancedSearchContentList = props => {
             read
             contentType={searchItem.contentType}
             isLast={index === resultList.length - 1}
+            isFirst={index === 0}
             key={searchItem.contentId}
           >
             <Link
@@ -75,10 +76,7 @@ export const AdvancedSearchContentList = props => {
               className='advancedSearchContent'
             >
               <div className='advancedSearchContent__wrapper'>
-                <div
-                  className='advancedSearchContent__type__content'
-                  style={{ color: searchItem.contentType.hexcolor }}
-                >
+                <div className='advancedSearchContent__type__content'>
                   <Icon
                     icon={`fa-fw ${searchItem.contentType.faIcon}`}
                     title={props.t(searchItem.contentType.label)}

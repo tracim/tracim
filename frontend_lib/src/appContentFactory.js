@@ -1,5 +1,7 @@
 import React from 'react'
 import i18n from './i18n.js'
+import Autolinker from 'autolinker'
+
 import {
   handleFetchResult,
   APP_FEATURE_MODE,
@@ -9,7 +11,10 @@ import {
   sortTimelineByDate,
   sendGlobalFlashMessage,
   TIMELINE_TYPE,
-  CONTENT_TYPE
+  CONTENT_TYPE,
+  permissiveNumberEqual,
+  getOrCreateSessionClientToken,
+  addRevisionFromTLM
 } from './helper.js'
 
 import {
@@ -29,7 +34,8 @@ import {
 
 import {
   getTranslationApiErrorMessage,
-  TRANSLATION_STATE
+  TRANSLATION_STATE,
+  getDefaultTranslationState
 } from './translation.js'
 
 import {
@@ -47,17 +53,74 @@ import {
   getCommentTranslated,
   postContentToFavoriteList,
   getFavoriteContentList,
-  deleteContentFromFavoriteList
+  deleteContentFromFavoriteList,
+  getContentComment,
+  getFileChildContent
 } from './action.async.js'
+
+import {
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST
+} from './tracimLiveMessage.js'
+
 import { CUSTOM_EVENT } from './customEvent.js'
-import Autolinker from 'autolinker'
 import { isFileUploadInErrorState, uploadFile } from './fileUpload.js'
+import { TracimComponent } from './tracimComponent.js'
+
+export const TIMELINE_ITEM_COUNT_PER_PAGE = 15
+
+const DEFAULT_TIMELINE_STATE = {
+  // INFO - SG - 2021-08-10 - timeline is the portion of wholeTimeline which
+  // is visible to the wrapped component through props.timeline.
+  // wholeTimeline can contain more elements as the timeline is paginated
+  // and comes from 3 different APIs (comments, child files, revisions)
+  timeline: [],
+  wholeTimeline: [],
+  commentPageToken: '',
+  hasMoreComments: true,
+  revisionPageToken: '',
+  hasMoreRevisions: true,
+  filePageToken: '',
+  hasMoreFiles: true,
+  isLastTimelineItemCurrentToken: false,
+  loadingTimeline: true
+}
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
 // For now, I don't have found a good way of checking if it has been done or not.
 export function appContentFactory (WrappedComponent) {
-  return class extends React.Component {
+  class AppContentFactory extends React.Component {
     apiUrl = null
+
+    constructor (props) {
+      super(props)
+      const param = props.data || { content: {} }
+      this.state = {
+        config: param.config,
+        loggedUser: param.loggedUser || props.user,
+        content: param.content,
+        ...DEFAULT_TIMELINE_STATE
+      }
+      this.sessionClientToken = getOrCreateSessionClientToken()
+
+      props.registerLiveMessageHandlerList([
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
+      ])
+
+      // FIXME - GB - 2021-09-08 - The condition below is needed because appContentFactory is used by
+      // frontend components (Publications and FeedItemWithPreview).
+      // Inside the frontend the user is called user and in the apps it is called loggedUser.
+      // Issue to refactor this behavior: https://github.com/tracim/tracim/issues/749
+      const lang = (param.loggedUser || props.user || { lang: 'en' }).lang
+      i18n.changeLanguage(lang)
+    }
 
     checkApiUrl = () => {
       if (!this.apiUrl) {
@@ -66,6 +129,78 @@ export function appContentFactory (WrappedComponent) {
     }
 
     setApiUrl = url => { this.apiUrl = url }
+
+    handleChildContentCreated = (tlm) => {
+      const { state } = this
+      // Not a child of our content
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+
+      const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
+      this.addChildContentToTimeline(
+        tlm.fields.content,
+        state.loggedUser,
+        isFromCurrentToken,
+        getDefaultTranslationState(state.config.system.config)
+      )
+    }
+
+    handleChildContentDeleted = (tlm) => {
+      const { state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      this.setState(prevState => {
+        const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
+        const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
+        return { timeline, wholeTimeline }
+      })
+    }
+
+    handleContentCommentModified = (tlm) => {
+      const { state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      this.setState(prevState => {
+        const wholeTimeline = this.updateCommentOnTimeline(
+          tlm.fields.content,
+          prevState.wholeTimeline,
+          prevState.loggedUser.username
+        )
+        const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length + 1)
+        return { wholeTimeline, timeline }
+      })
+    }
+
+    handleUserModified = tlm => {
+      this.setState(prevState => {
+        const wholeTimeline = prevState.wholeTimeline.map(
+          timelineItem => timelineItem.author.user_id === tlm.fields.user.user_id
+            ? { ...timelineItem, author: tlm.fields.user }
+            : timelineItem
+        )
+        const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length)
+        return { wholeTimeline, timeline }
+      })
+    }
+
+    handleContentModified = (tlm) => {
+      const { state } = this
+      // Not our content
+      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+
+      this.setState(prevState => {
+        const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
+        const wholeTimeline = addRevisionFromTLM(
+          tlm.fields,
+          prevState.wholeTimeline,
+          prevState.loggedUser.lang,
+          isFromCurrentToken
+        )
+
+        return {
+          timeline: this.getTimeline(wholeTimeline, prevState.timeline.length + 1),
+          wholeTimeline,
+          isLastTimelineItemCurrentToken: isFromCurrentToken
+        }
+      })
+    }
 
     // INFO - CH - 2019-01-08 - event called by OpenContentApp to open the show the app if it is already rendered
     appContentCustomEventHandlerShowApp = (newContent, content, setState, buildBreadcrumbs) => {
@@ -114,7 +249,7 @@ export function appContentFactory (WrappedComponent) {
 
     // CH - 2019-31-12 - This event is used to reload all app data. It's not supposed to handle content id change
     appContentCustomEventHandlerReloadAppFeatureData = async (loadContent, loadTimeline) => {
-      await loadContent()
+      loadContent()
       loadTimeline()
     }
 
@@ -232,32 +367,11 @@ export function appContentFactory (WrappedComponent) {
 
       setLocalStorageItem(
         appSlug,
-        content,
+        content.content_id,
+        content.workspace_id,
         LOCAL_STORAGE_FIELD.COMMENT,
         newComment
       )
-    }
-
-    appContentAddCommentAsFile = (fileToUploadList, setState) => {
-      if (!fileToUploadList.length) return
-      setState(prev => {
-        const fileToUploadListWithoutDuplicate = fileToUploadList
-          .filter(fileToAdd =>
-            !prev.newCommentAsFileList.find(fileAdded => fileToAdd.file.name === fileAdded.file.name)
-          )
-        return {
-          newCommentAsFileList: [...prev.newCommentAsFileList, ...fileToUploadListWithoutDuplicate]
-        }
-      })
-    }
-
-    appContentRemoveCommentAsFile = (fileToRemove, setState) => {
-      if (!fileToRemove) return
-      setState(prev => ({
-        newCommentAsFileList: prev.newCommentAsFileList.filter(
-          commentAsFile => commentAsFile.file.name !== fileToRemove.file.name
-        )
-      }))
     }
 
     saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id) => {
@@ -496,7 +610,6 @@ export function appContentFactory (WrappedComponent) {
       ...content,
       timelineType: TIMELINE_TYPE.COMMENT,
       created_raw: content.created,
-      created: displayDistanceDate(content.created, loggedUser.lang),
       raw_content: addClassToMentionsOfUser(content.raw_content, loggedUser.username),
       translatedRawContent: null,
       translationState: initialCommentTranslationState
@@ -563,12 +676,11 @@ export function appContentFactory (WrappedComponent) {
       created: displayDistanceDate(content.created, loggedUser.lang)
     })
 
-    buildTimelineItemRevision = (revision, loggedUser, number) => ({
+    buildTimelineItemRevision = (revision, loggedUser) => ({
       ...revision,
       created_raw: revision.created,
       created: displayDistanceDate(revision.created, loggedUser.lang),
-      timelineType: TIMELINE_TYPE.REVISION,
-      number: number
+      timelineType: TIMELINE_TYPE.REVISION
     })
 
     buildTimelineFromCommentAndRevision = (
@@ -576,7 +688,7 @@ export function appContentFactory (WrappedComponent) {
     ) => {
       const timelineCommentList = commentList.map(c => this.buildTimelineItemComment(c, loggedUser, initialCommentTranslationState))
       const timelineCommentAsFileList = commentAsFileList.map(c => this.buildTimelineItemCommentAsFile(c, loggedUser))
-      const timelineRevisionList = revisionList.map((r, i) => this.buildTimelineItemRevision(r, loggedUser, i + 1))
+      const timelineRevisionList = revisionList.map((r, i) => this.buildTimelineItemRevision(r, loggedUser))
 
       const fullTimeline = [
         ...timelineCommentList,
@@ -585,6 +697,83 @@ export function appContentFactory (WrappedComponent) {
       ]
 
       return sortTimelineByDate(fullTimeline)
+    }
+
+    loadMoreTimelineItems = async (getContentRevision, newContent = null) => {
+      const { props, state } = this
+
+      const content = newContent || state.content
+      const curState = newContent ? DEFAULT_TIMELINE_STATE : state
+      const newItemCount = curState.timeline.length + TIMELINE_ITEM_COUNT_PER_PAGE
+
+      const fetchResult = async (fetchPromise) => {
+        return await handleFetchResult(await fetchPromise)
+      }
+
+      // Get the newest comments, files and revisions from the paginated backend API
+      const [commentsResponse, filesResponse, revisionsResponse] = await Promise.all([
+        fetchResult(getContentComment(this.apiUrl, content.workspace_id, content.content_id, curState.commentPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
+        fetchResult(getFileChildContent(this.apiUrl, content.workspace_id, content.content_id, curState.filePageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'created:desc')),
+        // INFO - 2021/08/17 - S.G. - the order is done with "modified" for revisions as the "created" field is the creation
+        // date of the content, not of a revision (and thus is the same for all revisions of a content).
+        fetchResult(getContentRevision(this.apiUrl, content.workspace_id, content.content_id, curState.revisionPageToken, TIMELINE_ITEM_COUNT_PER_PAGE, 'modified:desc'))
+      ])
+
+      if (!commentsResponse.apiResponse.ok || !filesResponse.apiResponse.ok || !revisionsResponse.apiResponse.ok) {
+        sendGlobalFlashMessage(props.t('Error while loading timeline'))
+        console.error('Error loading timeline', 'comments:', commentsResponse, 'revisions:', revisionsResponse, 'files:', filesResponse)
+        return
+      }
+
+      const newTimeline = this.buildTimelineFromCommentAndRevision(
+        commentsResponse.body.items,
+        filesResponse.body.items,
+        revisionsResponse.body.items,
+        state.loggedUser,
+        getDefaultTranslationState(state.config.system.config)
+      )
+
+      this.setState((prevState) => {
+        const wholeTimeline = sortTimelineByDate([...newTimeline, ...prevState.wholeTimeline])
+        return {
+          commentPageToken: commentsResponse.body.next_page_token,
+          hasMoreComments: commentsResponse.body.has_next,
+          filePageToken: filesResponse.body.next_page_token,
+          hasMoreFiles: filesResponse.body.has_next,
+          revisionPageToken: revisionsResponse.body.next_page_token,
+          hasMoreRevisions: revisionsResponse.body.has_next,
+          wholeTimeline,
+          content,
+          timeline: this.getTimeline(wholeTimeline, newItemCount)
+        }
+      })
+    }
+
+    resetTimeline = () => this.setState(DEFAULT_TIMELINE_STATE)
+
+    loadTimeline = async (getContentRevision, content) => {
+      this.resetTimeline()
+      try {
+        await this.loadMoreTimelineItems(getContentRevision, content)
+      } finally {
+        this.setState({ loadingTimeline: false })
+      }
+    }
+
+    getTimeline = (wholeTimeline, itemCount) => {
+      // INFO - 2021-08-18 - S.G. - timeline is a view of the last "itemCount" items of wholeTimeline.
+      const timelineStartIndex = Math.max(wholeTimeline.length - itemCount, 0)
+      return wholeTimeline.slice(timelineStartIndex)
+    }
+
+    canLoadMoreTimelineItems = () => {
+      const { state } = this
+      return (
+        state.wholeTimeline.length > state.timeline.length ||
+          state.hasMoreComments ||
+          state.hasMoreFiles ||
+          state.hasMoreRevisions
+      )
     }
 
     replaceComment = (comment, timeline) => {
@@ -641,13 +830,25 @@ export function appContentFactory (WrappedComponent) {
       return autoCompleteItemList
     }
 
-    // INFO - CH - 20210318 - This function can add comment and comment as file
-    addCommentToTimeline = (comment, timeline, loggedUser, hasBeenRead, initialCommentTranslationState) => {
-      const commentForTimeline = comment.content_type === TIMELINE_TYPE.COMMENT
-        ? this.buildTimelineItemComment(comment, loggedUser, initialCommentTranslationState)
-        : this.buildTimelineItemCommentAsFile(comment, loggedUser)
+    buildChildContentTimelineItem = (content, loggedUser, initialCommentTranslationState) => {
+      const timelineItem = content.content_type === TIMELINE_TYPE.COMMENT
+        ? this.buildTimelineItemComment(content, loggedUser, initialCommentTranslationState)
+        : this.buildTimelineItemCommentAsFile(content, loggedUser)
+      return timelineItem
+    }
 
-      return sortTimelineByDate([...timeline, commentForTimeline])
+    // INFO - CH - 20210318 - This function can add comment and file
+    addChildContentToTimeline = (content, loggedUser, isFromCurrentToken, initialCommentTranslationState) => {
+      const timelineItem = this.buildChildContentTimelineItem(content, loggedUser, initialCommentTranslationState)
+      this.setState(prevState => {
+        const wholeTimeline = sortTimelineByDate([...prevState.wholeTimeline, timelineItem])
+        const timeline = sortTimelineByDate([...prevState.timeline, timelineItem])
+        return {
+          timeline,
+          wholeTimeline,
+          isLastTimelineItemCurrentToken: isFromCurrentToken
+        }
+      })
     }
 
     updateCommentOnTimeline = (comment, timeline, loggedUserUsername) => {
@@ -665,17 +866,15 @@ export function appContentFactory (WrappedComponent) {
       return newTimeline
     }
 
-    removeCommentFromTimeline = (commentId, timeline) => {
-      return timeline.filter(timelineItem => timelineItem.content_id !== commentId)
-    }
-
-    onHandleTranslateComment = async (comment, workspaceId, lang, setState) => {
-      setState(previousState => {
+    onHandleTranslateComment = async (comment, workspaceId, lang) => {
+      this.setState(previousState => {
+        const wholeTimeline = this.replaceComment(
+          { ...comment, translationState: TRANSLATION_STATE.PENDING },
+          previousState.wholeTimeline
+        )
         return {
-          timeline: this.replaceComment(
-            { ...comment, translationState: TRANSLATION_STATE.PENDING },
-            previousState.timeline
-          )
+          wholeTimeline,
+          timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
         }
       })
       const response = await getCommentTranslated(
@@ -688,38 +887,47 @@ export function appContentFactory (WrappedComponent) {
       const errorMessage = getTranslationApiErrorMessage(response)
       if (errorMessage) {
         sendGlobalFlashMessage(errorMessage, 'warning')
-        setState(previousState => {
+        this.setState(previousState => {
+          const wholeTimeline = this.replaceComment(
+            { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
+            previousState.wholeTimeline
+          )
           return {
-            timeline: this.replaceComment(
-              { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
-              previousState.timeline
-            )
+            wholeTimeline,
+            timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
           }
         })
         return
       }
       const translatedRawContent = await response.text()
-      setState(previousState => {
+      this.setState(previousState => {
+        const wholeTimeline = this.replaceComment(
+          {
+            ...comment,
+            translatedRawContent,
+            translationState: TRANSLATION_STATE.TRANSLATED
+          },
+          previousState.wholeTimeline
+        )
         return {
-          timeline: this.replaceComment(
-            {
-              ...comment,
-              translatedRawContent,
-              translationState: TRANSLATION_STATE.TRANSLATED
-            },
-            previousState.timeline
-          )
+          wholeTimeline,
+          timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
         }
       })
     }
 
-    onHandleRestoreComment = (comment, setState) => {
-      setState(previousState => {
+    onHandleRestoreComment = (comment) => {
+      this.setState(previousState => {
+        const wholeTimeline = this.replaceComment(
+          {
+            ...comment,
+            translationState: TRANSLATION_STATE.UNTRANSLATED
+          },
+          previousState.wholeTimeline
+        )
         return {
-          timeline: this.replaceComment(
-            { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },
-            previousState.timeline
-          )
+          wholeTimeline,
+          timeline: this.getTimeline(wholeTimeline, previousState.timeline.length)
         }
       })
     }
@@ -736,10 +944,8 @@ export function appContentFactory (WrappedComponent) {
           appContentCustomEventHandlerAllAppChangeLanguage={this.appContentCustomEventHandlerAllAppChangeLanguage}
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
-          appContentAddCommentAsFile={this.appContentAddCommentAsFile}
           appContentDeleteComment={this.appContentDeleteComment}
           appContentEditComment={this.appContentEditComment}
-          appContentRemoveCommentAsFile={this.appContentRemoveCommentAsFile}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
@@ -749,17 +955,24 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
           searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-          addCommentToTimeline={this.addCommentToTimeline}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           isContentInFavoriteList={this.isContentInFavoriteList}
           addContentToFavoriteList={this.addContentToFavoriteList}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
-          removeCommentFromTimeline={this.removeCommentFromTimeline}
+          buildChildContentTimelineItem={this.buildChildContentTimelineItem}
           updateCommentOnTimeline={this.updateCommentOnTimeline}
+          timeline={this.state.timeline}
+          loadTimeline={this.loadTimeline}
+          loadMoreTimelineItems={this.loadMoreTimelineItems}
+          resetTimeline={this.resetTimeline}
+          canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
+          isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}
+          loadingTimeline={this.state.loadingTimeline}
         />
       )
     }
   }
+  return TracimComponent(AppContentFactory)
 }

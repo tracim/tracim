@@ -1,5 +1,8 @@
 #!/bin/bash
 
+script_dir=$(realpath $(dirname "$0"))
+DEFAULTDIR=${DEFAULTDIR:-$script_dir}
+
 # Main in bottom
 
 YELLOW='\033[1;33m'
@@ -34,9 +37,10 @@ function create_dir(){
 # Function for backend
 
 function install_backend_system_dep {
-    log "Installing base Debian package dependencies for the backend..."
+    log "Installing system package dependencies for the backend..."
+    system_package_dir="$script_dir/system_packages/debian/"
     $SUDO apt update
-    PACKAGE_LIST='python3 python3-venv python3-dev python3-pip zlib1g-dev libjpeg-dev imagemagick libmagickwand-dev libpq-dev ghostscript libfile-mimeinfo-perl poppler-utils libimage-exiftool-perl qpdf libldap2-dev libsasl2-dev libreoffice inkscape ufraw-batch ffmpeg'
+    PACKAGE_LIST=$(cat "${system_package_dir}/build_backend_packages.list" "${system_package_dir}/run_backend_packages.list" "${system_package_dir}/optional_preview_packages.list")
     $SUDO apt install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
 }
 
@@ -126,15 +130,16 @@ function install_npm_and_nodejs {
         fi
 
         log "Installing npm..."
+        $SUDO apt update
         $SUDO apt install -y curl && loggood "Successfully installed curl" || logerror "Failed to install curl"
-        curl -sL https://deb.nodesource.com/setup_10.x | $SUDOCURL bash -
+        curl -sL https://deb.nodesource.com/setup_14.x | $SUDOCURL bash -
         $SUDO apt update
         $SUDO apt install -y nodejs && loggood "Successfully installed nodejs" || logerror "Failed to install nodejs"
 
-        log "Checking whether Node 10+ is installed..."
+        log "Checking whether Node 14+ is installed..."
         NODE_MAJOR_VERSION=$(node -v | sed -E 's/v([0-9]+)\..+/\1/g')
         if [ $? = "0" ]; then
-            if  [ "$NODE_MAJOR_VERSION" -ge "10" ] ; then
+            if  [ "$NODE_MAJOR_VERSION" -ge "14" ] ; then
                 loggood "Node $NODE_MAJOR_VERSION is correctly installed"
 
                 NPM_VERSION="$(npm -v 2> /dev/null)"
@@ -160,8 +165,8 @@ function translate_email {
 
 ############################################
 
-# Check if not running with sudoers
-if [ "$1" == "root" ]; then
+# Check if running as root
+if [ "$EUID" -eq 0 ]; then
     SUDO=""
     SUDOCURL=""
 else
@@ -169,16 +174,14 @@ else
     SUDOCURL="sudo -E"
 fi
 
-DEFAULTDIR=$(pwd)
-export DEFAULTDIR
-echo "Tracim DEFAULTDIR: $DEFAULTDIR"
-
 install_npm_and_nodejs
-cd "$DEFAULTDIR/backend"  || exit 1
+cd "$script_dir/backend"  || exit 1
 if [ -z "$IGNORE_APT_INSTALL" ]; then
     install_backend_system_dep
 fi
-setup_pyenv
+if [ -z "$DONT_GENERATE_PYENV" ]; then
+    setup_pyenv
+fi
 install_backend_python_packages
 setup_config_file
 create_require_dirs

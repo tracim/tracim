@@ -1,3 +1,5 @@
+// 2021-09-06 - MB - Unstable test. See : https://github.com/tracim/tracim/issues/4905
+
 import { PAGES } from '../../support/urls_commands'
 
 let workspaceId
@@ -6,6 +8,7 @@ const publicationLabel = 'publication'
 
 describe('In recent activities', () => {
   before(function () {
+    this.skip()
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
@@ -21,6 +24,7 @@ describe('In recent activities', () => {
 
   it('should have a specific icon and color for publication', () => {
     cy.contains('.feedItemHeader', publicationLabel)
+      .should('exist')
       .find('.feedItemHeader__icon')
       .should('have.class', 'fa-stream')
       .should('have.css', 'color', 'rgb(102, 31, 152)')
@@ -28,9 +32,10 @@ describe('In recent activities', () => {
 
   it("should have the app's icon and color for other contents", () => {
     cy.contains('.feedItemHeader', threadLabel)
+      .should('exist')
       .find('.feedItemHeader__icon')
       .should('have.class', 'fa-comments')
-      // INFO - GB - 20210323 - see file backend/color-test.json for thread color
-      .should('have.css', 'color', 'rgb(173, 76, 249)')
+      // INFO - GB - 20210323 - see file frontend/dist/assets/branding/color.json for thread color
+      .should('have.css', 'color', 'rgb(66, 139, 202)')
   })
 })

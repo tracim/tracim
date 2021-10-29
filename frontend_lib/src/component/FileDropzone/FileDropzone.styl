@@ -4,17 +4,19 @@
   &__form
     width 100%
     border 1px dashed grey
-    padding 10px 15px
+    padding standardSpacing 15px
+    margin-bottom standardSpacing
     cursor pointer
     &__icon
       margin-top 15px
-      font-size 30px
+      font-size bigIconSize
       & > label
         cursor pointer
     &__instruction
-      font-size 20px
+      font-size standardFontSize
     &__text
       margin-bottom 20px
+      font-size metadataFontSize
   &__preview
     text-align center
     & > img
@@ -22,7 +24,7 @@
       max-height 192px
     &__nopreview
       &-icon
-        font-size 30px
+        font-size bigIconSize
       &-msg
-        margin-top 10px
+        margin-top standardSpacing
         word-break break-word

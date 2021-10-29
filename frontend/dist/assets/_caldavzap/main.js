@@ -2002,7 +2002,7 @@ function setAgendaFullscreen () {
     iframeElement.style.position = 'static'
   } else {
     iframeElement.style.position = 'fixed'
-    iframeElement.style.top = '61px' // 61px is Tracim's header height
+    iframeElement.style.top = '60px' // 60px is Tracim's header height
     iframeElement.style.left = '0px'
     iframeElement.style.zIndex = '40'
   }

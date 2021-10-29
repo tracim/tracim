@@ -36,9 +36,12 @@ node_modules
 /tools_docker/test_docker/test_config.env
 tools_docker/test_docker/__pycache__
 
-# tide & projectile for emacs
+# emacs files
 jsconfig.json
 .projectile
-# emacs save files
 \#*
 .\#*
+.pyroot
+
+# pyenv
+.python-version

@@ -18,18 +18,18 @@
     align-items baseline
     margin-bottom 1.5rem
     &__icon
-      font-size 30px
+      font-size bigIconSize
       margin-left 0.25rem
       margin-right 1rem
     &__name
-      font-size 20px
+      font-size titleFontSize
   &__input
     width 100%
-    border 1px solid grey
-    border-radius 5px
+    border borderStyle
+    border-radius standardBorderRadius
     min-height 38px
     &[type='text']
-      padding-left 10px
+      padding-left standardSpacing
     &>div
       margin 0
       border none
@@ -39,7 +39,7 @@
       outline none
   &__label
     font-weight bold
-    margin 10px 0
+    margin standardSpacing 0
     display flex
     &__info
       margin-left 5px
@@ -57,7 +57,7 @@
     &__left
       margin-right 5px
   &__warningMessage
-    font-size fontSizeSmall
+    font-size metadataFontSize
     margin 5px 0
 
 @media (max-width: max-xs)

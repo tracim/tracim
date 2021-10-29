@@ -5,9 +5,8 @@ import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
-import Button from '../component/common/Input/Button.jsx'
 import { resetBreadcrumbs, setConfig, setHeadTitle } from '../action-creator.sync.js'
-import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, IconButton, PAGE } from 'tracim_frontend_lib'
 import { getConfig } from '../action-creator.async'
 
 export class ForgotPasswordNoEmailNotif extends React.Component {
@@ -65,15 +64,11 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
       <section className='forgotpassword'>
         <Card customClass='forgotpassword__card'>
           <CardHeader customClass='forgotpassword__card__header primaryColorBgLighten text-center'>
-            {props.t('Forgot password')}
+            {props.t('Did you forget your password?')}
           </CardHeader>
 
           <CardBody formClass='forgotpassword__card__body'>
             <div>
-              <div className='forgotpassword__card__body__title'>
-                {props.t('Did you forget your password?')}
-              </div>
-
               <div className='forgotpassword__card__body__submsg'>
                 {props.t("Unfortunately, email notifications aren't activated, we can't send you a reset password email")}.
               </div>
@@ -83,12 +78,13 @@ export class ForgotPasswordNoEmailNotif extends React.Component {
               </div>
 
               <div className='forgotpassword__card__body__btn-no-email'>
-                <Button
-                  htmlType='button'
-                  bootstrapType=''
-                  customClass='highlightBtn primaryColorBg primaryColorBgDarkenHover forgotpassword__card__body__btnsubmit'
-                  label={props.t('Go back to previous page')}
+                <IconButton
+                  customClass='forgotpassword__card__body__btnsubmit'
+                  intent='primary'
+                  mode='light'
                   onClick={this.handleClickBack}
+                  icon='fas fa-arrow-left'
+                  text={props.t('Go back to previous page')}
                 />
               </div>
             </div>

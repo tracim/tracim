@@ -29,18 +29,10 @@ class PopupCreateContent extends React.Component {
           customColor={props.customColor}
           onClose={props.onClose}
           customStyle={props.customStyle}
+          faIcon={props.faIcon}
+          label={props.label}
         >
           <div className='createcontent'>
-            <div className='createcontent__contentname'>
-              <div className='createcontent__contentname__icon'>
-                <i className={`${props.faIcon}`} style={{ color: props.customColor }} />
-              </div>
-
-              <div className='createcontent__contentname__title' style={{ color: props.customColor }}>
-                {props.label}
-              </div>
-            </div>
-
             <form className='createcontent__form' data-cy='createcontent__form'>
               {props.children
                 ? props.children

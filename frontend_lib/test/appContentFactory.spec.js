@@ -1,12 +1,16 @@
 import React from 'react'
 import { expect } from 'chai'
 import sinon from 'sinon'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import { appContentFactory } from '../src/appContentFactory.js'
 import { status } from './fixture/status.js'
-import { commentList as fixtureCommentList } from './fixture/contentCommentList.js'
+import { commentList } from './fixture/contentCommentList.js'
+import { commentTlm } from './fixture/tracimLiveMessage/commentTlm.js'
+import { user } from './fixture/user.js'
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
+import { defaultDebug } from '../src/debug.js'
+import { baseFetch } from '../src/action.async.js'
 import {
   mockGetMyselfKnownMember200,
   mockPutContent200,
@@ -15,7 +19,10 @@ import {
   mockPutContentArchive204,
   mockPutContentDelete204,
   mockPutContentArchiveRestore204,
-  mockPutContentDeleteRestore204
+  mockPutContentDeleteRestore204,
+  mockGetContentComments200,
+  mockGetFileChildContent200,
+  mockGetContentRevisions200
 } from './apiMock.js'
 import { generateLocalStorageContentId } from '../src/localStorage.js'
 
@@ -33,7 +40,9 @@ describe('appContentFactory.js', () => {
 
   const DummyComponent = () => <div>I'm empty</div>
   const WrappedDummyComponent = appContentFactory(DummyComponent)
-  const wrapper = shallow(<WrappedDummyComponent />)
+  const root = mount(<WrappedDummyComponent data={defaultDebug} />)
+  // INFO - 2021-08-17 - S.G. - get the first child as the root is in fact a TracimComponent() HOC.
+  const wrapper = root.childAt(0)
 
   const fakeContent = {
     ...content,
@@ -51,7 +60,10 @@ describe('appContentFactory.js', () => {
 
   describe('The wrapped component', () => {
     it('should have all the new props', () => {
-      expect(wrapper.props()).to.have.all.keys(
+      expect(wrapper.childAt(0).props()).to.include.keys(
+        'registerCustomEventHandlerList',
+        'registerGlobalLiveMessageHandler',
+        'registerLiveMessageHandlerList',
         'setApiUrl',
         'appContentCustomEventHandlerShowApp',
         'appContentCustomEventHandlerHideApp',
@@ -62,12 +74,9 @@ describe('appContentFactory.js', () => {
         'appContentChangeComment',
         'appContentDeleteComment',
         'appContentEditComment',
-        'appContentAddCommentAsFile',
         'appContentNotifyAll',
         'appContentSaveNewComment',
-        'appContentRemoveCommentAsFile',
         'appContentChangeStatus',
-        'addCommentToTimeline',
         'appContentArchive',
         'appContentDelete',
         'appContentRestoreArchive',
@@ -80,8 +89,13 @@ describe('appContentFactory.js', () => {
         'isContentInFavoriteList',
         'loadFavoriteContentList',
         'removeContentFromFavoriteList',
-        'removeCommentFromTimeline',
-        'updateCommentOnTimeline'
+        'updateCommentOnTimeline',
+        'loadTimeline',
+        'canLoadMoreTimelineItems',
+        'loadMoreTimelineItems',
+        'isLastTimelineItemCurrentToken',
+        'resetTimeline',
+        'timeline'
       )
     })
   })
@@ -534,13 +548,8 @@ describe('appContentFactory.js', () => {
       username: 'foo',
       lang: 'en'
     }
-    const commentList = fixtureCommentList
     const fileChildContentList = []
-    const revisionList = fixtureRevisionList.map((revision, i) => ({
-      ...revision,
-      // INFO - CH - 2019-01-14 - ensure that the first revision after creation has all the comments from commentList
-      comment_ids: i === 1 ? commentList.map(comment => comment.content_id) : []
-    }))
+    const revisionList = fixtureRevisionList
     let commentAndRevisionMergedList = []
 
     before(() => {
@@ -552,5 +561,147 @@ describe('appContentFactory.js', () => {
     it('should have merged all the comments and revision at depth 0', () => {
       expect(commentAndRevisionMergedList.length).to.equal(commentList.length + revisionList.length)
     })
+  })
+
+  describe('TLM handlers', () => {
+    describe('handleContentCommentCreated', () => {
+      it('should update the timeline if the tlm is related to the current content', () => {
+        const tlmData = {
+          fields: {
+            content: {
+              ...commentTlm,
+              parent_id: fakeContent.content_id,
+              content_id: 9
+            }
+          }
+        }
+        wrapper.instance().handleChildContentCreated(tlmData)
+        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.exist // eslint-disable-line
+      })
+
+      it('should not update the timeline if the tlm is not related to the current content', () => {
+        const tlmData = {
+          fields: {
+            content: {
+              ...commentTlm,
+              parent_id: fakeContent.content_id + 1,
+              content_id: 12
+            }
+          }
+        }
+        wrapper.instance().handleChildContentCreated(tlmData)
+        expect(wrapper.state().timeline.find(item => item.content_id === tlmData.fields.content.content_id)).to.not.exist // eslint-disable-line
+      })
+    })
+
+    describe('handleUserModified', () => {
+      describe('If the user is the author of a revision or comment', () => {
+        it('should update the timeline with the data of the user', () => {
+          const tlmData = { fields: { user: { ...user, public_name: 'newName' } } }
+          wrapper.instance().handleUserModified(tlmData)
+
+          const listPublicNameOfAuthor = wrapper.state('timeline')
+            .filter(timelineItem => timelineItem.author.user_id === tlmData.fields.user.user_id)
+            .map(timelineItem => timelineItem.author.public_name)
+          const isNewName = listPublicNameOfAuthor.every(publicName => publicName === tlmData.fields.user.public_name)
+          expect(isNewName).to.be.equal(true)
+        })
+      })
+    })
+  })
+
+  describe('Timeline pagination', () => {
+    const getContentRevisionFunc = (apiUrl, workspaceId, contentId, pageToken, count, sort) => {
+      return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${fakeContent.content_type}/${contentId}/revisions?page_token=${pageToken}&count=${count}&sort=${sort}`)
+    }
+
+    const testCases = [
+      {
+        description: 'empty',
+        commentPage: { items: [], has_next: false, next_page_token: '' },
+        fileChildPage: { items: [], has_next: false, next_page_token: '' },
+        revisionPage: { items: [], has_next: false, next_page_token: '' },
+        expectedTimelineLength: 0,
+        expectedWholeTimelineLength: 0,
+        canLoadMoreItems: false
+      },
+      {
+        description: 'less than 15 items',
+        commentPage: {
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
+          has_next: false,
+          next_page_token: ''
+        },
+        fileChildPage: {
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
+          has_next: false,
+          next_page_token: ''
+        },
+        revisionPage: {
+          items: (new Array(4)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
+          has_next: true,
+          next_page_token: 'token'
+        },
+        expectedTimelineLength: 12,
+        expectedWholeTimelineLength: 12,
+        canLoadMoreItems: true
+      },
+      {
+        description: 'more than 15 items',
+        commentPage: {
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
+          has_next: false,
+          next_page_token: ''
+        },
+        fileChildPage: {
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
+          has_next: false,
+          next_page_token: ''
+        },
+        revisionPage: {
+          items: (new Array(10)).fill().map((_, index) => { return { created: `2021-02-12T12:0${index}:00` } }),
+          has_next: false,
+          next_page_token: ''
+        },
+        expectedTimelineLength: 15,
+        expectedWholeTimelineLength: 30,
+        canLoadMoreItems: true
+      }
+    ]
+
+    for (const testCase of testCases) {
+      const getCommentsMock = mockGetContentComments200(
+        fakeApiUrl,
+        fakeContent.workspace_id,
+        fakeContent.content_id,
+        testCase.commentPage,
+        '?page_token=&count=15&sort=created:desc'
+      )
+      const getFileChildMock = mockGetFileChildContent200(
+        fakeApiUrl,
+        fakeContent.workspace_id,
+        fakeContent.content_id,
+        testCase.fileChildPage,
+        '&page_token=&count=15&sort=created:desc'
+      )
+      const getContentRevisionMock = mockGetContentRevisions200(
+        fakeApiUrl,
+        fakeContent.workspace_id,
+        fakeContent.content_type,
+        fakeContent.content_id,
+        testCase.revisionPage,
+        '?page_token=&count=15&sort=modified:desc'
+      )
+      it(`should fetch items and set the timeline state(${testCase.description})`, async () => {
+        wrapper.instance().resetTimeline()
+        await wrapper.instance().loadMoreTimelineItems(getContentRevisionFunc)
+        expect(getCommentsMock.isDone()).to.be.true  // eslint-disable-line
+        expect(getFileChildMock.isDone()).to.be.true  // eslint-disable-line
+        expect(getContentRevisionMock.isDone()).to.be.true  // eslint-disable-line
+        expect(wrapper.instance().state.timeline.length).to.be.equal(testCase.expectedTimelineLength)
+        expect(wrapper.instance().state.wholeTimeline.length).to.be.equal(testCase.expectedWholeTimelineLength)
+        expect(wrapper.instance().canLoadMoreTimelineItems()).to.be.equal(testCase.canLoadMoreItems)
+      })
+    }
   })
 })

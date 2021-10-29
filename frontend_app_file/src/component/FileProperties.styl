@@ -1,46 +1,37 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .fileProperties
-  width calc(100% - 65px) // 65px is the width of the rightPart header
-  padding 10px
-  overflow-x auto
-  &__title
-    margin 10px 15px
-    font-size 20px
   &__content
       width 100%
-      overflow-X hidden
+      overflow-x hidden
       &__detail
         display flex
         flex-direction column
-        padding 15px
+        padding 0px standardSpacing
         &__item
-          margin-bottom 20px
+          margin-bottom standardSpacing
         &__description
           font-weight bold
           &__text
-            margin 10px 0
+            margin-top standardSpacing
+            &:empty
+              display none
           &__editiondesc
-            margin 20px 0
+            margin standardSpacing 0
             textarea
               width 100%
               height 120px
+              border-radius standardBorderRadius
             &__btn
               display flex
               justify-content flex-end
+              margin-top standardSpacing
               &__cancel
-                margin 0 15px 0 0
+                margin-inline-end standardSpacing
                 &:hover
-                  color white
+                  color offWhite
               &__validate:hover
-                color white
+                color offWhite
         &__btndesc
-          margin-top 10px
+          margin-top standardSpacing
           margin-left auto
-
-// MEDIAQUERIES
-
-@media (min-width: min-xs) and (max-width: max-lg)
-  .fileProperties
-    height calc(100% - 65px) // 65px is the width of the rightPart header
-    width 100%

@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 
 import {
   Avatar,
@@ -65,6 +66,14 @@ export const ProfileMainBar = props => {
               </div>
               <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
             </div>
+            {props.system.config.call__enabled && props.user.userId !== props.displayedUser.userId && (
+              <IconButton
+                text={props.t('Call')}
+                icon='fas fa-phone'
+                onClick={props.onClickDisplayCallPopup}
+                customClass='profile__mainBar__callBtn'
+              />
+            )}
           </div>
         )
         : (
@@ -81,7 +90,8 @@ ProfileMainBar.propTypes = {
   breadcrumbsList: PropTypes.array,
   displayedUser: PropTypes.object,
   onChangeAvatarClick: PropTypes.func.isRequired,
-  changeAvatarEnabled: PropTypes.bool
+  changeAvatarEnabled: PropTypes.bool,
+  onClickDisplayCallPopup: PropTypes.func
 }
 
 ProfileMainBar.defaultProps = {
@@ -90,4 +100,8 @@ ProfileMainBar.defaultProps = {
   changeAvatarEnabled: false
 }
 
-export default translate()(ProfileMainBar)
+const mapStateToProps = ({ user, system }) => ({
+  user, system
+})
+
+export default connect(mapStateToProps)(translate()(ProfileMainBar))

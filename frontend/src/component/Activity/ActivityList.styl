@@ -1,29 +1,16 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
-feedWidth = 800px
-smallScreenFeedWidth = 100%
-spacingSize = 10px
 previewHeight = 400px
 
 .activityList
-  background-color veryLightGrey
   display flex
   flex-direction column
-  align-items center
-  width feedWidth
-  padding-bottom spacingSize
 
   &__refresh
     margin-right 0
-    margin-bottom 10px
-
-  &__list
-    display flex
-    width 100%
-    flex-direction column
+    margin-bottom standardSpacing
 
   &__placeholder
-    font-size fontSizeMedium
     text-align center
 
   & .feedItem__preview
@@ -42,6 +29,7 @@ previewHeight = 400px
       height 25%
       width 100%
 
-@media (max-width: max-sm)
-  .activityList
-    width smallScreenFeedWidth
+  & > .iconbutton
+    width fit-content
+    align-self center
+    margin-bottom pageSpacing

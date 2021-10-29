@@ -10,12 +10,12 @@ import {
   Icon,
   IconButton,
   PAGE,
+  COLORS,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   FilenameWithExtension
 } from 'tracim_frontend_lib'
 import TimedEvent from '../TimedEvent.jsx'
-import { publicationColor } from '../../util/helper.js'
 
 require('./FeedItemHeader.styl')
 
@@ -82,7 +82,7 @@ export class FeedItemHeader extends React.Component {
       <div className='feedItemHeader'>
         <Icon
           customClass='feedItemHeader__icon'
-          color={props.isPublication ? publicationColor : app.hexcolor}
+          color={props.isPublication ? COLORS.PUBLICATION : app.hexcolor}
           title={props.isPublication ? props.t('Publication') : app.label}
           icon={`fa-fw ${icon}`}
         />
@@ -167,7 +167,7 @@ export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
   content: PropTypes.object.isRequired,
-  contentAvailable: PropTypes.bool.isRequired,
+  contentAvailable: PropTypes.bool,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   isPublication: PropTypes.bool.isRequired,

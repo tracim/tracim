@@ -23,15 +23,15 @@ describe('Timeline', () => {
   })
 
   it('should have translations', () => {
-    cy.get('.timeline__title').contains('Timeline')
+    cy.contains('.wsContentGeneric__content__right__content__title', 'Timeline')
 
     cy.changeLanguage('fr')
-    cy.get('.timeline__title').contains('Historique')
+    cy.contains('.wsContentGeneric__content__right__content__title', 'Historique')
 
     cy.changeLanguage('pt')
-    cy.get('.timeline__title').contains('Linha cronológica')
+    cy.contains('.wsContentGeneric__content__right__content__title', 'Linha cronológica')
 
     cy.changeLanguage('de')
-    cy.get('.timeline__title').contains('Zeitleiste')
+    cy.contains('.wsContentGeneric__content__right__content__title', 'Zeitleiste')
   })
 })

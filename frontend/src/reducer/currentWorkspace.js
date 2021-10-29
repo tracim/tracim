@@ -14,7 +14,8 @@ import {
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
-  RESTORE
+  RESTORE,
+  WORKSPACE_LOADED
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
@@ -33,7 +34,8 @@ const defaultWorkspace = {
   memberList: [],
   recentActivityList: [],
   contentReadStatusList: [],
-  agendaUrl: ''
+  agendaUrl: '',
+  workspaceLoaded: false
 }
 
 export const serializeWorkspace = ws => {
@@ -80,7 +82,7 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
       }
 
-    // INFO - CH - 2020-06-18 - only difference with SET/WORKSPACE_DETAIL is the if (state.id !== action.workspace.workspace_id
+    // INFO - CH - 2020-06-18 - only difference with SET/WORKSPACE_DETAIL is the if (state.id !== action.workspace.workspace_id)
     // because this action is called by the TLM handler.
     // The SET is used to force a new workspace
     // The UPDATE is to update the same workspace
@@ -215,6 +217,9 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
 
     case `${SET}/${WORKSPACE_AGENDA_URL}`:
       return { ...state, agendaUrl: action.agendaUrl }
+
+    case `${SET}/${WORKSPACE_LOADED}`:
+      return { ...state, workspaceLoaded: true }
 
     case `${UPDATE}/${USER}`:
       if (!state.memberList.some(member => member.id === action.newUser.user_id)) return state

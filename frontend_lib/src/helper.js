@@ -449,13 +449,15 @@ export const parserStringToList = (string, separatorList = [',', ';', '\n']) => 
   return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
 }
 
-// INFO - GB - 2019-07-31 - This function check if the email has three parts arranged like somethig@something.somethig
+// INFO - GB - 2021-09-16 - This function checks if the string looks like an email (username@domain)
+// with a non empty username and a non-empty domain and without <, >, new line, comma or semicolon
+// Warning: These rules are the same in frontend and should be keep synchronised. If you change the rules
+// here, you shoul adapt the class TracimEmailValidator in tracim/backend/tracim_backend/app_models/email_validators.py
 export const checkEmailValidity = email => {
-  const parts = email.split('@')
-  if (parts.length !== 2) return false
-
-  const domainParts = parts[1].split('.')
-  return domainParts.length === 2
+  if (email.includes('<') && email.includes('>')) email = email.substring(email.indexOf('<') + 1, email.lastIndexOf('>'))
+  const firstPart = email.substr(0, email.lastIndexOf('@'))
+  const secondPart = email.substr(email.lastIndexOf('@') + 1)
+  return firstPart !== '' && secondPart !== '' && !/[,;<>\n]/.test(email)
 }
 
 export const buildFilePreviewUrl = (apiUrl, workspaceId, contentId, revisionId, filenameNoExtension, page, width, height) => {
@@ -516,8 +518,10 @@ export const TIMELINE_TYPE = {
 export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => {
     // INFO - CH - 20210322 - since we don't have the millisecond from backend, content created at the same second
-    // may very happen. So we sort on content_id in that case. This isn't ideal
-    if (a.created_raw === b.created_raw) return parseInt(a.content_id) - parseInt(b.content_id)
+    // may very happen. So we sort on revision_id in that case. This isn't ideal
+    // As the aim is to have a stable sort revision_id is used since it is different for every timeline item.
+    // This would not be the case for content_id as it is the same for every revision item.
+    if (a.created_raw === b.created_raw) return parseInt(a.revision_id) - parseInt(b.revision_id)
     return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
   })
 }
@@ -534,8 +538,6 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
     ...revisionObject
   } = data.content
 
-  const revisionNumber = 1 + timeline.filter(tl => tl.timelineType === 'revision').length
-
   return [
     ...timeline,
     {
@@ -545,15 +547,11 @@ export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) =
         avatar_url: data.author.avatar_url,
         user_id: data.author.user_id
       },
-      commentList: [], // INFO - GB - 2020-05-29 For now it is not possible to get commentList and comment_ids via TLM message, and since such properties are not used, we leave them empty.
-      comment_ids: [],
       created: displayDistanceDate(data.content.modified, lang),
       created_raw: data.content.modified,
-      number: revisionNumber,
       revision_id: data.content.current_revision_id,
       revision_type: data.content.current_revision_type,
-      timelineType: TIMELINE_TYPE.REVISION,
-      hasBeenRead: isTokenClient
+      timelineType: TIMELINE_TYPE.REVISION
     }
   ]
 }
@@ -580,7 +578,7 @@ export const serialize = (objectToSerialize, propertyMap) => {
 
 export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline) => {
   if (appFeatureMode === APP_FEATURE_MODE.REVISION) return content.number
-  return timeline.filter(t => t.timelineType === 'revision' && t.hasBeenRead).length
+  return timeline.filter(t => t.timelineType === 'revision').length
 }
 
 export const MINIMUM_CHARACTERS_USERNAME = 3
@@ -765,9 +763,7 @@ export const htmlCodeToDocumentFragment = (htmlCode) => {
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const workspaceId = content.workspace_id || content.workspaceId
   const contentId = content.content_id || content.contentId
-  const fetchGetContentPath = await handleFetchResult(
-    await getContentPath(apiUrl, workspaceId, contentId)
-  )
+  const fetchGetContentPath = await handleFetchResult(await getContentPath(apiUrl, contentId))
 
   switch (fetchGetContentPath.apiResponse.status) {
     case 200:
@@ -804,12 +800,21 @@ export const addExternalLinksIcons = (htmlString) => {
   const doc = getDocumentFromHTMLString(htmlString)
   const locationUrl = new URL(window.location.toString())
   for (const link of doc.getElementsByTagName('a')) {
-    const url = new URL(link.href)
-    if (url.origin === locationUrl.origin) continue
-    const icon = doc.createElement('i')
-    icon.className = 'fas fa-external-link-alt'
-    icon.style = 'margin-inline-start: 5px;'
-    link.appendChild(icon)
+    if (!link.hasAttribute('href')) continue
+    let url
+    try {
+      url = new URL(link.href)
+    } catch (e) {
+      console.error('Error in URL constructor', e)
+      continue
+    }
+
+    if (url.origin !== locationUrl.origin) {
+      const icon = doc.createElement('i')
+      icon.className = 'fas fa-external-link-alt'
+      icon.style = 'margin-inline-start: 5px;'
+      link.appendChild(icon)
+    }
   }
   return doc.body.innerHTML
 }
@@ -822,4 +827,13 @@ export const getDocumentFromHTMLString = (htmlString) => {
   }
 
   return doc
+}
+
+export const USER_CALL_STATE = {
+  IN_PROGRESS: 'in_progress',
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected',
+  DECLINED: 'declined',
+  CANCELLED: 'cancelled',
+  UNANSWERED: 'unanswered'
 }

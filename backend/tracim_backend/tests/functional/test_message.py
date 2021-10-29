@@ -25,6 +25,7 @@ def create_events_and_messages(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.CREATED,
             fields={"example": "hello", "author": {"user_id": 1}},
+            author_id=1,
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -38,6 +39,7 @@ def create_events_and_messages(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.MODIFIED,
             fields={"example": "bar", "author": {"user_id": 2}},
+            author_id=2,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -46,6 +48,7 @@ def create_events_and_messages(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.MODIFIED,
             fields={"example": "event without author", "author": None},
+            author_id=None,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -73,6 +76,7 @@ def create_workspace_messages(
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 1}, "workspace": {"workspace_id": 1}},
             workspace_id=1,
+            author_id=1,
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -87,6 +91,7 @@ def create_workspace_messages(
             operation=tracim_event.OperationType.MODIFIED,
             fields={"author": {"user_id": 2}, "workspace": {"workspace_id": 2}},
             workspace_id=2,
+            author_id=2,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -121,6 +126,8 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 1}, "content": {"content_id": 1, "parent_id": None}},
+            content_id=1,
+            author_id=1,
         )
         session.add(event)
         read_datetime = datetime.datetime.utcnow()
@@ -134,6 +141,9 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 2}, "content": {"content_id": 2, "parent_id": 1}},
+            author_id=2,
+            content_id=2,
+            parent_id=1,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -142,6 +152,8 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.WORKSPACE,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 2}, "content": {"content_id": 3, "parent_id": None}},
+            author_id=2,
+            content_id=3,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -150,6 +162,9 @@ def create_content_messages(
             entity_type=tracim_event.EntityType.CONTENT,
             operation=tracim_event.OperationType.CREATED,
             fields={"author": {"user_id": 2}, "content": {"content_id": 4, "parent_id": 3}},
+            author_id=2,
+            content_id=4,
+            parent_id=3,
         )
         session.add(event)
         messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
@@ -585,6 +600,45 @@ class TestMessages(object):
             "/api/users/1/messages?read_status=read", status=200,
         ).json_body.get("items")
         assert len(message_dicts) == 3
+
+    def test_api__read_content_related_messages__ok_204__nominal_case(
+        self, session, web_testapp
+    ) -> None:
+        """
+        Read all unread messages
+        """
+        create_content_messages(session, unread=True, sent_date=datetime.datetime.utcnow())
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 4
+
+        web_testapp.put("/api/users/1/messages/read?content_ids=1", status=204)
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 3
+        for message in message_dicts:
+            assert message["fields"].get("content", {}).get("content_id") != 1
+
+        web_testapp.put("/api/users/1/messages/read?parent_ids=1", status=204)
+
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 2
+        for message in message_dicts:
+            assert message["fields"].get("content", {}).get("parent_id") != 1
+
+        web_testapp.put("/api/users/1/messages/read?content_ids=3,4", status=204)
+
+        message_dicts = web_testapp.get(
+            "/api/users/1/messages?read_status=unread", status=200,
+        ).json_body.get("items")
+        assert len(message_dicts) == 0
 
     def test_api__read_message__err_400__message_does_not_exist(self, session, web_testapp) -> None:
         """

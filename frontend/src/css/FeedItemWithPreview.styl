@@ -1,17 +1,13 @@
-
-@import '~tracim_frontend_lib/src/css/Variable.styl'
-
 backgroundColor = grey-hover
-spacingSize = 10px
 feedWidth = 800px
 smallScreenFeedWidth = 400px
 
 .feedItem
   background-color backgroundColor
-  border 1px solid grey
-  border-radius 5px
-  padding spacingSize
-  margin-bottom spacingSize
+  border borderStyle
+  padding standardSpacing
+  margin-bottom standardSpacing
+  border-radius standardBorderRadius
   margin-inline-end auto
   margin-inline-start auto
   width feedWidth
@@ -19,17 +15,19 @@ smallScreenFeedWidth = 400px
   &__content
     position relative
     background-color offWhite
-    margin spacingSize 0
-    border-radius 5px
+    margin-top standardSpacing
+    border-radius standardBorderRadius
   & .timeline
     width 100%
     height unset
   &__timeline
-    &__texteditor
-      margin 0
+    &__texteditor.timeline__texteditor
+      margin standardSpacing 0 0
     &__messagelist
       padding 0
   &__publication
+    &__messagelist__item
+      margin-bottom 0
     &.comment
       border 0
       &.sent, &.received

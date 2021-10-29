@@ -1,5 +1,6 @@
 # coding=utf-8
 
+from http import HTTPStatus
 import typing
 
 from pyramid.config import Configurator
@@ -24,12 +25,6 @@ from tracim_backend.views.core_api.schemas import TagSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__TAG_SECTION = "Tags"
 SWAGGER_TAG__TAG_ENDPOINTS = generate_documentation_swagger_tag(
