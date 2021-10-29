@@ -61,6 +61,7 @@
 ### Known Issues
 
 - RAW image previews are broken (issue [#5008](https://github.com/tracim/tracim/issues/5008))
+- Notification call issue (issue [#5044](https://github.com/tracim/tracim/issues/5044))
 
 
 # 3.9.2 / 2021-07-30
