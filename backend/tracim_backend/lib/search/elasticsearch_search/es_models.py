@@ -34,18 +34,31 @@ folding = analyzer("folding", tokenizer="standard", filter=["lowercase", "asciif
 edge_ngram_token_filter = analysis.token_filter(
     "edge_ngram_filter", type="edge_ngram", min_ngram=2, max_gram=20
 )
+# NOTE 2021-11-02 - S.G. - Configuring a maximum length for tokens (e.g. words)
+# so that the following error does not occur:
+# https://stackoverflow.com/questions/24019868/utf8-encoding-is-longer-than-the-max-length-32766
+# It can happen in HTML custom properties as images/video are embedded in it
+# when the custom properties schema does not set '"format"="html"'.
+max_token_length_filter = analysis.token_filter(
+    "max_token_length_filter", type="length", min=0, max=32766
+)
 edge_ngram_folding = analyzer(
     "edge_ngram_folding",
     tokenizer="standard",
-    filter=["lowercase", "asciifolding", edge_ngram_token_filter],
+    filter=[max_token_length_filter, "lowercase", "asciifolding", edge_ngram_token_filter],
 )
 html_folding = analyzer(
     "html_folding",
     tokenizer="standard",
-    filter=["lowercase", "asciifolding", edge_ngram_token_filter],
+    filter=[max_token_length_filter, "lowercase", "asciifolding", edge_ngram_token_filter],
     char_filter="html_strip",
 )
-html_exact_folding = analyzer("html_exact_folding", tokenizer="standard", char_filter="html_strip")
+html_exact_folding = analyzer(
+    "html_exact_folding",
+    tokenizer="standard",
+    filter=[max_token_length_filter],
+    char_filter="html_strip",
+)
 
 
 class SimpleText(Text):
@@ -54,7 +67,7 @@ class SimpleText(Text):
             fields={EXACT_FIELD: Keyword()},
             analyzer=edge_ngram_folding,
             search_analyzer=folding,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -64,7 +77,7 @@ class HtmlText(Text):
             fields={EXACT_FIELD: Text(analyzer=html_exact_folding)},
             analyzer=html_folding,
             search_analyzer=folding,
-            **kwargs
+            **kwargs,
         )
 
 
