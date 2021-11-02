@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from urllib.parse import urlencode
 
+from beaker import cache
 import pytest
 import responses
 
@@ -46,6 +47,26 @@ relative_image_url_opengraph_html = """
 </html>
 """
 
+no_image_url_opengraph_html = """
+<html>
+<header>
+<meta property="og:title" content="Example title of article">
+<meta property="og:site_name" content="example.invalid website">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://example.invalid/example-title-of-article">
+<meta property="og:description" content="This example article is an example of OpenGraph protocol.">
+</header>
+<body>
+</body>
+</html>
+"""
+
+no_image_url_html_result_endpoint = {
+    "title": "Example title of article",
+    "description": "This example article is an example of OpenGraph protocol.",
+    "image": None,
+}
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
@@ -74,11 +95,18 @@ class TestUrlPreview(object):
                 simple_opengraph_html_result_endpoint,
                 id="relative image url",
             ),
+            pytest.param(
+                "http://example.invalid/relative-image-url",
+                no_image_url_opengraph_html,
+                no_image_url_html_result_endpoint,
+                id="no image url",
+            ),
         ),
     )
     def test_api__url_preview__ok_200__nominal_case(
         self, link_name, link_content, endpoint_result, web_testapp,
     ):
+        cache.cache_regions["url_preview"]["enabled"] = False
         responses.add(
             responses.GET,
             link_name,
