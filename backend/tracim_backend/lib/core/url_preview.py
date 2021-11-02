@@ -59,5 +59,5 @@ class URLPreviewLib(object):
             )
         except (WebpreviewException, InvalidURL) as exc:
             raise UnavailableURLPreview('Can\'t generate URL preview for "{}"'.format(url)) from exc
-        image_url = urljoin(url, image_url) if image_url else image_url
+        image_url = urljoin(url, image_url) if image_url else None
         return URLPreview(title=title, description=description, image=image_url)
