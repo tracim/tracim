@@ -81,6 +81,8 @@ jobs:
   plan:
   - get: pull-request
     trigger: true
+    params:
+        list_changed_files: true
 
   - put: abort-running-builds
 
@@ -103,6 +105,8 @@ jobs:
     - get: pull-request
       passed: [reconfigure-self]
       trigger: true
+      params:
+        list_changed_files: true
     - get: test-image
 
   - *pending_status_notification
@@ -165,6 +169,8 @@ jobs:
     - get: pull-request
       passed: [reconfigure-self]
       trigger: true
+      params:
+        list_changed_files: true
     - get: test-image
 
   - *pending_status_notification
@@ -186,6 +192,8 @@ jobs:
     - get: pull-request
       passed: [reconfigure-self]
       trigger: true
+      params:
+        list_changed_files: true
     - get: test-image
 
   - *pending_status_notification
