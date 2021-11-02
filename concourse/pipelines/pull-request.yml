@@ -2,7 +2,7 @@
 definitions:
   main_python_version: &main_python_version "3.9.6"
   python_versions: &python_versions ["3.6.14", "3.7.11", "3.8.11", "3.9.6"]
-  databases: &databases ["sqlite", "postgresql", "mysql", "mariadb"]
+  databases: &databases ["sqlite", "postgresql"]
 
 # plan step to put the current job name as pending in github's PR
 pending_status_notification: &pending_status_notification
