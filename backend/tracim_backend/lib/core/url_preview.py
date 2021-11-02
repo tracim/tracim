@@ -1,4 +1,5 @@
 from typing import Optional
+from urllib.parse import urljoin
 
 from requests.exceptions import InvalidURL
 from webpreview import WebpreviewException
@@ -45,7 +46,7 @@ class URLPreviewLib(object):
     def get_preview(self, url: str) -> URLPreview:
 
         try:
-            title, description, image = web_preview(
+            title, description, image_url = web_preview(
                 url,
                 timeout=self.app_config.URL_PREVIEW__FETCH_TIMEOUT,
                 headers={
@@ -58,4 +59,5 @@ class URLPreviewLib(object):
             )
         except (WebpreviewException, InvalidURL) as exc:
             raise UnavailableURLPreview('Can\'t generate URL preview for "{}"'.format(url)) from exc
-        return URLPreview(title=title, description=description, image=image)
+        image_url = urljoin(url, image_url) if image_url else image_url
+        return URLPreview(title=title, description=description, image=image_url)

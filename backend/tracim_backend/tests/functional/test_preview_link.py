@@ -31,6 +31,21 @@ simple_opengraph_html_result_endpoint = {
     "image": "http://example.invalid/article_thumbnail.jpg",
 }
 
+relative_image_url_opengraph_html = """
+<html>
+<header>
+<meta property="og:title" content="Example title of article">
+<meta property="og:site_name" content="example.invalid website">
+<meta property="og:type" content="article">
+<meta property="og:url" content="http://example.invalid/example-title-of-article">
+<meta property="og:image" content="article_thumbnail.jpg">
+<meta property="og:description" content="This example article is an example of OpenGraph protocol.">
+</header>
+<body>
+</body>
+</html>
+"""
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
@@ -52,6 +67,12 @@ class TestUrlPreview(object):
                 simple_opengraph_html,
                 simple_opengraph_html_result_endpoint,
                 id="simple link with space",
+            ),
+            pytest.param(
+                "http://example.invalid/relative-image-url",
+                relative_image_url_opengraph_html,
+                simple_opengraph_html_result_endpoint,
+                id="relative image url",
             ),
         ),
     )
