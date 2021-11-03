@@ -4,6 +4,7 @@
 
 - Backend: [#5048](https://github.com/tracim/tracim/issues/5048)
 
+
 # 4.0.0 / 2021-10-29
 
 ### New Features
