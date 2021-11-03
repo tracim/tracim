@@ -3,6 +3,9 @@
 ### Fixed Issues
 
 - Backend: [#5048](https://github.com/tracim/tracim/issues/5048)
+- Frontend: [#5049](https://github.com/tracim/tracim/issues/5049)
+[#4895](https://github.com/tracim/tracim/issues/4895)
+
 
 
 # 4.0.0 / 2021-10-29
