@@ -51,6 +51,7 @@ export class OpenContentApp extends React.Component {
         // The app is already open in the same workspace, just request a reload
         // for the new content
         dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
+        await this.readContentNotifications(user.userId, contentToOpen.content_id, parentId)
         return
       }
 
@@ -78,16 +79,21 @@ export class OpenContentApp extends React.Component {
       findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
       contentToOpen
     )
-    const fetchPutContentNotificationAsRead = await dispatch(putContentNotificationAsRead(user.userId, contentToOpen.content_id, parentId))
-    switch (fetchPutContentNotificationAsRead.status) {
-      case 204:
-        dispatch(readContentNotification(contentToOpen.content_id))
-        break
-      default: dispatch(newFlashMessage(t('Error while marking the notification as read'), 'warning'))
-    }
+    await this.readContentNotifications(user.userId, contentToOpen.content_id, parentId)
 
     if (contentToOpen.type !== appOpenedType) {
       this.props.onUpdateAppOpenedType(contentToOpen.type)
+    }
+  }
+
+  readContentNotifications = async (userId, contentId, parentId) => {
+    const { props } = this
+    const fetchPutContentNotificationAsRead = await props.dispatch(putContentNotificationAsRead(userId, contentId, parentId))
+    switch (fetchPutContentNotificationAsRead.status) {
+      case 204:
+        props.dispatch(readContentNotification(contentId))
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }
   }
 
