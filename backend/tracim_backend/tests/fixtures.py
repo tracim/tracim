@@ -501,3 +501,15 @@ def message_helper(session) -> MessageHelper:
 @pytest.fixture
 def html_with_nasty_mention() -> str:
     return "<p> You are not a <img onerror='nastyXSSCall()' alt='member' /> of this workspace <span id='mention-victim'>@victimnotmemberofthisworkspace</span>, are you? </p>"
+
+
+@pytest.fixture
+def html_with_wrong_user_mention() -> str:
+    return (
+        '<p>Bravo <span id="mention-errormention" class="mention">@userthatdoesnotexist</span></p>'
+    )
+
+
+@pytest.fixture
+def html_with_empty_mention() -> str:
+    return '<p>Bravo <span id="mention-emptymention" class="mention"></span></p>'
