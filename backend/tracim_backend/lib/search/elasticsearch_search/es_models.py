@@ -42,6 +42,13 @@ edge_ngram_token_filter = analysis.token_filter(
 max_token_length_filter = analysis.token_filter(
     "max_token_length_filter", type="length", min=0, max=32766
 )
+# NOTE 2021-11-04 - G.M. - Configuring a maximum length for keyword:
+# like tokens, keyword bigger than 32766 will failed, this is the max size accepted for keyword,
+# if text is bigger, keyword will not be stored.
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-above.html
+# ignore above count by character, so for utf-8 8191*4 ( 4 is max byte for utf-8 character) = 32766
+UTF8_MAX_KEYWORD_SIZE = 8191
+
 edge_ngram_folding = analyzer(
     "edge_ngram_folding",
     tokenizer="standard",
@@ -61,10 +68,17 @@ html_exact_folding = analyzer(
 )
 
 
+class SimpleKeyword(Keyword):
+    def __init__(self, **kwargs: dict) -> None:
+        super().__init__(
+            ignore_above=UTF8_MAX_KEYWORD_SIZE, **kwargs,
+        )
+
+
 class SimpleText(Text):
     def __init__(self, **kwargs: dict) -> None:
         super().__init__(
-            fields={EXACT_FIELD: Keyword()},
+            fields={EXACT_FIELD: SimpleKeyword()},
             analyzer=edge_ngram_folding,
             search_analyzer=folding,
             **kwargs,
@@ -85,26 +99,27 @@ class KeywordWithText(Keyword):
     def __init__(self, **kwargs: dict) -> None:
         super().__init__(
             fields={"text": Text(analyzer=edge_ngram_folding, search_analyzer=folding, **kwargs)},
+            ignore_above=UTF8_MAX_KEYWORD_SIZE,
         )
 
 
 class DigestUser(InnerDoc):
     user_id = Integer()
-    public_name = Text(fields={EXACT_FIELD: Keyword()})
+    public_name = Text(fields={EXACT_FIELD: SimpleKeyword()})
     has_avatar = Boolean()
     has_cover = Boolean()
 
 
 class DigestWorkspace(InnerDoc):
     workspace_id = Integer()
-    label = Text(fields={EXACT_FIELD: Keyword()})
+    label = Text(fields={EXACT_FIELD: SimpleKeyword()})
 
 
 class DigestContent(InnerDoc):
     content_id = Integer()
     label = SimpleText()
-    slug = Keyword()
-    content_type = Keyword()
+    slug = SimpleKeyword()
+    content_type = SimpleKeyword()
 
 
 class DigestComments(InnerDoc):
@@ -122,11 +137,11 @@ class FileData(InnerDoc):
     title = Text()
     name = Text()
     author = Text()
-    keywords = Keyword(multi=True)
+    keywords = SimpleKeyword(multi=True)
     date = Date()
-    content_type = Keyword()
+    content_type = SimpleKeyword()
     content_length = Integer()
-    language = Keyword()
+    language = SimpleKeyword()
 
 
 class IndexedContent(Document):
@@ -137,18 +152,18 @@ class IndexedContent(Document):
     Should stay an enhanced version of ContentDigestSchema.
     """
 
-    content_namespace = Keyword()
+    content_namespace = SimpleKeyword()
     content_id = Integer()
     current_revision_id = Integer()
-    current_revision_type = Keyword()
-    slug = Keyword()
+    current_revision_type = SimpleKeyword()
+    slug = SimpleKeyword()
     parent_id = Integer()
     workspace_id = Integer()
     workspace = Object(DigestWorkspace)
     label = SimpleText()
-    content_type = Keyword()
-    sub_content_types = Keyword(multi=True)
-    status = Keyword()
+    content_type = SimpleKeyword()
+    sub_content_types = SimpleKeyword(multi=True)
+    status = SimpleKeyword()
     is_archived = Boolean()
     is_deleted = Boolean()
     is_editable = Boolean()
@@ -270,7 +285,7 @@ def create_indexed_user_class(config: CFG) -> typing.Type[Document]:
 class IndexedWorkspace(Document):
     """Model used for indexing workspaces in elasticsearch."""
 
-    access_type = Keyword()
+    access_type = SimpleKeyword()
     label = SimpleText()
     description = HtmlText()
     workspace_id = Integer()
