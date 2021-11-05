@@ -18,13 +18,16 @@ from tracim_backend.app_models.validator import action_description_validator
 from tracim_backend.app_models.validator import all_content_types_validator
 from tracim_backend.app_models.validator import bool_as_int_validator
 from tracim_backend.app_models.validator import content_global_status_validator
+from tracim_backend.app_models.validator import content_label_length_validator
 from tracim_backend.app_models.validator import content_status_validator
 from tracim_backend.app_models.validator import not_empty_string_validator
 from tracim_backend.app_models.validator import page_token_validator
 from tracim_backend.app_models.validator import positive_int_validator
+from tracim_backend.app_models.validator import reaction_value_length_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
 from tracim_backend.app_models.validator import strictly_positive_int_validator
+from tracim_backend.app_models.validator import tag_length_validator
 from tracim_backend.app_models.validator import user_config_validator
 from tracim_backend.app_models.validator import user_email_validator
 from tracim_backend.app_models.validator import user_lang_validator
@@ -36,6 +39,7 @@ from tracim_backend.app_models.validator import user_role_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
 from tracim_backend.app_models.validator import workspace_access_type_validator
+from tracim_backend.app_models.validator import workspace_label_length_validator
 from tracim_backend.app_models.validator import workspace_subscription_state_validator
 from tracim_backend.lib.translate.translator import AUTODETECT_LANG
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
@@ -1253,7 +1257,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
     label = StrippedString(
         required=False,
         example="My Workspace",
-        validate=not_empty_string_validator,
+        validate=workspace_label_length_validator,
         default=None,
         allow_none=True,
     )
@@ -1305,7 +1309,7 @@ class WorkspaceModifySchema(marshmallow.Schema):
 
 class WorkspaceCreationSchema(marshmallow.Schema):
     label = StrippedString(
-        required=True, example="My Workspace", validate=not_empty_string_validator
+        required=True, example="My Workspace", validate=workspace_label_length_validator
     )
     description = StrippedString(required=True, example="A super description of my workspace.")
     agenda_enabled = marshmallow.fields.Bool(
@@ -1618,7 +1622,7 @@ class ContentCreationSchema(marshmallow.Schema):
         required=True,
         example="contract for client XXX",
         description="Title of the content to create",
-        validate=not_empty_string_validator,
+        validate=content_label_length_validator,
     )
     content_type = StrippedString(
         required=True, example="html-document", validate=all_content_types_validator
@@ -1856,7 +1860,7 @@ class SetCommentSchema(marshmallow.Schema):
 
 
 class SetReactionSchema(marshmallow.Schema):
-    value = StrippedString(example="😀", validate=not_empty_string_validator, required=True,)
+    value = StrippedString(example="😀", validate=reaction_value_length_validator, required=True,)
 
     @post_load()
     def create_reaction(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1864,7 +1868,7 @@ class SetReactionSchema(marshmallow.Schema):
 
 
 class SetTagByNameSchema(marshmallow.Schema):
-    tag_name = StrippedString(example="todo", validate=not_empty_string_validator, required=True)
+    tag_name = StrippedString(example="todo", validate=tag_length_validator, required=True)
 
     @post_load()
     def create_tag(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1876,7 +1880,7 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
         required=False,
         example="contract for client XXX",
         description="New title of the content",
-        validate=not_empty_string_validator,
+        validate=content_label_length_validator,
     )
     description = StrippedString(
         required=False, description="raw text or html description of the content"
