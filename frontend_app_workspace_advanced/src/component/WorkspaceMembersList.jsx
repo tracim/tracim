@@ -79,7 +79,8 @@ export const WorkspaceMembersList = props => {
 
                   <div
                     className='workspace_advanced__userlist__list__item__role'
-                    data-cy={`workspace_advanced__member-${m.user_id}_role`}>
+                    data-cy={`workspace_advanced__member-${m.user_id}_role`}
+                  >
                     {(() => {
                       const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
                       return props.userRoleIdInWorkspace > ROLE.contentManager.id
