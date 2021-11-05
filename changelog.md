@@ -1,3 +1,10 @@
+# 4.0.2 / 2021-11-05
+
+### Fixed Issues
+
+- Frontend: [#5049](https://github.com/tracim/tracim/issues/5049)
+
+
 # 4.0.1 / 2021-11-04
 
 ### Fixed Issues
