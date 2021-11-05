@@ -43,7 +43,7 @@ max_token_length_filter = analysis.token_filter(
     "max_token_length_filter", type="length", min=0, max=32766
 )
 # NOTE 2021-11-04 - G.M. - Configuring a maximum length for keyword:
-# like tokens, keyword bigger than 32766 will failed, this is the max size accepted for keyword,
+# like tokens, keyword bigger than 32766 will fail, this is the max size accepted for keyword,
 # if text is bigger, keyword will not be stored.
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-above.html
 # ignore above count by character, so for utf-8 8191*4 ( 4 is max byte for utf-8 character) = 32766
