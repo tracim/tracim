@@ -37,7 +37,7 @@ edge_ngram_token_filter = analysis.token_filter(
 # NOTE 2021-11-02 - S.G. - Configuring a maximum length for tokens (e.g. words)
 # so that the following error does not occur:
 # https://stackoverflow.com/questions/24019868/utf8-encoding-is-longer-than-the-max-length-32766
-# It can happen in HTML custom properties as images/video are embedded in it
+# It can happen in HTML custom properties in which images or videos are embedded
 # when the custom properties schema does not set '"format"="html"'.
 max_token_length_filter = analysis.token_filter(
     "max_token_length_filter", type="length", min=0, max=32766
