@@ -3,7 +3,7 @@ import { SELECTORS } from '../../support/generic_selector_commands'
 
 // FIIXME - GB - 2021-10-27 - Unstabel test, async problem
 // See https://github.com/tracim/tracim/issues/4995
-describe.skip('Create tags', () => {
+describe('Create tags', () => {
   const fileTitle = 'FileForTags'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'

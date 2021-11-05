@@ -11,7 +11,7 @@ describe('system reducer', () => {
     expect(systemReducer(undefined, {})).to.deep.equal(defaultSystem)
   })
 
-  describe.skip(`should handle ${SET}/${HEAD_TITLE}`, () => {
+  describe(`should handle ${SET}/${HEAD_TITLE}`, () => {
     // TODO - MB - 2021-10-12 - Adapt this U test with the call feature changes, see https://github.com/tracim/tracim/issues/4993
     const newTitle = 'newTitle'
 
