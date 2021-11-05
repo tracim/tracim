@@ -31,6 +31,7 @@ const DropdownMenu = props => {
       <div
         aria-labelledby='dropdownMenuButton'
         className={classnames('dropdownMenu dropdown-menu', props.menuCustomClass)}
+        data-cy='dropdownMenu_items'
       >
         {(props.children.length > 1
           ? props.children.map(child => child && <DropdownMenuItem key={child.key} customClass={props.itemCustomClass}> {child} </DropdownMenuItem>)
