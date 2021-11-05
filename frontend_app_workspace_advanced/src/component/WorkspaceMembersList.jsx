@@ -111,7 +111,7 @@ export const WorkspaceMembersList = props => {
                     ? (
                       <div
                         className='workspace_advanced__userlist__list__item__delete'
-                        data-cy="userlist_delete"
+                        data-cy='userlist_delete'
                         onClick={() => props.onClickDeleteMember(m.user_id)}
                       >
                         <i className='far fa-trash-alt' />
