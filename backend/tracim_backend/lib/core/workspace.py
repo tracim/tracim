@@ -168,8 +168,8 @@ class WorkspaceApi(object):
     ):
         """
         Move workspace.
-        Be carefull, don't set anything in parent_workspace_id
-        will set Workspace at root without any parent.
+        Be careful, not setting parent_workspace_id
+        will move workspace to root, without any parent.
         :param workspace:
         :param parent_workspace_id:
         :param save_now:
