@@ -40,7 +40,7 @@ describe('Space settings in reader mode', () => {
       cy.get('[data-cy=workspace_advanced__member-2_role]')
         .find('[data-cy=dropdownMenu_items]')
         .find('>span')
-        // FIXEME - MP - 05-11-2021 - Add data-cy into theses button
+        // FIXME - MP - 05-11-2021 - Add data-cy into these buttons
         // to not pick the last
         .first().click()
       // NOTE - MP - 05-11-2021 - 1 is the id of GlobalManager
