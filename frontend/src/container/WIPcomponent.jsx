@@ -8,8 +8,6 @@ export class WIPcomponent extends React.Component {
       Home
     }
 
-    // this.props.dispatch(newFlashMessage('TEST', 'info', 0))
-
     const ComponentToDisplay = MyComponent[this.props.match.params.cp]
 
     return (
