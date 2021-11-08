@@ -8,7 +8,6 @@ describe('App Workspace Advanced', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
     })
@@ -17,7 +16,12 @@ describe('App Workspace Advanced', function () {
   beforeEach(function () {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-    cy.contains('.userstatus__role__text', 'Space manager')
+
+    // NOTE - MP - 05-11-2021 - If the page isn't loaded after 30s
+    // there is a problem somewhere
+    cy.get('.userstatus__role__text', { timeout: 30000 })
+      .contains('Space manager')
+
     cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
       .find('.dashboard__workspace__detail__buttons .iconbutton')
       .click()
