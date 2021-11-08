@@ -14,7 +14,7 @@ class MoveSpaceCommand(AppContextCommand):
         parser.add_argument(
             "-w",
             "--workspace_id",
-            help="the workspace id to move",
+            help="Id of the workspace to move",
             dest="workspace_id",
             required=True,
             type=int,
@@ -22,7 +22,7 @@ class MoveSpaceCommand(AppContextCommand):
         parser.add_argument(
             "-p",
             "--new-parent",
-            help="the new parent of workspace id to move",
+            help="Id of the new parent workspace",
             dest="parent_workspace_id",
             required=False,
             default=None,
