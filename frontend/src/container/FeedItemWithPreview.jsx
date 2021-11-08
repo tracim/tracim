@@ -176,14 +176,14 @@ export class FeedItemWithPreview extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
   }
 
-  handleTranslateComment = () => {
+  handleTranslateComment = (languageCode) => {
     const { props, state } = this
     handleTranslateComment(
       FETCH_CONFIG.apiUrl,
       props.content.workspaceId,
       props.content.id,
       this.getFirstComment().content_id,
-      state.translationTargetLanguageCode,
+      languageCode || state.translationTargetLanguageCode,
       props.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, contentTranslationState: translationState })
@@ -191,14 +191,14 @@ export class FeedItemWithPreview extends React.Component {
     )
   }
 
-  handleTranslateHtmlDocument = () => {
+  handleTranslateHtmlDocument = (languageCode = null) => {
     const { props, state } = this
     handleTranslateHtmlContent(
       FETCH_CONFIG.apiUrl,
       props.content.workspaceId,
       props.content.id,
       props.content.currentRevisionId,
-      state.translationTargetLanguageCode,
+      languageCode || state.translationTargetLanguageCode,
       props.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, contentTranslationState: translationState })
@@ -372,7 +372,10 @@ export class FeedItemWithPreview extends React.Component {
                   translationState={state.contentTranslationState}
                   translationTargetLanguageList={props.system.config.translation_service__target_languages}
                   translationTargetLanguageCode={state.translationTargetLanguageCode}
-                  onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                  onChangeTranslationTargetLanguageCode={languageCode => {
+                    this.handleChangeTranslationTargetLanguageCode(languageCode)
+                    this.handleTranslateComment(languageCode)
+                  }}
                   onClickToggleCommentList={this.handleClickToggleComments}
                   discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
                   threadLength={props.commentList.length}
@@ -425,7 +428,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickEditComment={this.handleClickEditComment}
                 onClickValidateNewCommentBtn={this.handleClickSend}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
-                wysiwygId={this.getWysiwygId(props.content.id)}
+                wysiwygIdSelector={this.getWysiwygId(props.content.id)}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 timelineData={this.getTimelineData()}

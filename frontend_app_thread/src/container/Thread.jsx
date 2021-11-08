@@ -472,10 +472,10 @@ export class Thread extends React.Component {
                 workspaceId={state.content.workspace_id}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-                onClickTranslateComment={comment => props.handleTranslateComment(
+                onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
                   comment,
                   state.content.workspace_id,
-                  state.translationTargetLanguageCode
+                  languageCode || state.translationTargetLanguageCode
                 )}
                 onClickRestoreComment={props.handleRestoreComment}
                 onClickEditComment={this.handleClickEditComment}

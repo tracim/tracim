@@ -2,7 +2,7 @@ import { PAGES } from '../../support/urls_commands'
 import { SELECTORS } from '../../support/generic_selector_commands'
 
 describe('Create tags', () => {
-  const fileTitle = 'FileForSwitch'
+  const fileTitle = 'FileForTags'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
 
@@ -45,6 +45,8 @@ describe('Create tags', () => {
 
             // INFO - MP - 2021-10-21 - Create the desired content to test on depending of the testing type
             if (testedContent === 'file') {
+              cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
+              cy.contains('.userstatus__role__text', 'Space manager')
               cy.createFile(fullFilename, contentType, fileTitle, workspaceId).then(({ content_id: contentId }) => {
 
                 cy.visitPage({
@@ -52,16 +54,19 @@ describe('Create tags', () => {
                   params: { workspaceId, contentType: 'file', contentId }
                 })
                 cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
+                cy.contains('.file__contentpage__header__title', fileTitle)
               })
             } else {
               cy.createHtmlDocument('A note', workspaceId).then(({ content_id: contentId }) => {
-
+                cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
+                cy.contains('.userstatus__role__text', 'Space manager')
                 cy.visitPage({
                   pageName: PAGES.CONTENT_OPEN,
                   params: { workspaceId, contentType: 'html-document', contentId }
                 })
+                cy.contains('.html-document__contentpage__edition__header__title', 'A note')
                 cy.waitForTinyMCELoaded()
-                cy.typeInTinyMCE('Bar')
+                  .then(() => cy.typeInTinyMCE('Bar'))
                 cy.get('[data-cy=editionmode__button__submit]').should('be.visible').click()
                 cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
               })

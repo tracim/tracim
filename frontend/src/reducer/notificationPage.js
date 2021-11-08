@@ -1,4 +1,4 @@
-import { uniqBy } from 'lodash'
+import { uniqBy, cloneDeep } from 'lodash'
 import {
   ADD,
   APPEND,
@@ -145,10 +145,12 @@ export const belongsToGroup = (notification, groupedNotification, numberOfCriter
     (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace))) ||
     (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
   ) {
-    groupedNotification.group.push(notification)
+    groupedNotification.group = sortByCreatedDate([notification, ...groupedNotification.group])
     groupedNotification.type =
       `${numberOfCriteria}${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
-    groupedNotification.created = notification.created
+    groupedNotification.created = new Date(notification.created).getTime() < new Date(groupedNotification.created).getTime()
+      ? groupedNotification.created
+      : notification.created
     return true
   }
 }
@@ -255,7 +257,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${ADD}/${NOTIFICATION}`: {
       const notification = serializeNotification(action.notification)
       const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount + 1 : state.unreadMentionCount
-      let newNotificationList = state.list
+      let newNotificationList = cloneDeep(state.list)
       if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
         if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
           newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([notification, ...state.list], 'id'))

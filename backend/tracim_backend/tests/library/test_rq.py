@@ -30,7 +30,7 @@ class TestRQDatabaseWorker(object):
             # need to enqueue by name as enqueuing with get_public_name fails in pytest
             "tracim_backend.tests.library.test_rq.get_public_name",
             1,
-            timeout=self.JOB_EXECUTION_TIMEOUT,
+            job_timeout=self.JOB_EXECUTION_TIMEOUT,
         )
         while not job.result:
             if job.exc_info:

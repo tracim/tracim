@@ -403,10 +403,6 @@
   "Error while saving the comment": "Error while saving the comment",
   "publication list": "publication list",
   "Reorder": "Reorder",
-  "Your text contains mentions that do not match any member of this space:": "Your text contains mentions that do not match any member of this space:",
-  "Validate anyway": "Validate anyway",
-  "Simple edition": "Simple edition",
-  "Advanced edition": "Advanced edition",
   "This space doesn't have a description yet.": "This space doesn't have a description yet.",
   "Space settings": "Space settings",
   "Publish": "Publish",
@@ -428,7 +424,7 @@
   "copied": "copied",
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Download {{filename}}": "Download {{filename}}",
-  "This space does not have any publication yet, create the first publication using the area at the bottom of the page.": "This space does not have any publication yet, create the first publication using the area at the bottom of the page.",
+  "This space does not have any news yet, create the first news post using the area at the bottom of the page.": "This space does not have any news yet, create the first news post using the area at the bottom of the page.",
   "Open as content": "Open as content",
   "New full name:": "New full name:",
   "New username:": "New username:",
@@ -510,5 +506,8 @@
   "Show in news": "Show in news",
   "News": "News",
   "News of {{author}} on {{date}}": "News of {{author}} on {{date}}",
-  "Error while saving new news": "Error while saving new news"
+  "Error while saving new news": "Error while saving new news",
+  " is calling you on Tracim": " is calling you on Tracim",
+  "{{author}} called you": "{{author}} called you",
+  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> "
 }

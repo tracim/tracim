@@ -43,7 +43,7 @@ class TestUserConfigEndpoint(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get("/api/users/{user_id}/config".format(user_id=user_id), status=200)
 
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == {}
+        assert json.loads(res.body)["parameters"] == {}
 
     def test__put_user_config_endpoint_with_update(
         self, user_api_factory: UserApiFactory, web_testapp: TestApp
@@ -78,7 +78,7 @@ class TestUserConfigEndpoint(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get("/api/users/{user_id}/config".format(user_id=user_id), status=200)
 
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == fixture_params1
+        assert json.loads(res.body)["parameters"] == fixture_params1
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         web_testapp.put_json(
@@ -92,7 +92,7 @@ class TestUserConfigEndpoint(object):
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         res = web_testapp.get("/api/users/{user_id}/config".format(user_id=user_id), status=200)
 
-        assert json.loads(res.body, encoding="utf-8")["parameters"] == expected_result
+        assert json.loads(res.body)["parameters"] == expected_result
 
     @pytest.mark.parametrize(
         "user_config",

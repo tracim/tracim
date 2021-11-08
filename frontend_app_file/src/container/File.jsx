@@ -833,10 +833,10 @@ export class File extends React.Component {
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
-            onClickTranslateComment={comment => props.handleTranslateComment(
+            onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
-              state.translationTargetLanguageCode
+              languageCode || state.translationTargetLanguageCode
             )}
             onClickRestoreComment={props.handleRestoreComment}
             onClickEditComment={this.handleClickEditComment}

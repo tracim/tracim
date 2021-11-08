@@ -201,6 +201,19 @@ You will need it each time you need to run the docker.
 rm ~/tracim/secret/password.txt
 ```
 
+#### Troubleshooting
+
+If you encounter problems during the startup of the docker image, you can pass `DEBUG=1` to get additional messages that can help to find the problem cause:
+
+```bash
+docker run \
+    -e DATABASE_TYPE=sqlite \
+    -p 8080:80 \
+    -v ~/tracim/etc:/etc/tracim \
+    -v ~/tracim/var:/var/tracim \
+    -e DEBUG=1
+    algoo/tracim
+```
 
 ### Build images
 

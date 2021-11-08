@@ -1,4 +1,6 @@
 # coding=utf-8
+from http import HTTPStatus
+
 from pyramid.config import Configurator
 
 from tracim_backend.config import CFG
@@ -19,12 +21,6 @@ from tracim_backend.views.core_api.schemas import ResetPasswordCheckTokenSchema
 from tracim_backend.views.core_api.schemas import ResetPasswordModifySchema
 from tracim_backend.views.core_api.schemas import ResetPasswordRequestSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__AUTHENTICATION_ENDPOINTS
-
-try:  # Python 3.5+
-    from http import HTTPStatus
-except ImportError:
-    from http import client as HTTPStatus
-
 
 SWAGGER_TAG__RESET_PASSWORD_SECTION = "Reset Password"
 SWAGGER_TAG__AUTHENTICATION_RESET_PASSWORD_ENDPOINTS = generate_documentation_swagger_tag(

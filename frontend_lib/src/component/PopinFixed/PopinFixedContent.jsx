@@ -70,7 +70,10 @@ class PopinFixedContent extends React.Component {
                         translationState={props.translationState}
                         targetLanguageList={props.translationTargetLanguageList}
                         targetLanguageCode={props.translationTargetLanguageCode}
-                        onChangeTargetLanguageCode={props.onChangeTranslationTargetLanguageCode}
+                        onChangeTargetLanguageCode={languageCode => {
+                          props.onChangeTranslationTargetLanguageCode(languageCode)
+                          props.onClickTranslateDocument(languageCode)
+                        }}
                         onClickTranslate={props.onClickTranslateDocument}
                         onClickRestore={props.onClickRestoreDocument}
                         dataCy='htmlDocumentTranslateButton'

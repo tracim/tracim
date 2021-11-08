@@ -25,11 +25,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   setLocalStorageItem,
@@ -82,9 +78,6 @@ export class HtmlDocument extends React.Component {
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
-      isAutoCompleteActivated: false,
-      autoCompleteCursorPosition: 0,
-      autoCompleteItemList: [],
       invalidMentionList: [],
       oldInvalidMentionList: [],
       showInvalidMentionPopupInComment: false,
@@ -184,20 +177,6 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
-    this.reloadContentWysiwyg()
-  }
-
-  reloadContentWysiwyg () {
-    if (!document.getElementById('wysiwygNewVersion') || this.state.mode !== APP_FEATURE_MODE.EDIT) return
-    globalThis.tinymce.remove('#wysiwygNewVersion')
-    globalThis.wysiwyg('#wysiwygNewVersion',
-      this.state.loggedUser.lang,
-      this.handleChangeText,
-      this.handleTinyMceInput,
-      this.handleTinyMceKeyDown,
-      this.handleTinyMceKeyUp,
-      this.handleTinyMceSelectionChange
-    )
   }
 
   componentDidMount () {
@@ -208,21 +187,12 @@ export class HtmlDocument extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
-
-    const becameVisible = !prevState.isVisible && state.isVisible
-
     // console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.loadContent()
-      this.reloadContentWysiwyg()
-    }
-
-    if (state.mode === APP_FEATURE_MODE.EDIT && (becameVisible || prevState.mode !== APP_FEATURE_MODE.EDIT)) {
-      globalThis.tinymce.remove('#wysiwygTimelineComment')
-      this.reloadContentWysiwyg()
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
@@ -230,47 +200,6 @@ export class HtmlDocument extends React.Component {
     } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) {
       globalThis.tinymce.remove('#wysiwygTimelineComment')
     }
-  }
-
-  handleTinyMceInput = (e, position) => {
-    tinymceAutoCompleteHandleInput(
-      e,
-      (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  handleTinyMceSelectionChange = (e, position) => {
-    tinymceAutoCompleteHandleSelectionChange(
-      (state) => { this.setState({ ...state, tinymcePosition: position }) },
-      this.searchForMentionOrLinkInQuery,
-      this.state.isAutoCompleteActivated
-    )
-  }
-
-  handleTinyMceKeyUp = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyUp(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      this.searchForMentionOrLinkInQuery
-    )
-  }
-
-  handleTinyMceKeyDown = event => {
-    const { state } = this
-
-    tinymceAutoCompleteHandleKeyDown(
-      event,
-      this.setState.bind(this),
-      state.isAutoCompleteActivated,
-      state.autoCompleteCursorPosition,
-      state.autoCompleteItemList,
-      this.searchForMentionOrLinkInQuery
-    )
   }
 
   componentWillUnmount () {
@@ -347,28 +276,24 @@ export class HtmlDocument extends React.Component {
     const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const oldInvalidMentionList = getInvalidMentionList(rawContentBeforeEdit, knownMentions)
 
-    this.setState(previousState => {
-      return {
-        mode: modeToRender,
-        content: {
-          ...resHtmlDocument.body,
-          raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
-            ? localStorageRawContent
-            : rawContentBeforeEdit
-        },
-        newComment: localStorageComment || '',
-        rawContentBeforeEdit: rawContentBeforeEdit,
-        translationState: getDefaultTranslationState(previousState.config.system.config),
-        translatedRawContent: null,
-        oldInvalidMentionList: oldInvalidMentionList,
-        loadingContent: false
-      }
-    })
+    this.setState(previousState => ({
+      mode: modeToRender,
+      content: {
+        ...resHtmlDocument.body,
+        raw_content: modeToRender === APP_FEATURE_MODE.EDIT && hasLocalStorageRawContent
+          ? localStorageRawContent
+          : rawContentBeforeEdit
+      },
+      newComment: localStorageComment || '',
+      rawContentBeforeEdit: rawContentBeforeEdit,
+      translationState: getDefaultTranslationState(previousState.config.system.config),
+      translatedRawContent: null,
+      oldInvalidMentionList: oldInvalidMentionList,
+      loadingContent: false
+    }))
 
     this.setHeadTitle(resHtmlDocument.body.label)
     this.buildBreadcrumbs(resHtmlDocument.body)
-    this.reloadContentWysiwyg()
-
     await putHtmlDocRead(state.config.apiUrl, state.loggedUser, state.content.workspace_id, state.content.content_id) // mark as read after all requests are finished
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} }) // await above makes sure that we will reload workspace content after the read status update
   }
@@ -736,14 +661,14 @@ export class HtmlDocument extends React.Component {
     ))
   }
 
-  handleTranslateDocument = () => {
+  handleTranslateDocument = (languageCode = null) => {
     const { state } = this
     handleTranslateHtmlContent(
       state.config.apiUrl,
       state.content.workspace_id,
       state.content.content_id,
       state.content.current_revision_id,
-      state.translationTargetLanguageCode,
+      languageCode || state.translationTargetLanguageCode,
       state.config.system.config,
       ({ translatedRawContent = state.translatedRawContent, translationState }) => {
         this.setState({ translatedRawContent, translationState })
@@ -798,10 +723,10 @@ export class HtmlDocument extends React.Component {
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
-            onClickTranslateComment={comment => props.handleTranslateComment(
+            onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
-              state.translationTargetLanguageCode
+              languageCode || state.translationTargetLanguageCode
             )}
             onClickRestoreComment={props.handleRestoreComment}
             onClickEditComment={this.handleClickEditComment}
@@ -915,17 +840,20 @@ export class HtmlDocument extends React.Component {
             https://github.com/tracim/tracim/issues/1840
           */}
           <HtmlDocumentComponent
-            editionAuthor={state.editionAuthor}
-            invalidMentionList={state.invalidMentionList}
-            mode={state.mode}
             apiUrl={state.config.apiUrl}
             customColor={state.config.hexcolor}
+            contentId={state.content.content_id}
+            contentType={CONTENT_TYPE.HTML_DOCUMENT}
+            disableValidateBtn={(content) => state.rawContentBeforeEdit === content}
+            editionAuthor={state.editionAuthor}
+            invalidMentionList={state.invalidMentionList}
+            isVisible={state.isVisible}
+            lang={state.loggedUser.lang}
+            mode={state.mode}
             wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
-            disableValidateBtn={state.rawContentBeforeEdit === state.content.raw_content}
             onClickValidateBtn={this.handleClickSaveDocument}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
-            onChangeText={this.handleChangeText}
             isArchived={state.content.is_archived}
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
@@ -936,10 +864,6 @@ export class HtmlDocument extends React.Component {
             onClickShowDraft={this.handleClickNewVersion}
             key='html-document'
             isRefreshNeeded={state.showRefreshWarning}
-            isAutoCompleteActivated={state.isAutoCompleteActivated}
-            tinymcePosition={state.tinymcePosition}
-            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            autoCompleteItemList={state.autoCompleteItemList}
             onClickAutoCompleteItem={(mention) => tinymceAutoCompleteHandleClickItem(mention, this.setState.bind(this))}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
@@ -949,6 +873,8 @@ export class HtmlDocument extends React.Component {
             showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
+            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+            workspaceId={state.content.workspace_id}
           />
 
           <PopinFixedRightPart

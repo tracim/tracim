@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
+import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
 import { isEqual } from 'lodash'
@@ -147,8 +147,10 @@ export class Tracim extends React.Component {
     const { props } = this
     const bell = '🔔'
     const isMainTab = this.liveMessageManager.eventSource !== null
+    const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
+      const notification = new Notification(tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim'), notificationOptions)
       this.setState({ userCall: tlm.fields.user_call })
       this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
       if (!isMainTab) return
@@ -157,8 +159,16 @@ export class Tracim extends React.Component {
         this.play()
       }, false)
       this.audioCall.play()
+      if (Notification.permission === 'granted') {
+        return notification
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(function (permission) {
+          if (permission === 'granted') {
+            return notification
+          }
+        })
+      }
     }
-
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       this.setState({ userCall: tlm.fields.user_call })
     }
@@ -541,6 +551,19 @@ export class Tracim extends React.Component {
 
   render () {
     const { props, state } = this
+    let callLink
+
+    if (state.userCall) {
+      const userCalleeName = state.userCall.callee.public_name
+      const userCallUrl = state.userCall.url
+      callLink = (
+        <Trans>
+          <span> {{ userCalleeName }} has accepted your call. If the call has not opened click on this
+            <a href={userCallUrl} target='_blank' rel='noopener noreferrer'> link </a>
+          </span>&nbsp;
+        </Trans>
+      )
+    }
 
     if (props.user.logged === null) return null // @TODO show loader
 
@@ -615,6 +638,7 @@ export class Tracim extends React.Component {
           </CardPopup>
         )}
 
+        {/* INFO - MP - 2021-10-15: Call popup */}
         {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.IN_PROGRESS && (
           <CardPopup
             customClass=''
@@ -647,6 +671,7 @@ export class Tracim extends React.Component {
             </div>
           </CardPopup>
         )}
+        {/* INFO - MP - 2021-10-15: Declined popup */}
         {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.REJECTED && (
           <CardPopup
             customClass='callpopup__body'
@@ -654,8 +679,10 @@ export class Tracim extends React.Component {
             onClose={this.handleClosePopup}
             label={props.t('Call declined by {{username}}', { username: state.userCall.callee.public_name })}
             faIcon='fas fa-phone-slash'
+            displayCloseButton
           />
         )}
+        {/* INFO - MP - 2021-10-15: Call back later popup */}
         {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.DECLINED && (
           <CardPopup
             customClass='callpopup__body'
@@ -663,8 +690,10 @@ export class Tracim extends React.Component {
             onClose={this.handleClosePopup}
             label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
             faIcon='fas fa-phone-slash'
+            displayCloseButton
           />
         )}
+        {/* INFO - MP - 2021-10-15: Call failed popup */}
         {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.UNANSWERED && (
           <CardPopup
             customClass='callpopup__body'
@@ -672,6 +701,7 @@ export class Tracim extends React.Component {
             onClose={this.handleClosePopup}
             label={props.t('Call failed')}
             faIcon='fas fa-phone-slash'
+            displayCloseButton
           >
             <div className='callpopup__text'>
               {props.t('The call with {{username}} failed', { username: state.userCall.callee.public_name })}
@@ -689,13 +719,15 @@ export class Tracim extends React.Component {
             </div>
           </CardPopup>
         )}
-        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.DECLINED && (
+        {/* INFO - MB - 2021-10-26: Accepted popup */}
+        {state.userCall && (state.userCall.caller.user_id === props.user.userId) && state.userCall.state === USER_CALL_STATE.ACCEPTED && (
           <CardPopup
             customClass='callpopup__body'
             customHeaderClass='primaryColorBg'
             onClose={this.handleClosePopup}
-            label={props.t('{{username}} will call you back later', { username: state.userCall.callee.public_name })}
-            faIcon='fas fa-phone-slash'
+            label={callLink}
+            faIcon='fas fa-phone'
+            displayCloseButton
           />
         )}
 
@@ -857,7 +889,7 @@ export class Tracim extends React.Component {
         </div>
         {state.tooManyUsers && (
           <div className='tracim__pageBlock'>
-            <CardPopup hideCloseBtn customHeaderClass='bg-danger'>
+            <CardPopup displayCrossButton={false} customHeaderClass='bg-danger'>
               <div className='tracim__pageBlock__cardPopupContent'>
                 <div className='tracim__pageBlock__cardPopupContent__message'>
                   {props.t('You have reached the authorised number of simultaneous users. Please contact your administrator.')}
