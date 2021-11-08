@@ -26,7 +26,7 @@ describe('Space settings in reader mode', () => {
         .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
 
-      // NOTE - MP - 05-11-2021 - Add a tag to test the tag manipulation
+      // NOTE - MP - 05-11-2021 - Test the tag manipulation
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.get('[data-cy=add_tag]').type('Tag')
       cy.get('[data-cy=validate_tag]').click()
