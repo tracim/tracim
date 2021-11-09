@@ -343,7 +343,7 @@
   "in {{ count }} space": "in {{ count }} space",
   "in {{ count }} space_plural": "in {{ count }} spaces",
   "Upload an image": "Upload an image",
-  "Recommended dimensions:": "Recommended dimensions:",
+  "Recommended dimensions: {{dimensions}} px": "Recommended dimensions: {{dimensions}} px",
   "Change avatar": "Change avatar",
   "Maximum size: {{size}} MB": "Maximum size: {{size}} MB",
   "Registration date:": "Registration date:",

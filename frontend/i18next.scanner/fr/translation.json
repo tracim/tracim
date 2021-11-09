@@ -348,7 +348,7 @@
   "in {{ count }} space": "dans {{ count }} espace",
   "in {{ count }} space_plural": "dans {{ count }} espaces",
   "Upload an image": "Téléverser une image",
-  "Recommended dimensions:": "Dimensions recommandées :",
+  "Recommended dimensions: {{dimensions}} px": "Dimensions recommandées : {{dimensions}} px",
   "Registration date:": "Date d'inscription :",
   "Change avatar": "Changer l'avatar",
   "Maximum size: {{size}} MB": "Taille maximale: {{size}} Mo",

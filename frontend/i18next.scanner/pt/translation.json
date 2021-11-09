@@ -338,7 +338,7 @@
   "Results for: {{keywords}}": "Resultados para: {{keywords}}",
   "Filter": "Filtrar",
   "Search filters": "Filtros de pesquisa",
-  "Recommended dimensions:": "Dimensões recomendadas",
+  "Recommended dimensions: {{dimensions}} px": "Dimensões recomendadas: {{dimensions}} px",
   "Filters": "Filtros",
   "Title and path": "Título e caminho",
   "Name": "Nome",

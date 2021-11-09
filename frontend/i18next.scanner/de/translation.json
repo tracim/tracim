@@ -306,7 +306,7 @@
   "in {{ count }} space": "in {{ count }} Bereich",
   "in {{ count }} space_plural": "in {{ count }} Bereichen",
   "Upload an image": "Ein Bild hochladen",
-  "Recommended dimensions:": "Empfohlene Abmessungen:",
+  "Recommended dimensions: {{dimensions}} px": "Empfohlene Abmessungen: {{dimensions}} px",
   "Change avatar": "Avatar ändern",
   "Maximum size: {{size}} MB": "Maximale Größe: {{size}} MB",
   "Registration date:": "Datum der Registrierung:",
