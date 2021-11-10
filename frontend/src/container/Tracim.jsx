@@ -40,12 +40,12 @@ import {
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,
-  unLoggedAllowedPageList,
-  getUserProfile,
-  toggleFavicon,
   FETCH_CONFIG,
   SEARCH_TYPE,
-  WELCOME_ELEMENT_ID
+  WELCOME_ELEMENT_ID,
+  getUserProfile,
+  toggleFavicon,
+  unLoggedAllowedPageList
 } from '../util/helper.js'
 import {
   logoutUser,
@@ -549,6 +549,14 @@ export class Tracim extends React.Component {
     }))
   }
 
+  // INFO - MP - 2021-11-10 - Helper function
+  // Return the current time HH:mm
+  getHoursAndMinutes = () => {
+    const date = new Date()
+    const toReturn = date.toLocaleString(this.props.user.lang, { hour: '2-digit', minute: '2-digit' })
+    return toReturn
+  }
+
   render () {
     const { props, state } = this
     let callLink
@@ -677,7 +685,7 @@ export class Tracim extends React.Component {
             customClass='callpopup__body'
             customHeaderClass='primaryColorBg'
             onClose={this.handleClosePopup}
-            label={props.t('Call declined by {{username}}', { username: state.userCall.callee.public_name })}
+            label={props.t('Call declined by {{username}} at {{time}}', { username: state.userCall.callee.public_name, time: this.getHoursAndMinutes() })}
             faIcon='fas fa-phone-slash'
             displayCloseButton
           />
@@ -699,7 +707,7 @@ export class Tracim extends React.Component {
             customClass='callpopup__body'
             customHeaderClass='primaryColorBg'
             onClose={this.handleClosePopup}
-            label={props.t('Call failed')}
+            label={props.t('Call failed at {{time}}', { time: this.getHoursAndMinutes() })}
             faIcon='fas fa-phone-slash'
             displayCloseButton
           >
