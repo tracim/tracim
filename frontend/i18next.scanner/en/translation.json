@@ -342,7 +342,6 @@
   "{{ count }} intervention _plural": "{{ count }} interventions ",
   "in {{ count }} space": "in {{ count }} space",
   "in {{ count }} space_plural": "in {{ count }} spaces",
-  "Upload an image": "Upload an image",
   "Recommended dimensions: {{dimensions}} px": "Recommended dimensions: {{dimensions}} px",
   "Change avatar": "Change avatar",
   "Maximum size: {{size}} MB": "Maximum size: {{size}} MB",
@@ -509,5 +508,13 @@
   "Error while saving new news": "Error while saving new news",
   " is calling you on Tracim": " is calling you on Tracim",
   "{{author}} called you": "{{author}} called you",
-  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> "
+  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ",
+  "Drag and drop your file here": "Drag and drop your file here",
+  "You can also import your file by clicking here": "You can also import your file by clicking here",
+  "The type of this file is not allowed": "The type of this file is not allowed",
+  "The file is too big": "The file is too big",
+  "Select an image": "Select an image",
+  "Crop the image": "Crop the image",
+  "Back": "Back",
+  "Uploading…": "Uploading…"
 }

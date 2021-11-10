@@ -357,7 +357,6 @@
   "{{ count }} intervention _plural": "{{ count }} intervenções ",
   "in {{ count }} space": "em {{ count }} espaço",
   "in {{ count }} space_plural": "em {{ count }} espaços",
-  "Upload an image": "Carregar imagem",
   "Change avatar": "Mudar avatar",
   "Maximum size: {{size}} MB": "Tamanho máximo: {{size}} MB",
   "Registration date:": "Data de subscrição:",
@@ -509,5 +508,13 @@
   "Error while saving new news": "Erro ao salvar a nova notícia",
   " is calling you on Tracim": " está a chamar-lhe no Tracim",
   "{{author}} called you": "{{author}} chamou-te",
-  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{ userCalleeName }}</1> aceitou a sua chamada. Se a chamada não tiver sido aberta, clique neste<3> link </3></0>"
+  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{ userCalleeName }}</1> aceitou a sua chamada. Se a chamada não tiver sido aberta, clique neste<3> link </3></0>",
+  "Drag and drop your file here": "__NOT_TRANSLATED__",
+  "You can also import your file by clicking here": "__NOT_TRANSLATED__",
+  "The type of this file is not allowed": "__NOT_TRANSLATED__",
+  "The file is too big": "__NOT_TRANSLATED__",
+  "Select an image": "__NOT_TRANSLATED__",
+  "Crop the image": "__NOT_TRANSLATED__",
+  "Back": "__NOT_TRANSLATED__",
+  "Uploading…": "__NOT_TRANSLATED__"
 }
