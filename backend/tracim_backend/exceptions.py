@@ -541,7 +541,7 @@ class CannotUseBothIncludeAndExcludeWorkspaceUsers(TracimException):
 
 
 class PageNotFound(TracimException):
-    pass
+    error_code = ErrorCode.PAGE_NOT_FOUND
 
 
 class AppDoesNotExist(TracimException):
