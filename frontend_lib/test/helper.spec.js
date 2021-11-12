@@ -4,6 +4,7 @@ import {
   checkEmailValidity,
   createSpaceTree,
   convertBackslashNToBr,
+  formatAbsoluteDate,
   handleFetchResult,
   hasSpaces,
   generateFetchResponse,
@@ -354,6 +355,24 @@ describe('helper.js', () => {
     })
   })
 
+  describe('formatAbsoluteDate', () => {
+    it('Should return a french format date', () => {
+      expect(formatAbsoluteDate(new Date(), 'fr')).to.be.equal = new Date().toLocaleString('fr')
+    })
+
+    it('Should return an english format date', () => {
+      expect(formatAbsoluteDate(new Date(), 'en')).to.be.equal = new Date().toLocaleString('en')
+    })
+
+    it('Should return only time using options', () => {
+      expect(
+        formatAbsoluteDate(
+          new Date(), 'en', { hour: '2-digit', minute: '2-digit' }
+        )
+      ).to.be.equal = new Date().toLocaleString('en', { hour: '2-digit', minute: '2-digit' })
+    })
+  })
+
   describe('the permissiveNumberEqual function', () => {
     const testCases = [
       {
@@ -403,7 +422,7 @@ describe('helper.js', () => {
   })
 
   describe('createSpaceTree', () => {
-    it('should return a empty array if spaceList is empty', () => {
+    it('should return an empty array if spaceList is empty', () => {
       expect(createSpaceTree([])).to.be.deep.equal([])
     })
 
