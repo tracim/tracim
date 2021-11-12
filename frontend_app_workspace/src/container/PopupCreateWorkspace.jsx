@@ -10,6 +10,7 @@ import {
   handleFetchResult,
   ROLE_LIST,
   sortWorkspaceList,
+  sendGlobalFlashMessage,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
@@ -71,15 +72,6 @@ export class PopupCreateWorkspace extends React.Component {
     i18n.changeLanguage(data)
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   componentDidMount () {
     this.getTypeList()
   }
@@ -123,7 +115,7 @@ export class PopupCreateWorkspace extends React.Component {
           this.setState({ parentOptions: spaceList, newParentSpace: spaceList[0], isFirstStep: false })
           break
         }
-        default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
+        default: sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
       }
     } else this.setState({ isFirstStep: true })
   }
@@ -154,13 +146,13 @@ export class PopupCreateWorkspace extends React.Component {
 
       case 400:
         switch (fetchPostSpace.body.code) {
-          case 2001: this.sendGlobalFlashMessage(props.t('Some input are invalid')); break
-          case 3007: this.sendGlobalFlashMessage(props.t('A space with that name already exists')); break
-          case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
+          case 2001: sendGlobalFlashMessage(props.t('Some input are invalid')); break
+          case 3007: sendGlobalFlashMessage(props.t('A space with that name already exists')); break
+          case 6001: sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
+          default: sendGlobalFlashMessage(props.t('Error while saving new space')); break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
+      default: sendGlobalFlashMessage(props.t('Error while saving new space')); break
     }
   }
 
@@ -181,7 +173,7 @@ export class PopupCreateWorkspace extends React.Component {
         })
         break
       }
-      default: this.sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
+      default: sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
     }
   }
 

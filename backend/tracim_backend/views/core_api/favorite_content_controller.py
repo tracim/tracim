@@ -109,8 +109,7 @@ class FavoriteContentController(Controller):
             show_deleted=True,
             show_archived=True,
         )
-        content = api.get_one(content_id=request.current_content.content_id)
-        api.remove_favorite(content, do_save=True)
+        api.remove_favorite(hapic_data.path.content_id, do_save=True)
 
     def bind(self, configurator: Configurator):
         # Get Favorites content
