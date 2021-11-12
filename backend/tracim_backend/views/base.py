@@ -10,4 +10,4 @@ class BaseController(Controller):
         raise PageNotFound("{} is not a valid path".format(request.path)) from context
 
     def bind(self, configurator: Configurator) -> None:
-        configurator.add_notfound_view(self.not_found_view)
+        configurator.add_notfound_view(self.not_found_view, append_slash=True)
