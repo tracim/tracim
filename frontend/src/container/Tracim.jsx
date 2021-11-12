@@ -25,6 +25,7 @@ import {
   CUSTOM_EVENT,
   PROFILE,
   NUMBER_RESULTS_BY_PAGE,
+  formatAbsoluteDate,
   serialize,
   CardPopup,
   IconButton,
@@ -552,9 +553,7 @@ export class Tracim extends React.Component {
   // INFO - MP - 2021-11-10 - Helper function
   // Return the current time HH:mm
   getHoursAndMinutes = () => {
-    const date = new Date()
-    const toReturn = date.toLocaleString(this.props.user.lang, { hour: '2-digit', minute: '2-digit' })
-    return toReturn
+    return formatAbsoluteDate(new Date(), this.props.user.lang, { hour: '2-digit', minute: '2-digit' })
   }
 
   render () {
