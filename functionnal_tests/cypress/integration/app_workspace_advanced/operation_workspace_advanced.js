@@ -67,8 +67,9 @@ describe('App Workspace Advanced', function () {
     })
   })
 
-  describe('Member list of the workspace', () => {
+  describe.skip('Member list of the workspace', () => {
     // NOTE - MP - 05-11-2021 - 2 users: GlobalManager and Jhon Doe
+    // FIXME - MB - Unstable test https://github.com/tracim/tracim/issues/5091
     let numberOfUserInWorkSpace = 2
     let userId = 0
     let userPublicName = ''
