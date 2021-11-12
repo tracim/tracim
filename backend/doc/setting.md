@@ -473,8 +473,8 @@ To enable online edition on Tracim and allow communication with your edition sof
 
 First you need to enable the edition on the API:
 
-    collaborative_document_edition.activated = True
-    collaborative_document_edition.software = collabora`
+    app_enabled = collaborative_document_edition
+    collaborative_document_edition.software = collabora
 
 Then you need to indicate the ip adress of the server for the protocol `WOPI`:
 
@@ -496,7 +496,34 @@ But you can change the default directory to use your templates files:
 Filenames of the templates inside the directory are not relevant. Only their extensions matter and need to match the software's default extensions.
 For instance, `CODE` edits `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
 
-After all these changes in the configuration, you should restart all  process (web, webdav, etc...).
+After all these changes in the configuration, you should restart every process (web, webdav, etc...).
+
+## Call (Tracim v4.0+)
+
+### Configuring Tracim in `development.ini`
+To enable the call feature on Tracim.
+
+First you need to enable the call feature:
+
+    call.enabled = True
+
+#### Mandatory parameters
+Then select a profider:
+
+    call.provider = jitsi_meet
+
+Tracim is only supporting jitsi so far.
+
+Once you have selected a provider you will have to select an url:
+
+    call.jitsi_meet.url = https://meet.jit.si
+
+#### Facultative parameters
+You can specify the time (in ms) before the call is considered unanswered:
+
+    call.unanswered_timeout = 30000
+
+The default value is 30 seconds.
 
 ## User Custom Properties
 

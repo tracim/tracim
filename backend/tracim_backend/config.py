@@ -906,7 +906,7 @@ class CFG(object):
         self.CALL__JITSI_MEET__URL = self.get_raw_config("{}.jitsi_meet.url".format(prefix))
         self.CALL__PROVIDER = CallProvider(raw_call_provider)
         self.CALL__UNANSWERED_TIMEOUT = asint(
-            self.get_raw_config("{}.unanswered_timeout".format(prefix), "20000")
+            self.get_raw_config("{}.unanswered_timeout".format(prefix), "30000")
         )
         if self.CALL__ENABLED:
             self.check_mandatory_param(

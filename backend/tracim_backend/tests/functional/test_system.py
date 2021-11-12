@@ -290,7 +290,7 @@ class TestConfigCallJitsi(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/config", status=200)
         assert res.json_body["call__enabled"] is True
-        assert res.json_body["call__unanswered_timeout"] == 20000
+        assert res.json_body["call__unanswered_timeout"] == 30000
 
 
 @pytest.mark.usefixtures("base_fixture")
