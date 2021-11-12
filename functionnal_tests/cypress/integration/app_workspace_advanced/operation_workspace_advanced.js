@@ -67,7 +67,8 @@ describe('App Workspace Advanced', function () {
     })
   })
 
-  describe('Member list', () => {
+  describe.skip('Member list', () => {
+    // FIXME - MB - Unstable test https://github.com/tracim/tracim/issues/5091
     let userId = 0
     let userPublicName = ''
     let userEmail = ''
