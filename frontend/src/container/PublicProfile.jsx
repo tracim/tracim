@@ -58,7 +58,6 @@ const POPUP_DISPLAY_STATE = {
 }
 const AVATAR_IMAGE_DIMENSIONS = '100x100'
 const COVER_IMAGE_DIMENSIONS = '1300x150'
-const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
@@ -159,7 +158,7 @@ export class PublicProfile extends React.Component {
       const { props, state } = this
       props.dispatch(putSetOutgoingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.UNANSWERED))
     }
-    const id = setTimeout(setUserCallUnanswered, UNANSWERED_CALL_TIMEOUT)
+    const id = setTimeout(setUserCallUnanswered, props.system.config.call__unanswered_timeout)
     this.setState({ unansweredCallTimeoutId: id })
   }
 
@@ -526,5 +525,5 @@ export class PublicProfile extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user }) => ({ breadcrumbs, user })
+const mapStateToProps = ({ breadcrumbs, user, system }) => ({ breadcrumbs, user, system })
 export default connect(mapStateToProps)(translate()(TracimComponent(PublicProfile)))
