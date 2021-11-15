@@ -64,9 +64,9 @@ class PopupSelectImage extends React.Component {
     // INFO - SG - 2021-11-09 - ensure the blob represented by imageBlobURL
     // is properly de-allocated when the component is destroyed
     const { state } = this
-    if (!state.imageBlobURL) return
-    console.log(`Revoking object URL ${state.imageBlobURL}`)
-    URL.revokeObjectURL(state.imageBlobURL)
+    if (state.imageBlobURL) {
+      URL.revokeObjectURL(state.imageBlobURL)
+    }
   }
 
   handleDropFile = async (droppedFileList, rejectedFileList, event) => {
@@ -104,7 +104,7 @@ class PopupSelectImage extends React.Component {
     props.onValidate(blob)
   }
 
-  handleBack = async () => {
+  handleBack = () => {
     this.setState({ mode: MODE.SELECT })
   }
 
@@ -131,7 +131,7 @@ class PopupSelectImage extends React.Component {
             </Dropzone>
             {props.recommendedDimensions && (
               <div>
-                <i className='fas fa-fw fa-expand-arrows-alt' /> {props.t('Recommended dimensions: {{dimensions}} px', { dimensions: props.recommendedDimensions })}<br />
+                <i className='fas fa-fw fa-expand-arrows-alt' /> {props.t('Recommended dimensions: {{dimensions}} px', { dimensions: props.recommendedDimensions })}
               </div>
             )}
             <div><i className='far fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: props.maximumImageSize / (1024 * 1024) })}</div>
