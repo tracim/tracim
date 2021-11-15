@@ -117,12 +117,16 @@ const addNewNotificationGroup = (notification, newNotificationList, indexInNewLi
 
       for (let i = 0; i < (numberOfNotificationsToGroup - 1); i++) newNotificationList.pop()
       const notificationGroupList = sortByCreatedDate([notification, ...previousNotificationList])
+      const groupedByContent = `${numberOfCriteria}
+                                ${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}
+                                ${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}
+                                ${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
 
       newNotificationList.push({
         author: authorList,
         created: notificationGroupList[0].created,
         id: notification.id,
-        type: `${numberOfCriteria}${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`,
+        type: groupedByContent,
         group: notificationGroupList
       })
     }

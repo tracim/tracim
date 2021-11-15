@@ -8,7 +8,7 @@ requires = [
     "plaster_pastedeploy",
     "pyramid <2.0",
     "pyramid_debugtoolbar",
-    "pyramid_retry",
+    "pyramid_retry<2.0",
     "waitress",
     # Database
     "pyramid_tm",
