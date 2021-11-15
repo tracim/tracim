@@ -509,12 +509,12 @@
   " is calling you on Tracim": " está a chamar-lhe no Tracim",
   "{{author}} called you": "{{author}} chamou-te",
   "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{ userCalleeName }}</1> aceitou a sua chamada. Se a chamada não tiver sido aberta, clique neste<3> link </3></0>",
-  "Drag and drop your file here": "__NOT_TRANSLATED__",
-  "You can also import your file by clicking here": "__NOT_TRANSLATED__",
-  "The type of this file is not allowed": "__NOT_TRANSLATED__",
-  "The file is too big": "__NOT_TRANSLATED__",
-  "Select an image": "__NOT_TRANSLATED__",
-  "Crop the image": "__NOT_TRANSLATED__",
-  "Back": "__NOT_TRANSLATED__",
-  "Uploading…": "__NOT_TRANSLATED__"
+  "Drag and drop your file here": "Arrastar e largar o seu ficheiro aqui",
+  "You can also import your file by clicking here": "Também pode importar seu ficheiro clicando aqui",
+  "The type of this file is not allowed": "O tipo deste ficheiro não é permitido",
+  "The file is too big": "O ficheiro é demasiado grande",
+  "Select an image": "Seleccione uma imagem",
+  "Crop the image": "Recortar a imagem",
+  "Back": "Voltar",
+  "Uploading…": "Carregando..."
 }
