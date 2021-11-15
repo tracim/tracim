@@ -513,8 +513,8 @@
   "You can also import your file by clicking here": "Sie können Ihre Datei auch importieren, indem Sie hier klicken",
   "The type of this file is not allowed": "Die Art dieser Datei ist nicht erlaubt",
   "The file is too big": "Die Datei ist zu groß",
-  "Select an image": "__NOT_TRANSLATED__",
-  "Crop the image": "__NOT_TRANSLATED__",
-  "Back": "__NOT_TRANSLATED__",
-  "Uploading…": "__NOT_TRANSLATED__"
+  "Select an image": "Wählen Sie ein Bild",
+  "Crop the image": "Das Bild zuschneiden",
+  "Back": "Zurück",
+  "Uploading…": "Hochladen…"
 }
