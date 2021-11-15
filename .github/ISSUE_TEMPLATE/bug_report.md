@@ -10,17 +10,19 @@ assignees: ""
 <!-- Explain: -->
 <!-- - the bug and what is going wrong. -->
 <!-- - what needs to be done to consider the bug solved. -->
+<!-- - what would you have expected from tracim in this situation. -->
 
 <!-- If you know which component may be affected, feel free to mention it. -->
 
 ### How to reproduce
 
 <!-- Detail steps to reproduce the bug: -->
-
+<!-- If possible explain whether the bug is systematically occuring or if it is random. -->
 1. Go to…
 2. Click on…
 3. Scroll down to…
 
+<!-- Optionally, if you know how to get them through the browser's developer tools, please include console logs written during the bug occurence. You can also include HTTP responses which have a 4xx or 5xx error code. -->
 
 ### Version information
 
@@ -31,9 +33,10 @@ assignees: ""
 - Version: [e.g. 22, latest]
 - Device / System: [e.g. PC, iPhone 6]
 
-## Screenshots
+### Screenshots
 
 <!-- Help us understand the problem with screenshots. You can use [peek](https://github.com/phw/peek) to generate animated GIFs. -->
+<!-- Take care of not revealing sensitive data in those screenshots/videos. -->
 
 ________________________________________________
 <!-- *The following sections are for the maintainers* -->
