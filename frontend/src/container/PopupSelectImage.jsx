@@ -61,7 +61,7 @@ class PopupSelectImage extends React.Component {
   }
 
   componentWillUnmount () {
-    // INFO - SG - 20211109 - ensure the blob represented by imageBlobURL
+    // INFO - SG - 2021-11-09 - ensure the blob represented by imageBlobURL
     // is properly de-allocated when the component is destroyed
     const { state } = this
     if (!state.imageBlobURL) return
