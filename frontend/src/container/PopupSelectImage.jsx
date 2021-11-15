@@ -83,16 +83,7 @@ class PopupSelectImage extends React.Component {
       return
     }
 
-    this.setState({ imageBlobURL: URL.createObjectURL(file) })
-    // NOTE - 2021-11-10 - SG - Directly go to crop when the file has
-    // been added through a click + file selector.
-    // Going to crop in case of a drag event is handled by handleDragLeave()
-    // so that cypress upload() command properly works in functional tests.
-    if (!(event instanceof DragEvent)) this.setState({ mode: MODE.CROP })
-  }
-
-  handleDragLeave = () => {
-    this.setState({ mode: MODE.CROP })
+    this.setState({ imageBlobURL: URL.createObjectURL(file), mode: MODE.CROP })
   }
 
   handleValidate = async () => {
@@ -123,7 +114,6 @@ class PopupSelectImage extends React.Component {
           <>
             <Dropzone
               onDrop={this.handleDropFile}
-              onDragLeave={this.handleDragLeave}
               multiple={false}
               className='PopupSelectImage__dropZone'
             >
