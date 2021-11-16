@@ -214,6 +214,11 @@ describe('<Publications />', () => {
   })
 
   describe('handleClickValidateAnyway()', () => {
+    global.localStorage = {
+      getItem: sinon.spy(),
+      setItem: sinon.spy(),
+      removeItem: sinon.spy()
+    }
     it('should call appendPublication()', (done) => {
       publicationInstance.handleClickValidateAnyway().then(() => {
         expect(appendPublicationCallBack.called).to.equal(true)

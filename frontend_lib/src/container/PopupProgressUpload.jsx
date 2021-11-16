@@ -11,6 +11,7 @@ export const PopupProgressUpload = props =>
     customColor={props.color}
     onClose={() => {}}
     displayCrossButton={false}
+    label={props.label}
   >
     <div className='uploadPopup__body'>
       <ProgressBar
