@@ -13,7 +13,8 @@ import {
   PAGE,
   setupCommonRequestHeaders,
   createFileUpload,
-  isFileUploadInList
+  isFileUploadInList,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import ImportConfirmation from '../component/GuestPage/ImportConfirmation.jsx'
 import UploadForm from '../component/GuestPage/UploadForm.jsx'
@@ -74,13 +75,13 @@ class GuestUpload extends React.Component {
         break
       case 400:
         switch (response.json.code) {
-          case 1008: this.sendGlobalFlashMessage(props.t('Error, this link is invalid or has expired')); break
-          default: this.sendGlobalFlashMessage(props.t('Error in the URL')); break
+          case 1008: sendGlobalFlashMessage(props.t('Error, this link is invalid or has expired')); break
+          default: sendGlobalFlashMessage(props.t('Error in the URL')); break
         }
         props.history.push(PAGE.LOGIN)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading upload information'))
+        sendGlobalFlashMessage(props.t('Error while loading upload information'))
         props.history.push(PAGE.LOGIN)
     }
   }
@@ -92,15 +93,6 @@ class GuestUpload extends React.Component {
       this.setHeadTitle()
     }
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   setHeadTitle = () => {
     const { props } = this
@@ -215,11 +207,11 @@ class GuestUpload extends React.Component {
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
-              case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
-              case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
-              case 6003: this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
-              case 6004: this.sendGlobalFlashMessage(props.t('Upload impossible, the destination storage capacity has been reached')); break
-              default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
+              case 3002: sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+              case 6002: sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
+              case 6003: sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
+              case 6004: sendGlobalFlashMessage(props.t('Upload impossible, the destination storage capacity has been reached')); break
+              default: sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
             this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
             break
@@ -228,17 +220,17 @@ class GuestUpload extends React.Component {
             const jsonResult403 = JSON.parse(xhr.responseText)
             switch (jsonResult403.code) {
               case 2053:
-                this.sendGlobalFlashMessage((props.t('Invalid password')))
+                sendGlobalFlashMessage((props.t('Invalid password')))
                 this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
                 break
               default:
-                this.sendGlobalFlashMessage((props.t('Error while uploading file')))
+                sendGlobalFlashMessage((props.t('Error while uploading file')))
                 this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
             }
             break
           }
           default:
-            this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+            sendGlobalFlashMessage(props.t('Error while uploading file'))
             this.setState({ progressUpload: { display: this.UPLOAD_STATUS.BEFORE_LOAD, percent: 0 } })
         }
       }

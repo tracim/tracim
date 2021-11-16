@@ -16,6 +16,7 @@ import {
   checkUsernameValidity,
   deleteWorkspace,
   getWorkspaceMemberList,
+  sendGlobalFlashMessage,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
@@ -138,15 +139,6 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: type || 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = (title) => {
     const { state } = this
 
@@ -185,7 +177,7 @@ export class AdminWorkspaceUser extends React.Component {
         }))
         break
       }
-      default: this.sendGlobalFlashMsg(props.t('Error while loading spaces list', 'warning'))
+      default: sendGlobalFlashMessage(props.t('Error while loading spaces list'))
     }
   }
 
@@ -201,7 +193,7 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   displayErrorFetchingUserList () {
-    this.sendGlobalFlashMsg(this.props.t('Error while loading users list'), 'warning')
+    sendGlobalFlashMessage(this.props.t('Error while loading users list'))
   }
 
   loadUserContent = async () => {
@@ -258,7 +250,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
     if (deleteWorkspaceResponse.status !== 204) {
-      this.sendGlobalFlashMsg(props.t('Error while deleting space'), 'warning')
+      sendGlobalFlashMessage(props.t('Error while deleting space'))
     }
     this.handleClosePopupDeleteWorkspace()
   }
@@ -415,7 +407,7 @@ export class AdminWorkspaceUser extends React.Component {
     const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, userId))
 
     if (toggleUser.status !== 204) {
-      this.sendGlobalFlashMsg(props.t('Error while enabling or disabling user'), 'warning')
+      sendGlobalFlashMessage(props.t('Error while enabling or disabling user'))
     }
   }
 
@@ -425,7 +417,7 @@ export class AdminWorkspaceUser extends React.Component {
     const endPoint = userId === state.loggedUser.userId ? putMyselfProfile : putUserProfile
     const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, userId, newProfile))
     if (toggleManager.status !== 204) {
-      this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
+      sendGlobalFlashMessage(props.t('Error while saving new profile'))
     }
   }
 
@@ -433,26 +425,26 @@ export class AdminWorkspaceUser extends React.Component {
     const { props, state } = this
 
     if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
-      this.sendGlobalFlashMsg(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
-        'warning')
-      return
+      sendGlobalFlashMessage(
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+      )
+      return -1
     }
 
     if (!state.config.system.config.email_notification_activated || password !== '') {
       if (password === '') {
-        this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
-        return
+        sendGlobalFlashMessage(props.t('Please set a password'))
+        return -2
       }
 
       if (password.length < 6) {
-        this.sendGlobalFlashMsg(props.t('New password is too short (minimum 6 characters)'), 'warning')
-        return
+        sendGlobalFlashMessage(props.t('New password is too short (minimum 6 characters)'))
+        return -3
       }
 
       if (password.length > 512) {
-        this.sendGlobalFlashMsg(props.t('New password is too long (maximum 512 characters)'), 'warning')
-        return
+        sendGlobalFlashMessage(props.t('New password is too long (maximum 512 characters)'))
+        return -4
       }
     }
 
@@ -462,32 +454,32 @@ export class AdminWorkspaceUser extends React.Component {
 
     switch (newUserResult.apiResponse.status) {
       case 200:
-        this.sendGlobalFlashMsg(
+        sendGlobalFlashMessage(
           state.config.system.config.email_notification_activated
             ? props.t('User created and email sent')
             : props.t('User created'),
           'info'
         )
-        return true
+        return 1
       case 400:
         switch (newUserResult.body.code) {
           case 2001:
-            if (newUserResult.body.details.email) this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning')
-            if (newUserResult.body.details.username) this.sendGlobalFlashMsg(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
-            else this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+            if (newUserResult.body.details.email) sendGlobalFlashMessage(props.t('Error, invalid email address'))
+            if (newUserResult.body.details.username) sendGlobalFlashMessage(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
+            else sendGlobalFlashMessage(props.t('Error while saving new user'))
             break
           case 2062:
-            this.sendGlobalFlashMsg(
+            sendGlobalFlashMessage(
               props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
             )
             break
-          case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
-          default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+          case 2036: sendGlobalFlashMessage(props.t('Email already exists')); break
+          default: sendGlobalFlashMessage(props.t('Error while saving new user'))
         }
-        return false
+        return -5
       default:
-        this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
-        return false
+        sendGlobalFlashMessage(props.t('Error while saving new user'))
+        return -6
     }
   }
 
@@ -572,7 +564,7 @@ export class AdminWorkspaceUser extends React.Component {
     try {
       this.setState(await checkUsernameValidity(state.config.apiUrl, newUsername, props))
     } catch (errorWhileChecking) {
-      this.sendGlobalFlashMsg(errorWhileChecking.message)
+      sendGlobalFlashMessage(errorWhileChecking.message)
     }
   }
 

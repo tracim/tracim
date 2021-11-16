@@ -29,10 +29,9 @@ describe('Note/html document translation', function () {
     cy.contains('.wsContentHtmlDocument__contentpage__textnote', 'Hello, world')
   })
 
-  it('a menu should allow to change the target language', () => {
+  it('a menu should allow to change the target language and translate in one click', () => {
     cy.get('[data-cy=htmlDocumentTranslateButton__languageMenu]').click()
     cy.get('[data-cy=htmlDocumentTranslateButton__language__fr]').click()
-    cy.get('[data-cy=htmlDocumentTranslateButton]').click()
     cy.contains('.wsContentHtmlDocument__contentpage__textnote', 'fr')
   })
 })

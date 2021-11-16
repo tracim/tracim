@@ -1,7 +1,11 @@
 import React from 'react'
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
-import { handleFetchResult, getWorkspaceMemberList } from 'tracim_frontend_lib'
+import {
+  handleFetchResult,
+  getWorkspaceMemberList,
+  sendGlobalFlashMessage
+} from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 
@@ -17,24 +21,14 @@ export class UsersSelectField extends React.Component {
 
   componentDidMount = () => {
     this.fetchUsers().catch((r) => {
-      this.sendGlobalFlashMessage('Error while fetching users')
+      sendGlobalFlashMessage('Error while fetching users')
     })
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   fetchUsers = async () => {
     const formContext = this.props.formContext
     if (formContext.apiUrl === undefined && formContext.workspaceId === undefined) return
     const fetchUsersResponse = await handleFetchResult(await getWorkspaceMemberList(formContext.apiUrl, formContext.workspaceId))
-    // const fetchUsersResponse = await handleFetchResult(await getMyselfKnownMember(formContext.apiUrl, formContext.userId))
     switch (fetchUsersResponse.apiResponse.status) {
       case 200 :
         this.setState({
@@ -45,7 +39,7 @@ export class UsersSelectField extends React.Component {
         })
         break
       default :
-        this.sendGlobalFlashMessage('Error while fetch users')
+        sendGlobalFlashMessage('Error while fetch users')
         break
     }
   }

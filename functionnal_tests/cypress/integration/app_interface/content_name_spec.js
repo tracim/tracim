@@ -33,7 +33,8 @@ describe("A content's name inside an app", () => {
       pageName: PAGES.CONTENT_OPEN,
       params: { workspaceId: workspaceId, contentType: 'file', contentId: fileId }
     })
-    cy.get('[data-cy="dropdownContentButton"]').click()
+    cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle).should('be.visible')
+    cy.get('[data-cy="dropdownContentButton"]').should('be.visible').click()
     cy.get('[data-cy="newVersionBtn"]').click()
     cy.dropFixtureInDropZone(fullFilename, contentType, '.filecontent__form', fullFilename)
     cy.get('.file__contentpage__dropzone__btn__validate').click()

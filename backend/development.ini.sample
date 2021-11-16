@@ -483,7 +483,7 @@ website.usage_conditions =
 # To include all notifications, use web.notifications.excluded = ""
 # To exclude all notification of an entity, you can use wildcard syntax: for example "user.*" for user,
 # will exclude those events: user.deleted, user.created, user.modified, user.undeleted...
-; web.notifications.excluded = user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*
+; web.notifications.excluded = user_call.created, user.*, workspace.modified, workspace.deleted, workspace.undeleted, workspace_member.modified, content.modified, reaction.*, tag.*, content_tag.*
 
 ### UI Customization
 # These parameters configure the user interface without affecting the backend proper

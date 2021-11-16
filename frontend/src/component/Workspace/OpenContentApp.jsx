@@ -14,7 +14,7 @@ export class OpenContentApp extends React.Component {
   openContentApp = async (prevProps = {}) => {
     const {
       appList,
-      dispatch,
+      // dispatch,
       workspaceId,
       appOpenedType,
       user,
@@ -22,8 +22,8 @@ export class OpenContentApp extends React.Component {
       contentType,
       renderAppFeature,
       dispatchCustomEvent,
-      match,
-      t
+      match
+      // t
     } = this.props
 
     // RJ - 2020-01-13 - NOTE: match.params.idcts can be equal to "new"
@@ -45,19 +45,13 @@ export class OpenContentApp extends React.Component {
     console.log('%c<OpenContentApp> contentToOpen', 'color: #dcae84', contentToOpen)
 
     const parentId = contentToOpen.type === CONTENT_TYPE.FOLDER ? null : contentToOpen.content_id
-    const fetchPutContentNotificationAsRead = await dispatch(putContentNotificationAsRead(user.userId, contentToOpen.content_id, parentId))
-    switch (fetchPutContentNotificationAsRead.status) {
-      case 204:
-        dispatch(readContentNotification(contentToOpen.content_id))
-        break
-      default: dispatch(newFlashMessage(t('Error while marking the notification as read'), 'warning'))
-    }
 
     if (prevProps.match && prevProps.match.params.idws && match.params.idws === prevProps.match.params.idws) {
       if (appOpenedType === contentToOpen.type) {
         // The app is already open in the same workspace, just request a reload
         // for the new content
         dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT(contentToOpen.type), contentToOpen)
+        await this.readContentNotifications(user.userId, contentToOpen.content_id, parentId)
         return
       }
 
@@ -85,9 +79,21 @@ export class OpenContentApp extends React.Component {
       findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
       contentToOpen
     )
+    await this.readContentNotifications(user.userId, contentToOpen.content_id, parentId)
 
     if (contentToOpen.type !== appOpenedType) {
       this.props.onUpdateAppOpenedType(contentToOpen.type)
+    }
+  }
+
+  readContentNotifications = async (userId, contentId, parentId) => {
+    const { props } = this
+    const fetchPutContentNotificationAsRead = await props.dispatch(putContentNotificationAsRead(userId, contentId, parentId))
+    switch (fetchPutContentNotificationAsRead.status) {
+      case 204:
+        props.dispatch(readContentNotification(contentId))
+        break
+      default: props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }
   }
 

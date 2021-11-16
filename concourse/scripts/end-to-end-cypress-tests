@@ -3,7 +3,10 @@ set -e
 
 python_version=${1:-3.6.14}
 docker_registry=${2:-""}
+
 script_dir="$(realpath $(dirname $0))"
+source "$script_dir/util-lib.sh"
+skip_if_no_changed_file_match "^(frontend|backend|concourse)"
 
 "$script_dir/install_docker"
 source "$script_dir/docker-lib.sh"

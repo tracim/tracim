@@ -26,6 +26,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   getOrCreateSessionClientToken,
+  sendGlobalFlashMessage,
   FAVORITE_STATE,
   ROLE,
   COLORS,
@@ -175,15 +176,6 @@ export class Thread extends React.Component {
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = (contentName) => {
     const { state } = this
 
@@ -294,7 +286,7 @@ export class Thread extends React.Component {
         state.loggedUser.username
       )
     } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
   }
 
@@ -480,10 +472,10 @@ export class Thread extends React.Component {
                 workspaceId={state.content.workspace_id}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
                 searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-                onClickTranslateComment={comment => props.handleTranslateComment(
+                onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
                   comment,
                   state.content.workspace_id,
-                  state.translationTargetLanguageCode
+                  languageCode || state.translationTargetLanguageCode
                 )}
                 onClickRestoreComment={props.handleRestoreComment}
                 onClickEditComment={this.handleClickEditComment}

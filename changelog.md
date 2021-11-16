@@ -1,3 +1,85 @@
+# 4.0.2 / 2021-11-05
+
+### Fixed Issues
+
+- Frontend: [#5049](https://github.com/tracim/tracim/issues/5049)
+
+
+# 4.0.1 / 2021-11-04
+
+### Fixed Issues
+
+- Backend: [#5048](https://github.com/tracim/tracim/issues/5048)
+- Frontend: [#4895](https://github.com/tracim/tracim/issues/4895),
+[#5049](https://github.com/tracim/tracim/issues/5049)
+
+
+# 4.0.0 / 2021-10-29
+
+### New Features
+
+- 1-to-1 video calls based on Jitsi Meet
+- Notification wall improvements: notification grouping, design improvement, mention highlight, etc
+- Performance improvements: loading of contents, timelines...
+- News feature improvements: opening News in a dedicated application, thread design, responsiveness...
+- Timeline and news pagination
+- UI normalization work: margins, font size, etc
+
+### Fixed Issues
+
+- UX: [#3649](https://github.com/tracim/tracim/issues/3649),
+[#4802](https://github.com/tracim/tracim/issues/4802),
+[#4872](https://github.com/tracim/tracim/issues/4872),
+[#4916](https://github.com/tracim/tracim/issues/4916),
+[#4918](https://github.com/tracim/tracim/issues/4918),
+[#4919](https://github.com/tracim/tracim/issues/4919),
+[#4951](https://github.com/tracim/tracim/issues/4951)
+- App-agenda: [#4558](https://github.com/tracim/tracim/issues/4558)
+- App-file: [#4056](https://github.com/tracim/tracim/issues/4056)
+- App-admin: [#3689](https://github.com/tracim/tracim/issues/3689)
+- Frontend: [#3978](https://github.com/tracim/tracim/issues/3978),
+[#4170](https://github.com/tracim/tracim/issues/4170),
+[#4440](https://github.com/tracim/tracim/issues/4440),
+[#4463](https://github.com/tracim/tracim/issues/4463),
+[#4666](https://github.com/tracim/tracim/issues/4666),
+[#4815](https://github.com/tracim/tracim/issues/4815),
+[#4826](https://github.com/tracim/tracim/issues/4826),
+[#4882](https://github.com/tracim/tracim/issues/4882),
+[#4929](https://github.com/tracim/tracim/issues/4929),
+[#4950](https://github.com/tracim/tracim/issues/4950),
+[#4969](https://github.com/tracim/tracim/issues/4969)
+- Search: [#4825](https://github.com/tracim/tracim/issues/4825)
+- Email: [#4912](https://github.com/tracim/tracim/issues/4912),
+[#4966](https://github.com/tracim/tracim/issues/4966)
+- Backend: [#4296](https://github.com/tracim/tracim/issues/4296),
+[#4352](https://github.com/tracim/tracim/issues/4352),
+[#4784](https://github.com/tracim/tracim/issues/4784)
+- Performance: [#3628](https://github.com/tracim/tracim/issues/3628),
+[#3925](https://github.com/tracim/tracim/issues/3925),
+[#4837](https://github.com/tracim/tracim/issues/4837),
+[#5009](https://github.com/tracim/tracim/issues/5009)
+- Installation: [#3680](https://github.com/tracim/tracim/issues/3680),
+[#4874](https://github.com/tracim/tracim/issues/4874)
+- Docker: [#4991](https://github.com/tracim/tracim/issues/4991)
+
+### Breaking/Important change
+
+- :warning: Apache default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- Video calls: requires a modification on existing installations. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- Configuration file `development.ini`: default configuration change. See [Migrate to 4.0.0](https://github.com/tracim/tracim/issues/5039)
+- :warning: Python 3.5 support dropped (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Python 3.8 and 3.9 support (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Docker images now rely on Debian Bullseye (11) (issue [#4874](https://github.com/tracim/tracim/issues/4874))
+- Supported OS: see [README](README.md)
+- MySQL and MariaDB are not officially supported anymore (issue [#5043](https://github.com/tracim/tracim/issues/5043))
+- `Publications` are now named `News` (issue [#4950](https://github.com/tracim/tracim/issues/4950))
+
+### Known Issues
+
+- RAW image previews are broken (issue [#5008](https://github.com/tracim/tracim/issues/5008))
+- Notification call issue (issue [#5044](https://github.com/tracim/tracim/issues/5044))
+
+
 # 3.9.2 / 2021-07-30
 
 Fix installation process (broken due to the last version of Yarn).

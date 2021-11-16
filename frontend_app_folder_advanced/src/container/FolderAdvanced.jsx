@@ -18,6 +18,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
+  sendGlobalFlashMessage,
   FAVORITE_STATE
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
@@ -137,15 +138,6 @@ export class FolderAdvanced extends React.Component {
     }
   }
 
-  sendGlobalFlashMessage = (msg, type = 'info') => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: type,
-      delay: undefined
-    }
-  })
-
   setHeadTitle = (folderName) => {
     const { state } = this
 
@@ -168,12 +160,12 @@ export class FolderAdvanced extends React.Component {
         this.setHeadTitle(fetchFolder.body.label)
         this.buildBreadcrumbs(fetchFolder.body)
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading folder details'), 'warning')
+      default: sendGlobalFlashMessage(props.t('Error while loading folder details'))
     }
 
     switch (fetchContentTypeList.apiResponse.status) {
       case 200: this.setState({ tracimContentTypeList: filterSubContentTypes(fetchContentTypeList.body) }); break
-      default: this.sendGlobalFlashMessage(props.t("Error while loading Tracim's content type list"), 'warning')
+      default: sendGlobalFlashMessage(props.t("Error while loading Tracim's content type list"))
     }
   }
 
@@ -237,7 +229,7 @@ export class FolderAdvanced extends React.Component {
         GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while saving new available apps list'), 'warning')
+        sendGlobalFlashMessage(props.t('Error while saving new available apps list'))
         this.setState(prev => ({ content: { ...prev.content, sub_content_types: oldAvailableAppList } }))
         break
     }

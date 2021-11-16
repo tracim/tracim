@@ -1,6 +1,5 @@
 import React from 'react'
 import { expect } from 'chai'
-import sinon from 'sinon'
 import { shallow } from 'enzyme'
 import nock from 'nock'
 import {
@@ -90,17 +89,9 @@ describe('<AdminWorkspaceUser />', () => {
     const initialPassword = 'password'
 
     describe('handleClickAddUser()', () => {
-      const sendGlobalFlashMsgSpy = sinon.spy()
-      const initialSendGlobalFlashMsg = wrapper.instance().sendGlobalFlashMsg
-      wrapper.instance().sendGlobalFlashMsg = sendGlobalFlashMsgSpy
-
-      after(() => {
-        wrapper.instance().sendGlobalFlashMsg = initialSendGlobalFlashMsg
-      })
-
       describe('adding a new user with a name too small', () => {
-        before(() => {
-          wrapper.instance().handleClickAddUser(
+        it('should display a warning flash message', async () => {
+          const result = await wrapper.instance().handleClickAddUser(
             'a',
             initialUsername,
             initialEmail,
@@ -108,54 +99,36 @@ describe('<AdminWorkspaceUser />', () => {
             initialProfile,
             initialPassword
           )
-        })
-
-        afterEach(() => {
-          sendGlobalFlashMsgSpy.resetHistory()
-        })
-
-        it('should display a warning flash message', () => {
-          expect(sendGlobalFlashMsgSpy.calledOnceWith(
-            props.t('Full name must be at least {{minimumCharactersPublicName}} characters')
-          )).to.equal(true)
+          expect(result).to.equal(-1)
         })
       })
 
       describe('adding a new user with a wrong password', () => {
-        const addUserWithDifferentPassword = password => {
-          wrapper.instance().handleClickAddUser(
+        const addUserWithDifferentPassword = async (password) => {
+          const result = await wrapper.instance().handleClickAddUser(
             initialName,
             initialUsername,
             initialEmail,
             initialProfile,
             password
           )
+          return result
         }
 
         describe('when emailNotificationActivated is disabled', () => {
-          afterEach(() => {
-            sendGlobalFlashMsgSpy.resetHistory()
+          it('should display a flash message when the password is not defined', async () => {
+            const result = await addUserWithDifferentPassword('')
+            expect(result).to.equal(-2)
           })
 
-          it('should display a flash message when the password is not defined', () => {
-            addUserWithDifferentPassword('')
-            expect(sendGlobalFlashMsgSpy.calledOnceWith(
-              props.t('Please set a password')
-            )).to.equal(true)
+          it('should display a flash message when the password is not long enough', async () => {
+            const result = await addUserWithDifferentPassword('pa')
+            expect(result).to.equal(-3)
           })
 
-          it('should display a flash message when the password is not long enough', () => {
-            addUserWithDifferentPassword('pa')
-            expect(sendGlobalFlashMsgSpy.calledOnceWith(
-              props.t('New password is too short (minimum 6 characters)')
-            )).to.equal(true)
-          })
-
-          it('should display a flash message when the password is too long', () => {
-            addUserWithDifferentPassword('a'.repeat(530))
-            expect(sendGlobalFlashMsgSpy.calledOnceWith(
-              props.t('New password is too long (maximum 512 characters)')
-            )).to.equal(true)
+          it('should display a flash message when the password is too long', async () => {
+            const result = await addUserWithDifferentPassword('a'.repeat(530))
+            expect(result).to.equal(-4)
           })
         })
 
@@ -183,26 +156,14 @@ describe('<AdminWorkspaceUser />', () => {
             })
           })
 
-          afterEach(() => {
-            sendGlobalFlashMsgSpy.resetHistory()
+          it('should display a flash message when the password is not long enough', async () => {
+            const result = await addUserWithDifferentPassword('pa')
+            expect(result).to.equal(-3)
           })
 
-          it('should display a flash message when the password is not long enough', () => {
-            addUserWithDifferentPassword('pa')
-            expect(sendGlobalFlashMsgSpy.calledOnceWith(
-              props.t('New password is too short (minimum 6 characters)')
-            )).to.equal(true)
-          })
-
-          it('should display a flash message when the password is too long', () => {
-            let password = ''
-            for (let i = 0; i < 530; i++) {
-              password += 'a'
-            }
-            addUserWithDifferentPassword(password)
-            expect(sendGlobalFlashMsgSpy.calledOnceWith(
-              props.t('New password is too long (maximum 512 characters)')
-            )).to.equal(true)
+          it('should display a flash message when the password is too long', async () => {
+            const result = await addUserWithDifferentPassword('a'.repeat(530))
+            expect(result).to.equal(-4)
           })
         })
       })
@@ -211,23 +172,17 @@ describe('<AdminWorkspaceUser />', () => {
         describe('when emailNotificationActivated is disabled', () => {
           before(() => {
             mockPostUser200(props.data.config.apiUrl)
-            wrapper.instance().handleClickAddUser(
+          })
+
+          it('should display the success flash message', async () => {
+            const result = await wrapper.instance().handleClickAddUser(
               initialName,
               initialUsername,
               initialEmail,
               initialProfile,
               initialPassword
             )
-          })
-
-          afterEach(() => {
-            sendGlobalFlashMsgSpy.resetHistory()
-          })
-
-          it('should display the success flash message', () => {
-            expect(sendGlobalFlashMsgSpy.calledOnceWith(
-              props.t('User created')
-            )).to.equal(true)
+            expect(result).to.equal(1)
           })
         })
 
@@ -254,44 +209,36 @@ describe('<AdminWorkspaceUser />', () => {
             })
           })
 
-          afterEach(() => {
-            sendGlobalFlashMsgSpy.resetHistory()
-          })
-
           describe('with a password', () => {
             before(() => {
               mockPostUser200(props.data.config.apiUrl)
-              wrapper.instance().handleClickAddUser(
+            })
+
+            it('should display the success flash message', async () => {
+              const result = await wrapper.instance().handleClickAddUser(
                 initialName,
                 initialUsername,
                 initialEmail,
                 initialProfile,
                 initialPassword
               )
-            })
-
-            it('should display the success flash message', () => {
-              expect(sendGlobalFlashMsgSpy.calledOnceWith(
-                props.t('User created and email sent')
-              )).to.equal(true)
+              expect(result).to.equal(1)
             })
           })
 
           describe('without a password', () => {
             before(() => {
               mockPostUser200(props.data.config.apiUrl)
-              wrapper.instance().handleClickAddUser(
+            })
+            it('should display the success flash message', async () => {
+              const result = await wrapper.instance().handleClickAddUser(
                 initialName,
                 initialUsername,
                 initialEmail,
                 initialProfile,
                 ''
               )
-            })
-            it('should display the success flash message', () => {
-              expect(sendGlobalFlashMsgSpy.calledOnceWith(
-                props.t('User created and email sent')
-              )).to.equal(true)
+              expect(result).to.equal(1)
             })
           })
         })
