@@ -148,7 +148,7 @@ pluggy==0.13.1
     # via tracim-backend (setup.py)
 prettytable==2.1.0
     # via cliff
-preview-generator==0.25
+preview-generator==0.27
     # via tracim-backend (setup.py)
 pubcontrol==3.2.0
     # via gripcontrol
