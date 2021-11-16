@@ -36,7 +36,7 @@ assignees: ""
 ### Screenshots
 
 <!-- Help us understand the problem with screenshots. You can use [peek](https://github.com/phw/peek) to generate animated GIFs. -->
-<!-- Take care of not revealing sensitive data in those screenshots/videos. -->
+<!-- WARNING: take care of not revealing sensitive data in those screenshots/videos. -->
 
 ________________________________________________
 <!-- *The following sections are for the maintainers* -->
