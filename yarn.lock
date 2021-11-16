@@ -3,7 +3,7 @@
 
 __metadata:
   version: 4
-  cacheKey: 5
+  cacheKey: 4
 
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.10.1":
   version: 7.10.1
@@ -3995,6 +3995,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cropperjs@npm:^1.5.12":
+  version: 1.5.12
+  resolution: "cropperjs@npm:1.5.12"
+  checksum: 020ae86418673b92a49a5e0e5eeb00f669ade12b949d5dd4343afadc4471f25627158e4b6b49bf712d1670ddad688af281071ee236d58340f7cdb61ed909a53b
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^5.0.1":
   version: 5.1.0
   resolution: "cross-spawn@npm:5.1.0"
@@ -6147,7 +6154,7 @@ fsevents@^1.2.7:
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
-  checksum: 508a7e7e1e365236a7a0478392827145ba05c0181b1928b73b20c1a5212d15f6529735db897d617d7b0b051248c5720160f74c113bd727fc02de4f6cf885e1ff
+  checksum: f36f09403fbdff434b1cf4baa03d58b69e6ba5e84070bfd5cf48ef1ade8de364e01f2fcb1dafea8897732c211983cd2a593488b59b62b64ae9df4ffc5ab3685b
   languageName: node
   linkType: hard
 
@@ -6156,7 +6163,7 @@ fsevents@^1.2.7:
   resolution: "fsevents@patch:fsevents@npm%3A2.1.3#builtin<compat/fsevents>::version=2.1.3&hash=495457"
   dependencies:
     node-gyp: latest
-  checksum: 0005677b72f38a129a3cbe8c3794bdc83081a2bec53dfc03b085c2e5e4ca7a33a861a779d623313652df89746d97f79d24e4fef3b101c11c39ce1ea8a9690e18
+  checksum: b2c7c3576498b568fcc9e932d6ad10774abffb4668450de2d0afb64531f3aef35016bef0880a74f71b0fee99925301430634698d59c68781c337ba6e28ec038c
   languageName: node
   linkType: hard
 
@@ -10782,6 +10789,17 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"react-cropper@npm:^2.1.8":
+  version: 2.1.8
+  resolution: "react-cropper@npm:2.1.8"
+  dependencies:
+    cropperjs: ^1.5.12
+  peerDependencies:
+    react: ">=16.0.0"
+  checksum: 340b18b6511b24adae3dc087efb4e5395c46d438926565ba8bb907f55f9a30eeff7d9e7a3dd0be56424f052dd9716b8379547181696c722a0d2ccbff33173a04
+  languageName: node
+  linkType: hard
+
 "react-datepicker@npm:^2.7.0":
   version: 2.16.0
   resolution: "react-datepicker@npm:2.16.0"
@@ -11708,7 +11726,7 @@ fsevents@^1.2.7:
   dependencies:
     is-core-module: ^2.1.0
     path-parse: ^1.0.6
-  checksum: 188d5167e8578a9af8d194faf382b8f3526aad5145391c24ecdc6246c6fc82c10fc66d6352267f8e93c5977c503d61803169c91b9e2ee36dd2de759915c9b673
+  checksum: 983e1f00a147b20c9bd6c12216fad49d2d0b83a280a203a0261b68f48621d699c5131f9626044af91254da6d2e8309c7e5559c5886faeeae7c6c47507c855410
   languageName: node
   linkType: hard
 
@@ -13261,6 +13279,7 @@ fsevents@^1.2.7:
     radium: ^0.25.2
     react: ^16.13.1
     react-animate-height: ^2.0.15
+    react-cropper: ^2.1.8
     react-day-picker: ^7.4.8
     react-device-detect: ^1.7.5
     react-dnd: 7.4.5

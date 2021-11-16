@@ -305,8 +305,7 @@
   "{{ count }} intervention _plural": "{{ count }} Eingriffe ",
   "in {{ count }} space": "in {{ count }} Bereich",
   "in {{ count }} space_plural": "in {{ count }} Bereichen",
-  "Upload an image": "Ein Bild hochladen",
-  "Recommended dimensions:": "Empfohlene Abmessungen:",
+  "Recommended dimensions: {{dimensions}} px": "Empfohlene Abmessungen: {{dimensions}} px",
   "Change avatar": "Avatar ändern",
   "Maximum size: {{size}} MB": "Maximale Größe: {{size}} MB",
   "Registration date:": "Datum der Registrierung:",
@@ -509,5 +508,13 @@
   "Error while saving new news": "Fehler beim Speichern eine neue Nachricht",
   " is calling you on Tracim": " ruft Sie an auf Tracim",
   "{{author}} called you": "{{author}} hat Sie angerufen",
-  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> hat ihren Anruf angenommen. Falls der Anruf nicht geöffnet wurde, clicken Sie auf diesem <3> Link </3></0>"
+  "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> hat ihren Anruf angenommen. Falls der Anruf nicht geöffnet wurde, clicken Sie auf diesem <3> Link </3></0>",
+  "Drag and drop your file here": "Verschieben Sie Ihre Datei mit drag und drop",
+  "You can also import your file by clicking here": "Sie können Ihre Datei auch importieren, indem Sie hier klicken",
+  "The type of this file is not allowed": "Die Art dieser Datei ist nicht erlaubt",
+  "The file is too big": "Die Datei ist zu groß",
+  "Select an image": "Wählen Sie ein Bild",
+  "Crop the image": "Das Bild zuschneiden",
+  "Back": "Zurück",
+  "Uploading…": "Hochladen…"
 }
