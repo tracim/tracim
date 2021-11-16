@@ -6,7 +6,7 @@ import debounce from 'lodash/debounce'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
-import UserSpacesConfig from '../component/Account/UserSpacesConfig.jsx'
+import AdminUserSpacesConfig from '../component/Account/AdminUserSpacesConfig.jsx'
 import Password from '../component/Account/Password.jsx'
 import {
   Delimiter,
@@ -390,10 +390,9 @@ export class Account extends React.Component {
 
                       case 'spacesConfig':
                         return (
-                          <UserSpacesConfig
+                          <AdminUserSpacesConfig
                             userToEditId={Number(state.userToEditId)}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-                            admin
                           />
                         )
 

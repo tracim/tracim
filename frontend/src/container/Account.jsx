@@ -306,7 +306,6 @@ export class Account extends React.Component {
                           <UserSpacesConfig
                             userToEditId={props.user.userId}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
-                            admin={false}
                           />
                         )
 

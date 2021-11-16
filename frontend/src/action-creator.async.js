@@ -514,6 +514,21 @@ export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
   })
 }
 
+export const getWorkspaceList = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_LIST,
+    dispatch
+  })
+}
+
 export const getWorkspaceDetail = (workspaceId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}`,
