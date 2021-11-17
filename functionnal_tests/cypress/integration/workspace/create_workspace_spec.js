@@ -21,7 +21,7 @@ describe('Workspace', () => {
       .get('.newSpace__button .btn').last().should('be.visible').click()
   }
 
-  it('should create a new space while no others are created', () => {
+  it.skip('should create a new space while no others are created', () => {
     const spaceTitle = 'Space Title'
 
     cy.get('[data-cy=homepagecard__create_btn]').should('be.visible').click()
@@ -53,7 +53,7 @@ describe('Workspace', () => {
       }
     })
 
-    it('should scroll to the new workspace in the sidebar', () => {
+    it.skip('should scroll to the new workspace in the sidebar', () => {
       cy.visitPage({ pageName: p.HOME })
       cy.get('.sidebar__scrollview').scrollTo('bottom')
       cy.get('[data-cy=sidebarCreateWorkspaceBtn]').should('be.visible').click()
