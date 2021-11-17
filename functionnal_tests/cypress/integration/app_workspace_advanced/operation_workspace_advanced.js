@@ -17,9 +17,7 @@ describe('App Workspace Advanced', function () {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
-    // NOTE - MP - 05-11-2021 - If the page isn't loaded after 30s
-    // there is a problem somewhere
-    cy.get('.userstatus__role__text', { timeout: 30000 })
+    cy.get('.userstatus__role__text')
       .contains('Space manager')
 
     cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
@@ -67,18 +65,17 @@ describe('App Workspace Advanced', function () {
     })
   })
 
-  describe.skip('Member list of the workspace', () => {
-    // NOTE - MP - 05-11-2021 - 2 users: GlobalManager and Jhon Doe
-    // FIXME - MB - Unstable test https://github.com/tracim/tracim/issues/5091
+  describe('Member list of the workspace', () => {
+    // NOTE - MP - 2021-11-05 - 2 users: GlobalManager and Jhon Doe
     let numberOfUserInWorkSpace = 2
     let userId = 0
     let userPublicName = ''
     let userEmail = ''
     let userUsername = ''
 
-    // NOTE - MP - 05-11-2021 - We add an user everytime before a test
+    // NOTE - MP - 2021-11-05 - We add an user everytime before a test
     beforeEach(() => {
-      // FIXME - MP - 05-11-2021 - We need this assert to wait for the
+      // FIXME - MP - 2021-11-05 - We need this assert to wait for the
       // workspace to be successfully updated. We can remove this assert
       // when we upgrade cypress to > 6 and wait for a response
       cy.getTag({ selectorName: s.CONTENT_FRAME })
