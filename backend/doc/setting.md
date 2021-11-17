@@ -471,9 +471,24 @@ With a Collabora host, `<collabora_host>` may look like `collaboradomain.ndd` or
 
 To enable online edition on Tracim and allow communication with your edition software.
 
-First you need to enable the edition on the API:
+First you need to enable the edition on the API. To do that you have to add the application to app_enabled. For example:
 
-    app_enabled = collaborative_document_edition
+    Before:
+    app.enabled = contents/thread,contents/html-document,contents/folder,agenda
+
+    After:
+    app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
+
+This application need contents/file application to work fully. You will have to add this application too. With our example:
+
+    Before:
+    app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
+
+    After:
+    app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition
+
+Once the application enabled, you will have to specify which software you desire to use. So far Tracim only support Collabora.
+
     collaborative_document_edition.software = collabora
 
 Then you need to indicate the ip adress of the server for the protocol `WOPI`:
@@ -519,9 +534,9 @@ Once you have selected a provider you will have to select an url:
     call.jitsi_meet.url = https://meet.jit.si
 
 #### Facultative parameters
-You can specify the time (in ms) before the call is considered unanswered:
+You can specify the time (in seconds) before the call is considered unanswered:
 
-    call.unanswered_timeout = 30000
+    call.unanswered_timeout = 30
 
 The default value is 30 seconds.
 
