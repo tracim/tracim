@@ -523,7 +523,7 @@ First you need to enable the call feature:
     call.enabled = True
 
 #### Mandatory parameters
-Then select a profider:
+Then select a provider:
 
     call.provider = jitsi_meet
 
