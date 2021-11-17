@@ -7,14 +7,16 @@ import {
   PAGE,
   serialize,
   TracimComponent,
-  PopupUploadFile,
+  PopupProgressUpload,
   PROFILE,
   IconButton,
   getAvatarBaseUrl,
   getCoverBaseUrl,
   USER_CALL_STATE,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  createFileUpload,
+  uploadFile
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -37,6 +39,7 @@ import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
 import Information from '../component/PublicProfile/Information.jsx'
 import CustomFormManager from '../component/PublicProfile/CustomFormManager.jsx'
+import PopupSelectImage from '../container/PopupSelectImage.jsx'
 
 const DISPLAY_GROUP_BACKEND_KEY = {
   uiSchemaKey: 'tracim:display_group',
@@ -44,20 +47,18 @@ const DISPLAY_GROUP_BACKEND_KEY = {
   personalPage: 'public_profile_second'
 }
 
-const ALLOWED_IMAGE_MIMETYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/bmp',
-  'image/gif',
-  'image/webp'
-]
-const MAXIMUM_IMAGE_SIZE = 10 * 1024 * 1024 // 10 MBytes
 const POPUP_DISPLAY_STATE = {
   AVATAR: 'AVATAR',
-  COVER: 'COVER'
+  COVER: 'COVER',
+  UPLOAD: 'UPLOAD'
 }
-const AVATAR_IMAGE_DIMENSIONS = '100x100'
-const COVER_IMAGE_DIMENSIONS = '1300x150'
+
+const AVATAR_IMAGE_WIDTH = 100
+const AVATAR_IMAGE_HEIGHT = 100
+const AVATAR_IMAGE_DIMENSIONS = `${AVATAR_IMAGE_WIDTH}x${AVATAR_IMAGE_HEIGHT}`
+const COVER_IMAGE_WIDTH = 1300
+const COVER_IMAGE_HEIGHT = 150
+const COVER_IMAGE_DIMENSIONS = `${COVER_IMAGE_WIDTH}x${COVER_IMAGE_HEIGHT}`
 
 const CoverImage = translate()((props) => {
   const coverImageUrl = `${props.coverBaseUrl}/preview/jpg/${COVER_IMAGE_DIMENSIONS}/${props.coverImageName}`
@@ -96,28 +97,10 @@ const CoverImage = translate()((props) => {
   )
 })
 
-const PopupUploadImage = translate()((props) => {
-  return (
-    <PopupUploadFile
-      label={props.t('Upload an image')}
-      uploadUrl={`${props.imageBaseUrl}/raw/${props.imageName}`}
-      httpMethod='PUT'
-      color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-      onClose={props.onClose}
-      onSuccess={props.onSuccess}
-      allowedMimeTypes={ALLOWED_IMAGE_MIMETYPES}
-      maximumFileSize={MAXIMUM_IMAGE_SIZE}
-    >
-      <i className='fas fa-fw fa-expand-arrows-alt' /> {props.t('Recommended dimensions:')} {props.recommendedDimensions}<br />
-      <i className='far fa-fw fa-image' /> {props.t('Maximum size: {{size}} MB', { size: MAXIMUM_IMAGE_SIZE / (1024 * 1024) })}
-    </PopupUploadFile>
-  )
-})
-
 export class PublicProfile extends React.Component {
   constructor (props) {
     super(props)
-
+    this.cropperRef = React.createRef()
     this.state = {
       displayedUser: undefined,
       coverImageUrl: undefined,
@@ -127,9 +110,10 @@ export class PublicProfile extends React.Component {
       informationDataSchema: {},
       personalPageDataSchema: {},
       dataSchemaObject: {},
-      displayUploadPopup: undefined,
+      displayedPopup: undefined,
       userCall: undefined,
-      unansweredCallTimeoutId: -1
+      unansweredCallTimeoutId: -1,
+      fileUploadProgressPercentage: 0
     }
 
     props.registerCustomEventHandlerList([
@@ -235,26 +219,28 @@ export class PublicProfile extends React.Component {
     this.setHeadTitle(fetchGetUser.json.public_name)
   }
 
-  handleChangeAvatarClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.AVATAR })
+  handleChangeAvatarClick = () => this.setState({ displayedPopup: POPUP_DISPLAY_STATE.AVATAR })
 
-  handleChangeCoverClick = () => this.setState({ displayUploadPopup: POPUP_DISPLAY_STATE.COVER })
+  handleChangeCoverClick = () => this.setState({ displayedPopup: POPUP_DISPLAY_STATE.COVER })
 
-  handleChangeAvatarSuccess = () => this.handleChangeImageSuccess(
-    'avatar',
-    'profileAvatarName',
-    'hasAvatar',
-    updateUserProfileAvatarName
-  )
+  updateFileUploadProgress = (e) => {
+    const fileUploadProgressPercentage = 100 * (e.loaded / e.total)
+    this.setState({ fileUploadProgressPercentage })
+  }
 
-  handleChangeCoverSuccess = () => this.handleChangeImageSuccess(
-    'cover',
-    'profileCoverName',
-    'hasCover',
-    updateUserProfileCoverName
-  )
-
-  handleChangeImageSuccess = (basename, nameStateKey, hasImageKey, updateNameReducer) => {
+  handleValidateChangeImage = async (imageBlob, uploadBaseUrl, basename, nameStateKey, hasImageKey, updateNameReducer) => {
     const { props, state } = this
+    this.setState({ displayedPopup: POPUP_DISPLAY_STATE.UPLOAD, fileUploadProgressPercentage: 0 })
+    const fileUpload = createFileUpload(imageBlob)
+    await uploadFile(
+      fileUpload,
+      `${uploadBaseUrl}/raw/${basename}`,
+      {
+        httpMethod: 'PUT',
+        progressEventHandler: this.updateFileUploadProgress,
+        defaultErrorMessage: props.t('Error while uploading file')
+      }
+    )
     const name = `${basename}-${Date.now()}`
     if (state.displayedUser.userId === props.user.userId) {
       this.props.dispatch(updateNameReducer(name))
@@ -265,7 +251,7 @@ export class PublicProfile extends React.Component {
         displayedUser: { ...previousState.displayedUser, [nameStateKey]: name, [hasImageKey]: true }
       }
     })
-    this.handleCloseUploadPopup()
+    this.handleClosePopup()
   }
 
   getUserCustomPropertiesAndSchema = async () => {
@@ -414,7 +400,7 @@ export class PublicProfile extends React.Component {
     )
   }
 
-  handleCloseUploadPopup = () => this.setState({ displayUploadPopup: undefined })
+  handleClosePopup = () => this.setState({ displayedPopup: undefined })
 
   render () {
     const { props, state } = this
@@ -438,23 +424,49 @@ export class PublicProfile extends React.Component {
     return (
       <div className='tracim__content fullWidthFullHeight'>
         <div className='tracim__content-scrollview'>
-          {state.displayUploadPopup === POPUP_DISPLAY_STATE.AVATAR && (
-            <PopupUploadImage
-              imageBaseUrl={avatarBaseUrl}
-              imageName='avatar'
-              onClose={this.handleCloseUploadPopup}
-              onSuccess={this.handleChangeAvatarSuccess}
+          {state.displayedPopup === POPUP_DISPLAY_STATE.AVATAR && (
+            <PopupSelectImage
+              onClose={this.handleClosePopup}
+              onValidate={(imageBlob) => {
+                this.handleValidateChangeImage(
+                  imageBlob,
+                  avatarBaseUrl,
+                  'avatar',
+                  'profileAvatarName',
+                  'hasAvatar',
+                  updateUserProfileAvatarName
+                )
+              }}
               recommendedDimensions={AVATAR_IMAGE_DIMENSIONS}
+              aspectRatio={AVATAR_IMAGE_WIDTH / AVATAR_IMAGE_HEIGHT}
             />
           )}
 
-          {state.displayUploadPopup === POPUP_DISPLAY_STATE.COVER && (
-            <PopupUploadImage
+          {state.displayedPopup === POPUP_DISPLAY_STATE.COVER && (
+            <PopupSelectImage
               imageBaseUrl={coverBaseUrl}
               imageName='cover'
-              onClose={this.handleCloseUploadPopup}
-              onSuccess={this.handleChangeCoverSuccess}
+              onClose={this.handleClosePopup}
+              onValidate={(imageBlob) => {
+                this.handleValidateChangeImage(
+                  imageBlob,
+                  coverBaseUrl,
+                  'cover',
+                  'profileCoverName',
+                  'hasCover',
+                  updateUserProfileCoverName
+                )
+              }}
               recommendedDimensions={COVER_IMAGE_DIMENSIONS}
+              aspectRatio={COVER_IMAGE_WIDTH / COVER_IMAGE_HEIGHT}
+              customClass='profile__popup_select_cover'
+            />
+          )}
+          {state.displayedPopup === POPUP_DISPLAY_STATE.UPLOAD && (
+            <PopupProgressUpload
+              color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+              percent={state.fileUploadProgressPercentage}
+              label={props.t('Uploading…')}
             />
           )}
 

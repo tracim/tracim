@@ -8,7 +8,6 @@ from pyramid.renderers import render_to_response
 from pyramid.response import Response
 
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import PageNotFound
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.request import TracimRequest
@@ -68,9 +67,6 @@ class FrontendController(Controller):
             if entry.name.endswith(".js") and entry.is_file():
                 custom_toolbox_files.append(entry)
         return custom_toolbox_files
-
-    def not_found_view(self, context, request: TracimRequest):
-        raise PageNotFound("{} is not a valid path".format(request.path)) from context
 
     def ui(self, context, request: TracimRequest):
         return self.index(context, request)
@@ -145,8 +141,6 @@ class FrontendController(Controller):
         )
 
     def bind(self, configurator: Configurator) -> None:
-
-        configurator.add_notfound_view(self.not_found_view, append_slash=True)
         # index.html for /index.html and /
         configurator.add_route("root", "/", request_method="GET")
         configurator.add_view(self.index, route_name="root")

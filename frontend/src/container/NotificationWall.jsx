@@ -125,8 +125,8 @@ export class NotificationWall extends React.Component {
     }
 
     if (notification.numberOfWorkspaces > 1) {
-      i18nOpts.workspace = `<span title='${notification.numberOfWorkspaces}'>${
-        props.t('in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
+      i18nOpts.workspaceInfo = `<span title='${notification.numberOfWorkspaces}'>${
+        props.t(' in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
       }</span>`
     }
 
@@ -140,14 +140,14 @@ export class NotificationWall extends React.Component {
           if (contentType === TLM_SUB.COMMENT) {
             return {
               title: props.t('Comment_noun'),
-              text: props.t('{{author}} commented on {{content}} {{workspace}}', i18nOpts),
+              text: props.t('{{author}} commented on {{content}}{{workspaceInfo}}', i18nOpts),
               url: this.linkToComment(notification)
             }
           }
 
           return {
             title: isPublication ? props.t('New publication') : props.t('New content'),
-            text: props.t('{{author}} created {{content}} {{workspace}}', i18nOpts),
+            text: props.t('{{author}} created {{content}}{{workspaceInfo}}', i18nOpts),
             url: contentUrl
           }
         }
@@ -155,28 +155,28 @@ export class NotificationWall extends React.Component {
           if (notification.content.currentRevisionType === 'status-update') {
             return {
               title: props.t('Status updated'),
-              text: props.t('{{author}} changed the status of {{content}} {{workspace}}', i18nOpts),
+              text: props.t('{{author}} changed the status of {{content}}{{workspaceInfo}}', i18nOpts),
               url: contentUrl
             }
           }
 
           return {
             title: isPublication ? props.t('Publication updated') : props.t('Content updated'),
-            text: props.t('{{author}} updated {{content}} {{workspace}}', i18nOpts),
+            text: props.t('{{author}} updated {{content}}{{workspaceInfo}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.DELETED: {
           return {
             title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
-            text: props.t('{{author}} deleted {{content}} {{workspace}}', i18nOpts),
+            text: props.t('{{author}} deleted {{content}}{{workspaceInfo}}', i18nOpts),
             url: contentUrl
           }
         }
         case TLM_EVENT.UNDELETED: {
           return {
             title: isPublication ? props.t('Publication restored') : props.t('Content restored'),
-            text: props.t('{{author}} restored {{content}} {{workspace}}', i18nOpts),
+            text: props.t('{{author}} restored {{content}}{{workspaceInfo}}', i18nOpts),
             url: contentUrl
           }
         }

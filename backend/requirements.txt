@@ -192,7 +192,7 @@ pyramid-mako==1.1.0
     #   tracim-backend (setup.py)
 pyramid-multiauth==0.9.0
     # via tracim-backend (setup.py)
-pyramid-retry==2.1.1
+pyramid-retry==1.0
     # via tracim-backend (setup.py)
 pyramid-tm==2.4
     # via tracim-backend (setup.py)
