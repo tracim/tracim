@@ -410,7 +410,7 @@ class TestMessages(object):
         if workspace_ids:
             new_messages = []
             for m in messages:
-                if m.event.workspace_id:
+                if m.event.workspace_id and m.event.workspace_id in workspace_ids:
                     new_messages.append(m)
             messages = new_messages
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
