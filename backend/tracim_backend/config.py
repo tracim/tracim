@@ -905,8 +905,8 @@ class CFG(object):
         self.CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
         self.CALL__JITSI_MEET__URL = self.get_raw_config("{}.jitsi_meet.url".format(prefix))
         self.CALL__PROVIDER = CallProvider(raw_call_provider)
-        # NOTE - MP - 2021-11-17 - The value in the config file is in seconds. We need the timeout
-        # to be in miliseconds, so I multiply it by 1000
+        # NOTE - MP - 2021-11-17 - The value in the config file is in seconds. The frontend need the
+        # timeout to be in miliseconds, so it's multiplied by 1000
         self.CALL__UNANSWERED_TIMEOUT = (
             asint(self.get_raw_config("{}.unanswered_timeout".format(prefix), "30")) * 1000
         )
