@@ -18,7 +18,7 @@ import {
   deleteWorkspaceMember,
   getWorkspaceList,
   getWorkspaceMemberList,
-  postUserWorkspace
+  postWorkspaceMember
 } from '../../action-creator.async.js'
 
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
@@ -58,19 +58,21 @@ export class AdminUserSpacesConfig extends React.Component {
   updateMemberList = async (data) => {
     // RJ - 2020-10-28 - FIXME - https://github.com/tracim/tracim/issues/3740
     // We should update the member list with using information in data instead of re-fetching it
-    const { props } = this
-    const spaceIndex = this.state.workspaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
+    const { props, state } = this
+    const workspaceIndex = this.state.workspaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
+    const workspace = await this.fillMemberList(data.fields.workspace)
 
-    const space = await this.fillMemberList(data.fields.workspace)
+    if (workspaceIndex === -1 && Number(props.userToEditId) !== data.fields.user.user_id) return
 
-    if (spaceIndex === -1 && Number(props.userToEditId) !== data.fields.user.user_id) return
-
-    // TODO GIULIA Not working
-    const newWorkspaceList = this.state.workspaceList.map(workspace => ({ ...workspace, role: workspace.default_user_role }))
-    this.setState({ workspaceList: (
-        spaceIndex === -1
-          ? sortWorkspaceList([...newWorkspaceList, space])
-          : [...newWorkspaceList.slice(0, spaceIndex), space, ...newWorkspaceList.slice(spaceIndex + 1)]
+    this.setState({
+      workspaceList: (
+        workspaceIndex === -1
+          ? sortWorkspaceList([...state.workspaceList, { ...workspace, role: workspace.default_user_role }])
+          : [
+            ...state.workspaceList.slice(0, workspaceIndex),
+            { ...workspace, role: workspace.default_user_role },
+            ...state.workspaceList.slice(workspaceIndex + 1)
+          ]
       )
     })
   }
@@ -111,11 +113,11 @@ export class AdminUserSpacesConfig extends React.Component {
 
   handleConfirmDeleteSpace = async () => {
     const { props } = this
-    const spaceId = this.state.spaceBeingDeleted
-    if (!spaceId) return
+    const workspaceId = this.state.spaceBeingDeleted
+    if (!workspaceId) return
     this.setState({ spaceBeingDeleted: null })
 
-    const fetchResult = await props.dispatch(deleteWorkspaceMember(spaceId, props.userToEditId))
+    const fetchResult = await props.dispatch(deleteWorkspaceMember(workspaceId, props.userToEditId))
     if (fetchResult.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
     }
@@ -136,10 +138,17 @@ export class AdminUserSpacesConfig extends React.Component {
     return !memberList.some(u => u.user_id !== this.props.userToEditId && u.role === manager)
   }
 
-  handleAddToSpace = async (spaceId) => {
+  handleAddToSpace = async (workspace) => {
     const { props } = this
-    // TODO GIULIA set role
-    const fetchPutUserSpaceSubscription = await props.dispatch(postUserWorkspace(spaceId, props.userToEditId))
+    const fetchPutUserSpaceSubscription = await props.dispatch(
+      postWorkspaceMember(workspace.workspace_id, {
+        id: props.userToEditId,
+        email: props.userEmail,
+        username: props.userUsername,
+        role: workspace.role
+      })
+    )
+
     switch (fetchPutUserSpaceSubscription.status) {
       case 200:
         props.dispatch(newFlashMessage(props.t('The user joined the space'), 'info'))
@@ -224,7 +233,6 @@ export class AdminUserSpacesConfig extends React.Component {
                 <tbody>
                   {availableSpaceList.map(space => {
                     /* TODO GIULIA Make new component to availableSpaceListItem */
-                    const defaultRole = ROLE_LIST.find(role => role.slug === space.default_user_role)
                     const role = ROLE_LIST.find(r => r.slug === space.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
                     return (
                       <tr key={`availableSpace${space.workspace_id}`}>
@@ -232,37 +240,35 @@ export class AdminUserSpacesConfig extends React.Component {
                           <b>{space.label}</b>
                           {props.t('Id: ')}{space.workspace_id}
                           {props.t('Role: ')}
-                          <i className={`fa-fw ${defaultRole.faIcon}`} style={{ color: defaultRole.hexcolor }} />{props.t(defaultRole.label)}
+                          <DropdownMenu
+                            buttonOpts={<i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
+                            buttonLabel={props.t(role.label)}
+                            buttonCustomClass='nohover btndropdown transparentButton'
+                            isButton
+                          >
+                            {ROLE_LIST.map(r =>
+                              <button
+                                className='transparentButton'
+                                onClick={() => this.setState(prev => ({
+                                  workspaceList: prev.workspaceList.map(workspace => workspace.workspace_id === space.workspace_id
+                                    ? { ...workspace, role: r.slug }
+                                    : workspace
+                                  )
+                                }))}
+                                key={r.id}
+                              >
+                                <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
+                                {props.t(r.label)}
+                              </button>
+                            )}
+                          </DropdownMenu>
                         </td>
-
-                        <DropdownMenu
-                          buttonOpts={<i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
-                          buttonLabel={props.t(role.label)}
-                          buttonCustomClass='nohover btndropdown transparentButton'
-                          isButton
-                        >
-                          {ROLE_LIST.map(r =>
-                            <button
-                              className='transparentButton'
-                              onClick={() => this.setState(prev => ({
-                                workspaceList: prev.workspaceList.map(workspace => workspace.workspace_id === space.workspace_id
-                                  ? { ...workspace, role: r.slug }
-                                  : workspace
-                                )
-                              }))}
-                              key={r.id}
-                            >
-                              <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
-                              {props.t(r.label)}
-                            </button>
-                          )}
-                        </DropdownMenu>
 
                         <td data-cy='spaceconfig__table__leave_space_cell'>
                           <IconButton
                             mode='dark'
                             intent='secondary'
-                            onClick={(() => this.handleAddToSpace(space.workspace_id))}
+                            onClick={(() => this.handleAddToSpace(space))}
                             icon='fas fa-sign-in-alt'
                             text={props.t('Add to space')}
                           />

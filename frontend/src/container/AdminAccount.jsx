@@ -113,10 +113,18 @@ export class Account extends React.Component {
   }
 
   async componentDidMount () {
+    const { props, state } = this
+
     await this.getUserDetail()
     this.setHeadTitle()
-    if (this.props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
+    if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
+
+    if (props.history.location.state && state.subComponentMenu.find(component => component.name === props.history.location.state)) {
+      this.setState(prev => ({
+        subComponentMenu: prev.subComponentMenu.map(component => ({ ...component, active: component.name === props.history.location.state }))
+      }))
+    }
   }
 
   componentWillUnmount () {
@@ -392,6 +400,8 @@ export class Account extends React.Component {
                         return (
                           <AdminUserSpacesConfig
                             userToEditId={Number(state.userToEditId)}
+                            userEmail={state.userToEdit.email}
+                            userUsername={state.userToEdit.username}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
                           />
                         )
