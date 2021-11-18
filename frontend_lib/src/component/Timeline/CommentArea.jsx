@@ -379,6 +379,7 @@ export class CommentArea extends React.Component {
                 this.commentCursorPos = -1
               }
             }}
+            dataCy='commentArea__textinput'
           />
         </div>
 
