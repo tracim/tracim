@@ -288,9 +288,7 @@ class MessageHelper(object):
         messages = (
             self._session.query(Message)
             .join(Event)
-            .filter(
-                Event.fields[Event.WORKSPACE_FIELD]["workspace_id"].as_integer().in_([workspace_id])
-            )
+            .filter(Event.workspace_id.in_([workspace_id]))
             .filter(Message.receiver_id == user_id)
             .filter(Message.sent.is_(None))
             .order_by(Message.event_id.desc())
