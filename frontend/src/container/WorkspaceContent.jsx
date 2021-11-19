@@ -194,9 +194,9 @@ export class WorkspaceContent extends React.Component {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
   }
 
-  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent, shouldLoadReadStatus) => {
+  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent, shouldLoadReadStatusList) => {
     try {
-      await this.loadContentList(workspaceId, shouldLoadReadStatus)
+      await this.loadContentList(workspaceId, shouldLoadReadStatusList)
       await this.loadShareFolderContent(workspaceId)
     } catch (error) {
       console.log(error.message)
@@ -237,7 +237,7 @@ export class WorkspaceContent extends React.Component {
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
-  loadContentList = async (workspaceId, shouldLoadReadStatus) => {
+  loadContentList = async (workspaceId, shouldLoadReadStatusList) => {
     console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
     const { props } = this
 
@@ -303,7 +303,7 @@ export class WorkspaceContent extends React.Component {
     // than making the user wait
     // See https://github.com/tracim/tracim/issues/5009
 
-    if (shouldLoadReadStatus) {
+    if (shouldLoadReadStatusList) {
       const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
 
       switch (wsReadStatus.status) {
