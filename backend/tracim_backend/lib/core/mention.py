@@ -160,7 +160,7 @@ class MentionBuilder:
         if recipient in ALL__GROUP_MENTIONS:
             # send to all workspace users
             role_api = RoleApi(session=session, config=config, current_user=None)
-            workspace_id = event.workspace["workspace_id"]
+            workspace_id = event.workspace_id
             return role_api.get_workspace_member_ids(workspace_id)
         else:
             # send to mentioned user
