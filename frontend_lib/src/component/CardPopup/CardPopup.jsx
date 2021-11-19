@@ -62,6 +62,8 @@ const CardPopup = props => {
 export default translate()(CardPopup)
 
 CardPopup.propTypes = {
+  label: PropTypes.string.isRequired,
+  faIcon: PropTypes.string,
   customClass: PropTypes.string,
   customHeaderClass: PropTypes.string,
   customColor: PropTypes.string,
@@ -73,6 +75,7 @@ CardPopup.propTypes = {
 
 CardPopup.defaultProps = {
   customClass: 'defaultCustomClass',
+  faIcon: '',
   customHeaderClass: '',
   customColor: '',
   onClose: () => { },

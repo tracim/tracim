@@ -115,7 +115,11 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
       },
       {
         subjectType: 'drag-n-drop',
-        subjectNature: 'dom'
+        subjectNature: 'dom',
+        // NOTE - SG - 2021-11-15 - force is needed for cases where the drop zone is removed
+        // in response to the drop event. Otherwise upload() triggers a drag leave event which fails
+        // as the drop zone is detached.
+        force: true
       }
     )
   })
