@@ -127,7 +127,7 @@ const Comment = props => {
             <div className='comment__body__content__textAndPreview'>
               <div
                 className='comment__body__content__text'
-                >
+              >
                 <div
                   className={classnames(`${props.customClass}__body__content__text`, 'comment__body__content__text')}
                   data-cy='comment__body__content__text'
