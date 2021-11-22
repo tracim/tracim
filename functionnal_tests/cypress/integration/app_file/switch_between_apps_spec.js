@@ -49,7 +49,7 @@ describe('App File', () => {
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
 
-        cy.get('[data-cy="commentArea__textinput"]').type(comment)
+        cy.get('.commentArea__textinput').type(comment)
         cy.get('[data-cy="commentArea__comment__send"').click()
 
         // 2021-11-18 - MB - Switching to another file app
