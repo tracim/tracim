@@ -1,5 +1,3 @@
-//  mettre ce file dans un autre dossier
-
 import { SELECTORS as s, formatTag } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands.js'
 
@@ -52,7 +50,7 @@ describe('App File', () => {
         cy.get('.commentArea__textinput').type(comment)
         cy.get('[data-cy="commentArea__comment__send"').click()
 
-        // 2021-11-18 - MB - Switching to another file app
+        // INFO - MB - 2021-11-18 - Switching to another file app
         cy.get('.file__contentpage__header__close')
           .click()
         cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileTitle_1 } })
@@ -60,19 +58,19 @@ describe('App File', () => {
 
         cy.get('[data-cy="popinFixed"]')
           .should('be.visible')
-        cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
+        cy.getTag({ selectorName: s.SIDEBAR_ARROW })
           .click()
 
-        // 2021-11-18 - MB - Switching again
+        // INFO - MB - 2021-11-18 - Switching again
         cy.get('.file__contentpage__header__close')
           .click()
         cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fullFilename_3 } })
-        .click()
+          .click()
 
         cy.contains('.breadcrumbs__item', fullFilename_3)
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
-        cy.get('[data-cy="comment__body__content__text"]').contains(comment)
+        cy.get('.comment__body__content__text').contains(comment)
       })
     })
   })
