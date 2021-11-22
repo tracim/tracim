@@ -3,12 +3,14 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  ConfirmPopup,
+  BtnSwitch,
+  CardPopup,
   DropdownMenu,
   IconButton,
   ROLE,
   ROLE_LIST,
   sortWorkspaceList,
+  TextInput,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TracimComponent
@@ -18,18 +20,20 @@ import {
   deleteWorkspaceMember,
   getWorkspaceList,
   getWorkspaceMemberList,
-  postWorkspaceMember
+  postWorkspaceMember,
+  updateWorkspaceMember
 } from '../../action-creator.async.js'
 
-import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
+require('./AdminUserSpacesConfig.styl')
 
 export class AdminUserSpacesConfig extends React.Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      workspaceList: [],
-      spaceBeingDeleted: null
+      availableSpaceListFilter: '',
+      memberSpaceListFilter: '',
+      workspaceList: []
     }
 
     props.registerLiveMessageHandlerList([
@@ -67,10 +71,10 @@ export class AdminUserSpacesConfig extends React.Component {
     this.setState({
       workspaceList: (
         workspaceIndex === -1
-          ? sortWorkspaceList([...state.workspaceList, { ...workspace, role: workspace.default_user_role }])
+          ? sortWorkspaceList([...state.workspaceList, workspace])
           : [
             ...state.workspaceList.slice(0, workspaceIndex),
-            { ...workspace, role: workspace.default_user_role },
+            workspace,
             ...state.workspaceList.slice(workspaceIndex + 1)
           ]
       )
@@ -95,7 +99,7 @@ export class AdminUserSpacesConfig extends React.Component {
     switch (fetchGetWorkspaceList.status) {
       case 200: {
         const workspaceList = await Promise.all(fetchGetWorkspaceList.json.map(this.fillMemberList))
-        this.setState({ workspaceList: workspaceList.map(workspace => ({ ...workspace, role: workspace.default_user_role })) })
+        this.setState({ workspaceList })
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
@@ -111,21 +115,15 @@ export class AdminUserSpacesConfig extends React.Component {
     }
   }
 
-  handleConfirmDeleteSpace = async () => {
+  handleLeaveSpace = async (workspaceId) => {
     const { props } = this
-    const workspaceId = this.state.spaceBeingDeleted
     if (!workspaceId) return
-    this.setState({ spaceBeingDeleted: null })
 
     const fetchResult = await props.dispatch(deleteWorkspaceMember(workspaceId, props.userToEditId))
     if (fetchResult.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
     }
     props.dispatch(newFlashMessage(props.t('The user was removed from space'), 'info'))
-  }
-
-  handleLeaveSpace = (spaceBeingDeleted) => {
-    this.setState({ spaceBeingDeleted })
   }
 
   onlyManager (member, memberList) {
@@ -145,7 +143,7 @@ export class AdminUserSpacesConfig extends React.Component {
         id: props.userToEditId,
         email: props.userEmail,
         username: props.userUsername,
-        role: workspace.role
+        role: workspace.default_user_role
       })
     )
 
@@ -157,132 +155,178 @@ export class AdminUserSpacesConfig extends React.Component {
     }
   }
 
+  handleClickChangeRole = async (workspace, role) => {
+    const { props } = this
+    const fetchUpdateWorkspaceMember = await props.dispatch(
+      updateWorkspaceMember(workspace.workspace_id, props.userToEditId, role.slug)
+    )
+    if (fetchUpdateWorkspaceMember.status !== 200) {
+      props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
+    }
+  }
+
   render () {
     const { props, state } = this
 
-    const memberSpaceList = []
-    const availableSpaceList = []
+    let memberSpaceList = []
+    let availableSpaceList = []
 
     state.workspaceList.forEach(space => {
       if (space.memberList.length <= 0) return
       if (space.memberList.find(u => u.user_id === props.userToEditId)) memberSpaceList.push(space)
       else availableSpaceList.push(space)
     })
-    console.log('state.workspaceList', state.workspaceList) // TODO GIULIA clean code and better naming (specially for role code)
+
+    availableSpaceList = availableSpaceList.filter(workspace =>
+      workspace.label.toUpperCase().includes(state.availableSpaceListFilter.toUpperCase()) ||
+      workspace.workspace_id === Number(state.availableSpaceListFilter)
+    )
+
+    memberSpaceList = memberSpaceList.filter(workspace =>
+      workspace.label.toUpperCase().includes(state.memberSpaceListFilter.toUpperCase()) ||
+      workspace.workspace_id === Number(state.memberSpaceListFilter)
+    )
 
     return (
-      <div className='account__userpreference__setting__spacename'>
-        <div className='spaceconfig__sectiontitle subTitle'>
-          {props.t('Spaces')}
+      <CardPopup
+        onClose={props.onClose}
+        onValidate={props.onClose}
+        label={props.t('Space management of the user {{userName}}', { userName: props.userPublicName })}
+        customColor={GLOBAL_primaryColor} // eslint-disable-line camelcase
+        faIcon='fas fa-users'
+        customClass='adminUserSpacesConfig'
+      >
+        <div className='adminUserSpacesConfig__zones'>
+          <div className='adminUserSpacesConfig__zones__availableSpaces'>
+            <div className='adminUserSpacesConfig__zones__title'>
+              <b>{props.t('Available spaces')}</b>
+              <TextInput
+                customClass='form-control'
+                onChange={e => this.setState({ availableSpaceListFilter: e.target.value })}
+                placeholder={props.t('Filter spaces')}
+                icon='search'
+                value={state.availableSpaceListFilter}
+              />
+            </div>
+            {(availableSpaceList.length
+              ? (
+                <table className='table'>
+                  <tbody>
+                    {availableSpaceList.map(space => {
+                      /* TODO GIULIA Make new component to availableSpaceListItem ? */
+                      return (
+                        <tr key={`availableSpace${space.workspace_id}`}>
+                          <td>
+                            {space.workspace_id} ·
+                          </td>
+                          <td>
+                            {space.label}
+                          </td>
+
+                          <td>
+                            <IconButton
+                              intent='secondary'
+                              icon='fas fa-sign-in-alt'
+                              iconColor='green'
+                              mode='dark'
+                              onClick={(() => this.handleAddToSpace(space))}
+                              title={props.t('Add to space')}
+                            />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              ) : <div>{props.t('No other spaces available')}</div>
+            )}
+          </div>
+
+          <div className='adminUserSpacesConfig__zones__spacesMembership'>
+            <b className='adminUserSpacesConfig__zones__title'>
+              {props.t('Spaces membership')}
+              <TextInput
+                customClass='form-control'
+                onChange={e => this.setState({ memberSpaceListFilter: e.target.value })}
+                placeholder={props.t('Filter spaces')}
+                icon='search'
+                value={state.memberSpaceListFilter}
+              />
+            </b> {/* TODO GIULIA add translations */}
+            {(memberSpaceList.length
+              ? (
+                <table className='table'>
+                  <tbody>
+                    {memberSpaceList.map(space => {
+                      const member = space.memberList.find(u => u.user_id === props.userToEditId)
+                      const memberRole = ROLE_LIST.find(r => r.slug === member.role)
+                      /* TODO GIULIA Make new component to memberSpaceListItem ? */
+                      return (
+                        <tr key={`memberSpaceList_${space.workspace_id}`}>
+                          <td>
+                            {space.workspace_id} ·
+                          </td>
+                          <td>{space.label}
+                          </td>
+                          <td>
+                            <DropdownMenu
+                              buttonOpts={<i className={`fas fa-fw fa-${memberRole.faIcon}`} style={{ color: memberRole.hexcolor }} />}
+                              buttonLabel={props.t(memberRole.label)}
+                              buttonCustomClass='nohover btndropdown transparentButton'
+                              isButton
+                            >
+                              {ROLE_LIST.map(r =>
+                                <button
+                                  className='transparentButton'
+                                  onClick={() => this.handleClickChangeRole(space, r)}
+                                  key={r.id}
+                                >
+                                  <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
+                                  {props.t(r.label)}
+                                </button>
+                              )}
+                            </DropdownMenu>
+                          </td>
+                          {(props.system.config.email_notification_activated &&
+                            <td>
+                              <BtnSwitch
+                                checked={member.do_notify}
+                                onChange={() => props.onChangeSubscriptionNotif(space.workspace_id, !member.do_notify)}
+                              />
+                            </td>
+                          )}
+                          <td data-cy='spaceconfig__table__leave_space_cell'>
+                            <IconButton
+                              disabled={this.onlyManager(member, space.memberList)}
+                              icon='fas fa-sign-out-alt'
+                              iconColor='red'
+                              intent='secondary'
+                              onClick={(() => this.handleLeaveSpace(space.workspace_id))}
+                              mode='dark'
+                              title={
+                                this.onlyManager(member, space.memberList)
+                                  ? props.t('You cannot remove this member because there are no other space managers.')
+                                  : props.t('Remove from space')
+                              }
+                            />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              ) : <div>{props.t('This user is not a member of any space yet')}</div>
+            )}
+          </div>
         </div>
-
-        {(memberSpaceList.length
-          ? (
-            <div className='spaceconfig__table'>
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th>{props.t('Spaces of which the user is a member')}</th> {/* TODO GIULIA add translations */}
-                    {/* TODO GIULIA be careful with configs {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>} */}
-                    <th />
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {memberSpaceList.map(space => {
-                    const member = space.memberList.find(u => u.user_id === props.userToEditId)
-                    /* TODO GIULIA Use/adapt the same component or make a new one ? */
-                    return (
-                      <UserSpacesConfigLine
-                        admin
-                        key={space.workspace_id}
-                        member={member}
-                        onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-                        onLeaveSpace={this.handleLeaveSpace}
-                        onlyManager={this.onlyManager(member, space.memberList)}
-                        space={space}
-                        system={props.system}
-                      />
-                    )
-                  })}
-                </tbody>
-              </table>
-              {(state.spaceBeingDeleted && (
-                <ConfirmPopup
-                  onConfirm={this.handleConfirmDeleteSpace}
-                  onCancel={() => this.setState({ spaceBeingDeleted: null })}
-                  msg={props.t('Are you sure you want to remove this member from the space?')}
-                  confirmLabel={props.t('Remove from space')}
-                  confirmIcon='fa-fw fas fa-sign-out-alt'
-                />
-              ))}
-            </div>
-          ) : props.t('This user is not a member of any space yet')
-        )}
-
-        {(availableSpaceList.length
-          ? (
-            <div className='spaceconfig__table'>
-              <table className='table'>
-                <thead>
-                  <tr>
-                    <th>{props.t('Available spaces')}</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {availableSpaceList.map(space => {
-                    /* TODO GIULIA Make new component to availableSpaceListItem */
-                    const role = ROLE_LIST.find(r => r.slug === space.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
-                    return (
-                      <tr key={`availableSpace${space.workspace_id}`}>
-                        <td>
-                          <b>{space.label}</b>
-                          {props.t('Id: ')}{space.workspace_id}
-                          {props.t('Role: ')}
-                          <DropdownMenu
-                            buttonOpts={<i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
-                            buttonLabel={props.t(role.label)}
-                            buttonCustomClass='nohover btndropdown transparentButton'
-                            isButton
-                          >
-                            {ROLE_LIST.map(r =>
-                              <button
-                                className='transparentButton'
-                                onClick={() => this.setState(prev => ({
-                                  workspaceList: prev.workspaceList.map(workspace => workspace.workspace_id === space.workspace_id
-                                    ? { ...workspace, role: r.slug }
-                                    : workspace
-                                  )
-                                }))}
-                                key={r.id}
-                              >
-                                <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
-                                {props.t(r.label)}
-                              </button>
-                            )}
-                          </DropdownMenu>
-                        </td>
-
-                        <td data-cy='spaceconfig__table__leave_space_cell'>
-                          <IconButton
-                            mode='dark'
-                            intent='secondary'
-                            onClick={(() => this.handleAddToSpace(space))}
-                            icon='fas fa-sign-in-alt'
-                            text={props.t('Add to space')}
-                          />
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : props.t('No other spaces available')
-        )}
-
-      </div>
+        <IconButton
+          icon='fas fa-times'
+          intent='primary'
+          onClick={props.onClose}
+          mode='light'
+          text={props.t('Close')}
+        />
+      </CardPopup>
     )
   }
 }

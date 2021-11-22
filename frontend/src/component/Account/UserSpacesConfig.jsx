@@ -2,8 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-
 import {
+  IconButton,
   sortWorkspaceList,
   ConfirmPopup,
   TracimComponent,
@@ -11,10 +11,9 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
-
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList, getWorkspaceMemberList } from '../../action-creator.async.js'
-
+import AdminUserSpacesConfig from './AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
 export class UserSpacesConfig extends React.Component {
@@ -22,6 +21,7 @@ export class UserSpacesConfig extends React.Component {
     super(props)
 
     this.state = {
+      showSpacesManagementPopup: false,
       workspaceList: [],
       spaceBeingDeleted: null
     }
@@ -149,7 +149,7 @@ export class UserSpacesConfig extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
     const entries = this.state.workspaceList.reduce((res, space) => {
       if (space.memberList.length > 0) {
@@ -162,6 +162,7 @@ export class UserSpacesConfig extends React.Component {
               key={space.workspace_id}
               onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
               onLeaveSpace={this.handleLeaveSpace}
+              admin={props.admin}
               system={props.system}
               onlyManager={this.onlyManager(member, space.memberList)}
             />
@@ -175,7 +176,26 @@ export class UserSpacesConfig extends React.Component {
       <div className='account__userpreference__setting__spacename'>
         <div className='spaceconfig__sectiontitle subTitle'>
           {props.t('Spaces')}
+
+          <IconButton
+            mode='dark'
+            intent='secondary'
+            onClick={(() => this.setState(prev => ({ showSpacesManagementPopup: !prev.showSpacesManagementPopup })))}
+            icon='fas fa-user-cog'
+            text={props.t('Manage user spaces')}
+          />
         </div>
+
+        {state.showSpacesManagementPopup && (
+          <AdminUserSpacesConfig
+            userToEditId={props.userToEditId}
+            userEmail={props.userEmail}
+            userPublicName={props.userPublicName}
+            userUsername={props.userUsername}
+            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+            onClose={(() => this.setState(prev => ({ showSpacesManagementPopup: !prev.showSpacesManagementPopup })))}
+          />
+        )}
 
         {(entries.length
           ? (
@@ -196,13 +216,25 @@ export class UserSpacesConfig extends React.Component {
                 <ConfirmPopup
                   onConfirm={this.handleConfirmDeleteSpace}
                   onCancel={() => this.setState({ spaceBeingDeleted: null })}
-                  msg={props.t('Are you sure you want to leave the space?')}
-                  confirmLabel={props.t('Leave space')}
+                  msg={
+                    props.admin
+                      ? props.t('Are you sure you want to remove this member from the space?')
+                      : props.t('Are you sure you want to leave the space?')
+                  }
+                  confirmLabel={
+                    props.admin
+                      ? props.t('Remove from space')
+                      : props.t('Leave space')
+                  }
                   confirmIcon='fa-fw fas fa-sign-out-alt'
                 />
               ))}
             </div>
-          ) : props.t('You are not a member of any space yet')
+          ) : (
+            props.admin
+              ? props.t('This user is not a member of any space yet')
+              : props.t('You are not a member of any space yet')
+          )
         )}
       </div>
     )
@@ -214,7 +246,8 @@ export default connect(mapStateToProps)(translate()(TracimComponent(UserSpacesCo
 
 UserSpacesConfig.propTypes = {
   userToEditId: PropTypes.number.isRequired,
-  onChangeSubscriptionNotif: PropTypes.func
+  onChangeSubscriptionNotif: PropTypes.func,
+  admin: PropTypes.bool.isRequired
 }
 
 UserSpacesConfig.defaultProps = {

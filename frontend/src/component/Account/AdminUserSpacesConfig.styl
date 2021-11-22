@@ -1,0 +1,40 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+.adminUserSpacesConfig
+  &.cardPopup
+    top 5%
+    height 90%
+  & .cardPopup
+    &__container
+      width 95%
+    &__body
+      height calc(100% - 130px) // 130px is the popup header height + close button
+      flex-direction column
+  &__zones
+    display flex
+    width 100%
+    height 100%
+    &__title
+      font-size titleFontSize
+      display flex
+      align-items center
+      justify-content space-between
+      margin-bottom standardSpacing
+      & > .textinput__box
+        flex-grow 1
+        margin-inline-start standardSpacing
+    &__availableSpaces, &__spacesMembership
+      background-color offWhite
+      border-radius standardBorderRadius
+      padding standardSpacing
+      height 100%
+      overflow auto
+    &__availableSpaces
+      margin-inline-end standardSpacing
+      width 30%
+    &__spacesMembership
+      width 70%
+    & ~ .iconbutton
+      margin-inline-start auto
+      margin-top standardSpacing
+

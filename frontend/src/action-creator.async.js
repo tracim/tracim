@@ -53,6 +53,7 @@ import {
   WORKSPACE_MEMBER_ADD,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_REMOVE,
+  WORKSPACE_MEMBER_UPDATE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
@@ -679,6 +680,22 @@ export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
       method: 'DELETE'
     },
     actionName: WORKSPACE_MEMBER_REMOVE,
+    dispatch
+  })
+}
+
+export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
+    param: {
+      credentials: 'include',
+      headers: { ...FETCH_CONFIG.headers },
+      method: 'PUT',
+      body: JSON.stringify({
+        role: newRole
+      })
+    },
+    actionName: WORKSPACE_MEMBER_UPDATE,
     dispatch
   })
 }
