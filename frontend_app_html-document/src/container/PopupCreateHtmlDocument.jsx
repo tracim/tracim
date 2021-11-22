@@ -7,6 +7,7 @@ import {
   CardPopupCreateContent,
   CUSTOM_EVENT,
   handleFetchResult,
+  sendGlobalFlashMessage,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { postHtmlDocContent } from '../action.async.js'
@@ -68,15 +69,6 @@ class PopupCreateHtmlDocument extends React.Component {
     }
   })
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   handleValidate = async () => {
     const { config, appName, workspaceId, folderId, newContentName } = this.state
 
@@ -101,11 +93,11 @@ class PopupCreateHtmlDocument extends React.Component {
       case 400:
         switch (resSave.body.code) {
           case 3002:
-            this.sendGlobalFlashMessage(this.props.t('A content with the same name already exists'))
+            sendGlobalFlashMessage(this.props.t('A content with the same name already exists'))
             break
         }
         break
-      default: this.sendGlobalFlashMessage(this.props.t('Error while creating note'))
+      default: sendGlobalFlashMessage(this.props.t('Error while creating note'))
     }
   }
 

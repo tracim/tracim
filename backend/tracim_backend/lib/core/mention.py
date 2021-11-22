@@ -86,7 +86,7 @@ class DescriptionMentionParser(BaseMentionParser):
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            recipient = mention_tag.string[1:]
+            recipient = mention_tag.string[1:] if mention_tag.string else ""
             id_ = mention_tag["id"].replace(cls.MENTION_ID_START, "")
             mentions.append(Mention(recipient, id_))
         return mentions

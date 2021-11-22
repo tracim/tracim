@@ -22,6 +22,7 @@ import {
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
   getContentComment,
+  sendGlobalFlashMessage,
   PAGE
 } from 'tracim_frontend_lib'
 import {
@@ -170,19 +171,9 @@ class CustomForm extends React.Component {
 
   componentWillUnmount () {
     console.log('%c<CustomForm> will Unmount', `color: ${this.state.config.hexcolor}`)
-    // tinymce.remove('#wysiwygNewVersion')
     tinymce.remove('#wysiwygTimelineComment')
     document.removeEventListener('appCustomEvent', this.customEventReducer)
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: 'addFlashMsg',
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   buildBreadcrumbs = () => {
     const { state } = this
@@ -317,11 +308,11 @@ class CustomForm extends React.Component {
       case 400:
         switch (fetchResultSaveCustomForm.body.code) {
           case 2041: break // INFO - CH - 2019-04-04 - this means the same title has been sent. Therefore, no modification
-          case 3002: this.sendGlobalFlashMessage(props.t('A content with same name already exists')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
+          case 3002: sendGlobalFlashMessage(props.t('A content with same name already exists')); break
+          default: sendGlobalFlashMessage(props.t('Error while saving new title')); break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new title')); break
+      default: sendGlobalFlashMessage(props.t('Error while saving new title')); break
     }
   }
 
@@ -379,7 +370,7 @@ class CustomForm extends React.Component {
         this.loadContent()
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while saving new version')); break
+        sendGlobalFlashMessage(props.t('Error while saving new version')); break
     }
   }
 
@@ -413,7 +404,7 @@ class CustomForm extends React.Component {
         if (state.timelineWysiwyg) tinymce.get('wysiwygTimelineComment').setContent('')
         this.loadContent()
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new comment')); break
+      default: sendGlobalFlashMessage(props.t('Error while saving new comment')); break
     }
   }
 
@@ -430,7 +421,7 @@ class CustomForm extends React.Component {
 
     switch (fetchResultSaveEditStatus.status) {
       case 204: this.loadContent(); break
-      default: this.sendGlobalFlashMessage(props.t('Error while changing status'))
+      default: sendGlobalFlashMessage(props.t('Error while changing status'))
     }
   }
 

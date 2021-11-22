@@ -1,8 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 import { SELECTORS } from '../../support/generic_selector_commands'
 
-// FIIXME - GB - 2021-10-27 - Unstabel test, async problem
-// See https://github.com/tracim/tracim/issues/4995
 describe('Create tags', () => {
   const fileTitle = 'FileForTags'
   const fullFilename = 'Linux-Free-PNG.png'
@@ -18,40 +16,46 @@ describe('Create tags', () => {
   const itemListClass = '[data-cy=tag_list] li'
   const validateButtonClass = '[data-cy=validate_tag]'
 
-  before(() => {
-    cy.resetDB()
-    cy.setupBaseDB()
-  })
-
   describe('Tags', () => {
     for (const testedContent of ['file', 'note']) {
       describe(`in a ${testedContent}`, () => {
         beforeEach(() => {
           cy.resetDB()
           cy.setupBaseDB()
+
           cy.loginAs('administrators')
+
           cy.fixture('baseWorkspace').as('workspace').then(({ workspace_id: workspaceId }) => {
             cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
             cy.contains('.userstatus__role__text', 'Space manager')
             cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })
               .find('.dashboard__workspace__detail__buttons .iconbutton')
               .click()
-            cy.get('[data-cy=popin_right_part_tag').click()
+            cy.get('[data-cy=popin_right_part_tag')
+              .should('be.visible')
+              .click()
 
-            cy.get(inputClass).type(tagCreatedByWorkspace)
-            cy.get(validateButtonClass).click()
+            // INFO - MP - 2021-10-21 - Create a tag so it can be used for autocomletion
+            cy.get(inputClass).should('be.visible').type(tagCreatedByWorkspace)
+            cy.get(validateButtonClass)
+              .should('be.visible')
+              .click()
+
             cy.contains(flashMessageClass, flashMessageTextWorkspace)
+
+            // INFO - MP - 2021-10-21 - Create the desired content to test on depending of the testing type
             if (testedContent === 'file') {
               cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
               cy.contains('.userstatus__role__text', 'Space manager')
               cy.createFile(fullFilename, contentType, fileTitle, workspaceId).then(({ content_id: contentId }) => {
+
                 cy.visitPage({
                   pageName: PAGES.CONTENT_OPEN,
                   params: { workspaceId, contentType: 'file', contentId }
                 })
+                cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
                 cy.contains('.file__contentpage__header__title', fileTitle)
               })
-              cy.get('[data-cy=popin_right_part_tag]').click()
             } else {
               cy.createHtmlDocument('A note', workspaceId).then(({ content_id: contentId }) => {
                 cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
@@ -67,19 +71,27 @@ describe('Create tags', () => {
                 cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
               })
             }
+
+            // INFO - MP - 2021-10-20 - When TagList component is mounted, it GET the space's tag list.
+            // Creating a tag generate a POST. Without the cy.wait, depending on connection speed, the
+            // POST can respond before the GET. The POST TLM response handler is supposed to display the
+            // created tag but the GET that responds afterwards will hide it because it responds an
+            // empty list.
+            cy.wait(5000)
           })
         })
 
-        afterEach(function () {
-          cy.cancelXHR()
-        })
-
-        it('should create and add two tags', () => {
+        it('should add two tags', () => {
           cy.get(inputClass).type('TagOne')
-          cy.contains(validateButtonClass, 'Create and add')
-          cy.get(validateButtonClass).click()
+          cy.get(validateButtonClass)
+            .should('be.visible')
+            .click()
+
           cy.contains(flashMessageClass, flashMessageTextContent)
-          cy.get(itemListClass).should('have.length', 1)
+          cy.get(itemListClass)
+            .should('be.visible')
+            .should('have.length', 1)
+
           cy.get(inputClass).type('TagTwo')
           cy.get(validateButtonClass).click()
           cy.contains(flashMessageClass, flashMessageTextContent)
@@ -88,16 +100,28 @@ describe('Create tags', () => {
 
         it('should list the tags', () => {
           cy.get(inputClass).type('TagOne')
-          cy.get(validateButtonClass).click()
+          cy.get(validateButtonClass)
+            .should('be.visible')
+            .click()
+
           cy.contains(flashMessageClass, flashMessageTextContent)
-          cy.get(itemListClass).should('have.length', 1)
+          cy.get(itemListClass)
+            .should('be.visible')
+            .should('have.length', 1)
+
           cy.get(inputClass).type('TagTwo')
           cy.get(validateButtonClass).click()
           cy.contains(flashMessageClass, flashMessageTextContent)
           cy.get(itemListClass).should('have.length', 2)
+
           // switch tab and come back
-          cy.get('[data-cy=popin_right_part_timeline]').click()
-          cy.get('[data-cy=popin_right_part_tag]').click()
+          cy.get('[data-cy=popin_right_part_timeline]')
+            .should('be.visible')
+            .click()
+          cy.get('[data-cy=popin_right_part_tag]')
+            .should('be.visible')
+            .click()
+
           cy.get(itemListClass).should('have.length', 2)
           cy.get('[data-cy=tag_list]').first().should('contain', 'TagTwo')
         })
@@ -118,7 +142,9 @@ describe('Create tags', () => {
         it('should add a tag that exists already in workspace', () => {
           cy.get(inputClass).type(tagCreatedByWorkspace).type('{esc}')
           cy.contains(validateButtonClass, 'Add')
-          cy.get(validateButtonClass).click()
+          cy.get(validateButtonClass)
+            .should('be.visible')
+            .click()
           cy.contains(flashMessageClass, flashMessageTextContent)
           cy.contains(itemListClass, tagCreatedByWorkspace)
         })

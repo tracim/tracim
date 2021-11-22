@@ -6,6 +6,7 @@ import {
   addAllResourceI18n,
   RadioBtnGroup,
   buildHeadTitle,
+  sendGlobalFlashMessage,
   CUSTOM_EVENT,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -64,15 +65,6 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     this.setHeadTitle()
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = () => {
     const { state, props } = this
 
@@ -129,11 +121,11 @@ export class PopupCreateCollaborativeDocument extends React.Component {
       case 400:
         switch (response.body.code) {
           case 3002:
-            this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
+            sendGlobalFlashMessage(props.t('A content with the same name already exists'))
             break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating document'))
+      default: sendGlobalFlashMessage(props.t('Error while creating document'))
     }
   }
 

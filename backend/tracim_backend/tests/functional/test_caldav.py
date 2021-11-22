@@ -94,7 +94,10 @@ class TestCaldavRadicaleProxyEndpoints(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        web_testapp.get("/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=404)
+        web_testapp.get(
+            "/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=307
+        ).follow(status=404)
+
         event = VALID_CALDAV_BODY_PUT_EVENT
         web_testapp.put(
             "/agenda/user/{}/".format(user.user_id), event, content_type="text/calendar", status=201
