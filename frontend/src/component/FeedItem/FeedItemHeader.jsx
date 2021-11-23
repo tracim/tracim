@@ -133,6 +133,7 @@ export class FeedItemHeader extends React.Component {
               icon='fas fa-link'
               onClick={props.onClickCopyLink}
               text={props.t('Copy content link')}
+              textMobile={props.t('Copy content link')}
               key={`link-${contentId}`}
             />
 
@@ -142,6 +143,7 @@ export class FeedItemHeader extends React.Component {
                 icon='fas fa-pencil-alt'
                 onClick={props.onClickEdit}
                 text={props.t('Edit')}
+                textMobile={props.t('Edit')}
                 key={`edit-${contentId}`}
               />
             )}
