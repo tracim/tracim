@@ -36,7 +36,8 @@ import {
   getFileContent,
   getFileRevision,
   putFileRead,
-  TagList
+  TagList,
+  putMyselfFileRead
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -285,7 +286,7 @@ export class Kanban extends React.Component {
     this.setHeadTitle(response.body.label)
     this.buildBreadcrumbs(response.body)
 
-    await putFileRead(state.loggedUser, state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
