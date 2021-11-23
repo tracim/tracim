@@ -120,10 +120,17 @@ export class Account extends React.Component {
     if (props.appList.some(a => a.slug === 'agenda')) this.loadAgendaUrl()
     this.buildBreadcrumbs()
 
-    if (props.history.location.state && state.subComponentMenu.find(component => component.name === props.history.location.state)) {
+    if (props.openSpacesManagement) {
       this.setState(prev => ({
-        subComponentMenu: prev.subComponentMenu.map(component => ({ ...component, active: component.name === props.history.location.state }))
+        subComponentMenu: prev.subComponentMenu.map(component => ({ ...component, active: component.name === 'spacesConfig' }))
       }))
+    }
+    else {
+      if (props.history.location.state && state.subComponentMenu.find(component => component.name === props.history.location.state)) {
+        this.setState(prev => ({
+          subComponentMenu: prev.subComponentMenu.map(component => ({ ...component, active: component.name === props.history.location.state }))
+        }))
+      }
     }
   }
 
@@ -404,6 +411,7 @@ export class Account extends React.Component {
                             userPublicName={state.userToEdit.publicName}
                             userUsername={state.userToEdit.username}
                             onChangeSubscriptionNotif={this.handleChangeSubscriptionNotif}
+                            openSpacesManagement={props.openSpacesManagement}
                             admin
                           />
                         )

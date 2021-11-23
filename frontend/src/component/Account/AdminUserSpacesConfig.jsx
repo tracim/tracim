@@ -254,7 +254,7 @@ export class AdminUserSpacesConfig extends React.Component {
                 icon='search'
                 value={state.memberSpaceListFilter}
               />
-            </div> {/* TODO GIULIA add translations */}
+            </div>
             {(memberSpaceList.length
               ? (
                 <div className='adminUserSpacesConfig__zones__table'>

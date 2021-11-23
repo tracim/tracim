@@ -44,7 +44,8 @@ export const PAGE = {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
-    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
+    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`,
+    USER_SPACE_LIST: (userId = ':iduser') => `/ui/admin/user/${userId}/spaces`
   },
   SEARCH_RESULT: '/ui/search-result',
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,

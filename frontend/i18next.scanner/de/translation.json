@@ -1,9 +1,9 @@
 {
   "Account Settings": "Kontoeinstellungen",
-  "Add to space": "Dem Raum hinzufügen",
+  "Add to space": "Dem Bereich hinzufügen",
   "All fields are required. Please enter a name, an email and a password.": "Alle Eingabefelder sind erforderlich. Bitte geben Sie einen Namen, eine E-Mail und ein Passwort ein.",
   "Already have an account?": "Sie haben bereits ein Konto?",
-  "Available spaces": "Freie Plätze",
+  "Available spaces": "Freie Bereiche",
   "Create Account": "Konto erstellen",
   "Create account": "Konto erstellen",
   "Copy content link": "Link zum Inhalt kopieren",
@@ -520,10 +520,10 @@
   "Select an image": "Wählen Sie ein Bild",
   "Crop the image": "Das Bild zuschneiden",
   "Back": "Zurück",
-  "No other spaces available": "Keine weiteren Plätze verfügbar",
+  "No other spaces available": "Keine weiteren Bereiche verfügbar",
   "Manage user spaces": "Verwalten von Benutzerbereichen",
-  "Space management of the user {{userName}}": "Speicherplatzverwaltung für den Benutzer {{userName}}",
-  "Spaces membership": "Spaces Mitgliedschaft",
+  "Space management of the user {{userName}}": "Bereichsmanagement für den Benutzer {{userName}}",
+  "Spaces membership": "Bereiche Mitgliedschaft",
   "Uploading…": "Hochladen…",
-  "You cannot change this member role because there are no other space managers.": "Sie können diese Mitgliederrolle nicht ändern, da es keine anderen Raummanager gibt."
+  "You cannot change this member role because there are no other space managers.": "Sie können diese Mitgliederrolle nicht ändern, da es keine anderen Bereichsmanager gibt."
 }

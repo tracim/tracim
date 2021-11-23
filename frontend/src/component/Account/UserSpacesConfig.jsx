@@ -1,11 +1,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   IconButton,
   sortWorkspaceList,
   ConfirmPopup,
+  PAGE,
   TracimComponent,
   ROLE,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -21,7 +23,6 @@ export class UserSpacesConfig extends React.Component {
     super(props)
 
     this.state = {
-      showSpacesManagementPopup: false,
       workspaceList: [],
       spaceBeingDeleted: null
     }
@@ -180,20 +181,20 @@ export class UserSpacesConfig extends React.Component {
           <IconButton
             mode='dark'
             intent='secondary'
-            onClick={(() => this.setState(prev => ({ showSpacesManagementPopup: !prev.showSpacesManagementPopup })))}
+            onClick={(() => props.history.push(PAGE.ADMIN.USER_SPACE_LIST(props.userToEditId)))}
             icon='fas fa-user-cog'
             text={props.t('Manage user spaces')}
           />
         </div>
 
-        {state.showSpacesManagementPopup && (
+        {props.openSpacesManagement && (
           <AdminUserSpacesConfig
             userToEditId={props.userToEditId}
             userEmail={props.userEmail}
             userPublicName={props.userPublicName}
             userUsername={props.userUsername}
             onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-            onClose={(() => this.setState(prev => ({ showSpacesManagementPopup: !prev.showSpacesManagementPopup })))}
+            onClose={(() => props.history.push(PAGE.ADMIN.USER_EDIT(props.userToEditId), 'spacesConfig'))}
           />
         )}
 
@@ -242,7 +243,7 @@ export class UserSpacesConfig extends React.Component {
 }
 
 const mapStateToProps = ({ system }) => ({ system })
-export default connect(mapStateToProps)(translate()(TracimComponent(UserSpacesConfig)))
+export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(UserSpacesConfig))))
 
 UserSpacesConfig.propTypes = {
   userToEditId: PropTypes.number.isRequired,
