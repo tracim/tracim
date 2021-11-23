@@ -650,7 +650,7 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleString(lang)
+export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
 
 // Equality test done as numbers with the following rules:
 // - strings are converted to numbers before comparing
