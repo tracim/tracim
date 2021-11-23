@@ -30,7 +30,9 @@ import {
   isFileUploadInErrorState,
   CONTENT_TYPE,
   getFileDownloadUrl,
-  NUMBER_RESULTS_BY_PAGE
+  NUMBER_RESULTS_BY_PAGE,
+  LOCAL_STORAGE_FIELD,
+  setLocalStorageItem
 } from 'tracim_frontend_lib'
 import {
   CONTENT_NAMESPACE,
@@ -463,7 +465,7 @@ export class Publications extends React.Component {
   }
 
   handleClickValidateAnyway = async (publication, publicationAsFileList = []) => {
-    const { state } = this
+    const { state, props } = this
 
     if (state.showEditPopup) {
       this.handleClickValidateAnywayEdit()
@@ -477,6 +479,14 @@ export class Publications extends React.Component {
     if (publicationAsFileList.length > 0) {
       this.processSaveFilePublication(publication, publicationAsFileList)
     }
+
+    setLocalStorageItem(
+      CONTENT_TYPE.THREAD,
+      newPublicationId,
+      parseInt(props.match.params.idws),
+      LOCAL_STORAGE_FIELD.COMMENT,
+      ''
+    )
   }
 
   handleClickCopyLink = content => {

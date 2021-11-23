@@ -650,7 +650,7 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleString(lang)
+export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
 
 // Equality test done as numbers with the following rules:
 // - strings are converted to numbers before comparing
@@ -779,11 +779,11 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   }
 }
 
-export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
+export const sendGlobalFlashMessage = (msg, type = 'warning', delay = undefined) => GLOBAL_dispatchEvent({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {
     msg: msg, // INFO - RJ - 2021-03-17 - can be a string or a react element
-    type: type || 'warning',
+    type: type,
     delay: delay
   }
 })

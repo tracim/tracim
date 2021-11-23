@@ -31,7 +31,8 @@ import {
   buildHeadTitle,
   PAGE,
   TracimComponent,
-  IconButton
+  IconButton,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -205,15 +206,6 @@ export class WorkspaceContent extends React.Component {
     if (shouldScrollToContent) this.scrollToActiveContent()
     return true
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   setHeadTitle = (filterName) => {
     const { props } = this
@@ -578,7 +570,7 @@ export class WorkspaceContent extends React.Component {
         break
       }
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
+        sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
     }
 
     this.setState({ loadingShareFolder: false })

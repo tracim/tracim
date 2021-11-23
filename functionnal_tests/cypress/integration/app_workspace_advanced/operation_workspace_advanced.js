@@ -16,7 +16,13 @@ describe('App Workspace Advanced', function () {
   beforeEach(function () {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-    cy.contains('.userstatus__role__text', 'Space manager')
+
+    cy.get('.userstatus__role__text')
+      .contains('Space manager')
+
+    cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
+      .find('.dashboard__workspace__detail__buttons .iconbutton')
+      .click()
   })
 
   afterEach(function () {
@@ -25,10 +31,6 @@ describe('App Workspace Advanced', function () {
 
   describe("Changing the workspace's description", () => {
     it('Should update the description in the dashboard', function () {
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
-
       cy.waitForTinyMCELoaded().then(() => {
         cy.clearTinyMCE().then(() => {
           cy.typeInTinyMCE(newDescription).then(() => {
@@ -46,10 +48,6 @@ describe('App Workspace Advanced', function () {
 
   describe("Changing the space's default role", () => {
     it('Should show a flash message', function () {
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-      .find('.dashboard__workspace__detail__buttons .iconbutton')
-      .click()
-
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .find('.workspace_advanced__defaultRole')
         .should('be.visible')
@@ -67,14 +65,28 @@ describe('App Workspace Advanced', function () {
     })
   })
 
-  describe('Member list', () => {
+  describe('Member list of the workspace', () => {
+    // NOTE - MP - 2021-11-05 - 2 users: GlobalManager and Jhon Doe
+    let numberOfUserInWorkSpace = 2
     let userId = 0
     let userPublicName = ''
     let userEmail = ''
     let userUsername = ''
 
+    // NOTE - MP - 2021-11-05 - We add an user everytime before a test
     beforeEach(() => {
-      cy.loginAs('administrators')
+      // FIXME - MP - 2021-11-05 - We need this assert to wait for the
+      // workspace to be successfully updated. We can remove this assert
+      // when we upgrade cypress to > 6 and wait for a response
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
+        .get(`.workspace_advanced__userlist__list__item`)
+        .should('be.visible')
+        .and('have.length', numberOfUserInWorkSpace)
+
+      cy.getTag({ selectorName: s.CONTENT_FRAME })
+        .get('div.workspace_advanced__userlist__adduser__button')
+        .click()
+
       cy.createRandomUser().then(user => {
         userId = user.user_id
         userPublicName = user.public_name
@@ -83,137 +95,181 @@ describe('App Workspace Advanced', function () {
       })
     })
 
-    it('Should be able to add a user with their public name', () => {
-      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-      cy.contains('.userstatus__role__text', 'Space manager')
+    describe('Modify user list of a workspace', () => {
+      // NOTE - MP - 05-11-2021 - Finish the process to add an user
+      const finishAddUser = () => {
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('div.autocomplete__item')
+          .click()
 
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('.memberlist__form__role .singleChoiceList__item__radioButton > input')
+          .first()
+          .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('div.workspace_advanced__userlist__adduser__button')
-        .click()
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('.memberlist__form__submitbtn > button')
+          .click()
+      }
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('#addmember')
-        .clear()
-        .type(userPublicName)
+      // NOTE - MP - 05-11-2021 - Validate the test; not in aftereach since it is
+      // not a cleaning method
+      const successfullyAdded = (userId) => {
+        cy.getTag({ selectorName: s.FLASH_MESSAGE })
+          .should('be.visible')
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('div.autocomplete__item')
-        .click()
+        // NOTE: MP - 04-11-2021 - We got a success flash message the
+        // user is successfully added to the database
+        cy.getTag({ selectorName: s.FLASH_TYPE })
+          .should('have.class', 'bg-info')
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.memberlist__form__role .singleChoiceList__item__radioButton > input')
-        .first()
-        .click()
+        numberOfUserInWorkSpace += 1
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.memberlist__form__submitbtn > button')
-        .click()
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get(`.workspace_advanced__userlist__list__item`)
+          .should('be.visible')
+          .and('have.length', numberOfUserInWorkSpace)
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
-        .should('be.visible')
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get(`[data-cy=workspace_advanced__member-${userId}]`)
+          .should('be.visible')
+      }
+
+      it('Should be able to add an user with their public name', () => {
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('#addmember')
+          .clear()
+          .type(userPublicName)
+
+        finishAddUser()
+
+        successfullyAdded(userId)
+      })
+
+      it('Should be able to add an user with his email', () => {
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('#addmember')
+          .clear()
+          .type(userEmail)
+
+          finishAddUser()
+          successfullyAdded(userId)
+      })
+
+      it('Should be able to add an user with his username', () => {
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('#addmember')
+          .clear()
+          .type(userUsername)
+
+          finishAddUser()
+          successfullyAdded(userId)
+      })
+
+      it('Should be able to remove an user of a workspace', () => {
+        // NOTE - MP - 05-11-2021 - Before this test: add an user to
+        // remove
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('#addmember')
+          .clear()
+          .type(userPublicName)
+
+        finishAddUser()
+
+        numberOfUserInWorkSpace += 1
+
+        // Note - MP - 05-11-2021 - Start the current test
+        cy.getTag({ selectorName: s.WORKSPACE_ADVANCED_USER_DELETE })
+          .last()
+          .click()
+
+        cy.getTag({ selectorName: s.FLASH_MESSAGE })
+          .should('be.visible')
+
+        // NOTE: MP - 04-11-2021 - We got a success flash message the
+        // user is successfully added to the database
+        cy.getTag({ selectorName: s.FLASH_TYPE })
+          .should('have.class', 'bg-info')
+
+        numberOfUserInWorkSpace -= 1
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get(`.workspace_advanced__userlist__list__item`)
+          .should('be.visible')
+          .and('have.length', numberOfUserInWorkSpace)
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get(`[data-cy=workspace_advanced__member-${userId}]`)
+          .should('be.not.visible')
+      })
     })
 
-    it('Should be able to add a user with his email', () => {
-      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-      cy.contains('.userstatus__role__text', 'Space manager')
+    describe('Disabled user', () => {
+      beforeEach(() => {
+          cy.getTag({ selectorName: s.CONTENT_FRAME })
+            .get('#addmember')
+            .clear()
+            .type(userPublicName)
 
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
+          cy.getTag({ selectorName: s.CONTENT_FRAME })
+            .get('div.autocomplete__item')
+            .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('div.workspace_advanced__userlist__adduser__button')
-        .click()
+          cy.getTag({ selectorName: s.CONTENT_FRAME })
+            .get('.memberlist__form__role .singleChoiceList__item__radioButton > input')
+            .first()
+            .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('#addmember')
-        .clear()
-        .type(userEmail)
+          cy.getTag({ selectorName: s.CONTENT_FRAME })
+            .get('.memberlist__form__submitbtn > button')
+            .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('div.autocomplete__item')
-        .click()
+          cy.getTag({ selectorName: s.FLASH_MESSAGE })
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.memberlist__form__role .singleChoiceList__item__radioButton > input')
-        .first()
-        .click()
+          numberOfUserInWorkSpace += 1
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.memberlist__form__submitbtn > button')
-        .click()
+          cy.getTag({ selectorName: s.CONTENT_FRAME })
+            .get(`.workspace_advanced__userlist__list__item`)
+            .should('be.visible')
+            .and('have.length', numberOfUserInWorkSpace)
+      })
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
-        .should('be.visible')
-    })
+      it('Should not display disabled user of the workspace', () => {
+        cy.disableUser(userId)
 
-    it('Should be able to add a user with his username', () => {
-      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-      cy.contains('.userstatus__role__text', 'Space manager')
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
+          .should('be.visible')
 
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('div.workspace_advanced__userlist__adduser__button')
-        .click()
+        cy.loginAs('administrators')
+        cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('#addmember')
-        .clear()
-        .type(userUsername)
+        // NOTE - MP - 05-11-2021 - If the page isn't loaded after 30s
+        // there is a problem somewhere
+        cy.get('.userstatus__role__text', { timeout: 30000 })
+          .contains('Space manager')
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('div.autocomplete__item')
-        .click()
+        cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
+          .get('.dashboard__workspace__detail__buttons .iconbutton')
+          .click()
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.memberlist__form__role .singleChoiceList__item__radioButton > input')
-        .first()
-        .click()
+        // NOTE - MP - 05-11-2021 - Waiting for the app to be fully loaded
+        // ie: member list displayed
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-1]`)
+          .should('be.not.visible')
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find('.memberlist__form__submitbtn > button')
-        .click()
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
+          .should('be.not.visible')
 
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
-        .should('be.visible')
-    })
-
-    it('Should not display disabled user(s)', () => {
-      cy.disableUser(userId)
-      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-      cy.contains('.userstatus__role__text', 'Space manager')
-
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
-
-      cy.getTag({ selectorName: s.CONTENT_FRAME })
-        .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)
-        .should('be.not.visible')
-
-      cy.enableUser(userId)
+        cy.enableUser(userId)
+      })
     })
   })
 
   describe('Optional features', () => {
-    beforeEach(() => {
-      cy.loginAs('administrators')
-      cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
-      cy.contains('.userstatus__role__text', 'Space manager')
-      cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
-    })
     const testCases = [
       {
         feature: 'news',

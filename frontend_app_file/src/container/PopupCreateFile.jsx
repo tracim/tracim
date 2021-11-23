@@ -48,15 +48,6 @@ class PopupCreateFile extends React.Component {
     this.setHeadTitle()
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = () => {
     const { state, props } = this
 
