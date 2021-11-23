@@ -1,15 +1,19 @@
 {
   "Account Settings": "Kontoeinstellungen",
+  "Add to space": "Dem Raum hinzufügen",
   "All fields are required. Please enter a name, an email and a password.": "Alle Eingabefelder sind erforderlich. Bitte geben Sie einen Namen, eine E-Mail und ein Passwort ein.",
   "Already have an account?": "Sie haben bereits ein Konto?",
+  "Available spaces": "Freie Plätze",
   "Create Account": "Konto erstellen",
   "Create account": "Konto erstellen",
   "Copy content link": "Link zum Inhalt kopieren",
   "Email:": "E-Mail:",
   "Email already exists": "E-Mail bereits verwendet",
+  "Email notif": "E-Mail-Benach",
   "Empty note": "Leere Notiz",
   "Empty thread": "Leeres Diskussion",
   "Error while creating account": "Fehler beim Anlegen eines Kontos",
+  "Error while saving new role for member": "Fehler beim Speichern einer neuen Rolle für ein Mitglied",
   "Full name:": "Vollständiger Name:",
   "Invalid email": "Ungültige E-Mail",
   "Invalid email. Please enter a valid email.": "Ungültige E-Mail. Bitte geben Sie eine gültige E-Mail ein.",
@@ -516,5 +520,10 @@
   "Select an image": "Wählen Sie ein Bild",
   "Crop the image": "Das Bild zuschneiden",
   "Back": "Zurück",
-  "Uploading…": "Hochladen…"
+  "No other spaces available": "Keine weiteren Plätze verfügbar",
+  "Manage user spaces": "Verwalten von Benutzerbereichen",
+  "Space management of the user {{userName}}": "Speicherplatzverwaltung für den Benutzer {{userName}}",
+  "Spaces membership": "Spaces Mitgliedschaft",
+  "Uploading…": "Hochladen…",
+  "You cannot change this member role because there are no other space managers.": "Sie können diese Mitgliederrolle nicht ändern, da es keine anderen Raummanager gibt."
 }
