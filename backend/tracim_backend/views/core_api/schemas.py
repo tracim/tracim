@@ -1948,6 +1948,7 @@ class ConfigSchema(marshmallow.Schema):
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
     limitation__maximum_online_users_message = marshmallow.fields.String()
     call__enabled = marshmallow.fields.Bool()
+    call__unanswered_timeout = marshmallow.fields.Int()
 
 
 class ConditionFileSchema(marshmallow.Schema):
