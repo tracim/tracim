@@ -471,10 +471,25 @@ With a Collabora host, `<collabora_host>` may look like `collaboradomain.ndd` or
 
 To enable online edition on Tracim and allow communication with your edition software.
 
-First you need to enable the edition on the API:
+First you need to enable the edition on the API. To do that you have to add the application to app_enabled. For example:
 
-    collaborative_document_edition.activated = True
-    collaborative_document_edition.software = collabora`
+    Before:
+    app.enabled = contents/thread,contents/html-document,contents/folder,agenda
+
+    After:
+    app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
+
+This application need contents/file application to work fully. You will have to add this application too. With our example:
+
+    Before:
+    app.enabled = contents/thread,contents/html-document,contents/folder,agenda,collaborative_document_edition
+
+    After:
+    app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,agenda,collaborative_document_edition
+
+Once the application enabled, you will have to specify which software you desire to use. So far Tracim only support Collabora.
+
+    collaborative_document_edition.software = collabora
 
 Then you need to indicate the ip adress of the server for the protocol `WOPI`:
 
@@ -496,7 +511,34 @@ But you can change the default directory to use your templates files:
 Filenames of the templates inside the directory are not relevant. Only their extensions matter and need to match the software's default extensions.
 For instance, `CODE` edits `Libre Office` files, so extensions will be `odt`, `odp`, `ods`.
 
-After all these changes in the configuration, you should restart all  process (web, webdav, etc...).
+After all these changes in the configuration, you should restart every process (web, webdav, etc...).
+
+## Call (Tracim v4.0+)
+
+### Configuring Tracim in `development.ini`
+To enable the call feature on Tracim.
+
+First you need to enable the call feature:
+
+    call.enabled = True
+
+#### Mandatory parameters
+Then select a provider:
+
+    call.provider = jitsi_meet
+
+Tracim is only supporting jitsi so far.
+
+Once you have selected a provider you will have to select an url:
+
+    call.jitsi_meet.url = https://meet.jit.si
+
+#### Facultative parameters
+You can specify the time (in seconds) before the call is considered unanswered:
+
+    call.unanswered_timeout = 30
+
+The default value is 30 seconds.
 
 ## User Custom Properties
 
