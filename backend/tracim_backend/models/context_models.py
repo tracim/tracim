@@ -12,6 +12,7 @@ from slugify import slugify
 from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.applications.collaborative_document_edition.models import (
@@ -207,10 +208,14 @@ class FileCreation(object):
     """
 
     def __init__(
-        self, content_namespace: ContentNamespaces = ContentNamespaces.CONTENT, parent_id: int = 0
+        self,
+        content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
+        parent_id: int = 0,
+        content_type: str = FILE_TYPE,
     ) -> None:
         self.parent_id = parent_id
         self.content_namespace = content_namespace
+        self.content_type = content_type
 
 
 class SetPassword(object):
