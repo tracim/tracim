@@ -178,6 +178,7 @@ class WorkspaceApi(object):
         if parent_workspace:
             assert parent_workspace.workspace_id != workspace.workspace_id
             assert parent_workspace.workspace_id > 0
+            assert parent_workspace.parent_id != workspace.workspace_id
             workspace.parent_id = parent_workspace.workspace_id
         else:
             workspace.parent_id = None
