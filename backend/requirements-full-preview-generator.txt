@@ -15,3 +15,5 @@ xvfbwrapper==0.2.9        # via preview-generator
 # FFMPEG (video)
 ffmpeg-python==0.2.0      # via preview-generator
 future==0.18.2            # via ffmpeg-python
+rawpy==0.16.0             # via preview-generator
+numpy==1.21.4             # via rawpy

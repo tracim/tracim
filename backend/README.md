@@ -23,7 +23,6 @@ On Debian Stretch (9) with sudo:
     python3-dev \
     python3-pip \
     python3-venv \
-    qpdf \
     ufraw-batch \
     ffmpeg \
     zlib1g-dev \
