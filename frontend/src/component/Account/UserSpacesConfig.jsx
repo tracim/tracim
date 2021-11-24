@@ -152,7 +152,7 @@ export class UserSpacesConfig extends React.Component {
   render () {
     const { props, state } = this
 
-    const entries = this.state.workspaceList.reduce((res, space) => {
+    const entries = state.workspaceList.reduce((res, space) => {
       if (space.memberList.length > 0) {
         const member = space.memberList.find(u => u.user_id === props.userToEditId)
         if (member) {

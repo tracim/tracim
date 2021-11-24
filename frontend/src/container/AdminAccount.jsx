@@ -124,8 +124,7 @@ export class Account extends React.Component {
       this.setState(prev => ({
         subComponentMenu: prev.subComponentMenu.map(component => ({ ...component, active: component.name === 'spacesConfig' }))
       }))
-    }
-    else {
+    } else {
       if (props.history.location.state && state.subComponentMenu.find(component => component.name === props.history.location.state)) {
         this.setState(prev => ({
           subComponentMenu: prev.subComponentMenu.map(component => ({ ...component, active: component.name === props.history.location.state }))
