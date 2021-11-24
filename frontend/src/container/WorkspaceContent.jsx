@@ -185,7 +185,7 @@ export class WorkspaceContent extends React.Component {
 
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
       this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: false })
-      this.loadAllWorkspaceContent(workspaceId, false, hasWorkspaceIdChanged)
+      this.loadAllWorkspaceContent(workspaceId, false)
     } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
   }
 
@@ -617,14 +617,17 @@ export class WorkspaceContent extends React.Component {
   }
 
   scrollToActiveContent = () => {
-    let contentToScrollTo = this.getContentIdOpenedInUrl(this.props.match.params)
+    let contentIdToScrollTo = this.getContentIdOpenedInUrl(this.props.match.params)
 
-    if (contentToScrollTo === undefined) {
+    if (contentIdToScrollTo === undefined) {
       const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
-      if (folderIdToOpen.length > 0) contentToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
+      if (folderIdToOpen.length > 0) contentIdToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
     }
-    const idContentToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentToScrollTo}`
-    if (document.getElementById(idContentToScrollTo)) document.getElementById(idContentToScrollTo).scrollIntoView()
+    const htmlContentIdToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentIdToScrollTo}`
+    const domElementToScrollTo = document.getElementById(htmlContentIdToScrollTo)
+    if (domElementToScrollTo) {
+      domElementToScrollTo.parentNode.scrollTop = domElementToScrollTo.offsetTop
+    }
   }
 
   render () {
