@@ -1430,7 +1430,7 @@ class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
     )
     number_of_members = marshmallow.fields.Int(
         example=42,
-        description="",
+        description="number of members of a space",
         allow_none=False,
         required=True,
         validate=positive_int_validator,

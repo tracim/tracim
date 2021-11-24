@@ -15,7 +15,6 @@ import {
   TracimComponent,
   checkUsernameValidity,
   deleteWorkspace,
-  getWorkspaceMemberList,
   sendGlobalFlashMessage,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
