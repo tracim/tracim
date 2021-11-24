@@ -4,6 +4,7 @@ imagemagick
 iproute2
 libfile-mimeinfo-perl
 libimage-exiftool-perl
+webp
 libmagic1
 locales
 poppler-utils
