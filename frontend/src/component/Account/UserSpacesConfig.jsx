@@ -15,7 +15,7 @@ import {
 } from 'tracim_frontend_lib'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList, getWorkspaceMemberList } from '../../action-creator.async.js'
-import AdminUserSpacesConfig from './AdminUserSpacesConfig.jsx'
+import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
 export class UserSpacesConfig extends React.Component {

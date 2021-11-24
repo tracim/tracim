@@ -15,16 +15,14 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { newFlashMessage } from '../../action-creator.sync.js'
+import { newFlashMessage } from '../action-creator.sync.js'
 import {
   deleteWorkspaceMember,
   getWorkspaceList,
   getWorkspaceMemberList,
   postWorkspaceMember,
   updateWorkspaceMember
-} from '../../action-creator.async.js'
-
-require('./AdminUserSpacesConfig.styl')
+} from '../action-creator.async.js'
 
 export class AdminUserSpacesConfig extends React.Component {
   constructor (props) {
@@ -165,6 +163,13 @@ export class AdminUserSpacesConfig extends React.Component {
     }
   }
 
+  filterWorkspaceList (list, filter) {
+    return list.filter(workspace =>
+      workspace.label.toUpperCase().includes(filter.toUpperCase()) ||
+      workspace.workspace_id === Number(filter)
+    )
+  }
+
   render () {
     const { props, state } = this
 
@@ -177,15 +182,8 @@ export class AdminUserSpacesConfig extends React.Component {
       else availableSpaceList.push(space)
     })
 
-    availableSpaceList = availableSpaceList.filter(workspace =>
-      workspace.label.toUpperCase().includes(state.availableSpaceListFilter.toUpperCase()) ||
-      workspace.workspace_id === Number(state.availableSpaceListFilter)
-    )
-
-    memberSpaceList = memberSpaceList.filter(workspace =>
-      workspace.label.toUpperCase().includes(state.memberSpaceListFilter.toUpperCase()) ||
-      workspace.workspace_id === Number(state.memberSpaceListFilter)
-    )
+    availableSpaceList = this.filterWorkspaceList(availableSpaceList, state.availableSpaceListFilter)
+    memberSpaceList = this.filterWorkspaceList(memberSpaceList, state.memberSpaceListFilter)
 
     return (
       <CardPopup
