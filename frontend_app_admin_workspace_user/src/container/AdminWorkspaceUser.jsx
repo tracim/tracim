@@ -152,27 +152,16 @@ export class AdminWorkspaceUser extends React.Component {
 
   loadWorkspaceContent = async () => {
     const { props, state } = this
+    const fetchWorkspaceList = await handleFetchResult(await getWorkspaceList(state.config.apiUrl))
 
-    const fetchWorkspaceList = getWorkspaceList(state.config.apiUrl)
-    const workspaceList = await handleFetchResult(await fetchWorkspaceList)
-
-    switch (workspaceList.apiResponse.status) {
+    switch (fetchWorkspaceList.apiResponse.status) {
       case 200: {
-        const fetchWorkspaceListMemberList = await Promise.all(
-          workspaceList.body.map(async ws =>
-            handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
-          )
-        )
+        const workspaceList = fetchWorkspaceList.body
 
         this.setState(prev => ({
           content: {
             ...prev.content,
-            workspaceList: workspaceList.body.map(ws => ({
-              ...ws,
-              memberList: (fetchWorkspaceListMemberList.find(
-                fws => fws.body.length > 0 && fws.body[0].workspace_id === ws.workspace_id
-              ) || { body: [] }).body
-            }))
+            workspaceList
           }
         }))
         break
@@ -192,11 +181,10 @@ export class AdminWorkspaceUser extends React.Component {
     return fetchUserDetail.body
   }
 
-  displayErrorFetchingUserList () {
-    sendGlobalFlashMessage(this.props.t('Error while loading users list'))
-  }
-
   loadUserContent = async () => {
+    const { state } = this
+    const fetchUserList = await handleFetchResult(await getUserList(state.config.apiUrl))
+
     switch (fetchUserList.apiResponse.status) {
       case 200: {
         const userList = fetchUserList.body
@@ -209,7 +197,7 @@ export class AdminWorkspaceUser extends React.Component {
         }))
         break
       }
-      default: this.displayErrorFetchingUserList()
+      default: sendGlobalFlashMessage(this.props.t('Error while loading users list'))
     }
   }
 

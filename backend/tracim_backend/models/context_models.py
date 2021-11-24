@@ -1072,6 +1072,10 @@ class WorkspaceInContext(object):
     def publication_enabled(self) -> bool:
         return self.workspace.publication_enabled
 
+    @property
+    def number_of_members(self) -> int:
+        return self.workspace.number_of_members
+
 
 class UserRoleWorkspaceInContext(object):
     """
