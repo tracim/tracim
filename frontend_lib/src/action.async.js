@@ -1,12 +1,17 @@
-import { CONTENT_NAMESPACE, FETCH_CONFIG } from './helper.js'
+import { COMMON_REQUEST_HEADERS, CONTENT_NAMESPACE, FETCH_CONFIG } from './helper.js'
 
-export const baseFetch = (method, url, body) =>
-  fetch(url, {
+export const baseFetch = (method, url, body = undefined) => {
+  const isFormData = body instanceof FormData
+  const headers = isFormData
+    ? COMMON_REQUEST_HEADERS
+    : FETCH_CONFIG.headers
+  return fetch(url, {
     credentials: 'include',
-    headers: FETCH_CONFIG.headers,
+    headers: headers,
     method: method,
-    body: body ? JSON.stringify(body) : undefined
+    body: body && !isFormData ? JSON.stringify(body) : body
   })
+}
 
 export const getContentPath = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}/path`)
@@ -209,3 +214,12 @@ export const deleteContentTag = (apiUrl, workspaceId, contentId, tagId) =>
 
 export const deleteWorkspaceTag = (apiUrl, workspaceId, tagId) =>
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/tags/${tagId}`)
+
+export const getRawFileContent = (apiUrl, workspaceId, contentId, revisionId, filename) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/raw/${filename}`)
+
+export const putRawFileContent = (apiUrl, workspaceId, contentId, filename, newContent, type = 'text/plain') => {
+  const formData = new FormData()
+  formData.append('files', new File([newContent], filename, { type }))
+  return baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}`, formData)
+}

@@ -8,13 +8,11 @@ import {
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
-  CONTENT_NAMESPACE,
   CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
   PAGE,
   PopinFixed,
-  PopinFixedHeader,
   PopinFixedContent,
   PopinFixedRightPart,
   PopinFixedRightPartContent,
@@ -23,7 +21,6 @@ import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
   buildHeadTitle,
-  RefreshWarningMessage,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
@@ -31,16 +28,17 @@ import {
   getOrCreateSessionClientToken,
   FAVORITE_STATE,
   ROLE,
-  COLORS,
-  SelectStatus,
   getFileContent,
   getFileRevision,
-  putFileRead,
   TagList,
   putMyselfFileRead
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
+
+// TODO - S.G. - 2021-11-24 - The kanban app uses file storage in backend
+// This should be fixed when https://github.com/tracim/tracim/issues/5102 is implemented.
+const FILE_APP_SLUG = 'file'
 
 export class Kanban extends React.Component {
   constructor (props) {
@@ -373,27 +371,27 @@ export class Kanban extends React.Component {
 
   handleChangeStatus = async newStatus => {
     const { props, state } = this
-    props.appContentChangeStatus(state.content, newStatus, state.config.slug)
+    props.appContentChangeStatus(state.content, newStatus, FILE_APP_SLUG)
   }
 
   handleClickArchive = async () => {
     const { props, state } = this
-    props.appContentArchive(state.content, this.setState.bind(this), state.config.slug)
+    props.appContentArchive(state.content, this.setState.bind(this), FILE_APP_SLUG)
   }
 
   handleClickDelete = async () => {
     const { props, state } = this
-    props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
+    props.appContentDelete(state.content, this.setState.bind(this), FILE_APP_SLUG)
   }
 
   handleClickRestoreArchive = async () => {
     const { props, state } = this
-    props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+    props.appContentRestoreArchive(state.content, this.setState.bind(this), FILE_APP_SLUG)
   }
 
   handleClickRestoreDelete = async () => {
     const { props, state } = this
-    props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
+    props.appContentRestoreDelete(state.content, this.setState.bind(this), FILE_APP_SLUG)
   }
 
   handleClickEditComment = (comment) => {
@@ -455,10 +453,17 @@ export class Kanban extends React.Component {
     const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
+    const readOnly = (
+      state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id ||
+        state.mode === APP_FEATURE_MODE.REVISION ||
+        state.content.is_archived ||
+        state.content.is_deleted ||
+        !state.content.is_editable
+    )
 
     return (
       <PopinFixed
-        customClass={`${state.config.slug}`}
+        customClass={state.config.slug}
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
@@ -468,17 +473,9 @@ export class Kanban extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
           content={state.content}
           config={state.config}
+          componentTitle={<div>{state.content.label}</div>}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
-          headerButtons={[
-            {
-              icon: 'fas fa-edit',
-              label: props.t('Edit'),
-              onClick: undefined,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'wsContentGeneric__option__menu__addversion'
-            }
-          ]}
           isRefreshNeeded={state.showRefreshWarning}
           contentVersionNumber={contentVersionNumber}
           lastVersion={lastVersionNumber}
@@ -492,7 +489,7 @@ export class Kanban extends React.Component {
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-              disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
+              disabled: readOnly,
               dataCy: 'popinListItem__delete'
             }
           ]}
@@ -507,9 +504,7 @@ export class Kanban extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
         >
-          {/* FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
-              https://github.com/tracim/tracim/issues/1840 */}
-          <KanbanComponent mode={state.mode} content={state.content} config={state.config} />
+          <KanbanComponent content={state.content} config={state.config} readOnly={readOnly} />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}

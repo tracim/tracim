@@ -217,7 +217,9 @@ import {
   getWorkspaceContent,
   getHtmlDocTranslated,
   getCommentTranslated,
-  getGenericWorkspaceContent
+  getGenericWorkspaceContent,
+  getRawFileContent,
+  putRawFileContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -445,5 +447,7 @@ export {
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
   getGenericWorkspaceContent,
-  htmlToText
+  htmlToText,
+  getRawFileContent,
+  putRawFileContent
 }

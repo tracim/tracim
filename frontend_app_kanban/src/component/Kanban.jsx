@@ -1,47 +1,49 @@
-/* global alert, confirm, prompt */
-
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { escape as escapeHtml } from 'lodash'
 import classnames from 'classnames'
 import { v4 as uuidv4 } from 'uuid'
-import Board, { addColumn } from '@asseinfo/react-kanban'
+import Board, { addColumn, removeColumn, moveColumn, changeColumn, addCard, changeCard, moveCard, removeCard } from '@asseinfo/react-kanban'
 import '@asseinfo/react-kanban/dist/styles.css'
 
 import {
   IconButton,
-  PromptMessage,
   handleFetchResult,
   putRawFileContent,
   getRawFileContent,
-  CardPopup
+  CardPopup,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
+import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
 require('./Kanban.styl')
 
 const KANBAN_MIME_TYPE = 'application/json'
 const KANBAN_FILE_EXTENSION = '.kanban'
 
-function moveElem (array, fromPosition, toPosition, elem) {
-  const a = array.slice()
-  a.splice(fromPosition, 1)
-  a.splice(toPosition, 0, elem)
-  return a
+const BOARD_STATE = {
+  LOADING: 'loading',
+  LOADED: 'loaded',
+  ERROR: 'error'
 }
 
 class Kanban extends React.Component {
   constructor (props) {
     super(props)
+
+    const justCreated = props.content.current_revision_type === 'creation'
+
     this.state = {
-      loading: props.content.current_revision_type !== 'creation',
-      error: false,
+      boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
       fullscreen: false,
-      autoSave: false,
+      saveRequired: false,
+      saving: false,
       colorPickerEnabledForColumnId: null,
       board: { columns: [] },
+      editedCardInfos: null
     }
   }
 
@@ -51,45 +53,42 @@ class Kanban extends React.Component {
 
   async componentDidUpdate (prevProps) {
     const { props, state } = this
-    if (props.content.current_revision_id !== prevProps.content.current_revision_id) {
-      this.setState({ loading: true })
+    if (!state.saving && props.content.current_revision_id !== prevProps.content.current_revision_id) {
       this.loadBoardContent()
     }
-    if (state.autoSave) {
+    if (state.saveRequired) {
+      this.setState({ saveRequired: false })
       await this.handleSave()
     }
   }
 
   async loadBoardContent () {
+    this.setState({ boardState: BOARD_STATE.LOADING })
     const { props } = this
-    const { content } = props
 
-    if (content.current_revision_type === 'creation') {
-      this.setState({ loading: false, board: { columns: [] } })
+    if (props.content.current_revision_type === 'creation') {
+      this.setState({ boardState: BOARD_STATE.LOADED, board: { columns: [] } })
       return
     }
 
     const fetchRawFileContent = await handleFetchResult(
       await getRawFileContent(
         props.config.apiUrl,
-        content.workspace_id,
-        content.content_id,
-        content.current_revision_id,
-        content.label + KANBAN_FILE_EXTENSION
+        props.content.workspace_id,
+        props.content.content_id,
+        props.content.current_revision_id,
+        props.content.label + KANBAN_FILE_EXTENSION
       ),
       true
     )
 
     if (fetchRawFileContent.apiResponse.ok) {
       this.setState({
-        loading: false,
-        board: {
-          columns: [],
-          ...JSON.parse(fetchRawFileContent.body || '{}')
-        }
+        boardState: BOARD_STATE.LOADED,
+        board: fetchRawFileContent.body || {}
       })
     } else {
-      this.setState({ loading: false, error: true })
+      this.setState({ boardState: BOARD_STATE.ERROR })
     }
   }
 
@@ -99,95 +98,75 @@ class Kanban extends React.Component {
 
   handleEditCardTitle = (card) => {
     const title = prompt(this.props.t('Please enter the new title of this card'), card.title || '')
-    if (title) {
-      this.updateCard({ ...card, title })
-    }
+    if (!title) return
+    this.setState(prevState => {
+      return {
+        board: changeCard(prevState.board, card.id, { title }),
+        saveRequired: true
+      }
+    })
   }
 
   handleEditCardContent = (card) => {
     this.setState({
-      editCard: { card, focusOnDescription: true }
+      editedCardInfos: { card, focusOnDescription: true }
     })
   }
 
-  updateColumn (column) {
-    this.updateColumns(
-      this.state.board.columns.map(
-        col => col.id === column.id
-          ? column
-          : col
-      )
-    )
-  }
-
-  updateCard (updatedCard) {
-    this.updateColumns(
-      this.state.board.columns.map(
-        col => ({
-          ...col,
-          cards: col.cards.map(
-            card => (
-              updatedCard.id === card.id
-                ? updatedCard
-                : card
-            )
-          )
-        })
-      )
-    )
-  }
-
   handleRemoveCard = (card) => {
-    this.updateColumns(
-      this.state.board.columns.map(
-        col => ({
-          ...col,
-          cards: col.cards.filter(c => c !== card)
-        })
-      )
-    )
+    this.setState(prevState => {
+      let column = null
+      for (column of prevState.board.columns) {
+        for (const columnCard of column.cards) {
+          if (columnCard.id === card.id) break
+        }
+      }
+
+      return {
+        board: column ? removeCard(prevState.board, column, card) : prevState.board,
+        saveRequired: true
+      }
+    })
   }
 
-  handleCardAdd (column) {
+  handleAddCard = (column) => {
     this.setState({
-      editCard: {
+      editedCardInfos: {
         card: {},
         column
       }
     })
   }
 
-  handleEditCard (card) {
+  handleEditCard = (card) => {
     this.setState({
-      editCard: { card }
+      editedCardInfos: { card }
     })
   }
 
   handleCardEdited = (card) => {
     if (card.id) {
-      this.updateCard(card)
-    } else {
-      this.addCardToColumn(this.state.editCard.column, { ...card, id: uuidv4() })
+      this.setState(prevState => {
+        return {
+          editedCardInfos: null,
+          board: changeCard(prevState.board, card.id, card),
+          saveRequired: true
+        }
+      })
+      return
     }
-    this.setState({
-      editCard: null
+    this.setState(prevState => {
+      const newCard = { ...card, id: uuidv4() }
+      return {
+        editedCardInfos: null,
+        board: addCard(prevState.board, prevState.editedCardInfos.column, newCard),
+        saveRequired: true
+      }
     })
   }
 
-  addCardToColumn (column, card) {
-    this.updateColumns(
-      this.state.board.columns.map(
-        col => (
-          col.id === column.id
-            ? { ...col, cards: [...col.cards, card] }
-            : col
-        )
-      )
-    )
-  }
-
-  handleSave = async () => {
-    const { props } = this
+  async handleSave () {
+    const { props, state } = this
     this.setState({ saving: true })
     const fetchResultSaveKanban = await handleFetchResult(
       await putRawFileContent(
@@ -195,7 +174,7 @@ class Kanban extends React.Component {
         props.content.workspace_id,
         props.content.content_id,
         props.content.label + KANBAN_FILE_EXTENSION,
-        JSON.stringify(this.state.board),
+        JSON.stringify(state.board),
         KANBAN_MIME_TYPE
       )
     )
@@ -203,14 +182,14 @@ class Kanban extends React.Component {
     if (!fetchResultSaveKanban.ok) {
       switch (fetchResultSaveKanban.body.code) {
         case 2044:
-          alert(props.t('You must change the status or restore this kanban board before any change'))
+          sendGlobalFlashMessage(props.t('You must change the status or restore this kanban board before any change'))
           break
         default:
-          alert(props.t('Error while saving the new version'))
+          sendGlobalFlashMessage(props.t('Error while saving the new version'))
           break
       }
     }
-    this.setState({ autoSave: false, saving: false })
+    this.setState({ saving: false })
   }
 
   handleAddColumn = async () => {
@@ -218,72 +197,41 @@ class Kanban extends React.Component {
     if (!title) {
       return
     }
+    this.handleNewColumnConfirm({ title, cards: [] })
+  }
 
-    const id = uuidv4()
-    const column = {
-      title,
-      id,
-      cards: [],
-      key: id
-    }
+  handleRemoveColumn = (column) => {
     this.setState(prevState => {
-      return { board: addColumn(prevState.board, column), autoSave: true }
+      return {
+        board: removeColumn(prevState.board, column),
+        saveRequired: true
+      }
     })
   }
 
-  handleCardRemove = (card) => {
-    this.handleRemoveCard(card)
-  }
-
-  handleColumnRemove = (column) => {
-    this.updateColumns(this.state.board.columns.filter(col => col !== column))
-  }
-
-  handleCardDragEnd = (card, { fromColumnId, fromPosition }, { toColumnId, toPosition }) => {
-    this.updateColumns(
-      this.state.board.columns.map(
-        col => (
-          (col.id === fromColumnId && col.id === toColumnId)
-            ? { ...col, cards: moveElem(col.cards, fromPosition, toPosition, card) }
-            : (
-              col.id === fromColumnId
-                ? { ...col, cards: col.cards.filter(c => c !== card) }
-                : (
-                  col.id === toColumnId
-                    ? {
-                      ...col,
-                      cards: [
-                        ...col.cards.slice(0, toPosition),
-                        card,
-                        ...col.cards.slice(toPosition)
-                      ]
-                    }
-                    : col
-                )
-            )
-        )
-      )
-    )
+  handleCardDragEnd = (card, from, to) => {
+    this.setState(prevState => {
+      return {
+        board: moveCard(prevState.board, from, to),
+        saveRequired: true
+      }
+    })
   }
 
   handleNewColumnConfirm = (column) => {
     const newColumn = { ...column, id: uuidv4() }
-
-    this.updateColumns([
-      ...this.state.board.columns,
-      newColumn
-    ])
+    this.setState(prevState => {
+      return { board: addColumn(prevState.board, newColumn), saveRequired: true }
+    })
   }
 
   handleColumnDragEnd = (column, { fromPosition }, { toPosition }) => {
-    this.updateColumns(
-      moveElem(
-        this.state.board.columns,
-        fromPosition,
-        toPosition,
-        column
-      )
-    )
+    this.setState(prevState => {
+      return {
+        board: moveColumn(prevState.board, fromPosition, toPosition),
+        saveRequired: true
+      }
+    })
   }
 
   updateColumns (newColumns) {
@@ -305,164 +253,144 @@ class Kanban extends React.Component {
   }
 
   handleColumnRename = (column, title) => {
-    // console.log("handleColumnRename", column, title)
-    const newColumns = this.state.board.columns
-    newColumns[newColumns.indexOf(column)] = { ...column, title }
-    this.updateColumns(newColumns)
-    return column
+    this.setState(prevState => {
+      return {
+        board: changeColumn(prevState.board, column, { title }),
+        saveRequired: true
+      }
+    })
   }
 
   handleColumnNew = (board, column) => {
-    // console.log("handleColumnNew", board, column)
     this.updateBoard(board)
     return column
   }
 
   handleColumnColorChange = (column, bgColor) => {
-    this.updateColumn({ ...column, bgColor })
-  }
-
-  handleCardColorChange = (card, e) => {
-    this.updateCard({ ...card, bgColor: e.target.value })
-  }
-
-  handleColumnColorClick = (column) => {
-    this.setState({
-      colorPickerEnabledForColumnId: this.state.colorPickerEnabledForColumnId === column.id
-        ? null
-        : column.id
+    this.setState(prevState => {
+      return {
+        board: changeColumn(prevState.board, column, { bgColor }),
+        saveRequired: true
+      }
     })
   }
 
-  renderColumnHeader = (column) => {
-    const { props } = this
-    return (
-      <>
-        <div
-          className='file__contentpage__statewrapper__kanban__column__header'
-          style={{ backgroundColor: column.bgColor || '' }}
-        >
-          <strong onClick={() => this.handleColumnRenameClick(column)}>{column.title}</strong>
-          <IconButton
-            text=''
-            icon='fas fa-paint-brush'
-            tooltip={props.t('Change the color of this column')}
-            onClick={() => this.handleColumnColorClick(column)}
-          />
-          <IconButton
-            text=''
-            icon='fas fa-plus'
-            tooltip={props.t('Add a card')}
-            onClick={() => this.handleCardAdd(column)}
-          />
-          <IconButton
-            text=''
-            icon='far fa-trash-alt'
-            tooltip={props.t('Remove this column')}
-            onClick={() => {
-              if (confirm(props.t('Are you sure you want to delete this column?'))) {
-                this.handleColumnRemove(column)
-              }
-            }}
-          />
-        </div>
-        {(this.state.colorPickerEnabledForColumnId === column.id && (
-          <div className='file__contentpage__statewrapper__kanban__column__colorPicker'>
-            <input type='color' onChange={(e) => this.handleColumnColorChange(column, e.target.value)} />
-            <input type='button' style={{ fontSize: 'small' }} value={props.t('Hide')} onClick={() => this.setState({ colorPickerEnabledForColumnId: null })} />
-          </div>
-        ))}
-      </>
-    )
+  handleCardColorChange = (card, e) => {
+    this.setState(prevState => {
+      return {
+        board: changeCard(prevState.board, card.id, { bgColor: e.target.value }),
+        saveRequired: true
+      }
+    })
+  }
+
+  handleColumnColorClick = (column) => {
+    this.setState(prevState => {
+      return {
+        colorPickerEnabledForColumnId: prevState.colorPickerEnabledForColumnId === column.id
+          ? null
+          : column.id
+      }
+    })
   }
 
   handleCardEditCancel = () => {
-    this.setState({ editCard: null })
+    this.setState({ editedCardInfos: null })
   }
 
   render () {
     const { props, state } = this
 
     return (
-      <div className={classnames('file__contentpage__statewrapper__kanban', { fullscreen: state.fullscreen })}>
-        {state.isDrafAvailable && (
-          <PromptMessage
-            msg={props.t('You have a pending draft')}
-            btnType='link'
-            icon='far fa-hand-point-right'
-            btnLabel={props.t('Resume writing')}
-            onClickBtn={this.handleRestoreDraft}
-          />
-        )}
-
-        <div className='file__contentpage__statewrapper__kanban__toolbar'>
+      <div className={classnames('kanban__contentpage__statewrapper__kanban', { fullscreen: state.fullscreen })}>
+        <div className='kanban__contentpage__statewrapper__kanban__toolbar'>
           <IconButton
             text={props.t('column')}
             icon='fas fa-plus'
             onClick={this.handleAddColumn}
+            disabled={props.readOnly}
           />
           <IconButton
             icon='fas fa-arrows-alt'
             text={props.t('Fullscreen')}
             onClick={this.handleClickFullscreen}
           />
-          {state.fullscreen && (<span className='file__contentpage__statewrapper__kanban__toolbar__title'>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
+          {state.fullscreen && (<span className='kanban__contentpage__statewrapper__kanban__toolbar__title'>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
         </div>
-        {(state.loading
-          ? <span>{props.t('Loading, please wait…')}</span>
-          : (state.error
-            ? <span style={{ color: '#FF3333' }}> {props.t('Error while loading the board.')} </span> // FIXME inline style
-            : (
-              <>
-                <div className='file__contentpage__statewrapper__kanban__wrapper'>
-                  <Board
-                    allowAddColumn
-                    allowRemoveColumn
-                    allowRenameColumn
-                    allowAddCard
-                    allowRemoveCard
-                    onCardDragEnd={this.handleCardDragEnd}
-                    onColumnDragEnd={this.handleColumnDragEnd}
-                    onNewColumnConfirm={this.handleNewColumnConfirm}
-                    onColumnNew={this.handleColumnNew}
-                    onColumnRemove={this.handleColumnRemove}
-                    onCardRemove={this.handleCardRemove}
-                    onColumnRename={this.handleColumnRename}
-                    renderColumnHeader={this.renderColumnHeader}
-                    renderCard={card => (
-                      <KanbanCard
-                        card={card}
-                        onEditCardTitle={this.handleEditCardTitle}
-                        onEditCardColor={this.handleEditCard}
-                        onEditCardContent={this.handleEditCardContent}
-                        onRemoveCard={this.handleRemoveCard}
-                      />
-                    )}
-                  >
-                    {state.board}
-                  </Board>
-                </div>
-                {state.editCard && (
-                  <CardPopup
-                    customClass='file__kanbanCardEditor'
-                    customHeaderClass='primaryColorBg'
-                    onClose={this.handleCardEditCancel}
-                  >
-                    <KanbanCardEditor
-                      card={state.editCard.card}
-                      focusOnDescription={state.editCard.focusOnDescription}
-                      onValidate={this.handleCardEdited}
-                      onCancel={this.handleCardEditCancel}
-                    />
-                  </CardPopup>
+        {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}
+        {state.boardState === BOARD_STATE.ERROR && <span style={{ color: '#FF3333' }}> {props.t('Error while loading the board.')} </span>}
+        {state.boardState === BOARD_STATE.LOADED && (
+          <>
+            <div className='kanban__contentpage__statewrapper__kanban__wrapper'>
+              <Board
+                allowAddColumn={props.readOnly}
+                allowRemoveColumn={props.readOnly}
+                allowRenameColumn={props.readOnly}
+                allowAddCar={props.readOnly}
+                allowRemoveCard={props.readOnly}
+                onCardDragEnd={this.handleCardDragEnd}
+                onColumnDragEnd={this.handleColumnDragEnd}
+                onNewColumnConfirm={this.handleNewColumnConfirm}
+                onColumnNew={this.handleColumnNew}
+                onColumnRemove={this.handleRemoveColumn}
+                onCardRemove={this.handleRemoveCard}
+                onColumnRename={this.handleColumnRename}
+                renderColumnHeader={column => (
+                  <KanbanColumnHeader
+                    readOnly={props.readOnly}
+                    column={column}
+                    onRenameColumn={this.handleColumnRenameClick}
+                    onChangeColumnColor={this.handleColumnColorClick}
+                    onApplyColumnColorChange={this.handleColumnColorChange}
+                    onCancelColumnColorChange={() => this.setState({ colorPickerEnabledForColumnId: null })}
+                    onAddCard={this.handleAddCard}
+                    onRemoveColumn={this.handleRemoveColumn}
+                    showColorPicker={state.colorPickerEnabledForColumnId === column.id}
+                  />
                 )}
-              </>
-            )
-          )
+                renderCard={card => (
+                  <KanbanCard
+                    readOnly={props.readOnly}
+                    card={card}
+                    onEditCardTitle={this.handleEditCardTitle}
+                    onEditCardColor={this.handleEditCard}
+                    onEditCardContent={this.handleEditCardContent}
+                    onRemoveCard={this.handleRemoveCard}
+                  />
+                )}
+              >
+                {state.board}
+              </Board>
+            </div>
+            {state.editedCardInfos && (
+              <CardPopup
+                customClass='kanban__kanbanCardEditor'
+                customHeaderClass='primaryColorBg'
+                onClose={this.handleCardEditCancel}
+              >
+                <KanbanCardEditor
+                  card={state.editedCardInfos.card}
+                  focusOnDescription={state.editedCardInfos.focusOnDescription}
+                  onValidate={this.handleCardEdited}
+                  onCancel={this.handleCardEditCancel}
+                />
+              </CardPopup>
+            )}
+          </>
         )}
       </div>
     )
   }
+}
+
+Kanban.propTypes = {
+  config: PropTypes.object.isRequired,
+  content: PropTypes.object.isRequired,
+  readOnly: PropTypes.bool
+}
+
+Kanban.defaultProps = {
+  readOnly: false
 }
 
 export default translate()(Kanban)

@@ -5,8 +5,8 @@ export const debug = {
   config: {
     ...defaultDebug.config,
     slug: 'kanban',
-    faIcon: 'far fa-comments',
-    hexcolor: '#428BCA',
+    faIcon: 'fas fa-columns',
+    hexcolor: '#197474',
     creationLabel: 'Start a topic',
     label: 'Kanban',
     workspace: {

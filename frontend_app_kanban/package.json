@@ -17,7 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@asseinfo/react-kanban": "2.1.0",
+    "@asseinfo/react-kanban": "^2.2.0",
     "classnames": "^2.2.6",
     "core-js": "^3.6.4",
     "eslint-import-resolver-node": "^0.3.3",
@@ -80,7 +80,10 @@
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
-      "CustomEvent"
+      "CustomEvent",
+      "confirm",
+      "alert",
+      "prompt"
     ],
     "parser": "babel-eslint",
     "ignore": []

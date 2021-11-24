@@ -5,15 +5,15 @@ __metadata:
   version: 4
   cacheKey: 4
 
-"@asseinfo/react-kanban@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@asseinfo/react-kanban@npm:2.1.0"
+"@asseinfo/react-kanban@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@asseinfo/react-kanban@npm:2.2.0"
   dependencies:
     react-beautiful-dnd: ^13.0.0
   peerDependencies:
     react: ^16.8.0 || ^17.0.0
     react-dom: ^16.8.0 || ^17.0.0
-  checksum: 2b2640e358f1f75cc53fe91743d6d9066320dbdf733159c45115eb61b061296b3de577ad9911658160838a26bc9cbf7b6743c0356956f4c79c4b944b3c2aecb9
+  checksum: ec719ad508c8a394c5dca1ce8a11a5308cf032d67f265bef94acb0adf9c74c292e518ee3d75ec710fdc1fad6bb6444898bcd80e795ac151d0ba199f222b39284
   languageName: node
   linkType: hard
 
@@ -13876,7 +13876,7 @@ fsevents@^1.2.7:
   version: 0.0.0-use.local
   resolution: "tracim_app_kanban@workspace:frontend_app_kanban"
   dependencies:
-    "@asseinfo/react-kanban": 2.1.0
+    "@asseinfo/react-kanban": ^2.2.0
     "@babel/core": ^7.12.10
     "@babel/plugin-proposal-class-properties": ^7.12.1
     "@babel/plugin-proposal-object-rest-spread": ^7.12.1
