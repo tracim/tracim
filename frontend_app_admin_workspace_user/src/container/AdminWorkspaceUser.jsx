@@ -197,17 +197,9 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   loadUserContent = async () => {
-    const fetchUserList = await handleFetchResult(await getUserList(this.state.config.apiUrl))
-
     switch (fetchUserList.apiResponse.status) {
       case 200: {
-        const userList = []
-
-        for (const user of fetchUserList.body) {
-          const detailedUser = await this.getDetailedUser(user)
-          if (!detailedUser) return
-          userList.push(detailedUser)
-        }
+        const userList = fetchUserList.body
 
         this.setState(prev => ({
           content: {
