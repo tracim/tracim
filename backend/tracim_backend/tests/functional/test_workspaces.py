@@ -1178,7 +1178,7 @@ class TestWorkspacesEndpoints(object):
 
     def test_api__get_workspaces__ok_200__nominal_case(self, workspace_api_factory, web_testapp):
         """
-        Check obtain all workspaces reachables for user with user auth.
+        Check obtain all workspaces reachables for admin user.
         """
 
         workspace_api = workspace_api_factory.get()
@@ -1202,6 +1202,45 @@ class TestWorkspacesEndpoints(object):
         assert workspace["label"] == "test3"
         assert workspace["publication_enabled"] is True
         assert workspace["slug"] == "test3"
+
+    def test_api__get_workspaces__ok_200__number_of_members(
+        self, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
+    ):
+        """
+        Check the number of members of a space
+        """
+
+        uapi = user_api_factory.get()
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=Profile.TRUSTED_USER,
+        )
+
+        admin2 = uapi.create_user(
+            email="admin2@admin2.admin2", profile=Profile.ADMIN, do_notify=False
+        )
+
+        workspace_api = workspace_api_factory.get(current_user=admin2)
+        workspace_api.create_workspace("test", save_now=True)
+        space2 = workspace_api.create_workspace("test2", save_now=True)
+
+        rapi = role_api_factory.get(current_user=admin2)
+        rapi.create_one(user, space2, UserRoleInWorkspace.READER, False)
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/workspaces", status=200)
+        res = res.json_body
+        assert len(res) == 2
+        workspace = res[0]
+        assert workspace["label"] == "test"
+        assert workspace["number_of_members"] == 1
+        workspace = res[1]
+        assert workspace["label"] == "test2"
+        assert workspace["number_of_members"] == 2
 
     def test_api__get_workspaces__ok_200__with_parent_ids(self, workspace_api_factory, web_testapp):
         """
