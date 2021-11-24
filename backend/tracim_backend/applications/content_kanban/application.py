@@ -18,6 +18,7 @@ class ContentKanbanApp(TracimApplication):
                 creation_label="Create a Kanban board",
                 available_statuses=content_status_list.get_all(),
                 minimal_role_content_creation=WorkspaceRoles.CONTRIBUTOR,
+                file_extension=".kanban",
                 app=self,
             )
         )
@@ -44,7 +45,7 @@ def create_app() -> TracimApplication:
     return ContentKanbanApp(
         label="Kanban boards",
         slug="contents/kanban",
-        fa_icon="fas fa-paperclip",
+        fa_icon="fas fa-columns",
         config={},
         main_route="",
     )
