@@ -6,32 +6,21 @@ Backend source code of Tracim, using Pyramid Framework.
 
 ### Distribution dependencies
 
-On Debian Stretch (9) with sudo:
+On Debian Bullseye (11) with sudo:
 
-    sudo apt update && sudo apt install \
-    ghostscript \
-    git \
-    imagemagick \
-    libfile-mimeinfo-perl \
-    libjpeg-dev \
-    libldap2-dev \
-    libmagickwand-dev \
-    libpq-dev \
-    libsasl2-dev \
-    poppler-utils \
-    python3 \
-    python3-dev \
-    python3-pip \
-    python3-venv \
-    ufraw-batch \
-    ffmpeg \
-    zlib1g-dev \
-    exiftool
+```shell
+sudo apt update
+sudo apt install system_packages/debian/build_backend_packages.list
+sudo apt install system_packages/debian/run_backend_packages.list
+```
 
-For better preview support:
 
-    sudo apt install libreoffice # most office documents file and text format
-    sudo apt install inkscape # for .svg files.
+(Optional) Add optional preview dependencies for better preview support (LibreOffice, Inkscape, FFmpeg,...):
+
+```shell
+sudo apt install system_packages/debian/optional_preview_packages.list
+```
+
 
 ### Supported database engines
 

@@ -56,5 +56,6 @@
   "News activated": "Actualités activées",
   "News deactivated": "Actualités désactivées",
   "Error while activating news": "Erreur pendant l'activation des actualités",
-  "Error while deactivating news": "Erreur pendant la désactivation des actualités"
+  "Error while deactivating news": "Erreur pendant la désactivation des actualités",
+  "You cannot change this member role because there are no other space managers.": "Vous ne pouvez pas modifier ce rôle de membre car il n'y a pas d'autres gestionnaires d'espace."
 }

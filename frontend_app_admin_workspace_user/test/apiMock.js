@@ -24,10 +24,10 @@ const mockGetUserDetails200 = (apiUrl, user) => {
     .reply(200, user)
 }
 
-const mockPostUser200 = (apiUrl) => {
+const mockPostUser200 = (apiUrl, user) => {
   return nock(apiUrl)
     .post('/users')
-    .reply(200, {})
+    .reply(200, { ...user, user_id: 1 })
 }
 
 export {

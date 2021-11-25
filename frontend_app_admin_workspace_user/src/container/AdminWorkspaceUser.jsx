@@ -460,7 +460,7 @@ export class AdminWorkspaceUser extends React.Component {
             : props.t('User created'),
           'info'
         )
-        return 1
+        return newUserResult.body.user_id
       case 400:
         switch (newUserResult.body.code) {
           case 2001:
@@ -481,6 +481,11 @@ export class AdminWorkspaceUser extends React.Component {
         sendGlobalFlashMessage(props.t('Error while saving new user'))
         return -6
     }
+  }
+
+  handleClickCreateUserAndAddToSpaces = async (publicName, username, email, profile, password) => {
+    const userId = await this.handleClickAddUser(publicName, username, email, profile, password)
+    if (userId > 0) this.state.config.history.push(PAGE.ADMIN.USER_EDIT(userId), 'spacesConfig')
   }
 
   handleUserCreated = async (message) => {
@@ -595,6 +600,7 @@ export class AdminWorkspaceUser extends React.Component {
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
+            onClickCreateUserAndAddToSpaces={this.handleClickCreateUserAndAddToSpaces}
             onChangeUsername={this.handleChangeUsername}
             breadcrumbsList={state.breadcrumbsList}
             isUsernameValid={state.isUsernameValid}
