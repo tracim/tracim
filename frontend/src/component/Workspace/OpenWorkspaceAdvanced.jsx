@@ -36,7 +36,7 @@ export class OpenWorkspaceAdvanced extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    console.log('%c<OpenContentApp> did Update', 'color: #dcae84', this.props)
+    console.log('%c<OpenWorkspaceAdvanced> did Update', 'color: #dcae84', this.props)
     this.openWorkspaceAdvanced(prevProps)
   }
 
