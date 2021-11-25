@@ -15,7 +15,7 @@ sudo apt install system_packages/debian/run_backend_packages.list
 ```
 
 
-(Optional) Add optional preview dependencies for better preview support (libreoffice,inkscape,ffmpeg,...):
+(Optional) Add optional preview dependencies for better preview support (LibreOffice, Inkscape, FFmpeg,...):
 
 ```shell
 sudo apt install system_packages/debian/optional_preview_packages.list
