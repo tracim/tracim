@@ -57,7 +57,7 @@ class MoveSpaceCommand(AppContextCommand):
             if parsed_args.debug:
                 raise exc
             else:
-                return
+                exit(1)
 
         if parsed_args.parent_space_id == 0:
             print("Space {}({}) moved to root.".format(parsed_args.space_id, workspace.label,))
