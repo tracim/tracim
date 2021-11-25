@@ -10,6 +10,7 @@ from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 
+from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.email_validators import RFCEmailValidator
@@ -367,6 +368,7 @@ class FileCreationFormSchema(marshmallow.Schema):
     content_namespace = EnumField(
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
+    content_type = marshmallow.fields.String(missing=FILE_TYPE, example=FILE_TYPE)
 
     @post_load
     def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:

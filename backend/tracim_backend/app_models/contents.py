@@ -164,6 +164,7 @@ MARKDOWNPLUSPAGE_TYPE = "markdownpage"
 HTML_DOCUMENTS_TYPE = "html-document"
 FOLDER_TYPE = "folder"
 COMMENT_TYPE = "comment"
+KANBAN_TYPE = "kanban"
 
 
 # TODO - G.M - 31-05-2018 - Set Better Comment params
@@ -221,7 +222,7 @@ class ContentTypeList(object):
         for item in content_types:
             if item.slug == slug or (item.slug_aliases and slug in item.slug_aliases):
                 return item
-        raise ContentTypeNotExist()
+        raise ContentTypeNotExist("Content-type does not exist/is disabled: {}".format(slug))
 
     def restricted_allowed_types_slug(self) -> typing.List[str]:
         """

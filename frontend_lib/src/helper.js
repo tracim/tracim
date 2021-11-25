@@ -500,7 +500,8 @@ export const CONTENT_TYPE = {
   FILE: 'file',
   THREAD: 'thread',
   FOLDER: 'folder',
-  COMMENT: 'comment'
+  COMMENT: 'comment',
+  KANBAN: 'kanban'
 }
 
 // FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
