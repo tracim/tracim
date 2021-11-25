@@ -14,6 +14,7 @@ export class OpenContentApp extends React.Component {
   openContentApp = async (prevProps = {}) => {
     const {
       appList,
+      // dispatch,
       workspaceId,
       appOpenedType,
       user,
@@ -22,6 +23,7 @@ export class OpenContentApp extends React.Component {
       renderAppFeature,
       dispatchCustomEvent,
       match
+      // t
     } = this.props
 
     // RJ - 2020-01-13 - NOTE: match.params.idcts can be equal to "new"
@@ -77,7 +79,6 @@ export class OpenContentApp extends React.Component {
       findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST),
       contentToOpen
     )
-
     await this.readContentNotifications(user.userId, contentToOpen.content_id, parentId)
 
     if (contentToOpen.type !== appOpenedType) {

@@ -297,10 +297,8 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   handleClickBtnCloseApp = () => {
-    const { state } = this
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
-    state.config.history.push(PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id))
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -799,10 +797,6 @@ export class WorkspaceAdvanced extends React.Component {
 
   render () {
     const { state } = this
-
-    if (state.loggedUser.userRoleIdInWorkspace !== ROLE.workspaceManager.id) {
-      state.config.history.push(PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id))
-    }
 
     if (!state.isVisible) return null
 
