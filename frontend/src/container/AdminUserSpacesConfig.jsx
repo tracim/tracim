@@ -3,9 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  BtnSwitch,
   CardPopup,
-  DropdownMenu,
   IconButton,
   PROFILE,
   ROLE,
@@ -33,7 +31,7 @@ export class AdminUserSpacesConfig extends React.Component {
     this.state = {
       availableSpaceListFilter: '',
       memberSpaceListFilter: '',
-      workspaceList: []
+      spaceList: []
     }
 
     props.registerLiveMessageHandlerList([
@@ -45,7 +43,7 @@ export class AdminUserSpacesConfig extends React.Component {
 
   handleMemberModified = (data) => {
     this.setState(prev => ({
-      workspaceList: prev.workspaceList.map(space =>
+      spaceList: prev.spaceList.map(space =>
         space.workspace_id === data.fields.workspace.workspace_id
           ? {
             ...space,
@@ -63,43 +61,43 @@ export class AdminUserSpacesConfig extends React.Component {
     // RJ - 2020-10-28 - FIXME - https://github.com/tracim/tracim/issues/3740
     // We should update the member list with using information in data instead of re-fetching it
     const { props, state } = this
-    const workspaceIndex = this.state.workspaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
-    const workspace = await this.fillMemberList(data.fields.workspace)
+    const spaceIndex = this.state.spaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
+    const space = await this.fillMemberList(data.fields.workspace)
 
-    if (workspaceIndex === -1 && Number(props.userToEditId) !== data.fields.user.user_id) return
+    if (spaceIndex === -1 && Number(props.userToEditId) !== data.fields.user.user_id) return
 
     this.setState({
-      workspaceList: (
-        workspaceIndex === -1
-          ? sortWorkspaceList([...state.workspaceList, workspace])
+      spaceList: (
+        spaceIndex === -1
+          ? sortWorkspaceList([...state.spaceList, space])
           : [
-            ...state.workspaceList.slice(0, workspaceIndex),
-            workspace,
-            ...state.workspaceList.slice(workspaceIndex + 1)
+            ...state.spaceList.slice(0, spaceIndex),
+            space,
+            ...state.spaceList.slice(spaceIndex + 1)
           ]
       )
     })
   }
 
   componentDidMount () {
-    this.getWorkspaceList()
+    this.getSpaceList()
   }
 
   componentDidUpdate (prevProps) {
     if (prevProps.userToEditId !== this.props.userToEditId) {
-      this.getWorkspaceList()
+      this.getSpaceList()
     }
   }
 
-  getWorkspaceList = async () => {
+  getSpaceList = async () => {
     const { props } = this
 
-    const fetchGetWorkspaceList = await props.dispatch(getWorkspaceList())
+    const fetchGetSpaceList = await props.dispatch(getWorkspaceList())
 
-    switch (fetchGetWorkspaceList.status) {
+    switch (fetchGetSpaceList.status) {
       case 200: {
-        const workspaceList = await Promise.all(fetchGetWorkspaceList.json.map(this.fillMemberList))
-        this.setState({ workspaceList })
+        const spaceList = await Promise.all(fetchGetSpaceList.json.map(this.fillMemberList))
+        this.setState({ spaceList })
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
@@ -115,11 +113,11 @@ export class AdminUserSpacesConfig extends React.Component {
     }
   }
 
-  handleLeaveSpace = async (workspace) => {
+  handleLeaveSpace = async (space) => {
     const { props } = this
-    if (!workspace.workspace_id) return
+    if (!space.workspace_id) return
 
-    const fetchResult = await props.dispatch(deleteWorkspaceMember(workspace.workspace_id, props.userToEditId))
+    const fetchResult = await props.dispatch(deleteWorkspaceMember(space.workspace_id, props.userToEditId))
     if (fetchResult.status !== 204) {
       props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
     }
@@ -135,14 +133,14 @@ export class AdminUserSpacesConfig extends React.Component {
     return !memberList.some(u => u.user_id !== this.props.userToEditId && u.role === manager)
   }
 
-  handleAddToSpace = async (workspace) => {
+  handleAddToSpace = async (space) => {
     const { props } = this
     const fetchPutUserSpaceSubscription = await props.dispatch(
-      postWorkspaceMember(workspace.workspace_id, {
+      postWorkspaceMember(space.workspace_id, {
         id: props.userToEditId,
         email: props.userEmail,
         username: props.userUsername,
-        role: workspace.default_user_role
+        role: space.default_user_role
       })
     )
 
@@ -151,24 +149,24 @@ export class AdminUserSpacesConfig extends React.Component {
     }
   }
 
-  handleClickChangeRole = async (workspace, role) => {
+  handleClickChangeRole = async (space, role) => {
     const { props } = this
-    const fetchUpdateWorkspaceMember = await props.dispatch(
-      updateWorkspaceMember(workspace.workspace_id, props.userToEditId, role.slug)
+    const fetchUpdateSpaceMember = await props.dispatch(
+      updateWorkspaceMember(space.workspace_id, props.userToEditId, role.slug)
     )
-    if (fetchUpdateWorkspaceMember.status !== 200) {
+    if (fetchUpdateSpaceMember.status !== 200) {
       props.dispatch(newFlashMessage(
-        fetchUpdateWorkspaceMember.json.code === 3011
+        fetchUpdateSpaceMember.json.code === 3011
           ? props.t('You cannot change this member role because there are no other space managers.')
           : props.t('Error while saving new role for member')
         , 'warning'))
     }
   }
 
-  filterWorkspaceList (list, filter) {
-    return list.filter(workspace =>
-      workspace.label.toUpperCase().includes(filter.toUpperCase()) ||
-      workspace.workspace_id === Number(filter)
+  filterSpaceList (list, filter) {
+    return list.filter(space =>
+      space.label.toUpperCase().includes(filter.toUpperCase()) ||
+      space.workspace_id === Number(filter)
     )
   }
 
@@ -180,14 +178,14 @@ export class AdminUserSpacesConfig extends React.Component {
     let memberSpaceList = []
     let availableSpaceList = []
 
-    state.workspaceList.forEach(space => {
+    state.spaceList.forEach(space => {
       if (space.memberList.length <= 0) return
       if (space.memberList.find(u => u.user_id === props.userToEditId)) memberSpaceList.push(space)
       else availableSpaceList.push(space)
     })
 
-    availableSpaceList = this.filterWorkspaceList(availableSpaceList, state.availableSpaceListFilter)
-    memberSpaceList = this.filterWorkspaceList(memberSpaceList, state.memberSpaceListFilter)
+    availableSpaceList = this.filterSpaceList(availableSpaceList, state.availableSpaceListFilter)
+    memberSpaceList = this.filterSpaceList(memberSpaceList, state.memberSpaceListFilter)
 
     return (
       <CardPopup
@@ -218,6 +216,7 @@ export class AdminUserSpacesConfig extends React.Component {
                       {availableSpaceList.map(space => {
                         return (
                           <AdminUserSpacesConfigItem
+                            key={`availableSpaceList_${space.workspace_id}`}
                             onClickButton={this.handleAddToSpace}
                             space={space}
                           />
@@ -253,6 +252,7 @@ export class AdminUserSpacesConfig extends React.Component {
                         return (
                           <AdminUserSpacesConfigItem
                             emailNotificationActivated={props.system.config.email_notification_activated}
+                            key={`memberSpaceList_${space.workspace_id}`}
                             onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
                             onClickButton={this.handleLeaveSpace}
                             onClickChangeRole={this.handleClickChangeRole}

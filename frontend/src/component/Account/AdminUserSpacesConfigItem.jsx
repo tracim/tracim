@@ -4,8 +4,9 @@ import {
   BtnSwitch,
   DropdownMenu,
   IconButton,
-  ROLE_LIST,
+  ROLE_LIST
 } from 'tracim_frontend_lib'
+import PropTypes from 'prop-types'
 
 export const AdminUserSpacesConfigItem = props => {
   let buttonTitle = ''
@@ -15,33 +16,33 @@ export const AdminUserSpacesConfigItem = props => {
       : props.t('Remove from space')
   } else buttonTitle = props.t('Add to space')
   return (
-    <tr key={`memberSpaceList_${props.space.workspace_id}`}>
+    <tr>
       <td>
         {props.space.workspace_id}
       </td>
       <td className='adminUserSpacesConfig__zones__table__spaceName'>
         {props.space.label}
       </td>
-      {(props.memberRole &&
-      <td>
-        <DropdownMenu
-          buttonOpts={<i className={`fas fa-fw fa-${props.memberRole.faIcon}`} style={{ color: props.memberRole.hexcolor }} />}
-          buttonLabel={props.t(props.memberRole.label)}
-          buttonCustomClass='nohover btndropdown transparentButton'
-          isButton
-        >
-          {ROLE_LIST.map(r =>
-            <button
-              className='transparentButton'
-              onClick={() => props.onClickChangeRole(props.space, r)}
-              key={r.id}
-            >
-              <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
-              {props.t(r.label)}
-            </button>
-          )}
-        </DropdownMenu>
-      </td>
+      {props.memberRole && (
+        <td>
+          <DropdownMenu
+            buttonOpts={<i className={`fas fa-fw fa-${props.memberRole.faIcon}`} style={{ color: props.memberRole.hexcolor }} />}
+            buttonLabel={props.t(props.memberRole.label)}
+            buttonCustomClass='nohover btndropdown transparentButton'
+            isButton
+          >
+            {ROLE_LIST.map(r =>
+              <button
+                className='transparentButton'
+                onClick={() => props.onClickChangeRole(props.space, r)}
+                key={r.id}
+              >
+                <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
+                {props.t(r.label)}
+              </button>
+            )}
+          </DropdownMenu>
+        </td>
       )}
       {(props.emailNotificationActivated &&
         <td className='adminUserSpacesConfig__zones__table__notifications'>
