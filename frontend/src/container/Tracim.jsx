@@ -858,6 +858,12 @@ export class Tracim extends React.Component {
 
           <Route
             exact
+            path={PAGE.ADMIN.USER_SPACE_LIST(':userid')}
+            render={() => <AdminAccount openSpacesManagement />}
+          />
+
+          <Route
+            exact
             path={PAGE.PUBLIC_PROFILE(':userid')}
             component={PublicProfile}
           />

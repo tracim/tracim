@@ -146,6 +146,7 @@ export class AdminUser extends React.Component {
           {state.displayAddUser && (
             <AddUserForm
               onClickAddUser={this.handleClickAddUser}
+              onClickCreateUserAndAddToSpaces={props.onClickCreateUserAndAddToSpaces}
               onChangeUsername={props.onChangeUsername}
               emailNotifActivated={props.emailNotifActivated}
               isUsernameValid={props.isUsernameValid}
