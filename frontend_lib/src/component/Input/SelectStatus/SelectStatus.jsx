@@ -23,6 +23,7 @@ export const SelectStatus = props => {
             customClass='transparentButton'
             key={status.slug}
             text={props.t(status.label)}
+            textMobile={props.t(status.label)}
             icon={status.faIcon}
             iconColor={status.hexcolor}
             onClick={() => props.onChangeStatus(status.slug)}
