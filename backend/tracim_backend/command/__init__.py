@@ -27,7 +27,7 @@ class TracimCLI(App):
         )
 
     def initialize_app(self, argv: List[str]) -> None:
-        self.LOG.info("initialize_app: DEBUG is available after initialization")
+        self.LOG.debug("initialize_app: DEBUG is available after initialization")
 
     def prepare_to_run_command(self, cmd: Command) -> None:
         self.LOG.debug("prepare_to_run_command %s", cmd.__class__.__name__)
