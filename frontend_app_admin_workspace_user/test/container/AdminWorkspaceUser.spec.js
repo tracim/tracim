@@ -171,7 +171,13 @@ describe('<AdminWorkspaceUser />', () => {
       describe('adding a new user with a valid form', () => {
         describe('when emailNotificationActivated is disabled', () => {
           before(() => {
-            mockPostUser200(props.data.config.apiUrl)
+            mockPostUser200(props.data.config.apiUrl, {
+              initialName,
+              initialUsername,
+              initialEmail,
+              initialProfile,
+              initialPassword
+            })
           })
 
           it('should display the success flash message', async () => {

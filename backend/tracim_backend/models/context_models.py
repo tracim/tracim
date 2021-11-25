@@ -79,6 +79,7 @@ class ConfigModel(object):
         ui__spaces__creation__parent_space_choice__visible: bool,
         limitation__maximum_online_users_message: str,
         call__enabled: bool,
+        call__unanswered_timeout: int,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -99,6 +100,7 @@ class ConfigModel(object):
         )
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
         self.call__enabled = call__enabled
+        self.call__unanswered_timeout = call__unanswered_timeout
 
 
 class ErrorCodeModel(object):

@@ -870,7 +870,12 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ## Jitsi Meet configuration parameters
 ; call.jitsi_meet.url =
 # example:
-; call.jitsi_meet.url = https://meet.jit.si
+# call.jitsi_meet.url = https://meet.jit.si
+
+## Time (in seconds) before the call is considered unanswered
+; call.unanswered_timeout = 30
+# example: timeout after 60s
+# call.unanswered_timeout = 60
 
 ##############################
 # SPECIFIC CONFIG FOR WEBAPP #

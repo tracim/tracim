@@ -308,7 +308,7 @@ export class WorkspaceAdvanced extends React.Component {
     const fetchPutWorkspaceLabel = await handleFetchResult(await putLabel(state.config.apiUrl, state.content, newLabel))
 
     switch (fetchPutWorkspaceLabel.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful', 'info')); break
+      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
       default: sendGlobalFlashMessage(props.t('Error while saving new space label'))
     }
   }
@@ -339,7 +339,7 @@ export class WorkspaceAdvanced extends React.Component {
     const fetchPutDescription = await handleFetchResult(await putDescription(state.config.apiUrl, state.content, newDescription))
 
     switch (fetchPutDescription.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful', 'info')); break
+      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
       default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
     }
   }
@@ -355,7 +355,7 @@ export class WorkspaceAdvanced extends React.Component {
     )
 
     switch (fetchPutDefaultRole.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful', 'info')); break
+      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
       default: sendGlobalFlashMessage(props.t('Error while saving new default role'))
     }
   }
@@ -365,8 +365,11 @@ export class WorkspaceAdvanced extends React.Component {
     const fetchPutUserRole = await handleFetchResult(await putMemberRole(state.config.apiUrl, state.content.workspace_id, memberId, slugNewRole))
 
     switch (fetchPutUserRole.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful', 'info')); break
-      default: sendGlobalFlashMessage(props.t('Error while saving new role for member'))
+      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
+      default: sendGlobalFlashMessage(fetchPutUserRole.body.code === 3011
+        ? props.t('You cannot change this member role because there are no other space managers.')
+        : props.t('Error while saving new role for member')
+      )
     }
   }
 
@@ -519,7 +522,7 @@ export class WorkspaceAdvanced extends React.Component {
     const fetchDeleteMember = await deleteMember(state.config.apiUrl, state.content.workspace_id, userId)
     switch (fetchDeleteMember.status) {
       case 204:
-        sendGlobalFlashMessage(props.t('Member removed', 'info'))
+        sendGlobalFlashMessage(props.t('Member removed'), 'info')
         break
       default: sendGlobalFlashMessage(props.t('Error while removing member'))
     }
@@ -611,7 +614,7 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchWorkspaceNewMember.apiResponse.status) {
       case 200:
-        sendGlobalFlashMessage(props.t('Member added', 'info'))
+        sendGlobalFlashMessage(props.t('Member added'), 'info')
         break
       case 400:
         switch (fetchWorkspaceNewMember.body.code) {
