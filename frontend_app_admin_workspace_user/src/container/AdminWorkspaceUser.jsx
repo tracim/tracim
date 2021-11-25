@@ -173,7 +173,7 @@ export class AdminWorkspaceUser extends React.Component {
     const fetchUserDetail = await handleFetchResult(await getUserDetail(this.state.config.apiUrl, user.user_id))
 
     if (!fetchUserDetail.apiResponse.ok) {
-      this.displayErrorFetchingUserList()
+      sendGlobalFlashMessage(this.props.t('Error while loading users list'))
       return null
     }
 
@@ -242,6 +242,7 @@ export class AdminWorkspaceUser extends React.Component {
   handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
   handleWorkspaceCreated = (message) => {
+    console.log('Space Créé')
     const { state } = this
     const workspace = message.fields.workspace
     const newWorkspaceList = state.content.workspaceList.slice()
@@ -250,7 +251,7 @@ export class AdminWorkspaceUser extends React.Component {
      *  - initialize member list as empty since the space member created message will handle
      *    adding the initial user.
      */
-    newWorkspaceList.push({ ...workspace, memberList: [] })
+    newWorkspaceList.push({ ...workspace })
 
     this.setState(prev => ({
       content: {
@@ -261,6 +262,36 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleWorkspaceModified = (message) => {
+    console.log('Space Modifié')
+    const { state } = this
+
+    const workspace = message.fields.workspace
+    console.log(workspace)
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
+
+    if (workspaceIndex === -1) {
+      // We do not have this workspace in our list...
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
+      return
+    }
+
+    const newWorkspaceList = [
+      ...workspaceList.slice(0, workspaceIndex),
+      workspace,
+      ...workspaceList.slice(workspaceIndex + 1)
+    ]
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        workspaceList: newWorkspaceList
+      }
+    }))
+  }
+
+  handleWorkspaceDeleted = (message) => {
+    console.log('Space Supprimé')
     const { state } = this
 
     const workspace = message.fields.workspace
@@ -272,41 +303,12 @@ export class AdminWorkspaceUser extends React.Component {
       console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
-    const memberList = workspaceList[workspaceIndex].memberList
-
-    const workspaceWithMemberList = {
-      ...workspace,
-      memberList: memberList
-    }
-
-    const newWorkspaceList = [
-      ...workspaceList.slice(0, workspaceIndex),
-      workspaceWithMemberList,
-      ...workspaceList.slice(workspaceIndex + 1)
-    ]
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        workspaceList: newWorkspaceList
-      }
-    }))
-  }
-
-  handleWorkspaceDeleted = (message) => {
-    const { state } = this
-    const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
-
-    if (workspaceIndex === -1) {
-      // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
-      return
-    }
 
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -316,33 +318,26 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleWorkspaceMemberCreated = (message) => {
+    console.log('Membre Créé')
     const { state } = this
 
+    const workspace = message.fields.workspace
+    console.log(workspace)
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.slice()
-    newMemberList.push({
-      user_id: message.fields.user.user_id,
-      user: message.fields.user,
-      workspace_id: message.fields.workspace.workspace_id,
-      workspace: message.fields.workspace,
-      do_notify: message.fields.member.do_notify,
-      is_active: message.fields.user.is_active,
-      role: message.fields.member.role
-    })
-    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      newWorkspace,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -352,24 +347,25 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleWorkspaceMemberDeleted = (message) => {
+    console.log('Membre Supprimé')
     const { state } = this
 
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       // We do not have this workspace in our list...
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.fields.user.user_id)
-    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
     const newWorkspaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      newWorkspace,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
