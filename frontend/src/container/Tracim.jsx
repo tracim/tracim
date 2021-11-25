@@ -19,6 +19,7 @@ import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
+import OpenWorkspaceAdvanced from '../component/Workspace/OpenWorkspaceAdvanced.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
@@ -809,6 +810,15 @@ export class Tracim extends React.Component {
                     <div className='tracim__content fullWidthFullHeight'>
                       <WorkspaceContent />
                     </div>
+                  )}
+                />
+
+                <Route
+                  path={[
+                    PAGE.WORKSPACE.ADVANCED_DASHBOARD(':idws')
+                  ]}
+                  render={() => (
+                    <OpenWorkspaceAdvanced />
                   )}
                 />
 

@@ -20,6 +20,7 @@ export const PAGE = {
   CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,
   HOME: '/ui',
   WORKSPACE: {
+    ADVANCED_DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/advanced_dashboard`,
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,

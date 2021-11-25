@@ -332,18 +332,7 @@ export class Dashboard extends React.Component {
     const { props, state } = this
 
     if (state.advancedDashboardOpenedId === null) {
-      props.renderAppFeature(
-        {
-          label: 'Advanced dashboard',
-          slug: 'workspace_advanced',
-          faIcon: 'fas fa-users',
-          hexcolor: GLOBAL_primaryColor,
-          creationLabel: ''
-        },
-        props.user,
-        findUserRoleIdInWorkspace(props.user.userId, props.currentWorkspace.memberList, ROLE_LIST),
-        { ...props.currentWorkspace, workspace_id: props.currentWorkspace.id }
-      )
+      props.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id))
     } else {
       props.dispatchCustomEvent(CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), { workspace_id: props.currentWorkspace.id })
     }
