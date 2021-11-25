@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import appFactory from '../../util/appFactory.js'
 import { findUserRoleIdInWorkspace } from '../../util/helper.js'
-import { ROLE_LIST } from 'tracim_frontend_lib'
+import { ROLE_LIST, CUSTOM_EVENT } from 'tracim_frontend_lib'
 
 export class OpenWorkspaceAdvanced extends React.Component {
   openWorkspaceAdvanced = async (prevProps = {}) => {
@@ -38,6 +38,10 @@ export class OpenWorkspaceAdvanced extends React.Component {
   componentDidUpdate (prevProps) {
     console.log('%c<OpenWorkspaceAdvanced> did Update', 'color: #dcae84', this.props)
     this.openWorkspaceAdvanced(prevProps)
+  }
+
+  componentWillUnmount () {
+    this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
   }
 
   render () {
