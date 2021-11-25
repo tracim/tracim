@@ -31,7 +31,7 @@ export class OpenWorkspaceAdvanced extends React.Component {
   }
 
   componentDidMount () {
-    console.log('%c<OpenContentApp> did Mount', 'color: #dcae84', this.props)
+    console.log('%c<OpenWorkspaceAdvanced> did Mount', 'color: #dcae84', this.props)
     this.openWorkspaceAdvanced()
   }
 
