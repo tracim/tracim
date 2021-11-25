@@ -95,7 +95,7 @@ export class NotificationWall extends React.Component {
   }
 
   getNotificationDetails = notification => {
-    const { props, state } = this
+    const { props } = this
 
     const [entityType, eventType, contentType] = notification.type.split('.')
 
@@ -322,7 +322,7 @@ export class NotificationWall extends React.Component {
 
     const defaultEmptyUrlMsg = props.t('This notification has no associated content')
     const subscriptionPageURL = '' // RJ - 2020-10-19 - FIXME: depends on https://github.com/tracim/tracim/issues/3594
-    const advancedDashboardUrl = notification.workspace  ? PAGE.WORKSPACE.ADVANCED_DASHBOARD(notification.workspace.id) : ''
+    const advancedDashboardUrl = notification.workspace ? PAGE.WORKSPACE.ADVANCED_DASHBOARD(notification.workspace.id) : ''
 
     if (entityType === TLM_ENTITY.SHAREDSPACE_SUBSCRIPTION) {
       // INFO - GB - 2020-12-29 - MODIFIED.accepted and DELETED events do not make notifications
