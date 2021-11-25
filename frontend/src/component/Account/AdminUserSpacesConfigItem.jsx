@@ -45,7 +45,7 @@ export const AdminUserSpacesConfigItem = props => {
       )}
       {(props.emailNotificationActivated &&
         <td className='adminUserSpacesConfig__zones__table__notifications'>
-          <div>{props.t('Email notif')}</div>
+          <div>{props.t('Email notif.')}</div>
           <BtnSwitch
             checked={props.member.do_notify}
             onChange={() => props.onChangeSubscriptionNotif(props.space.workspace_id, !props.member.do_notify)}
