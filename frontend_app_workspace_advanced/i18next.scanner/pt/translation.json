@@ -56,5 +56,6 @@
   "News activated": "Notícias activadas",
   "News deactivated": "Notícias desactivadas",
   "Error while activating news": "Erro ao activar notícia",
-  "Error while deactivating news": "Erro ao desactivar notícias"
+  "Error while deactivating news": "Erro ao desactivar notícias",
+  "You cannot change this member role because there are no other space managers.": "Não se pode alterar a função deste membro porque não há outros gestores de espaço."
 }

@@ -218,6 +218,7 @@ class PopinFixedHeader extends React.Component {
                   disabled={action.disabled}
                   icon={action.icon}
                   text={action.label}
+                  textMobile={action.label}
                   label={action.label}
                   key={action.label}
                   onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
