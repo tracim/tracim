@@ -1678,6 +1678,7 @@ class TestWorkspaceMembersEndpoint(object):
         user = web_testapp.get("/api/users/2", status=200).json_body
         assert last_event.user == user_schema.dump(user).data
         assert last_event.client_token is None
+        assert last_event.workspace["number_of_members"] == 2
 
         res = web_testapp.get("/api/workspaces/1/members", status=200).json_body
         assert len(res) == 2

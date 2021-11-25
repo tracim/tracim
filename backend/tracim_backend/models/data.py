@@ -183,10 +183,6 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
         virtual_extension = Workspace.FILEMANAGER_EXTENSION
         return "{}{}".format(self.label, virtual_extension)
 
-    @property
-    def number_of_members(self) -> int:
-        return len(self.roles)
-
     @hybrid_property
     def contents(self) -> List["Content"]:
         # Return a list of unique revisions parent content

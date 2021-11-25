@@ -1074,7 +1074,11 @@ class WorkspaceInContext(object):
 
     @property
     def number_of_members(self) -> int:
-        return self.workspace.number_of_members
+        return (
+            self.dbsession.query(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == self.workspace.workspace_id)
+            .count()
+        )
 
 
 class UserRoleWorkspaceInContext(object):

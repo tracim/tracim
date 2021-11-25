@@ -242,7 +242,6 @@ export class AdminWorkspaceUser extends React.Component {
   handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
   handleWorkspaceCreated = (message) => {
-    console.log('Space Créé')
     const { state } = this
     const workspace = message.fields.workspace
     const newWorkspaceList = state.content.workspaceList.slice()
@@ -262,11 +261,9 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleWorkspaceModified = (message) => {
-    console.log('Space Modifié')
     const { state } = this
 
     const workspace = message.fields.workspace
-    console.log(workspace)
     const workspaceList = state.content.workspaceList
     const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
@@ -291,7 +288,6 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleWorkspaceDeleted = (message) => {
-    console.log('Space Supprimé')
     const { state } = this
 
     const workspace = message.fields.workspace
@@ -318,11 +314,9 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleWorkspaceMemberCreated = (message) => {
-    console.log('Membre Créé')
     const { state } = this
 
     const workspace = message.fields.workspace
-    console.log(workspace)
     const workspaceList = state.content.workspaceList
     const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
@@ -347,7 +341,6 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   handleWorkspaceMemberDeleted = (message) => {
-    console.log('Membre Supprimé')
     const { state } = this
 
     const workspace = message.fields.workspace
