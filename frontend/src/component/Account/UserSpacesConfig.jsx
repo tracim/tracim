@@ -8,6 +8,7 @@ import {
   sortWorkspaceList,
   ConfirmPopup,
   PAGE,
+  PROFILE,
   TracimComponent,
   ROLE,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -177,14 +178,15 @@ export class UserSpacesConfig extends React.Component {
       <div className='account__userpreference__setting__spacename'>
         <div className='spaceconfig__sectiontitle subTitle'>
           {props.t('Spaces')}
-
-          <IconButton
-            mode='dark'
-            intent='secondary'
-            onClick={(() => props.history.push(PAGE.ADMIN.USER_SPACE_LIST(props.userToEditId)))}
-            icon='fas fa-user-cog'
-            text={props.t('Manage user spaces')}
-          />
+          {(props.user.profile === PROFILE.administrator.slug) && (
+            <IconButton
+              mode='dark'
+              intent='secondary'
+              onClick={(() => props.history.push(PAGE.ADMIN.USER_SPACE_LIST(props.userToEditId)))}
+              icon='fas fa-user-cog'
+              text={props.t('Manage user spaces')}
+            />
+          )}
         </div>
 
         {props.openSpacesManagement && (
@@ -242,7 +244,7 @@ export class UserSpacesConfig extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system }) => ({ system })
+const mapStateToProps = ({ system, user }) => ({ system, user })
 export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(UserSpacesConfig))))
 
 UserSpacesConfig.propTypes = {
