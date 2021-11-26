@@ -803,10 +803,6 @@ export class WorkspaceAdvanced extends React.Component {
   render () {
     const { state } = this
 
-    if (state.loggedUser.userRoleIdInWorkspace !== ROLE.workspaceManager.id) {
-      state.config.history.push(PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id))
-    }
-
     if (!state.isVisible) return null
 
     return (
