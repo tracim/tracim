@@ -61,7 +61,7 @@ export class AdminUserSpacesConfig extends React.Component {
     // RJ - 2020-10-28 - FIXME - https://github.com/tracim/tracim/issues/3740
     // We should update the member list with using information in data instead of re-fetching it
     const { props, state } = this
-    const spaceIndex = this.state.spaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
+    const spaceIndex = state.spaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
     const space = await this.fillMemberList(data.fields.workspace)
 
     if (spaceIndex === -1 && Number(props.userToEditId) !== data.fields.user.user_id) return
@@ -123,7 +123,7 @@ export class AdminUserSpacesConfig extends React.Component {
     }
   }
 
-  onlyManager (member, memberList) {
+  onlyManager = (member, memberList) => {
     const manager = ROLE.workspaceManager.slug
 
     if (member.role !== manager) {
@@ -163,10 +163,10 @@ export class AdminUserSpacesConfig extends React.Component {
     }
   }
 
-  filterSpaceList (list, filter) {
+  filterSpaceList = (list, filterList) => {
     return list.filter(space =>
-      space.label.toUpperCase().includes(filter.toUpperCase()) ||
-      space.workspace_id === Number(filter)
+      space.label.toUpperCase().includes(filterList.toUpperCase()) ||
+      space.workspace_id === Number(filterList)
     )
   }
 
@@ -179,7 +179,7 @@ export class AdminUserSpacesConfig extends React.Component {
     let availableSpaceList = []
 
     state.spaceList.forEach(space => {
-      if (space.memberList.length <= 0) return
+      if (!space.memberList || space.memberList.length <= 0) return
       if (space.memberList.find(u => u.user_id === props.userToEditId)) memberSpaceList.push(space)
       else availableSpaceList.push(space)
     })
@@ -202,7 +202,10 @@ export class AdminUserSpacesConfig extends React.Component {
               <b>{props.t('Available spaces')}</b>
               <TextInput
                 customClass='form-control'
-                onChange={e => this.setState({ availableSpaceListFilter: e.target.value })}
+                onChange={e => {
+                  const newFilter = e.target.value
+                  this.setState({ availableSpaceListFilter: newFilter })
+                }}
                 placeholder={props.t('Filter spaces')}
                 icon='search'
                 value={state.availableSpaceListFilter}
@@ -234,7 +237,10 @@ export class AdminUserSpacesConfig extends React.Component {
               <b>{props.t('Spaces membership')}</b>&nbsp;({memberSpaceList.length})
               <TextInput
                 customClass='form-control'
-                onChange={e => this.setState({ memberSpaceListFilter: e.target.value })}
+                onChange={e => {
+                  const newFilter = e.target.value
+                  this.setState({ memberSpaceListFilter: newFilter })
+                }}
                 placeholder={props.t('Filter spaces')}
                 icon='search'
                 value={state.memberSpaceListFilter}

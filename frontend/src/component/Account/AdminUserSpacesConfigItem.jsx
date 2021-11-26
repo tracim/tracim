@@ -35,7 +35,7 @@ export const AdminUserSpacesConfigItem = props => {
               <button
                 className='transparentButton'
                 onClick={() => props.onClickChangeRole(props.space, r)}
-                key={r.id}
+                key={`role_${r.slug}`}
               >
                 <i className={`fas fa-fw fa-${r.faIcon}`} style={{ color: r.hexcolor }} />
                 {props.t(r.label)}
@@ -70,7 +70,7 @@ export const AdminUserSpacesConfigItem = props => {
 export default translate()(AdminUserSpacesConfigItem)
 
 AdminUserSpacesConfigItem.propTypes = {
-  space: PropTypes.number.isRequired,
+  space: PropTypes.object.isRequired,
   onClickButton: PropTypes.func.isRequired,
   emailNotificationActivated: PropTypes.bool,
   memberRole: PropTypes.object,
