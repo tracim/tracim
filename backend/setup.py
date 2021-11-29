@@ -62,7 +62,7 @@ requires = [
     "Babel",
     "requests",
     # caldav support
-    "radicale<3.0.0",
+    "radicale>=3.0.6",
     "caldav",
     # search support
     "elasticsearch",
