@@ -1,4 +1,4 @@
-import { COMMON_REQUEST_HEADERS, CONTENT_NAMESPACE, FETCH_CONFIG } from './helper.js'
+import { COMMON_REQUEST_HEADERS, CONTENT_NAMESPACE, FETCH_CONFIG, CONTENT_TYPE } from './helper.js'
 
 export const baseFetch = (method, url, body = undefined) => {
   const isFormData = body instanceof FormData
@@ -222,4 +222,22 @@ export const putRawFileContent = (apiUrl, workspaceId, contentId, filename, newC
   const formData = new FormData()
   formData.append('files', new File([newContent], filename, { type }))
   return baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/raw/${filename}`, formData)
+}
+
+export const postRawFileContent = (
+  apiUrl,
+  workspaceId,
+  filename,
+  content,
+  mimetype = 'text/plain',
+  parentId = null,
+  contentType = CONTENT_TYPE.FILE,
+  contentNamespace = CONTENT_NAMESPACE.CONTENT
+) => {
+  const formData = new FormData()
+  formData.append('files', new File([content], filename, { type: mimetype }))
+  formData.append('content_namespace', contentNamespace)
+  formData.append('content_type', contentType)
+  if (parentId) formData.append("parent_id", parentId)
+  return baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/files`, formData)
 }

@@ -1690,10 +1690,32 @@ class TestFiles(object):
 
     def test_api__get_file__err_400__content_does_not_exist(self, web_testapp) -> None:
         """
-        Get one file (content 170 does not exist in db
+        Get one file (content 170 does not exist in db)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/1/files/170", status=400)
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
+    def test_api__get_file__err_400__file_does_not_exist(
+        self, web_testapp, workspace_api_factory
+    ) -> None:
+        """
+        Get one file (file has not been uploaded)
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        res = web_testapp.post_json(
+            "/api/workspaces/{}/contents".format(business_workspace.workspace_id),
+            {"content_type": "file", "label": "Empty content"},
+            status=200,
+        )
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}/raw/filename".format(res.json_body["content_id"]),
+            status=400,
+        )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
