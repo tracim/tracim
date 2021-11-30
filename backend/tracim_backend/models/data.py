@@ -210,7 +210,9 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
                 try:
                     size += revision.depot_file.file.content_length
                 except IOError:
-                    logger.warning("Cannot get depot_file {}".format(revision.depot_file.file_id))
+                    logger.warning(
+                        self, "Cannot get depot_file {}".format(revision.depot_file.file_id)
+                    )
                     pass
         return size
 
