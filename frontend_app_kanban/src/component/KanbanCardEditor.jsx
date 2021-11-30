@@ -58,11 +58,11 @@ function KanbanCardEditor (props) {
             <span>
               <label htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__description'>{props.t('Description:') + ' '}</label>
             </span>
-            <span>
+            <div>
               <textarea autoFocus={props.focusOnDescription} id='file__contentpage__statewrapper__kanban__KanbanCardEditor__description' value={description || ''} onChange={(e) => setDescription(e.target.value)} />
               <br />
               <label><input type='checkbox' checked={htmlEnabledForDescription} onChange={(e) => setHtmlEnabledForDescription(e.target.checked)} />{props.t('Enable HTML')}</label>
-            </span>
+            </div>
           </p>
           <p>
             <span>

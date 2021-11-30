@@ -122,12 +122,9 @@ class Kanban extends React.Component {
 
   handleRemoveCard = (card) => {
     this.setState(prevState => {
-      let column = null
-      for (column of prevState.board.columns) {
-        for (const columnCard of column.cards) {
-          if (columnCard.id === card.id) break
-        }
-      }
+      const column = prevState.board.columns
+        .find(column => column.cards
+          .find(columnCard => columnCard.id === card.id))
 
       return {
         board: column ? removeCard(prevState.board, column, card) : prevState.board,
@@ -314,7 +311,7 @@ class Kanban extends React.Component {
           {state.fullscreen && (<span className='kanban__contentpage__statewrapper__kanban__toolbar__title'>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
         </div>
         {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}
-        {state.boardState === BOARD_STATE.ERROR && <span style={{ color: '#FF3333' }}> {props.t('Error while loading the board.')} </span>}
+        {state.boardState === BOARD_STATE.ERROR && <span className='.kanban__contentpage__statewrapper__kanban__error'> {props.t('Error while loading the board.')} </span>}
         {state.boardState === BOARD_STATE.LOADED && (
           <>
             <div className='kanban__contentpage__statewrapper__kanban__wrapper'>
