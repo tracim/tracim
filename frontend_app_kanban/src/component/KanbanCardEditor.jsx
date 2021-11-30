@@ -1,7 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { IconButton } from 'tracim_frontend_lib'
+import {
+  Icon,
+  IconButton
+} from 'tracim_frontend_lib'
 
 function KanbanCardEditor (props) {
   const { card } = props
@@ -32,8 +35,8 @@ function KanbanCardEditor (props) {
     <div className='file__contentpage__statewrapper__kanban__KanbanCardEditor'>
       <div className='file__contentpage__statewrapper__kanban__KanbanCardEditor__title'>
         <span className='file__contentpage__statewrapper__kanban__KanbanCardEditor__title__icon'>
-          <i
-            className='fa fa-id-card-o'
+          <Icon
+            icon='far fa-id-card'
             title={editorTitle}
           />
         </span>

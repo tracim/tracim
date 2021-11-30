@@ -116,7 +116,7 @@ class PopupCreateKanban extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New Kanban board')} // @TODO get the lang of user
+        label={this.props.t('New Kanban board')}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}

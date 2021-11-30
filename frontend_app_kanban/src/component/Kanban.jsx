@@ -3,7 +3,16 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import { v4 as uuidv4 } from 'uuid'
-import Board, { addColumn, removeColumn, moveColumn, changeColumn, addCard, changeCard, moveCard, removeCard } from '@asseinfo/react-kanban'
+import Board, {
+  addColumn,
+  removeColumn,
+  moveColumn,
+  changeColumn,
+  addCard,
+  changeCard,
+  moveCard,
+  removeCard
+} from '@asseinfo/react-kanban'
 import '@asseinfo/react-kanban/dist/styles.css'
 
 import {
@@ -93,7 +102,7 @@ class Kanban extends React.Component {
   }
 
   handleClickFullscreen = () => {
-    this.setState({ fullscreen: !this.state.fullscreen })
+    this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
   }
 
   handleEditCardTitle = (card) => {
@@ -145,24 +154,13 @@ class Kanban extends React.Component {
   }
 
   handleCardEdited = (card) => {
-    if (card.id) {
-      this.setState(prevState => {
-        return {
-          editedCardInfos: null,
-          board: changeCard(prevState.board, card.id, card),
-          saveRequired: true
-        }
-      })
-      return
-    }
-    this.setState(prevState => {
-      const newCard = { ...card, id: uuidv4() }
-      return {
-        editedCardInfos: null,
-        board: addCard(prevState.board, prevState.editedCardInfos.column, newCard),
-        saveRequired: true
-      }
-    })
+    this.setState(prevState => ({
+      editedCardInfos: null,
+      board: card.id
+        ? changeCard(prevState.board, card.id, card)
+        : addCard(prevState.board, prevState.editedCardInfos.column, { ...card, id: uuidv4() }),
+      saveRequired: true
+    }))
   }
 
   async handleSave () {

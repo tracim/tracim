@@ -1,5 +1,7 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
+cardSize = 230px
+
 .kanban__contentpage__statewrapper__kanban
   display flex
   flex-direction column
@@ -10,7 +12,7 @@
     top headerHeight
     left 0
     width 100%
-    height calc(100% - 61px)
+    height "calc(100% - %s)" % headerHeight
     z-index 1
     background offWhite
 
@@ -23,11 +25,11 @@
       overflow-x visible
 
   &__toolbar
-    background #eff0f1
+    background lightGrey
 
     button
-      font-size small
-      padding 3px 5px
+      font-size metadataFontSize
+      padding textSpacing
       border none
       border-radius 0
 
@@ -35,11 +37,11 @@
       display none
 
     .iconbutton:not(last-child)
-      border-right 1px solid gray
+      border-right borderStyle
 
     &__title
       display inline-block
-      padding-left 1em
+      padding-left standardFontSize
       color darkGrey
 
   .react-kanban-column-header
@@ -49,26 +51,29 @@
       flex 1
     > :last-child
       display inline-block
-      border-radius 2px
+      border-radius standardBorderRadius
       cursor default
 
       &:hover
         transform scale(1.2)
         color red
-        background #FCC
+        background offWhite
 
   .react-kanban-column
-    padding 5px
+    padding textSpacing
 
   &__column
     &__colorPicker
-      display: flex;
-      justify-content: end;
+      display flex
+      justify-content end
+
+    &__hideColorButton
+      font-size metadataFontSize
 
     &__header
       display flex
       flex-direction row
-      border-bottom 1px solid gray
+      border-bottom borderStyle
 
       > strong
         flex 1
@@ -79,23 +84,23 @@
         text-overflow ellipsis
 
       button
-        font-size small
-        padding 3px 5px
+        font-size metadataFontSize
+        padding textSpacing
         border none
         border-radius 0
 
   &__card
-    margin 5px
-    width 30ex
-    background white
+    margin textSpacing
+    width cardSize
+    background offWhite
     border 1px solid back
     box-shadow 0 0 3px black
-    border-radius 3px
-    background: rgba(0, 0, 0, 0.1)
+    border-radius standardBorderRadius
+    background rgba(0, 0, 0, 0.1)
 
     &__title
       text-align center
-      border-bottom 1px solid gray
+      border-bottom borderStyle
       display flex
       flex-direction row
       align-items flex-start
@@ -108,8 +113,8 @@
 
 
       button
-        font-size small
-        padding 5px
+        font-size metadataFontSize
+        padding textSpacing
         border none
         border-radius 0
         display flex
@@ -118,40 +123,40 @@
           margin 0
 
     &__description
-      padding 5px
-      background white
+      padding textSpacing
+      background offWhite
       overflow hidden
       word-break break-word
       overflow-wrap break-word
       hyphens auto
-      min-height 1.5em
+      min-height titleFontSize
 
   &__KanbanCardEditor
     width 100%
 
-    [type=checkbox]
-      margin-right 1ex
+    & [type=checkbox]
+      margin-right textSpacing
 
-    [type=text], textarea
+    & [type=text], textarea
       width 100%
 
-    textarea
+    & textarea
       resize both
 
-    label
+    & label
       white-space pre
 
-    input
+    & input
       vertical-align middle
 
     &__title
       margin-top -26px
-      margin-bottom 10px
-      font-size 1.2rem
+      margin-bottom standardSpacing
+      font-size titleFontSize
       font-weight bold
 
       &__icon
-        padding-right 1ex
+        padding-right textSpacing
 
     &__form__fields
       display table
@@ -162,7 +167,7 @@
 
         > span
           display table-cell
-          padding-right 1ex
+          padding-right textSpacing
           padding-bottom 1px
           padding-top 1px
           vertical-align top
@@ -176,4 +181,4 @@
       text-align right
 
       button:last-child, input:last-child
-        margin-left 10px
+        margin-left standardSpacing
