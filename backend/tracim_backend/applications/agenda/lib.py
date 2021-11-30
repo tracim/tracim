@@ -1,3 +1,4 @@
+import os
 import typing
 from xml.sax.saxutils import escape
 
@@ -147,14 +148,17 @@ class AgendaApi(object):
                 agenda_name=workspace.label,
                 agenda_description=workspace.description,
             )
-            return False
+            result = False
         else:
             self._update_agenda_props(
                 agenda_url=workspace_agenda_url,
                 agenda_name=workspace.label,
                 agenda_description=workspace.description,
             )
-            return True
+            result = True
+        for role in workspace.roles:
+            self._create_workspace_symlink(workspace.workspace_id, role.user_id, type="agenda")
+        return result
 
     def ensure_user_agenda_exists(self, user: User) -> bool:
         """
@@ -167,12 +171,81 @@ class AgendaApi(object):
             self._create_agenda(
                 agenda_url=user_agenda_url, agenda_name=user.display_name, agenda_description=""
             )
-            return False
+            result = False
         else:
             self._update_agenda_props(
                 agenda_url=user_agenda_url, agenda_name=user.display_name, agenda_description=""
             )
-            return True
+            result = True
+        self._create_user_symlink(user.user_id, user.user_id, type="agenda")
+        return result
+
+    def _delete_user_symlink(self, original_user_id: int, dest_user_id: int, type="agenda"):
+        symlink_path = "{}{}{}/{}".format(
+            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            "/collection-root",
+            "/user_resource_{}".format(dest_user_id),
+            "{}_{}_{}".format("user", original_user_id, "type"),
+        )
+        os.remove(symlink_path)
+
+    def _create_user_symlink(self, original_user_id: int, dest_user_id: int, type="agenda"):
+        original_agenda_path = "{}{}{}{}".format(
+            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            "/collection-root",
+            self._config.CALDAV__RADICALE__USER_PATH,
+            original_user_id,
+        )
+        os.makedirs(
+            "{}{}{}".format(
+                self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+                "/collection-root",
+                "/user_resource_{}".format(dest_user_id),
+                dest_user_id,
+            ),
+            exist_ok=True,
+        )
+        symlink_path = "{}{}{}/{}".format(
+            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            "/collection-root",
+            "/user_resource_{}".format(dest_user_id),
+            "{}_{}_{}".format("user", original_user_id, type),
+        )
+        if not os.path.islink(symlink_path):
+            os.symlink(original_agenda_path, symlink_path)
+
+    def _delete_workspace_symlink(self, workspace_id: int, dest_user_id: int, type="agenda"):
+        symlink_path = "{}{}{}/{}".format(
+            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            "/collection-root",
+            "/user_resource_{}".format(dest_user_id),
+            "{}_{}_{}".format("space", workspace_id, type),
+        )
+        os.remove(symlink_path)
+
+    def _create_workspace_symlink(self, workspace_id: int, dest_user_id: int, type="agenda"):
+        original_agenda_path = "{}{}{}{}".format(
+            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            "/collection-root",
+            self._config.CALDAV_RADICALE_WORKSPACE_PATH,
+            workspace_id,
+        )
+        os.makedirs(
+            "{}{}{}".format(
+                self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+                "/collection-root",
+                "/user_resource_{}".format(dest_user_id),
+            ),
+            exist_ok=True,
+        )
+        symlink_path = "{}{}{}/{}".format(
+            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            "/collection-root",
+            "/user_resource_{}".format(dest_user_id),
+            "{}_{}_{}".format("space", workspace_id, type),
+        )
+        if not os.path.islink(symlink_path):
+            os.symlink(original_agenda_path, symlink_path)
 
     def get_user_agendas(
         self,
