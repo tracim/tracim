@@ -15,14 +15,12 @@ import {
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
+import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION } from '../helper.js'
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
 require('./Kanban.styl')
-
-const KANBAN_MIME_TYPE = 'application/json'
-const KANBAN_FILE_EXTENSION = '.kanban'
 
 const BOARD_STATE = {
   LOADING: 'loading',
@@ -82,7 +80,7 @@ class Kanban extends React.Component {
       true
     )
 
-    if (fetchRawFileContent.apiResponse.ok) {
+    if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
       this.setState({
         boardState: BOARD_STATE.LOADED,
         board: fetchRawFileContent.body || {}

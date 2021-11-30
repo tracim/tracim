@@ -9,9 +9,15 @@ import {
   buildHeadTitle,
   appContentFactory,
   TracimComponent,
-  postNewEmptyContent
+  postRawFileContent
 } from 'tracim_frontend_lib'
+
+import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION } from '../helper.js'
 import { debug } from '../debug.js'
+
+const defaultKanbanBoard = {
+  columns: []
+}
 
 class PopupCreateKanban extends React.Component {
   constructor (props) {
@@ -81,8 +87,14 @@ class PopupCreateKanban extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchSaveKanbanDoc = postNewEmptyContent(
-      state.config.apiUrl, state.workspaceId, state.folderId, state.config.slug, state.newContentName
+    const fetchSaveKanbanDoc = postRawFileContent(
+      state.config.apiUrl,
+      state.workspaceId,
+      state.newContentName + KANBAN_FILE_EXTENSION,
+      JSON.stringify(defaultKanbanBoard),
+      KANBAN_MIME_TYPE,
+      state.folderId,
+      state.config.slug
     )
 
     const resSave = await handleFetchResult(await fetchSaveKanbanDoc)
