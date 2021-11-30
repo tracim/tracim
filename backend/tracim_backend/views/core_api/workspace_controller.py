@@ -184,7 +184,6 @@ class WorkspaceController(Controller):
             publication_enabled=hapic_data.body.publication_enabled,
             save_now=True,
         )
-        wapi.execute_update_workspace_actions(request.current_workspace)
         return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
@@ -217,7 +216,6 @@ class WorkspaceController(Controller):
             publication_enabled=hapic_data.body.publication_enabled,
             parent=parent,
         )
-        wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
@@ -413,7 +411,6 @@ class WorkspaceController(Controller):
                     creation_type=UserCreationType.INVITATION,
                     creation_author=request.current_user,
                 )
-            uapi.execute_created_user_actions(user)
             newly_created = True
 
         role = rapi.create_one(

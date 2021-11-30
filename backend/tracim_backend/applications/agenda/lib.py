@@ -8,14 +8,19 @@ from colour import Color
 import requests
 from sqlalchemy.orm import Session
 
+from tracim_backend import ApplicationApi
+from tracim_backend import app_list
 from tracim_backend.applications.agenda.schemas import AgendaType
+from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaPropsUpdateFailed
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import CannotCreateAgenda
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
+from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import Agenda
 from tracim_backend.models.data import Workspace
@@ -210,3 +215,76 @@ class AgendaApi(object):
                     )
                 )
         return user_agendas
+
+
+class AgendaHooks:
+    def ensure_workspace_agenda_exists(
+        self, workspace: Workspace, context: TracimContext, create_event: bool
+    ):
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
+            if workspace.agenda_enabled:
+                agenda_api = AgendaApi(
+                    current_user=None, session=context.dbsession, config=context.app_config
+                )
+                try:
+                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
+                    if create_event and agenda_already_exist:
+                        logger.warning(
+                            self,
+                            "workspace {} is just created but it own agenda already exist !!".format(
+                                workspace.workspace_id
+                            ),
+                        )
+                except AgendaServerConnectionError as exc:
+                    logger.error(self, "Cannot connect to agenda server")
+                    logger.exception(self, exc)
+                except Exception as exc:
+                    logger.error(self, "Something goes wrong during agenda create/update")
+                    logger.exception(self, exc)
+
+    def ensure_user_agenda_exists(self, user: User, context: TracimContext, create_event: bool):
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
+            agenda_api = AgendaApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            try:
+                agenda_already_exist = agenda_api.ensure_user_agenda_exists(user)
+                if agenda_already_exist and create_event:
+                    logger.warning(
+                        self,
+                        "user {} has just been created but their own agenda already exists".format(
+                            user.user_id
+                        ),
+                    )
+            except AgendaServerConnectionError as exc:
+                logger.error(self, "Cannot connect to the agenda server")
+                logger.exception(self, exc)
+            except Exception as exc:
+                logger.error(self, "Something went wrong during agenda create/update")
+                logger.exception(self, exc)
+
+    @hookimpl
+    def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
+        self.ensure_workspace_agenda_exists(workspace, context, create_event=True)
+
+    @hookimpl
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+
+        self.ensure_workspace_agenda_exists(workspace, context, create_event=False)
+
+    @hookimpl
+    def on_user_created(self, user: User, context: TracimContext) -> None:
+
+        # TODO - G.M - 04-04-2018 - [auth]
+        # Check if this is already needed with new auth system
+        user.ensure_auth_token(validity_seconds=context.app_config.USER__AUTH_TOKEN__VALIDITY)
+        self.ensure_user_agenda_exists(user, context, create_event=True)
+
+    @hookimpl
+    def on_user_modified(self, user: User, context: TracimContext) -> None:
+        # TODO - G.M - 04-04-2018 - [auth]
+        # Check if this is already needed with new auth system
+        user.ensure_auth_token(validity_seconds=context.app_config.USER__AUTH_TOKEN__VALIDITY)
+        self.ensure_user_agenda_exists(user, context, create_event=False)

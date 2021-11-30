@@ -2,9 +2,11 @@ from http import HTTPStatus
 import typing
 
 from hapic.ext.pyramid import PyramidContext
+from pluggy import PluginManager
 from pyramid.config import Configurator
 
 from tracim_backend.applications.agenda.authorization import add_www_authenticate_header_for_caldav
+from tracim_backend.applications.agenda.lib import AgendaHooks
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CaldavNotAuthenticated
 from tracim_backend.exceptions import CaldavNotAuthorized
@@ -79,6 +81,7 @@ class AgendaApp(TracimApplication):
         route_prefix: str,
         context: PyramidContext,
     ) -> None:
+
         # TODO - G.M - 2019-03-18 - check if possible to avoid this import here,
         # import is here because import AgendaController without adding it to
         # pyramid make trouble in hapic which try to get view related
@@ -109,6 +112,10 @@ class AgendaApp(TracimApplication):
         self, app_config: CFG
     ) -> typing.Tuple[typing.Tuple[str, str], ...]:
         return (("frame-src", "'self'"),)
+
+    def register_tracim_plugin(self, plugin_manager: PluginManager) -> None:
+        """Entry point for this plugin."""
+        plugin_manager.register(AgendaHooks())
 
 
 def create_app() -> TracimApplication:
