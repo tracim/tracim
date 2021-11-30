@@ -68,6 +68,8 @@ from tracim_backend.models.context_models import LiveMessageQuery
 from tracim_backend.models.context_models import LoginCredentials
 from tracim_backend.models.context_models import MoveParams
 from tracim_backend.models.context_models import PageQuery
+from tracim_backend.models.context_models import RadicaleUserResourceUserSubitemsPath
+from tracim_backend.models.context_models import RadicaleUserResourceWorkspaceSubitemsPath
 from tracim_backend.models.context_models import RadicaleUserSubitemsPath
 from tracim_backend.models.context_models import RadicaleWorkspaceSubitemsPath
 from tracim_backend.models.context_models import ReactionCreation
@@ -800,6 +802,32 @@ class WorkspaceIdPathSchema(WorkspaceIdSchema):
     @post_load
     def make_path_object(self, data: typing.Dict[str, typing.Any]):
         return WorkspacePath(**data)
+
+
+class RadicaleUserResourceUserSubItemPathSchema(UserIdPathSchema):
+    dest_user_id = marshmallow.fields.Int(
+        example=3,
+        required=True,
+        description="id of a valid user",
+        validate=strictly_positive_int_validator,
+    )
+    type = marshmallow.fields.Str(required=True,)
+    sub_item = marshmallow.fields.String(default="", allow_none=True)
+    trailing_slash = marshmallow.fields.String()
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return RadicaleUserResourceUserSubitemsPath(**data)
+
+
+class RadicaleUserResourceWorkspaceSubItemPathSchema(UserIdPathSchema, WorkspaceIdPathSchema):
+    type = marshmallow.fields.Str(required=True,)
+    sub_item = marshmallow.fields.String()
+    trailing_slash = marshmallow.fields.String()
+
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return RadicaleUserResourceWorkspaceSubitemsPath(**data)
 
 
 class RadicaleUserSubItemPathSchema(RadicaleSubItemPathSchema, UserIdPathSchema):

@@ -17,6 +17,8 @@ from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
+from tracim_backend.views.core_api.schemas import RadicaleUserResourceUserSubItemPathSchema
+from tracim_backend.views.core_api.schemas import RadicaleUserResourceWorkspaceSubItemPathSchema
 from tracim_backend.views.core_api.schemas import RadicaleUserSubItemPathSchema
 from tracim_backend.views.core_api.schemas import RadicaleWorkspaceSubItemPathSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
@@ -36,6 +38,7 @@ class RadicaleProxyController(Controller):
         self.radicale_base_path_dir = radicale_base_path
         self.radicale_path_user_dir = radicale_user_path
         self.radicale_path_workspace_dir = radicale_workspace_path
+        self.proxy_base_address = proxy_base_address
         self._proxy = Proxy(base_address=proxy_base_address, auth=HTTPBasicAuth("tracim", "tracim"))
 
     @hapic.with_api_doc(disable_doc=True)
@@ -74,6 +77,115 @@ class RadicaleProxyController(Controller):
         example: /agenda/user/ to radicale path /agenda/user/
         """
         return self._proxy.get_response_for_request(request, self.radicale_path_user_dir)
+
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(can_access_user_agenda)
+    @hapic.input_path(UserIdPathSchema())
+    def radicale_proxy__user_resource(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> Response:
+        """
+        proxy user agenda
+        example: /user_resource_1/ to radicale path /user_resource_1/
+        """
+        proxy = Proxy(
+            base_address=self.proxy_base_address,
+            auth=HTTPBasicAuth("user_resource_{}".format(request.candidate_user.user_id), "tracim"),
+        )
+        path = "user_resource_{}/".format(request.candidate_user.user_id)
+        return proxy.get_response_for_request(request, path)
+
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(can_access_user_agenda)
+    @hapic.input_path(RadicaleUserResourceUserSubItemPathSchema())
+    def radicale_proxy__user_resource_user_subitems(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> Response:
+        """
+        proxy user agenda
+        example: /user_resource_1/user_1_agenda/ to radicale path /user_resource_1/user_1_agenda/
+        """
+        assert hapic_data.path.dest_user_id == hapic_data.path.user_id
+        proxy = Proxy(
+            base_address=self.proxy_base_address,
+            auth=HTTPBasicAuth("user_resource_{}".format(request.candidate_user.user_id), "tracim"),
+        )
+        path = "user_resource_{}/{}_{}_{}".format(
+            request.candidate_user.user_id,
+            "user",
+            hapic_data.path.dest_user_id,
+            hapic_data.path.type,
+        )
+        return proxy.get_response_for_request(request, path)
+
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(can_access_user_agenda)
+    @hapic.input_path(RadicaleUserResourceUserSubItemPathSchema())
+    def radicale_proxy__user_resource_user_subitems_x(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> Response:
+        """
+        proxy user agenda
+        example: /user_resource_1/user_1_agenda/... to radicale path /user_resource_1/user_1_agenda/...
+        """
+        assert hapic_data.path.dest_user_id == hapic_data.path.user_id
+        proxy = Proxy(
+            base_address=self.proxy_base_address,
+            auth=HTTPBasicAuth("user_resource_{}".format(request.candidate_user.user_id), "tracim"),
+        )
+        path = "user_resource_{}/{}_{}_{}/{}".format(
+            request.candidate_user.user_id,
+            "user",
+            hapic_data.path.dest_user_id,
+            hapic_data.path.type,
+            hapic_data.path.sub_item,
+        )
+        return proxy.get_response_for_request(request, path)
+
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(can_access_workspace_event_agenda)
+    @hapic.input_path(RadicaleUserResourceWorkspaceSubItemPathSchema())
+    def radicale_proxy__user_resource_workspace_subitems(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> Response:
+        """
+        proxy user agenda
+        example: /user_resource_1/space_1_agenda/ to radicale path /user_resource_1/space_1_agenda/
+        """
+        proxy = Proxy(
+            base_address=self.proxy_base_address,
+            auth=HTTPBasicAuth("user_resource_{}".format(request.candidate_user.user_id), "tracim"),
+        )
+        path = "user_resource_{}/{}_{}_{}".format(
+            request.candidate_user.user_id,
+            "space",
+            hapic_data.path.workspace_id,
+            hapic_data.path.type,
+        )
+        return proxy.get_response_for_request(request, path)
+
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(can_access_workspace_event_agenda)
+    @hapic.input_path(RadicaleUserResourceWorkspaceSubItemPathSchema())
+    def radicale_proxy__user_resource_workspace_subitems_x(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> Response:
+        """
+        proxy user agenda
+        example: /user_resource_1/space_1_agenda/... to radicale path /user_resource_1/space_1_agenda/...
+        """
+        proxy = Proxy(
+            base_address=self.proxy_base_address,
+            auth=HTTPBasicAuth("user_resource_{}".format(request.candidate_user.user_id), "tracim"),
+        )
+        path = "user_resource_{}/{}_{}_{}/{}".format(
+            request.candidate_user.user_id,
+            "space",
+            hapic_data.path.workspace_id,
+            hapic_data.path.type,
+            hapic_data.path.sub_item,
+        )
+        return proxy.get_response_for_request(request, path)
 
     @hapic.with_api_doc(disable_doc=True)
     @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
@@ -124,6 +236,50 @@ class RadicaleProxyController(Controller):
         Create all routes and views using pyramid configurator
         for this controller
         """
+        # Radicale user resource agenda
+        configurator.add_route(
+            "radicale_proxy__user_resource", "/user_resource_{user_id:[0-9]+}{trailing_slash:[/]?}"
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_resource, route_name="radicale_proxy__user_resource"
+        )
+
+        configurator.add_route(
+            "radicale_proxy__user_resource_user",
+            "/user_resource_{user_id:[0-9]+}/user_{dest_user_id:[0-9]+}_{type}{trailing_slash:[/]?}",  # noqa: W605
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_resource_user_subitems,
+            route_name="radicale_proxy__user_resource_user",
+        )
+
+        configurator.add_route(
+            "radicale_proxy__user_resource_user_x",
+            "/user_resource_{user_id:[0-9]+}/user_{dest_user_id:[0-9]+}_{type}/{sub_item:.*}",  # noqa: W605
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_resource_user_subitems_x,
+            route_name="radicale_proxy__user_resource_user_x",
+        )
+
+        configurator.add_route(
+            "radicale_proxy__user_resource_workspace",
+            "/user_resource_{user_id:[0-9]+}/space_{workspace_id:[0-9]+}_{type}{trailing_slash:[/]?}",  # noqa: W605
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_resource_workspace_subitems,
+            route_name="radicale_proxy__user_resource_workspace",
+        )
+
+        configurator.add_route(
+            "radicale_proxy__user_resource_workspace_x",
+            "/user_resource_{user_id:[0-9]+}/space_{workspace_id:[0-9]+}_{type}/{sub_item:.*}",  # noqa: W605
+        )
+        configurator.add_view(
+            self.radicale_proxy__user_resource_workspace_subitems_x,
+            route_name="radicale_proxy__user_resource_workspace_x",
+        )
+
         # Radicale user agenda
         configurator.add_route("radicale_proxy__users", self.radicale_path_user_dir)
         configurator.add_view(self.radicale_proxy__users, route_name="radicale_proxy__users")

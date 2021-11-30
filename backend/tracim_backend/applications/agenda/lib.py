@@ -24,6 +24,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import Agenda
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 
 CREATE_AGENDA_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
@@ -127,7 +128,13 @@ class AgendaApi(object):
             base_url, self._config.CALDAV_RADICALE_WORKSPACE_PATH, workspace.workspace_id
         )
 
+    def get_user_resource_agenda_url(self, user: User, use_proxy: bool) -> str:
+        # HACK return user resource agenda instead of user_agenda
+        base_url = self._get_agenda_base_url(use_proxy=use_proxy)
+        return "{}{}/".format(base_url, "user_resource_{}".format(user.user_id))
+
     def get_user_agenda_url(self, user: User, use_proxy: bool) -> str:
+        # HACK return user resource agenda instead of user_agenda
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
         return "{}{}{}/".format(base_url, self._config.CALDAV__RADICALE__USER_PATH, user.user_id)
 
@@ -261,7 +268,9 @@ class AgendaApi(object):
         if AgendaType.private.value in agenda_types_filter and not workspaces_ids_filter:
             user_agendas.append(
                 Agenda(
-                    agenda_url=self.get_user_agenda_url(user, use_proxy=True),
+                    # HACK
+                    # agenda_url=self.get_user_agenda_url(user, use_proxy=True),
+                    agenda_url=self.get_user_resource_agenda_url(user, use_proxy=True),
                     with_credentials=True,
                     agenda_type=AgendaType.private.value,
                     workspace_id=None,
@@ -361,3 +370,29 @@ class AgendaHooks:
         # Check if this is already needed with new auth system
         user.ensure_auth_token(validity_seconds=context.app_config.USER__AUTH_TOKEN__VALIDITY)
         self.ensure_user_agenda_exists(user, context, create_event=False)
+
+    @hookimpl
+    def on_user_role_in_workspace_deleted(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
+            agenda_api = AgendaApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            agenda_api._delete_workspace_symlink(
+                workspace_id=role.workspace_id, dest_user_id=role.user_id, type="agenda"
+            )
+
+    @hookimpl
+    def on_user_role_in_workspace_created(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
+            agenda_api = AgendaApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            agenda_api._create_workspace_symlink(
+                workspace_id=role.workspace_id, dest_user_id=role.user_id, type="agenda"
+            )

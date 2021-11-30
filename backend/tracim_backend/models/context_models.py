@@ -421,6 +421,38 @@ class ContentAndUserPath(object):
         self.user_id = user_id
 
 
+class RadicaleUserResourceUserSubitemsPath(object):
+    def __init__(
+        self,
+        user_id: int,
+        dest_user_id: int,
+        type: str,
+        sub_item: str = "",
+        trailing_slash: str = "",
+    ) -> None:
+        self.user_id = user_id
+        self.dest_user_id = dest_user_id
+        self.type = type
+        self.sub_item = sub_item
+        self.trailing_slash = trailing_slash
+
+
+class RadicaleUserResourceWorkspaceSubitemsPath(object):
+    def __init__(
+        self,
+        user_id: int,
+        workspace_id: int,
+        type: str,
+        sub_item: str = "",
+        trailing_slash: str = "",
+    ) -> None:
+        self.user_id = user_id
+        self.workspace_id = workspace_id
+        self.type = type
+        self.sub_item = sub_item
+        self.trailing_slash = trailing_slash
+
+
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem
