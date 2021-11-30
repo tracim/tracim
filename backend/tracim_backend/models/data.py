@@ -207,7 +207,11 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
             if not include_archived and revision.node.is_archived:
                 continue
             if revision.depot_file:
-                size += revision.depot_file.file.content_length
+                try:
+                    size += revision.depot_file.file.content_length
+                except IOError:
+                    logger.warning("Cannot get depot_file {}".format(revision.depot_file.file_id))
+                    pass
         return size
 
     def get_user_role(self, user: User) -> int:
