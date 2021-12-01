@@ -41,7 +41,8 @@ const userDetails = {
 const workspace = {
   workspace_id: 1,
   label: 'Hello, world',
-  description: ''
+  description: '',
+  number_of_members: 0
 }
 
 const props = {
@@ -247,53 +248,53 @@ describe('<AdminWorkspaceUser />', () => {
   })
 
   describe('TLM handlers', () => {
-    describe('eventType workspace', () => {
+    describe('eventType space', () => {
       props.data.config.type = 'workspace'
 
-      describe('handleWorkspaceCreated', () => {
-        it('should add the created workspace to the end of the list', async () => {
+      describe('handleSpaceCreated', () => {
+        it('should add the created space to the end of the list', async () => {
           enableMocks()
-          const secondWorkspace = {
+          const secondSpace = {
             workspace_id: 5,
-            label: 'A workspace',
+            label: 'A space',
             description: ''
           }
 
-          const tlmData = { fields: { workspace: secondWorkspace } }
+          const tlmData = { fields: { workspace: secondSpace } }
           const wrapper = shallow(<AdminWorkspaceUser {...props} />)
 
-          await wrapper.instance().handleWorkspaceCreated(tlmData)
+          await wrapper.instance().handleSpaceCreated(tlmData)
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace, memberList: [] })
+          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace })
         })
       })
 
-      describe('handleWorkspaceModified', () => {
+      describe('handleSpaceModified', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
         const tlmData = { fields: { workspace: workspace } }
 
         before(() => {
-          wrapper.instance().handleWorkspaceModified(tlmData)
+          wrapper.instance().handleSpaceModified(tlmData)
         })
 
-        it('should replace the modified workspace', () => {
+        it('should replace the modified space', () => {
           const workspaceList = wrapper.state('content').workspaceList
           console.log(workspaceList)
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace, memberList: [] })
+          expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace })
         })
       })
 
-      describe('handleWorkspaceDeleted', () => {
+      describe('handleSpaceDeleted', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
         const tlmData = { fields: { workspace: workspace } }
 
         before(() => {
-          wrapper.instance().handleWorkspaceDeleted(tlmData)
+          wrapper.instance().handleSpaceDeleted(tlmData)
         })
 
-        it('should remove the deleted workspace', () => {
+        it('should remove the deleted space', () => {
           const workspaceList = wrapper.state('content').workspaceList
           expect(workspaceList.length).to.equal(0)
         })
@@ -309,51 +310,57 @@ describe('<AdminWorkspaceUser />', () => {
         role: 'contributor'
       }
 
-      describe('handleWorkspaceMemberCreated', () => {
+      describe('handleSpaceMemberCreated', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
 
         before(() => {
           const tlmData = {
             fields: {
-              workspace: workspace,
+              workspace: {
+                workspace_id: workspace.workspace_id,
+                label: workspace.label,
+                description: workspace.description,
+                // INFO - MP - 2021-12-01 - The new number of members is into the TLM
+                number_of_members: 1
+              },
               member: member,
               user: userDetails
             }
           }
-          wrapper.instance().handleWorkspaceMemberCreated(tlmData)
+          wrapper.instance().handleSpaceMemberCreated(tlmData)
         })
 
-        it('should add the created member to the end of the workspace member list', async () => {
+        it('should add the created member at the end of the space member list', async () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace.memberList).to.deep.equal([{
-            ...member,
-            user: userDetails,
-            user_id: user.user_id,
-            workspace: workspace,
-            workspace_id: workspace.workspace_id
-          }])
+          expect(lastWorkspace.number_of_members).to.equal(1)
         })
       })
 
-      describe('handleWorkspaceMemberDeleted', () => {
+      describe('handleSpaceMemberDeleted', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
 
         before(() => {
           const tlmData = {
             fields: {
-              workspace: workspace,
+              workspace: {
+                workspace_id: workspace.workspace_id,
+                label: workspace.label,
+                description: workspace.description,
+                // INFO - MP - 2021-12-01 - The new number of members is into the TLM
+                number_of_members: 0
+              },
               member: member,
               user: user
             }
           }
-          wrapper.instance().handleWorkspaceMemberDeleted(tlmData)
+          wrapper.instance().handleSpaceMemberDeleted(tlmData)
         })
 
         it('should remove the deleted member from the workspace\'s member list', () => {
           const workspaceList = wrapper.state('content').workspaceList
           const lastWorkspace = workspaceList[workspaceList.length - 1]
-          expect(lastWorkspace.memberList).to.deep.equal([])
+          expect(lastWorkspace.number_of_members).to.equal(0)
         })
       })
     })
@@ -379,6 +386,7 @@ describe('<AdminWorkspaceUser />', () => {
 
       describe('handleUserDeleted', () => {
         const wrapper = shallow(<AdminWorkspaceUser {...props} />)
+
         before(async () => {
           const tlmData = { fields: { user: userDetails } }
           await wrapper.instance().handleUserDeleted(tlmData)
@@ -386,9 +394,7 @@ describe('<AdminWorkspaceUser />', () => {
 
         it('should remove the deleted user from the user list', async () => {
           const userList = wrapper.state('content').userList
-          expect(userList.length).to.equal(1)
-          const lastUser = userList[userList.length - 1]
-          expect(lastUser).to.deep.equal(adminDetails)
+          expect(userList.every(u => u.user_id != user.user_id)).to.equal(true)
         })
       })
 

@@ -71,11 +71,11 @@ export class AdminWorkspaceUser extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceCreated },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceMemberCreated },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceMemberDeleted },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleSpaceCreated },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleSpaceModified },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleSpaceDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleSpaceMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleSpaceMemberDeleted },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCreated },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.DELETED, handler: this.handleUserDeleted }
@@ -114,7 +114,7 @@ export class AdminWorkspaceUser extends React.Component {
   refreshAll = async () => {
     this.updateTitleAndBreadcrumbs()
     if (this.state.config.type === 'workspace') {
-      await this.loadWorkspaceContent()
+      await this.loadSpaceContent()
     } else if (this.state.config.type === 'user') {
       await this.loadUserContent()
     }
@@ -149,13 +149,13 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  loadWorkspaceContent = async () => {
+  loadSpaceContent = async () => {
     const { props, state } = this
-    const fetchWorkspaceList = await handleFetchResult(await getWorkspaceList(state.config.apiUrl))
+    const fetchSpaceList = await handleFetchResult(await getWorkspaceList(state.config.apiUrl))
 
-    switch (fetchWorkspaceList.apiResponse.status) {
+    switch (fetchSpaceList.apiResponse.status) {
       case 200: {
-        const workspaceList = fetchWorkspaceList.body
+        const workspaceList = fetchSpaceList.body
 
         this.setState(prev => ({
           content: {
@@ -224,43 +224,43 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
-  handleDeleteWorkspace = async () => {
+  handleDeleteSpace = async () => {
     const { props, state } = this
 
-    const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
-    if (deleteWorkspaceResponse.status !== 204) {
+    const deleteSpaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
+    if (deleteSpaceResponse.status !== 204) {
       sendGlobalFlashMessage(props.t('Error while deleting space'))
     }
-    this.handleClosePopupDeleteWorkspace()
+    this.handleClosePopupDeleteSpace()
   }
 
-  handleOpenPopupDeleteWorkspace = workspaceId => this.setState({
+  handleOpenPopupDeleteSpace = workspaceId => this.setState({
     popupDeleteWorkspaceDisplay: true,
     workspaceToDelete: workspaceId
   })
 
-  handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
+  handleClosePopupDeleteSpace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
-  handleWorkspaceCreated = (message) => {
+  handleSpaceCreated = (message) => {
     const { state } = this
     const workspace = message.fields.workspace
-    const newWorkspaceList = state.content.workspaceList.slice()
+    const newSpaceList = state.content.workspaceList.slice()
     /* INFO SG 2020-06-15:
      *  - the list is ordered by id and a newly created workspace has a greater id than all others.
      *  - initialize member list as empty since the space member created message will handle
      *    adding the initial user.
      */
-    newWorkspaceList.push({ ...workspace })
+    newSpaceList.push({ ...workspace })
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceModified = (message) => {
+  handleSpaceModified = (message) => {
     const { state } = this
 
     const workspace = message.fields.workspace
@@ -273,7 +273,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       workspace,
       ...workspaceList.slice(workspaceIndex + 1)
@@ -282,12 +282,12 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceDeleted = (message) => {
+  handleSpaceDeleted = (message) => {
     const { state } = this
 
     const workspace = message.fields.workspace
@@ -300,7 +300,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       ...workspaceList.slice(workspaceIndex + 1)
     ]
@@ -308,12 +308,12 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceMemberCreated = (message) => {
+  handleSpaceMemberCreated = (message) => {
     const { state } = this
 
     const workspace = message.fields.workspace
@@ -326,34 +326,7 @@ export class AdminWorkspaceUser extends React.Component {
       return
     }
 
-    const newWorkspaceList = [
-      ...workspaceList.slice(0, workspaceIndex),
-      workspace,
-      ...workspaceList.slice(workspaceIndex + 1)
-    ]
-
-    this.setState(prev => ({
-      content: {
-        ...prev.content,
-        workspaceList: newWorkspaceList
-      }
-    }))
-  }
-
-  handleWorkspaceMemberDeleted = (message) => {
-    const { state } = this
-
-    const workspace = message.fields.workspace
-    const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
-
-    if (workspaceIndex === -1) {
-      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
-      // We do not have this workspace in our list...
-      return
-    }
-
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       workspace,
       ...workspaceList.slice(workspaceIndex + 1)
@@ -362,7 +335,34 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
+      }
+    }))
+  }
+
+  handleSpaceMemberDeleted = (message) => {
+    const { state } = this
+
+    const workspace = message.fields.workspace
+    const workspaceList = state.content.workspaceList
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
+
+    if (workspaceIndex === -1) {
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
+      // We do not have this workspace in our list...
+      return
+    }
+
+    const newSpaceList = [
+      ...workspaceList.slice(0, workspaceIndex),
+      workspace,
+      ...workspaceList.slice(workspaceIndex + 1)
+    ]
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        workspaceList: newSpaceList
       }
     }))
   }
@@ -486,7 +486,7 @@ export class AdminWorkspaceUser extends React.Component {
     }))
   }
 
-  handleClickWorkspace = workspaceId => {
+  handleClickSpace = workspaceId => {
     const { state } = this
     if (state.workspaceIdOpened === null) {
       GLOBAL_renderAppFeature({
@@ -518,7 +518,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState({ workspaceIdOpened: workspaceId })
   }
 
-  handleClickNewWorkspace = () => {
+  handleClickNewSpace = () => {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
@@ -548,9 +548,9 @@ export class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'workspace' && (
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
-            onClickWorkspace={this.handleClickWorkspace}
-            onClickNewWorkspace={this.handleClickNewWorkspace}
-            onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
+            onClickWorkspace={this.handleClickSpace}
+            onClickNewWorkspace={this.handleClickNewSpace}
+            onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
           />
         )}
@@ -573,8 +573,8 @@ export class AdminWorkspaceUser extends React.Component {
 
         {state.popupDeleteWorkspaceDisplay && (
           <ConfirmPopup
-            onCancel={this.handleClosePopupDeleteWorkspace}
-            onConfirm={this.handleDeleteWorkspace}
+            onCancel={this.handleClosePopupDeleteSpace}
+            onConfirm={this.handleDeleteSpace}
             confirmLabel={props.t('Delete')}
             confirmIcon='far fa-fw fa-trash-alt'
           />
