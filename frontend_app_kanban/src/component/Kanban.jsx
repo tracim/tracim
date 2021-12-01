@@ -45,6 +45,10 @@ class Kanban extends React.Component {
 
     this.state = {
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
+      selectedColumnColor: {
+        bgColor: '',
+        column: {}
+      },
       fullscreen: false,
       saveRequired: false,
       saving: false,
@@ -260,9 +264,19 @@ class Kanban extends React.Component {
   }
 
   handleColumnColorChange = (column, bgColor) => {
+    this.setState({ selectedColumnColor: { bgColor, column } })
+  }
+
+  handleColumnColorChangeApply = () => {
     this.setState(prevState => {
+      const bgColor = prevState.selectedColumnColor.bgColor
+
       return {
-        board: changeColumn(prevState.board, column, { bgColor }),
+        board: changeColumn(
+          prevState.board,
+          prevState.selectedColumnColor.column,
+          { bgColor }
+        ),
         saveRequired: true
       }
     })
@@ -334,11 +348,13 @@ class Kanban extends React.Component {
                     column={column}
                     onRenameColumn={this.handleColumnRenameClick}
                     onChangeColumnColor={this.handleColumnColorClick}
-                    onApplyColumnColorChange={this.handleColumnColorChange}
+                    onChangeColumnColorPicker={this.handleColumnColorChange}
+                    onApplyColumnColorChange={this.handleColumnColorChangeApply}
                     onCancelColumnColorChange={() => this.setState({ colorPickerEnabledForColumnId: null })}
                     onAddCard={this.handleAddCard}
                     onRemoveColumn={this.handleRemoveColumn}
                     showColorPicker={state.colorPickerEnabledForColumnId === column.id}
+                    selectedColumnColor={state.selectedColumnColor}
                   />
                 )}
                 renderCard={card => (

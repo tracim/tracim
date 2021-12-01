@@ -39,9 +39,18 @@ const KanbanColumnHeader = props => {
         <div className='kanban__contentpage__statewrapper__kanban__column__colorPicker'>
           <input
             type='color'
-            onChange={(e) => props.onApplyColumnColorChange(props.column, e.target.value)}
+            value={props.selectedColumnColor.bgColor}
+            onChange={(e) => props.onChangeColumnColorPicker(props.column, e.target.value)}
             disabled={props.readOnly}
           />
+          {!props.readOnly && props.column.bgColor !== props.selectedColumnColor.bgColor && (
+            <input
+              type='button'
+              className='kanban__contentpage__statewrapper__kanban__column__hideColorButton'
+              value={props.t('Apply')}
+              onClick={props.onApplyColumnColorChange}
+            />
+          )}
           <input
             type='button'
             className='kanban__contentpage__statewrapper__kanban__column__hideColorButton'
