@@ -297,8 +297,10 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   handleClickBtnCloseApp = () => {
+    const { state } = this
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+    state.config.history.push(PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id))
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -364,7 +366,10 @@ export class WorkspaceAdvanced extends React.Component {
 
     switch (fetchPutUserRole.apiResponse.status) {
       case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
-      default: sendGlobalFlashMessage(props.t('Error while saving new role for member'))
+      default: sendGlobalFlashMessage(fetchPutUserRole.body.code === 3011
+        ? props.t('You cannot change this member role because there are no other space managers.')
+        : props.t('Error while saving new role for member')
+      )
     }
   }
 

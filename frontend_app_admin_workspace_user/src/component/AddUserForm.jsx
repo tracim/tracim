@@ -230,12 +230,26 @@ export class AddUserForm extends React.Component {
         </div>
         <div className='adminUser__adduser__form__submit'>
           <IconButton
+            customClass='adminUser__adduser__form__submit__spaces'
+            disabled={this.isValidateButtonDisabled()}
+            icon='fas fa-users'
+            onClick={() => props.onClickCreateUserAndAddToSpaces(
+              state.newUserName,
+              state.newUserUsername,
+              state.newUserEmail,
+              state.newUserType,
+              state.newUserPassword
+            )}
+            text={props.t('Create and add to spaces')}
+          />
+
+          <IconButton
             intent='primary'
             mode='light'
             disabled={this.isValidateButtonDisabled()}
             onClick={this.handleClickAddUser}
             icon='fas fa-check'
-            text={props.t('Create the user')}
+            text={props.t('Create')}
             dataCy='adminUser__adduser__form__submit'
           />
         </div>

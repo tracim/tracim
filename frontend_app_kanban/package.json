@@ -1,0 +1,106 @@
+{
+  "name": "tracim_app_kanban",
+  "version": "1.1.2",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
+    "build": "NODE_ENV=production webpack-cli",
+    "buildoptimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
+    "build-dev": "NODE_ENV=development webpack-cli",
+    "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
+    "build-translation": "node ../i18next.scanner.js",
+    "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
+    "test": "yarn run lint && yarn run test:quick",
+    "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@asseinfo/react-kanban": "^2.2.0",
+    "classnames": "^2.2.6",
+    "core-js": "^3.6.4",
+    "eslint-import-resolver-node": "^0.3.3",
+    "i18next": "10.5.0",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-i18next": "7.4.0",
+    "react-router-dom": "^5.2.0",
+    "regenerator-runtime": "^0.13.2",
+    "tracim_frontend_lib": "^1.1.9",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "peerDependencies": {
+    "cheerio": "^1.0.0",
+    "eslint": "^6.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
+    "@babel/plugin-transform-object-assign": "^7.12.1",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-react": "^7.12.10",
+    "@babel/register": "^7.12.10",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.2",
+    "chai": "^4.2.0",
+    "chai-enzyme": "^1.0.0-beta.1",
+    "css-loader": "^3.5.1",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "eslint": "^6.8.0",
+    "file-loader": "^6.0.0",
+    "i18next-scanner": "^2.10.2",
+    "ignore-styles": "^5.0.1",
+    "jsdom": "^15.1.1",
+    "mocha": "^7.1.1",
+    "nock": "^12.0.3",
+    "pnp-webpack-plugin": "^1.6.4",
+    "sinon": "^7.4.1",
+    "standard": "^14",
+    "standard-loader": "^7.0.0",
+    "style-loader": "^0.23.1",
+    "stylus": "^0.54.5",
+    "stylus-native-loader": "^1.1.0",
+    "url-loader": "^2.0.1",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "standard": {
+    "globals": [
+      "globalThis",
+      "fetch",
+      "history",
+      "btoa",
+      "wysiwyg",
+      "tinymce",
+      "localStorage",
+      "GLOBAL_renderAppFeature",
+      "GLOBAL_unmountApp",
+      "GLOBAL_dispatchEvent",
+      "CustomEvent",
+      "confirm",
+      "alert",
+      "prompt"
+    ],
+    "parser": "babel-eslint",
+    "ignore": []
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "presets": [
+          "@babel/preset-env",
+          "@babel/preset-react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-proposal-object-rest-spread",
+          "@babel/plugin-transform-object-assign"
+        ]
+      }
+    }
+  }
+}

@@ -169,15 +169,12 @@ class EventApi:
             )
         elif parent_ids and content_ids:
             query = query.filter(
-                or_(
-                    Event.content["content_id"].as_integer().in_(content_ids),
-                    Event.content["parent_id"].as_integer().in_(parent_ids),
-                )
+                or_(Event.content_id.in_(content_ids), Event.parent_id.in_(parent_ids),)
             )
         elif content_ids:
-            query = query.filter(Event.content["content_id"].as_integer().in_(content_ids))
+            query = query.filter(Event.content_id.in_(content_ids))
         elif parent_ids:
-            query = query.filter(Event.content["parent_id"].as_integer().in_(parent_ids))
+            query = query.filter(Event.parent_id.in_(parent_ids))
 
         if not include_not_sent:
             query = query.filter(Message.sent != None)  # noqa: E711

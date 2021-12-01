@@ -5,6 +5,7 @@
   "contents/thread": "#428BCA",
   "contents/file": "#ffa500",
   "contents/folder": "#414548",
+  "contents/kanban": "#197474",
   "agenda": "#ff4b3a",
   "gallery": "#999999"
 }

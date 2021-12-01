@@ -20,6 +20,7 @@ export const PAGE = {
   CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,
   HOME: '/ui',
   WORKSPACE: {
+    ADVANCED_DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/advanced_dashboard`,
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
@@ -44,7 +45,8 @@ export const PAGE = {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
-    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
+    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`,
+    USER_SPACE_LIST: (userId = ':iduser') => `/ui/admin/user/${userId}/spaces`
   },
   SEARCH_RESULT: '/ui/search-result',
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
@@ -498,7 +500,8 @@ export const CONTENT_TYPE = {
   FILE: 'file',
   THREAD: 'thread',
   FOLDER: 'folder',
-  COMMENT: 'comment'
+  COMMENT: 'comment',
+  KANBAN: 'kanban'
 }
 
 // FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js

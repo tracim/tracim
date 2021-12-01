@@ -40,6 +40,8 @@ const getSelectedApp = function (appName) {
         return (appCollaborativeDocumentEdition || { default: {} }).default
       case 'gallery':
         return (appGallery || { default: {} }).default
+      case 'kanban':
+        return (appKanban || { default: {} }).default
       default:
         return APP_NOT_LOADED
     }
