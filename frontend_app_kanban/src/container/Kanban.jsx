@@ -326,7 +326,7 @@ export class Kanban extends React.Component {
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
-    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
+    props.appContentChangeTitle(state.content, newTitle, FILE_APP_SLUG)
   }
 
   handleChangeNewComment = e => {
