@@ -99,6 +99,7 @@ import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
+import Hooks from './hooks'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
@@ -587,6 +588,7 @@ export class Tracim extends React.Component {
 
     return (
       <div className='tracim fullWidthFullHeight'>
+        <Hooks/>
         <Header
           onClickNotification={this.handleClickNotificationButton}
           unreadNotificationCount={props.notificationPage.unreadNotificationCount}

@@ -46,7 +46,12 @@ module.exports = {
     rules: [isProduction ? {} : {
       test: /\.jsx?$/,
       enforce: 'pre',
-      exclude: [/node_modules/, /frontend_lib/],
+      exclude: [/node_modules/],
+      use: 'eslint-loader',
+    }, {
+      test: /\.jsx?$/,
+      enforce: 'pre',
+      exclude: [/node_modules/],
       use: 'standard-loader'
     }, {
       test: [/\.js$/, /\.jsx$/],
