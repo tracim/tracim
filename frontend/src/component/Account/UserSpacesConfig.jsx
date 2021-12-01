@@ -185,6 +185,7 @@ export class UserSpacesConfig extends React.Component {
               onClick={(() => props.history.push(PAGE.ADMIN.USER_SPACE_LIST(props.userToEditId)))}
               icon='fas fa-user-cog'
               text={props.t('Manage user spaces')}
+              dataCy='account__userpreference__setting__spacename'
             />
           )}
         </div>
