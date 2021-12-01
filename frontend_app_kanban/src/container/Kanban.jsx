@@ -514,6 +514,7 @@ export class Kanban extends React.Component {
             content={state.content}
             isNewContentRevision={state.isNewContentRevision}
             readOnly={readOnly}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
           />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}

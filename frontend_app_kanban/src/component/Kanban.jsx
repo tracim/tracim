@@ -21,6 +21,7 @@ import {
   putRawFileContent,
   getRawFileContent,
   CardPopup,
+  PromptMessage,
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
@@ -310,6 +311,16 @@ class Kanban extends React.Component {
 
     return (
       <div className={classnames('kanban__contentpage__statewrapper__kanban', { fullscreen: state.fullscreen })}>
+        {props.content.is_deleted && (
+          <PromptMessage
+            msg={props.t('This content is deleted')}
+            btnType='button'
+            icon='far fa-trash-alt'
+            btnLabel={props.t('Restore')}
+            onClickBtn={props.onClickRestoreDeleted}
+          />
+        )}
+
         <div className='kanban__contentpage__statewrapper__kanban__toolbar'>
           <IconButton
             text={props.t('column')}
