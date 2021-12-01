@@ -53,6 +53,7 @@ export class Kanban extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
+      isNewContentRevision: false,
       newComment: '',
       loading: false,
       newContent: {},
@@ -238,6 +239,10 @@ export class Kanban extends React.Component {
       this.updateTimelineAndContent()
     }
 
+    if (state.isNewContentRevision && prevState.content.current_revision_id === state.content.current_revision_id) {
+      this.setState({ isNewContentRevision: false })
+    }
+
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
@@ -278,6 +283,7 @@ export class Kanban extends React.Component {
     )
     this.setState({
       content: response.body,
+      isNewContentRevision: true,
       loadingContent: false
     })
     this.setHeadTitle(response.body.label)
@@ -503,7 +509,12 @@ export class Kanban extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
         >
-          <KanbanComponent content={state.content} config={state.config} readOnly={readOnly} />
+          <KanbanComponent
+            config={state.config}
+            content={state.content}
+            isNewContentRevision={state.isNewContentRevision}
+            readOnly={readOnly}
+          />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}

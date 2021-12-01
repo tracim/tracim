@@ -55,7 +55,12 @@ class Kanban extends React.Component {
   }
 
   componentDidMount () {
-    this.loadBoardContent()
+    const { props } = this
+    if (props.isNewContentRevision) this.loadBoardContent()
+
+    if (props.content.current_revision_type === 'creation') {
+      this.setState({ boardState: BOARD_STATE.LOADED, board: { columns: [] } })
+    }
   }
 
   async componentDidUpdate (prevProps) {
@@ -72,11 +77,6 @@ class Kanban extends React.Component {
   async loadBoardContent () {
     this.setState({ boardState: BOARD_STATE.LOADING })
     const { props } = this
-
-    if (props.content.current_revision_type === 'creation') {
-      this.setState({ boardState: BOARD_STATE.LOADED, board: { columns: [] } })
-      return
-    }
 
     const fetchRawFileContent = await handleFetchResult(
       await getRawFileContent(
