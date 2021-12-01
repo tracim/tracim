@@ -43,18 +43,31 @@ class CaldavAppFactory(object):
                     parent_folder
                 )
             )
-        user_dir = os.path.join(
+        user_agenda_dir = os.path.join(
             sub_dir_storage_path,
             app_config.CALDAV__RADICALE__AGENDA_DIR,
             app_config.CALDAV__RADICALE__USER_SUBDIR,
         )
-        os.makedirs(user_dir, exist_ok=True)
-        workspace_dir = os.path.join(
+        os.makedirs(user_agenda_dir, exist_ok=True)
+        workspace_agenda_dir = os.path.join(
             sub_dir_storage_path,
             app_config.CALDAV__RADICALE__AGENDA_DIR,
             app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR,
         )
-        os.makedirs(workspace_dir, exist_ok=True)
+        os.makedirs(workspace_agenda_dir, exist_ok=True)
+
+        user_address_book_dir = os.path.join(
+            sub_dir_storage_path,
+            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR,
+            app_config.CARDDAV__RADICALE__USER_SUBDIR,
+        )
+        os.makedirs(user_address_book_dir, exist_ok=True)
+        workspace_address_book_dir = os.path.join(
+            sub_dir_storage_path,
+            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR,
+            app_config.CARDDAV__RADICALE__WORKSPACE_SUBDIR,
+        )
+        os.makedirs(workspace_address_book_dir, exist_ok=True)
 
     def _parse_additional_radicale_config(
         self, config: ConfigParser, settings: dict

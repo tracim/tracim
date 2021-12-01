@@ -1,3 +1,4 @@
+import enum
 import os
 import typing
 from xml.sax.saxutils import escape
@@ -16,7 +17,7 @@ from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaPropsUpdateFailed
 from tracim_backend.exceptions import AgendaServerConnectionError
-from tracim_backend.exceptions import CannotCreateAgenda
+from tracim_backend.exceptions import CannotCreateAgendaResource
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.workspace import WorkspaceApi
@@ -27,7 +28,7 @@ from tracim_backend.models.context_models import Agenda
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 
-CREATE_AGENDA_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
+CREATE_CALENDAR_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 <create xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:I="http://apple.com/ns/ical/">
   <set>
     <prop>
@@ -48,6 +49,26 @@ CREATE_AGENDA_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 </create>
 """
 
+CREATE_ADDRESS_BOOK_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
+<create xmlns="DAV:" xmlns:CR="urn:ietf:params:xml:ns:carddav">
+  <set>
+    <prop>
+      <resourcetype>
+        <collection />
+        <CR:addressbook />
+      </resourcetype>
+      <displayname>{address_book_name}</displayname>
+      <CR:addressbook-description>{address_book_description}</CR:addressbook-description>
+    </prop>
+  </set>
+</create>
+"""
+
+
+class AgendaAppCollectionType(enum.Enum):
+    AGENDA = "agenda"
+    ADDRESS_BOOK = "address_book"
+
 
 class CalendarDescription(ValuedBaseElement):
     tag = ns("C", "calendar-description")
@@ -59,11 +80,14 @@ class AgendaApi(object):
         self._session = session
         self._config = config
 
-    def _check_agenda_exist(self, agenda_url) -> bool:
+    def _check_collection_exist(self, url) -> bool:
         try:
-            response = requests.get(agenda_url)
+            response = requests.get(url)
         except requests.exceptions.ConnectionError as exc:
-            logger.error(self, "Cannot check agenda existence, connection error to radicale server")
+            logger.error(
+                self,
+                "Cannot check agenda collection existence, connection error to radicale server",
+            )
             logger.exception(self, exc)
             raise AgendaServerConnectionError() from exc
         if response.status_code < 400:
@@ -72,48 +96,74 @@ class AgendaApi(object):
             # TODO - G.M - 2019-03-13 - Better deal with other error code
             return False
 
-    def _create_agenda(self, agenda_url, agenda_name, agenda_description):
-        logger.debug(self, "create a new caldav agenda at url {}".format(agenda_url))
+    def create_collection(self, url, name, description, type: AgendaAppCollectionType):
+        logger.debug(
+            self, "create a new agenda collection of type {} at url {}".format(type.value, url)
+        )
         # INFO - G.M - 2019-05-10 - we use str as pick key as it is determinist: same
         # result between run. default method use hash which use random hash for security concern
-        body = CREATE_AGENDA_TEMPLATE.format(
-            agenda_name=escape(agenda_name),
-            agenda_color=Color(pick_for=agenda_name, pick_key=str).get_hex(),
-            agenda_description=escape(agenda_description),
-        )
+        if type == AgendaAppCollectionType.AGENDA:
+            body = CREATE_CALENDAR_TEMPLATE.format(
+                agenda_name=escape(name),
+                agenda_color=Color(pick_for=name, pick_key=str).get_hex(),
+                agenda_description=escape(description),
+            )
+        elif type == AgendaAppCollectionType.ADDRESS_BOOK:
+            body = CREATE_ADDRESS_BOOK_TEMPLATE.format(
+                address_book_name=escape(name), address_book_description=escape(description),
+            )
+        else:
+            raise ()
         try:
-            response = requests.request("mkcol", agenda_url, data=body.encode("utf-8"))
+            response = requests.request("mkcol", url, data=body.encode("utf-8"))
         except requests.exceptions.ConnectionError as exc:
             raise AgendaServerConnectionError() from exc
         if not response.status_code == 201:
-            raise CannotCreateAgenda(
-                "Agenda {} cannot be created:{},{}".format(
-                    agenda_url, response.status_code, response.content
+            raise CannotCreateAgendaResource(
+                "Agenda resource of type {} at url {} cannot be created:{},{}".format(
+                    type.value, url, response.status_code, response.content
                 )
             )
-        logger.info(self, "new caldav agenda created at url {}".format(agenda_url))
+        logger.info(
+            self, "new agenda resource of type {} created at url {}".format(type.value, url)
+        )
 
-    def _update_agenda_props(self, agenda_url, agenda_name, agenda_description):
-        logger.debug(self, "update existing caldav agenda props at url {}".format(agenda_url))
+    def update_collection_props(self, url, name, description, type: AgendaAppCollectionType):
+        logger.debug(
+            self,
+            "update existing agenda collection of type {} props at url {}".format(type.value, url),
+        )
         # force renaming of agenda to be sure of consistency
+        if type.AGENDA:
+            return self._update_agenda_props(url, name, description)
+        elif type.ADDRESS_BOOK:
+            return self._update_address_book_props(url, name, description)
+        else:
+            raise ()
+
+    def _update_agenda_props(self, url, name, description):
         try:
-            caldav_client = caldav.DAVClient(username="tracim", password="tracim", url=agenda_url)
-            agenda = caldav.objects.Calendar(client=caldav_client, url=agenda_url)
+            caldav_client = caldav.DAVClient(username="tracim", password="tracim", url=url)
+            agenda = caldav.objects.Calendar(client=caldav_client, url=url)
             props = agenda.get_properties([caldav.dav.DisplayName(), CalendarDescription()])
             # TODO - G.M - 2019-04-11 - Rewrote this better, we need to verify
             # if value are same but as props may be None but agenda_description
             # can be '' we need to convert thing in order that '' is same as None.
-            if agenda_name != str(
-                props.get(caldav.dav.DisplayName().tag) or ""
-            ) or agenda_description != str(props.get(CalendarDescription().tag) or ""):
+            if name != str(props.get(caldav.dav.DisplayName().tag) or "") or description != str(
+                props.get(CalendarDescription().tag) or ""
+            ):
                 agenda.set_properties(
-                    [caldav.dav.DisplayName(agenda_name), CalendarDescription(agenda_description)]
+                    [caldav.dav.DisplayName(name), CalendarDescription(description)]
                 )
-                logger.debug(self, "props for calendar at url {} updated".format(agenda_url))
+                logger.debug(self, "props for agenda at url {} updated".format(url))
             else:
-                logger.debug(self, "No props to update for calendar at url {}".format(agenda_url))
+                logger.debug(self, "No props to update for agenda at url {}".format(url))
         except Exception as exc:
             raise AgendaPropsUpdateFailed("Failed to update props of agenda") from exc
+
+    def _update_address_book_props(self, url, name, description):
+        # TODO
+        pass
 
     def _get_agenda_base_url(self, use_proxy: bool) -> str:
         if use_proxy:
@@ -125,22 +175,33 @@ class AgendaApi(object):
     def get_workspace_agenda_url(self, workspace: Workspace, use_proxy: bool) -> str:
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
         return "{}{}{}/".format(
-            base_url, self._config.CALDAV_RADICALE_WORKSPACE_PATH, workspace.workspace_id
+            base_url, self._config.CALDAV__RADICALE__WORKSPACE_PATH, workspace.workspace_id
         )
 
-    def get_user_resource_agenda_url(self, user: User, use_proxy: bool) -> str:
+    def get_workspace_address_book_url(self, workspace: Workspace, use_proxy: bool) -> str:
+        base_url = self._get_agenda_base_url(use_proxy=use_proxy)
+        return "{}{}{}/".format(
+            base_url, self._config.CARDDAV__RADICALE__WORKSPACE_PATH, workspace.workspace_id
+        )
+
+    def get_user_resource_url(self, user: User, use_proxy: bool) -> str:
         # HACK return user resource agenda instead of user_agenda
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
-        return "{}{}/".format(base_url, "user_resource_{}".format(user.user_id))
+        return "{}/{}/".format(base_url, "user_resource_{}".format(user.user_id))
 
     def get_user_agenda_url(self, user: User, use_proxy: bool) -> str:
         # HACK return user resource agenda instead of user_agenda
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
         return "{}{}{}/".format(base_url, self._config.CALDAV__RADICALE__USER_PATH, user.user_id)
 
+    def get_user_address_book_url(self, user: User, use_proxy: bool) -> str:
+        # HACK return user resource agenda instead of user_agenda
+        base_url = self._get_agenda_base_url(use_proxy=use_proxy)
+        return "{}{}{}/".format(base_url, self._config.CARDDAV__RADICALE__USER_PATH, user.user_id)
+
     def ensure_workspace_agenda_exists(self, workspace: Workspace) -> bool:
         """
-        Return true if agenda already exist, false if it was just create,
+        Return true if agenda already exist, false if it was just create
         raise Exception if agenda cannot be created.
         """
         logger.debug(
@@ -149,63 +210,121 @@ class AgendaApi(object):
         if not workspace.agenda_enabled:
             raise WorkspaceAgendaDisabledException()
         workspace_agenda_url = self.get_workspace_agenda_url(workspace, use_proxy=False)
-        if not self._check_agenda_exist(workspace_agenda_url):
-            self._create_agenda(
-                agenda_url=workspace_agenda_url,
-                agenda_name=workspace.label,
-                agenda_description=workspace.description,
+        if not self._check_collection_exist(workspace_agenda_url):
+            self.create_collection(
+                url=workspace_agenda_url,
+                name=workspace.label,
+                description=workspace.description,
+                type=AgendaAppCollectionType.AGENDA,
             )
             result = False
         else:
-            self._update_agenda_props(
-                agenda_url=workspace_agenda_url,
-                agenda_name=workspace.label,
-                agenda_description=workspace.description,
+            self.update_collection_props(
+                url=workspace_agenda_url,
+                name=workspace.label,
+                description=workspace.description,
+                type=AgendaAppCollectionType.AGENDA,
+            )
+            result = True
+        workspace_address_book_url = self.get_workspace_address_book_url(workspace, use_proxy=False)
+        if not self._check_collection_exist(workspace_address_book_url):
+            self.create_collection(
+                url=workspace_address_book_url,
+                name=workspace.label,
+                description=workspace.description,
+                type=AgendaAppCollectionType.ADDRESS_BOOK,
+            )
+            result = False
+        else:
+            self.update_collection_props(
+                url=workspace_address_book_url,
+                name=workspace.label,
+                description=workspace.description,
+                type=AgendaAppCollectionType.ADDRESS_BOOK,
             )
             result = True
         for role in workspace.roles:
-            self._create_workspace_symlink(workspace.workspace_id, role.user_id, type="agenda")
+            self._create_workspace_symlinks(
+                workspace.workspace_id, role.user_id, type=AgendaAppCollectionType.AGENDA
+            )
+            self._create_workspace_symlinks(
+                workspace.workspace_id, role.user_id, type=AgendaAppCollectionType.ADDRESS_BOOK
+            )
         return result
 
     def ensure_user_agenda_exists(self, user: User) -> bool:
         """
-        Return true if agenda already exist, false if it was just create,
+        Return true if agenda already exist, false if it was just create
         raise Exception if agenda cannot be created.
         """
         logger.debug(self, "check for agenda existence of user {}".format(user.user_id))
         user_agenda_url = self.get_user_agenda_url(user, use_proxy=False)
-        if not self._check_agenda_exist(user_agenda_url):
-            self._create_agenda(
-                agenda_url=user_agenda_url, agenda_name=user.display_name, agenda_description=""
+        if not self._check_collection_exist(user_agenda_url):
+            self.create_collection(
+                url=user_agenda_url,
+                name=user.display_name,
+                description="",
+                type=AgendaAppCollectionType.AGENDA,
             )
             result = False
         else:
-            self._update_agenda_props(
-                agenda_url=user_agenda_url, agenda_name=user.display_name, agenda_description=""
+            self.update_collection_props(
+                url=user_agenda_url,
+                name=user.display_name,
+                description="",
+                type=AgendaAppCollectionType.AGENDA,
             )
             result = True
-        self._create_user_symlink(user.user_id, user.user_id, type="agenda")
+        user_address_book_url = self.get_user_address_book_url(user, use_proxy=False)
+        if not self._check_collection_exist(user_address_book_url):
+            self.create_collection(
+                url=user_address_book_url,
+                name=user.display_name,
+                description="",
+                type=AgendaAppCollectionType.ADDRESS_BOOK,
+            )
+            result = False
+        else:
+            self.update_collection_props(
+                url=user_address_book_url,
+                name=user.display_name,
+                description="",
+                type=AgendaAppCollectionType.ADDRESS_BOOK,
+            )
+            result = True
+        self._create_user_symlinks(user.user_id, user.user_id, type=AgendaAppCollectionType.AGENDA)
+        self._create_user_symlinks(
+            user.user_id, user.user_id, type=AgendaAppCollectionType.ADDRESS_BOOK
+        )
         return result
 
-    def _delete_user_symlink(self, original_user_id: int, dest_user_id: int, type="agenda"):
+    def _delete_user_symlinks(
+        self, original_user_id: int, dest_user_id: int, type: AgendaAppCollectionType
+    ):
         symlink_path = "{}{}{}/{}".format(
             self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
             "/collection-root",
             "/user_resource_{}".format(dest_user_id),
-            "{}_{}_{}".format("user", original_user_id, "type"),
+            "{}_{}_{}".format("user", original_user_id, type.value),
         )
         os.remove(symlink_path)
 
-    def _create_user_symlink(self, original_user_id: int, dest_user_id: int, type="agenda"):
+    def _create_user_symlinks(
+        self, original_user_id: int, dest_user_id: int, type: AgendaAppCollectionType
+    ):
+        radicale_file_system_folder = self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER
+        if type == AgendaAppCollectionType.AGENDA:
+            radicale_path = self._config.CALDAV__RADICALE__USER_PATH
+        elif type == AgendaAppCollectionType.ADDRESS_BOOK:
+            radicale_path = self._config.CARDDAV__RADICALE__USER_PATH
+        else:
+            raise ()
         original_agenda_path = "{}{}{}{}".format(
-            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            "/collection-root",
-            self._config.CALDAV__RADICALE__USER_PATH,
-            original_user_id,
+            radicale_file_system_folder, "/collection-root", radicale_path, original_user_id,
         )
         os.makedirs(
             "{}{}{}".format(
-                self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+                radicale_file_system_folder,
                 "/collection-root",
                 "/user_resource_{}".format(dest_user_id),
                 dest_user_id,
@@ -213,28 +332,36 @@ class AgendaApi(object):
             exist_ok=True,
         )
         symlink_path = "{}{}{}/{}".format(
-            self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            radicale_file_system_folder,
             "/collection-root",
             "/user_resource_{}".format(dest_user_id),
-            "{}_{}_{}".format("user", original_user_id, type),
+            "{}_{}_{}".format("user", original_user_id, type.value),
         )
         if not os.path.islink(symlink_path):
             os.symlink(original_agenda_path, symlink_path)
 
-    def _delete_workspace_symlink(self, workspace_id: int, dest_user_id: int, type="agenda"):
+    def _delete_workspace_symlinks(
+        self, workspace_id: int, dest_user_id: int, type: AgendaAppCollectionType
+    ):
         symlink_path = "{}{}{}/{}".format(
             self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
             "/collection-root",
             "/user_resource_{}".format(dest_user_id),
-            "{}_{}_{}".format("space", workspace_id, type),
+            "{}_{}_{}".format("space", workspace_id, type.value),
         )
         os.remove(symlink_path)
 
-    def _create_workspace_symlink(self, workspace_id: int, dest_user_id: int, type="agenda"):
+    def _create_workspace_symlinks(
+        self, workspace_id: int, dest_user_id: int, type: AgendaAppCollectionType
+    ):
+        if type == AgendaAppCollectionType.AGENDA:
+            radicale_path = self._config.CALDAV__RADICALE__WORKSPACE_PATH
+        elif type == AgendaAppCollectionType.ADDRESS_BOOK:
+            radicale_path = self._config.CARDDAV__RADICALE__WORKSPACE_PATH
         original_agenda_path = "{}{}{}{}".format(
             self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
             "/collection-root",
-            self._config.CALDAV_RADICALE_WORKSPACE_PATH,
+            radicale_path,
             workspace_id,
         )
         os.makedirs(
@@ -249,7 +376,7 @@ class AgendaApi(object):
             self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
             "/collection-root",
             "/user_resource_{}".format(dest_user_id),
-            "{}_{}_{}".format("space", workspace_id, type),
+            "{}_{}_{}".format("space", workspace_id, type.value),
         )
         if not os.path.islink(symlink_path):
             os.symlink(original_agenda_path, symlink_path)
@@ -270,7 +397,7 @@ class AgendaApi(object):
                 Agenda(
                     # HACK
                     # agenda_url=self.get_user_agenda_url(user, use_proxy=True),
-                    agenda_url=self.get_user_resource_agenda_url(user, use_proxy=True),
+                    agenda_url=self.get_user_resource_url(user, use_proxy=True),
                     with_credentials=True,
                     agenda_type=AgendaType.private.value,
                     workspace_id=None,
@@ -380,8 +507,15 @@ class AgendaHooks:
             agenda_api = AgendaApi(
                 current_user=None, session=context.dbsession, config=context.app_config
             )
-            agenda_api._delete_workspace_symlink(
-                workspace_id=role.workspace_id, dest_user_id=role.user_id, type="agenda"
+            agenda_api._delete_workspace_symlinks(
+                workspace_id=role.workspace_id,
+                dest_user_id=role.user_id,
+                type=AgendaAppCollectionType.AGENDA,
+            )
+            agenda_api._delete_workspace_symlinks(
+                workspace_id=role.workspace_id,
+                dest_user_id=role.user_id,
+                type=AgendaAppCollectionType.ADDRESS_BOOK,
             )
 
     @hookimpl
@@ -393,6 +527,13 @@ class AgendaHooks:
             agenda_api = AgendaApi(
                 current_user=None, session=context.dbsession, config=context.app_config
             )
-            agenda_api._create_workspace_symlink(
-                workspace_id=role.workspace_id, dest_user_id=role.user_id, type="agenda"
+            agenda_api._create_workspace_symlinks(
+                workspace_id=role.workspace_id,
+                dest_user_id=role.user_id,
+                type=AgendaAppCollectionType.AGENDA,
+            )
+            agenda_api._create_workspace_symlinks(
+                workspace_id=role.workspace_id,
+                dest_user_id=role.user_id,
+                type=AgendaAppCollectionType.ADDRESS_BOOK,
             )

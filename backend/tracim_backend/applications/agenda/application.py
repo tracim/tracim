@@ -39,8 +39,23 @@ class AgendaApp(TracimApplication):
         app_config.CALDAV__RADICALE__USER_PATH = "/{}/{}/".format(
             app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__USER_SUBDIR
         )
-        app_config.CALDAV_RADICALE_WORKSPACE_PATH = "/{}/{}/".format(
+        app_config.CALDAV__RADICALE__WORKSPACE_PATH = "/{}/{}/".format(
             app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR
+        )
+
+        app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR = "address_book"
+        app_config.CARDDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
+        app_config.CARDDAV__RADICALE__USER_SUBDIR = "user"
+        app_config.CARDDAV__RADICALE__BASE_PATH = "/{}/".format(
+            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR
+        )
+        app_config.CARDDAV__RADICALE__USER_PATH = "/{}/{}/".format(
+            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR,
+            app_config.CARDDAV__RADICALE__USER_SUBDIR,
+        )
+        app_config.CARDDAV__RADICALE__WORKSPACE_PATH = "/{}/{}/".format(
+            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR,
+            app_config.CARDDAV__RADICALE__WORKSPACE_SUBDIR,
         )
 
     def check_config(self, app_config: CFG) -> None:
@@ -101,8 +116,10 @@ class AgendaApp(TracimApplication):
         radicale_proxy_controller = RadicaleProxyController(
             proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL,
             radicale_base_path=app_config.CALDAV__RADICALE__BASE_PATH,
-            radicale_user_path=app_config.CALDAV__RADICALE__USER_PATH,
-            radicale_workspace_path=app_config.CALDAV_RADICALE_WORKSPACE_PATH,
+            radicale_agenda_user_path=app_config.CALDAV__RADICALE__USER_PATH,
+            radicale_agenda_workspace_path=app_config.CALDAV__RADICALE__WORKSPACE_PATH,
+            radicale_address_book_user_path=app_config.CARDDAV__RADICALE__USER_PATH,
+            radicale_address_book_workspace_path=app_config.CARDDAV__RADICALE__WORKSPACE_PATH,
         )
         agenda_controller = AgendaController()
         configurator.include(agenda_controller.bind, route_prefix=BASE_API)
