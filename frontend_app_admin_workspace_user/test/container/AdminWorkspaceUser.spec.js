@@ -280,7 +280,6 @@ describe('<AdminWorkspaceUser />', () => {
 
         it('should replace the modified space', () => {
           const workspaceList = wrapper.state('content').workspaceList
-          console.log(workspaceList)
           const lastWorkspace = workspaceList[workspaceList.length - 1]
           expect(lastWorkspace).to.deep.equal({ ...tlmData.fields.workspace })
         })
