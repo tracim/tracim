@@ -218,7 +218,7 @@ class Kanban extends React.Component {
     })
   }
 
-  handleColumnDragEnd = (column, { fromPosition }, { toPosition }) => {
+  handleColumnDragEnd = (column, fromPosition, toPosition) => {
     this.setState(prevState => {
       return {
         board: moveColumn(prevState.board, fromPosition, toPosition),
