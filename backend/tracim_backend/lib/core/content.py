@@ -1458,6 +1458,9 @@ class ContentApi(object):
         new_label: typing.Optional[str] = None,
         new_raw_content: typing.Optional[str] = None,
         new_description: typing.Optional[str] = None,
+        new_content_metadata: typing.Optional[typing.Dict[str, typing.Any]] = None,
+        new_metadata_schema_id: typing.Optional[int] = None,
+        new_metadata_ui_schema_id: typing.Optional[int] = None,
         force_update=False,
     ) -> Content:
         """
@@ -1480,11 +1483,20 @@ class ContentApi(object):
             new_raw_content = item.raw_content
         if new_description is None:
             new_description = item.description
+        if new_content_metadata is None:
+            new_content_metadata = item.content_metadata
+        if new_metadata_schema_id is None:
+            new_metadata_schema_id = item.metadata_schema_id
+        if new_metadata_ui_schema_id is None:
+            new_metadata_ui_schema_id = item.metadata_ui_schema_id
         if not force_update:
             if (
                 item.label == new_label
                 and item.raw_content == new_raw_content
                 and item.description == new_description
+                and item.content_metadata == new_content_metadata
+                and item.metadata_schema_id == new_metadata_schema_id
+                and item.metadata_ui_schema_id == new_metadata_ui_schema_id
             ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
@@ -1512,6 +1524,17 @@ class ContentApi(object):
             item.owner = self._user
         item.label = new_label
         item.raw_content = new_raw_content
+        item.content_metadata = new_content_metadata
+        item.metadata_schema_id = new_metadata_schema_id
+        if new_metadata_schema_id:
+            item.metadata_schema_revision_id = self.get_one(
+                new_metadata_schema_id
+            ).last_revision.revision_id
+        item.metadata_ui_schema_id = new_metadata_ui_schema_id
+        if new_metadata_ui_schema_id:
+            item.metadata_ui_schema_revision_id = self.get_one(
+                new_metadata_ui_schema_id
+            ).last_revision.revision_id
         item.description = new_description
         item.revision_type = ActionDescription.EDITION
         return item
@@ -2054,3 +2077,46 @@ class ContentApi(object):
         ).delete()
         if do_save:
             self._session.flush()
+
+    def get_metadata_schema_union(self) -> typing.Dict[str, typing.Any]:
+        # FIXME this method will need to be moved outside content api
+
+        # https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
+        def deep_update(source, overrides):
+            """
+            Update a nested dictionary or similar mapping.
+            Modify ``source`` in place.
+            """
+            import collections
+
+            for key, value in overrides.iteritems():
+                if isinstance(value, collections.Mapping) and value:
+                    returned = deep_update(source.get(key, {}), value)
+                    source[key] = returned
+                else:
+                    source[key] = overrides[key]
+            return source
+
+        import json
+
+        content_schemas = self.get_all_query().filter(
+            Content.content_id.in_(
+                self._session.query(ContentRevisionRO.metadata_schema_id)
+                .filter(ContentRevisionRO.metadata_schema_id != None)  # noqa: E711
+                .subquery()
+            )
+        )
+
+        schema_union = {}
+
+        for content in content_schemas.all():
+            schema_file_content = (
+                StorageLib(self._config)._get_depot_file(depot_file=content.depot_file).read()
+            )
+            schema_dict = json.loads(schema_file_content)
+            if schema_union:
+                deep_update(schema_union["properties"], schema_dict["properties"])
+            else:
+                schema_union = schema_dict
+
+        return schema_dict

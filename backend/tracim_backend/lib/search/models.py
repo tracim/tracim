@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -96,6 +97,7 @@ class SearchedContent(object):
         tags: Optional[List[str]] = None,
         tag_count: int = 0,
         parent_id: Optional[int] = None,
+        content_metadata: Optional[Dict[str, str]] = None,
     ) -> None:
         self.current_revision_id = current_revision_id
         self.current_revision_type = current_revision_type
@@ -127,6 +129,7 @@ class SearchedContent(object):
         self.content_size = content_size
         self.tags = tags or []
         self.tag_count = tag_count
+        self.content_metadata = content_metadata
 
 
 class ContentSearchResponse:

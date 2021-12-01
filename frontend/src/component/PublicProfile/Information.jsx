@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import CustomFormManager from './CustomFormManager.jsx'
+import { CustomFormManager } from 'tracim_frontend_lib'
 
 require('./Information.styl')
 

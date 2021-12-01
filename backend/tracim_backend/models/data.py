@@ -6,6 +6,7 @@ import enum
 import json
 import os
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -33,6 +34,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.sql import func
+from sqlalchemy.types import JSON
 from sqlalchemy.types import Boolean
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Integer
@@ -509,6 +511,26 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         Enum(ContentNamespaces), nullable=False, server_default=ContentNamespaces.CONTENT.name
     )
 
+    metadata_schema_id = Column(Integer, ForeignKey("content.id"), nullable=True, default=None)
+    metadata_schema_revision_id = Column(
+        Integer, ForeignKey("content_revisions.revision_id"), nullable=True, default=None
+    )
+    metadata_schema_revision = relationship(
+        "ContentRevisionRO", foreign_keys=[metadata_schema_revision_id]
+    )
+    metadata_schema = relationship("Content", foreign_keys=[metadata_schema_id])
+
+    metadata_ui_schema_id = Column(Integer, ForeignKey("content.id"), nullable=True, default=None)
+    metadata_ui_schema_revision_id = Column(
+        Integer, ForeignKey("content_revisions.revision_id"), nullable=True, default=None
+    )
+    metadata_ui_schema_revision = relationship(
+        "ContentRevisionRO", foreign_keys=[metadata_ui_schema_revision_id]
+    )
+    metadata_ui_schema = relationship("Content", foreign_keys=[metadata_ui_schema_id])
+
+    content_metadata = Column(JSON, nullable=True, default={})
+
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
         # db_column
@@ -535,6 +557,9 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         "owner",
         "parent",
         "workspace",
+        "metadata_schema_id",
+        "metadata_ui_schema_id",
+        "content_metadata",
     )
 
     # Read by must be used like this:
@@ -856,6 +881,78 @@ class Content(DeclarativeBase):
     @raw_content.setter
     def raw_content(self, value: str) -> None:
         self.revision.raw_content = value
+
+    @hybrid_property
+    def content_metadata(self) -> Dict[str, Any]:
+        return self.revision.content_metadata
+
+    @content_metadata.setter
+    def content_metadata(self, value: Dict[str, Any]) -> None:
+        self.revision.content_metadata = value
+
+    @hybrid_property
+    def metadata_schema_id(self) -> int:
+        return self.revision.metadata_schema_id
+
+    @metadata_schema_id.setter
+    def metadata_schema_id(self, value: int) -> None:
+        self.revision.metadata_schema_id = value
+
+    @hybrid_property
+    def metadata_schema(self) -> "Content":
+        return self.revision.metadata_schema
+
+    @metadata_schema.setter
+    def metadata_schema(self, value: "Content") -> None:
+        self.revision.metadata_schema = value
+
+    @hybrid_property
+    def metadata_ui_schema_id(self) -> int:
+        return self.revision.metadata_ui_schema_id
+
+    @metadata_ui_schema_id.setter
+    def metadata_ui_schema_id(self, value: int) -> None:
+        self.revision.metadata_ui_schema_id = value
+
+    @hybrid_property
+    def metadata_ui_schema(self) -> "Content":
+        return self.revision.metadata_ui_schema
+
+    @metadata_ui_schema.setter
+    def metadata_ui_schema(self, value: "Content") -> None:
+        self.revision.metadata_ui_schema = value
+
+    @hybrid_property
+    def metadata_schema_revision_id(self) -> int:
+        return self.revision.metadata_schema_revision_id
+
+    @metadata_schema_revision_id.setter
+    def metadata_schema_revision_id(self, value: int) -> None:
+        self.revision.metadata_schema_revision_id = value
+
+    @hybrid_property
+    def metadata_schema_revision(self) -> "ContentRevisionRO":
+        return self.revision.metadata_schema_revision
+
+    @metadata_schema_revision.setter
+    def metadata_schema_revision(self, value: "ContentRevisionRO") -> None:
+        self.revision.metadata_schema_revision = value
+
+    @hybrid_property
+    def metadata_ui_schema_revision_id(self) -> int:
+        return self.revision.metadata_ui_schema_revision_id
+
+    @metadata_ui_schema_revision_id.setter
+    def metadata_ui_schema_revision_id(self, value: int) -> None:
+        self.revision.metadata_ui_schema_revision_id = value
+
+    @hybrid_property
+    def metadata_ui_schema_revision(self) -> "ContentRevisionRO":
+        return self.revision.metadata_ui_schema_revision
+
+    @metadata_ui_schema_revision.setter
+    def metadata_ui_schema_revision(self, value: "ContentRevisionRO") -> None:
+        self.revision.metadata_ui_schema_revision = value
 
     @raw_content.expression
     def raw_content(cls) -> InstrumentedAttribute:

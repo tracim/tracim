@@ -1,5 +1,6 @@
 # coding=utf-8
 from enum import Enum
+import json
 import typing
 
 import marshmallow
@@ -55,6 +56,7 @@ from tracim_backend.models.context_models import ContentAndUserPath
 from tracim_backend.models.context_models import ContentCreation
 from tracim_backend.models.context_models import ContentFilter
 from tracim_backend.models.context_models import ContentIdsQuery
+from tracim_backend.models.context_models import ContentMetadataUpdate
 from tracim_backend.models.context_models import ContentUpdate
 from tracim_backend.models.context_models import FileCreation
 from tracim_backend.models.context_models import FilePath
@@ -144,6 +146,21 @@ class StringList(marshmallow.fields.List):
 
     def _serialize(self, *args: typing.Any, **kwargs: typing.Any) -> str:
         return self._separator.join(super()._serialize(*args, **kwargs))
+
+
+class StringDict(marshmallow.fields.Dict):
+    def __init__(self, **kwargs: dict) -> None:
+        super().__init__(self, **kwargs)
+
+    def _deserialize(self, value: str, *args: typing.Any, **kwargs: typing.Any):
+        value = value.strip()
+        if value:
+            return json.loads(value)
+
+        return {}
+
+    def _serialize(self, value, *args: typing.Any, **kwargs: typing.Any) -> str:
+        return json.dumps(value)
 
 
 class EnumField(marshmallow.fields.Field):
@@ -1665,6 +1682,13 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
     last_modifier = marshmallow.fields.Nested(UserDigestSchema)
 
 
+class ContentMetadataSchemaSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    workspace_id = marshmallow.fields.Int(example=19, validate=strictly_positive_int_validator)
+    cached_revision_id = marshmallow.fields.Int(example=12, dump_to="current_revision_id")
+    label = StrippedString(example="Facture")
+
+
 class ContentDigestSchema(UserInfoContentAbstractSchema):
     content_namespace = EnumField(ContentNamespaces, example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
@@ -1714,6 +1738,12 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
     actives_shares = marshmallow.fields.Int(
         description="number of active share on file", validate=positive_int_validator
     )
+    content_metadata = marshmallow.fields.Dict(allow_none=True)
+    metadata_schema = marshmallow.fields.Nested(ContentMetadataSchemaSchema(), allow_none=True)
+    metadata_ui_schema = marshmallow.fields.Nested(ContentMetadataSchemaSchema(), allow_none=True)
+
+    class Meta:
+        allow_none = ("metadata_schema", "metadata_ui_schema", "content_metadata")
 
 
 class PaginatedContentDigestSchema(BasePaginatedSchemaPage):
@@ -1900,10 +1930,34 @@ class ContentModifyAbstractSchema(marshmallow.Schema):
     )
 
 
+class ContentModifyMetadataAbstractSchema(marshmallow.Schema):
+    content_metadata = marshmallow.fields.Dict(
+        required=True, description="an object representing the metadata to save"
+    )
+    metadata_schema_id = marshmallow.fields.Int(
+        example=6,
+        required=True,
+        description="id of a valid schema content",
+        validate=strictly_positive_int_validator,
+    )
+    metadata_ui_schema_id = marshmallow.fields.Int(
+        example=7,
+        required=True,
+        description="id of a valid UI schema content",
+        validate=strictly_positive_int_validator,
+    )
+
+
 class ContentModifySchema(ContentModifyAbstractSchema):
     @post_load
     def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
         return ContentUpdate(**data)
+
+
+class ContentModifyMetadataSchema(ContentModifyMetadataAbstractSchema):
+    @post_load
+    def text_based_content_update(self, data: typing.Dict[str, typing.Any]) -> object:
+        return ContentMetadataUpdate(**data)
 
 
 class FolderContentModifySchema(ContentModifyAbstractSchema):

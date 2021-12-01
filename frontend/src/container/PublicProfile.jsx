@@ -7,6 +7,7 @@ import {
   PAGE,
   serialize,
   TracimComponent,
+  CustomFormManager,
   PopupProgressUpload,
   PROFILE,
   IconButton,
@@ -38,7 +39,6 @@ import { serializeUserProps } from '../reducer/user.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import ProfileMainBar from '../component/PublicProfile/ProfileMainBar.jsx'
 import Information from '../component/PublicProfile/Information.jsx'
-import CustomFormManager from '../component/PublicProfile/CustomFormManager.jsx'
 import PopupSelectImage from '../container/PopupSelectImage.jsx'
 
 const DISPLAY_GROUP_BACKEND_KEY = {

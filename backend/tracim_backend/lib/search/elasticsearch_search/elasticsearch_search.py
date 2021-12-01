@@ -33,8 +33,8 @@ from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComme
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
-from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_content_class
 from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class
 from tracim_backend.lib.search.elasticsearch_search.models import ESContentSearchResponse
 from tracim_backend.lib.search.elasticsearch_search.models import FacetCount
@@ -115,6 +115,7 @@ class ESSearchApi(SearchApi):
             ]
         )
         self.IndexedUser = create_indexed_user_class(config)
+        self.IndexedContent = create_indexed_content_class(config, session)
 
     def create_indices(self) -> None:
         # INFO - G.M - 2019-05-15 - alias migration mechanism to allow easily updateable index.
@@ -266,7 +267,7 @@ class ESSearchApi(SearchApi):
             for comment in content_in_context.comments
         ]
         tags = [content_tag.tag.tag_name for content_tag in content.tags]
-        indexed_content = IndexedContent(
+        indexed_content = self.IndexedContent(
             content_namespace=content_in_context.content_namespace,
             content_id=content_in_context.content_id,
             current_revision_id=content_in_context.current_revision_id,
@@ -301,9 +302,10 @@ class ESSearchApi(SearchApi):
             deleted_through_parent_id=content_in_context.deleted_through_parent_id,
             raw_content=content_in_context.raw_content,
             content_size=content_in_context.size,
+            content_metadata=content_in_context.content_metadata,
         )
         indexed_content.meta.id = content_in_context.content_id
-        content_index_alias = self._get_index_parameters(IndexedContent).alias
+        content_index_alias = self._get_index_parameters(self.IndexedContent).alias
         pipeline_id = None  # type: typing.Optional[str]
         if self._should_index_depot_file(content_in_context):
             indexed_content.b64_file = content_in_context.get_b64_file()
@@ -535,8 +537,8 @@ class ESSearchApi(SearchApi):
 
         search = Search(
             using=self.es,
-            doc_type=IndexedContent,
-            index=self._get_index_parameters(IndexedContent).alias,
+            doc_type=self.IndexedContent,
+            index=self._get_index_parameters(self.IndexedContent).alias,
         ).query(
             "simple_query_string", query=search_parameters.search_string, fields=es_search_fields,
         )
@@ -599,6 +601,10 @@ class ESSearchApi(SearchApi):
                 "terms",
                 last_modifier__public_name__exact=search_parameters.last_modifier__public_names,
             )
+
+        if search_parameters.content_metadata:
+            for (key, value) in search_parameters.content_metadata.items():
+                search = search.filter("term", **{"content_metadata__" + key + "__exact": value},)
 
         if search_parameters.file_extensions:
             search = search.filter("terms", file_extension__exact=search_parameters.file_extensions)
@@ -818,7 +824,7 @@ class ESSearchApi(SearchApi):
             IndexParameters(
                 alias=prefix + "-content",
                 index_name_template=template.format(index_alias=prefix + "-content", date="{date}"),
-                document_class=IndexedContent,
+                document_class=self.IndexedContent,
                 indexer=ESContentIndexer(),
             ),
             IndexParameters(

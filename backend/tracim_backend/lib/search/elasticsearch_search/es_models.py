@@ -13,6 +13,7 @@ from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 from elasticsearch_dsl import analysis
 from elasticsearch_dsl import analyzer
+from sqlalchemy.orm import Session
 
 from tracim_backend.config import CFG
 
@@ -144,61 +145,77 @@ class FileData(InnerDoc):
     language = SimpleKeyword()
 
 
-class IndexedContent(Document):
+def create_indexed_content_class(config: CFG, session: Session) -> typing.Type[Document]:
+    """Create the indexed content class appropriate for the schemas present in the database.
+
+    The returned document class has a content_metadata field created
+    using these schemas.
     """
-    ElasticSearch Content Models.
-    Used for index creation.
 
-    Should stay an enhanced version of ContentDigestSchema.
-    """
+    from tracim_backend.lib.core.content import ContentApi
 
-    content_namespace = SimpleKeyword()
-    content_id = Integer()
-    current_revision_id = Integer()
-    current_revision_type = SimpleKeyword()
-    slug = SimpleKeyword()
-    parent_id = Integer()
-    workspace_id = Integer()
-    workspace = Object(DigestWorkspace)
-    label = SimpleText()
-    content_type = SimpleKeyword()
-    sub_content_types = SimpleKeyword(multi=True)
-    status = SimpleKeyword()
-    is_archived = Boolean()
-    is_deleted = Boolean()
-    is_editable = Boolean()
-    show_in_ui = Boolean()
-    file_extension = SimpleText()
-    filename = SimpleText()
-    modified = Date()
-    created = Date()
-    active_shares = Integer()
+    content_api = ContentApi(
+        session=session, current_user=None, config=config, show_deleted=True, show_archived=True,
+    )
 
-    # Fields below are specific to IndexedContent
+    class IndexedContent(Document):
+        """
+        ElasticSearch Content Models.
+        Used for index creation.
 
-    is_active = Boolean()
-    description = HtmlText()
-    # path as returned by the /path HTTP API
-    path = Nested(DigestContent)
-    # INFO - G.M - 2019-05-31 - we need to include in parent here, because we need
-    # to search into comments content.
-    comments = Nested(DigestComments, include_in_parent=True)
-    comment_count = Integer()
-    author = Object(DigestUser)
-    last_modifier = Object(DigestUser)
+        Should stay an enhanced version of ContentDigestSchema.
+        """
 
-    archived_through_parent_id = Integer()
-    deleted_through_parent_id = Integer()
-    raw_content = HtmlText()
-    content_size = Integer()
+        content_namespace = SimpleKeyword()
+        content_id = Integer()
+        current_revision_id = Integer()
+        current_revision_type = SimpleKeyword()
+        slug = SimpleKeyword()
+        parent_id = Integer()
+        workspace_id = Integer()
+        workspace = Object(DigestWorkspace)
+        label = SimpleText()
+        content_type = SimpleKeyword()
+        sub_content_types = SimpleKeyword(multi=True)
+        status = SimpleKeyword()
+        is_archived = Boolean()
+        is_deleted = Boolean()
+        is_editable = Boolean()
+        show_in_ui = Boolean()
+        file_extension = SimpleText()
+        filename = SimpleText()
+        modified = Date()
+        created = Date()
+        active_shares = Integer()
 
-    tags = KeywordWithText()
-    tag_count = Integer()
+        # Fields below are specific to IndexedContent
 
-    # INFO - G.M - 2019-05-31 - b64_file is needed for storing the raw file contents
-    # it is analysed then removed by the ingest pipeline.
-    b64_file = Text()
-    file_data = Object(FileData)
+        is_active = Boolean()
+        description = HtmlText()
+        # path as returned by the /path HTTP API
+        path = Nested(DigestContent)
+        # INFO - G.M - 2019-05-31 - we need to include in parent here, because we need
+        # to search into comments content.
+        comments = Nested(DigestComments, include_in_parent=True)
+        comment_count = Integer()
+        author = Object(DigestUser)
+        last_modifier = Object(DigestUser)
+
+        archived_through_parent_id = Integer()
+        deleted_through_parent_id = Integer()
+        raw_content = HtmlText()
+        content_size = Integer()
+
+        tags = KeywordWithText()
+        tag_count = Integer()
+
+        # INFO - G.M - 2019-05-31 - b64_file is needed for storing the raw file contents
+        # it is analysed then removed by the ingest pipeline.
+        b64_file = Text()
+        file_data = Object(FileData)
+        content_metadata = get_es_field_from_json_schema(content_api.get_metadata_schema_union())
+
+    return IndexedContent
 
 
 # Mappings from (type, format) -> ES field type.

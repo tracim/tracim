@@ -2,6 +2,7 @@
 import base64
 import cgi
 from datetime import datetime
+from typing import Any
 from typing import Dict
 from typing import Generic
 from typing import List
@@ -752,6 +753,22 @@ class ContentUpdate(object):
         self.description = description
 
 
+class ContentMetadataUpdate(object):
+    """
+    Content update model
+    """
+
+    def __init__(
+        self,
+        content_metadata: Optional[Dict[str, Any]] = None,
+        metadata_schema_id: Optional[id] = None,
+        metadata_ui_schema_id: Optional[id] = None,
+    ) -> None:
+        self.content_metadata = content_metadata
+        self.metadata_schema_id = metadata_schema_id
+        self.metadata_ui_schema_id = metadata_ui_schema_id
+
+
 class BasePaginatedQuery(object):
     """
     Base of paginated query
@@ -1359,6 +1376,18 @@ class ContentInContext(object):
     @property
     def description(self) -> str:
         return self.content.description
+
+    @property
+    def content_metadata(self) -> Dict[str, any]:
+        return self.content.content_metadata
+
+    @property
+    def metadata_schema(self) -> Content:
+        return self.content.metadata_schema
+
+    @property
+    def metadata_ui_schema(self) -> Content:
+        return self.content.metadata_ui_schema
 
     @property
     def author(self) -> UserInContext:

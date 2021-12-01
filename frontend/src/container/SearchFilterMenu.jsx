@@ -9,9 +9,123 @@ import ContentFacets from '../component/Search/ContentFacets.jsx'
 import SpaceFacets from '../component/Search/SpaceFacets.jsx'
 import CheckboxFilter from '../component/Search/CheckboxFilter.jsx'
 import {
+  FETCH_CONFIG,
   ADVANCED_SEARCH_TYPE,
   DATE_FILTER_ELEMENT
 } from '../util/helper.js'
+
+function buildMetadataForm (schema, setMetadataFilter, handleValidate, prefix = '', level = 0) {
+  const form = []
+  const { properties } = schema
+  for (const [k, prop] of Object.entries(properties)) {
+    const newPrefix = (prefix ? prefix + '__' : '') + k
+    switch (prop.type) {
+      case 'string':
+        if (!prop.title.trim()) {
+          continue
+        }
+
+        form.push(
+          <li key={newPrefix}>
+            <label style={{ display: 'flex', marginBottom: '0.25ex' }}>
+              <span
+                style={{ flex: 1 }}
+              >{prop.title + ' '}
+              </span>
+              <input
+                onInput={(e) => setMetadataFilter(newPrefix, e.target.value)}
+                onKeyUp={(e) => { if (e.key === 'Enter') handleValidate() }}
+              />
+            </label>
+          </li>
+        )
+        break
+      case 'object':
+        form.push(
+          <li key={newPrefix}>
+            {buildMetadataForm(prop, setMetadataFilter, handleValidate, newPrefix, level + 1)}
+          </li>
+        )
+    }
+  }
+  return form ? (
+    <>
+      {level
+        ? (
+          <p>
+            <strong>{schema.title}</strong>
+          </p>
+        )
+        : null}
+      <ul style={{ listStyle: 'none', paddingLeft: '1ex', marginLeft: 0 }}>{form}</ul>
+    </>
+  ) : null
+}
+
+function ContentMetadataSearch (props) {
+  const [contentMetadataSchema, setContentMetadataSchema] = React.useState()
+  const [metadataFilters, setMetadataFilters] = React.useState({})
+  const [showMetadata, setShowMetadata] = React.useState({})
+
+  function setMetadataFilter (key, value) {
+    setMetadataFilters({ ...metadataFilters, [key]: value || undefined })
+  }
+
+  React.useEffect(() => {
+    (async function getContentMetadataSchema () {
+      const fetchSchema = await fetch(`${FETCH_CONFIG.apiUrl}/system/content-metadata-union-schema`, {
+        credentials: 'include',
+        headers: FETCH_CONFIG.headers,
+        method: 'GET'
+      })
+      const schema = (await fetchSchema.json()).json_schema
+      setContentMetadataSchema(schema)
+    }())
+  }, [])
+
+  function handleValidate () {
+    props.onChangeMetadataSearch(metadataFilters)
+  }
+
+  return (
+    contentMetadataSchema && contentMetadataSchema.type === 'object'
+      ? (
+        <div className='checkboxFilter'>
+          <div className='checkboxFilter__title' style={{ display: 'flex' }}>
+            <button
+              className='transparentButton'
+              onClick={() => setShowMetadata(!showMetadata)}
+            >
+              <Icon
+                icon={showMetadata
+                  ? 'fa-fw fas fa-caret-down'
+                  : 'fa-fw fas fa-caret-right'}
+                title={showMetadata
+                  ? props.t('Hide {{filter}}', { filter: props.t('Metadata') })
+                  : props.t('Show {{filter}}', { filter: props.t('Metadata') })}
+              />
+            </button>
+            <span style={{ flex: 1 }}>{props.t('Metadata')}</span>
+            {props.onChangeMetadataSearch && showMetadata && (
+              <button onClick={handleValidate}>
+                <Icon
+                  icon='fa-fw fas fa-check'
+                  title={showMetadata
+                    ? props.t('Hide {{filter}}', { filter: props.t('Metadata') })
+                    : props.t('Show {{filter}}', { filter: props.t('Metadata') })}
+                />
+                {' ' + props.t('Apply')}
+              </button>
+            )}
+          </div>
+          {showMetadata && (
+            buildMetadataForm(contentMetadataSchema, setMetadataFilter, handleValidate)
+          )}
+        </div>
+      )
+      : null
+  )
+}
 
 export class SearchFilterMenu extends React.Component {
   constructor (props) {
@@ -370,6 +484,13 @@ export class SearchFilterMenu extends React.Component {
               searchFacets={currentSearch.searchFacets}
               onChangeSearchFacets={(facetObject) => props.onChangeSearchFacets(facetObject)}
               appliedFilters={currentSearch.appliedFilters.searchFacets || {}}
+            />
+          )}
+
+          {props.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
+            <ContentMetadataSearch
+              onChangeMetadataSearch={props.onChangeContentMetadataSearch}
+              t={props.t}
             />
           )}
 

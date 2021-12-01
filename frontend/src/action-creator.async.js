@@ -1213,7 +1213,8 @@ export const getAdvancedSearchResult = (
   createdRange,
   modifiedRange,
   newestAuthoredContentRange,
-  searchFacets
+  searchFacets,
+  metadata
 ) => dispatch => {
   let queryParameterList = []
   if (searchString) queryParameterList.push(`search_string=${encodeURIComponent(searchString)}`)
@@ -1235,6 +1236,9 @@ export const getAdvancedSearchResult = (
       if (searchFacets.file_extensions && searchFacets.file_extensions.length > 0) queryParameterList.push(`file_extensions=${encodeArrayAsURIComponent(searchFacets.file_extensions)}`)
       if (searchFacets.author__public_names && searchFacets.author__public_names.length > 0) queryParameterList.push(`author__public_names=${encodeArrayAsURIComponent(searchFacets.author__public_names)}`)
       if (searchFacets.tags && searchFacets.tags.length > 0) queryParameterList.push(`tags=${encodeArrayAsURIComponent(searchFacets.tags)}`)
+    }
+    if (metadata) {
+      queryParameterList.push(`content_metadata=${encodeURIComponent(JSON.stringify(metadata))}`)
     }
   }
   if (searchType === ADVANCED_SEARCH_TYPE.USER) {

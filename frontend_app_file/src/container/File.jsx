@@ -45,6 +45,7 @@ import {
   FAVORITE_STATE,
   PopinFixedRightPartContent,
   sendGlobalFlashMessage,
+  ContentMetadata,
   TagList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
@@ -868,6 +869,21 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    const metadata = {
+      id: 'metadata',
+      label: props.t('Metadata'),
+      icon: 'fas fa-list',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Metadata')}
+        >
+          <ContentMetadata
+            apiUrl={state.config.apiUrl}
+            content={state.content}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
     const propertiesObject = {
       id: 'properties',
       label: props.t('Properties'),
@@ -926,11 +942,12 @@ export class File extends React.Component {
             </PopinFixedRightPartContent>
           )
         },
+        metadata,
         propertiesObject
 
       ]
     } else {
-      return [timelineObject, tag, propertiesObject]
+      return [timelineObject, tag, metadata, propertiesObject]
     }
   }
 

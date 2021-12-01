@@ -6,10 +6,16 @@ import types
 import typing
 
 import pluggy
+import transaction
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.utils.logger import logger
+from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.lib.utils.utils import find_all_submodule_path
+from tracim_backend.models.setup_models import create_dbsession_for_context
+from tracim_backend.models.setup_models import get_engine
+from tracim_backend.models.setup_models import get_session_factory
+from tracim_backend.models.tracim_session import TracimSession
 
 PLUGIN_NAMESPACE = "tracim"
 hookspec = pluggy.HookspecMarker(PLUGIN_NAMESPACE)
@@ -107,6 +113,31 @@ def create_plugin_manager() -> pluggy.PluginManager:
     return plugin_manager
 
 
+class FoobarTracimContext(TracimContext):
+    def __init__(self, config: CFG, plugin_manager) -> None:
+        super().__init__()
+        self._app_config = config
+        self._dbsession = None
+        self._plugin_manager = plugin_manager
+
+    @property
+    def app_config(self) -> CFG:
+        return self._app_config
+
+    @property
+    def current_user(self) -> None:
+        return None
+
+    @property
+    def dbsession(self) -> TracimSession:
+        assert self._dbsession
+        return self._dbsession
+
+    @property
+    def plugin_manager(self) -> pluggy.PluginManager:
+        return self._plugin_manager
+
+
 def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     plugin_manager = create_plugin_manager()
 
@@ -116,10 +147,15 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     from tracim_backend.lib.search.search_factory import SearchFactory
     import tracim_backend.lib.core.mention as mention
 
+    context = FoobarTracimContext(app_config, plugin_manager)
+    session_factory = get_session_factory(get_engine(app_config))
+    session = create_dbsession_for_context(session_factory, transaction.manager, context)
+
     plugin_manager.register(EventBuilder(app_config))
     plugin_manager.register(EventPublisher(app_config))
     mention.register_tracim_plugin(plugin_manager)
-    search_api = SearchFactory.get_search_lib(session=None, config=app_config, current_user=None)
+
+    search_api = SearchFactory.get_search_lib(session, config=app_config, current_user=None)
     search_api.register_plugins(plugin_manager)
 
     # INFO - G.M - 2019-11-27 - if a plugin path is provided, load plugins from this path

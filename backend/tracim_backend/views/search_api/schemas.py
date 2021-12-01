@@ -14,6 +14,7 @@ from tracim_backend.lib.utils.utils import DATETIME_FORMAT
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentMinimalSchema
 from tracim_backend.views.core_api.schemas import EnumField
+from tracim_backend.views.core_api.schemas import StringDict
 from tracim_backend.views.core_api.schemas import StringList
 from tracim_backend.views.core_api.schemas import StrippedString
 from tracim_backend.views.core_api.schemas import UserDigestSchema
@@ -77,6 +78,7 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
         modified_from: typing.Optional[datetime] = None,
         modified_to: typing.Optional[datetime] = None,
         tags: typing.Optional[typing.List[str]] = None,
+        content_metadata: typing.Optional[typing.Dict[str, str]] = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -91,6 +93,7 @@ class AdvancedContentSearchQuery(ContentSearchQuery):
         self.created_to = created_to
         self.modified_from = modified_from
         self.modified_to = modified_to
+        self.content_metadata = content_metadata
         self.tags = tags or []
 
 
@@ -191,6 +194,11 @@ class AdvancedContentSearchQuerySchema(ContentSearchQuerySchema):
         marshmallow.fields.String(),
         required=False,
         description="select contents matching the given tags",
+    )
+
+    content_metadata = StringDict(
+        required=False,
+        description="select contents whose metadata match these values for the given fields",
     )
 
 

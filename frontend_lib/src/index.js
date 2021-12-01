@@ -259,8 +259,10 @@ export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/Fa
 export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
 export { default as LinkPreview } from './component/LinkPreview/LinkPreview.jsx'
 export { default as TagList } from './component/Tags/TagList.jsx'
+export { default as ContentMetadata } from './component/ContentMetadata/ContentMetadata.jsx'
 export { default as Tag } from './component/Tags/Tag.jsx'
 export { default as Loading } from './component/Loading/Loading.jsx'
+export { default as CustomFormManager } from './component/JSONSchemaForms/CustomFormManager.jsx'
 export { default as COLORS } from './colors.js'
 
 export {

@@ -9,6 +9,7 @@ from tracim_backend.config import CFG
 from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.system import SystemApi
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
 from tracim_backend.lib.utils.authorization import check_right
@@ -179,6 +180,18 @@ class SystemController(Controller):
         return {"ui_schema": custom_properties_api.get_ui_schema()}
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.output_body(UserCustomPropertiesSchema())
+    def content_metadata_union_schema(self, context, request: TracimRequest, hapic_data=None):
+        """
+        Returns the union of all metadata schemas
+        """
+        content_api = ContentApi(
+            config=request.app_config, session=request.dbsession, current_user=request.current_user,
+        )
+        return {"json_schema": content_api.get_metadata_schema_union()}
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @hapic.output_body(ErrorCodeSchema(many=True))
     def error_codes(self, context, request: TracimRequest, hapic_data=None):
         app_config = request.registry.settings["CFG"]  # type: CFG
@@ -247,6 +260,16 @@ class SystemController(Controller):
         )
         configurator.add_view(
             self.custom_user_properties_ui_schema, route_name="user_custom_properties_ui_schema"
+        )
+
+        # union of content metadata schemas
+        configurator.add_route(
+            "content_metadata_union_schema",
+            "/system/content-metadata-union-schema",
+            request_method="GET",
+        )
+        configurator.add_view(
+            self.content_metadata_union_schema, route_name="content_metadata_union_schema"
         )
 
         # reserved usernames

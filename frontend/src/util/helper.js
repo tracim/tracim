@@ -41,6 +41,7 @@ export const ADVANCED_SEARCH_FILTER = {
   NEWEST_AUTHORED_CONTENT_RANGE: 'newestAuthoredContentRange',
   CREATED_RANGE: 'createdRange',
   MODIFIED_RANGE: 'modifiedRange',
+  METADATA: 'metadata',
   SEARCH_FACETS: 'searchFacets'
 }
 

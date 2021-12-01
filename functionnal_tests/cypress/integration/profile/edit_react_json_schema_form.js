@@ -17,7 +17,7 @@ describe("Editing the user profile", () => {
   describe('Information form', () => {
     describe('while receiving a TLM', () => {
       it('should not have reset the value of the first input', () => {
-        cy.get('[data-cy=CustomFormManager__updateProfile__edit__button]')
+        cy.get('[data-cy=CustomFormManager__edit__button]')
           .first()
           .should('be.visible')
           .click()

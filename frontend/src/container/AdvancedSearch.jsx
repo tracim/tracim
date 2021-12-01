@@ -123,12 +123,14 @@ export class AdvancedSearch extends React.Component {
 
   getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters = {}) => {
     const { props } = this
+    const searchString = searchObject.searchString || (Object.keys(appliedFilters.metadata).length ? '*' : '')
+
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
     const onlyGetFacet = (
       Object.values(appliedFilters).filter(item => !Array.isArray(item)).every(item => Object.keys(item).length === 0) &&
       searchFieldList.length === 0 &&
-      !searchObject.searchString
+      !searchString
     )
 
     let pageNumber = searchObject.currentPage
@@ -143,7 +145,7 @@ export class AdvancedSearch extends React.Component {
     }
 
     const fetchGetAdvancedSearchResult = await props.dispatch(getAdvancedSearchResult(
-      searchObject.searchString,
+      searchString,
       searchObject.contentTypes,
       pageNumber,
       pageSize,
@@ -155,7 +157,8 @@ export class AdvancedSearch extends React.Component {
       appliedFilters.createdRange || {},
       appliedFilters.modifiedRange || {},
       appliedFilters.newestAuthoredContentRange || {},
-      appliedFilters.searchFacets || {}
+      appliedFilters.searchFacets || {},
+      appliedFilters.metadata || {}
     ))
 
     switch (fetchGetAdvancedSearchResult.status) {
@@ -173,7 +176,7 @@ export class AdvancedSearch extends React.Component {
           resultList = fetchGetAdvancedSearchResult.json.workspaces
         }
 
-        props.dispatch(setSearchString(searchObject.searchString))
+        props.dispatch(setSearchString(searchString))
         props.dispatch(setCurrentNumberPage(searchObject.currentPage, searchObject.searchType))
         props.dispatch(setNumberResultsByPage(searchObject.numberResultsByPage))
         props.dispatch(setNewestAuthoredContentRange(fetchGetAdvancedSearchResult.json.newest_authored_content_date_range, searchObject.searchType))
@@ -256,6 +259,16 @@ export class AdvancedSearch extends React.Component {
       currentSearch.appliedFilters.searchFacets,
       facetObject,
       this.updateList
+    )
+  }
+
+  handleChangeContentMetadataSearch = (metadataObject) => {
+    const currentSearch = this.getCurrentSearchObject()
+    this.updateAppliedFilter(
+      ADVANCED_SEARCH_FILTER.METADATA,
+      currentSearch.appliedFilters.metadata,
+      metadataObject,
+      this.updateScalar
     )
   }
 
@@ -573,6 +586,7 @@ export class AdvancedSearch extends React.Component {
                     onChangeCreatedDate={this.handleChangeCreatedRange}
                     onChangeModifiedDate={this.handleChangeModifiedRange}
                     onChangeSearchFacets={this.handleChangeSearchFacets}
+                    onChangeContentMetadataSearch={this.handleChangeContentMetadataSearch}
                   />
                 )}
               </div>

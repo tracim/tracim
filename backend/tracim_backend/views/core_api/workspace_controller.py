@@ -24,6 +24,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserIsDeleted
 from tracim_backend.exceptions import UserIsNotActive
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
+from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.exceptions import WorkspacesDoNotMatch
@@ -42,6 +43,7 @@ from tracim_backend.lib.utils.authorization import can_see_workspace_information
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import is_content_manager
+from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.request import TracimRequest
@@ -65,8 +67,10 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentCreationSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdPathSchema
+from tracim_backend.views.core_api.schemas import ContentModifyMetadataSchema
 from tracim_backend.views.core_api.schemas import ContentMoveSchema
 from tracim_backend.views.core_api.schemas import ContentPathInfoSchema
+from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PaginatedContentDigestSchema
@@ -780,6 +784,37 @@ class WorkspaceController(Controller):
             api.unarchive(content)
         return
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
+    @check_right(is_contributor)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_body(ContentModifyMetadataSchema())
+    @hapic.output_body(ContentSchema())
+    def update_content_metadata(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
+        """
+        Update a content's metadata
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+            api.update_content(
+                item=content,
+                new_content_metadata=hapic_data.body.content_metadata,
+                new_metadata_schema_id=hapic_data.body.metadata_schema_id,
+                new_metadata_ui_schema_id=hapic_data.body.metadata_ui_schema_id,
+            )
+            api.save(content)
+        return api.get_content_in_context(content)
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using
@@ -882,6 +917,12 @@ class WorkspaceController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.move_content, route_name="move_content")
+        configurator.add_route(
+            "update_content_metadata",
+            "/workspaces/{workspace_id}/contents/{content_id}/metadata",
+            request_method="PUT",
+        )
+        configurator.add_view(self.update_content_metadata, route_name="update_content_metadata")
         # Delete/Undelete Content
         configurator.add_route(
             "delete_content",
