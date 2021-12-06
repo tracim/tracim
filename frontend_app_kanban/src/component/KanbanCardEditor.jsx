@@ -109,8 +109,8 @@ function KanbanCardEditor (props) {
           />
         </div>
 
-        <div>
-          <label htmlFor='kanban__KanbanCardEditor__duration'>{props.t('Duration:')}</label>
+        <div className='kanban__KanbanCardEditor__duration'>
+          <label htmlFor='kanban__KanbanCardEditor__duration'>{props.t('Value:')}</label>
           <input
             id='kanban__KanbanCardEditor__duration'
             type='time'
