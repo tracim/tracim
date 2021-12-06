@@ -35,7 +35,7 @@ import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
-require('./Kanban.styl')
+require('../css/Kanban.styl')
 
 const BOARD_STATE = {
   LOADING: 'loading',
@@ -433,8 +433,10 @@ class Kanban extends React.Component {
             </div>
             {state.editedCardInfos && (
               <CardPopup
-                customClass='kanban__kanbanCardEditor'
-                customHeaderClass='primaryColorBg'
+                customClass='kanban__KanbanCardEditor'
+                customColor={props.config.hexcolor}
+                faIcon='far fa-id-card'
+                label={state.editedCardInfos.card.id ? props.t('Editing Card') : props.t('New Card')}
                 onClose={this.handleCardEditCancel}
               >
                 <KanbanCardEditor

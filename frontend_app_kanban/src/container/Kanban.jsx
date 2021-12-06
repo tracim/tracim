@@ -53,7 +53,7 @@ export class Kanban extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
-      isNewContentRevision: false,
+      currentContentRevisionId: param.content.current_revision_id,
       newComment: '',
       loading: false,
       newContent: {},
@@ -91,6 +91,9 @@ export class Kanban extends React.Component {
     console.log('%c<Kanban> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
     props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
     if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
+    if (state.currentContentRevisionId && data.content.current_revision_id !== state.currentContentRevisionId) {
+      this.setState({ currentContentRevisionId: data.content.current_revision_id })
+    }
   }
 
   handleHideApp = data => {
@@ -239,10 +242,6 @@ export class Kanban extends React.Component {
       this.updateTimelineAndContent()
     }
 
-    if (state.isNewContentRevision && prevState.content.current_revision_id === state.content.current_revision_id) {
-      this.setState({ isNewContentRevision: false })
-    }
-
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
@@ -283,7 +282,7 @@ export class Kanban extends React.Component {
     )
     this.setState({
       content: response.body,
-      isNewContentRevision: true,
+      currentContentRevisionId: response.body.current_revision_id,
       loadingContent: false
     })
     this.setHeadTitle(response.body.label)
@@ -512,7 +511,7 @@ export class Kanban extends React.Component {
           <KanbanComponent
             config={state.config}
             content={state.content}
-            isNewContentRevision={state.isNewContentRevision}
+            isNewContentRevision={state.currentContentRevisionId === state.content.current_revision_id}
             readOnly={readOnly}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
           />

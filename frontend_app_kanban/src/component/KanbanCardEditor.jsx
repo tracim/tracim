@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   AutoComplete,
-  CardPopup,
   IconButton
 } from 'tracim_frontend_lib'
 
@@ -37,113 +36,107 @@ function KanbanCardEditor (props) {
   function handleValidate (e) {
     e.preventDefault()
 
+    const descriptionText = description.target ? description.target.value : description
+
     props.onValidate({
       ...card,
       title,
-      description: description.target.value,
+      description: descriptionText,
       bgColor: colorEnabled ? bgColor : '',
       deadline,
       duration
     })
   }
 
-  const editorTitle = props.card.id ? props.t('Editing Card') : props.t('New Card')
   return (
-    <CardPopup
-      onClose={props.onCancel}
-      onValidate={props.onCancel}
-      label={editorTitle}
-      customColor={bgColor}
-      faIcon='far fa-id-card'
-    >
-      <form className='file__contentpage__statewrapper__kanban__KanbanCardEditor__form' onSubmit={handleValidate}>
-        <div className='file__contentpage__statewrapper__kanban__KanbanCardEditor__form__fields'>
-          <p>
-            <span>
-              <label htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__title'>{props.t('Title:') + ' '}</label>
-            </span>
-            <span>
-              <input autoFocus={!props.focusOnDescription} id='file__contentpage__statewrapper__kanban__KanbanCardEditor__title' type='text' value={title} onChange={(e) => setTitle(e.target.value)} />
-            </span>
-          </p>
-          <p>
-            <span>
-              <label htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__description'>{props.t('Description:') + ' '}</label>
-            </span>
-            <div className='formBlock__field workspace_advanced__description__text '>
-              {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-                <AutoComplete
-                  apiUrl={props.apiUrl}
-                  autoCompleteItemList={props.autoCompleteItemList}
-                  autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                  onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                  delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-                />
-              )}
-              <textarea
-                autoFocus={props.focusOnDescription}
-                id={descriptionEditionId}
-                className='workspace_advanced__description__text__textarea'
-                placeholder={props.t('Description')}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows='3'
-              />
-            </div>
-          </p>
-          <p>
-            <span>
-              <label htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__bgColor'>{props.t('Color:') + ' '}</label>
-            </span>
-            <span>
-              <input type='checkbox' checked={colorEnabled} onChange={(e) => setColorEnabled(e.target.checked)} />
-              <input id='file__contentpage__statewrapper__kanban__KanbanCardEditor__bgColor' type='color' value={bgColor} onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }} />
-            </span>
-          </p>
-          <p>
-            <span>
-              <label htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__deadline'>{props.t('Deadline:') + ' '}</label>
-            </span>
-            <span>
-              <input htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__deadline' type='date' value={deadline} onChange={(e) => setDeadline(e.target.value)} />
-            </span>
-          </p>
-          <p>
-            <span>
-              <label htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__duration'>{props.t('Duration:') + ' '}</label>
-            </span>
-            <span>
-              <input id='file__contentpage__statewrapper__kanban__KanbanCardEditor__duration' type='time' value={duration} onChange={(e) => setDuration(e.target.value)} />
-            </span>
-          </p>
+    <form className='kanban__KanbanCardEditor__form' onSubmit={handleValidate}>
+      <div className='kanban__KanbanCardEditor__form__fields'>
+        <div className='kanban__KanbanCardEditor__title'>
+          <label htmlFor='kanban__KanbanCardEditor__title'>{props.t('Title:')}</label>
+          <input
+            autoFocus={!props.focusOnDescription}
+            id='kanban__KanbanCardEditor__title'
+            type='text' value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
         </div>
-        <p className='file__contentpage__statewrapper__kanban__KanbanCardEditor__form_buttons'>
-          <IconButton
-            icon='fas fa-times'
-            text={props.t('Cancel')}
-            title={props.t('Cancel')}
-            type='button'
-            intent='secondary'
-            mode='dark'
-            disabled={false}
-            onClick={props.onCancel}
-            dataCy='confirm_popup__button_cancel'
-          />
 
-          <IconButton
-            icon='fas fa-check'
-            text={props.t('Validate')}
-            title={props.t('Validate')}
-            type='button'
-            intent='primary'
-            mode='light'
-            disabled={false}
-            onClick={handleValidate}
-            dataCy='confirm_popup__button_confirm'
+        <div className='kanban__KanbanCardEditor__description'>
+          <label htmlFor={descriptionEditionId}>{props.t('Description:')}</label>
+          <div>
+            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+              <AutoComplete
+                apiUrl={props.apiUrl}
+                autoCompleteItemList={props.autoCompleteItemList}
+                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+              />
+            )}
+            <textarea
+              autoFocus={props.focusOnDescription}
+              id={descriptionEditionId}
+              placeholder={props.t('Description')}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows='3'
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor='kanban__KanbanCardEditor__bgColor'>{props.t('Color:')}</label>
+          <input
+            type='checkbox'
+            checked={colorEnabled}
+            onChange={(e) => setColorEnabled(e.target.checked)}
           />
-        </p>
-      </form>
-    </CardPopup>
+          <input
+            id='kanban__KanbanCardEditor__bgColor'
+            type='color'
+            value={bgColor}
+            onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
+          />
+        </div>
+
+        <div>
+          <label htmlFor='kanban__KanbanCardEditor__deadline'>{props.t('Deadline:')}</label>
+          <input
+            htmlFor='kanban__KanbanCardEditor__deadline'
+            type='date'
+            value={deadline}
+            onChange={(e) => setDeadline(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label htmlFor='kanban__KanbanCardEditor__duration'>{props.t('Duration:')}</label>
+          <input
+            id='kanban__KanbanCardEditor__duration'
+            type='time'
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+          />
+        </div>
+      </div>
+      <div className='kanban__KanbanCardEditor__form_buttons'>
+        <IconButton
+          dataCy='confirm_popup__button_cancel'
+          icon='fas fa-times'
+          onClick={props.onCancel}
+          text={props.t('Cancel')}
+        />
+
+        <IconButton
+          dataCy='confirm_popup__button_confirm'
+          icon='fas fa-check'
+          intent='primary'
+          mode='light'
+          onClick={handleValidate}
+          text={props.t('Validate')}
+        />
+      </div>
+    </form>
   )
 }
 
