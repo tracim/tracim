@@ -20,10 +20,8 @@
   "New Card": "Neue Karte",
   "Title:": "Titel",
   "Description:": "Beschreibung",
-  "Enable HTML": "HTML aktivieren",
   "Color:": "Farbe",
   "Deadline:": "Deadline",
-  "Duration:": "Dauer",
   "Cancel": "Abbrechen",
   "Validate": "Bestätigen",
   "Change the color of this column": "Ändern Sie die Farbe dieser Spalte",
@@ -34,5 +32,10 @@
   "Timeline": "Zeitleiste",
   "Tags": "Markierungen",
   "New Kanban board": "Neue Kanban-Tafel",
-  "Board's name": "Name der Tafel"
+  "Board's name": "Name der Tafel",
+  "This content is deleted": "Dieser Inhalt wird gelöscht",
+  "Restore": "Wiederherstellen",
+  "Description": "Beschreibung",
+  "Value:": "__NOT_TRANSLATED__",
+  "Apply": "Anwenden"
 }

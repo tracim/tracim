@@ -20,10 +20,8 @@
   "New Card": "New Card",
   "Title:": "Title:",
   "Description:": "Description:",
-  "Enable HTML": "Enable HTML",
   "Color:": "Color:",
   "Deadline:": "Deadline:",
-  "Duration:": "Duration:",
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Change the color of this column": "Change the color of this column",
@@ -34,5 +32,10 @@
   "Timeline": "Timeline",
   "Tags": "Tags",
   "New Kanban board": "New Kanban board",
-  "Board's name": "Board's name"
+  "Board's name": "Board's name",
+  "This content is deleted": "This content is deleted",
+  "Restore": "Restore",
+  "Description": "Description",
+  "Value:": "Value:",
+  "Apply": "Apply"
 }

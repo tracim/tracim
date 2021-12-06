@@ -20,10 +20,8 @@
   "New Card": "Novo Cartão",
   "Title:": "Título:",
   "Description:": "Descrição:",
-  "Enable HTML": "Habilitar HTML",
   "Color:": "Cor:",
   "Deadline:": "Prazo limite:",
-  "Duration:": "Duração:",
   "Cancel": "Cancelar",
   "Validate": "Validar",
   "Change the color of this column": "Mudar a cor desta coluna",
@@ -34,5 +32,10 @@
   "Timeline": "Linha cronológica",
   "Tags": "Etiquetas",
   "New Kanban board": "Novo quadro Kanban",
-  "Board's name": "Nome do quadro"
+  "Board's name": "Nome do quadro",
+  "This content is deleted": "Este conteúdo está eliminado",
+  "Restore": "Restaurar",
+  "Description": "Descrição",
+  "Value:": "Valor:",
+  "Apply": "Aplicar"
 }
