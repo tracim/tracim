@@ -4,15 +4,6 @@ import { PAGES as p } from '../../support/urls_commands'
 
 
 describe('Account page', () => {
-  beforeEach(() => {
-    cy.cancelXHR()
-    cy.resetDB()
-    cy.setupBaseDB()
-    cy.loginAs('administrators')
-    cy.visitPage({ pageName: p.ACCOUNT })
-    cy.log('Todo must be reworked')
-  })
-
   const createOneSpace = (cy, spaceName) => {
     cy.visitPage({ pageName: p.ACCOUNT })
     cy.get('[data-cy=sidebarCreateWorkspaceBtn]')
@@ -34,19 +25,24 @@ describe('Account page', () => {
 
   describe('Changing account preferences', () => {
     describe('Manage user space popup', () => {
-      it('Open the popup', () => {
+      beforeEach(() => {
+        cy.cancelXHR()
+        cy.resetDB()
+        cy.setupBaseDB()
+        cy.loginAs('administrators')
         createOneSpace(cy, 'newSpaceName')
         createOneSpace(cy, 'newSpaceName2')
         createOneSpace(cy, 'newSpaceName3')
-
         cy.visitPage({ pageName: p.ADMIN_USER })
         cy.get('.adminUser__table__tr__td-link').last()
           .click()
         cy.get('[data-cy=menusubcomponent__list__spacesConfig]').should('be.visible').click()
           .click()
-        cy.get('.iconbutton__text_with_icon').contains('Manage user spaces')
+        cy.contains('.iconbutton__text_with_icon', 'Manage user spaces')
           .click()
+      })
 
+      it('Add and remove user from space', () => {
         // add user to a space
         cy.get('[data-cy=spaceconfig__add_to_space]').first()
           .click()
@@ -55,28 +51,21 @@ describe('Account page', () => {
         // remove user from a space
         cy.get('[data-cy=spaceconfig__remove_from_space]').first()
           .click()
-        cy.get('[data-cy=spaceconfig__remove_from_space]').should('have.length', 1)
+      })
 
-        // filter spaces
+      it('Filter spaces', () => {
         cy.get('.textinput__text.form-control').first().should('be.visible').type('2')
-        cy.get('[data-cy=spaceconfig__add_to_space]').should('have.length', 1)
+        cy.get('[data-cy=spaceconfig__add_to_space]').should('have.length', 2)
+      })
 
-        // change role of a member
-        cy.get('.dropdownMenuButton').contains('Space manager')
+      it('Change role of a member, close popup', () => {
+        cy.contains('.dropdownMenuButton', 'Contributor')
           .click()
-        cy.get('.transparentButton').contains('Content manager')
+        cy.contains('.transparentButton', 'Content manager')
           .click()
-        cy.get('.dropdownMenuButton').contains('Content manager')
-
-        // close popup
+        cy.contains('.dropdownMenuButton', 'Content manager')
         cy.get('.cardPopup__header__close')
           .click()
-
-        // change language
-        cy.changeLanguage('de')
-        cy.get('.iconbutton__text_with_icon').contains('Verwalten von Benutzerbereichen')
-          .click()
-        cy.get('.cardPopup__header__title').contains('Bereichsmanagement für den Benutzer John Doe')
       })
     })
   })

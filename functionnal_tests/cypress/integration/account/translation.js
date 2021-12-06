@@ -19,5 +19,9 @@ describe('Account page', function () {
 
     cy.changeLanguage('de')
     cy.get('.account__userpreference__setting').contains('Meine Kontoeinstellungen ändern')
+
+    cy.get('.iconbutton__text_with_icon').contains('Verwalten von Benutzerbereichen')
+      .click()
+    cy.get('.cardPopup__header__title').contains('Bereichsmanagement für den Benutzer John Doe')
   })
 })
