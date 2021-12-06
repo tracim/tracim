@@ -20,14 +20,14 @@ describe('Account page', () => {
       .click()
     cy.contains('.cardPopup__header__title', 'New space')
     cy.get('.newSpace__input').should('be.visible').type(spaceName)
-    // NOTE - MP - 2021-11-17 - Select space type
+    // INFO - MP - 2021-11-17 - Select space type
     cy.get('.singleChoiceList__item').first().should('be.visible').click()
     cy.get('.newSpace__button .btn').should('be.visible').click()
 
-    // NOTE - MP - 2021-11-17 - Wait for the other part of the popup to load
+    // INFO - MP - 2021-11-17 - Wait for the other part of the popup to load
     cy.get('.newSpace__button .btn').should('have.length', 2)
 
-    // NOTE - MP - 2021-11-17 - Select default role
+    // INFO - MP - 2021-11-17 - Select default role
     cy.get('.singleChoiceList__item').first().should('be.visible').click()
     cy.get('.newSpace__button .btn').last().should('be.visible').click()
   }
