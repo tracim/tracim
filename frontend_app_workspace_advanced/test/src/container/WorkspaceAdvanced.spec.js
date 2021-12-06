@@ -99,6 +99,7 @@ describe('<WorkspaceAdvanced />', () => {
       describe('handleMemberModified', () => {
         describe('modify the member role', () => {
           it('should update the member with the new role', () => {
+            wrapper.setState({ content: { ...wrapper.state('content'), memberList: [{ ...user, role: 'contributor' }] } })
             const tlmData = {
               fields: {
                 author: author,
@@ -108,6 +109,7 @@ describe('<WorkspaceAdvanced />', () => {
               }
             }
             wrapper.instance().handleMemberModified(tlmData)
+
             const stateMember = wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id)
             expect(stateMember.role).to.equal(tlmData.fields.member.role)
           })
@@ -116,6 +118,7 @@ describe('<WorkspaceAdvanced />', () => {
 
       describe('handleMemberDeleted', () => {
         it("should delete the user from member's list", () => {
+          wrapper.setState({ content: { ...wrapper.state('content'), memberList: [{ ...user, role: 'contributor' }] } })
           const tlmData = {
             fields: {
               author: author,
@@ -124,6 +127,7 @@ describe('<WorkspaceAdvanced />', () => {
             }
           }
           wrapper.instance().handleMemberDeleted(tlmData)
+
           const hasMember = !!(wrapper.state('content').memberList.find(member => member.user_id === tlmData.fields.user.user_id))
           expect(hasMember).to.equal(false)
         })

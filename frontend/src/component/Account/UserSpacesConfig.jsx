@@ -178,7 +178,7 @@ export class UserSpacesConfig extends React.Component {
       <div className='account__userpreference__setting__spacename'>
         <div className='spaceconfig__sectiontitle subTitle'>
           {props.t('Spaces')}
-          {(props.user.profile === PROFILE.administrator.slug) && (
+          {(props.user && props.user.profile === PROFILE.administrator.slug) && (
             <IconButton
               mode='dark'
               intent='secondary'
