@@ -1,13 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { escape as escapeHtml } from 'lodash'
 import { IconButton } from 'tracim_frontend_lib'
 
 const KanbanCard = (props) => {
-  const description = props.card.htmlEnabledForDescription
-    ? props.card.description
-    : escapeHtml(props.card.description).replace(/\n/g, '<br />')
   return (
     <div
       style={{ backgroundColor: props.card.bgColor || '' }}
@@ -36,7 +32,7 @@ const KanbanCard = (props) => {
         className='kanban__contentpage__statewrapper__kanban__card__description'
         onClick={() => props.onEditCardContent(props.card)}
         disabled={props.readOnly}
-        dangerouslySetInnerHTML={{ __html: description }}
+        dangerouslySetInnerHTML={{ __html: props.card.description }}
       />
     </div>
   )

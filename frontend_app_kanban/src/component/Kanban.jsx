@@ -16,6 +16,11 @@ import Board, {
 import '@asseinfo/react-kanban/dist/styles.css'
 
 import {
+  tinymceAutoCompleteHandleInput,
+  tinymceAutoCompleteHandleKeyUp,
+  tinymceAutoCompleteHandleKeyDown,
+  tinymceAutoCompleteHandleClickItem,
+  tinymceAutoCompleteHandleSelectionChange,
   IconButton,
   handleFetchResult,
   putRawFileContent,
@@ -45,7 +50,10 @@ class Kanban extends React.Component {
     const justCreated = props.content.current_revision_type === 'creation'
 
     this.state = {
+      autoCompleteCursorPosition: 0,
+      autoCompleteItemList: [],
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
+      isAutoCompleteActivated: false,
       selectedColumnColor: {
         bgColor: '',
         column: {}
@@ -306,6 +314,47 @@ class Kanban extends React.Component {
     this.setState({ editedCardInfos: null })
   }
 
+  handleTinyMceInput = (e, position) => {
+    tinymceAutoCompleteHandleInput(
+      e,
+      this.setState.bind(this),
+      this.searchForMentionOrLinkInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
+  handleTinyMceKeyUp = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyUp(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      this.searchForMentionOrLinkInQuery
+    )
+  }
+
+  handleTinyMceKeyDown = event => {
+    const { state } = this
+
+    tinymceAutoCompleteHandleKeyDown(
+      event,
+      this.setState.bind(this),
+      state.isAutoCompleteActivated,
+      state.autoCompleteCursorPosition,
+      state.autoCompleteItemList,
+      this.searchForMentionOrLinkInQuery
+    )
+  }
+
+  handleTinyMceSelectionChange = () => {
+    tinymceAutoCompleteHandleSelectionChange(
+      this.setState.bind(this),
+      this.searchForMentionOrLinkInQuery,
+      this.state.isAutoCompleteActivated
+    )
+  }
+
   render () {
     const { props, state } = this
 
@@ -389,10 +438,17 @@ class Kanban extends React.Component {
                 onClose={this.handleCardEditCancel}
               >
                 <KanbanCardEditor
+                  apiUrl={props.config.apiUrl}
                   card={state.editedCardInfos.card}
                   focusOnDescription={state.editedCardInfos.focusOnDescription}
                   onValidate={this.handleCardEdited}
                   onCancel={this.handleCardEditCancel}
+                  isAutoCompleteActivated={state.isAutoCompleteActivated}
+                  autoCompleteItemList={state.autoCompleteItemList}
+                  autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+                  onClickAutoCompleteItem={(item) => {
+                    tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
+                  }}
                 />
               </CardPopup>
             )}

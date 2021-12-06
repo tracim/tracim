@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  Icon,
+  AutoComplete,
+  CardPopup,
   IconButton
 } from 'tracim_frontend_lib'
 
@@ -15,15 +16,31 @@ function KanbanCardEditor (props) {
   const [bgColor, setBgColor] = React.useState(card.bgColor || '')
   const [deadline, setDeadline] = React.useState(card.deadline || '')
   const [duration, setDuration] = React.useState(card.duration || '')
-  const [htmlEnabledForDescription, setHtmlEnabledForDescription] = React.useState(!!card.htmlEnabledForDescription)
+
+  const descriptionEditionId = 'descriptionEditionWysiwyg'
+  const descriptionEditionSelector = `#${descriptionEditionId}`
+
+  useEffect(() => {
+    globalThis.wysiwyg(
+      descriptionEditionSelector,
+      props.i18n.language,
+      setDescription,
+      props.onTinyMceInput,
+      props.onTinyMceKeyDown,
+      props.onTinyMceKeyUp,
+      props.onTinyMceSelectionChange
+    )
+
+    return () => globalThis.tinymce.remove(descriptionEditionSelector)
+  }, [])
 
   function handleValidate (e) {
     e.preventDefault()
+
     props.onValidate({
       ...card,
       title,
-      description,
-      htmlEnabledForDescription,
+      description: description.target.value,
       bgColor: colorEnabled ? bgColor : '',
       deadline,
       duration
@@ -32,18 +49,13 @@ function KanbanCardEditor (props) {
 
   const editorTitle = props.card.id ? props.t('Editing Card') : props.t('New Card')
   return (
-    <div className='file__contentpage__statewrapper__kanban__KanbanCardEditor'>
-      <div className='file__contentpage__statewrapper__kanban__KanbanCardEditor__title'>
-        <span className='file__contentpage__statewrapper__kanban__KanbanCardEditor__title__icon'>
-          <Icon
-            icon='far fa-id-card'
-            title={editorTitle}
-          />
-        </span>
-        <span className='file__contentpage__statewrapper__kanban__KanbanCardEditor__title__name'>
-          {editorTitle}
-        </span>
-      </div>
+    <CardPopup
+      onClose={props.onCancel}
+      onValidate={props.onCancel}
+      label={editorTitle}
+      customColor={bgColor}
+      faIcon='far fa-id-card'
+    >
       <form className='file__contentpage__statewrapper__kanban__KanbanCardEditor__form' onSubmit={handleValidate}>
         <div className='file__contentpage__statewrapper__kanban__KanbanCardEditor__form__fields'>
           <p>
@@ -58,10 +70,25 @@ function KanbanCardEditor (props) {
             <span>
               <label htmlFor='file__contentpage__statewrapper__kanban__KanbanCardEditor__description'>{props.t('Description:') + ' '}</label>
             </span>
-            <div>
-              <textarea autoFocus={props.focusOnDescription} id='file__contentpage__statewrapper__kanban__KanbanCardEditor__description' value={description || ''} onChange={(e) => setDescription(e.target.value)} />
-              <br />
-              <label><input type='checkbox' checked={htmlEnabledForDescription} onChange={(e) => setHtmlEnabledForDescription(e.target.checked)} />{props.t('Enable HTML')}</label>
+            <div className='formBlock__field workspace_advanced__description__text '>
+              {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+                <AutoComplete
+                  apiUrl={props.apiUrl}
+                  autoCompleteItemList={props.autoCompleteItemList}
+                  autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                  onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                  delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+                />
+              )}
+              <textarea
+                autoFocus={props.focusOnDescription}
+                id={descriptionEditionId}
+                className='workspace_advanced__description__text__textarea'
+                placeholder={props.t('Description')}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows='3'
+              />
             </div>
           </p>
           <p>
@@ -116,7 +143,7 @@ function KanbanCardEditor (props) {
           />
         </p>
       </form>
-    </div>
+    </CardPopup>
   )
 }
 
