@@ -78,7 +78,10 @@ class Kanban extends React.Component {
 
   async componentDidUpdate (prevProps) {
     const { props, state } = this
-    if (!state.saving && props.content.current_revision_id !== prevProps.content.current_revision_id) {
+    if (
+      (!state.saving && props.content.current_revision_id !== prevProps.content.current_revision_id) ||
+      (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
+    ) {
       this.loadBoardContent()
     }
     if (state.saveRequired) {

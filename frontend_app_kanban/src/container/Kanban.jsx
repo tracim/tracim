@@ -91,9 +91,6 @@ export class Kanban extends React.Component {
     console.log('%c<Kanban> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP(state.config.slug), data)
     props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
     if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
-    if (state.currentContentRevisionId && data.content.current_revision_id !== state.currentContentRevisionId) {
-      this.setState({ currentContentRevisionId: data.content.current_revision_id })
-    }
   }
 
   handleHideApp = data => {
@@ -240,6 +237,14 @@ export class Kanban extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.updateTimelineAndContent()
+    }
+
+    if (prevState.isVisible !== state.isVisible) {
+      this.setState({
+        currentContentRevisionId: (prevState.isVisible && !state.isVisible)
+          ? undefined
+          : state.content.current_revision_id
+      })
     }
 
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
@@ -511,7 +516,7 @@ export class Kanban extends React.Component {
           <KanbanComponent
             config={state.config}
             content={state.content}
-            isNewContentRevision={state.currentContentRevisionId === state.content.current_revision_id}
+            isNewContentRevision={!!state.currentContentRevisionId}
             readOnly={readOnly}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
           />
