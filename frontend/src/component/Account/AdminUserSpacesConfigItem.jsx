@@ -55,6 +55,7 @@ export const AdminUserSpacesConfigItem = props => {
       )}
       <td data-cy='spaceconfig__table__leave_space_cell'>
         <IconButton
+          dataCy={props.memberRole ? 'spaceconfig__remove_from_space' : 'spaceconfig__add_to_space'}
           disabled={props.memberRole && props.onlyManager}
           icon={`fas fa-sign-${props.memberRole ? 'out' : 'in'}-alt`}
           iconColor={props.memberRole ? 'red' : 'green'}

@@ -7,7 +7,7 @@ require('./TextInput.styl')
 // A thin-layer around <input type='text'> that sets the Tracim style and behaviour
 // Also provide a onValidate handler which is called when Enter is pressed by the user.
 export class TextInput extends React.Component {
-  handleValidateIfEnterKey (e) {
+  handleValidateIfEnterKey = (e) => {
     const { props } = this
     if (e.key !== 'Enter' || !props.onValidate) return
     props.onValidate(e)
