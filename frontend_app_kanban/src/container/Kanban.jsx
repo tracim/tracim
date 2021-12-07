@@ -58,7 +58,9 @@ export class Kanban extends React.Component {
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
-      externalTranslationList: [],
+      externalTranslationList: [
+        props.t('Create a Kanban board')
+      ],
       showRefreshWarning: false,
       editionAuthor: '',
       invalidMentionList: [],
@@ -463,7 +465,7 @@ export class Kanban extends React.Component {
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
     const readOnly = (
-      state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id ||
+      state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id ||
       state.mode === APP_FEATURE_MODE.REVISION ||
       state.content.is_archived ||
       state.content.is_deleted ||

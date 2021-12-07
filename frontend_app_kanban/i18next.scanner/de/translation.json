@@ -8,7 +8,6 @@
   "You must change the status or restore this kanban board before any change": "Sie müssen den Status ändern oder diese Kanbantafel vor jeder Änderung wiederherstellen",
   "Error while saving the new version": "Fehler beim Speichern der neuen Version",
   "Please enter the new name of the column": "Bitte geben Sie den neuen Namen der Spalte ein",
-  "column": "Spalte",
   "Fullscreen": "Vollbild",
   "Board: {{label}}": "Tafel: {{label}}",
   "Loading, please wait…": "Laden, bitte warten...",
@@ -37,5 +36,6 @@
   "Restore": "Wiederherstellen",
   "Description": "Beschreibung",
   "Value:": "__NOT_TRANSLATED__",
+  "Create a Kanban board": "__NOT_TRANSLATED__",
   "Apply": "Anwenden"
 }

@@ -1,4 +1,5 @@
 {
+  "Create a Kanban board": "Criar um quadro Kanban",
   "Error while saving the comment": "Erro ao guardar o comentário",
   "Delete": "Eliminar",
   "A content with the same name already exists": "Já existe um conteúdo com o mesmo nome",
@@ -8,7 +9,6 @@
   "You must change the status or restore this kanban board before any change": "É necessário alterar o estado ou restaurar este quadro Kanban antes de qualquer alteração",
   "Error while saving the new version": "Erro ao guardar a nova versão",
   "Please enter the new name of the column": "Por favor, introduza o novo nome da coluna",
-  "column": "coluna",
   "Fullscreen": "Ecrã inteiro",
   "Board: {{label}}": "Quadro: {{label}}",
   "Loading, please wait…": "Carregando, por favor aguarde...",

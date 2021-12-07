@@ -201,14 +201,6 @@ class Kanban extends React.Component {
     this.setState({ saving: false })
   }
 
-  handleAddColumn = async () => {
-    const title = prompt('Please enter the name of the new column')
-    if (!title) {
-      return
-    }
-    this.handleNewColumnConfirm({ title, cards: [] })
-  }
-
   handleRemoveColumn = (column) => {
     this.setState(prevState => {
       return {
@@ -375,12 +367,6 @@ class Kanban extends React.Component {
 
         <div className='kanban__contentpage__statewrapper__kanban__toolbar'>
           <IconButton
-            text={props.t('column')}
-            icon='fas fa-plus'
-            onClick={this.handleAddColumn}
-            disabled={props.readOnly}
-          />
-          <IconButton
             icon='fas fa-arrows-alt'
             text={props.t('Fullscreen')}
             onClick={this.handleClickFullscreen}
@@ -393,11 +379,11 @@ class Kanban extends React.Component {
           <>
             <div className='kanban__contentpage__statewrapper__kanban__wrapper'>
               <Board
-                allowAddColumn={props.readOnly}
-                allowRemoveColumn={props.readOnly}
-                allowRenameColumn={props.readOnly}
-                allowAddCar={props.readOnly}
-                allowRemoveCard={props.readOnly}
+                allowAddColumn={!props.readOnly}
+                allowRemoveColumn={!props.readOnly}
+                allowRenameColumn={!props.readOnly}
+                allowAddCar={!props.readOnly}
+                allowRemoveCard={!props.readOnly}
                 onCardDragEnd={this.handleCardDragEnd}
                 onColumnDragEnd={this.handleColumnDragEnd}
                 onNewColumnConfirm={this.handleNewColumnConfirm}
