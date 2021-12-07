@@ -431,6 +431,7 @@ class Kanban extends React.Component {
                 <KanbanCardEditor
                   apiUrl={props.config.apiUrl}
                   card={state.editedCardInfos.card}
+                  customColor={props.config.hexcolor}
                   focusOnDescription={state.editedCardInfos.focusOnDescription}
                   onValidate={this.handleCardEdited}
                   onCancel={this.handleCardEditCancel}

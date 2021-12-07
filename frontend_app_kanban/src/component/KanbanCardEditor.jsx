@@ -121,6 +121,7 @@ function KanbanCardEditor (props) {
       </div>
       <div className='kanban__KanbanCardEditor__form_buttons'>
         <IconButton
+          color={props.customColor}
           dataCy='confirm_popup__button_cancel'
           icon='fas fa-times'
           onClick={props.onCancel}
@@ -128,6 +129,7 @@ function KanbanCardEditor (props) {
         />
 
         <IconButton
+          color={props.customColor}
           dataCy='confirm_popup__button_confirm'
           icon='fas fa-check'
           intent='primary'

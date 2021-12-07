@@ -2,7 +2,6 @@
 
 cardSize = 280px
 
-
 .kanban
   &__contentpage__statewrapper__kanban
     display flex
@@ -13,7 +12,7 @@ cardSize = 280px
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
-
+      flex 1
     &.fullscreen
       position fixed
       top headerHeight
@@ -84,6 +83,8 @@ cardSize = 280px
         display flex
         flex-direction row
         border-bottom borderStyle
+        align-items baseline
+        justify-content space-evenly
 
         > strong
           flex 1
