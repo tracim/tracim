@@ -6,6 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
+from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.config import CFG
@@ -228,22 +229,34 @@ class CleanupLib(object):
         self.safe_delete(workspace)
         return workspace_id
 
-    def delete_workspace_agenda(self, workspace_id: int) -> typing.Optional[str]:
-        agenda_dir = "{}{}{}{}".format(
-            self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            "/collection-root",
-            self.app_config.CALDAV_RADICALE_WORKSPACE_PATH,
-            workspace_id,
+    def delete_workspace_agenda(
+        self, workspace_id: int, resource_type: AgendaResourceType
+    ) -> typing.Optional[str]:
+        if resource_type == AgendaResourceType.calendar:
+            resource_type_dir = self.app_config.RADICALE__CALENDAR_DIR
+        if resource_type == AgendaResourceType.addressbook:
+            resource_type_dir == self.app_config.RADICALE__ADDRESSBOOK_DIR
+        agenda_dir = "{filesystem_folder}/{collection_root_dir}/{resource_type_dir}/{workspace_subdir}/{workspace_id}".format(
+            filesystem_folder=self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
+            collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
+            resource_type_dir=resource_type_dir,
+            workspace_subdir=self.app_config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=workspace_id,
         )
         logger.info(
-            self, 'delete workspace "{}" agenda dir at "{}"'.format(workspace_id, agenda_dir)
+            self,
+            'delete workspace "{workspace_id}" {resource_type} (agenda) dir at "{agenda_dir}"'.format(
+                workspace_id=workspace_id, resource_type=resource_type.value, agenda_dir=agenda_dir
+            ),
         )
         try:
             self.safe_delete_dir(agenda_dir)
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
-                'Try to delete workspace "{}" agenda but no agenda found at {}'.format(
-                    workspace_id, agenda_dir
+                'Try to delete workspace "{workspace_id}" {resource_type} (agenda) but no {resource_type} found at {agenda_dir}'.format(
+                    workspace_id=workspace_id,
+                    resource_type=resource_type.value,
+                    agenda_dir=agenda_dir,
                 )
             ) from e
         return agenda_dir

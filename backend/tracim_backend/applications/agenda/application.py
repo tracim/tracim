@@ -30,32 +30,28 @@ class AgendaApp(TracimApplication):
         app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER = app_config.get_raw_config(
             "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
         )
-        app_config.CALDAV__RADICALE__AGENDA_DIR = "agenda"
-        app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
-        app_config.CALDAV__RADICALE__USER_SUBDIR = "user"
-        app_config.CALDAV__RADICALE__BASE_PATH = "/{}/".format(
-            app_config.CALDAV__RADICALE__AGENDA_DIR
-        )
-        app_config.CALDAV__RADICALE__USER_PATH = "/{}/{}/".format(
-            app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__USER_SUBDIR
-        )
-        app_config.CALDAV__RADICALE__WORKSPACE_PATH = "/{}/{}/".format(
-            app_config.CALDAV__RADICALE__AGENDA_DIR, app_config.CALDAV__RADICALE__WORKSPACE_SUBDIR
-        )
 
-        app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR = "address_book"
-        app_config.CARDDAV__RADICALE__WORKSPACE_SUBDIR = "workspace"
-        app_config.CARDDAV__RADICALE__USER_SUBDIR = "user"
-        app_config.CARDDAV__RADICALE__BASE_PATH = "/{}/".format(
-            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR
+        # INFO - G.M - 2021-12-07 - internal config param to configure installed agenda hierarchy
+        app_config.RADICALE__COLLECTION_ROOT_DIR = "collection-root"
+        app_config.RADICALE__CALENDAR_DIR = "agenda"
+        app_config.RADICALE__ADDRESSBOOK_DIR = "user"
+        app_config.RADICALE__USER_RESOURCE_DIR_PATTERN = "caldav-cardav_user_{user_id}"
+        app_config.RADICALE__USER_RESOURCE_PATTERN = "{owner_type}_{owner_id}_{resource_type}"
+        app_config.RADICALE__WORKSPACE_SUBDIR = "workspace"
+        app_config.RADICALE__USER_SUBDIR = "user"
+
+        app_config.RADICALE__WORKSPACE_AGENDA_DIR_PATTERN = "{filesystem_folder}/{collection_root_dir}/{resource_type_dir}/{workspace_subdir}/{workspace_id}"
+        app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN = (
+            "/{resource_type_dir}/{workspace_subdir}/{workspace_id}"
         )
-        app_config.CARDDAV__RADICALE__USER_PATH = "/{}/{}/".format(
-            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR,
-            app_config.CARDDAV__RADICALE__USER_SUBDIR,
+        app_config.RADICALE__USER_AGENDA_DIR_PATTERN = (
+            "{filesystem_folder}/{collection_root_dir}/{resource_type_dir}/{user_subdir}/{user_id}"
         )
-        app_config.CARDDAV__RADICALE__WORKSPACE_PATH = "/{}/{}/".format(
-            app_config.CARDDAV__RADICALE__ADDRESS_BOOK_DIR,
-            app_config.CARDDAV__RADICALE__WORKSPACE_SUBDIR,
+        app_config.RADICALE__USER_AGENDA_PATH_PATTERN = (
+            "/{resource_type_dir}/{user_subdir}/{workspace_id}"
+        )
+        app_config.RADICALE__USER_RESOURCE_SYMLINK_PATTERN = (
+            "{filesystem_folder}/{collection_root_dir}/{user_resource_id}/{user_resource}"
         )
 
     def check_config(self, app_config: CFG) -> None:

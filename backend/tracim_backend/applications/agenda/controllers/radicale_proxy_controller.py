@@ -10,6 +10,7 @@ from tracim_backend.applications.agenda.authorization import can_access_user_age
 from tracim_backend.applications.agenda.authorization import can_access_workspace_event_agenda
 from tracim_backend.applications.agenda.authorization import can_access_workspace_root_agenda
 from tracim_backend.applications.agenda.utils.determiner import CaldavAuthorizationDeterminer
+from tracim_backend.config import CFG
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.proxy.proxy import Proxy
@@ -31,20 +32,14 @@ RADICALE_HTTP_AUTH_PASSWORD = "tracimpass"
 
 class RadicaleProxyController(Controller):
     def __init__(
-        self,
-        proxy_base_address,
-        radicale_base_path,
-        radicale_agenda_user_path,
-        radicale_agenda_workspace_path,
-        radicale_address_book_user_path,
-        radicale_address_book_workspace_path,
+        self, proxy_base_address, app_config: CFG,
     ):
         self._authorization = CaldavAuthorizationDeterminer()
-        self.radicale_base_path_dir = radicale_base_path
-        self.radicale_path_agenda_user_dir = radicale_agenda_user_path
-        self.radicale_path_agenda_workspace_dir = radicale_agenda_workspace_path
-        self.radicale_path_address_book_user_dir = radicale_address_book_user_path
-        self.radicale_path_address_book_workspace_dir = radicale_address_book_workspace_path
+        # self.radicale_path_agenda_user_dir = radicale_agenda_user_path
+        # self.radicale_path_agenda_workspace_dir = radicale_agenda_workspace_path
+        # self.radicale_path_address_book_user_dir = radicale_address_book_user_path
+        # self.radicale_path_address_book_workspace_dir = radicale_address_book_workspace_path
+        self.app_config = app_config
         self.proxy_base_address = proxy_base_address
         self._proxy = Proxy(base_address=proxy_base_address, auth=HTTPBasicAuth("tracim", "tracim"))
 
@@ -58,6 +53,10 @@ class RadicaleProxyController(Controller):
         proxy user agenda
         example: /agenda/user/1/ to radicale path /agenda/user/1/
         """
+        path = self.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=self.app_config.RADICALE__CALENDAR_DIR,
+            user_subdir=self.app_config.RADICALE__USER_SUBDIR,
+        )
         path = "{}{}/".format(self.radicale_path_agenda_user_dir, request.candidate_user.user_id)
         return self._proxy.get_response_for_request(request, path)
 
@@ -69,7 +68,7 @@ class RadicaleProxyController(Controller):
     ) -> Response:
         """
         proxy user address_book
-        example: /address_book/user/1/ to radicale path /address_book/user/1/
+        example: /addressbook/user/1/ to radicale path /address_book/user/1/
         """
         path = "{}{}/".format(
             self.radicale_path_address_book_user_dir, request.candidate_user.user_id
@@ -101,7 +100,7 @@ class RadicaleProxyController(Controller):
     ) -> Response:
         """
         proxy user agenda
-        example: /address_book/user/1/blabla.ics/ to radicale path /address_book/user/1/blabla.ics
+        example: /addressbook/user/1/blabla.ics/ to radicale path /address_book/user/1/blabla.ics
         """
         path = "{}{}/{}".format(
             self.radicale_path_address_book_user_dir,
