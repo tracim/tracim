@@ -18,10 +18,10 @@ describe('Account page', function () {
     cy.get('.account__userpreference__setting').contains('Mudar minhas definições de conta')
 
     cy.changeLanguage('de')
-    cy.get('.account__userpreference__setting').contains('Meine Kontoeinstellungen ändern')
+    cy.contains('.account__userpreference__setting', 'Meine Kontoeinstellungen ändern')
 
-    cy.get('.iconbutton__text_with_icon').contains('Verwalten von Benutzerbereichen')
+    cy.contains('.iconbutton__text_with_icon', 'Verwalten von Benutzerbereichen')
       .click()
-    cy.get('.cardPopup__header__title').contains('Bereichsmanagement für den Benutzer John Doe')
+    cy.contains('.cardPopup__header__title', 'Bereichsmanagement für den Benutzer John Doe')
   })
 })
