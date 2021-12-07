@@ -43,6 +43,8 @@ class TestCommandsList(object):
         output = subprocess.check_output(["tracimcli", "-h"])
         output = output.decode("utf-8")
 
+        # space
+        assert output.find("space move") > 0
         # user
         assert output.find("user create") > 0
         assert output.find("user update") > 0
@@ -99,7 +101,6 @@ class TestCommands(object):
                 "command_test@user",
                 "-p",
                 "new_password",
-                "--debug",
             ]
         )
         assert result == 0
@@ -135,7 +136,6 @@ class TestCommands(object):
                 "new_password",
                 "--profile",
                 "administrators",
-                "--debug",
             ]
         )
         assert result == 0
@@ -166,7 +166,6 @@ class TestCommands(object):
                 "new_password",
                 "--profile",
                 "unknown",
-                "--debug",
             ]
         )
         assert res == 1
@@ -182,7 +181,6 @@ class TestCommands(object):
         app = TracimCLI()
         res = app.run(
             [
-                "--debug",
                 "user",
                 "create",
                 "-c",
@@ -191,7 +189,6 @@ class TestCommands(object):
                 "admin@admin.admin",
                 "-p",
                 "new_password",
-                "--debug",
             ]
         )
         assert res == 1
@@ -209,7 +206,6 @@ class TestCommands(object):
         app = TracimCLI()
         res = app.run(
             [
-                "--debug",
                 "user",
                 "create",
                 "-c",
@@ -219,7 +215,6 @@ class TestCommands(object):
                 "-p",
                 "new_password",
                 "--send-email",
-                "--debug",
             ]
         )
         assert res == 1
@@ -250,7 +245,6 @@ class TestCommands(object):
                 "admin@admin.admin",
                 "-p",
                 "new_password",
-                "--debug",
             ]
         )
         assert result == 0
@@ -291,7 +285,6 @@ class TestCommands(object):
                 "admin@admin.admin",
                 "-p",
                 "new_ldap_password",
-                "--debug",
             ]
         )
         assert res == 1
@@ -325,7 +318,6 @@ class TestCommands(object):
                 "new_password",
                 "--profile",
                 "trusted-users",
-                "--debug",
             ]
         )
         assert result == 0
@@ -335,6 +327,203 @@ class TestCommands(object):
         assert new_user.validate_password("new_password")
         assert not new_user.validate_password("admin@admin.admin")
         assert new_user.profile.slug == "trusted-users"
+
+    def test_func__workspace_move_command__ok__nominal_case(
+        self, session, workspace_api_factory
+    ) -> None:
+        """
+        Test Workspace Move
+        """
+        api = workspace_api_factory.get()
+        workspace_api = workspace_api_factory.get()
+        test_workspace_parent = workspace_api.create_workspace("parent")
+        session.add(test_workspace_parent)
+        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        session.add(test_workspace)
+        test_workspace_new_parent = workspace_api.create_workspace("new_parent")
+        session.add(test_workspace_new_parent)
+        session.flush()
+        workspace_id = test_workspace.workspace_id
+        new_parent_workspace_id = test_workspace_new_parent.workspace_id
+        transaction.commit()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI needs the context to be reset when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "space",
+                "move",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-s",
+                str(workspace_id),
+                "-p",
+                str(new_parent_workspace_id),
+            ]
+        )
+        assert result == 0
+        api = workspace_api_factory.get()
+        workspace = api.get_one(workspace_id)
+        assert workspace.parent_id == new_parent_workspace_id
+
+    def test_func__workspace_move_command__ok__to_root(
+        self, session, workspace_api_factory
+    ) -> None:
+        """
+        Test Workspace Move
+        """
+        api = workspace_api_factory.get()
+        workspace_api = workspace_api_factory.get()
+        test_workspace_parent = workspace_api.create_workspace("parent")
+        session.add(test_workspace_parent)
+        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        session.add(test_workspace)
+        test_workspace_new_parent = workspace_api.create_workspace("new_parent")
+        session.add(test_workspace_new_parent)
+        session.flush()
+        workspace_id = test_workspace.workspace_id
+        transaction.commit()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI needs the context to be reset when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "space",
+                "move",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-s",
+                str(workspace_id),
+                "-p",
+                str(0),
+            ]
+        )
+        assert result == 0
+        api = workspace_api_factory.get()
+        workspace = api.get_one(workspace_id)
+        assert workspace.parent_id is None
+
+    def test_func__workspace_move_command__err__bad_workspace_id(
+        self, session, workspace_api_factory
+    ) -> None:
+        """
+        Test Workspace Move
+        """
+        api = workspace_api_factory.get()
+        workspace_api = workspace_api_factory.get()
+        test_workspace_parent = workspace_api.create_workspace("parent")
+        session.add(test_workspace_parent)
+        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        session.add(test_workspace)
+        test_workspace_new_parent = workspace_api.create_workspace("new_parent")
+        session.add(test_workspace_new_parent)
+        session.flush()
+        workspace_id = test_workspace.workspace_id
+        new_parent_workspace_id = test_workspace_new_parent.workspace_id
+        workspace_parent_id = test_workspace_parent.workspace_id
+        transaction.commit()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI needs the context to be reset when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "space",
+                "move",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-s",
+                "9999",
+                "-p",
+                str(new_parent_workspace_id),
+                "-d",
+            ]
+        )
+        assert result == 1
+        api = workspace_api_factory.get()
+        workspace = api.get_one(workspace_id)
+        assert workspace.parent_id == workspace_parent_id
+
+    def test_func__workspace_move_command__err__to_itself(
+        self, session, workspace_api_factory
+    ) -> None:
+        """
+        Test Workspace Move
+        """
+        api = workspace_api_factory.get()
+        workspace_api = workspace_api_factory.get()
+        test_workspace_parent = workspace_api.create_workspace("parent")
+        session.add(test_workspace_parent)
+        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        session.add(test_workspace)
+        test_workspace_new_parent = workspace_api.create_workspace("new_parent")
+        session.add(test_workspace_new_parent)
+        session.flush()
+        workspace_id = test_workspace.workspace_id
+        workspace_parent_id = test_workspace_parent.workspace_id
+        transaction.commit()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI needs the context to be reset when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "space",
+                "move",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-s",
+                str(workspace_id),
+                "-p",
+                str(workspace_id),
+            ]
+        )
+        assert result == 1
+        api = workspace_api_factory.get()
+        workspace = api.get_one(workspace_id)
+        assert workspace.parent_id == workspace_parent_id
+
+    def test_func__workspace_move_command__err__bad_parent_workspace_id(
+        self, session, workspace_api_factory
+    ) -> None:
+        """
+        Test Workspace Move
+        """
+        api = workspace_api_factory.get()
+        workspace_api = workspace_api_factory.get()
+        test_workspace_parent = workspace_api.create_workspace("parent")
+        session.add(test_workspace_parent)
+        test_workspace = workspace_api.create_workspace("child", parent=test_workspace_parent)
+        session.add(test_workspace)
+        test_workspace_new_parent = workspace_api.create_workspace("new_parent")
+        session.add(test_workspace_new_parent)
+        session.flush()
+        workspace_id = test_workspace.workspace_id
+        workspace_parent_id = test_workspace_parent.workspace_id
+        transaction.commit()
+        # NOTE GM 2019-07-21: Unset Depot configuration. Done here and not in fixture because
+        # TracimCLI needs the context to be reset when ran.
+        DepotManager._clear()
+        app = TracimCLI()
+        result = app.run(
+            [
+                "space",
+                "move",
+                "-c",
+                "{}#command_test".format(TEST_CONFIG_FILE_PATH),
+                "-s",
+                str(workspace_id),
+                "-p",
+                "9999",
+                "-d",
+            ]
+        )
+        assert result == 1
+        api = workspace_api_factory.get()
+        workspace = api.get_one(workspace_id)
+        assert workspace.parent_id == workspace_parent_id
 
     def test__init__db__ok_db_already_exist(self, hapic, session, user_api_factory):
         """
@@ -350,7 +539,7 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        res = app.run(["db", "init", "-c", COMMAND_CONFIG_PATH, "--debug"])
+        res = app.run(["db", "init", "-c", COMMAND_CONFIG_PATH])
         assert res == 1
 
     def test__init__db__ok_nominal_case(self, hapic, session, user_api_factory):
@@ -368,8 +557,8 @@ class TestCommands(object):
         DepotManager._clear()
         app = TracimCLI()
         # delete config to be sure command will work
-        app.run(["db", "delete", "--force", "-c", COMMAND_CONFIG_PATH, "--debug"])
-        result = app.run(["db", "init", "-c", COMMAND_CONFIG_PATH, "--debug"])
+        app.run(["db", "delete", "--force", "-c", COMMAND_CONFIG_PATH, "-d"])
+        result = app.run(["db", "init", "-c", COMMAND_CONFIG_PATH, "-d"])
         assert result == 0
 
     def test__init__db__no_config_file(self, hapic, session, user_api_factory):
@@ -387,7 +576,7 @@ class TestCommands(object):
         DepotManager._clear()
 
         app = TracimCLI()
-        res = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test", "--debug"])
+        res = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test"])
         assert res == 1
         result = app.run(["db", "init", "-c", "filewhonotexit.ini#command_test"])
         assert result == 1
@@ -413,7 +602,7 @@ class TestCommands(object):
                 "--force",
                 "-c",
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
-                "--debug",
+                "-d",
             ]
         )
         assert result == 0
@@ -432,9 +621,7 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        res = app.run(
-            ["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH), "--debug"]
-        )
+        res = app.run(["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)])
         assert res == 1
         result = app.run(["db", "delete", "-c", "{}#command_test".format(TEST_CONFIG_FILE_PATH)])
         assert result == 1
@@ -453,7 +640,7 @@ class TestCommands(object):
         # TracimCLI need reseted context when ran.
         DepotManager._clear()
         app = TracimCLI()
-        res = app.run(["db", "delete", "-c", "donotexit.ini#command_test", "--debug"])
+        res = app.run(["db", "delete", "-c", "donotexit.ini#command_test"])
         assert res == 1
         result = app.run(["db", "delete", "-c", "donotexist.ini#command_test"])
         assert result == 1
@@ -500,7 +687,6 @@ class TestCommands(object):
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "admin@admin.admin",
-                "-d",
             ]
         )
         assert result == 1
@@ -545,7 +731,6 @@ class TestCommands(object):
                 "{}#command_test".format(TEST_CONFIG_FILE_PATH),
                 "-l",
                 "test@test.test",
-                "-d",
             ]
         )
         assert result == 0
