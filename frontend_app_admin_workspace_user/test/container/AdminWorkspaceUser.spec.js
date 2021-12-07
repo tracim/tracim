@@ -399,7 +399,7 @@ describe('<AdminWorkspaceUser />', () => {
 
         it('should remove the deleted user from the user list', async () => {
           const userList = wrapper.state('content').userList
-          expect(userList.every(u => u.user_id != user.user_id)).to.equal(true)
+          expect(userList.every(u => u.user_id !== user.user_id)).to.equal(true)
         })
       })
 
