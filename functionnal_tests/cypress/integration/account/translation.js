@@ -4,7 +4,7 @@ describe('Account page', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.loginAs('users')
+    cy.loginAs('administrators')
     cy.visitPage({ pageName: PAGES.ACCOUNT })
   })
 
@@ -20,8 +20,11 @@ describe('Account page', function () {
     cy.changeLanguage('de')
     cy.contains('.account__userpreference__setting', 'Meine Kontoeinstellungen ändern')
 
+    cy.get('[data-cy=menusubcomponent__list__spacesConfig]')
+      .should('be.visible')
+      .click()
     cy.contains('.iconbutton__text_with_icon', 'Verwalten von Benutzerbereichen')
       .click()
-    cy.contains('.cardPopup__header__title', 'Bereichsmanagement für den Benutzer John Doe')
+    cy.contains('.cardPopup__header__title', 'Bereichsmanagement für den Benutzer Global manager')
   })
 })

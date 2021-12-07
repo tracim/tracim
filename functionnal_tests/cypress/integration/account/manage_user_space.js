@@ -1,5 +1,3 @@
-import { SELECTORS as s } from '../../support/generic_selector_commands'
-import baseUser from '../../fixtures/baseUser.json'
 import { PAGES as p } from '../../support/urls_commands'
 
 
