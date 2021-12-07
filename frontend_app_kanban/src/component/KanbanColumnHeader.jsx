@@ -11,7 +11,11 @@ const KanbanColumnHeader = props => {
         className='kanban__contentpage__statewrapper__kanban__column__header'
         style={{ backgroundColor: props.column.bgColor || '' }}
       >
-        <strong onClick={() => props.onRenameColumn(props.column)}>{props.column.title}</strong>
+        <div
+          className='kanban__contentpage__statewrapper__kanban__column__header__title'
+        >
+          <strong onClick={() => props.onRenameColumn(props.column)}>{props.column.title}</strong>
+        </div>
         <IconButton
           icon='fas fa-paint-brush'
           tooltip={props.t('Change the color of this column')}

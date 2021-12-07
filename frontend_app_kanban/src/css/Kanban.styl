@@ -1,12 +1,18 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
-cardSize = 230px
+cardSize = 280px
+
 
 .kanban
   &__contentpage__statewrapper__kanban
     display flex
     flex-direction column
     height calc(100% - 77px)
+    &__column__header__title
+      max-width 180px
+      text-overflow ellipsis
+      overflow hidden
+      white-space nowrap
 
     &.fullscreen
       position fixed
