@@ -113,7 +113,7 @@ function KanbanCardEditor (props) {
           <label htmlFor='kanban__KanbanCardEditor__duration'>{props.t('Value:')}</label>
           <input
             id='kanban__KanbanCardEditor__duration'
-            type='time'
+            type='text'
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
           />
