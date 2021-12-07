@@ -161,7 +161,10 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   handleMemberModified = data => {
-    if (data.fields.workspace.workspace_id !== this.state.content.workspace_id) return
+    if (
+      data.fields.workspace.workspace_id !== this.state.content.workspace_id ||
+      !this.state.content.memberList
+    ) return
 
     this.setState(prev => ({
       content: {
@@ -183,6 +186,7 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   handleMemberDeleted = data => {
+    if (!this.state.content.memberList) return
     this.setState(prev => ({
       content: {
         ...prev.content,

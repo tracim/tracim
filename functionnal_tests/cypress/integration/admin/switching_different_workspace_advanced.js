@@ -1,7 +1,9 @@
 import { PAGES as p } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 
-describe('Switching between workspaces advanced', () => {
+// FIXME - GB - 2021-12-07 - Test from a bugged feature that should be fixed before test it
+// See https://github.com/tracim/tracim/issues/5137
+describe.skip('Switching between workspaces advanced', () => {
   let workspaceId
   let workspaceLabel
 
