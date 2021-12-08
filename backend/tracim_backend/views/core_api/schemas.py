@@ -1434,6 +1434,13 @@ class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
         default=True,
         description="define whether a user can create and view publications in this workspace",
     )
+    number_of_members = marshmallow.fields.Int(
+        example=42,
+        description="number of members of a space",
+        allow_none=False,
+        required=True,
+        validate=positive_int_validator,
+    )
 
 
 class WorkspaceSchema(WorkspaceWithoutDescriptionSchema):

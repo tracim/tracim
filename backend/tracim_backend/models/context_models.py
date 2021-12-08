@@ -1077,6 +1077,14 @@ class WorkspaceInContext(object):
     def publication_enabled(self) -> bool:
         return self.workspace.publication_enabled
 
+    @property
+    def number_of_members(self) -> int:
+        return (
+            self.dbsession.query(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == self.workspace.workspace_id)
+            .count()
+        )
+
 
 class UserRoleWorkspaceInContext(object):
     """
