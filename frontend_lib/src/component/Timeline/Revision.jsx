@@ -15,6 +15,8 @@ const Revision = props => {
     ? revisionType.label(props.status.label)
     : props.t(revisionType.label)
 
+  console.log("REVISION")
+
   return (
     <div
       className={classnames(`${props.customClass}__messagelist__version`, 'revision')}
