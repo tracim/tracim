@@ -144,7 +144,12 @@ cardSize = 280px
 
   &__KanbanCardEditor
     width 100%
-    top 20%
+    top 15%
+    &__bgColor, &__deadline
+      display flex
+      flex-direction column
+      &__inline
+        flex-direction row
 
     & .cardPopup__container
       width unset
@@ -157,12 +162,12 @@ cardSize = 280px
 
     & label
       white-space pre
+      font-weight bold
 
     & input
       vertical-align middle
 
     &__description, &__title, &__duration
-      display flex
       margin-bottom standardSpacing
 
     &__form
