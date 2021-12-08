@@ -32,27 +32,24 @@ class AgendaApp(TracimApplication):
         )
 
         # INFO - G.M - 2021-12-07 - internal config param to configure installed agenda hierarchy
-        app_config.RADICALE__COLLECTION_ROOT_DIR = "collection-root"
         app_config.RADICALE__CALENDAR_DIR = "agenda"
-        app_config.RADICALE__ADDRESSBOOK_DIR = "user"
+        app_config.RADICALE__ADDRESSBOOK_DIR = "addressbook"
         app_config.RADICALE__USER_RESOURCE_DIR_PATTERN = "caldav-cardav_user_{user_id}"
         app_config.RADICALE__USER_RESOURCE_PATTERN = "{owner_type}_{owner_id}_{resource_type}"
         app_config.RADICALE__WORKSPACE_SUBDIR = "workspace"
         app_config.RADICALE__USER_SUBDIR = "user"
 
-        app_config.RADICALE__WORKSPACE_AGENDA_DIR_PATTERN = "{filesystem_folder}/{collection_root_dir}/{resource_type_dir}/{workspace_subdir}/{workspace_id}"
+        app_config.RADICALE__LOCAL_PATH_STORAGE = "{}/{}".format(
+            app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER, "collection-root"
+        )
+        # Path:
         app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN = (
             "/{resource_type_dir}/{workspace_subdir}/{workspace_id}"
         )
-        app_config.RADICALE__USER_AGENDA_DIR_PATTERN = (
-            "{filesystem_folder}/{collection_root_dir}/{resource_type_dir}/{user_subdir}/{user_id}"
-        )
         app_config.RADICALE__USER_AGENDA_PATH_PATTERN = (
-            "/{resource_type_dir}/{user_subdir}/{workspace_id}"
+            "/{resource_type_dir}/{user_subdir}/{user_id}"
         )
-        app_config.RADICALE__USER_RESOURCE_SYMLINK_PATTERN = (
-            "{filesystem_folder}/{collection_root_dir}/{user_resource_id}/{user_resource}"
-        )
+        app_config.RADICALE__USER_RESOURCE_PATH_PATTERN = "/{user_resource_dir}/{user_resource}"
 
     def check_config(self, app_config: CFG) -> None:
         """
@@ -110,12 +107,7 @@ class AgendaApp(TracimApplication):
         context.handle_exception(CaldavNotAuthenticated, HTTPStatus.UNAUTHORIZED)
         # controller
         radicale_proxy_controller = RadicaleProxyController(
-            proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL,
-            radicale_base_path=app_config.CALDAV__RADICALE__BASE_PATH,
-            radicale_agenda_user_path=app_config.CALDAV__RADICALE__USER_PATH,
-            radicale_agenda_workspace_path=app_config.CALDAV__RADICALE__WORKSPACE_PATH,
-            radicale_address_book_user_path=app_config.CARDDAV__RADICALE__USER_PATH,
-            radicale_address_book_workspace_path=app_config.CARDDAV__RADICALE__WORKSPACE_PATH,
+            proxy_base_address=app_config.CALDAV__RADICALE_PROXY__BASE_URL
         )
         agenda_controller = AgendaController()
         configurator.include(agenda_controller.bind, route_prefix=BASE_API)

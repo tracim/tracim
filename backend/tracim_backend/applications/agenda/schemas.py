@@ -3,6 +3,7 @@ import typing
 import marshmallow
 from marshmallow import post_load
 
+from tracim_backend.app_models.validator import agenda_resource_type_validator
 from tracim_backend.app_models.validator import agenda_type_validator
 from tracim_backend.app_models.validator import regex_string_as_list_of_int
 from tracim_backend.app_models.validator import regex_string_as_list_of_string
@@ -26,6 +27,9 @@ class AgendaSchema(marshmallow.Schema):
         description="Workspace id if agenda is link to a workspace",
         default=None,
         allow_none=True,
+    )
+    resource_type = StrippedString(
+        validate=agenda_resource_type_validator, example=AgendaResourceType.addressbook.value
     )
 
     @post_load
@@ -57,6 +61,7 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
             [resource_type.value for resource_type in AgendaResourceType]
         ),
         default="calendar",
+        missing=None,
     )
 
     @post_load

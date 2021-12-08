@@ -169,30 +169,57 @@ class AgendaApi(object):
 
     def get_workspace_agenda_url(self, workspace: Workspace, use_proxy: bool) -> str:
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
-        return "{}{}{}/".format(
-            base_url, self._config.CALDAV__RADICALE__WORKSPACE_PATH, workspace.workspace_id
+        workspace_agenda_path = self._config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=self._config.RADICALE__CALENDAR_DIR,
+            workspace_subdir=self._config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=workspace.workspace_id,
+        )
+        return "{base_url}{workspace_agenda_path}/".format(
+            base_url=base_url, workspace_agenda_path=workspace_agenda_path
         )
 
-    def get_workspace_address_book_url(self, workspace: Workspace, use_proxy: bool) -> str:
+    def get_workspace_addressbook_url(self, workspace: Workspace, use_proxy: bool) -> str:
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
-        return "{}{}{}/".format(
-            base_url, self._config.CARDDAV__RADICALE__WORKSPACE_PATH, workspace.workspace_id
+        workspace_agenda_path = self._config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=self._config.RADICALE__ADDRESSBOOK_DIR,
+            workspace_subdir=self._config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=workspace.workspace_id,
+        )
+        return "{base_url}{workspace_agenda_path}/".format(
+            base_url=base_url, workspace_agenda_path=workspace_agenda_path
         )
 
     def get_user_resource_url(self, user: User, use_proxy: bool) -> str:
         # HACK return user resource agenda instead of user_agenda
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
-        return "{}/{}/".format(base_url, "user_resource_{}".format(user.user_id))
+        return "{base_url}/{user_resource_dir}/".format(
+            base_url=base_url,
+            user_resource_dir=self._config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+                user_id=user.user_id
+            ),
+        )
 
     def get_user_agenda_url(self, user: User, use_proxy: bool) -> str:
-        # HACK return user resource agenda instead of user_agenda
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
-        return "{}{}{}/".format(base_url, self._config.CALDAV__RADICALE__USER_PATH, user.user_id)
+        user_agenda_path = self._config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=self._config.RADICALE__CALENDAR_DIR,
+            user_subdir=self._config.RADICALE__USER_SUBDIR,
+            user_id=user.user_id,
+        )
+        return "{base_url}{user_agenda_path}/".format(
+            base_url=base_url, user_agenda_path=user_agenda_path
+        )
 
-    def get_user_address_book_url(self, user: User, use_proxy: bool) -> str:
-        # HACK return user resource agenda instead of user_agenda
+    def get_user_addressbook_url(self, user: User, use_proxy: bool) -> str:
         base_url = self._get_agenda_base_url(use_proxy=use_proxy)
-        return "{}{}{}/".format(base_url, self._config.CARDDAV__RADICALE__USER_PATH, user.user_id)
+        user_agenda_path = self._config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=self._config.RADICALE__ADDRESSBOOK_DIR,
+            user_subdir=self._config.RADICALE__USER_SUBDIR,
+            user_id=user.user_id,
+        )
+        return "{base_url}{user_agenda_path}/".format(
+            base_url=base_url, user_agenda_path=user_agenda_path
+        )
 
     def ensure_workspace_agenda_exists(self, workspace: Workspace) -> bool:
         """
@@ -221,7 +248,7 @@ class AgendaApi(object):
                 type=AgendaResourceType.calendar,
             )
             result = True
-        workspace_address_book_url = self.get_workspace_address_book_url(workspace, use_proxy=False)
+        workspace_address_book_url = self.get_workspace_addressbook_url(workspace, use_proxy=False)
         if not self._check_collection_exist(workspace_address_book_url):
             self.create_collection(
                 url=workspace_address_book_url,
@@ -270,7 +297,7 @@ class AgendaApi(object):
                 type=AgendaResourceType.calendar,
             )
             result = True
-        user_address_book_url = self.get_user_address_book_url(user, use_proxy=False)
+        user_address_book_url = self.get_user_addressbook_url(user, use_proxy=False)
         if not self._check_collection_exist(user_address_book_url):
             self.create_collection(
                 url=user_address_book_url,
@@ -295,135 +322,148 @@ class AgendaApi(object):
         )
         return result
 
+    def get_resource_type_dir(self, resource_type: AgendaResourceType) -> typing.Optional[str]:
+        if resource_type == AgendaResourceType.calendar:
+            return self._config.RADICALE__CALENDAR_DIR
+        if resource_type == AgendaResourceType.addressbook:
+            return self._config.RADICALE__ADDRESSBOOK_DIR
+        else:
+            return None
+
     def _delete_user_symlinks(
-        self, original_user_id: int, dest_user_id: int, type: AgendaResourceType
+        self, original_user_id: int, dest_user_id: int, resource_type: AgendaResourceType
     ):
-        user_resource_dir = self.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+        user_resource_dir = self._config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
             user_id=dest_user_id
         )
-        user_resource = self.app_config.RADICALE__USER_RESOURCE_PATTERN.format(user_id=dest_user_id)
-        symlink_path = "{filesystem_folder}/{collection_root_dir}/{user_resource_dir}/{user_resource}".format(
-            filesystem_folder=self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
-            user_resource_dir=user_resource_dir,
-            user_resource=user_resource,
+        user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
+            owner_type="user", owner_id=original_user_id, resource_type=resource_type.value,
         )
+        user_resource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
+            user_resource_dir=user_resource_dir, user_resource=user_resource
+        )
+        symlink_path = "{local_path}{user_resource_path}".format(
+            local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+            user_resource_path=user_resource_path,
+        )
+
         os.remove(symlink_path)
 
     def _create_user_symlinks(
         self, original_user_id: int, dest_user_id: int, resource_type: AgendaResourceType
     ):
-        if resource_type == AgendaResourceType.calendar:
-            resource_type_dir = self.app_config.RADICALE__CALENDAR_DIR
-        if resource_type == AgendaResourceType.addressbook:
-            resource_type_dir = self.app_config.RADICALE__ADDRESSBOOK_DIR
-
-        original_agenda_path = "{filesystem_folder}/{collection_root_dir}/{resource_type_dir}/{user_subdir}/{user_id}".format(
-            filesystem_folder=self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
+        resource_type_dir = self.get_resource_type_dir(resource_type)
+        user_agenda_path = self._config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
             resource_type_dir=resource_type_dir,
-            user_subdir=self.app_config.RADICALE__USER_SUBDIR,
+            user_subdir=self._config.RADICALE__USER_SUBDIR,
             user_id=original_user_id,
         )
-        user_resource_dir = self.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+        user_resource_dir = self._config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
             user_id=dest_user_id
         )
-        user_resource = self.app_config.RADICALE__USER_RESOURCE_PATTERN.format(
+        user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
             owner_type="user", owner_id=original_user_id, resource_type=resource_type.value,
         )
         os.makedirs(
-            "{filesystem_folder}/{collection_root_dir}/{user_resource_dir}".format(
-                filesystem_folder=self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
+            "{local_path}/{user_resource_dir}".format(
+                local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
                 user_resource_dir=user_resource_dir,
             ),
             exist_ok=True,
         )
 
-        symlink_path = "{filesystem_folder}/{collection_root_dir}/{user_resource_dir}/{user_resource}".format(
-            filesystem_folder=self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
-            user_resource_dir=user_resource_dir,
-            user_resource=user_resource,
+        user_ressource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
+            user_resource_dir=user_resource_dir, user_resource=user_resource,
+        )
+        symlink_path = "{local_path}{user_resource_path}".format(
+            local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+            user_resource_path=user_ressource_path,
         )
         if not os.path.islink(symlink_path):
-            os.symlink(original_agenda_path, symlink_path)
+            os.symlink(
+                "{local_path}{user_agenda_path}".format(
+                    local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+                    user_agenda_path=user_agenda_path,
+                ),
+                symlink_path,
+            )
 
     def _delete_workspace_symlinks(
         self, workspace_id: int, dest_user_id: int, resource_type: AgendaResourceType
     ):
-        user_resource_dir = self.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+        user_resource_dir = self._config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
             user_id=dest_user_id
         )
-        user_resource = self.app_config.RADICALE__USER_RESOURCE_PATTERN.format(
+        user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
             owner_type="space", owner_id=workspace_id, resource_type=resource_type.value,
         )
-        symlink_path = "{filesystem_folder}/{collection_root_dir}/{user_resource_dir}/{user_resource}".format(
-            filesystem_folder=self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
-            user_resource_dir=user_resource_dir,
-            user_resource=user_resource,
+        user_resource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
+            user_resource_dir=user_resource_dir, user_resource=user_resource
+        )
+        symlink_path = "{local_path}{user_resource_path}".format(
+            local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+            user_resource_path=user_resource_path,
         )
         os.remove(symlink_path)
 
     def _create_workspace_symlinks(
         self, workspace_id: int, dest_user_id: int, resource_type: AgendaResourceType
     ):
-        if resource_type == AgendaResourceType.calendar:
-            resource_type_dir = self.app_config.RADICALE__CALENDAR_DIR
-        if resource_type == AgendaResourceType.addressbook:
-            resource_type_dir = self.app_config.RADICALE__ADDRESSBOOK_DIR
-
-        original_agenda_path = "{filesystem_folder}/{collection_root_dir}/{resource_type_dir}/{workspace_subdir}/{workspace_id}".format(
-            filesystem_folder=self._config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
+        resource_type_dir = self.get_resource_type_dir(resource_type)
+        workspace_agenda_path = self._config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
             resource_type_dir=resource_type_dir,
-            workspace_workspace_subdir=self.app_config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_subdir=self._config.RADICALE__WORKSPACE_SUBDIR,
             workspace_id=workspace_id,
         )
-        user_resource_dir = self.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+        user_resource_dir = self._config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
             user_id=dest_user_id
         )
-        user_resource = self.app_config.RADICALE__USER_RESOURCE_PATTERN.format(
+        user_resource = self._config.RADICALE__USER_RESOURCE_PATTERN.format(
             owner_type="space", owner_id=workspace_id, resource_type=resource_type.value,
         )
         os.makedirs(
-            "{filesystem_folder}/{collection_root_dir}/{user_resource_dir}".format(
-                filesystem_folder=self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-                collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
+            "{local_path}/{user_resource_dir}".format(
+                local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
                 user_resource_dir=user_resource_dir,
             ),
             exist_ok=True,
         )
-        symlink_path = "{filesystem_folder}/{collection_root_dir}/{user_resource_dir}/{user_resource}".format(
-            filesystem_folder=self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            collection_root_dir=self.app_config.RADICALE__COLLECTION_ROOT_DIR,
-            user_resource_dir=user_resource_dir,
-            user_resource=user_resource,
+
+        user_ressource_path = self._config.RADICALE__USER_RESOURCE_PATH_PATTERN.format(
+            user_resource_dir=user_resource_dir, user_resource=user_resource,
+        )
+        symlink_path = "{local_path}{user_resource_path}".format(
+            local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+            user_resource_path=user_ressource_path,
         )
         if not os.path.islink(symlink_path):
-            os.symlink(original_agenda_path, symlink_path)
+            os.symlink(
+                "{local_path}{workspace_agenda_path}".format(
+                    local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
+                    workspace_agenda_path=workspace_agenda_path,
+                ),
+                symlink_path,
+            )
 
     def get_user_agendas(
         self,
         user: User,
         workspaces_ids_filter: typing.Optional[typing.List[int]],
         agenda_types_filter: typing.Optional[str],
-        resource_type_filter: typing.Optional[str],
+        resource_types_filter: typing.Optional[str],
     ) -> typing.List[Agenda]:
         user_agendas = []
-
         if workspaces_ids_filter:
-            agenda_types_filter = [AgendaType.workspace]
+            agenda_types_filter = [AgendaType.workspace.value]
 
         if not agenda_types_filter:
             agenda_types_filter = [agenda.value for agenda in AgendaType]
 
-        if not resource_type_filter:
-            resource_type_filter = [AgendaResourceType.calendar.value]
+        if not resource_types_filter:
+            resource_types_filter = [AgendaResourceType.calendar.value]
 
         if AgendaType.private.value in agenda_types_filter:
-            if AgendaResourceType.calendar.value in resource_type_filter:
+            if AgendaResourceType.calendar.value in resource_types_filter:
                 user_agendas.append(
                     Agenda(
                         agenda_url=self.get_user_agenda_url(user, use_proxy=True),
@@ -433,17 +473,17 @@ class AgendaApi(object):
                         resource_type=AgendaResourceType.calendar.value,
                     )
                 )
-            if AgendaResourceType.addressbook.value in resource_type_filter:
+            if AgendaResourceType.addressbook.value in resource_types_filter:
                 user_agendas.append(
                     Agenda(
-                        agenda_url=self.get_user_address_book_url(user, use_proxy=True),
+                        agenda_url=self.get_user_addressbook_url(user, use_proxy=True),
                         with_credentials=True,
                         agenda_type=AgendaType.private.value,
                         workspace_id=None,
                         resource_type=AgendaResourceType.addressbook.value,
                     )
                 )
-            if AgendaResourceType.directory.value in resource_type_filter:
+            if AgendaResourceType.directory.value in resource_types_filter:
                 user_agendas.append(
                     Agenda(
                         agenda_url=self.get_user_resource_url(user, use_proxy=True),
@@ -453,7 +493,6 @@ class AgendaApi(object):
                         resource_type=AgendaResourceType.directory.value,
                     )
                 )
-
         if AgendaType.workspace.value in agenda_types_filter:
             workspace_api = WorkspaceApi(
                 current_user=self._user, session=self._session, config=self._config
@@ -467,7 +506,7 @@ class AgendaApi(object):
                 if not workspace.agenda_enabled:
                     continue
 
-                if AgendaResourceType.calendar.value in resource_type_filter:
+                if AgendaResourceType.calendar.value in resource_types_filter:
                     user_agendas.append(
                         Agenda(
                             agenda_url=self.get_workspace_agenda_url(workspace, use_proxy=True),
@@ -477,10 +516,10 @@ class AgendaApi(object):
                             resource_type=AgendaResourceType.calendar.value,
                         )
                     )
-                if AgendaResourceType.addressbook.value in resource_type_filter:
+                if AgendaResourceType.addressbook.value in resource_types_filter:
                     user_agendas.append(
                         Agenda(
-                            agenda_url=self.get_workspace_address_book_url(
+                            agenda_url=self.get_workspace_addressbook_url(
                                 workspace, use_proxy=True
                             ),
                             with_credentials=True,
