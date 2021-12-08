@@ -479,7 +479,7 @@ export function appContentFactory (WrappedComponent) {
           newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
         )
         const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
-        uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage, 'warning'))
+        uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
 
         setState({ newCommentAsFileList: uploadFailedList })
       }
@@ -495,7 +495,7 @@ export function appContentFactory (WrappedComponent) {
       )
 
       if (response.status !== 204) {
-        sendGlobalFlashMessage(i18n.t('Error while changing status'), 'warning')
+        sendGlobalFlashMessage(i18n.t('Error while changing status'))
       }
 
       return response
@@ -816,7 +816,7 @@ export function appContentFactory (WrappedComponent) {
             const matchingList = fetchUserKnownContents.body.map(m => ({ detail: m.label, ...m }))
             return matchingList.sort(matchingContentIdsFirst)
           }
-          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known content list'), 'warning'); break
+          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known content list')); break
         }
       } else {
         autoCompleteItemList = getMatchingGroupMentionList(keyword)
@@ -824,7 +824,7 @@ export function appContentFactory (WrappedComponent) {
 
         switch (fetchUserKnownMemberList.apiResponse.status) {
           case 200: return [...autoCompleteItemList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
-          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list'), 'warning'); break
+          default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list')); break
         }
       }
       return autoCompleteItemList
@@ -855,7 +855,7 @@ export function appContentFactory (WrappedComponent) {
       const oldComment = timeline.find(timelineItem => timelineItem.content_id === comment.content_id)
 
       if (!oldComment) {
-        sendGlobalFlashMessage(i18n.t('Error while saving the comment'), 'warning')
+        sendGlobalFlashMessage(i18n.t('Error while saving the comment'))
         return timeline
       }
 
@@ -886,7 +886,7 @@ export function appContentFactory (WrappedComponent) {
       )
       const errorMessage = getTranslationApiErrorMessage(response)
       if (errorMessage) {
-        sendGlobalFlashMessage(errorMessage, 'warning')
+        sendGlobalFlashMessage(errorMessage)
         this.setState(previousState => {
           const wholeTimeline = this.replaceComment(
             { ...comment, translationState: TRANSLATION_STATE.UNTRANSLATED },

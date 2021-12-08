@@ -4,6 +4,7 @@ import {
   checkEmailValidity,
   createSpaceTree,
   convertBackslashNToBr,
+  formatAbsoluteDate,
   handleFetchResult,
   hasSpaces,
   generateFetchResponse,
@@ -15,6 +16,7 @@ import {
   COMMON_REQUEST_HEADERS,
   setupCommonRequestHeaders,
   serialize,
+  sortTimelineByDate,
   sortWorkspaceList,
   addRevisionFromTLM,
   checkUsernameValidity,
@@ -354,6 +356,24 @@ describe('helper.js', () => {
     })
   })
 
+  describe('formatAbsoluteDate', () => {
+    it('Should return a french format date', () => {
+      expect(formatAbsoluteDate(new Date(), 'fr')).to.be.equal = new Date().toLocaleString('fr')
+    })
+
+    it('Should return an english format date', () => {
+      expect(formatAbsoluteDate(new Date(), 'en')).to.be.equal = new Date().toLocaleString('en')
+    })
+
+    it('Should return only time using options', () => {
+      expect(
+        formatAbsoluteDate(
+          new Date(), 'en', { hour: '2-digit', minute: '2-digit' }
+        )
+      ).to.be.equal = new Date().toLocaleString('en', { hour: '2-digit', minute: '2-digit' })
+    })
+  })
+
   describe('the permissiveNumberEqual function', () => {
     const testCases = [
       {
@@ -403,7 +423,7 @@ describe('helper.js', () => {
   })
 
   describe('createSpaceTree', () => {
-    it('should return a empty array if spaceList is empty', () => {
+    it('should return an empty array if spaceList is empty', () => {
       expect(createSpaceTree([])).to.be.deep.equal([])
     })
 
@@ -592,6 +612,138 @@ describe('helper.js', () => {
 
     it('should return true if the string has two not-empty parts with an @ between even if multiples @', () => {
       expect(checkEmailValidity('something@something@something')).to.equal(true)
+    })
+  })
+
+  describe('Function sortTimelineByDate()', () => {
+    it('should sort the timeline array for creation date', () => {
+      const timelineData = [
+        { created_raw: 1 },
+        { created_raw: 3 },
+        { created_raw: 21 },
+        { created_raw: 23 },
+        { created_raw: 35 },
+        { created_raw: 5 },
+        { created_raw: 41 },
+        { created_raw: 7 },
+        { created_raw: 19 },
+        { created_raw: 36 },
+        { created_raw: 43 }
+      ]
+
+      const sortedTimelineData = [
+        { created_raw: 1 },
+        { created_raw: 3 },
+        { created_raw: 5 },
+        { created_raw: 7 },
+        { created_raw: 19 },
+        { created_raw: 21 },
+        { created_raw: 23 },
+        { created_raw: 35 },
+        { created_raw: 36 },
+        { created_raw: 41 },
+        { created_raw: 43 }
+      ]
+
+      expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
+    })
+
+    describe('if two elements has same creation date', () => {
+      it('should sort two revision by revision_id', () => {
+        const timelineData = [
+          { created_raw: 1 },
+          { created_raw: 3 },
+          { created_raw: 21 },
+          { created_raw: 23 },
+          { created_raw: 43, revision_id: 5 },
+          { created_raw: 5 },
+          { created_raw: 41 },
+          { created_raw: 7 },
+          { created_raw: 19 },
+          { created_raw: 36 },
+          { created_raw: 43, revision_id: 1 }
+        ]
+
+        const sortedTimelineData = [
+          { created_raw: 1 },
+          { created_raw: 3 },
+          { created_raw: 5 },
+          { created_raw: 7 },
+          { created_raw: 19 },
+          { created_raw: 21 },
+          { created_raw: 23 },
+          { created_raw: 36 },
+          { created_raw: 41 },
+          { created_raw: 43, revision_id: 1 },
+          { created_raw: 43, revision_id: 5 }
+        ]
+
+        expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
+      })
+
+      it('should sort two comments by content_id', () => {
+        const timelineData = [
+          { created_raw: 1 },
+          { created_raw: 3 },
+          { created_raw: 21 },
+          { created_raw: 23 },
+          { created_raw: 43, content_id: 8 },
+          { created_raw: 5 },
+          { created_raw: 41 },
+          { created_raw: 7 },
+          { created_raw: 19 },
+          { created_raw: 36 },
+          { created_raw: 43, content_id: 9 }
+        ]
+
+        const sortedTimelineData = [
+          { created_raw: 1 },
+          { created_raw: 3 },
+          { created_raw: 5 },
+          { created_raw: 7 },
+          { created_raw: 19 },
+          { created_raw: 21 },
+          { created_raw: 23 },
+          { created_raw: 36 },
+          { created_raw: 41 },
+          { created_raw: 43, content_id: 8 },
+          { created_raw: 43, content_id: 9 }
+        ]
+
+        expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
+      })
+
+      it('should choose the revision first between a revision and a comment', () => {
+        const timelineData = [
+          { created_raw: 1 },
+          { created_raw: 3 },
+          { created_raw: 21 },
+          { created_raw: 23 },
+          { created_raw: 43, revision_id: 95, content_id: 63 },
+          { created_raw: 5 },
+          { created_raw: 41 },
+          { created_raw: 7 },
+          { created_raw: 19 },
+          { created_raw: 36 },
+          { created_raw: 43, content_id: 4 }
+        ]
+
+        const sortedTimelineData = [
+          { created_raw: 1 },
+          { created_raw: 3 },
+          { created_raw: 5 },
+          { created_raw: 7 },
+          { created_raw: 19 },
+          { created_raw: 21 },
+          { created_raw: 23 },
+          { created_raw: 36 },
+          { created_raw: 41 },
+          { created_raw: 43, revision_id: 95, content_id: 63 },
+          { created_raw: 43, content_id: 4 }
+        ]
+
+        expect(sortTimelineByDate(timelineData)).to.deep.equal(sortedTimelineData)
+      })
     })
   })
 })

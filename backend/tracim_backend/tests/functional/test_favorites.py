@@ -8,6 +8,7 @@ from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import FavoriteContentNotFound
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -277,3 +278,91 @@ class TestFavoriteContent(object):
             content_api.get_one_user_favorite_content(
                 user_id=riyad_user.user_id, content_id=test_thread.content_id
             )
+
+    def test_api__remove_content_as_favorites__ok__not_in_workspace(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        role_api_factory,
+        content_type_list,
+        riyad_user,
+        admin_user,
+        session,
+    ):
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        role_api = role_api_factory.get(current_user=riyad_user)
+        test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
+        role_api.create_one(
+            riyad_user,
+            test_workspace,
+            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+        )
+        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
+        transaction.commit()
+        assert content_api.get_one_user_favorite_content(
+            user_id=riyad_user.user_id, content_id=test_thread.content_id
+        )
+
+        role_api.delete_one(riyad_user.user_id, test_workspace.workspace_id)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
+        res = web_testapp.get(
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            status=HTTPStatus.OK,
+        )
+        web_testapp.delete(
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            status=HTTPStatus.NO_CONTENT,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            status=HTTPStatus.BAD_REQUEST,
+        )
+        assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND
+
+    def test_api__remove_content_as_favorites__ok__deleted_workspace(
+        self,
+        web_testapp,
+        workspace_api_factory,
+        content_api_factory,
+        role_api_factory,
+        content_type_list,
+        riyad_user,
+        admin_user,
+        session,
+    ):
+        workspace_api = workspace_api_factory.get(current_user=admin_user)
+        role_api = role_api_factory.get(current_user=riyad_user)
+        test_workspace = workspace_api.create_workspace("test_workspace", save_now=True)
+        role_api.create_one(
+            riyad_user,
+            test_workspace,
+            role_level=UserRoleInWorkspace.CONTENT_MANAGER,
+            with_notif=False,
+        )
+        content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
+        test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
+        transaction.commit()
+        assert content_api.get_one_user_favorite_content(
+            user_id=riyad_user.user_id, content_id=test_thread.content_id
+        )
+
+        workspace_api.delete(test_workspace)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("riyad@test.test", "password"))
+        res = web_testapp.get(
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            status=HTTPStatus.OK,
+        )
+        web_testapp.delete(
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            status=HTTPStatus.NO_CONTENT,
+        )
+        res = web_testapp.get(
+            "/api/users/{}/favorite-contents/{}".format(riyad_user.user_id, test_thread.content_id),
+            status=HTTPStatus.BAD_REQUEST,
+        )
+        assert res.json_body["code"] == ErrorCode.FAVORITE_CONTENT_NOT_FOUND

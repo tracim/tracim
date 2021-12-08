@@ -31,7 +31,8 @@ import {
   buildHeadTitle,
   PAGE,
   TracimComponent,
-  IconButton
+  IconButton,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -94,7 +95,7 @@ export class WorkspaceContent extends React.Component {
   // CustomEvent handlers
   handleRefreshContentList = data => {
     console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.REFRESH_CONTENT_LIST, data)
-    this.loadAllWorkspaceContent(this.props.currentWorkspace.id)
+    this.loadAllWorkspaceContent(this.props.currentWorkspace.id, false, false)
   }
 
   handleOpenContentUrl = data => {
@@ -150,7 +151,7 @@ export class WorkspaceContent extends React.Component {
       else return
     } else wsToLoad = props.match.params.idws
 
-    this.loadAllWorkspaceContent(wsToLoad, true)
+    this.loadAllWorkspaceContent(wsToLoad, true, true)
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -162,13 +163,14 @@ export class WorkspaceContent extends React.Component {
 
     if (props.currentWorkspace.id === null) return
 
+    const previousWorkspaceId = parseInt(prevProps.match.params.idws)
     const workspaceId = parseInt(props.match.params.idws)
     if (isNaN(workspaceId)) return
 
     const prevFilter = qs.parse(prevProps.location.search).type
     const currentFilter = qs.parse(props.location.search).type
 
-    const hasWorkspaceIdChanged = prevState.workspaceIdInUrl !== workspaceId
+    const hasWorkspaceIdChanged = previousWorkspaceId !== workspaceId
 
     if (prevProps.system.config.instance_name !== props.system.config.instance_name || prevProps.currentWorkspace.label !== props.currentWorkspace.label || prevFilter !== currentFilter) {
       this.setHeadTitle(this.getFilterName(currentFilter))
@@ -183,8 +185,8 @@ export class WorkspaceContent extends React.Component {
     }
 
     if (hasWorkspaceIdChanged || prevFilter !== currentFilter) {
-      this.setState({ workspaceIdInUrl: workspaceId, contentLoaded: false })
-      this.loadAllWorkspaceContent(workspaceId, false, hasWorkspaceIdChanged)
+      this.setState({ contentLoaded: false })
+      this.loadAllWorkspaceContent(workspaceId, false)
     } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
   }
 
@@ -192,9 +194,9 @@ export class WorkspaceContent extends React.Component {
     this.props.dispatchCustomEvent(CUSTOM_EVENT.UNMOUNT_APP)
   }
 
-  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent = false) => {
+  loadAllWorkspaceContent = async (workspaceId, shouldScrollToContent, shouldLoadReadStatusList) => {
     try {
-      await this.loadContentList(workspaceId)
+      await this.loadContentList(workspaceId, shouldLoadReadStatusList)
       await this.loadShareFolderContent(workspaceId)
     } catch (error) {
       console.log(error.message)
@@ -205,15 +207,6 @@ export class WorkspaceContent extends React.Component {
     if (shouldScrollToContent) this.scrollToActiveContent()
     return true
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   setHeadTitle = (filterName) => {
     const { props } = this
@@ -244,7 +237,7 @@ export class WorkspaceContent extends React.Component {
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
-  loadContentList = async (workspaceId) => {
+  loadContentList = async (workspaceId, shouldLoadReadStatusList) => {
     console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
     const { props } = this
 
@@ -281,7 +274,7 @@ export class WorkspaceContent extends React.Component {
           case 2023: // eslint-disable-line no-fallthrough
             props.dispatch(newFlashMessage(props.t('Content not found'), 'warning'))
             props.history.push(`/ui/workspaces/${workspaceId}/contents`)
-            this.loadAllWorkspaceContent(workspaceId, false) // INFO - CH - 2019-08-27 - force reload data because, in this case, componentDidUpdate wont
+            this.loadAllWorkspaceContent(workspaceId, false, false) // INFO - CH - 2019-08-27 - force reload data because, in this case, componentDidUpdate wont
             throw new Error(fetchContentList.json.message)
           // INFO - B.L - 2019.08.06 - workspace does not exists or forbidden
           case 1002:
@@ -310,12 +303,14 @@ export class WorkspaceContent extends React.Component {
     // than making the user wait
     // See https://github.com/tracim/tracim/issues/5009
 
-    const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
+    if (shouldLoadReadStatusList) {
+      const wsReadStatus = await props.dispatch(getMyselfWorkspaceReadStatusList(workspaceId))
 
-    switch (wsReadStatus.status) {
-      case 200: props.dispatch(setWorkspaceReadStatusList(wsReadStatus.json)); break
-      case 401: break
-      default: props.dispatch(newFlashMessage(props.t('Error while loading read status list'), 'warning'))
+      switch (wsReadStatus.status) {
+        case 200: props.dispatch(setWorkspaceReadStatusList(wsReadStatus.json)); break
+        case 401: break
+        default: props.dispatch(newFlashMessage(props.t('Error while loading read status list'), 'warning'))
+      }
     }
   }
 
@@ -578,7 +573,7 @@ export class WorkspaceContent extends React.Component {
         break
       }
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
+        sendGlobalFlashMessage(props.t('Error while loading uploaded files'))
     }
 
     this.setState({ loadingShareFolder: false })
@@ -625,14 +620,17 @@ export class WorkspaceContent extends React.Component {
   }
 
   scrollToActiveContent = () => {
-    let contentToScrollTo = this.getContentIdOpenedInUrl(this.props.match.params)
+    let contentIdToScrollTo = this.getContentIdOpenedInUrl(this.props.match.params)
 
-    if (contentToScrollTo === undefined) {
+    if (contentIdToScrollTo === undefined) {
       const folderIdToOpen = this.getFolderIdToOpenInUrl(this.props.location.search)
-      if (folderIdToOpen.length > 0) contentToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
+      if (folderIdToOpen.length > 0) contentIdToScrollTo = folderIdToOpen[folderIdToOpen.length - 1]
     }
-    const idContentToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentToScrollTo}`
-    if (document.getElementById(idContentToScrollTo)) document.getElementById(idContentToScrollTo).scrollIntoView()
+    const htmlContentIdToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentIdToScrollTo}`
+    const domElementToScrollTo = document.getElementById(htmlContentIdToScrollTo)
+    if (domElementToScrollTo) {
+      domElementToScrollTo.parentNode.scrollTop = domElementToScrollTo.offsetTop
+    }
   }
 
   render () {

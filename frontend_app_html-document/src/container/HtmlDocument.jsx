@@ -37,6 +37,7 @@ import {
   TRANSLATION_STATE,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
+  sendGlobalFlashMessage,
   FAVORITE_STATE,
   addExternalLinksIcons,
   PopinFixedRightPartContent
@@ -207,15 +208,6 @@ export class HtmlDocument extends React.Component {
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = (contentName) => {
     const { state } = this
 
@@ -383,7 +375,7 @@ export class HtmlDocument extends React.Component {
         allInvalidMentionList
       )
     } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
+      sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
       return
     }
 
@@ -425,25 +417,25 @@ export class HtmlDocument extends React.Component {
           await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config)
         )
         if (fetchPutUserConfiguration.status !== 204) {
-          this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+          sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
         }
         break
       }
       case 400:
         switch (fetchResultSaveHtmlDoc.body.code) {
           case 2067:
-            this.sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
+            sendGlobalFlashMessage(props.t('You are trying to mention an invalid user'))
             break
           case 2044:
-            this.sendGlobalFlashMessage(props.t('You must change the status or restore this note before any change'))
+            sendGlobalFlashMessage(props.t('You must change the status or restore this note before any change'))
             break
           default:
-            this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
+            sendGlobalFlashMessage(props.t('Error while saving the new version'))
             break
         }
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while saving the new version'))
+        sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
   }
@@ -478,7 +470,7 @@ export class HtmlDocument extends React.Component {
         state.loggedUser.username
       )
     } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
   }
 
@@ -610,7 +602,7 @@ export class HtmlDocument extends React.Component {
       await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, newConfiguration)
     )
     if (fetchPutUserConfiguration.status !== 204) {
-      this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+      sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
     }
   }
 

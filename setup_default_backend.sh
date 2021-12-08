@@ -40,7 +40,12 @@ function install_backend_system_dep {
     log "Installing system package dependencies for the backend..."
     system_package_dir="$script_dir/system_packages/debian/"
     $SUDO apt update
-    PACKAGE_LIST=$(cat "${system_package_dir}/build_backend_packages.list" "${system_package_dir}/run_backend_packages.list" "${system_package_dir}/optional_preview_packages.list")
+    if [ -z "$IGNORE_FULL_PREVIEW_GENERATOR" ]; then
+        log "add optional preview dependencies to the list of package to install..."
+        PACKAGE_LIST=$(cat "${system_package_dir}/build_backend_packages.list" "${system_package_dir}/run_backend_packages.list" "${system_package_dir}/optional_preview_packages.list")
+    else
+        PACKAGE_LIST=$(cat "${system_package_dir}/build_backend_packages.list" "${system_package_dir}/run_backend_packages.list")
+    fi
     $SUDO apt install -y $PACKAGE_LIST && loggood "$PACKAGE correctly installed" || logerror "failed to install $PACKAGE"
 }
 

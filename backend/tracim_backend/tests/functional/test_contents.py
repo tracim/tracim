@@ -2396,7 +2396,10 @@ class TestFiles(object):
         assert res.last_modified.month == test_file.updated.month
         assert res.last_modified.year == test_file.updated.year
 
-    @pytest.mark.parametrize("content_namespace", ["content", "publication"])
+    @pytest.mark.parametrize(
+        "content_namespace, content_type",
+        [("content", "file"), ("publication", "file"), ("content", "kanban")],
+    )
     def test_api__create_file__ok__200__nominal_case(
         self,
         workspace_api_factory,
@@ -2406,6 +2409,7 @@ class TestFiles(object):
         admin_user,
         event_helper,
         content_namespace: str,
+        content_type: str,
     ) -> None:
         """
         create one file of a content at workspace root

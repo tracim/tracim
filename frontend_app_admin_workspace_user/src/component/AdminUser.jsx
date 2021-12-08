@@ -97,7 +97,7 @@ export class AdminUser extends React.Component {
 
   handleClickAddUser = async (publicName, username, email, profile, password) => {
     const resultSuccess = await this.props.onClickAddUser(publicName, username, email, profile, password)
-    if (resultSuccess) this.handleToggleAddUser()
+    if (resultSuccess > 0) this.handleToggleAddUser()
   }
 
   render () {
@@ -146,6 +146,7 @@ export class AdminUser extends React.Component {
           {state.displayAddUser && (
             <AddUserForm
               onClickAddUser={this.handleClickAddUser}
+              onClickCreateUserAndAddToSpaces={props.onClickCreateUserAndAddToSpaces}
               onChangeUsername={props.onChangeUsername}
               emailNotifActivated={props.emailNotifActivated}
               isUsernameValid={props.isUsernameValid}

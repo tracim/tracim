@@ -48,6 +48,7 @@ if (!global.window && !global.document) {
   global.AbortController = AbortController
   global.lastCustomEventTypes = new Set()
   global.GLOBAL_dispatchEvent = sinon.spy()
+  global.FormData = window.FormData
   document.dispatchEvent = sinon.spy()
 }
 

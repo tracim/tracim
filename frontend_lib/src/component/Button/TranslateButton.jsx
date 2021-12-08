@@ -40,6 +40,7 @@ export const TranslateButton = props => {
               <IconButton
                 key={language.code}
                 text={language.display}
+                textMobile={language.display}
                 onClick={() => { props.onChangeTargetLanguageCode(language.code) }}
                 intent='link'
                 mode='light'
