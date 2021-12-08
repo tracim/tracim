@@ -1,7 +1,8 @@
 import { PAGES } from '../../support/urls_commands'
 let workspaceId
 
-describe('navigate :: workspace > create_new > kanban', function () {
+// FIXME - GB - 2021-12-08 - See https://github.com/tracim/tracim/issues/5129
+describe.skip('navigate :: workspace > create_new > kanban', function () {
   beforeEach(() => {
     cy.resetDB()
     cy.setupBaseDB()
