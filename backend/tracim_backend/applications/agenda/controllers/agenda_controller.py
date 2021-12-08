@@ -35,6 +35,7 @@ class AgendaController(Controller):
             request.candidate_user,
             workspaces_ids_filter=hapic_data.query.workspace_ids,
             agenda_types_filter=hapic_data.query.agenda_types,
+            resource_types_filter=hapic_data.query.resource_types,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_AGENDA_ENDPOINTS])
@@ -50,6 +51,7 @@ class AgendaController(Controller):
             request.current_user,
             workspaces_ids_filter=hapic_data.query.workspace_ids,
             agenda_types_filter=hapic_data.query.agenda_types,
+            resource_types_filter=hapic_data.query.resource_types,
         )
 
     def bind(self, configurator: Configurator) -> None:

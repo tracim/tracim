@@ -12,6 +12,7 @@ from marshmallow.validate import Regexp
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.applications.agenda.models import AgendaType
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.lib.utils.dict_parsing import validate_simple_dict
@@ -104,6 +105,9 @@ content_status_validator = OneOf(content_status_list.get_all_slugs_values())
 user_profile_validator = OneOf(Profile.get_all_valid_slugs())
 user_profile_validator_with_nobody = OneOf(Profile.get_all_valid_slugs(include_nobody=True))
 agenda_type_validator = OneOf([agenda_type.value for agenda_type in AgendaType])
+agenda_resource_type_validator = OneOf(
+    [agenda_resource_type.value for agenda_resource_type in AgendaResourceType]
+)
 user_timezone_validator = Length(max=User.MAX_TIMEZONE_LENGTH)
 user_email_validator = Length(min=User.MIN_EMAIL_LENGTH, max=User.MAX_EMAIL_LENGTH)
 user_username_validator = Length(min=User.MIN_USERNAME_LENGTH, max=User.MAX_USERNAME_LENGTH)
