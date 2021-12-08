@@ -213,7 +213,6 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
                     logger.warning(
                         self, "Cannot get depot_file {}".format(revision.depot_file.file_id)
                     )
-                    pass
         return size
 
     def get_user_role(self, user: User) -> int:
