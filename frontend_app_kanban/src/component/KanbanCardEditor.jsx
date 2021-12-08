@@ -86,19 +86,19 @@ function KanbanCardEditor (props) {
 
         <div className='kanban__KanbanCardEditor__bgColor'>
           <label htmlFor='kanban__KanbanCardEditor__bgColor'>{props.t('Color:')}</label>
-            <div>
-              <input
-                type='checkbox'
-                checked={colorEnabled}
-                onChange={(e) => setColorEnabled(e.target.checked)}
-              />
-              <input
-                id='kanban__KanbanCardEditor__bgColor'
-                type='color'
-                value={bgColor}
-                onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
-              />
-            </div>
+          <div>
+            <input
+              type='checkbox'
+              checked={colorEnabled}
+              onChange={(e) => setColorEnabled(e.target.checked)}
+            />
+            <input
+              id='kanban__KanbanCardEditor__bgColor'
+              type='color'
+              value={bgColor}
+              onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
+            />
+          </div>
         </div>
 
         <div className='kanban__KanbanCardEditor__deadline'>
