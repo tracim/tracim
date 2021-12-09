@@ -3071,6 +3071,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 1
         content = res[1]
@@ -3133,6 +3134,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 1
         assert content["modified"]
@@ -3168,6 +3170,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3188,6 +3191,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3208,6 +3212,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3240,6 +3245,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3260,6 +3266,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3280,6 +3287,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3767,6 +3775,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3799,6 +3808,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3830,6 +3840,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3863,6 +3874,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 3
         assert content["modified"]
@@ -3961,6 +3973,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 1
         assert content["modified"]
@@ -4047,6 +4060,7 @@ class TestWorkspaceContentsWithFixture(object):
             "thread",
             "file",
             "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 1
         assert res[0]["content_id"] != res[1]["content_id"]
@@ -4064,10 +4078,11 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert set(content["sub_content_types"]) == {
             "comment",
-            "file",
             "folder",
-            "html-document",
             "thread",
+            "file",
+            "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 1
         assert content["modified"]
@@ -4101,10 +4116,11 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert set(content["sub_content_types"]) == {
             "comment",
-            "file",
             "folder",
-            "html-document",
             "thread",
+            "file",
+            "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 2
         assert content["modified"]
@@ -4121,10 +4137,11 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert set(content["sub_content_types"]) == {
             "comment",
-            "file",
             "folder",
-            "html-document",
             "thread",
+            "file",
+            "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 2
         assert content["modified"]
@@ -4141,10 +4158,11 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert set(content["sub_content_types"]) == {
             "comment",
-            "file",
             "folder",
-            "html-document",
             "thread",
+            "file",
+            "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 2
         assert content["modified"]
@@ -4172,10 +4190,11 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert set(content["sub_content_types"]) == {
             "comment",
-            "file",
             "folder",
-            "html-document",
             "thread",
+            "file",
+            "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 2
         assert content["modified"]
@@ -4205,10 +4224,11 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert set(content["sub_content_types"]) == {
             "comment",
-            "file",
             "folder",
-            "html-document",
             "thread",
+            "file",
+            "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 2
         assert content["modified"]
@@ -4237,10 +4257,11 @@ class TestWorkspaceContentsWithFixture(object):
         assert content["status"] == "open"
         assert set(content["sub_content_types"]) == {
             "comment",
-            "file",
             "folder",
-            "html-document",
             "thread",
+            "file",
+            "html-document",
+            "kanban",
         }
         assert content["workspace_id"] == 2
         assert content["modified"]
