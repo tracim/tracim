@@ -18,6 +18,7 @@ from tracim_backend.config import DepotFileStorageType
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import PageOfPreviewNotFound
 from tracim_backend.exceptions import PreviewGeneratorPassthroughError
+from tracim_backend.exceptions import TracimFileNotFound
 from tracim_backend.exceptions import TracimUnavailablePreviewType
 from tracim_backend.exceptions import UnavailablePreview
 from tracim_backend.lib.utils.logger import logger
@@ -38,6 +39,8 @@ class StorageLib:
         self.preview_manager = PreviewManager(app_config.PREVIEW_CACHE_DIR, create_folder=True)
 
     def _get_depot_file(self, depot_file) -> StoredFile:
+        if depot_file is None:
+            raise TracimFileNotFound("depot file is not existing")
         try:
             return self.uploaded_file_depot.get(depot_file)
         except IOError as exc:

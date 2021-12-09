@@ -1,5 +1,3 @@
-/* global confirm */
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
@@ -13,23 +11,24 @@ const KanbanColumnHeader = props => {
         className='kanban__contentpage__statewrapper__kanban__column__header'
         style={{ backgroundColor: props.column.bgColor || '' }}
       >
-        <strong onClick={() => props.onRenameColumn(props.column)}>{props.column.title}</strong>
+        <div
+          className='kanban__contentpage__statewrapper__kanban__column__header__title'
+        >
+          <strong onClick={() => props.onRenameColumn(props.column)}>{props.column.title}</strong>
+        </div>
         <IconButton
-          text=''
           icon='fas fa-paint-brush'
           tooltip={props.t('Change the color of this column')}
           onClick={() => props.onChangeColumnColor(props.column)}
           disabled={props.readOnly}
         />
         <IconButton
-          text=''
           icon='fas fa-plus'
           tooltip={props.t('Add a card')}
           onClick={() => props.onAddCard(props.column)}
           disabled={props.readOnly}
         />
         <IconButton
-          text=''
           icon='far fa-trash-alt'
           tooltip={props.t('Remove this column')}
           onClick={() => {
@@ -44,12 +43,21 @@ const KanbanColumnHeader = props => {
         <div className='kanban__contentpage__statewrapper__kanban__column__colorPicker'>
           <input
             type='color'
-            onChange={(e) => props.onApplyColumnColorChange(props.column, e.target.value)}
+            value={props.selectedColumnColor.bgColor}
+            onChange={(e) => props.onChangeColumnColorPicker(props.column, e.target.value)}
             disabled={props.readOnly}
           />
+          {!props.readOnly && props.column.bgColor !== props.selectedColumnColor.bgColor && (
+            <input
+              type='button'
+              className='kanban__contentpage__statewrapper__kanban__column__hideColorButton'
+              value={props.t('Apply')}
+              onClick={props.onApplyColumnColorChange}
+            />
+          )}
           <input
             type='button'
-            style={{ fontSize: 'small' }}
+            className='kanban__contentpage__statewrapper__kanban__column__hideColorButton'
             value={props.t('Hide')}
             onClick={props.onCancelColumnColorChange}
             disabled={props.readOnly}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
@@ -38,7 +37,7 @@ import KanbanComponent from '../component/Kanban.jsx'
 
 // TODO - S.G. - 2021-11-24 - The kanban app uses file storage in backend
 // This should be fixed when https://github.com/tracim/tracim/issues/5102 is implemented.
-const FILE_APP_SLUG = 'file'
+const FILE_APP_SLUG = CONTENT_TYPE.FILE
 
 export class Kanban extends React.Component {
   constructor (props) {
@@ -54,11 +53,14 @@ export class Kanban extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
+      currentContentRevisionId: param.content.current_revision_id,
       newComment: '',
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
-      externalTranslationList: [],
+      externalTranslationList: [
+        props.t('Create a Kanban board')
+      ],
       showRefreshWarning: false,
       editionAuthor: '',
       invalidMentionList: [],
@@ -239,6 +241,14 @@ export class Kanban extends React.Component {
       this.updateTimelineAndContent()
     }
 
+    if (prevState.isVisible !== state.isVisible) {
+      this.setState({
+        currentContentRevisionId: (prevState.isVisible && !state.isVisible)
+          ? undefined
+          : state.content.current_revision_id
+      })
+    }
+
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
@@ -279,6 +289,7 @@ export class Kanban extends React.Component {
     )
     this.setState({
       content: response.body,
+      currentContentRevisionId: response.body.current_revision_id,
       loadingContent: false
     })
     this.setHeadTitle(response.body.label)
@@ -321,7 +332,7 @@ export class Kanban extends React.Component {
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
-    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
+    props.appContentChangeTitle(state.content, newTitle, FILE_APP_SLUG)
   }
 
   handleChangeNewComment = e => {
@@ -454,11 +465,11 @@ export class Kanban extends React.Component {
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
     const readOnly = (
-      state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id ||
-        state.mode === APP_FEATURE_MODE.REVISION ||
-        state.content.is_archived ||
-        state.content.is_deleted ||
-        !state.content.is_editable
+      state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id ||
+      state.mode === APP_FEATURE_MODE.REVISION ||
+      state.content.is_archived ||
+      state.content.is_deleted ||
+      !state.content.is_editable
     )
 
     return (
@@ -504,7 +515,13 @@ export class Kanban extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
         >
-          <KanbanComponent content={state.content} config={state.config} readOnly={readOnly} />
+          <KanbanComponent
+            config={state.config}
+            content={state.content}
+            isNewContentRevision={!!state.currentContentRevisionId}
+            readOnly={readOnly}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
+          />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}

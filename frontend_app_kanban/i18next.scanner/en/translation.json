@@ -1,4 +1,5 @@
 {
+  "Create a Kanban board": "Create a Kanban board",
   "Error while saving the comment": "Error while saving the comment",
   "Delete": "Delete",
   "A content with the same name already exists": "A content with the same name already exists",
@@ -8,7 +9,6 @@
   "You must change the status or restore this kanban board before any change": "You must change the status or restore this kanban board before any change",
   "Error while saving the new version": "Error while saving the new version",
   "Please enter the new name of the column": "Please enter the new name of the column",
-  "column": "column",
   "Fullscreen": "Fullscreen",
   "Board: {{label}}": "Board: {{label}}",
   "Loading, please wait…": "Loading, please wait…",
@@ -20,10 +20,8 @@
   "New Card": "New Card",
   "Title:": "Title:",
   "Description:": "Description:",
-  "Enable HTML": "Enable HTML",
   "Color:": "Color:",
   "Deadline:": "Deadline:",
-  "Duration:": "Duration:",
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Change the color of this column": "Change the color of this column",
@@ -34,5 +32,10 @@
   "Timeline": "Timeline",
   "Tags": "Tags",
   "New Kanban board": "New Kanban board",
-  "Board's name": "Board's name"
+  "Board's name": "Board's name",
+  "This content is deleted": "This content is deleted",
+  "Restore": "Restore",
+  "Description": "Description",
+  "Value:": "Value:",
+  "Apply": "Apply"
 }
