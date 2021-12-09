@@ -27,6 +27,7 @@ import {
   getRawFileContent,
   CardPopup,
   PromptMessage,
+  RefreshWarningMessage,
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 
@@ -363,6 +364,15 @@ class Kanban extends React.Component {
             btnLabel={props.t('Restore')}
             onClickBtn={props.onClickRestoreDeleted}
           />
+        )}
+
+        {props.isRefreshNeeded && (
+          <div className={'kanban__contentpage__statewrapper__kanban__refresh'}>
+            <RefreshWarningMessage
+              tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
+              onClickRefresh={props.onClickRefresh}
+            />
+          </div>
         )}
 
         <div className='kanban__contentpage__statewrapper__kanban__toolbar'>

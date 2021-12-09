@@ -446,6 +446,7 @@ export class Kanban extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
+      currentContentRevisionId: newObjectContent.current_revision_id,
       showRefreshWarning: false
     }))
     this.setHeadTitle(newObjectContent.label)
@@ -518,9 +519,12 @@ export class Kanban extends React.Component {
           <KanbanComponent
             config={state.config}
             content={state.content}
+            editionAuthor={state.editionAuthor}
             isNewContentRevision={!!state.currentContentRevisionId}
             readOnly={readOnly}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
+            isRefreshNeeded={state.showRefreshWarning}
+            onClickRefresh={this.handleClickRefresh}
           />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
