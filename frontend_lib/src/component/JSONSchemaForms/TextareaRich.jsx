@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { TracimComponent, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { TracimComponent } from '../../tracimComponent.js'
+import { CUSTOM_EVENT } from '../../customEvent.js'
 
 export class TextareaRich extends React.Component {
   constructor (props) {
