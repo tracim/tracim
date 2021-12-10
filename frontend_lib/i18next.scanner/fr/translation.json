@@ -214,5 +214,7 @@
   "This tag already exists": "Cette étiquette existe déjà",
   "Version #{{versionNumber}}": "Version n°{{versionNumber}}",
   "Your tag has been added": "Votre étiquette a été ajoutée",
-  "Your tag has been created": "Votre étiquette a été créée"
+  "Your tag has been created": "Votre étiquette a été créée",
+  "See more": "Voir plus",
+  "Error while loading timeline": "Erreur lors du chargement de l'historique"
 }

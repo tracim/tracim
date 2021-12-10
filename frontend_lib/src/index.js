@@ -219,7 +219,8 @@ import {
   getCommentTranslated,
   getGenericWorkspaceContent,
   getRawFileContent,
-  putRawFileContent
+  putRawFileContent,
+  postRawFileContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -449,5 +450,6 @@ export {
   getGenericWorkspaceContent,
   htmlToText,
   getRawFileContent,
-  putRawFileContent
+  putRawFileContent,
+  postRawFileContent
 }
