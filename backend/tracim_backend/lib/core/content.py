@@ -2089,7 +2089,7 @@ class ContentApi(object):
             """
             import collections
 
-            for key, value in overrides.iteritems():
+            for key, value in overrides.items():
                 if isinstance(value, collections.Mapping) and value:
                     returned = deep_update(source.get(key, {}), value)
                     source[key] = returned
