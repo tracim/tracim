@@ -123,7 +123,7 @@ export class AdvancedSearch extends React.Component {
 
   getSearchResult = async (searchObject, currentSearchLength, searchFieldList, appliedFilters = {}) => {
     const { props } = this
-    const searchString = searchObject.searchString || (Object.keys(appliedFilters.metadata).length ? '*' : '')
+    const searchString = searchObject.searchString || (appliedFilters.metadata && Object.keys(appliedFilters.metadata).length ? '*' : '')
 
     // INFO - G.B. - 2021-02-12 - check if the user comes through an url that is not placed at first page
     const hasFirstPage = !(currentSearchLength < searchObject.numberResultsByPage * (searchObject.currentPage - 1))
@@ -293,18 +293,22 @@ export class AdvancedSearch extends React.Component {
     const filterValue = filterObject[filterKey]
     const oldFilterValue = oldAppliedFilter[filterKey]
 
-    const newFilterValue = updateFilterValue(filterValue, oldFilterValue)
-    /* INFO - SG - 2021/06/28 - If the new filter value is not existing,
-       remove the key from the applied filter object, else set its value.
-       This is done in order to properly get facets only when no filter is selected.
-       Please see onlyGetFacet in getSearchResult().
-    */
     let newAppliedFilter
-    if (newFilterValue) {
-      newAppliedFilter = { ...oldAppliedFilter, [filterKey]: newFilterValue }
+    if (type === 'metadata') {
+      newAppliedFilter = filterObject
     } else {
-      newAppliedFilter = { ...oldAppliedFilter }
-      delete newAppliedFilter[filterKey]
+      const newFilterValue = updateFilterValue(filterValue, oldFilterValue)
+      /* INFO - SG - 2021/06/28 - If the new filter value is not existing,
+         remove the key from the applied filter object, else set its value.
+         This is done in order to properly get facets only when no filter is selected.
+         Please see onlyGetFacet in getSearchResult().
+      */
+      if (newFilterValue) {
+        newAppliedFilter = { ...oldAppliedFilter, [filterKey]: newFilterValue }
+      } else {
+        newAppliedFilter = { ...oldAppliedFilter }
+        delete newAppliedFilter[filterKey]
+      }
     }
     props.dispatch(setAppliedFilter(type, newAppliedFilter, state.searchType))
     const currentSearch = this.getCurrentSearchObject()
