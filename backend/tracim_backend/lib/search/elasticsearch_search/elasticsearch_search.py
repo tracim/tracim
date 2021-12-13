@@ -7,6 +7,7 @@ from elasticsearch import NotFoundError
 from elasticsearch.client import IngestClient
 from elasticsearch_dsl import Document
 from elasticsearch_dsl import Index
+from elasticsearch_dsl import Q
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.response.aggs import Bucket
 import pluggy
@@ -604,7 +605,13 @@ class ESSearchApi(SearchApi):
 
         if search_parameters.content_metadata:
             for (key, value) in search_parameters.content_metadata.items():
-                search = search.filter("term", **{"content_metadata__" + key + "__exact": value},)
+                search = search.query(
+                    "bool",
+                    filter=[
+                        Q("term", **{"content_metadata__" + key + "__exact": value})
+                        | Q("term", **{"content_metadata__" + key: value}),
+                    ],
+                )
 
         if search_parameters.file_extensions:
             search = search.filter("terms", file_extension__exact=search_parameters.file_extensions)
