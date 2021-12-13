@@ -21,20 +21,20 @@ function KanbanColumnEditor (props) {
   }
 
   return (
-    <form className='kanban__KanbanPopupEditor__form' onSubmit={handleValidate}>
-      <div className='kanban__KanbanPopupEditor__form__fields'>
-        <div className='kanban__KanbanPopupEditor__title'>
-          <label htmlFor='kanban__KanbanPopupEditor__title'>{props.t('Title:')}</label>
+    <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
+      <div className='kanban__KanbanPopup__form__fields'>
+        <div className='kanban__KanbanPopup__title'>
+          <label htmlFor='kanban__KanbanPopup__title'>{props.t('Title:')}</label>
           <input
             autoFocus
-            id='kanban__KanbanPopupEditor__title'
+            id='kanban__KanbanPopup__title'
             type='text' value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
-        <div className='kanban__KanbanPopupEditor__bgColor'>
-          <label htmlFor='kanban__KanbanPopupEditor__bgColor'>{props.t('Color:')}</label>
+        <div className='kanban__KanbanPopup__bgColor'>
+          <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
           <div>
             <input
               type='checkbox'
@@ -42,7 +42,7 @@ function KanbanColumnEditor (props) {
               onChange={(e) => setColorEnabled(e.target.checked)}
             />
             <input
-              id='kanban__KanbanPopupEditor__bgColor'
+              id='kanban__KanbanPopup__bgColor'
               type='color'
               value={bgColor}
               onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
@@ -50,7 +50,7 @@ function KanbanColumnEditor (props) {
           </div>
         </div>
       </div>
-      <div className='kanban__KanbanPopupEditor__form_buttons'>
+      <div className='kanban__KanbanPopup__form_buttons'>
         <IconButton
           color={props.customColor}
           dataCy='confirm_popup__button_cancel'

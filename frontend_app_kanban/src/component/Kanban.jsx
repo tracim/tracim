@@ -371,6 +371,7 @@ class Kanban extends React.Component {
                 )}
                 renderColumnHeader={column => (
                   <KanbanColumnHeader
+                    customColor={props.config.hexcolor}
                     readOnly={props.readOnly}
                     column={column}
                     onRenameColumn={this.handleEditColumn}
@@ -380,6 +381,7 @@ class Kanban extends React.Component {
                 )}
                 renderCard={card => (
                   <KanbanCard
+                    customColor={props.config.hexcolor}
                     readOnly={props.readOnly}
                     card={card}
                     onEditCardTitle={this.handleEditCard}
@@ -394,7 +396,7 @@ class Kanban extends React.Component {
             </div>
             {state.editedCardInfos && (
               <CardPopup
-                customClass='kanban__KanbanPopupEditor'
+                customClass='kanban__KanbanPopup'
                 customColor={props.config.hexcolor}
                 faIcon='far fa-id-card'
                 label={state.editedCardInfos.card.id ? props.t('Editing Card') : props.t('New Card')}
@@ -418,7 +420,7 @@ class Kanban extends React.Component {
             )}
             {state.editedColumnInfos && (
               <CardPopup
-                customClass='kanban__KanbanPopupEditor'
+                customClass='kanban__KanbanPopup'
                 customColor={props.config.hexcolor}
                 faIcon='far fa-id-card'
                 label={state.editedColumnInfos.id ? props.t('Editing Column') : props.t('New Column')}

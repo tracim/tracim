@@ -100,7 +100,7 @@ cardWidth = 280px
           overflow hidden
           text-overflow ellipsis
 
-        button
+        > button
           font-size metadataFontSize
           padding textSpacing
           border none
@@ -129,7 +129,7 @@ cardWidth = 280px
           hyphens auto
 
 
-        button
+        > button
           font-size metadataFontSize
           padding textSpacing
           border none
@@ -148,7 +148,7 @@ cardWidth = 280px
         hyphens auto
         min-height titleFontSize
 
-  &__KanbanPopupEditor
+  &__KanbanPopup
     width 100%
     top 15%
     &__bgColor, &__deadline
@@ -188,6 +188,13 @@ cardWidth = 280px
         text-align right
         button:last-child, input:last-child
           margin-left standardSpacing
+
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
 
   &__columnAdder
     border 2px mediumGrey dashed
