@@ -11,8 +11,21 @@ function ContentMetadata (props) {
   const [schema, setSchema] = useState(null)
   const [uiSchema, setUiSchema] = useState(null)
 
+  const contentMetadata = props.content.content_metadata
+
+  const hasMetadata = (
+    contentMetadata &&
+    Object.keys(contentMetadata).length > 0
+  )
+
+  const hasMetadataAndSchemasLoaded = (
+    hasMetadata &&
+    props.content.metadata_ui_schema &&
+    props.content.metadata_schema
+  )
+
   useEffect(() => {
-    if (!props.content.content_metadata) {
+    if (!hasMetadataAndSchemasLoaded) {
       setSchema(null)
       setUiSchema(null)
       return
@@ -50,16 +63,19 @@ function ContentMetadata (props) {
     }())
   }, [props.content.revision_id])
 
-  return (schema && uiSchema) ? (
-    <CustomFormManager
-      schemaObject={schema}
-      uiSchemaObject={uiSchema}
-      dataSchemaObject={props.content.content_metadata}
-    />
-  ) : (
-    props.content.content_metadata
-      ? <Loading />
-      : props.t('No metadata are attached to this file.')
+  return (
+    hasMetadataAndSchemasLoaded
+      ? (
+        <CustomFormManager
+          schemaObject={schema}
+          uiSchemaObject={uiSchema}
+          dataSchemaObject={contentMetadata}
+        />
+      ) : (
+        hasMetadata
+          ? <Loading />
+          : props.t('No metadata are attached to this file.')
+      )
   )
 }
 
