@@ -113,7 +113,7 @@ def create_plugin_manager() -> pluggy.PluginManager:
     return plugin_manager
 
 
-class FoobarTracimContext(TracimContext):
+class StartupTracimContext(TracimContext):
     def __init__(self, config: CFG, plugin_manager) -> None:
         super().__init__()
         self._app_config = config
@@ -147,7 +147,7 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     from tracim_backend.lib.search.search_factory import SearchFactory
     import tracim_backend.lib.core.mention as mention
 
-    context = FoobarTracimContext(app_config, plugin_manager)
+    context = StartupTracimContext(app_config, plugin_manager)
     session_factory = get_session_factory(get_engine(app_config))
     session = create_dbsession_for_context(session_factory, transaction.manager, context)
 
@@ -175,4 +175,7 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
         "Loaded and registered the following plugins: {}".format(tuple(plugins.keys())),
     )
     plugin_manager.hook.on_plugins_loaded(plugin_manager=plugin_manager)
+
+    session.close()
+
     return plugin_manager
