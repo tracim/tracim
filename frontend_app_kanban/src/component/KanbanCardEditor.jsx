@@ -49,19 +49,19 @@ function KanbanCardEditor (props) {
   }
 
   return (
-    <form className='kanban__KanbanCardEditor__form' onSubmit={handleValidate}>
-      <div className='kanban__KanbanCardEditor__form__fields'>
-        <div className='kanban__KanbanCardEditor__title'>
-          <label htmlFor='kanban__KanbanCardEditor__title'>{props.t('Title:')}</label>
+    <form className='kanban__KanbanPopupEditor__form' onSubmit={handleValidate}>
+      <div className='kanban__KanbanPopupEditor__form__fields'>
+        <div className='kanban__KanbanPopupEditor__title'>
+          <label htmlFor='kanban__KanbanPopupEditor__title'>{props.t('Title:')}</label>
           <input
             autoFocus={!props.focusOnDescription}
-            id='kanban__KanbanCardEditor__title'
+            id='kanban__KanbanPopupEditor__title'
             type='text' value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
-        <div className='kanban__KanbanCardEditor__description'>
+        <div className='kanban__KanbanPopupEditor__description'>
           <label htmlFor={descriptionEditionId}>{props.t('Description:')}</label>
           <div>
             {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
@@ -84,8 +84,8 @@ function KanbanCardEditor (props) {
           </div>
         </div>
 
-        <div className='kanban__KanbanCardEditor__bgColor'>
-          <label htmlFor='kanban__KanbanCardEditor__bgColor'>{props.t('Color:')}</label>
+        <div className='kanban__KanbanPopupEditor__bgColor'>
+          <label htmlFor='kanban__KanbanPopupEditor__bgColor'>{props.t('Color:')}</label>
           <div>
             <input
               type='checkbox'
@@ -93,7 +93,7 @@ function KanbanCardEditor (props) {
               onChange={(e) => setColorEnabled(e.target.checked)}
             />
             <input
-              id='kanban__KanbanCardEditor__bgColor'
+              id='kanban__KanbanPopupEditor__bgColor'
               type='color'
               value={bgColor}
               onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
@@ -101,28 +101,28 @@ function KanbanCardEditor (props) {
           </div>
         </div>
 
-        <div className='kanban__KanbanCardEditor__deadline'>
-          <label htmlFor='kanban__KanbanCardEditor__deadline'>{props.t('Deadline:')}</label>
+        <div className='kanban__KanbanPopupEditor__deadline'>
+          <label htmlFor='kanban__KanbanPopupEditor__deadline'>{props.t('Deadline:')}</label>
           <input
-            id='kanban__KanbanCardEditor__deadline'
-            htmlFor='kanban__KanbanCardEditor__deadline'
+            id='kanban__KanbanPopupEditor__deadline'
+            htmlFor='kanban__KanbanPopupEditor__deadline'
             type='date'
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
           />
         </div>
 
-        <div className='kanban__KanbanCardEditor__duration'>
-          <label htmlFor='kanban__KanbanCardEditor__duration'>{props.t('Value:')}</label>
+        <div className='kanban__KanbanPopupEditor__duration'>
+          <label htmlFor='kanban__KanbanPopupEditor__duration'>{props.t('Value:')}</label>
           <input
-            id='kanban__KanbanCardEditor__duration'
+            id='kanban__KanbanPopupEditor__duration'
             type='text'
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
           />
         </div>
       </div>
-      <div className='kanban__KanbanCardEditor__form_buttons'>
+      <div className='kanban__KanbanPopupEditor__form_buttons'>
         <IconButton
           color={props.customColor}
           dataCy='confirm_popup__button_cancel'

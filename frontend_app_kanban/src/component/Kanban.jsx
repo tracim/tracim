@@ -35,6 +35,7 @@ import {
 import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION } from '../helper.js'
 import KanbanCard from './KanbanCard.jsx'
 import KanbanCardEditor from './KanbanCardEditor.jsx'
+import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
 require('../css/Kanban.styl')
@@ -54,18 +55,14 @@ class Kanban extends React.Component {
     this.state = {
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
-      boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
-      isAutoCompleteActivated: false,
-      selectedColumnColor: {
-        bgColor: '',
-        column: {}
-      },
-      fullscreen: false,
-      saveRequired: false,
-      saving: false,
-      colorPickerEnabledForColumnId: null,
       board: { columns: [] },
-      editedCardInfos: null
+      boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
+      editedCardInfos: null,
+      editedColumnInfos: null,
+      fullscreen: false,
+      isAutoCompleteActivated: false,
+      saveRequired: false,
+      saving: false
     }
   }
 
@@ -121,14 +118,9 @@ class Kanban extends React.Component {
     this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
   }
 
-  handleEditCardTitle = (card) => {
-    const title = prompt(this.props.t('Please enter the new title of this card'), card.title || '')
-    if (!title) return
-    this.setState(prevState => {
-      return {
-        board: changeCard(prevState.board, card.id, { title }),
-        saveRequired: true
-      }
+  handleEditCard = (card) => {
+    this.setState({
+      editedCardInfos: { card, focusOnDescription: false }
     })
   }
 
@@ -160,12 +152,6 @@ class Kanban extends React.Component {
     })
   }
 
-  handleEditCard = (card) => {
-    this.setState({
-      editedCardInfos: { card }
-    })
-  }
-
   handleCardEdited = (card) => {
     this.setState(prevState => ({
       editedCardInfos: null,
@@ -174,6 +160,33 @@ class Kanban extends React.Component {
         : addCard(prevState.board, prevState.editedCardInfos.column, { ...card, id: uuidv4() }),
       saveRequired: true
     }))
+  }
+
+  handleEditColumn = (column) => {
+    this.setState({
+      editedColumnInfos: column
+    })
+  }
+
+  handleColumnEdited = (column) => {
+    const newColumn = {
+      title: column.title,
+      bgColor: column.bgColor,
+      id: column.id || uuidv4()
+    }
+    this.setState(prevState => {
+      return {
+        editedColumnInfos: null,
+        board: column.id
+          ? changeColumn(prevState.board, column, newColumn)
+          : addColumn(prevState.board, { ...newColumn, cards: [] }),
+        saveRequired: true
+      }
+    })
+  }
+
+  handleColumnEditCancel = () => {
+    this.setState({ editedColumnInfos: null })
   }
 
   async handleSave () {
@@ -221,13 +234,6 @@ class Kanban extends React.Component {
     })
   }
 
-  handleNewColumnConfirm = (column) => {
-    const newColumn = { ...column, id: uuidv4() }
-    this.setState(prevState => {
-      return { board: addColumn(prevState.board, newColumn), saveRequired: true }
-    })
-  }
-
   handleColumnDragEnd = (column, fromPosition, toPosition) => {
     this.setState(prevState => {
       return {
@@ -237,10 +243,6 @@ class Kanban extends React.Component {
     })
   }
 
-  updateColumns (newColumns) {
-    this.updateBoard({ ...this.state.board, columns: newColumns })
-  }
-
   updateBoard (newBoard, dontSaveDraftToLocalStorage) {
     this.setState({
       board: newBoard,
@@ -248,63 +250,9 @@ class Kanban extends React.Component {
     })
   }
 
-  handleColumnRenameClick = (column) => {
-    const newName = prompt(this.props.t('Please enter the new name of the column'), column.title)
-    if (newName) {
-      this.handleColumnRename(column, newName)
-    }
-  }
-
-  handleColumnRename = (column, title) => {
-    this.setState(prevState => {
-      return {
-        board: changeColumn(prevState.board, column, { title }),
-        saveRequired: true
-      }
-    })
-  }
-
   handleColumnNew = (board, column) => {
     this.updateBoard(board)
     return column
-  }
-
-  handleColumnColorChange = (column, bgColor) => {
-    this.setState({ selectedColumnColor: { bgColor, column } })
-  }
-
-  handleColumnColorChangeApply = () => {
-    this.setState(prevState => {
-      const bgColor = prevState.selectedColumnColor.bgColor
-
-      return {
-        board: changeColumn(
-          prevState.board,
-          prevState.selectedColumnColor.column,
-          { bgColor }
-        ),
-        saveRequired: true
-      }
-    })
-  }
-
-  handleCardColorChange = (card, e) => {
-    this.setState(prevState => {
-      return {
-        board: changeCard(prevState.board, card.id, { bgColor: e.target.value }),
-        saveRequired: true
-      }
-    })
-  }
-
-  handleColumnColorClick = (column) => {
-    this.setState(prevState => {
-      return {
-        colorPickerEnabledForColumnId: prevState.colorPickerEnabledForColumnId === column.id
-          ? null
-          : column.id
-      }
-    })
   }
 
   handleCardEditCancel = () => {
@@ -408,31 +356,33 @@ class Kanban extends React.Component {
                 allowRemoveCard={!props.readOnly}
                 onCardDragEnd={this.handleCardDragEnd}
                 onColumnDragEnd={this.handleColumnDragEnd}
-                onNewColumnConfirm={this.handleNewColumnConfirm}
                 onColumnNew={this.handleColumnNew}
                 onColumnRemove={this.handleRemoveColumn}
                 onCardRemove={this.handleRemoveCard}
-                onColumnRename={this.handleColumnRename}
+                onColumnRename={this.handleEditColumn}
+                renderColumnAdder={() => (
+                  <div
+                    className='kanban__columnAdder'
+                    onClick={this.handleEditColumn}
+                  >
+                    <i className='fa fas fa-fw fa-plus' />
+                    <span>{props.t('Create new column')}</span>
+                  </div>
+                )}
                 renderColumnHeader={column => (
                   <KanbanColumnHeader
                     readOnly={props.readOnly}
                     column={column}
-                    onRenameColumn={this.handleColumnRenameClick}
-                    onChangeColumnColor={this.handleColumnColorClick}
-                    onChangeColumnColorPicker={this.handleColumnColorChange}
-                    onApplyColumnColorChange={this.handleColumnColorChangeApply}
-                    onCancelColumnColorChange={() => this.setState({ colorPickerEnabledForColumnId: null })}
+                    onRenameColumn={this.handleEditColumn}
                     onAddCard={this.handleAddCard}
                     onRemoveColumn={this.handleRemoveColumn}
-                    showColorPicker={state.colorPickerEnabledForColumnId === column.id}
-                    selectedColumnColor={state.selectedColumnColor}
                   />
                 )}
                 renderCard={card => (
                   <KanbanCard
                     readOnly={props.readOnly}
                     card={card}
-                    onEditCardTitle={this.handleEditCardTitle}
+                    onEditCardTitle={this.handleEditCard}
                     onEditCardColor={this.handleEditCard}
                     onEditCardContent={this.handleEditCardContent}
                     onRemoveCard={this.handleRemoveCard}
@@ -444,7 +394,7 @@ class Kanban extends React.Component {
             </div>
             {state.editedCardInfos && (
               <CardPopup
-                customClass='kanban__KanbanCardEditor'
+                customClass='kanban__KanbanPopupEditor'
                 customColor={props.config.hexcolor}
                 faIcon='far fa-id-card'
                 label={state.editedCardInfos.card.id ? props.t('Editing Card') : props.t('New Card')}
@@ -463,6 +413,22 @@ class Kanban extends React.Component {
                   onClickAutoCompleteItem={(item) => {
                     tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
                   }}
+                />
+              </CardPopup>
+            )}
+            {state.editedColumnInfos && (
+              <CardPopup
+                customClass='kanban__KanbanPopupEditor'
+                customColor={props.config.hexcolor}
+                faIcon='far fa-id-card'
+                label={state.editedColumnInfos.id ? props.t('Editing Column') : props.t('New Column')}
+                onClose={this.handleColumnEditCancel}
+              >
+                <KanbanColumnEditor
+                  column={state.editedColumnInfos}
+                  customColor={props.config.hexcolor}
+                  onValidate={this.handleColumnEdited}
+                  onCancel={this.handleColumnEditCancel}
                 />
               </CardPopup>
             )}
