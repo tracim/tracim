@@ -374,7 +374,7 @@ class Kanban extends React.Component {
                     customColor={props.config.hexcolor}
                     readOnly={props.readOnly}
                     column={column}
-                    onRenameColumn={this.handleEditColumn}
+                    onEditColumn={this.handleEditColumn}
                     onAddCard={this.handleAddCard}
                     onRemoveColumn={this.handleRemoveColumn}
                   />

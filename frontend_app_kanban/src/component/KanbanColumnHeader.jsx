@@ -14,8 +14,14 @@ function KanbanColumnHeader (props) {
       <div
         className='kanban__contentpage__statewrapper__kanban__column__header__title'
       >
-        <strong onClick={() => props.onRenameColumn(props.column)}>{props.column.title}</strong>
+        <strong onClick={() => props.onEditColumn(props.column)}>{props.column.title}</strong>
       </div>
+      <IconButton
+        icon='fas fa-pencil-alt'
+        tooltip={props.t('Edit this column')}
+        onClick={() => props.onEditColumn(props.column)}
+        disabled={props.readOnly}
+      />
       <IconButton
         icon='fas fa-plus'
         tooltip={props.t('Add a card')}
@@ -62,7 +68,7 @@ function KanbanColumnHeader (props) {
 
 KanbanColumnHeader.propTypes = {
   column: PropTypes.object.isRequired,
-  onRenameColumn: PropTypes.func.isRequired,
+  onEditColumn: PropTypes.func.isRequired,
   onAddCard: PropTypes.func.isRequired,
   onRemoveColumn: PropTypes.func.isRequired,
   customColor: PropTypes.string,
