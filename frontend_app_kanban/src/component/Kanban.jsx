@@ -423,7 +423,7 @@ class Kanban extends React.Component {
                 customClass='kanban__KanbanPopup'
                 customColor={props.config.hexcolor}
                 faIcon='far fa-id-card'
-                label={state.editedColumnInfos.id ? props.t('Editing Column') : props.t('New Column')}
+                label={state.editedColumnInfos.id ? props.t('Edit Column') : props.t('New Column')}
                 onClose={this.handleColumnEditCancel}
               >
                 <KanbanColumnEditor
