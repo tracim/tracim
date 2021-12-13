@@ -2119,4 +2119,4 @@ class ContentApi(object):
             else:
                 schema_union = schema_dict
 
-        return schema_dict
+        return schema_union
