@@ -43,22 +43,22 @@ function KanbanColumnHeader (props) {
           label={props.t('Are you sure?')}
           onClose={() => setShowConfirmPopup(false)}
         >
-            <div className='kanban__KanbanPopup__confirm'>
-              <IconButton
-                color={props.customColor}
-                icon='fas fa-times'
-                onClick={() => setShowConfirmPopup(false)}
-                text={props.t('Cancel')}
-              />
+          <div className='kanban__KanbanPopup__confirm'>
+            <IconButton
+              color={props.customColor}
+              icon='fas fa-times'
+              onClick={() => setShowConfirmPopup(false)}
+              text={props.t('Cancel')}
+            />
 
-              <IconButton
-                color={props.customColor}
-                icon='far fa-trash-alt'
-                intent='primary'
-                mode='light'
-                onClick={() => props.onRemoveColumn(props.column)}
-                text={props.t('Delete')}
-              />
+            <IconButton
+              color={props.customColor}
+              icon='far fa-trash-alt'
+              intent='primary'
+              mode='light'
+              onClick={() => props.onRemoveColumn(props.column)}
+              text={props.t('Delete')}
+            />
           </div>
         </CardPopup>
       )}

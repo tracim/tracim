@@ -26,15 +26,14 @@ function KanbanCard (props) {
           disabled={props.readOnly}
         />
 
-
-      {showConfirmPopup && (
-        <CardPopup
-          customClass='kanban__KanbanPopup'
-          customColor={props.customColor}
-          faIcon='far fa-fw fa-trash-alt'
-          label={props.t('Are you sure?')}
-          onClose={() => setShowConfirmPopup(false)}
-        >
+        {showConfirmPopup && (
+          <CardPopup
+            customClass='kanban__KanbanPopup'
+            customColor={props.customColor}
+            faIcon='far fa-fw fa-trash-alt'
+            label={props.t('Are you sure?')}
+            onClose={() => setShowConfirmPopup(false)}
+          >
             <div className='kanban__KanbanPopup__confirm'>
               <IconButton
                 color={props.customColor}
@@ -51,9 +50,9 @@ function KanbanCard (props) {
                 onClick={() => props.onRemoveCard(props.card)}
                 text={props.t('Delete')}
               />
-          </div>
-        </CardPopup>
-      )}
+            </div>
+          </CardPopup>
+        )}
       </div>
       <div
         className='kanban__contentpage__statewrapper__kanban__card__description'
@@ -80,4 +79,3 @@ KanbanCard.defaultProps = {
   customColor: '',
   readOnly: false
 }
-
