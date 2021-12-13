@@ -16,6 +16,7 @@ import Board, {
 import '@asseinfo/react-kanban/dist/styles.css'
 
 import {
+  APP_FEATURE_MODE,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
   tinymceAutoCompleteHandleKeyDown,
@@ -365,15 +366,26 @@ class Kanban extends React.Component {
             onClickBtn={props.onClickRestoreDeleted}
           />
         )}
+        <div className='kanban__contentpage__statewrapper__kanban__options'>
+          {props.mode === APP_FEATURE_MODE.REVISION && (
+            <IconButton
+              customClass='wsContentGeneric__option__menu__lastversion'
+              color={props.customColor}
+              intent='primary'
+              mode='light'
+              onClick={props.onClickLastVersion}
+              icon='fas fa-history'
+              text={props.t('Last version')}
+            />
+          )}
 
-        {props.isRefreshNeeded && (
-          <div className={'kanban__contentpage__statewrapper__kanban__refresh'}>
+          {props.isRefreshNeeded && (
             <RefreshWarningMessage
               tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
               onClickRefresh={props.onClickRefresh}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         <div className='kanban__contentpage__statewrapper__kanban__toolbar'>
           <IconButton
