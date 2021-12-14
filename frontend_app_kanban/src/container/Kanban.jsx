@@ -118,6 +118,37 @@ export class Kanban extends React.Component {
     )
   }
 
+  handleClickShowRevision = async revision => {
+    const { state, props } = this
+
+    const revisionArray = props.timeline.filter(t => t.timelineType === 'revision')
+    const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
+
+    if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
+      this.handleClickLastVersion()
+      return
+    }
+
+    if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...revision,
+        workspace_id: state.content.workspace_id,
+        current_revision_id: revision.revision_id,
+        is_archived: prev.is_archived,
+        is_deleted: prev.is_deleted
+      },
+      mode: APP_FEATURE_MODE.REVISION
+    }))
+  }
+
+  handleClickLastVersion = () => {
+    this.setState({ mode: APP_FEATURE_MODE.VIEW })
+    this.loadContent()
+  }
+
   handleContentChanged = data => {
     const { state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
@@ -521,10 +552,12 @@ export class Kanban extends React.Component {
             content={state.content}
             editionAuthor={state.editionAuthor}
             isNewContentRevision={!!state.currentContentRevisionId}
-            readOnly={readOnly}
-            onClickRestoreDeleted={this.handleClickRestoreDelete}
             isRefreshNeeded={state.showRefreshWarning}
+            mode={state.mode}
+            onClickLastVersion={this.handleClickLastVersion}
             onClickRefresh={this.handleClickRefresh}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
+            readOnly={readOnly}
           />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}

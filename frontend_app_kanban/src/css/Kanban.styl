@@ -1,6 +1,6 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
-cardSize = 280px
+cardWidth = 280px
 
 .kanban
   &__contentpage__statewrapper__kanban
@@ -8,7 +8,7 @@ cardSize = 280px
     flex-direction column
     height calc(100% - 77px)
     &__column__header__title
-      max-width 180px
+      width 180px
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
@@ -22,8 +22,11 @@ cardSize = 280px
       z-index 1
       background offWhite
 
-    &__refresh button
-      margin-inline-start auto
+    &__options
+      display flex
+      justify-content flex-end
+      & button
+        margin-inline-end standardSpacing
 
     &__wrapper
       flex 1
@@ -97,7 +100,7 @@ cardSize = 280px
           overflow hidden
           text-overflow ellipsis
 
-        button
+        > button
           font-size metadataFontSize
           padding textSpacing
           border none
@@ -105,7 +108,7 @@ cardSize = 280px
 
     &__card
       margin textSpacing
-      width cardSize
+      width cardWidth
       background offWhite
       border 1px solid back
       box-shadow 0 0 3px black
@@ -126,7 +129,7 @@ cardSize = 280px
           hyphens auto
 
 
-        button
+        > button
           font-size metadataFontSize
           padding textSpacing
           border none
@@ -145,7 +148,7 @@ cardSize = 280px
         hyphens auto
         min-height titleFontSize
 
-  &__KanbanCardEditor
+  &__KanbanPopup
     width 100%
     top 15%
     &__bgColor, &__deadline
@@ -156,6 +159,7 @@ cardSize = 280px
 
     & .cardPopup__container
       width unset
+      min-width 500px
 
     & [type=checkbox]
       margin textSpacing
@@ -184,3 +188,23 @@ cardSize = 280px
         text-align right
         button:last-child, input:last-child
           margin-left standardSpacing
+
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+  &__columnAdder
+    border 2px mediumGrey dashed
+    min-width cardWidth
+    height 70px
+    margin textSpacing
+    text-align-last center
+    display flex
+    border-radius standardBorderRadius
+    flex-direction column
+    cursor pointer
+    & > *
+      margin auto
