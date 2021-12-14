@@ -8,7 +8,7 @@ function KanbanColumnEditor (props) {
 
   const [title, setTitle] = React.useState(column.title || '')
   const [colorEnabled, setColorEnabled] = React.useState(!!column.bgColor)
-  const [bgColor, setBgColor] = React.useState(column.bgColor || '#00000000')
+  const [bgColor, setBgColor] = React.useState(column.bgColor || '#00000000') // TODO GIULIA Kanban color by default and always actived (cards too)
 
   function handleValidate (e) {
     e.preventDefault()

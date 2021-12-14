@@ -334,7 +334,7 @@ class Kanban extends React.Component {
         </div>
 
         <div className='kanban__contentpage__statewrapper__kanban__toolbar'>
-          <IconButton
+          <IconButton // TODO GIULIA Add to content header and edit fullsceen version
             icon='fas fa-arrows-alt'
             text={props.t('Fullscreen')}
             onClick={this.handleClickFullscreen}

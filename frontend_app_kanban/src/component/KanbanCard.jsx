@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { CardPopup, IconButton } from 'tracim_frontend_lib'
+import {
+  CardPopup,
+  DropdownMenu,
+  IconButton
+} from 'tracim_frontend_lib'
 
 require('./KanbanCard.styl')
 
@@ -9,24 +13,34 @@ function KanbanCard (props) {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false)
 
   return (
-    <div className='kanban__contentpage__statewrapper__kanban__card'>
-      <div
-        style={{ backgroundColor: props.card.bgColor || '' }}
-        className='kanban__contentpage__statewrapper__kanban__card__title'
-      >
+    <div
+      style={{ borderColor: props.card.bgColor || props.customColor }}
+      className='kanban__contentpage__statewrapper__kanban__card' // TODO GIULIA Better class names
+    >
+      <div className='kanban__contentpage__statewrapper__kanban__card__title'>
         <strong onClick={() => props.onEditCardTitle(props.card)}>{props.card.title}</strong>
-        <IconButton
-          icon='fas fa-pencil-alt'
-          tooltip={props.t('Change the color of this card')}
-          onClick={() => props.onEditCardColor(props.card)}
-          disabled={props.readOnly}
-        />
-        <IconButton
-          icon='far fa-trash-alt'
-          tooltip={props.t('Remove this card')}
-          onClick={() => setShowConfirmPopup(true)}
-          disabled={props.readOnly}
-        />
+        <DropdownMenu
+          buttonCustomClass='kanban__contentpage__statewrapper__kanban__card__title__actions'
+          buttonIcon='fas fa-ellipsis-v'
+          buttonTooltip={props.t('Actions')}
+        >
+          <IconButton
+            disabled={props.readOnly}
+            icon='fas fa-pencil-alt'
+            intent='link'
+            onClick={() => props.onEditCardColor(props.card)} // TODO GIULIA Have only editcard function
+            text={props.t('Edit')}
+            tooltip={props.t('Edit this card')}
+          />
+          <IconButton
+            disabled={props.readOnly}
+            icon='far fa-trash-alt'
+            intent='link'
+            onClick={() => setShowConfirmPopup(true)}
+            text={props.t('Delete')}
+            tooltip={props.t('Delete this card')}
+          />
+        </DropdownMenu>
 
         {showConfirmPopup && (
           <CardPopup

@@ -1,7 +1,7 @@
 {
   "Create a Kanban board": "Créer un tableau Kanban",
   "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
-  "Delete": "Effacer",
+  "Delete": "Supprimer",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while creating kanban": "Erreur pendant la création du tableau Kanban",
   "Validate and create": "Valider et créer",
@@ -35,9 +35,9 @@
   "New Column": "Nouvelle colonne",
   "Are you sure?": "Êtes-vous sûr ?",
   "Edit this column": "Modifier cette colonne",
-  "Actions": "__NOT_TRANSLATED__",
-  "Edit": "__NOT_TRANSLATED__",
-  "Edit this card": "__NOT_TRANSLATED__",
-  "Delete this card": "__NOT_TRANSLATED__",
-  "Delete this column": "__NOT_TRANSLATED__"
+  "Actions": "Actions",
+  "Edit": "Modifier",
+  "Edit this card": "Modifier cette carte",
+  "Delete this card": "Supprimer cette carte",
+  "Delete this column": "Supprimer cette colonne"
 }

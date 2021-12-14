@@ -5,33 +5,33 @@ cardWidth = 280px
 .kanban
   &__contentpage__statewrapper__kanban
     &__card
-      margin textSpacing
+      margin-bottom standardSpacing
       width cardWidth
       background-color offWhite
-      border 1px solid back
-      box-shadow 0 0 3px black
+      border 1px solid
       border-radius standardBorderRadius
+      padding standardSpacing
 
       &__title
-        text-align center
-        border-bottom borderStyle
         display flex
-        flex-direction row
-        align-items flex-start
 
-        strong
+        & strong
           flex 1
-          text-align center
           overflow-wrap anywhere
           hyphens auto
+          margin-bottom textSpacing
 
-
-        > button
+        & > button
           font-size metadataFontSize
           padding textSpacing
           border none
           border-radius 0
           display flex
 
-          .iconbutton__icon
+          &.iconbutton__icon
             margin 0
+
+        &__actions.dropdownMenuButton
+          padding 0
+          &::after
+            display none
