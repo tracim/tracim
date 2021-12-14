@@ -11,8 +11,6 @@
   "Board: {{label}}": "Tableau: {{label}}",
   "Loading, please wait…": "Chargement en cours, veuillez patienter…",
   "Error while loading the board.": "Erreur lors du chargement du tableau",
-  "Change the color of this card": "Changer la couleur de cette carte",
-  "Remove this card": "Effacer cette carte",
   "Editing Card": "Edition de la carte",
   "New Card": "Nouvelle carte",
   "Title:": "Titre :",
@@ -22,7 +20,6 @@
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Add a card": "Ajouter une carte",
-  "Remove this column": "Enlever cette colonne",
   "Timeline": "Historique",
   "Tags": "Étiquettes",
   "New Kanban board": "Nouveau tableau Kanban",
@@ -37,5 +34,10 @@
   "Edit Column": "Modifier la colonne",
   "New Column": "Nouvelle colonne",
   "Are you sure?": "Êtes-vous sûr ?",
-  "Edit this column": "Modifier cette colonne"
+  "Edit this column": "Modifier cette colonne",
+  "Actions": "__NOT_TRANSLATED__",
+  "Edit": "__NOT_TRANSLATED__",
+  "Edit this card": "__NOT_TRANSLATED__",
+  "Delete this card": "__NOT_TRANSLATED__",
+  "Delete this column": "__NOT_TRANSLATED__"
 }
