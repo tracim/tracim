@@ -3,15 +3,17 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { CardPopup, IconButton } from 'tracim_frontend_lib'
 
+require('./KanbanCard.styl')
+
 function KanbanCard (props) {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false)
 
   return (
-    <div
-      style={{ backgroundColor: props.card.bgColor || '' }}
-      className='kanban__contentpage__statewrapper__kanban__card'
-    >
-      <div className='kanban__contentpage__statewrapper__kanban__card__title'>
+    <div className='kanban__contentpage__statewrapper__kanban__card'>
+      <div
+        style={{ backgroundColor: props.card.bgColor || '' }}
+        className='kanban__contentpage__statewrapper__kanban__card__title'
+      >
         <strong onClick={() => props.onEditCardTitle(props.card)}>{props.card.title}</strong>
         <IconButton
           icon='fas fa-pencil-alt'

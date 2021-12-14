@@ -1,6 +1,181 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+cardWidth = 280px
 
 .kanban
+  &__contentpage__statewrapper__kanban
+    display flex
+    flex-direction column
+    height calc(100% - 77px)
+    &__column__header__title
+      width 180px
+      text-overflow ellipsis
+      overflow hidden
+      white-space nowrap
+      flex 1
+    &.fullscreen
+      position fixed
+      top headerHeight
+      left 0
+      width 100%
+      height "calc(100% - %s)" % headerHeight
+      z-index 1
+      background offWhite
+
+    &__options
+      display flex
+      justify-content flex-end
+      & button
+        margin-inline-end standardSpacing
+
+    &__wrapper
+      flex 1
+      overflow auto
+
+      .react-kanban-board
+        overflow-y visible !important
+        overflow-x visible
+
+    &__error
+      color errorRed
+
+    &__toolbar
+      background lightGrey
+
+      button
+        font-size metadataFontSize
+        padding textSpacing
+        border none
+        border-radius 0
+
+      [disabled]
+        display none
+
+      .iconbutton:not(last-child)
+        border-right borderStyle
+
+      &__title
+        display inline-block
+        padding-left standardFontSize
+        color darkGrey
+
+    .react-kanban-column-header
+      display flex
+      flex-direction row
+      > :first-child
+        flex 1
+      > :last-child
+        display inline-block
+        border-radius standardBorderRadius
+        cursor default
+
+        &:hover
+          transform scale(1.2)
+          color red
+          background offWhite
+
+    .react-kanban-column
+      padding textSpacing
+
+    &__column
+      &__colorPicker
+        display flex
+        justify-content end
+
+      &__hideColorButton
+        font-size metadataFontSize
+
+      &__header
+        display flex
+        flex-direction row
+        border-bottom borderStyle
+        align-items baseline
+        justify-content space-evenly
+
+        > strong
+          flex 1
+          text-align center
+          display block
+          cursor pointer
+          overflow hidden
+          text-overflow ellipsis
+
+        > button
+          font-size metadataFontSize
+          padding textSpacing
+          border none
+          border-radius 0
+
+      &__description
+        padding textSpacing
+        background offWhite
+        overflow hidden
+        word-break break-word
+        overflow-wrap break-word
+        hyphens auto
+        min-height titleFontSize
+
+  &__KanbanPopup
+    width 100%
+    top 15%
+    &__bgColor, &__deadline
+      display flex
+      flex-direction column
+      &__inline
+        flex-direction row
+
+    & .cardPopup__container
+      width unset
+      min-width 500px
+
+    & [type=checkbox]
+      margin textSpacing
+
+    & [type=text], textarea
+      width 100%
+
+    & label
+      white-space pre
+      font-weight bold
+
+    & input
+      vertical-align middle
+
+    &__description, &__title, &__duration
+      margin-bottom standardSpacing
+
+    &__form
+      width 100%
+      &__fields
+        & label
+          padding-right textSpacing
+      &_buttons
+        margin-bottom 0
+        padding-bottom 0
+        text-align right
+        button:last-child, input:last-child
+          margin-left standardSpacing
+
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+  &__columnAdder
+    border 2px mediumGrey dashed
+    min-width cardWidth
+    height 70px
+    margin textSpacing
+    text-align-last center
+    display flex
+    border-radius standardBorderRadius
+    flex-direction column
+    cursor pointer
+    & > *
+      margin auto
+
   &__header
     &__editionmode
       display none

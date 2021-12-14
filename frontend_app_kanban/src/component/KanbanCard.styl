@@ -1,0 +1,37 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+cardWidth = 280px
+
+.kanban
+  &__contentpage__statewrapper__kanban
+    &__card
+      margin textSpacing
+      width cardWidth
+      background-color offWhite
+      border 1px solid back
+      box-shadow 0 0 3px black
+      border-radius standardBorderRadius
+
+      &__title
+        text-align center
+        border-bottom borderStyle
+        display flex
+        flex-direction row
+        align-items flex-start
+
+        strong
+          flex 1
+          text-align center
+          overflow-wrap anywhere
+          hyphens auto
+
+
+        > button
+          font-size metadataFontSize
+          padding textSpacing
+          border none
+          border-radius 0
+          display flex
+
+          .iconbutton__icon
+            margin 0

@@ -38,8 +38,6 @@ import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
-require('../css/Kanban.styl')
-
 const BOARD_STATE = {
   LOADING: 'loading',
   LOADED: 'loaded',
