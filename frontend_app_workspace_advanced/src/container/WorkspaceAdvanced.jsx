@@ -304,7 +304,11 @@ export class WorkspaceAdvanced extends React.Component {
     const { state } = this
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
-    state.config.history.push(PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id))
+    const isFromAdminSpaceList = state.config.history.location.state && state.config.history.location.state.from === 'adminSpaceList'
+    state.config.history.push(isFromAdminSpaceList
+      ? PAGE.ADMIN.WORKSPACE
+      : PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id)
+    )
   }
 
   handleSaveEditLabel = async newLabel => {

@@ -8,7 +8,6 @@ import {
   ConfirmPopup,
   BREADCRUMBS_TYPE,
   handleFetchResult,
-  ROLE,
   CUSTOM_EVENT,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -494,30 +493,7 @@ export class AdminWorkspaceUser extends React.Component {
   handleClickSpace = workspaceId => {
     const { state } = this
     if (state.workspaceIdOpened === null) {
-      GLOBAL_renderAppFeature({
-        loggedUser: {
-          ...state.loggedUser,
-          userRoleIdInWorkspace: ROLE.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
-        },
-        config: {
-          history: state.config.history,
-          label: 'Advanced dashboard',
-          slug: 'workspace_advanced',
-          faIcon: 'fas fa-users',
-          hexcolor: GLOBAL_primaryColor,
-          creationLabel: '',
-          domContainer: 'appFeatureContainer',
-          apiUrl: state.config.apiUrl,
-          apiHeader: state.config.apiHeader,
-          roleList: state.config.roleList,
-          profileObject: state.config.profileObject,
-          system: { ...state.config.system },
-          translation: state.config.translation
-        },
-        content: {
-          workspace_id: workspaceId
-        }
-      })
+      state.config.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(workspaceId), { from: 'adminSpaceList' })
     } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: { workspace_id: workspaceId } })
 
     this.setState({ workspaceIdOpened: workspaceId })

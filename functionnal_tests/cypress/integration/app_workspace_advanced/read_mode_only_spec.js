@@ -3,8 +3,6 @@ import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 describe('Space settings in reader mode', () => {
   let workspaceId
-  const flashMessageClass = '.flashmessage__container__content__text__paragraph'
-  const flashMessageText = 'Your tag has been created'
 
   before(() => {
     cy.resetDB()
