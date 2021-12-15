@@ -11,8 +11,7 @@ function KanbanCardEditor (props) {
 
   const [title, setTitle] = React.useState(card.title || '')
   const [description, setDescription] = React.useState(card.description || '')
-  const [colorEnabled, setColorEnabled] = React.useState(!!card.bgColor)
-  const [bgColor, setBgColor] = React.useState(card.bgColor || '')
+  const [bgColor, setBgColor] = React.useState(card.bgColor || props.customColor)
   const [deadline, setDeadline] = React.useState(card.deadline || '')
   const [duration, setDuration] = React.useState(card.duration || '')
 
@@ -42,7 +41,7 @@ function KanbanCardEditor (props) {
       ...card,
       title,
       description: descriptionText,
-      bgColor: colorEnabled ? bgColor : '',
+      bgColor,
       deadline,
       duration
     })
@@ -86,19 +85,12 @@ function KanbanCardEditor (props) {
 
         <div className='kanban__KanbanPopup__bgColor'>
           <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
-          <div>
-            <input
-              type='checkbox'
-              checked={colorEnabled}
-              onChange={(e) => setColorEnabled(e.target.checked)}
-            />
-            <input
-              id='kanban__KanbanPopup__bgColor'
-              type='color'
-              value={bgColor}
-              onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
-            />
-          </div>
+          <input
+            id='kanban__KanbanPopup__bgColor'
+            type='color'
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
+          />
         </div>
 
         <div className='kanban__KanbanPopup__deadline'>

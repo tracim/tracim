@@ -36,15 +36,21 @@ cardWidth = 280px
       flex 1
       overflow auto
 
-      &.react-kanban-board
+      & .react-kanban-board
         overflow-y visible !important
         overflow-x visible
+        height 100%
+        padding standardSpacing
 
     &__error
       color errorRed
 
     &__toolbar
-      button
+      display flex
+      justify-content space-between
+      align-items center
+      padding standardSpacing
+      & button
         font-size metadataFontSize
         padding textSpacing
         border none
@@ -53,8 +59,7 @@ cardWidth = 280px
         display none
       &__title
         display inline-block
-        padding-left standardFontSize
-        color darkGrey
+        padding-left pageSpacing
 
     .react-kanban-column-header
       display flex
@@ -70,6 +75,7 @@ cardWidth = 280px
       padding standardSpacing
       background-color lightGrey
       border-radius standardBorderRadius
+      margin 0 textSpacing
 
     &__column
       &__header
@@ -153,7 +159,7 @@ cardWidth = 280px
     border 1px mediumGrey dashed
     min-width cardWidth
     height 70px
-    margin textSpacing
+    margin 0 textSpacing
     text-align-last center
     display flex
     border-radius standardBorderRadius

@@ -18,7 +18,7 @@ function KanbanCard (props) {
       className='kanban__contentpage__statewrapper__kanban__card' // TODO GIULIA Better class names
     >
       <div className='kanban__contentpage__statewrapper__kanban__card__title'>
-        <strong onClick={() => props.onEditCardTitle(props.card)}>{props.card.title}</strong>
+        <strong onClick={() => props.onEditCard(props.card)}>{props.card.title}</strong>
         <DropdownMenu
           buttonCustomClass='kanban__contentpage__statewrapper__kanban__card__title__actions'
           buttonIcon='fas fa-ellipsis-v'
@@ -28,7 +28,7 @@ function KanbanCard (props) {
             disabled={props.readOnly}
             icon='fas fa-pencil-alt'
             intent='link'
-            onClick={() => props.onEditCardColor(props.card)} // TODO GIULIA Have only editcard function
+            onClick={() => props.onEditCard(props.card)}
             text={props.t('Edit')}
             tooltip={props.t('Edit this card')}
           />
@@ -83,8 +83,7 @@ export default translate()(KanbanCard)
 
 KanbanCard.propTypes = {
   card: PropTypes.object.isRequired,
-  onEditCardTitle: PropTypes.func.isRequired,
-  onEditCardColor: PropTypes.func.isRequired,
+  onEditCard: PropTypes.func.isRequired,
   onEditCardContent: PropTypes.func.isRequired,
   onRemoveCard: PropTypes.func.isRequired,
   customColor: PropTypes.string,

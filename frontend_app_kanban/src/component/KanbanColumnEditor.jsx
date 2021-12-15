@@ -7,8 +7,7 @@ function KanbanColumnEditor (props) {
   const { column } = props
 
   const [title, setTitle] = React.useState(column.title || '')
-  const [colorEnabled, setColorEnabled] = React.useState(!!column.bgColor)
-  const [bgColor, setBgColor] = React.useState(column.bgColor || '#00000000') // TODO GIULIA Kanban color by default and always actived (cards too)
+  const [bgColor, setBgColor] = React.useState(column.bgColor || props.customColor)
 
   function handleValidate (e) {
     e.preventDefault()
@@ -16,7 +15,7 @@ function KanbanColumnEditor (props) {
     props.onValidate({
       ...column,
       title,
-      bgColor: colorEnabled ? bgColor : ''
+      bgColor
     })
   }
 
@@ -35,19 +34,12 @@ function KanbanColumnEditor (props) {
 
         <div className='kanban__KanbanPopup__bgColor'>
           <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
-          <div>
-            <input
-              type='checkbox'
-              checked={colorEnabled}
-              onChange={(e) => setColorEnabled(e.target.checked)}
-            />
-            <input
-              id='kanban__KanbanPopup__bgColor'
-              type='color'
-              value={bgColor}
-              onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
-            />
-          </div>
+          <input
+            id='kanban__KanbanPopup__bgColor'
+            type='color'
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
+          />
         </div>
       </div>
       <div className='kanban__KanbanPopup__form_buttons'>
