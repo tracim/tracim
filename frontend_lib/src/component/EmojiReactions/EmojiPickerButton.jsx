@@ -101,7 +101,6 @@ class EmojiPickerButton extends React.Component {
             <Picker
               native
               emojiTooltip
-              autoFocus
               title=''
               i18n={emojiMartI18n}
               onSelect={this.handleSelect}
