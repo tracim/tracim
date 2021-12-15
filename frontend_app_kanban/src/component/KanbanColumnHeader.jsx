@@ -26,7 +26,7 @@ function KanbanColumnHeader (props) {
         icon='fas fa-plus'
         intent='link'
         onClick={() => props.onAddCard(props.column)}
-        tooltip={props.t('Add a card')}
+        title={props.t('Add a card')}
       />
 
       <DropdownMenu
@@ -46,7 +46,7 @@ function KanbanColumnHeader (props) {
           intent='link'
           onClick={() => props.onEditColumn(props.column)}
           text={props.t('Edit')}
-          tooltip={props.t('Edit this column')}
+          title={props.t('Edit this column')}
         />
         <IconButton
           disabled={props.readOnly}
@@ -54,7 +54,7 @@ function KanbanColumnHeader (props) {
           intent='link'
           onClick={() => setShowConfirmPopup(true)}
           text={props.t('Delete')}
-          tooltip={props.t('Delete this column')}
+          title={props.t('Delete this column')}
         />
       </DropdownMenu>
 

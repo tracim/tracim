@@ -332,10 +332,10 @@ class Kanban extends React.Component {
           {props.fullscreen && (<span>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
           {props.fullscreen && (
             <IconButton
-              icon='fas fa-arrows-alt'
-              text={props.t('Fullscreen')}
+              icon='fas fa-compress-arrows-alt'
+              title={props.t('Fullscreen')}
               onClick={props.onClickFullscreen}
-            /> // TODO GIULIA update style
+            />
           )}
         </div>
         {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}

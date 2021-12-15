@@ -517,7 +517,7 @@ export class Kanban extends React.Component {
         <PopinFixedContent
           headerButtons={[
             {
-              icon: 'fas fa-arrows-alt',
+              icon: 'fas fa-expand-arrows-alt',
               label: props.t('Fullscreen'),
               onClick: this.handleClickFullscreen,
               showAction: true

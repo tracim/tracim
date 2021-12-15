@@ -30,7 +30,7 @@ function KanbanCard (props) {
             intent='link'
             onClick={() => props.onEditCard(props.card)}
             text={props.t('Edit')}
-            tooltip={props.t('Edit this card')}
+            title={props.t('Edit this card')}
           />
           <IconButton
             disabled={props.readOnly}
@@ -38,7 +38,7 @@ function KanbanCard (props) {
             intent='link'
             onClick={() => setShowConfirmPopup(true)}
             text={props.t('Delete')}
-            tooltip={props.t('Delete this card')}
+            title={props.t('Delete this card')}
           />
         </DropdownMenu>
 
