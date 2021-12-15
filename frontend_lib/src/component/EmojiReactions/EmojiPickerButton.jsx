@@ -6,6 +6,7 @@ import classnames from 'classnames'
 import { Picker } from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
 import onClickOutside from 'react-onclickoutside'
+import { isMobile } from 'react-device-detect'
 
 class EmojiPickerButton extends React.Component {
   constructor (props) {
@@ -99,6 +100,7 @@ class EmojiPickerButton extends React.Component {
         >
           <PopoverBody>
             <Picker
+              autoFocus={!isMobile}
               native
               emojiTooltip
               title=''
