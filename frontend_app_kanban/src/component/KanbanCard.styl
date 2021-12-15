@@ -3,35 +3,34 @@
 cardWidth = 280px
 
 .kanban
-  &__contentpage__statewrapper__kanban
-    &__card
-      margin-bottom standardSpacing
-      width cardWidth
-      background-color offWhite
-      border 1px solid
-      border-radius standardBorderRadius
-      padding standardSpacing
+  &__contentpage__wrapper__board__card
+    margin-bottom standardSpacing
+    width cardWidth
+    background-color offWhite
+    border 1px solid
+    border-radius standardBorderRadius
+    padding standardSpacing
 
-      &__title
+    &__title
+      display flex
+
+      & strong
+        flex 1
+        overflow-wrap anywhere
+        hyphens auto
+        margin-bottom textSpacing
+
+      & > button
+        font-size metadataFontSize
+        padding textSpacing
+        border none
+        border-radius 0
         display flex
 
-        & strong
-          flex 1
-          overflow-wrap anywhere
-          hyphens auto
-          margin-bottom textSpacing
+        &.iconbutton__icon
+          margin 0
 
-        & > button
-          font-size metadataFontSize
-          padding textSpacing
-          border none
-          border-radius 0
-          display flex
-
-          &.iconbutton__icon
-            margin 0
-
-        &__actions.dropdownMenuButton
-          padding 0
-          &::after
-            display none
+      &__actions.dropdownMenuButton
+        padding 0
+        &::after
+          display none

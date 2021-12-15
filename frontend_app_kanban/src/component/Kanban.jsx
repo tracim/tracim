@@ -297,7 +297,7 @@ class Kanban extends React.Component {
     const { props, state } = this
 
     return (
-      <div className={classnames('kanban__contentpage__statewrapper__kanban', { fullscreen: props.fullscreen })}>
+      <div className={classnames('kanban__contentpage__wrapper', { fullscreen: props.fullscreen })}>
         {props.content.is_deleted && (
           <PromptMessage
             msg={props.t('This content is deleted')}
@@ -307,7 +307,7 @@ class Kanban extends React.Component {
             onClickBtn={props.onClickRestoreDeleted}
           />
         )}
-        <div className='kanban__contentpage__statewrapper__kanban__options'>
+        <div className='kanban__contentpage__wrapper__options'>
           {props.mode === APP_FEATURE_MODE.REVISION && (
             <IconButton
               customClass='wsContentGeneric__option__menu__lastversion'
@@ -328,8 +328,8 @@ class Kanban extends React.Component {
           )}
         </div>
 
-        <div className='kanban__contentpage__statewrapper__kanban__toolbar'>
-          {props.fullscreen && (<span className='kanban__contentpage__statewrapper__kanban__toolbar__title'>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
+        <div className='kanban__contentpage__wrapper__toolbar'>
+          {props.fullscreen && (<span>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
           {props.fullscreen && (
             <IconButton
               icon='fas fa-arrows-alt'
@@ -339,10 +339,10 @@ class Kanban extends React.Component {
           )}
         </div>
         {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}
-        {state.boardState === BOARD_STATE.ERROR && <span className='.kanban__contentpage__statewrapper__kanban__error'> {props.t('Error while loading the board.')} </span>}
+        {state.boardState === BOARD_STATE.ERROR && <span> {props.t('Error while loading the board.')} </span>}
         {state.boardState === BOARD_STATE.LOADED && (
           <>
-            <div className='kanban__contentpage__statewrapper__kanban__wrapper'>
+            <div className='kanban__contentpage__wrapper__board'>
               <Board
                 allowAddColumn={!props.readOnly}
                 allowRemoveColumn={!props.readOnly}

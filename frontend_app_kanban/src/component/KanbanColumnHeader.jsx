@@ -12,11 +12,11 @@ function KanbanColumnHeader (props) {
 
   return (
     <div
-      className='kanban__contentpage__statewrapper__kanban__column__header'
+      className='kanban__contentpage__wrapper__board__column'
       style={{ borderColor: props.column.bgColor || props.customColor }}
     >
       <div
-        className='kanban__contentpage__statewrapper__kanban__column__header__title'
+        className='kanban__contentpage__wrapper__board__column__title'
       >
         <strong onClick={() => props.onEditColumn(props.column)}>{props.column.title}</strong>
       </div>
@@ -30,7 +30,7 @@ function KanbanColumnHeader (props) {
       />
 
       <DropdownMenu
-        buttonCustomClass='kanban__contentpage__statewrapper__kanban__column__header__title__actions'
+        buttonCustomClass='kanban__contentpage__wrapper__board__column__title__actions'
         buttonIcon='fas fa-ellipsis-v'
         buttonTooltip={props.t('Actions')}
       >

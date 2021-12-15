@@ -3,109 +3,98 @@
 cardWidth = 280px
 
 .kanban
-  &__contentpage__statewrapper__kanban
-    display flex
-    flex-direction column
-    height calc(100% - 77px)
-    &__column__header__title
-      width 180px
-      text-overflow ellipsis
-      overflow hidden
-      white-space nowrap
-      flex 1
-      &__actions.dropdownMenuButton
-        padding 0
-        &::after
-          display none
-    &.fullscreen
-      position fixed
-      top headerHeight
-      left 0
-      width 100%
-      height "calc(100% - %s)" % headerHeight
-      z-index 1
-      background offWhite
-
-    &__options
-      display flex
-      justify-content flex-end
-      & button
-        margin-inline-end standardSpacing
-
+  &__contentpage
+    &__content
+      &__left
+        background-color offWhite
+        display flex
+        flex-direction column
     &__wrapper
-      flex 1
-      overflow auto
-
-      & .react-kanban-board
-        overflow-y visible !important
-        overflow-x visible
-        height 100%
-        padding standardSpacing
-
-    &__error
-      color errorRed
-
-    &__toolbar
       display flex
-      justify-content space-between
-      align-items center
-      padding standardSpacing
-      & button
-        font-size metadataFontSize
-        padding textSpacing
-        border none
-        border-radius 0
-      [disabled]
-        display none
-      &__title
-        display inline-block
-        padding-left pageSpacing
+      flex-direction column
+      height calc(100% - 77px)
+      &.fullscreen
+        position fixed
+        top headerHeight
+        left 0
+        width 100%
+        height "calc(100% - %s)" % headerHeight
+        z-index 1
+        background offWhite
 
-    .react-kanban-column-header
-      display flex
-      flex-direction row
-      > :first-child
+      &__options
+        display flex
+        justify-content flex-end
+        & button
+          margin-inline-end standardSpacing
+
+      &__board
         flex 1
-      > :last-child
-        display inline-block
-        border-radius standardBorderRadius
-        cursor default
+        overflow auto
+        &__column
+          display flex
+          flex-direction row
+          border-bottom 3px solid
+          padding-bottom standardSpacing
+          margin-bottom standardSpacing
+          align-items baseline
+          justify-content space-evenly
+          &__title
+            width 180px
+            text-overflow ellipsis
+            overflow hidden
+            white-space nowrap
+            flex 1
+            & > strong
+              font-size titleFontSize
+              flex 1
+              cursor pointer
+              overflow hidden
+              text-overflow ellipsis
 
-    .react-kanban-column
-      padding standardSpacing
-      background-color lightGrey
-      border-radius standardBorderRadius
-      margin 0 textSpacing
+            & > button
+              font-size standardFontSize
+              padding-left textSpacing
 
-    &__column
-      &__header
+            &__actions.dropdownMenuButton
+              padding 0
+              &::after
+                display none
+
+        & .react-kanban-board
+          overflow-y visible !important
+          overflow-x visible
+          height 100%
+          padding standardSpacing
+
+      &__toolbar
+        display flex
+        justify-content space-between
+        align-items center
+        padding standardSpacing
+        & button
+          font-size metadataFontSize
+          padding textSpacing
+          border none
+          border-radius 0
+        [disabled]
+          display none
+
+      & .react-kanban-column-header
         display flex
         flex-direction row
-        border-bottom 3px solid
-        padding-bottom standardSpacing
-        margin-bottom standardSpacing
-        align-items baseline
-        justify-content space-evenly
-        &__title
-          & > strong
-            font-size titleFontSize
-            flex 1
-            cursor pointer
-            overflow hidden
-            text-overflow ellipsis
+        > :first-child
+          flex 1
+        > :last-child
+          display inline-block
+          border-radius standardBorderRadius
+          cursor default
 
-          & > button
-            font-size standardFontSize
-            padding-left textSpacing
-
-      &__description
-        padding textSpacing
-        background offWhite
-        overflow hidden
-        word-break break-word
-        overflow-wrap break-word
-        hyphens auto
-        min-height titleFontSize
+      & .react-kanban-column
+        padding standardSpacing
+        background-color lightGrey
+        border-radius standardBorderRadius
+        margin 0 textSpacing
 
   &__KanbanPopup
     width 100%
@@ -170,147 +159,18 @@ cardWidth = 280px
     & > *
       margin auto
 
-  &__header
-    &__editionmode
-      display none
-    .fa-kanban-image
-      color offWhite
-  &__lastversionbtn
-    cursor pointer
-    margin-right standardSpacing
-  &__option
-    &__menu
-      &__addversion
-        padding standardSpacing
-        border-width 1px
-        border-style solid
-        border-radius standardBorderRadius
-        background-color transparent
-        cursor pointer
-        & > i
-          margin-left standardSpacing
-  &__contentpage
-    width 100%
-    &__option
-      display flex
-      justify-content flex-end
-    &__content
-      &__left
-        background-color offWhite
-        display flex
-        flex-direction column
-    &__statewrapper
-      flex 1
-      overflow-y auto
-    &__wrapper
-      width 40%
-      height calc(100% - 150px) // margin + height of header and option
-      overflow-Y auto
-      .timeline
-        &__messagelist
-          min-height 300px
-    &__rightContent
-      width 100%
-    &__messagelist
-      padding 0 standardSpacing standardSpacing
-
-
-.activeEditionTitle
-  .kanban__header
-    &__editionmode
-      display block
-    &__title
-      display none
-
-.activeEditionDesc
-  .kanban__contentpage__preview__content__detail
-    &__description
-      &__editiondesc
-        display block
-    &__btndesc
-      display none
-
 @media (min-width: max-xs) and (max-width: max-lg)
   .kanban
     &__contentpage
       display block
-      &__preview
-        display flex
-        flex-direction column
-        width calc(100% - 30px) // 30px => margin
+      &__content__left
+        min-height 250px
       &__wrapper
-        width calc(100% - 30px) // 30px => margin
-        .commentArea
-          &__simpletext
-            display inline-flex
-            width 60%
-          &__submit
-            display inline-flex
-            margin standardSpacing 0
-            &__btn
-              display flex
-              margin-left 35px
-              &__icon
-                margin-left 15px
-      &__statewrapper
-        padding 0
-
-@media (min-width: min-lg) and (max-width: max-lg)
-  .kanban
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-md) and (max-width: max-md)
-  .kanban
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .kanban
-    height "calc(100% - %s)" % headerHeight
-    &__contentpage__content__left
-      min-height 250px
-
-@media (max-width: max-xs)
-  .kanban
-    height "calc(100% - %s)" % headerHeight
-    &__lastversionbtn
-      > span
-        display none
-      > i
-        margin 0
-    &__option__menu
-      &__addversion
-        padding 8px 5px
-        & > i
-          display none
-      &__editBtn
-        & > .genericButton__icon
-          margin 0
-        & > .genericButton__label
-          display none
-    &__contentpage
-      display block
-      &__content
-        &__left
-          width 100%
-          min-height 250px
-        &__right
-          width 100%
-      &__statewrapper
         width 100%
-      &__wrapper
-        width calc(100% - 30px) // 30px => margin
         .commentArea
           &__simpletext
             display inline-flex
             width 60%
-            margin-right 0
           &__submit
             display inline-flex
             margin standardSpacing 0
-            &__btn
-              display flex
-              margin-left standardSpacing
-              &__icon
-                margin-left 15px

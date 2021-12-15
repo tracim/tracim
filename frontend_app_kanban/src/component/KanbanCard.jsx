@@ -15,12 +15,12 @@ function KanbanCard (props) {
   return (
     <div
       style={{ borderColor: props.card.bgColor || props.customColor }}
-      className='kanban__contentpage__statewrapper__kanban__card' // TODO GIULIA Better class names
+      className='kanban__contentpage__wrapper__board__card'
     >
-      <div className='kanban__contentpage__statewrapper__kanban__card__title'>
+      <div className='kanban__contentpage__wrapper__board__card__title'>
         <strong onClick={() => props.onEditCard(props.card)}>{props.card.title}</strong>
         <DropdownMenu
-          buttonCustomClass='kanban__contentpage__statewrapper__kanban__card__title__actions'
+          buttonCustomClass='kanban__contentpage__wrapper__board__card__title__actions'
           buttonIcon='fas fa-ellipsis-v'
           buttonTooltip={props.t('Actions')}
         >
@@ -71,7 +71,7 @@ function KanbanCard (props) {
         )}
       </div>
       <div
-        className='kanban__contentpage__statewrapper__kanban__card__description'
+        className='kanban__contentpage__wrapper__board__card__description'
         onClick={() => props.onEditCardContent(props.card)}
         disabled={props.readOnly}
         dangerouslySetInnerHTML={{ __html: props.card.description }}
