@@ -80,18 +80,17 @@ cardWidth = 280px
         margin-bottom standardSpacing
         align-items baseline
         justify-content space-evenly
-        > strong
-          font-size titleFontSize
-          flex 1
-          text-align center
-          display block
-          cursor pointer
-          overflow hidden
-          text-overflow ellipsis
+        &__title
+          & > strong
+            font-size titleFontSize
+            flex 1
+            cursor pointer
+            overflow hidden
+            text-overflow ellipsis
 
-        > button
-          font-size standardFontSize
-          padding-left textSpacing
+          & > button
+            font-size standardFontSize
+            padding-left textSpacing
 
       &__description
         padding textSpacing

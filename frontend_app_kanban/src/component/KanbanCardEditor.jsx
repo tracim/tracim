@@ -103,7 +103,7 @@ function KanbanCardEditor (props) {
 
         <div className='kanban__KanbanPopup__deadline'>
           <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Deadline:')}</label>
-          <input
+          <input // TODO GIULIA Use Tracim inputs
             id='kanban__KanbanPopup__deadline'
             htmlFor='kanban__KanbanPopup__deadline'
             type='date'
