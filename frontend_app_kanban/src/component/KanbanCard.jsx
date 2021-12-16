@@ -28,6 +28,7 @@ function KanbanCard (props) {
             disabled={props.readOnly}
             icon='fas fa-pencil-alt'
             intent='link'
+            key='kanban_card_edit'
             onClick={() => props.onEditCard(props.card)}
             text={props.t('Edit')}
             title={props.t('Edit this card')}
@@ -36,6 +37,7 @@ function KanbanCard (props) {
             disabled={props.readOnly}
             icon='far fa-trash-alt'
             intent='link'
+            key='kanban_card_delete'
             onClick={() => setShowConfirmPopup(true)}
             text={props.t('Delete')}
             title={props.t('Delete this card')}

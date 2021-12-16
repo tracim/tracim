@@ -8,7 +8,6 @@
   "You must change the status or restore this kanban board before any change": "Vous devez changer le statut ou restaurer ce tableau Kanban avant de pouvoir l'éditer",
   "Error while saving the new version": "Erreur lors de la sauvegarde de la nouvelle version",
   "Fullscreen": "Plein écran",
-  "Board: {{label}}": "Tableau: {{label}}",
   "Loading, please wait…": "Chargement en cours, veuillez patienter…",
   "Error while loading the board.": "Erreur lors du chargement du tableau",
   "Editing Card": "Edition de la carte",
@@ -39,5 +38,6 @@
   "Edit": "Modifier",
   "Edit this card": "Modifier cette carte",
   "Delete this card": "Supprimer cette carte",
-  "Delete this column": "Supprimer cette colonne"
+  "Delete this column": "Supprimer cette colonne",
+  "Exit fullscreen mode": "Quitter le mode plein écran"
 }

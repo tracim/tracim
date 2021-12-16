@@ -52,14 +52,12 @@ cardWidth = 280px
               overflow hidden
               text-overflow ellipsis
 
-            & > button
-              font-size standardFontSize
-              padding-left textSpacing
-
             &__actions.dropdownMenuButton
               padding 0
               &::after
                 display none
+          & button:hover
+            background-color grey-hover
 
         & .react-kanban-board
           overflow-y visible !important
@@ -68,10 +66,16 @@ cardWidth = 280px
           padding standardSpacing
 
       &__toolbar
-        display flex
-        justify-content space-between
-        align-items center
-        padding standardSpacing
+        position absolute
+        top standardSpacing
+        right standardSpacing
+        z-index 1
+        & .iconbutton
+          background-color offWhite
+          &:hover
+            background-color veryLightGrey
+        &:empty
+          display none
 
       & .react-kanban-column-header
         display flex
@@ -115,7 +119,7 @@ cardWidth = 280px
     & input
       vertical-align middle
 
-    &__description, &__title, &__duration
+    &__description, &__title, &__freeInput
       margin-bottom standardSpacing
 
     &__form

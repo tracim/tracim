@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { IconButton } from 'tracim_frontend_lib'
+import { IconButton, TextInput } from 'tracim_frontend_lib'
 
 function KanbanColumnEditor (props) {
   const { column } = props
@@ -24,11 +24,12 @@ function KanbanColumnEditor (props) {
       <div className='kanban__KanbanPopup__form__fields'>
         <div className='kanban__KanbanPopup__title'>
           <label htmlFor='kanban__KanbanPopup__title'>{props.t('Title:')}</label>
-          <input
+          <TextInput
             autoFocus
             id='kanban__KanbanPopup__title'
-            type='text' value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onValidate={handleValidate}
+            value={title}
           />
         </div>
 

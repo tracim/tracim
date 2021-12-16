@@ -8,7 +8,6 @@
   "You must change the status or restore this kanban board before any change": "You must change the status or restore this kanban board before any change",
   "Error while saving the new version": "Error while saving the new version",
   "Fullscreen": "Fullscreen",
-  "Board: {{label}}": "Board: {{label}}",
   "Loading, please wait…": "Loading, please wait…",
   "Error while loading the board.": "Error while loading the board.",
   "Editing Card": "Editing Card",
@@ -39,5 +38,6 @@
   "Edit": "Edit",
   "Edit this card": "Edit this card",
   "Delete this card": "Delete this card",
-  "Delete this column": "Delete this column"
+  "Delete this column": "Delete this column",
+  "Exit fullscreen mode": "Exit fullscreen mode"
 }

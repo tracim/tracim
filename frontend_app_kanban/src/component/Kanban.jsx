@@ -329,11 +329,10 @@ class Kanban extends React.Component {
         </div>
 
         <div className='kanban__contentpage__wrapper__toolbar'>
-          {props.fullscreen && (<span>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
           {props.fullscreen && (
             <IconButton
               icon='fas fa-compress-arrows-alt'
-              title={props.t('Fullscreen')}
+              title={props.t('Exit fullscreen mode')}
               onClick={props.onClickFullscreen}
             />
           )}
@@ -358,6 +357,7 @@ class Kanban extends React.Component {
                 renderColumnAdder={() => (
                   <div
                     className='kanban__columnAdder'
+                    key='kanban__columnAdder'
                     onClick={this.handleEditColumn}
                   >
                     <i className='fa fas fa-fw fa-plus' />

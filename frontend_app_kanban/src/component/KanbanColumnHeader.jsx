@@ -21,7 +21,7 @@ function KanbanColumnHeader (props) {
         <strong onClick={() => props.onEditColumn(props.column)}>{props.column.title}</strong>
       </div>
 
-      <IconButton // TODO GIULIA add a hover
+      <IconButton
         disabled={props.readOnly}
         icon='fas fa-plus'
         intent='link'
@@ -34,16 +34,11 @@ function KanbanColumnHeader (props) {
         buttonIcon='fas fa-ellipsis-v'
         buttonTooltip={props.t('Actions')}
       >
-        {/* <IconButton
-          icon='fas fa-plus'
-          text={props.t('Add a card')}
-          onClick={() => props.onAddCard(props.column)}
-          disabled={props.readOnly}
-        /> TODO GIULIA */}
         <IconButton
           disabled={props.readOnly}
           icon='fas fa-pencil-alt'
           intent='link'
+          key='kanban_column_edit'
           onClick={() => props.onEditColumn(props.column)}
           text={props.t('Edit')}
           title={props.t('Edit this column')}
@@ -52,6 +47,7 @@ function KanbanColumnHeader (props) {
           disabled={props.readOnly}
           icon='far fa-trash-alt'
           intent='link'
+          key='kanban_column_delete'
           onClick={() => setShowConfirmPopup(true)}
           text={props.t('Delete')}
           title={props.t('Delete this column')}
