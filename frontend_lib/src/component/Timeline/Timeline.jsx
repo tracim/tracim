@@ -18,6 +18,7 @@ import ScrollToBottomWrapper from '../ScrollToBottomWrapper/ScrollToBottomWrappe
 import EditCommentPopup from './EditCommentPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Loading from '../Loading/Loading.jsx'
+import { isMobile } from 'react-device-detect'
 
 // require('./Timeline.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -141,7 +142,7 @@ export class Timeline extends React.Component {
 
         <ScrollToBottomWrapper
           customClass={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}
-          shouldScrollToBottom={props.shouldScrollToBottom}
+          shouldScrollToBottom={!isMobile ? props.shouldScrollToBottom : false}
           isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
         >
           {!props.loading && props.canLoadMoreTimelineItems() && (
