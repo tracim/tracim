@@ -49,6 +49,7 @@ export class Kanban extends React.Component {
     this.state = {
       appName: 'kanban',
       breadcrumbsList: [],
+      fullscreen: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -436,6 +437,10 @@ export class Kanban extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), FILE_APP_SLUG)
   }
 
+  handleClickFullscreen = () => {
+    this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
+  }
+
   handleClickEditComment = (comment) => {
     const { props, state } = this
     props.appContentEditComment(
@@ -510,6 +515,14 @@ export class Kanban extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          headerButtons={[
+            {
+              icon: 'fas fa-expand-arrows-alt',
+              label: props.t('Fullscreen'),
+              onClick: this.handleClickFullscreen,
+              showAction: true
+            }
+          ]}
           loading={state.loadingContent}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
@@ -551,9 +564,11 @@ export class Kanban extends React.Component {
             config={state.config}
             content={state.content}
             editionAuthor={state.editionAuthor}
+            fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}
             isRefreshNeeded={state.showRefreshWarning}
             mode={state.mode}
+            onClickFullscreen={this.handleClickFullscreen}
             onClickLastVersion={this.handleClickLastVersion}
             onClickRefresh={this.handleClickRefresh}
             onClickRestoreDeleted={this.handleClickRestoreDelete}

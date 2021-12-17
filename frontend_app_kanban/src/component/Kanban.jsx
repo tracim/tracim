@@ -38,8 +38,6 @@ import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
-require('../css/Kanban.styl')
-
 const BOARD_STATE = {
   LOADING: 'loading',
   LOADED: 'loaded',
@@ -59,7 +57,6 @@ class Kanban extends React.Component {
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
       editedCardInfos: null,
       editedColumnInfos: null,
-      fullscreen: false,
       isAutoCompleteActivated: false,
       saveRequired: false,
       saving: false
@@ -112,10 +109,6 @@ class Kanban extends React.Component {
     } else {
       this.setState({ boardState: BOARD_STATE.ERROR })
     }
-  }
-
-  handleClickFullscreen = () => {
-    this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
   }
 
   handleEditCard = (card) => {
@@ -304,7 +297,7 @@ class Kanban extends React.Component {
     const { props, state } = this
 
     return (
-      <div className={classnames('kanban__contentpage__statewrapper__kanban', { fullscreen: state.fullscreen })}>
+      <div className={classnames('kanban__contentpage__wrapper', { fullscreen: props.fullscreen })}>
         {props.content.is_deleted && (
           <PromptMessage
             msg={props.t('This content is deleted')}
@@ -314,11 +307,11 @@ class Kanban extends React.Component {
             onClickBtn={props.onClickRestoreDeleted}
           />
         )}
-        <div className='kanban__contentpage__statewrapper__kanban__options'>
+        <div className='kanban__contentpage__wrapper__options'>
           {props.mode === APP_FEATURE_MODE.REVISION && (
             <IconButton
               customClass='wsContentGeneric__option__menu__lastversion'
-              color={props.customColor}
+              color={props.config.hexcolor}
               intent='primary'
               mode='light'
               onClick={props.onClickLastVersion}
@@ -335,19 +328,20 @@ class Kanban extends React.Component {
           )}
         </div>
 
-        <div className='kanban__contentpage__statewrapper__kanban__toolbar'>
-          <IconButton
-            icon='fas fa-arrows-alt'
-            text={props.t('Fullscreen')}
-            onClick={this.handleClickFullscreen}
-          />
-          {state.fullscreen && (<span className='kanban__contentpage__statewrapper__kanban__toolbar__title'>{props.t('Board: {{label}}', { label: props.content.label })}</span>)}
+        <div className='kanban__contentpage__wrapper__toolbar'>
+          {props.fullscreen && (
+            <IconButton
+              icon='fas fa-compress-arrows-alt'
+              title={props.t('Exit fullscreen mode')}
+              onClick={props.onClickFullscreen}
+            />
+          )}
         </div>
         {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}
-        {state.boardState === BOARD_STATE.ERROR && <span className='.kanban__contentpage__statewrapper__kanban__error'> {props.t('Error while loading the board.')} </span>}
+        {state.boardState === BOARD_STATE.ERROR && <span> {props.t('Error while loading the board.')} </span>}
         {state.boardState === BOARD_STATE.LOADED && (
           <>
-            <div className='kanban__contentpage__statewrapper__kanban__wrapper'>
+            <div className='kanban__contentpage__wrapper__board'>
               <Board
                 allowAddColumn={!props.readOnly}
                 allowRemoveColumn={!props.readOnly}
@@ -363,6 +357,7 @@ class Kanban extends React.Component {
                 renderColumnAdder={() => (
                   <div
                     className='kanban__columnAdder'
+                    key='kanban__columnAdder'
                     onClick={this.handleEditColumn}
                   >
                     <i className='fa fas fa-fw fa-plus' />
@@ -384,8 +379,7 @@ class Kanban extends React.Component {
                     customColor={props.config.hexcolor}
                     readOnly={props.readOnly}
                     card={card}
-                    onEditCardTitle={this.handleEditCard}
-                    onEditCardColor={this.handleEditCard}
+                    onEditCard={this.handleEditCard}
                     onEditCardContent={this.handleEditCardContent}
                     onRemoveCard={this.handleRemoveCard}
                   />

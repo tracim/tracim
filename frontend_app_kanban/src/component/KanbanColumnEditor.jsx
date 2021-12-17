@@ -1,14 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { IconButton } from 'tracim_frontend_lib'
+import { IconButton, TextInput } from 'tracim_frontend_lib'
 
 function KanbanColumnEditor (props) {
   const { column } = props
 
   const [title, setTitle] = React.useState(column.title || '')
-  const [colorEnabled, setColorEnabled] = React.useState(!!column.bgColor)
-  const [bgColor, setBgColor] = React.useState(column.bgColor || '#00000000')
+  const [bgColor, setBgColor] = React.useState(column.bgColor || props.customColor)
 
   function handleValidate (e) {
     e.preventDefault()
@@ -16,7 +15,7 @@ function KanbanColumnEditor (props) {
     props.onValidate({
       ...column,
       title,
-      bgColor: colorEnabled ? bgColor : ''
+      bgColor
     })
   }
 
@@ -25,29 +24,23 @@ function KanbanColumnEditor (props) {
       <div className='kanban__KanbanPopup__form__fields'>
         <div className='kanban__KanbanPopup__title'>
           <label htmlFor='kanban__KanbanPopup__title'>{props.t('Title:')}</label>
-          <input
+          <TextInput
             autoFocus
             id='kanban__KanbanPopup__title'
-            type='text' value={title}
             onChange={(e) => setTitle(e.target.value)}
+            onValidate={handleValidate}
+            value={title}
           />
         </div>
 
         <div className='kanban__KanbanPopup__bgColor'>
           <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
-          <div>
-            <input
-              type='checkbox'
-              checked={colorEnabled}
-              onChange={(e) => setColorEnabled(e.target.checked)}
-            />
-            <input
-              id='kanban__KanbanPopup__bgColor'
-              type='color'
-              value={bgColor}
-              onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
-            />
-          </div>
+          <input
+            id='kanban__KanbanPopup__bgColor'
+            type='color'
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
+          />
         </div>
       </div>
       <div className='kanban__KanbanPopup__form_buttons'>

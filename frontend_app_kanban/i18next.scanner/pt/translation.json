@@ -8,11 +8,8 @@
   "You must change the status or restore this kanban board before any change": "É necessário alterar o estado ou restaurar este quadro Kanban antes de qualquer alteração",
   "Error while saving the new version": "Erro ao guardar a nova versão",
   "Fullscreen": "Ecrã inteiro",
-  "Board: {{label}}": "Quadro: {{label}}",
   "Loading, please wait…": "Carregando, por favor aguarde...",
   "Error while loading the board.": "Erro ao carregar o quadro",
-  "Change the color of this card": "Mudar a cor deste cartão",
-  "Remove this card": "Retirar este cartão",
   "Editing Card": "Editando cartão",
   "New Card": "Novo Cartão",
   "Title:": "Título:",
@@ -22,7 +19,6 @@
   "Cancel": "Cancelar",
   "Validate": "Validar",
   "Add a card": "Acrescentar um cartão",
-  "Remove this column": "Eliminar esta coluna",
   "Timeline": "Linha cronológica",
   "Tags": "Etiquetas",
   "New Kanban board": "Novo quadro Kanban",
@@ -37,5 +33,11 @@
   "Edit Column": "Editar coluna",
   "New Column": "Nova coluna",
   "Are you sure?": "Tem certeza?",
-  "Edit this column": "Editar esta coluna"
+  "Edit this column": "Editar esta coluna",
+  "Actions": "Ações",
+  "Edit": "Editar",
+  "Edit this card": "Editar este cartão",
+  "Delete this card": "Eliminar este cartão",
+  "Delete this column": "Eliminar esta coluna",
+  "Exit fullscreen mode": "Sair em modo ecrã inteiro"
 }

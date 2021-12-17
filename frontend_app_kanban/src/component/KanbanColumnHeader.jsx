@@ -1,39 +1,58 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { CardPopup, IconButton } from 'tracim_frontend_lib'
+import {
+  CardPopup,
+  DropdownMenu,
+  IconButton
+} from 'tracim_frontend_lib'
 
 function KanbanColumnHeader (props) {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false)
 
   return (
     <div
-      className='kanban__contentpage__statewrapper__kanban__column__header'
-      style={{ backgroundColor: props.column.bgColor || '#00000000' }}
+      className='kanban__contentpage__wrapper__board__column'
+      style={{ borderColor: props.column.bgColor || props.customColor }}
     >
       <div
-        className='kanban__contentpage__statewrapper__kanban__column__header__title'
+        className='kanban__contentpage__wrapper__board__column__title'
       >
         <strong onClick={() => props.onEditColumn(props.column)}>{props.column.title}</strong>
       </div>
+
       <IconButton
-        icon='fas fa-pencil-alt'
-        tooltip={props.t('Edit this column')}
-        onClick={() => props.onEditColumn(props.column)}
         disabled={props.readOnly}
-      />
-      <IconButton
         icon='fas fa-plus'
-        tooltip={props.t('Add a card')}
+        intent='link'
         onClick={() => props.onAddCard(props.column)}
-        disabled={props.readOnly}
+        title={props.t('Add a card')}
       />
-      <IconButton
-        icon='far fa-trash-alt'
-        tooltip={props.t('Remove this column')}
-        onClick={() => setShowConfirmPopup(true)}
-        disabled={props.readOnly}
-      />
+
+      <DropdownMenu
+        buttonCustomClass='kanban__contentpage__wrapper__board__column__title__actions'
+        buttonIcon='fas fa-ellipsis-v'
+        buttonTooltip={props.t('Actions')}
+      >
+        <IconButton
+          disabled={props.readOnly}
+          icon='fas fa-pencil-alt'
+          intent='link'
+          key='kanban_column_edit'
+          onClick={() => props.onEditColumn(props.column)}
+          text={props.t('Edit')}
+          title={props.t('Edit this column')}
+        />
+        <IconButton
+          disabled={props.readOnly}
+          icon='far fa-trash-alt'
+          intent='link'
+          key='kanban_column_delete'
+          onClick={() => setShowConfirmPopup(true)}
+          text={props.t('Delete')}
+          title={props.t('Delete this column')}
+        />
+      </DropdownMenu>
 
       {showConfirmPopup && (
         <CardPopup

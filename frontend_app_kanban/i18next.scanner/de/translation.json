@@ -7,11 +7,8 @@
   "You must change the status or restore this kanban board before any change": "Sie müssen den Status ändern oder diese Kanbantafel vor jeder Änderung wiederherstellen",
   "Error while saving the new version": "Fehler beim Speichern der neuen Version",
   "Fullscreen": "Vollbild",
-  "Board: {{label}}": "Tafel: {{label}}",
   "Loading, please wait…": "Laden, bitte warten...",
   "Error while loading the board.": "Fehler beim Laden des Boards.",
-  "Change the color of this card": "Ändern Sie die Farbe dieser Karte",
-  "Remove this card": "Diese Karte entfernen",
   "Editing Card": "Karte bearbeiten",
   "New Card": "Neue Karte",
   "Title:": "Titel",
@@ -21,7 +18,6 @@
   "Cancel": "Abbrechen",
   "Validate": "Bestätigen",
   "Add a card": "Eine Karte hinzufügen",
-  "Remove this column": "Diese Spalte entfernen",
   "Timeline": "Zeitleiste",
   "Tags": "Markierungen",
   "New Kanban board": "Neue Kanban-Tafel",
@@ -37,5 +33,11 @@
   "Edit Column": "Spalte bearbeiten",
   "New Column": "Neue Spalte",
   "Are you sure?": "Sind Sie sicher?",
-  "Edit this column": "Diese Spalte bearbeiten"
+  "Edit this column": "Diese Spalte bearbeiten",
+  "Actions": "Aktionen",
+  "Edit": "Bearbeiten",
+  "Edit this card": "Diese Karte bearbeiten",
+  "Delete this card": "Diese Karte löschen",
+  "Delete this column": "Diese Spalte löschen",
+  "Exit fullscreen mode": "Beenden des Vollbildmodus"
 }
