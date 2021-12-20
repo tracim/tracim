@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   AutoComplete,
-  IconButton
+  DateInput,
+  IconButton,
+  TextInput
 } from 'tracim_frontend_lib'
 
 function KanbanCardEditor (props) {
@@ -11,10 +13,9 @@ function KanbanCardEditor (props) {
 
   const [title, setTitle] = React.useState(card.title || '')
   const [description, setDescription] = React.useState(card.description || '')
-  const [colorEnabled, setColorEnabled] = React.useState(!!card.bgColor)
-  const [bgColor, setBgColor] = React.useState(card.bgColor || '')
+  const [bgColor, setBgColor] = React.useState(card.bgColor || props.customColor)
   const [deadline, setDeadline] = React.useState(card.deadline || '')
-  const [duration, setDuration] = React.useState(card.duration || '')
+  const [freeInput, setFreeInput] = React.useState(card.freeInput || '')
 
   const descriptionEditionId = 'descriptionEditionWysiwyg'
   const descriptionEditionSelector = `#${descriptionEditionId}`
@@ -42,26 +43,27 @@ function KanbanCardEditor (props) {
       ...card,
       title,
       description: descriptionText,
-      bgColor: colorEnabled ? bgColor : '',
+      bgColor,
       deadline,
-      duration
+      freeInput
     })
   }
 
   return (
-    <form className='kanban__KanbanCardEditor__form' onSubmit={handleValidate}>
-      <div className='kanban__KanbanCardEditor__form__fields'>
-        <div className='kanban__KanbanCardEditor__title'>
-          <label htmlFor='kanban__KanbanCardEditor__title'>{props.t('Title:')}</label>
-          <input
+    <form className='kanban__KanbanPopup__form' onSubmit={handleValidate}>
+      <div className='kanban__KanbanPopup__form__fields'>
+        <div className='kanban__KanbanPopup__title'>
+          <label htmlFor='kanban__KanbanPopup__title'>{props.t('Title:')}</label>
+          <TextInput
             autoFocus={!props.focusOnDescription}
-            id='kanban__KanbanCardEditor__title'
-            type='text' value={title}
+            id='kanban__KanbanPopup__title'
             onChange={(e) => setTitle(e.target.value)}
+            onValidate={handleValidate}
+            value={title}
           />
         </div>
 
-        <div className='kanban__KanbanCardEditor__description'>
+        <div className='kanban__KanbanPopup__description'>
           <label htmlFor={descriptionEditionId}>{props.t('Description:')}</label>
           <div>
             {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
@@ -84,45 +86,37 @@ function KanbanCardEditor (props) {
           </div>
         </div>
 
-        <div className='kanban__KanbanCardEditor__bgColor'>
-          <label htmlFor='kanban__KanbanCardEditor__bgColor'>{props.t('Color:')}</label>
-          <div>
-            <input
-              type='checkbox'
-              checked={colorEnabled}
-              onChange={(e) => setColorEnabled(e.target.checked)}
-            />
-            <input
-              id='kanban__KanbanCardEditor__bgColor'
-              type='color'
-              value={bgColor}
-              onChange={(e) => { setColorEnabled(true); setBgColor(e.target.value) }}
-            />
-          </div>
-        </div>
-
-        <div className='kanban__KanbanCardEditor__deadline'>
-          <label htmlFor='kanban__KanbanCardEditor__deadline'>{props.t('Deadline:')}</label>
+        <div className='kanban__KanbanPopup__bgColor'>
+          <label htmlFor='kanban__KanbanPopup__bgColor'>{props.t('Color:')}</label>
           <input
-            id='kanban__KanbanCardEditor__deadline'
-            htmlFor='kanban__KanbanCardEditor__deadline'
-            type='date'
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
+            id='kanban__KanbanPopup__bgColor'
+            type='color'
+            value={bgColor}
+            onChange={(e) => setBgColor(e.target.value)}
           />
         </div>
 
-        <div className='kanban__KanbanCardEditor__duration'>
-          <label htmlFor='kanban__KanbanCardEditor__duration'>{props.t('Value:')}</label>
-          <input
-            id='kanban__KanbanCardEditor__duration'
-            type='text'
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+        <div className='kanban__KanbanPopup__deadline'>
+          <label htmlFor='kanban__KanbanPopup__deadline'>{props.t('Deadline:')}</label>
+          <DateInput
+            id='kanban__KanbanPopup__deadline'
+            onChange={(e) => setDeadline(e.target.value)}
+            onValidate={handleValidate}
+            value={deadline}
+          />
+        </div>
+
+        <div className='kanban__KanbanPopup__freeInput'>
+          <label htmlFor='kanban__KanbanPopup__freeInput'>{props.t('Value:')}</label>
+          <TextInput
+            id='kanban__KanbanPopup__freeInput'
+            onChange={(e) => setFreeInput(e.target.value)}
+            onValidate={handleValidate}
+            value={freeInput}
           />
         </div>
       </div>
-      <div className='kanban__KanbanCardEditor__form_buttons'>
+      <div className='kanban__KanbanPopup__form_buttons'>
         <IconButton
           color={props.customColor}
           dataCy='confirm_popup__button_cancel'
@@ -144,11 +138,39 @@ function KanbanCardEditor (props) {
     </form>
   )
 }
+export default translate()(KanbanCardEditor)
 
 KanbanCardEditor.propTypes = {
   card: PropTypes.object.isRequired,
   onValidate: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired
+  onCancel: PropTypes.func.isRequired,
+  apiUrl: PropTypes.string,
+  autoCompleteCursorPosition: PropTypes.number,
+  autoCompleteItemList: PropTypes.array,
+  customColor: PropTypes.string,
+  focusOnDescription: PropTypes.bool,
+  i18n: PropTypes.object,
+  isAutoCompleteActivated: PropTypes.bool,
+  onClickAutoCompleteItem: PropTypes.func,
+  onTinyMceInput: PropTypes.func,
+  onTinyMceKeyDown: PropTypes.func,
+  onTinyMceKeyUp: PropTypes.func,
+  onTinyMceSelectionChange: PropTypes.func
 }
 
-export default translate()(KanbanCardEditor)
+KanbanCardEditor.defaultProps = {
+  apiUrl: '',
+  autoCompleteCursorPosition: 0,
+  autoCompleteItemList: [],
+  customColor: '',
+  focusOnDescription: false,
+  i18n: {
+    language: 'en'
+  },
+  isAutoCompleteActivated: false,
+  onClickAutoCompleteItem: () => {},
+  onTinyMceInput: () => {},
+  onTinyMceKeyDown: () => {},
+  onTinyMceKeyUp: () => {},
+  onTinyMceSelectionChange: () => {}
+}

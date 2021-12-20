@@ -1,179 +1,173 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+cardWidth = 280px
 
 .kanban
-  &__header
-    &__editionmode
-      display none
-    .fa-kanban-image
-      color offWhite
-  &__lastversionbtn
-    cursor pointer
-    margin-right standardSpacing
-  &__option
-    &__menu
-      &__addversion
-        padding standardSpacing
-        border-width 1px
-        border-style solid
-        border-radius standardBorderRadius
-        background-color transparent
-        cursor pointer
-        & > i
-          margin-left standardSpacing
   &__contentpage
-    width 100%
-    &__option
-      display flex
-      justify-content flex-end
     &__content
       &__left
         background-color offWhite
         display flex
         flex-direction column
-    &__statewrapper
-      flex 1
-      overflow-y auto
-      &.promptMessageWrapper > .previewcomponent // render .kanban__contentpage__statewrapper.promptMessageWrapper .kanban__contentpage__preview
-        height calc(100% - 68px) // 100% - kanban__contentpage__preview__state height
     &__wrapper
-      width 40%
-      height calc(100% - 150px) // margin + height of header and option
-      overflow-Y auto
-      .timeline
-        &__messagelist
-          min-height 300px
-    &__dropzone
-      padding 20px 15px 20px 20px
-      &__btn
+      display flex
+      flex-direction column
+      height calc(100% - 77px)
+      &.fullscreen
+        position fixed
+        top headerHeight
+        left 0
+        width 100%
+        height "calc(100% - %s)" % headerHeight
+        z-index 1
+        background offWhite
+
+      &__options
         display flex
         justify-content flex-end
-        &__cancel
-          margin-right 15px
-    &__rightContent
-      width 100%
-    &__messagelist
-      padding 0 standardSpacing standardSpacing
-  &__previewVideo
-    position fixed
-    top 0
-    left 0
-    display flex
-    justify-content center
-    flex-direction column
-    align-items center
+        & button
+          margin-inline-end standardSpacing
+
+      &__board
+        flex 1
+        overflow auto
+        &__column
+          display flex
+          flex-direction row
+          border-bottom 3px solid
+          padding-bottom standardSpacing
+          margin-bottom standardSpacing
+          align-items baseline
+          justify-content space-evenly
+          &__title
+            width 180px
+            text-overflow ellipsis
+            overflow hidden
+            white-space nowrap
+            flex 1
+            & > strong
+              font-size titleFontSize
+              flex 1
+              cursor pointer
+              overflow hidden
+              text-overflow ellipsis
+
+            &__actions.dropdownMenuButton
+              padding 0
+              &::after
+                display none
+          & button:hover
+            background-color grey-hover
+
+        & .react-kanban-board
+          overflow-y visible !important
+          overflow-x visible
+          height 100%
+          padding standardSpacing
+
+      &__toolbar
+        position absolute
+        top standardSpacing
+        right standardSpacing
+        z-index 1
+        & .iconbutton
+          background-color offWhite
+          &:hover
+            background-color veryLightGrey
+        &:empty
+          display none
+
+      & .react-kanban-column-header
+        display flex
+        flex-direction row
+        > :first-child
+          flex 1
+        > :last-child
+          display inline-block
+          border-radius standardBorderRadius
+          cursor default
+
+      & .react-kanban-column
+        padding standardSpacing
+        background-color lightGrey
+        border-radius standardBorderRadius
+        margin 0 textSpacing
+
+  &__KanbanPopup
     width 100%
-    height 100%
-    color offWhite
-    line-height 28px
-    background-color rgba(10, 10, 10, 0.9)
-    opacity 0
-    transition opacity 0.3s
-    z-index 1000
-    &.open
-      opacity 1
-    &__error
-      margin 25px 15px
+    top 15%
+    &__bgColor, &__deadline
+      display flex
+      flex-direction column
+      &__inline
+        flex-direction row
+
+    & .cardPopup__container
+      width unset
+      min-width 500px
+
+    & [type=checkbox]
+      margin textSpacing
+
+    & [type=text], textarea
+      width 100%
+
+    & label
+      white-space pre
       font-weight bold
-      font-style italic
 
-.activeEditionTitle
-  .kanban__header
-    &__editionmode
-      display block
-    &__title
-      display none
+    & input
+      vertical-align middle
 
-.activeEditionDesc
-  .kanban__contentpage__preview__content__detail
-    &__description
-      &__editiondesc
-        display block
-    &__btndesc
-      display none
+    &__description, &__title, &__freeInput
+      margin-bottom standardSpacing
 
-// MEDIAQUERIES
+    &__form
+      width 100%
+      &__fields
+        & label
+          padding-right textSpacing
+      &_buttons
+        margin-bottom 0
+        padding-bottom 0
+        text-align right
+        button:last-child, input:last-child
+          margin-left standardSpacing
+
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+  &__columnAdder
+    border 1px mediumGrey dashed
+    min-width cardWidth
+    height 70px
+    margin 0 textSpacing
+    text-align-last center
+    display flex
+    border-radius standardBorderRadius
+    flex-direction column
+    cursor pointer
+    &:hover
+      background-color veryLightGrey
+    & > *
+      margin auto
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .kanban
     &__contentpage
       display block
-      &__preview
-        display flex
-        flex-direction column
-        width calc(100% - 30px) // 30px => margin
+      &__content__left
+        min-height 250px
       &__wrapper
-        width calc(100% - 30px) // 30px => margin
-        .commentArea
-          &__simpletext
-            display inline-flex
-            width 60%
-          &__submit
-            display inline-flex
-            margin standardSpacing 0
-            &__btn
-              display flex
-              margin-left 35px
-              &__icon
-                margin-left 15px
-      &__statewrapper
-        padding 0
-
-@media (min-width: min-lg) and (max-width: max-lg)
-  .kanban
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-md) and (max-width: max-md)
-  .kanban
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .kanban
-    height "calc(100% - %s)" % headerHeight
-    &__contentpage__content__left
-      min-height 250px
-
-@media (max-width: max-xs)
-  .kanban
-    height "calc(100% - %s)" % headerHeight
-    &__lastversionbtn
-      > span
-        display none
-      > i
-        margin 0
-    &__option__menu
-      &__addversion
-        padding 8px 5px
-        & > i
-          display none
-      &__editBtn
-        & > .genericButton__icon
-          margin 0
-        & > .genericButton__label
-          display none
-    &__contentpage
-      display block
-      &__content
-        &__left
-          width 100%
-          min-height 250px
-        &__right
-          width 100%
-      &__statewrapper
         width 100%
-      &__wrapper
-        width calc(100% - 30px) // 30px => margin
         .commentArea
           &__simpletext
             display inline-flex
             width 60%
-            margin-right 0
           &__submit
             display inline-flex
             margin standardSpacing 0
-            &__btn
-              display flex
-              margin-left standardSpacing
-              &__icon
-                margin-left 15px

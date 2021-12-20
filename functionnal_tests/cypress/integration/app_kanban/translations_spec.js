@@ -1,7 +1,7 @@
 import { PAGES } from '../../support/urls_commands'
 
 describe('App Kanban', () => {
-  const fullscreenButtonSelector = '.kanban__contentpage__statewrapper__kanban__toolbar .iconbutton__text_with_icon'
+  const fullscreenButtonSelector = '.headerBtn'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
   const kanbantitle = 'Kanban'
