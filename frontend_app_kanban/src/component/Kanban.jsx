@@ -367,7 +367,7 @@ class Kanban extends React.Component {
         )}
 
         {props.isRefreshNeeded && (
-          <div className={'kanban__contentpage__statewrapper__kanban__refresh'}>
+          <div className='kanban__contentpage__statewrapper__kanban__refresh'>
             <RefreshWarningMessage
               tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
               onClickRefresh={props.onClickRefresh}
