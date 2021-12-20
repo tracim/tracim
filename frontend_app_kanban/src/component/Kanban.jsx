@@ -361,7 +361,7 @@ class Kanban extends React.Component {
                     onClick={this.handleEditColumn}
                   >
                     <i className='fa fas fa-fw fa-plus' />
-                    <span>{props.t('Create new column')}</span>
+                    <span>{props.t('Add new column')}</span>
                   </div>
                 )}
                 renderColumnHeader={column => (
