@@ -1560,7 +1560,7 @@ class TestFiles(object):
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
 
-    def test_api__get_kaban__ok_200__nominal_case(
+    def test_api__get_kanban__ok_200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
     ) -> None:
         """
