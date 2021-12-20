@@ -37,3 +37,19 @@ cardWidth = 280px
 
     &__description
       overflow-wrap break-word
+      &__overflow__button
+        display none
+      & > div
+        line-height standardFontSize
+      &.kanban__contentpage__wrapper__board__card__description__overflow
+        display flex
+        flex-direction column
+        & > div
+          max-height 75px
+          overflow hidden
+        & .kanban__contentpage__wrapper__board__card__description__overflow__button
+          display unset
+          align-self flex-end
+          font-size metadataFontSize
+          font-weight bold
+          margin-top textSpacing

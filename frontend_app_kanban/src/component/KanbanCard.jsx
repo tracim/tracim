@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   CardPopup,
@@ -11,6 +12,13 @@ require('./KanbanCard.styl')
 
 function KanbanCard (props) {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false)
+  const [showAllDescription, setShowAllDescription] = useState(false)
+
+  useEffect(() => {
+    const descriptionElement = document.getElementById(`${props.card.id}_description`)
+    const descriptionHeight = (descriptionElement || { scrollHeight: 0 }).scrollHeight
+    setShowAllDescription(descriptionHeight > 75)
+  }, [props.card.description])
 
   return (
     <div
@@ -73,11 +81,25 @@ function KanbanCard (props) {
         )}
       </div>
       <div
-        className='kanban__contentpage__wrapper__board__card__description'
-        onClick={() => props.onEditCardContent(props.card)}
-        disabled={props.readOnly}
-        dangerouslySetInnerHTML={{ __html: props.card.description }}
-      />
+        className={classnames(
+          'kanban__contentpage__wrapper__board__card__description',
+          { kanban__contentpage__wrapper__board__card__description__overflow: showAllDescription }
+        )}
+      >
+        <div
+          dangerouslySetInnerHTML={{ __html: props.card.description }}
+          disabled={props.readOnly}
+          id={`${props.card.id}_description`}
+          onClick={() => props.onEditCardContent(props.card)}
+        />
+        <IconButton
+          customClass='kanban__contentpage__wrapper__board__card__description__overflow__button'
+          intent='link'
+          mode='light'
+          onClick={() => setShowAllDescription(false)}
+          text={props.t('See more')}
+        />
+      </div>
     </div>
   )
 }
