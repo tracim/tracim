@@ -49,6 +49,7 @@ export class Kanban extends React.Component {
     this.state = {
       appName: 'kanban',
       breadcrumbsList: [],
+      fullscreen: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -116,6 +117,37 @@ export class Kanban extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
+  }
+
+  handleClickShowRevision = async revision => {
+    const { state, props } = this
+
+    const revisionArray = props.timeline.filter(t => t.timelineType === 'revision')
+    const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
+
+    if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
+      this.handleClickLastVersion()
+      return
+    }
+
+    if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...revision,
+        workspace_id: state.content.workspace_id,
+        current_revision_id: revision.revision_id,
+        is_archived: prev.is_archived,
+        is_deleted: prev.is_deleted
+      },
+      mode: APP_FEATURE_MODE.REVISION
+    }))
+  }
+
+  handleClickLastVersion = () => {
+    this.setState({ mode: APP_FEATURE_MODE.VIEW })
+    this.loadContent()
   }
 
   handleContentChanged = data => {
@@ -405,6 +437,10 @@ export class Kanban extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), FILE_APP_SLUG)
   }
 
+  handleClickFullscreen = () => {
+    this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
+  }
+
   handleClickEditComment = (comment) => {
     const { props, state } = this
     props.appContentEditComment(
@@ -479,6 +515,14 @@ export class Kanban extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          headerButtons={[
+            {
+              icon: 'fas fa-expand-arrows-alt',
+              label: props.t('Fullscreen'),
+              onClick: this.handleClickFullscreen,
+              showAction: true
+            }
+          ]}
           loading={state.loadingContent}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
@@ -520,11 +564,15 @@ export class Kanban extends React.Component {
             config={state.config}
             content={state.content}
             editionAuthor={state.editionAuthor}
+            fullscreen={state.fullscreen}
             isNewContentRevision={!!state.currentContentRevisionId}
-            readOnly={readOnly}
-            onClickRestoreDeleted={this.handleClickRestoreDelete}
             isRefreshNeeded={state.showRefreshWarning}
+            mode={state.mode}
+            onClickFullscreen={this.handleClickFullscreen}
+            onClickLastVersion={this.handleClickLastVersion}
             onClickRefresh={this.handleClickRefresh}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
+            readOnly={readOnly}
           />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}

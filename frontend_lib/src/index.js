@@ -166,6 +166,7 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+import DateInput from './component/Input/DateInput/DateInput.jsx'
 
 import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
@@ -273,6 +274,7 @@ export {
 
 export {
   appContentFactory,
+  DateInput,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
