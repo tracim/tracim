@@ -2,6 +2,8 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { Popover, PopoverBody } from 'reactstrap'
+import { isMobile } from 'react-device-detect'
 import {
   BREADCRUMBS_TYPE,
   PAGE,
@@ -19,7 +21,8 @@ class PopinFixedHeader extends React.Component {
     super(props)
     this.state = {
       editTitle: false,
-      editTitleValue: props.rawTitle
+      editTitleValue: props.rawTitle,
+      popoverSpaceTitleOpen: false
     }
   }
 
@@ -58,6 +61,12 @@ class PopinFixedHeader extends React.Component {
       case 'Enter': this.handleClickChangeTitleBtn(); break
       case 'Escape': this.handleClickUndoChangeTitleBtn(); break
     }
+  }
+
+  handleTogglePopoverSpaceTitle = () => {
+    this.setState(prevState => ({
+      popoverSpaceTitleOpen: !prevState.popoverSpaceTitleOpen
+    }))
   }
 
   render () {
@@ -109,6 +118,7 @@ class PopinFixedHeader extends React.Component {
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
                   title={rawTitle}
+                  id='rawTitle'
                 >
                   {state.editTitle
                     ? (
@@ -122,6 +132,18 @@ class PopinFixedHeader extends React.Component {
                     )
                     : componentTitle}
                 </div>
+                <Popover
+                  placement='bottom'
+                  isOpen={this.state.popoverSpaceTitleOpen}
+                  target='rawTitle'
+                  toggle={this.handleTogglePopoverSpaceTitle} // eslint-disable-line react/jsx-handler-names
+                  trigger={isMobile ? 'click' : 'hover'}
+                >
+                  <PopoverBody>
+                    {rawTitle}
+                  </PopoverBody>
+                </Popover>
+
                 {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
                   <button
                     className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}

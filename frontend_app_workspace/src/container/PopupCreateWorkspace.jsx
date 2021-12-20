@@ -265,7 +265,7 @@ export class PopupCreateWorkspace extends React.Component {
                     target='popoverDefaultRoleInfo'
                     // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
                     toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
-                    trigger={isMobile ? 'focus' : 'hover'}
+                    trigger={isMobile ? 'click' : 'hover'}
                   >
                     <PopoverBody>
                       {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}

@@ -52,7 +52,7 @@ export class UserInfo extends React.Component {
               target='popoverFullName'
               // INFO - CR - 2021-04-29 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
               toggle={this.handleTogglePopoverFullName}// eslint-disable-line react/jsx-handler-names
-              trigger={isMobile ? 'focus' : 'hover'}
+              trigger={isMobile ? 'click' : 'hover'}
             >
               <PopoverBody>
                 {props.t('Full name')}
@@ -71,7 +71,7 @@ export class UserInfo extends React.Component {
                 target='popoverUsername'
                 // INFO - CR - 2021-04-29 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
                 toggle={this.handleTogglePopoverUsername}// eslint-disable-line react/jsx-handler-names
-                trigger={isMobile ? 'focus' : 'hover'}
+                trigger={isMobile ? 'click' : 'hover'}
               >
                 <PopoverBody>
                   {props.t('Username')}
