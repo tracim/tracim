@@ -37,19 +37,17 @@ cardWidth = 280px
 
     &__description
       overflow-wrap break-word
-      &__overflow__button
-        display none
+      display flex
+      flex-direction column
       & > div
         line-height standardFontSize
-      &.kanban__contentpage__wrapper__board__card__description__overflow
-        display flex
-        flex-direction column
-        & > div
-          max-height 75px
-          overflow hidden
-        & .kanban__contentpage__wrapper__board__card__description__overflow__button
-          display unset
-          align-self flex-end
-          font-size metadataFontSize
-          font-weight bold
-          margin-top textSpacing
+      &.kanban__contentpage__wrapper__board__card__description__overflow > div
+        // INFO - GB - 2021-12-21 - 45px is 3 * standardFontSize (15px)
+        max-height 45px
+        overflow hidden
+      &__overflow__button
+        align-self flex-end
+        font-size metadataFontSize
+        font-weight bold
+        margin-top textSpacing
+        color mediumDarkGrey
