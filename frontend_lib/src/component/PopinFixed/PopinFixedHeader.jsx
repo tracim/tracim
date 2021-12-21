@@ -63,7 +63,7 @@ class PopinFixedHeader extends React.Component {
     }
   }
 
-  handleTogglePopoverSpaceTitle = () => {
+  handleTogglePopoverTitle = () => {
     this.setState(prevState => ({
       popoverTitleOpen: !prevState.popoverTitleOpen
     }))
