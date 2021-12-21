@@ -22,7 +22,7 @@ class PopinFixedHeader extends React.Component {
     this.state = {
       editTitle: false,
       editTitleValue: props.rawTitle,
-      popoverSpaceTitleOpen: false
+      popoverTitleOpen: false
     }
   }
 
