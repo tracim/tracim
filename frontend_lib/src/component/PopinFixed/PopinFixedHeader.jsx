@@ -65,7 +65,7 @@ class PopinFixedHeader extends React.Component {
 
   handleTogglePopoverSpaceTitle = () => {
     this.setState(prevState => ({
-      popoverSpaceTitleOpen: !prevState.popoverSpaceTitleOpen
+      popoverTitleOpen: !prevState.popoverTitleOpen
     }))
   }
 
@@ -118,7 +118,7 @@ class PopinFixedHeader extends React.Component {
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
                   title={rawTitle}
-                  id={rawTitle}
+                  id='rawTitle'
                 >
                   {state.editTitle
                     ? (
@@ -134,7 +134,7 @@ class PopinFixedHeader extends React.Component {
                 </div>
                 <Popover
                   placement='bottom'
-                  isOpen={state.popoverSpaceTitleOpen}
+                  isOpen={state.popoverTitleOpen}
                   target='rawTitle'
                   toggle={this.handleTogglePopoverSpaceTitle} // eslint-disable-line react/jsx-handler-names
                   trigger={isMobile ? 'click' : 'hover'}
