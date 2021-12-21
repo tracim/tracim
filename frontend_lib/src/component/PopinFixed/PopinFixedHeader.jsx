@@ -134,7 +134,7 @@ class PopinFixedHeader extends React.Component {
                 </div>
                 <Popover
                   placement='bottom'
-                  isOpen={this.state.popoverSpaceTitleOpen}
+                  isOpen={state.popoverSpaceTitleOpen}
                   target='rawTitle'
                   toggle={this.handleTogglePopoverSpaceTitle} // eslint-disable-line react/jsx-handler-names
                   trigger={isMobile ? 'click' : 'hover'}
