@@ -1,3 +1,9 @@
+# 4.0.4 / 2021-12-21
+
+### Fixed Issues
+
+- Docker: [#5183](https://github.com/tracim/tracim/issues/5183)
+
 # 4.0.3 / 2021-11-22
 
 ### Fixed Issues
