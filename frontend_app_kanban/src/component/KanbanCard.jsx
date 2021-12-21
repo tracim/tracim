@@ -113,6 +113,7 @@ function KanbanCard (props) {
         {showSeeDescriptionButton !== DESCRIPTION_BUTTON.HIDDEN && (
           <IconButton
             customClass='kanban__contentpage__wrapper__board__card__description__overflow__button'
+            dataCy='kanban_descriptionOverflow'
             intent='link'
             mode='light'
             onClick={hancleClickSeeDescriptionButton}
