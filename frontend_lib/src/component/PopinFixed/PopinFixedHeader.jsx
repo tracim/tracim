@@ -118,7 +118,7 @@ class PopinFixedHeader extends React.Component {
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
                   title={rawTitle}
-                  id='rawTitle'
+                  id={rawTitle}
                 >
                   {state.editTitle
                     ? (
