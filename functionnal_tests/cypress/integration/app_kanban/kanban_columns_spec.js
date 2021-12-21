@@ -1,6 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 
-// FIXME - GB - 2021-12-08 - See https://github.com/tracim/tracim/issues/5129
+// FIXME - GB - 2021-12-08 - See https://github.com/tracim/tracim/issues/5153
 describe.skip('App Kanban', () => {
   const kanbanTitle = 'Kanban'
   const columnTitle = 'Title'
