@@ -22,6 +22,7 @@ function KanbanColumnHeader (props) {
       </div>
 
       <IconButton
+        dataCy='kanban_addCard'
         disabled={props.readOnly}
         icon='fas fa-plus'
         intent='link'

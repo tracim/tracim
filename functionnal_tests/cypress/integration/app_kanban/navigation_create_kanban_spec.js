@@ -1,7 +1,7 @@
 import { PAGES } from '../../support/urls_commands'
 let workspaceId
 
-// FIXME - GB - 2021-12-08 - See https://github.com/tracim/tracim/issues/5129
+// FIXME - GB - 2021-12-08 - See https://github.com/tracim/tracim/issues/5153
 describe.skip('navigate :: workspace > create_new > kanban', function () {
   beforeEach(() => {
     cy.resetDB()
