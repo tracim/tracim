@@ -53,7 +53,7 @@ export class PageTitle extends React.Component {
             target='popoverSpaceTitle'
             // INFO - GB - 2020-11-06 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
             toggle={this.handleTogglePopoverSpaceTitle} // eslint-disable-line react/jsx-handler-names
-            trigger={isMobile ? 'click' : 'hover'}
+            trigger={isMobile ? 'focus' : 'hover'}
           >
             <PopoverBody>
               {props.title}

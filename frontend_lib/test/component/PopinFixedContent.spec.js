@@ -4,7 +4,6 @@ import { expect } from 'chai'
 import { mount } from 'enzyme'
 import { APP_FEATURE_MODE } from '../../src/helper.js'
 import PopinFixedContent from '../../src/component/PopinFixed/PopinFixedContent.jsx'
-import { reactstrapPopoverHack } from '../testHelper.js'
 
 describe('<PopinFixedContent />', () => {
   const props = {
@@ -45,8 +44,6 @@ describe('<PopinFixedContent />', () => {
   const Children2 = () => <div><h1>Random title2</h1>I am the second children of PopinFixedContent</div>
 
   const PopinFixedContentWithHOC = withRouterMock(PopinFixedContent)
-
-  reactstrapPopoverHack(document, 'rawTitle')
 
   const wrapper = mount(
     <PopinFixedContentWithHOC {...props}>

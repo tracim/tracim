@@ -166,7 +166,7 @@ export class NewTagForm extends React.Component {
           : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')}
         <div className='tagList__form__tag'>
           <input
-            autoFocus={!isMobile}
+            autofocus={!isMobile}
             type='text'
             className='name__input form-control'
             id='addTag'

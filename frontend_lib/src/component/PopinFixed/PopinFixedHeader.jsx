@@ -2,8 +2,6 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 import {
   BREADCRUMBS_TYPE,
   PAGE,
@@ -21,8 +19,7 @@ class PopinFixedHeader extends React.Component {
     super(props)
     this.state = {
       editTitle: false,
-      editTitleValue: props.rawTitle,
-      popoverTitleOpen: false
+      editTitleValue: props.rawTitle
     }
   }
 
@@ -61,12 +58,6 @@ class PopinFixedHeader extends React.Component {
       case 'Enter': this.handleClickChangeTitleBtn(); break
       case 'Escape': this.handleClickUndoChangeTitleBtn(); break
     }
-  }
-
-  handleTogglePopoverTitle = () => {
-    this.setState(prevState => ({
-      popoverTitleOpen: !prevState.popoverTitleOpen
-    }))
   }
 
   render () {
@@ -118,7 +109,6 @@ class PopinFixedHeader extends React.Component {
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
                   title={rawTitle}
-                  id='rawTitle'
                 >
                   {state.editTitle
                     ? (
@@ -132,18 +122,6 @@ class PopinFixedHeader extends React.Component {
                     )
                     : componentTitle}
                 </div>
-                <Popover
-                  placement='bottom'
-                  isOpen={state.popoverTitleOpen}
-                  target='rawTitle'
-                  toggle={this.handleTogglePopoverTitle} // eslint-disable-line react/jsx-handler-names
-                  trigger={isMobile ? 'click' : 'hover'}
-                >
-                  <PopoverBody>
-                    {rawTitle}
-                  </PopoverBody>
-                </Popover>
-
                 {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
                   <button
                     className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}

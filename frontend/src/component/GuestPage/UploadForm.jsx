@@ -77,7 +77,7 @@ class UploadForm extends React.Component {
                 target='popoverPasswordInfo'
                 // INFO - CH - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
                 toggle={this.handleTogglePopoverPasswordInfo} // eslint-disable-line react/jsx-handler-names
-                trigger={isMobile ? 'click' : 'hover'}
+                trigger={isMobile ? 'focus' : 'hover'}
               >
                 <PopoverBody>
                   {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
