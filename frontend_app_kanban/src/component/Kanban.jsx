@@ -319,7 +319,6 @@ class Kanban extends React.Component {
               text={props.t('Last version')}
             />
           )}
-
           {props.isRefreshNeeded && (
             <RefreshWarningMessage
               tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
