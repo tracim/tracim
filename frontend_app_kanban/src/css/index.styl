@@ -12,8 +12,8 @@ cardWidth = 280px
     &__wrapper
       display flex
       flex-direction column
-      // INFO - GB - 2021-12-20 - 88px = headerHeight + 28px of wsContentGeneric__content__left__top height
-      height calc(100% - 88px)
+      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 28px)
       &.fullscreen
         position fixed
         top headerHeight
