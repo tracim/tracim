@@ -9,10 +9,12 @@ import {
 import {
   handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
+  PROFILE,
   ROLE,
   sendGlobalFlashMessage
 } from '../../helper.js'
 import IconButton from '../Button/IconButton.jsx'
+import { isMobile } from 'react-device-detect'
 
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -120,7 +122,7 @@ export class NewTagForm extends React.Component {
   getSubmitButtonLabel (tagExitsInSpace) {
     const { props } = this
     if (props.contentId) {
-      return props.userRoleIdInWorkspace < ROLE.contentManager.id || tagExitsInSpace
+      return props.userRoleIdInWorkspace < ROLE.contentManager.id || tagExitsInSpace || props.userProfile === PROFILE.administrator.slug
         ? props.t('Add')
         : props.t('Create and add')
     } else return props.t('Create')
@@ -135,7 +137,7 @@ export class NewTagForm extends React.Component {
       e.key === 'Enter' && !(
         !state.tagName ||
         (!props.contentId && tagExitsInSpace) ||
-        (props.contentId && !tagExitsInSpace && props.userRoleIdInWorkspace < ROLE.contentManager.id)
+        (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id || props.userProfile === PROFILE.administrator.slug))
       )
     ) this.handleClickBtnValidate()
     if (e.key === 'Escape') {
@@ -165,7 +167,7 @@ export class NewTagForm extends React.Component {
           : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')}
         <div className='tagList__form__tag'>
           <input
-            autoFocus
+            autoFocus={!isMobile}
             type='text'
             className='name__input form-control'
             id='addTag'
@@ -198,7 +200,7 @@ export class NewTagForm extends React.Component {
             disabled={
               !state.tagName ||
               (!props.contentId && tagExitsInSpace) ||
-              (props.contentId && !tagExitsInSpace && props.userRoleIdInWorkspace < ROLE.contentManager.id)
+              (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id || props.userProfile === PROFILE.administrator.slug))
             }
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
@@ -219,11 +221,13 @@ NewTagForm.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   contentTagList: PropTypes.array,
   spaceTaglist: PropTypes.array,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  userProfile: PropTypes.string
 }
 
 NewTagForm.defaultProps = {
   contentTagList: [],
   spaceTaglist: [],
-  userRoleIdInWorkspace: ROLE.reader.id
+  userRoleIdInWorkspace: ROLE.reader.id,
+  userProfile: PROFILE.user.slug
 }

@@ -22,6 +22,7 @@ import {
   PAGE,
   SPACE_TYPE,
   PopinFixedRightPartContent,
+  PROFILE,
   ROLE,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyUp,
@@ -235,10 +236,11 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   componentDidMount () {
+    const { state } = this
     console.log('%c<WorkspaceAdvanced> did mount', `color: ${this.state.config.hexcolor}`)
 
     this.loadContent()
-    if (this.state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id) {
+    if (state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id || state.loggedUser.profile === PROFILE.administrator.slug) {
       this.loadSubscriptionRequestList()
     }
   }
@@ -304,7 +306,11 @@ export class WorkspaceAdvanced extends React.Component {
     const { state } = this
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
-    state.config.history.push(PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id))
+    const isFromAdminSpaceList = state.config.history.location.state && state.config.history.location.state.from === 'adminSpaceList'
+    state.config.history.push(isFromAdminSpaceList
+      ? PAGE.ADMIN.WORKSPACE
+      : PAGE.WORKSPACE.DASHBOARD(state.content.workspace_id)
+    )
   }
 
   handleSaveEditLabel = async newLabel => {
@@ -724,6 +730,7 @@ export class WorkspaceAdvanced extends React.Component {
               [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
             }
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            userProfile={state.loggedUser.profile}
             autoCompleteClicked={state.autoCompleteClicked}
             onClickAutoComplete={this.handleClickAutoComplete}
           />
@@ -784,18 +791,20 @@ export class WorkspaceAdvanced extends React.Component {
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            userProfile={state.loggedUser.profile}
           />
         </PopinFixedRightPartContent>
       )
     }
 
     const menuItemList = [memberlistObject]
-    const isWorkspaceManager = state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id
-    if (state.content.access_type === SPACE_TYPE.onRequest.slug && isWorkspaceManager) {
+    const isWorkspaceManagerOrAdministrator = state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id ||
+      state.loggedUser.profile === PROFILE.administrator.slug
+    if (state.content.access_type === SPACE_TYPE.onRequest.slug && isWorkspaceManagerOrAdministrator) {
       menuItemList.push(subscriptionObject)
     }
 
-    if (isWorkspaceManager) {
+    if (isWorkspaceManagerOrAdministrator) {
       menuItemList.push(functionalitesObject)
     }
 
@@ -823,11 +832,17 @@ export class WorkspaceAdvanced extends React.Component {
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}
           disableChangeTitle={false}
-          showChangeTitleButton={state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id}
+          showChangeTitleButton={
+            state.loggedUser.userRoleIdInWorkspace > ROLE.contentManager.id ||
+            state.loggedUser.profile === PROFILE.administrator.slug
+          }
         >
           <WorkspaceAdvancedConfiguration
             apiUrl={state.config.apiUrl}
-            isReadOnlyMode={state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id}
+            isReadOnlyMode={
+              state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id &&
+              state.loggedUser.profile !== PROFILE.administrator.slug
+            }
             textareaId={WORKSPACE_DESCRIPTION_TEXTAREA_ID}
             autoCompleteCursorPosition={state.autoCompleteCursorPosition}
             autoCompleteItemList={state.autoCompleteItemList}

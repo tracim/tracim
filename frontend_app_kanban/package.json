@@ -80,10 +80,7 @@
       "GLOBAL_renderAppFeature",
       "GLOBAL_unmountApp",
       "GLOBAL_dispatchEvent",
-      "CustomEvent",
-      "confirm",
-      "alert",
-      "prompt"
+      "CustomEvent"
     ],
     "parser": "babel-eslint",
     "ignore": []

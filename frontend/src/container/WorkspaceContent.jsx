@@ -58,6 +58,7 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import uniq from 'lodash/uniq'
+import { isMobile } from 'react-device-detect'
 
 const qs = require('query-string')
 
@@ -204,7 +205,7 @@ export class WorkspaceContent extends React.Component {
     }
 
     this.buildBreadcrumbs()
-    if (shouldScrollToContent) this.scrollToActiveContent()
+    if (shouldScrollToContent && !isMobile) this.scrollToActiveContent()
     return true
   }
 

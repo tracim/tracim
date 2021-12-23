@@ -34,6 +34,7 @@ RUN apt-get install -qy $(cat "${PACKAGE_DIR}/run_backend_packages.list") \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
+ENV SETUPTOOLS_USE_DISTUTILS=stdlib
 ARG PACKAGE_DIR
 # required packages for building the backend dependencies
 RUN apt-get install -qy $(cat "${PACKAGE_DIR}/build_backend_packages.list") \

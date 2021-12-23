@@ -24,6 +24,7 @@ export class WorkspaceRecentActivities extends React.Component {
   constructor (props) {
     super(props)
     props.registerGlobalLiveMessageHandler(this.handleTlm)
+    this.isLoadMoreIsProgress = false
   }
 
   componentDidMount () {
@@ -52,6 +53,16 @@ export class WorkspaceRecentActivities extends React.Component {
     props.handleTlm(data)
   }
 
+  handleClickLoadMore = async () => {
+    const { props } = this
+
+    if (this.isLoadMoreIsProgress) return
+
+    this.isLoadMoreIsProgress = true
+    await props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE, false, props.workspaceId)
+    this.isLoadMoreIsProgress = false
+  }
+
   render () {
     const { props } = this
 
@@ -64,13 +75,7 @@ export class WorkspaceRecentActivities extends React.Component {
         <ActivityList
           activity={props.activity}
           onRefreshClicked={props.onRefreshClicked}
-          onLoadMoreClicked={() => {
-            props.loadActivities(
-              props.activity.list.length + ACTIVITY_COUNT_PER_PAGE,
-              false,
-              props.workspaceId
-            )
-          }}
+          onLoadMoreClicked={this.handleClickLoadMore}
           onCopyLinkClicked={props.onCopyLinkClicked}
           onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}

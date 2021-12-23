@@ -1,9 +1,10 @@
 import { PAGES } from '../../support/urls_commands'
 
-// FIXME - GB - 2021-12-08 - See https://github.com/tracim/tracim/issues/5153
+// FIXME - GB - 2021-12-21 - See https://github.com/tracim/tracim/issues/5153
 describe.skip('App Kanban', () => {
   const kanbanTitle = 'Kanban'
-  const columnTitle = 'Title'
+  const columnTitle = 'Column Title'
+  const cardTitle = 'Card Title'
 
   let workspaceId
 
@@ -20,6 +21,10 @@ describe.skip('App Kanban', () => {
       cy.get('[data-cy=createcontent__form__input]').type(kanbanTitle)
       cy.get('[data-cy=popup__createcontent__form__button]').should('be.enabled').click()
       cy.contains('.wsContentGeneric__header__title', kanbanTitle)
+      cy.get('.kanban__columnAdder').should('be.visible').click()
+      cy.get('.textinput__text').should('be.visible').type(columnTitle)
+      cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
+      cy.contains('.kanban__contentpage__wrapper__board__column__title', columnTitle)
     })
   })
 
@@ -27,10 +32,12 @@ describe.skip('App Kanban', () => {
     cy.cancelXHR()
   })
 
-  it('should be possible to create a column', () => {
-    cy.get('.kanban__columnAdder').should('be.visible').click()
-    cy.get('.textinput__text').should('be.visible').type(columnTitle)
+  it('should be possible to create a card', () => {
+    cy.get('[data-cy=kanban_addCard]').should('be.visible').click()
+    cy.contains('.cardPopup__header', 'New Card')
+    cy.waitForTinyMCELoaded()
+    cy.get('.kanban__KanbanPopup__title .textinput__text').type(cardTitle)
     cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
-    cy.contains('.kanban__contentpage__wrapper__board__column__title', columnTitle)
+    cy.contains('.kanban__contentpage__wrapper__board__card__title', cardTitle)
   })
 })
