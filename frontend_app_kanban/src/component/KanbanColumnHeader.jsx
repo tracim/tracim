@@ -42,6 +42,7 @@ function KanbanColumnHeader (props) {
           key='kanban_column_edit'
           onClick={() => props.onEditColumn(props.column)}
           text={props.t('Edit')}
+          textMobile={props.t('Edit')}
           title={props.t('Edit this column')}
         />
         <IconButton
@@ -51,6 +52,7 @@ function KanbanColumnHeader (props) {
           key='kanban_column_delete'
           onClick={() => setShowConfirmPopup(true)}
           text={props.t('Delete')}
+          textMobile={props.t('Delete')}
           title={props.t('Delete this column')}
         />
       </DropdownMenu>
