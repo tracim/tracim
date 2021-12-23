@@ -10,7 +10,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist/assets'),
-    filename: 'tracim.[name].js',
+    filename: 'tracim.[name].standalone.js',
     pathinfo: !isProduction,
     publicPath: '/assets/'
   },
@@ -18,22 +18,6 @@ module.exports = {
     splitChunks: {
       chunks: 'all'
     }
-  },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist/'),
-    proxy: { '/api': 'http://127.0.0.1:7999' },
-    host: '0.0.0.0',
-    port: 8090,
-    hot: true,
-    noInfo: true,
-    overlay: {
-      warnings: false,
-      errors: true
-    },
-    historyApiFallback: true
-    // headers: {
-    //   'Access-Control-Allow-Origin': '*'
-    // }
   },
   devtool: isProduction ? false : 'eval-cheap-module-source-map',
   node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999

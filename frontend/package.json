@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "mockapi": "node jsonserver/server.js",
-    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.config.js --watch --colors --inline --hot --progress",
-    "build": "NODE_ENV=production webpack-cli",
-    "buildoptimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
-    "build-dev": "NODE_ENV=development webpack-cli",
-    "buildoptimized-dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
-    "build-translation": "node ../i18next.scanner.js",
+    "build": "NODE_ENV=production webpack-cli --config webpack.standalone.config.js ",
+    "build:dev": "NODE_ENV=development webpack-cli",
+    "build:optimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
+    "build:optimized:dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
+    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
+    "build:translation": "node ../i18next.scanner.js",
     "lint": "cd src && yarn standard --parser babel-eslint --plugin react && cd ../test && yarn standard --env mocha --parser babel-eslint --plugin react",
     "test": "yarn run lint && yarn run test:quick",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"
