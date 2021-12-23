@@ -754,6 +754,7 @@ export class HtmlDocument extends React.Component {
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            userProfile={state.loggedUser.profile}
           />
         </PopinFixedRightPartContent>
       )
