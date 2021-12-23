@@ -120,6 +120,9 @@ function KanbanCard (props) {
             text={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
               ? props.t('See more')
               : props.t('See less')}
+            textMobile={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
+              ? props.t('See more')
+              : props.t('See less')}
           />
         )}
       </div>
