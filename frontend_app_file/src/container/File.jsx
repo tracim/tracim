@@ -102,6 +102,7 @@ export class File extends React.Component {
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
+    this.isLoadMoreTimelineInProgress = false
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -336,7 +337,12 @@ export class File extends React.Component {
 
   handleLoadMoreTimelineItems = async () => {
     const { props } = this
+
+    if (this.isLoadMoreTimelineInProgress) return
+
+    this.isLoadMoreTimelineInProgress = true
     await props.loadMoreTimelineItems(getFileRevision)
+    this.isLoadMoreTimelineInProgress = false
   }
 
   handleClickBtnCloseApp = () => {
