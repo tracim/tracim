@@ -97,14 +97,14 @@ cardWidth = 280px
         background-color lightGrey
         border-radius standardBorderRadius
         margin 0 textSpacing
-        overflow-y hidden
+        overflow hidden
         min-width 315px
         text-align center
-        > :last-child
-          overflow-x auto
+        & > :last-child
           // INFO - GB - 2021-12-20 - The css rule below is !important because it overrides the library style
           height calc(100% - 43px) !important
-
+          &:hover
+            overflow-y auto
   &__KanbanPopup
     width 100%
     top 15%
