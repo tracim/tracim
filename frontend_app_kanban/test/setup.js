@@ -21,6 +21,7 @@ if (!global.window && !global.document) {
   global.window = window
   global.document = window.document
   global.navigator = window.navigator
+  global.Element = window.Element
   global.GLOBAL_dispatchEvent = () => {}
   global.localStorage = {
     getItem: () => {}

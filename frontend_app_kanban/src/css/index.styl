@@ -33,6 +33,10 @@ cardWidth = 280px
         flex 1
         overflow-x auto
         overflow-y hidden
+
+        &.hidden
+          display none
+
         &__column
           display flex
           flex-direction row
@@ -108,6 +112,8 @@ cardWidth = 280px
   &__KanbanPopup
     width 100%
     top 15%
+    &.hidden
+      display none
     &__bgColor, &__deadline
       display flex
       flex-direction column
