@@ -1,4 +1,4 @@
-module.exports = require('./webpack.config.js')
+module.exports = require('./webpack.standalone.config.js')
 
 const optimizedVendors = {}
 for (const dep of require('tracim_frontend_vendors/dist/list.js')) {

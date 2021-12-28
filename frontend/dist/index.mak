@@ -110,24 +110,24 @@
       -->
     <div id="welcome"><%include file="assets/branding/${website__welcome_page}" /></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/tracim_frontend_lib.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/tracim_frontend_lib.style.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/tracim_frontend_lib.optimized.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/tracim_frontend_lib.optimized.style.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     % for custom_toolbox_file in custom_toolbox_files:
     <script type="text/javascript" src="/custom_toolbox-assets/${custom_toolbox_file.name}?token=${cache_token}" nonce="${csp_nonce}"></script>
     % endfor
 
-    <script type="text/javascript" src="/assets/tracim.vendors~app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tracim.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.vendors~app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
-    <script type="text/javascript" src="/app/workspace.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/workspace.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     % for app in applications:
-    <script type="text/javascript" src="/app/${app.minislug}.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/${app.minislug}.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
-    <script type="text/javascript" src="/app/share_folder.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/admin_workspace_user.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/workspace_advanced.app.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/share_folder.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/admin_workspace_user.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/workspace_advanced.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     <script type="text/javascript" src="/assets/bootstrap/jquery-3.2.1.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/bootstrap/popper-1.12.3.js?token=${cache_token}" nonce="${csp_nonce}"></script>

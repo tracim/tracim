@@ -28,7 +28,7 @@ if [ "$1" = "-d" ]; then
 fi
 
 log "creating debug file"
-cp src/debug.js.sample src/debug.js
+cp -u src/debug.js.sample src/debug.js
 log "building frontend_app_file"
 yarn run build:optimized$dev  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"

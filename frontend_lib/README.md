@@ -21,7 +21,7 @@ This will produce two UMD modules:
 - `dist/tracim_frontend_lib.lib.js`: the library part
 - `dist/tracim_frontend_lib.style.js`: the styling part
 
-The Webpack configuration used to build the standalone bundle is `webpack.config.js`.
+The Webpack configuration used to build the standalone bundle is `webpack.standalone.config.js`.
 
 ## When to use this bundle
 

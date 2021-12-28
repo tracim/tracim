@@ -9,7 +9,7 @@ const PnpWebpackPlugin = require('pnp-webpack-plugin')
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    lib: process.env.SERVDEV !== 'true' ? './src/index.js' : './src/index.dev.js',
+    lib: './src/index.js',
     test_utils: './test/index.js',
     style: glob.sync('./src/**/*.styl')
   },
@@ -17,7 +17,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'tracim_frontend_lib.[name].js',
     pathinfo: !isProduction,
-    library: process.env.SERVDEV !== 'true' ? ['tracim_frontend_lib', '[name]'] : undefined,
+    library: ['tracim_frontend_lib', '[name]'],
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
@@ -44,26 +44,9 @@ module.exports = {
     //   }
     // }
   },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist/'),
-    proxy: { '/api': 'http://127.0.0.1:7999' },
-    port: 8070,
-    hot: true,
-    noInfo: true,
-    overlay: {
-      warnings: false,
-      errors: true
-    },
-    historyApiFallback: true
-    // headers: {
-    //   'Access-Control-Allow-Origin': '*'
-    // }
-  },
-
   devtool: false,
   // RJ - 2020-06-11 - source maps disabled for frontend_lib for now,
   // they cause a lot of warnings in the browser's console
-
   module: {
     rules: [
       isProduction ? {} : {

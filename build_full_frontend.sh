@@ -40,14 +40,16 @@ mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $D
 cd "$DEFAULTDIR/frontend_vendors"
 ./build_vendors.sh $shelldev && loggood "success" || logerror "Could not build tracim_frontend_vendors"
 
-# Tracim Lib for unit tests
+# Tracim Lib as standalone
+# required to support standalone build and because tracim_frontend_lib is in app's package.json
+# But it is currently not used
 # NOTE - RJ - 2020-08-20 - the absence of $yarndev is intentional
-log "Building unoptimized tracim_frontend_lib for tests"
-yarn workspace tracim_frontend_lib run build && loggood "success" || logerror "Could not build tracim_frontend_lib"
+yarn workspace tracim_frontend_lib run build:standalone && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
 # Tracim Lib for the browsers
 log "Building optimized tracim_frontend_lib"
-yarn workspace tracim_frontend_lib run build:optimized$yarndev && loggood "success" || logerror "Could not build tracim_frontend_lib for Tracim"
+cd "$DEFAULTDIR/frontend_lib"
+./build_frontend_lib.sh
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
