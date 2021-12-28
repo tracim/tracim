@@ -183,7 +183,7 @@ export function appContentFactory (WrappedComponent) {
     handleContentModified = (tlm) => {
       const { state } = this
       // Not our content
-      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
 
       this.setState(prevState => {
         const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
