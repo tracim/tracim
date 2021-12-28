@@ -22,6 +22,9 @@ if (!global.window && !global.document) {
   global.document = window.document
   global.navigator = window.navigator
   global.GLOBAL_dispatchEvent = () => {}
+  global.Element = window.Element
+  global.FormData = window.FormData
+  global.File = window.File
   global.localStorage = {
     getItem: () => {}
   }
