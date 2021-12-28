@@ -137,7 +137,7 @@ export class NewTagForm extends React.Component {
       e.key === 'Enter' && !(
         !state.tagName ||
         (!props.contentId && tagExitsInSpace) ||
-        (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id || props.userProfile === PROFILE.administrator.slug))
+        (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id || props.userProfile !== PROFILE.administrator.slug))
       )
     ) this.handleClickBtnValidate()
     if (e.key === 'Escape') {
