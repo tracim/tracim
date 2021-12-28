@@ -122,7 +122,7 @@ export class NewTagForm extends React.Component {
   getSubmitButtonLabel (tagExitsInSpace) {
     const { props } = this
     if (props.contentId) {
-      return props.userRoleIdInWorkspace < ROLE.contentManager.id || tagExitsInSpace || props.userProfile === PROFILE.administrator.slug
+      return props.userRoleIdInWorkspace < ROLE.contentManager.id || tagExitsInSpace || props.userProfile !== PROFILE.administrator.slug
         ? props.t('Add')
         : props.t('Create and add')
     } else return props.t('Create')
@@ -200,7 +200,7 @@ export class NewTagForm extends React.Component {
             disabled={
               !state.tagName ||
               (!props.contentId && tagExitsInSpace) ||
-              (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id || props.userProfile === PROFILE.administrator.slug))
+              (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id && props.userProfile !== PROFILE.administrator.slug))
             }
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
