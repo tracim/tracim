@@ -9,24 +9,14 @@
 # works with mongrel2.
 
 # Pull the base image
-FROM ubuntu:18.04
-MAINTAINER Justin Karneges <justin@fanout.io>
+FROM debian:bullseye
+MAINTAINER Algoo team <contact@algoo.fr>
 
-# Add private APT repository
-RUN \
-  apt-get update && \
-  apt-get install -y apt-transport-https software-properties-common && \
-  echo deb https://fanout.jfrog.io/artifactory/debian fanout-bionic main \
-    | tee /etc/apt/sources.list.d/fanout.list && \
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys \
-    EA01C1E777F95324
-
-ENV PUSHPIN_VERSION 1.31.0-1~bionic1
 
 # Install Pushpin
 RUN \
   apt-get update && \
-  apt-get install -y mongrel2-core pushpin=$PUSHPIN_VERSION
+  apt-get install -y mongrel2-core pushpin
 
 # Cleanup
 RUN \
