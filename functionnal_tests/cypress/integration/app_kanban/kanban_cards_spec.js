@@ -33,8 +33,8 @@ describe('App Kanban', () => {
 
   it('should be possible to create a card', () => {
     cy.get('[data-cy=kanban_addCard]').should('be.visible').click()
-    cy.contains('.cardPopup__header', 'New Card')
     cy.waitForTinyMCELoaded()
+    cy.contains('.cardPopup__header', 'New Card')
     cy.get('.kanban__KanbanPopup__title .textinput__text').type(cardTitle)
     cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
     cy.contains('.kanban__contentpage__wrapper__board__card__title', cardTitle)
