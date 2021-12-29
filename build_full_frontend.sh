@@ -36,17 +36,17 @@ export DEFAULTDIR
 # create folder $DEFAULTDIR/frontend/dist/app/ if no exists
 mkdir -p $DEFAULTDIR/frontend/dist/app/ || logerror "Failed to make directory $DEFAULTDIR/frontend/dist/app/"
 
-# Tracim vendors
+# Tracim frontend vendors
 cd "$DEFAULTDIR/frontend_vendors"
 ./build_vendors.sh $shelldev && loggood "success" || logerror "Could not build tracim_frontend_vendors"
 
-# Tracim Lib as standalone
+# Tracim frontend Lib as standalone
 # required to support standalone build and because tracim_frontend_lib is in app's package.json
-# But it is currently not used
+# INFO - CH - 2021-12-29 - It is currently only used to allow apps to import frontend_lib stylus files
 # NOTE - RJ - 2020-08-20 - the absence of $yarndev is intentional
 yarn workspace tracim_frontend_lib run build:standalone && loggood "success" || logerror "Could not build tracim_frontend_lib"
 
-# Tracim Lib for the browsers
+# Tracim frontend Lib as optimized
 log "Building optimized tracim_frontend_lib"
 cd "$DEFAULTDIR/frontend_lib"
 ./build_frontend_lib.sh
@@ -60,9 +60,8 @@ for app in "$DEFAULTDIR"/frontend_app_*; do
 	fi
 done
 
-# build Tracim frontend
+# Build Tracim frontend
 log "building the Tracim frontend"
-# yarn workspace tracim run build:optimized$yarndev && loggood "success" || logerror "Could not build the Tracim frontend."
 cd "$DEFAULTDIR/frontend"
 ./build_frontend.sh $shelldev || logerror "Failed building frontend."
 
