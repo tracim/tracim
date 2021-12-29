@@ -17,7 +17,7 @@ It can be built in two different ways:
 ## Optimized build
 
 This build can be included using a `<script>` tag.  
-It does not come with all its dependencies which makes it lighter.  
+It does not come with all its dependencies which makes it smaller.
 Some of them are in the `tracim_frontend_vendors` bundle.  
 This is the build used in Tracim's default configuration.
 
@@ -44,7 +44,7 @@ This will produce two scripts:
 The Webpack configuration used to build the standalone bundle is [webpack.optimized.config.js](./webpack.optimized.config.js).
 
 #### Pros
-- it is lighter: some dependencies are externals therefore not in the bundle
+- it is smaller: some dependencies are externals thus not in the bundle
 - it builds faster: since it is lighter
 
 #### Cons

@@ -9,7 +9,7 @@ See [README.md](../../README.md) at the root of the repository.
 
 ## Development
 
-You must have run [install_frontend_dependencies.sh](../../install_frontend_dependencies.sh) before starting any build.
+You must run [install_frontend_dependencies.sh](../../install_frontend_dependencies.sh) before starting any build.
 
 ### Basic
 - save your modifications
@@ -28,9 +28,12 @@ Once the script ends, refresh the browser's page to load your new app version (b
     - password: admin@admin.admin
     - _(optional) if you need to be logged in with a different user, see [below](#run-servdev-with-a-different-user)_
 2. Update your `debug.js` file to match your local database. See [below](#update-debugjs-for-servdev)
+3. update `cors.access-control-allowed-origin` from `backend/development.ini` to add the app's dev serveur address
+   - This address is available in `webpack.servdev.config.js` in the property `devServer.port`
+   - exemple for app File: `http://localhost:8075`
 
 #### Run the server
-From any app (forntend, frontend_app_file, frontend_lib, ...)
+From any app (frontend, frontend_app_file, frontend_lib, ...)
 
     yarn run servdev
 
@@ -51,7 +54,7 @@ Login with that user in the frontend.
 
 Add the `loggedUser` property at the root of your `debug.js` and update the properties you need.
 
-Keep the `...defaultDebug.loggedUser` to avoid missing a required properties.
+Keep the `...defaultDebug.loggedUser` to avoid missing a required property.
 
 Example for frontend_app_file/src/debug.js:
 ```js

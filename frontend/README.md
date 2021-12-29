@@ -20,7 +20,7 @@ See [README.md](../../README.md) at the root of the repository.
 
 This shell script accept `-d` to bypass obfuscation and minification to help debugging.
 
-#### Start de development server
+#### Start the development server
 
     yarn run servdev
 

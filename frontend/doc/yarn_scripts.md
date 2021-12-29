@@ -1,7 +1,8 @@
 Available yarn scripts
 ======================
 
-These commands can be executed from any folders starting by `frontend` except `frontend_vendors`.  
+These commands can be executed from any folder starting by `frontend` except `frontend_vendors`.
+
 Example: `frontend/`, `frontend_app_file/`, `frontend_app_agenda/`, `frontend_app_workspace/` ...
 
 ### build the app without shared dependencies - Optimized build
@@ -28,9 +29,9 @@ Example: `frontend/`, `frontend_app_file/`, `frontend_app_agenda/`, `frontend_ap
     yarn run build:translation
 
 - Build the translation files
-- It will add any new translation keys and remove unseen one
+- It will add any new translation keys and remove unused one
 - see [./i18n.md](./i18n.md)
-- Must be run before pushing modifications to the displayed texts of the app
+- Must be run before pushing modifications to any text displayed in the app
 
 ### run the linting
 
