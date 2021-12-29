@@ -22,6 +22,7 @@ describe('<PopinFixedContent />', () => {
       apiUrl: 'http://fake.url/api'
     },
     content: {
+      content_id: 0,
       is_archived: false,
       is_deleted: false,
       status: ''
@@ -46,7 +47,7 @@ describe('<PopinFixedContent />', () => {
 
   const PopinFixedContentWithHOC = withRouterMock(PopinFixedContent)
 
-  reactstrapPopoverHack(document, 'rawTitle')
+  reactstrapPopoverHack(document, `wsContentGeneric__header__title_${props.content.content_id}`)
 
   const wrapper = mount(
     <PopinFixedContentWithHOC {...props}>
