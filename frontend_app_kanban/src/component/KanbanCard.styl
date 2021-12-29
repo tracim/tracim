@@ -10,7 +10,7 @@ cardWidth = 280px
     border 1px solid
     border-radius standardBorderRadius
     padding standardSpacing
-
+    text-align start
     &__title
       display flex
 
@@ -37,3 +37,16 @@ cardWidth = 280px
 
     &__description
       overflow-wrap break-word
+      display flex
+      flex-direction column
+      & > div
+        line-height standardFontSize
+      &.kanban__contentpage__wrapper__board__card__description__overflow > div
+        max-height (3 * standardFontSize)
+        overflow hidden
+      &__overflow__button
+        align-self flex-end
+        font-size metadataFontSize
+        font-weight bold
+        margin-top textSpacing
+        color mediumDarkGrey

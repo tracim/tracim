@@ -29,7 +29,7 @@
   "Create a Kanban board": "Eine Kanban-Tafel erstellen",
   "Last version": "Letzte Version",
   "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}",
-  "Create new column": "Eine neue Spalte erstellen",
+  "Add new column": "Eine neue Spalte erstellen",
   "Edit Column": "Spalte bearbeiten",
   "New Column": "Neue Spalte",
   "Are you sure?": "Sind Sie sicher?",
@@ -39,5 +39,7 @@
   "Edit this card": "Diese Karte bearbeiten",
   "Delete this card": "Diese Karte löschen",
   "Delete this column": "Diese Spalte löschen",
-  "Exit fullscreen mode": "Beenden des Vollbildmodus"
+  "Exit fullscreen mode": "Beenden des Vollbildmodus",
+  "See more": "Mehr sehen",
+  "See less": "Weniger sehen"
 }

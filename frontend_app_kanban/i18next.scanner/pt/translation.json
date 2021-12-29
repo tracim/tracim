@@ -29,7 +29,7 @@
   "Value:": "Valor:",
   "Last version": "Última versão",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
-  "Create new column": "Criar nova coluna",
+  "Add new column": "Acrescentar nova coluna",
   "Edit Column": "Editar coluna",
   "New Column": "Nova coluna",
   "Are you sure?": "Tem certeza?",
@@ -39,5 +39,7 @@
   "Edit this card": "Editar este cartão",
   "Delete this card": "Eliminar este cartão",
   "Delete this column": "Eliminar esta coluna",
-  "Exit fullscreen mode": "Sair em modo ecrã inteiro"
+  "Exit fullscreen mode": "Sair em modo ecrã inteiro",
+  "See more": "Ver mais",
+  "See less": "Ver menos"
 }

@@ -319,7 +319,6 @@ class Kanban extends React.Component {
               text={props.t('Last version')}
             />
           )}
-
           {props.isRefreshNeeded && (
             <RefreshWarningMessage
               tooltip={props.t('The content has been modified by {{author}}', { author: props.editionAuthor, interpolation: { escapeValue: false } })}
@@ -361,7 +360,7 @@ class Kanban extends React.Component {
                     onClick={this.handleEditColumn}
                   >
                     <i className='fa fas fa-fw fa-plus' />
-                    <span>{props.t('Create new column')}</span>
+                    <span>{props.t('Add new column')}</span>
                   </div>
                 )}
                 renderColumnHeader={column => (

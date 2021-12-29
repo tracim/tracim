@@ -12,7 +12,8 @@ cardWidth = 280px
     &__wrapper
       display flex
       flex-direction column
-      height calc(100% - 77px)
+      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 28px)
       &.fullscreen
         position fixed
         top headerHeight
@@ -30,7 +31,8 @@ cardWidth = 280px
 
       &__board
         flex 1
-        overflow auto
+        overflow-x auto
+        overflow-y hidden
         &__column
           display flex
           flex-direction row
@@ -39,6 +41,7 @@ cardWidth = 280px
           margin-bottom standardSpacing
           align-items baseline
           justify-content space-evenly
+          text-align start
           &__title
             width 180px
             text-overflow ellipsis
@@ -64,6 +67,8 @@ cardWidth = 280px
           overflow-x visible
           height 100%
           padding standardSpacing
+          & > div
+            height 100%
 
       &__toolbar
         position absolute
@@ -92,6 +97,13 @@ cardWidth = 280px
         background-color lightGrey
         border-radius standardBorderRadius
         margin 0 textSpacing
+        overflow-y hidden
+        min-width 315px
+        text-align center
+        > :last-child
+          overflow-x auto
+          // INFO - GB - 2021-12-20 - The css rule below is !important because it overrides the library style
+          height calc(100% - 43px) !important
 
   &__KanbanPopup
     width 100%
@@ -144,7 +156,7 @@ cardWidth = 280px
   &__columnAdder
     border 1px mediumGrey dashed
     min-width cardWidth
-    height 70px
+    max-height 70px
     margin 0 textSpacing
     text-align-last center
     display flex
@@ -171,3 +183,9 @@ cardWidth = 280px
           &__submit
             display inline-flex
             margin standardSpacing 0
+
+@media (max-width: max-xs)
+  .kanban__KanbanPopup
+    top 10%
+    & .cardPopup__container
+      min-width 100%

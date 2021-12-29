@@ -87,6 +87,7 @@ export class HtmlDocument extends React.Component {
       translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
+    this.isLoadMoreTimelineInProgress = false
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -305,7 +306,12 @@ export class HtmlDocument extends React.Component {
 
   handleLoadMoreTimelineItems = async () => {
     const { props } = this
+
+    if (this.isLoadMoreTimelineInProgress) return
+
+    this.isLoadMoreTimelineInProgress = true
     await props.loadMoreTimelineItems(getHtmlDocRevision)
+    this.isLoadMoreTimelineInProgress = false
   }
 
   handleClickBtnCloseApp = () => {
@@ -754,6 +760,7 @@ export class HtmlDocument extends React.Component {
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            userProfile={state.loggedUser.profile}
           />
         </PopinFixedRightPartContent>
       )

@@ -31,6 +31,7 @@
     &__statewrapper
       overflow-y auto
       position relative
+      height 100%
       &.promptMessageWrapper > .previewcomponent // render .file__contentpage__statewrapper.promptMessageWrapper .file__contentpage__preview
         height calc(100% - 68px) // 100% - file__contentpage__preview__state height
     &__wrapper
@@ -161,6 +162,7 @@
           height 100%
       &__statewrapper
         width 100%
+        height auto
       &__wrapper
         width calc(100% - 30px) // 30px => margin
         .commentArea
