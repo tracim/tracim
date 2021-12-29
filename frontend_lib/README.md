@@ -1,79 +1,79 @@
-# Tracim lib
+Tracim lib
+==========
 
 This library groups the components shared across Tracim frontend and the Tracim frontend apps.
 
 It can be built in two different ways:
 
-- as a standalone module, that could be published on NPM and used by external apps
-- as a script to be inserted in an HTML page using the a `<script>` tag, without the shared vendors. This is what is used for Tracim.
+- [**Optimized build**](#optimized-build):
+  - A script to be inserted in an HTML page using the a `<script>` tag
+  - Build without the shared dependencies
+  - The default usage for Tracim
+- [**Standalone build**](#standalone-build):
+  - a script that can be published on NPM and used by external apps
+  - Build with every dependency
+  - A UMD build
 
-# Building as a standalone bundle
+## Optimized build
 
-The standalone bundle can be used in external Tracim apps as an UMD module.
-It includes all its dependencies, is self-contained, and can be imported using
-`require('tracim_frontend_lib')` or `import ... from 'tracim_frontend_lib'`.
+This build can be included using a `<script>` tag.  
+It does not come with all its dependencies which makes it lighter.  
+Some of them are in the `tracim_frontend_vendors` bundle.  
+This is the build used in Tracim's default configuration.
 
-Run:
-
-    yarn run build
-
-This will produce two UMD modules:
-- `dist/tracim_frontend_lib.lib.js`: the library part
-- `dist/tracim_frontend_lib.style.js`: the styling part
-
-The Webpack configuration used to build the standalone bundle is `webpack.standalone.config.js`.
-
-## When to use this bundle
-
-This bundle should be used when building a Tracim app outside of Tracim.
-
-# Building without shared vendors, using externals
-
-This build can be included using a `<script>` tag.
-It does not come with all its dependencies.
-Some of them are in the `tracim_frontend_vendors` bundle.
-The point of this way of building is to share the `tracim_frontend_lib` and common `dependencies` across the frontend, the apps and the lib in Tracim.
-
-The build can be used from a package (a Tracim frontend app) by accessing the global variable `tracim_frontend_lib` or in a package built with Webpack as long as:
+The build and its functions can be used by accessing the global variable `tracim_frontend_lib` or in a package built with Webpack as long as:
 
 - `tracim_frontend_lib` is listed in the `externals` property of the Webpack configuration
 - all the libraries in `tracim_frontend_vendors` are also listed in `externals`
-- `tracim_frontend_vendors` and `tracim_frontend_libs` are included using the `<script>` tag before the app is loaded. In this configuration, `tracim_frontend_lib` expects the global object `tracim_frontend_vendors` to be available.
-
-This can be done by using the `externals.json` file built when bundling `tracim_frontend_vendors`.
+- `tracim_frontend_vendors` and `tracim_frontend_lib` are included using the `<script>` tag before the app is loaded.
+  - In this configuration, `tracim_frontend_lib` expects the global object `tracim_frontend_vendors` to be available.
+  - This can be done by using the `externals.json` file built when bundling `tracim_frontend_vendors`.
+  
+Note: All the above is already configured for Tracim's `optimized` bundles.
 
 Run:
 
-    yarn run buildwithextvendors
+    ./build_frontend_lib.sh
 
-This will produce two scripst:
-- `dist/tracim_frontend_lib.optimized.lib.js`: the library part, declaring the `tracim_frontend_lib` global variable
+This shell script accept `-d` to bypass obfuscation and minification to help debugging.
+
+This will produce two scripts:
+- `dist/tracim_frontend_lib.optimized.lib.js`: the library part
 - `dist/tracim_frontend_lib.optimized.style.js`: the styling part
 
-The Webpack configuration used to build tracim_frontend_lib this way `webpack.optimized.config.js`.
+The Webpack configuration used to build the standalone bundle is [webpack.optimized.config.js](./webpack.optimized.config.js).
 
-## When to use this bundle
+#### Pros
+- it is lighter: some dependencies are externals therefore not in the bundle
+- it builds faster: since it is lighter
 
-This bundle should be used when building a Tracim app for Tracim.
+#### Cons
+- It declares a global variable tracim_frontend_lib that the Tracim apps expect (when they are built as `optimized`)
+- It must be used with the `tracim_vendors` feature: it is the features that merge the shared dependencies
 
-# Frontend unit tests
+## Standalone build
 
-Frontend unit tests use the standalone bundle, hence the need to build it when building the full frontend.
-Using the tracim_frontend_lib build which does not include the shared vendors does not work: `tracim_frontend_lib` needs to be compatible with CommonJS, and needs to access its dependencies. It is, however, impossible to make a `tracim_frontend_vendors` global object available for `tracim_frontend_lib` when using CommonJS modules, since their is no global namespace shared between the modules (in Node.js at least).
+The standalone module can be used in external apps as a UMD module.  
+It includes all its dependencies, is self-contained, and can be imported using
+`require('tracim_frontend_lib')` or `import {...} from 'tracim_frontend_lib'`.
 
-# Building a Tracim app using `tracim_frontend_lib`
+Run:
 
-In the code of your app, use `import ... from tracim_frontend_lib` to import the library (or `require('tracim_frontend_lib')`).
+    yarn run build:standalone
 
-In its webpack configuration, either use the bundle, which is the default entry point of `tracim_frontend_lib`, or use the browser library:
+Or, to bypass obfuscation and minification
 
- - declare `tracim_frontend_lib` and the optimized vendors in the `externals` field of the Webpack configuration of the app.
-   See [../frontend_app_file/webpack.optimized.config.js](../frontend_app_file/webpack.optimized.config.js) for an example.
- - include `tracim_frontend_lib` and `tracim_frontend_vendors` in the HTML pages where the app is used:
+    yarn run build:standalone:dev
 
-    ```html
-    <script src='./app/tracim_frontend_vendors.js'></script>
-    <script src='./app/tracim_frontend_lib.lib.js'></script>
-    ```
+This will produce two UMD modules:
+- `dist/tracim_frontend_lib.lib.js` is the library part
+- `dist/tracim_frontend_lib.style.js` is the styling part (css)
 
-Apps in the Tracim project need to support both methods, using separate Webpack configurations.
+The Webpack configuration used is [webpack.standalone.config.js](./webpack.standalone.config.js).
+
+#### Pros
+- it is the conventional build way for js libraries
+- it is exported as a UMD module
+
+#### Cons
+- it cannot use the tracim_vendors feature. So it will bundle dependencies that are already available in Tracim
