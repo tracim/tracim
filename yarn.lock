@@ -13406,7 +13406,6 @@ fsevents@^1.2.7:
     react-redux: 5.0.6
     react-router-dom: ^5.2.0
     react-select: ^3.0.4
-    reactstrap: ^8.9.0
     redux: 3.7.2
     redux-logger: ^3.0.6
     redux-mock-store: ^1.5.3
@@ -13738,7 +13737,6 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-i18next: 7.4.0
     react-router-dom: ^5.2.0
-    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     standard: ^14
     standard-loader: ^7.0.0
@@ -13963,7 +13961,6 @@ fsevents@^1.2.7:
     react-dom: ^16.13.1
     react-i18next: 7.4.0
     react-router-dom: ^5.2.0
-    reactstrap: ^8.9.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14

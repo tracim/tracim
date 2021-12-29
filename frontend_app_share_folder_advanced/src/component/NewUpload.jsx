@@ -1,9 +1,11 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import { Popover, PopoverBody } from 'reactstrap'
-import { generateRandomPassword, ComposedIcon } from 'tracim_frontend_lib'
-import { isMobile } from 'react-device-detect'
+import {
+  ComposedIcon,
+  generateRandomPassword,
+  Popover
+} from 'tracim_frontend_lib'
 import PropTypes from 'prop-types'
 
 const color = require('color')
@@ -12,16 +14,9 @@ export class NewUpload extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      popoverMultipleEmailsOpen: false,
       hidePassword: true,
       isPasswordActive: false
     }
-  }
-
-  handleTogglePopoverMultipleEmails = () => {
-    this.setState(prevState => ({
-      popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
-    }))
   }
 
   handleTogglePasswordVisibility = () => {
@@ -73,15 +68,9 @@ export class NewUpload extends React.Component {
             <i className='fas fa-fw fa-question-circle' />
           </button>
           <Popover
-            placement='bottom'
-            isOpen={state.popoverMultipleEmailsOpen}
-            target='popoverMultipleEmails'
-            // INFO - CH - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-            toggle={this.handleTogglePopoverMultipleEmails} // eslint-disable-line react/jsx-handler-names
-            trigger={isMobile ? 'click' : 'hover'}
-          >
-            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
-          </Popover>
+            targetId='popoverMultipleEmails'
+            popoverBody={props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}
+          />
         </div>
 
         {(state.isPasswordActive
@@ -186,7 +175,6 @@ export class NewUpload extends React.Component {
 export default translate()(Radium(NewUpload))
 
 NewUpload.propTypes = {
-  uploadLinkList: PropTypes.array.isRequired,
   customColor: PropTypes.string,
   uploadEmails: PropTypes.string,
   onChangeUploadEmails: PropTypes.func,

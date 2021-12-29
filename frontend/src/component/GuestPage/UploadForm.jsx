@@ -1,29 +1,15 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 import InputGroupText from '../common/Input/InputGroupText.jsx'
 import InputTextArea from '../common/Input/InputTextArea.jsx'
 import {
   IconButton,
   FileDropzone,
-  FileUploadList
+  FileUploadList,
+  Popover
 } from 'tracim_frontend_lib'
 
 class UploadForm extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      popoverPasswordInfoOpen: false
-    }
-  }
-
-  handleTogglePopoverPasswordInfo = () => {
-    this.setState(prevState => ({
-      popoverPasswordInfoOpen: !prevState.popoverPasswordInfoOpen
-    }))
-  }
-
   sendButtonIsDisabled = () => {
     const { props } = this
     const guestFullnameIsValid = props.guestFullname.value.length && !props.guestFullname.isInvalid
@@ -72,17 +58,9 @@ class UploadForm extends React.Component {
               </button>
 
               <Popover
-                placement='bottom'
-                isOpen={this.state.popoverPasswordInfoOpen}
-                target='popoverPasswordInfo'
-                // INFO - CH - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                toggle={this.handleTogglePopoverPasswordInfo} // eslint-disable-line react/jsx-handler-names
-                trigger={isMobile ? 'click' : 'hover'}
-              >
-                <PopoverBody>
-                  {props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
-                </PopoverBody>
-              </Popover>
+                targetId='popoverPasswordInfo'
+                popoverBody={props.t('The person who sent you this file protected it with a password. If you do not know the password, please contact her.')}
+              />
             </div>
           )}
 

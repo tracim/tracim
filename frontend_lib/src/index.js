@@ -111,6 +111,7 @@ import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPa
 
 import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
+import Popover from './component/Popover/Popover.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentArea from './component/Timeline/CommentArea.jsx'
@@ -453,5 +454,6 @@ export {
   htmlToText,
   getRawFileContent,
   putRawFileContent,
-  postRawFileContent
+  postRawFileContent,
+  Popover
 }
