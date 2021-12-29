@@ -117,8 +117,7 @@ class PopinFixedHeader extends React.Component {
               <>
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
-                  title={rawTitle}
-                  id='rawTitle'
+                  id={`wsContentGeneric__header__title_${content.content_id}`}
                 >
                   {state.editTitle
                     ? (
@@ -135,7 +134,7 @@ class PopinFixedHeader extends React.Component {
                 <Popover
                   placement='bottom'
                   isOpen={state.popoverTitleOpen}
-                  target='rawTitle'
+                  target={`wsContentGeneric__header__title_${content.content_id}`}
                   toggle={this.handleTogglePopoverTitle} // eslint-disable-line react/jsx-handler-names
                   trigger={isMobile ? 'click' : 'hover'}
                 >
