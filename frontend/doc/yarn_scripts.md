@@ -1,7 +1,7 @@
 Available yarn scripts
 ======================
 
-These commands can be executed from any folders starting by `frontend` except `frontend_vendors` and `frontend_lib`.  
+These commands can be executed from any folders starting by `frontend` except `frontend_vendors`.  
 Example: `frontend/`, `frontend_app_file/`, `frontend_app_agenda/`, `frontend_app_workspace/` ...
 
 ### build the app without shared dependencies - Optimized build

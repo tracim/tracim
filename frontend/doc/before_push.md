@@ -10,4 +10,4 @@ Run the script for linting and unit tests without any errors
 ###### 2) Translation
 Run the translation generation script and update any values marked `__NOT_TRANSLATED__` at least in the english translation ([here](./i18next.scanner/en/translation.json)). Notify your PR if some translations are missing
 
-    yarn run build-translation
+    yarn run build:translation

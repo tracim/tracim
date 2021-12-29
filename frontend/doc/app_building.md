@@ -44,7 +44,8 @@ The configuration file `debug.js` will be used, following the `debug.sample.js` 
 
 To adapt the configuration to your local database, you need to create the required data for test using Tracim's frontend interface
 > See the respective app's README.md for details, part "Specific `debug.js` configuration"
-### Run servdev with a different user
+
+### Run servdev with a different user (only useful for app's servdev)
 
 Login with that user in the frontend.
 
@@ -52,9 +53,11 @@ Add the `loggedUser` property at the root of your `debug.js` and update the prop
 
 Keep the `...defaultDebug.loggedUser` to avoid missing a required properties.
 
-Example:
+Example for frontend_app_file/src/debug.js:
 ```js
-const updatedDebugExample = {
+import { defaultDebug } from 'tracim_frontend_lib'
+
+export const updatedDebugExample = {
   ...debug,
   loggedUser: {
     ...defaultDebug.loggedUser,
