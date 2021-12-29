@@ -1,3 +1,10 @@
+# 4.0.5 / 2021-12-29
+
+### Fixed Issues
+
+- CI/tests: [#5212](https://github.com/tracim/tracim/issues/5212)
+
+
 # 4.0.4 / 2021-12-21
 
 ### Fixed Issues
