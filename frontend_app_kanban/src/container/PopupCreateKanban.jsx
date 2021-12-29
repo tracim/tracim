@@ -19,7 +19,7 @@ const defaultKanbanBoard = {
   columns: []
 }
 
-class PopupCreateKanban extends React.Component {
+export class PopupCreateKanban extends React.Component {
   constructor (props) {
     super(props)
 
@@ -117,9 +117,23 @@ class PopupCreateKanban extends React.Component {
           case 3002:
             this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
             break
+          case 6002:
+            this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed'))
+            break
+          case 6003:
+            this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size'))
+            break
+          case 6004:
+            this.sendGlobalFlashMessage(props.t('You have reached your storage limit, you cannot add new files'))
+            break
+          default:
+            this.sendGlobalFlashMessage(props.t('Error while creating kanban'))
+            break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating kanban'))
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while creating kanban'))
+        break
     }
   }
 
