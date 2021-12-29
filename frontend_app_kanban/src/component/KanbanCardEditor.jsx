@@ -28,7 +28,8 @@ function KanbanCardEditor (props) {
       props.onTinyMceInput,
       props.onTinyMceKeyDown,
       props.onTinyMceKeyUp,
-      props.onTinyMceSelectionChange
+      props.onTinyMceSelectionChange,
+      props.focusOnDescription
     )
 
     return () => globalThis.tinymce.remove(descriptionEditionSelector)
