@@ -5,3 +5,4 @@ node_modules/
 src/debug.js
 dist/folder.app.js
 dist/folder.app.standalone.js
+dist/folder.app.optimized.js
