@@ -12,3 +12,4 @@ dist/tracim_frontend_lib.optimized.test_utils.js
 dist/tracim_frontend_lib.tracim.lib.js
 dist/tracim_frontend_lib.tracim.style.js
 dist/tracim_frontend_lib.tracim.test_utils.js
+src/index.dev.js
