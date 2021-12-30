@@ -61,7 +61,7 @@ Example: `frontend/`, `frontend_app_file/`, `frontend_app_agenda/`, `frontend_ap
     yarn run build:standalone
 
 - Build the app as standalone app including all its dependencies
-- Uses the local `webpack.config.standalone.js`
+- Uses the local `webpack.standalone.config.js`
 
 ### build Tracim the app Standalone for debugging
 

@@ -13,22 +13,6 @@ module.exports = {
     library: 'appAdminWorkspaceUser',
     libraryTarget: isProduction ? 'var' : undefined
   },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist/'),
-    proxy: { '/api': 'http://127.0.0.1:7999' },
-    host: '0.0.0.0',
-    port: 8073,
-    hot: true,
-    noInfo: true,
-    overlay: {
-      warnings: false,
-      errors: true
-    },
-    historyApiFallback: true
-    // headers: {
-    //   'Access-Control-Allow-Origin': '*'
-    // }
-  },
   devtool: isProduction ? false : 'eval-cheap-module-source-map',
   performance: {
     hints: false
