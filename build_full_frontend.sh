@@ -56,7 +56,7 @@ for app in "$DEFAULTDIR"/frontend_app_*; do
 		log "Skipping $app because of the existence of the .disabled-app file"
 	else
 		cd "$app" || exit 1
-		./build_*.sh $shelldev || logerror "Failed building $app."
+		./build_app.sh $shelldev || logerror "Failed building $app."
 	fi
 done
 

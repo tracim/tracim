@@ -12,7 +12,7 @@ Example: `frontend/`, `frontend_app_file/`, `frontend_app_agenda/`, `frontend_ap
 - Build the app including only its specific dependencies
 - Uses the merge dependencies feature of Tracim (see `frontend_vendors` folder)
 - Uses the local webpack.optimized.config.js
-- Is the script used by `build_[appName].sh` files
+- Is the script used by `build_app.sh` files
 
 ### build Tracim lib Optimized for debugging
 
@@ -22,7 +22,7 @@ Example: `frontend/`, `frontend_app_file/`, `frontend_app_agenda/`, `frontend_ap
 - Is faster than `buildoptimized` (less processing)
 - Include sourcemaps
 - Useful for debugging
-- Is the script used by `build_[appName].sh -d` files using the `-d` option
+- Is the script used by `build_app.sh -d` files using the `-d` option
 
 ### build the translation files
 

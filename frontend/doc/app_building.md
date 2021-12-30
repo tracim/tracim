@@ -13,9 +13,9 @@ You must run [install_frontend_dependencies.sh](../../install_frontend_dependenc
 
 ### Basic
 - save your modifications
-- run `build_[appName].sh`
+- run `build_app.sh`
 
-`build_[appName].sh` will build the app and copy everything (bundle and translations files) into the `frontend/dist/app` folder.
+`build_app.sh` will build the app and copy everything (bundle and translations files) into the `frontend/dist/app` folder.
 
 Once the script ends, refresh the browser's page to load your new app version (be careful with the cache).
 
