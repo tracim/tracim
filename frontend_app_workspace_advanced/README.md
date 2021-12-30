@@ -1,24 +1,34 @@
-# App Workspace Advanced for Tracim
+App Workspace Advanced for Tracim
+===================
 
-This repo is an app loaded by Tracim.
+This folder is a feature app loaded by Tracim.
 
-### To update this repo
-- commit and push changes
-- run `$ npm run build`
-- copy dist/pageHtml.app.js and past it into Tracim(repo)/dist/app
+It is meant to manage Tracim spaces.
 
-### Development
-To see your changes without importing the app into Tracim you need to be logged in to the frontend's dev server to have an auth cookie an run:
-- run `$ npm run servdev`
-Which will create a web server (webpack) where you will see the app loaded with some default values
-For this command the configuration file debug.js is used which follows the template of the file debug.sample.js. To adapt the configuration to your content, you need to change the variables:
- - workspaceId: integer
- - agendaUrl: string composed of 'http://MACHINE_ADRESS/agenda/workspace/${workspaceId}/'
- - contentReadStatusList: array of integers
- - description: string
- - label: string
- - memberList: array of objects
- - recentActivityList: array of objects
- - apiUrl: /api (this can be a full URL)
- - slug: string
-Another needed configuration is made in the backend/development.ini, where you need to add http://MACHINE_ADRESS:8076 in to the variable cors.access-control-allowed-origin
+It allows changing the description, the name, the default role, the member list and their roles, the activation of optional features and to delete the space.
+
+### Build the app
+
+#### For production
+
+see [frontend/doc/app_building#Production](../frontend/doc/app_building.md#production)
+
+#### For development
+
+see [frontend/doc/app_building#Development](../frontend/doc/app_building.md#development)
+
+##### Specific `debug.js` configuration
+
+- Create a content of type file (in any space) using Tracim's frontend interface
+- In `src/debug.js`, change:
+  - `content.workspace_id` to the id of the space you just created the content in
+
+___
+
+### Other available yarn scripts
+
+see [frontend/doc/yarn_scripts.md](../frontend/doc/yarn_scripts.md)
+
+### Before pushing changes to this app, you must
+
+see [frontend/doc/before_push.md](../frontend/doc/before_push.md)
