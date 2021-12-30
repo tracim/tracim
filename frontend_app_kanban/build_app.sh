@@ -24,15 +24,15 @@ function logerror {
 
 dev=""
 if [ "$1" = "-d" ]; then
-    dev="-dev"
+    dev=":dev"
 fi
 
-log "creating debug file"
-cp src/debug.js.sample src/debug.js
+log "creating debug file if not already exists"
+cp -u src/debug.js.sample src/debug.js
 log "building frontend_app_kanban"
-yarn run buildoptimized$dev  && loggood "success" || logerror "some error"
+yarn run build:optimized$dev && loggood "success" || logerror "some error"
 log "copying built kanban to frontend/"
-cp dist/kanban.app.js ../frontend/dist/app/kanban.app.js && loggood "success" || logerror "some error"
+cp dist/kanban.app.optimized.js ../frontend/dist/app/kanban.app.optimized.js && loggood "success" || logerror "some error"
 for lang in en fr pt de; do
     cp i18next.scanner/${lang}/translation.json ../frontend/dist/app/kanban_${lang}_translation.json && loggood "success" || logerror "some error"
 done
