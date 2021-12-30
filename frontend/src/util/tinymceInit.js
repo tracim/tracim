@@ -38,7 +38,8 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
     handleTinyMceInput,
     handleTinyMceKeyDown,
     handleTinyMceKeyUp,
-    handleTinyMceSelectionChange
+    handleTinyMceSelectionChange,
+    autoFocus = true
   ) {
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
@@ -120,9 +121,11 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
             $editor.selection.select($editor.getBody(), true)
           }
 
-          // INFO - GM - 2020/03/17 - theses 2 lines enable autofocus at the end of the document
-          $editor.focus()
-          $editor.selection.collapse(false)
+          if (autoFocus) {
+            // INFO - GM - 2020/03/17 - theses 2 lines enable autofocus at the end of the document
+            $editor.focus()
+            $editor.selection.collapse(false)
+          }
 
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)

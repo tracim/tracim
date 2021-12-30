@@ -9,6 +9,7 @@ import {
 import {
   handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
+  PROFILE,
   ROLE,
   sendGlobalFlashMessage
 } from '../../helper.js'
@@ -121,7 +122,7 @@ export class NewTagForm extends React.Component {
   getSubmitButtonLabel (tagExitsInSpace) {
     const { props } = this
     if (props.contentId) {
-      return props.userRoleIdInWorkspace < ROLE.contentManager.id || tagExitsInSpace
+      return props.userRoleIdInWorkspace < ROLE.contentManager.id || tagExitsInSpace || props.userProfile !== PROFILE.administrator.slug
         ? props.t('Add')
         : props.t('Create and add')
     } else return props.t('Create')
@@ -136,7 +137,7 @@ export class NewTagForm extends React.Component {
       e.key === 'Enter' && !(
         !state.tagName ||
         (!props.contentId && tagExitsInSpace) ||
-        (props.contentId && !tagExitsInSpace && props.userRoleIdInWorkspace < ROLE.contentManager.id)
+        (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id || props.userProfile !== PROFILE.administrator.slug))
       )
     ) this.handleClickBtnValidate()
     if (e.key === 'Escape') {
@@ -199,7 +200,7 @@ export class NewTagForm extends React.Component {
             disabled={
               !state.tagName ||
               (!props.contentId && tagExitsInSpace) ||
-              (props.contentId && !tagExitsInSpace && props.userRoleIdInWorkspace < ROLE.contentManager.id)
+              (props.contentId && !tagExitsInSpace && (props.userRoleIdInWorkspace < ROLE.contentManager.id && props.userProfile !== PROFILE.administrator.slug))
             }
             icon='fas fa-check'
             onClick={this.handleClickBtnValidate}
@@ -220,11 +221,13 @@ NewTagForm.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   contentTagList: PropTypes.array,
   spaceTaglist: PropTypes.array,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  userProfile: PropTypes.string
 }
 
 NewTagForm.defaultProps = {
   contentTagList: [],
   spaceTaglist: [],
-  userRoleIdInWorkspace: ROLE.reader.id
+  userRoleIdInWorkspace: ROLE.reader.id,
+  userProfile: PROFILE.user.slug
 }

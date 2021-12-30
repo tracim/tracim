@@ -2,7 +2,7 @@ import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
 import { NewTagForm } from '../../src/component/Tags/NewTagForm.jsx'
-import { ROLE } from '../../src/helper.js'
+import { PROFILE, ROLE } from '../../src/helper.js'
 
 require('../../src/component/Tags/NewTagForm.styl')
 
@@ -14,6 +14,7 @@ describe('<NewTagForm />', () => {
     contentTagList: [],
     spaceTaglist: [],
     userRoleIdInWorkspace: ROLE.workspaceManager.id,
+    userProfile: PROFILE.administrator.slug,
     t: key => key
   }
 

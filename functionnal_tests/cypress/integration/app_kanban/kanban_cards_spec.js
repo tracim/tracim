@@ -1,7 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 
-// FIXME - GB - 2021-12-21 - See https://github.com/tracim/tracim/issues/5153
-describe.skip('App Kanban', () => {
+describe('App Kanban', () => {
   const kanbanTitle = 'Kanban'
   const columnTitle = 'Column Title'
   const cardTitle = 'Card Title'
@@ -34,8 +33,8 @@ describe.skip('App Kanban', () => {
 
   it('should be possible to create a card', () => {
     cy.get('[data-cy=kanban_addCard]').should('be.visible').click()
-    cy.contains('.cardPopup__header', 'New Card')
     cy.waitForTinyMCELoaded()
+    cy.contains('.cardPopup__header', 'New Card')
     cy.get('.kanban__KanbanPopup__title .textinput__text').type(cardTitle)
     cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
     cy.contains('.kanban__contentpage__wrapper__board__card__title', cardTitle)

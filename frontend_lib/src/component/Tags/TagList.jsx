@@ -5,6 +5,7 @@ import {
   sendGlobalFlashMessage,
   naturalCompare,
   handleFetchResult,
+  PROFILE,
   ROLE
 } from '../../helper.js'
 import {
@@ -165,9 +166,10 @@ class TagList extends React.Component {
 
   render () {
     const { props, state } = this
-    const isReadOnlyMode = props.contentId
+    const isReadOnlyMode = (props.contentId
       ? props.userRoleIdInWorkspace < ROLE.contributor.id
-      : props.userRoleIdInWorkspace < ROLE.contentManager.id
+      : props.userRoleIdInWorkspace < ROLE.contentManager.id) &&
+      props.userProfile !== PROFILE.administrator.slug
 
     return (
       <div className='tagList' data-cy='tag_list'>
@@ -179,6 +181,7 @@ class TagList extends React.Component {
               contentTagList={state.tagList}
               spaceTagList={state.spaceTagList}
               userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+              userProfile={props.userProfile}
               workspaceId={props.workspaceId}
             />
           )}
@@ -231,10 +234,12 @@ TagList.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  userProfile: PropTypes.string
 }
 
 TagList.defaultProps = {
   contentId: 0,
-  userRoleIdInWorkspace: ROLE.reader.id
+  userRoleIdInWorkspace: ROLE.reader.id,
+  userProfile: PROFILE.user.slug
 }

@@ -57,6 +57,7 @@ function KanbanCard (props) {
             key='kanban_card_edit'
             onClick={() => props.onEditCard(props.card)}
             text={props.t('Edit')}
+            textMobile={props.t('Edit')}
             title={props.t('Edit this card')}
           />
           <IconButton
@@ -66,6 +67,7 @@ function KanbanCard (props) {
             key='kanban_card_delete'
             onClick={() => setShowConfirmPopup(true)}
             text={props.t('Delete')}
+            textMobile={props.t('Delete')}
             title={props.t('Delete this card')}
           />
         </DropdownMenu>
@@ -118,6 +120,9 @@ function KanbanCard (props) {
             mode='light'
             onClick={hancleClickSeeDescriptionButton}
             text={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
+              ? props.t('See more')
+              : props.t('See less')}
+            textMobile={showSeeDescriptionButton === DESCRIPTION_BUTTON.SEE_MORE
               ? props.t('See more')
               : props.t('See less')}
           />

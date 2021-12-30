@@ -33,6 +33,10 @@ cardWidth = 280px
         flex 1
         overflow-x auto
         overflow-y hidden
+
+        &.hidden
+          display none
+
         &__column
           display flex
           flex-direction row
@@ -97,17 +101,20 @@ cardWidth = 280px
         background-color lightGrey
         border-radius standardBorderRadius
         margin 0 textSpacing
-        overflow-y hidden
+        overflow hidden
         min-width 315px
         text-align center
-        > :last-child
-          overflow-x auto
+        & > :last-child
+          overflow hidden
           // INFO - GB - 2021-12-20 - The css rule below is !important because it overrides the library style
           height calc(100% - 43px) !important
-
+          &:hover
+            overflow-y auto
   &__KanbanPopup
     width 100%
     top 15%
+    &.hidden
+      display none
     &__bgColor, &__deadline
       display flex
       flex-direction column
@@ -183,3 +190,16 @@ cardWidth = 280px
           &__submit
             display inline-flex
             margin standardSpacing 0
+
+@media (max-width: max-xs)
+  .kanban__KanbanPopup
+    top 10%
+    max-height "calc(100% - %s)" % (headerHeight + standardSpacing)
+    & .cardPopup__container
+      min-width 100%
+      max-height 100%
+      overflow auto
+      & .cardPopup__body
+        height "calc(100% - %s)" % headerHeight
+        & .kanban__KanbanPopup__form
+          height "calc(100% - %s)" % standardSpacing

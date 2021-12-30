@@ -4,11 +4,14 @@ import {
   AVATAR_SIZE,
   DropdownMenu,
   NewMemberForm,
+  PROFILE,
   ROLE
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
 export const WorkspaceMembersList = props => {
+  const isWorkspaceManagerOrAdministrator = props.userRoleIdInWorkspace > ROLE.contentManager.id ||
+    props.userProfile === PROFILE.administrator.slug
   return (
     <div className='formBlock workspace_advanced__userlist'>
       {props.displayFormNewMember
@@ -34,7 +37,7 @@ export const WorkspaceMembersList = props => {
           />
         ) : (
           <div>
-            {props.userRoleIdInWorkspace > ROLE.contentManager.id && (
+            {isWorkspaceManagerOrAdministrator && (
               <div
                 className='formBlock__bottom workspace_advanced__userlist__adduser'
                 onClick={props.onClickToggleFormNewMember}
@@ -83,7 +86,7 @@ export const WorkspaceMembersList = props => {
                   >
                     {(() => {
                       const role = props.roleList.find(r => r.slug === m.role) || { label: 'unknown', hexcolor: '#333', faIcon: '' }
-                      return props.userRoleIdInWorkspace > ROLE.contentManager.id
+                      return isWorkspaceManagerOrAdministrator
                         ? (
                           <DropdownMenu
                             buttonOpts={<i className={`fas fa-fw fa-${role.faIcon}`} style={{ color: role.hexcolor }} />}
@@ -110,7 +113,7 @@ export const WorkspaceMembersList = props => {
                         )
                     })()}
                   </div>
-                  {props.userRoleIdInWorkspace > ROLE.contentManager.id && (m.user_id !== props.loggedUser.userId
+                  {isWorkspaceManagerOrAdministrator && (m.user_id !== props.loggedUser.userId
                     ? (
                       <div
                         className='workspace_advanced__userlist__list__item__delete'

@@ -38,13 +38,13 @@ import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
-const BOARD_STATE = {
+export const BOARD_STATE = {
   LOADING: 'loading',
   LOADED: 'loaded',
   ERROR: 'error'
 }
 
-class Kanban extends React.Component {
+export class Kanban extends React.Component {
   constructor (props) {
     super(props)
 
@@ -338,97 +338,95 @@ class Kanban extends React.Component {
         </div>
         {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}
         {state.boardState === BOARD_STATE.ERROR && <span> {props.t('Error while loading the board.')} </span>}
-        {state.boardState === BOARD_STATE.LOADED && (
-          <>
-            <div className='kanban__contentpage__wrapper__board'>
-              <Board
-                allowAddColumn={!props.readOnly}
-                allowRemoveColumn={!props.readOnly}
-                allowRenameColumn={!props.readOnly}
-                allowAddCar={!props.readOnly}
-                allowRemoveCard={!props.readOnly}
-                onCardDragEnd={this.handleCardDragEnd}
-                onColumnDragEnd={this.handleColumnDragEnd}
-                onColumnNew={this.handleColumnNew}
-                onColumnRemove={this.handleRemoveColumn}
-                onCardRemove={this.handleRemoveCard}
-                onColumnRename={this.handleEditColumn}
-                renderColumnAdder={() => (
-                  <div
-                    className='kanban__columnAdder'
-                    key='kanban__columnAdder'
-                    onClick={this.handleEditColumn}
-                  >
-                    <i className='fa fas fa-fw fa-plus' />
-                    <span>{props.t('Add new column')}</span>
-                  </div>
-                )}
-                renderColumnHeader={column => (
-                  <KanbanColumnHeader
-                    customColor={props.config.hexcolor}
-                    readOnly={props.readOnly}
-                    column={column}
-                    onEditColumn={this.handleEditColumn}
-                    onAddCard={this.handleAddCard}
-                    onRemoveColumn={this.handleRemoveColumn}
-                  />
-                )}
-                renderCard={card => (
-                  <KanbanCard
-                    customColor={props.config.hexcolor}
-                    readOnly={props.readOnly}
-                    card={card}
-                    onEditCard={this.handleEditCard}
-                    onEditCardContent={this.handleEditCardContent}
-                    onRemoveCard={this.handleRemoveCard}
-                  />
-                )}
-              >
-                {state.board}
-              </Board>
-            </div>
-            {state.editedCardInfos && (
-              <CardPopup
-                customClass='kanban__KanbanPopup'
-                customColor={props.config.hexcolor}
-                faIcon='far fa-id-card'
-                label={state.editedCardInfos.card.id ? props.t('Editing Card') : props.t('New Card')}
-                onClose={this.handleCardEditCancel}
-              >
-                <KanbanCardEditor
-                  apiUrl={props.config.apiUrl}
-                  card={state.editedCardInfos.card}
+        <>
+          <div className={classnames('kanban__contentpage__wrapper__board', { hidden: state.boardState !== BOARD_STATE.LOADED })}>
+            <Board
+              allowAddColumn={!props.readOnly}
+              allowRemoveColumn={!props.readOnly}
+              allowRenameColumn={!props.readOnly}
+              allowAddCar={!props.readOnly}
+              allowRemoveCard={!props.readOnly}
+              onCardDragEnd={this.handleCardDragEnd}
+              onColumnDragEnd={this.handleColumnDragEnd}
+              onColumnNew={this.handleColumnNew}
+              onColumnRemove={this.handleRemoveColumn}
+              onCardRemove={this.handleRemoveCard}
+              onColumnRename={this.handleEditColumn}
+              renderColumnAdder={() => (
+                <div
+                  className='kanban__columnAdder'
+                  key='kanban__columnAdder'
+                  onClick={this.handleEditColumn}
+                >
+                  <i className='fa fas fa-fw fa-plus' />
+                  <span>{props.t('Add new column')}</span>
+                </div>
+              )}
+              renderColumnHeader={column => (
+                <KanbanColumnHeader
                   customColor={props.config.hexcolor}
-                  focusOnDescription={state.editedCardInfos.focusOnDescription}
-                  onValidate={this.handleCardEdited}
-                  onCancel={this.handleCardEditCancel}
-                  isAutoCompleteActivated={state.isAutoCompleteActivated}
-                  autoCompleteItemList={state.autoCompleteItemList}
-                  autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-                  onClickAutoCompleteItem={(item) => {
-                    tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
-                  }}
+                  readOnly={props.readOnly}
+                  column={column}
+                  onEditColumn={this.handleEditColumn}
+                  onAddCard={this.handleAddCard}
+                  onRemoveColumn={this.handleRemoveColumn}
                 />
-              </CardPopup>
-            )}
-            {state.editedColumnInfos && (
-              <CardPopup
-                customClass='kanban__KanbanPopup'
-                customColor={props.config.hexcolor}
-                faIcon='far fa-id-card'
-                label={state.editedColumnInfos.id ? props.t('Edit Column') : props.t('New Column')}
-                onClose={this.handleColumnEditCancel}
-              >
-                <KanbanColumnEditor
-                  column={state.editedColumnInfos}
+              )}
+              renderCard={card => (
+                <KanbanCard
                   customColor={props.config.hexcolor}
-                  onValidate={this.handleColumnEdited}
-                  onCancel={this.handleColumnEditCancel}
+                  readOnly={props.readOnly}
+                  card={card}
+                  onEditCard={this.handleEditCard}
+                  onEditCardContent={this.handleEditCardContent}
+                  onRemoveCard={this.handleRemoveCard}
                 />
-              </CardPopup>
-            )}
-          </>
-        )}
+              )}
+            >
+              {state.board}
+            </Board>
+          </div>
+          {state.editedCardInfos && (
+            <CardPopup
+              customClass={classnames('kanban__KanbanPopup', { hidden: state.boardState !== BOARD_STATE.LOADED })}
+              customColor={props.config.hexcolor}
+              faIcon='far fa-id-card'
+              label={state.editedCardInfos.card.id ? props.t('Editing Card') : props.t('New Card')}
+              onClose={this.handleCardEditCancel}
+            >
+              <KanbanCardEditor
+                apiUrl={props.config.apiUrl}
+                card={state.editedCardInfos.card}
+                customColor={props.config.hexcolor}
+                focusOnDescription={state.editedCardInfos.focusOnDescription}
+                onValidate={this.handleCardEdited}
+                onCancel={this.handleCardEditCancel}
+                isAutoCompleteActivated={state.isAutoCompleteActivated}
+                autoCompleteItemList={state.autoCompleteItemList}
+                autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+                onClickAutoCompleteItem={(item) => {
+                  tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
+                }}
+              />
+            </CardPopup>
+          )}
+          {state.editedColumnInfos && (
+            <CardPopup
+              customClass={classnames('kanban__KanbanPopup', { hidden: state.boardState !== BOARD_STATE.LOADED })}
+              customColor={props.config.hexcolor}
+              faIcon='far fa-id-card'
+              label={state.editedColumnInfos.id ? props.t('Edit Column') : props.t('New Column')}
+              onClose={this.handleColumnEditCancel}
+            >
+              <KanbanColumnEditor
+                column={state.editedColumnInfos}
+                customColor={props.config.hexcolor}
+                onValidate={this.handleColumnEdited}
+                onCancel={this.handleColumnEditCancel}
+              />
+            </CardPopup>
+          )}
+        </>
       </div>
     )
   }
