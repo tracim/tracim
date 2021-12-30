@@ -27,4 +27,14 @@ describe('navigate :: workspace > create_new > kanban', function () {
     cy.get('[data-cy=createcontent__form__input]').type('Hello Kanban (from contents)')
     cy.get('[data-cy=popup__createcontent__form__button]').should('be.enabled').click()
   })
+
+  it('kanban with a double-quote in its name', function () {
+    cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
+    cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
+    cy.contains('Kanban').click()
+    cy.get('[data-cy=popup__createcontent__form__button]').should('be.disabled')
+    cy.get('[data-cy=createcontent__form__input]').type('"Hello double-quote"')
+    cy.get('[data-cy=popup__createcontent__form__button]').should('be.enabled').click()
+    cy.get('.kanban__columnAdder > span').should('be.visible')
+  })
 })

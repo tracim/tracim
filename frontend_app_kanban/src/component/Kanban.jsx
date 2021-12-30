@@ -38,6 +38,8 @@ import KanbanCardEditor from './KanbanCardEditor.jsx'
 import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
+const KANBAN_GET_URL_FILENAME = 'kanban' + KANBAN_FILE_EXTENSION
+
 export const BOARD_STATE = {
   LOADING: 'loading',
   LOADED: 'loaded',
@@ -90,23 +92,27 @@ export class Kanban extends React.Component {
     this.setState({ boardState: BOARD_STATE.LOADING })
     const { props } = this
 
-    const fetchRawFileContent = await handleFetchResult(
-      await getRawFileContent(
-        props.config.apiUrl,
-        props.content.workspace_id,
-        props.content.content_id,
-        props.content.current_revision_id,
-        props.content.label + KANBAN_FILE_EXTENSION
-      ),
-      true
-    )
-
-    if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
-      this.setState({
-        boardState: BOARD_STATE.LOADED,
-        board: fetchRawFileContent.body || {}
-      })
-    } else {
+    try {
+      const fetchRawFileContent = await handleFetchResult(
+        await getRawFileContent(
+          props.config.apiUrl,
+          props.content.workspace_id,
+          props.content.content_id,
+          props.content.current_revision_id,
+          KANBAN_GET_URL_FILENAME
+        ),
+        true
+      )
+      if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
+        this.setState({
+          boardState: BOARD_STATE.LOADED,
+          board: fetchRawFileContent.body || {}
+        })
+      } else {
+        this.setState({ boardState: BOARD_STATE.ERROR })
+      }
+    } catch (error) {
+      console.log(`Got an error while fetching the board's contents: ${error}`)
       this.setState({ boardState: BOARD_STATE.ERROR })
     }
   }
