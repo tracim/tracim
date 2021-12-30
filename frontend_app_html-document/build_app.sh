@@ -21,18 +21,17 @@ function logerror {
     exit 1
 }
 
-
 dev=""
 if [ "$1" = "-d" ]; then
-    dev="-dev"
+    dev=":dev"
 fi
 
-log "creating debug file"
-cp src/debug.js.sample src/debug.js
+log "creating debug file if not already exists"
+cp -u src/debug.js.sample src/debug.js
 log "building frontend_app_html-document"
-yarn run buildoptimized$dev && loggood "success" || logerror "some error"
+yarn run build:optimized$dev && loggood "success" || logerror "some error"
 log "copying built file to frontend/"
-cp dist/html-document.app.js ../frontend/dist/app/html-document.app.js && loggood "success" || logerror "some error"
+cp dist/html-document.app.optimized.js ../frontend/dist/app/html-document.app.optimized.js && loggood "success" || logerror "some error"
 log "copying en translation.json"
 cp i18next.scanner/en/translation.json ../frontend/dist/app/html-document_en_translation.json && loggood "success" || logerror "some error"
 log "copying fr translation.json"
