@@ -6,5 +6,4 @@ source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(frontend|concourse)"
 
 ./install_frontend_dependencies.sh root
-./build_full_frontend.sh
 ./run_frontend_unit_test.sh
