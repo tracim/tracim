@@ -13,19 +13,6 @@ module.exports = {
     library: 'appGallery',
     libraryTarget: isProduction ? 'var' : undefined
   },
-  devServer: {
-    contentBase: path.join(__dirname, 'dist/'),
-    proxy: { '/api': 'http://127.0.0.1:7999', '/assets': 'http://127.0.0.1:7999' },
-    host: '0.0.0.0',
-    port: 8081,
-    hot: true,
-    noInfo: true,
-    overlay: {
-      warnings: false,
-      errors: true
-    },
-    historyApiFallback: true
-  },
   devtool: isProduction ? false : 'eval-cheap-module-source-map',
   performance: {
     hints: false
