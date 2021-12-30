@@ -29,6 +29,8 @@ fi
 
 log "creating debug file if not already exists"
 cp -u src/debug.js.sample src/debug.js
+log "creating default props file for unit tests"
+cp src/debug.js.sample test/fixture/defaultProps.js
 log "building frontend_app_file"
 yarn run build:optimized$dev  && loggood "success" || logerror "some error"
 log "copying built file to frontend/"

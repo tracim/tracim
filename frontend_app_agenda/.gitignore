@@ -8,3 +8,4 @@ dist/agenda.app.standalone.js
 dist/agenda.app.optimized.js
 node_modules/
 src/debug.js
+test/fixture/defaultProps.js

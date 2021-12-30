@@ -8,3 +8,4 @@ dist/workspace.app.standalone.js
 dist/workspace.app.optimized.js
 dist/workspace.app.standalone.js.map
 src/debug.js
+test/fixture/defaultProps.js

@@ -6,3 +6,4 @@ dist/file.app.js
 dist/file.app.standalone.js
 dist/file.app.optimized.js
 src/debug.js
+test/fixture/defaultProps.js

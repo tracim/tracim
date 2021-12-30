@@ -3,6 +3,7 @@
 .git/
 node_modules/
 src/debug.js
+test/fixture/defaultProps.js
 dist/thread.app.js
 dist/thread.app.js.map
 dist/thread.app.standalone.js

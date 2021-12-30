@@ -3,6 +3,7 @@
 .git/
 node_modules/
 src/debug.js
+test/fixture/defaultProps.js
 dist/html-document.app.js
 dist/html-document.app.js.map
 dist/html-document.app.dev.js
