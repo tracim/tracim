@@ -49,6 +49,8 @@ function KanbanCard (props) {
           buttonCustomClass='kanban__contentpage__wrapper__board__card__title__actions'
           buttonIcon='fas fa-ellipsis-v'
           buttonTooltip={props.t('Actions')}
+          buttonDataCy='cardActions'
+          menuCustomClass='dropdown-menu-right'
         >
           <IconButton
             disabled={props.readOnly}
@@ -59,6 +61,7 @@ function KanbanCard (props) {
             text={props.t('Edit')}
             textMobile={props.t('Edit')}
             title={props.t('Edit this card')}
+            dataCy='editCard'
           />
           <IconButton
             disabled={props.readOnly}
@@ -69,6 +72,7 @@ function KanbanCard (props) {
             text={props.t('Delete')}
             textMobile={props.t('Delete')}
             title={props.t('Delete this card')}
+            dataCy='deleteCard'
           />
         </DropdownMenu>
 
@@ -86,6 +90,7 @@ function KanbanCard (props) {
                 icon='fas fa-times'
                 onClick={() => setShowConfirmPopup(false)}
                 text={props.t('Cancel')}
+                dataCy='cancelDeleteCard'
               />
 
               <IconButton
@@ -95,6 +100,7 @@ function KanbanCard (props) {
                 mode='light'
                 onClick={() => props.onRemoveCard(props.card)}
                 text={props.t('Delete')}
+                dataCy='confirmDeleteCard'
               />
             </div>
           </CardPopup>
