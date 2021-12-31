@@ -13,6 +13,7 @@ import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import FavoriteButton from '../Button/FavoriteButton.jsx'
+import Popover from '../Popover/Popover.jsx'
 
 class PopinFixedHeader extends React.Component {
   constructor (props) {
@@ -108,7 +109,7 @@ class PopinFixedHeader extends React.Component {
               <>
                 <div
                   className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
-                  title={rawTitle}
+                  id={`wsContentGeneric__header__title_${content.content_id}`}
                 >
                   {state.editTitle
                     ? (
@@ -122,6 +123,11 @@ class PopinFixedHeader extends React.Component {
                     )
                     : componentTitle}
                 </div>
+                <Popover
+                  targetId={`wsContentGeneric__header__title_${content.content_id}`}
+                  popoverBody={rawTitle}
+                />
+
                 {userRoleIdInWorkspace >= ROLE.contributor.id && state.editTitle && (
                   <button
                     className={classnames('wsContentGeneric__header__edittitle', `${customClass}__header__changetitle transparentButton`)}

@@ -30,8 +30,12 @@ import {
   mockPutUserPassword204,
   mockPutUserPassword403
 } from '../../apiMock'
+import { reactstrapPopoverHack } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
 
 describe('In <Account /> at AdminAccount.jsx', () => {
+  reactstrapPopoverHack(document, 'popoverFullName')
+  reactstrapPopoverHack(document, 'popoverUsername')
+
   const newFlashMessageInfoCallBack = sinon.spy()
   const newFlashMessageWarningCallBack = sinon.spy()
   const setBreadcrumbsCallBack = sinon.spy()
