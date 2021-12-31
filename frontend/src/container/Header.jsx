@@ -157,8 +157,13 @@ export class Header extends React.Component {
                     className='btn outlineTextBtn primaryColorBorder nohover'
                     to={PAGE.AGENDA}
                   >
-                    <i className='fas fa-fw fa-calendar-alt' />
-                    {props.t('Agendas')}
+                    <div
+                      data-toggle='collapse'
+                      data-target='#navbarSupportedContent'
+                    >
+                      <i className='fas fa-fw fa-calendar-alt' />
+                      {props.t('Agendas')}
+                    </div>
                   </Link>
                 </li>
               )}

@@ -18,8 +18,13 @@ const AdminLink = props => {
         data-cy='adminlink__workspace__link'
         key='adminlink__workspace__link'
       >
-        <i className={`fa-fw ${workspaceConfig.faIcon}`} />
-        {props.t('Spaces')}
+        <div
+          data-toggle='collapse'
+          data-target='#navbarSupportedContent'
+        >
+          <i className={`fa-fw ${workspaceConfig.faIcon}`} />
+          {props.t('Spaces')}
+        </div>
       </Link>
 
       <Link
@@ -27,8 +32,13 @@ const AdminLink = props => {
         data-cy='adminlink__user__link'
         key='adminlink__user__link'
       >
-        <i className='far fa-fw fa-user' />
-        {props.t('Users')}
+        <div
+          data-toggle='collapse'
+          data-target='#navbarSupportedContent'
+        >
+          <i className='far fa-fw fa-user' />
+          {props.t('Users')}
+        </div>
       </Link>
     </DropdownMenu>
   )

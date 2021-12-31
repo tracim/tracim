@@ -22,6 +22,8 @@ const DropdownLang = props => {
             data-cy={lang.id}
             onClick={() => props.onChangeLang(lang.id)}
             key={lang.id}
+            data-toggle='collapse'
+            data-target='#navbarSupportedContent'
           >
             <img className='dropdownlang__dropdown__subdropdown__link__flag' src={lang.icon} />
             {lang.label}

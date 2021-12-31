@@ -31,8 +31,13 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__profile__link'
           key='menuprofil__dropdown__profile__link'
         >
-          <i className='far fa-fw fa-user' />
-          {props.t('My profile')}
+          <div
+            data-toggle='collapse'
+            data-target='#navbarSupportedContent'
+          >
+            <i className='far fa-fw fa-user' />
+            {props.t('My profile')}
+          </div>
         </Link>
 
         <Link
@@ -40,8 +45,13 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__account__link'
           key='menuprofil__dropdown__account__link'
         >
-          <i className='fas fa-fw fa-cogs' />
-          {props.t('Account Settings')}
+          <div
+            data-toggle='collapse'
+            data-target='#navbarSupportedContent'
+          >
+            <i className='fas fa-fw fa-cogs' />
+            {props.t('Account Settings')}
+          </div>
         </Link>
 
         <button
@@ -49,6 +59,8 @@ export const MenuProfil = props => {
           onClick={props.onClickLogout}
           data-cy='menuprofil__dropdown__logout__link'
           key='menuprofil__dropdown__logout__link'
+          data-toggle='collapse'
+          data-target='#navbarSupportedContent'
         >
           <i className='fas fa-fw fa-sign-out-alt' />
           {props.t('Log out')}

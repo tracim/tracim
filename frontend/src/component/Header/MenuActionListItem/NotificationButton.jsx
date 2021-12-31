@@ -10,6 +10,8 @@ export const NotificationButton = props => {
         className='notificationButton__btn btn outlineTextBtn nohover primaryColorBorder'
         type='button'
         onClick={props.onClickNotification}
+        data-toggle='collapse'
+        data-target='#navbarSupportedContent'
       >
         <i className='far fa-fw fa-bell' />
         {props.t('Notifications')}

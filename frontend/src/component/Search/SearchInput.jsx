@@ -48,6 +48,8 @@ export class SearchInput extends React.Component {
           data-cy='search__btn'
           onClick={this.handleClickSearch}
           title={props.t('Search')}
+          data-toggle='collapse'
+          data-target='#navbarSupportedContent'
         >
           <i className='fas fa-search' />
         </button>
