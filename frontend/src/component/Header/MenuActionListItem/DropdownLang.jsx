@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { DropdownMenu } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 
 require('./DropdownLang.styl')
 
@@ -22,7 +23,7 @@ const DropdownLang = props => {
             data-cy={lang.id}
             onClick={() => props.onChangeLang(lang.id)}
             key={lang.id}
-            data-toggle='collapse'
+            data-toggle={isMobile ? 'collapse' : ''}
             data-target='#navbarSupportedContent'
           >
             <img className='dropdownlang__dropdown__subdropdown__link__flag' src={lang.icon} />

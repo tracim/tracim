@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { workspaceConfig } from '../../../util/helper.js'
 import { DropdownMenu, PAGE } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 
 const AdminLink = props => {
   return (
@@ -19,7 +20,7 @@ const AdminLink = props => {
         key='adminlink__workspace__link'
       >
         <div
-          data-toggle='collapse'
+          data-toggle={isMobile ? 'collapse' : ''}
           data-target='#navbarSupportedContent'
         >
           <i className={`fa-fw ${workspaceConfig.faIcon}`} />
@@ -33,7 +34,7 @@ const AdminLink = props => {
         key='adminlink__user__link'
       >
         <div
-          data-toggle='collapse'
+          data-toggle={isMobile ? 'collapse' : ''}
           data-target='#navbarSupportedContent'
         >
           <i className='far fa-fw fa-user' />

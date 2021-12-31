@@ -1,6 +1,8 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+import { isMobile } from 'react-device-detect'
+
 require('./NotificationButton.styl')
 
 export const NotificationButton = props => {
@@ -10,7 +12,7 @@ export const NotificationButton = props => {
         className='notificationButton__btn btn outlineTextBtn nohover primaryColorBorder'
         type='button'
         onClick={props.onClickNotification}
-        data-toggle='collapse'
+        data-toggle={isMobile ? 'collapse' : ''}
         data-target='#navbarSupportedContent'
       >
         <i className='far fa-fw fa-bell' />

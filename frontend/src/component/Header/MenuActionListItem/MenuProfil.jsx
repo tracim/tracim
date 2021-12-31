@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { FETCH_CONFIG } from '../../../util/helper.js'
 import { Avatar, AVATAR_SIZE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 
 require('./MenuProfil.styl')
 
@@ -32,7 +33,7 @@ export const MenuProfil = props => {
           key='menuprofil__dropdown__profile__link'
         >
           <div
-            data-toggle='collapse'
+            data-toggle={isMobile ? 'collapse' : ''}
             data-target='#navbarSupportedContent'
           >
             <i className='far fa-fw fa-user' />
@@ -46,7 +47,7 @@ export const MenuProfil = props => {
           key='menuprofil__dropdown__account__link'
         >
           <div
-            data-toggle='collapse'
+            data-toggle={isMobile ? 'collapse' : ''}
             data-target='#navbarSupportedContent'
           >
             <i className='fas fa-fw fa-cogs' />
@@ -59,7 +60,7 @@ export const MenuProfil = props => {
           onClick={props.onClickLogout}
           data-cy='menuprofil__dropdown__logout__link'
           key='menuprofil__dropdown__logout__link'
-          data-toggle='collapse'
+          data-toggle={isMobile ? 'collapse' : ''}
           data-target='#navbarSupportedContent'
         >
           <i className='fas fa-fw fa-sign-out-alt' />
