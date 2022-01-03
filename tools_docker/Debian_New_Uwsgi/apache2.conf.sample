@@ -47,6 +47,9 @@
     <IfDefine START_CALDAV>
         ProxyPassMatch ^/agenda uwsgi://127.0.0.1:8081
         ProxyPassReverse /agenda uwsgi://127.0.0.1:8081
+        ProxyPassMatch ^/addressbook uwsgi://127.0.0.1:8081
+        ProxyPassReverse /addressbook uwsgi://127.0.0.1:8081
+        ProxyPassMatch ^/caldav-cardav_(.*)$ uwsgi://127.0.0.1:8081
     </IfDefine>
 
     # Proxying Frontend

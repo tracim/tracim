@@ -42,6 +42,9 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
     # Proxying Caldav
     ProxyPassMatch ^/agenda uwsgi://127.0.0.1:6544
     ProxyPassReverse /agenda uwsgi://127.0.0.1:6544
+    ProxyPassMatch ^/addressbook uwsgi://127.0.0.1:6544
+    ProxyPassReverse /addressbook uwsgi://127.0.0.1:6544
+    ProxyPassMatch ^/caldav-cardav_(.*)$ uwsgi://127.0.0.1:6544
 
     # Proxying Frontend
     ProxyPassMatch ^/ui uwsgi://127.0.0.1:6544
