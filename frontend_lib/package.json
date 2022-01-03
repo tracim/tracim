@@ -1,7 +1,7 @@
 {
   "name": "tracim_frontend_lib",
   "version": "1.1.9",
-  "main": "dist/tracim_frontend_lib.lib.js",
+  "main": "dist/tracim_frontend_lib.lib.standalone.js",
   "scripts": {
     "build:standalone": "NODE_ENV=production webpack-cli --config webpack.standalone.config.js",
     "build:standalone:dev": "NODE_ENV=development webpack-cli --config webpack.standalone.config.js",

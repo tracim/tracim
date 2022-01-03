@@ -6,4 +6,7 @@ source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(frontend|concourse)"
 
 ./install_frontend_dependencies.sh root
+cd frontend_lib
+yarn run build:standalone
+cd ..
 ./run_frontend_unit_test.sh

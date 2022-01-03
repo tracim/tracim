@@ -15,7 +15,7 @@ log "creating webpack dev server index.dev.js if not exists"
 cp -u src/index.dev.js.sample src/index.dev.js
 
 for i in lib style; do
-    cp "./dist/tracim_frontend_lib.optimized.$i.js" "../frontend/dist/app/tracim_frontend_lib.optimized.$i.js" || exit 1
+    cp "./dist/tracim_frontend_lib.$i.optimized.js" "../frontend/dist/app/tracim_frontend_lib.$i.optimized.js" || exit 1
 done
 
 echo "Script ended at $(date +'%H:%M:%S')"

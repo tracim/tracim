@@ -38,8 +38,8 @@ Run:
 This shell script accept `-d` to bypass obfuscation and minification to help debugging.
 
 This will produce two scripts:
-- `dist/tracim_frontend_lib.optimized.lib.js`: the library part
-- `dist/tracim_frontend_lib.optimized.style.js`: the styling part
+- `dist/tracim_frontend_lib.lib.optimized.js`: the library part
+- `dist/tracim_frontend_lib.style.optimized.js`: the styling part
 
 The Webpack configuration used to build the standalone bundle is [webpack.optimized.config.js](./webpack.optimized.config.js).
 

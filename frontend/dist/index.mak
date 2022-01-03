@@ -110,8 +110,8 @@
       -->
     <div id="welcome"><%include file="assets/branding/${website__welcome_page}" /></div>
     <script type="text/javascript" src="/app/tracim_frontend_vendors.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/tracim_frontend_lib.optimized.lib.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/app/tracim_frontend_lib.optimized.style.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/tracim_frontend_lib.lib.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/app/tracim_frontend_lib.style.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     % for custom_toolbox_file in custom_toolbox_files:
     <script type="text/javascript" src="/custom_toolbox-assets/${custom_toolbox_file.name}?token=${cache_token}" nonce="${csp_nonce}"></script>

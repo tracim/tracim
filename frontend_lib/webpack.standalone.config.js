@@ -15,7 +15,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'tracim_frontend_lib.[name].js',
+    filename: 'tracim_frontend_lib.[name].standalone.js',
     pathinfo: !isProduction,
     library: ['tracim_frontend_lib', '[name]'],
     libraryTarget: 'umd',
