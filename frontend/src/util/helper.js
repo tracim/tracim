@@ -77,7 +77,8 @@ export const SEARCH_CONTENT_FACETS = {
       i18n.t('folder_search'),
       i18n.t('html-document_search'),
       i18n.t('thread_search'),
-      i18n.t('file_search')
+      i18n.t('file_search'),
+      i18n.t('kanban_search')
     ]
   },
   EXTENSION: {

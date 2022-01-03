@@ -621,7 +621,7 @@ class CopyRevisionAbortedDepotCorrupted(DepotCorrupted):
 
 
 class TracimFileNotFound(FileNotFoundError, DepotCorrupted):
-    pass
+    error_code = ErrorCode.CONTENT_NOT_FOUND
 
 
 class ContentStatusException(TracimError):

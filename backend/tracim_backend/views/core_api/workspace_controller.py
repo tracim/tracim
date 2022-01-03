@@ -5,6 +5,8 @@ from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 import transaction
 
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import KANBAN_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -593,6 +595,10 @@ class WorkspaceController(Controller):
             content_id=hapic_data.path["content_id"], content_type=content_type_list.Any_SLUG
         )
         content_type = content_type_list.get_one_by_slug(content.type).slug
+
+        if content_type == KANBAN_TYPE:
+            content_type = FILE_TYPE
+
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(

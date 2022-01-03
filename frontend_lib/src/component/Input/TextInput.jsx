@@ -7,7 +7,7 @@ require('./TextInput.styl')
 // A thin-layer around <input type='text'> that sets the Tracim style and behaviour
 // Also provide a onValidate handler which is called when Enter is pressed by the user.
 export class TextInput extends React.Component {
-  handleValidateIfEnterKey (e) {
+  handleValidateIfEnterKey = (e) => {
     const { props } = this
     if (e.key !== 'Enter' || !props.onValidate) return
     props.onValidate(e)
@@ -18,6 +18,7 @@ export class TextInput extends React.Component {
     return (
       <div className='textinput__box'>
         <input
+          autoFocus={props.autoFocus}
           type='text'
           className='textinput__text form-control primaryColorBorder'
           onChange={props.onChange}
@@ -33,9 +34,10 @@ export class TextInput extends React.Component {
 }
 
 TextInput.propTypes = {
-  onChange: PropTypes.func,
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
+  autoFocus: PropTypes.bool,
   onValidate: PropTypes.func,
-  value: PropTypes.string,
   disabled: PropTypes.bool,
   placeholder: PropTypes.string,
   customClass: PropTypes.string,
@@ -43,9 +45,8 @@ TextInput.propTypes = {
 }
 
 TextInput.defaultProps = {
-  onChange: () => {},
+  autoFocus: false,
   onValidate: undefined,
-  value: '',
   disabled: false,
   placeholder: undefined,
   customClass: '',

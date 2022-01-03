@@ -1,0 +1,54 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+cardWidth = 280px
+
+.kanban
+  &__contentpage__wrapper__board__card
+    margin-bottom standardSpacing
+    width cardWidth
+    background-color offWhite
+    border 1px solid
+    border-radius standardBorderRadius
+    padding standardSpacing
+    text-align start
+    &:active
+      opacity 70%
+    &__title
+      display flex
+
+      & strong
+        flex 1
+        overflow-wrap anywhere
+        hyphens auto
+        margin-bottom textSpacing
+
+      & > button
+        font-size metadataFontSize
+        padding textSpacing
+        border none
+        border-radius 0
+        display flex
+
+        &.iconbutton__icon
+          margin 0
+
+      &__actions.dropdownMenuButton
+        padding 0
+        &::after
+          display none
+
+    &__description
+      overflow-wrap break-word
+      display flex
+      flex-direction column
+      & > div
+        line-height standardFontSize
+      &.kanban__contentpage__wrapper__board__card__description__overflow > div
+        max-height (3 * standardFontSize)
+        overflow hidden
+      &__overflow__button
+        align-self flex-end
+        font-size metadataFontSize
+        font-weight bold
+        margin-top textSpacing
+        color mediumDarkGrey

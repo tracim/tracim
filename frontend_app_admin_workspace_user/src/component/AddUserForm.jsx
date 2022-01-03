@@ -1,11 +1,11 @@
 import React from 'react'
 import { translate } from 'react-i18next'
-import { Popover, PopoverBody } from 'reactstrap'
 import {
   CUSTOM_EVENT,
   IconButton,
   PROFILE_LIST,
-  ALLOWED_CHARACTERS_USERNAME
+  ALLOWED_CHARACTERS_USERNAME,
+  Popover
 } from 'tracim_frontend_lib'
 
 export class AddUserForm extends React.Component {
@@ -17,15 +17,8 @@ export class AddUserForm extends React.Component {
       newUserUsername: '',
       newUserEmail: '',
       newUserPassword: '',
-      newUserType: '',
-      popoverEmailInfoOpen: false
+      newUserType: ''
     }
-  }
-
-  handleTogglePopoverEmailInfo = () => {
-    this.setState(prevState => ({
-      popoverEmailInfoOpen: !prevState.popoverEmailInfoOpen
-    }))
   }
 
   handleChangeNewUserName = e => this.setState({ newUserName: e.target.value })
@@ -137,17 +130,9 @@ export class AddUserForm extends React.Component {
                 </button>
 
                 <Popover
-                  placement='bottom'
-                  isOpen={state.popoverEmailInfoOpen}
-                  target='popoverEmailInfo'
-                  // INFO - GB - 20200507 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                  toggle={this.handleTogglePopoverEmailInfo} // eslint-disable-line react/jsx-handler-names
-                  trigger='hover'
-                >
-                  <PopoverBody>
-                    {props.t('Linking an email address is required for the user to be able to reset the password.')}
-                  </PopoverBody>
-                </Popover>
+                  targetId='popoverEmailInfo'
+                  popoverBody={props.t('Linking an email address is required for the user to be able to reset the password.')}
+                />
               </>
             )}
           </div>

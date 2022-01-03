@@ -87,7 +87,7 @@ const AdminWorkspace = props => {
                        Enable
                        </td>
                     */}
-                    <td className='table__memberCount'>{ws.memberList.length}</td>
+                    <td className='table__memberCount'>{ws.number_of_members}</td>
                     <td>
                       <div className='table__delete adminWorkspace__table__delete'>
                         <button

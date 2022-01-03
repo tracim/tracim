@@ -3,8 +3,6 @@ import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 describe('Space settings in reader mode', () => {
   let workspaceId
-  const flashMessageClass = '.flashmessage__container__content__text__paragraph'
-  const flashMessageText = 'Your tag has been created'
 
   before(() => {
     cy.resetDB()
@@ -17,7 +15,7 @@ describe('Space settings in reader mode', () => {
 
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
-      // NOTE - MP - 05-11-2021 - If the page isn't loaded after 30s
+      // INFO - MP - 2021-11-05 - If the page isn't loaded after 30s
       // there is a problem somewhere
       cy.get('.userstatus__role__text', { timeout: 30000 })
         .contains('Space manager')
@@ -26,41 +24,41 @@ describe('Space settings in reader mode', () => {
         .find('.dashboard__workspace__detail__buttons .iconbutton')
         .click()
 
-      // NOTE - MP - 05-11-2021 - Test the tag manipulation
+      // INFO - MP - 2021-11-05 - Test the tag manipulation
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.get('[data-cy=add_tag]').type('Tag')
       cy.get('[data-cy=validate_tag]').click()
 
-      // NOTE - MP - 05-11-2021 - Change visibility
+      // INFO - MP - 2021-11-05 - Change visibility
       cy.get('[data-cy=popin_right_part_members_list]').click()
-      // NOTE - MP - 05-11-2021 - 2 is the id of John Doe
+      // INFO - MP - 2021-11-05 - 2 is the id of John Doe
       cy.get('[data-cy=workspace_advanced__member-2_role]')
         .find('button')
         .first().click()
       cy.get('[data-cy=workspace_advanced__member-2_role]')
         .find('[data-cy=dropdownMenu_items]')
         .find('>span')
-        // FIXME - MP - 05-11-2021 - Add data-cy into these buttons
-        // to not pick the last
-        .first().click()
-      // NOTE - MP - 05-11-2021 - 1 is the id of GlobalManager
+        // FIXME - MP - 2021-11-05 - Add data-cy into these buttons
+        // to not pick the wrong one
+        .last().click()
+      // INFO - MP - 2021-11-05 - 1 is the id of GlobalManager
       cy.get('[data-cy=workspace_advanced__member-1_role]')
         .find('button')
         .first().click()
       cy.get('[data-cy=workspace_advanced__member-1_role]')
         .find('[data-cy=dropdownMenu_items]')
         .find('>span')
-        // FIXEME - MP - 05-11-2021 - Add data-cy into theses button
-        // to not pick the last
+        // FIXME - MP - 2021-11-05 - Add data-cy into theses button
+        // to not pick the rong one
         .last().click()
     })
   })
 
   beforeEach(() => {
-    cy.loginAs('administrators')
+    cy.loginAs('users')
     cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
 
-    // NOTE - MP - 05-11-2021 - If the page isn't loaded after 30s
+    // INFO - MP - 2021-11-05 - If the page isn't loaded after 30s
     // there is a problem somewhere
     cy.get('.userstatus__role__text', { timeout: 30000 })
       .contains('Reader')

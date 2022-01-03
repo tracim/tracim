@@ -1,79 +1,109 @@
-/* global confirm */
-
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import {
+  CardPopup,
+  DropdownMenu,
+  IconButton
+} from 'tracim_frontend_lib'
 
-import { IconButton } from 'tracim_frontend_lib'
+function KanbanColumnHeader (props) {
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false)
 
-const KanbanColumnHeader = props => {
   return (
-    <>
+    <div
+      className='kanban__contentpage__wrapper__board__column'
+      style={{ borderColor: props.column.bgColor || props.customColor }}
+    >
       <div
-        className='kanban__contentpage__statewrapper__kanban__column__header'
-        style={{ backgroundColor: props.column.bgColor || '' }}
+        className='kanban__contentpage__wrapper__board__column__title'
       >
-        <strong onClick={() => props.onRenameColumn(props.column)}>{props.column.title}</strong>
-        <IconButton
-          text=''
-          icon='fas fa-paint-brush'
-          tooltip={props.t('Change the color of this column')}
-          onClick={() => props.onChangeColumnColor(props.column)}
-          disabled={props.readOnly}
-        />
-        <IconButton
-          text=''
-          icon='fas fa-plus'
-          tooltip={props.t('Add a card')}
-          onClick={() => props.onAddCard(props.column)}
-          disabled={props.readOnly}
-        />
-        <IconButton
-          text=''
-          icon='far fa-trash-alt'
-          tooltip={props.t('Remove this column')}
-          onClick={() => {
-            if (confirm(props.t('Are you sure you want to delete this column?'))) {
-              props.onRemoveColumn(props.column)
-            }
-          }}
-          disabled={props.readOnly}
-        />
+        <strong onClick={() => props.onEditColumn(props.column)}>{props.column.title}</strong>
       </div>
-      {(props.showColorPicker && (
-        <div className='kanban__contentpage__statewrapper__kanban__column__colorPicker'>
-          <input
-            type='color'
-            onChange={(e) => props.onApplyColumnColorChange(props.column, e.target.value)}
-            disabled={props.readOnly}
-          />
-          <input
-            type='button'
-            style={{ fontSize: 'small' }}
-            value={props.t('Hide')}
-            onClick={props.onCancelColumnColorChange}
-            disabled={props.readOnly}
-          />
-        </div>
-      ))}
-    </>
+
+      <IconButton
+        dataCy='kanban_addCard'
+        disabled={props.readOnly}
+        icon='fas fa-plus'
+        intent='link'
+        onClick={() => props.onAddCard(props.column)}
+        title={props.t('Add a card')}
+      />
+
+      <DropdownMenu
+        buttonCustomClass='kanban__contentpage__wrapper__board__column__title__actions'
+        buttonIcon='fas fa-ellipsis-v'
+        buttonTooltip={props.t('Actions')}
+        buttonDataCy='columnActions'
+      >
+        <IconButton
+          disabled={props.readOnly}
+          icon='fas fa-pencil-alt'
+          intent='link'
+          key='kanban_column_edit'
+          onClick={() => props.onEditColumn(props.column)}
+          text={props.t('Edit')}
+          textMobile={props.t('Edit')}
+          title={props.t('Edit this column')}
+          dataCy='editColumn'
+        />
+        <IconButton
+          disabled={props.readOnly}
+          icon='far fa-trash-alt'
+          intent='link'
+          key='kanban_column_delete'
+          onClick={() => setShowConfirmPopup(true)}
+          text={props.t('Delete')}
+          textMobile={props.t('Delete')}
+          title={props.t('Delete this column')}
+          dataCy='deleteColumn'
+        />
+      </DropdownMenu>
+
+      {showConfirmPopup && (
+        <CardPopup
+          customClass='kanban__KanbanPopup'
+          customColor={props.customColor}
+          faIcon='far fa-fw fa-trash-alt'
+          label={props.t('Are you sure?')}
+          onClose={() => setShowConfirmPopup(false)}
+        >
+          <div className='kanban__KanbanPopup__confirm'>
+            <IconButton
+              color={props.customColor}
+              icon='fas fa-times'
+              onClick={() => setShowConfirmPopup(false)}
+              text={props.t('Cancel')}
+              dataCy='cancelDeleteColumn'
+            />
+
+            <IconButton
+              color={props.customColor}
+              icon='far fa-trash-alt'
+              intent='primary'
+              mode='light'
+              onClick={() => props.onRemoveColumn(props.column)}
+              text={props.t('Delete')}
+              dataCy='confirmDeleteColumn'
+            />
+          </div>
+        </CardPopup>
+      )}
+    </div>
   )
 }
 
 KanbanColumnHeader.propTypes = {
   column: PropTypes.object.isRequired,
-  onRenameColumn: PropTypes.func.isRequired,
-  onChangeColumnColor: PropTypes.func.isRequired,
-  onApplyColumnColorChange: PropTypes.func.isRequired,
-  onCancelColumnColorChange: PropTypes.func.isRequired,
+  onEditColumn: PropTypes.func.isRequired,
   onAddCard: PropTypes.func.isRequired,
   onRemoveColumn: PropTypes.func.isRequired,
-  showColorPicker: PropTypes.bool,
+  customColor: PropTypes.string,
   readOnly: PropTypes.bool
 }
 
 KanbanColumnHeader.defaultProps = {
-  showColorPicker: false,
+  customColor: '',
   readOnly: false
 }
 

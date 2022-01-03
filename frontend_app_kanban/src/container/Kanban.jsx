@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
@@ -38,7 +37,7 @@ import KanbanComponent from '../component/Kanban.jsx'
 
 // TODO - S.G. - 2021-11-24 - The kanban app uses file storage in backend
 // This should be fixed when https://github.com/tracim/tracim/issues/5102 is implemented.
-const FILE_APP_SLUG = 'file'
+const FILE_APP_SLUG = CONTENT_TYPE.FILE
 
 export class Kanban extends React.Component {
   constructor (props) {
@@ -50,15 +49,19 @@ export class Kanban extends React.Component {
     this.state = {
       appName: 'kanban',
       breadcrumbsList: [],
+      fullscreen: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
+      currentContentRevisionId: param.content.current_revision_id,
       newComment: '',
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
-      externalTranslationList: [],
+      externalTranslationList: [
+        props.t('Create a Kanban board')
+      ],
       showRefreshWarning: false,
       editionAuthor: '',
       invalidMentionList: [],
@@ -114,6 +117,37 @@ export class Kanban extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
+  }
+
+  handleClickShowRevision = async revision => {
+    const { state, props } = this
+
+    const revisionArray = props.timeline.filter(t => t.timelineType === 'revision')
+    const isLastRevision = revision.revision_id === revisionArray[revisionArray.length - 1].revision_id
+
+    if (state.mode === APP_FEATURE_MODE.REVISION && isLastRevision) {
+      this.handleClickLastVersion()
+      return
+    }
+
+    if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
+
+    this.setState(prev => ({
+      content: {
+        ...prev.content,
+        ...revision,
+        workspace_id: state.content.workspace_id,
+        current_revision_id: revision.revision_id,
+        is_archived: prev.is_archived,
+        is_deleted: prev.is_deleted
+      },
+      mode: APP_FEATURE_MODE.REVISION
+    }))
+  }
+
+  handleClickLastVersion = () => {
+    this.setState({ mode: APP_FEATURE_MODE.VIEW })
+    this.loadContent()
   }
 
   handleContentChanged = data => {
@@ -222,6 +256,7 @@ export class Kanban extends React.Component {
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            userProfile={state.loggedUser.profile}
           />
         </PopinFixedRightPartContent>
       )
@@ -237,6 +272,14 @@ export class Kanban extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.updateTimelineAndContent()
+    }
+
+    if (prevState.isVisible !== state.isVisible) {
+      this.setState({
+        currentContentRevisionId: (prevState.isVisible && !state.isVisible)
+          ? undefined
+          : state.content.current_revision_id
+      })
     }
 
     if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
@@ -279,6 +322,7 @@ export class Kanban extends React.Component {
     )
     this.setState({
       content: response.body,
+      currentContentRevisionId: response.body.current_revision_id,
       loadingContent: false
     })
     this.setHeadTitle(response.body.label)
@@ -321,7 +365,7 @@ export class Kanban extends React.Component {
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
-    props.appContentChangeTitle(state.content, newTitle, state.config.slug)
+    props.appContentChangeTitle(state.content, newTitle, FILE_APP_SLUG)
   }
 
   handleChangeNewComment = e => {
@@ -394,6 +438,10 @@ export class Kanban extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), FILE_APP_SLUG)
   }
 
+  handleClickFullscreen = () => {
+    this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
+  }
+
   handleClickEditComment = (comment) => {
     const { props, state } = this
     props.appContentEditComment(
@@ -435,6 +483,7 @@ export class Kanban extends React.Component {
         ...prev.content,
         ...prev.newContent
       },
+      currentContentRevisionId: newObjectContent.current_revision_id,
       showRefreshWarning: false
     }))
     this.setHeadTitle(newObjectContent.label)
@@ -454,11 +503,11 @@ export class Kanban extends React.Component {
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
     const readOnly = (
-      state.loggedUser.userRoleIdInWorkspace < ROLE.contentManager.id ||
-        state.mode === APP_FEATURE_MODE.REVISION ||
-        state.content.is_archived ||
-        state.content.is_deleted ||
-        !state.content.is_editable
+      state.loggedUser.userRoleIdInWorkspace < ROLE.contributor.id ||
+      state.mode === APP_FEATURE_MODE.REVISION ||
+      state.content.is_archived ||
+      state.content.is_deleted ||
+      !state.content.is_editable
     )
 
     return (
@@ -467,6 +516,14 @@ export class Kanban extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          headerButtons={[
+            {
+              icon: 'fas fa-expand-arrows-alt',
+              label: props.t('Fullscreen'),
+              onClick: this.handleClickFullscreen,
+              showAction: true
+            }
+          ]}
           loading={state.loadingContent}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
@@ -504,7 +561,20 @@ export class Kanban extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
         >
-          <KanbanComponent content={state.content} config={state.config} readOnly={readOnly} />
+          <KanbanComponent
+            config={state.config}
+            content={state.content}
+            editionAuthor={state.editionAuthor}
+            fullscreen={state.fullscreen}
+            isNewContentRevision={!!state.currentContentRevisionId}
+            isRefreshNeeded={state.showRefreshWarning}
+            mode={state.mode}
+            onClickFullscreen={this.handleClickFullscreen}
+            onClickLastVersion={this.handleClickLastVersion}
+            onClickRefresh={this.handleClickRefresh}
+            onClickRestoreDeleted={this.handleClickRestoreDelete}
+            readOnly={readOnly}
+          />
           <PopinFixedRightPart
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}

@@ -3118,11 +3118,13 @@ class TestUsersEndpoint(object):
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
         assert res[0]["has_avatar"] is False
+        assert res[0]["email"] == test_user.email
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
         assert res[1]["username"] == admin_user.username
         assert res[1]["has_avatar"] is False
+        assert res[1]["email"] == admin_user.email
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
         uapi = user_api_factory.get()

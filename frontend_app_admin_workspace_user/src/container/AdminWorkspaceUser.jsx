@@ -8,14 +8,12 @@ import {
   ConfirmPopup,
   BREADCRUMBS_TYPE,
   handleFetchResult,
-  ROLE,
   CUSTOM_EVENT,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent,
   checkUsernameValidity,
   deleteWorkspace,
-  getWorkspaceMemberList,
   sendGlobalFlashMessage,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
@@ -72,11 +70,11 @@ export class AdminWorkspaceUser extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceCreated },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceMemberCreated },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceMemberDeleted },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleSpaceCreated },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleSpaceModified },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleSpaceDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleSpaceMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleSpaceMemberDeleted },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCreated },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.DELETED, handler: this.handleUserDeleted }
@@ -115,7 +113,7 @@ export class AdminWorkspaceUser extends React.Component {
   refreshAll = async () => {
     this.updateTitleAndBreadcrumbs()
     if (this.state.config.type === 'workspace') {
-      await this.loadWorkspaceContent()
+      await this.loadSpaceContent()
     } else if (this.state.config.type === 'user') {
       await this.loadUserContent()
     }
@@ -150,29 +148,18 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  loadWorkspaceContent = async () => {
+  loadSpaceContent = async () => {
     const { props, state } = this
+    const fetchSpaceList = await handleFetchResult(await getWorkspaceList(state.config.apiUrl))
 
-    const fetchWorkspaceList = getWorkspaceList(state.config.apiUrl)
-    const workspaceList = await handleFetchResult(await fetchWorkspaceList)
-
-    switch (workspaceList.apiResponse.status) {
+    switch (fetchSpaceList.apiResponse.status) {
       case 200: {
-        const fetchWorkspaceListMemberList = await Promise.all(
-          workspaceList.body.map(async ws =>
-            handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
-          )
-        )
+        const workspaceList = fetchSpaceList.body
 
         this.setState(prev => ({
           content: {
             ...prev.content,
-            workspaceList: workspaceList.body.map(ws => ({
-              ...ws,
-              memberList: (fetchWorkspaceListMemberList.find(
-                fws => fws.body.length > 0 && fws.body[0].workspace_id === ws.workspace_id
-              ) || { body: [] }).body
-            }))
+            workspaceList
           }
         }))
         break
@@ -185,29 +172,20 @@ export class AdminWorkspaceUser extends React.Component {
     const fetchUserDetail = await handleFetchResult(await getUserDetail(this.state.config.apiUrl, user.user_id))
 
     if (!fetchUserDetail.apiResponse.ok) {
-      this.displayErrorFetchingUserList()
+      sendGlobalFlashMessage(this.props.t('Error while loading users list'))
       return null
     }
 
     return fetchUserDetail.body
   }
 
-  displayErrorFetchingUserList () {
-    sendGlobalFlashMessage(this.props.t('Error while loading users list'))
-  }
-
   loadUserContent = async () => {
-    const fetchUserList = await handleFetchResult(await getUserList(this.state.config.apiUrl))
+    const { state } = this
+    const fetchUserList = await handleFetchResult(await getUserList(state.config.apiUrl))
 
     switch (fetchUserList.apiResponse.status) {
       case 200: {
-        const userList = []
-
-        for (const user of fetchUserList.body) {
-          const detailedUser = await this.getDetailedUser(user)
-          if (!detailedUser) return
-          userList.push(detailedUser)
-        }
+        const userList = fetchUserList.body
 
         this.setState(prev => ({
           content: {
@@ -217,7 +195,7 @@ export class AdminWorkspaceUser extends React.Component {
         }))
         break
       }
-      default: this.displayErrorFetchingUserList()
+      default: sendGlobalFlashMessage(this.props.t('Error while loading users list'))
     }
   }
 
@@ -245,43 +223,43 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
-  handleDeleteWorkspace = async () => {
+  handleDeleteSpace = async () => {
     const { props, state } = this
 
-    const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
-    if (deleteWorkspaceResponse.status !== 204) {
+    const deleteSpaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
+    if (deleteSpaceResponse.status !== 204) {
       sendGlobalFlashMessage(props.t('Error while deleting space'))
     }
-    this.handleClosePopupDeleteWorkspace()
+    this.handleClosePopupDeleteSpace()
   }
 
-  handleOpenPopupDeleteWorkspace = workspaceId => this.setState({
+  handleOpenPopupDeleteSpace = workspaceId => this.setState({
     popupDeleteWorkspaceDisplay: true,
     workspaceToDelete: workspaceId
   })
 
-  handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
+  handleClosePopupDeleteSpace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
-  handleWorkspaceCreated = (message) => {
+  handleSpaceCreated = (message) => {
     const { state } = this
     const workspace = message.fields.workspace
-    const newWorkspaceList = state.content.workspaceList.slice()
+    const newSpaceList = state.content.workspaceList.slice()
     /* INFO SG 2020-06-15:
      *  - the list is ordered by id and a newly created workspace has a greater id than all others.
      *  - initialize member list as empty since the space member created message will handle
      *    adding the initial user.
      */
-    newWorkspaceList.push({ ...workspace, memberList: [] })
+    newSpaceList.push({ ...workspace })
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceModified = (message) => {
+  handleSpaceModified = (message) => {
     const { state } = this
 
     const workspace = message.fields.workspace
@@ -293,108 +271,97 @@ export class AdminWorkspaceUser extends React.Component {
       console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
-    const memberList = workspaceList[workspaceIndex].memberList
 
-    const workspaceWithMemberList = {
-      ...workspace,
-      memberList: memberList
-    }
-
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      workspaceWithMemberList,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceDeleted = (message) => {
+  handleSpaceDeleted = (message) => {
     const { state } = this
+
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
 
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceMemberCreated = (message) => {
+  handleSpaceMemberCreated = (message) => {
     const { state } = this
 
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.slice()
-    newMemberList.push({
-      user_id: message.fields.user.user_id,
-      user: message.fields.user,
-      workspace_id: message.fields.workspace.workspace_id,
-      workspace: message.fields.workspace,
-      do_notify: message.fields.member.do_notify,
-      is_active: message.fields.user.is_active,
-      role: message.fields.member.role
-    })
-    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      newWorkspace,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceMemberDeleted = (message) => {
+  handleSpaceMemberDeleted = (message) => {
     const { state } = this
 
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       // We do not have this workspace in our list...
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.fields.user.user_id)
-    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      newWorkspace,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
@@ -523,39 +490,16 @@ export class AdminWorkspaceUser extends React.Component {
     }))
   }
 
-  handleClickWorkspace = workspaceId => {
+  handleClickSpace = workspaceId => {
     const { state } = this
     if (state.workspaceIdOpened === null) {
-      GLOBAL_renderAppFeature({
-        loggedUser: {
-          ...state.loggedUser,
-          userRoleIdInWorkspace: ROLE.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
-        },
-        config: {
-          history: state.config.history,
-          label: 'Advanced dashboard',
-          slug: 'workspace_advanced',
-          faIcon: 'fas fa-users',
-          hexcolor: GLOBAL_primaryColor,
-          creationLabel: '',
-          domContainer: 'appFeatureContainer',
-          apiUrl: state.config.apiUrl,
-          apiHeader: state.config.apiHeader,
-          roleList: state.config.roleList,
-          profileObject: state.config.profileObject,
-          system: { ...state.config.system },
-          translation: state.config.translation
-        },
-        content: {
-          workspace_id: workspaceId
-        }
-      })
+      state.config.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(workspaceId), { from: 'adminSpaceList' })
     } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: { workspace_id: workspaceId } })
 
     this.setState({ workspaceIdOpened: workspaceId })
   }
 
-  handleClickNewWorkspace = () => {
+  handleClickNewSpace = () => {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
@@ -585,9 +529,9 @@ export class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'workspace' && (
           <AdminWorkspace
             workspaceList={state.content.workspaceList}
-            onClickWorkspace={this.handleClickWorkspace}
-            onClickNewWorkspace={this.handleClickNewWorkspace}
-            onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
+            onClickWorkspace={this.handleClickSpace}
+            onClickNewWorkspace={this.handleClickNewSpace}
+            onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
           />
         )}
@@ -611,8 +555,8 @@ export class AdminWorkspaceUser extends React.Component {
 
         {state.popupDeleteWorkspaceDisplay && (
           <ConfirmPopup
-            onCancel={this.handleClosePopupDeleteWorkspace}
-            onConfirm={this.handleDeleteWorkspace}
+            onCancel={this.handleClosePopupDeleteSpace}
+            onConfirm={this.handleDeleteSpace}
             confirmLabel={props.t('Delete')}
             confirmIcon='far fa-fw fa-trash-alt'
           />

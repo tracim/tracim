@@ -14,7 +14,7 @@ const getSelectedApp = function (appName) {
 
   /*
     global appHtmlDocument, appThread, appFile, appFolderAdvanced, appAdminWorkspaceUser, appWorkspaceAdvanced,
-    appAgenda, appShareFolderAdvanced, appCollaborativeDocumentEdition, appGallery, appWorkspace
+    appAgenda, appShareFolderAdvanced, appCollaborativeDocumentEdition, appGallery, appWorkspace, appKanban
   */
   try {
     switch (appName) {

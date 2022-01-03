@@ -179,7 +179,7 @@ export class ReduxTlmDispatcher extends React.Component {
     const { props } = this
     if (data.fields.author.user_id === props.user.userId) return
     const commentParentId = data.fields.content.parent_id
-    const response = await props.dispatch(getContent(data.fields.workspace.workspace_id, commentParentId))
+    const response = await props.dispatch(getContent(commentParentId))
 
     if (response.status !== 200) return
     const notificationData = {

@@ -18,6 +18,7 @@
   "Invalid email": "Ungültige E-Mail",
   "Invalid email. Please enter a valid email.": "Ungültige E-Mail. Bitte geben Sie eine gültige E-Mail ein.",
   "Invalid name": "Ungültiger Name",
+  "kanban_search": "Kanban-Tafel",
   "Unknown space type": "Unbekannter Bereichsart",
   "Allowed characters: {{allowedCharactersUsername}}": "Erlaubte Zeichen: {{allowedCharactersUsername}}",
   "Create a space": "Einen Bereich schaffen",

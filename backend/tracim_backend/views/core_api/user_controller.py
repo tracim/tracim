@@ -237,7 +237,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(is_administrator)
-    @hapic.output_body(UserDigestSchema(many=True))
+    @hapic.output_body(UserSchema(many=True))
     def users(self, context, request: TracimRequest, hapic_data=None):
         """
         Get all users

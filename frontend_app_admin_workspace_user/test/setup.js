@@ -3,7 +3,7 @@ import chai from 'chai'
 import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
-// import sinon from 'sinon'
+import sinon from 'sinon'
 
 process.env.NODE_ENV = 'test'
 
@@ -23,6 +23,7 @@ if (!global.window && !global.document) {
   global.navigator = window.navigator
   global.GLOBAL_dispatchEvent = () => {}
   global.GLOBAL_primaryColor = '#aaaaaa'
+  global.FormData = window.FormData
 
   const nodeCrypto = require('crypto')
   global.crypto = {
@@ -32,4 +33,4 @@ if (!global.window && !global.document) {
 
 Enzyme.configure({ adapter: new Adapter() })
 chai.use(chaiEnzyme())
-// sinon.stub(console, 'log')
+sinon.stub(console, 'log')

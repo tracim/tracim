@@ -37,6 +37,8 @@ describe('App Workspace Advanced', function () {
             cy.get('.workspace_advanced__description__bottom__btn')
               .click()
 
+            cy.get('.workspace_advanced__contentpage__header__close').click()
+
             cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
               .find('.dashboard__workspace__detail__description')
               .contains(newDescription)
@@ -65,8 +67,9 @@ describe('App Workspace Advanced', function () {
     })
   })
 
-  describe('Member list of the workspace', () => {
-    // NOTE - MP - 2021-11-05 - 2 users: GlobalManager and Jhon Doe
+  describe.skip('Member list of the workspace', () => {
+    // NOTE - MP - 05-11-2021 - 2 users: GlobalManager and Jhon Doe
+    // FIXME - MB - Unstable test https://github.com/tracim/tracim/issues/5091
     let numberOfUserInWorkSpace = 2
     let userId = 0
     let userPublicName = ''

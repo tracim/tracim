@@ -9,11 +9,17 @@ import {
   buildHeadTitle,
   appContentFactory,
   TracimComponent,
-  postNewEmptyContent
+  postRawFileContent
 } from 'tracim_frontend_lib'
+
+import { KANBAN_MIME_TYPE, KANBAN_FILE_EXTENSION } from '../helper.js'
 import { debug } from '../debug.js'
 
-class PopupCreateKanban extends React.Component {
+const defaultKanbanBoard = {
+  columns: []
+}
+
+export class PopupCreateKanban extends React.Component {
   constructor (props) {
     super(props)
 
@@ -81,8 +87,14 @@ class PopupCreateKanban extends React.Component {
   handleValidate = async () => {
     const { props, state } = this
 
-    const fetchSaveKanbanDoc = postNewEmptyContent(
-      state.config.apiUrl, state.workspaceId, state.folderId, state.config.slug, state.newContentName
+    const fetchSaveKanbanDoc = postRawFileContent(
+      state.config.apiUrl,
+      state.workspaceId,
+      state.newContentName + KANBAN_FILE_EXTENSION,
+      JSON.stringify(defaultKanbanBoard),
+      KANBAN_MIME_TYPE,
+      state.folderId,
+      state.config.slug
     )
 
     const resSave = await handleFetchResult(await fetchSaveKanbanDoc)
@@ -105,9 +117,23 @@ class PopupCreateKanban extends React.Component {
           case 3002:
             this.sendGlobalFlashMessage(props.t('A content with the same name already exists'))
             break
+          case 6002:
+            this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed'))
+            break
+          case 6003:
+            this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size'))
+            break
+          case 6004:
+            this.sendGlobalFlashMessage(props.t('You have reached your storage limit, you cannot add new files'))
+            break
+          default:
+            this.sendGlobalFlashMessage(props.t('Error while creating kanban'))
+            break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating kanban'))
+      default:
+        this.sendGlobalFlashMessage(props.t('Error while creating kanban'))
+        break
     }
   }
 
@@ -116,7 +142,7 @@ class PopupCreateKanban extends React.Component {
       <CardPopupCreateContent
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New Kanban board')} // @TODO get the lang of user
+        label={this.props.t('New Kanban board')}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
         contentName={this.state.newContentName}

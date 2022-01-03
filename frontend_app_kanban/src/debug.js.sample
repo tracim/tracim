@@ -18,5 +18,6 @@ export const debug = {
     content_id: 1,
     content_type: 'kanban',
     workspace_id: 1
-  }
+  },
+  workspaceId: 1
 }

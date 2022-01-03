@@ -183,7 +183,7 @@ export function appContentFactory (WrappedComponent) {
     handleContentModified = (tlm) => {
       const { state } = this
       // Not our content
-      if (!permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
 
       this.setState(prevState => {
         const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
@@ -699,7 +699,7 @@ export function appContentFactory (WrappedComponent) {
       return sortTimelineByDate(fullTimeline)
     }
 
-    loadMoreTimelineItems = async (getContentRevision, newContent = null) => {
+    loadMoreTimelineItems = async (getContentRevision, newContent = null, keepPreviousItems = true) => {
       const { props, state } = this
 
       const content = newContent || state.content
@@ -734,7 +734,7 @@ export function appContentFactory (WrappedComponent) {
       )
 
       this.setState((prevState) => {
-        const wholeTimeline = sortTimelineByDate([...newTimeline, ...prevState.wholeTimeline])
+        const wholeTimeline = sortTimelineByDate(keepPreviousItems ? [...newTimeline, ...prevState.wholeTimeline] : newTimeline)
         return {
           commentPageToken: commentsResponse.body.next_page_token,
           hasMoreComments: commentsResponse.body.has_next,
@@ -754,7 +754,7 @@ export function appContentFactory (WrappedComponent) {
     loadTimeline = async (getContentRevision, content) => {
       this.resetTimeline()
       try {
-        await this.loadMoreTimelineItems(getContentRevision, content)
+        await this.loadMoreTimelineItems(getContentRevision, content, false)
       } finally {
         this.setState({ loadingTimeline: false })
       }

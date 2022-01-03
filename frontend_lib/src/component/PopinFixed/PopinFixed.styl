@@ -16,6 +16,7 @@
     display flex
     align-items center
     height headerHeight
+    min-height headerHeight
     border-bottom 1px solid mediumGrey
     margin 0 pageSpacing
     &__titleWithBreadcrumbs
@@ -84,16 +85,6 @@
         display flex
         align-items center
         cursor pointer
-      &__lastversion
-        display flex
-        align-items center
-        margin-left 15px
-        border-width 1px
-        border-style solid
-        & > i
-          margin-right standardSpacing
-          color darkGrey
-          font-size titleFontSize
       &__action
         font-size titleFontSize
         background-color transparent
@@ -206,6 +197,7 @@ responsiveColumnStyle()
           display none
     &__content
       width 100%
+      overflow visible
   .rightPartClose
     .wsContentGeneric__content__right__header__icon.active
       border-top 5px solid
