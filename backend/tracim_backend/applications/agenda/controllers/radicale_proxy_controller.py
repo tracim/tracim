@@ -3,6 +3,7 @@ from http import HTTPStatus
 
 from hapic import HapicData
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.response import Response
 from requests.auth import HTTPBasicAuth
 
@@ -14,6 +15,7 @@ from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import RadicaleUserResourceUserSubItemPathSchema
@@ -324,6 +326,30 @@ class RadicaleProxyController(Controller):
         )
         return self._proxy.get_response_for_request(request, path + "/")
 
+    @hapic.with_api_doc(disable_doc=True)
+    @check_right(is_user)
+    def root_discovery(self, context, request: TracimRequest) -> Response:
+        """
+        proxy root agenda path (propfind
+        example: / to radicale path /
+        """
+        user_resource_dir_name = request.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+            user_id=request.current_user.user_id
+        )
+        proxy = Proxy(
+            base_address=self.proxy_base_address,
+            auth=HTTPBasicAuth(user_resource_dir_name, "tracim"),
+        )
+        return proxy.get_response_for_request(request, "/")
+
+    @hapic.with_api_doc(disable_doc=True)
+    def well_known_caldav(self, context, request: TracimRequest) -> Response:
+        return HTTPMovedPermanently(request.url.replace("/.well-known/caldav", "/", 1))
+
+    @hapic.with_api_doc(disable_doc=True)
+    def well_known_carddav(self, context, request: TracimRequest) -> Response:
+        return HTTPMovedPermanently(request.url.replace("/.well-known/carddav", "/", 1))
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -332,7 +358,19 @@ class RadicaleProxyController(Controller):
 
         # INFO - G.M - 2021-12-08 - Please keep theses URL in sync with url proxified
         # (check RADICALE config parameters)
+        configurator.add_route(
+            "root_discovery", "/", request_method="PROPFIND",
+        )
+        configurator.add_view(self.root_discovery, route_name="root_discovery")
 
+        configurator.add_route(
+            "well_known_caldav", "/.well-known/caldav",
+        )
+        configurator.add_view(self.well_known_caldav, route_name="well_known_caldav")
+        configurator.add_route(
+            "well_known_carddav", "/.well-known/carddav",
+        )
+        configurator.add_view(self.well_known_carddav, route_name="well_known_carddav")
         # Radicale user resource agenda
         configurator.add_route(
             "radicale_proxy__user_resource",
