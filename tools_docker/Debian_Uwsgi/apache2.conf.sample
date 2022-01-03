@@ -50,12 +50,8 @@
         ProxyPassMatch ^/addressbook uwsgi://127.0.0.1:8081
         ProxyPassReverse /addressbook uwsgi://127.0.0.1:8081
         ProxyPassMatch ^/caldav-cardav_(.*)$ uwsgi://127.0.0.1:8081
-        location = /.well-known/carddav {
-               return 301 /;
-        }
-        location = /.well-known/caldav {
-               return 301 /;
-        }
+        Redirect 301 /.well-known/carddav /
+        Redirect 301 /.well-known/caldav /
     </IfDefine>
 
     # Proxying Frontend

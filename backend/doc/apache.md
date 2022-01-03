@@ -45,12 +45,8 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
     ProxyPassMatch ^/addressbook uwsgi://127.0.0.1:6544
     ProxyPassReverse /addressbook uwsgi://127.0.0.1:6544
     ProxyPassMatch ^/caldav-cardav_(.*)$ uwsgi://127.0.0.1:6544
-    location = /.well-known/carddav {
-           return 301 /;
-    }
-    location = /.well-known/caldav {
-           return 301 /;
-    }
+    Redirect 301 /.well-known/carddav /
+    Redirect 301 /.well-known/caldav /
     # Proxying Frontend
     ProxyPassMatch ^/ui uwsgi://127.0.0.1:6544
     ProxyPassReverse /ui uwsgi://127.0.0.1:6544
