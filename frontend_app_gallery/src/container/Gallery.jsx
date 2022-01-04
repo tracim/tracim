@@ -856,7 +856,7 @@ export class Gallery extends React.Component {
                 customHeaderClass='primaryColorBg'
                 onClose={this.handleCloseDeleteFilePopup}
                 label={props.t('Are you sure?')}
-                faIcon='far fa-fw fa-trash-alt'
+                faIcon='far fa-trash-alt'
               >
                 <div className='gallery__delete__file__popup__body'>
                   <div className='gallery__delete__file__popup__body__btn'>

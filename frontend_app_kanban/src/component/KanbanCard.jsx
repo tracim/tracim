@@ -80,7 +80,7 @@ function KanbanCard (props) {
           <CardPopup
             customClass='kanban__KanbanPopup'
             customColor={props.customColor}
-            faIcon='far fa-fw fa-trash-alt'
+            faIcon='far fa-trash-alt'
             label={props.t('Are you sure?')}
             onClose={() => setShowConfirmPopup(false)}
           >
