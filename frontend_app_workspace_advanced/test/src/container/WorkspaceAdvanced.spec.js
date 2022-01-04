@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { author, user, workspace } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
+import { author, user, workspace } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.standalone.js'
 import { WorkspaceAdvanced } from '../../../src/container/WorkspaceAdvanced.jsx'
 import {
   mockGetAppList200,

@@ -23,16 +23,27 @@ function logerror {
 
 
 dev=""
-if [ "$1" = "-d" ]; then
-    dev=":dev"
-fi
+only_utils=""
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -d|--development) dev=":dev" ;;
+        -u|--only-utils) only_utils="--only-utils" ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
 
 log "creating debug file if not already exists"
 cp -u src/debug.js.sample src/debug.js
-log "building frontend_app_admin_workspace_user"
-yarn run build:optimized$dev  && loggood "success" || logerror "some error"
-log "copying built file to frontend/"
-cp dist/admin_workspace_user.app.optimized.js ../frontend/dist/app/admin_workspace_user.app.optimized.js  && loggood "success" || logerror "some error"
+
+if [ $only_utils != "--only-utils" ]; then
+    log "building frontend_app_admin_workspace_user"
+    yarn run build:optimized$dev  && loggood "success" || logerror "some error"
+    log "copying built file to frontend/"
+    cp dist/admin_workspace_user.app.optimized.js ../frontend/dist/app/admin_workspace_user.app.optimized.js  && loggood "success" || logerror "some error"
+fi
+
 log "copying en translation.json"
 cp i18next.scanner/en/translation.json ../frontend/dist/app/admin_workspace_user_en_translation.json && loggood "success" || logerror "some error"
 log "copying fr translation.json"

@@ -23,16 +23,29 @@ function logerror {
 
 
 dev=""
-if [ "$1" = "-d" ]; then
-    dev=":dev"
-fi
+only_utils=""
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -d|--development) dev=":dev" ;;
+        -u|--only-utils) only_utils="--only-utils" ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
 
 log "creating debug file if not already exists"
 cp -u src/debug.js.sample src/debug.js
-log "building frontend_app_kanban"
-yarn run build:optimized$dev && loggood "success" || logerror "some error"
-log "copying built kanban to frontend/"
-cp dist/kanban.app.optimized.js ../frontend/dist/app/kanban.app.optimized.js && loggood "success" || logerror "some error"
+log "creating default props file for unit tests"
+cp src/debug.js.sample test/fixture/defaultProps.js
+
+if [ $only_utils != "--only-utils" ]; then
+    log "building frontend_app_kanban"
+    yarn run build:optimized$dev  && loggood "success" || logerror "some error"
+    log "copying built kanban to frontend/"
+    cp dist/kanban.app.optimized.js ../frontend/dist/app/kanban.app.optimized.js && loggood "success" || logerror "some error"
+fi
+
 for lang in en fr pt de; do
     cp i18next.scanner/${lang}/translation.json ../frontend/dist/app/kanban_${lang}_translation.json && loggood "success" || logerror "some error"
 done

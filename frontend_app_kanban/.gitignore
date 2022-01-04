@@ -8,3 +8,4 @@ dist/kanban.app.js.map
 dist/kanban.app.standalone.js
 dist/kanban.app.optimized.js
 dist/kanban.app.standalone.js.map
+test/fixture/defaultProps.js
