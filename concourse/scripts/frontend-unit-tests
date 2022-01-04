@@ -2,14 +2,14 @@
 set -e
 
 script_dir="$(realpath $(dirname $0))"
+tracim_root_dir="$(realpath "$script_dir/../..")"
 source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(frontend|concourse)"
 
 ./install_frontend_dependencies.sh root
-cd frontend_vendors && ./build_vendors.sh && cd ..
+cd "$tracim_root_dir"/frontend_vendors && ./build_vendors.sh && cd ..
 yarn run --cwd frontend_lib/ build:standalone
 
-tracim_root_dir="$(realpath "$script_dir/../..")"
 
 for app in "$tracim_root_dir"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
