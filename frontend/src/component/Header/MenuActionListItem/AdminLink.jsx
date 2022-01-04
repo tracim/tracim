@@ -22,6 +22,7 @@ const AdminLink = props => {
         <div
           data-toggle={isMobile ? 'collapse' : ''}
           data-target='#navbarSupportedContent'
+          className='collapseNavbar'
         >
           <i className={`fa-fw ${workspaceConfig.faIcon}`} />
           {props.t('Spaces')}
@@ -36,6 +37,7 @@ const AdminLink = props => {
         <div
           data-toggle={isMobile ? 'collapse' : ''}
           data-target='#navbarSupportedContent'
+          className='collapseNavbar'
         >
           <i className='far fa-fw fa-user' />
           {props.t('Users')}

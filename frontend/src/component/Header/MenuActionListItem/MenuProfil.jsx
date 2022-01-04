@@ -35,6 +35,7 @@ export const MenuProfil = props => {
           <div
             data-toggle={isMobile ? 'collapse' : ''}
             data-target='#navbarSupportedContent'
+            className='collapseNavbar'
           >
             <i className='far fa-fw fa-user' />
             {props.t('My profile')}
@@ -49,6 +50,7 @@ export const MenuProfil = props => {
           <div
             data-toggle={isMobile ? 'collapse' : ''}
             data-target='#navbarSupportedContent'
+            className='collapseNavbar'
           >
             <i className='fas fa-fw fa-cogs' />
             {props.t('Account Settings')}

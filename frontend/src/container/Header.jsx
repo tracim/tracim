@@ -161,6 +161,7 @@ export class Header extends React.Component {
                     <div
                       data-toggle={isMobile ? 'collapse' : ''}
                       data-target='#navbarSupportedContent'
+                      className='collapseNavbar'
                     >
                       <i className='fas fa-fw fa-calendar-alt' />
                       {props.t('Agendas')}
