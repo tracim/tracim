@@ -84,6 +84,7 @@ export class Sidebar extends React.Component {
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
           id={this.spaceItemId(space.id)}
+          onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
         />
         {!state.foldedSpaceList.find(id => id === space.id) &&
@@ -111,6 +112,7 @@ export class Sidebar extends React.Component {
           }
         )}
         to={to}
+        onClick={isMobile ? this.handleClickToggleSidebar : () => {}}
       >
         <div
           className='sidebar__content__navigation__item__name'
