@@ -525,15 +525,17 @@ class TestAgendaApi(object):
 
         assert len(result.json_body) == 3
         agenda = result.json_body[0]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/user/{}/".format(user.user_id)
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/user/{}/".format(
+            user.user_id
+        )
         assert agenda["with_credentials"] is True
         agenda = result.json_body[1]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace.workspace_id
         )
         assert agenda["with_credentials"] is True
         agenda = result.json_body[2]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace2.workspace_id
         )
         assert agenda["with_credentials"] is True
@@ -574,12 +576,12 @@ class TestAgendaApi(object):
         )
         assert len(result.json_body) == 2
         agenda = result.json_body[0]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace.workspace_id
         )
         assert agenda["with_credentials"] is True
         agenda = result.json_body[1]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace3.workspace_id
         )
         assert agenda["with_credentials"] is True

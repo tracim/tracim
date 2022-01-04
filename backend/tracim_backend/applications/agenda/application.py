@@ -34,7 +34,7 @@ class AgendaApp(TracimApplication):
         # INFO - G.M - 2021-12-07 - internal config param to configure installed agenda hierarchy
         app_config.RADICALE__CALENDAR_DIR = "agenda"
         app_config.RADICALE__ADDRESSBOOK_DIR = "addressbook"
-        app_config.RADICALE__USER_RESOURCE_DIR_PATTERN = "caldav-cardav_user_{user_id}"
+        app_config.RADICALE__USER_RESOURCE_DIR_PATTERN = "user_{user_id}"
         app_config.RADICALE__USER_RESOURCE_PATTERN = "{owner_type}_{owner_id}_{resource_type}"
         app_config.RADICALE__WORKSPACE_SUBDIR = "workspace"
         app_config.RADICALE__USER_SUBDIR = "user"

@@ -162,7 +162,7 @@ class AgendaApi(object):
 
     def _get_agenda_base_url(self, use_proxy: bool) -> str:
         if use_proxy:
-            base_url = self._config.WEBSITE__BASE_URL
+            base_url = self._config.WEBSITE__BASE_URL + "/dav"
         else:
             base_url = self._config.CALDAV__RADICALE_PROXY__BASE_URL
         return base_url
