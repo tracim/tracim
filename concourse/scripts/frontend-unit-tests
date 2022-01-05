@@ -21,5 +21,6 @@ for app in "$tracim_root_dir"/frontend_app_*; do
 		./build_app.sh $shelldev --only-utils
 	fi
 done
+cd $tracim_root_dir
 
 ./run_frontend_unit_test.sh
