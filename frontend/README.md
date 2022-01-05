@@ -1,70 +1,38 @@
-# The Tracim Frontend
+Frontend
+========
 
-This project is the frontend part of Tracim.
+This folder is the frontend part of Tracim.
 
-## Installation
+## Build the app
 
-Install all dependencies
-`$ yarn install`
+### Production
 
-Build the sources
-`$ yarn run build`
+Its installation and building are respectively handled by [install_frontend_dependencies.sh](../../install_frontend_dependencies.sh) and [build_full_frontend.sh](../../build_full_frontend.sh).
 
-Load `dist/index.html` in your webserver.
-
-## Development
-
-Install all dependencies
-`$ yarn install`
-
-Start development server (webpack dev server)
-`$ yarn run servdev`
-
-Start mockapi server
-`$ yarn run mockapi`
+See [README.md](../../README.md) at the root of the repository.
 
 
-## Apps
+### Development
 
-Tracim is a skeleton that runs apps to do the actual work. (like managing Documents, Files, Threads ...)
+#### Rebuild the app
 
-Apps are all independant React applications.
-They can be freely added to or removed from Tracim without the need for a rebuild.
-They can be run outside of Tracim as well.
-In Tracim, they act as plugins.
+    ./build_frontend.sh
 
-### To add Apps to your Tracim instance
+This shell script accept `-d` to bypass obfuscation and minification to help debugging.
 
-You need to separately get the built version of each apps and add them to `dist/app` folder.
-App file names should be of the form of '__appName__.app.js'.
+#### Start the development server
 
-1. install and build the app using `yarn install && yarn run buildwithextvendors`
-2. copy the bundle generated at `dist/__appName__.app.js` to tracim_frontend/dist/app folder
+    yarn run servdev
 
-By default, for development, the Tracim frontend expects every apps but won't crash if one is missing.
+The development server uses webpack-dev-server with hot module reloading.
 
-## Developing Apps
+It uses a proxy for the api and pushpin so that there is nothing more to configure.
 
-Apps are independent React applications. They can be tested and run outside Tracim and tested using Webpack's servdev feature.
+## Linting and translation
+Before pushing changes to this folder, you must:
 
-:warning: Documentation on Apps interface is work in progress.
+see [frontend/doc/before_push.md](../frontend/doc/before_push.md)
 
-To test them inside Tracim, you need to build them and copy the generated bundle to `tracim_frontend/dist/app`.
-This is automatically done by the build script of the apps of this repository.
+## Other available yarn scripts
 
-You also need to allow the mock api to tell the Tracim Frontend that it handles your app:
-- add an entry for the app in tracim_frontend/jsonserver/static_db.json in the `app_config` property
-- reload the mock api server
-- add the source of your app in tracim_frontend/dist/index.html and an entry to the switch case of the function `GLOBAL_renderAppFeature`. All of this will be handled by backend later on. This is in a work in progress state.
-
-
-## URL list
-- __/__ => detail of the first workspace
-- __/login__ => login page
-- __/workspace/:idws__ => detail of the workspace :idws
-- __/workspace/:idws/content/:idc__ => detail of the workspace :idws with the app of the content :idc openned
-- __/account__ => profile page of the connected user
-- __/dashboard__ => dashboard of a workspace (code not plugged in therefore no :idws in url)
-
-## Documentation
-- [doc/i18n.md](doc/i18n.md): How to Translate the Frontend
+see [frontend/doc/yarn_scripts.md](../frontend/doc/yarn_scripts.md)

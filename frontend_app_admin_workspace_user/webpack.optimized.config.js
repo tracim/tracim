@@ -1,4 +1,4 @@
-module.exports = require('./webpack.config.js')
+module.exports = require('./webpack.standalone.config.js')
 
 const optimizedVendors = {}
 for (const dep of require('tracim_frontend_vendors/dist/list.js')) {
@@ -9,4 +9,4 @@ module.exports.externals = {
   tracim_frontend_lib: 'tracim_frontend_lib.lib',
   ...optimizedVendors
 }
-module.exports.output.filename = 'admin_workspace_user.app.js'
+module.exports.output.filename = 'admin_workspace_user.app.optimized.js'

@@ -6,7 +6,7 @@
   "scripts": {
     "build-list": "webpack-cli -p --config webpack.list.config.js",
     "build": "NODE_ENV=production webpack-cli && yarn run build-list",
-    "build-dev": "NODE_ENV=development webpack-cli && yarn run build-list"
+    "build:dev": "NODE_ENV=development webpack-cli && yarn run build-list"
   },
   "author": "",
   "license": "ISC",

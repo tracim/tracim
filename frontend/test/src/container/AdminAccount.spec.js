@@ -30,7 +30,7 @@ import {
   mockPutUserPassword204,
   mockPutUserPassword403
 } from '../../apiMock'
-import { reactstrapPopoverHack } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
+import { reactstrapPopoverHack } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.standalone.js'
 
 describe('In <Account /> at AdminAccount.jsx', () => {
   reactstrapPopoverHack(document, 'popoverFullName')

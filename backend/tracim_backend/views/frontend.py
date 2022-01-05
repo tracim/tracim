@@ -16,7 +16,7 @@ from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.views.controllers import Controller
 
 INDEX_PAGE_NAME = "index.mak"
-APP_FRONTEND_PATH = "app/{minislug}.app.js"
+APP_FRONTEND_PATH = "app/{minislug}.app.optimized.js"
 # INFO S.G - 2020-12-10 - minimum recommended size is 128bits = 16bytes, doubling this
 CSP_NONCE_SIZE = 32
 BASE_CSP_DIRECTIVES = (

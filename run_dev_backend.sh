@@ -15,7 +15,7 @@ EOF
 
 database_type="sqlite"
 while :; do
-    case $1 in
+    case "$1" in
         -h|--help)
             show_help
             exit

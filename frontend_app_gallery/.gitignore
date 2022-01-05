@@ -3,5 +3,6 @@
 .git/
 dist/gallery.app.js
 dist/gallery.app.standalone.js
+dist/gallery.app.optimized.js
 node_modules/
 src/debug.js
