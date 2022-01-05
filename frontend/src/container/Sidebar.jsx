@@ -222,6 +222,7 @@ export class Sidebar extends React.Component {
                     dataCy='sidebarCreateWorkspaceBtn'
                     icon='fas fa-plus'
                     text={props.t('Create a space')}
+                    textMobile={props.t('Create a space')}
                     mode='light'
                   />
                 )}
@@ -231,6 +232,7 @@ export class Sidebar extends React.Component {
                     dataCy='sidebarJoinWorkspaceBtn'
                     icon='fas fa-users'
                     text={props.t('Join a space')}
+                    textMobile={props.t('Join a space')}
                     intent='primary'
                     mode='light'
                   />

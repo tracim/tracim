@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+import { isMobile } from 'react-device-detect'
 
 require('./SearchInput.styl')
 
@@ -48,6 +49,8 @@ export class SearchInput extends React.Component {
           data-cy='search__btn'
           onClick={this.handleClickSearch}
           title={props.t('Search')}
+          data-toggle={isMobile ? 'collapse' : ''}
+          data-target='#navbarSupportedContent'
         >
           <i className='fas fa-search' />
         </button>
