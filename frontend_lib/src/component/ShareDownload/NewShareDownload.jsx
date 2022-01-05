@@ -1,10 +1,9 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 import { generateRandomPassword } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
+import Popover from '../Popover/Popover.jsx'
 
 const color = require('color')
 
@@ -14,15 +13,8 @@ export class NewShareDownload extends React.Component {
 
     this.state = {
       isPasswordActive: false,
-      popoverMultipleEmailsOpen: false,
       hidePassword: true
     }
-  }
-
-  togglePopoverMultipleEmails = () => {
-    this.setState(prevState => ({
-      popoverMultipleEmailsOpen: !prevState.popoverMultipleEmailsOpen
-    }))
   }
 
   handleTogglePasswordVisibility = () => {
@@ -74,14 +66,9 @@ export class NewShareDownload extends React.Component {
           </button>
 
           <Popover
-            placement='bottom'
-            isOpen={state.popoverMultipleEmailsOpen}
-            target='popoverMultipleEmails'
-            toggle={this.togglePopoverMultipleEmails}
-            trigger={isMobile ? 'focus' : 'hover'}
-          >
-            <PopoverBody>{props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}</PopoverBody>
-          </Popover>
+            targetId='popoverMultipleEmails'
+            popoverBody={props.t('To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.')}
+          />
         </div>
 
         {state.isPasswordActive
