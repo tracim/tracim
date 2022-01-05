@@ -41,7 +41,7 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
     workspace_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="1,5",
-        description="comma separated list of included workspace ids,"
+        description="comma separated list of included workspace ids, "
         "setting this parameters will disable"
         "showing of user personals agenda",
         default="",
