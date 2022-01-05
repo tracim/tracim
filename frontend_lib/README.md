@@ -41,7 +41,7 @@ This will produce two scripts:
 - `dist/tracim_frontend_lib.lib.optimized.js`: the library part
 - `dist/tracim_frontend_lib.style.optimized.js`: the styling part
 
-The Webpack configuration used to build the standalone bundle is [webpack.optimized.config.js](./webpack.optimized.config.js).
+The Webpack configuration used to build the optimized bundle is [webpack.optimized.config.js](./webpack.optimized.config.js).
 
 #### Pros
 - it is smaller: some dependencies are externals thus not in the bundle
@@ -77,3 +77,25 @@ The Webpack configuration used is [webpack.standalone.config.js](./webpack.stand
 
 #### Cons
 - it cannot use the tracim_vendors feature. So it will bundle dependencies that are already available in Tracim
+
+
+## Using servdev
+
+You can develop and test your components directly in frontend_lib servdev (development server) without the need to test
+them in another app.
+
+#### To do so
+
+Servdev uses the file `src/index.dev.js` which is created by running `./build_frontend_lib.sh`.
+
+If you have run `build_full_frontend.sh` at the root of the repository, the file should already exists.
+
+Update `src/index.dev.js` with your component and give it some static props.
+
+`src/index.dev.js` is in the `.gitignore` so don't worry about modifying it.
+
+Run
+
+    yarn run servdev
+
+connect to `http://localhost:8070`
