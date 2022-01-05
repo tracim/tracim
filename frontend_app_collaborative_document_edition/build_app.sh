@@ -25,8 +25,8 @@ function logerror {
 dev=""
 only_utils=""
 
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
+while [ "$#" -gt 0 ]; do
+    case "$1" in
         -d|--development) dev=":dev" ;;
         -u|--only-utils) only_utils="--only-utils" ;;
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
@@ -37,7 +37,7 @@ done
 log "creating debug file if not already exists"
 cp -u src/debug.js.sample src/debug.js
 
-if [ $only_utils != "--only-utils" ]; then
+if [ "$only_utils" != "--only-utils" ]; then
     log "building frontend_app_collaborative_document_edition"
     yarn run build:optimized$dev  && loggood "success" || logerror "some error"
     log "copying built file to frontend/"
