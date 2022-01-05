@@ -34,6 +34,7 @@ function KanbanColumnHeader (props) {
         buttonCustomClass='kanban__contentpage__wrapper__board__column__title__actions'
         buttonIcon='fas fa-ellipsis-v'
         buttonTooltip={props.t('Actions')}
+        buttonDataCy='columnActions'
       >
         <IconButton
           disabled={props.readOnly}
@@ -44,6 +45,7 @@ function KanbanColumnHeader (props) {
           text={props.t('Edit')}
           textMobile={props.t('Edit')}
           title={props.t('Edit this column')}
+          dataCy='editColumn'
         />
         <IconButton
           disabled={props.readOnly}
@@ -54,6 +56,7 @@ function KanbanColumnHeader (props) {
           text={props.t('Delete')}
           textMobile={props.t('Delete')}
           title={props.t('Delete this column')}
+          dataCy='deleteColumn'
         />
       </DropdownMenu>
 
@@ -71,6 +74,7 @@ function KanbanColumnHeader (props) {
               icon='fas fa-times'
               onClick={() => setShowConfirmPopup(false)}
               text={props.t('Cancel')}
+              dataCy='cancelDeleteColumn'
             />
 
             <IconButton
@@ -80,6 +84,7 @@ function KanbanColumnHeader (props) {
               mode='light'
               onClick={() => props.onRemoveColumn(props.column)}
               text={props.t('Delete')}
+              dataCy='confirmDeleteColumn'
             />
           </div>
         </CardPopup>
