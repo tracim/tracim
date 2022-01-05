@@ -120,14 +120,21 @@
           color inherit
         & > i
           margin-right textSpacing
+        & .profileNavigation:hover
+          text-decoration underline
     &__active
       width 17%
     &__profile
-      width 62px // 62px it's the size of avatar's profile
+      width 49px // 49px it's the size of avatar's profile
+      &__icon
+        vertical-align middle
+        font-size bigIconSize
     &__fullName
       width 18%
-    &__useername
+    &__username
       width 17%
+    &__user
+      display none
     &__email
       width 18%
     &__canCreate
@@ -144,9 +151,9 @@
       &__type
         text-align center
         & i
-          font-size titleFontSize
+          font-size bigIconSize
         & .label
-          font-size standardSpacing
+          font-size metadataFontSize
       &__sharedSpace
         width 15%
       &__description
@@ -191,6 +198,21 @@
         &__delete
           width 15%
 
+@media (max-width: max-sm)
+  .adminUser
+    &__table
+      &__profile
+        width 43px
+        &__icon
+          font-size standardFontSize
+      &__fullName
+        display none
+      &__username
+        display none
+      &__user
+        display table-cell
+        width 35%
+
 @media (max-width: max-xs)
   .adminWorkspace
     &__workspaceTable
@@ -206,3 +228,8 @@
           width 30%
         &__delete
           width 30%
+        &__type
+          & i
+            font-size standardFontSize
+          & .label
+            display none

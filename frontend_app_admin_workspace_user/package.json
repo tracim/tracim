@@ -36,6 +36,7 @@
     "prop-types": "^15.7.2",
     "radium": "^0.25.2",
     "react": "^16.13.1",
+    "react-device-detect": "^1.7.5",
     "react-dnd": "7.4.5",
     "react-dom": "^16.13.1",
     "react-i18next": "7.4.0",
