@@ -56,18 +56,18 @@ class CaldavAppFactory(object):
         )
         os.makedirs(workspace_agenda_dir, exist_ok=True)
 
-        user_address_book_dir = os.path.join(
+        user_addressbook_dir = os.path.join(
             sub_dir_storage_path,
             app_config.RADICALE__ADDRESSBOOK_DIR,
             app_config.RADICALE__USER_SUBDIR,
         )
-        os.makedirs(user_address_book_dir, exist_ok=True)
-        workspace_address_book_dir = os.path.join(
+        os.makedirs(user_addressbook_dir, exist_ok=True)
+        workspace_addressbook_dir = os.path.join(
             sub_dir_storage_path,
             app_config.RADICALE__ADDRESSBOOK_DIR,
             app_config.RADICALE__WORKSPACE_SUBDIR,
         )
-        os.makedirs(workspace_address_book_dir, exist_ok=True)
+        os.makedirs(workspace_addressbook_dir, exist_ok=True)
 
     def _parse_additional_radicale_config(
         self, config: ConfigParser, settings: dict

@@ -65,11 +65,11 @@ class RadicaleProxyController(Controller):
     @hapic.with_api_doc(disable_doc=True)
     @check_right(can_access_user_agenda)
     @hapic.input_path(UserIdPathSchema())
-    def radicale_proxy__user_address_book(
+    def radicale_proxy__user_addressbook(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> Response:
         """
-        proxy user address_book
+        proxy user addressbook
         example: /dav/addressbook/user/1/ to radicale path /addressbook/user/1/
         """
         path = request.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
@@ -89,7 +89,7 @@ class RadicaleProxyController(Controller):
     ) -> Response:
         """
         proxy user agenda
-        example: /dav//agenda/user/1/event.ics to radicale path /agenda/user/1/event.ics
+        example: /dav/agenda/user/1/event.ics to radicale path /agenda/user/1/event.ics
         """
         user_calendar_path = request.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
             resource_type_dir=request.app_config.RADICALE__CALENDAR_DIR,
@@ -106,7 +106,7 @@ class RadicaleProxyController(Controller):
     @hapic.with_api_doc(disable_doc=True)
     @check_right(can_access_user_agenda)
     @hapic.input_path(RadicaleUserSubItemPathSchema())
-    def radicale_proxy__user_address_book_subitems(
+    def radicale_proxy__user_addressbook_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> Response:
         """
@@ -319,7 +319,7 @@ class RadicaleProxyController(Controller):
     @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(WorkspaceIdPathSchema())
-    def radicale_proxy__workspace_address_book(
+    def radicale_proxy__workspace_addressbook(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> Response:
         """
@@ -339,7 +339,7 @@ class RadicaleProxyController(Controller):
     @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_event_agenda)
     @hapic.input_path(RadicaleWorkspaceSubItemPathSchema())
-    def radicale_proxy__workspace_address_book_subitems(
+    def radicale_proxy__workspace_addressbook_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> Response:
         """
@@ -464,22 +464,22 @@ class RadicaleProxyController(Controller):
             self.radicale_proxy__user_agenda_subitems, route_name="radicale_proxy__user_agenda_x"
         )
 
-        # user address_book
+        # user addressbook
         configurator.add_route(
-            "radicale_proxy__user_address_book",
+            "radicale_proxy__user_addressbook",
             "/dav/addressbook/user/{user_id:[0-9]+}{trailing_slash:[/]?}",
         )
         configurator.add_view(
-            self.radicale_proxy__user_address_book, route_name="radicale_proxy__user_address_book"
+            self.radicale_proxy__user_addressbook, route_name="radicale_proxy__user_addressbook"
         )
 
         configurator.add_route(
-            "radicale_proxy__user_address_book_x",
+            "radicale_proxy__user_addressbook_x",
             "/dav/addressbook/user/{user_id:[0-9]+}/{sub_item:[^\/]+\.vcf}{trailing_slash:[/]?}",  # noqa: W605
         )
         configurator.add_view(
             self.radicale_proxy__user_agenda_subitems,
-            route_name="radicale_proxy__user_address_book_x",
+            route_name="radicale_proxy__user_addressbook_x",
         )
 
         # workspace agenda
@@ -499,21 +499,21 @@ class RadicaleProxyController(Controller):
             self.radicale_proxy__workspace_agenda_subitems, route_name="radicale_proxy__workspace_x"
         )
 
-        # workspace address_book
+        # workspace addressbook
         configurator.add_route(
-            "radicale_proxy__address_book_workspace",
+            "radicale_proxy__addressbook_workspace",
             "/dav/addressbook/workspace/{workspace_id:[0-9]+}{trailing_slash:[/]?}",
         )
         configurator.add_view(
-            self.radicale_proxy__workspace_address_book,
-            route_name="radicale_proxy__address_book_workspace",
+            self.radicale_proxy__workspace_addressbook,
+            route_name="radicale_proxy__addressbook_workspace",
         )
 
         configurator.add_route(
-            "radicale_proxy__address_book_workspace_x",
+            "radicale_proxy__addressbook_workspace_x",
             "/dav/addressbook/workspace/{workspace_id:[0-9]+}/{sub_item:.*}",
         )
         configurator.add_view(
-            self.radicale_proxy__workspace_address_book_subitems,
-            route_name="radicale_proxy__address_book_workspace_x",
+            self.radicale_proxy__workspace_addressbook_subitems,
+            route_name="radicale_proxy__addressbook_workspace_x",
         )

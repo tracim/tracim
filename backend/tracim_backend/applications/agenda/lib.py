@@ -49,7 +49,7 @@ CREATE_CALENDAR_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 </create>
 """
 
-CREATE_ADDRESS_BOOK_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
+CREATE_ADDRESSBOOK_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 <create xmlns="DAV:" xmlns:CR="urn:ietf:params:xml:ns:carddav">
   <set>
     <prop>
@@ -57,8 +57,8 @@ CREATE_ADDRESS_BOOK_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
         <collection />
         <CR:addressbook />
       </resourcetype>
-      <displayname>{address_book_name}</displayname>
-      <CR:addressbook-description>{address_book_description}</CR:addressbook-description>
+      <displayname>{addressbook_name}</displayname>
+      <CR:addressbook-description>{addressbook_description}</CR:addressbook-description>
     </prop>
   </set>
 </create>
@@ -104,8 +104,8 @@ class AgendaApi(object):
                 agenda_description=escape(description),
             )
         elif type == AgendaResourceType.addressbook:
-            body = CREATE_ADDRESS_BOOK_TEMPLATE.format(
-                address_book_name=escape(name), address_book_description=escape(description),
+            body = CREATE_ADDRESSBOOK_TEMPLATE.format(
+                addressbook_name=escape(name), addressbook_description=escape(description),
             )
         else:
             raise ()
@@ -132,7 +132,7 @@ class AgendaApi(object):
         if type.calendar:
             return self._update_agenda_props(url, name, description)
         elif type.addressbook:
-            return self._update_address_book_props(url, name, description)
+            return self._update_addressbook_props(url, name, description)
         else:
             raise ()
 
@@ -156,8 +156,8 @@ class AgendaApi(object):
         except Exception as exc:
             raise AgendaPropsUpdateFailed("Failed to update props of agenda") from exc
 
-    def _update_address_book_props(self, url, name, description):
-        # TODO
+    def _update_addressbook_props(self, url, name, description):
+        # GM - 05-01-2022 - TODO Handle renaming of addressbook
         pass
 
     def _get_agenda_base_url(self, use_proxy: bool) -> str:
@@ -248,10 +248,10 @@ class AgendaApi(object):
                 type=AgendaResourceType.calendar,
             )
             result = True
-        workspace_address_book_url = self.get_workspace_addressbook_url(workspace, use_proxy=False)
-        if not self._check_collection_exist(workspace_address_book_url):
+        workspace_addressbook_url = self.get_workspace_addressbook_url(workspace, use_proxy=False)
+        if not self._check_collection_exist(workspace_addressbook_url):
             self.create_collection(
-                url=workspace_address_book_url,
+                url=workspace_addressbook_url,
                 name=workspace.label,
                 description=workspace.description,
                 type=AgendaResourceType.addressbook,
@@ -259,7 +259,7 @@ class AgendaApi(object):
             result = False
         else:
             self.update_collection_props(
-                url=workspace_address_book_url,
+                url=workspace_addressbook_url,
                 name=workspace.label,
                 description=workspace.description,
                 type=AgendaResourceType.addressbook,
@@ -297,10 +297,10 @@ class AgendaApi(object):
                 type=AgendaResourceType.calendar,
             )
             result = True
-        user_address_book_url = self.get_user_addressbook_url(user, use_proxy=False)
-        if not self._check_collection_exist(user_address_book_url):
+        user_addressbook_url = self.get_user_addressbook_url(user, use_proxy=False)
+        if not self._check_collection_exist(user_addressbook_url):
             self.create_collection(
-                url=user_address_book_url,
+                url=user_addressbook_url,
                 name=user.display_name,
                 description="",
                 type=AgendaResourceType.addressbook,
@@ -308,7 +308,7 @@ class AgendaApi(object):
             result = False
         else:
             self.update_collection_props(
-                url=user_address_book_url,
+                url=user_addressbook_url,
                 name=user.display_name,
                 description="",
                 type=AgendaResourceType.addressbook,
@@ -542,11 +542,11 @@ class AgendaHooks:
                     current_user=None, session=context.dbsession, config=context.app_config
                 )
                 try:
-                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
-                    if create_event and agenda_already_exist:
+                    agenda_already_exists = agenda_api.ensure_workspace_agenda_exists(workspace)
+                    if create_event and agenda_already_exists:
                         logger.warning(
                             self,
-                            "workspace {} is just created but it own agenda already exist !!".format(
+                            "workspace {} is just created but its own agenda already exists !!".format(
                                 workspace.workspace_id
                             ),
                         )
@@ -564,8 +564,8 @@ class AgendaHooks:
                 current_user=None, session=context.dbsession, config=context.app_config
             )
             try:
-                agenda_already_exist = agenda_api.ensure_user_agenda_exists(user)
-                if agenda_already_exist and create_event:
+                agenda_already_exists = agenda_api.ensure_user_agenda_exists(user)
+                if agenda_already_exists and create_event:
                     logger.warning(
                         self,
                         "user {} has just been created but their own agenda already exists".format(
