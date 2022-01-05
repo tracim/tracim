@@ -49,7 +49,7 @@ export class EditCommentPopup extends React.Component {
         customColor={props.customColor}
         onClose={props.onClickClose}
         label={props.t('Edit comment')}
-        faIcon='far fa-fw fa-edit'
+        faIcon='fas fa-edit'
       >
         <CommentArea
           apiUrl={props.apiUrl}

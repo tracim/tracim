@@ -339,7 +339,7 @@ export class CommentArea extends React.Component {
               </>
             }
             confirmLabel={props.t('Edit')}
-            confirmIcon='far fa-fw fa-edit'
+            confirmIcon='fas fa-edit'
             cancelLabel={props.t('Validate anyway')}
             cancelIcon='fas fa-fw fa-check'
           />
