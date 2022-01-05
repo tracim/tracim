@@ -7,7 +7,7 @@ from pyramid.scripting import AppEnvironment
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaServerConnectionError
-from tracim_backend.exceptions import CannotCreateAgenda
+from tracim_backend.exceptions import CannotCreateAgendaResource
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
@@ -66,7 +66,7 @@ class CaldavSyncCommand(AppContextCommand):
                 already_exist = self._agenda_api.ensure_user_agenda_exists(user)
                 if not already_exist:
                     print("New created agenda for user {}".format(user))
-            except CannotCreateAgenda as exc:
+            except CannotCreateAgendaResource as exc:
                 nb_error_agenda_access += 1
                 print("Cannot create agenda for user {}".format(user.user_id))
                 logger.exception(self, exc)
@@ -95,7 +95,7 @@ class CaldavSyncCommand(AppContextCommand):
                     already_exist = self._agenda_api.ensure_workspace_agenda_exists(workspace)
                     if not already_exist:
                         print("New created agenda for workspace {}".format(workspace.workspace_id))
-                except CannotCreateAgenda as exc:
+                except CannotCreateAgendaResource as exc:
                     print("Cannot create agenda for workspace {}".format(workspace.workspace_id))
                     logger.exception(self, exc)
                 except AgendaServerConnectionError as exc:

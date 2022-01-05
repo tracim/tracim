@@ -30,10 +30,7 @@ from tracim_backend.app_models.validator import user_password_validator
 from tracim_backend.app_models.validator import user_public_name_validator
 from tracim_backend.app_models.validator import user_timezone_validator
 from tracim_backend.app_models.validator import user_username_validator
-from tracim_backend.applications.agenda.lib import AgendaApi
-from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import AuthenticationFailed
 from tracim_backend.exceptions import CannotUseBothIncludeAndExcludeWorkspaceUsers
 from tracim_backend.exceptions import EmailAlreadyExists
@@ -71,8 +68,6 @@ from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WrongAuthTypeForUser
 from tracim_backend.exceptions import WrongLDAPCredentials
 from tracim_backend.exceptions import WrongUserPassword
-from tracim_backend.extensions import app_list
-from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.mail_notifier.notifier import get_email_manager
@@ -475,7 +470,6 @@ class UserApi(object):
                 do_save=True,
                 do_notify=False,
             )
-            self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-11-08 - get new created user
             user = self.get_one_by_login(login)
@@ -560,7 +554,6 @@ class UserApi(object):
                 do_save=True,
                 do_notify=False,
             )
-            self.execute_created_user_actions(user)
             transaction.commit()
             # INFO - G.M - 2018-12-02 - get new created user
             user = self.get_one_by_login(login)
@@ -1122,72 +1115,6 @@ class UserApi(object):
             self._session.add(UserCustomProperties(user=user))
 
         self._session.flush()
-
-    def execute_updated_user_actions(self, user: User) -> None:
-        """
-        WARNING! This method will be deprecated soon, see
-        https://github.com/tracim/tracim/issues/1589 and
-        https://github.com/tracim/tracim/issues/1487
-
-        This method does post-update user actions
-        """
-
-        # TODO - G.M - 04-04-2018 - [auth]
-        # Check if this is already needed with
-        # new auth system
-        user.ensure_auth_token(validity_seconds=self._config.USER__AUTH_TOKEN__VALIDITY)
-
-        # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_updated_user should start hook use by agenda  app code.
-
-        app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist(AGENDA__APP_SLUG):
-            agenda_api = AgendaApi(
-                current_user=self._user, session=self._session, config=self._config
-            )
-            try:
-                agenda_api.ensure_user_agenda_exists(user)
-            except AgendaServerConnectionError as exc:
-                logger.error(self, "Cannot connect to agenda server")
-                logger.exception(self, exc)
-            except Exception as exc:
-                logger.error(self, "Something goes wrong during agenda create/update")
-                logger.exception(self, exc)
-
-    def execute_created_user_actions(self, user: User) -> None:
-        """
-        WARNING! This method will be deprecated soon, see
-        https://github.com/tracim/tracim/issues/1589 and
-        https://github.com/tracim/tracim/issues/1487
-
-        This method do post-create user actions
-        """
-
-        # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_created_user should start hook use by agenda  app code.
-
-        app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist(AGENDA__APP_SLUG):
-            agenda_api = AgendaApi(
-                current_user=self._user, session=self._session, config=self._config
-            )
-            try:
-                agenda_already_exist = agenda_api.ensure_user_agenda_exists(user)
-                if agenda_already_exist:
-                    logger.warning(
-                        self,
-                        "user {} has just been created but their own agenda already exists".format(
-                            user.user_id
-                        ),
-                    )
-            except AgendaServerConnectionError as exc:
-                logger.error(self, "Cannot connect to the agenda server")
-                logger.exception(self, exc)
-            except Exception as exc:
-                logger.error(self, "Something went wrong during agenda create/update")
-                logger.exception(self, exc)
 
     def _check_user_auth_validity(self, user: User) -> None:
         if not self._user_can_authenticate(user):

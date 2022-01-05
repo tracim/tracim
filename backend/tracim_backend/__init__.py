@@ -324,6 +324,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         app.load_controllers(
             app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
         )
+        app.register_tracim_plugin(plugin_manager)
 
     configurator.scan("tracim_backend.lib.utils.authentification")
 

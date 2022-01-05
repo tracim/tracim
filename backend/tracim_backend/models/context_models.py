@@ -421,6 +421,38 @@ class ContentAndUserPath(object):
         self.user_id = user_id
 
 
+class RadicaleUserResourceUserSubitemsPath(object):
+    def __init__(
+        self,
+        user_id: int,
+        dest_user_id: int,
+        type: str,
+        sub_item: str = "",
+        trailing_slash: str = "",
+    ) -> None:
+        self.user_id = user_id
+        self.dest_user_id = dest_user_id
+        self.type = type
+        self.sub_item = sub_item
+        self.trailing_slash = trailing_slash
+
+
+class RadicaleUserResourceWorkspaceSubitemsPath(object):
+    def __init__(
+        self,
+        user_id: int,
+        workspace_id: int,
+        type: str,
+        sub_item: str = "",
+        trailing_slash: str = "",
+    ) -> None:
+        self.user_id = user_id
+        self.workspace_id = workspace_id
+        self.type = type
+        self.sub_item = sub_item
+        self.trailing_slash = trailing_slash
+
+
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem
@@ -533,9 +565,10 @@ class AgendaFilterQuery(object):
     Agenda filter query model
     """
 
-    def __init__(self, workspace_ids: str = "", agenda_types: str = ""):
+    def __init__(self, workspace_ids: str = "", agenda_types: str = "", resource_types: str = ""):
         self.workspace_ids = string_to_list(workspace_ids, ",", int) or None
         self.agenda_types = string_to_list(agenda_types, ",", str) or None
+        self.resource_types = string_to_list(resource_types, ",", str) or None
 
 
 class FileQuery(object):
@@ -848,12 +881,18 @@ class FolderContentUpdate(object):
 
 class Agenda(object):
     def __init__(
-        self, agenda_url: str, with_credentials: bool, workspace_id: Optional[int], agenda_type: str
+        self,
+        agenda_url: str,
+        with_credentials: bool,
+        workspace_id: Optional[int],
+        agenda_type: str,
+        resource_type: str,
     ) -> None:
         self.agenda_url = agenda_url
         self.with_credentials = with_credentials
         self.workspace_id = workspace_id
         self.agenda_type = agenda_type
+        self.resource_type = resource_type
 
 
 class UserInContext(object):

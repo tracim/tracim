@@ -216,6 +216,9 @@ class TracimApplication(ABC):
         """
         pass
 
+    def register_tracim_plugin(self, plugin_manager):
+        pass
+
     def get_content_security_policy_directives(
         self, app_config: "CFG"
     ) -> typing.Tuple[typing.Tuple[str, str], ...]:
