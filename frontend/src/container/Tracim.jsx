@@ -640,6 +640,7 @@ export class Tracim extends React.Component {
                     text={props.t('Open call')}
                     icon='fas fa-phone'
                     color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
                   />
                 </a>
               </div>
@@ -676,6 +677,7 @@ export class Tracim extends React.Component {
                     text={props.t('Open call')}
                     icon='fas fa-phone'
                     color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
                   />
                 </a>
               </div>
