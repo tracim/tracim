@@ -125,7 +125,8 @@
     &__active
       width 17%
     &__profile
-      width 49px // 49px it's the size of avatar's profile
+      // INFO - GB - 2022-01-05 - 12px = 0.75rem is the bootstrap padding for ".table td, .table th" + fa-fw correction
+      width bigIconSize + (2 * 14.5px)
       &__icon
         vertical-align middle
         font-size bigIconSize
@@ -202,7 +203,8 @@
   .adminUser
     &__table
       &__profile
-        width 43px
+        // INFO - GB - 2022-01-05 - 12px = 0.75rem is the bootstrap padding for ".table td, .table th" + fa-fw correction
+        width standardFontSize + (2 * 14.5px)
         &__icon
           font-size standardFontSize
       &__fullName
