@@ -7,7 +7,9 @@ from pyramid.httpexceptions import HTTPMovedPermanently
 from pyramid.response import Response
 from requests.auth import HTTPBasicAuth
 
-from tracim_backend.applications.agenda.authorization import can_access_user_agenda
+from tracim_backend.applications.agenda.authorization import can_access_to_agenda_list
+from tracim_backend.applications.agenda.authorization import can_access_user_agenda_event
+from tracim_backend.applications.agenda.authorization import can_access_user_root_agenda
 from tracim_backend.applications.agenda.authorization import can_access_workspace_event_agenda
 from tracim_backend.applications.agenda.authorization import can_access_workspace_root_agenda
 from tracim_backend.applications.agenda.utils.determiner import CaldavAuthorizationDeterminer
@@ -15,7 +17,6 @@ from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.proxy.proxy import Proxy
 from tracim_backend.lib.utils.authorization import check_right
-from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import RadicaleUserResourceUserSubItemPathSchema
@@ -44,7 +45,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_agenda)
+    @check_right(can_access_user_root_agenda)
     @hapic.input_path(UserIdPathSchema())
     def radicale_proxy__user_agenda(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -63,7 +64,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_agenda)
+    @check_right(can_access_user_root_agenda)
     @hapic.input_path(UserIdPathSchema())
     def radicale_proxy__user_addressbook(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -82,7 +83,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_agenda)
+    @check_right(can_access_user_agenda_event)
     @hapic.input_path(RadicaleUserSubItemPathSchema())
     def radicale_proxy__user_agenda_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -104,7 +105,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_agenda)
+    @check_right(can_access_user_agenda_event)
     @hapic.input_path(RadicaleUserSubItemPathSchema())
     def radicale_proxy__user_addressbook_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -126,7 +127,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_agenda)
+    @check_right(can_access_user_root_agenda)
     @hapic.input_path(UserIdPathSchema())
     def radicale_proxy__user_resource(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -149,7 +150,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_agenda)
+    @check_right(can_access_user_root_agenda)
     @hapic.input_path(RadicaleUserResourceUserSubItemPathSchema())
     def radicale_proxy__user_resource_user_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -179,7 +180,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_user_agenda)
+    @check_right(can_access_user_agenda_event)
     @hapic.input_path(RadicaleUserResourceUserSubItemPathSchema())
     def radicale_proxy__user_resource_user_subitems_x(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -212,7 +213,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(can_access_workspace_event_agenda)
+    @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(RadicaleUserResourceWorkspaceSubItemPathSchema())
     def radicale_proxy__user_resource_workspace_subitems(
         self, context, request: TracimRequest, hapic_data: HapicData
@@ -359,7 +360,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
-    @check_right(is_user)
+    @check_right(can_access_to_agenda_list)
     def root_discovery(self, context, request: TracimRequest) -> Response:
         """
         proxy root agenda path (propfind
