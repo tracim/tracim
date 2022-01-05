@@ -129,9 +129,9 @@ class AgendaApi(object):
             "update existing agenda collection of type {} props at url {}".format(type.value, url),
         )
         # force renaming of agenda to be sure of consistency
-        if type.calendar:
+        if type == AgendaResourceType.calendar:
             return self._update_agenda_props(url, name, description)
-        elif type.addressbook:
+        elif type == AgendaResourceType.addressbook:
             return self._update_addressbook_props(url, name, description)
         else:
             raise ()
@@ -157,8 +157,20 @@ class AgendaApi(object):
             raise AgendaPropsUpdateFailed("Failed to update props of agenda") from exc
 
     def _update_addressbook_props(self, url, name, description):
-        # GM - 05-01-2022 - TODO Handle renaming of addressbook
-        pass
+        try:
+            caldav_client = caldav.DAVClient(username="tracim", password="tracim", url=url)
+            addressbook = caldav.objects.Calendar(client=caldav_client, url=url)
+            props = addressbook.get_properties([caldav.dav.DisplayName()])
+            # TODO - G.M - 2019-04-11 - Rewrote this better, we need to verify
+            # if value are same but as props may be None but agenda_description
+            # can be '' we need to convert thing in order that '' is same as None.
+            if name != str(props.get(caldav.dav.DisplayName().tag) or ""):
+                addressbook.set_properties([caldav.dav.DisplayName(name)])
+                logger.debug(self, "props for addressbook at url {} updated".format(url))
+            else:
+                logger.debug(self, "No props to update for addressbook at url {}".format(url))
+        except Exception as exc:
+            raise AgendaPropsUpdateFailed("Failed to update props of addressbook") from exc
 
     def _get_agenda_base_url(self, use_proxy: bool) -> str:
         if use_proxy:
