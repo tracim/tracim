@@ -182,7 +182,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
             status=201,
         )
         web_testapp.get("/dav/agenda/user/{}/".format(user.user_id), status=200)
-        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id), status=200)
+        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id), status=403)
 
     @pytest.mark.parametrize(
         "sub_item_label",
@@ -231,7 +231,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         web_testapp.delete(
             "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
         )
-        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id, sub_item_label), status=200)
+        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id, sub_item_label), status=403)
 
     def test_proxy_user_agenda__err__other_user_agenda(
         self, radicale_server, user_api_factory, web_testapp
@@ -285,7 +285,6 @@ class TestCaldavRadicaleProxyEndpoints(object):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        web_testapp.get("/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
         web_testapp.put(
             "/dav/agenda/workspace/{}/".format(workspace.workspace_id),
@@ -294,7 +293,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
             status=201,
         )
         web_testapp.get("/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
-        web_testapp.delete("/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
+        web_testapp.delete("/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=403)
 
     def test_proxy_workspace_agenda__err__other_workspace_agenda(
         self, radicale_server, user_api_factory, workspace_api_factory, web_testapp
@@ -344,7 +343,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
             status=201,
         )
         web_testapp.get("/dav/addressbook/user/{}/".format(user.user_id), status=200)
-        web_testapp.delete("/dav/addressbook/user/{}/".format(user.user_id), status=200)
+        web_testapp.delete("/dav/addressbook/user/{}/".format(user.user_id), status=403)
 
     @pytest.mark.xfail(reason="unclear how carddav work")
     @pytest.mark.parametrize(
@@ -460,7 +459,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         )
         web_testapp.get("/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=200)
         web_testapp.delete(
-            "/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=200
+            "/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=403
         )
 
     def test_proxy_workspace_addressbook__err__other_workspace_agenda(
