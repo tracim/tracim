@@ -37,6 +37,25 @@
     padding 0 pageSpacing pageSpacing
     &__close_btn
       margin-inline-start auto
+
+.callpopup
+  width 300px
+  &__text
+    margin-bottom standardSpacing
+  &__body
+    width 100%
+    &__btn
+      margin textSpacing standardSpacing
+      display flex
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+.openCallButton
+  margin-left standardSpacing
+  // FIXME - MB - 2022-01-05 - this should be removed when a LinkButton is created
+  // see https://github.com/tracim/tracim/issues/5242
+
 @media (max-width: max-xs)
   .cardPopup
     &__header
