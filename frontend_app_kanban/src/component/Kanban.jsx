@@ -223,6 +223,10 @@ export class Kanban extends React.Component {
   }
 
   handleCardDragEnd = (card, from, to) => {
+    const { props } = this
+    if (props.mode === APP_FEATURE_MODE.REVISION) {
+      return
+    }
     this.setState(prevState => {
       return {
         board: moveCard(prevState.board, from, to),
@@ -232,6 +236,10 @@ export class Kanban extends React.Component {
   }
 
   handleColumnDragEnd = (column, fromPosition, toPosition) => {
+    const { props } = this
+    if (props.mode === APP_FEATURE_MODE.REVISION) {
+      return
+    }
     this.setState(prevState => {
       return {
         board: moveColumn(prevState.board, fromPosition, toPosition),
