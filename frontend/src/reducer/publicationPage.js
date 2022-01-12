@@ -13,10 +13,10 @@ import {
 import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
 
-function sortByModifiedDate (arrayToSort) {
+function sortByModifiedDate (arrayToSort) { // TODO MARIE inverser ici
   return arrayToSort.sort(function (a, b) {
-    if (a.modified > b.modified) return 1
-    if (a.modified < b.modified) return -1
+    if (a.modified > b.modified) return -1
+    if (a.modified < b.modified) return 1
     return 0
   })
 }
@@ -77,11 +77,12 @@ export default function publicationPage (state = defaultPublicationPage, action)
       }
 
     case `${APPEND}/${PUBLICATION}`: {
-      const newPublicationList = state.list
-      newPublicationList.push(serialize(action.publication, serializeContentProps))
       return {
         ...state,
-        list: uniqByContentId(newPublicationList)
+        list: uniqByContentId([
+          serialize(action.publication, serializeContentProps),
+          ...state.list
+        ])
       }
     }
 
