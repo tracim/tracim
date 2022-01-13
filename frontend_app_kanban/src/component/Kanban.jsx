@@ -299,7 +299,7 @@ export class Kanban extends React.Component {
 
   render () {
     const { props, state } = this
-    const changesAllowed = !props.readOnly
+    const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
 
     return (
       <div className={classnames('kanban__contentpage__wrapper', { fullscreen: props.fullscreen })}>
