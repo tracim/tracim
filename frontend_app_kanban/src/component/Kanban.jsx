@@ -27,6 +27,7 @@ import {
   putRawFileContent,
   getRawFileContent,
   CardPopup,
+  Loading,
   PromptMessage,
   RefreshWarningMessage,
   sendGlobalFlashMessage
@@ -55,11 +56,11 @@ export class Kanban extends React.Component {
       autoCompleteItemList: [],
       board: { columns: [] },
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
+      boardInitiallyLoaded: justCreated,
       editedCardInfos: null,
       editedColumnInfos: null,
       isAutoCompleteActivated: false,
-      saveRequired: false,
-      saving: false
+      saveRequired: false
     }
   }
 
@@ -68,14 +69,18 @@ export class Kanban extends React.Component {
     if (props.isNewContentRevision) this.loadBoardContent()
 
     if (props.content.current_revision_type === 'creation') {
-      this.setState({ boardState: BOARD_STATE.LOADED, board: { columns: [] } })
+      this.setState({
+        boardState: BOARD_STATE.LOADED,
+        boardInitiallyLoaded: true,
+        board: { columns: [] }
+      })
     }
   }
 
   async componentDidUpdate (prevProps) {
     const { props, state } = this
     if (
-      (!state.saving && props.content.current_revision_id !== prevProps.content.current_revision_id) ||
+      (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
       (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
     ) {
       this.loadBoardContent()
@@ -104,7 +109,8 @@ export class Kanban extends React.Component {
     if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
       this.setState({
         boardState: BOARD_STATE.LOADED,
-        board: fetchRawFileContent.body || {}
+        boardInitiallyLoaded: true,
+        board: fetchRawFileContent.body
       })
     } else {
       this.setState({ boardState: BOARD_STATE.ERROR })
@@ -184,7 +190,6 @@ export class Kanban extends React.Component {
 
   async handleSave () {
     const { props, state } = this
-    this.setState({ saving: true })
     const fetchResultSaveKanban = await handleFetchResult(
       await putRawFileContent(
         props.config.apiUrl,
@@ -206,7 +211,6 @@ export class Kanban extends React.Component {
           break
       }
     }
-    this.setState({ saving: false })
   }
 
   handleRemoveColumn = (column) => {
@@ -336,10 +340,14 @@ export class Kanban extends React.Component {
             />
           )}
         </div>
-        {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}
+        {!state.boardInitiallyLoaded && <Loading />}
         {state.boardState === BOARD_STATE.ERROR && <span> {props.t('Error while loading the board.')} </span>}
         <>
-          <div className={classnames('kanban__contentpage__wrapper__board', { hidden: state.boardState !== BOARD_STATE.LOADED })}>
+          <div
+            className={classnames('kanban__contentpage__wrapper__board', {
+              hidden: !state.boardInitiallyLoaded,
+            })}
+          >
             <Board
               allowAddColumn={!props.readOnly}
               allowRemoveColumn={!props.readOnly}
