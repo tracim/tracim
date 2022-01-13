@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   CardPopup,
@@ -12,17 +13,26 @@ function KanbanColumnHeader (props) {
 
   return (
     <div
-      className='kanban__contentpage__wrapper__board__column'
+      className={classnames(
+        { readOnly: props.readOnly },
+        'kanban__contentpage__wrapper__board__column'
+      )}
       style={{ borderColor: props.column.bgColor || props.customColor }}
     >
       <div
         className='kanban__contentpage__wrapper__board__column__title'
       >
-        <strong onClick={() => props.onEditColumn(props.column)}>{props.column.title}</strong>
+        <strong
+          className={classnames({ readOnly: props. readOnly})}
+          onClick={!props.readOnly && (() => props.onEditColumn(props.column))}
+        >
+          {props.column.title}
+        </strong>
       </div>
 
       <IconButton
         dataCy='kanban_addCard'
+        customClass='kanban_addCard'
         disabled={props.readOnly}
         icon='fas fa-plus'
         intent='link'

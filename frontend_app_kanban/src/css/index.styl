@@ -55,16 +55,21 @@ cardWidth = 280px
             & > strong
               font-size titleFontSize
               flex 1
-              cursor pointer
               overflow hidden
               text-overflow ellipsis
-
+              cursor pointer
             &__actions.dropdownMenuButton
               padding 0
               &::after
                 display none
           & button:hover
             background-color grey-hover
+
+          &.readOnly
+            .dropdown, .kanban_addCard
+              display none
+            strong
+              cursor auto
 
         & .react-kanban-board
           overflow-y visible !important
@@ -168,18 +173,7 @@ cardWidth = 280px
     display flex
     border-radius standardBorderRadius
     flex-direction column
-    cursor pointer
-    &:hover
-      background-color veryLightGrey
-    & > *
-      margin auto
-
-@media (min-width: max-xs) and (max-width: max-lg)
-  .kanban
-    &__contentpage
-      display block
-      &__content__left
-        min-height 250px
+    cursor pointergdfsgdfd
       &__wrapper
         width 100%
         .commentArea

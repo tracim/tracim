@@ -219,10 +219,6 @@ export class Kanban extends React.Component {
   }
 
   handleCardDragEnd = (card, from, to) => {
-    const { props } = this
-    if (props.mode === APP_FEATURE_MODE.REVISION) {
-      return
-    }
     this.setState(prevState => {
       return {
         board: moveCard(prevState.board, from, to),
@@ -232,10 +228,6 @@ export class Kanban extends React.Component {
   }
 
   handleColumnDragEnd = (column, fromPosition, toPosition) => {
-    const { props } = this
-    if (props.mode === APP_FEATURE_MODE.REVISION) {
-      return
-    }
     this.setState(prevState => {
       return {
         board: moveColumn(prevState.board, fromPosition, toPosition),
@@ -303,6 +295,7 @@ export class Kanban extends React.Component {
 
   render () {
     const { props, state } = this
+    const changesAllowed = !props.readOnly
 
     return (
       <div className={classnames('kanban__contentpage__wrapper', { fullscreen: props.fullscreen })}>
@@ -349,11 +342,13 @@ export class Kanban extends React.Component {
         <>
           <div className={classnames('kanban__contentpage__wrapper__board', { hidden: state.boardState !== BOARD_STATE.LOADED })}>
             <Board
-              allowAddColumn={!props.readOnly}
-              allowRemoveColumn={!props.readOnly}
-              allowRenameColumn={!props.readOnly}
-              allowAddCar={!props.readOnly}
-              allowRemoveCard={!props.readOnly}
+              allowAddColumn={changesAllowed}
+              allowRemoveColumn={changesAllowed}
+              allowRenameColumn={changesAllowed}
+              allowAddCard={changesAllowed}
+              allowRemoveCard={changesAllowed}
+              disableCardDrag={!changesAllowed}
+              disableColumnDrag={!changesAllowed}
               onCardDragEnd={this.handleCardDragEnd}
               onColumnDragEnd={this.handleColumnDragEnd}
               onColumnNew={this.handleColumnNew}
@@ -373,7 +368,7 @@ export class Kanban extends React.Component {
               renderColumnHeader={column => (
                 <KanbanColumnHeader
                   customColor={props.config.hexcolor}
-                  readOnly={props.readOnly}
+                  readOnly={!changesAllowed}
                   column={column}
                   onEditColumn={this.handleEditColumn}
                   onAddCard={this.handleAddCard}
@@ -383,7 +378,7 @@ export class Kanban extends React.Component {
               renderCard={card => (
                 <KanbanCard
                   customColor={props.config.hexcolor}
-                  readOnly={props.readOnly}
+                  readOnly={!changesAllowed}
                   card={card}
                   onEditCard={this.handleEditCard}
                   onEditCardContent={this.handleEditCardContent}
