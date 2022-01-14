@@ -13,7 +13,7 @@ import {
 import { serializeContentProps } from './workspaceContentList.js'
 import { serialize } from 'tracim_frontend_lib'
 
-function sortByModifiedDate (arrayToSort) { // TODO MARIE inverser ici
+function sortByModifiedDate (arrayToSort) {
   return arrayToSort.sort(function (a, b) {
     if (a.modified > b.modified) return -1
     if (a.modified < b.modified) return 1
