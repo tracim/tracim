@@ -173,7 +173,22 @@ cardWidth = 280px
     display flex
     border-radius standardBorderRadius
     flex-direction column
-    cursor pointergdfsgdfd
+    cursor pointer
+    &.disabled
+      cursor not-allowed
+      opacity 0.5
+
+    &:hover
+      background-color veryLightGrey
+    & > *
+      margin auto
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .kanban
+    &__contentpage
+      display block
+      &__content__left
+        min-height 250px
       &__wrapper
         width 100%
         .commentArea

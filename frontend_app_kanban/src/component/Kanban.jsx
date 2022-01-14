@@ -42,6 +42,7 @@ import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 export const BOARD_STATE = {
   LOADING: 'loading',
   LOADED: 'loaded',
+  SAVING: 'saving',
   ERROR: 'error'
 }
 
@@ -137,12 +138,16 @@ export class Kanban extends React.Component {
 
       return {
         board: column ? removeCard(prevState.board, column, card) : prevState.board,
+        boardState: BOARD_STATE.SAVING,
         saveRequired: true
       }
     })
   }
 
   handleAddCard = (column) => {
+    // RJ - 2022-01-14 - NOTE
+    // we don't set saveRequired here because handleCardEdited will be called after
+    // adding a card
     this.setState({
       editedCardInfos: {
         card: {},
@@ -157,6 +162,7 @@ export class Kanban extends React.Component {
       board: card.id
         ? changeCard(prevState.board, card.id, card)
         : addCard(prevState.board, prevState.editedCardInfos.column, { ...card, id: uuidv4() }),
+      boardState: BOARD_STATE.SAVING,
       saveRequired: true
     }))
   }
@@ -179,6 +185,7 @@ export class Kanban extends React.Component {
         board: column.id
           ? changeColumn(prevState.board, column, newColumn)
           : addColumn(prevState.board, { ...newColumn, cards: [] }),
+        boardState: BOARD_STATE.SAVING,
         saveRequired: true
       }
     })
@@ -217,6 +224,7 @@ export class Kanban extends React.Component {
     this.setState(prevState => {
       return {
         board: removeColumn(prevState.board, column),
+        boardState: BOARD_STATE.SAVING,
         saveRequired: true
       }
     })
@@ -226,6 +234,7 @@ export class Kanban extends React.Component {
     this.setState(prevState => {
       return {
         board: moveCard(prevState.board, from, to),
+        boardState: BOARD_STATE.SAVING,
         saveRequired: true
       }
     })
@@ -235,6 +244,7 @@ export class Kanban extends React.Component {
     this.setState(prevState => {
       return {
         board: moveColumn(prevState.board, fromPosition, toPosition),
+        boardState: BOARD_STATE.SAVING,
         saveRequired: true
       }
     })
@@ -346,11 +356,11 @@ export class Kanban extends React.Component {
         <>
           <div
             className={classnames('kanban__contentpage__wrapper__board', {
-              hidden: !state.boardInitiallyLoaded,
+              hidden: !state.boardInitiallyLoaded
             })}
           >
             <Board
-              allowAddColumn={changesAllowed}
+              allowAddColumn={!props.readOnly}
               allowRemoveColumn={changesAllowed}
               allowRenameColumn={changesAllowed}
               allowAddCard={changesAllowed}
@@ -365,12 +375,12 @@ export class Kanban extends React.Component {
               onColumnRename={this.handleEditColumn}
               renderColumnAdder={() => (
                 <div
-                  className='kanban__columnAdder'
+                  className={classnames({ disabled: !changesAllowed }, 'kanban__columnAdder')}
                   key='kanban__columnAdder'
-                  onClick={this.handleEditColumn}
+                  onClick={changesAllowed ? this.handleEditColumn : undefined}
                 >
                   <i className='fa fas fa-fw fa-plus' />
-                  <span>{props.t('Add new column')}</span>
+                  <p>{props.t('Add new column')}</p>
                 </div>
               )}
               renderColumnHeader={column => (

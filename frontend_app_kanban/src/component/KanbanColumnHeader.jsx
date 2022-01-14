@@ -23,7 +23,7 @@ function KanbanColumnHeader (props) {
         className='kanban__contentpage__wrapper__board__column__title'
       >
         <strong
-          className={classnames({ readOnly: props. readOnly})}
+          className={classnames({ readOnly: props.readOnly })}
           onClick={!props.readOnly && (() => props.onEditColumn(props.column))}
         >
           {props.column.title}
