@@ -55,19 +55,19 @@ cardWidth = 280px
             & > strong
               font-size titleFontSize
               flex 1
+              cursor pointer
               overflow hidden
               text-overflow ellipsis
-              cursor pointer
             &__actions.dropdownMenuButton
               padding 0
               &::after
                 display none
           & button:hover
             background-color grey-hover
-
-          &.readOnly
+          .buttonHidden
             .dropdown, .kanban_addCard
               display none
+          &.readOnly
             strong
               cursor auto
 

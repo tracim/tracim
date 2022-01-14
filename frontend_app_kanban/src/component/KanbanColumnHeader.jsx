@@ -13,10 +13,10 @@ function KanbanColumnHeader (props) {
 
   return (
     <div
-      className={classnames(
-        { readOnly: props.readOnly },
-        'kanban__contentpage__wrapper__board__column'
-      )}
+      className={classnames('kanban__contentpage__wrapper__board__column', {
+        readOnly: props.readOnly,
+        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
+      })}
       style={{ borderColor: props.column.bgColor || props.customColor }}
     >
       <div
@@ -24,7 +24,7 @@ function KanbanColumnHeader (props) {
       >
         <strong
           className={classnames({ readOnly: props.readOnly })}
-          onClick={!props.readOnly && (() => props.onEditColumn(props.column))}
+          onClick={props.readOnly ? undefined : () => props.onEditColumn(props.column)}
         >
           {props.column.title}
         </strong>
@@ -41,6 +41,7 @@ function KanbanColumnHeader (props) {
       />
 
       <DropdownMenu
+        buttonDisabled={props.readOnly}
         buttonCustomClass='kanban__contentpage__wrapper__board__column__title__actions'
         buttonIcon='fas fa-ellipsis-v'
         buttonTooltip={props.t('Actions')}
@@ -109,6 +110,7 @@ KanbanColumnHeader.propTypes = {
   onAddCard: PropTypes.func.isRequired,
   onRemoveColumn: PropTypes.func.isRequired,
   customColor: PropTypes.string,
+  hideButtonsWhenReadOnly: PropTypes.bool,
   readOnly: PropTypes.bool
 }
 

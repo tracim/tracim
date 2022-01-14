@@ -41,7 +41,10 @@ function KanbanCard (props) {
   return (
     <div
       style={{ borderColor: props.card.bgColor || props.customColor }}
-      className={classnames({ readOnly: props.readOnly }, 'kanban__contentpage__wrapper__board__card')}
+      className={classnames('kanban__contentpage__wrapper__board__card', {
+        readOnly: props.readOnly,
+        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
+      })}
     >
       <div className='kanban__contentpage__wrapper__board__card__title'>
         <strong onClick={props.readOnly ? undefined : () => props.onEditCard(props.card)}>
@@ -52,6 +55,7 @@ function KanbanCard (props) {
           buttonIcon='fas fa-ellipsis-v'
           buttonTooltip={props.t('Actions')}
           buttonDataCy='cardActions'
+          buttonDisabled={props.readOnly}
           menuCustomClass='dropdown-menu-right'
         >
           <IconButton
