@@ -151,17 +151,21 @@ export class Tracim extends React.Component {
     const isMainTab = this.liveMessageManager.eventSource !== null
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
-      if ('Notification' in window) {
+      if (window.Notification) {
         const notificationString = tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim')
         const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
 
-        if (Notification.permission === 'granted') {
-          new Notification(notificationString, notificationOptions) // eslint-disable-line
-        } else if (Notification.permission !== 'denied') {
-          const permission = await Notification.requestPermission()
-          if (permission === 'granted') {
-            new Notification(notificationString, notificationOptions) // eslint-disable-line
+        try {
+          if (Notification.permission === 'granted') {
+            new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+          } else if (Notification.permission !== 'denied') {
+            const permission = await Notification.requestPermission()
+            if (permission === 'granted') {
+              new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+            }
           }
+        } catch (e) {
+          console.error("Could not show notification", e)
         }
       }
 
