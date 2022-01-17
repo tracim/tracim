@@ -165,7 +165,7 @@ export class Tracim extends React.Component {
             }
           }
         } catch (e) {
-          console.error("Could not show notification", e)
+          console.error('Could not show notification', e)
         }
       }
 
