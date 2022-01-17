@@ -533,75 +533,12 @@ export class Publications extends React.Component {
       <ScrollToBottomWrapper
         customClass='publications'
         isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
-        shouldScrollToBottom={!state.newCurrentPublication}
+        shouldScrollToBottom={state.newCurrentPublication}
       >
         <TabBar
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
         />
-
-        {state.loading && <Loading />}
-
-        {!state.loading && isPublicationListEmpty && (
-          <div className='publications__empty'>
-            {props.t('This space does not have any news yet, create the first news post using the area at the bottom of the page.')}
-          </div>
-        )}
-
-        {!state.loading && props.publicationPage.hasNextPage && (
-          <IconButton
-            text={props.t('See more')}
-            icon='fas fa-chevron-up'
-            dataCy='showMorePublicationItemsBtn'
-            customClass='publications__showMoreButton'
-            onClick={() => this.getPublicationPage(props.publicationPage.nextPageToken)}
-          />
-        )}
-
-        {!state.loading && props.publicationPage.list.map(publication =>
-          <FeedItemWithPreview
-            contentAvailable
-            allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
-            commentList={publication.commentList}
-            content={publication}
-            customColor={COLORS.PUBLICATION}
-            key={`publication_${publication.id}`}
-            ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
-            memberList={props.currentWorkspace.memberList}
-            onClickCopyLink={() => this.handleClickCopyLink(publication)}
-            isPublication
-            inRecentActivities={false}
-            onClickEdit={() => this.handleClickEdit(publication)}
-            showTimeline
-            workspaceId={Number(publication.workspaceId)}
-            user={props.user}
-            {...this.getPreviewLinkParameters(publication)}
-          />
-        )}
-
-        {!state.loading && state.showReorderButton && (
-          <IconButton
-            customClass='publications__reorder'
-            text={props.t('Reorder')}
-            icon='fas fa-redo-alt'
-            intent='link'
-            onClick={this.handleClickReorder}
-          />
-        )}
-
-        {!state.loading && state.showEditPopup && (
-          <EditCommentPopup
-            apiUrl={FETCH_CONFIG.apiUrl}
-            comment={state.commentToEdit.raw_content}
-            commentId={state.commentToEdit.content_id}
-            customColor={COLORS.PUBLICATION}
-            loggedUserLanguage={props.user.lang}
-            onClickValidate={this.handleClickValidateEdit}
-            onClickClose={() => this.setState({ showEditPopup: false })}
-            workspaceId={props.currentWorkspace.id}
-          />
-        )}
-
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='publishAreaContainer'>
             <CommentArea
@@ -627,6 +564,68 @@ export class Publications extends React.Component {
               lang={props.user.lang}
             />
           </div>
+        )}
+
+        {!state.loading && state.showReorderButton && (
+          <IconButton
+            customClass='publications__reorder'
+            text={props.t('Reorder')}
+            icon='fas fa-redo-alt'
+            intent='link'
+            onClick={this.handleClickReorder}
+          />
+        )}
+
+        {state.loading && <Loading />}
+
+        {!state.loading && isPublicationListEmpty && (
+          <div className='publications__empty'>
+            {props.t('This space does not have any news yet, create the first news post using the area at the bottom of the page.')}
+          </div>
+        )}
+
+        {!state.loading && props.publicationPage.list.map(publication =>
+          <FeedItemWithPreview
+            contentAvailable
+            allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
+            commentList={publication.commentList}
+            content={publication}
+            customColor={COLORS.PUBLICATION}
+            key={`publication_${publication.id}`}
+            ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
+            memberList={props.currentWorkspace.memberList}
+            onClickCopyLink={() => this.handleClickCopyLink(publication)}
+            isPublication
+            inRecentActivities={false}
+            onClickEdit={() => this.handleClickEdit(publication)}
+            showTimeline
+            workspaceId={Number(publication.workspaceId)}
+            user={props.user}
+            {...this.getPreviewLinkParameters(publication)}
+          />
+        )}
+
+        {!state.loading && state.showEditPopup && (
+          <EditCommentPopup
+            apiUrl={FETCH_CONFIG.apiUrl}
+            comment={state.commentToEdit.raw_content}
+            commentId={state.commentToEdit.content_id}
+            customColor={COLORS.PUBLICATION}
+            loggedUserLanguage={props.user.lang}
+            onClickValidate={this.handleClickValidateEdit}
+            onClickClose={() => this.setState({ showEditPopup: false })}
+            workspaceId={props.currentWorkspace.id}
+          />
+        )}
+
+        {!state.loading && props.publicationPage.hasNextPage && (
+          <IconButton
+            text={props.t('See more')}
+            icon='fas fa-chevron-down'
+            dataCy='showMorePublicationItemsBtn'
+            customClass='publications__showMoreButton'
+            onClick={() => this.getPublicationPage(props.publicationPage.nextPageToken)}
+          />
         )}
       </ScrollToBottomWrapper>
     )
