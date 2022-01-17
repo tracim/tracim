@@ -60,6 +60,7 @@ export class Kanban extends React.Component {
       boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.INIT,
       editedCardInfos: null,
       editedColumnInfos: null,
+      saveRequired: false,
       isAutoCompleteActivated: false
     }
   }
@@ -73,19 +74,24 @@ export class Kanban extends React.Component {
       this.setState({
         boardState: BOARD_STATE.LOADED,
         boardInitiallyLoaded: true,
+        saveRequired: true,
         board: newBoard
       })
-      this.save(newBoard)
     }
   }
 
   async componentDidUpdate (prevProps) {
-    const { props } = this
+    const { state, props } = this
     if (
       (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
       (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
     ) {
       this.loadBoardContent()
+    }
+
+    if (state.saveRequired) {
+      this.save(state.board)
+      this.setState({ saveRequired: false })
     }
   }
 
@@ -134,9 +140,9 @@ export class Kanban extends React.Component {
           .find(columnCard => columnCard.id === card.id))
 
       const newBoard = column ? removeCard(prevState.board, column, card) : prevState.board
-      this.save(newBoard)
       return {
         board: newBoard,
+        saveRequired: true,
         boardState: BOARD_STATE.SAVING
       }
     })
@@ -162,10 +168,10 @@ export class Kanban extends React.Component {
           : addCard(prevState.board, prevState.editedCardInfos.column, { ...card, id: uuidv4() })
       )
 
-      this.save(newBoard)
       return {
         editedCardInfos: null,
         board: newBoard,
+        saveRequired: true,
         boardState: BOARD_STATE.SAVING
       }
     })
@@ -189,10 +195,10 @@ export class Kanban extends React.Component {
         ? changeColumn(prevState.board, column, newColumn)
         : addColumn(prevState.board, { ...newColumn, cards: [] })
 
-      this.save(newBoard)
       return {
         editedColumnInfos: null,
         board: newBoard,
+        saveRequired: true,
         boardState: BOARD_STATE.SAVING
       }
     })
@@ -230,9 +236,9 @@ export class Kanban extends React.Component {
   handleRemoveColumn = (column) => {
     this.setState(prevState => {
       const newBoard = removeColumn(prevState.board, column)
-      this.save(newBoard)
       return {
         board: newBoard,
+        saveRequired: true,
         boardState: BOARD_STATE.SAVING
       }
     })
@@ -241,9 +247,9 @@ export class Kanban extends React.Component {
   handleCardDragEnd = (card, from, to) => {
     this.setState(prevState => {
       const newBoard = moveCard(prevState.board, from, to)
-      this.save(newBoard)
       return {
         board: newBoard,
+        saveRequired: true,
         boardState: BOARD_STATE.SAVING
       }
     })
@@ -252,9 +258,9 @@ export class Kanban extends React.Component {
   handleColumnDragEnd = (column, fromPosition, toPosition) => {
     this.setState(prevState => {
       const newBoard = moveColumn(prevState.board, fromPosition, toPosition)
-      this.save(newBoard)
       return {
         board: newBoard,
+        saveRequired: true,
         boardState: BOARD_STATE.SAVING
       }
     })
