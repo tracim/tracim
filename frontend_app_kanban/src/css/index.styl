@@ -58,13 +58,18 @@ cardWidth = 280px
               cursor pointer
               overflow hidden
               text-overflow ellipsis
-
             &__actions.dropdownMenuButton
               padding 0
               &::after
                 display none
           & button:hover
             background-color grey-hover
+          .buttonHidden
+            .dropdown, .kanban_addCard
+              display none
+          &.readOnly
+            strong
+              cursor auto
 
         & .react-kanban-board
           overflow-y visible !important
@@ -169,6 +174,10 @@ cardWidth = 280px
     border-radius standardBorderRadius
     flex-direction column
     cursor pointer
+    &.disabled
+      cursor not-allowed
+      opacity 0.5
+
     &:hover
       background-color veryLightGrey
     & > *

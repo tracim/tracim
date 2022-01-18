@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   CardPopup,
@@ -12,17 +13,26 @@ function KanbanColumnHeader (props) {
 
   return (
     <div
-      className='kanban__contentpage__wrapper__board__column'
+      className={classnames('kanban__contentpage__wrapper__board__column', {
+        readOnly: props.readOnly,
+        buttonHidden: props.readOnly && props.hideButtonsWhenReadOnly
+      })}
       style={{ borderColor: props.column.bgColor || props.customColor }}
     >
       <div
         className='kanban__contentpage__wrapper__board__column__title'
       >
-        <strong onClick={() => props.onEditColumn(props.column)}>{props.column.title}</strong>
+        <strong
+          className={classnames({ readOnly: props.readOnly })}
+          onClick={props.readOnly ? undefined : () => props.onEditColumn(props.column)}
+        >
+          {props.column.title}
+        </strong>
       </div>
 
       <IconButton
         dataCy='kanban_addCard'
+        customClass='kanban_addCard'
         disabled={props.readOnly}
         icon='fas fa-plus'
         intent='link'
@@ -31,6 +41,7 @@ function KanbanColumnHeader (props) {
       />
 
       <DropdownMenu
+        buttonDisabled={props.readOnly}
         buttonCustomClass='kanban__contentpage__wrapper__board__column__title__actions'
         buttonIcon='fas fa-ellipsis-v'
         buttonTooltip={props.t('Actions')}
@@ -99,6 +110,7 @@ KanbanColumnHeader.propTypes = {
   onAddCard: PropTypes.func.isRequired,
   onRemoveColumn: PropTypes.func.isRequired,
   customColor: PropTypes.string,
+  hideButtonsWhenReadOnly: PropTypes.bool,
   readOnly: PropTypes.bool
 }
 
