@@ -46,6 +46,11 @@ cardWidth = 280px
       flex-direction column
       & > div
         line-height standardFontSize
+        img
+          object-fit contain
+          max-width 100%
+          display block // INFO - RJ - 2021-01-19 - without this, the card wrapper from react-kanban is weirdly sized
+
       &.kanban__contentpage__wrapper__board__card__description__overflow > div
         max-height (3 * standardFontSize)
         overflow hidden
