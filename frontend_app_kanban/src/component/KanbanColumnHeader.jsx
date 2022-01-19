@@ -43,6 +43,7 @@ function KanbanColumnHeader (props) {
       <DropdownMenu
         buttonDisabled={props.readOnly}
         buttonCustomClass='kanban__contentpage__wrapper__board__column__title__actions'
+        menuCustomClass='dropdown-menu-right'
         buttonIcon='fas fa-ellipsis-v'
         buttonTooltip={props.t('Actions')}
         buttonDataCy='columnActions'
