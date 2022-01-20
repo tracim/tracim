@@ -3,7 +3,9 @@
 ### New Features
 
 - New kanban feature
-- Improvement of the responsive
+- Improvement of the responsive aspect of the interface
+``
+(responsive is an adjective)
 - News feed reversed
 - Calibration of the cover and avatar profile photos
 - Improvement of user's space management for the admin
