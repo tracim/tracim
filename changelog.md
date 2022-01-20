@@ -28,6 +28,7 @@
 
 ### Breaking/Important change
 
+- :warning: You need to adjust some settings before running this version. For more information see: [#5118](https://github.com/tracim/tracim/issues/5118)
 - Poppler-utils and webp now need to be present (and qpdf can be gotten rid off) on Tracim installations that don't use Docker (PR [#5121](https://github.com/tracim/tracim/pull/5121)),
 - By default, EPS previews are now disabled for security reasons, unless you manually enable them. ([see preview generator documentation](https://github.com/algoo/preview-generator#eps-support))
 - Docker image support for ARM64 ([#3985](https://github.com/tracim/tracim/issues/3985))
@@ -38,7 +39,7 @@
 ### Known Issues
 
 - Activation/Deactivation of agenda is not properly handled. In some cases you will not be able to remove users from spaces because of this. See the workaround in issue:([#5263](https://github.com/tracim/tracim/issues/5263#issuecomment-1016454036))
-- Having a double quote (`"`) in a kanban's title causes the kanban to not load. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
+- Having a double quote (`"`) or a slash (`\`) in a kanban's title causes the kanban to not load. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
 
 
 # 4.0.6 / 2022-01-18
