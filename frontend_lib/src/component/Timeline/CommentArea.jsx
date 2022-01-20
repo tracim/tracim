@@ -366,7 +366,7 @@ export class CommentArea extends React.Component {
           <textarea
             id={props.id}
             className={props.customClass}
-            placeholder={props.t('Your message...')}
+            placeholder={props.placeHolder || props.t('Your message...')}
             value={state.newComment}
             onChange={props.wysiwyg ? () => { } : this.handleChangeNewComment}
             disabled={props.disableComment}
@@ -421,7 +421,7 @@ export class CommentArea extends React.Component {
                 color={props.customColor}
                 customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'commentArea__submit__btn')}
                 disabled={props.disableComment || (state.newComment === '' && state.newCommentAsFileList.length === 0)}
-                icon='far fa-paper-plane'
+                icon={props.icon}
                 intent='primary'
                 mode='light'
                 onClick={this.handleClickSend}
@@ -441,48 +441,54 @@ export class CommentArea extends React.Component {
 export default translate()(CommentArea)
 
 CommentArea.propTypes = {
-  id: PropTypes.string.isRequired,
   apiUrl: PropTypes.string.isRequired,
-  newComment: PropTypes.string,
+  buttonLabel: PropTypes.string,
+  contentId: PropTypes.number,
+  contentType: PropTypes.string,
+  customClass: PropTypes.string,
   disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
-  wysiwyg: PropTypes.bool,
-  searchForMentionOrLinkInQuery: PropTypes.func,
-  customClass: PropTypes.string,
   hideSendButtonAndOptions: PropTypes.bool,
-  multipleFiles: PropTypes.bool,
-  contentType: PropTypes.string,
-  contentId: PropTypes.number,
-  workspaceId: PropTypes.number,
-  wysiwygIdSelector: PropTypes.string,
+  icon: PropTypes.string,
+  id: PropTypes.string.isRequired,
+  invalidMentionList: PropTypes.array,
   lang: PropTypes.string,
+  multipleFiles: PropTypes.bool,
+  newComment: PropTypes.string,
   onClickCancelSave: PropTypes.func,
   onClickSaveAnyway: PropTypes.func,
   onClickValidateNewCommentBtn: PropTypes.func,
-  invalidMentionList: PropTypes.array,
+  onClickWysiwygBtn: PropTypes.func,
+  placeHolder: PropTypes.string,
+  searchForMentionOrLinkInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool,
-  onClickWysiwygBtn: PropTypes.func
+  workspaceId: PropTypes.number,
+  wysiwyg: PropTypes.bool,
+  wysiwygIdSelector: PropTypes.string
 }
 
 CommentArea.defaultProps = {
+  buttonLabel: '',
+  contentId: 0,
+  contentType: '',
+  customClass: '',
   disableAutocompletePosition: false,
   disableComment: false,
-  customClass: '',
-  id: '',
-  newComment: '',
-  wysiwyg: false,
-  searchForMentionOrLinkInQuery: () => { },
   hideSendButtonAndOptions: false,
-  multipleFiles: true,
-  contentType: '',
-  contentId: 0,
-  workspaceId: 0,
-  wysiwygIdSelector: '',
+  icon: 'far fa-paper-plane',
+  id: '',
+  invalidMentionList: [],
   lang: 'en',
+  multipleFiles: true,
+  newComment: '',
   onClickCancelSave: () => { },
   onClickSaveAnyway: () => { },
   onClickValidateNewCommentBtn: () => { },
-  invalidMentionList: [],
+  onClickWysiwygBtn: () => { },
+  placeHolder: '',
+  searchForMentionOrLinkInQuery: () => { },
   showInvalidMentionPopup: false,
-  onClickWysiwygBtn: () => { }
+  workspaceId: 0,
+  wysiwyg: false,
+  wysiwygIdSelector: ''
 }
