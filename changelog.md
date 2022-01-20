@@ -5,7 +5,7 @@
 - New kanban feature
 - Improvement of the responsive aspect of the interface
 - News feed now displays newest news first.
-- Calibration of the cover and avatar profile photos
+- Crop feature for the cover and avatar profile photos
 - Improvement of user's space management for the admin
 - Improvement of the call feature (bugfix and polish)
 - UI/UX improvement (buttons, redirections)
