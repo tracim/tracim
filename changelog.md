@@ -29,7 +29,7 @@
 ### Breaking/Important change
 
 - Poppler-utils and webp now need to be present (and qpdf can be gotten rid off) on Tracim installations that don't use Docker (PR [#5121](https://github.com/tracim/tracim/pull/5121)),
-- By default, EPS previews are now disabled for security reasons, unless you manually enabled them. ([see preview generator documentation](https://github.com/algoo/preview-generator#eps-support))
+- By default, EPS previews are now disabled for security reasons, unless you manually enable them. ([see preview generator documentation](https://github.com/algoo/preview-generator#eps-support))
 - Docker image support for ARM64 ([#3985](https://github.com/tracim/tracim/issues/3985))
 - Allow changing the parent of a space through tracimcli ([#3636](https://github.com/tracim/tracim/issues/3636))
 - Improve and add caldav (agenda) ([#2099](https://github.com/tracim/tracim/issues/2099)) and add carddav (adressbook) support ([#1469](https://github.com/tracim/tracim/issues/1469))
