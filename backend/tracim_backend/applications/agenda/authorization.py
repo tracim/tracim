@@ -12,6 +12,7 @@ from tracim_backend.exceptions import UserDoesNotExist
 from tracim_backend.exceptions import UserGivenIsNotTheSameAsAuthenticated
 from tracim_backend.exceptions import WorkspaceAgendaDisabledException
 from tracim_backend.exceptions import WorkspaceNotFound
+from tracim_backend.lib.utils.authorization import AndAuthorizationChecker
 from tracim_backend.lib.utils.authorization import AuthorizationChecker
 from tracim_backend.lib.utils.authorization import CandidateIsCurrentUserChecker
 from tracim_backend.lib.utils.authorization import is_content_manager
@@ -64,7 +65,10 @@ class CanAccessWorkspaceRootAgendaChecker(AuthorizationChecker):
         if (
             self.caldav_auth_determiner.determine_requested_mode(tracim_context)
             == DavAuthorization.MANAGER
-            or self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+        ):
+            raise CaldavNotAuthorized()
+        if (
+            self.caldav_auth_determiner.determine_requested_mode(tracim_context)
             == DavAuthorization.WRITE
         ):
             is_content_manager.check(tracim_context)
@@ -117,6 +121,24 @@ class CanAccessWorkspaceEventAgendaChecker(AuthorizationChecker):
         return True
 
 
+class CanAccessUserRootAgendaChecker(AuthorizationChecker):
+    def __init__(self) -> None:
+        self.caldav_auth_determiner = CaldavAuthorizationDeterminer()
+
+    def check(self, tracim_context: "TracimRequest") -> bool:
+        """
+        :param tracim_context: Must be a TracimRequest because this checker only
+        work in pyramid http request context.
+        :return: true or raise Exception according to right.
+        """
+        if (
+            self.caldav_auth_determiner.determine_requested_mode(tracim_context)
+            == DavAuthorization.MANAGER
+        ):
+            raise CaldavNotAuthorized()
+        return True
+
+
 class CaldavChecker(AuthorizationChecker):
     """
     Wrapper for NotAuthenticated case
@@ -136,5 +158,8 @@ class CaldavChecker(AuthorizationChecker):
 
 can_access_workspace_root_agenda = CaldavChecker(CanAccessWorkspaceRootAgendaChecker())
 can_access_workspace_event_agenda = CaldavChecker(CanAccessWorkspaceEventAgendaChecker())
-can_access_user_agenda = CaldavChecker(CandidateIsCurrentUserChecker())
+can_access_user_agenda_event = CaldavChecker(CandidateIsCurrentUserChecker())
+can_access_user_root_agenda = CaldavChecker(
+    AndAuthorizationChecker(CandidateIsCurrentUserChecker(), CanAccessUserRootAgendaChecker())
+)
 can_access_to_agenda_list = CaldavChecker(is_user)

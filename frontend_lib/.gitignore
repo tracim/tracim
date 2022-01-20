@@ -5,10 +5,14 @@ node_modules/
 dist/tracim_frontend_lib.full.js
 dist/tracim_frontend_lib.lib.js
 dist/tracim_frontend_lib.style.js
-dist/tracim_frontend_lib.optimized.lib.js
-dist/tracim_frontend_lib.optimized.style.js
-dist/tracim_frontend_lib.test_utils.js
+dist/tracim_frontend_lib.lib.optimized.js
+dist/tracim_frontend_lib.style.optimized.js
+dist/tracim_frontend_lib.test_utils.optimized.js
 dist/tracim_frontend_lib.optimized.test_utils.js
+dist/tracim_frontend_lib.lib.standalone.js
+dist/tracim_frontend_lib.style.standalone.js
+dist/tracim_frontend_lib.test_utils.standalone.js
 dist/tracim_frontend_lib.tracim.lib.js
 dist/tracim_frontend_lib.tracim.style.js
 dist/tracim_frontend_lib.tracim.test_utils.js
+src/index.dev.js

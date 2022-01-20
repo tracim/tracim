@@ -533,12 +533,50 @@ export class Publications extends React.Component {
       <ScrollToBottomWrapper
         customClass='publications'
         isLastItemAddedFromCurrentToken={state.isLastItemAddedFromCurrentToken}
-        shouldScrollToBottom={!state.newCurrentPublication}
+        shouldScrollToBottom={state.newCurrentPublication}
       >
         <TabBar
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
         />
+        {userRoleIdInWorkspace >= ROLE.contributor.id && (
+          <div className='publishAreaContainer'>
+            <CommentArea
+              apiUrl={FETCH_CONFIG.apiUrl}
+              buttonLabel={props.t('Publish')}
+              contentId={newPublicationId}
+              contentType={CONTENT_TYPE.THREAD}
+              customColor={COLORS.PUBLICATION}
+              customClass='publishArea'
+              disableAutocompletePosition
+              icon='fa-fw fas fa-stream'
+              id={wysiwygId}
+              invalidMentionList={state.invalidMentionList}
+              lang={props.user.lang}
+              multipleFiles={false}
+              onClickCancelSave={this.handleCancelSave}
+              onClickSaveAnyway={this.handleClickValidateAnyway}
+              onClickValidateNewCommentBtn={this.handleClickPublish}
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              placeHolder={props.t('Share a news...')}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
+              workspaceId={parseInt(props.match.params.idws)}
+              wysiwygIdSelector={`#${wysiwygId}`}
+              wysiwyg={state.publicationWysiwyg}
+            />
+          </div>
+        )}
+
+        {!state.loading && state.showReorderButton && (
+          <IconButton
+            customClass='publications__reorder'
+            text={props.t('Reorder')}
+            icon='fas fa-redo-alt'
+            intent='link'
+            onClick={this.handleClickReorder}
+          />
+        )}
 
         {state.loading && <Loading />}
 
@@ -546,16 +584,6 @@ export class Publications extends React.Component {
           <div className='publications__empty'>
             {props.t('This space does not have any news yet, create the first news post using the area at the bottom of the page.')}
           </div>
-        )}
-
-        {!state.loading && props.publicationPage.hasNextPage && (
-          <IconButton
-            text={props.t('See more')}
-            icon='fas fa-chevron-up'
-            dataCy='showMorePublicationItemsBtn'
-            customClass='publications__showMoreButton'
-            onClick={() => this.getPublicationPage(props.publicationPage.nextPageToken)}
-          />
         )}
 
         {!state.loading && props.publicationPage.list.map(publication =>
@@ -579,16 +607,6 @@ export class Publications extends React.Component {
           />
         )}
 
-        {!state.loading && state.showReorderButton && (
-          <IconButton
-            customClass='publications__reorder'
-            text={props.t('Reorder')}
-            icon='fas fa-redo-alt'
-            intent='link'
-            onClick={this.handleClickReorder}
-          />
-        )}
-
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
@@ -602,31 +620,14 @@ export class Publications extends React.Component {
           />
         )}
 
-        {userRoleIdInWorkspace >= ROLE.contributor.id && (
-          <div className='publishAreaContainer'>
-            <CommentArea
-              apiUrl={FETCH_CONFIG.apiUrl}
-              buttonLabel={props.t('Publish')}
-              contentId={newPublicationId}
-              contentType={CONTENT_TYPE.THREAD}
-              customColor={COLORS.PUBLICATION}
-              customClass='publishArea'
-              id={wysiwygId}
-              wysiwygIdSelector={`#${wysiwygId}`}
-              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-              wysiwyg={state.publicationWysiwyg}
-              disableAutocompletePosition
-              onClickWysiwygBtn={this.handleToggleWysiwyg}
-              workspaceId={parseInt(props.match.params.idws)}
-              onClickValidateNewCommentBtn={this.handleClickPublish}
-              multipleFiles={false}
-              onClickSaveAnyway={this.handleClickValidateAnyway}
-              invalidMentionList={state.invalidMentionList}
-              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
-              onClickCancelSave={this.handleCancelSave}
-              lang={props.user.lang}
-            />
-          </div>
+        {!state.loading && props.publicationPage.hasNextPage && (
+          <IconButton
+            text={props.t('See more')}
+            icon='fas fa-chevron-down'
+            dataCy='showMorePublicationItemsBtn'
+            customClass='publications__showMoreButton'
+            onClick={() => this.getPublicationPage(props.publicationPage.nextPageToken)}
+          />
         )}
       </ScrollToBottomWrapper>
     )

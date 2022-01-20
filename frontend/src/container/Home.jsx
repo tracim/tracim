@@ -212,7 +212,7 @@ export class Home extends React.Component {
                 customHeaderClass='primaryColorBg'
                 onClose={this.handleClickCloseUsernamePopup}
                 label={props.t('Set your username')}
-                faIcon='fas fa-fw fa-at'
+                faIcon='fas fa-at'
               >
                 <div className='homepage__usernamePopup__body'>
                   <div className='homepage__usernamePopup__body__title'>

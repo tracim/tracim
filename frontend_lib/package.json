@@ -1,17 +1,14 @@
 {
   "name": "tracim_frontend_lib",
   "version": "1.1.9",
-  "main": "dist/tracim_frontend_lib.lib.js",
+  "main": "dist/tracim_frontend_lib.lib.standalone.js",
   "scripts": {
-    "mockapi": "node jsonserver/server.js",
+    "build:standalone": "NODE_ENV=production webpack-cli --config webpack.standalone.config.js",
+    "build:standalone:dev": "NODE_ENV=development webpack-cli --config webpack.standalone.config.js",
+    "build:optimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
+    "build:optimized:dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
     "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
-    "buildtracimlib": "yarn run build && yarn run buildoptimized",
-    "buildtracimlib-dev": "yarn run build-dev && yarn run buildoptimized-dev",
-    "build-translation": "node ../i18next.scanner.js",
-    "build": "./build-script.sh",
-    "build-dev": "./build-script.sh dev",
-    "buildoptimized": "./build-script.sh optimized",
-    "buildoptimized-dev": "./build-script.sh optimized dev",
+    "build:translation": "node ../i18next.scanner.js",
     "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
     "test": "yarn run lint && yarn run test:quick",
     "test:quick": "NODE_ENV=test mocha --config test/.mocharc.js"

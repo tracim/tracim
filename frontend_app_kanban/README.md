@@ -1,12 +1,34 @@
-# App Kanban for Tracim
+App Kanban for Tracim
+===================
 
-This repo is an app loaded by Tracim.
+This folder is a feature app loaded by Tracim.
 
-### Development
-To see your changes without importing the app into Tracim you need to be logged in to the frontend's dev server to have an auth cookie an run:
-- run `yarn run servdev`
-Which will create a web server (webpack) where you will see the app loaded with some default values.
-For this command the configuration file debug.js is used which follows the template of the file debug.sample.js. To adapt the configuration to your content, you need to change the variables:
- - content_id: integer
- - workspace_id: integer
- - apiUrl: /api (this can be a full URL)
+It is meant to handle Tracim Kanban file.
+
+
+### Build the app
+
+#### For production
+
+see [frontend/doc/app_building#Production](../frontend/doc/app_building.md#production)
+
+#### For development
+
+see [frontend/doc/app_building#Development](../frontend/doc/app_building.md#development)
+
+##### Specific `debug.js` configuration
+
+- Create a content of type kanban (in any space) using Tracim's frontend interface
+- In `src/debug.js`, change:
+  - `content.content_id` to the id of the content you just created
+  - `content.workspace_id` to the id of the space you just created the content in
+
+___
+
+### Other available yarn scripts
+
+see [frontend/doc/yarn_scripts.md](../frontend/doc/yarn_scripts.md)
+
+### Before pushing changes to this app, you must
+
+see [frontend/doc/before_push.md](../frontend/doc/before_push.md)

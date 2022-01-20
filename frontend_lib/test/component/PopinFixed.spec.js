@@ -5,6 +5,7 @@ import { mount } from 'enzyme'
 import PopinFixed from '../../src/component/PopinFixed/PopinFixed'
 import PopinFixedContent from '../../src/component/PopinFixed/PopinFixedContent'
 import PopinFixedHeader from '../../src/component/PopinFixed/PopinFixedHeader'
+import { reactstrapPopoverHack } from '../testHelper.js'
 require('../../src/component/PopinFixed/PopinFixed.styl')
 
 describe('<PopinFixed />', () => {
@@ -22,6 +23,7 @@ describe('<PopinFixed />', () => {
       faIcon: ''
     },
     content: {
+      content_id: 0,
       is_archived: false,
       is_deleted: false
     },
@@ -36,6 +38,8 @@ describe('<PopinFixed />', () => {
   }
 
   const PopinFixedWithHOC = withRouterMock(PopinFixed)
+
+  reactstrapPopoverHack(document, `wsContentGeneric__header__title_${props.content.content_id}`)
 
   const wrapper = mount(
     <PopinFixedWithHOC

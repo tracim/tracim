@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { mount } from 'enzyme'
 import { APP_FEATURE_MODE } from '../../src/helper.js'
 import PopinFixedContent from '../../src/component/PopinFixed/PopinFixedContent.jsx'
+import { reactstrapPopoverHack } from '../testHelper.js'
 
 describe('<PopinFixedContent />', () => {
   const props = {
@@ -21,6 +22,7 @@ describe('<PopinFixedContent />', () => {
       apiUrl: 'http://fake.url/api'
     },
     content: {
+      content_id: 0,
       is_archived: false,
       is_deleted: false,
       status: ''
@@ -44,6 +46,8 @@ describe('<PopinFixedContent />', () => {
   const Children2 = () => <div><h1>Random title2</h1>I am the second children of PopinFixedContent</div>
 
   const PopinFixedContentWithHOC = withRouterMock(PopinFixedContent)
+
+  reactstrapPopoverHack(document, `wsContentGeneric__header__title_${props.content.content_id}`)
 
   const wrapper = mount(
     <PopinFixedContentWithHOC {...props}>

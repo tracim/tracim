@@ -122,18 +122,12 @@
 
   <div id='content'></div>
 
-  <!--
-  INFO - CH - 2021-01-14
-  since servdev uses standalone frontend_lib build, you should not include frontend_lib directly in the page
-  it is already in the bundles
-  same for frontend_vendor
-  -->
-  <!--  <script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>-->
-  <!--  <script type='text/javascript' src='./app/tracim_frontend_lib.lib.js'></script>-->
+  <script type='text/javascript' src='./app/tracim_frontend_vendors.js'></script>
+  <script type='text/javascript' src='./app/tracim_frontend_lib.lib.optimized.js'></script>
 
-  <script type='text/javascript' src='./app/tracim_frontend_lib.style.js'></script>
+  <script type='text/javascript' src='./app/tracim_frontend_lib.style.optimized.js'></script>
 
-  <script src='./admin_workspace_user.app.standalone.js'></script>
+  <script src='./admin_workspace_user.app.optimized.js'></script>
 
   <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js'></script>
   <script type='text/javascript' src='./assets/tinymce-4.7.13/js/tinymce/tinymce.min.js'></script>

@@ -2,9 +2,25 @@
 set -e
 
 script_dir="$(realpath $(dirname $0))"
+tracim_root_dir="$(realpath "$script_dir/../..")"
 source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(frontend|concourse)"
 
 ./install_frontend_dependencies.sh root
-./build_full_frontend.sh
+cd "$tracim_root_dir"/frontend_vendors && ./build_vendors.sh && cd ..
+yarn run --cwd frontend_lib/ build:standalone
+
+
+for app in "$tracim_root_dir"/frontend_app_*; do
+	if [ -f "$app/.disabled-app" ]; then
+		echo "Skipping $app because of the existence of the .disabled-app file"
+	else
+		cd "$app" || exit 1
+		# INFO - CH - 2021-01-04 - Calling build script of each apps with --only-utils to avoid generating the bundle.
+		# Unit tests only needs the translations files to exists
+		./build_app.sh $shelldev --only-utils
+	fi
+done
+cd $tracim_root_dir
+
 ./run_frontend_unit_test.sh

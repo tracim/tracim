@@ -3,5 +3,7 @@
 .git/
 node_modules/
 src/debug.js
+test/fixture/defaultProps.js
 dist/folder.app.js
 dist/folder.app.standalone.js
+dist/folder.app.optimized.js

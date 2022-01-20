@@ -84,6 +84,7 @@ export class Sidebar extends React.Component {
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
           id={this.spaceItemId(space.id)}
+          onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
         />
         {!state.foldedSpaceList.find(id => id === space.id) &&
@@ -111,6 +112,7 @@ export class Sidebar extends React.Component {
           }
         )}
         to={to}
+        onClick={isMobile ? this.handleClickToggleSidebar : () => {}}
       >
         <div
           className='sidebar__content__navigation__item__name'
@@ -220,6 +222,7 @@ export class Sidebar extends React.Component {
                     dataCy='sidebarCreateWorkspaceBtn'
                     icon='fas fa-plus'
                     text={props.t('Create a space')}
+                    textMobile={props.t('Create a space')}
                     mode='light'
                   />
                 )}
@@ -229,6 +232,7 @@ export class Sidebar extends React.Component {
                     dataCy='sidebarJoinWorkspaceBtn'
                     icon='fas fa-users'
                     text={props.t('Join a space')}
+                    textMobile={props.t('Join a space')}
                     intent='primary'
                     mode='light'
                   />
@@ -238,7 +242,7 @@ export class Sidebar extends React.Component {
                 {TRACIM_APP_VERSION}
               </div>
               <div className='sidebar__footer__text'>
-                Copyright - 2013 - 2021
+                Copyright - 2013 - 2022
                 <div className='sidebar__footer__text__link'>
                   <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
                 </div>

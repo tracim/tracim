@@ -164,7 +164,7 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Deprecated')
 ]
 
-export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban'
 
 export const compareContents = (a, b, lang) => {
   if (a.type === 'folder' && b.type !== 'folder') return -1

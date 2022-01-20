@@ -8,7 +8,7 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { expect } from 'chai'
 import sinon from 'sinon'
-import { fileTlm, author } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.js'
+import { fileTlm, author } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.standalone.js'
 import {
   PopupCreateCollaborativeDocument as PopupCreateCollaborativeDocumentWithoutHoc
 } from '../src/container/PopupCreateOfficeDocument.jsx'

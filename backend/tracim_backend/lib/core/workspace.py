@@ -7,19 +7,14 @@ from sqlalchemy import func
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import DisallowedWorkspaceAccessType
 from tracim_backend.exceptions import EmptyLabelNotAllowed
 from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WorkspacePublicDownloadDisabledException
 from tracim_backend.exceptions import WorkspacePublicUploadDisabledException
-from tracim_backend.extensions import app_list
-from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.userworkspace import RoleApi
-from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.utils import current_date_for_filename
 from tracim_backend.models.auth import AuthType
@@ -475,77 +470,6 @@ class WorkspaceApi(object):
             self._session.flush()
 
         return workspace
-
-    def execute_created_workspace_actions(self, workspace: Workspace) -> None:
-        """
-        WARNING ! This method Will be Deprecated soon, see
-        https://github.com/tracim/tracim/issues/1589 and
-        https://github.com/tracim/tracim/issues/1487
-
-        This method do post creation workspace actions
-        """
-
-        # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_created_workspace should start hook use by agenda app code.
-
-        # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
-        # with event refactor, see https://github.com/tracim/tracim/issues/1487
-        from tracim_backend.applications.agenda.lib import AgendaApi
-
-        app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist(AGENDA__APP_SLUG):
-            if workspace.agenda_enabled:
-                agenda_api = AgendaApi(
-                    current_user=self._user, session=self._session, config=self._config
-                )
-                try:
-                    agenda_already_exist = agenda_api.ensure_workspace_agenda_exists(workspace)
-                    if agenda_already_exist:
-                        logger.warning(
-                            self,
-                            "workspace {} is just created but it own agenda already exist !!".format(
-                                workspace.workspace_id
-                            ),
-                        )
-                except AgendaServerConnectionError as exc:
-                    logger.error(self, "Cannot connect to agenda server")
-                    logger.exception(self, exc)
-                except Exception as exc:
-                    logger.error(self, "Something goes wrong during agenda create/update")
-                    logger.exception(self, exc)
-
-    def execute_update_workspace_actions(self, workspace: Workspace) -> None:
-        """
-        WARNING ! This method Will be Deprecated soon, see
-        https://github.com/tracim/tracim/issues/1589 and
-        https://github.com/tracim/tracim/issues/1487
-
-        This method do post update workspace actions
-        """
-
-        # FIXME - G.M - 2019-03-18 - move this code to another place when
-        # event mechanism is ready, see https://github.com/tracim/tracim/issues/1487
-        # event on_updated_workspace should start hook use by agenda app code.
-
-        app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist(AGENDA__APP_SLUG):
-            # TODO - G.M - 2019-04-11 - Circular Import, will probably be remove
-            # with event refactor, see https://github.com/tracim/tracim/issues/1487
-            from tracim_backend.applications.agenda.lib import AgendaApi
-
-            if workspace.agenda_enabled:
-                agenda_api = AgendaApi(
-                    current_user=self._user, session=self._session, config=self._config
-                )
-                try:
-                    agenda_api.ensure_workspace_agenda_exists(workspace)
-                except AgendaServerConnectionError as exc:
-                    logger.error(self, "Cannot connect to agenda server")
-                    logger.exception(self, exc)
-                except Exception as exc:
-                    logger.error(self, "Something goes wrong during agenda create/update")
-                    logger.exception(self, exc)
 
     def check_public_upload_enabled(self, workspace: Workspace) -> None:
         if not workspace.public_upload_enabled:

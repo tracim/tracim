@@ -21,7 +21,7 @@ const CardPopup = props => {
             <div className='cardPopup__header__title'>
               <div className='cardPopup__header__title__icon'>
                 <i
-                  className={`${props.faIcon}`}
+                  className={`fa-fw ${props.faIcon}`}
                   style={{ color: props.customColor }}
                   title={props.label}
                 />

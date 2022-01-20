@@ -145,31 +145,40 @@ export class Tracim extends React.Component {
     ])
   }
 
-  handleUserCallCreated = (tlm) => {
+  handleUserCallCreated = async (tlm) => {
     const { props } = this
     const bell = '🔔'
     const isMainTab = this.liveMessageManager.eventSource !== null
-    const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
-      const notification = new Notification(tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim'), notificationOptions)
+      if (window.Notification) {
+        const notificationString = tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim')
+        const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
+
+        try {
+          if (Notification.permission === 'granted') {
+            new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+          } else if (Notification.permission !== 'denied') {
+            const permission = await Notification.requestPermission()
+            if (permission === 'granted') {
+              new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+            }
+          }
+        } catch (e) {
+          console.error('Could not show notification', e)
+        }
+      }
+
       this.setState({ userCall: tlm.fields.user_call })
       this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
+
       if (!isMainTab) return
+
       this.audioCall.addEventListener('ended', function () {
         this.currentTime = 0
         this.play()
       }, false)
       this.audioCall.play()
-      if (Notification.permission === 'granted') {
-        return notification
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(function (permission) {
-          if (permission === 'granted') {
-            return notification
-          }
-        })
-      }
     }
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       this.setState({ userCall: tlm.fields.user_call })
@@ -187,13 +196,6 @@ export class Tracim extends React.Component {
     props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
     this.handleSetHeadTitle({ title: props.system.headTitle })
     this.audioCall.pause()
-  }
-
-  handleClickOpenCallWindowCaller = () => {
-    const { state } = this
-    const isMainTab = this.liveMessageManager.eventSource !== null
-    if (!isMainTab) return
-    window.open(state.userCall.url)
   }
 
   handleClickRejectCall = () => {
@@ -220,7 +222,6 @@ export class Tracim extends React.Component {
         this.handleSetHeadTitle({ title: props.system.headTitle })
         this.audioCall.pause()
         if (!isMainTab) return
-        window.open(tlm.fields.user_call.url)
       }
       if (tlm.fields.user_call.state === (USER_CALL_STATE.CANCELLED)) {
         this.audioCall.pause()
@@ -633,14 +634,19 @@ export class Tracim extends React.Component {
                   icon='far fa-clock'
                 />
 
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickOpenCallWindowCallee}
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                />
+                <a href={state.userCall.url} target='_blank' rel='noopener noreferrer'>
+                  {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
+                  see https://github.com/tracim/tracim/issues/5242 */}
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    onClick={this.handleClickOpenCallWindowCallee}
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
+                  />
+                </a>
               </div>
             </div>
           </CardPopup>
@@ -666,15 +672,18 @@ export class Tracim extends React.Component {
                   text={props.t('Cancel the call')}
                   icon='fas fa-phone-slash'
                 />
-
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickOpenCallWindowCaller}
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                />
+                <a href={state.userCall.url} target='_blank' rel='noopener noreferrer'>
+                  {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
+                  see https://github.com/tracim/tracim/issues/5242 */}
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
+                  />
+                </a>
               </div>
             </div>
           </CardPopup>

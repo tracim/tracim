@@ -118,7 +118,7 @@ class AgendaServerConnectionError(TracimException):
     pass
 
 
-class CannotCreateAgenda(TracimException):
+class CannotCreateAgendaResource(TracimException):
     pass
 
 
