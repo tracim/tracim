@@ -122,6 +122,16 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState({ loaded: true })
   }
 
+  sortUserList (userList) {
+    return userList.sort((u1, u2) => {
+      if (u1.public_name < u2.public_name) return -1
+      if (u1.public_name > u2.public_name) return 1
+      if (u1.username < u2.username) return -1
+      if (u1.username > u2.username) return 1
+      return u1.user_id - u2.user_id
+    })
+  }
+
   async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
     await this.refreshAll()
@@ -193,7 +203,7 @@ export class AdminWorkspaceUser extends React.Component {
         this.setState(prev => ({
           content: {
             ...prev.content,
-            userList
+            userList: this.sortUserList(userList)
           }
         }))
         break
@@ -465,7 +475,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: [...prev.content.userList, detailedUser]
+        userList: this.sortUserList([...prev.content.userList, detailedUser])
       }
     }))
   }
@@ -478,7 +488,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u)
+        userList: this.sortUserList(prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u))
       }
     }))
   }
