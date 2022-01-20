@@ -34,7 +34,7 @@
 
 ### Known Issues
 
-- Activation/Deactivation of agenda is not properly handled. In some cases you will not be able to remove users from spaces because of this. See workaround in ticket:([#5263]https://github.com/tracim/tracim/issues/5263#issuecomment-1016454036)
+- Activation/Deactivation of agenda is not properly handled. In some cases you will not be able to remove users from spaces because of this. See workaround in ticket:([#5263](https://github.com/tracim/tracim/issues/5263#issuecomment-1016454036))
 - Having special characters breaks the Kanban. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
 
 
