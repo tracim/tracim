@@ -1,4 +1,42 @@
-# 4.0.6 / 2022-01-18
+# 4.1.0 / 2022-01-21
+
+### New Features
+
+- Add kanban feature
+- Improvement of the responsive
+- News feed reversed
+- Calibration of the cover and avatar profile photos
+- Improve user's space management for the admin
+- Improvement of the call feature (bugfix and polish)
+- UI/UX improvement (buttons, redirections)
+- Performance improvement: better image and PDF preview generation, loading of space list and user list
+- Reactivation of the collabora draw functionality
+
+### Fixed Issues
+
+- Frontend: [#4907](https://github.com/tracim/tracim/issues/4907),
+[#5136](https://github.com/tracim/tracim/issues/5136)
+- Backend: [#4483](https://github.com/tracim/tracim/issues/4483),
+[#4494](https://github.com/tracim/tracim/issues/4494),
+[#4648](https://github.com/tracim/tracim/issues/4648),
+[#4718](https://github.com/tracim/tracim/issues/4718),
+[#4955](https://github.com/tracim/tracim/issues/4955),
+[#4985](https://github.com/tracim/tracim/issues/4985),
+[#5008](https://github.com/tracim/tracim/issues/5008)
+
+### Breaking/Important change
+
+- Poppler-utils and webp now need to be present (and qpdf can be gotten rid off) on tracim installations that don't use Docker (pr [#5121](https://github.com/tracim/tracim/pull/5121)),
+- By default, EPS previews are now deactivated for security reasons, unless you manually activate them. ([see preview generator documentation](https://github.com/algoo/preview-generator#eps-support))
+- Docker image support for ARM64 ([#3985](https://github.com/tracim/tracim/issues/3985))
+- Allow to change space's parent through tracimcli ([#3636](https://github.com/tracim/tracim/issues/3636))
+- Improve and add caldav (agenda) ([#2099](https://github.com/tracim/tracim/issues/2099)) and add carddav (adressbook) support ([#1469](https://github.com/tracim/tracim/issues/1469))
+
+### Known Issues
+
+- Activation/Deactivation of agenda is not properly handled. In some cases you will not be able to remove users from spaces because of this. See workaround in ticket:([#5263]https://github.com/tracim/tracim/issues/5263#issuecomment-1016454036)
+- Having special characters breaks the Kanban. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
+
 
 ### Fixed Issues
 
@@ -12,14 +50,7 @@
 - CI/tests: [#5212](https://github.com/tracim/tracim/issues/5212)
 
 
-# 4.0.4 / 2021-12-21
-
-### Fixed Issues
-
-- Docker: [#5183](https://github.com/tracim/tracim/issues/5183)
-
-
-# 4.0.3 / 2021-11-22
+# 4.0.4 / 2021-12-21- RAW image previews are broken (issue [#5008](https://github.com/tracim/tracim/issues/5008))
 
 ### Fixed Issues
 
