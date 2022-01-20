@@ -4,8 +4,6 @@
 
 - New kanban feature
 - Improvement of the responsive aspect of the interface
-``
-(responsive is an adjective)
 - News feed reversed
 - Calibration of the cover and avatar profile photos
 - Improvement of user's space management for the admin
@@ -54,7 +52,14 @@
 - CI/tests: [#5212](https://github.com/tracim/tracim/issues/5212)
 
 
-# 4.0.4 / 2021-12-21- RAW image previews are broken (issue [#5008](https://github.com/tracim/tracim/issues/5008))
+# 4.0.4 / 2021-12-21
+
+### Fixed Issues
+
+- Docker: [#5183](https://github.com/tracim/tracim/issues/5183)
+
+
+# 4.0.3 / 2021-11-22
 
 ### Fixed Issues
 
