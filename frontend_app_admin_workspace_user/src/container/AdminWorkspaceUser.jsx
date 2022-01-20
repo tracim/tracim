@@ -57,6 +57,7 @@ export class AdminWorkspaceUser extends React.Component {
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
       workspaceIdOpened: null,
+      loaded: false,
       breadcrumbsList: []
     }
 
@@ -111,12 +112,14 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   refreshAll = async () => {
+    this.setState({ loaded: false })
     this.updateTitleAndBreadcrumbs()
     if (this.state.config.type === 'workspace') {
       await this.loadSpaceContent()
     } else if (this.state.config.type === 'user') {
       await this.loadUserContent()
     }
+    this.setState({ loaded: true })
   }
 
   async componentDidMount () {
@@ -528,6 +531,7 @@ export class AdminWorkspaceUser extends React.Component {
       <div>
         {state.config.type === 'workspace' && (
           <AdminWorkspace
+            loaded={state.loaded}
             workspaceList={state.content.workspaceList}
             onClickWorkspace={this.handleClickSpace}
             onClickNewWorkspace={this.handleClickNewSpace}
@@ -538,6 +542,7 @@ export class AdminWorkspaceUser extends React.Component {
 
         {state.config.type === 'user' && (
           <AdminUser
+            loaded={state.loaded}
             userList={state.content.userList}
             loggedUserId={state.loggedUser.userId}
             emailNotifActivated={state.config.system.config.email_notification_activated}
