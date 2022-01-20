@@ -9,7 +9,9 @@
 - Improvement of user's space management for the admin
 - Improvement of the call feature (bugfix and polish)
 - UI/UX improvement (buttons, redirections)
-- Performance improvement: better image and PDF preview generation, loading of space list and user list
+- Performance improvements:
+  - better image and PDF preview generation
+  - loading speed of spaces and users lists
 - Reactivation of the collabora draw functionality
 
 ### Fixed Issues
