@@ -548,20 +548,22 @@ export class Publications extends React.Component {
               contentType={CONTENT_TYPE.THREAD}
               customColor={COLORS.PUBLICATION}
               customClass='publishArea'
-              id={wysiwygId}
-              wysiwygIdSelector={`#${wysiwygId}`}
-              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-              wysiwyg={state.publicationWysiwyg}
               disableAutocompletePosition
-              onClickWysiwygBtn={this.handleToggleWysiwyg}
-              workspaceId={parseInt(props.match.params.idws)}
-              onClickValidateNewCommentBtn={this.handleClickPublish}
-              multipleFiles={false}
-              onClickSaveAnyway={this.handleClickValidateAnyway}
+              icon='fa-fw fas fa-stream'
+              id={wysiwygId}
               invalidMentionList={state.invalidMentionList}
-              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
-              onClickCancelSave={this.handleCancelSave}
               lang={props.user.lang}
+              multipleFiles={false}
+              onClickCancelSave={this.handleCancelSave}
+              onClickSaveAnyway={this.handleClickValidateAnyway}
+              onClickValidateNewCommentBtn={this.handleClickPublish}
+              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              placeHolder={props.t('Share a news...')}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
+              workspaceId={parseInt(props.match.params.idws)}
+              wysiwygIdSelector={`#${wysiwygId}`}
+              wysiwyg={state.publicationWysiwyg}
             />
           </div>
         )}

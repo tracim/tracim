@@ -49,7 +49,7 @@ yarn workspace tracim_frontend_lib run build:standalone && loggood "success" || 
 # Tracim frontend Lib as optimized
 log "Building optimized tracim_frontend_lib"
 cd "$DEFAULTDIR/frontend_lib"
-./build_frontend_lib.sh
+./build_frontend_lib.sh $shelldev
 
 for app in "$DEFAULTDIR"/frontend_app_*; do
 	if [ -f "$app/.disabled-app" ]; then
