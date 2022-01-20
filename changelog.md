@@ -2,11 +2,11 @@
 
 ### New Features
 
-- Add kanban feature
+- New kanban feature
 - Improvement of the responsive
 - News feed reversed
 - Calibration of the cover and avatar profile photos
-- Improve user's space management for the admin
+- Improvement of user's space management for the admin
 - Improvement of the call feature (bugfix and polish)
 - UI/UX improvement (buttons, redirections)
 - Performance improvement: better image and PDF preview generation, loading of space list and user list
