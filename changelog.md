@@ -38,6 +38,8 @@
 - Having special characters breaks the Kanban. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
 
 
+# 4.0.6 / 2022-01-18
+
 ### Fixed Issues
 
 - Backend: [#5253](https://github.com/tracim/tracim/issues/5253)
