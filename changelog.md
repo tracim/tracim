@@ -38,7 +38,7 @@
 ### Known Issues
 
 - Activation/Deactivation of agenda is not properly handled. In some cases you will not be able to remove users from spaces because of this. See the workaround in issue:([#5263](https://github.com/tracim/tracim/issues/5263#issuecomment-1016454036))
-- Having special characters in the kanban title causes the kanban to not load. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
+- Having a double quote (`"`) in a kanban's title causes the kanban to not load. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
 
 
 # 4.0.6 / 2022-01-18
