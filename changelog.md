@@ -12,7 +12,7 @@
 - Performance improvements:
   - better image and PDF preview generation
   - loading speed of spaces and users lists
-- Reactivation of the collabora draw functionality
+- Reactivation of the draw functionality in the Office Documents
 
 ### Fixed Issues
 
