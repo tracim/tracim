@@ -219,6 +219,23 @@ Cypress.Commands.add('createFolder', (title, workspaceId, parentId = null) => {
     .then(handleUndefinedResponse)
 })
 
+// FIXME - GB - 2021-12-08 - Based on file function, should be update to do not need a file
+Cypress.Commands.add('createKanban', (fixturePath, fixtureMime, fileTitle, workspaceId) => {
+  let url = `/api/workspaces/${workspaceId}/files`
+
+  return cy.fixture(fixturePath, 'base64')
+    .then(fixture => Cypress.Blob.base64StringToBlob(fixture, fixtureMime))
+    .then(blob => {
+      const form = new FormData()
+
+      form.set('files', blob, fileTitle)
+      form.set('content_namespace', 'content')
+      form.set('content_type', 'kanban')
+
+      return cy.form_request('POST', url, form)
+    })
+})
+
 Cypress.Commands.add('createFile', (fixturePath, fixtureMime, fileTitle, workspaceId, parentId = null) => {
   let url = `/api/workspaces/${workspaceId}/files`
 

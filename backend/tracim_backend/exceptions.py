@@ -118,7 +118,7 @@ class AgendaServerConnectionError(TracimException):
     pass
 
 
-class CannotCreateAgenda(TracimException):
+class CannotCreateAgendaResource(TracimException):
     pass
 
 
@@ -541,7 +541,7 @@ class CannotUseBothIncludeAndExcludeWorkspaceUsers(TracimException):
 
 
 class PageNotFound(TracimException):
-    pass
+    error_code = ErrorCode.PAGE_NOT_FOUND
 
 
 class AppDoesNotExist(TracimException):
@@ -621,7 +621,7 @@ class CopyRevisionAbortedDepotCorrupted(DepotCorrupted):
 
 
 class TracimFileNotFound(FileNotFoundError, DepotCorrupted):
-    pass
+    error_code = ErrorCode.CONTENT_NOT_FOUND
 
 
 class ContentStatusException(TracimError):

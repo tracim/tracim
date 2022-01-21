@@ -5,7 +5,8 @@ import {
   handleFetchResult,
   addAllResourceI18n,
   CUSTOM_EVENT,
-  buildHeadTitle
+  buildHeadTitle,
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import { postFolder } from '../action.async.js'
 import i18n from '../i18n.js'
@@ -67,15 +68,6 @@ class PopupCreateFolder extends React.Component {
     }
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   handleChangeNewFolderName = e => this.setState({ newFolderName: e.target.value })
 
   handleClose = () => GLOBAL_dispatchEvent({
@@ -98,10 +90,10 @@ class PopupCreateFolder extends React.Component {
         break
       case 400:
         switch (fetchSaveNewFolder.body.code) {
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
+          default: sendGlobalFlashMessage(props.t('Error while saving new folder')); break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new folder')); break
+      default: sendGlobalFlashMessage(props.t('Error while saving new folder')); break
     }
   }
 

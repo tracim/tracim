@@ -12,6 +12,8 @@
   "Advanced edition": "Erweiterte Ausgaben",
   "Send": "Senden",
   "Your message...": "Ihre Nachricht...",
+  "Write an answer...": "Eine Antwort schreiben...",
+  "Share a news...": "Eine Nachricht teilen...",
   "Validate the title": "Überprüfen Sie den Titel",
   "Edit title": "Titel bearbeiten",
   "Undo change in title": "Änderung des Titels rückgängig machen",
@@ -214,5 +216,7 @@
   "Tag removed": "Etikett entfernt",
   "Error while removing tag": "Fehler beim Entfernen des Etiketts",
   "This content has no associated tags yet.": "Dieser Inhalt hat noch keine zugehörigen Markierungen.",
-  "This space has no tags yet.": "Dieser Bereich hat noch keine Markierungen."
+  "This space has no tags yet.": "Dieser Bereich hat noch keine Markierungen.",
+  "See more": "Mehr sehen",
+  "Error while loading timeline": "Fehler beim Laden der Zeitleiste"
 }

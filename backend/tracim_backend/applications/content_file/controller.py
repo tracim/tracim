@@ -6,6 +6,7 @@ from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import KANBAN_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
@@ -30,6 +31,7 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.utils.authorization import ContentTypeChecker
 from tracim_backend.lib.utils.authorization import ContentTypeCreationChecker
+from tracim_backend.lib.utils.authorization import OrAuthorizationChecker
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
@@ -64,8 +66,11 @@ SWAGGER_TAG__CONTENT_FILE_SECTION = "Files"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_FILE_SECTION
 )
-is_file_content = ContentTypeChecker([FILE_TYPE])
-can_create_file = ContentTypeCreationChecker(content_type_list, FILE_TYPE)
+is_file_content = ContentTypeChecker([FILE_TYPE, KANBAN_TYPE])
+can_create_file = OrAuthorizationChecker(
+    ContentTypeCreationChecker(content_type_list, FILE_TYPE),
+    ContentTypeCreationChecker(content_type_list, KANBAN_TYPE),
+)
 
 
 class FileController(Controller):
@@ -91,7 +96,7 @@ class FileController(Controller):
     @hapic.input_files(SimpleFileSchema())
     def create_file(self, context, request: TracimRequest, hapic_data=None):
         """
-        Create a file .This will create 2 new revision.
+        Create a file. This will create 2 revisions.
         """
         # INFO - G.M - 2019-09-03 - check validation of file here, because marshmallow
         # required doesn't work correctly with cgi_fieldstorage.
@@ -119,7 +124,7 @@ class FileController(Controller):
                 ) from exc
         content = api.create(
             filename=_file.filename,
-            content_type_slug=FILE_TYPE,
+            content_type_slug=hapic_data.forms.content_type,
             workspace=request.current_workspace,
             parent=parent,
             content_namespace=hapic_data.forms.content_namespace,
@@ -182,6 +187,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_file_content)
+    @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
@@ -218,6 +224,7 @@ class FileController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_file_content)
+    @hapic.handle_exception(TracimFileNotFound, HTTPStatus.BAD_REQUEST)
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.output_file([])

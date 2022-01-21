@@ -9,6 +9,8 @@ import pytest
 import responses
 import transaction
 
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import KANBAN_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
 from tracim_backend.models.revision_protection import new_revision
@@ -1527,7 +1529,7 @@ class TestFiles(object):
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
         content = res.json_body
-        assert content["content_type"] == "file"
+        assert content["content_type"] == FILE_TYPE
         assert content["content_id"] == test_file.content_id
         assert content["is_archived"] is False
         assert content["is_deleted"] is False
@@ -1557,6 +1559,35 @@ class TestFiles(object):
         assert content["page_nb"] == 1
         assert content["has_pdf_preview"] is True
         assert content["has_jpeg_preview"] is True
+
+    def test_api__get_kanban__ok_200__nominal_case(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
+        """
+        Get a kanban from content endpoint
+        """
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=KANBAN_TYPE,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/contents/{}".format(test_file.content_id), status=302).follow(
+            status=200
+        )
+        content = res.json_body
+        assert content["content_type"] == KANBAN_TYPE
 
     def test_api__get_file__ok_200__no_file_add(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -1690,10 +1721,32 @@ class TestFiles(object):
 
     def test_api__get_file__err_400__content_does_not_exist(self, web_testapp) -> None:
         """
-        Get one file (content 170 does not exist in db
+        Get one file (content 170 does not exist in db)
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/workspaces/1/files/170", status=400)
+        assert res.json_body
+        assert "code" in res.json_body
+        assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
+
+    def test_api__get_file__err_400__file_does_not_exist(
+        self, web_testapp, workspace_api_factory
+    ) -> None:
+        """
+        Get one file (file has not been uploaded)
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        workspace_api = workspace_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        res = web_testapp.post_json(
+            "/api/workspaces/{}/contents".format(business_workspace.workspace_id),
+            {"content_type": "file", "label": "Empty content"},
+            status=200,
+        )
+        res = web_testapp.get(
+            "/api/workspaces/1/files/{}/raw/filename".format(res.json_body["content_id"]),
+            status=400,
+        )
         assert res.json_body
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.CONTENT_NOT_FOUND
@@ -2396,7 +2449,10 @@ class TestFiles(object):
         assert res.last_modified.month == test_file.updated.month
         assert res.last_modified.year == test_file.updated.year
 
-    @pytest.mark.parametrize("content_namespace", ["content", "publication"])
+    @pytest.mark.parametrize(
+        "content_namespace, content_type",
+        [("content", "file"), ("publication", "file"), ("content", "kanban")],
+    )
     def test_api__create_file__ok__200__nominal_case(
         self,
         workspace_api_factory,
@@ -2406,6 +2462,7 @@ class TestFiles(object):
         admin_user,
         event_helper,
         content_namespace: str,
+        content_type: str,
     ) -> None:
         """
         create one file of a content at workspace root

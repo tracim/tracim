@@ -86,7 +86,7 @@ class DescriptionMentionParser(BaseMentionParser):
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            recipient = mention_tag.string[1:]
+            recipient = mention_tag.string[1:] if mention_tag.string else ""
             id_ = mention_tag["id"].replace(cls.MENTION_ID_START, "")
             mentions.append(Mention(recipient, id_))
         return mentions
@@ -160,7 +160,7 @@ class MentionBuilder:
         if recipient in ALL__GROUP_MENTIONS:
             # send to all workspace users
             role_api = RoleApi(session=session, config=config, current_user=None)
-            workspace_id = event.workspace["workspace_id"]
+            workspace_id = event.workspace_id
             return role_api.get_workspace_member_ids(workspace_id)
         else:
             # send to mentioned user

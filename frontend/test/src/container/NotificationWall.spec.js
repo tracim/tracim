@@ -14,7 +14,8 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
-  buildTracimLiveMessageEventType, serialize,
+  buildTracimLiveMessageEventType,
+  serialize,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST
@@ -80,7 +81,7 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.COMMENT)
         }))
           .to.deep.equal({
-            text: '{{author}} commented on {{content}} {{workspace}}',
+            text: '{{author}} commented on {{content}}{{workspaceInfo}}',
             title: 'Comment_noun',
             url: `/ui/contents/${baseNotification.content.parentId}`
           })
@@ -92,7 +93,7 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.CREATED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            text: '{{author}} created {{content}} {{workspace}}',
+            text: '{{author}} created {{content}}{{workspaceInfo}}',
             title: 'New content',
             url: `/ui/contents/${baseNotification.content.id}`
           })
@@ -104,7 +105,7 @@ describe('<NotificationWall />', () => {
           type: buildTracimLiveMessageEventType(TLM_ET.CONTENT, TLM_CET.MODIFIED, TLM_ST.THREAD)
         }))
           .to.deep.equal({
-            text: '{{author}} updated {{content}} {{workspace}}',
+            text: '{{author}} updated {{content}}{{workspaceInfo}}',
             title: 'Content updated',
             url: `/ui/contents/${baseNotification.content.id}`
           })

@@ -1,0 +1,221 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
+cardWidth = 280px
+
+.kanban
+  &__contentpage
+    &__content
+      &__left
+        background-color offWhite
+        display flex
+        flex-direction column
+    &__wrapper
+      display flex
+      flex-direction column
+      // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
+      height "calc(100% - %s)" % (headerHeight + 28px)
+      &.fullscreen
+        position fixed
+        top headerHeight
+        left 0
+        width 100%
+        height "calc(100% - %s)" % headerHeight
+        z-index 1
+        background offWhite
+
+      &__options
+        display flex
+        justify-content flex-end
+        & button
+          margin-inline-end standardSpacing
+
+      &__board
+        flex 1
+        overflow-x auto
+        overflow-y hidden
+
+        &.hidden
+          display none
+
+        &__column
+          display flex
+          flex-direction row
+          border-bottom 3px solid
+          padding-bottom standardSpacing
+          margin-bottom standardSpacing
+          align-items baseline
+          justify-content space-evenly
+          text-align start
+          &__title
+            width 180px
+            text-overflow ellipsis
+            overflow hidden
+            white-space nowrap
+            flex 1
+            & > strong
+              font-size titleFontSize
+              flex 1
+              cursor pointer
+              overflow hidden
+              text-overflow ellipsis
+            &__actions.dropdownMenuButton
+              padding 0
+              &::after
+                display none
+          & button:hover
+            background-color grey-hover
+          &.buttonHidden
+            .dropdown, .kanban_addCard
+              display none
+          &.readOnly
+            strong
+              cursor auto
+
+        & .react-kanban-board
+          overflow-y visible !important
+          overflow-x visible
+          height 100%
+          padding standardSpacing
+          & > div
+            height 100%
+
+      &__toolbar
+        position absolute
+        top standardSpacing
+        right standardSpacing
+        z-index 1
+        & .iconbutton
+          background-color offWhite
+          &:hover
+            background-color veryLightGrey
+        &:empty
+          display none
+
+      & .react-kanban-column-header
+        display flex
+        flex-direction row
+        > :first-child
+          flex 1
+        > :last-child
+          display inline-block
+          border-radius standardBorderRadius
+          cursor default
+
+      & .react-kanban-column
+        padding standardSpacing
+        background-color lightGrey
+        border-radius standardBorderRadius
+        margin 0 textSpacing
+        min-width 315px
+        text-align center
+        & > :last-child
+          overflow hidden
+          // INFO - GB - 2021-12-20 - The css rule below is !important because it overrides the library style
+          height calc(100% - 43px) !important
+          &:hover
+            overflow-y auto
+  &__KanbanPopup
+    width 100%
+    top 15%
+    max-height 80%
+    &.hidden
+      display none
+    &__bgColor, &__deadline
+      display flex
+      flex-direction column
+      &__inline
+        flex-direction row
+
+    & .cardPopup__container
+      width unset
+      min-width 500px
+      display flex
+      flex-direction column
+
+    & [type=checkbox]
+      margin textSpacing
+
+    & [type=text], textarea
+      width 100%
+
+    & label
+      white-space pre
+      font-weight bold
+
+    & input
+      vertical-align middle
+
+    &__description, &__title, &__freeInput
+      margin-bottom standardSpacing
+
+    &__form
+      overflow-y auto
+      width 100%
+      height 100%
+      &__fields
+          width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
+        label
+          padding-right textSpacing
+        input
+            margin-bottom textSpacing
+      &_buttons
+        margin-bottom 0
+        padding-bottom 0
+        text-align right
+        button:last-child, input:last-child
+          margin-left standardSpacing
+
+    &__confirm
+      display flex
+      width 100%
+      justify-content flex-end
+      & > .iconbutton
+        margin-inline-start standardSpacing
+
+  &__columnAdder
+    border 1px mediumGrey dashed
+    min-width cardWidth
+    max-height 70px
+    margin 0 textSpacing
+    text-align-last center
+    display flex
+    border-radius standardBorderRadius
+    flex-direction column
+    cursor pointer
+    &.disabled
+      cursor not-allowed
+      opacity 0.5
+
+    &:hover
+      background-color veryLightGrey
+    & > *
+      margin auto
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .kanban
+    &__contentpage
+      display block
+      &__content__left
+        min-height 250px
+      &__wrapper
+        width 100%
+        .commentArea
+          &__simpletext
+            display inline-flex
+            width 60%
+          &__submit
+            display inline-flex
+            margin standardSpacing 0
+
+@media (max-width: max-xs)
+  .kanban__KanbanPopup
+    top 10%
+    max-height "calc(100% - %s)" % (headerHeight + standardSpacing)
+    & .cardPopup__container
+      min-width 100%
+      max-height 100%
+      overflow auto
+      & .cardPopup__body
+        height "calc(100% - %s)" % headerHeight
+        & .kanban__KanbanPopup__form
+          height "calc(100% - %s)" % standardSpacing

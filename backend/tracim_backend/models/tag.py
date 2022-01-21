@@ -14,6 +14,9 @@ from tracim_backend.models.mixins import CreationDateMixin
 
 
 class Tag(CreationDateMixin, DeclarativeBase):
+    MAX_TAG_NAME_LENGTH = 255
+    MIN_TAG_NAME_LENGTH = 1
+
     __tablename__ = "tag"
     __table_args__ = (UniqueConstraint("workspace_id", "tag_name"),)
 
@@ -23,7 +26,7 @@ class Tag(CreationDateMixin, DeclarativeBase):
         ForeignKey("workspaces.workspace_id", onupdate="CASCADE", ondelete="CASCADE"),
         nullable=False,
     )
-    tag_name = Column(Unicode(length=255), nullable=False)
+    tag_name = Column(Unicode(length=MAX_TAG_NAME_LENGTH), nullable=False)
 
     workspace = relationship("Workspace", remote_side=[Workspace.workspace_id], lazy="joined")
 

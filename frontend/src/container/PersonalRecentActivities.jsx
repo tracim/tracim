@@ -33,6 +33,7 @@ export class PersonalRecentActivities extends React.Component {
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
+    this.isLoadMoreIsProgress = false
   }
 
   componentDidMount () {
@@ -77,6 +78,16 @@ export class PersonalRecentActivities extends React.Component {
     props.dispatch(setBreadcrumbs(breadcrumbsList))
   }
 
+  handleClickLoadMore = async () => {
+    const { props } = this
+
+    if (this.isLoadMoreIsProgress) return
+
+    this.isLoadMoreIsProgress = true
+    await props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)
+    this.isLoadMoreIsProgress = false
+  }
+
   render () {
     const { props } = this
     return (
@@ -91,7 +102,7 @@ export class PersonalRecentActivities extends React.Component {
           <ActivityList
             activity={props.activity}
             onRefreshClicked={props.onRefreshClicked}
-            onLoadMoreClicked={() => props.loadActivities(props.activity.list.length + ACTIVITY_COUNT_PER_PAGE)}
+            onLoadMoreClicked={this.handleClickLoadMore}
             onCopyLinkClicked={props.onCopyLinkClicked}
             onEventClicked={props.onEventClicked}
             showRefresh={props.showRefresh}

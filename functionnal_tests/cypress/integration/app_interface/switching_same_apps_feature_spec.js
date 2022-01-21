@@ -7,14 +7,17 @@ describe('Hot switching between the same app', () => {
   const fileTitle = 'first File'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
+  const kanbantitle = 'first Kanban'
 
   const anotherHtmlDocTitle = 'second Html Doc'
   const anotherThreadTitle = 'second Thread'
   const anotherFileTitle = 'second File'
+  const anotherKanbanTitle = 'second Kanban'
 
   const aThirdHtmlDocTitle = 'third Html Doc'
   const aThirdThreadTitle = 'third Thread'
   const aThirdFileTitle = 'third File'
+  const aThirdKanbanTitle = 'third Kanban'
 
   let workspaceId, secondWorkspaceId
 
@@ -29,9 +32,12 @@ describe('Hot switching between the same app', () => {
       // FIXME -  B.L - 2019/05/03 - when we send simultaneous request to create contents we
       // end up with an undefined response we need to dig up to find if it's the server or cypress
       // Issue 1836
+      cy.createKanban(fullFilename, contentType, kanbantitle, workspaceId)
       cy.createHtmlDocument(htmlDocTitle, workspaceId)
       cy.createThread(threadTitle, workspaceId)
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
+
+      cy.createKanban(fullFilename, contentType, anotherKanbanTitle, workspaceId)
       cy.createHtmlDocument(anotherHtmlDocTitle, workspaceId)
       cy.createThread(anotherThreadTitle, workspaceId)
       cy.createFile(fullFilename, contentType, anotherFileTitle, workspaceId)
@@ -42,6 +48,7 @@ describe('Hot switching between the same app', () => {
       cy.getUserByRole('users').then(user => {
         cy.addUserToWorkspace(user.user_id, workspace.workspace_id)
       })
+      cy.createKanban(fullFilename, contentType, aThirdKanbanTitle, workspaceId)
       cy.createHtmlDocument(aThirdHtmlDocTitle, secondWorkspaceId)
       cy.createThread(aThirdThreadTitle, secondWorkspaceId)
       cy.createFile(fullFilename, contentType, aThirdFileTitle, secondWorkspaceId)
@@ -116,6 +123,26 @@ describe('Hot switching between the same app', () => {
           .click('left')
 
         cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(aThirdThreadTitle)
+      })
+    })
+
+    describe('From Kanban to Kanban', () => {
+      it('should close first kanban and open the second one', () => {
+        cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: kanbantitle } })
+          .find('.content__item')
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(kanbantitle)
+
+        cy.get('.notificationButton__btn')
+          .click('left')
+
+        cy.get('.notification__list__item').first().click()
+
+        cy.contains(aThirdKanbanTitle)
+          .click('left')
+
+        cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(aThirdKanbanTitle)
       })
     })
   })

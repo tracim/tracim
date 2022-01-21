@@ -12,6 +12,7 @@ from slugify import slugify
 from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.applications.collaborative_document_edition.models import (
@@ -79,6 +80,7 @@ class ConfigModel(object):
         ui__spaces__creation__parent_space_choice__visible: bool,
         limitation__maximum_online_users_message: str,
         call__enabled: bool,
+        call__unanswered_timeout: int,
     ) -> None:
         self.email_notification_activated = email_notification_activated
         self.new_user_invitation_do_notify = new_user_invitation_do_notify
@@ -99,6 +101,7 @@ class ConfigModel(object):
         )
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
         self.call__enabled = call__enabled
+        self.call__unanswered_timeout = call__unanswered_timeout
 
 
 class ErrorCodeModel(object):
@@ -207,10 +210,14 @@ class FileCreation(object):
     """
 
     def __init__(
-        self, content_namespace: ContentNamespaces = ContentNamespaces.CONTENT, parent_id: int = 0
+        self,
+        content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
+        parent_id: int = 0,
+        content_type: str = FILE_TYPE,
     ) -> None:
         self.parent_id = parent_id
         self.content_namespace = content_namespace
+        self.content_type = content_type
 
 
 class SetPassword(object):
@@ -414,6 +421,38 @@ class ContentAndUserPath(object):
         self.user_id = user_id
 
 
+class RadicaleUserResourceUserSubitemsPath(object):
+    def __init__(
+        self,
+        user_id: int,
+        dest_user_id: int,
+        type: str,
+        sub_item: str = "",
+        trailing_slash: str = "",
+    ) -> None:
+        self.user_id = user_id
+        self.dest_user_id = dest_user_id
+        self.type = type
+        self.sub_item = sub_item
+        self.trailing_slash = trailing_slash
+
+
+class RadicaleUserResourceWorkspaceSubitemsPath(object):
+    def __init__(
+        self,
+        user_id: int,
+        workspace_id: int,
+        type: str,
+        sub_item: str = "",
+        trailing_slash: str = "",
+    ) -> None:
+        self.user_id = user_id
+        self.workspace_id = workspace_id
+        self.type = type
+        self.sub_item = sub_item
+        self.trailing_slash = trailing_slash
+
+
 class RadicaleUserSubitemsPath(object):
     """
     Paths params with workspace id and subitem
@@ -526,9 +565,10 @@ class AgendaFilterQuery(object):
     Agenda filter query model
     """
 
-    def __init__(self, workspace_ids: str = "", agenda_types: str = ""):
+    def __init__(self, workspace_ids: str = "", agenda_types: str = "", resource_types: str = ""):
         self.workspace_ids = string_to_list(workspace_ids, ",", int) or None
         self.agenda_types = string_to_list(agenda_types, ",", str) or None
+        self.resource_types = string_to_list(resource_types, ",", str) or None
 
 
 class FileQuery(object):
@@ -841,12 +881,18 @@ class FolderContentUpdate(object):
 
 class Agenda(object):
     def __init__(
-        self, agenda_url: str, with_credentials: bool, workspace_id: Optional[int], agenda_type: str
+        self,
+        agenda_url: str,
+        with_credentials: bool,
+        workspace_id: Optional[int],
+        agenda_type: str,
+        resource_type: str,
     ) -> None:
         self.agenda_url = agenda_url
         self.with_credentials = with_credentials
         self.workspace_id = workspace_id
         self.agenda_type = agenda_type
+        self.resource_type = resource_type
 
 
 class UserInContext(object):
@@ -1069,6 +1115,14 @@ class WorkspaceInContext(object):
     @property
     def publication_enabled(self) -> bool:
         return self.workspace.publication_enabled
+
+    @property
+    def number_of_members(self) -> int:
+        return (
+            self.dbsession.query(UserRoleInWorkspace)
+            .filter(UserRoleInWorkspace.workspace_id == self.workspace.workspace_id)
+            .count()
+        )
 
 
 class UserRoleWorkspaceInContext(object):

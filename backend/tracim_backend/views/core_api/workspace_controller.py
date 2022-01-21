@@ -5,6 +5,8 @@ from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 import transaction
 
+from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import KANBAN_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -184,7 +186,6 @@ class WorkspaceController(Controller):
             publication_enabled=hapic_data.body.publication_enabled,
             save_now=True,
         )
-        wapi.execute_update_workspace_actions(request.current_workspace)
         return wapi.get_workspace_with_context(request.current_workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_ENDPOINTS])
@@ -217,7 +218,6 @@ class WorkspaceController(Controller):
             publication_enabled=hapic_data.body.publication_enabled,
             parent=parent,
         )
-        wapi.execute_created_workspace_actions(workspace)
         return wapi.get_workspace_with_context(workspace)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_TRASH_AND_RESTORE_ENDPOINTS])
@@ -413,7 +413,6 @@ class WorkspaceController(Controller):
                     creation_type=UserCreationType.INVITATION,
                     creation_author=request.current_user,
                 )
-            uapi.execute_created_user_actions(user)
             newly_created = True
 
         role = rapi.create_one(
@@ -596,6 +595,10 @@ class WorkspaceController(Controller):
             content_id=hapic_data.path["content_id"], content_type=content_type_list.Any_SLUG
         )
         content_type = content_type_list.get_one_by_slug(content.type).slug
+
+        if content_type == KANBAN_TYPE:
+            content_type = FILE_TYPE
+
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
             "{base_url}workspaces/{workspace_id}/{content_type}s/{content_id}".format(

@@ -237,7 +237,7 @@ class UserController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
     @check_right(is_administrator)
-    @hapic.output_body(UserDigestSchema(many=True))
+    @hapic.output_body(UserSchema(many=True))
     def users(self, context, request: TracimRequest, hapic_data=None):
         """
         Get all users
@@ -396,7 +396,6 @@ class UserController(Controller):
             lang=hapic_data.body.lang,
             do_save=True,
         )
-        uapi.execute_updated_user_actions(user)
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -438,7 +437,6 @@ class UserController(Controller):
             profile=profile,
             do_save=True,
         )
-        uapi.execute_created_user_actions(user)
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENDPOINTS])
@@ -475,7 +473,6 @@ class UserController(Controller):
             do_save=True,
             do_notify=do_notify,
         )
-        uapi.execute_created_user_actions(user)
         return uapi.get_user_with_context(user)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_ENABLE_AND_DISABLE_ENDPOINTS])

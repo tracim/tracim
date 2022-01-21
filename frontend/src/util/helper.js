@@ -77,7 +77,8 @@ export const SEARCH_CONTENT_FACETS = {
       i18n.t('folder_search'),
       i18n.t('html-document_search'),
       i18n.t('thread_search'),
-      i18n.t('file_search')
+      i18n.t('file_search'),
+      i18n.t('kanban_search')
     ]
   },
   EXTENSION: {
@@ -163,7 +164,7 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Deprecated')
 ]
 
-export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment'
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban'
 
 export const compareContents = (a, b, lang) => {
   if (a.type === 'folder' && b.type !== 'folder') return -1

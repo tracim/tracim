@@ -1,10 +1,8 @@
 # German translations for tracim_backend.
-# Copyright (C) 2021 ORGANIZATION
+# Copyright (C) 2022 Algoo SAS
 # This file is distributed under the same license as the tracim_backend
 # project.
-#
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2021.
-# marie <marie.begue@algoo.fr>, 2021.
+# Marie Bégué <marie.begue@algoo.fr>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 3.7.1\n"

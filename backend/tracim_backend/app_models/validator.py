@@ -12,6 +12,7 @@ from marshmallow.validate import Regexp
 from tracim_backend.app_models.contents import GlobalStatus
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.applications.agenda.models import AgendaType
 from tracim_backend.exceptions import TracimValidationFailed
 from tracim_backend.lib.utils.dict_parsing import validate_simple_dict
@@ -19,9 +20,13 @@ from tracim_backend.lib.utils.utils import validate_page_token
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
+from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import UserRoleInWorkspace
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.data import WorkspaceSubscriptionState
+from tracim_backend.models.reaction import Reaction
+from tracim_backend.models.tag import Tag
 
 
 class TracimValidator(object):
@@ -100,6 +105,9 @@ content_status_validator = OneOf(content_status_list.get_all_slugs_values())
 user_profile_validator = OneOf(Profile.get_all_valid_slugs())
 user_profile_validator_with_nobody = OneOf(Profile.get_all_valid_slugs(include_nobody=True))
 agenda_type_validator = OneOf([agenda_type.value for agenda_type in AgendaType])
+agenda_resource_type_validator = OneOf(
+    [agenda_resource_type.value for agenda_resource_type in AgendaResourceType]
+)
 user_timezone_validator = Length(max=User.MAX_TIMEZONE_LENGTH)
 user_email_validator = Length(min=User.MIN_EMAIL_LENGTH, max=User.MAX_EMAIL_LENGTH)
 user_username_validator = Length(min=User.MIN_USERNAME_LENGTH, max=User.MAX_USERNAME_LENGTH)
@@ -111,6 +119,14 @@ user_lang_validator = Length(min=User.MIN_LANG_LENGTH, max=User.MAX_LANG_LENGTH)
 user_role_validator = OneOf(UserRoleInWorkspace.get_all_role_slug())
 page_token_validator = validate_page_token
 user_config_validator = validate_simple_dict
+tag_length_validator = Length(min=Tag.MIN_TAG_NAME_LENGTH, max=Tag.MAX_TAG_NAME_LENGTH)
+# NOTE - G.M - 2021-11-05: no min check for label as comment have empty label
+content_label_length_validator = Length(min=1, max=ContentRevisionRO.MAX_LABEL_LENGTH)
+workspace_label_length_validator = Length(
+    min=Workspace.MIN_WORKSPACE_LABEL_LENGTH, max=Workspace.MAX_WORKSPACE_LABEL_LENGTH
+)
+reaction_value_length_validator = Length(min=1, max=Reaction.MAX_REACTION_VALUE_LENGTH)
+
 
 # Dynamic validator #
 all_content_types_validator = OneOf(choices=[])

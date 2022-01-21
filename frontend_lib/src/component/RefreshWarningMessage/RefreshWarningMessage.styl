@@ -1,25 +1,9 @@
 @import '../../css/Variable.styl'
 
 .refreshWarningMessage
-  color darkGrey
-  padding 5px standardSpacing
   background-color lightyellow
   border 1px solid warningOrange
-  border-radius standardBorderRadius
   margin-right standardSpacing
-  display flex
-  cursor pointer
+  font-weight bold
   .fas
-    align-self center
     color warningOrange
-  &__text
-    margin-left 5px
-    font-weight bold
-    align-self center
-
-@media (max-width: max-lg)
-  .refreshWarningMessage
-    .fas
-      padding 5px
-    &__text
-      display none

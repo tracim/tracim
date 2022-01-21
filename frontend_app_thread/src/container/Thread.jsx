@@ -26,6 +26,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   getOrCreateSessionClientToken,
+  sendGlobalFlashMessage,
   FAVORITE_STATE,
   ROLE,
   COLORS,
@@ -69,6 +70,7 @@ export class Thread extends React.Component {
       translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
+    this.isLoadMoreTimelineInProgress = false
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -175,15 +177,6 @@ export class Thread extends React.Component {
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = (contentName) => {
     const { state } = this
 
@@ -249,7 +242,12 @@ export class Thread extends React.Component {
 
   handleLoadMoreTimelineItems = async () => {
     const { props } = this
+
+    if (this.isLoadMoreTimelineInProgress) return
+
+    this.isLoadMoreTimelineInProgress = true
     await props.loadMoreTimelineItems(getThreadRevision)
+    this.isLoadMoreTimelineInProgress = false
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -294,7 +292,7 @@ export class Thread extends React.Component {
         state.loggedUser.username
       )
     } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
   }
 

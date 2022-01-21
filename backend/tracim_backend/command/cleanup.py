@@ -5,6 +5,7 @@ import typing
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend import UserDoesNotExist
+from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaNotFoundError
@@ -185,7 +186,12 @@ class DeleteUserCommand(AppContextCommand):
                     )
                     for workspace_id in deleted_workspace_ids:
                         try:
-                            cleanup_lib.delete_workspace_agenda(workspace_id)
+                            cleanup_lib.delete_workspace_agenda(
+                                workspace_id, resource_type=AgendaResourceType.calendar
+                            )
+                            cleanup_lib.delete_workspace_agenda(
+                                workspace_id, resource_type=AgendaResourceType.addressbook
+                            )
                         except AgendaNotFoundError:
                             print(
                                 'Warning: Cannot delete agenda for workspace "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(

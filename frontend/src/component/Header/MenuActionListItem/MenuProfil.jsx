@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { FETCH_CONFIG } from '../../../util/helper.js'
 import { Avatar, AVATAR_SIZE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 
 require('./MenuProfil.styl')
 
@@ -31,8 +32,14 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__profile__link'
           key='menuprofil__dropdown__profile__link'
         >
-          <i className='far fa-fw fa-user' />
-          {props.t('My profile')}
+          <div
+            data-toggle={isMobile ? 'collapse' : ''}
+            data-target='#navbarSupportedContent'
+            className='collapseNavbar'
+          >
+            <i className='far fa-fw fa-user' />
+            {props.t('My profile')}
+          </div>
         </Link>
 
         <Link
@@ -40,8 +47,14 @@ export const MenuProfil = props => {
           data-cy='menuprofil__dropdown__account__link'
           key='menuprofil__dropdown__account__link'
         >
-          <i className='fas fa-fw fa-cogs' />
-          {props.t('Account Settings')}
+          <div
+            data-toggle={isMobile ? 'collapse' : ''}
+            data-target='#navbarSupportedContent'
+            className='collapseNavbar'
+          >
+            <i className='fas fa-fw fa-cogs' />
+            {props.t('Account Settings')}
+          </div>
         </Link>
 
         <button
@@ -49,6 +62,8 @@ export const MenuProfil = props => {
           onClick={props.onClickLogout}
           data-cy='menuprofil__dropdown__logout__link'
           key='menuprofil__dropdown__logout__link'
+          data-toggle={isMobile ? 'collapse' : ''}
+          data-target='#navbarSupportedContent'
         >
           <i className='fas fa-fw fa-sign-out-alt' />
           {props.t('Log out')}

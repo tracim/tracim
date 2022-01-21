@@ -8,14 +8,13 @@ import {
   ConfirmPopup,
   BREADCRUMBS_TYPE,
   handleFetchResult,
-  ROLE,
   CUSTOM_EVENT,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TracimComponent,
   checkUsernameValidity,
   deleteWorkspace,
-  getWorkspaceMemberList,
+  sendGlobalFlashMessage,
   ALLOWED_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
@@ -58,6 +57,7 @@ export class AdminWorkspaceUser extends React.Component {
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
       workspaceIdOpened: null,
+      loaded: false,
       breadcrumbsList: []
     }
 
@@ -71,11 +71,11 @@ export class AdminWorkspaceUser extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceCreated },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleWorkspaceModified },
-      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceDeleted },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleWorkspaceMemberCreated },
-      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleWorkspaceMemberDeleted },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.CREATED, handler: this.handleSpaceCreated },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.MODIFIED, handler: this.handleSpaceModified },
+      { entityType: TLM_ET.SHAREDSPACE, coreEntityType: TLM_CET.DELETED, handler: this.handleSpaceDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleSpaceMemberCreated },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: this.handleSpaceMemberDeleted },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.CREATED, handler: this.handleUserCreated },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified },
       { entityType: TLM_ET.USER, coreEntityType: TLM_CET.DELETED, handler: this.handleUserDeleted }
@@ -112,12 +112,30 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   refreshAll = async () => {
+    this.setState({ loaded: false })
     this.updateTitleAndBreadcrumbs()
     if (this.state.config.type === 'workspace') {
-      await this.loadWorkspaceContent()
+      await this.loadSpaceContent()
     } else if (this.state.config.type === 'user') {
       await this.loadUserContent()
     }
+    this.setState({ loaded: true })
+  }
+
+  sortUserList (userList) {
+    return userList.sort((u1, u2) => {
+      const u1PublicName = (u1.public_name || '').toLowerCase()
+      const u2PublicName = (u2.public_name || '').toLowerCase()
+      const u1username = (u1.username || '').toLowerCase()
+      const u2username = (u2.username || '').toLowerCase()
+
+      if (u1PublicName < u2PublicName) return -1
+      if (u1PublicName > u2PublicName) return 1
+      if (u1username < u2username) return -1
+      if (u1username > u2username) return 1
+
+      return u1.user_id - u2.user_id
+    })
   }
 
   async componentDidMount () {
@@ -138,15 +156,6 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  sendGlobalFlashMsg = (msg, type) => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: this.props.t(msg),
-      type: type || 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = (title) => {
     const { state } = this
 
@@ -158,34 +167,23 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  loadWorkspaceContent = async () => {
+  loadSpaceContent = async () => {
     const { props, state } = this
+    const fetchSpaceList = await handleFetchResult(await getWorkspaceList(state.config.apiUrl))
 
-    const fetchWorkspaceList = getWorkspaceList(state.config.apiUrl)
-    const workspaceList = await handleFetchResult(await fetchWorkspaceList)
-
-    switch (workspaceList.apiResponse.status) {
+    switch (fetchSpaceList.apiResponse.status) {
       case 200: {
-        const fetchWorkspaceListMemberList = await Promise.all(
-          workspaceList.body.map(async ws =>
-            handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, ws.workspace_id))
-          )
-        )
+        const workspaceList = fetchSpaceList.body
 
         this.setState(prev => ({
           content: {
             ...prev.content,
-            workspaceList: workspaceList.body.map(ws => ({
-              ...ws,
-              memberList: (fetchWorkspaceListMemberList.find(
-                fws => fws.body.length > 0 && fws.body[0].workspace_id === ws.workspace_id
-              ) || { body: [] }).body
-            }))
+            workspaceList
           }
         }))
         break
       }
-      default: this.sendGlobalFlashMsg(props.t('Error while loading spaces list', 'warning'))
+      default: sendGlobalFlashMessage(props.t('Error while loading spaces list'))
     }
   }
 
@@ -193,39 +191,30 @@ export class AdminWorkspaceUser extends React.Component {
     const fetchUserDetail = await handleFetchResult(await getUserDetail(this.state.config.apiUrl, user.user_id))
 
     if (!fetchUserDetail.apiResponse.ok) {
-      this.displayErrorFetchingUserList()
+      sendGlobalFlashMessage(this.props.t('Error while loading users list'))
       return null
     }
 
     return fetchUserDetail.body
   }
 
-  displayErrorFetchingUserList () {
-    this.sendGlobalFlashMsg(this.props.t('Error while loading users list'), 'warning')
-  }
-
   loadUserContent = async () => {
-    const fetchUserList = await handleFetchResult(await getUserList(this.state.config.apiUrl))
+    const { state } = this
+    const fetchUserList = await handleFetchResult(await getUserList(state.config.apiUrl))
 
     switch (fetchUserList.apiResponse.status) {
       case 200: {
-        const userList = []
-
-        for (const user of fetchUserList.body) {
-          const detailedUser = await this.getDetailedUser(user)
-          if (!detailedUser) return
-          userList.push(detailedUser)
-        }
+        const userList = fetchUserList.body
 
         this.setState(prev => ({
           content: {
             ...prev.content,
-            userList
+            userList: this.sortUserList(userList)
           }
         }))
         break
       }
-      default: this.displayErrorFetchingUserList()
+      default: sendGlobalFlashMessage(this.props.t('Error while loading users list'))
     }
   }
 
@@ -253,43 +242,43 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState({ breadcrumbsList: breadcrumbsList })
   }
 
-  handleDeleteWorkspace = async () => {
+  handleDeleteSpace = async () => {
     const { props, state } = this
 
-    const deleteWorkspaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
-    if (deleteWorkspaceResponse.status !== 204) {
-      this.sendGlobalFlashMsg(props.t('Error while deleting space'), 'warning')
+    const deleteSpaceResponse = await handleFetchResult(await deleteWorkspace(state.config.apiUrl, state.workspaceToDelete))
+    if (deleteSpaceResponse.status !== 204) {
+      sendGlobalFlashMessage(props.t('Error while deleting space'))
     }
-    this.handleClosePopupDeleteWorkspace()
+    this.handleClosePopupDeleteSpace()
   }
 
-  handleOpenPopupDeleteWorkspace = workspaceId => this.setState({
+  handleOpenPopupDeleteSpace = workspaceId => this.setState({
     popupDeleteWorkspaceDisplay: true,
     workspaceToDelete: workspaceId
   })
 
-  handleClosePopupDeleteWorkspace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
+  handleClosePopupDeleteSpace = () => this.setState({ popupDeleteWorkspaceDisplay: false })
 
-  handleWorkspaceCreated = (message) => {
+  handleSpaceCreated = (message) => {
     const { state } = this
     const workspace = message.fields.workspace
-    const newWorkspaceList = state.content.workspaceList.slice()
+    const newSpaceList = state.content.workspaceList.slice()
     /* INFO SG 2020-06-15:
      *  - the list is ordered by id and a newly created workspace has a greater id than all others.
      *  - initialize member list as empty since the space member created message will handle
      *    adding the initial user.
      */
-    newWorkspaceList.push({ ...workspace, memberList: [] })
+    newSpaceList.push({ ...workspace })
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceModified = (message) => {
+  handleSpaceModified = (message) => {
     const { state } = this
 
     const workspace = message.fields.workspace
@@ -301,108 +290,97 @@ export class AdminWorkspaceUser extends React.Component {
       console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
-    const memberList = workspaceList[workspaceIndex].memberList
 
-    const workspaceWithMemberList = {
-      ...workspace,
-      memberList: memberList
-    }
-
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      workspaceWithMemberList,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceDeleted = (message) => {
+  handleSpaceDeleted = (message) => {
     const { state } = this
+
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
 
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceMemberCreated = (message) => {
+  handleSpaceMemberCreated = (message) => {
     const { state } = this
 
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
       // We do not have this workspace in our list...
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.slice()
-    newMemberList.push({
-      user_id: message.fields.user.user_id,
-      user: message.fields.user,
-      workspace_id: message.fields.workspace.workspace_id,
-      workspace: message.fields.workspace,
-      do_notify: message.fields.member.do_notify,
-      is_active: message.fields.user.is_active,
-      role: message.fields.member.role
-    })
-    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      newWorkspace,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
 
-  handleWorkspaceMemberDeleted = (message) => {
+  handleSpaceMemberDeleted = (message) => {
     const { state } = this
 
+    const workspace = message.fields.workspace
     const workspaceList = state.content.workspaceList
-    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === message.fields.workspace.workspace_id)
+    const workspaceIndex = workspaceList.findIndex(ws => ws.workspace_id === workspace.workspace_id)
 
     if (workspaceIndex === -1) {
-      console.log(`<AdminWorkspaceUser>: workspace id ${message.fields.workspace.workspace_id} not found`)
+      console.log(`<AdminWorkspaceUser>: workspace id ${workspace.workspace_id} not found`)
       // We do not have this workspace in our list...
       return
     }
 
-    const newMemberList = workspaceList[workspaceIndex].memberList.filter(m => m.user_id !== message.fields.user.user_id)
-    const newWorkspace = { ...message.fields.workspace, memberList: newMemberList }
-    const newWorkspaceList = [
+    const newSpaceList = [
       ...workspaceList.slice(0, workspaceIndex),
-      newWorkspace,
+      workspace,
       ...workspaceList.slice(workspaceIndex + 1)
     ]
+
     this.setState(prev => ({
       content: {
         ...prev.content,
-        workspaceList: newWorkspaceList
+        workspaceList: newSpaceList
       }
     }))
   }
@@ -415,7 +393,7 @@ export class AdminWorkspaceUser extends React.Component {
     const toggleUser = await handleFetchResult(await activateOrDelete(state.config.apiUrl, userId))
 
     if (toggleUser.status !== 204) {
-      this.sendGlobalFlashMsg(props.t('Error while enabling or disabling user'), 'warning')
+      sendGlobalFlashMessage(props.t('Error while enabling or disabling user'))
     }
   }
 
@@ -425,7 +403,7 @@ export class AdminWorkspaceUser extends React.Component {
     const endPoint = userId === state.loggedUser.userId ? putMyselfProfile : putUserProfile
     const toggleManager = await handleFetchResult(await endPoint(state.config.apiUrl, userId, newProfile))
     if (toggleManager.status !== 204) {
-      this.sendGlobalFlashMsg(props.t('Error while saving new profile'), 'warning')
+      sendGlobalFlashMessage(props.t('Error while saving new profile'))
     }
   }
 
@@ -433,26 +411,26 @@ export class AdminWorkspaceUser extends React.Component {
     const { props, state } = this
 
     if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
-      this.sendGlobalFlashMsg(
-        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME }),
-        'warning')
-      return
+      sendGlobalFlashMessage(
+        props.t('Full name must be at least {{minimumCharactersPublicName}} characters', { minimumCharactersPublicName: MINIMUM_CHARACTERS_PUBLIC_NAME })
+      )
+      return -1
     }
 
     if (!state.config.system.config.email_notification_activated || password !== '') {
       if (password === '') {
-        this.sendGlobalFlashMsg(props.t('Please set a password'), 'warning')
-        return
+        sendGlobalFlashMessage(props.t('Please set a password'))
+        return -2
       }
 
       if (password.length < 6) {
-        this.sendGlobalFlashMsg(props.t('New password is too short (minimum 6 characters)'), 'warning')
-        return
+        sendGlobalFlashMessage(props.t('New password is too short (minimum 6 characters)'))
+        return -3
       }
 
       if (password.length > 512) {
-        this.sendGlobalFlashMsg(props.t('New password is too long (maximum 512 characters)'), 'warning')
-        return
+        sendGlobalFlashMessage(props.t('New password is too long (maximum 512 characters)'))
+        return -4
       }
     }
 
@@ -462,33 +440,38 @@ export class AdminWorkspaceUser extends React.Component {
 
     switch (newUserResult.apiResponse.status) {
       case 200:
-        this.sendGlobalFlashMsg(
+        sendGlobalFlashMessage(
           state.config.system.config.email_notification_activated
             ? props.t('User created and email sent')
             : props.t('User created'),
           'info'
         )
-        return true
+        return newUserResult.body.user_id
       case 400:
         switch (newUserResult.body.code) {
           case 2001:
-            if (newUserResult.body.details.email) this.sendGlobalFlashMsg(props.t('Error, invalid email address'), 'warning')
-            if (newUserResult.body.details.username) this.sendGlobalFlashMsg(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
-            else this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+            if (newUserResult.body.details.email) sendGlobalFlashMessage(props.t('Error, invalid email address'))
+            if (newUserResult.body.details.username) sendGlobalFlashMessage(props.t('Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long', { minimumCharactersUsername: MINIMUM_CHARACTERS_USERNAME, maximumCharactersUsername: MAXIMUM_CHARACTERS_USERNAME }))
+            else sendGlobalFlashMessage(props.t('Error while saving new user'))
             break
           case 2062:
-            this.sendGlobalFlashMsg(
+            sendGlobalFlashMessage(
               props.t('Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
             )
             break
-          case 2036: this.sendGlobalFlashMsg(props.t('Email already exists'), 'warning'); break
-          default: this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
+          case 2036: sendGlobalFlashMessage(props.t('Email already exists')); break
+          default: sendGlobalFlashMessage(props.t('Error while saving new user'))
         }
-        return false
+        return -5
       default:
-        this.sendGlobalFlashMsg(props.t('Error while saving new user'), 'warning')
-        return false
+        sendGlobalFlashMessage(props.t('Error while saving new user'))
+        return -6
     }
+  }
+
+  handleClickCreateUserAndAddToSpaces = async (publicName, username, email, profile, password) => {
+    const userId = await this.handleClickAddUser(publicName, username, email, profile, password)
+    if (userId > 0) this.state.config.history.push(PAGE.ADMIN.USER_EDIT(userId), 'spacesConfig')
   }
 
   handleUserCreated = async (message) => {
@@ -498,7 +481,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: [...prev.content.userList, detailedUser]
+        userList: this.sortUserList([...prev.content.userList, detailedUser])
       }
     }))
   }
@@ -511,7 +494,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u)
+        userList: this.sortUserList(prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u))
       }
     }))
   }
@@ -526,39 +509,16 @@ export class AdminWorkspaceUser extends React.Component {
     }))
   }
 
-  handleClickWorkspace = workspaceId => {
+  handleClickSpace = workspaceId => {
     const { state } = this
     if (state.workspaceIdOpened === null) {
-      GLOBAL_renderAppFeature({
-        loggedUser: {
-          ...state.loggedUser,
-          userRoleIdInWorkspace: ROLE.workspaceManager.id // only global admin can see this app, he is workspace manager of any workspace. So, force userRoleIdInWorkspace to 8
-        },
-        config: {
-          history: state.config.history,
-          label: 'Advanced dashboard',
-          slug: 'workspace_advanced',
-          faIcon: 'fas fa-users',
-          hexcolor: GLOBAL_primaryColor,
-          creationLabel: '',
-          domContainer: 'appFeatureContainer',
-          apiUrl: state.config.apiUrl,
-          apiHeader: state.config.apiHeader,
-          roleList: state.config.roleList,
-          profileObject: state.config.profileObject,
-          system: { ...state.config.system },
-          translation: state.config.translation
-        },
-        content: {
-          workspace_id: workspaceId
-        }
-      })
+      state.config.history.push(PAGE.WORKSPACE.ADVANCED_DASHBOARD(workspaceId), { from: 'adminSpaceList' })
     } else GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.RELOAD_CONTENT('workspace_advanced'), data: { workspace_id: workspaceId } })
 
     this.setState({ workspaceIdOpened: workspaceId })
   }
 
-  handleClickNewWorkspace = () => {
+  handleClickNewSpace = () => {
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, data: {} })
   }
 
@@ -572,7 +532,7 @@ export class AdminWorkspaceUser extends React.Component {
     try {
       this.setState(await checkUsernameValidity(state.config.apiUrl, newUsername, props))
     } catch (errorWhileChecking) {
-      this.sendGlobalFlashMsg(errorWhileChecking.message)
+      sendGlobalFlashMessage(errorWhileChecking.message)
     }
   }
 
@@ -587,22 +547,25 @@ export class AdminWorkspaceUser extends React.Component {
       <div>
         {state.config.type === 'workspace' && (
           <AdminWorkspace
+            loaded={state.loaded}
             workspaceList={state.content.workspaceList}
-            onClickWorkspace={this.handleClickWorkspace}
-            onClickNewWorkspace={this.handleClickNewWorkspace}
-            onClickDeleteWorkspace={this.handleOpenPopupDeleteWorkspace}
+            onClickWorkspace={this.handleClickSpace}
+            onClickNewWorkspace={this.handleClickNewSpace}
+            onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
           />
         )}
 
         {state.config.type === 'user' && (
           <AdminUser
+            loaded={state.loaded}
             userList={state.content.userList}
             loggedUserId={state.loggedUser.userId}
             emailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}
+            onClickCreateUserAndAddToSpaces={this.handleClickCreateUserAndAddToSpaces}
             onChangeUsername={this.handleChangeUsername}
             breadcrumbsList={state.breadcrumbsList}
             isUsernameValid={state.isUsernameValid}
@@ -613,8 +576,8 @@ export class AdminWorkspaceUser extends React.Component {
 
         {state.popupDeleteWorkspaceDisplay && (
           <ConfirmPopup
-            onCancel={this.handleClosePopupDeleteWorkspace}
-            onConfirm={this.handleDeleteWorkspace}
+            onCancel={this.handleClosePopupDeleteSpace}
+            onConfirm={this.handleDeleteSpace}
             confirmLabel={props.t('Delete')}
             confirmIcon='far fa-fw fa-trash-alt'
           />

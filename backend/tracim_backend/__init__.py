@@ -59,6 +59,7 @@ from tracim_backend.lib.webdav import WebdavAppFactory
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.setup_models import init_models
 from tracim_backend.views import BASE_API
+from tracim_backend.views.base import BaseController
 from tracim_backend.views.contents_api.comment_controller import CommentController
 from tracim_backend.views.core_api.account_controller import AccountController
 from tracim_backend.views.core_api.favorite_content_controller import FavoriteContentController
@@ -286,6 +287,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     context.handle_exception(Exception, HTTPStatus.INTERNAL_SERVER_ERROR)
 
     # Add controllers
+    base_controller = BaseController()
     session_controller = SessionController()
     system_controller = SystemController()
     user_controller = UserController()
@@ -297,6 +299,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     tag_controller = TagController()
     url_preview_controller = URLPreviewController()
     favorite_content_controller = FavoriteContentController()
+    configurator.include(base_controller.bind, route_prefix=BASE_API)
     configurator.include(session_controller.bind, route_prefix=BASE_API)
     configurator.include(system_controller.bind, route_prefix=BASE_API)
     configurator.include(user_controller.bind, route_prefix=BASE_API)
@@ -321,6 +324,7 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         app.load_controllers(
             app_config=app_config, configurator=configurator, route_prefix=BASE_API, context=context
         )
+        app.register_tracim_plugin(plugin_manager)
 
     configurator.scan("tracim_backend.lib.utils.authentification")
 

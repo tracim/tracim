@@ -44,6 +44,7 @@ import {
   putUserConfiguration,
   FAVORITE_STATE,
   PopinFixedRightPartContent,
+  sendGlobalFlashMessage,
   TagList
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
@@ -101,6 +102,7 @@ export class File extends React.Component {
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
+    this.isLoadMoreTimelineInProgress = false
 
     // i18n has been init, add resources from frontend
     addAllResourceI18n(i18n, this.state.config.translation, this.state.loggedUser.lang)
@@ -243,15 +245,6 @@ export class File extends React.Component {
     globalThis.tinymce.remove('#wysiwygTimelineComment')
   }
 
-  sendGlobalFlashMessage = (msg, type) => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: type || 'warning',
-      delay: undefined
-    }
-  })
-
   setHeadTitle = (contentName) => {
     const { state } = this
 
@@ -294,7 +287,7 @@ export class File extends React.Component {
         break
       }
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading file'))
+        sendGlobalFlashMessage(props.t('Error while loading file'))
         return
     }
 
@@ -317,7 +310,7 @@ export class File extends React.Component {
           shareLinkList: response.body
         })
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while loading share links list')); break
+      default: sendGlobalFlashMessage(props.t('Error while loading share links list')); break
     }
   }
 
@@ -344,14 +337,19 @@ export class File extends React.Component {
 
   handleLoadMoreTimelineItems = async () => {
     const { props } = this
+
+    if (this.isLoadMoreTimelineInProgress) return
+
+    this.isLoadMoreTimelineInProgress = true
     await props.loadMoreTimelineItems(getFileRevision)
+    this.isLoadMoreTimelineInProgress = false
   }
 
   handleClickBtnCloseApp = () => {
     const { state, props } = this
 
     if (state.progressUpload.display) {
-      this.sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
+      sendGlobalFlashMessage(props.t('Please wait until the upload ends'))
       return
     }
 
@@ -378,16 +376,16 @@ export class File extends React.Component {
         this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, config: newConfiguration } }))
 
         const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
-        if (fetchPutUserConfiguration.status !== 204) { this.sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
+        if (fetchPutUserConfiguration.status !== 204) { sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
         break
       }
       case 400:
         switch (fetchResultSaveFile.body.code) {
           case 2041: break // same description sent, no need for error msg
-          default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
+          default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving the new description'))
+      default: sendGlobalFlashMessage(props.t('Error while saving the new description'))
     }
   }
 
@@ -436,7 +434,7 @@ export class File extends React.Component {
         state.loggedUser.username
       )
     } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
     }
   }
 
@@ -601,21 +599,21 @@ export class File extends React.Component {
             }))
 
             const fetchPutUserConfiguration = await handleFetchResult(await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, state.loggedUser.config))
-            if (fetchPutUserConfiguration.status !== 204) { this.sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
+            if (fetchPutUserConfiguration.status !== 204) { sendGlobalFlashMessage(props.t('Error while saving the user configuration')) }
             break
           }
           case 400: {
             const jsonResult400 = JSON.parse(xhr.responseText)
             switch (jsonResult400.code) {
-              case 3002: this.sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
-              case 6002: this.sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
-              case 6003: this.sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
-              case 6004: this.sendGlobalFlashMessage(props.t('You have reached your storage limit, you cannot add new files')); break
-              default: this.sendGlobalFlashMessage(props.t('Error while uploading file')); break
+              case 3002: sendGlobalFlashMessage(props.t('A content with the same name already exists')); break
+              case 6002: sendGlobalFlashMessage(props.t('The file is larger than the maximum file size allowed')); break
+              case 6003: sendGlobalFlashMessage(props.t('Error, the space exceed its maximum size')); break
+              case 6004: sendGlobalFlashMessage(props.t('You have reached your storage limit, you cannot add new files')); break
+              default: sendGlobalFlashMessage(props.t('Error while uploading file')); break
             }
             break
           }
-          default: this.sendGlobalFlashMessage(props.t('Error while uploading file'))
+          default: sendGlobalFlashMessage(props.t('Error while uploading file'))
         }
       }
     }
@@ -666,12 +664,12 @@ export class File extends React.Component {
     }
 
     if (isPasswordActive && state.sharePassword.length < 6) {
-      this.sendGlobalFlashMessage(props.t('The password is too short (minimum 6 characters)'))
+      sendGlobalFlashMessage(props.t('The password is too short (minimum 6 characters)'))
       return false
     }
 
     if (isPasswordActive && state.sharePassword.length > 512) {
-      this.sendGlobalFlashMessage(props.t('The password is too long (maximum 512 characters)'))
+      sendGlobalFlashMessage(props.t('The password is too long (maximum 512 characters)'))
       return false
     }
 
@@ -694,12 +692,12 @@ export class File extends React.Component {
       case 400:
         switch (response.body.code) {
           case 2001:
-            this.sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
+            sendGlobalFlashMessage(props.t('The password length must be between 6 and 512 characters and the email(s) must be valid'))
             break
-          default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+          default: sendGlobalFlashMessage(props.t('Error while creating new share link'))
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while creating new share link'))
+      default: sendGlobalFlashMessage(props.t('Error while creating new share link'))
     }
     return false
   }
@@ -716,7 +714,7 @@ export class File extends React.Component {
       })
 
       if (invalidEmails.length > 0) {
-        this.sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
+        sendGlobalFlashMessage(this.props.t(`Error: ${invalidEmails} are not valid`))
       } else {
         this.setState({ shareEmails: emailList.join('\n') })
       }
@@ -737,10 +735,10 @@ export class File extends React.Component {
         this.loadShareLinkList()
         break
       case 400:
-        this.sendGlobalFlashMessage(props.t('Error in the URL'))
+        sendGlobalFlashMessage(props.t('Error in the URL'))
         state.config.history.push(PAGE.LOGIN)
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while deleting share link'))
+      default: sendGlobalFlashMessage(props.t('Error while deleting share link'))
     }
   }
 
@@ -872,6 +870,7 @@ export class File extends React.Component {
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+            userProfile={state.loggedUser.profile}
           />
         </PopinFixedRightPartContent>
       )
@@ -959,7 +958,7 @@ export class File extends React.Component {
       await putUserConfiguration(state.config.apiUrl, state.loggedUser.userId, newConfiguration)
     )
     if (fetchPutUserConfiguration.status !== 204) {
-      this.sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
+      sendGlobalFlashMessage(props.t('Error while saving the user configuration'))
     }
   }
 

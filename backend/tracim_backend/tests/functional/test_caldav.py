@@ -27,6 +27,14 @@ TRANSP:TRANSPARENT
 END:VEVENT
 END:VCALENDAR
 """
+
+VALID_CARDDAV_BODY_PUT = """
+BEGIN:VCARD
+VERSION:4.0
+FN:Evert Pot
+N:Pot;Evert;;;
+END:VCARD
+"""
 CALDAV_URL_FOR_TEST = "http://localhost:5232"
 
 
@@ -46,6 +54,109 @@ class TestCaldavRadicaleProxyEndpoints(object):
             result = requests.get(CALDAV_URL_FOR_TEST, timeout=3)
         assert result.status_code == 200
 
+    def test_proxy_user_resources_root__ok__nominal_case(
+        self, radicale_server, user_api_factory, web_testapp
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.request("/dav/user_{}/".format(user.user_id), status=207, method="PROPFIND")
+
+    def test_proxy_user_resources_root__err__other_user_ressource(
+        self, radicale_server, user_api_factory, web_testapp
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        result = web_testapp.request("/dav/user_999/", status=403, method="PROPFIND")
+        assert result.json_body["code"] == 5001
+
+    @pytest.mark.xfail(reason="unclear for now")
+    def test_proxy_user_resources_user_calendar_and_addressbook__ok__nominal_case(
+        self, radicale_server, user_api_factory, web_testapp
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.get(
+            "/dav/user_{user_id}/user_{user_id}_calendar".format(user_id=user.user_id), status=200,
+        )
+        web_testapp.get(
+            "/dav/user_{user_id}/user_{user_id}_addressbook".format(user_id=user.user_id),
+            status=200,
+        )
+
+    @pytest.mark.xfail(reason="unclear for now")
+    def test_proxy_user_resources_workspace_calendar_and_addressbook__ok__nominal_case(
+        self,
+        radicale_server,
+        user_api_factory,
+        web_testapp,
+        workspace_api_factory,
+        role_api_factory,
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        workspace.agenda_enabled = True
+        rapi = role_api_factory.get()
+
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.get(
+            "/dav/user_{user_id}/space_{workspace_id}_calendar/".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+            status=200,
+        )
+        web_testapp.get(
+            "/dav/user_{user_id}/space_{workspace_id}_addressbook/".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+            status=200,
+        )
+
     def test_proxy_user_agenda__ok__nominal_case(
         self, radicale_server, user_api_factory, web_testapp
     ) -> None:
@@ -62,13 +173,16 @@ class TestCaldavRadicaleProxyEndpoints(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        web_testapp.get("/agenda/user/{}/".format(user.user_id), status=404)
+        web_testapp.get("/dav/agenda/user/{}/".format(user.user_id), status=200)
         event = VALID_CALDAV_BODY_PUT_EVENT
         web_testapp.put(
-            "/agenda/user/{}/".format(user.user_id), event, content_type="text/calendar", status=201
+            "/dav/agenda/user/{}/".format(user.user_id),
+            event,
+            content_type="text/calendar",
+            status=201,
         )
-        web_testapp.get("/agenda/user/{}/".format(user.user_id), status=200)
-        web_testapp.delete("/agenda/user/{}/".format(user.user_id), status=200)
+        web_testapp.get("/dav/agenda/user/{}/".format(user.user_id), status=200)
+        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id), status=403)
 
     @pytest.mark.parametrize(
         "sub_item_label",
@@ -94,22 +208,30 @@ class TestCaldavRadicaleProxyEndpoints(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        web_testapp.get("/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=404)
+        web_testapp.get(
+            "/dav/agenda/user/{}/{}".format(user.user_id, sub_item_label), status=307
+        ).follow(status=404)
+
         event = VALID_CALDAV_BODY_PUT_EVENT
         web_testapp.put(
-            "/agenda/user/{}/".format(user.user_id), event, content_type="text/calendar", status=201
+            "/dav/agenda/user/{}/".format(user.user_id),
+            event,
+            content_type="text/calendar",
+            status=201,
         )
         web_testapp.put(
-            "/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label),
+            "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label),
             event,
             content_type="text/calendar",
             status="*",
         )
-        web_testapp.get("/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200)
-        web_testapp.delete(
-            "/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
+        web_testapp.get(
+            "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
         )
-        web_testapp.delete("/agenda/user/{}/".format(user.user_id, sub_item_label), status=200)
+        web_testapp.delete(
+            "/dav/agenda/user/{}/{}.ics".format(user.user_id, sub_item_label), status=200
+        )
+        web_testapp.delete("/dav/agenda/user/{}/".format(user.user_id, sub_item_label), status=403)
 
     def test_proxy_user_agenda__err__other_user_agenda(
         self, radicale_server, user_api_factory, web_testapp
@@ -134,7 +256,7 @@ class TestCaldavRadicaleProxyEndpoints(object):
         )
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        result = web_testapp.get("/agenda/user/{}/".format(user2.user_id), status=403)
+        result = web_testapp.get("/dav/agenda/user/{}/".format(user2.user_id), status=403)
         assert result.json_body["code"] == 5001
 
     def test_proxy_workspace_agenda__ok__nominal_case(
@@ -163,16 +285,15 @@ class TestCaldavRadicaleProxyEndpoints(object):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        web_testapp.get("/agenda/workspace/{}/".format(workspace.workspace_id), status=404)
         event = VALID_CALDAV_BODY_PUT_EVENT
         web_testapp.put(
-            "/agenda/workspace/{}/".format(workspace.workspace_id),
+            "/dav/agenda/workspace/{}/".format(workspace.workspace_id),
             event,
             content_type="text/agenda",
             status=201,
         )
-        web_testapp.get("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
-        web_testapp.delete("/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
+        web_testapp.get("/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=200)
+        web_testapp.delete("/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=403)
 
     def test_proxy_workspace_agenda__err__other_workspace_agenda(
         self, radicale_server, user_api_factory, workspace_api_factory, web_testapp
@@ -192,7 +313,176 @@ class TestCaldavRadicaleProxyEndpoints(object):
         workspace = workspace_api.create_workspace("test", save_now=True)
         transaction.commit()
         web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
-        result = web_testapp.get("/agenda/workspace/{}/".format(workspace.workspace_id), status=403)
+        result = web_testapp.get(
+            "/dav/agenda/workspace/{}/".format(workspace.workspace_id), status=403
+        )
+        assert result.json_body["code"] == 5001
+
+    def test_proxy_user_addressbook__ok__nominal_case(
+        self, radicale_server, user_api_factory, web_testapp
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.get("/dav/addressbook/user/{}/".format(user.user_id), status=200)
+        addressbook = VALID_CARDDAV_BODY_PUT
+        web_testapp.put(
+            "/dav/addressbook/user/{}/".format(user.user_id),
+            addressbook,
+            content_type="text/vcard",
+            status=201,
+        )
+        web_testapp.get("/dav/addressbook/user/{}/".format(user.user_id), status=200)
+        web_testapp.delete("/dav/addressbook/user/{}/".format(user.user_id), status=403)
+
+    @pytest.mark.xfail(reason="unclear how carddav work")
+    @pytest.mark.parametrize(
+        "sub_item_label",
+        [
+            #  sub_items label
+            ("2d89ab53-e66f-6a48-634a-f112fb27b5e8"),  # thunderbird-like
+            ("c584046fa2a358f646aa18e94f61a011f32e7d14a5735cd80bceaca8351d8fa4"),  # caldavzap-like
+        ],
+    )
+    def test_proxy_user_addressbook__ok__on_sub_items(
+        self, radicale_server, sub_item_label, user_api_factory, web_testapp
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.get(
+            "/dav/addressbook/user/{}/{}".format(user.user_id, sub_item_label), status=307
+        ).follow(status=404)
+
+        addressbook = VALID_CARDDAV_BODY_PUT
+        web_testapp.put(
+            "/dav/addressbook/user/{}/".format(user.user_id),
+            addressbook,
+            content_type="text/calendar",
+            status=201,
+        )
+        web_testapp.put(
+            "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label),
+            addressbook,
+            content_type="text/vcard",
+            status="*",
+        )
+        web_testapp.get(
+            "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label), status=307
+        )
+        web_testapp.delete(
+            "/dav/addressbook/user/{}/{}.vcf".format(user.user_id, sub_item_label), status=200
+        )
+        web_testapp.delete(
+            "/dav/addressbook/user/{}/".format(user.user_id, sub_item_label), status=200
+        )
+
+    def test_proxy_user_addressbook__err__other_user_agenda(
+        self, radicale_server, user_api_factory, web_testapp
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        user2 = uapi.create_user(
+            "test2@test2.test2",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        result = web_testapp.get("/dav/addressbook/user/{}/".format(user2.user_id), status=403)
+        assert result.json_body["code"] == 5001
+
+    def test_proxy_workspace_addressbook__ok__nominal_case(
+        self,
+        radicale_server,
+        user_api_factory,
+        web_testapp,
+        workspace_api_factory,
+        role_api_factory,
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        workspace.agenda_enabled = True
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        web_testapp.get("/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=404)
+        addressbook = VALID_CARDDAV_BODY_PUT
+        web_testapp.put(
+            "/dav/addressbook/workspace/{}/".format(workspace.workspace_id),
+            addressbook,
+            content_type="text/vcard",
+            status=201,
+        )
+        web_testapp.get("/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=200)
+        web_testapp.delete(
+            "/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=403
+        )
+
+    def test_proxy_workspace_addressbook__err__other_workspace_agenda(
+        self, radicale_server, user_api_factory, workspace_api_factory, web_testapp
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.USER
+        uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        result = web_testapp.get(
+            "/dav/addressbook/workspace/{}/".format(workspace.workspace_id), status=403
+        )
         assert result.json_body["code"] == 5001
 
 
@@ -234,15 +524,17 @@ class TestAgendaApi(object):
 
         assert len(result.json_body) == 3
         agenda = result.json_body[0]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/user/{}/".format(user.user_id)
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/user/{}/".format(
+            user.user_id
+        )
         assert agenda["with_credentials"] is True
         agenda = result.json_body[1]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace.workspace_id
         )
         assert agenda["with_credentials"] is True
         agenda = result.json_body[2]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace2.workspace_id
         )
         assert agenda["with_credentials"] is True
@@ -283,12 +575,12 @@ class TestAgendaApi(object):
         )
         assert len(result.json_body) == 2
         agenda = result.json_body[0]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace.workspace_id
         )
         assert agenda["with_credentials"] is True
         agenda = result.json_body[1]
-        assert agenda["agenda_url"] == "http://localhost:6543/agenda/workspace/{}/".format(
+        assert agenda["agenda_url"] == "http://localhost:6543/dav/agenda/workspace/{}/".format(
             workspace3.workspace_id
         )
         assert agenda["with_credentials"] is True

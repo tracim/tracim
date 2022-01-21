@@ -17,6 +17,8 @@
   "Restore": "Restaurar",
   "Send": "Enviar",
   "Your message...": "Sua mensagem...",
+  "Write an answer...": "Escrever uma resposta...",
+  "Share a news...": "Partilhar uma notícia...",
   "Validate the title": "Validar o título",
   "Edit title": "Editar o título",
   "Undo change in title": "Desfazer alteração no título",
@@ -214,5 +216,7 @@
   "This tag already exists": "Esta etiqueta já existe",
   "Version #{{versionNumber}}": "Versão n°{{versionNumber}}",
   "Your tag has been added": "A sua etiqueta foi adicionada",
-  "Your tag has been created": "A sua etiqueta foi criada"
+  "Your tag has been created": "A sua etiqueta foi criada",
+  "See more": "Ver mais",
+  "Error while loading timeline": "Erro ao carregar a linha cronológica"
 }

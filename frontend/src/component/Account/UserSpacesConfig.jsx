@@ -1,20 +1,22 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-
 import {
+  IconButton,
   sortWorkspaceList,
   ConfirmPopup,
+  PAGE,
+  PROFILE,
   TracimComponent,
   ROLE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
-
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList, getWorkspaceMemberList } from '../../action-creator.async.js'
-
+import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
 export class UserSpacesConfig extends React.Component {
@@ -149,9 +151,9 @@ export class UserSpacesConfig extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
 
-    const entries = this.state.workspaceList.reduce((res, space) => {
+    const entries = state.workspaceList.reduce((res, space) => {
       if (space.memberList.length > 0) {
         const member = space.memberList.find(u => u.user_id === props.userToEditId)
         if (member) {
@@ -176,7 +178,28 @@ export class UserSpacesConfig extends React.Component {
       <div className='account__userpreference__setting__spacename'>
         <div className='spaceconfig__sectiontitle subTitle'>
           {props.t('Spaces')}
+          {(props.user && props.user.profile === PROFILE.administrator.slug) && (
+            <IconButton
+              mode='dark'
+              intent='secondary'
+              onClick={(() => props.history.push(PAGE.ADMIN.USER_SPACE_LIST(props.userToEditId)))}
+              icon='fas fa-user-cog'
+              text={props.t('Manage user spaces')}
+              dataCy='account__userpreference__setting__spacename'
+            />
+          )}
         </div>
+
+        {props.openSpacesManagement && (
+          <AdminUserSpacesConfig
+            userToEditId={props.userToEditId}
+            userEmail={props.userEmail}
+            userPublicName={props.userPublicName}
+            userUsername={props.userUsername}
+            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+            onClose={(() => props.history.push(PAGE.ADMIN.USER_EDIT(props.userToEditId), 'spacesConfig'))}
+          />
+        )}
 
         {(entries.length
           ? (
@@ -222,8 +245,8 @@ export class UserSpacesConfig extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system }) => ({ system })
-export default connect(mapStateToProps)(translate()(TracimComponent(UserSpacesConfig)))
+const mapStateToProps = ({ system, user }) => ({ system, user })
+export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(UserSpacesConfig))))
 
 UserSpacesConfig.propTypes = {
   userToEditId: PropTypes.number.isRequired,

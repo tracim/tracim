@@ -12,6 +12,7 @@ import {
   getFolderDetail,
   putFileIsDeleted,
   getWorkspaceContentList,
+  sendGlobalFlashMessage,
   CUSTOM_EVENT,
   PageTitle,
   PageWrapper,
@@ -368,14 +369,14 @@ export class Gallery extends React.Component {
               folderDetail.folderParentIdList.push(fetchContentDetail.body.parent_id)
             }
           } else {
-            this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+            sendGlobalFlashMessage(props.t('Error while loading folder detail'))
             hasReachRootWorkspace = false
           }
         }
         break
       }
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading folder detail'))
+        sendGlobalFlashMessage(props.t('Error while loading folder detail'))
     }
     return folderDetail
   }
@@ -409,7 +410,7 @@ export class Gallery extends React.Component {
 
         break
       }
-      default: this.sendGlobalFlashMessage(props.t('Error while loading content list'))
+      default: sendGlobalFlashMessage(props.t('Error while loading content list'))
     }
   }
 
@@ -490,7 +491,7 @@ export class Gallery extends React.Component {
         return this.buildPreview(fetchFileContent.body)
       }
 
-      this.sendGlobalFlashMessage(this.props.t('Error while loading file preview'))
+      sendGlobalFlashMessage(this.props.t('Error while loading file preview'))
       return false
     }))).filter(i => i !== false)
   }
@@ -510,19 +511,10 @@ export class Gallery extends React.Component {
         this.setHeadTitle(`${props.t('Gallery')} · ${fetchResultWorkspaceDetail.body.label}`)
         break
       default:
-        this.sendGlobalFlashMessage(props.t('Error while loading space detail'))
+        sendGlobalFlashMessage(props.t('Error while loading space detail'))
     }
     return workspaceLabel
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   setHeadTitle = (title) => {
     GLOBAL_dispatchEvent({
@@ -582,7 +574,7 @@ export class Gallery extends React.Component {
         displayPopupDelete: true
       })
     } else {
-      this.sendGlobalFlashMessage(this.props.t("There isn't any picture to delete."))
+      sendGlobalFlashMessage(this.props.t("There isn't any picture to delete."))
     }
   }
 
@@ -608,10 +600,10 @@ export class Gallery extends React.Component {
         })
         break
       case 403:
-        this.sendGlobalFlashMessage(this.props.t('Insufficient permissions'))
+        sendGlobalFlashMessage(this.props.t('Insufficient permissions'))
         break
       default:
-        this.sendGlobalFlashMessage(this.props.t('Error while deleting document'))
+        sendGlobalFlashMessage(this.props.t('Error while deleting document'))
         break
     }
   }
@@ -864,7 +856,7 @@ export class Gallery extends React.Component {
                 customHeaderClass='primaryColorBg'
                 onClose={this.handleCloseDeleteFilePopup}
                 label={props.t('Are you sure?')}
-                faIcon='far fa-fw fa-trash-alt'
+                faIcon='far fa-trash-alt'
               >
                 <div className='gallery__delete__file__popup__body'>
                   <div className='gallery__delete__file__popup__body__btn'>

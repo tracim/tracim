@@ -70,6 +70,9 @@ class WorkspaceAccessType(enum.Enum):
 
 
 class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeBase):
+    MAX_WORKSPACE_LABEL_LENGTH = 1024
+    MIN_WORKSPACE_LABEL_LENGTH = 1
+
     FILEMANAGER_EXTENSION = ".space"
     ACCESSIBLE_TYPES = [WorkspaceAccessType.OPEN, WorkspaceAccessType.ON_REQUEST]
 
@@ -83,7 +86,7 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
     # we should be sure at database level that workspace label are unique
     # nb: be careful about mysql compat with long unicode, forcing utf8 charset
     # for mysql will probably be needed, see fix in User sqlalchemy object
-    label = Column(Unicode(1024), unique=False, nullable=False, default="")
+    label = Column(Unicode(MAX_WORKSPACE_LABEL_LENGTH), unique=False, nullable=False, default="")
     description = Column(Text(), unique=False, nullable=False, default="")
 
     is_deleted = Column(Boolean, unique=False, nullable=False, default=False)
@@ -204,7 +207,12 @@ class Workspace(CreationDateMixin, UpdateDateMixin, TrashableMixin, DeclarativeB
             if not include_archived and revision.node.is_archived:
                 continue
             if revision.depot_file:
-                size += revision.depot_file.file.content_length
+                try:
+                    size += revision.depot_file.file.content_length
+                except IOError:
+                    logger.warning(
+                        self, "Cannot get depot_file {}".format(revision.depot_file.file_id)
+                    )
         return size
 
     def get_user_role(self, user: User) -> int:
@@ -436,6 +444,13 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     ContentRevisionUpdateError errors.
     """
 
+    MAX_FILE_EXTENSION_LENGTH = 255
+    MAX_FILE_MIMETYPE_LENGTH = 255
+    MAX_LABEL_LENGTH = 1024
+    MAX_TYPE_LENGTH = 32
+    MAX_STATUS_LENGTH = 32
+    MAX_REVISION_TYPE_LENGTH = 32
+
     __tablename__ = "content_revisions"
 
     revision_id = Column(
@@ -453,8 +468,12 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
 
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
-    file_extension = Column(Unicode(255), unique=False, nullable=False, server_default="")
-    file_mimetype = Column(Unicode(255), unique=False, nullable=False, default="")
+    file_extension = Column(
+        Unicode(MAX_FILE_EXTENSION_LENGTH), unique=False, nullable=False, server_default=""
+    )
+    file_mimetype = Column(
+        Unicode(MAX_FILE_MIMETYPE_LENGTH), unique=False, nullable=False, default=""
+    )
     # INFO - A.P - 2017-07-03 - Depot Doc
     # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
@@ -462,18 +481,20 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     properties = Column("properties", Text(), unique=False, nullable=False, default="")
 
     # INFO - G.M - same type are used for FavoriteContent.
-    label = Column(Unicode(1024), unique=False, nullable=False)
-    type = Column(Unicode(32), unique=False, nullable=False)
+    label = Column(Unicode(MAX_LABEL_LENGTH), unique=False, nullable=False)
+    type = Column(Unicode(MAX_TYPE_LENGTH), unique=False, nullable=False)
 
     status = Column(
-        Unicode(32),
+        Unicode(MAX_STATUS_LENGTH),
         unique=False,
         nullable=False,
         default=str(content_status_list.get_default_status().slug),
     )
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
     is_temporary = Column(Boolean, unique=False, nullable=False, default=False)
-    revision_type = Column(Unicode(32), unique=False, nullable=False, default="")
+    revision_type = Column(
+        Unicode(MAX_REVISION_TYPE_LENGTH), unique=False, nullable=False, default=""
+    )
 
     workspace_id = Column(
         Integer, ForeignKey("workspaces.workspace_id"), unique=False, nullable=True

@@ -1,16 +1,6 @@
-.callpopup
-  width 300px
-  &__text
-    margin-bottom standardSpacing
-  &__body
-    width 100%
-    &__btn
-      margin textSpacing standardSpacing
-      display flex
-      justify-content flex-end
-      & > .iconbutton
-        margin-inline-start standardSpacing
-
+.uploadPopup
+  .cardPopup__container
+    width 400px
 
 .profile
   &__text__loading
@@ -18,6 +8,11 @@
     height 20px
     width 200px
     margin standardSpacing
+  &__imageUploadProgress
+    width 400px
+  &__popup_select_cover
+    width 50%
+    margin-left -25%
   &__cover
     height 150px
     width 100%
@@ -40,8 +35,7 @@
       width 100%
       height 100%
       object-position 50% 50%
-      object-fit fill
-
+      object-fit cover
   &__mainBar
     height headerHeight
     padding-left pageSpacing
@@ -138,8 +132,10 @@
         &__user
           display flex
           flex-direction column
-          width 100%
+          &__name
+            max-width 60%
           &__username
+            max-width 100%
             font-size metadataFontSize
             &__separator
               display none

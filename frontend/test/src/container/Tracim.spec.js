@@ -133,7 +133,7 @@ describe('<Tracim />', () => {
 
   global.document.title = props.system.headTitle
 
-  describe('intern function', () => {
+  describe('intern functions', () => {
     describe('loadAppConfig', () => {
       it('setConfigCallBack should be called when loadAppConfig() is called', (done) => {
         mockGetConfig200(FETCH_CONFIG.apiUrl)

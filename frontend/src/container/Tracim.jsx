@@ -19,12 +19,14 @@ import AdminAccount from './AdminAccount.jsx'
 import AppFullscreenRouter from './AppFullscreenRouter.jsx'
 import FlashMessage from '../component/FlashMessage.jsx'
 import WorkspaceContent from './WorkspaceContent.jsx'
+import OpenWorkspaceAdvanced from '../component/Workspace/OpenWorkspaceAdvanced.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
   CUSTOM_EVENT,
   PROFILE,
   NUMBER_RESULTS_BY_PAGE,
+  formatAbsoluteDate,
   serialize,
   CardPopup,
   IconButton,
@@ -40,12 +42,12 @@ import {
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,
-  unLoggedAllowedPageList,
-  getUserProfile,
-  toggleFavicon,
   FETCH_CONFIG,
   SEARCH_TYPE,
-  WELCOME_ELEMENT_ID
+  WELCOME_ELEMENT_ID,
+  getUserProfile,
+  toggleFavicon,
+  unLoggedAllowedPageList
 } from '../util/helper.js'
 import {
   logoutUser,
@@ -143,31 +145,40 @@ export class Tracim extends React.Component {
     ])
   }
 
-  handleUserCallCreated = (tlm) => {
+  handleUserCallCreated = async (tlm) => {
     const { props } = this
     const bell = '🔔'
     const isMainTab = this.liveMessageManager.eventSource !== null
-    const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
-      const notification = new Notification(tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim'), notificationOptions)
+      if (window.Notification) {
+        const notificationString = tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim')
+        const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
+
+        try {
+          if (Notification.permission === 'granted') {
+            new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+          } else if (Notification.permission !== 'denied') {
+            const permission = await Notification.requestPermission()
+            if (permission === 'granted') {
+              new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+            }
+          }
+        } catch (e) {
+          console.error('Could not show notification', e)
+        }
+      }
+
       this.setState({ userCall: tlm.fields.user_call })
       this.handleSetHeadTitle({ title: props.system.headTitle }, bell)
+
       if (!isMainTab) return
+
       this.audioCall.addEventListener('ended', function () {
         this.currentTime = 0
         this.play()
       }, false)
       this.audioCall.play()
-      if (Notification.permission === 'granted') {
-        return notification
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(function (permission) {
-          if (permission === 'granted') {
-            return notification
-          }
-        })
-      }
     }
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
       this.setState({ userCall: tlm.fields.user_call })
@@ -185,13 +196,6 @@ export class Tracim extends React.Component {
     props.dispatch(putSetIncomingUserCallState(props.user.userId, state.userCall.call_id, USER_CALL_STATE.ACCEPTED))
     this.handleSetHeadTitle({ title: props.system.headTitle })
     this.audioCall.pause()
-  }
-
-  handleClickOpenCallWindowCaller = () => {
-    const { state } = this
-    const isMainTab = this.liveMessageManager.eventSource !== null
-    if (!isMainTab) return
-    window.open(state.userCall.url)
   }
 
   handleClickRejectCall = () => {
@@ -218,7 +222,6 @@ export class Tracim extends React.Component {
         this.handleSetHeadTitle({ title: props.system.headTitle })
         this.audioCall.pause()
         if (!isMainTab) return
-        window.open(tlm.fields.user_call.url)
       }
       if (tlm.fields.user_call.state === (USER_CALL_STATE.CANCELLED)) {
         this.audioCall.pause()
@@ -549,6 +552,12 @@ export class Tracim extends React.Component {
     }))
   }
 
+  // INFO - MP - 2021-11-10 - Helper function
+  // Return the current time HH:mm
+  getHoursAndMinutes = () => {
+    return formatAbsoluteDate(new Date(), this.props.user.lang, { hour: '2-digit', minute: '2-digit' })
+  }
+
   render () {
     const { props, state } = this
     let callLink
@@ -625,14 +634,19 @@ export class Tracim extends React.Component {
                   icon='far fa-clock'
                 />
 
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickOpenCallWindowCallee}
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                />
+                <a href={state.userCall.url} target='_blank' rel='noopener noreferrer'>
+                  {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
+                  see https://github.com/tracim/tracim/issues/5242 */}
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    onClick={this.handleClickOpenCallWindowCallee}
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
+                  />
+                </a>
               </div>
             </div>
           </CardPopup>
@@ -658,15 +672,18 @@ export class Tracim extends React.Component {
                   text={props.t('Cancel the call')}
                   icon='fas fa-phone-slash'
                 />
-
-                <IconButton
-                  intent='primary'
-                  mode='light'
-                  onClick={this.handleClickOpenCallWindowCaller}
-                  text={props.t('Open call')}
-                  icon='fas fa-phone'
-                  color={GLOBAL_primaryColor} // eslint-disable-line camelcase
-                />
+                <a href={state.userCall.url} target='_blank' rel='noopener noreferrer'>
+                  {/* FIXME - MB - 2022-01-05 - a LinkButton should be created with the same style that IconButton
+                  see https://github.com/tracim/tracim/issues/5242 */}
+                  <IconButton
+                    intent='primary'
+                    mode='light'
+                    text={props.t('Open call')}
+                    icon='fas fa-phone'
+                    color={GLOBAL_primaryColor} // eslint-disable-line camelcase
+                    customClass='openCallButton'
+                  />
+                </a>
               </div>
             </div>
           </CardPopup>
@@ -677,7 +694,7 @@ export class Tracim extends React.Component {
             customClass='callpopup__body'
             customHeaderClass='primaryColorBg'
             onClose={this.handleClosePopup}
-            label={props.t('Call declined by {{username}}', { username: state.userCall.callee.public_name })}
+            label={props.t('Call declined by {{username}} at {{time}}', { username: state.userCall.callee.public_name, time: this.getHoursAndMinutes() })}
             faIcon='fas fa-phone-slash'
             displayCloseButton
           />
@@ -699,7 +716,7 @@ export class Tracim extends React.Component {
             customClass='callpopup__body'
             customHeaderClass='primaryColorBg'
             onClose={this.handleClosePopup}
-            label={props.t('Call failed')}
+            label={props.t('Call failed at {{time}}', { time: this.getHoursAndMinutes() })}
             faIcon='fas fa-phone-slash'
             displayCloseButton
           >
@@ -806,6 +823,15 @@ export class Tracim extends React.Component {
                 />
 
                 <Route
+                  path={[
+                    PAGE.WORKSPACE.ADVANCED_DASHBOARD(':idws')
+                  ]}
+                  render={() => (
+                    <OpenWorkspaceAdvanced />
+                  )}
+                />
+
+                <Route
                   path={PAGE.WORKSPACE.DASHBOARD(':idws')}
                   render={() => (
                     <div className='tracim__content fullWidthFullHeight'>
@@ -847,6 +873,12 @@ export class Tracim extends React.Component {
             exact
             path={PAGE.ADMIN.USER_EDIT(':userid')}
             render={() => <AdminAccount />}
+          />
+
+          <Route
+            exact
+            path={PAGE.ADMIN.USER_SPACE_LIST(':userid')}
+            render={() => <AdminAccount openSpacesManagement />}
           />
 
           <Route

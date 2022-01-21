@@ -5,25 +5,13 @@ import {
   AutoComplete,
   BtnSwitch,
   ConfirmPopup,
+  Popover,
   ROLE_LIST,
   SingleChoiceList
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 
 export class WorkspaceAdvancedConfiguration extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      popoverDefaultRoleInfoOpen: false
-    }
-  }
-
-  handleTogglePopoverDefaultRoleInfo = () => {
-    this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
-  }
-
   componentDidMount () {
     const { props } = this
     if (!props.isReadOnlyMode) {
@@ -45,7 +33,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
   }
 
   render () {
-    const { props, state } = this
+    const { props } = this
 
     return (
       <div className='workspace_advanced-content'>
@@ -105,17 +93,9 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
                 </button>
 
                 <Popover
-                  placement='bottom'
-                  isOpen={state.popoverDefaultRoleInfoOpen}
-                  target='popoverDefaultRoleInfo'
-                  // INFO - GB - 2020-11-16 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                  toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
-                  trigger={isMobile ? 'focus' : 'hover'}
-                >
-                  <PopoverBody>
-                    {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
-                  </PopoverBody>
-                </Popover>
+                  targetId='popoverDefaultRoleInfo'
+                  popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
+                />
               </div>
 
               <div className='workspace_advanced__defaultRole__list'>

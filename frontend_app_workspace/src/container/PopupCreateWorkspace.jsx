@@ -8,14 +8,14 @@ import {
   CUSTOM_EVENT,
   SingleChoiceList,
   handleFetchResult,
+  Popover,
   ROLE_LIST,
   sortWorkspaceList,
+  sendGlobalFlashMessage,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 import {
   getAllowedSpaceTypes,
   getUserSpaces,
@@ -46,7 +46,6 @@ export class PopupCreateWorkspace extends React.Component {
       newType: '',
       newName: '',
       parentOptions: [],
-      popoverDefaultRoleInfoOpen: false,
       showWarningMessage: false
     }
 
@@ -70,15 +69,6 @@ export class PopupCreateWorkspace extends React.Component {
     }))
     i18n.changeLanguage(data)
   }
-
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: 'warning',
-      delay: undefined
-    }
-  })
 
   componentDidMount () {
     this.getTypeList()
@@ -123,7 +113,7 @@ export class PopupCreateWorkspace extends React.Component {
           this.setState({ parentOptions: spaceList, newParentSpace: spaceList[0], isFirstStep: false })
           break
         }
-        default: this.sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
+        default: sendGlobalFlashMessage(props.t('Error while getting user spaces')); break
       }
     } else this.setState({ isFirstStep: true })
   }
@@ -154,18 +144,14 @@ export class PopupCreateWorkspace extends React.Component {
 
       case 400:
         switch (fetchPostSpace.body.code) {
-          case 2001: this.sendGlobalFlashMessage(props.t('Some input are invalid')); break
-          case 3007: this.sendGlobalFlashMessage(props.t('A space with that name already exists')); break
-          case 6001: this.sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
-          default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
+          case 2001: sendGlobalFlashMessage(props.t('Some input are invalid')); break
+          case 3007: sendGlobalFlashMessage(props.t('A space with that name already exists')); break
+          case 6001: sendGlobalFlashMessage(props.t('You cannot create anymore space')); break
+          default: sendGlobalFlashMessage(props.t('Error while saving new space')); break
         }
         break
-      default: this.sendGlobalFlashMessage(props.t('Error while saving new space')); break
+      default: sendGlobalFlashMessage(props.t('Error while saving new space')); break
     }
-  }
-
-  handleTogglePopoverDefaultRoleInfo = () => {
-    this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
   }
 
   getTypeList = async () => {
@@ -181,7 +167,7 @@ export class PopupCreateWorkspace extends React.Component {
         })
         break
       }
-      default: this.sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
+      default: sendGlobalFlashMessage(this.props.t('Error while saving new space')); break
     }
   }
 
@@ -268,17 +254,9 @@ export class PopupCreateWorkspace extends React.Component {
                   </button>
 
                   <Popover
-                    placement='bottom'
-                    isOpen={state.popoverDefaultRoleInfoOpen}
-                    target='popoverDefaultRoleInfo'
-                    // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                    toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
-                    trigger={isMobile ? 'focus' : 'hover'}
-                  >
-                    <PopoverBody>
-                      {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
-                    </PopoverBody>
-                  </Popover>
+                    targetId='popoverDefaultRoleInfo'
+                    popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
+                  />
                 </div>
 
                 <SingleChoiceList

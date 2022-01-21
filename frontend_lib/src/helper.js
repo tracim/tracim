@@ -20,6 +20,7 @@ export const PAGE = {
   CONTENT: (idcts = ':idcts') => `/ui/contents/${idcts}`,
   HOME: '/ui',
   WORKSPACE: {
+    ADVANCED_DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/advanced_dashboard`,
     ROOT: '/ui/workspaces',
     DASHBOARD: (idws = ':idws') => `/ui/workspaces/${idws}/dashboard`,
     NEW: (idws, type) => `/ui/workspaces/${idws}/contents/${type}/new`,
@@ -44,7 +45,8 @@ export const PAGE = {
     ROOT: '/ui/admin',
     WORKSPACE: '/ui/admin/workspace',
     USER: '/ui/admin/user',
-    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`
+    USER_EDIT: (userId = ':iduser') => `/ui/admin/user/${userId}`,
+    USER_SPACE_LIST: (userId = ':iduser') => `/ui/admin/user/${userId}/spaces`
   },
   SEARCH_RESULT: '/ui/search-result',
   GUEST_UPLOAD: (token = ':token') => `/ui/guest-upload/${token}`,
@@ -498,7 +500,8 @@ export const CONTENT_TYPE = {
   FILE: 'file',
   THREAD: 'thread',
   FOLDER: 'folder',
-  COMMENT: 'comment'
+  COMMENT: 'comment',
+  KANBAN: 'kanban'
 }
 
 // FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
@@ -517,16 +520,20 @@ export const TIMELINE_TYPE = {
 
 export const sortTimelineByDate = (timeline) => {
   return timeline.sort((a, b) => {
-    // INFO - CH - 20210322 - since we don't have the millisecond from backend, content created at the same second
-    // may very happen. So we sort on revision_id in that case. This isn't ideal
-    // As the aim is to have a stable sort revision_id is used since it is different for every timeline item.
-    // This would not be the case for content_id as it is the same for every revision item.
-    if (a.created_raw === b.created_raw) return parseInt(a.revision_id) - parseInt(b.revision_id)
+    // INFO - GB - 2021-12-07 - since we don't have the millisecond from backend, we can
+    // have contents created at the same second. So we sort on revision_id for revision,
+    // content_id for comments and we choose revision over comments if we have to sort between both.
+    if (a.created_raw === b.created_raw) {
+      if (a.revision_id && b.revision_id) return parseInt(a.revision_id) - parseInt(b.revision_id)
+      if (!a.revision_id && !b.revision_id) return parseInt(a.content_id) - parseInt(b.content_id)
+      else return a.revision_id ? -1 : 1
+    }
     return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
   })
 }
 
 export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
+  if (timeline.find(item => item.revision_id === data.content.current_revision_id)) return timeline
   // INFO - GB - 2020-05-29 In the filter below we use the names from the TLM message so they are not in camelCase and it is necessary to ignore the eslint rule.
   const {
     actives_shares, // eslint-disable-line camelcase
@@ -650,7 +657,7 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang) => new Date(rawDate).toLocaleString(lang)
+export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
 
 // Equality test done as numbers with the following rules:
 // - strings are converted to numbers before comparing
@@ -779,11 +786,11 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   }
 }
 
-export const sendGlobalFlashMessage = (msg, type, delay = undefined) => GLOBAL_dispatchEvent({
+export const sendGlobalFlashMessage = (msg, type = 'warning', delay = undefined) => GLOBAL_dispatchEvent({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {
     msg: msg, // INFO - RJ - 2021-03-17 - can be a string or a react element
-    type: type || 'warning',
+    type: type,
     delay: delay
   }
 })

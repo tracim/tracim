@@ -14,7 +14,7 @@ const getSelectedApp = function (appName) {
 
   /*
     global appHtmlDocument, appThread, appFile, appFolderAdvanced, appAdminWorkspaceUser, appWorkspaceAdvanced,
-    appAgenda, appShareFolderAdvanced, appCollaborativeDocumentEdition, appGallery, appWorkspace
+    appAgenda, appShareFolderAdvanced, appCollaborativeDocumentEdition, appGallery, appWorkspace, appKanban
   */
   try {
     switch (appName) {
@@ -40,6 +40,8 @@ const getSelectedApp = function (appName) {
         return (appCollaborativeDocumentEdition || { default: {} }).default
       case 'gallery':
         return (appGallery || { default: {} }).default
+      case 'kanban':
+        return (appKanban || { default: {} }).default
       default:
         return APP_NOT_LOADED
     }

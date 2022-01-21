@@ -6,6 +6,7 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
+  USER_CALL_STATE as USC,
   ACCESSIBLE_SPACE_TYPE_LIST
 } from 'tracim_frontend_lib'
 import {
@@ -98,7 +99,7 @@ export class ReduxTlmDispatcher extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FOLDER, handler: this.handleContentUnDeleted },
 
       // User call
-      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleNotification }
+      { entityType: TLM_ET.USER_CALL, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserCallNotification }
     ])
   }
 
@@ -178,7 +179,7 @@ export class ReduxTlmDispatcher extends React.Component {
     const { props } = this
     if (data.fields.author.user_id === props.user.userId) return
     const commentParentId = data.fields.content.parent_id
-    const response = await props.dispatch(getContent(data.fields.workspace.workspace_id, commentParentId))
+    const response = await props.dispatch(getContent(commentParentId))
 
     if (response.status !== 200) return
     const notificationData = {
@@ -271,6 +272,16 @@ export class ReduxTlmDispatcher extends React.Component {
       props.dispatch(updateWorkspaceSubscription(data.fields.subscription))
     }
     this.handleNotification(data)
+  }
+
+  handleUserCallNotification = data => {
+    const { props } = this
+    if (data.fields.author.user_id !== props.user.userId) {
+      if (data.fields.user_call.state === USC.CANCELLED ||
+        data.fields.user_call.state === USC.UNANSWERED) {
+        this.handleNotification(data)
+      }
+    }
   }
 
   render () {

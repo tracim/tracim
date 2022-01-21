@@ -93,6 +93,7 @@ const Comment = props => {
                           mode='dark'
                           onClick={props.onClickOpenFileComment}
                           text={props.t('Open as content')}
+                          textMobile={props.t('Open as content')}
                         />
                       )
                       : (
@@ -104,6 +105,7 @@ const Comment = props => {
                           onClick={props.onClickEditComment}
                           text={props.t('Edit')}
                           title={props.t('Edit comment')}
+                          textMobile={props.t('Edit comment')}
                         />
                       )
                     )}
@@ -117,6 +119,7 @@ const Comment = props => {
                         onClick={props.onClickDeleteComment}
                         text={props.t('Delete')}
                         title={props.t('Delete comment')}
+                        textMobile={props.t('Delete comment')}
                       />
                     )}
                   </DropdownMenu>
@@ -125,9 +128,12 @@ const Comment = props => {
             )}
 
             <div className='comment__body__content__textAndPreview'>
-              <div className='comment__body__content__text'>
+              <div
+                className='comment__body__content__text'
+              >
                 <div
                   className={classnames(`${props.customClass}__body__content__text`, 'comment__body__content__text')}
+                  data-cy='comment__body__content__text'
                 >
                   {(isFile
                     ? (

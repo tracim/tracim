@@ -53,6 +53,7 @@ import {
   WORKSPACE_MEMBER_ADD,
   WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_REMOVE,
+  WORKSPACE_MEMBER_UPDATE,
   WORKSPACE_PUBLICATION_LIST,
   WORKSPACE_READ_STATUS,
   ACCESSIBLE_WORKSPACE_LIST,
@@ -514,6 +515,21 @@ export const getMyselfWorkspaceList = (showOwnedWorkspace) => dispatch => {
   })
 }
 
+export const getWorkspaceList = () => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces`,
+    param: {
+      credentials: 'include',
+      headers: {
+        ...FETCH_CONFIG.headers
+      },
+      method: 'GET'
+    },
+    actionName: WORKSPACE_LIST,
+    dispatch
+  })
+}
+
 export const getWorkspaceDetail = (workspaceId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}`,
@@ -544,9 +560,9 @@ export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) =>
   })
 }
 
-export const getContent = (workspaceId, contentId) => dispatch => {
+export const getContent = (contentId) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/contents/${contentId}`,
+    url: `${FETCH_CONFIG.apiUrl}/contents/${contentId}`,
     param: {
       credentials: 'include',
       headers: {
@@ -664,6 +680,22 @@ export const deleteWorkspaceMember = (workspaceId, memberId) => dispatch => {
       method: 'DELETE'
     },
     actionName: WORKSPACE_MEMBER_REMOVE,
+    dispatch
+  })
+}
+
+export const updateWorkspaceMember = (workspaceId, memberId, newRole) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members/${memberId}`,
+    param: {
+      credentials: 'include',
+      headers: { ...FETCH_CONFIG.headers },
+      method: 'PUT',
+      body: JSON.stringify({
+        role: newRole
+      })
+    },
+    actionName: WORKSPACE_MEMBER_UPDATE,
     dispatch
   })
 }

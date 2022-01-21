@@ -169,15 +169,12 @@ class EventApi:
             )
         elif parent_ids and content_ids:
             query = query.filter(
-                or_(
-                    Event.content["content_id"].as_integer().in_(content_ids),
-                    Event.content["parent_id"].as_integer().in_(parent_ids),
-                )
+                or_(Event.content_id.in_(content_ids), Event.parent_id.in_(parent_ids),)
             )
         elif content_ids:
-            query = query.filter(Event.content["content_id"].as_integer().in_(content_ids))
+            query = query.filter(Event.content_id.in_(content_ids))
         elif parent_ids:
-            query = query.filter(Event.content["parent_id"].as_integer().in_(parent_ids))
+            query = query.filter(Event.parent_id.in_(parent_ids))
 
         if not include_not_sent:
             query = query.filter(Message.sent != None)  # noqa: E711
@@ -386,14 +383,13 @@ class EventApi:
         for event in event_query:
             try:
                 receiver_ids = BaseLiveMessageBuilder.get_receiver_ids(event, session, self._config)
-            except KeyError as exc:
+            except Exception as exc:
                 # NOTE - 2021-02-03 - S.G.
                 # Safeguard easy mistakes due to changing JSON structure of fields
                 msg = (
-                    "Event {} is missing key '{}' in one of its fields, "
-                    "ignoring it during historic messages creation"
+                    "Event {} is malformed " "ignoring it during historic messages creation"
                 ).format(event.event_id, exc)
-                logger.warning(self, msg)
+                logger.warning(self, msg, exc_info=True)
                 receiver_ids = []
             if user_id in receiver_ids:
                 messages.append(
@@ -870,6 +866,9 @@ class EventBuilder:
 
 
 def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[int]:
+    # INFO - G.M - 2022-01-10 - user is None case
+    if not event.fields.get(Event.USER_FIELD):
+        return None
     try:
         return session.query(User.user_id).filter(User.user_id == event.user["user_id"]).scalar()
     except (AttributeError, NoResultFound):

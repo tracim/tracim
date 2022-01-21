@@ -21,7 +21,7 @@ const CardPopup = props => {
             <div className='cardPopup__header__title'>
               <div className='cardPopup__header__title__icon'>
                 <i
-                  className={`${props.faIcon}`}
+                  className={`fa-fw ${props.faIcon}`}
                   style={{ color: props.customColor }}
                   title={props.label}
                 />
@@ -62,6 +62,8 @@ const CardPopup = props => {
 export default translate()(CardPopup)
 
 CardPopup.propTypes = {
+  label: PropTypes.string.isRequired,
+  faIcon: PropTypes.string,
   customClass: PropTypes.string,
   customHeaderClass: PropTypes.string,
   customColor: PropTypes.string,
@@ -73,6 +75,7 @@ CardPopup.propTypes = {
 
 CardPopup.defaultProps = {
   customClass: 'defaultCustomClass',
+  faIcon: '',
   customHeaderClass: '',
   customColor: '',
   onClose: () => { },

@@ -1,0 +1,11 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+.git/
+node_modules/
+src/debug.js
+dist/kanban.app.js
+dist/kanban.app.js.map
+dist/kanban.app.standalone.js
+dist/kanban.app.optimized.js
+dist/kanban.app.standalone.js.map
+test/fixture/defaultProps.js

@@ -5,5 +5,7 @@ node_modules/
 dist/workspace.app.js
 dist/workspace.app.js.map
 dist/workspace.app.standalone.js
+dist/workspace.app.optimized.js
 dist/workspace.app.standalone.js.map
 src/debug.js
+test/fixture/defaultProps.js

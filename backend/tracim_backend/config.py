@@ -8,6 +8,7 @@ from depot.manager import DepotManager
 from jsonschema import SchemaError
 from jsonschema.validators import validator_for
 from paste.deploy.converters import asbool
+from paste.deploy.converters import asint
 
 from tracim_backend.app_models.validator import update_validators
 from tracim_backend.apps import load_apps
@@ -257,6 +258,7 @@ class CFG(object):
             "contents/file,"
             "contents/html-document,"
             "contents/folder,"
+            "contents/kanban,"
             "agenda,"
             "share_content,"
             "upload_permission,"
@@ -287,6 +289,7 @@ class CFG(object):
             "contents/file",
             "contents/html-document",
             "contents/folder",
+            "contents/kanban",
             "agenda",
             "collaborative_document_edition",
             "share_content",
@@ -900,20 +903,25 @@ class CFG(object):
 
     def _load_call_config(self) -> None:
         prefix = "call"
-        self.CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
         raw_call_provider = self.get_raw_config("{}.provider".format(prefix), "")
+        self.CALL__ENABLED = asbool(self.get_raw_config("{}.enabled".format(prefix), "False"))
+        self.CALL__JITSI_MEET__URL = self.get_raw_config("{}.jitsi_meet.url".format(prefix))
         self.CALL__PROVIDER = CallProvider(raw_call_provider)
+        # NOTE - MP - 2021-11-17 - The value in the config file is in seconds. The frontend need the
+        # timeout to be in miliseconds, so it's multiplied by 1000
+        self.CALL__UNANSWERED_TIMEOUT = (
+            asint(self.get_raw_config("{}.unanswered_timeout".format(prefix), "30")) * 1000
+        )
         if self.CALL__ENABLED:
             self.check_mandatory_param(
                 "CALL__PROVIDER", raw_call_provider, when_str="when call is enabled",
             )
-        self.CALL__JITSI_MEET__URL = self.get_raw_config("{}.jitsi_meet.url".format(prefix))
-        if self.CALL__ENABLED and self.CALL__PROVIDER == CallProvider.JITSI_MEET:
-            self.check_mandatory_param(
-                "CALL__JITSI_MEET__URL",
-                self.CALL__JITSI_MEET__URL,
-                when_str="when call provider is jitsi_meet",
-            )
+            if self.CALL__PROVIDER == CallProvider.JITSI_MEET:
+                self.check_mandatory_param(
+                    "CALL__JITSI_MEET__URL",
+                    self.CALL__JITSI_MEET__URL,
+                    when_str="when call provider is jitsi_meet",
+                )
 
     # INFO - G.M - 2019-04-05 - Config validation methods
 

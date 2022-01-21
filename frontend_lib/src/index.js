@@ -111,6 +111,7 @@ import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPa
 
 import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
+import Popover from './component/Popover/Popover.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentArea from './component/Timeline/CommentArea.jsx'
@@ -166,6 +167,7 @@ import ShareLink from './component/ShareLink/ShareLink.jsx'
 import ProgressBar from './component/ProgressBar/ProgressBar.jsx'
 
 import RadioBtnGroup from './component/Input/RadioBtn/RadioBtn.jsx'
+import DateInput from './component/Input/DateInput/DateInput.jsx'
 
 import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
@@ -188,6 +190,7 @@ import {
   baseFetch,
   getContentPath,
   putEditContent,
+  postNewEmptyContent,
   postNewComment,
   putEditStatus,
   putContentArchived,
@@ -216,7 +219,10 @@ import {
   getWorkspaceContent,
   getHtmlDocTranslated,
   getCommentTranslated,
-  getGenericWorkspaceContent
+  getGenericWorkspaceContent,
+  getRawFileContent,
+  putRawFileContent,
+  postRawFileContent
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -269,6 +275,7 @@ export {
 
 export {
   appContentFactory,
+  DateInput,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -381,6 +388,7 @@ export {
   updateTLMUser,
   baseFetch,
   putEditContent,
+  postNewEmptyContent,
   postNewComment,
   putEditStatus,
   putContentArchived,
@@ -443,5 +451,9 @@ export {
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
   getGenericWorkspaceContent,
-  htmlToText
+  htmlToText,
+  getRawFileContent,
+  putRawFileContent,
+  postRawFileContent,
+  Popover
 }

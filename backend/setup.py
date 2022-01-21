@@ -8,7 +8,7 @@ requires = [
     "plaster_pastedeploy",
     "pyramid <2.0",
     "pyramid_debugtoolbar",
-    "pyramid_retry",
+    "pyramid_retry<2.0",
     "waitress",
     # Database
     "pyramid_tm",
@@ -33,7 +33,7 @@ requires = [
     "filedepot>=0.8.0",
     "babel",
     "python-slugify",
-    "preview-generator>=0.25",
+    "preview-generator>=0.28",
     "colour",
     "python-dateutil",
     "gitpython",
@@ -144,6 +144,8 @@ setup(
         ],
         "console_scripts": ["tracimcli = tracim_backend.command:main"],
         "tracimcli": [
+            # workspace
+            "space_move = tracim_backend.command.space:MoveSpaceCommand",
             # user
             "user_create = tracim_backend.command.user:CreateUserCommand",
             "user_update = tracim_backend.command.user:UpdateUserCommand",
