@@ -189,7 +189,15 @@ export class GroupedNotificationItem extends React.Component {
           </div>
         </div>
         <div className='notification__list__item__circle__wrapper'>
-          {!readStatus && <i className='notification__list__item__circle fas fa-circle' />}
+          {!readStatus &&
+          <i
+            className='notification__list__item__circle fas fa-circle'
+            onClick={(e) => {
+              notification.group.forEach(n => {
+                props.onClickCircle(n.id)
+              })
+            }}
+          />}
         </div>
       </Link>
 
@@ -203,6 +211,7 @@ export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotif
 GroupedNotificationItem.propTypes = {
   getNotificationDetails: PropTypes.func.isRequired,
   notification: PropTypes.object.isRequired,
+  onClickCircle: PropTypes.func.isRequired,
   onClickNotification: PropTypes.func.isRequired,
   shortDate: PropTypes.func.isRequired
 }
