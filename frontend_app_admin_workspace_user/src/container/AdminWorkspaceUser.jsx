@@ -124,10 +124,16 @@ export class AdminWorkspaceUser extends React.Component {
 
   sortUserList (userList) {
     return userList.sort((u1, u2) => {
-      if (u1.public_name < u2.public_name) return -1
-      if (u1.public_name > u2.public_name) return 1
-      if (u1.username < u2.username) return -1
-      if (u1.username > u2.username) return 1
+      const u1PublicName = (u1.public_name || '').toLowerCase()
+      const u2PublicName = (u2.public_name || '').toLowerCase()
+      const u1username = (u1.username || '').toLowerCase()
+      const u2username = (u2.username || '').toLowerCase()
+
+      if (u1PublicName < u2PublicName) return -1
+      if (u1PublicName > u2PublicName) return 1
+      if (u1username < u2username) return -1
+      if (u1username > u2username) return 1
+
       return u1.user_id - u2.user_id
     })
   }
