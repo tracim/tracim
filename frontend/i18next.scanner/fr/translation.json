@@ -514,7 +514,7 @@
     "Error while saving new news": "Erreur lors de l'enregistrement de la nouvelle actualité",
     " is calling you on Tracim": " vous appelle sur Tracim",
     "{{author}} called you": "{{author}} vous a appelé",
-    "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> a accepté votre appel. Si l'appel ne s'est pas ouvert, cliquez sur ce <3> lien </3></0> ",
+    "<0> <1>{{userCalleeName}}</1> has accepted your call. If the call has not opened click on this<3> link </3></0> ": "<0> <1>{{userCalleeName}}</1> a accepté votre appel. Si l'appel ne s'est pas ouvert, cliquez sur ce <3>lien</3></0> ",
     "Drag and drop your file here": "Glisser déposer un fichier ici",
     "You can also import your file by clicking here": "Vous pouvez aussi sélectionner votre fichier en cliquant ici",
     "The type of this file is not allowed": "Ce type de fichier n'est pas autorisé",
