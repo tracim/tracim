@@ -1,14 +1,14 @@
 {
-  "Validate and create": "Valider et créer",
-  "Topic's subject": "Sujet de la discussion",
-  "New Thread": "Nouvelle discussion",
-  "Threads": "Discussions",
-  "Start a topic": "Lancer une discussion",
-  "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
-  "Error while creating thread": "Erreur lors de la création de la discussion",
-  "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
-  "Thread": "Discussion",
-  "thread": "discussion",
-  "threads": "discussions",
-  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
+    "Validate and create": "Valider et créer",
+    "Topic's subject": "Sujet de la discussion",
+    "New Thread": "Nouvelle discussion",
+    "Threads": "Discussions",
+    "Start a topic": "Lancer une discussion",
+    "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
+    "Error while creating thread": "Erreur lors de la création de la discussion",
+    "Error while saving the comment": "Erreur pendant la sauvegarde du commentaire",
+    "Thread": "Discussion",
+    "thread": "discussion",
+    "threads": "discussions",
+    "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
 }
