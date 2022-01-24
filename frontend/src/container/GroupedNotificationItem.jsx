@@ -190,14 +190,14 @@ export class GroupedNotificationItem extends React.Component {
         </div>
         <div className='notification__list__item__circle__wrapper'>
           {!readStatus &&
-          <i
-            className='notification__list__item__circle fas fa-circle'
-            onClick={(e) => {
-              notification.group.forEach(n => {
-                props.onClickCircle(n.id)
-              })
-            }}
-          />}
+            <i
+              className='notification__list__item__circle fas fa-circle'
+              onClick={(e) => {
+                notification.group.forEach(n => {
+                  props.onClickCircle(n.id)
+                })
+              }}
+            />}
         </div>
       </Link>
 
