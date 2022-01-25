@@ -15,7 +15,7 @@ export const AgendaInfo = props => (
         <div>
           {props.introText}&nbsp;
           <a
-            className='primaryColorFont primaryColorFontDarkenHover'
+            className='agendaInfo__content__text__help primaryColorFont primaryColorFontDarkenHover'
             href='https://github.com/tracim/tracim/issues/1673'
             target='_blank'
             rel='noopener noreferrer'
