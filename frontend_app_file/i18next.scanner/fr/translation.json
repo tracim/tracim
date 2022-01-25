@@ -13,7 +13,6 @@
   "Change description": "Changer la description",
   "Error while saving the new description": "Erreur lors de l'enregistrement d'une nouvelle description",
   "Error while uploading file": "Erreur lors du téléchargement du fichier",
-  "Error while loading timeline": "Erreur lors du chargement de l'historique",
   "Files": "Fichiers",
   "Please wait until the upload ends": "Veuillez attendre la fin de l'envoi",
   "Error while loading file": "Erreur lors du chargement du fichier",
@@ -62,5 +61,6 @@
   "The file has been updated, it can't be edited anymore": "Le fichier a été mis à jour, il ne peut plus être édité",
   "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
   "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur",
-  "Tags": "Étiquettes"
+  "Tags": "Étiquettes",
+  "Delete": "__NOT_TRANSLATED__"
 }

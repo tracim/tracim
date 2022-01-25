@@ -526,5 +526,6 @@
   "Space management of the user {{userName}}": "Gestion des espaces de l'utilisateur {{userName}}",
   "Spaces membership": "Espaces affiliés",
   "Uploading…": "Téléversement en cours…",
-  "You cannot change this member role because there are no other space managers.": "Vous ne pouvez pas modifier ce rôle de membre car il n'y a pas d'autres responsables."
+  "You cannot change this member role because there are no other space managers.": "Vous ne pouvez pas modifier ce rôle de membre car il n'y a pas d'autres responsables.",
+  "Share a news...": "__NOT_TRANSLATED__"
 }

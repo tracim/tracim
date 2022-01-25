@@ -33,7 +33,6 @@
   "User created": "User created",
   "Email already exists": "Email already exists",
   "Password": "Password",
-  "Create the user": "Create the user",
   "Create a user": "Create a user",
   "Please set a password": "Please set a password",
   "Full name": "Full name",
@@ -47,5 +46,7 @@
   "Allowed characters: {{allowedCharactersUsername}}": "Allowed characters: {{allowedCharactersUsername}}",
   "Please enter a name, an email, a password and select a type": "Please enter a name, an email, a password and select a type",
   "Choose the user's type": "Choose the user's type",
-  "Type": "Type"
+  "Type": "Type",
+  "Create and add to spaces": "Create and add to spaces",
+  "Create": "Create"
 }

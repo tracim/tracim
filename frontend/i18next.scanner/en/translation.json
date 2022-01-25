@@ -526,5 +526,6 @@
   "Space management of the user {{userName}}": "Space management of the user {{userName}}",
   "Spaces membership": "Spaces membership",
   "Uploading…": "Uploading…",
-  "You cannot change this member role because there are no other space managers.": "You cannot change this member role because there are no other space managers."
+  "You cannot change this member role because there are no other space managers.": "You cannot change this member role because there are no other space managers.",
+  "Share a news...": "Share a news..."
 }

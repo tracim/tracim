@@ -526,5 +526,6 @@
   "Space management of the user {{userName}}": "Bereichsmanagement für den Benutzer {{userName}}",
   "Spaces membership": "Bereiche Mitgliedschaft",
   "Uploading…": "Hochladen…",
-  "You cannot change this member role because there are no other space managers.": "Sie können diese Mitgliederrolle nicht ändern, da es keine anderen Bereichsmanager gibt."
+  "You cannot change this member role because there are no other space managers.": "Sie können diese Mitgliederrolle nicht ändern, da es keine anderen Bereichsmanager gibt.",
+  "Share a news...": "__NOT_TRANSLATED__"
 }

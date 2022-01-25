@@ -526,5 +526,6 @@
   "Space management of the user {{userName}}": "Gestão dos espaços do utilizador {{userName}}",
   "Spaces membership": "Espaços afiliados",
   "Uploading…": "Carregando...",
-  "You cannot change this member role because there are no other space managers.": "Não se pode alterar a função deste membro porque não há outros gestores de espaço."
+  "You cannot change this member role because there are no other space managers.": "Não se pode alterar a função deste membro porque não há outros gestores de espaço.",
+  "Share a news...": "__NOT_TRANSLATED__"
 }

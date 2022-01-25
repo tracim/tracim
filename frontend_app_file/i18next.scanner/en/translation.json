@@ -13,7 +13,6 @@
   "Change description": "Change description",
   "Error while saving the new description": "Error while saving the new description",
   "Error while uploading file": "Error while uploading file",
-  "Error while loading timeline": "Error while loading timeline",
   "Files": "Files",
   "Please wait until the upload ends": "Please wait until the upload ends",
   "Error while loading file": "Error while loading file",
@@ -62,5 +61,6 @@
   "The file has been updated, it can't be edited anymore": "The file has been updated, it can't be edited anymore",
   "The content has been modified by {{author}}": "The content has been modified by {{author}}",
   "Error while saving the user configuration": "Error while saving the user configuration",
-  "Tags": "Tags"
+  "Tags": "Tags",
+  "Delete": "Delete"
 }
