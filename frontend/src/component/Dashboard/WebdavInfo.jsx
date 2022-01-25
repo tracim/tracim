@@ -11,9 +11,9 @@ export const WebdavInfo = props => (
     <div className='webdavInfo__content'>
       <div className='webdavInfo__content__text'>
         <div>
-          {props.introText}
+          {props.introText}&nbsp;
           <a
-            className='webdavInfo__content__text__help primaryColorFont primaryColorFontDarkenHover'
+            className='primaryColorFont primaryColorFontDarkenHover'
             href='https://github.com/tracim/tracim/issues/1674'
             target='_blank'
             rel='noopener noreferrer'
