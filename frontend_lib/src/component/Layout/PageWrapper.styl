@@ -9,7 +9,7 @@
 .pageTitleGeneric
   position relative
   padding-left pageSpacing
-  padding-right pageSpacing
+  padding-inline-end pageSpacing
   width 100%
   background-color offWhite
   border-bottom borderStyle
@@ -39,7 +39,10 @@
   .pageWrapperGeneric
     display block
     &__header
-      margin 95px 0 5px 30px
+      margin-top 95px
+      margin-inline-end 0
+      margin-bottom textSpacing
+      margin-inline-start pageSpacing
     &__content
       margin 0
 
