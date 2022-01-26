@@ -3,8 +3,6 @@
   "Last version": "Dernière version",
   "Validate and create": "Valider et créer",
   "Note's title": "Titre de la note",
-  "latest version: {{versionNumber}}": "dernière version : {{versionNumber}}",
-  "Version #{{versionNumber}}": "Version n°{{versionNumber}}",
   "Write a note": "Rédiger une note",
   "Notes": "Notes",
   "Edit": "Modifier",
@@ -30,5 +28,6 @@
   "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur",
   "Your text contains mentions that do not match any member of this space:": "Votre texte contient des mentions qui ne correspondent à aucun membre de cet espace :",
   "Validate anyway": "Valider quand même",
-  "Tags": "Étiquettes"
+  "Tags": "Étiquettes",
+  "Delete": "__NOT_TRANSLATED__"
 }

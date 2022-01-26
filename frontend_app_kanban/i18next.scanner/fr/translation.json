@@ -40,5 +40,8 @@
   "Delete this column": "Supprimer cette colonne",
   "Exit fullscreen mode": "Quitter le mode plein écran",
   "See more": "Voir plus",
-  "See less": "Voir moins"
+  "See less": "Voir moins",
+  "The file is larger than the maximum file size allowed": "__NOT_TRANSLATED__",
+  "Error, the space exceed its maximum size": "__NOT_TRANSLATED__",
+  "You have reached your storage limit, you cannot add new files": "__NOT_TRANSLATED__"
 }

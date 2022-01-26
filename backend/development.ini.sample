@@ -63,9 +63,9 @@ basic_setup.session_secret = change_this_value_please!
 ; debug = False
 
 
-### Lang ###
-## default lang used in backend if user doesn't provided any lang.
-# Available parameter: en, fr, pt, de
+### Language ###
+## default language used in backend if user do not set any language.
+# Available parameter: en, fr, pt, de, ar
 ; default_lang = en
 
 ### Apps ###
@@ -831,7 +831,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ## Translation service target languages that will be proposed in Tracim's interface
 # It is a comma-separated list of <ISO-639-1 language code>:<Language string to display> pairs.
 # The string can use any UTF-8 character.
-; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch
+; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch,ar:العربية
 # example:
 # translation_service.target_languages = fr:Français,ar:العربية,ja:日本語
 
