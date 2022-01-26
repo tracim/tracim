@@ -4,12 +4,12 @@
   .comment
     &.received
       .comment__header__text
-        padding-left calc(5% + 4px)
+        padding-inline-start calc(5% + 4px)
         padding-right 0
     &.sent
       .comment__header__text
         padding-right calc(5% + 4px)
-        padding-left 0
+        padding-inline-start 0
   &__header
     &__editionmode
       display none
@@ -29,7 +29,7 @@
         justify-content flex-end
         padding standardSpacing pageSpacing 0
       &__messagelist
-        padding-left pageSpacing
+        padding-inline-start pageSpacing
         padding-right pageSpacing
       &__content
         width 100%
