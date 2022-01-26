@@ -2,19 +2,24 @@ sidebar-animate-speed = 0.5s
 
 .sidebar
   &__expand
-    left sidebarWidth
-    position absolute
+    // left sidebarWidth
+    // position absolute
     display flex
     z-index 15
     align-items center
-    border-bottom-right-radius 15px
+    // border-bottom-right-radius 15px
     padding standardSpacing
     cursor pointer
     color offWhite
-    transition all sidebar-animate-speed
+    // transition all sidebar-animate-speed
     background-color var(--sidebarColor)
-    &.sidebarclose
-      left 0
+    // &.sidebarclose
+    //  left 0
+
+    &:hover
+      background-color var(--sidebarColorDarken)
+    & i
+      margin-inline-start auto
   &__frame
     position relative
     transition all sidebar-animate-speed
