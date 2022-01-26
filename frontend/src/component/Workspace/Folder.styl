@@ -106,7 +106,7 @@ folderopen()
         text-overflow ellipsis
         overflow hidden
       i
-        margin-right: 1ex
+        margin-inline-end 1ex
       color darkGrey
       font-weight bold
       ^[0].read > div > ^[1] &, ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name
@@ -124,7 +124,7 @@ folderopen()
         &:hover > .folder__header__name__addbtn__text
           color offWhite
         &__text
-          margin-right standardSpacing
+          margin-inline-end standardSpacing
           &::after
             margin-left 20px
           &-desktop
@@ -144,7 +144,7 @@ folderopen()
   .folder
     &__header
       &__button__addbtn__text
-        margin-right standardSpacing
+        margin-inline-end standardSpacing
       &__status
         display none
 
@@ -152,7 +152,7 @@ folderopen()
   .folder
     &__header
       &__button__addbtn__text
-        margin-right standardSpacing
+        margin-inline-end standardSpacing
       &__status
         display none
       &__button__addbtn__text
