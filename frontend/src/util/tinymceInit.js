@@ -1,6 +1,7 @@
 import i18n from './i18n.js'
 import { uniqueId } from 'lodash'
 import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
+import i18next from 'i18next'
 
 (function () {
   function base64EncodeAndTinyMceInsert (files) {
@@ -86,6 +87,7 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
 
     globalThis.tinymce.init({
       selector: selector,
+      directionality: i18next.dir(),
       language: getTinyMceLang(lang),
       menubar: false,
       resize: false,
