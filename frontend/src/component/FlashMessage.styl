@@ -4,7 +4,7 @@
   position fixed
   display flex
   justify-content center
-  margin-left calc(50% - 400px)
+  margin-inline-start calc(50% - 400px)
   z-index 60
   &__container
     margin-top 50px
@@ -14,21 +14,24 @@
     background lightGrey
     box-shadow shadow-all
     overflow hidden
+    &__body
+      display flex
     &__header
-      border-top-right-radius 10px
-      border-top-left-radius 10px
+      border-start-end-radius 10px
+      border-start-start-radius 10px
       width 100%
       height 8px
     &__close
       float right
       margin 5px 0 0 0
       &__icon
-        padding-right standardSpacing
+        padding-inline-end standardSpacing
         cursor pointer
     &__content
       display flex
       align-items center
       margin standardSpacing 0
+      flex 1
       &__icon
         padding 0 25px
         font-size bigIconSize
@@ -36,14 +39,14 @@
         &__title
           font-weight bold
         &__paragraph
-          padding-right 20px
+          padding-inline-end 20px
 
 .connection_error
   z-index 2000
 
 @media (max-width: max-sm)
   .flashmessage
-    margin-left 0px
+    margin-inline-start 0px
     width 100%
     &__container
       width 100%
