@@ -1,5 +1,11 @@
 sidebar-animate-speed = 0.5s
 
+[dir=ltr] .sidebar
+  box-shadow -1px 2px 2px 1px var(--sidebarColor)
+
+[dir=rtl] .sidebar
+  box-shadow 1px 2px 2px 1px var(--sidebarColor)
+
 .sidebar
   background-color var(--sidebarColor)
   z-index 10
@@ -31,12 +37,6 @@ sidebar-animate-speed = 0.5s
     position relative
     transition all sidebar-animate-speed
     width sidebarWidth
-    @include if-ltr {
-      box-shadow -1px 2px 2px 1px var(--sidebarColor)
-    }
-    @include if-rtl {
-      box-shadow 1px 2px 2px 1px var(--sidebarColor)
-    }
     &.sidebarclose
       width 0
       overflow hidden
