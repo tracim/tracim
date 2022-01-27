@@ -7,7 +7,7 @@ sidebar-animate-speed = 0.5s
     display flex
     z-index 15
     align-items center
-    border-bottom-right-radius 15px
+    border-end-end-radius 15px
     padding standardSpacing
     cursor pointer
     color offWhite
@@ -43,7 +43,7 @@ sidebar-animate-speed = 0.5s
     justify-content center
     align-items center
     border 1px solid var(--sidebarColor)
-    border-top-right-radius 15px
+    border-start-end-radius 15px
     padding 8px 12px
     cursor pointer
     color offWhite
@@ -56,15 +56,15 @@ sidebar-animate-speed = 0.5s
     &.sidebarclose
       width 0
     &__workspace
-      padding-left 0
+      padding-inline-start 0
       list-style none
     &__item
       align-items center
-      border-left-width 0
-      border-left-style solid
+      border-inline-start-width 0
+      border-inline-start-style solid
       border-bottom 1px solid var(--sidebarColorDarken)
       display flex
-      padding-left 5px
+      padding-inline-start textSpacing
       &:hover
         background-color var(--sidebarColorDarken)
       &__withoutChildren
@@ -87,7 +87,7 @@ sidebar-animate-speed = 0.5s
         &::after
           display none
       &__dragNdrop
-        margin-left 5px
+        margin-inline-start 5px
       &__wrapper
         display flex
         align-items center
@@ -111,9 +111,9 @@ sidebar-animate-speed = 0.5s
         overflow hidden
         text-overflow ellipsis
       &__current
-        padding-left 0
+        padding-inline-start 0
         background-color var(--sidebarColorLighten)
-        border-left-width 5px
+        border-inline-start-width 5px
         font-weight bold
   &__footer
     margin-top auto
