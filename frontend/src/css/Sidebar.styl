@@ -1,18 +1,22 @@
 sidebar-animate-speed = 0.5s
 
 .sidebar
+  background-color var(--sidebarColor)
+  z-index 10
+
   &__expand
+    // background-color var(--sidebarColor)
+    // border-end-end-radius 15px
     // left sidebarWidth
     // position absolute
-    display flex
-    z-index 15
+    // transition all sidebar-animate-speed
+    // z-index 15
     align-items center
-    // border-end-end-radius 15px
-    padding standardSpacing
     cursor pointer
     color offWhite
-    // transition all sidebar-animate-speed
-    background-color var(--sidebarColor)
+    display flex
+    min-width 30px
+    padding standardSpacing
     // &.sidebarclose
     //  left 0
 
@@ -21,18 +25,18 @@ sidebar-animate-speed = 0.5s
     & i
       margin-inline-start auto
   &__frame
+    // background-color var(--sidebarColor)
+    // z-index 10
+    height "calc(100vh - %s)" % headerHeight
     position relative
     transition all sidebar-animate-speed
     width sidebarWidth
-    height "calc(100vh - %s)" % headerHeight
-    z-index 10
     @include if-ltr {
       box-shadow -1px 2px 2px 1px var(--sidebarColor)
     }
     @include if-rtl {
       box-shadow 1px 2px 2px 1px var(--sidebarColor)
     }
-    background-color var(--sidebarColor)
     &.sidebarclose
       width 0
       overflow hidden
