@@ -283,7 +283,7 @@ export class FeedItemWithPreview extends React.Component {
     } else {
       return state.isDiscussionDisplayed
         ? props.t('Hide comment area')
-        : props.t('Comment')
+        : props.t('Comment', { context: 'verb' })
     }
   }
 
