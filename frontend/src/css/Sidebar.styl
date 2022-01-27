@@ -178,3 +178,16 @@ sidebar-animate-speed = 0.5s
     &__frame
       position absolute
       min-height "calc(100% - %s)" % headerHeight
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-end-end-radius and border-start-end-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+[dir=ltr] .sidebar
+  &__expand
+    border-bottom-right-radius 15px
+  &__scrollup
+    border-top-right-radius 15px
+[dir=rtl] .sidebar
+  &__expand
+    border-bottom-left-radius 15px
+  &__scrollup
+    border-top-left-radius 15px

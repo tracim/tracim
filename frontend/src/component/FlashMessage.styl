@@ -50,3 +50,9 @@
     width 100%
     &__container
       width 100%
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius and border-start-start-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+.flashmessage__container__header
+  border-top-right-radius 10px
+  border-top-left-radius 10px

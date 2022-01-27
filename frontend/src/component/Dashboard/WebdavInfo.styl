@@ -32,3 +32,21 @@
 @media (max-width: max-xs)
   .webdavInfo__content
     font-size metadataFontSize
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius, border-end-start-radius
+// border-start-start-radius and border-end-end-radius are new and have a global usage below 90% according to
+// https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+[dir=ltr] .webdavInfo__content__link
+  &__icon
+    border-top-left-radius standardBorderRadius
+    border-bottom-left-radius standardBorderRadius
+  &__url
+    border-top-right-radius standardBorderRadius
+    border-bottom-right-radius standardBorderRadius
+[dir=rtl] .webdavInfo__content__link
+  &__icon
+    border-top-right-radius standardBorderRadius
+    border-bottom-right-radius standardBorderRadius
+  &__url
+    border-top-left-radius standardBorderRadius
+    border-bottom-left-radius standardBorderRadius

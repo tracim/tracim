@@ -64,3 +64,10 @@
       padding standardSpacing
     &__body
       padding 0 standardSpacing standardSpacing
+
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius and border-start-start-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+.cardPopup__border
+  border-top-right-radius standardBorderRadius
+  border-top-left-radius standardBorderRadius
