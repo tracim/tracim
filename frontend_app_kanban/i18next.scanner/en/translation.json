@@ -40,5 +40,8 @@
   "Delete this column": "Delete this column",
   "Exit fullscreen mode": "Exit fullscreen mode",
   "See more": "See more",
-  "See less": "See less"
+  "See less": "See less",
+  "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
+  "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
+  "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files"
 }

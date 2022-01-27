@@ -3,8 +3,6 @@
   "Last version": "Letzte Version",
   "Validate and create": "Validieren und erstellen",
   "Note's title": "Titel des Hinweises",
-  "latest version: {{versionNumber}}": "letzte Version: {{versionNumber}}",
-  "Version #{{versionNumber}}": "Version #{{versionNumber}}",
   "Write a note": "Hinweis schreiben",
   "Notes": "Hinweise",
   "Edit": "Bearbeiten",
@@ -30,5 +28,6 @@
   "Error while saving the user configuration": "Fehler beim Speichern der Benutzerkonfiguration",
   "Your text contains mentions that do not match any member of this space:": "Ihr Text enthält Erwähnungen, die mit keinem Mitglied dieses Bereichs übereinstimmen:",
   "Validate anyway": "Trotzdem validieren",
-  "Tags": "Markierungen"
+  "Tags": "Markierungen",
+  "Delete": "__NOT_TRANSLATED__"
 }

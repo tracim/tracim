@@ -29,14 +29,7 @@ export const FlashMessage = props => {
         <div className='flashmessage__container card'>
           <div className={classnames('flashmessage__container__header', `bg-${dataType.id}`)} />
 
-          <div className='card-body nopadding'>
-            {props.showCloseButton && (
-              <div className='flashmessage__container__close'>
-                <div className='flashmessage__container__close__icon' onClick={() => props.onRemoveFlashMessage(props.flashMessage[0].message)}>
-                  <i className='fas fa-times' />
-                </div>
-              </div>
-            )}
+          <div className='card-body nopadding flashmessage__container__body'>
             <div className='flashmessage__container__content'>
               <div className={classnames('flashmessage__container__content__icon', `text-${dataType.id}`)}>
                 <i className={classnames(`${dataType.icon}`)} />
@@ -52,6 +45,14 @@ export const FlashMessage = props => {
                 </div>
               </div>
             </div>
+
+            {props.showCloseButton && (
+              <div className='flashmessage__container__close'>
+                <div className='flashmessage__container__close__icon' onClick={() => props.onRemoveFlashMessage(props.flashMessage[0].message)}>
+                  <i className='fas fa-times' />
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

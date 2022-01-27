@@ -15,8 +15,8 @@
     background lightGrey
     box-shadow shadow-all
   &__border
-    border-top-right-radius standardBorderRadius
-    border-top-left-radius standardBorderRadius
+    border-start-end-radius standardBorderRadius
+    border-start-start-radius standardBorderRadius
     width 100%
     height standardSpacing
   &__header
@@ -54,7 +54,7 @@
         margin-inline-start standardSpacing
 
 .openCallButton
-  margin-left standardSpacing
+  margin-inline-start standardSpacing
   // FIXME - MB - 2022-01-05 - this should be removed when a LinkButton is created
   // see https://github.com/tracim/tracim/issues/5242
 

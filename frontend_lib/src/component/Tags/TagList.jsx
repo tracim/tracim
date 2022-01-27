@@ -189,7 +189,6 @@ class TagList extends React.Component {
             {state.tagList && state.tagList.map((tag, index) =>
               <li
                 className={classnames(
-                  'tagList__list__item_wrapper',
                   { tagList__list__item__last: state.tagList.length === index + 1 }
                 )}
                 key={tag.tag_id}
