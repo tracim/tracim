@@ -33,7 +33,6 @@
   "User created": "Utilisateur créé",
   "Email already exists": "Email déjà utilisé",
   "Password": "Mot de passe",
-  "Create the user": "Créer l'utilisateur",
   "Create a user": "Créer un utilisateur",
   "Please enter a name, an email, a password and select a type": "Veuillez saisir un nom, un email, un mot de passe et sélectionner un type",
   "Please set a password": "Veuillez définir un mot de passe",
@@ -47,5 +46,7 @@
   "Username": "Identifiant",
   "Allowed characters: {{allowedCharactersUsername}}": "Caractères autorisés : {{allowedCharactersUsername}}",
   "Choose the user's type": "Choisir le type d'utilisateur",
-  "Type": "Type"
+  "Type": "Type",
+  "Create and add to spaces": "__NOT_TRANSLATED__",
+  "Create": "__NOT_TRANSLATED__"
 }

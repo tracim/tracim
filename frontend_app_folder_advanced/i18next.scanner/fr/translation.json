@@ -12,5 +12,6 @@
   "This folder is archived": "Ce dossier est archivé",
   "This folder is deleted": "Ce dossier est supprimé",
   "Error while loading Tracim's content type list": "Erreur lors du chargement des types de contenus Tracim",
-  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
+  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
+  "Delete": "__NOT_TRANSLATED__"
 }

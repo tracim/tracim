@@ -8,9 +8,9 @@
   height 40px
   &__icon
     font-size bigIconSize
-    margin-right standardSpacing
+    margin-inline-end standardSpacing
   &__title
-    margin-right auto
+    margin-inline-end auto
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
@@ -20,11 +20,12 @@
       &:hover
         text-decoration underline fontColor
   &__right
-    margin-left standardSpacing
-    text-align right
+    margin-inline-start standardSpacing
+    text-align end
     align-items flex-end
   &__unavailable
     font-style italic
+    padding-inline-end standardSpacing
   &__actionMenu
     &.dropdownMenuButton
       padding 0 (standardSpacing * 2)

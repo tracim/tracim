@@ -3,6 +3,7 @@ import flagEn from '../img/flag_en.png'
 import flagFr from '../img/flag_fr.png'
 import flagPt from '../img/flag_pt.png'
 import flagDe from '../img/flag_de.png'
+import flagAr from '../img/flag_ar.png'
 
 const defaultLang = [{
   id: 'en',
@@ -20,6 +21,10 @@ const defaultLang = [{
   id: 'de',
   label: 'Deutsch',
   icon: flagDe
+}, {
+  id: 'ar',
+  label: 'العربية',
+  icon: flagAr
 }]
 
 export function lang (state = defaultLang, action) {

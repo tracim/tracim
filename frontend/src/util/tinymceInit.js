@@ -4,6 +4,13 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
 import i18next from 'i18next'
 
 (function () {
+  // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
+  // but Tracim only uses the main language code
+  const TINY_MCE_LANGUAGE = {
+    fr: 'fr_FR',
+    pt: 'pt_PT'
+  }
+
   function base64EncodeAndTinyMceInsert (files) {
     for (let i = 0; i < files.length; i++) {
       if (files[i].size > 1000000) {
@@ -56,21 +63,6 @@ import i18next from 'i18next'
       return parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
     }
 
-    // TODO - GM - 2020/05/07 - find a better way to handle language support in order to make it more generic
-    // see: https://github.com/tracim/tracim/issues/3011
-    const getTinyMceLang = (lang) => {
-      switch (lang) {
-        case 'fr':
-          return 'fr_FR'
-        case 'pt':
-          return 'pt_PT'
-        case 'de':
-          return 'de'
-        default:
-          return lang
-      }
-    }
-
     const hiddenTinymceFileInput = document.createElement('input')
     hiddenTinymceFileInput.id = 'hidden_tinymce_fileinput'
     hiddenTinymceFileInput.type = 'file'
@@ -88,7 +80,7 @@ import i18next from 'i18next'
     globalThis.tinymce.init({
       selector: selector,
       directionality: i18next.dir(),
-      language: getTinyMceLang(lang),
+      language: TINY_MCE_LANGUAGE[lang] || lang,
       menubar: false,
       resize: false,
       skin: 'lightgray',

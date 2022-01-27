@@ -12,7 +12,7 @@
     & > i
       font-size titleFontSize
   .selectStatus
-    margin-right standardSpacing
+    margin-inline-end standardSpacing
   &__contentpage
     width 100%
     &__left
@@ -37,11 +37,11 @@
         background-color #fee498
         border-radius standardBorderRadius
         &__msg > i
-          margin-right 8px
+          margin-inline-end textSpacing
         &__btnrestore
           cursor pointer
           & > i
-            margin-right 8px
+            margin-inline-end textSpacing
           &.link
             color #453d9b
             &:hover
@@ -51,10 +51,10 @@
         display flex
         justify-content flex-end
         align-items center
-        text-align right
+        text-align end
         opacity 0.7
       &__lastversion
-        margin-left standardSpacing
+        margin-inline-start standardSpacing
         font-weight bold
       &__text
         font-size metadataFontSize
@@ -74,7 +74,7 @@
           color white
           font-size 17px
           & > i
-            margin-right standardSpacing
+            margin-inline-end standardSpacing
             color darkGrey
             font-size titleFontSize
         &__date
