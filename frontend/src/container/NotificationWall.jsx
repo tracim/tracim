@@ -60,6 +60,14 @@ export class NotificationWall extends React.Component {
       e.preventDefault()
     }
 
+    this.handleReadNotification(notificationId)
+
+    props.onCloseNotificationWall()
+  }
+
+  handleReadNotification = async (notificationId) => {
+    const { props } = this
+
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
       case 204: {
@@ -69,8 +77,6 @@ export class NotificationWall extends React.Component {
       default:
         props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }
-
-    props.onCloseNotificationWall()
   }
 
   handleClickSeeMore = async () => {
@@ -463,6 +469,7 @@ export class NotificationWall extends React.Component {
                       getNotificationDetails={this.getNotificationDetails}
                       notification={notification}
                       onClickNotification={this.handleClickNotification}
+                      onClickCircle={this.handleReadNotification}
                       shortDate={this.shortDate}
                     />
                   )
@@ -471,6 +478,7 @@ export class NotificationWall extends React.Component {
                       getNotificationDetails={this.getNotificationDetails}
                       notification={notification}
                       onClickNotification={this.handleClickNotification}
+                      onClickCircle={this.handleReadNotification}
                       shortDate={this.shortDate}
                       user={props.user}
                     />

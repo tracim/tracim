@@ -68,13 +68,17 @@
           overflow hidden
           font-weight bold
       &__circle
+        font-size wallCircleSize
+        transition 300ms font-size color
+        color lightBlue
+        margin -20px -10px
+        padding 20px 10px
+        &:hover
+            filter brightness(0.7)
         &__wrapper
           margin 0
           min-width 1em
           text-align center
-        font-size 8px
-        transition 300ms font-size color
-        color lightBlue
       &.itemRead
         color lightDarkGrey
         background-color offWhite
