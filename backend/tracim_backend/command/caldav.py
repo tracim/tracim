@@ -5,6 +5,7 @@ import plaster
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend.applications.agenda.lib import AgendaApi
+from tracim_backend.applications.agenda.lib import AgendaCreationState
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaServerConnectionError
 from tracim_backend.exceptions import CannotCreateAgendaResource
@@ -63,9 +64,9 @@ class CaldavSyncCommand(AppContextCommand):
         nb_error_agenda_access = 0
         for user in users:
             try:
-                already_exist = self._agenda_api.ensure_user_agenda_exists(user)
-                if not already_exist:
-                    print("New created agenda for user {}".format(user))
+                state = self._agenda_api.sync_user_agenda(user=user)
+                if state == AgendaCreationState.CREATED:
+                    print("New created agenda for user {}".format(user.user_id))
             except CannotCreateAgendaResource as exc:
                 nb_error_agenda_access += 1
                 print("Cannot create agenda for user {}".format(user.user_id))
@@ -89,19 +90,19 @@ class CaldavSyncCommand(AppContextCommand):
         nb_agenda_enabled_workspace = 0
         for workspace in workspaces:
             nb_workspaces += 1
-            if workspace.agenda_enabled:
-                nb_agenda_enabled_workspace += 1
-                try:
-                    already_exist = self._agenda_api.ensure_workspace_agenda_exists(workspace)
-                    if not already_exist:
-                        print("New created agenda for workspace {}".format(workspace.workspace_id))
-                except CannotCreateAgendaResource as exc:
-                    print("Cannot create agenda for workspace {}".format(workspace.workspace_id))
-                    logger.exception(self, exc)
-                except AgendaServerConnectionError as exc:
-                    nb_error_agenda_access += 1
-                    print("Cannot access to agenda server: connection error.")
-                    logger.exception(self, exc)
+            try:
+                state = self._agenda_api.sync_workspace_agenda(workspace=workspace)
+                if state in [AgendaCreationState.CREATED, AgendaCreationState.EXISTING]:
+                    nb_agenda_enabled_workspace += 1
+                if state == AgendaCreationState.CREATED:
+                    print("New created agenda for workspace {}".format(workspace.workspace_id))
+            except CannotCreateAgendaResource as exc:
+                print("Cannot create agenda for workspace {}".format(workspace.workspace_id))
+                logger.exception(self, exc)
+            except AgendaServerConnectionError as exc:
+                nb_error_agenda_access += 1
+                print("Cannot access to agenda server: connection error.")
+                logger.exception(self, exc)
         nb_verified_workspace_agenda = nb_agenda_enabled_workspace - nb_error_agenda_access
         nb_workspace_without_agenda_enabled = nb_workspaces - nb_agenda_enabled_workspace
         print(
