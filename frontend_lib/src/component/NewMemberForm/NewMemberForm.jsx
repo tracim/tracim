@@ -14,7 +14,6 @@ export const NewMemberForm = props => {
       <div className='memberlist__form__member'>
         <div className='memberlist__form__title'>
           {props.t('Add a member')}
-
           <div
             className='memberlist__form__close'
             onClick={props.onClickCloseAddMemberBtn}
