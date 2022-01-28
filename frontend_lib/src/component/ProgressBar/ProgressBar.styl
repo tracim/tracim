@@ -65,3 +65,21 @@
   border-inline-end 0
   -webkit-transform-origin center right
   transform-origin center right
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius, border-end-start-radius
+// border-start-start-radius and border-end-end-radius are new and have a global usage below 90% according to
+// https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+[dir=ltr] .progress
+  & .progress-left .progress-bar
+    border-top-right-radius 80px
+    border-bottom-right-radius 80px
+  & .progress-right .progress-bar
+    border-top-left-radius 80px
+    border-bottom-left-radius 80px
+[dir=rtl] .progress
+  & .progress-left .progress-bar
+    border-top-left-radius 80px
+    border-bottom-left-radius 80px
+  & .progress-right .progress-bar
+    border-top-right-radius 80px
+    border-bottom-right-radius 80px
