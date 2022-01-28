@@ -23,6 +23,12 @@ folderopen()
   visibility visible
   transition opacity 0.3s
 
+[dir=ltr] .folder__header__triangleborder
+  left -1px
+
+[dir=rtl] .folder__header__triangleborder
+  right -1px
+
 .folder
   padding-inline-start 20px
   .folder__header
@@ -59,7 +65,6 @@ folderopen()
       display none
       position absolute
       bottom -16px
-      left -1px
       border-style solid
       border-width 16px 21px 0 21px
       border-color grey transparent transparent transparent
