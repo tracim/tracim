@@ -86,10 +86,10 @@ import i18next from 'i18next'
       skin: 'lightgray',
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
+      plugins: 'advlist anchor autolink charmap code contextmenu directionality fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
+        'ltr rtl | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
       ],
       insert_button_items: 'media anchor insertdatetime',
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
