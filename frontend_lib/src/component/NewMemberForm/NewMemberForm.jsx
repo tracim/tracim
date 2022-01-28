@@ -11,12 +11,17 @@ import SingleChoiceList from '../Input/SingleChoiceList/SingleChoiceList.jsx'
 export const NewMemberForm = props => {
   return (
     <div className='memberlist__form'>
-      <div className='memberlist__form__close' onClick={props.onClickCloseAddMemberBtn}>
-        <i className='fas fa-times' />
-      </div>
-
       <div className='memberlist__form__member'>
-        <div className='memberlist__form__title'>{props.t('Add a member')}</div>
+        <div className='memberlist__form__title'>
+          {props.t('Add a member')}
+          <div
+            className='memberlist__form__close'
+            onClick={props.onClickCloseAddMemberBtn}
+            title={props.t('Close')}
+          >
+            <i className='fas fa-times' />
+          </div>
+        </div>
 
         <div className='memberlist__form__member__name'>
           <label className='name__label' htmlFor='addmember'>
