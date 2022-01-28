@@ -1,28 +1,32 @@
 sidebar-animate-speed = 0.5s
 
+[dir=ltr] .sidebar
+  box-shadow -1px 2px 2px 1px var(--sidebarColor)
+
+[dir=rtl] .sidebar
+  box-shadow 1px 2px 2px 1px var(--sidebarColor)
+
 .sidebar
+  background-color var(--sidebarColor)
+  z-index 10
+
   &__expand
-    left sidebarWidth
-    position absolute
-    display flex
-    z-index 15
     align-items center
-    border-end-end-radius 15px
-    padding standardSpacing
     cursor pointer
     color offWhite
-    transition all sidebar-animate-speed
-    background-color var(--sidebarColor)
-    &.sidebarclose
-      left 0
+    display flex
+    min-width sidebarWidthReduced
+    padding standardSpacing
+
+    &:hover
+      background-color var(--sidebarColorDarken)
+    & i
+      margin-inline-start auto
   &__frame
+    height "calc(100vh - %s)" % headerHeight
     position relative
     transition all sidebar-animate-speed
     width sidebarWidth
-    height "calc(100vh - %s)" % headerHeight
-    z-index 10
-    box-shadow -1px 2px 2px 1px var(--sidebarColor)
-    background-color var(--sidebarColor)
     &.sidebarclose
       width 0
       overflow hidden
@@ -60,8 +64,6 @@ sidebar-animate-speed = 0.5s
       list-style none
     &__item
       align-items center
-      border-inline-start-width 0
-      border-inline-start-style solid
       border-bottom 1px solid var(--sidebarColorDarken)
       display flex
       padding-inline-start textSpacing
@@ -112,8 +114,9 @@ sidebar-animate-speed = 0.5s
         text-overflow ellipsis
       &__current
         padding-inline-start 0
-        background-color var(--sidebarColorLighten)
+        border-inline-start-style solid
         border-inline-start-width 5px
+        background-color var(--sidebarColorLighten)
         font-weight bold
   &__footer
     margin-top auto

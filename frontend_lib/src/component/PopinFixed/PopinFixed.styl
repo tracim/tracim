@@ -1,13 +1,19 @@
 @import '../../css/Variable.styl'
 
+[dir=ltr] .wsContentGeneric
+  right 0
+
+[dir=rtl] .wsContentGeneric
+  left 0
+
 .wsContentGeneric
   position fixed
   top headerHeight
-  right 0
   width 100%
+  max-width "calc(100% - %s)" % sidebarWidthReduced
   height "calc(100% - %s)" % headerHeight
   background-color lightGrey
-  z-index 9
+  z-index 15
   &.sidebarVisible
     max-width "calc(100% - %s)" % sidebarWidth
   &.visible
