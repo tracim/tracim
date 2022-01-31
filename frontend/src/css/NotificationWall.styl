@@ -1,7 +1,12 @@
+[dir=ltr] .notification
+  right 0
+
+[dir=rtl] .notification
+  left 0
+
 .notification
   position fixed
   top headerHeight
-  right 0
   width 40%
   height "calc(100% - %s)" % headerHeight
   background-color offWhite
@@ -127,7 +132,3 @@
       display none
     & > .genericButton__icon
       margin 0px
-
-
-[dir=rtl] .notification
-  left 0
