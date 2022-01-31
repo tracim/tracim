@@ -92,7 +92,7 @@ class WorkspaceListItem extends React.Component {
           props.level > 0 && (
             <div
               style={{
-                marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
+                marginInlineStart: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
               }}
             />
           )
