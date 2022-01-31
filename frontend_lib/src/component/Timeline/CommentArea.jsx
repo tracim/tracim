@@ -10,6 +10,7 @@ import {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
+import { autoCompleteItem } from '../../helper.js'
 import {
   getLocalStorageItem,
   LOCAL_STORAGE_FIELD,
@@ -19,16 +20,6 @@ import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
-
-const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
-
-const seekUsernameEnd = (text, offset) => {
-  while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
-    offset++
-  }
-
-  return offset
-}
 
 export class CommentArea extends React.Component {
   constructor (props) {
@@ -155,41 +146,15 @@ export class CommentArea extends React.Component {
     }
   }
 
-  // RJ - 2020-09-25 - FIXME
-  // Duplicate code with tinymceAutoCompleteHelper.js
-  // See https://github.com/tracim/tracim/issues/3639
-  handleClickAutoCompleteItem = (autoCompleteItem) => {
-    let character, keyword
-
-    if (autoCompleteItem.content_id) {
-      character = '#'
-      keyword = autoCompleteItem.content_id
-    } else {
-      character = '@'
-      keyword = autoCompleteItem.mention
-    }
-
-    const cursorPos = this.textAreaRef.selectionStart
-    const endSpace = ' '
-
-    const charAtCursor = cursorPos - 1
+  handleClickAutoCompleteItem = (item) => {
     const text = this.state.newComment
-    const posAt = text.lastIndexOf(character, charAtCursor)
-    let textBegin, textEnd
+    const cursorPos = this.textAreaRef.selectionStart
 
-    if (posAt > -1) {
-      const end = seekUsernameEnd(text, cursorPos)
-      textBegin = text.substring(0, posAt) + character + keyword + endSpace
-      textEnd = text.substring(end)
-    } else {
-      console.log(`Error in autocompletion: did not find ${character}`)
-      textBegin = `${text} ${character}${keyword}${endSpace}`
-      textEnd = ''
-    }
+    let {textBegin, textEnd} = autoCompleteItem(text, item, cursorPos)
 
     this.commentCursorPos = textBegin.length
 
-    this.handleChangeNewComment({ target: { value: textBegin + textEnd } })
+    this.handleChangeNewComment({ target: { value: textBegin + textEnd }})
 
     this.setState({
       isAutoCompleteActivated: false,

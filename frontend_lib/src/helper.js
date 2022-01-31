@@ -846,3 +846,42 @@ export const USER_CALL_STATE = {
   CANCELLED: 'cancelled',
   UNANSWERED: 'unanswered'
 }
+
+export const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z0-9\-_]/
+
+const seekUsernameEnd = (text, offset) => {
+  while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
+    offset++
+  }
+
+  return offset
+}
+
+export const autoCompleteItem = (text, item, cursorPos) => {
+  let character, keyword
+  let textBegin, textEnd
+
+  if (item.content_id) {
+    character = '#'
+    keyword = item.content_id
+  } else {
+    character = '@'
+    keyword = item.mention
+  }
+
+  const endSpace = '\u00A0'
+  const charAtCursor = cursorPos - 1
+  const posAt = text.lastIndexOf(character, charAtCursor)
+
+  if (posAt > -1) {
+    const end = seekUsernameEnd(text, cursorPos)
+    textBegin = text.substring(0, posAt) + character + keyword + endSpace
+    textEnd = text.substring(end)
+  } else {
+    console.log(`Error in autocompletion: did not find ${character}`)
+    textBegin = `${text} ${character}${keyword}${endSpace}`
+    textEnd = ''
+  }
+
+  return { textBegin, textEnd }
+}
