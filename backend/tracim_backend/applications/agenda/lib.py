@@ -68,9 +68,9 @@ CREATE_ADDRESSBOOK_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 
 
 class AgendaSyncState(str, Enum):
-    CREATED = "created"
-    DISABLED = "disabled"
-    EXISTING = "existing"
+    CREATED = "created"  # Agenda created during sync
+    DISABLED = "disabled"  # Agenda disabled (not created but not deleted if exist)
+    EXISTING = "existing"  # Agenda enabled and already exist
 
 
 class CalendarDescription(ValuedBaseElement):
