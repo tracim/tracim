@@ -494,7 +494,15 @@ class TestCaldavRadicaleProxyEndpoints(object):
 )
 class TestCaldavRadicaleSync(object):
     def test_user_sync__ok__deletion_restore(
-        self, radicale_server, user_api_factory, web_testapp, app_config, session, test_context
+        self,
+        radicale_server,
+        user_api_factory,
+        web_testapp,
+        app_config,
+        session,
+        test_context,
+        workspace_api_factory,
+        role_api_factory,
     ) -> None:
         test_context.plugin_manager.register(AgendaHooks())
         uapi = user_api_factory.get()
@@ -507,8 +515,26 @@ class TestCaldavRadicaleSync(object):
             profile=profile,
         )
         session.add(user)
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
         session.flush()
         transaction.commit()
+
+        workspace_calendar_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/space_{workspace_id}_calendar".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+        )
+        workspace_addressbook_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/space_{workspace_id}_addressbook".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+        )
+
         user_agenda_path = "{source_path}/{local_path}".format(
             source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
             local_path="agenda/user/{user_id}".format(user_id=user.user_id),
@@ -535,6 +561,8 @@ class TestCaldavRadicaleSync(object):
         # Links are created
         assert os.path.islink(user_calendar_symlink_path)
         assert os.path.islink(user_addressbook_symlink_path)
+        assert os.path.islink(workspace_calendar_symlink_path)
+        assert os.path.islink(workspace_addressbook_symlink_path)
         uapi.delete(user, do_save=True)
         transaction.commit()
         assert os.path.isdir(user_agenda_path)
@@ -543,7 +571,8 @@ class TestCaldavRadicaleSync(object):
         # Links are removed
         assert not os.path.islink(user_calendar_symlink_path)
         assert not os.path.islink(user_addressbook_symlink_path)
-
+        assert not os.path.islink(workspace_calendar_symlink_path)
+        assert not os.path.islink(workspace_addressbook_symlink_path)
         uapi.undelete(user, do_save=True)
         transaction.commit()
         assert os.path.isdir(user_agenda_path)
@@ -554,7 +583,15 @@ class TestCaldavRadicaleSync(object):
         assert os.path.islink(user_addressbook_symlink_path)
 
     def test_user_sync__ok__disable_reenable(
-        self, radicale_server, user_api_factory, web_testapp, app_config, session, test_context
+        self,
+        radicale_server,
+        user_api_factory,
+        web_testapp,
+        app_config,
+        session,
+        test_context,
+        workspace_api_factory,
+        role_api_factory,
     ) -> None:
 
         test_context.plugin_manager.register(AgendaHooks())
@@ -568,6 +605,26 @@ class TestCaldavRadicaleSync(object):
             profile=profile,
         )
         session.add(user)
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        session.flush()
+        transaction.commit()
+
+        workspace_calendar_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/space_{workspace_id}_calendar".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+        )
+        workspace_addressbook_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/space_{workspace_id}_addressbook".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+        )
+
         session.flush()
         transaction.commit()
         user_agenda_path = "{source_path}/{local_path}".format(
@@ -596,6 +653,8 @@ class TestCaldavRadicaleSync(object):
         # Links are created
         assert os.path.islink(user_calendar_symlink_path)
         assert os.path.islink(user_addressbook_symlink_path)
+        assert os.path.islink(workspace_calendar_symlink_path)
+        assert os.path.islink(workspace_addressbook_symlink_path)
         uapi.disable(user, do_save=True)
         transaction.commit()
         assert os.path.isdir(user_agenda_path)
@@ -604,7 +663,8 @@ class TestCaldavRadicaleSync(object):
         # Links are removed
         assert not os.path.islink(user_calendar_symlink_path)
         assert not os.path.islink(user_addressbook_symlink_path)
-
+        assert not os.path.islink(workspace_calendar_symlink_path)
+        assert not os.path.islink(workspace_addressbook_symlink_path)
         uapi.enable(user, do_save=True)
         transaction.commit()
         assert os.path.isdir(user_agenda_path)
@@ -613,6 +673,8 @@ class TestCaldavRadicaleSync(object):
         # Links are recreated
         assert os.path.islink(user_calendar_symlink_path)
         assert os.path.islink(user_addressbook_symlink_path)
+        assert os.path.islink(workspace_calendar_symlink_path)
+        assert os.path.islink(workspace_addressbook_symlink_path)
 
     def test_role_sync__ok__added_removed(
         self,
