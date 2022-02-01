@@ -8,6 +8,18 @@
   margin 0 auto
   position relative
 
+// RJ - 2022-02-01 - NOTE
+// the right ⟷ left changes in [dir=rtl] blocks below fix the broken appearance
+// of the progress bar for RTL langages, but make the progress go from
+// south, to west, to north, to west, to south.
+// Arabic clocks still turn clockwise, from the top, so lets reflect that by
+// rotating this.
+// https://marvelapp.com/blog/mirroring-designing-for-arab-users/
+[dir=rtl] .progress
+  transform rotate(180deg)
+  .progress-value
+    transform rotate(180deg)
+
 .progress > span
   width 50%
   height 100%
@@ -16,8 +28,11 @@
   top 0
   z-index 1
 
-.progress .progress-left
+[dir=ltr] .progress .progress-left
   left 0
+
+[dir=rtl] .progress .progress-left
+  right 0
 
 .progress .progress-bar
   width 100%
@@ -29,15 +44,23 @@
   top 0
 
 .progress .progress-left .progress-bar
-  left 100%
   border-start-end-radius 80px
   border-end-end-radius 80px
   border-inline-start 0
-  -webkit-transform-origin center left
+
+[dir=ltr] .progress .progress-left .progress-bar
+  left 100%
   transform-origin center left
 
-.progress .progress-right
+[dir=rtl] .progress .progress-left .progress-bar
+  right 100%
+  transform-origin center right
+
+[dir=ltr] .progress .progress-right
   right 0
+
+[dir=rtl] .progress .progress-right
+  left 0
 
 .progress .progress-value
   display flex
@@ -59,12 +82,17 @@
   border-color mediumGrey
 
 .progress .progress-right .progress-bar
-  left -100%
   border-start-start-radius 80px
   border-end-start-radius 80px
   border-inline-end 0
-  -webkit-transform-origin center right
+
+[dir=ltr] .progress .progress-right .progress-bar
+  left -100%
   transform-origin center right
+
+[dir=rtl] .progress .progress-right .progress-bar
+  right -100%
+  transform-origin center left
 
 // INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius, border-end-start-radius
 // border-start-start-radius and border-end-end-radius are new and have a global usage below 90% according to
