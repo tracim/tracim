@@ -67,7 +67,7 @@ CREATE_ADDRESSBOOK_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 """
 
 
-class AgendaCreationState(str, Enum):
+class AgendaSyncState(str, Enum):
     CREATED = "created"
     DISABLED = "disabled"
     EXISTING = "existing"
@@ -247,27 +247,27 @@ class AgendaApi(object):
             base_url=base_url, user_agenda_path=user_agenda_path
         )
 
-    def sync_user_agenda(self, user: User) -> AgendaCreationState:
+    def sync_user_agenda(self, user: User) -> AgendaSyncState:
         if self.user_has_agenda_enabled(user):
             if self._ensure_user_agenda_exists(user=user):
-                state = AgendaCreationState.EXISTING
+                state = AgendaSyncState.EXISTING
             else:
-                state = AgendaCreationState.CREATED
+                state = AgendaSyncState.CREATED
         else:
             # INFO - GM - 2022-27-01  - We do not delete existing agenda if set to disabled
-            state = AgendaCreationState.DISABLED
+            state = AgendaSyncState.DISABLED
         self.sync_user_symlinks(user=user)
         return state
 
-    def sync_workspace_agenda(self, workspace: Workspace) -> AgendaCreationState:
+    def sync_workspace_agenda(self, workspace: Workspace) -> AgendaSyncState:
         if self.workspace_has_agenda_enabled(workspace):
             if self._ensure_workspace_agenda_exists(workspace=workspace):
-                state = AgendaCreationState.EXISTING
+                state = AgendaSyncState.EXISTING
             else:
-                state = AgendaCreationState.CREATED
+                state = AgendaSyncState.CREATED
         else:
             # INFO - GM - 2022-27-01  - We do not delete existing agenda if set to disabled
-            state = AgendaCreationState.DISABLED
+            state = AgendaSyncState.DISABLED
         for role in workspace.roles:
             self.sync_workspace_symlinks(workspace=workspace, user=role.user)
         return state
@@ -640,7 +640,7 @@ class AgendaHooks:
             )
             try:
                 state = agenda_api.sync_workspace_agenda(workspace)
-                if create_event and state == AgendaCreationState.CREATED:
+                if create_event and state == AgendaSyncState.CREATED:
                     logger.warning(
                         self,
                         "workspace {} is just created but its own agenda already exists !!".format(
@@ -662,7 +662,7 @@ class AgendaHooks:
             )
             try:
                 state = agenda_api.sync_user_agenda(user)
-                if create_event and state == AgendaCreationState.CREATED:
+                if create_event and state == AgendaSyncState.CREATED:
                     logger.warning(
                         self,
                         "user {} has just been created but their own agenda already exists".format(
