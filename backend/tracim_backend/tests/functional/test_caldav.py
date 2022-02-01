@@ -7,6 +7,8 @@ from requests.exceptions import ConnectionError
 import transaction
 
 from tracim_backend.applications.agenda.lib import AgendaHooks
+from tracim_backend.applications.agenda.models import AgendaResourceType
+from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -970,6 +972,148 @@ class TestCaldavRadicaleSync(object):
         # Links are removed
         assert not os.path.islink(workspace_addressbook_symlink_path)
         assert not os.path.islink(workspace_calendar_symlink_path)
+
+    def test_cleanup_delete_user_agenda__ok__nominal_case(
+        self,
+        radicale_server,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        web_testapp,
+        app_config,
+        session,
+        test_context,
+    ) -> None:
+
+        test_context.plugin_manager.register(AgendaHooks())
+        uapi = user_api_factory.get()
+        profile = Profile.USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        session.add(user)
+        workspace_api = workspace_api_factory.get()
+        workspace = workspace_api.create_workspace("wp1", save_now=True, agenda_enabled=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
+        session.flush()
+        transaction.commit()
+
+        workspace_agenda_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="agenda/workspace/{workspace_id}".format(
+                workspace_id=workspace.workspace_id
+            ),
+        )
+        workspace_addressbook_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="addressbook/workspace/{workspace_id}".format(
+                workspace_id=workspace.workspace_id
+            ),
+        )
+        workspace_calendar_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/space_{workspace_id}_calendar".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+        )
+        workspace_addressbook_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/space_{workspace_id}_addressbook".format(
+                user_id=user.user_id, workspace_id=workspace.workspace_id
+            ),
+        )
+        user_agenda_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="agenda/user/{user_id}".format(user_id=user.user_id),
+        )
+        user_addressbook_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="addressbook/user/{user_id}".format(user_id=user.user_id),
+        )
+        user_dav_resource_root_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}".format(user_id=user.user_id),
+        )
+        user_calendar_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/user_{user_id}_calendar".format(user_id=user.user_id),
+        )
+        user_addressbook_symlink_path = "{source_path}/{local_path}".format(
+            source_path=app_config.RADICALE__LOCAL_PATH_STORAGE,
+            local_path="user_{user_id}/user_{user_id}_addressbook".format(user_id=user.user_id),
+        )
+
+        assert os.path.isdir(user_agenda_path)
+        assert os.path.isdir(user_addressbook_path)
+        assert os.path.isdir(user_dav_resource_root_path)
+        assert os.path.isdir(workspace_agenda_path)
+        assert os.path.isdir(workspace_addressbook_path)
+        # Links are created
+        assert os.path.islink(user_calendar_symlink_path)
+        assert os.path.islink(user_addressbook_symlink_path)
+        assert os.path.islink(workspace_addressbook_symlink_path)
+        assert os.path.islink(workspace_calendar_symlink_path)
+
+        cleanup_lib = CleanupLib(app_config=app_config, session=session)
+        cleanup_lib.delete_user_agenda(user.user_id, AgendaResourceType.calendar)
+        transaction.commit()
+
+        assert not os.path.isdir(user_agenda_path)
+        assert os.path.isdir(user_addressbook_path)
+        # Links are not changed
+        assert os.path.isdir(user_dav_resource_root_path)
+        assert os.path.islink(user_calendar_symlink_path)
+        assert os.path.islink(user_addressbook_symlink_path)
+
+        cleanup_lib.delete_user_agenda(user.user_id, AgendaResourceType.addressbook)
+        transaction.commit()
+
+        assert not os.path.isdir(user_agenda_path)
+        assert not os.path.isdir(user_addressbook_path)
+        # Links are not changed
+        assert os.path.isdir(user_dav_resource_root_path)
+        assert os.path.islink(user_calendar_symlink_path)
+        assert os.path.islink(user_addressbook_symlink_path)
+
+        # workspace
+        assert os.path.isdir(workspace_agenda_path)
+        assert os.path.isdir(workspace_addressbook_path)
+        assert os.path.islink(workspace_calendar_symlink_path)
+        assert os.path.islink(workspace_addressbook_symlink_path)
+        cleanup_lib.delete_workspace_agenda(workspace.workspace_id, AgendaResourceType.calendar)
+        transaction.commit()
+
+        assert not os.path.isdir(workspace_agenda_path)
+        assert os.path.isdir(workspace_addressbook_path)
+        # Links are not changed
+        assert os.path.islink(workspace_calendar_symlink_path)
+        assert os.path.islink(workspace_addressbook_symlink_path)
+
+        cleanup_lib.delete_workspace_agenda(workspace.workspace_id, AgendaResourceType.addressbook)
+        transaction.commit()
+
+        assert not os.path.isdir(workspace_agenda_path)
+        assert not os.path.isdir(workspace_addressbook_path)
+        # Links are not changed
+        assert os.path.islink(workspace_calendar_symlink_path)
+        assert os.path.islink(workspace_addressbook_symlink_path)
+
+        cleanup_lib.delete_user_dav_symlinks(user.user_id)
+        transaction.commit()
+
+        assert not os.path.isdir(user_agenda_path)
+        assert not os.path.isdir(user_addressbook_path)
+        # Links dav resource is removed
+        assert not os.path.isdir(user_dav_resource_root_path)
+        assert not os.path.islink(user_calendar_symlink_path)
+        assert not os.path.islink(user_addressbook_symlink_path)
+        assert not os.path.islink(workspace_calendar_symlink_path)
+        assert not os.path.islink(workspace_addressbook_symlink_path)
 
 
 @pytest.mark.usefixtures("base_fixture")

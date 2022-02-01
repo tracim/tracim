@@ -235,17 +235,14 @@ class CleanupLib(object):
     ) -> typing.Optional[str]:
         agenda_api = AgendaApi(config=self.app_config, current_user=None, session=self.session)
         resource_type_dir = agenda_api.get_resource_type_dir(resource_type)
-        resource_type_dir = self.get_resource_type_dir(resource_type)
         workspace_agenda_path = self.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
             resource_type_dir=resource_type_dir,
             workspace_subdir=self.app_config.RADICALE__WORKSPACE_SUBDIR,
             workspace_id=workspace_id,
         )
-        agenda_dir = (
-            "{local_path}{workspace_agenda_path}".format(
-                local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
-                workspace_agenda_path=workspace_agenda_path,
-            ),
+        agenda_dir = "{local_path}{workspace_agenda_path}".format(
+            local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
+            workspace_agenda_path=workspace_agenda_path,
         )
         logger.info(
             self,

@@ -206,6 +206,7 @@ class DeleteUserCommand(AppContextCommand):
                     for user_id in deleted_user_ids:
                         try:
                             cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.calendar)
+                            cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.addressbook)
                             cleanup_lib.delete_user_dav_symlinks(user_id)
                         except AgendaNotFoundError:
                             print(
