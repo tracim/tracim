@@ -4,6 +4,7 @@ import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
 import { isEqual } from 'lodash'
+import { isMobile } from 'react-device-detect'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -178,6 +179,7 @@ export class Tracim extends React.Component {
         this.currentTime = 0
         this.play()
       }, false)
+      if (isMobile) return
       this.audioCall.play()
     }
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
