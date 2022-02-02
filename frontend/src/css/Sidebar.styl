@@ -23,6 +23,8 @@ sidebar-animate-speed = 0.5s
     & i
       margin-inline-start auto
   &__frame
+    // Info - MP - 2022-02-02 - Duplicated code since the element .sidebar doesn't expand in responsive
+    background-color var(--sidebarColor)
     height "calc(100vh - %s)" % headerHeight
     position relative
     transition all sidebar-animate-speed
@@ -146,6 +148,20 @@ sidebar-animate-speed = 0.5s
           &:hover
             text-decoration underline
 
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-end-end-radius and border-start-end-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+[dir=ltr] .sidebar
+  &__expand
+    border-bottom-right-radius 15px
+  &__scrollup
+    border-top-right-radius 15px
+
+[dir=rtl] .sidebar
+  &__expand
+    border-bottom-left-radius 15px
+  &__scrollup
+    border-top-left-radius 15px
+
 @media (min-width: min-lg) and (max-width: max-lg)
   .sidebarpagecontainer
     position relative
@@ -181,16 +197,3 @@ sidebar-animate-speed = 0.5s
     &__frame
       position absolute
       min-height "calc(100% - %s)" % headerHeight
-
-// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-end-end-radius and border-start-end-radius are new
-// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
-[dir=ltr] .sidebar
-  &__expand
-    border-bottom-right-radius 15px
-  &__scrollup
-    border-top-right-radius 15px
-[dir=rtl] .sidebar
-  &__expand
-    border-bottom-left-radius 15px
-  &__scrollup
-    border-top-left-radius 15px
