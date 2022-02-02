@@ -51,7 +51,7 @@ describe('<Timeline />', () => {
     canFetchMoreTimelineItems: () => false
   }
 
-  function mockReactions() {
+  function mockReactions () {
     for (const comment of commentList) {
       nock(props.apiUrl).get(`/workspaces/${props.workspaceId}/contents/${comment.content_id}/reactions`).reply(200, [])
     }

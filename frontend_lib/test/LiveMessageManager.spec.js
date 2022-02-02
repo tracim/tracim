@@ -58,7 +58,6 @@ const createManager = (heartbeatTimeOut, reconnectionInterval) => {
 
 const emitMessage = async (manager, data) => {
   while (manager.status !== LIVE_MESSAGE_STATUS.OPENED) {
-    console.error("emitMessage: awaiting... status =", manager.status)
     await manager.onStatusChange()
   }
   manager.eventSource.emitMessage({ data })
