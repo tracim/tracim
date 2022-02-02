@@ -21,7 +21,8 @@ describe('Account page', () => {
     cy.get('.newSpace__button .btn').last().should('be.visible').click()
   }
 
-  describe('Changing account preferences', () => {
+  describe.skip('Changing account preferences', () => {
+  // FIXME - MB - 2022-02-02 - Unstable test, see https://github.com/tracim/tracim/issues/5344
     describe('Manage user space popup', () => {
       beforeEach(() => {
         cy.cancelXHR()
