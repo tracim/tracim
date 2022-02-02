@@ -7,7 +7,7 @@ import {
   LIVE_MESSAGE_STATUS
 } from '../src/LiveMessageManager.js'
 
-import { enforceOptions } from 'broadcast-channel'
+import { enforceOptions, BroadcastChannel } from 'broadcast-channel'
 
 // RJ - 2020-09-13 - NOTE: Makes the tests run faster.
 // See https://github.com/pubkey/broadcast-channel#enforce-a-options-globally
@@ -40,6 +40,13 @@ LiveMessageManager.prototype.onStatusChange = async function () {
 // We directly open an EventSource connection. We are alone.
 LiveMessageManager.prototype.electLeader = LiveMessageManager.prototype.openEventSourceConnection
 
+let currentChannelNumber = 0
+
+// RJ - 2022-02-02 - NOTE: isolate LiveMessageManager objects from each others
+LiveMessageManager.prototype.createBroadcastChannel = function () {
+  return new BroadcastChannel('test-channel-' + (++currentChannelNumber))
+}
+
 const managers = []
 
 const createManager = (heartbeatTimeOut, reconnectionInterval) => {
@@ -49,10 +56,19 @@ const createManager = (heartbeatTimeOut, reconnectionInterval) => {
   return manager
 }
 
+const emitMessage = async (manager, data) => {
+  while (manager.status !== LIVE_MESSAGE_STATUS.OPENED) {
+    console.error("emitMessage: awaiting... status =", manager.status)
+    await manager.onStatusChange()
+  }
+  manager.eventSource.emitMessage({ data })
+}
+
 const openedManager = (heartbeatTimeOut, reconnectionInterval) => {
   const manager = createManager(heartbeatTimeOut, reconnectionInterval)
   manager.openLiveMessageConnection(userId, apiUrl)
   manager.eventSource.emitOpen()
+  manager.eventSource.emit('stream-open')
   return manager
 }
 
@@ -124,7 +140,7 @@ describe('LiveMessageManager class', () => {
     })
   })
 
-  describe('the heartbeat timer', async () => {
+  describe('the heartbeat timer', () => {
     it('should restart connection when the heartbeat event is not received in time', async () => {
       mockGetWhoami(apiUrl, 200)
       const manager = openedManager(2, 10)
@@ -134,7 +150,7 @@ describe('LiveMessageManager class', () => {
     })
   })
 
-  describe('after losing the connection', async function () {
+  describe('after losing the connection', function () {
     const testCases = [
       {
         description: 'nominal case',
@@ -161,8 +177,7 @@ describe('LiveMessageManager class', () => {
       it(`should restart connection with the after_event_id parameter (${testCase.description})`, async () => {
         const mock = testCase.mockWhoami()
         const manager = openedManager(30000, testCase.reconnectionInterval)
-
-        manager.eventSource.emitMessage({ data: '{ "event_id": 42 }' })
+        await emitMessage(manager, '{ "event_id": 42 }')
         expect(manager.lastEventId).to.be.equal(42)
 
         const promiseStatus = manager.onStatusChange()
@@ -185,10 +200,10 @@ describe('LiveMessageManager class', () => {
     }
   })
 
-  describe('after closing and re-opening the connection', async () => {
+  describe('after closing and re-opening the connection', () => {
     it('should restart connection with the after_event_id parameter', async () => {
       const manager = openedManager(30000, 0)
-      manager.eventSource.emitMessage({ data: '{ "event_id": 1337 }' })
+      await emitMessage(manager, '{ "event_id": 1337 }')
       expect(manager.lastEventId).to.be.equal(1337)
 
       manager.closeLiveMessageConnection()
@@ -207,7 +222,7 @@ describe('LiveMessageManager class', () => {
     })
   })
 
-  describe('after losing the connection due to a logout', async () => {
+  describe('after losing the connection due to a logout', () => {
     it('should redirect to the login page (by sending a custom event)', async () => {
       mockGetWhoami(apiUrl, 401)
       const manager = openedManager(30000, 10)
