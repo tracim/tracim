@@ -1,16 +1,9 @@
-[dir=ltr] .notification
-  right 0
-
-[dir=rtl] .notification
-  left 0
-
 .notification
   position fixed
   top headerHeight
   width 40%
   height "calc(100% - %s)" % headerHeight
   background-color offWhite
-  box-shadow shadow-right
   z-index 26
   display flex
   flex-direction column
@@ -117,6 +110,14 @@
 // INFO - MB - 20210204 - overrides ListItemWrapper styles because .content is used in many places
 .notification > .notification__list > .content
   border none
+
+[dir=ltr] .notification
+  right 0
+  box-shadow shadow-right
+
+[dir=rtl] .notification
+  left 0
+  box-shadow shadow-left
 
 @media (min-width: min-md) and (max-width: max-md)
   .notification
