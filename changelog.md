@@ -1,3 +1,16 @@
+# 4.1.1 / 2022-02-03
+
+### Fixed Issues
+
+- Backend: [#5253](https://github.com/tracim/tracim/issues/5263)
+- Frontend: [#5286](https://github.com/tracim/tracim/issues/5286),
+[#5285](https://github.com/tracim/tracim/issues/5285),
+[#5315](https://github.com/tracim/tracim/issues/#5315)
+
+### Known Issues
+
+- Tracim can display an error message related to connection problems while everything actually works ([#5315](https://github.com/tracim/tracim/issues/5315)). A fix is planned for the next maintenance release.
+
 # 4.1.0 / 2022-01-21
 
 ### New Features
