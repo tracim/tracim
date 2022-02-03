@@ -25,7 +25,6 @@
     &__changeBtn
       position absolute
       bottom standardSpacing
-      right pageSpacing
       background-color offWhite
       &:hover
         background-color lightGrey
@@ -114,7 +113,19 @@
   &__customForm__submit
     position absolute
     top 0
+
+[dir=ltr] .profile
+  &__customForm__submit
     right 0
+  &__cover__changeBtn
+    right pageSpacing
+[dir=rtl] .profile
+  &__customForm__submit
+    left 0
+  &__cover__changeBtn
+    left pageSpacing
+  &__popup_select_cover
+    left 25%
 
 @media (max-width: max-sm)
   .profile
