@@ -7,13 +7,12 @@
   left 0
 
 .wsContentGeneric
+  background-color lightGrey
+  height "calc(100% - %s)" % headerHeight
   position fixed
   top headerHeight
   width 100%
-  max-width "calc(100% - %s)" % sidebarWidthReduced
-  height "calc(100% - %s)" % headerHeight
-  background-color lightGrey
-  z-index 15
+  z-index 9
   &.sidebarVisible
     max-width "calc(100% - %s)" % sidebarWidth
   &.visible
