@@ -5,7 +5,7 @@
 - Backend: [#5253](https://github.com/tracim/tracim/issues/5263)
 - Frontend: [#5286](https://github.com/tracim/tracim/issues/5286),
 [#5285](https://github.com/tracim/tracim/issues/5285),
-[#5315](https://github.com/tracim/tracim/issues/#5315)
+[#5315](https://github.com/tracim/tracim/issues/5315)
 
 ### Known Issues
 
