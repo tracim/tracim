@@ -23,7 +23,7 @@ export const createKanbanBoard = (title) => {
  * It requires that the kanban board is already displayed to work properly.
  */
 export const createKanbanColumn = (title) => {
-  cy.get('.kanban__columnAdder').should('be.visible').click()
+  cy.get('.kanban__columnAdder:not(.disabled)').should('be.visible').click()
   cy.get('.textinput__text').should('be.visible').type(title)
   cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
   cy.contains('.kanban__contentpage__wrapper__board__column__title', title)

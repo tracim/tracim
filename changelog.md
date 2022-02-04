@@ -1,3 +1,63 @@
+# 4.1.1 / 2022-02-03
+
+### Fixed Issues
+
+- Backend: [#5263](https://github.com/tracim/tracim/issues/5263)
+- Frontend: [#5286](https://github.com/tracim/tracim/issues/5286),
+[#5285](https://github.com/tracim/tracim/issues/5285),
+[#5315](https://github.com/tracim/tracim/issues/5315)
+
+
+# 4.1.0 / 2022-01-21
+
+### New Features
+
+- Kanban boards
+- Reactivation of the draw functionality in the collaborative document
+- News feed now displays newest news first
+- Crop feature for the cover and avatar profile photos
+- Improvement of user's space management for the admin
+- Improvement of the call feature (bugfix and polish)
+- UI/UX improvement (responsive, buttons, redirections)
+- Performance improvements:
+  - better image and PDF preview generation
+  - loading speed of spaces and users lists
+
+### Fixed Issues
+
+- Frontend: [#4907](https://github.com/tracim/tracim/issues/4907),
+[#5136](https://github.com/tracim/tracim/issues/5136)
+- Backend: [#4483](https://github.com/tracim/tracim/issues/4483),
+[#4494](https://github.com/tracim/tracim/issues/4494),
+[#4648](https://github.com/tracim/tracim/issues/4648),
+[#4718](https://github.com/tracim/tracim/issues/4718),
+[#4955](https://github.com/tracim/tracim/issues/4955),
+[#4985](https://github.com/tracim/tracim/issues/4985),
+[#5008](https://github.com/tracim/tracim/issues/5008)
+
+### Breaking/Important change
+
+- :warning: You need to adjust some settings before running this version. For more information see: [#5118](https://github.com/tracim/tracim/issues/5118)
+- Poppler-utils and webp now need to be present (and qpdf can be gotten rid off) on Tracim installations that don't use Docker (PR [#5121](https://github.com/tracim/tracim/pull/5121)),
+- By default, EPS previews are now disabled for security reasons, unless you manually enable them. ([see preview generator documentation](https://github.com/algoo/preview-generator#eps-support))
+- Docker image support for ARM64 ([#3985](https://github.com/tracim/tracim/issues/3985))
+- Allow changing the parent of a space with `tracimcli` ([#3636](https://github.com/tracim/tracim/issues/3636))
+- Improve agenda discovery with caldav ([#2099](https://github.com/tracim/tracim/issues/2099))
+- Address book support with carddav ([#1469](https://github.com/tracim/tracim/issues/1469))
+
+### Known Issues
+
+- Activation/Deactivation of agenda is not properly handled. In some cases you will not be able to remove users from spaces because of this. See the workaround in issue:([#5263](https://github.com/tracim/tracim/issues/5263#issuecomment-1016454036))
+- Having a double quote (`"`) or a slash (`\`) in a kanban's title causes the kanban to not load. See: ([#5220](https://github.com/tracim/tracim/issues/5220))
+
+
+# 4.0.6 / 2022-01-18
+
+### Fixed Issues
+
+- Backend: [#5253](https://github.com/tracim/tracim/issues/5253)
+
+
 # 4.0.5 / 2021-12-29
 
 ### Fixed Issues

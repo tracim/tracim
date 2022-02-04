@@ -189,8 +189,8 @@ export class Sidebar extends React.Component {
       <div className='sidebar'>
         <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {state.sidebarClose
-            ? <i className={classnames('fas fa-chevron-right')} title={props.t('See sidebar')} />
-            : <i className={classnames('fas fa-chevron-left')} title={props.t('Hide sidebar')} />}
+            ? <i className={classnames('fas', 'fa-chevron-right')} title={props.t('See sidebar')} />
+            : <i className={classnames('fas', 'fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
         <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
@@ -242,7 +242,7 @@ export class Sidebar extends React.Component {
                 {TRACIM_APP_VERSION}
               </div>
               <div className='sidebar__footer__text'>
-                Copyright - 2013 - 2021
+                Copyright - 2013 - 2022
                 <div className='sidebar__footer__text__link'>
                   <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
                 </div>

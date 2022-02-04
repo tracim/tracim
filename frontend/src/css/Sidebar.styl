@@ -1,28 +1,45 @@
 sidebar-animate-speed = 0.5s
 
+[dir=ltr]
+  .sidebar
+    &__frame
+      box-shadow -1px 2px 2px 1px var(--sidebarColor)
+    &__expand
+      left sidebarWidth
+      &.sidebarclose
+        left 0
+
+[dir=rtl]
+  .sidebar
+    &__frame
+      box-shadow 1px 2px 2px 1px var(--sidebarColor)
+    &__expand
+      right sidebarWidth
+      &.sidebarclose
+        right 0
+
 .sidebar
   &__expand
-    left sidebarWidth
-    position absolute
-    display flex
-    z-index 15
     align-items center
-    border-bottom-right-radius 15px
-    padding standardSpacing
+    background-color var(--sidebarColor)
     cursor pointer
     color offWhite
+    display flex
+    padding standardSpacing
+    position absolute
     transition all sidebar-animate-speed
-    background-color var(--sidebarColor)
-    &.sidebarclose
-      left 0
+    z-index 15
+    &:hover
+      background-color var(--sidebarColorDarken)
+    & i
+      margin-inline-start auto
   &__frame
+    background-color var(--sidebarColor)
+    height "calc(100vh - %s)" % headerHeight
     position relative
     transition all sidebar-animate-speed
     width sidebarWidth
-    height "calc(100vh - %s)" % headerHeight
     z-index 10
-    box-shadow -1px 2px 2px 1px var(--sidebarColor)
-    background-color var(--sidebarColor)
     &.sidebarclose
       width 0
       overflow hidden
@@ -43,7 +60,7 @@ sidebar-animate-speed = 0.5s
     justify-content center
     align-items center
     border 1px solid var(--sidebarColor)
-    border-top-right-radius 15px
+    border-start-end-radius 15px
     padding 8px 12px
     cursor pointer
     color offWhite
@@ -56,15 +73,13 @@ sidebar-animate-speed = 0.5s
     &.sidebarclose
       width 0
     &__workspace
-      padding-left 0
+      padding-inline-start 0
       list-style none
     &__item
       align-items center
-      border-left-width 0
-      border-left-style solid
       border-bottom 1px solid var(--sidebarColorDarken)
       display flex
-      padding-left 5px
+      padding-inline-start textSpacing
       &:hover
         background-color var(--sidebarColorDarken)
       &__withoutChildren
@@ -87,7 +102,7 @@ sidebar-animate-speed = 0.5s
         &::after
           display none
       &__dragNdrop
-        margin-left 5px
+        margin-inline-start 5px
       &__wrapper
         display flex
         align-items center
@@ -111,9 +126,10 @@ sidebar-animate-speed = 0.5s
         overflow hidden
         text-overflow ellipsis
       &__current
-        padding-left 0
+        padding-inline-start 0
+        border-inline-start-style solid
+        border-inline-start-width 5px
         background-color var(--sidebarColorLighten)
-        border-left-width 5px
         font-weight bold
   &__footer
     margin-top auto
@@ -178,3 +194,16 @@ sidebar-animate-speed = 0.5s
     &__frame
       position absolute
       min-height "calc(100% - %s)" % headerHeight
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-end-end-radius and border-start-end-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+[dir=ltr] .sidebar
+  &__expand
+    border-bottom-right-radius 15px
+  &__scrollup
+    border-top-right-radius 15px
+[dir=rtl] .sidebar
+  &__expand
+    border-bottom-left-radius 15px
+  &__scrollup
+    border-top-left-radius 15px

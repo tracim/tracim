@@ -49,7 +49,7 @@ describe('Publications page', () => {
 
     it('should be able to copy content link', () => {
       cy.get('.feedItemHeader__actionMenu__item[title="Copy content link"]').click()
-      cy.contains('.flashmessage__container__content__text__paragraph', 'The link has been copied to clipboard')
+      cy.contains('.flashmessage__container__content__text__paragraph', 'Link copied to clipboard')
     })
 
     it('should be able to edit publication', () => {

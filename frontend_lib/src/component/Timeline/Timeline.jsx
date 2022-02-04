@@ -233,6 +233,7 @@ export class Timeline extends React.Component {
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
+              buttonLabel={props.t('Send')}
               contentId={props.contentId}
               contentType={props.contentType}
               customClass={props.customClass}
@@ -242,6 +243,7 @@ export class Timeline extends React.Component {
               invalidMentionList={props.invalidMentionList}
               lang={props.loggedUser.lang}
               newComment={props.newComment}
+              placeHolder={props.t('Write an answer...')}
               onClickCancelSave={props.onClickCancelSave}
               onClickSaveAnyway={props.onClickSaveAnyway}
               onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}

@@ -65,17 +65,17 @@ div.mce-statusbar
   padding 0
 
 .dropdownCreateBtn
-  margin-left standardSpacing
+  margin-inline-start standardSpacing
   &__label
     display flex
-    margin-left auto
+    margin-inline-start auto
     align-items center
     &__text
       display inline-block
       color offWhite
     &::after //bootstrap override
       display inline-block
-      margin-left 30px
+      margin-inline-start 30px
       color offWhite
     &:hover
       color offWhite
@@ -102,7 +102,7 @@ div.mce-statusbar
     &:hover
       color offWhite
     &__icon
-      margin-right 20px
+      margin-inline-end 20px
       font-size bigIconSize
   &__info
     border borderStyle
@@ -126,7 +126,10 @@ div.mce-statusbar
     border-style solid
     top 0
     right 0
-    border-width 6px 6px 0 0
+    border-top-width 6px
+    border-inline-end-width 6px
+    border-bottom-width 0
+    border-inline-start-width 0
     border-color inherit
   &::after
     content ''
@@ -136,7 +139,10 @@ div.mce-statusbar
     border-style solid
     bottom 0
     left 0
-    border-width 0 0 6px 6px
+    border-top-width 0
+    border-inline-end-width 0
+    border-bottom-width 6px
+    border-inline-start-width 6px
     border-color inherit
 
 #appFullscreenContainer

@@ -11,6 +11,7 @@ import {
   PageContent,
   BtnSwitch,
   ComposedIcon,
+  Loading,
   CUSTOM_EVENT,
   PROFILE,
   PROFILE_LIST,
@@ -175,7 +176,7 @@ export class AdminUser extends React.Component {
               </thead>
 
               <tbody>
-                {props.userList.map(u => {
+                {props.loaded && props.userList.map(u => {
                   const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
@@ -269,6 +270,21 @@ export class AdminUser extends React.Component {
                     </tr>
                   )
                 })}
+                {!props.loaded && (
+                  <tr
+                    className='adminUser__table__tr'
+                    data-cy='adminUser__table__tr'
+                  >
+                    <td><Loading /></td>
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

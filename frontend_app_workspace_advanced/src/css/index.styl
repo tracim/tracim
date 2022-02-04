@@ -29,21 +29,21 @@
         width 100%
     &__bottom
       display flex
-      padding-right standardSpacing
+      padding-inline-end standardSpacing
       &__btn
-        margin-left auto
+        margin-inline-start auto
   &__defaultRole
     &__list
       padding standardSpacing
     &__info
-      margin-left textSpacing
+      margin-inline-start textSpacing
       color grey
       padding 0
     &__bottom
       display flex
-      padding-right standardSpacing
+      padding-inline-end standardSpacing
       &__btn
-        margin-left auto
+        margin-inline-start auto
   &__userlist
     &__list
       margin 0
@@ -57,7 +57,7 @@
         padding 0 standardSpacing
         height 60px
         &__avatar
-          margin-right standardSpacing
+          margin-inline-end standardSpacing
         &__name
           flex 1
           overflow hidden
@@ -76,10 +76,10 @@
             width 100%
             &__icon
               width 25px
-              margin-right standardSpacing
+              margin-inline-end standardSpacing
             &::after
               display flex
-              margin-left auto
+              margin-inline-start auto
             &.bordered
               border borderStyle
               border-radius standardSpacing
@@ -91,7 +91,7 @@
               align-items center
               padding standardSpacing
               &__icon
-                margin-right standardSpacing
+                margin-inline-end standardSpacing
               &__text
                 white-space normal
         &__delete
@@ -110,7 +110,7 @@
           display flex
           justify-content center
           align-items center
-          margin-right standardSpacing
+          margin-inline-end standardSpacing
           border-width 2px
           border-style dashed
           border-radius 50%
@@ -129,7 +129,7 @@
       max-width 170px
       flex 1
     &__button
-      margin-left auto
+      margin-inline-start auto
       &:hover
         color offWhite
     &__empty
@@ -145,7 +145,7 @@
       display flex
       justify-content flex-end
       .btn:first-child
-        margin-right 15px
+        margin-inline-end 15px
 
 // MEDIAQUERIES
 

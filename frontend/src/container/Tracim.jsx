@@ -1,9 +1,11 @@
 import React from 'react'
+import i18next from 'i18next'
 import { connect } from 'react-redux'
 import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
 import { isEqual } from 'lodash'
+import { isMobile } from 'react-device-detect'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -151,17 +153,21 @@ export class Tracim extends React.Component {
     const isMainTab = this.liveMessageManager.eventSource !== null
 
     if (tlm.fields.user_call.callee.user_id === props.user.userId) {
-      if ('Notification' in window) {
+      if (window.Notification) {
         const notificationString = tlm.fields.user_call.caller.public_name + props.t(' is calling you on Tracim')
         const notificationOptions = { tag: 'call', renotify: true, requireInteraction: true }
 
-        if (Notification.permission === 'granted') {
-          new Notification(notificationString, notificationOptions) // eslint-disable-line
-        } else if (Notification.permission !== 'denied') {
-          const permission = await Notification.requestPermission()
-          if (permission === 'granted') {
-            new Notification(notificationString, notificationOptions) // eslint-disable-line
+        try {
+          if (Notification.permission === 'granted') {
+            new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+          } else if (Notification.permission !== 'denied') {
+            const permission = await Notification.requestPermission()
+            if (permission === 'granted') {
+              new Notification(notificationString, notificationOptions) // eslint-disable-line no-new
+            }
           }
+        } catch (e) {
+          console.error('Could not show notification', e)
         }
       }
 
@@ -174,6 +180,7 @@ export class Tracim extends React.Component {
         this.currentTime = 0
         this.play()
       }, false)
+      if (isMobile) return
       this.audioCall.play()
     }
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
@@ -583,7 +590,7 @@ export class Tracim extends React.Component {
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
-      <div className='tracim fullWidthFullHeight'>
+      <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
         <Header
           onClickNotification={this.handleClickNotificationButton}
           unreadNotificationCount={props.notificationPage.unreadNotificationCount}

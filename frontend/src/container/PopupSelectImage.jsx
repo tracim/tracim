@@ -83,7 +83,7 @@ class PopupSelectImage extends React.Component {
       return
     }
 
-    this.setState({ imageBlobURL: URL.createObjectURL(file), mode: MODE.CROP })
+    this.setState({ imageBlobURL: URL.createObjectURL(file), mode: MODE.CROP, errorMessage: null })
   }
 
   handleValidate = async () => {

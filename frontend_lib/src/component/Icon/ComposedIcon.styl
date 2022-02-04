@@ -1,13 +1,20 @@
 @import '../../css/Variable.styl'
 
+
+[dir=ltr] .composedIcon__subIcon
+  right 0
+  transform translate(50%, 50%)
+
+[dir=rtl] .composedIcon__subIcon
+  left 0
+  transform translate(-50%, 50%)
+
 .composedIcon
-  margin-right standardSpacing
+  margin-inline-end standardSpacing
   position relative
   &__subIcon
     position absolute
     bottom 0
-    right 0
-    height 80%
-    width 50%
-    transform translate(50%, 50%)
+    height 100%
+    width 100%
     font-size metadataFontSize

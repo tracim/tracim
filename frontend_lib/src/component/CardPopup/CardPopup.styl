@@ -15,8 +15,8 @@
     background lightGrey
     box-shadow shadow-all
   &__border
-    border-top-right-radius standardBorderRadius
-    border-top-left-radius standardBorderRadius
+    border-start-end-radius standardBorderRadius
+    border-start-start-radius standardBorderRadius
     width 100%
     height standardSpacing
   &__header
@@ -33,6 +33,8 @@
       margin-inline-start auto
   &__body
     display flex
+    overflow auto
+    flex 1
     align-items center
     padding 0 pageSpacing pageSpacing
     &__close_btn
@@ -52,7 +54,7 @@
         margin-inline-start standardSpacing
 
 .openCallButton
-  margin-left standardSpacing
+  margin-inline-start standardSpacing
   // FIXME - MB - 2022-01-05 - this should be removed when a LinkButton is created
   // see https://github.com/tracim/tracim/issues/5242
 
@@ -62,3 +64,10 @@
       padding standardSpacing
     &__body
       padding 0 standardSpacing standardSpacing
+
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius and border-start-start-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+.cardPopup__border
+  border-top-right-radius standardBorderRadius
+  border-top-left-radius standardBorderRadius

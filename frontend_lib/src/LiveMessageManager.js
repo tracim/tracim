@@ -71,6 +71,11 @@ export class LiveMessageManager {
 
     if (message.tlm) {
       this.dispatchLiveMessage(message.tlm)
+
+      if (this.status === LIVE_MESSAGE_STATUS.PENDING) {
+        console.error('HACK(issue #5315): we received a TLM while the status was pending as a secondary tab. Fixing up the status, but please report a bug.')
+        this.broadcastChannel.postMessage({ canIHaveStatus: true })
+      }
     }
   }
 
@@ -98,6 +103,12 @@ export class LiveMessageManager {
     this.eventSource.onmessage = (e) => {
       const tlm = JSON.parse(e.data)
       console.log('%c.:. TLM received: ', 'color: #ccc0e2', { ...e, data: tlm })
+
+      if (this.status === LIVE_MESSAGE_STATUS.PENDING) {
+        console.error('HACK(issue #5315): we received a TLM while the status was pending as a leader tab. Fixing up the status, but please report a bug.')
+        this.broadcastStatus(LIVE_MESSAGE_STATUS.OPENED)
+      }
+
       this.broadcastChannel.postMessage({ tlm })
       this.dispatchLiveMessage(tlm)
       this.stopHeartbeatFailureTimer()
@@ -150,9 +161,13 @@ export class LiveMessageManager {
     }
   }
 
+  createBroadcastChannel () {
+    return new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+  }
+
   openBroadcastChannel () {
     if (!this.broadcastChannel) {
-      this.broadcastChannel = new BroadcastChannel(BROADCAST_CHANNEL_NAME)
+      this.broadcastChannel = this.createBroadcastChannel()
       this.broadcastChannel.addEventListener('message', this.broadcastChannelMessageReceived.bind(this))
       this.broadcastChannel.postMessage({ canIHaveStatus: true })
       this.electLeader()

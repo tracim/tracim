@@ -57,6 +57,7 @@ export class AdminWorkspaceUser extends React.Component {
       popupDeleteWorkspaceDisplay: false,
       workspaceToDelete: null,
       workspaceIdOpened: null,
+      loaded: false,
       breadcrumbsList: []
     }
 
@@ -111,12 +112,30 @@ export class AdminWorkspaceUser extends React.Component {
   }
 
   refreshAll = async () => {
+    this.setState({ loaded: false })
     this.updateTitleAndBreadcrumbs()
     if (this.state.config.type === 'workspace') {
       await this.loadSpaceContent()
     } else if (this.state.config.type === 'user') {
       await this.loadUserContent()
     }
+    this.setState({ loaded: true })
+  }
+
+  sortUserList (userList) {
+    return userList.sort((u1, u2) => {
+      const u1PublicName = (u1.public_name || '').toLowerCase()
+      const u2PublicName = (u2.public_name || '').toLowerCase()
+      const u1username = (u1.username || '').toLowerCase()
+      const u2username = (u2.username || '').toLowerCase()
+
+      if (u1PublicName < u2PublicName) return -1
+      if (u1PublicName > u2PublicName) return 1
+      if (u1username < u2username) return -1
+      if (u1username > u2username) return 1
+
+      return u1.user_id - u2.user_id
+    })
   }
 
   async componentDidMount () {
@@ -190,7 +209,7 @@ export class AdminWorkspaceUser extends React.Component {
         this.setState(prev => ({
           content: {
             ...prev.content,
-            userList
+            userList: this.sortUserList(userList)
           }
         }))
         break
@@ -462,7 +481,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: [...prev.content.userList, detailedUser]
+        userList: this.sortUserList([...prev.content.userList, detailedUser])
       }
     }))
   }
@@ -475,7 +494,7 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState(prev => ({
       content: {
         ...prev.content,
-        userList: prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u)
+        userList: this.sortUserList(prev.content.userList.map(u => u.user_id === tlmUser.user_id ? detailedUser : u))
       }
     }))
   }
@@ -528,6 +547,7 @@ export class AdminWorkspaceUser extends React.Component {
       <div>
         {state.config.type === 'workspace' && (
           <AdminWorkspace
+            loaded={state.loaded}
             workspaceList={state.content.workspaceList}
             onClickWorkspace={this.handleClickSpace}
             onClickNewWorkspace={this.handleClickNewSpace}
@@ -538,6 +558,7 @@ export class AdminWorkspaceUser extends React.Component {
 
         {state.config.type === 'user' && (
           <AdminUser
+            loaded={state.loaded}
             userList={state.content.userList}
             loggedUserId={state.loggedUser.userId}
             emailNotifActivated={state.config.system.config.email_notification_activated}

@@ -15,7 +15,7 @@ describe('Login after a disconnection ', function () {
     cy.changeLanguage('en')
     cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '?dc=1' }, waitForTlm: false })
 
-    cy.contains('.flashmessage__container__content__text__paragraph', 'You have been disconnected, please login again')
+    cy.contains('.flashmessage__container__content__text__paragraph', 'You have been disconnected. Please log in again.')
       .should('be.visible')
 
     cy.get('.flashmessage__container__close__icon')

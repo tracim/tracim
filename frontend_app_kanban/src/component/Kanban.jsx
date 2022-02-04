@@ -27,6 +27,7 @@ import {
   putRawFileContent,
   getRawFileContent,
   CardPopup,
+  Loading,
   PromptMessage,
   RefreshWarningMessage,
   sendGlobalFlashMessage
@@ -39,8 +40,10 @@ import KanbanColumnEditor from './KanbanColumnEditor.jsx'
 import KanbanColumnHeader from './KanbanColumnHeader.jsx'
 
 export const BOARD_STATE = {
+  INIT: 'init',
   LOADING: 'loading',
   LOADED: 'loaded',
+  SAVING: 'saving',
   ERROR: 'error'
 }
 
@@ -54,12 +57,11 @@ export class Kanban extends React.Component {
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
       board: { columns: [] },
-      boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.LOADING,
+      boardState: justCreated ? BOARD_STATE.LOADED : BOARD_STATE.INIT,
       editedCardInfos: null,
       editedColumnInfos: null,
-      isAutoCompleteActivated: false,
       saveRequired: false,
-      saving: false
+      isAutoCompleteActivated: false
     }
   }
 
@@ -68,21 +70,28 @@ export class Kanban extends React.Component {
     if (props.isNewContentRevision) this.loadBoardContent()
 
     if (props.content.current_revision_type === 'creation') {
-      this.setState({ boardState: BOARD_STATE.LOADED, board: { columns: [] } })
+      const newBoard = { columns: [] }
+      this.setState({
+        boardState: BOARD_STATE.LOADED,
+        boardInitiallyLoaded: true,
+        saveRequired: true,
+        board: newBoard
+      })
     }
   }
 
   async componentDidUpdate (prevProps) {
-    const { props, state } = this
+    const { state, props } = this
     if (
-      (!state.saving && props.content.current_revision_id !== prevProps.content.current_revision_id) ||
+      (props.content.current_revision_id !== prevProps.content.current_revision_id) ||
       (props.isNewContentRevision && prevProps.isNewContentRevision !== props.isNewContentRevision)
     ) {
       this.loadBoardContent()
     }
+
     if (state.saveRequired) {
+      this.save(state.board)
       this.setState({ saveRequired: false })
-      await this.handleSave()
     }
   }
 
@@ -104,7 +113,8 @@ export class Kanban extends React.Component {
     if (fetchRawFileContent.apiResponse.ok && fetchRawFileContent.body.columns) {
       this.setState({
         boardState: BOARD_STATE.LOADED,
-        board: fetchRawFileContent.body || {}
+        boardInitiallyLoaded: true,
+        board: fetchRawFileContent.body
       })
     } else {
       this.setState({ boardState: BOARD_STATE.ERROR })
@@ -129,14 +139,19 @@ export class Kanban extends React.Component {
         .find(column => column.cards
           .find(columnCard => columnCard.id === card.id))
 
+      const newBoard = column ? removeCard(prevState.board, column, card) : prevState.board
       return {
-        board: column ? removeCard(prevState.board, column, card) : prevState.board,
-        saveRequired: true
+        board: newBoard,
+        saveRequired: true,
+        boardState: BOARD_STATE.SAVING
       }
     })
   }
 
   handleAddCard = (column) => {
+    // RJ - 2022-01-14 - NOTE
+    // we don't call save() here because handleCardEdited will be called after
+    // adding a card
     this.setState({
       editedCardInfos: {
         card: {},
@@ -146,13 +161,20 @@ export class Kanban extends React.Component {
   }
 
   handleCardEdited = (card) => {
-    this.setState(prevState => ({
-      editedCardInfos: null,
-      board: card.id
-        ? changeCard(prevState.board, card.id, card)
-        : addCard(prevState.board, prevState.editedCardInfos.column, { ...card, id: uuidv4() }),
-      saveRequired: true
-    }))
+    this.setState(prevState => {
+      const newBoard = (
+        card.id
+          ? changeCard(prevState.board, card.id, card)
+          : addCard(prevState.board, prevState.editedCardInfos.column, { ...card, id: uuidv4() })
+      )
+
+      return {
+        editedCardInfos: null,
+        board: newBoard,
+        saveRequired: true,
+        boardState: BOARD_STATE.SAVING
+      }
+    })
   }
 
   handleEditColumn = (column) => {
@@ -167,13 +189,17 @@ export class Kanban extends React.Component {
       bgColor: column.bgColor,
       id: column.id || uuidv4()
     }
+
     this.setState(prevState => {
+      const newBoard = column.id
+        ? changeColumn(prevState.board, column, newColumn)
+        : addColumn(prevState.board, { ...newColumn, cards: [] })
+
       return {
         editedColumnInfos: null,
-        board: column.id
-          ? changeColumn(prevState.board, column, newColumn)
-          : addColumn(prevState.board, { ...newColumn, cards: [] }),
-        saveRequired: true
+        board: newBoard,
+        saveRequired: true,
+        boardState: BOARD_STATE.SAVING
       }
     })
   }
@@ -182,16 +208,15 @@ export class Kanban extends React.Component {
     this.setState({ editedColumnInfos: null })
   }
 
-  async handleSave () {
-    const { props, state } = this
-    this.setState({ saving: true })
+  async save (newBoard) {
+    const { props } = this
     const fetchResultSaveKanban = await handleFetchResult(
       await putRawFileContent(
         props.config.apiUrl,
         props.content.workspace_id,
         props.content.content_id,
         props.content.label + KANBAN_FILE_EXTENSION,
-        JSON.stringify(state.board),
+        JSON.stringify(newBoard),
         KANBAN_MIME_TYPE
       )
     )
@@ -206,32 +231,37 @@ export class Kanban extends React.Component {
           break
       }
     }
-    this.setState({ saving: false })
   }
 
   handleRemoveColumn = (column) => {
     this.setState(prevState => {
+      const newBoard = removeColumn(prevState.board, column)
       return {
-        board: removeColumn(prevState.board, column),
-        saveRequired: true
+        board: newBoard,
+        saveRequired: true,
+        boardState: BOARD_STATE.SAVING
       }
     })
   }
 
   handleCardDragEnd = (card, from, to) => {
     this.setState(prevState => {
+      const newBoard = moveCard(prevState.board, from, to)
       return {
-        board: moveCard(prevState.board, from, to),
-        saveRequired: true
+        board: newBoard,
+        saveRequired: true,
+        boardState: BOARD_STATE.SAVING
       }
     })
   }
 
   handleColumnDragEnd = (column, fromPosition, toPosition) => {
     this.setState(prevState => {
+      const newBoard = moveColumn(prevState.board, fromPosition, toPosition)
       return {
-        board: moveColumn(prevState.board, fromPosition, toPosition),
-        saveRequired: true
+        board: newBoard,
+        saveRequired: true,
+        boardState: BOARD_STATE.SAVING
       }
     })
   }
@@ -295,6 +325,7 @@ export class Kanban extends React.Component {
 
   render () {
     const { props, state } = this
+    const changesAllowed = !props.readOnly && state.boardState === BOARD_STATE.LOADED
 
     return (
       <div className={classnames('kanban__contentpage__wrapper', { fullscreen: props.fullscreen })}>
@@ -336,16 +367,22 @@ export class Kanban extends React.Component {
             />
           )}
         </div>
-        {state.boardState === BOARD_STATE.LOADING && <span>{props.t('Loading, please wait…')}</span>}
+        {state.boardState === BOARD_STATE.INIT && <Loading />}
         {state.boardState === BOARD_STATE.ERROR && <span> {props.t('Error while loading the board.')} </span>}
         <>
-          <div className={classnames('kanban__contentpage__wrapper__board', { hidden: state.boardState !== BOARD_STATE.LOADED })}>
+          <div
+            className={classnames('kanban__contentpage__wrapper__board', {
+              hidden: state.boardState === BOARD_STATE.INIT
+            })}
+          >
             <Board
               allowAddColumn={!props.readOnly}
-              allowRemoveColumn={!props.readOnly}
-              allowRenameColumn={!props.readOnly}
-              allowAddCar={!props.readOnly}
-              allowRemoveCard={!props.readOnly}
+              allowRemoveColumn={changesAllowed}
+              allowRenameColumn={changesAllowed}
+              allowAddCard={changesAllowed}
+              allowRemoveCard={changesAllowed}
+              disableCardDrag={!changesAllowed}
+              disableColumnDrag={!changesAllowed}
               onCardDragEnd={this.handleCardDragEnd}
               onColumnDragEnd={this.handleColumnDragEnd}
               onColumnNew={this.handleColumnNew}
@@ -354,18 +391,19 @@ export class Kanban extends React.Component {
               onColumnRename={this.handleEditColumn}
               renderColumnAdder={() => (
                 <div
-                  className='kanban__columnAdder'
+                  className={classnames({ disabled: !changesAllowed }, 'kanban__columnAdder')}
                   key='kanban__columnAdder'
-                  onClick={this.handleEditColumn}
+                  onClick={changesAllowed ? this.handleEditColumn : undefined}
                 >
                   <i className='fa fas fa-fw fa-plus' />
-                  <span>{props.t('Add new column')}</span>
+                  <p>{props.t('Add new column')}</p>
                 </div>
               )}
               renderColumnHeader={column => (
                 <KanbanColumnHeader
                   customColor={props.config.hexcolor}
-                  readOnly={props.readOnly}
+                  readOnly={!changesAllowed}
+                  hideButtonsWhenReadOnly={props.readOnly}
                   column={column}
                   onEditColumn={this.handleEditColumn}
                   onAddCard={this.handleAddCard}
@@ -375,7 +413,8 @@ export class Kanban extends React.Component {
               renderCard={card => (
                 <KanbanCard
                   customColor={props.config.hexcolor}
-                  readOnly={props.readOnly}
+                  readOnly={!changesAllowed}
+                  hideButtonsWhenReadOnly={props.readOnly}
                   card={card}
                   onEditCard={this.handleEditCard}
                   onEditCardContent={this.handleEditCardContent}

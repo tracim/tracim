@@ -7,6 +7,7 @@ import {
   PageTitle,
   PageContent,
   Icon,
+  Loading,
   SPACE_TYPE_LIST,
   htmlToText
 } from 'tracim_frontend_lib'
@@ -83,7 +84,7 @@ const AdminWorkspace = props => {
                       <div className='table__delete adminWorkspace__table__delete'>
                         <button
                           type='button'
-                          className='adminWorkspace__table__delete__icon btn iconBtn primaryColorFont primaryColorFontDarkenHover mr-3'
+                          className='adminWorkspace__table__delete__icon btn iconBtn primaryColorFont primaryColorFontDarkenHover'
                           onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
                         >
                           <i className='far fa-fw fa-trash-alt' />
@@ -95,8 +96,8 @@ const AdminWorkspace = props => {
               })
                 : (
                   <tr>
-                    <td />
-                    <td>{props.t('There is no space yet')}</td>
+                    <td>{!props.loaded && <Loading />}</td>
+                    <td>{props.loaded && props.t('There is no space yet')}</td>
                     <td />
                     <td />
                     <td />
