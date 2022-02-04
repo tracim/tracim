@@ -14,7 +14,7 @@
       &:hover
         background-color transparent
       & > *:last-child
-        text-align left
+        text-align start
 
     &__item
       border borderStyle
@@ -36,13 +36,13 @@
         background-color grey-hover
 
       & > *
-        margin-left standardSpacing
+        margin-inline-start standardSpacing
         flex auto
 
       // buttons "column"
       & > *:last-child
         flex 0 0 220px
-        margin-right standardSpacing
+        margin-inline-end standardSpacing
         text-align center
 
       // type "column"

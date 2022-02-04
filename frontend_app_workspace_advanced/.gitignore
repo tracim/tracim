@@ -3,5 +3,7 @@
 .git/
 node_modules/
 src/debug.js
+test/fixture/defaultProps.js
 dist/workspace_advanced.app.js
 dist/workspace_advanced.app.standalone.js
+dist/workspace_advanced.app.optimized.js

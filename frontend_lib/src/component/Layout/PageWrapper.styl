@@ -8,8 +8,8 @@
 
 .pageTitleGeneric
   position relative
-  padding-left pageSpacing
-  padding-right pageSpacing
+  padding-inline-start pageSpacing
+  padding-inline-end pageSpacing
   width 100%
   background-color offWhite
   border-bottom borderStyle
@@ -22,7 +22,7 @@
     align-items center
     font-size titleFontSize
     &__icon > i
-      margin-right standardSpacing
+      margin-inline-end standardSpacing
     &__label
       overflow hidden
       text-overflow ellipsis
@@ -39,7 +39,10 @@
   .pageWrapperGeneric
     display block
     &__header
-      margin 95px 0 5px 30px
+      margin-top 95px
+      margin-inline-end 0
+      margin-bottom textSpacing
+      margin-inline-start pageSpacing
     &__content
       margin 0
 
@@ -50,7 +53,7 @@
       margin 95px 0 35px 0
       &__title
         display inline-block
-        margin-left 0
+        margin-inline-start 0
     &__content
       margin 0
 
@@ -62,6 +65,8 @@
       margin-top 60px
     &__content
       margin 0
+  .pageContentGeneric
+    padding standardSpacing
 
 #appFullscreenContainer > div[data-radium="true"] > .pageWrapperGeneric
   width auto

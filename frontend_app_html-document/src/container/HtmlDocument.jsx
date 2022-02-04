@@ -799,7 +799,7 @@ export class HtmlDocument extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
-              icon: 'fas fa-plus-circle',
+              icon: 'fas fa-edit',
               label: props.t('Edit'),
               key: props.t('Edit'),
               onClick: this.handleClickNewVersion,

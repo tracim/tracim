@@ -40,9 +40,12 @@ Create a file named `/etc/apache2/sites-available/tracim.conf` containing:
     </Location>
 
     # Proxying Caldav
-    ProxyPassMatch ^/agenda uwsgi://127.0.0.1:6544
-    ProxyPassReverse /agenda uwsgi://127.0.0.1:6544
-
+    ProxyPassMatch ^/dav uwsgi://127.0.0.1:8081
+    ProxyPassReverse /dav uwsgi://127.0.0.1:8081
+    # Note: to ensure smoother transition for client that are able to deal with redirection
+    RedirectMatch 301 "^/agenda/(.*)" "/dav/agenda/$1"
+    Redirect 301 /.well-known/carddav /dav/
+    Redirect 301 /.well-known/caldav /dav/
     # Proxying Frontend
     ProxyPassMatch ^/ui uwsgi://127.0.0.1:6544
     ProxyPassReverse /ui uwsgi://127.0.0.1:6544

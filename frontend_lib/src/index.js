@@ -111,6 +111,7 @@ import PopinFixedRightPartContent from './component/PopinFixed/PopinFixedRightPa
 
 import Avatar, { AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
 import Badge from './component/Badge/Badge.jsx'
+import Popover from './component/Popover/Popover.jsx'
 
 import Timeline from './component/Timeline/Timeline.jsx'
 import CommentArea from './component/Timeline/CommentArea.jsx'
@@ -238,6 +239,7 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
+export const arTranslation = require('../i18next.scanner/ar/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
@@ -453,5 +455,6 @@ export {
   htmlToText,
   getRawFileContent,
   putRawFileContent,
-  postRawFileContent
+  postRawFileContent,
+  Popover
 }

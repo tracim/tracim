@@ -8,6 +8,7 @@ import {
   CUSTOM_EVENT,
   SingleChoiceList,
   handleFetchResult,
+  Popover,
   ROLE_LIST,
   sortWorkspaceList,
   sendGlobalFlashMessage,
@@ -15,8 +16,6 @@ import {
   SPACE_TYPE_LIST,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { Popover, PopoverBody } from 'reactstrap'
-import { isMobile } from 'react-device-detect'
 import {
   getAllowedSpaceTypes,
   getUserSpaces,
@@ -47,7 +46,6 @@ export class PopupCreateWorkspace extends React.Component {
       newType: '',
       newName: '',
       parentOptions: [],
-      popoverDefaultRoleInfoOpen: false,
       showWarningMessage: false
     }
 
@@ -156,10 +154,6 @@ export class PopupCreateWorkspace extends React.Component {
     }
   }
 
-  handleTogglePopoverDefaultRoleInfo = () => {
-    this.setState(prev => ({ popoverDefaultRoleInfoOpen: !prev.popoverDefaultRoleInfoOpen }))
-  }
-
   getTypeList = async () => {
     const fetchGetAllowedSpaceTypes = await handleFetchResult(await getAllowedSpaceTypes(this.state.config.apiUrl))
 
@@ -260,17 +254,9 @@ export class PopupCreateWorkspace extends React.Component {
                   </button>
 
                   <Popover
-                    placement='bottom'
-                    isOpen={state.popoverDefaultRoleInfoOpen}
-                    target='popoverDefaultRoleInfo'
-                    // INFO - GB - 2020-109 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
-                    toggle={this.handleTogglePopoverDefaultRoleInfo} // eslint-disable-line react/jsx-handler-names
-                    trigger={isMobile ? 'focus' : 'hover'}
-                  >
-                    <PopoverBody>
-                      {props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
-                    </PopoverBody>
-                  </Popover>
+                    targetId='popoverDefaultRoleInfo'
+                    popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
+                  />
                 </div>
 
                 <SingleChoiceList

@@ -7,6 +7,7 @@ import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
+import dateFnsAr from 'date-fns/locale/ar-SA'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -62,7 +63,8 @@ export const DATE_FNS_LOCALE = {
   fr: dateFnsFr,
   en: dateFnsEn,
   pt: dateFnsPt,
-  de: dateFnsDe
+  de: dateFnsDe,
+  ar: dateFnsAr
 }
 
 export const generateFetchResponse = async fetchResult => {

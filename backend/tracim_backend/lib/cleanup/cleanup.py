@@ -6,6 +6,8 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
+from tracim_backend.applications.agenda.lib import AgendaApi
+from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.applications.share.models import ContentShare
 from tracim_backend.applications.upload_permissions.models import UploadPermission
 from tracim_backend.config import CFG
@@ -228,22 +230,34 @@ class CleanupLib(object):
         self.safe_delete(workspace)
         return workspace_id
 
-    def delete_workspace_agenda(self, workspace_id: int) -> typing.Optional[str]:
-        agenda_dir = "{}{}{}{}".format(
-            self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            "/collection-root",
-            self.app_config.CALDAV_RADICALE_WORKSPACE_PATH,
-            workspace_id,
+    def delete_workspace_agenda(
+        self, workspace_id: int, resource_type: AgendaResourceType
+    ) -> typing.Optional[str]:
+        agenda_api = AgendaApi(config=self.app_config, current_user=None, session=self.session)
+        resource_type_dir = agenda_api.get_resource_type_dir(resource_type)
+        workspace_agenda_path = self.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=resource_type_dir,
+            workspace_subdir=self.app_config.RADICALE__WORKSPACE_SUBDIR,
+            workspace_id=workspace_id,
+        )
+        agenda_dir = "{local_path}{workspace_agenda_path}".format(
+            local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
+            workspace_agenda_path=workspace_agenda_path,
         )
         logger.info(
-            self, 'delete workspace "{}" agenda dir at "{}"'.format(workspace_id, agenda_dir)
+            self,
+            'delete workspace "{workspace_id}" {resource_type} (agenda) dir at "{agenda_dir}"'.format(
+                workspace_id=workspace_id, resource_type=resource_type.value, agenda_dir=agenda_dir
+            ),
         )
         try:
             self.safe_delete_dir(agenda_dir)
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
-                'Try to delete workspace "{}" agenda but no agenda found at {}'.format(
-                    workspace_id, agenda_dir
+                'Try to delete workspace "{workspace_id}" {resource_type} (agenda) but no {resource_type} found at {agenda_dir}'.format(
+                    workspace_id=workspace_id,
+                    resource_type=resource_type.value,
+                    agenda_dir=agenda_dir,
                 )
             ) from e
         return agenda_dir
@@ -298,24 +312,61 @@ class CleanupLib(object):
         user.groups = []
         self.safe_update(user)
 
-    def delete_user_agenda(self, user_id: int) -> typing.Optional[str]:
+    def delete_user_dav_symlinks(self, user_id: int):
+        resource_dir = "{local_path}/{user_resource_path}".format(
+            local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
+            user_resource_path=self.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+                user_id=user_id
+            ),
+        )
+        logger.info(
+            self,
+            'delete user "{user_id}" DAV resource root dir at "{resource_dir}"'.format(
+                user_id=user_id, resource_dir=resource_dir
+            ),
+        )
+        try:
+            self.safe_delete_dir(resource_dir)
+        except FileNotFoundError as e:
+            raise AgendaNotFoundError(
+                'Try to delete user "{user_id}" DAV resource root but directory {resource_dir} not found'.format(
+                    user_id=user_id, resource_dir=resource_dir,
+                )
+            ) from e
+        return resource_dir
+
+    def delete_user_agenda(
+        self, user_id: int, resource_type: AgendaResourceType
+    ) -> typing.Optional[str]:
         """
         delete agenda of user
         :param user_id: user_id of user whe delete agenda
         :return: path of deleted agenda
         """
-        agenda_dir = "{}{}{}{}".format(
-            self.app_config.CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER,
-            "/collection-root",
-            self.app_config.CALDAV__RADICALE__USER_PATH,
-            user_id,
+        agenda_api = AgendaApi(config=self.app_config, current_user=None, session=self.session)
+        resource_type_dir = agenda_api.get_resource_type_dir(resource_type)
+        user_agenda_path = self.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
+            resource_type_dir=resource_type_dir,
+            user_subdir=self.app_config.RADICALE__USER_SUBDIR,
+            user_id=user_id,
         )
-        logger.info(self, "delete user {} agenda dir : {}".format(user_id, agenda_dir))
+        agenda_dir = "{local_path}{user_agenda_path}".format(
+            local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
+            user_agenda_path=user_agenda_path,
+        )
+        logger.info(
+            self,
+            'delete user "{user_id}" {resource_type} (agenda) dir at "{agenda_dir}"'.format(
+                user_id=user_id, resource_type=resource_type.value, agenda_dir=agenda_dir
+            ),
+        )
         try:
             self.safe_delete_dir(agenda_dir)
         except FileNotFoundError as e:
             raise AgendaNotFoundError(
-                "Try to delete user {} agenda but no agenda found at {}".format(user_id, agenda_dir)
+                'Try to delete user "{user_id}" {resource_type} (agenda) but no {resource_type} found at {agenda_dir}'.format(
+                    user_id=user_id, resource_type=resource_type.value, agenda_dir=agenda_dir,
+                )
             ) from e
         return agenda_dir
 

@@ -2,6 +2,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { Link, withRouter } from 'react-router-dom'
+import { isMobile } from 'react-device-detect'
 import {
   Delimiter,
   IconButton,
@@ -10,9 +11,11 @@ import {
   PageContent,
   BtnSwitch,
   ComposedIcon,
+  Loading,
   CUSTOM_EVENT,
   PROFILE,
-  PROFILE_LIST
+  PROFILE_LIST,
+  ProfileNavigation
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -163,8 +166,9 @@ export class AdminUser extends React.Component {
                 <tr>
                   <th className='adminUser__table__active' scope='col'>{props.t('Active')}</th>
                   <th className='adminUser__table__profile' />
-                  <th className='adminUser__table__fullName' scope='col'>{props.t('User')}</th>
+                  <th className='adminUser__table__fullName' scope='col'>{props.t('Full name')}</th>
                   <th className='adminUser__table__username' scope='col'>{props.t('Username')}</th>
+                  <th className='adminUser__table__user' scope='col'>{props.t('User')}</th>
                   <th className='adminUser__table__email' scope='col'>{props.t('Email')}</th>
                   <th className='adminUser__table__canCreate' scope='col'>{props.t('Can create space')}</th>
                   <th className='adminUser__table__administrator' scope='col'>{props.t('Administrator')}</th>
@@ -172,7 +176,7 @@ export class AdminUser extends React.Component {
               </thead>
 
               <tbody>
-                {props.userList.map(u => {
+                {props.loaded && props.userList.map(u => {
                   const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
@@ -183,22 +187,22 @@ export class AdminUser extends React.Component {
                       <td>
                         <BtnSwitch
                           checked={u.is_active}
+                          inactiveLabel={isMobile ? '' : props.t('Account deactivated')}
                           onChange={e => this.handleToggleUser(e, u.user_id, !u.is_active)}
-                          activeLabel=''
-                          inactiveLabel={props.t('Account deactivated')}
+                          smallSize={isMobile}
                         />
                       </td>
 
                       <td>
                         <i
-                          className={`fa-fw fa-2x ${userProfile.faIcon}`}
+                          className={`fa-fw ${userProfile.faIcon} adminUser__table__profile__icon`}
                           style={{ color: userProfile.hexcolor }}
                           title={props.t(userProfile.label)}
                         />
                       </td>
 
                       <td
-                        className='adminUser__table__tr__td-link primaryColorFont'
+                        className='adminUser__table__tr__td-link primaryColorFont adminUser__table__fullName'
                         title={u.public_name}
                       >
                         <Link to={`/ui/admin/user/${u.user_id}`}>
@@ -206,8 +210,36 @@ export class AdminUser extends React.Component {
                         </Link>
                       </td>
 
-                      <td title={u.username}>
+                      <td
+                        className='adminUser__table__username'
+                        title={u.username}
+                      >
                         {u.username && `@${u.username}`}
+                      </td>
+
+                      <td
+                        className='adminUser__table__tr__td-link primaryColorFont adminUser__table__user'
+                        title={u.public_name}
+                      >
+                        <ProfileNavigation
+                          user={{
+                            userId: u.user_id,
+                            publicName: u.public_name
+                          }}
+                        >
+                          <span
+                            title={u.public_name}
+                          >
+                            {u.public_name}
+                          </span>
+                          {u.username && (
+                            <div
+                              title={`@${u.username}`}
+                            >
+                              @{u.username}
+                            </div>
+                          )}
+                        </ProfileNavigation>
                       </td>
 
                       <td title={u.email}>
@@ -218,9 +250,10 @@ export class AdminUser extends React.Component {
                         <BtnSwitch
                           checked={u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug}
                           onChange={e => this.handleToggleProfileManager(e, u.user_id, !(u.profile === PROFILE.manager.slug || u.profile === PROFILE.administrator.slug))}
-                          activeLabel={props.t('Activated')}
-                          inactiveLabel={props.t('Deactivated')}
+                          activeLabel={isMobile ? '' : props.t('Activated')}
+                          inactiveLabel={isMobile ? '' : props.t('Deactivated')}
                           disabled={!u.is_active}
+                          smallSize={isMobile}
                         />
                       </td>
 
@@ -228,14 +261,30 @@ export class AdminUser extends React.Component {
                         <BtnSwitch
                           checked={u.profile === PROFILE.administrator.slug}
                           onChange={e => this.handleToggleProfileAdministrator(e, u.user_id, !(u.profile === PROFILE.administrator.slug))}
-                          activeLabel={props.t('Activated')}
-                          inactiveLabel={props.t('Deactivated')}
+                          activeLabel={isMobile ? '' : props.t('Activated')}
+                          inactiveLabel={isMobile ? '' : props.t('Deactivated')}
                           disabled={!u.is_active}
+                          smallSize={isMobile}
                         />
                       </td>
                     </tr>
                   )
                 })}
+                {!props.loaded && (
+                  <tr
+                    className='adminUser__table__tr'
+                    data-cy='adminUser__table__tr'
+                  >
+                    <td><Loading /></td>
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                    <td />
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

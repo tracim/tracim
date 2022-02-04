@@ -1,8 +1,16 @@
 import i18n from './i18n.js'
 import { uniqueId } from 'lodash'
 import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
+import i18next from 'i18next'
 
 (function () {
+  // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
+  // but Tracim only uses the main language code
+  const TINY_MCE_LANGUAGE = {
+    fr: 'fr_FR',
+    pt: 'pt_PT'
+  }
+
   function base64EncodeAndTinyMceInsert (files) {
     for (let i = 0; i < files.length; i++) {
       if (files[i].size > 1000000) {
@@ -55,21 +63,6 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
       return parseInt(currentHeight.substr(0, currentHeight.length - 2)) // remove the last 'px' to cast to int
     }
 
-    // TODO - GM - 2020/05/07 - find a better way to handle language support in order to make it more generic
-    // see: https://github.com/tracim/tracim/issues/3011
-    const getTinyMceLang = (lang) => {
-      switch (lang) {
-        case 'fr':
-          return 'fr_FR'
-        case 'pt':
-          return 'pt_PT'
-        case 'de':
-          return 'de'
-        default:
-          return lang
-      }
-    }
-
     const hiddenTinymceFileInput = document.createElement('input')
     hiddenTinymceFileInput.id = 'hidden_tinymce_fileinput'
     hiddenTinymceFileInput.type = 'file'
@@ -86,16 +79,17 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
 
     globalThis.tinymce.init({
       selector: selector,
-      language: getTinyMceLang(lang),
+      directionality: i18next.dir(),
+      language: TINY_MCE_LANGUAGE[lang] || lang,
       menubar: false,
       resize: false,
       skin: 'lightgray',
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist autolink lists link image charmap print preview anchor textcolor searchreplace visualblocks code fullscreen insertdatetime media table contextmenu paste code help',
+      plugins: 'advlist anchor autolink charmap code contextmenu directionality fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
+        'ltr rtl | alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
       ],
       insert_button_items: 'media anchor insertdatetime',
       // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1

@@ -13,7 +13,7 @@ export const AgendaInfo = props => (
     <div className='agendaInfo__content'>
       <div className='agendaInfo__content__text'>
         <div>
-          {props.introText}
+          {props.introText}&nbsp;
           <a
             className='agendaInfo__content__text__help primaryColorFont primaryColorFontDarkenHover'
             href='https://github.com/tracim/tracim/issues/1673'

@@ -3,8 +3,6 @@
   "Last version": "Last version",
   "Validate and create": "Validate and create",
   "Note's title": "Note's title",
-  "latest version: {{versionNumber}}": "latest version: {{versionNumber}}",
-  "Version #{{versionNumber}}": "Version #{{versionNumber}}",
   "Write a note": "Write a note",
   "Notes": "Notes",
   "Edit": "Edit",
@@ -30,5 +28,6 @@
   "Error while saving the user configuration": "Error while saving the user configuration",
   "Your text contains mentions that do not match any member of this space:": "Your text contains mentions that do not match any member of this space:",
   "Validate anyway": "Validate anyway",
-  "Tags": "Tags"
+  "Tags": "Tags",
+  "Delete": "Delete"
 }

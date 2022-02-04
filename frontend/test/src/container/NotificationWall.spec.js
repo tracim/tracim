@@ -14,7 +14,8 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { FETCH_CONFIG } from '../../../src/util/helper.js'
 import {
-  buildTracimLiveMessageEventType, serialize,
+  buildTracimLiveMessageEventType,
+  serialize,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST

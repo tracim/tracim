@@ -33,7 +33,7 @@
     display flex
     &__comments
       display inline-block
-      padding-right standardSpacing
+      padding-inline-end standardSpacing
     & > *
       font-size metadataFontSize
 
@@ -54,6 +54,11 @@
       display none
 
 @media (max-width: max-sm)
+  .timedEvent
+    &__author
+      overflow hidden
+      text-overflow ellipsis
+      white-space nowrap
   .contentListItem
     &__name_path
       & > .breadcrumbs

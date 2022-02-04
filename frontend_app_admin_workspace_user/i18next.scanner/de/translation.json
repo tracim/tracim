@@ -33,7 +33,6 @@
   "User created": "Benutzer erstellt",
   "Email already exists": "E-Mail ist bereits vorhanden",
   "Password": "Passwort",
-  "Create the user": "Erstellen Sie den Benutzer",
   "Create a user": "Einen Benutzer erstellen",
   "Please set a password": "Bitte setzen Sie ein Passwort",
   "Full name": "Vollständiger Name",
@@ -47,5 +46,7 @@
   "Allowed characters: {{allowedCharactersUsername}}": "Erlaubte Zeichen: {{allowedCharactersUsername}}",
   "Please enter a name, an email, a password and select a type": "Bitte geben Sie einen Namen, eine E-Mail, ein Passwort ein und wählen Sie eine Art",
   "Choose the user's type": "Wählen Sie die Art des Benutzers",
-  "Type": "Art"
+  "Type": "Art",
+  "Create and add to spaces": "__NOT_TRANSLATED__",
+  "Create": "__NOT_TRANSLATED__"
 }

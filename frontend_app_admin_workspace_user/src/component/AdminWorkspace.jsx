@@ -7,6 +7,7 @@ import {
   PageTitle,
   PageContent,
   Icon,
+  Loading,
   SPACE_TYPE_LIST,
   htmlToText
 } from 'tracim_frontend_lib'
@@ -48,13 +49,12 @@ const AdminWorkspace = props => {
                 <th className='table__sharedSpace' scope='col'>{props.t('Space')}</th>
                 <th className='table__description' scope='col'>{props.t('Description')}</th>
                 <th className='table__memberCount' scope='col'>{props.t('Members')}</th>
-                {/* <th scope='col'>Calendar</th> */}
                 <th className='table__delete' scope='col'>{props.t('Delete')}</th>
               </tr>
             </thead>
 
             <tbody>
-              {(props.workspaceList.length > 0 ? props.workspaceList/* .sort((a, b) => a.workspace_id > b.workspace_id) */.map(ws => {
+              {(props.workspaceList.length > 0 ? props.workspaceList.map(ws => {
                 const spaceType = SPACE_TYPE_LIST.find(type => type.slug === ws.access_type) || { hexcolor: '', label: '', faIcon: '' }
                 const descriptionText = htmlToText(parser, ws.description)
                 return (
@@ -79,20 +79,12 @@ const AdminWorkspace = props => {
                       {ws.label}
                     </td>
                     <td className='table__description adminWorkspace__workspaceTable__tr__td-description'>{descriptionText}</td>
-                    {/*
-                       <td className='d-flex align-items-center flex-wrap'>
-                       <div className='adminWorkspace__workspaceTable__calendaricon mr-2'>
-                       <i className='far fa-fw fa-check-square' />
-                       </div>
-                       Enable
-                       </td>
-                    */}
                     <td className='table__memberCount'>{ws.number_of_members}</td>
                     <td>
                       <div className='table__delete adminWorkspace__table__delete'>
                         <button
                           type='button'
-                          className='adminWorkspace__table__delete__icon btn iconBtn primaryColorFont primaryColorFontDarkenHover mr-3'
+                          className='adminWorkspace__table__delete__icon btn iconBtn primaryColorFont primaryColorFontDarkenHover'
                           onClick={() => props.onClickDeleteWorkspace(ws.workspace_id)}
                         >
                           <i className='far fa-fw fa-trash-alt' />
@@ -104,8 +96,8 @@ const AdminWorkspace = props => {
               })
                 : (
                   <tr>
-                    <td />
-                    <td>{props.t('There is no space yet')}</td>
+                    <td>{!props.loaded && <Loading />}</td>
+                    <td>{props.loaded && props.t('There is no space yet')}</td>
                     <td />
                     <td />
                     <td />

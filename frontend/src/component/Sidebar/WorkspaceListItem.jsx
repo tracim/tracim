@@ -92,7 +92,7 @@ class WorkspaceListItem extends React.Component {
           props.level > 0 && (
             <div
               style={{
-                marginLeft: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
+                marginInlineStart: `${(props.level - 1) * INDENT_WIDTH + BASE_MARGIN}px`
               }}
             />
           )
@@ -115,6 +115,7 @@ class WorkspaceListItem extends React.Component {
             { sidebar__content__navigation__item__withoutChildren: !props.hasChildren }
           )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
+          onClick={isMobile ? props.onClickToggleSidebar : () => {}}
         >
           {(props.canDrop && props.isOver) && (
             <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
@@ -178,6 +179,7 @@ WorkspaceListItem.propTypes = {
   onClickAllContent: PropTypes.func,
   activeWorkspaceId: PropTypes.number,
   level: PropTypes.number,
+  onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.number
 }
@@ -189,6 +191,7 @@ WorkspaceListItem.defaultProps = {
   onClickAllContent: () => { },
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   level: 0,
+  onClickToggleSidebar: () => {},
   onToggleFoldChildren: () => {},
   userRoleIdInWorkspace: ROLE.reader.id
 }

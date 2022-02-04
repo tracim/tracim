@@ -140,7 +140,7 @@ class CreateUserCommand(UserCommand):
         if not parsed_args.password and parsed_args.send_email:
             parsed_args.password = password_generator()
         try:
-            user = self._user_api.create_user(
+            self._user_api.create_user(
                 email=parsed_args.email,
                 name=parsed_args.public_name,
                 password=parsed_args.password,
@@ -153,7 +153,6 @@ class CreateUserCommand(UserCommand):
                 do_save=True,
                 do_notify=parsed_args.send_email,
             )
-            self._user_api.execute_created_user_actions(user)
         except TracimException as exc:
             self._session.rollback()
             print("Error: " + str(exc))
@@ -188,7 +187,7 @@ class UpdateUserCommand(UserCommand):
         if parsed_args.profile:
             profile = Profile.get_profile_from_slug(parsed_args.profile)
         try:
-            user = self._user_api.update(
+            self._user_api.update(
                 user=user,
                 email=parsed_args.email,
                 name=parsed_args.public_name,
@@ -199,7 +198,6 @@ class UpdateUserCommand(UserCommand):
                 profile=profile,
                 do_save=True,
             )
-            self._user_api.execute_created_user_actions(user)
         except TracimException as exc:
             self._session.rollback()
             print("Error: " + str(exc))

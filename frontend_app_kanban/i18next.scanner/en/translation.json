@@ -8,13 +8,12 @@
   "You must change the status or restore this kanban board before any change": "You must change the status or restore this kanban board before any change",
   "Error while saving the new version": "Error while saving the new version",
   "Fullscreen": "Fullscreen",
-  "Loading, please wait…": "Loading, please wait…",
   "Error while loading the board.": "Error while loading the board.",
   "Editing Card": "Editing Card",
   "New Card": "New Card",
   "Title:": "Title:",
   "Description:": "Description:",
-  "Color:": "Color:",
+  "Color:": "Colour:",
   "Deadline:": "Deadline:",
   "Cancel": "Cancel",
   "Validate": "Validate",
@@ -41,5 +40,8 @@
   "Delete this column": "Delete this column",
   "Exit fullscreen mode": "Exit fullscreen mode",
   "See more": "See more",
-  "See less": "See less"
+  "See less": "See less",
+  "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
+  "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
+  "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files"
 }

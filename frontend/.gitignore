@@ -4,5 +4,7 @@ node_modules/
 dist/assets/branding
 dist/assets/tracim.app.js
 dist/assets/tracim.vendors~app.js
+dist/assets/tracim.app.optimized.js
+dist/assets/tracim.vendors~app.optimized.js
 dist/assets/custom_toolbox/
 configEnv.json

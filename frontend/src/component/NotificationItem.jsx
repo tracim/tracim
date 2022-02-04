@@ -56,7 +56,15 @@ const NotificationItem = props => {
         </div>
       </div>
       <div className='notification__list__item__circle__wrapper'>
-        {!notification.read && <i className='notification__list__item__circle fas fa-circle' />}
+        {!notification.read &&
+          <i
+            className='notification__list__item__circle fas fa-circle'
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              props.onClickCircle(notification.id)
+            }}
+          />}
       </div>
     </Link>
 
@@ -67,6 +75,7 @@ export default translate()(TracimComponent(NotificationItem))
 NotificationItem.propTypes = {
   getNotificationDetails: PropTypes.func.isRequired,
   notification: PropTypes.object.isRequired,
+  onClickCircle: PropTypes.func.isRequired,
   onClickNotification: PropTypes.func.isRequired,
   shortDate: PropTypes.func.isRequired,
   user: PropTypes.object.isRequired

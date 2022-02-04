@@ -18,7 +18,7 @@
     color offWhite
 
   &__text-with-icon
-    padding-left 5px
+    padding-inline-start textSpacing
     white-space pre
 
   &__icon
@@ -78,6 +78,8 @@
 
 @media (min-width: min-xs) && (max-width: max-xs)
   .iconbutton
+    &__icon
+      margin 0
     &__label
       display none
       &-mobile

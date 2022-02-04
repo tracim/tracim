@@ -34,6 +34,7 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   PAGE
 } from 'tracim_frontend_lib'
+import { isMobile } from 'react-device-detect'
 
 const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 
@@ -157,8 +158,14 @@ export class Header extends React.Component {
                     className='btn outlineTextBtn primaryColorBorder nohover'
                     to={PAGE.AGENDA}
                   >
-                    <i className='fas fa-fw fa-calendar-alt' />
-                    {props.t('Agendas')}
+                    <div
+                      data-toggle={isMobile ? 'collapse' : ''}
+                      data-target='#navbarSupportedContent'
+                      className='collapseNavbar'
+                    >
+                      <i className='fas fa-fw fa-calendar-alt' />
+                      {props.t('Agendas')}
+                    </div>
                   </Link>
                 </li>
               )}

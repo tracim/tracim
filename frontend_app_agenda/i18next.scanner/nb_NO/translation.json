@@ -1,0 +1,12 @@
+{
+  "Space": "Rom",
+  "Error while loading space list": "Kunne ikke åpne liste over rom",
+  "Spaces": "Rom",
+  "Agenda": "Agenda",
+  "Some agenda could not be loaded": "Noen agendaer kunne ikke lastes inn",
+  "My agendas": "Mine agendaer",
+  "Some information was modified by {{author}}": "Noe av informasjonen ble endret av {{author}}",
+  "User": "Bruker",
+  "All my agendas": "Alle mine agendaer",
+  "Agenda of space {{workspaceLabel}}": "Agenda for {{workspaceLabel}}-rommet"
+}

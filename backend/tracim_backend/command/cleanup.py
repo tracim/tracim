@@ -5,6 +5,7 @@ import typing
 from pyramid.scripting import AppEnvironment
 
 from tracim_backend import UserDoesNotExist
+from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaNotFoundError
@@ -185,7 +186,12 @@ class DeleteUserCommand(AppContextCommand):
                     )
                     for workspace_id in deleted_workspace_ids:
                         try:
-                            cleanup_lib.delete_workspace_agenda(workspace_id)
+                            cleanup_lib.delete_workspace_agenda(
+                                workspace_id, resource_type=AgendaResourceType.calendar
+                            )
+                            cleanup_lib.delete_workspace_agenda(
+                                workspace_id, resource_type=AgendaResourceType.addressbook
+                            )
                         except AgendaNotFoundError:
                             print(
                                 'Warning: Cannot delete agenda for workspace "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
@@ -199,7 +205,9 @@ class DeleteUserCommand(AppContextCommand):
                     print("delete agenda of users {}".format(", ".join(deleted_user_ids_str)))
                     for user_id in deleted_user_ids:
                         try:
-                            cleanup_lib.delete_user_agenda(user_id)
+                            cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.calendar)
+                            cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.addressbook)
+                            cleanup_lib.delete_user_dav_symlinks(user_id)
                         except AgendaNotFoundError:
                             print(
                                 'Warning: Cannot delete agenda for user "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(

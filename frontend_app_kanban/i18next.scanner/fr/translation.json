@@ -1,6 +1,6 @@
 {
   "Create a Kanban board": "Créer un tableau Kanban",
-  "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
+  "Error while saving the comment": "Erreur pendant la sauvegarde du commentaire",
   "Delete": "Supprimer",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while creating kanban": "Erreur pendant la création du tableau Kanban",
@@ -8,14 +8,13 @@
   "You must change the status or restore this kanban board before any change": "Vous devez changer le statut ou restaurer ce tableau Kanban avant de pouvoir l'éditer",
   "Error while saving the new version": "Erreur lors de la sauvegarde de la nouvelle version",
   "Fullscreen": "Plein écran",
-  "Loading, please wait…": "Chargement en cours, veuillez patienter…",
-  "Error while loading the board.": "Erreur lors du chargement du tableau",
-  "Editing Card": "Edition de la carte",
+  "Error while loading the board.": "Erreur lors du chargement du tableau.",
+  "Editing Card": "Édition de la carte",
   "New Card": "Nouvelle carte",
-  "Title:": "Titre :",
-  "Description:": "Description :",
-  "Color:": "Couleur :",
-  "Deadline:": "Échéance :",
+  "Title:": "Titre :",
+  "Description:": "Description :",
+  "Color:": "Couleur :",
+  "Deadline:": "Échéance :",
   "Cancel": "Annuler",
   "Validate": "Valider",
   "Add a card": "Ajouter une carte",
@@ -41,5 +40,8 @@
   "Delete this column": "Supprimer cette colonne",
   "Exit fullscreen mode": "Quitter le mode plein écran",
   "See more": "Voir plus",
-  "See less": "Voir moins"
+  "See less": "Voir moins",
+  "The file is larger than the maximum file size allowed": "__NOT_TRANSLATED__",
+  "Error, the space exceed its maximum size": "__NOT_TRANSLATED__",
+  "You have reached your storage limit, you cannot add new files": "__NOT_TRANSLATED__"
 }

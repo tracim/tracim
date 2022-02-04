@@ -1,0 +1,29 @@
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './i18n.js'
+import 'core-js/stable'
+import 'regenerator-runtime/runtime'
+import { Avatar, AVATAR_SIZE } from './component/Avatar/Avatar.jsx'
+
+/*
+INFO - CH - 2021-12-30 - This file is only used by frontend_lib yarn run servdev.
+It allows developing and testing frontend_lib components using frontend_lib webpack dev server
+To use is:
+- Bellow, replace <Avatar /> with the component you want to test and give it some static props
+- cd tracim/frontend_lib/
+- yarn run servdev
+- Connect to http://localhost:8070
+*/
+
+ReactDOM.render(
+  <div>
+    <Avatar
+      apiUrl='/api/user'
+      customClass=''
+      user={{ publicName: 'testName' }}
+      size={AVATAR_SIZE.MEDIUM}
+      style={{}}
+    />
+  </div>
+  , document.getElementById('content')
+)
