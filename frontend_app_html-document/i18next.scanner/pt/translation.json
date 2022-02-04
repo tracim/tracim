@@ -8,13 +8,13 @@
   "Edit": "Editar",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Error while creating note": "Erro ao criar a nota",
-  "Error while saving the comment": "Erro ao salvar o comentário",
+  "Error while saving the comment": "Erro ao guardar o comentário",
   "This content is archived": "Este conteúdo está arquivado",
   "Restore": "Restaurar",
   "This content is deleted": "Este conteúdo está eliminado",
   "You have a pending draft": "Você tem um rascunho pendente",
   "Resume writing": "Continuar a escrever",
-  "Error while saving the new version": "Erro ao salvar a nova versão",
+  "Error while saving the new version": "Erro ao guardar a nova versão",
   "Note": "Nota",
   "note": "nota",
   "notes": "notas",
@@ -29,5 +29,5 @@
   "Your text contains mentions that do not match any member of this space:": "O seu texto contém menções que não correspondem a nenhum membro deste espaço:",
   "Validate anyway": "Validar de qualquer forma",
   "Tags": "Etiquetas",
-  "Delete": "__NOT_TRANSLATED__"
+  "Delete": "Eliminar"
 }

@@ -6,10 +6,10 @@
   "Start a topic": "Começar uma discussão",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
   "Error while creating thread": "Erro ao criar a discussão",
-  "Error while saving the comment": "Erro ao salvar o comentário",
+  "Error while saving the comment": "Erro ao guardar o comentário",
   "Thread": "Discussão",
   "thread": "discussão",
   "threads": "discussões",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
-  "Delete": "__NOT_TRANSLATED__"
+  "Delete": "Eliminar"
 }

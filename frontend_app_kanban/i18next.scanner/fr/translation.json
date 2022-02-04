@@ -41,7 +41,7 @@
   "Exit fullscreen mode": "Quitter le mode plein écran",
   "See more": "Voir plus",
   "See less": "Voir moins",
-  "The file is larger than the maximum file size allowed": "__NOT_TRANSLATED__",
-  "Error, the space exceed its maximum size": "__NOT_TRANSLATED__",
-  "You have reached your storage limit, you cannot add new files": "__NOT_TRANSLATED__"
+  "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
+  "Error, the space exceed its maximum size": "Erreur, l'espace dépasse sa taille maximale",
+  "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers"
 }
