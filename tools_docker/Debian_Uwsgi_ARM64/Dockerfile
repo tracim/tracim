@@ -35,6 +35,7 @@ RUN apt-get install -qy --no-install-recommends \
 # - installs optional dependencies
 ####
 FROM base AS build_backend
+
 ARG PACKAGE_DIR
 # Specific ARM64 requirements to disable VTK support
 COPY requirements-full-preview-generator_ARM64.txt /tracim/backend/requirements-full-preview-generator.txt
