@@ -235,17 +235,14 @@ class CleanupLib(object):
     ) -> typing.Optional[str]:
         agenda_api = AgendaApi(config=self.app_config, current_user=None, session=self.session)
         resource_type_dir = agenda_api.get_resource_type_dir(resource_type)
-        resource_type_dir = self.get_resource_type_dir(resource_type)
         workspace_agenda_path = self.app_config.RADICALE__WORKSPACE_AGENDA_PATH_PATTERN.format(
             resource_type_dir=resource_type_dir,
             workspace_subdir=self.app_config.RADICALE__WORKSPACE_SUBDIR,
             workspace_id=workspace_id,
         )
-        agenda_dir = (
-            "{local_path}{workspace_agenda_path}".format(
-                local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
-                workspace_agenda_path=workspace_agenda_path,
-            ),
+        agenda_dir = "{local_path}{workspace_agenda_path}".format(
+            local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
+            workspace_agenda_path=workspace_agenda_path,
         )
         logger.info(
             self,
@@ -315,6 +312,29 @@ class CleanupLib(object):
         user.groups = []
         self.safe_update(user)
 
+    def delete_user_dav_symlinks(self, user_id: int):
+        resource_dir = "{local_path}/{user_resource_path}".format(
+            local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
+            user_resource_path=self.app_config.RADICALE__USER_RESOURCE_DIR_PATTERN.format(
+                user_id=user_id
+            ),
+        )
+        logger.info(
+            self,
+            'delete user "{user_id}" DAV resource root dir at "{resource_dir}"'.format(
+                user_id=user_id, resource_dir=resource_dir
+            ),
+        )
+        try:
+            self.safe_delete_dir(resource_dir)
+        except FileNotFoundError as e:
+            raise AgendaNotFoundError(
+                'Try to delete user "{user_id}" DAV resource root but directory {resource_dir} not found'.format(
+                    user_id=user_id, resource_dir=resource_dir,
+                )
+            ) from e
+        return resource_dir
+
     def delete_user_agenda(
         self, user_id: int, resource_type: AgendaResourceType
     ) -> typing.Optional[str]:
@@ -325,17 +345,14 @@ class CleanupLib(object):
         """
         agenda_api = AgendaApi(config=self.app_config, current_user=None, session=self.session)
         resource_type_dir = agenda_api.get_resource_type_dir(resource_type)
-        resource_type_dir = self.get_resource_type_dir(resource_type)
         user_agenda_path = self.app_config.RADICALE__USER_AGENDA_PATH_PATTERN.format(
             resource_type_dir=resource_type_dir,
             user_subdir=self.app_config.RADICALE__USER_SUBDIR,
             user_id=user_id,
         )
-        agenda_dir = (
-            "{local_path}{user_agenda_path}".format(
-                local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
-                user_agenda_path=user_agenda_path,
-            ),
+        agenda_dir = "{local_path}{user_agenda_path}".format(
+            local_path=self.app_config.RADICALE__LOCAL_PATH_STORAGE,
+            user_agenda_path=user_agenda_path,
         )
         logger.info(
             self,

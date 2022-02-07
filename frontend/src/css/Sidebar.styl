@@ -1,32 +1,45 @@
 sidebar-animate-speed = 0.5s
 
-[dir=ltr] .sidebar
-  box-shadow -1px 2px 2px 1px var(--sidebarColor)
+[dir=ltr]
+  .sidebar
+    &__frame
+      box-shadow -1px 2px 2px 1px var(--sidebarColor)
+    &__expand
+      left sidebarWidth
+      &.sidebarclose
+        left 0
 
-[dir=rtl] .sidebar
-  box-shadow 1px 2px 2px 1px var(--sidebarColor)
+[dir=rtl]
+  .sidebar
+    &__frame
+      box-shadow 1px 2px 2px 1px var(--sidebarColor)
+    &__expand
+      right sidebarWidth
+      &.sidebarclose
+        right 0
 
 .sidebar
-  background-color var(--sidebarColor)
-  z-index 10
-
   &__expand
     align-items center
+    background-color var(--sidebarColor)
     cursor pointer
     color offWhite
     display flex
-    min-width sidebarWidthReduced
     padding standardSpacing
-
+    position absolute
+    transition all sidebar-animate-speed
+    z-index 15
     &:hover
       background-color var(--sidebarColorDarken)
     & i
       margin-inline-start auto
   &__frame
+    background-color var(--sidebarColor)
     height "calc(100vh - %s)" % headerHeight
     position relative
     transition all sidebar-animate-speed
     width sidebarWidth
+    z-index 10
     &.sidebarclose
       width 0
       overflow hidden

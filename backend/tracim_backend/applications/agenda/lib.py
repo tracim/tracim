@@ -1,3 +1,5 @@
+import contextlib
+from enum import Enum
 import os
 import typing
 from xml.sax.saxutils import escape
@@ -65,6 +67,12 @@ CREATE_ADDRESSBOOK_TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
 """
 
 
+class AgendaSyncState(str, Enum):
+    CREATED = "created"  # Agenda created during sync
+    DISABLED = "disabled"  # Agenda disabled (not created but not deleted if exist)
+    EXISTING = "existing"  # Agenda enabled and already exist
+
+
 class CalendarDescription(ValuedBaseElement):
     tag = ns("C", "calendar-description")
 
@@ -90,6 +98,12 @@ class AgendaApi(object):
         else:
             # TODO - G.M - 2019-03-13 - Better deal with other error code
             return False
+
+    def user_has_agenda_enabled(self, user: User):
+        return user.is_active and not user.is_deleted
+
+    def workspace_has_agenda_enabled(self, workspace: Workspace):
+        return workspace.agenda_enabled and not workspace.is_deleted
 
     def create_collection(self, url, name, description, type: AgendaResourceType):
         logger.debug(
@@ -233,7 +247,51 @@ class AgendaApi(object):
             base_url=base_url, user_agenda_path=user_agenda_path
         )
 
-    def ensure_workspace_agenda_exists(self, workspace: Workspace) -> bool:
+    def sync_user_agenda(self, user: User) -> AgendaSyncState:
+        if self.user_has_agenda_enabled(user):
+            if self._ensure_user_agenda_exists(user=user):
+                state = AgendaSyncState.EXISTING
+            else:
+                state = AgendaSyncState.CREATED
+        else:
+            # INFO - GM - 2022-27-01  - We do not delete existing agenda if set to disabled
+            state = AgendaSyncState.DISABLED
+        self.sync_user_symlinks(user=user)
+        return state
+
+    def sync_workspace_agenda(self, workspace: Workspace) -> AgendaSyncState:
+        if self.workspace_has_agenda_enabled(workspace):
+            if self._ensure_workspace_agenda_exists(workspace=workspace):
+                state = AgendaSyncState.EXISTING
+            else:
+                state = AgendaSyncState.CREATED
+        else:
+            # INFO - GM - 2022-27-01  - We do not delete existing agenda if set to disabled
+            state = AgendaSyncState.DISABLED
+        for role in workspace.roles:
+            self.sync_workspace_symlinks(workspace=workspace, user=role.user)
+        return state
+
+    def sync_user_symlinks(self, user: User):
+        if self.user_has_agenda_enabled(user):
+            self._ensure_user_symlinks_exist(user)
+        else:
+            self._ensure_user_symlinks_missing(user)
+
+    def sync_workspace_symlinks(self, user: User, workspace: Workspace, role_deletion=False):
+        # TODO - G.M - 2022-01-27 - Reconsider role_deletion option with change in role before
+        # deletion like deleted status for User or Workspace ?
+
+        if (
+            self.workspace_has_agenda_enabled(workspace)
+            and self.user_has_agenda_enabled(user=user)
+            and not role_deletion
+        ):
+            self._ensure_workspace_symlinks_exist(user, workspace)
+        else:
+            self._ensure_workspace_symlinks_missing(user, workspace)
+
+    def _ensure_workspace_agenda_exists(self, workspace: Workspace) -> bool:
         """
         Return true if agenda already exist, false if it was just create
         raise Exception if agenda cannot be created.
@@ -277,16 +335,9 @@ class AgendaApi(object):
                 type=AgendaResourceType.addressbook,
             )
             result = True
-        for role in workspace.roles:
-            self._create_workspace_symlinks(
-                workspace.workspace_id, role.user_id, resource_type=AgendaResourceType.calendar
-            )
-            self._create_workspace_symlinks(
-                workspace.workspace_id, role.user_id, resource_type=AgendaResourceType.addressbook
-            )
         return result
 
-    def ensure_user_agenda_exists(self, user: User) -> bool:
+    def _ensure_user_agenda_exists(self, user: User) -> bool:
         """
         Return true if agenda already exist, false if it was just create
         raise Exception if agenda cannot be created.
@@ -326,12 +377,6 @@ class AgendaApi(object):
                 type=AgendaResourceType.addressbook,
             )
             result = True
-        self._create_user_symlinks(
-            user.user_id, user.user_id, resource_type=AgendaResourceType.calendar
-        )
-        self._create_user_symlinks(
-            user.user_id, user.user_id, resource_type=AgendaResourceType.addressbook
-        )
         return result
 
     def get_resource_type_dir(self, resource_type: AgendaResourceType) -> typing.Optional[str]:
@@ -358,8 +403,8 @@ class AgendaApi(object):
             local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
             user_resource_path=user_resource_path,
         )
-
-        os.remove(symlink_path)
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(symlink_path)
 
     def _create_user_symlinks(
         self, original_user_id: int, dest_user_id: int, resource_type: AgendaResourceType
@@ -400,6 +445,46 @@ class AgendaApi(object):
                 symlink_path,
             )
 
+    def _ensure_user_symlinks_exist(self, user: User):
+        self._create_user_symlinks(
+            user.user_id, user.user_id, resource_type=AgendaResourceType.calendar
+        )
+        self._create_user_symlinks(
+            user.user_id, user.user_id, resource_type=AgendaResourceType.addressbook
+        )
+
+    def _ensure_user_symlinks_missing(self, user: User):
+        self._delete_user_symlinks(
+            user.user_id, user.user_id, resource_type=AgendaResourceType.calendar
+        )
+        self._delete_user_symlinks(
+            user.user_id, user.user_id, resource_type=AgendaResourceType.addressbook
+        )
+
+    def _ensure_workspace_symlinks_exist(self, user: User, workspace: Workspace):
+        self._create_workspace_symlinks(
+            workspace_id=workspace.workspace_id,
+            dest_user_id=user.user_id,
+            resource_type=AgendaResourceType.calendar,
+        )
+        self._create_workspace_symlinks(
+            workspace_id=workspace.workspace_id,
+            dest_user_id=user.user_id,
+            resource_type=AgendaResourceType.addressbook,
+        )
+
+    def _ensure_workspace_symlinks_missing(self, user: User, workspace: Workspace):
+        self._delete_workspace_symlinks(
+            workspace_id=workspace.workspace_id,
+            dest_user_id=user.user_id,
+            resource_type=AgendaResourceType.calendar,
+        )
+        self._delete_workspace_symlinks(
+            workspace_id=workspace.workspace_id,
+            dest_user_id=user.user_id,
+            resource_type=AgendaResourceType.addressbook,
+        )
+
     def _delete_workspace_symlinks(
         self, workspace_id: int, dest_user_id: int, resource_type: AgendaResourceType
     ):
@@ -416,7 +501,8 @@ class AgendaApi(object):
             local_path=self._config.RADICALE__LOCAL_PATH_STORAGE,
             user_resource_path=user_resource_path,
         )
-        os.remove(symlink_path)
+        with contextlib.suppress(FileNotFoundError):
+            os.remove(symlink_path)
 
     def _create_workspace_symlinks(
         self, workspace_id: int, dest_user_id: int, resource_type: AgendaResourceType
@@ -544,40 +630,39 @@ class AgendaApi(object):
 
 
 class AgendaHooks:
-    def ensure_workspace_agenda_exists(
+    def sync_workspace_agenda(
         self, workspace: Workspace, context: TracimContext, create_event: bool
     ):
-        app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist(AGENDA__APP_SLUG):
-            if workspace.agenda_enabled:
-                agenda_api = AgendaApi(
-                    current_user=None, session=context.dbsession, config=context.app_config
-                )
-                try:
-                    agenda_already_exists = agenda_api.ensure_workspace_agenda_exists(workspace)
-                    if create_event and agenda_already_exists:
-                        logger.warning(
-                            self,
-                            "workspace {} is just created but its own agenda already exists !!".format(
-                                workspace.workspace_id
-                            ),
-                        )
-                except AgendaServerConnectionError as exc:
-                    logger.error(self, "Cannot connect to agenda server")
-                    logger.exception(self, exc)
-                except Exception as exc:
-                    logger.error(self, "Something goes wrong during agenda create/update")
-                    logger.exception(self, exc)
-
-    def ensure_user_agenda_exists(self, user: User, context: TracimContext, create_event: bool):
         app_lib = ApplicationApi(app_list=app_list)
         if app_lib.exist(AGENDA__APP_SLUG):
             agenda_api = AgendaApi(
                 current_user=None, session=context.dbsession, config=context.app_config
             )
             try:
-                agenda_already_exists = agenda_api.ensure_user_agenda_exists(user)
-                if agenda_already_exists and create_event:
+                state = agenda_api.sync_workspace_agenda(workspace)
+                if create_event and state == AgendaSyncState.CREATED:
+                    logger.warning(
+                        self,
+                        "workspace {} is just created but its own agenda already exists !!".format(
+                            workspace.workspace_id
+                        ),
+                    )
+            except AgendaServerConnectionError as exc:
+                logger.error(self, "Cannot connect to agenda server")
+                logger.exception(self, exc)
+            except Exception as exc:
+                logger.error(self, "Something goes wrong during agenda create/update")
+                logger.exception(self, exc)
+
+    def sync_user_agenda(self, user: User, context: TracimContext, create_event: bool):
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
+            agenda_api = AgendaApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            try:
+                state = agenda_api.sync_user_agenda(user)
+                if create_event and state == AgendaSyncState.CREATED:
                     logger.warning(
                         self,
                         "user {} has just been created but their own agenda already exists".format(
@@ -591,66 +676,62 @@ class AgendaHooks:
                 logger.error(self, "Something went wrong during agenda create/update")
                 logger.exception(self, exc)
 
+    def sync_workspace_symlinks(
+        self, role: UserRoleInWorkspace, context: TracimContext, role_deletion=False
+    ):
+        app_lib = ApplicationApi(app_list=app_list)
+        if app_lib.exist(AGENDA__APP_SLUG):
+            agenda_api = AgendaApi(
+                current_user=None, session=context.dbsession, config=context.app_config
+            )
+            agenda_api.sync_workspace_symlinks(
+                role.user, role.workspace, role_deletion=role_deletion
+            )
+
     @hookimpl
     def on_workspace_created(self, workspace: Workspace, context: TracimContext) -> None:
-        self.ensure_workspace_agenda_exists(workspace, context, create_event=True)
+        self.sync_workspace_agenda(workspace, context, create_event=True)
 
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
-
-        self.ensure_workspace_agenda_exists(workspace, context, create_event=False)
+        self.sync_workspace_agenda(workspace, context, create_event=False)
 
     @hookimpl
     def on_user_created(self, user: User, context: TracimContext) -> None:
-
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with new auth system
         user.ensure_auth_token(validity_seconds=context.app_config.USER__AUTH_TOKEN__VALIDITY)
-        self.ensure_user_agenda_exists(user, context, create_event=True)
+        self.sync_user_agenda(user, context, create_event=True)
 
     @hookimpl
     def on_user_modified(self, user: User, context: TracimContext) -> None:
         # TODO - G.M - 04-04-2018 - [auth]
         # Check if this is already needed with new auth system
         user.ensure_auth_token(validity_seconds=context.app_config.USER__AUTH_TOKEN__VALIDITY)
-        self.ensure_user_agenda_exists(user, context, create_event=False)
+        self.sync_user_agenda(user, context, create_event=False)
+        for role in user.roles:
+            self.sync_workspace_symlinks(role, context)
+
+    @hookimpl
+    def on_user_deleted(self, user: User, context: TracimContext) -> None:
+        self.sync_user_agenda(user, context, create_event=False)
+        for role in user.roles:
+            self.sync_workspace_symlinks(role, context)
 
     @hookimpl
     def on_user_role_in_workspace_deleted(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist(AGENDA__APP_SLUG):
-            agenda_api = AgendaApi(
-                current_user=None, session=context.dbsession, config=context.app_config
-            )
-            agenda_api._delete_workspace_symlinks(
-                workspace_id=role.workspace_id,
-                dest_user_id=role.user_id,
-                resource_type=AgendaResourceType.calendar,
-            )
-            agenda_api._delete_workspace_symlinks(
-                workspace_id=role.workspace_id,
-                dest_user_id=role.user_id,
-                resource_type=AgendaResourceType.addressbook,
-            )
+        self.sync_workspace_symlinks(role=role, context=context, role_deletion=True)
+
+    @hookimpl
+    def on_user_role_in_workspace_modified(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self.sync_workspace_symlinks(role=role, context=context)
 
     @hookimpl
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        app_lib = ApplicationApi(app_list=app_list)
-        if app_lib.exist(AGENDA__APP_SLUG):
-            agenda_api = AgendaApi(
-                current_user=None, session=context.dbsession, config=context.app_config
-            )
-            agenda_api._create_workspace_symlinks(
-                workspace_id=role.workspace_id,
-                dest_user_id=role.user_id,
-                resource_type=AgendaResourceType.calendar,
-            )
-            agenda_api._create_workspace_symlinks(
-                workspace_id=role.workspace_id,
-                dest_user_id=role.user_id,
-                resource_type=AgendaResourceType.addressbook,
-            )
+        self.sync_workspace_symlinks(role=role, context=context)

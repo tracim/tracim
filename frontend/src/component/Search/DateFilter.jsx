@@ -65,7 +65,7 @@ export class DateFilter extends React.Component {
             name={`${props.id}_${DATE_FILTER_ELEMENT.AFTER}`}
             onClickCheckbox={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.AFTER)}
             checked={props.isAfterCheckboxChecked}
-            styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+            styleLabel={{ marginInlineStart: '5px', marginInlineEnd: '10px' }}
             styleCheck={{ top: '-5px' }}
             disabled={props.afterDate === ''}
           />
@@ -96,7 +96,7 @@ export class DateFilter extends React.Component {
             name={`${props.id}_${DATE_FILTER_ELEMENT.BEFORE}`}
             onClickCheckbox={() => props.onClickDateCheckbox(DATE_FILTER_ELEMENT.BEFORE)}
             checked={props.isBeforeCheckboxChecked}
-            styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+            styleLabel={{ marginInlineStart: '5px', marginInlineEnd: '10px' }}
             styleCheck={{ top: '-5px' }}
             disabled={props.beforeDate === ''}
           />

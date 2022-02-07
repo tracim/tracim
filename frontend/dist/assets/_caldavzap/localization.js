@@ -2468,7 +2468,7 @@ localizationCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 
 	txtRepeatEnd: 'Fin',
 	txtEventCalendar: 'Calendrier',
-	txtSelectCalendar: 'Selectonner un calendrier',
+	txtSelectCalendar: 'Sélectionner un calendrier',
 	txtAlert: 'Alerte',
 	txtAlertNone: 'Vide',
 	txtAlertMessage: 'Message',

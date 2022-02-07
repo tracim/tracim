@@ -9,15 +9,17 @@ msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-01-25 09:53+0100\n"
-"PO-Revision-Date: 2022-01-25 09:53+0100\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2022-02-03 10:07+0000\n"
+"Last-Translator: Myriam Rabhi <myriamrabhi6@gmail.com>\n"
+"Language-Team: Arabic <https://hosted.weblate.org/projects/tracim/backend/ar/"
+">\n"
 "Language: ar\n"
-"Language-Team: ar <LL@li.org>\n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : "
-"n%100>=3 && n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5);\n"
+"X-Generator: Weblate 4.11-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:667
@@ -100,11 +102,11 @@ msgstr ""
 
 #: tracim_backend/lib/core/workspace.py:497
 msgid "Space"
-msgstr ""
+msgstr "مساحة"
 
 #: tracim_backend/lib/core/workspace.py:500
 msgid "Space {}"
-msgstr ""
+msgstr "مساحة"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:280
 msgid "{username} & all members of {workspace}"

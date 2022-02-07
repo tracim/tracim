@@ -96,7 +96,7 @@ export class WorkspaceContent extends React.Component {
   // CustomEvent handlers
   handleRefreshContentList = data => {
     console.log('%c<WorkspaceContent> Custom event', 'color: #28a745', CUSTOM_EVENT.REFRESH_CONTENT_LIST, data)
-    this.loadAllWorkspaceContent(this.props.currentWorkspace.id, false, false)
+    this.loadAllWorkspaceContent(this.props.currentWorkspace.id, false, true)
   }
 
   handleOpenContentUrl = data => {
@@ -239,7 +239,7 @@ export class WorkspaceContent extends React.Component {
   }
 
   loadContentList = async (workspaceId, shouldLoadReadStatusList) => {
-    console.log('%c<WorkspaceContent> loadContentList', 'color: #c17838')
+    console.log(`%c<WorkspaceContent> loadContentList (with read status list: ${shouldLoadReadStatusList})`, 'color: #c17838')
     const { props } = this
 
     const folderIdInUrl = [0, ...this.getFolderIdToOpenInUrl(props.location.search)] // add 0 to get workspace's root
