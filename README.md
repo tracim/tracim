@@ -34,6 +34,14 @@ For advanced docker-based usage, look at the full [Tracim Docker documentation](
 
 In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
 
+### Translation
+
+You can help Tracim with improvements or new translations, for this we use the [Weblate](https://hosted.weblate.org/projects/tracim/) platform.
+
+Our current translation status:
+
+![Weblate translation status](https://hosted.weblate.org/widgets/tracim/-/frontend/horizontal-auto.svg)
+
 ## Advanced - Install Tracim from Source
 
 OS compatibility (tested with Python >= 3.6.14):
