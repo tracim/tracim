@@ -25,7 +25,7 @@ describe('navigate :: workspace > create_new > thread', function () {
     cy.get('.thread__contentpage__texteditor__submit__btn').contains('Envoyer')
 
     cy.changeLanguage('pt')
-    cy.get('.thread__contentpage__texteditor__submit__btn').contains('Envíar')
+    cy.get('.thread__contentpage__texteditor__submit__btn').contains('Enviar')
 
     cy.changeLanguage('de')
     cy.get('.thread__contentpage__texteditor__submit__btn').contains('Senden')
