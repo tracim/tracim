@@ -8,6 +8,8 @@
   border-radius standardBorderRadius
   padding textSpacing
   background-color offWhite
+  &:focus-within
+    border 1px solid lightBlue
 
 .textinput__icon
   color grey
@@ -21,3 +23,7 @@
 .textinput__text
   border none
   flex 1
+  &:focus
+    box-shadow 0 0 0 0
+    border 0 none
+    outline 0
