@@ -7,3 +7,7 @@ export const getAgendaList = (apiUrl, workspaceId = null) => {
 
   return baseFetch('GET', `${apiUrl}/users/me/agenda${param}`)
 }
+
+export const getPreFilledAgendaEvent = (apiUrl) => {
+  return baseFetch('GET', `${apiUrl}/system/pre-filled-agenda-event`)
+}

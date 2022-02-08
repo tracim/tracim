@@ -474,6 +474,16 @@ class CFG(object):
             default_user_custom_properties_path + "locale",
         )
 
+        self.AGENDA__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH = self.get_raw_config(
+            "agenda.pre_filled_event.description_file_path", "",
+        )
+
+        if self.AGENDA__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH:
+            with open(self.AGENDA__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH) as f:
+                self.AGENDA__PRE_FILLED_EVENT__DESCRIPTION = f.read()
+        else:
+            self.AGENDA__PRE_FILLED_EVENT__DESCRIPTION = None
+
         self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
             self.get_raw_config("workspace.allowed_access_types", "confidential,on_request,open"),
             separator=",",

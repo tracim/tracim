@@ -450,6 +450,37 @@ class TestUserCustomPropertiesSchema(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+class TestPreFilledAgendaEventSchema(object):
+    """
+    Tests for GET /api/system/pre-filled-agenda-event
+    """
+
+    @pytest.mark.parametrize(
+        "config_section", [{"name": "pre-filled-agenda-event_sample_test"}], indirect=True
+    )
+    def test_api__get_prefilled_agenda_event_schema__ok_200__sample_data(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/pre-filled-agenda-event", status=200)
+        assert res.json_body["description"] == "Organizer:\n\nAttendees:\n\nProgram:\n - …\n - …\n"
+
+    def test_api__get_prefilled_agenda_event_schema__ok_200__no_data(self, web_testapp):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/system/pre-filled-agenda-event", status=200)
+        assert res.json_body["description"] is None
+
+    def test_api__get_prefilled_agenda_event_schema_err_401__unregistered_user(self, web_testapp):
+        """
+        Get some config info about tracim with an unregistered user (bad auth)
+        """
+        web_testapp.authorization = ("Basic", ("john@doe.doe", "lapin"))
+        res = web_testapp.get("/api/system/pre-filled-agenda-event", status=401)
+        assert isinstance(res.json, dict)
+        assert "code" in res.json.keys()
+        assert "message" in res.json.keys()
+        assert "details" in res.json.keys()
+
+
+@pytest.mark.usefixtures("base_fixture")
 class TestUserCustomPropertiesUISchema(object):
     """
     Tests for GET /api/system/users-custom-properties-ui-schema
