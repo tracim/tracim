@@ -36,7 +36,7 @@ In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](
 
 ### Translation
 
-You can help Tracim with improvements or new translations, for this we use the [Weblate](https://hosted.weblate.org/projects/tracim/) platform.
+You can help us translate Tracim! If you want to contribute a new language or you see missing or wrong translations, head over to [Weblate](https://hosted.weblate.org/projects/tracim/).
 
 Our current translation status:
 
