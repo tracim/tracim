@@ -544,6 +544,6 @@
   "October": "Outubro",
   "November": "Novembro",
   "December": "Dezembro",
-  "MM/dd/yyyy": "dd/mm/aaaa",
+  "MM/dd/yyyy": "dd/MM/yyyy",
   "Comment_verb": "Comentar"
 }
