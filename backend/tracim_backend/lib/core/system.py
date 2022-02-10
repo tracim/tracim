@@ -16,10 +16,12 @@ from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.context_models import AboutModel
 from tracim_backend.models.context_models import ConfigModel
 from tracim_backend.models.context_models import ErrorCodeModel
 from tracim_backend.models.context_models import UsageConditionModel
+from tracim_backend.models.database_version import MigrateVersion
 
 
 class SystemApi(object):
@@ -30,13 +32,23 @@ class SystemApi(object):
         self._session = session
 
     def get_about(self) -> AboutModel:
-        # TODO - G.M - 2018-09-26 - Set version correctly
+        database_version = None
+        try:
+            database_version = self._session.query(MigrateVersion).one().version_num
+        except Exception:
+            logger.warning(
+                self,
+                "Unable to get database version ! Alembic seems to not be properly setted up.",
+                exc_info=True,
+            )
+
         return AboutModel(
             name="Tracim",
             version=metadata("tracim_backend")["Version"],
             build_version=self._config.BUILD_VERSION,
             datetime=datetime.datetime.now(),
             website=metadata("tracim_backend")["Home-page"],
+            database_version=database_version,
         )
 
     def get_config(self) -> ConfigModel:
