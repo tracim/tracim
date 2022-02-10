@@ -26,6 +26,7 @@ services:
     environment:
       discovery.type: single-node
       cluster.routing.allocation.disk.threshold_enabled: "false"
+      ES_JAVA_OPTS: "-Xms4g -Xmx4g"
   mailhog:
     image: mailhog/mailhog:v1.0.1
     ports:
