@@ -1567,8 +1567,8 @@ class AboutSchema(marshmallow.Schema):
     )
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL()
-    database_version = StrippedString(
-        example="8382e5a19f0d", description="Database version id", allow_none=True
+    database_schema_version = StrippedString(
+        example="8382e5a19f0d", description="Database schema version", allow_none=True
     )
 
 

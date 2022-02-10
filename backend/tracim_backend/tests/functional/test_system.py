@@ -156,7 +156,7 @@ class TestAboutEndpoint(object):
         assert res.json_body["version"]
         assert res.json_body["datetime"]
         assert res.json_body["website"] == "https://www.algoo.fr/fr/tracim"
-        assert res.json_body["database_version"] is None
+        assert res.json_body["database_schema_version"] is None
 
     def test_api__get_about__err_401__unregistered_user(self, web_testapp):
         """

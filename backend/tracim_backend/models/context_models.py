@@ -52,14 +52,14 @@ class AboutModel(object):
         build_version: str,
         datetime: datetime,
         website: str,
-        database_version: Optional[str],
+        database_schema_version: Optional[str],
     ) -> None:
         self.name = name
         self.version = version
         self.build_version = build_version
         self.datetime = datetime
         self.website = website
-        self.database_version = database_version
+        self.database_schema_version = database_schema_version
 
 
 class ConfigModel(object):

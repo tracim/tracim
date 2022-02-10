@@ -32,13 +32,13 @@ class SystemApi(object):
         self._session = session
 
     def get_about(self) -> AboutModel:
-        database_version = None
+        database_schema_version = None
         try:
-            database_version = self._session.query(MigrateVersion).one().version_num
+            database_schema_version = self._session.query(MigrateVersion).one().version_num
         except Exception:
             logger.warning(
                 self,
-                "Unable to get database version ! Alembic seems to not be properly setted up.",
+                "Unable to get database schema version ! Alembic seems to not be properly set up.",
                 exc_info=True,
             )
 
@@ -48,7 +48,7 @@ class SystemApi(object):
             build_version=self._config.BUILD_VERSION,
             datetime=datetime.datetime.now(),
             website=metadata("tracim_backend")["Home-page"],
-            database_version=database_version,
+            database_schema_version=database_schema_version,
         )
 
     def get_config(self) -> ConfigModel:
