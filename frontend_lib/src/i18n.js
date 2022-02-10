@@ -4,6 +4,7 @@ import en from '../i18next.scanner/en/translation.json'
 import fr from '../i18next.scanner/fr/translation.json'
 import pt from '../i18next.scanner/pt/translation.json'
 import de from '../i18next.scanner/de/translation.json'
+import ar from '../i18next.scanner/ar/translation.json'
 
 i18n
   .use(reactI18nextModule)
@@ -30,6 +31,9 @@ i18n
       },
       de: {
         translation: de
+      },
+      ar: {
+        translation: ar
       }
     }
   })
