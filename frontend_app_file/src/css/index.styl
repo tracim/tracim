@@ -97,8 +97,16 @@
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .file
+    height "calc(100% - %s)" % headerHeight
     &__contentpage
       display block
+      &__messagelist
+        overflow-y visible
+      &__content
+        &__left
+          min-height 60%
+        &__right
+          min-height 40%
       &__preview
         display flex
         flex-direction column
@@ -119,26 +127,10 @@
                 margin-inline-start 15px
       &__statewrapper
         padding 0
-
-@media (min-width: min-lg) and (max-width: max-lg)
-  .file
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-md) and (max-width: max-md)
-  .file
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .file
-    height "calc(100% - %s)" % headerHeight
-    &__contentpage__content__left
-      min-height 250px
+        height calc(100% - 88px)
 
 @media (max-width: max-xs)
   .file
-    height "calc(100% - %s)" % headerHeight
     &__lastversionbtn
       > span
         display none
@@ -159,7 +151,6 @@
       &__content
         &__left
           width 100%
-          min-height 250px
         &__right
           width 100%
           height 100%
