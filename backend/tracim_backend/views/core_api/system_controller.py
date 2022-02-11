@@ -22,7 +22,6 @@ from tracim_backend.views.core_api.schemas import ConfigSchema
 from tracim_backend.views.core_api.schemas import ContentTypeSchema
 from tracim_backend.views.core_api.schemas import ErrorCodeSchema
 from tracim_backend.views.core_api.schemas import GetUsernameAvailability
-from tracim_backend.views.core_api.schemas import PreFilledAgendaEventSchema
 from tracim_backend.views.core_api.schemas import ReservedUsernamesSchema
 from tracim_backend.views.core_api.schemas import TimezoneSchema
 from tracim_backend.views.core_api.schemas import UsageConditionsSchema
@@ -156,15 +155,6 @@ class SystemController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
     @check_right(is_user)
-    @hapic.output_body(PreFilledAgendaEventSchema())
-    def pre_filled_agenda_event(self, context, request: TracimRequest, hapic_data=None):
-        """
-        Returns user custom properties JSONSchema
-        """
-        return {"description": request.app_config.AGENDA__PRE_FILLED_EVENT__DESCRIPTION}
-
-    @hapic.with_api_doc(tags=[SWAGGER_TAG_SYSTEM_ENDPOINTS])
-    @check_right(is_user)
     @hapic.output_body(UsageConditionsSchema())
     def usage_conditions(self, context, request: TracimRequest, hapic_data=None):
         """
@@ -258,12 +248,6 @@ class SystemController(Controller):
         configurator.add_view(
             self.custom_user_properties_ui_schema, route_name="user_custom_properties_ui_schema"
         )
-
-        # pre-filled agenda event
-        configurator.add_route(
-            "pre_filled_agenda_event", "/system/pre-filled-agenda-event", request_method="GET",
-        )
-        configurator.add_view(self.pre_filled_agenda_event, route_name="pre_filled_agenda_event")
 
         # reserved usernames
         configurator.add_route(

@@ -404,17 +404,6 @@ api.key = %(basic_setup.api_key)s
 # user.custom_properties.ui_schema_file_path = %(user.custom_properties.dir)s/ui.json
 # user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/locale
 
-###
-# AGENDA
-###
-
-# in Tracim's Frontend, when creating a new event, the description (note) of the event will be pre-filled with the content
-# of the file given in the following parameter. Leave empty if you don't want any pre-filling.
-; agenda.pre_filled_event.description_file_path =
-
-## example:
-# agenda.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event_description.txt
-
 ####
 # IHM
 ####
@@ -756,6 +745,13 @@ caldav.radicale.headers.Access-Control-Allow-Origin = *
 caldav.radicale.headers.Access-Control-Allow-Methods =  GET, POST, OPTIONS, PROPFIND, PROPPATCH, REPORT, PUT, MOVE, DELETE, LOCK, UNLOCK
 caldav.radicale.headers.Access-Control-Allow-Headers =  User-Agent, Authorization, Content-type, Depth, If-match, If-None-Match, Lock-Token, Timeout, Destination, Overwrite, X-client, X-Requested-With, Prefer
 caldav.radicale.headers.Access-Control-Expose-Headers = Etag
+
+# in Tracim's Frontend, when creating a new event, the description (note) of the event will be pre-filled with the content
+# of the file given in the following parameter. Leave empty if you don't want any pre-filling.
+; caldav.pre_filled_event.description_file_path =
+
+## example:
+# caldav.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event_description.txt
 
 ####
 # SEARCH (ElasticSearch)

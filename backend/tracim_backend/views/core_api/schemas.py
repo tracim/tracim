@@ -1496,14 +1496,6 @@ class UserCustomPropertiesUiSchema(marshmallow.Schema):
     )
 
 
-class PreFilledAgendaEventSchema(marshmallow.Schema):
-    description = marshmallow.fields.String(
-        description="the text with which new agenda events shall be pre-filled",
-        required=True,
-        allow_none=True,
-    )
-
-
 class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace_id = marshmallow.fields.Int(example=4, validate=strictly_positive_int_validator)
     used_space = marshmallow.fields.Int(
