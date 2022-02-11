@@ -869,7 +869,7 @@ export const autoCompleteItem = (text, item, cursorPos) => {
     keyword = item.mention
   }
 
-  const endSpace = '\u00A0'
+  const endSpace = ' '
   const charAtCursor = cursorPos - 1
   const posAt = text.lastIndexOf(character, charAtCursor)
 

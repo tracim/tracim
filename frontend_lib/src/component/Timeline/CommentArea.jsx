@@ -147,8 +147,9 @@ export class CommentArea extends React.Component {
   }
 
   handleClickAutoCompleteItem = (item) => {
-    const text = this.state.newComment
     const cursorPos = this.textAreaRef.selectionStart
+    const text = this.state.newComment
+
     const { textBegin, textEnd } = autoCompleteItem(text, item, cursorPos)
 
     this.commentCursorPos = textBegin.length
