@@ -39,7 +39,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     | user.custom_properties.json_schema_file_path                   | USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH                     |
 | TRACIM_USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       | user.custom_properties.ui_schema_file_path                     | USER__CUSTOM_PROPERTIES__UI_SCHEMA_FILE_PATH                       |
 | TRACIM_USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     | user.custom_properties.translations_dir_path                   | USER__CUSTOM_PROPERTIES__TRANSLATIONS_DIR_PATH                     |
-| TRACIM_AGENDA__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    | agenda.pre_filled_event.description_file_path                  | AGENDA__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH           |
+| TRACIM_CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    | caldav.pre_filled_event.description_file_path                  | CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    |
 | TRACIM_WORKSPACE__ALLOWED_ACCESS_TYPES                                    | workspace.allowed_access_types                                 | WORKSPACE__ALLOWED_ACCESS_TYPES                                    |
 | TRACIM_WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT                        | workspace.join.max_messages_history_count                      | WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT                        |
 | TRACIM_KNOWN_MEMBERS__FILTER                                              | known_members.filter                                           | KNOWN_MEMBERS__FILTER                                              |
