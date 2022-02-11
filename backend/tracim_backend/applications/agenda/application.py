@@ -31,6 +31,16 @@ class AgendaApp(TracimApplication):
             "caldav.radicale.storage.filesystem_folder", default_caldav_storage_dir
         )
 
+        app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH = app_config.get_raw_config(
+            "caldav.pre_filled_event.description_file_path", "",
+        )
+
+        if app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH:
+            with open(app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH) as f:
+                app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION = f.read()
+        else:
+            app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION = None
+
         # INFO - G.M - 2021-12-07 - internal config param to configure installed agenda hierarchy
         app_config.RADICALE__CALENDAR_DIR = "agenda"
         app_config.RADICALE__ADDRESSBOOK_DIR = "addressbook"

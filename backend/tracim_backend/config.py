@@ -474,16 +474,6 @@ class CFG(object):
             default_user_custom_properties_path + "locale",
         )
 
-        self.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH = self.get_raw_config(
-            "caldav.pre_filled_event.description_file_path", "",
-        )
-
-        if self.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH:
-            with open(self.CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH) as f:
-                self.CALDAV__PRE_FILLED_EVENT__DESCRIPTION = f.read()
-        else:
-            self.CALDAV__PRE_FILLED_EVENT__DESCRIPTION = None
-
         self.WORKSPACE__ALLOWED_ACCESS_TYPES = string_to_unique_item_list(
             self.get_raw_config("workspace.allowed_access_types", "confidential,on_request,open"),
             separator=",",
