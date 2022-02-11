@@ -857,7 +857,7 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
-export const autoCompleteItem = (text, item, cursorPos) => {
+export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
   let character, keyword
   let textBegin, textEnd
 
@@ -869,17 +869,16 @@ export const autoCompleteItem = (text, item, cursorPos) => {
     keyword = item.mention
   }
 
-  const endSpace = ' '
   const charAtCursor = cursorPos - 1
   const posAt = text.lastIndexOf(character, charAtCursor)
 
   if (posAt > -1) {
     const end = seekUsernameEnd(text, cursorPos)
-    textBegin = text.substring(0, posAt) + character + keyword + endSpace
+    textBegin = text.substring(0, posAt) + character + keyword + endCharacter
     textEnd = text.substring(end)
   } else {
     console.log(`Error in autocompletion: did not find ${character}`)
-    textBegin = `${text} ${character}${keyword}${endSpace}`
+    textBegin = `${text} ${character}${keyword}${endCharacter}`
     textEnd = ''
   }
 

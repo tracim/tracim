@@ -121,7 +121,7 @@ export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
   const cursorPos = selection.anchorOffset
   const text = selection.anchorNode.textContent
 
-  const { textBegin, textEnd } = autoCompleteItem(text, item, cursorPos)
+  const { textBegin, textEnd } = autoCompleteItem(text, item, cursorPos, ' ')
 
   selection.anchorNode.textContent = textBegin + textEnd
   selection.collapse(selection.anchorNode, textBegin.length)
