@@ -2,7 +2,7 @@
 
 This maintenance release fixes a few things:
  - the Docker image, broken after a setuptools update, once again works
- - on mobile devices, a work around prevents the send button to be covered by the browser's native UI
+ - on mobile devices, a workaround prevents the send button to be covered by the browser's native UI
  - a dependency has been updated, hoping this prevents the connection error popup from showing up when everything actually works correctly
 
 ### Fixed Issues
