@@ -733,7 +733,7 @@ webdav.listen = localhost:3030
 caldav.radicale.server.hosts = localhost:5232
 ## To make Tracim work, we need to disable auth and rights.
 caldav.radicale.auth.type = none
-caldav.radicale.rights.type =  tracim_backend.radicale_plugins.radicale_none_right
+caldav.radicale.rights.type = tracim_backend.radicale_plugins.radicale_none_right
 ## We do not need radicale web ui
 caldav.radicale.web.type = none
 ## for Tracim we do use file storage.
