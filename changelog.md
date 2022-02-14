@@ -1,3 +1,17 @@
+# 4.1.2 / 2022-02-14
+
+This maintenance release fixes a few things:
+ - the Docker image, broken after a setuptools update, once again works
+ - on mobile devices, a work around prevents the send button to be covered by the browser's native UI
+ - a dependency has been updated, hoping this prevents the connection error popup from showing up when everything actually works correctly
+
+### Fixed Issues
+
+- Backend: [#5183](https://github.com/tracim/tracim/issues/5183)
+- Frontend: [#5370](https://github.com/tracim/tracim/issues/5370),
+[#5175](https://github.com/tracim/tracim/issues/5175)
+
+
 # 4.1.1 / 2022-02-03
 
 ### Fixed Issues
