@@ -751,7 +751,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ; caldav.pre_filled_event.description_file_path =
 
 ## example:
-# caldav.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event_description.txt
+# caldav.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event/test/description.txt
 
 ####
 # SEARCH (ElasticSearch)
