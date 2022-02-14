@@ -69,7 +69,7 @@ class CaldavAppFactory(object):
         self, config: RadicaleConfiguration, settings: dict
     ) -> dict:
         """
-        get settings params beginning with
+        Get settings params beginning with
         "RADICALE_MAIN_SECTION.RADICALE_SUBMAIN_SECTION." to radicale config.
         """
         update_config = {}
@@ -91,7 +91,7 @@ class CaldavAppFactory(object):
             if not update_config.get(radicale_section):
                 update_config[radicale_section] = {}
             logger.debug(
-                self, "Prepare Overriding radicale config: {} : {}".format(param_name, value)
+                self, "Prepare overriding radicale config: {} : {}".format(param_name, value)
             )
             update_config[radicale_section][radicale_param_config] = value
         logger.debug(self, "Overriding radicale config")
