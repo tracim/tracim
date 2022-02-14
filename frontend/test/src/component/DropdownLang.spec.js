@@ -37,12 +37,6 @@ describe('<DropdownLang />', () => {
         expect(wrapper.find('button.transparentButton').at(i - 1)).to.text().equal(props.langList[i].label)
       }
     })
-
-    it('should display the icon of each other language', () => {
-      for (let i = 1; i < props.langList.length; i++) {
-        expect(wrapper.find('img.dropdownlang__dropdown__subdropdown__link__flag').at(i - 1).prop('src')).to.equal(props.langList[i].icon)
-      }
-    })
   })
 
   describe('handler', () => {
