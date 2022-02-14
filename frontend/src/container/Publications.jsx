@@ -548,7 +548,6 @@ export class Publications extends React.Component {
               contentType={CONTENT_TYPE.THREAD}
               customColor={COLORS.PUBLICATION}
               customClass='publishArea'
-              disableAutocompletePosition
               icon='fa-fw far fa-paper-plane'
               id={wysiwygId}
               invalidMentionList={state.invalidMentionList}

@@ -313,13 +313,14 @@ export class CommentArea extends React.Component {
         <div
           className={classnames(
             `${props.customClass}__texteditor__textinput`,
-            'commentArea__textinput'
+            'commentArea__textinput',
+            props.wysiwyg && 'richtextedition'
           )}
         >
           {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
             <AutoComplete
               autoCompleteItemList={state.autoCompleteItemList}
-              style={props.disableAutocompletePosition ? {} : style}
+              style={style}
               apiUrl={props.apiUrl}
               autoCompleteCursorPosition={state.autoCompleteCursorPosition}
               onClickAutoCompleteItem={(m) => props.wysiwyg
@@ -411,7 +412,6 @@ CommentArea.propTypes = {
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customClass: PropTypes.string,
-  disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   hideSendButtonAndOptions: PropTypes.bool,
   icon: PropTypes.string,
@@ -437,7 +437,6 @@ CommentArea.defaultProps = {
   contentId: 0,
   contentType: '',
   customClass: '',
-  disableAutocompletePosition: false,
   disableComment: false,
   hideSendButtonAndOptions: false,
   icon: 'far fa-paper-plane',
