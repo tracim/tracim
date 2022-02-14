@@ -135,7 +135,6 @@
 
     <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/jquery.tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <!--<script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/themes/modern/theme.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>-->
     <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/themes/silver/theme.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/icons/default/icons.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     % for plugin in glob("assets/tinymce-5.10.3/js/tinymce/plugins/*/plugin.min.js"):

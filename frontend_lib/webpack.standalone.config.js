@@ -49,7 +49,7 @@ module.exports = {
   // they cause a lot of warnings in the browser's console
   module: {
     rules: [
-      true || isProduction ? {} : {
+      isProduction ? {} : {
         test: /\.jsx?$/,
         enforce: 'pre',
         use: 'standard-loader',
