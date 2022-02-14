@@ -253,8 +253,14 @@ To enable mail notification, the smallest config is:
 Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
 link the frontend in emails.
 
-:warning: It is necessary to check if your SMTP configuration is working correctly before using Tracim.
-In the next release we will include a quick solution to test if your STMP configuration works properly.
+:warning: It is necessary to check if your SMTP configuration is working correctly before using Tracim. To do so,
+we do provide this command:
+
+    tracimcli dev test smtp -r myemailadress@mydomain.local
+
+This will send a test email to the provided email address (here: myemailadress@mydomain.local)
+with the same parameters as tracim config.
+
 
 ### Configuring Invitations in Spaces
 
