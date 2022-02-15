@@ -3,14 +3,12 @@ import PropTypes from 'prop-types'
 import { DropdownMenu } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
 
-require('./DropdownLang.styl')
-
 const DropdownLang = props => {
   const activeLang = props.langList.find(lang => lang.id === props.langActiveId)
   return (
     <li className='dropdownlang'>
       <DropdownMenu
-        buttonImage={activeLang.icon}
+        buttonIcon='fas fa-globe'
         buttonLabel={activeLang.label}
         buttonDataCy={`${activeLang.id}-active`}
         buttonCustomClass='dropdownlang__dropdown__btnlanguage outlineTextBtn nohover'
@@ -26,7 +24,6 @@ const DropdownLang = props => {
             data-toggle={isMobile ? 'collapse' : ''}
             data-target='#navbarSupportedContent'
           >
-            <img className='dropdownlang__dropdown__subdropdown__link__flag' src={lang.icon} />
             {lang.label}
           </button>
         )}
