@@ -1,7 +1,7 @@
 # 4.1.2 / 2022-02-14
 
 This maintenance release fixes a few things:
- - the Docker image, broken after a setuptools update, once again works
+ - the experimental Docker image for arm64, broken after a setuptools update, once again works
  - on mobile devices, a workaround prevents the send button to be covered by the browser's native UI
  - a dependency has been updated, hoping this prevents the connection error popup from showing up when everything actually works correctly
 
