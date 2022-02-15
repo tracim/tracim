@@ -1,4 +1,4 @@
-# 4.1.2 / 2022-02-14
+# 4.1.2 / 2022-02-15
 
 This maintenance release fixes a few things:
  - the experimental Docker image for arm64, broken after a setuptools update, once again works
