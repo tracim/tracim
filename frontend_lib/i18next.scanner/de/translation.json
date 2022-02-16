@@ -101,7 +101,7 @@
   "Username must be at least {{minimumCharactersUsername}} characters long": "Der Benutzername muss mindestens {{minimumCharactersUsername}} Zeichen lang sein",
   "Username must be at maximum {{maximumCharactersUsername}} characters long": "Der Benutzername muss maximal {{maximumCharactersUsername}} Zeichen lang sein",
   "Username can't contain any whitespace": "Der Benutzername darf keine Leerzeichen enthalten",
-  "Allowed characters: {{allowedCharactersUsername}}": "Erlaubte Zeichen:  {{allowedCharactersUsername}}",
+  "Allowed characters: {{allowedCharactersUsername}}": "Erlaubte Zeichen: {{allowedCharactersUsername}}",
   "Error while checking reserved usernames": "Fehler bei der Überprüfung reservierter Benutzernamen",
   "This word is reserved for group mentions": "Dieses Wort ist für Gruppenerwähnungen reserviert",
   "Error while checking username availability": "Fehler beim Prüfen der Verfügbarkeit des Benutzernamens",
