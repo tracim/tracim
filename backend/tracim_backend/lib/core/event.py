@@ -404,6 +404,20 @@ class EventApi:
         session.add_all(messages)
         return messages
 
+    def delete_message_for_workspace(self, workspace_id: int) -> None:
+        query = self._session.query(Message).join(Event)
+        query = query.filter(Event.workspace_id == workspace_id)
+        for message in query:
+            self._session.delete(message)
+
+    def delete_message_for_user_in_workspace(self, workspace_id: int, user_id: int) -> None:
+        query = self._session.query(Message).join(Event)
+        query = query.filter(
+            and_(Event.workspace_id == workspace_id, Message.receiver_id == user_id)
+        )
+        for message in query:
+            self._session.delete(message)
+
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
         try:
@@ -580,19 +594,7 @@ class EventBuilder:
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._create_workspace_historic_messages_for_current_user(role, context)
         self._create_role_event(OperationType.CREATED, role, context)
-
-    def _create_workspace_historic_messages_for_current_user(
-        self, role: UserRoleInWorkspace, context: TracimContext
-    ):
-        current_user = context.safe_current_user()
-        event_api = EventApi(current_user, context.dbsession, self._config)
-        event_api.create_messages_history_for_user(
-            user_id=role.user_id,
-            workspace_ids=[role.workspace_id],
-            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
-        )
 
     @hookimpl
     def on_user_role_in_workspace_modified(
@@ -1055,3 +1057,53 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
     def publish_messages_for_event(self, event_id: int) -> None:
         logger.debug(self, "publish event(id={}) synchronously".format(event_id))
         self._publish_messages_for_event(event_id)
+
+
+class MessageHooks:
+    def _create_workspace_historic_messages_for_current_user(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ):
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        event_api.create_messages_history_for_user(
+            user_id=role.user_id,
+            workspace_ids=[role.workspace_id],
+            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+        )
+
+    @hookimpl
+    def on_user_role_in_workspace_created(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self._create_workspace_historic_messages_for_current_user(role, context)
+
+    @hookimpl
+    def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        event_api.delete_message_for_workspace(workspace.workspace_id)
+
+    @hookimpl
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+        current_user = context.safe_current_user()
+        event_builder = EventBuilder(context.app_config)
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        if event_builder._has_just_been_deleted(workspace):
+            event_api.delete_message_for_workspace(workspace.workspace_id)
+        elif event_builder._has_just_been_undeleted(workspace):
+            for role in workspace.roles:
+                event_api.create_messages_history_for_user(
+                    user_id=role.user_id,
+                    workspace_ids=[workspace.workspace_id],
+                    max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+                )
+
+    @hookimpl
+    def on_user_role_in_workspace_deleted(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        event_api.delete_message_for_user_in_workspace(
+            user_id=role.user_id, workspace_id=role.workspace_id
+        )
