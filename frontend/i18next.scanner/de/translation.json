@@ -544,6 +544,6 @@
   "October": "__NOT_TRANSLATED__",
   "November": "__NOT_TRANSLATED__",
   "December": "__NOT_TRANSLATED__",
-  "MM/dd/yyyy": "__NOT_TRANSLATED__",
+  "MM/dd/yyyy": "dd/MM/yyyy",
   "Comment_verb": "__NOT_TRANSLATED__"
 }

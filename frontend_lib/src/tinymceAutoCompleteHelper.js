@@ -1,6 +1,9 @@
-const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-Z0-9\-_]*)$/
+import {
+  autoCompleteItem,
+  USERNAME_ALLOWED_CHARACTERS_REGEX
+} from './helper.js'
 
-const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z0-9\-_]/
+const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-Z0-9\-_]*)$/
 
 let previousSelAndOffset = null
 
@@ -113,40 +116,15 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
   }
 }
 
-// FIXME - RJ - 2020-09-25
-// Duplicate code with CommentArea.js
-// See https://github.com/tracim/tracim/issues/3639
-export const tinymceAutoCompleteHandleClickItem = (autoCompleteItem, setState) => {
-  let character, keyword
+export const tinymceAutoCompleteHandleClickItem = (item, setState) => {
+  const selection = tinymce.activeEditor.selection.getSel()
+  const cursorPos = selection.anchorOffset
+  const text = selection.anchorNode.textContent
 
-  if (autoCompleteItem.content_id) {
-    character = '#'
-    keyword = autoCompleteItem.content_id
-  } else {
-    character = '@'
-    keyword = autoCompleteItem.mention
-  }
+  const { textBegin, textEnd } = autoCompleteItem(text, item, cursorPos, ' ')
 
-  const sel = tinymce.activeEditor.selection.getSel()
-  const cursorPos = sel.anchorOffset
-  const endSpace = '\u00A0'
-
-  const charAtCursor = cursorPos - 1
-  const text = sel.anchorNode.textContent
-  const posAt = text.lastIndexOf(character, charAtCursor)
-  let textBegin, textEnd
-
-  if (posAt > -1) {
-    textBegin = text.substring(0, posAt) + character + keyword + endSpace
-    textEnd = text.substring(seekUsernameEnd(text, cursorPos))
-  } else {
-    console.log(`Error in autocompletion: did not find ${character}`)
-    textBegin = `${text} ${character}${keyword}${endSpace}`
-    textEnd = ''
-  }
-
-  sel.anchorNode.textContent = textBegin + textEnd
-  sel.collapse(sel.anchorNode, textBegin.length)
+  selection.anchorNode.textContent = textBegin + textEnd
+  selection.collapse(selection.anchorNode, textBegin.length)
 
   // NOTE - RJ - 2021-07-08 - focusing the editor lets TinyMCE execute its cleanups
   // routine. If we don't do this and the user saves the document right after an

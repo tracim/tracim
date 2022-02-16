@@ -9,9 +9,9 @@
     display flex
     font-size titleFontSize
     margin-bottom 25px
+    justify-content space-between
   &__close
     font-size titleFontSize
-    justify-content space-between
     z-index 1
     & > i
       cursor pointer
@@ -60,11 +60,13 @@
             text-overflow ellipsis
             white-space nowrap
             &__username
-              font-size metadataFontSize
               color grey
+              font-size metadataFontSize
               overflow hidden
               text-overflow ellipsis
+              unicode-bidi plaintext
             &__unknownuser
+              unicode-bidi plaintext
               &__msg
                 color grey
                 font-size metadataFontSize

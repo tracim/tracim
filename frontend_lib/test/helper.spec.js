@@ -315,6 +315,7 @@ describe('helper.js', () => {
     const nominalCases = [
       { username: 'foo', available: true, valid: true, message: '' },
       { username: 'foo ', available: true, valid: false, message: "Username can't contain any whitespace" },
+      { username: '@foo', available: true, valid: false, message: 'Allowed characters: {{allowedCharactersUsername}}' },
       { username: 'foo(', available: true, valid: false, message: 'Allowed characters: {{allowedCharactersUsername}}' },
       { username: 'f'.repeat(MINIMUM_CHARACTERS_USERNAME - 1), available: true, valid: false, message: 'Username must be at least {{minimumCharactersUsername}} characters long' },
       { username: '', available: true, valid: false, message: 'Username must be at least {{minimumCharactersUsername}} characters long' },

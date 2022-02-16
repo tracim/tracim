@@ -551,6 +551,15 @@ The default value is 30 seconds.
 It's possible to configure custom properties attached to user per instance, [read specific documentation
 to know more about this feature](./user_custom_properties.md).
 
+
+## Default agenda event description in the Frontend
+
+It's possible to set a default agenda event description when creating an event in the agenda from Tracim.
+Write the text you which to have as the defaut event description in a file and put its path in the corresponding parameter.
+For instance:
+
+    agenda.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event_description.txt
+
 ## Security settings
 
 ### Content Security Policy
