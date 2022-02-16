@@ -839,6 +839,7 @@ export class WorkspaceAdvanced extends React.Component {
         >
           <WorkspaceAdvancedConfiguration
             apiUrl={state.config.apiUrl}
+            lang={state.loggedUser.lang}
             isReadOnlyMode={
               state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id &&
               state.loggedUser.profile !== PROFILE.administrator.slug

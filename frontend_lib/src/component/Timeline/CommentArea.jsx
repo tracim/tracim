@@ -325,7 +325,7 @@ export class CommentArea extends React.Component {
           className={classnames(
             `${props.customClass}__texteditor__textinput`,
             'commentArea__textinput',
-            props.wysiwyg && 'richtextedition'
+            { richtextedition: props.wysiwyg }
           )}
         >
           {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (

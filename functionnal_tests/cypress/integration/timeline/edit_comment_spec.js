@@ -22,7 +22,8 @@ describe('Timeline', () => {
   })
 
   describe('edit a comment', () => {
-    it('should show new comment', () => {
+    it.skip('should show new comment', () => {
+      // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
       cy.get('.comment__body__content__header__actions').click()
       cy.contains('.comment__body__content__textAndPreview', text)
       cy.get('.iconbutton[title="Edit comment"]').click()

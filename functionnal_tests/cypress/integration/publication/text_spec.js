@@ -60,7 +60,8 @@ describe('Publications', () => {
       cy.contains('.comment__body__content__textAndPreview', exampleText).should('be.visible')
     })
 
-    it('should show the first message as preview for advanced edition', function () {
+    it.skip('should show the first message as preview for advanced edition', function () {
+      // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
       cy.get(publicationInput).type('!')
       cy.get('.commentArea__advancedtext__btn').click()
       cy.waitForTinyMCELoaded().then(() => {
