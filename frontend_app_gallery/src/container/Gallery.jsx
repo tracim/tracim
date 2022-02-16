@@ -130,7 +130,7 @@ export class Gallery extends React.Component {
   handleContentCreatedOrUndeleted = data => {
     if (this.liveMessageNotRelevant(data, this.state)) return
 
-    const preview = this.buildPreview(data.content)
+    const preview = this.buildPreview(data.fields.content)
     if (preview) {
       this.setNewPicturesPreviews([preview, ...this.state.imagePreviewList].sort(this.sortPreviews))
     }
