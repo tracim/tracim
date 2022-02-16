@@ -1,4 +1,5 @@
 import React from 'react'
+import i18next from 'i18next'
 import { translate } from 'react-i18next'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -15,17 +16,26 @@ export class Carousel extends React.Component {
     this.components = {}
   }
 
-  componentDidUpdate () {
+  componentDidUpdate (prevProps) {
+    // NOTE - 2022-02-17 - SG - avoid changing the position if index are equal
+    // as react-slick will trigger an afterChange callback in this case (which will lead
+    // to an update loop)
+    if (prevProps.displayedPictureIndex === this.props.displayedPictureIndex) return
     this.setPositionFor('main', this.props.displayedPictureIndex)
     this.setPositionFor('thumbnails', this.props.displayedPictureIndex)
   }
 
   setPositionFor (component, position) {
-    this.components[component] && this.components[component].setDisplayedPictureIndex(position)
+    const positionWithDirection = this.reverseIndexWhenRtl(position)
+    this.components[component] && this.components[component].slickGoTo(positionWithDirection)
   }
 
-  onPositionChange = (newIndex) => {
-    this.props.onCarouselPositionChange(newIndex)
+  onPositionChange = newIndex => {
+    this.props.onCarouselPositionChange(this.reverseIndexWhenRtl(newIndex))
+  }
+
+  reverseIndexWhenRtl = (index) => {
+    return i18next.dir() === 'rtl' ? this.props.slides.length - 1 - index : index
   }
 
   render () {
@@ -36,20 +46,16 @@ export class Carousel extends React.Component {
         ? <div className='gallery__noContent'>{props.t("There isn't any previewable content at that space's root.")}</div>
         : <div className='gallery__noContent'>{props.t("There isn't any previewable content at that folder's root.")}</div>
     }
-
     const mainSliderProps = {
       ref: slider => { this.components.main = slider },
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
       slidesToShow: 1,
       slidesToScroll: 1,
-      centerMode: false,
-      initialSlide: 0,
+      centerMode: true,
       swipe: false,
       arrows: !props.disableAnimation && !props.autoPlay,
       afterChange: this.onPositionChange,
-      beforeChange: (oldIndex, newIndex) => this.setPositionFor('thumbnails', newIndex),
-      lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
       nextArrow: <CarouselArrow direction={DIRECTION.RIGHT} />,
@@ -60,11 +66,8 @@ export class Carousel extends React.Component {
       ref: r => { this.components.thumbnails = r },
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: !props.autoPlay,
-      initialSlide: 0,
-      beforeChange: (oldIndex, newIndex) => this.setPositionFor('main', newIndex),
       afterChange: this.onPositionChange,
       swipe: false,
-      lazyLoad: 'progressive',
       centerPadding: '0px',
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
@@ -85,28 +88,32 @@ export class Carousel extends React.Component {
       ]
     }
 
+    // NOTE 2022-02-16 - SG - The support of RTL in react-slick is very buggy
+    // so do not use it and ensure a reverse of the slides list.
+    // Also adaptat props.displayedPictureIndex to be invariant to direction changes outside this component.
+    const slides = i18next.dir() === 'rtl' ? props.slides.slice().reverse() : props.slides
+
     return (
       <>
-        <GallerySlider {...mainSliderProps}>
-          {props.slides.map((slide, index) => (
+        <GallerySlider {...mainSliderProps} displayedPictureIndex={this.reverseIndexWhenRtl(0)}>
+          {slides.map((slide, index) => (
             <MainPreview
               previewSrc={slide.src}
-              index={index}
               onClickShowImageRaw={props.onClickShowImageRaw}
               rotationAngle={slide.rotationAngle}
-              key={slide.src}
               fileName={slide.fileName}
+              key={slide.contentId}
             />
           ))}
         </GallerySlider>
-        <GallerySlider {...thumbnailSliderProps}>
-          {props.slides.map((slide, i) => (
+        <GallerySlider {...thumbnailSliderProps} displayedPictureIndex={this.reverseIndexWhenRtl(0)}>
+          {slides.map(slide => (
             <ThumbnailPreview
               previewSrc={slide.previewUrlForThumbnail}
               rotationAngle={slide.rotationAngle}
               onClickShowImageRaw={props.onClickShowImageRaw}
-              key={slide.src}
               fileName={slide.fileName}
+              key={slide.contentId}
             />
           ))}
         </GallerySlider>

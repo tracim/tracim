@@ -135,14 +135,12 @@ export default translate()(MainPreview)
 
 MainPreview.propTypes = {
   previewSrc: PropTypes.string,
-  index: PropTypes.number,
   onClickShowImageRaw: PropTypes.func,
   rotationAngle: PropTypes.number
 }
 
 MainPreview.defaultProps = {
   previewSrc: '',
-  index: 0,
   onClickShowImageRaw: () => {},
   rotationAngle: 0
 }

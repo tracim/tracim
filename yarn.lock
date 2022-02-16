@@ -3,7 +3,7 @@
 
 __metadata:
   version: 4
-  cacheKey: 5
+  cacheKey: 4
 
 "@asseinfo/react-kanban@npm:^2.2.0":
   version: 2.2.0
@@ -6206,7 +6206,7 @@ fsevents@^1.2.7:
   dependencies:
     bindings: ^1.5.0
     nan: ^2.12.1
-  checksum: 508a7e7e1e365236a7a0478392827145ba05c0181b1928b73b20c1a5212d15f6529735db897d617d7b0b051248c5720160f74c113bd727fc02de4f6cf885e1ff
+  checksum: f36f09403fbdff434b1cf4baa03d58b69e6ba5e84070bfd5cf48ef1ade8de364e01f2fcb1dafea8897732c211983cd2a593488b59b62b64ae9df4ffc5ab3685b
   languageName: node
   linkType: hard
 
@@ -6215,7 +6215,7 @@ fsevents@^1.2.7:
   resolution: "fsevents@patch:fsevents@npm%3A2.1.3#builtin<compat/fsevents>::version=2.1.3&hash=495457"
   dependencies:
     node-gyp: latest
-  checksum: 0005677b72f38a129a3cbe8c3794bdc83081a2bec53dfc03b085c2e5e4ca7a33a861a779d623313652df89746d97f79d24e4fef3b101c11c39ce1ea8a9690e18
+  checksum: b2c7c3576498b568fcc9e932d6ad10774abffb4668450de2d0afb64531f3aef35016bef0880a74f71b0fee99925301430634698d59c68781c337ba6e28ec038c
   languageName: node
   linkType: hard
 
@@ -11238,9 +11238,9 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-slick@npm:^0.25.2":
-  version: 0.25.2
-  resolution: "react-slick@npm:0.25.2"
+"react-slick@npm:0.28":
+  version: 0.28.1
+  resolution: "react-slick@npm:0.28.1"
   dependencies:
     classnames: ^2.2.5
     enquire.js: ^2.1.6
@@ -11248,9 +11248,9 @@ fsevents@^1.2.7:
     lodash.debounce: ^4.0.8
     resize-observer-polyfill: ^1.5.0
   peerDependencies:
-    react: ^0.14.0 || ^15.0.1 || ^16.0.0
-    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0
-  checksum: b4313df728a53d2c26b0d501f89a50f91354e8ee09cd04c3cf703791e782843697f4ec996a3f187fd5570e0a204d2803d9fc20efb1c18f22a53ac269db59b8bb
+    react: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+  checksum: fa9694f2e8ce05ab2e19acb577bed85433be4a0a7dca8ee5888090c6bc171f3417d957b8097fdd3a08284fa96e1c621585313431a9e8c2c138a4acbb9e318321
   languageName: node
   linkType: hard
 
@@ -11842,7 +11842,7 @@ fsevents@^1.2.7:
   dependencies:
     is-core-module: ^2.1.0
     path-parse: ^1.0.6
-  checksum: 188d5167e8578a9af8d194faf382b8f3526aad5145391c24ecdc6246c6fc82c10fc66d6352267f8e93c5977c503d61803169c91b9e2ee36dd2de759915c9b673
+  checksum: 983e1f00a147b20c9bd6c12216fad49d2d0b83a280a203a0261b68f48621d699c5131f9626044af91254da6d2e8309c7e5559c5886faeeae7c6c47507c855410
   languageName: node
   linkType: hard
 
@@ -13797,7 +13797,7 @@ fsevents@^1.2.7:
     react-i18next: 7.4.0
     react-image-lightbox: ^5.1.0
     react-router-dom: ^5.2.0
-    react-slick: ^0.25.2
+    react-slick: 0.28
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     slick-carousel: ^1.8.1

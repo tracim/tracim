@@ -1,5 +1,8 @@
 import Slider from 'react-slick'
 
+// NOTE 2022-02-16 - SG - Extending Slider
+// to enforce the right initial slide selection at start as 'initialIndex'
+// of react-slick does not work in every case (when several slides are displayed)
 export default class GallerySlider extends Slider {
   constructor (props) {
     super(props)
@@ -10,12 +13,6 @@ export default class GallerySlider extends Slider {
       if (this.props.displayedPictureIndex) {
         this.innerSlider.slickGoTo(this.props.displayedPictureIndex)
       }
-    }
-  }
-
-  setDisplayedPictureIndex = index => {
-    if (this.innerSlider) {
-      this.innerSlider.slickGoTo(index)
     }
   }
 }
