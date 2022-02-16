@@ -46,8 +46,15 @@ textarea
         &__active
           background-color grey-hover
     &__textinput
+      position relative
       width 100%
+      height 80px
       min-height 80px
+      &.richtextedition
+        min-height 180px
+        height 180px
+        // NOTE - RJ - 2022-02-11 - TinyMCE' UI without the content is 96px
+        // TinyMCE 5 is not high enough with 80px anymore
       & > textarea
         border-radius standardBorderRadius
         border borderStyle

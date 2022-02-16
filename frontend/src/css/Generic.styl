@@ -35,28 +35,34 @@ a
   &:disabled
     cursor not-allowed
 
-div.mce-fullscreen
+.tox-tinymce
+  min-height 150px
+
+div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
   z-index 1050
-  &.mce-container
-    top headerHeight
-// INFO - GM - 2020/03/20 - Custom css to make TinyMCE fill its 100% height container
-// Solution inspired originally by these answers: https://stackoverflow.com/questions/19861838/tinymce-4-and-100-height-within-containing-element?answertab=votes#tab-top
-/*Editing container*/
-#content .mce-tinymce:not(.mce-fullscreen), #content .mce-container-body
-  min-height 100%
-.mce-container-body.mce-stack-layout
-  height 100%
-  display flex
-  flex-flow column
-/*Editor header*/
-div.mce-top-part
-  flex 0 1 auto
-/*Editor body*/
-div.mce-edit-area
-  flex 1 1 auto
-/*Editor footer*/
-div.mce-statusbar
-  flex 0 1 31px
+  top headerHeight !important
+
+// NOTE - RJ - 2022-02-14 - remove some borders on TinyMCE toolbars
+.tox-toolbar
+  background-image none !important // native TinyMCE borders are drawn using a background image
+  &__group
+    border 0 !important
+    padding 0 !important
+
+    &:not(:last-child)
+      > :last-child
+        padding-right 3px
+        &:not(:hover)
+          border-right 1px solid #ccc
+          border-top-right-radius 0
+          border-bottom-right-radius 0
+        &:hover
+          border-right 1px solid transparent
+
+.tox-toolbar-overlord
+  border-bottom 1px solid #ccc !important
+  margin-bottom -1px
+
 
 .sidebarpagecontainer
   display flex

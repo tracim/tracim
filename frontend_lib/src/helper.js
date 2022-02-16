@@ -857,6 +857,18 @@ const seekUsernameEnd = (text, offset) => {
   return offset
 }
 
+export const tinymceRemove = (selector) => {
+  try {
+    globalThis.tinymce.remove(selector)
+  } catch (e) {
+    if (e instanceof TypeError) {
+      console.error('HACK(#5437): removing TinyMCE raised a TypeError exception. If the message looks like "Can\'t access dead object". Ignoring the exception but please fix this.', e)
+    } else {
+      throw e
+    }
+  }
+}
+
 export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
   let character, keyword
   let textBegin, textEnd

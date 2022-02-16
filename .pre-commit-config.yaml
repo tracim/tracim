@@ -5,7 +5,9 @@ repos:
       hooks:
           - id: trailing-whitespace
             args: [--markdown-linebreak-ext=md]
+            exclude: ^frontend/dist/assets/.*$
           - id: end-of-file-fixer
+            exclude: ^frontend/dist/assets/.*$
           - id: check-json
           - id: check-yaml
           - id: debug-statements

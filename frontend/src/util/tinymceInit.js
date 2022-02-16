@@ -1,7 +1,6 @@
 import i18n from './i18n.js'
 import { uniqueId } from 'lodash'
-import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
-import i18next from 'i18next'
+import { htmlCodeToDocumentFragment, tinymceRemove } from 'tracim_frontend_lib'
 
 (function () {
   // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
@@ -49,6 +48,9 @@ import i18next from 'i18next'
     handleTinyMceSelectionChange,
     autoFocus = true
   ) {
+    // RJ - NOTE - 2021-02-16 - ensure tinyMCE is not currently handling this textarea (or think it is)
+    tinymceRemove(selector)
+
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
     // solves the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
@@ -77,26 +79,53 @@ import i18next from 'i18next'
     const content = htmlCodeToDocumentFragment(textarea.value)
     textarea.value = ''
 
+    const language = TINY_MCE_LANGUAGE[lang] || lang
+
+    // NOTE/HACK - 2O22-02-10 - RJ
+    // The direction of the interface (RTL or LTR) of TinyMCE is set by the last language being loaded.
+    // If you open any langage file, like ar.js, you'll notice that tinymce.addI18n is called. in the
+    // object passed to this function, there is a _dir attribute containing "rtl" for RTL languages.
+    // This function in turn calls tinymce.util.I18n.add which stores this object and calls setCode.
+    // This last method updates the rtl boolean of I18n.
+    //
+    // As of the time of this note, TinyMCE languages are loaded in a loop by index.mak.
+    // Usually, TinyMCE would load them itself but our default CSP policy prevents this.
+    // Languages are not necessarily iterated in the same order on different tracim instances
+    // so difficult to understand differences in behavior can be observed.
+    //
+    // For whatever reason, setting language in the tinymce.init is not enough so let's call setCode
+    // ourself.
+    //
+    // WARNING when upgrading TinyMCE, you should check that the direction of TinyMCE's UI is still correct.
+    globalThis.tinymce.util.I18n.setCode(language)
+
     globalThis.tinymce.init({
       selector: selector,
-      directionality: i18next.dir(),
-      language: TINY_MCE_LANGUAGE[lang] || lang,
+      language,
       menubar: false,
       resize: false,
-      skin: 'lightgray',
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist anchor autolink charmap code contextmenu fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks',
+      plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks',
       toolbar: [
-        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
+        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap ',
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen'
       ],
-      insert_button_items: 'media anchor insertdatetime',
-      // toolbar: 'undo redo | bold italic underline strikethrough | link | bullist numlist | outdent indent | table | charmap | styleselect | alignleft aligncenter alignright | fullscreen | customInsertImage | code', // v1
+      insertdatetime_element: true,
       content_style: 'div {height: 100%;}',
       paste_data_images: true,
+      contextmenu: 'selectall copy paste link customInsertImage table',
       height: '100%',
+      width: '100%',
       setup: function ($editor) {
+        $editor.ui.registry.addMenuButton('insert', {
+          icon: 'plus',
+          tooltip: 'Insert',
+          fetch: function (f) {
+            f('media anchor insertdatetime')
+          }
+        })
+
         $editor.on('init', function (e) {
           // NOTE - RJ - 2021-04-28 - appending the content of the textarea
           // after initialization instead of using TinyMCE's own mechanism works
@@ -126,9 +155,9 @@ import i18next from 'i18next'
         })
 
         const getPosition = (e) => {
-          const toolbarPosition = $($editor.getContainer()).find('.mce-toolbar-grp').first()
+          const toolbarPosition = $($editor.getContainer()).find('.tox-toolbar-overlord').first()
           const nodePosition = $editor.selection.getNode().getBoundingClientRect()
-          const isFullscreen = $editor.getContainer().className.includes('mce-fullscreen')
+          const isFullscreen = $editor.getContainer().className.includes('tox-fullscreen')
 
           const topPosition = (isFullscreen ? $editor.getContainer().offsetTop : 0) + nodePosition.top + toolbarPosition.height()
           const AUTOCOMPLETE_HEIGHT = 280
@@ -147,8 +176,8 @@ import i18next from 'i18next'
           })
         }
 
-        if (handleTinyMceKeyDown) $editor.on('keydown', handleTinyMceKeyDown)
-        if (handleTinyMceKeyUp) $editor.on('keyup', handleTinyMceKeyUp)
+        if (handleTinyMceKeyDown) $editor.on('keydown', (e) => { handleTinyMceKeyDown(e, getPosition()) })
+        if (handleTinyMceKeyUp) $editor.on('keyup', (e) => { handleTinyMceKeyUp(e, getPosition()) })
         if (handleTinyMceInput) $editor.on('input', (e) => { handleTinyMceInput(e, getPosition()) })
 
         if (handleTinyMceSelectionChange) {
@@ -159,15 +188,18 @@ import i18next from 'i18next'
 
         // ////////////////////////////////////////////
         // add custom btn to handle image by selecting them with system explorer
-        $editor.addButton('customInsertImage', {
-          icon: 'mce-ico mce-i-image',
-          title: 'Image',
-          onclick: function () {
+        const customInsertImageButton = {
+          icon: 'image',
+          tooltip: i18n.t('Image'),
+          onAction: function () {
             $editor.focus()
             hiddenTinymceFileInput.value = ''
             hiddenTinymceFileInput.click()
           }
-        })
+        }
+
+        $editor.ui.registry.addMenuItem('customInsertImage', { ...customInsertImageButton, text: customInsertImageButton.tooltip })
+        $editor.ui.registry.addButton('customInsertImage', { ...customInsertImageButton, title: customInsertImageButton.tooltip })
 
         var customFullscreen = {
           active: false,
@@ -175,10 +207,10 @@ import i18next from 'i18next'
           newHeight: 0
         }
 
-        $editor.addButton('customFullscreen', {
-          icon: 'mce-ico mce-i-fullscreen',
+        $editor.ui.registry.addButton('customFullscreen', {
+          icon: 'fullscreen',
           title: 'Fullscreen',
-          onclick: function () {
+          onAction: function () {
             $editor.focus()
             const headerHeight = 60 // 60px is Tracim's header height
             var iframeElement = $editor.getWin()

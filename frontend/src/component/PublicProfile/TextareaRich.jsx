@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { TracimComponent, CUSTOM_EVENT } from 'tracim_frontend_lib'
+import { TracimComponent, CUSTOM_EVENT, tinymceRemove } from 'tracim_frontend_lib'
 
 export class TextareaRich extends React.Component {
   constructor (props) {
@@ -31,7 +31,7 @@ export class TextareaRich extends React.Component {
   }
 
   removeTextRich = () => {
-    globalThis.tinymce.remove(this.editorIdAsSelector)
+    tinymceRemove(this.editorIdAsSelector)
   }
 
   customOnChange = e => {

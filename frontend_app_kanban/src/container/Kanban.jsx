@@ -17,8 +17,6 @@ import {
   PopinFixedRightPartContent,
   Timeline,
   CUSTOM_EVENT,
-  LOCAL_STORAGE_FIELD,
-  getLocalStorageItem,
   buildHeadTitle,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -29,6 +27,7 @@ import {
   ROLE,
   getFileContent,
   getFileRevision,
+  tinymceRemove,
   TagList,
   putMyselfFileRead
 } from 'tracim_frontend_lib'
@@ -55,7 +54,6 @@ export class Kanban extends React.Component {
       loggedUser: param.loggedUser,
       content: param.content,
       currentContentRevisionId: param.content.current_revision_id,
-      newComment: '',
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
@@ -176,14 +174,6 @@ export class Kanban extends React.Component {
 
   updateTimelineAndContent () {
     const { props } = this
-    this.setState({
-      newComment: getLocalStorageItem(
-        this.state.appName,
-        this.state.content,
-        LOCAL_STORAGE_FIELD.COMMENT
-      ) || ''
-    })
-
     this.loadContent()
     props.loadTimeline(getFileRevision, this.state.content)
   }
@@ -208,7 +198,6 @@ export class Kanban extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
-            newComment={state.newComment}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
@@ -282,12 +271,12 @@ export class Kanban extends React.Component {
       })
     }
 
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<Kanban> will Unmount', `color: ${this.state.config.hexcolor}`)
-    globalThis.tinymce.remove('#wysiwygTimelineComment')
+    tinymceRemove('#wysiwygTimelineComment')
   }
 
   sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({

@@ -2,6 +2,7 @@ import React from 'react'
 import Radium from 'radium'
 import PropTypes from 'prop-types'
 import {
+  tinymceRemove,
   AutoComplete,
   BtnSwitch,
   ConfirmPopup,
@@ -13,11 +14,15 @@ import { translate } from 'react-i18next'
 
 export class WorkspaceAdvancedConfiguration extends React.Component {
   componentDidMount () {
+    this.updateWysiwyg()
+  }
+
+  updateWysiwyg () {
     const { props } = this
     if (!props.isReadOnlyMode) {
       globalThis.wysiwyg(
         `#${props.textareaId}`,
-        props.i18n.language,
+        props.lang,
         props.onChangeDescription,
         props.onTinyMceInput,
         props.onTinyMceKeyDown,
@@ -27,9 +32,15 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
     }
   }
 
+  componentDidUpdate (prevProps) {
+    if (this.props.lang !== prevProps.lang) {
+      this.updateWysiwyg()
+    }
+  }
+
   componentWillUnmount () {
     const { props } = this
-    if (!props.isReadOnlyMode) globalThis.tinymce.remove(`#${props.textareaId}`)
+    if (!props.isReadOnlyMode) tinymceRemove(`#${props.textareaId}`)
   }
 
   render () {
@@ -46,15 +57,6 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
             : (
               <div>
                 <div className='formBlock__field workspace_advanced__description__text '>
-                  {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-                    <AutoComplete
-                      apiUrl={props.apiUrl}
-                      autoCompleteItemList={props.autoCompleteItemList}
-                      autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                      onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                      delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-                    />
-                  )}
                   <textarea
                     id={props.textareaId}
                     className='workspace_advanced__description__text__textarea'
@@ -64,6 +66,15 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
                     rows='3'
                   />
                 </div>
+                {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+                  <AutoComplete
+                    apiUrl={props.apiUrl}
+                    autoCompleteItemList={props.autoCompleteItemList}
+                    autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                    onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                    delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+                  />
+                )}
 
                 <div className='workspace_advanced__description__bottom'>
                   <button
@@ -187,10 +198,12 @@ export default translate()(Radium(WorkspaceAdvancedConfiguration))
 
 WorkspaceAdvancedConfiguration.propTypes = {
   description: PropTypes.string,
+  lang: PropTypes.string,
   isReadOnlyMode: PropTypes.bool
 }
 
 WorkspaceAdvancedConfiguration.defaultProps = {
   description: '',
+  lang: '',
   isReadOnlyMode: true
 }

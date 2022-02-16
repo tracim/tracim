@@ -127,14 +127,14 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
   cy.removeAllListeners('uncaught:exception')
 })
 
-// FIXME - GB - 2019-07-02 - This events are hardcoded strings because cypress doesn't have the
+// FIXME - GB - 2019-07-02 - These events are hardcoded strings because cypress doesn't have the
 // @babel/polyfill loaded and crash when using something from tracim_frontend_lib
 // https://github.com/tracim/tracim/issues/2041
 Cypress.Commands.add('waitForTinyMCELoaded', () => {
   let isTinyMCEActive = false
 
   cy.window().its('tinyMCE').its('activeEditor').then(activeEditor => {
-    if (activeEditor.getContent()) isTinyMCEActive = true
+    if (activeEditor) isTinyMCEActive = true
   })
 
   cy.document().then( $doc => {
