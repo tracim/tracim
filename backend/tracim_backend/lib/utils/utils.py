@@ -25,8 +25,9 @@ from colour import Color
 from git import InvalidGitRepositoryError
 import jsonschema
 from jsonschema import SchemaError
+from jsonschema import ValidationError as JsonSchemaValidationError
 from jsonschema.validators import validator_for
-from marshmallow import ValidationError
+from marshmallow import ValidationError as MarshmallowValidationError
 import pytz
 from sqlakeyset import unserialize_bookmark
 
@@ -485,7 +486,9 @@ def validate_page_token(page_token: str) -> None:
     try:
         unserialize_bookmark(page_token)
     except Exception as e:
-        raise ValidationError('Page token "{}" is not a valid page token'.format(page_token)) from e
+        raise MarshmallowValidationError(
+            'Page token "{}" is not a valid page token'.format(page_token)
+        ) from e
 
 
 def validate_json(json_file_path: str) -> Dict[str, Any]:
@@ -532,7 +535,7 @@ class CustomPropertiesValidator:
     def validate_data(self, params: Dict[str, Any], json_schema: Dict[str, Any]):
         try:
             jsonschema.validate(params, schema=json_schema)
-        except ValidationError as exc:
+        except JsonSchemaValidationError as exc:
             raise TracimValidationFailed(
                 'JSONSchema Validation Failed: {}: "{}"'.format(
                     "> ".join([str(item) for item in exc.absolute_path]), exc.message
