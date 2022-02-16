@@ -19,7 +19,7 @@ import {
   TracimComponent
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
-import { getAgendaList } from '../action.async.js'
+import { getAgendaList, getPreFilledAgendaEvent } from '../action.async.js'
 
 export class Agenda extends React.Component {
   constructor (props) {
@@ -35,6 +35,7 @@ export class Agenda extends React.Component {
       content: param.content,
       userWorkspaceList: [],
       userWorkspaceListLoaded: false,
+      preFilledAgendaEvent: null,
       breadcrumbsList: [],
       appMounted: false,
       editionAuthor: '',
@@ -129,6 +130,7 @@ export class Agenda extends React.Component {
     console.log('%c<Agenda> did mount', `color: ${state.config.hexcolor}`)
 
     this.loadAgendaList(state.config.appConfig.workspaceId)
+    this.loadPrefilledAgendaEvent()
     if (state.config.appConfig.workspaceId !== null) {
       await this.loadWorkspaceData()
     } else {
@@ -178,6 +180,19 @@ export class Agenda extends React.Component {
         }
         break
       default: sendGlobalFlashMessage(props.t('Error while loading space list'))
+    }
+  }
+
+  async loadPrefilledAgendaEvent () {
+    const fetchGetPreFilledAgendaEvent = await handleFetchResult(
+      await getPreFilledAgendaEvent(this.state.config.apiUrl)
+    )
+
+    if (fetchGetPreFilledAgendaEvent.apiResponse.ok) {
+      this.setState({ preFilledAgendaEvent: fetchGetPreFilledAgendaEvent.body })
+    } else {
+      sendGlobalFlashMessage(this.props.t('Error while loading pre-filled agenda event information'))
+      this.setState({ preFilledAgendaEvent: {} })
     }
   }
 
@@ -283,7 +298,7 @@ export class Agenda extends React.Component {
   render () {
     const { props, state } = this
 
-    if (!state.isVisible || !state.userWorkspaceListLoaded) return null
+    if (!state.isVisible || !state.userWorkspaceListLoaded || !state.preFilledAgendaEvent) return null
 
     const config = {
       globalAccountSettings: {
@@ -299,6 +314,7 @@ export class Agenda extends React.Component {
         }))
       },
       userLang: state.loggedUser.lang,
+      preFilledAgendaEvent: state.preFilledAgendaEvent,
       shouldShowCaldavzapSidebar: state.config.appConfig.forceShowSidebar
     }
 
