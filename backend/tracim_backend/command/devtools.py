@@ -12,6 +12,7 @@ from tracim_backend.lib.mail_notifier.sender import EmailSender
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.utils.utils import CustomPropertiesValidator
 
 
 class ParametersListCommand(AppContextCommand):
@@ -267,3 +268,43 @@ class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
             current_user=None, app_config=self._app_config, session=self._session
         )
         print(json.dumps(custom_properties_api.get_translation_template()))
+
+
+class CustomPropertiesCheckerCommand(AppContextCommand):
+    """
+    Tool to validate custom properties
+    """
+
+    auto_setup_context = False
+
+    def get_description(self) -> str:
+        return "Check custom properties"
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "-s", "--json-schema", help="path of the json schema", dest="json_schema",
+        )
+        parser.add_argument(
+            "-u", "--ui-schema", help="path of the ui schema", dest="ui_schema",
+        )
+        return parser
+
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
+        super(CustomPropertiesCheckerCommand, self).take_action(parsed_args)
+        custom_propertie_validator = CustomPropertiesValidator()
+        if not parsed_args.json_schema and not parsed_args.ui_schema:
+            print("No schema provided, skip checking.")
+            return
+        if parsed_args.json_schema:
+            print("Checking json schema at {}".format(parsed_args.json_schema))
+            json_content = custom_propertie_validator.validate_valid_json_file(
+                parsed_args.json_schema
+            )
+            custom_propertie_validator.validate_json_schema(json_content)
+        if parsed_args.ui_schema:
+            print("Checking ui schema at {}".format(parsed_args.ui_schema))
+            json_content = custom_propertie_validator.validate_valid_json_file(
+                parsed_args.ui_schema
+            )
+        print("Schema validated without any issues")

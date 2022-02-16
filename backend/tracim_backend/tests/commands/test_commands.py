@@ -71,6 +71,7 @@ class TestCommandsList(object):
         assert output.find("dev test live-messages") > 0
         assert output.find("dev test smtp") > 0
         assert output.find("dev custom-properties extract-translation-source") > 0
+        assert output.find("dev custom-properties checker") > 0
 
 
 @pytest.mark.usefixtures("base_fixture")

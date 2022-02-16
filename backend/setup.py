@@ -173,6 +173,7 @@ setup(
             "dev test live-messages = tracim_backend.command.devtools:LiveMessageTesterCommand",
             "dev test smtp = tracim_backend.command.devtools:SMTPMailCheckerCommand",
             "dev custom-properties extract-translation-source = tracim_backend.command.devtools:ExtractCustomPropertiesTranslationsCommand",
+            "dev custom-properties checker = tracim_backend.command.devtools:CustomPropertiesCheckerCommand",
         ],
     },
     message_extractors={
