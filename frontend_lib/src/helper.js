@@ -862,7 +862,7 @@ export const tinymceRemove = (selector) => {
     globalThis.tinymce.remove(selector)
   } catch (e) {
     if (e instanceof TypeError) {
-      console.error('HACK: removing TinyMCE raised a TypeError exception. If the message looks like "Can\'t access dead object", this probably means TinyMCE has been removed too late, or several times. Ignoring the exception but please fix this.', e)
+      console.error('HACK(#5437): removing TinyMCE raised a TypeError exception. If the message looks like "Can\'t access dead object". Ignoring the exception but please fix this.', e)
     } else {
       throw e
     }
