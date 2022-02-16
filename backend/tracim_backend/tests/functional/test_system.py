@@ -1,4 +1,6 @@
 # coding=utf-8
+from urllib.parse import quote
+
 from mock import patch
 import pytest
 import transaction
@@ -188,6 +190,15 @@ class TestUsernameEndpoints(object):
             ("all", False),
             ("tous", False),
             ("todos", False),
+            ("test-2", True),
+            ("41", False),  # too small
+            ("747", True),
+            ("hello_you", True),
+            ("مرموط", True),  # Arabic
+            ("\\test", False),
+            ("&super", False),
+            ("١٢٣٤٥", True),  # Arabic
+            ("۵۶۷", False),  # Persan
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
@@ -195,7 +206,7 @@ class TestUsernameEndpoints(object):
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/system/username-availability?username={}".format(username), status=200
+            "/api/system/username-availability?username={}".format(quote(username)), status=200
         )
         assert res.json["available"] == is_available
 

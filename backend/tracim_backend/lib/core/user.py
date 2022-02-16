@@ -2,6 +2,7 @@
 import datetime
 import io
 import os
+import re
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing as typing
@@ -99,6 +100,10 @@ AVATAR_RATIO = ImageRatio(1, 1)
 COVER_RATIO = ImageRatio(35, 4)
 DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
 DEFAULT_COVER_SIZE = ImageSize(1300, 150)
+# INFO - G.M - 2022-02-16 - Allow all alphanumeric characters for latin and arabic characters
+# and - and _ characters,
+# This need to be updated synchronously to frontend verification.
+USERNAME_VALIDITY_PATTERN = re.compile("^[a-zA-Z0-9\\-_\u0621-\u064A\u0660-\u0669]+$")
 
 
 class UserApi(object):
@@ -838,10 +843,7 @@ class UserApi(object):
     def _check_username_correctness(self, username: str) -> bool:
         if len(username) < User.MIN_USERNAME_LENGTH or len(username) > User.MAX_USERNAME_LENGTH:
             return False
-        for char in username:
-            if char not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_":
-                return False
-        return True
+        return bool(USERNAME_VALIDITY_PATTERN.match(username))
 
     def update(
         self,
