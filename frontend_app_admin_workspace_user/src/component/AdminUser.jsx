@@ -211,7 +211,7 @@ export class AdminUser extends React.Component {
                       </td>
 
                       <td
-                        className='adminUser__table__username'
+                        className='adminUser__table__line__username'
                         title={u.username}
                       >
                         {u.username && `@${u.username}`}
@@ -242,7 +242,10 @@ export class AdminUser extends React.Component {
                         </ProfileNavigation>
                       </td>
 
-                      <td title={u.email}>
+                      <td
+                        className='adminUser__table__line__email'
+                        title={u.email}
+                      >
                         {u.email}
                       </td>
 

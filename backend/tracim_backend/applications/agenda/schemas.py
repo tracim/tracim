@@ -67,3 +67,11 @@ class AgendaFilterQuerySchema(marshmallow.Schema):
     @post_load
     def make_query_object(self, data: typing.Dict[str, typing.Any]) -> object:
         return AgendaFilterQuery(**data)
+
+
+class PreFilledAgendaEventSchema(marshmallow.Schema):
+    description = marshmallow.fields.String(
+        description="the text with which new agenda events shall be pre-filled",
+        required=True,
+        allow_none=True,
+    )

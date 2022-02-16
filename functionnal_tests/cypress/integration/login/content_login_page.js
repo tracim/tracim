@@ -22,7 +22,7 @@ describe('Login page', function () {
       .should('be.visible')
 
     cy.getTag({ selectorName: s.HEADER })
-      .find('.dropdownMenu__image')
+      .find('.dropdownMenuButton')
       .should('be.visible')
 
     cy.get('.loginpage__main__footer__text')

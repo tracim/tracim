@@ -24,6 +24,8 @@ var globalAccountSettings = configObj.globalAccountSettings.agendaList.map(c => 
   loggedUserRole: c.loggedUserRole
 }))
 
+var globalPreFilledAgendaEventDescription = configObj.preFilledAgendaEvent && configObj.preFilledAgendaEvent.description
+
 var globalShouldShowSidebar = configObj.shouldShowCaldavzapSidebar || configObj.globalAccountSettings.agendaList.length > 1
 
 var globalBackgroundSync=true
