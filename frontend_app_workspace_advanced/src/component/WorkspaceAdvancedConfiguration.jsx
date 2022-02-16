@@ -2,6 +2,7 @@ import React from 'react'
 import Radium from 'radium'
 import PropTypes from 'prop-types'
 import {
+  tinymceRemove,
   AutoComplete,
   BtnSwitch,
   ConfirmPopup,
@@ -29,7 +30,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 
   componentWillUnmount () {
     const { props } = this
-    if (!props.isReadOnlyMode) globalThis.tinymce.remove(`#${props.textareaId}`)
+    if (!props.isReadOnlyMode) tinymceRemove(`#${props.textareaId}`)
   }
 
   render () {

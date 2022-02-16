@@ -1,6 +1,6 @@
 import i18n from './i18n.js'
 import { uniqueId } from 'lodash'
-import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
+import { htmlCodeToDocumentFragment, tinymceRemove } from 'tracim_frontend_lib'
 
 (function () {
   // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
@@ -48,6 +48,9 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
     handleTinyMceSelectionChange,
     autoFocus = true
   ) {
+    // RJ - NOTE - 2021-02-16 - ensure tinyMCE is not currently handling this textarea (or think it is)
+    tinymceRemove(selector)
+
     // HACK: The tiny mce source code modal contain a textarea, but we
     // can't edit it (like it's readonly). The following solution
     // solves the bug: https://stackoverflow.com/questions/36952148/tinymce-code-editor-is-readonly-in-jtable-grid
@@ -105,16 +108,24 @@ import { htmlCodeToDocumentFragment } from 'tracim_frontend_lib'
       remove_script_host: false,
       plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks',
       toolbar: [
-        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | insert',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | customFullscreen'
+        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap ',
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen'
       ],
-      insert_button_items: 'media anchor insertdatetime',
+      insertdatetime_element: true,
       content_style: 'div {height: 100%;}',
       paste_data_images: true,
       contextmenu: 'selectall copy paste link customInsertImage table',
       height: '100%',
       width: '100%',
       setup: function ($editor) {
+        $editor.ui.registry.addMenuButton('insert', {
+          icon: 'plus',
+          tooltip: 'Insert',
+          fetch: function (f) {
+            f('media anchor insertdatetime')
+          }
+        })
+
         $editor.on('init', function (e) {
           // NOTE - RJ - 2021-04-28 - appending the content of the textarea
           // after initialization instead of using TinyMCE's own mechanism works

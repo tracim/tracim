@@ -15,6 +15,7 @@ import {
   getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
+  tinymceRemove,
   IconButton,
   Loading,
   PAGE,
@@ -138,7 +139,7 @@ export class Publications extends React.Component {
     }
 
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
-      globalThis.tinymce.remove(`#${wysiwygId}`)
+      tinymceRemove(`#${wysiwygId}`)
     }
 
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
@@ -147,12 +148,12 @@ export class Publications extends React.Component {
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove(`#${wysiwygId}`)
+    tinymceRemove(`#${wysiwygId}`)
   }
 
   handleAllAppChangeLanguage = (data) => {
     if (this.state.publicationWysiwyg) {
-      globalThis.tinymce.remove(`#${wysiwygId}`)
+      tinymceRemove(`#${wysiwygId}`)
       globalThis.wysiwyg(`#${wysiwygId}`, data, this.handleChangeNewPublication)
     }
     this.buildBreadcrumbs()

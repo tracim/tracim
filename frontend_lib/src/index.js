@@ -63,6 +63,7 @@ import {
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
   htmlToText,
+  tinymceRemove,
   addExternalLinksIcons,
   USER_CALL_STATE
 } from './helper.js'
@@ -456,5 +457,6 @@ export {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
+  tinymceRemove,
   Popover
 }

@@ -1,4 +1,4 @@
-a
+
   &:hover, &:link, &:visited
     text-decoration none
 
@@ -35,9 +35,12 @@ a
   &:disabled
     cursor not-allowed
 
+.tox-tinymce
+  min-height 150px
+
 div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
   z-index 1050
-  top headerHeight
+  top headerHeight !important
 
 // NOTE - RJ - 2022-02-14 - remove some borders on TinyMCE toolbars
 .tox-toolbar
