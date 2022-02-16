@@ -592,7 +592,9 @@ export const getCurrentContentVersionNumber = (appFeatureMode, content, timeline
 
 export const MINIMUM_CHARACTERS_USERNAME = 3
 export const MAXIMUM_CHARACTERS_USERNAME = 255
-export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_'
+export const ALLOWED_CHARACTERS_USERNAME = 'azAZ09-_ءي٩٠'
+// INFO - MB - 2022-02-16 -This RegEX supports arabic characters, numbers,underscores, and hiphens
+export const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z0-9\-_\u0621-\u064A\u0660-\u0669]/
 export const CHECK_USERNAME_DEBOUNCE_WAIT = 250
 
 export const NUMBER_RESULTS_BY_PAGE = 15
@@ -623,8 +625,7 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
     }
   }
 
-  // INFO - GB - 2020-06-08 The allowed characters are azAZ09-_
-  if (!(/^[A-Za-z0-9_-]*$/.test(username))) {
+  if (!(USERNAME_ALLOWED_CHARACTERS_REGEX.test(username))) {
     return {
       isUsernameValid: false,
       usernameInvalidMsg: props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })
@@ -846,8 +847,6 @@ export const USER_CALL_STATE = {
   CANCELLED: 'cancelled',
   UNANSWERED: 'unanswered'
 }
-
-export const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z0-9\-_]/
 
 const seekUsernameEnd = (text, offset) => {
   while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
