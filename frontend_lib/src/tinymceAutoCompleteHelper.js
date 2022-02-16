@@ -3,7 +3,10 @@ import {
   USERNAME_ALLOWED_CHARACTERS_REGEX
 } from './helper.js'
 
-const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-Z0-9\-_]*)$/
+import {
+  MENTION_REGEX,
+  LINK_REGEX
+ } from './mentionOrLink.js'
 
 let previousSelAndOffset = null
 
@@ -38,7 +41,7 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchAutoCompleteIte
   }
 
   previousSelAndOffset = selAndOffset
-  if (AUTOCOMPLETE_REGEX.test(getTextOnCursor(selAndOffset))) {
+  if (MENTION_REGEX.test(getTextOnCursor(selAndOffset))) {
     if (isAutoCompleteActivated) {
       tinymceAutoCompleteSearchForMentionOrLinkCandidate(fetchAutoCompleteItemList, setState)
       return
@@ -56,7 +59,8 @@ export const tinymceAutoCompleteHandleInput = (e, setState, fetchAutoCompleteIte
 }
 
 const tinymceAutoCompleteSearchForMentionOrLinkCandidate = async (fetchAutoCompleteItemList, setState) => {
-  const mentionOrLinkCandidate = getTextOnCursor(previousSelAndOffset).match(AUTOCOMPLETE_REGEX)
+  const mentionOrLinkCandidate = getTextOnCursor(previousSelAndOffset).match(MENTION_REGEX) ||
+    getTextOnCursor(previousSelAndOffset).match(LINK_REGEX)
   if (!mentionOrLinkCandidate) {
     previousSelAndOffset = null
     setState({ isAutoCompleteActivated: false })
