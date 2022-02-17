@@ -58,6 +58,7 @@ export class Carousel extends React.Component {
       afterChange: this.onPositionChange,
       centerPadding: '0px',
       className: 'carousel__main',
+      lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       nextArrow: <CarouselArrow direction={DIRECTION.RIGHT} />,
       prevArrow: <CarouselArrow direction={DIRECTION.LEFT} />
     }
