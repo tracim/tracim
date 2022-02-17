@@ -33,6 +33,9 @@ export class ContentFacets extends React.Component {
       case SEARCH_CONTENT_FACETS.AUTHOR.slug:
         this.setState(prev => ({ showAuthorList: !prev.showAuthorList }))
         break
+      case SEARCH_CONTENT_FACETS.TAGS.slug:
+        this.setState(prev => ({ showTagList: !prev.showTagList }))
+        break
     }
   }
 
