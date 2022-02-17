@@ -12,7 +12,8 @@ export class ContentFacets extends React.Component {
       showStatusList: true,
       showContentTypeList: true,
       showFileExtensionList: true,
-      showAuthorList: true
+      showAuthorList: true,
+      showTagList: true
     }
   }
 
