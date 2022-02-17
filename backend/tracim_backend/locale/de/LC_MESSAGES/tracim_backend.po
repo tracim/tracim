@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: tracim_backend 3.7.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-06-29 12:15+0200\n"
-"PO-Revision-Date: 2022-02-16 16:38+0000\n"
+"PO-Revision-Date: 2022-02-17 08:54+0000\n"
 "Last-Translator: Marie Bégué <marie.prandstetter@gmail.com>\n"
 "Language-Team: German <https://hosted.weblate.org/projects/tracim/backend/de/"
 ">\n"
@@ -50,7 +50,7 @@ msgstr "Abgebrochen"
 
 #: tracim_backend/app_models/contents.py:71
 msgid "Deprecated"
-msgstr "Abgelehnt"
+msgstr "Veraltet"
 
 #: tracim_backend/applications/share/application.py:25
 msgid ""
@@ -61,7 +61,6 @@ msgstr ""
 "Ihnen freigegeben"
 
 #: tracim_backend/applications/share/application.py:33
-#, fuzzy
 msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
 "people"
@@ -73,7 +72,7 @@ msgstr ""
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
 msgstr ""
 "{emitter_name} hat Sie eingeladen, Dateien auf \"{website_title}\" "
-"hochzuladen."
+"hochzuladen"
 
 #: tracim_backend/applications/upload_permissions/application.py:32
 msgid ""
@@ -81,7 +80,7 @@ msgid ""
 "\"{workspace_name}\""
 msgstr ""
 "[{website_title}] Sie haben {nb_receivers} Personen zum Hochladen von "
-"Dateien auf \"{workspace_name}\" eingeladen "
+"Dateien auf \"{workspace_name}\" eingeladen"
 
 #: tracim_backend/applications/upload_permissions/application.py:42
 msgid ""
@@ -148,8 +147,8 @@ msgid ""
 "Reply to this email directly or <a href=\"{call_to_action_url}\">view it "
 "on tracim</a>"
 msgstr ""
-"Antworten Sie direkt auf diese E-Mail oder <a "
-"href=\"{call_to_action_url}\">sehen Sie auf tracim</a>"
+"Antworten Sie direkt auf diese E-Mail oder <a href=\"{call_to_action_url}\""
+">sehen Sie auf tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:63
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
@@ -164,8 +163,8 @@ msgid ""
 "If you'd like to receive fewer emails, you can <a "
 "href=\"{website_title}/ui/account\">unsubscribe from notifications</a>."
 msgstr ""
-"Wenn Sie weniger E-Mails erhalten möchten, können Sie <a "
-"href=\"{website_title}/ui/account\">Benachrichtigungen abbestellen</a>."
+"Wenn Sie weniger E-Mails erhalten möchten, können Sie <a href=\""
+"{website_title}/ui/account\">Benachrichtigungen abbestellen</a>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:5
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:4
@@ -179,7 +178,8 @@ msgstr "Hallo {username},"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:8
 msgid "{origin_user_name} invited you to join <i>{website_title}</i>."
-msgstr "{origin_user_name} hat Sie eingeladen, <i>{website_title}</i> beizutreten."
+msgstr ""
+"{origin_user_name} hat Sie eingeladen, <i>{website_title}</i> beizutreten."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:10
 msgid "Someone invited you to join <i>{website_title}</i>."
@@ -202,9 +202,8 @@ msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your space: {a_link}"
 msgstr ""
-"Beginnen Sie zu diskutieren, teilen Sie Dateien, Kalender und "
-"Dokumentation mit Kollaborateuren, indem Sie sich in Ihrem Bereich "
-"anmelden: {a_link}"
+"Beginnen Sie zu diskutieren, teilen Sie Dateien, Kalender und Dokumentation "
+"mit Kollaborateuren, indem Sie sich in Ihrem Bereich anmelden: {a_link}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:23
 msgid ""
@@ -253,7 +252,7 @@ msgid ""
 "files with you in this space: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 msgstr ""
-"{username} (<a href=\"{email_link}\">{email}</a>) hat eine oder mehrere  "
+"{username} (<a href=\"{email_link}\">{email}</a>) hat eine oder mehrere "
 "Dateien mit Ihnen in diesem Bereich geteilt: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 
