@@ -17,7 +17,6 @@ cardWidth = 280px
       &.fullscreen
         position fixed
         top headerHeight
-        left 0
         width 100%
         height "calc(100% - %s)" % headerHeight
         z-index 1
@@ -83,7 +82,6 @@ cardWidth = 280px
       &__toolbar
         position absolute
         top standardSpacing
-        right standardSpacing
         z-index 1
         & .iconbutton
           background-color offWhite
@@ -195,6 +193,22 @@ cardWidth = 280px
       background-color veryLightGrey
     & > *
       margin auto
+
+[dir=ltr] .kanban
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        left 0
+      &__toolbar
+        right standardSpacing
+
+[dir=rtl] .kanban
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        right 0
+      &__toolbar
+        left standardSpacing
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .kanban
