@@ -1,5 +1,4 @@
 import React from 'react'
-import i18next from 'i18next'
 import { translate } from 'react-i18next'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -20,22 +19,27 @@ export class Carousel extends React.Component {
     // INFO - SG  - 2022-02-17 - SG - avoid changing the position if index are equal
     // as react-slick will trigger an afterChange callback in this case (which will lead
     // to an update loop)
-    if (prevProps.displayedPictureIndex === this.props.displayedPictureIndex) return
-    this.setPositionFor('main', this.props.displayedPictureIndex)
-    this.setPositionFor('thumbnails', this.props.displayedPictureIndex)
+    const { props } = this
+    if (prevProps.displayedPictureIndex === props.displayedPictureIndex && prevProps.dir === props.dir) return
+
+    const position = this.reverseIndexWhenRtl(props.displayedPictureIndex)
+
+    this.setPositionFor('main', position)
+    this.setPositionFor('thumbnails', position)
   }
 
   setPositionFor (component, position) {
-    const positionWithDirection = this.reverseIndexWhenRtl(position)
-    this.components[component] && this.components[component].slickGoTo(positionWithDirection)
+    this.components[component] && this.components[component].slickGoTo(position)
   }
 
   onPositionChange = newIndex => {
-    this.props.onCarouselPositionChange(this.reverseIndexWhenRtl(newIndex))
+    const { props } = this
+    props.onCarouselPositionChange(this.reverseIndexWhenRtl(newIndex, props.dir))
   }
 
   reverseIndexWhenRtl = (index) => {
-    return i18next.dir() === 'rtl' ? this.props.slides.length - 1 - index : index
+    const { props } = this
+    return props.dir === 'rtl' ? props.slides.length - 1 - index : index
   }
 
   render () {
@@ -92,11 +96,11 @@ export class Carousel extends React.Component {
     // INFO - SG - 2022-02-16 - The support of RTL in react-slick is very buggy
     // so do not use it and ensure a reverse of the slides list.
     // Also adapt props.displayedPictureIndex to be invariant to direction changes outside this component.
-    const slides = i18next.dir() === 'rtl' ? props.slides.slice().reverse() : props.slides
-
+    const slides = props.dir === 'rtl' ? props.slides.slice().reverse() : props.slides
+    const position = this.reverseIndexWhenRtl(props.displayedPictureIndex)
     return (
       <>
-        <GallerySlider {...mainSliderProps} displayedPictureIndex={this.reverseIndexWhenRtl(0)}>
+        <GallerySlider {...mainSliderProps} displayedPictureIndex={position}>
           {slides.map((slide, index) => (
             <MainPreview
               previewSrc={slide.src}
@@ -107,7 +111,7 @@ export class Carousel extends React.Component {
             />
           ))}
         </GallerySlider>
-        <GallerySlider {...thumbnailSliderProps} displayedPictureIndex={this.reverseIndexWhenRtl(0)}>
+        <GallerySlider {...thumbnailSliderProps} displayedPictureIndex={position}>
           {slides.map(slide => (
             <ThumbnailPreview
               previewSrc={slide.previewUrlForThumbnail}
@@ -131,7 +135,8 @@ Carousel.propTypes = {
   displayedPictureIndex: PropTypes.number.isRequired,
   onFileDeleted: PropTypes.func.isRequired,
   disableAnimation: PropTypes.bool,
-  isWorkspaceRoot: PropTypes.bool
+  isWorkspaceRoot: PropTypes.bool,
+  dir: PropTypes.string
 }
 
 Carousel.defaultProps = {
@@ -141,5 +146,6 @@ Carousel.defaultProps = {
   onFileDeleted: () => {},
   disableAnimation: false,
   displayedPictureIndex: 0,
-  isWorkspaceRoot: true
+  isWorkspaceRoot: true,
+  dir: 'ltr'
 }

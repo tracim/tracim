@@ -1,4 +1,5 @@
 import React from 'react'
+import i18next from 'i18next'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -768,6 +769,7 @@ export class Gallery extends React.Component {
                   disableAnimation={state.displayLightbox}
                   isWorkspaceRoot={state.folderId === 0}
                   autoPlay={state.autoPlay}
+                  dir={i18next.dir()}
                 />
               ) : (
                 <div className='gallery__loader'>
