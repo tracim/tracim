@@ -193,10 +193,15 @@ export class NotificationWall extends React.Component {
       const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
+      const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT
+
       return {
         title: props.t('Mention'),
         text: groupMention ? mentionEveryone : mentionYou,
-        url: PAGE.CONTENT(notification.content.parentId),
+        url: PAGE.CONTENT(isHtmlDocument
+          ? notification.content.id
+          : notification.content.parentId
+        ),
         isMention: true
       }
     }
