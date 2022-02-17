@@ -65,7 +65,7 @@
       position absolute
       top calc(50% - 20px)
       left 50%
-      // NOTE 2022-02-16 - SG - forcing the scale to (1, 1)
+      // INFO - SG - 2022-02-16 - forcing the scale to (1, 1)
       // as the prev/next arrows aren't reversed with react-slick when dir="rtl"
       transform translateX(-50%) scale(1, 1)
       font-size bigIconSize
@@ -167,7 +167,7 @@
   height 100%
 
 // NOTE 2022-02-17 - SG - disable react-slick rtl handling as it is buggy.
-[dir="rtl"] .slick-slide
+[dir='rtl'] .slick-slide
   float left !important
 
 .carousel__main .slick-track

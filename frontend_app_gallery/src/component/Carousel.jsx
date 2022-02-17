@@ -17,7 +17,7 @@ export class Carousel extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    // NOTE - 2022-02-17 - SG - avoid changing the position if index are equal
+    // INFO - SG  - 2022-02-17 - SG - avoid changing the position if index are equal
     // as react-slick will trigger an afterChange callback in this case (which will lead
     // to an update loop)
     if (prevProps.displayedPictureIndex === this.props.displayedPictureIndex) return
@@ -88,7 +88,7 @@ export class Carousel extends React.Component {
       ]
     }
 
-    // NOTE 2022-02-16 - SG - The support of RTL in react-slick is very buggy
+    // INFO - SG - 2022-02-16 - The support of RTL in react-slick is very buggy
     // so do not use it and ensure a reverse of the slides list.
     // Also adaptat props.displayedPictureIndex to be invariant to direction changes outside this component.
     const slides = i18next.dir() === 'rtl' ? props.slides.slice().reverse() : props.slides
