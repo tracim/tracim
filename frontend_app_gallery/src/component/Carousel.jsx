@@ -15,17 +15,31 @@ export class Carousel extends React.Component {
     this.components = {}
   }
 
-  componentDidUpdate () {
-    this.setPositionFor('main', this.props.displayedPictureIndex)
-    this.setPositionFor('thumbnails', this.props.displayedPictureIndex)
+  componentDidUpdate (prevProps) {
+    // INFO - SG  - 2022-02-17 - SG - avoid changing the position if index are equal
+    // as react-slick will trigger an afterChange callback in this case (which will lead
+    // to an update loop)
+    const { props } = this
+    if (prevProps.displayedPictureIndex === props.displayedPictureIndex && prevProps.dir === props.dir) return
+
+    const position = this.reverseIndexWhenRtl(props.displayedPictureIndex)
+
+    this.setPositionFor('main', position)
+    this.setPositionFor('thumbnails', position)
   }
 
   setPositionFor (component, position) {
-    this.components[component] && this.components[component].setDisplayedPictureIndex(position)
+    this.components[component] && this.components[component].slickGoTo(position)
   }
 
-  onPositionChange = (newIndex) => {
-    this.props.onCarouselPositionChange(newIndex)
+  onPositionChange = newIndex => {
+    const { props } = this
+    props.onCarouselPositionChange(this.reverseIndexWhenRtl(newIndex, props.dir))
+  }
+
+  reverseIndexWhenRtl = (index) => {
+    const { props } = this
+    return props.dir === 'rtl' ? props.slides.length - 1 - index : index
   }
 
   render () {
@@ -36,22 +50,19 @@ export class Carousel extends React.Component {
         ? <div className='gallery__noContent'>{props.t("There isn't any previewable content at that space's root.")}</div>
         : <div className='gallery__noContent'>{props.t("There isn't any previewable content at that folder's root.")}</div>
     }
-
     const mainSliderProps = {
       ref: slider => { this.components.main = slider },
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
       slidesToShow: 1,
       slidesToScroll: 1,
-      centerMode: false,
-      initialSlide: 0,
+      centerMode: true,
       swipe: false,
       arrows: !props.disableAnimation && !props.autoPlay,
       afterChange: this.onPositionChange,
-      beforeChange: (oldIndex, newIndex) => this.setPositionFor('thumbnails', newIndex),
-      lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       centerPadding: '0px',
       className: 'carousel__main',
+      lazyLoad: props.autoPlay ? 'progressive' : 'ondemand',
       nextArrow: <CarouselArrow direction={DIRECTION.RIGHT} />,
       prevArrow: <CarouselArrow direction={DIRECTION.LEFT} />
     }
@@ -60,11 +71,8 @@ export class Carousel extends React.Component {
       ref: r => { this.components.thumbnails = r },
       slidesToShow: props.slides.length > 6 ? 7 : props.slides.length,
       focusOnSelect: !props.autoPlay,
-      initialSlide: 0,
-      beforeChange: (oldIndex, newIndex) => this.setPositionFor('main', newIndex),
       afterChange: this.onPositionChange,
       swipe: false,
-      lazyLoad: 'progressive',
       centerPadding: '0px',
       infinite: true,
       speed: props.disableAnimation ? 0 : 300,
@@ -85,28 +93,32 @@ export class Carousel extends React.Component {
       ]
     }
 
+    // INFO - SG - 2022-02-16 - The support of RTL in react-slick is very buggy
+    // so do not use it and ensure a reverse of the slides list.
+    // Also adapt props.displayedPictureIndex to be invariant to direction changes outside this component.
+    const slides = props.dir === 'rtl' ? props.slides.slice().reverse() : props.slides
+    const position = this.reverseIndexWhenRtl(props.displayedPictureIndex)
     return (
       <>
-        <GallerySlider {...mainSliderProps}>
-          {props.slides.map((slide, index) => (
+        <GallerySlider {...mainSliderProps} displayedPictureIndex={position}>
+          {slides.map((slide, index) => (
             <MainPreview
               previewSrc={slide.src}
-              index={index}
               onClickShowImageRaw={props.onClickShowImageRaw}
               rotationAngle={slide.rotationAngle}
-              key={slide.src}
               fileName={slide.fileName}
+              key={slide.contentId}
             />
           ))}
         </GallerySlider>
-        <GallerySlider {...thumbnailSliderProps}>
-          {props.slides.map((slide, i) => (
+        <GallerySlider {...thumbnailSliderProps} displayedPictureIndex={position}>
+          {slides.map(slide => (
             <ThumbnailPreview
               previewSrc={slide.previewUrlForThumbnail}
               rotationAngle={slide.rotationAngle}
               onClickShowImageRaw={props.onClickShowImageRaw}
-              key={slide.src}
               fileName={slide.fileName}
+              key={slide.contentId}
             />
           ))}
         </GallerySlider>
@@ -123,7 +135,8 @@ Carousel.propTypes = {
   displayedPictureIndex: PropTypes.number.isRequired,
   onFileDeleted: PropTypes.func.isRequired,
   disableAnimation: PropTypes.bool,
-  isWorkspaceRoot: PropTypes.bool
+  isWorkspaceRoot: PropTypes.bool,
+  dir: PropTypes.string
 }
 
 Carousel.defaultProps = {
@@ -133,5 +146,6 @@ Carousel.defaultProps = {
   onFileDeleted: () => {},
   disableAnimation: false,
   displayedPictureIndex: 0,
-  isWorkspaceRoot: true
+  isWorkspaceRoot: true,
+  dir: 'ltr'
 }
