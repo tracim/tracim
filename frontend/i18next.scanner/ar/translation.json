@@ -2,12 +2,6 @@
   "0 comments": "0 تعليق",
   "{{numberComments}} comment": "تعليق {{numberComments}}",
   "{{numberComments}} comments": "__NOT_TRANSLATED__",
-  "Information_0": "__NOT_TRANSLATED__",
-  "Information_1": "__NOT_TRANSLATED__",
-  "Information_2": "",
-  "Information_3": "",
-  "Information_4": "",
-  "Information_5": "",
   "Warning": "__NOT_TRANSLATED__",
   "Error": "__NOT_TRANSLATED__",
   "by": "__NOT_TRANSLATED__",
@@ -557,5 +551,8 @@
   "November": "__NOT_TRANSLATED__",
   "December": "__NOT_TRANSLATED__",
   "MM/dd/yyyy": "__NOT_TRANSLATED__",
-  "Comment_verb": "__NOT_TRANSLATED__"
+  "Comment_verb": "__NOT_TRANSLATED__",
+  "Information": "__NOT_TRANSLATED__",
+  "Information_plural": "__NOT_TRANSLATED__",
+  "Image": "__NOT_TRANSLATED__"
 }
