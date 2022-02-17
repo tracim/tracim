@@ -8,5 +8,6 @@
   "Spaces": "فضاءات",
   "Space": "فضاء",
   "Agenda of space {{workspaceLabel}}": "__NOT_TRANSLATED__",
-  "Some information was modified by {{author}}": "تم تعديل بعض المعلومات من طرف {{author}}"
+  "Some information was modified by {{author}}": "تم تعديل بعض المعلومات من طرف {{author}}",
+  "Error while loading pre-filled agenda event information": "__NOT_TRANSLATED__"
 }

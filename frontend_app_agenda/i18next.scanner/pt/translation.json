@@ -8,5 +8,6 @@
   "Agenda": "Agenda",
   "Some agenda could not be loaded": "Impossível de carregar alguma agenda",
   "My agendas": "Minhas agendas",
-  "Some information was modified by {{author}}": "Algumas informações foram modificadas por {{author}}"
+  "Some information was modified by {{author}}": "Algumas informações foram modificadas por {{author}}",
+  "Error while loading pre-filled agenda event information": "__NOT_TRANSLATED__"
 }
