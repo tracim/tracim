@@ -1,10 +1,10 @@
 ## Tracim Live Messages
 
-Tracim Lives messages are events send from the tracim server to the browser client
-using ServerSideEvents (SSE) on the `/api/users/<user_id>/live_messages` endpoint.
+Tracim Live Messages are events sent from the Tracim server to the browser client
+using Server-Sent-Events (SSE) on the `/api/users/<user_id>/live_messages` endpoint.
 
-The idea is that the browser client open an http connexion and keep it opened to allow
-the server to keep the user informed about change that happened in Tracim.
+The idea is that the browser client opens an HTTP connection and keep it opened to allow
+the server to keep the user informed about changes that happened in Tracim.
 
 ## TLM Exemple
 
@@ -33,10 +33,10 @@ TLM are returned as json, for example:
 
 Possible core event types:
 
-    created (C below)
-    modified (M below)
-    deleted (D below)
-    undeleted (U below)
+- created (C below)
+- modified (M below)
+- deleted (D below)
+- undeleted (U below)
 
 Possible entity types (plus their needed fields):
 
@@ -44,7 +44,7 @@ Possible entity types (plus their needed fields):
 |:----------------------:|:----------------:|:-------------:|:--------------------------------------:|:--------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------:|
 | user                   | C/M/D/U          |               | author,user                            |   author can be null (tracimcli),   user account modification, user creation/disabling/etc.  | administrators, user itself, user in at least one same space                        |
 | workspace              | C/M/D/U          |               | author,workspace                       | Space creation/deletion but also description/name update,                                    | same as workspace_members if confidential, all users if not (open/on_request space) |
-| workspace_member       | C/M/D            |               | author,user,workspace,member           |  Add/remove members in space but also role change                                            | administrators, user itself (if one), space members                                 |
+| workspace_member       | C/M/D            |               | author,user,workspace,member           |  Add/remove members in space but also role change                                            | administrators, user themself (if one), space members                                 |
 | content                | C/M/D/U          | file          | author,workspace,content               |                                                                                              | space members                                                                       |
 |   content              | C/M/D/U          | thread        | author,workspace,content               |                                                                                              | space members                                                                       |
 |   content              | C/M/D/U          | html-document | author,workspace,content               |                                                                                              | space members                                                                       |
