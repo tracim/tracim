@@ -486,9 +486,9 @@ class EventBuilder:
 
     @hookimpl
     def on_user_modified(self, user: User, context: TracimContext) -> None:
-        if self._has_just_been_deleted(user):
+        if has_just_been_deleted(user):
             self._create_user_event(OperationType.DELETED, user, context)
-        elif self._has_just_been_undeleted(user):
+        elif has_just_been_undeleted(user):
             self._create_user_event(OperationType.UNDELETED, user, context)
         else:
             self._create_user_event(OperationType.MODIFIED, user, context)
@@ -521,9 +521,9 @@ class EventBuilder:
 
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
-        if self._has_just_been_deleted(workspace):
+        if has_just_been_deleted(workspace):
             self._create_workspace_event(OperationType.DELETED, workspace, context)
-        elif self._has_just_been_undeleted(workspace):
+        elif has_just_been_undeleted(workspace):
             self._create_workspace_event(OperationType.UNDELETED, workspace, context)
         else:
             self._create_workspace_event(OperationType.MODIFIED, workspace, context)
@@ -850,21 +850,23 @@ class EventBuilder:
             context=context,
         )
 
-    def _has_just_been_deleted(self, obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
-        """Check that an object has been deleted since it has been queried from database."""
-        if obj.is_deleted:
-            history = inspect(obj).attrs.is_deleted.history
-            was_changed = not history.unchanged and (history.deleted or history.added)
-            return was_changed
-        return False
 
-    def _has_just_been_undeleted(self, obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
-        """Check whether an object has been undeleted since queried from database."""
-        if not obj.is_deleted:
-            history = inspect(obj).attrs.is_deleted.history
-            was_changed = not history.unchanged and (history.deleted or history.added)
-            return was_changed
-        return False
+def has_just_been_deleted(obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
+    """Check that an object has been deleted since it has been queried from database."""
+    if obj.is_deleted:
+        history = inspect(obj).attrs.is_deleted.history
+        was_changed = not history.unchanged and (history.deleted or history.added)
+        return was_changed
+    return False
+
+
+def has_just_been_undeleted(obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
+    """Check whether an object has been undeleted since queried from database."""
+    if not obj.is_deleted:
+        history = inspect(obj).attrs.is_deleted.history
+        was_changed = not history.unchanged and (history.deleted or history.added)
+        return was_changed
+    return False
 
 
 def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[int]:
@@ -1086,11 +1088,10 @@ class MessageHooks:
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
         current_user = context.safe_current_user()
-        event_builder = EventBuilder(context.app_config)
         event_api = EventApi(current_user, context.dbsession, context.app_config)
-        if event_builder._has_just_been_deleted(workspace):
+        if has_just_been_deleted(workspace):
             event_api.delete_message_for_workspace(workspace.workspace_id)
-        elif event_builder._has_just_been_undeleted(workspace):
+        elif has_just_been_undeleted(workspace):
             for role in workspace.roles:
                 event_api.create_messages_history_for_user(
                     user_id=role.user_id,
