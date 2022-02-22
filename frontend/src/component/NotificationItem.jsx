@@ -5,10 +5,10 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { FETCH_CONFIG } from '../util/helper.js'
 import {
-  Avatar,
   AVATAR_SIZE,
-  formatAbsoluteDate,
-  TracimComponent
+  Avatar,
+  TracimComponent,
+  formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
 
@@ -47,7 +47,7 @@ const NotificationItem = props => {
           className='notification__list__item__meta__date'
           title={formatAbsoluteDate(notification.created, user.lang)}
         >
-          {props.shortDate(notification.created)}
+          {props.shortDate}
         </div>
         <div className='notification__list__item__meta__space'>
           {(notification.workspace &&
@@ -70,6 +70,7 @@ const NotificationItem = props => {
 
   )
 }
+
 export default translate()(TracimComponent(NotificationItem))
 
 NotificationItem.propTypes = {
@@ -77,6 +78,6 @@ NotificationItem.propTypes = {
   notification: PropTypes.object.isRequired,
   onClickCircle: PropTypes.func.isRequired,
   onClickNotification: PropTypes.func.isRequired,
-  shortDate: PropTypes.func.isRequired,
+  shortDate: PropTypes.string.isRequired,
   user: PropTypes.object.isRequired
 }

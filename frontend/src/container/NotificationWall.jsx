@@ -19,16 +19,16 @@ import {
 } from '../util/helper.js'
 import {
   CONTENT_TYPE,
-  IconButton,
   GROUP_MENTION_TRANSLATION_LIST,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
   PROFILE,
-  ListItemWrapper,
+  SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
-  SUBSCRIPTION_TYPE,
-  NUMBER_RESULTS_BY_PAGE,
-  PAGE,
+  IconButton,
+  ListItemWrapper,
   PopinFixedHeader,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -37,7 +37,7 @@ import NotificationItem from '../component/NotificationItem.jsx'
 import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export class NotificationWall extends React.Component {
-  shortDate = date => {
+  computeShortDate = date => {
     const { props } = this
 
     const msElapsed = Date.now() - new Date(date).getTime()
@@ -461,6 +461,12 @@ export class NotificationWall extends React.Component {
 
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
+            // HACK - MP - 2022-02-22 - We know this component is rendered every time we click on the
+            // notification button. We know the NotificationItem is rendered everytime too but not the
+            // GroupedNotificationItem. To enable GroupedNotificationItem to be rendered everytime, we
+            // need to change one props each time. That's why we are calculating it here.
+            const shortDate = this.computeShortDate(notification.created, props.user.lang)
+
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
@@ -473,19 +479,19 @@ export class NotificationWall extends React.Component {
                     <GroupedNotificationItem
                       getNotificationDetails={this.getNotificationDetails}
                       notification={notification}
-                      onClickNotification={this.handleClickNotification}
                       onClickCircle={this.handleReadNotification}
-                      shortDate={this.shortDate}
+                      onClickNotification={this.handleClickNotification}
+                      shortDate={shortDate}
                     />
                   )
                   : (
                     <NotificationItem
                       getNotificationDetails={this.getNotificationDetails}
                       notification={notification}
-                      onClickNotification={this.handleClickNotification}
                       onClickCircle={this.handleReadNotification}
-                      shortDate={this.shortDate}
+                      onClickNotification={this.handleClickNotification}
                       user={props.user}
+                      shortDate={shortDate}
                     />
                   )}
               </ListItemWrapper>
