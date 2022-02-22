@@ -285,7 +285,7 @@
   "Preview loading...": "Vorschau wird geladen …",
   "Unknown entity type": "Unbekannter Entitätsart",
   "The link has been copied to clipboard": "Der Link wurde in die Clipboard kopiert",
-  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  trat in den Bereich  <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> trat in den Bereich <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>{{userPublicName}}</0></0>s Rolle wurde geändert in <2>{{role}}</2>",
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  möchte dem Bereich beitreten <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "Die Anfrage von <0><0>{{userPublicName}}</0></0> dem Bereich beizutreten, wurde <2>{{state}}</2>",
@@ -546,5 +546,5 @@
   "December": "__NOT_TRANSLATED__",
   "MM/dd/yyyy": "dd/MM/yyyy",
   "Comment_verb": "Kommentieren",
-  "Image": "__NOT_TRANSLATED__"
+  "Image": "Bild"
 }

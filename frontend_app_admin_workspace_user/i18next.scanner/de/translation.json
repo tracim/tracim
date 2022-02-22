@@ -31,7 +31,7 @@
   "New password is too long (maximum 512 characters)": "Neues Passwort ist zu lang (maximum 512 Zeichen)",
   "User created and email sent": "Benutzer angelegt und E-Mail gesendet",
   "User created": "Benutzer erstellt",
-  "Email already exists": "E-Mail ist bereits vorhanden",
+  "Email already exists": "E-Mail ist bereits verwendet",
   "Password": "Passwort",
   "Create a user": "Einen Benutzer erstellen",
   "Please set a password": "Bitte setzen Sie ein Passwort",
