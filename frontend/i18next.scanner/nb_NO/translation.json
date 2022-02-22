@@ -455,7 +455,7 @@
   "you can set your username on page My Account": "du kan sette brukernavnet ditt på «Min konto»-siden",
   "{{author}} made {{numberOfContribution}} contributions": "{{author}} har {{numberOfContribution}} bidrag",
   "Create an office document": "Opprett et kontor-dokument",
-  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  tok del i rommet <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> tok del i rommet <2><0><0>{{workspaceLabel}}</0></0></2>",
   "{{ count }} intervention ": "{{ count }} inngripen ",
   "{{ count }} intervention _plural": "{{ count }} inngrep ",
   "in {{ count }} space": "i {{ count }} rom",
