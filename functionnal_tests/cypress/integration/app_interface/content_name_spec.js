@@ -31,7 +31,7 @@ describe("A content's name inside an app", () => {
   it('should show the extension if content type is a file', () => {
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'file', contentId: fileId }
+      params: { contentId: fileId }
     })
     cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle).should('be.visible')
     cy.get('[data-cy="dropdownContentButton"]').should('be.visible').click()
@@ -44,7 +44,7 @@ describe("A content's name inside an app", () => {
   it('should not show the extension if content type is not a file', () => {
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+      params: { contentId: threadId }
     })
     cy.get('.FilenameWithExtension').should('not.exist')
   })

@@ -137,7 +137,7 @@ export class PersonalData extends React.Component {
 
           {!props.displayAdminInfo && (
             <div>
-              {props.t('Select your preferred display language for Tracim:')}
+              {props.t('New display language:')}
               <DropdownLang
                 langList={props.lang}
                 langActiveId={state.newLang}

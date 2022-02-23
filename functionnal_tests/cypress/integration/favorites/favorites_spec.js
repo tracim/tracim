@@ -89,11 +89,7 @@ describe('Favorites', function () {
         cy.loginAs('administrators')
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: {
-            contentId: contentIdByType[app],
-            contentType: app,
-            workspaceId
-          }
+          params: { contentId: contentIdByType[app] }
         })
         cy.contains('.wsContentGeneric__header__title', contentName)
       })

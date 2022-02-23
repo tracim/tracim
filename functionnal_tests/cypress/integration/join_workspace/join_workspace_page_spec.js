@@ -13,9 +13,7 @@ describe('Join space page', () => {
   before(() => prepareTest())
   beforeEach(() => {
     cy.loginAs('users')
-    cy.visitPage({
-      pageName: p.JOIN_WORKSPACE
-    })
+    cy.visitPage({ pageName: p.JOIN_WORKSPACE })
   })
   describe('The space list', () => {
     it('should contain a header plus two spaces', () => {
@@ -59,10 +57,12 @@ describe('Join space page', () => {
       cy.get('.joinWorkspace__content__workspaceList__item i.fas').invoke('attr', 'title').then(title => expect(title).to.equal('On request'))
 
       cy.changeLanguage('fr')
+      cy.visitPage({ pageName: p.JOIN_WORKSPACE })
       cy.contains('.pageTitleGeneric', 'Rejoindre un espace')
       cy.get('.joinWorkspace__content__workspaceList__item i.fas').invoke('attr', 'title').then(title => expect(title).to.equal('Sur demande'))
 
       cy.changeLanguage('pt')
+      cy.visitPage({ pageName: p.JOIN_WORKSPACE })
       cy.contains('.pageTitleGeneric', 'Junte-se a um espaço')
       cy.get('.joinWorkspace__content__workspaceList__item i.fas').invoke('attr', 'title').then(title => expect(title).to.equal('A pedido'))
     })

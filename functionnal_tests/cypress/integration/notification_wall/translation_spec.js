@@ -10,15 +10,18 @@ describe('Notification Wall', () => {
   })
 
   it('should have translations', () => {
-    cy.get('.notification__header__title').contains('Notifications').should('be.visible')
+    cy.contains('.notification__header__title', 'Notifications').should('be.visible')
 
     cy.changeLanguage('fr')
-    cy.get('.notification__header__title').contains('Notifications').should('be.visible')
+    cy.get('.notificationButton').click()
+    cy.contains('.notification__header__title', 'Notifications').should('be.visible')
 
     cy.changeLanguage('pt')
-    cy.get('.notification__header__title').contains('Notificações').should('be.visible')
+    cy.get('.notificationButton').click()
+    cy.contains('.notification__header__title', 'Notificações').should('be.visible')
 
     cy.changeLanguage('de')
-    cy.get('.notification__header__title').contains('Benachrichtigungen').should('be.visible')
+    cy.get('.notificationButton').click()
+    cy.contains('.notification__header__title', 'Benachrichtigungen').should('be.visible')
   })
 })

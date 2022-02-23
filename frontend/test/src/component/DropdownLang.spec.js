@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import DropdownLang from '../../../src/component/Header/MenuActionListItem/DropdownLang.jsx'
+import DropdownLang from '../../../src/component/DropdownLang.jsx'
 import sinon from 'sinon'
 
 describe('<DropdownLang />', () => {
