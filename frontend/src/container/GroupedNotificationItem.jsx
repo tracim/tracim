@@ -167,7 +167,7 @@ const GroupedNotificationItem = props => {
           dangerouslySetInnerHTML={{
             __html: (
               notificationDetails.text + ' ' +
-              `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'\\>`
+              `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'></span>`
             )
           }}
         />
