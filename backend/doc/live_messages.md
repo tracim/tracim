@@ -10,7 +10,8 @@ the server to keep the user informed about changes that happened in Tracim.
 
 TLM are returned as json, for example:
 
-```{
+```
+{
     "event_id": 42,
     "event_type": "user.created", # hierarchy in the naming: entity_type.core_event_type.optional_sub_type
     "created": "2012-04-23T18:25:43.511Z",
@@ -31,6 +32,7 @@ TLM are returned as json, for example:
 
 ## TLM Types
 
+### Core events types
 Possible core event types:
 
 - created (C below)
@@ -38,28 +40,38 @@ Possible core event types:
 - deleted (D below)
 - undeleted (U below)
 
+### Tracim Content types
+
+content type handled in tlm are:
+
+- thread (topic in ui)
+- html-document (note in ui)
+- folder
+- comment
+- kanban
+
+
 Possible entity types (plus their needed fields):
 
-|       entity type      | core event types |    sub_type   |                 fields                 |                                            comment                                           |                                     Received by                                     |
+
+|       entity type      | core event types |    sub_types   |                 fields                 |                                            comment                                           |                                     Received by                                     |
 |:----------------------:|:----------------:|:-------------:|:--------------------------------------:|:--------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------:|
-| user                   | C/M/D/U          |               | author,user                            |   author can be null (tracimcli),   user account modification, user creation/disabling/etc.  | administrators, user itself, user in at least one same space                        |
-| workspace              | C/M/D/U          |               | author,workspace                       | Space creation/deletion but also description/name update,                                    | same as workspace_members if confidential, all users if not (open/on_request space) |
-| workspace_member       | C/M/D            |               | author,user,workspace,member           |  Add/remove members in space but also role change                                            | administrators, user themself (if one), space members                                 |
-| content                | C/M/D/U          | file          | author,workspace,content               |                                                                                              | space members                                                                       |
-|   content              | C/M/D/U          | thread        | author,workspace,content               |                                                                                              | space members                                                                       |
-|   content              | C/M/D/U          | html-document | author,workspace,content               |                                                                                              | space members                                                                       |
-|   content              | C/M/D/U          | folder        | author,workspace,content               |                                                                                              | space members                                                                       |
-|   content              | C/M/D/U          | comment       | author,workspace,content               |                                                                                              | space members                                                                       |
-| mention                | C                |               | author,workspace,content,mention       |  mention with "@" in note/comment                                                            | mentioned users (all space members if @all)                                         |
-| reaction               | C/D              |               | author,workspace,content,reaction,user | emoji reaction on content/comment                                                            | space members                                                                       |
-| workspace_subscription | C/M/D            |               | author, workspace, subscription, user  | subscription for on request space. (with validation mecanism)                                | administrator, subscription author, workspace managers                              |
-| tag                    | C/M/D            |               | author,workspace,tag                   |  tag usable in space                                                                         | same as workspace                                                                   |
+| user                   | C/M/D/U          |               | author,user                            |   author can be null (tracimcli),   user account modification, user creation/disabling/etc  | administrators, user itself, user in at least one same space                        |
+| workspace              | C/M/D/U          |               | author,workspace                       | Space creation/deletion but also description/name update                                    | same as workspace_members if confidential, all users if not (open/on_request space) |
+| workspace_member       | C/M/D            |               | author,user,workspace,member           |  add/remove members in space but also role change                                            | administrators, user themself (if one), space members                                 |
+| content                | C/M/D/U          | any [content type](#Tracim Content types), e.g "thread"  | author,workspace,content               | any content modification(create/update/deletion,etc) | space members                                                                       |
+| mention                | C                |               | author,workspace,content,mention       |  mention with "@" in note/comment                                                           | mentioned users (all space members if @all)                                         |
+| reaction               | C/D              |               | author,workspace,content,reaction,user | emoji reaction on content/comment                                                           | space members                                                                       |
+| workspace_subscription | C/M/D            |               | author, workspace, subscription, user  | subscription for on request space (with validation mecanism)                                | administrator, subscription author, workspace managers                              |
+| tag                    | C/M/D            |               | author,workspace,tag                   | tag usable in space                                                                         | same as workspace                                                                   |
 | content_tag            | C/D              |               | author,workspace,tag,content           | Tag associated to a content                                                                  | space members                                                                       |
-| user_call              | C/M/D            |               | author,user_call,user                  | user is always the callee                                                                    | caller and callee users                                                             |
+| user_call              | C/M/D            |               | author,user_call,user                  | call feature, user is always the callee                                                                    | caller and callee users                                                             |
 
 ## Fields
 
 Each entry in fields is a subset of the corresponding HTTP API structure.
+
+:warning: "content" field structure vary depending on the type of content (see below).
 
 ### user and author (same as UserSchema in API)
 
