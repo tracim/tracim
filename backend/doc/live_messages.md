@@ -50,10 +50,10 @@ content type handled in tlm are:
 - comment
 - kanban
 
-There are used as sub_type for content event type (see below).
+There are used as sub_type for the event type "content" (see section Entities below).
 
-
-Possible entity types (plus their needed fields):
+### Entities
+Possible entity types of TLM (plus their needed fields):
 
 
 |       entity type      | core event types |    sub_types   |                 fields                 |                                            comment                                           |                                     Received by                                     |
