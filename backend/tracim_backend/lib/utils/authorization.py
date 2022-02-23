@@ -64,7 +64,7 @@ class TracimSecurityPolicy:
         return self.authn_policy.remember(request, userid, **kw)
 
     def forget(self, request, **kw):
-        return self.authz_policy.forget(request, **kw)
+        return self.authn_policy.forget(request, **kw)
 
 
 @implementer(IAuthorizationPolicy)
