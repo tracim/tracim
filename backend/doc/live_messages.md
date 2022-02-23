@@ -159,10 +159,6 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 }
 ```
 
-### content_share (same as ContentShareSchema in API)
-```
-{ "author": { "avatar_url": "/api/asset/avatars/john-doe.jpg", "public_name": "John Doe", "user_id": 3, "username": "My-Power_User99" }, "author_id": 3, "content_id": 6, "created": "2020-06-15T15:05:50.955Z", "direct_url": "http://localhost:6543/api/public/guest-download/444b026a068d42d6ab5e12fde08efb7b/myfile.txt", "disabled": "2020-06-15T15:05:50.955Z", "email": "hello@tracim.fr", "has_password": true, "is_disabled": true, "share_group_uuid": "string", "share_id": 4, "share_token": "444b026a068d42d6ab5e12fde08efb7b", "type": "email", "url": "http://localhost:6543/ui/guest-download/444b026a068d42d6ab5e12fde08efb7b" }
-```
 ### member
 ```
 {"role": "reader", "do_notify": false}
