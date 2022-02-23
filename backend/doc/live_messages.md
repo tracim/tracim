@@ -50,6 +50,8 @@ content type handled in tlm are:
 - comment
 - kanban
 
+There are used as sub_type for content event type (see below).
+
 
 Possible entity types (plus their needed fields):
 
@@ -59,7 +61,7 @@ Possible entity types (plus their needed fields):
 | user                   | C/M/D/U          |               | author,user                            |   author can be null (tracimcli),   user account modification, user creation/disabling/etc  | administrators, user itself, user in at least one same space                        |
 | workspace              | C/M/D/U          |               | author,workspace                       | Space creation/deletion but also description/name update                                    | same as workspace_members if confidential, all users if not (open/on_request space) |
 | workspace_member       | C/M/D            |               | author,user,workspace,member           |  add/remove members in space but also role change                                            | administrators, user themself (if one), space members                                 |
-| content                | C/M/D/U          | any [content type](#Tracim Content types), e.g "thread"  | author,workspace,content               | any content modification(create/update/deletion,etc) | space members                                                                       |
+| content                | C/M/D/U          | any content type, e.g "thread"  | author,workspace,content               | any content modification(create/update/deletion,etc) | space members                                                                       |
 | mention                | C                |               | author,workspace,content,mention       |  mention with "@" in note/comment                                                           | mentioned users (all space members if @all)                                         |
 | reaction               | C/D              |               | author,workspace,content,reaction,user | emoji reaction on content/comment                                                           | space members                                                                       |
 | workspace_subscription | C/M/D            |               | author, workspace, subscription, user  | subscription for on request space (with validation mecanism)                                | administrator, subscription author, workspace managers                              |
