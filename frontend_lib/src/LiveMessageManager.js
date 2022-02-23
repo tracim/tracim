@@ -1,5 +1,6 @@
 import { CUSTOM_EVENT } from './customEvent.js'
 import { BroadcastChannel, createLeaderElection } from 'broadcast-channel'
+import { v4 as uuidv4 } from 'uuid'
 
 export const LIVE_MESSAGE_STATUS = {
   PENDING: 'pending', // INFO - CH - 2020-05-14 - "pending" means connecting started but not yet got the initial event from backend
@@ -84,10 +85,19 @@ export class LiveMessageManager {
 
     this.closeEventSourceConnection()
 
+    const cacheData = localStorage.getItem('last_event_id')
+
+    if (cacheData != null) {
+      this.lastEventId = cacheData
+    }
+
     // INFO - SG - 2021-04-08 - restart from the last received event id
     // or from the predecessor of the last leftover event id if there are leftovers
     const afterId = this.leftoverEventIdList.length ? Math.min(...this.leftoverEventIdList) - 1 : this.lastEventId
-    const afterEventFilter = afterId ? `?after_event_id=${afterId}` : ''
+    // INFO - MP - 2022-02-23 - We use a random parameter to generate an unique url so
+    // the browser doesn't use its cache
+    const afterEventFilter = afterId ? `?after_event_id=${afterId}` : `?${uuidv4()}=`
+
 
     this.eventSource = new EventSource(
       `${url}/users/${this.userId}/live_messages${afterEventFilter}`,
@@ -261,6 +271,8 @@ export class LiveMessageManager {
       }
     }
     this.lastEventId = Math.max(this.lastEventId, tlm.event_id)
+
+    localStorage.setItem('last_event_id', this.lastEventId)
 
     const customEvent = new CustomEvent(CUSTOM_EVENT.TRACIM_LIVE_MESSAGE, {
       detail: {
