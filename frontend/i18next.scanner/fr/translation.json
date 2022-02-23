@@ -316,7 +316,7 @@
   "Unknown entity type": "Type d'entité inconnu",
   "Open_action": "Ouvrir",
   "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
-  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  a rejoint l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  joined the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> a rejoint l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "<0><0>Le role de {{userPublicName}}</0></0> a été changé en <2>{{role}}</2>",
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  souhaite rejoindre l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "La demande de <0><0>{{userPublicName}}</0></0> pour rejoindre l'espace a été <2>{{state}}</2>",
@@ -546,5 +546,5 @@
   "December": "Décembre",
   "MM/dd/yyyy": "dd/MM/yyyy",
   "Comment": "Commentaire",
-  "Image": "__NOT_TRANSLATED__"
+  "Image": "Image"
 }

@@ -9,5 +9,5 @@
   "Some agenda could not be loaded": "Certains agendas n'ont pas pu être chargés",
   "My agendas": "Mes agendas",
   "Some information was modified by {{author}}": "Certaines informations ont été modifiées par {{author}}",
-  "Error while loading pre-filled agenda event information": "__NOT_TRANSLATED__"
+  "Error while loading pre-filled agenda event information": "Erreur de chargement du modèle pré-remplis d'évènement d'agenda"
 }
