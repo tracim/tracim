@@ -51,6 +51,7 @@ from tracim_backend.lib.utils.authentification import RemoteAuthentificationPoli
 from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
+from tracim_backend.lib.utils.authorization import TracimSecurityPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
@@ -235,9 +236,12 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
     # Default authorization : Accept anything.
-    configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
-    authn_policy = MultiAuthenticationPolicy(policies)
-    configurator.set_authentication_policy(authn_policy)
+    configurator.set_security_policy(
+        TracimSecurityPolicy(
+            authn_policy=MultiAuthenticationPolicy(policies),
+            authz_policy=AcceptAllAuthorizationPolicy(),
+        )
+    )
     # INFO - GM - 11-04-2018 - set default perm
     # setting default perm is needed to force authentification
     # mechanism in all views.

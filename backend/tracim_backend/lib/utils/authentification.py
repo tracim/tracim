@@ -142,10 +142,11 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
         # if we are using basic_auth policy, unauthenticated_userid is string,
         # this means this policy is not the correct one. Explictly not checking
         # this avoid issue in some database because int is expected not string.
-        if not isinstance(request.unauthenticated_userid, int):
+        unauthenticated_user_id = self.unauthenticated_userid(request)
+        if not isinstance(unauthenticated_user_id, int):
             return None
         try:
-            user = self._get_user_api(request).get_one(user_id=request.unauthenticated_userid)
+            user = self._get_user_api(request).get_one(user_id=unauthenticated_user_id)
         except UserDoesNotExist:
             user = None
         # do not allow invalid_user
