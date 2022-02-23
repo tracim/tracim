@@ -7,7 +7,7 @@ import {
   ALLOWED_CHARACTERS_USERNAME,
   IconButton
 } from 'tracim_frontend_lib'
-
+import DropdownLang from '../DropdownLang.jsx'
 import {
   editableUserAuthTypeList
 } from '../../util/helper.js'
@@ -21,6 +21,7 @@ export class PersonalData extends React.Component {
       newPublicName: '',
       newUsername: '',
       newEmail: '',
+      newLang: props.user.lang,
       checkPassword: ''
     }
   }
@@ -31,6 +32,8 @@ export class PersonalData extends React.Component {
     this.setState({ newUsername: e.target.value })
     this.props.onChangeUsername(e.target.value)
   }
+
+  handleChangeLang = newLang => this.setState({ newLang })
 
   handleChangeEmail = e => this.setState({ newEmail: e.target.value })
 
@@ -44,7 +47,7 @@ export class PersonalData extends React.Component {
       return
     }
 
-    await props.onClickSubmit(state.newPublicName, state.newUsername, state.newEmail, state.checkPassword) && this.setState({
+    await props.onClickSubmit(state.newPublicName, state.newUsername, state.newEmail, state.checkPassword, state.newLang) && this.setState({
       newPublicName: '',
       newUsername: '',
       newEmail: '',
@@ -132,6 +135,17 @@ export class PersonalData extends React.Component {
             </div>
           )}
 
+          {!props.displayAdminInfo && (
+            <div>
+              {props.t('Select your preferred display language for Tracim:')}
+              <DropdownLang
+                langList={props.lang}
+                langActiveId={state.newLang}
+                onChangeLang={this.handleChangeLang}
+              />
+            </div>
+          )}
+
           <IconButton
             customClass='personaldata__form__button'
             intent='secondary'
@@ -164,10 +178,10 @@ PersonalData.defaultProps = {
   userPublicName: '',
   isUsernameValid: true,
   userAuthType: '',
-  onClickSubmit: () => {},
-  onChangeUsername: () => {},
+  onClickSubmit: () => { },
+  onChangeUsername: () => { },
   displayAdminInfo: false
 }
 
-const mapStateToProps = () => ({}) // connect for .dispatch()
+const mapStateToProps = ({ lang, user }) => ({ lang, user })
 export default connect(mapStateToProps)(translate()(PersonalData))
