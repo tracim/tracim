@@ -137,7 +137,7 @@ export class PersonalData extends React.Component {
 
           {!props.displayAdminInfo && (
             <div>
-              {props.t('New display language:')}
+              {props.t('New language:')}
               <DropdownLang
                 langList={props.langList}
                 langActiveId={state.newLang}
