@@ -118,12 +118,12 @@ for (const pageTestCase of activityPages) {
 
       it('should have a title link, clicking on it opens the content', () => {
         cy.get('[data-cy=FilenameWithExtension__label]').click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ contentId: fileId }))
+        cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/file/${fileId}`)
       })
 
       it('should have a preview, clicking on it opens the content', () => {
         cy.get('.feedItem__preview__image > img').click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ contentId: fileId }))
+        cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/file/${fileId}`)
       })
 
       it('should have a button on last activity, clicking on it opens a short history', () => {
@@ -199,7 +199,7 @@ for (const pageTestCase of activityPages) {
 
         cy.get('.feedItem__preview__html')
           .click()
-        cy.location('pathname').should('be.equal', URLS[PAGES.CONTENT_OPEN]({ contentId: contentId }))
+        cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/html-document/${contentId}`)
       })
 
       it('A translation button should be visible', function () {
