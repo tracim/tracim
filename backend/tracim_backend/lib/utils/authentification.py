@@ -182,7 +182,7 @@ class CookieSessionAuthentificationPolicy(TracimAuthenticationPolicy, SessionAut
 
     def forget(self, request: TracimRequest) -> typing.List[typing.Any]:
         """ Remove the stored userid from the session."""
-        if self.userid_key in request.session:
+        if self.helper.userid_key in request.session:
             request.session.delete()
         return []
 
@@ -246,7 +246,7 @@ class ApiTokenAuthentificationPolicy(TracimAuthenticationPolicy, CallbackAuthent
         # check if user is correct
         try:
             user = self._get_user_api(request).get_one_by_login(
-                login=request.unauthenticated_userid
+                login=self.unauthenticated_userid(request)
             )
         except UserDoesNotExist:
             user = None
