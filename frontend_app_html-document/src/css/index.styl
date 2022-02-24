@@ -24,7 +24,7 @@
       margin 0 pageSpacing
     &__left
       &__wrapper
-        height "calc(100% - %s)" % (headerHeight + standardSpacing + 28px) // 28px is the option menu height
+        flex 1
         overflow-y auto
         display flex
         flex-direction column
@@ -32,6 +32,8 @@
     &__content
       &__left
         background-color offWhite
+        display flex
+        flex-direction column
     &__textnote
       padding 0 pageSpacing standardSpacing
       flex 1
