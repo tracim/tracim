@@ -307,6 +307,7 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
+                            langList={props.lang}
                             userEmail={props.user.email}
                             userUsername={props.user.username}
                             userPublicName={props.user.publicName}
@@ -352,7 +353,7 @@ export class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, timezone, system, appList }) => ({
-  breadcrumbs, user, timezone, system, appList
+const mapStateToProps = ({ breadcrumbs, user, timezone, system, appList, lang }) => ({
+  breadcrumbs, user, timezone, system, appList, lang
 })
 export default connect(mapStateToProps)(translate()(appFactory(TracimComponent(Account))))

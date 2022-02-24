@@ -21,7 +21,7 @@ export class PersonalData extends React.Component {
       newPublicName: '',
       newUsername: '',
       newEmail: '',
-      newLang: props.user.lang,
+      newLang: props.user ? props.user.lang : '',
       checkPassword: ''
     }
   }
@@ -139,7 +139,7 @@ export class PersonalData extends React.Component {
             <div>
               {props.t('New display language:')}
               <DropdownLang
-                langList={props.lang}
+                langList={props.langList}
                 langActiveId={state.newLang}
                 onChangeLang={this.handleChangeLang}
               />
@@ -169,7 +169,8 @@ PersonalData.propTypes = {
   onClickSubmit: PropTypes.func,
   onChangeUsername: PropTypes.func,
   isUsernameValid: PropTypes.bool,
-  displayAdminInfo: PropTypes.bool
+  displayAdminInfo: PropTypes.bool,
+  langList: PropTypes.array
 }
 
 PersonalData.defaultProps = {
@@ -180,8 +181,9 @@ PersonalData.defaultProps = {
   userAuthType: '',
   onClickSubmit: () => { },
   onChangeUsername: () => { },
-  displayAdminInfo: false
+  displayAdminInfo: false,
+  langList: [{ id: '', label: '' }]
 }
 
-const mapStateToProps = ({ lang, user }) => ({ lang, user })
+const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(PersonalData))

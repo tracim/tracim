@@ -10,16 +10,13 @@ describe('<DropdownLang />', () => {
   const props = {
     langList: [{
       id: 'fr',
-      label: 'French',
-      icon: 'iconFrench'
+      label: 'French'
     }, {
       id: 'en',
-      label: 'English',
-      icon: 'iconEnglish'
+      label: 'English'
     }, {
       id: 'cn',
-      label: '中文',
-      icon: 'iconChinese'
+      label: '中文'
     }],
     langActiveId: 'fr',
     onChangeLang: onChangeLangCallBack
