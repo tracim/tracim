@@ -80,8 +80,11 @@ class WorkspaceListItem extends React.Component {
           {
             'primaryColorBorder sidebar__content__navigation__item__current':
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
-          }
-        )}
+          },
+          {
+            sidebar__content__navigation__item__unread:
+              props.isUnread
+          })}
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
@@ -170,27 +173,29 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
 export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(translate()(WorkspaceListItem)))
 
 WorkspaceListItem.propTypes = {
-  id: PropTypes.string.isRequired,
-  workspaceId: PropTypes.number.isRequired,
-  label: PropTypes.string.isRequired,
-  allowedAppList: PropTypes.array,
-  hasChildren: PropTypes.bool,
-  foldChildren: PropTypes.bool,
-  onClickAllContent: PropTypes.func,
   activeWorkspaceId: PropTypes.number,
+  allowedAppList: PropTypes.array,
+  foldChildren: PropTypes.bool,
+  hasChildren: PropTypes.bool,
+  id: PropTypes.string.isRequired,
+  isUnread: PropTypes.bool,
+  label: PropTypes.string.isRequired,
   level: PropTypes.number,
+  onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  workspaceId: PropTypes.number.isRequired
 }
 
 WorkspaceListItem.defaultProps = {
-  allowedAppList: [],
-  hasChildren: false,
-  foldChildren: false,
-  onClickAllContent: () => { },
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+  allowedAppList: [],
+  foldChildren: false,
+  hasChildren: false,
+  isUnread: false,
   level: 0,
+  onClickAllContent: () => { },
   onClickToggleSidebar: () => {},
   onToggleFoldChildren: () => {},
   userRoleIdInWorkspace: ROLE.reader.id

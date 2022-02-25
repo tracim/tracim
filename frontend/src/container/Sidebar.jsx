@@ -70,6 +70,7 @@ export class Sidebar extends React.Component {
 
   displaySpace = (spaceLevel, spaceList) => {
     const { props, state } = this
+    const unreadSpaceList = this.handleReadNotification(props.notificationPage.list)
 
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
@@ -78,14 +79,15 @@ export class Sidebar extends React.Component {
           allowedAppList={space.sidebarEntryList}
           foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
           hasChildren={space.children.length > 0}
+          id={this.spaceItemId(space.id)}
+          isUnread={unreadSpaceList.includes(space.id)}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
-          userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
-          workspaceId={space.id}
-          id={this.spaceItemId(space.id)}
           onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
+          userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
+          workspaceId={space.id}
         />
         {!state.foldedSpaceList.find(id => id === space.id) &&
           space.children.length !== 0 &&
@@ -180,6 +182,15 @@ export class Sidebar extends React.Component {
 
   handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
 
+  handleReadNotification = (notificationList) => {
+    const unreadSpaceList = []
+    notificationList.forEach(notification => {
+      if (notification.workspace && !notification.read)
+        unreadSpaceList.push(notification.workspace.id)
+    })
+    return unreadSpaceList
+  }
+
   render () {
     const { props, state } = this
 
@@ -255,5 +266,5 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, system, accessibleWorkspaceList }) => ({ user, workspaceList, system, accessibleWorkspaceList })
+const mapStateToProps = ({ accessibleWorkspaceList, notificationPage, system, user, workspaceList }) => ({ accessibleWorkspaceList, notificationPage, system, user, workspaceList })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))
