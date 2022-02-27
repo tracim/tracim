@@ -31,7 +31,7 @@
   "New password is too long (maximum 512 characters)": "Neues Passwort ist zu lang (maximum 512 Zeichen)",
   "User created and email sent": "Benutzer angelegt und E-Mail gesendet",
   "User created": "Benutzer erstellt",
-  "Email already exists": "E-Mail ist bereits verwendet",
+  "Email already exists": "Diese E-Mail-Adresse existiert bereits",
   "Password": "Passwort",
   "Create a user": "Einen Benutzer erstellen",
   "Please set a password": "Bitte setzen Sie ein Passwort",
@@ -47,6 +47,6 @@
   "Please enter a name, an email, a password and select a type": "Bitte geben Sie einen Namen, eine E-Mail, ein Passwort ein und wählen Sie eine Art",
   "Choose the user's type": "Wählen Sie die Art des Benutzers",
   "Type": "Art",
-  "Create and add to spaces": "__NOT_TRANSLATED__",
+  "Create and add to spaces": "Bereiche erstellen und hinzufügen",
   "Create": "Erstellen"
 }
