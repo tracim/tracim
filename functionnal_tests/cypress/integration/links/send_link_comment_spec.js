@@ -33,7 +33,7 @@ describe('In a comment', () => {
     cy.loginAs('administrators')
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+      params: { contentId: threadId }
     })
     cy.get(commentAreaInput)
       .should('be.visible')

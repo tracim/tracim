@@ -8,16 +8,16 @@ describe('Login page', function () {
   })
 
   it('should have translations', () => {
-    cy.changeLanguage('en')
+    cy.changeLanguageUnloggedPages('en')
     cy.contains('.loginpage__main__form__btnsubmit', 'Connection')
 
-    cy.changeLanguage('fr')
+    cy.changeLanguageUnloggedPages('fr')
     cy.contains('.loginpage__main__form__btnsubmit', 'Connexion')
 
-    cy.changeLanguage('pt')
+    cy.changeLanguageUnloggedPages('pt')
     cy.contains('.loginpage__main__form__btnsubmit', 'Conexão')
 
-    cy.changeLanguage('de')
+    cy.changeLanguageUnloggedPages('de')
     cy.contains('.loginpage__main__form__btnsubmit', 'Verbindung')
   })
 })

@@ -22,10 +22,7 @@ describe('In Html Document', () => {
 
     beforeEach(function () {
       cy.loginAs('administrators')
-      cy.visitPage({
-        pageName: p.CONTENT_OPEN,
-        params: { workspaceId: workspaceId, contentType: 'html-document', contentId: contentId }
-      })
+      cy.visitPage({ pageName: p.CONTENT_OPEN, params: { contentId } })
     })
 
     afterEach(function () {

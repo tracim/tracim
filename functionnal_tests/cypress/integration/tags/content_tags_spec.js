@@ -51,7 +51,7 @@ describe('Create tags', () => {
 
                 cy.visitPage({
                   pageName: PAGES.CONTENT_OPEN,
-                  params: { workspaceId, contentType: 'file', contentId }
+                  params: { contentId }
                 })
                 cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
                 cy.contains('.file__contentpage__header__title', fileTitle)
@@ -62,7 +62,7 @@ describe('Create tags', () => {
                 cy.contains('.userstatus__role__text', 'Space manager')
                 cy.visitPage({
                   pageName: PAGES.CONTENT_OPEN,
-                  params: { workspaceId, contentType: 'html-document', contentId }
+                  params: { contentId }
                 })
                 cy.contains('.html-document__contentpage__edition__header__title', 'A note')
                 cy.waitForTinyMCELoaded()

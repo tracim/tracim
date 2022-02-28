@@ -18,7 +18,7 @@ describe('Note/html document translation', function () {
     )
     cy.visitPage({
       pageName: p.CONTENT_OPEN,
-      params: { workspaceId, contentType: 'html-document', contentId }
+      params: { contentId }
     })
   })
 

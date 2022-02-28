@@ -20,7 +20,7 @@ describe('In a note', function () {
     cy.loginAs('users')
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'html-document', contentId: noteId }
+      params: { contentId: noteId }
     })
   })
 
