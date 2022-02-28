@@ -238,8 +238,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # Default authorization : Accept anything.
     configurator.set_security_policy(
         TracimSecurityPolicy(
-            authn_policy=MultiAuthenticationPolicy(policies),
-            authz_policy=AcceptAllAuthorizationPolicy(),
+            authentification_policy=MultiAuthenticationPolicy(policies),
+            authorization_policy=AcceptAllAuthorizationPolicy(),
         )
     )
     # INFO - GM - 11-04-2018 - set default perm

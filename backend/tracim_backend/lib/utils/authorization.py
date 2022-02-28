@@ -49,22 +49,22 @@ class TracimSecurityPolicy:
     https://docs.pylonsproject.org/projects/pyramid/en/latest/whatsnew-2.0.html#upgrading-from-third-party-policies
     """
 
-    def __init__(self, authn_policy, authz_policy):
-        self.authn_policy = authn_policy
-        self.authz_policy = authz_policy
+    def __init__(self, authentification_policy, authorization_policy):
+        self.authentification_policy = authentification_policy
+        self.authorization_policy = authorization_policy
 
     def authenticated_userid(self, request):
-        return self.authn_policy.authenticated_userid(request)
+        return self.authentification_policy.authenticated_userid(request)
 
     def permits(self, request, context, permission):
-        principals = self.authn_policy.effective_principals(request)
-        return self.authz_policy.permits(context, principals, permission)
+        principals = self.authentification_policy.effective_principals(request)
+        return self.authorization_policy.permits(context, principals, permission)
 
     def remember(self, request, userid, **kw):
-        return self.authn_policy.remember(request, userid, **kw)
+        return self.authentification_policy.remember(request, userid, **kw)
 
     def forget(self, request, **kw):
-        return self.authn_policy.forget(request, **kw)
+        return self.authentification_policy.forget(request, **kw)
 
 
 @implementer(IAuthorizationPolicy)
