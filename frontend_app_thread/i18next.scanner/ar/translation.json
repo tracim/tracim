@@ -1,15 +1,15 @@
 {
-  "New Thread": "__NOT_TRANSLATED__",
-  "A content with the same name already exists": "__NOT_TRANSLATED__",
-  "Error while creating thread": "__NOT_TRANSLATED__",
-  "Validate and create": "__NOT_TRANSLATED__",
-  "Topic's subject": "__NOT_TRANSLATED__",
-  "Thread": "__NOT_TRANSLATED__",
-  "Threads": "__NOT_TRANSLATED__",
-  "thread": "__NOT_TRANSLATED__",
-  "threads": "__NOT_TRANSLATED__",
-  "Start a topic": "__NOT_TRANSLATED__",
-  "Error while saving the comment": "__NOT_TRANSLATED__",
+  "New Thread": "محادثة جديدة",
+  "A content with the same name already exists": "محتوى بنفس الاسم موجود سابقا",
+  "Error while creating thread": "خطأ أثناء انشاء محادثة",
+  "Validate and create": "اعتماد و انشاء",
+  "Topic's subject": "موضوع النقاش",
+  "Thread": "محادثة",
+  "Threads": "محادثات",
+  "thread": "محادثة",
+  "threads": "محادثات",
+  "Start a topic": "الشروع في محادثة",
+  "Error while saving the comment": "خطأ أثناء حفظ التعليق",
   "Delete": "احذف",
-  "The content has been modified by {{author}}": "__NOT_TRANSLATED__"
+  "The content has been modified by {{author}}": "تم تعديل المحتوى عبر{{author}}"
 }
