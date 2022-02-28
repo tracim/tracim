@@ -128,7 +128,18 @@ class WorkspaceListItem extends React.Component {
             className='sidebar__content__navigation__item__name'
             title={props.label}
           >
-            {props.label}
+            <div
+              className='label'
+            >
+              {props.label}
+            </div>
+            {props.unreadMentionCount > 0 && (
+              <div
+                className='mention'
+              >
+                {props.unreadMentionCount > 99 ? '99+' : props.unreadMentionCount}
+              </div>
+            )}
           </div>
         </Link>
 
@@ -184,6 +195,7 @@ WorkspaceListItem.propTypes = {
   onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
+  unreadMentionCount: PropTypes.number,
   userRoleIdInWorkspace: PropTypes.number,
   workspaceId: PropTypes.number.isRequired
 }
@@ -198,5 +210,6 @@ WorkspaceListItem.defaultProps = {
   onClickAllContent: () => { },
   onClickToggleSidebar: () => {},
   onToggleFoldChildren: () => {},
+  unreadMentionCount: 0,
   userRoleIdInWorkspace: ROLE.reader.id
 }

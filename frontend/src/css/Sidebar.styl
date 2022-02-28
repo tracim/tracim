@@ -123,10 +123,22 @@ sidebar-animate-speed = 0.5s
         & .fas
           font-size bigIconSize
       &__name
+        align-items center
+        display inline-flex
         padding standardSpacing
         width 100%
-        overflow hidden
-        text-overflow ellipsis
+        & .label
+          overflow hidden
+          text-overflow ellipsis
+        & .mention
+          background errorRed
+          border-radius 50%
+          font-size 15px
+          font-weight normal
+          line-height 25px
+          margin-inline-start 10px
+          min-width 25px
+          text-align center
       &__current
         padding-inline-start 0
         border-inline-start-style solid
