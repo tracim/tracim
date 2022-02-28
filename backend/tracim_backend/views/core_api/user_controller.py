@@ -829,7 +829,8 @@ class UserController(Controller):
     def open_message_stream(self, context, request: TracimRequest, hapic_data) -> Response:
         """
         Open the message stream for the given user.
-        Tracim Live Message Events as ServerSide Event Stream
+        return Tracim Live Message Events as [ServerSide Event Stream (SSE)](https://en.wikipedia.org/wiki/Server-sent_events).
+        See [Live message documentation of development version](https://github.com/tracim/tracim/blob/develop/backend/doc/live_messages.md) for details about received messages.
         """
 
         headers = [

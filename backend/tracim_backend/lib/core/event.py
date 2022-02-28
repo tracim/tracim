@@ -881,6 +881,12 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
 
 
 def _get_user_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
+    """
+    User event are received by :
+    - the user themself
+    - administrators
+    - users knowing the user (in same workspace)
+    """
     user_api = UserApi(current_user=event.user, session=session, config=config)
     receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
     event_user_id = get_event_user_id(session, event)
@@ -930,6 +936,12 @@ def _get_workspace_event_receiver_ids(
 def _get_workspace_subscription_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> Set[int]:
+    """
+    Workspace subscription are readable by
+    - subscription author
+    - administrators
+    - workspace manager of the workspace the subscription took place
+    """
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     author = event.subscription["author"]["user_id"]
@@ -941,6 +953,9 @@ def _get_workspace_subscription_event_receiver_ids(
 
 
 def _get_content_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
+    """
+    Content event are returned to workspace members only
+    """
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
     return set(workspace_members)
