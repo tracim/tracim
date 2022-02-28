@@ -67,6 +67,17 @@ no_image_url_html_result_endpoint = {
     "image": None,
 }
 
+simple_image_png_result_endpoint = {
+    "title": "mysuperimage.png",
+    "description": "mysuperimage.png",
+    "image": "http://example.invalid/mysuperimage.png",
+}
+simple_image_jpg_result_endpoint = {
+    "title": "mysuperimage.jpg",
+    "description": "mysuperimage.jpg",
+    "image": "http://example.invalid/mysuperimage.jpg",
+}
+
 
 @pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize(
@@ -114,6 +125,38 @@ class TestUrlPreview(object):
             status=200,
             content_type="text/html",
             stream=True,
+        )
+        params = {"url": link_name}
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            "/api/url-preview?{params}".format(params=urlencode(params)), status=200,
+        )
+        assert res.json_body == endpoint_result
+
+    @responses.activate
+    @pytest.mark.parametrize(
+        "link_name, endpoint_result, content_type",
+        (
+            pytest.param(
+                "http://example.invalid/mysuperimage.png",
+                simple_image_png_result_endpoint,
+                "image/png",
+                id="simple png image link example",
+            ),
+            pytest.param(
+                "http://example.invalid/mysuperimage.jpg",
+                simple_image_jpg_result_endpoint,
+                "image/jpeg",
+                id="simple jpeg image link example",
+            ),
+        ),
+    )
+    def test_api__url_preview__ok_200__image(
+        self, link_name, endpoint_result, content_type, web_testapp,
+    ):
+        cache.cache_regions["url_preview"]["enabled"] = False
+        responses.add(
+            responses.GET, link_name, status=200, content_type=content_type, stream=True,
         )
         params = {"url": link_name}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

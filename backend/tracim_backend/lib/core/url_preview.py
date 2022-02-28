@@ -3,7 +3,7 @@ from urllib.parse import urljoin
 from urllib.parse import urlparse
 
 from requests.exceptions import InvalidURL
-from webpreview import LengthLimitedResponse
+from webpreview import MaxLengthResponse
 from webpreview import WebpreviewException
 from webpreview import do_request
 from webpreview import web_preview
@@ -44,8 +44,8 @@ class URLPreview:
         self.image = image
 
 
-class URLPreviewResponse(LengthLimitedResponse):
-    def __init__(self, response: LengthLimitedResponse) -> None:
+class URLPreviewResponse(MaxLengthResponse):
+    def __init__(self, response: MaxLengthResponse) -> None:
         self.__setstate__(response.__getstate__())
         self.content_length_limit = response.content_length_limit
         self.origin_url = response.origin_url
@@ -96,17 +96,15 @@ class URLPreviewLib(object):
             # INFO - GM - 2022-02-22 - Small image case: preview is image itself
             elif response.is_image and response.allowed_content_length:
                 title = response.filename
-                description = response.mimetype
+                # FIXME - 2022-02-28 - default description to force image preview visibility
+                description = title
                 image_url = url
             # INFO - GM - 2022-02-22 - others case: return only few informations
             else:
                 title = response.filename
-                description = response.mimetype
+                description = None
                 image_url = None
         except (WebpreviewException, InvalidURL) as exc:
             raise UnavailableURLPreview('Can\'t generate URL preview for "{}"'.format(url)) from exc
         image_url = urljoin(url, image_url) if image_url else None
-        # HACK - GM - 2022-02-22 - waiting for frontend fix to allow empty description or title ?
-        description = description or "EMPTY"
-        title = title or "EMPTY"
         return URLPreview(title=title, description=description, image=image_url)
