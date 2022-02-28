@@ -33,8 +33,8 @@ const options = {
   // @param {string} ns The namespace currently used.
   // @param {string} key The translation key.
   // @return {string} Returns a default value for the translation key.
-  // Return key as the default value for English language. Otherwise, returns '__NOT_TRANSLATED__'
-  defaultValue: (lng, ns, key) => lng === 'en' ? key : '__NOT_TRANSLATED__',
+  // Return key as the default value for English language. Otherwise, returns an empty string
+  defaultValue: (lng, ns, key) => lng === 'en' ? key : '',
 
   react: { wait: true },
 
