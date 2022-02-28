@@ -23,7 +23,7 @@ export const LINK_REGEX = /#([0-9]+)(?=\s|$)/
 export const LINK_TAG_NAME = 'a'
 export const LINK_CLASS = 'internal_link primaryColorFont'
 
-export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos', 'alle']
+export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos', 'alle', 'الكل']
 
 const wrapMentionsFromText = (text, doc, invalidMentionList) => {
   // takes a text as string, and returns a document fragment
