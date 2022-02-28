@@ -273,9 +273,6 @@ class Login extends React.Component {
       try {
         if (Notification.permission !== 'denied') {
           const permission = Notification.requestPermission()
-          if (permission === 'granted') {
-            new Notification('notification granted') // eslint-disable-line no-new
-          }
         }
       } catch (e) {
         console.error('Could not show notification', e)
