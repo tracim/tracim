@@ -271,7 +271,7 @@ class Login extends React.Component {
     if (window.Notification) {
       try {
         if (Notification.permission !== 'denied') {
-          const permission = Notification.requestPermission()
+          Notification.requestPermission()
         }
       } catch (e) {
         console.error('Could not show notification', e)
