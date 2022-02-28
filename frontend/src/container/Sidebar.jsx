@@ -72,6 +72,7 @@ export class Sidebar extends React.Component {
     const { props, state } = this
     const {
       unreadSpaceList,
+      unreadNotificationsIdByWorkspace,
       unreadMentionCountByWorkspace
     } = this.handleReadNotification(props.notificationPage.list)
 
@@ -83,6 +84,7 @@ export class Sidebar extends React.Component {
           foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
           hasChildren={space.children.length > 0}
           id={this.spaceItemId(space.id)}
+          // Not sure this is usefull
           isUnread={unreadSpaceList.includes(space.id)}
           label={space.label}
           level={spaceLevel}
@@ -90,6 +92,7 @@ export class Sidebar extends React.Component {
           onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
           unreadMentionCount={unreadMentionCountByWorkspace[space.id] || 0}
+          unreadNotificationsId={unreadNotificationsIdByWorkspace[space.id] || []}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
         />
@@ -188,26 +191,41 @@ export class Sidebar extends React.Component {
 
   handleReadNotification = (notificationList) => {
     const unreadSpaceList = []
+    const unreadNotificationsIdByWorkspace = {}
     const unreadMentionCountByWorkspace = {}
+
+    const fillParameters = (notification) => {
+      const workspaceId = notification.workspace.id
+      const [entityType] = notification.type.split('.')
+
+      if (!unreadSpaceList.includes(workspaceId)) {
+        unreadSpaceList.push(workspaceId)
+        unreadNotificationsIdByWorkspace[workspaceId] = []
+        unreadMentionCountByWorkspace[workspaceId] = 0
+      }
+
+      unreadNotificationsIdByWorkspace[workspaceId].push(notification.id)
+
+      if (entityType === TLM_ET.MENTION) {
+        unreadMentionCountByWorkspace[workspaceId]++
+      }
+    }
 
     notificationList.forEach(notification => {
       if (notification.workspace && !notification.read) {
-        const workspaceId = notification.workspace.id
-
-        unreadSpaceList.push(workspaceId)
-
-        const [entityType] = notification.type.split('.')
-        if (entityType === TLM_ET.MENTION) {
-          if (!unreadMentionCountByWorkspace[workspaceId]) {
-            unreadMentionCountByWorkspace[workspaceId] = 0
+          fillParameters(notification)
+      } else if (notification.group) {
+        notification.group.forEach(n => {
+          if (n.workspace && !n.read) {
+            fillParameters(n)
           }
-          unreadMentionCountByWorkspace[workspaceId]++
-        }
+        })
       }
     })
 
     return {
       unreadSpaceList,
+      unreadNotificationsIdByWorkspace,
       unreadMentionCountByWorkspace
     }
   }

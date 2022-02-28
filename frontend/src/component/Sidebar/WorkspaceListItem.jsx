@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { withRouter, Link } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -7,6 +8,13 @@ import { DropTarget } from 'react-dnd'
 import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
 import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
+import {
+  putNotificationAsRead
+} from '../../action-creator.async.js'
+import {
+  newFlashMessage,
+  readNotification,
+} from '../../action-creator.sync.js'
 
 const qs = require('query-string')
 
@@ -63,9 +71,35 @@ class WorkspaceListItem extends React.Component {
 
   activeDropdownMenu = () => this.setState({ dropdownMenuIsActive: true })
 
+  handleClickSpace = () => {
+    this.handleReadSpaceNotifications()
+    if (isMobile) {
+      this.props.onClickToggleSidebar()
+    }
+  }
+
   handleMouseEnterItem = () => this.setState({ showDropdownMenuButton: true })
 
   handleMouseLeaveItem = () => this.setState(prev => ({ showDropdownMenuButton: isMobile ? true : prev.dropdownMenuIsActive }))
+
+  handleReadSpaceNotifications = () => {
+    const { props } = this
+
+    props.unreadNotificationsId.forEach(async (notificationId) => {
+      const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
+      switch (fetchPutNotificationAsRead.status) {
+        case 204: {
+          props.dispatch(readNotification(notificationId))
+          console.log(notificationId)
+          break
+        }
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
+      }
+    });
+
+    console.log(props.unreadNotificationsId)
+  }
 
   render () {
     const { props, state } = this
@@ -82,9 +116,10 @@ class WorkspaceListItem extends React.Component {
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           },
           {
-            sidebar__content__navigation__item__unread:
+            'sidebar__content__navigation__item__unread':
               props.isUnread
-          })}
+          }
+        )}
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
@@ -118,7 +153,7 @@ class WorkspaceListItem extends React.Component {
             { sidebar__content__navigation__item__withoutChildren: !props.hasChildren }
           )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
-          onClick={isMobile ? props.onClickToggleSidebar : () => {}}
+          onClick={this.handleClickSpace}
         >
           {(props.canDrop && props.isOver) && (
             <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
@@ -133,13 +168,10 @@ class WorkspaceListItem extends React.Component {
             >
               {props.label}
             </div>
-            {props.unreadMentionCount > 0 && (
-              <div
-                className='mention'
-              >
-                {props.unreadMentionCount > 99 ? '99+' : props.unreadMentionCount}
-              </div>
-            )}
+            {props.unreadMentionCount > 0
+              ? <i className='mention fas fa-circle' />
+              : (props.isUnread && (<i className='activity fas fa-circle' />))
+            }
           </div>
         </Link>
 
@@ -181,7 +213,8 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
   draggedItem: monitor.getItem()
 })
 
-export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(withRouter(translate()(WorkspaceListItem)))
+const mapStateToProps = ({ user }) => ({ user })
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(WorkspaceListItem))))
 
 WorkspaceListItem.propTypes = {
   activeWorkspaceId: PropTypes.number,
@@ -196,7 +229,8 @@ WorkspaceListItem.propTypes = {
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   unreadMentionCount: PropTypes.number,
-  userRoleIdInWorkspace: PropTypes.number,
+  unreadNotificationsId: PropTypes.number,
+  userRoleIdInWorkspace: PropTypes.array,
   workspaceId: PropTypes.number.isRequired
 }
 
@@ -211,5 +245,6 @@ WorkspaceListItem.defaultProps = {
   onClickToggleSidebar: () => {},
   onToggleFoldChildren: () => {},
   unreadMentionCount: 0,
+  unreadNotificationsId: [],
   userRoleIdInWorkspace: ROLE.reader.id
 }

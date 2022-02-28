@@ -127,18 +127,17 @@ sidebar-animate-speed = 0.5s
         display inline-flex
         padding standardSpacing
         width 100%
-        & .label
+        &.label
           overflow hidden
           text-overflow ellipsis
-        & .mention
-          background errorRed
-          border-radius 50%
-          font-size 15px
-          font-weight normal
-          line-height 25px
-          margin-inline-start 10px
-          min-width 25px
+        & i
+          font-size wallCircleSize
+          margin-inline-start standardSpacing
           text-align center
+          &.mention
+            color errorRed
+          &.activity
+            color lightBlue
       &__current
         padding-inline-start 0
         border-inline-start-style solid
