@@ -97,6 +97,7 @@ class URLPreviewLib(object):
             elif response.is_image and response.allowed_content_length:
                 title = response.filename
                 # FIXME - 2022-02-28 - default description to force image preview visibility
+                # see https://github.com/tracim/tracim/issues/4574
                 description = title
                 image_url = url
             # INFO - GM - 2022-02-22 - others case: return only few informations

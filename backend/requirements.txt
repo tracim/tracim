@@ -84,7 +84,7 @@ idna==2.10
     # via requests
 imapclient==2.2.0
     # via tracim-backend (setup.py)
-importlib-metadata==4.11.2
+importlib-metadata==4.6.0
     # via tracim-backend (setup.py)
 jsmin==2.2.2
     # via wsgidav
@@ -283,7 +283,7 @@ webpreview @ git+https://github.com/algoo/webpreview@v0.1
     # via tracim-backend (setup.py)
 wsgidav==2.4.1
     # via tracim-backend (setup.py)
-zipp==3.7.0
+zipp==3.4.1
     # via importlib-metadata
 zope.deprecation==4.4.0
     # via pyramid
