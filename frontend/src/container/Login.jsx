@@ -267,6 +267,17 @@ class Login extends React.Component {
 
   handleUserConnection = async () => {
     const { props } = this
+
+    if (window.Notification) {
+      try {
+        if (Notification.permission !== 'denied') {
+          const permission = Notification.requestPermission()
+        }
+      } catch (e) {
+        console.error('Could not show notification', e)
+      }
+    }
+
     props.dispatch(setUserConnected({ ...props.user, logged: true }))
     if (props.system.redirectLogin !== '') {
       props.history.push(props.system.redirectLogin)
