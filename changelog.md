@@ -7,7 +7,6 @@
 [#5455](https://github.com/tracim/tracim/issues/5455)
 
 
-
 # 4.1.2 / 2022-02-15
 
 This maintenance release fixes a few things:
