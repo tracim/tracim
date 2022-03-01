@@ -205,7 +205,7 @@ class TestUserApi(object):
         with pytest.raises(UsernameAlreadyExists):
             api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
 
-    @pytest.mark.parametrize("username", ["all", "tous", "todos"])
+    @pytest.mark.parametrize("username", ["all", "tous", "todos", "alle", "الكل"])
     def test_unit__create_minimal_user__error__reserved_username(
         self, session, app_config, username: str
     ):
@@ -262,7 +262,7 @@ class TestUserApi(object):
         with pytest.raises(UsernameAlreadyExists):
             api.update(user=u1, username="jean")
 
-    @pytest.mark.parametrize("username", ["all", "tous", "todos"])
+    @pytest.mark.parametrize("username", ["all", "tous", "todos", "alle", "الكل"])
     def test_unit__update_user_username__error__reserved_username(
         self, session, app_config, username: str
     ):
