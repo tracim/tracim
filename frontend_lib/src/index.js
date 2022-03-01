@@ -1,4 +1,4 @@
-import i18n from './i18n.js'
+import i18n, { getBrowserLang } from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
@@ -458,5 +458,6 @@ export {
   putRawFileContent,
   postRawFileContent,
   tinymceRemove,
-  Popover
+  Popover,
+  getBrowserLang
 }
