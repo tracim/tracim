@@ -157,7 +157,7 @@
   "Error while removing content from favorites": "خطأ أثناء حذف المحتوى من المفضلات",
   "Error while getting favorites": "خطأ أثناء فتح المفضلات",
   "Error while loading timeline": "خطأ أثناء تحميل اليوميات",
-  "An error has happened while getting the known content list": "__NOT_TRANSLATED__",
+  "An error has happened while getting the known content list": "",
   "An error has happened while getting the known members list": "حدث خطأ أثناء الحصول على قائمة الأعضاء المعروفين",
   "Item archived": "تمت أرشفة العنصر",
   "Comment": "علق",

@@ -1,6 +1,6 @@
 import i18n from 'i18next'
 import { reactI18nextModule } from 'react-i18next'
-import { frTranslation, enTranslation, ptTranslation, deTranslation, arTranslation } from 'tracim_frontend_lib'
+import { getBrowserLang, frTranslation, enTranslation, ptTranslation, deTranslation, arTranslation } from 'tracim_frontend_lib'
 import en from '../../i18next.scanner/en/translation.json'
 import fr from '../../i18next.scanner/fr/translation.json'
 import pt from '../../i18next.scanner/pt/translation.json'
@@ -70,23 +70,12 @@ const kanbanPtTranslation = require('../../dist/app/kanban_pt_translation.json')
 const kanbanDeTranslation = require('../../dist/app/kanban_de_translation.json')
 const kanbanArTranslation = require('../../dist/app/kanban_ar_translation.json')
 
-export const getBrowserLang = () => {
-  const browserLang = navigator.language
-
-  if (['en', 'fr', 'pt', 'de', 'ar'].includes(browserLang)) return browserLang
-  if (browserLang.includes('fr')) return 'fr' // for fr-XX
-  if (browserLang.includes('pt')) return 'pt' // for pt-XX
-  if (browserLang.includes('de')) return 'de' // for de-XX
-  if (browserLang.includes('ar')) return 'ar' // for de-XX
-
-  return 'en'
-}
-
 i18n
   .use(reactI18nextModule)
   .init({
     fallbackLng: getBrowserLang(),
     // have a common namespace used around the full app
+    returnEmptyString: false,
     ns: ['translation'], // namespace
     defaultNS: 'translation',
     nsSeparator: false,
