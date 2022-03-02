@@ -41,7 +41,6 @@ const wrapMentionsFromText = (text, doc, invalidMentionList) => {
   if (invalidMentionList.indexOf(match[0]) === -1) {
     const wrappedMention = doc.createElement(MENTION_TAG_NAME)
     wrappedMention.className = MENTION_CLASS
-    // wrappedMention.dir = 'ltr'
     wrappedMention.id = `${MENTION_ID_PREFIX}${uuidv4()}`
     wrappedMention.textContent = match[0]
     fragment.appendChild(wrappedMention)

@@ -189,6 +189,7 @@ class TestUsernameEndpoints(object):
             ("tous", False),
             ("todos", False),
             ("alle", False),
+            ("الكل", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
