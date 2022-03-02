@@ -188,6 +188,8 @@ class TestUsernameEndpoints(object):
             ("all", False),
             ("tous", False),
             ("todos", False),
+            ("alle", False),
+            ("الكل", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
@@ -202,7 +204,7 @@ class TestUsernameEndpoints(object):
     def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/reserved-usernames", status=200)
-        assert set(res.json["items"]) == set(("all", "tous", "todos"))
+        assert set(res.json["items"]) == set(("all", "tous", "todos", "alle", "الكل"))
 
 
 @pytest.mark.usefixtures("test_fixture")
