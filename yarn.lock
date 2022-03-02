@@ -11281,9 +11281,9 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-slick@npm:^0.25.2":
-  version: 0.25.2
-  resolution: "react-slick@npm:0.25.2"
+"react-slick@npm:0.28":
+  version: 0.28.1
+  resolution: "react-slick@npm:0.28.1"
   dependencies:
     classnames: ^2.2.5
     enquire.js: ^2.1.6
@@ -11291,9 +11291,9 @@ fsevents@^1.2.7:
     lodash.debounce: ^4.0.8
     resize-observer-polyfill: ^1.5.0
   peerDependencies:
-    react: ^0.14.0 || ^15.0.1 || ^16.0.0
-    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0
-  checksum: b4313df728a53d2c26b0d501f89a50f91354e8ee09cd04c3cf703791e782843697f4ec996a3f187fd5570e0a204d2803d9fc20efb1c18f22a53ac269db59b8bb
+    react: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+  checksum: fa9694f2e8ce05ab2e19acb577bed85433be4a0a7dca8ee5888090c6bc171f3417d957b8097fdd3a08284fa96e1c621585313431a9e8c2c138a4acbb9e318321
   languageName: node
   linkType: hard
 
@@ -13839,7 +13839,7 @@ fsevents@^1.2.7:
     react-i18next: 7.4.0
     react-image-lightbox: ^5.1.0
     react-router-dom: ^5.2.0
-    react-slick: ^0.25.2
+    react-slick: 0.28
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     slick-carousel: ^1.8.1

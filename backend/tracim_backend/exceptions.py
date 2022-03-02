@@ -142,6 +142,14 @@ class UnknownAgendaType(AgendaException):
     pass
 
 
+class UnvalidJsonFile(TracimException):
+    pass
+
+
+class UnvalidCustomPropertiesSchema(TracimException):
+    pass
+
+
 class NotFound(TracimException):
     pass
 

@@ -1,0 +1,15 @@
+{
+  "New Thread": "محادثة جديدة",
+  "A content with the same name already exists": "محتوى بنفس الاسم موجود سابقا",
+  "Error while creating thread": "خطأ أثناء انشاء محادثة",
+  "Validate and create": "اعتماد و انشاء",
+  "Topic's subject": "موضوع النقاش",
+  "Thread": "محادثة",
+  "Threads": "محادثات",
+  "thread": "محادثة",
+  "threads": "محادثات",
+  "Start a topic": "الشروع في محادثة",
+  "Error while saving the comment": "خطأ أثناء حفظ التعليق",
+  "Delete": "احذف",
+  "The content has been modified by {{author}}": "تم تعديل المحتوى عبر{{author}}"
+}

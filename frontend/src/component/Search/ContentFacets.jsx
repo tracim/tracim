@@ -12,7 +12,8 @@ export class ContentFacets extends React.Component {
       showStatusList: true,
       showContentTypeList: true,
       showFileExtensionList: true,
-      showAuthorList: true
+      showAuthorList: true,
+      showTagList: true
     }
   }
 
@@ -32,6 +33,9 @@ export class ContentFacets extends React.Component {
         break
       case SEARCH_CONTENT_FACETS.AUTHOR.slug:
         this.setState(prev => ({ showAuthorList: !prev.showAuthorList }))
+        break
+      case SEARCH_CONTENT_FACETS.TAGS.slug:
+        this.setState(prev => ({ showTagList: !prev.showTagList }))
         break
     }
   }

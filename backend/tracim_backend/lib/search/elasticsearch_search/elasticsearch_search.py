@@ -67,6 +67,9 @@ FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
 DEFAULT_CONTENT_SEARCH_FIELDS = list(ContentSearchField)
 DEFAULT_USER_SEARCH_FIELDS = list(UserSearchField)
 DEFAULT_WORKSPACE_SEARCH_FIELDS = list(WorkspaceSearchField)
+# INFO - G.M - 2022-11-02 - This is the default bucket size which decide the maximum list of result
+# of a facets, see
+DEFAULT_BUCKET_SIZE = 10
 
 T = typing.TypeVar("T")
 
@@ -623,23 +626,33 @@ class ESSearchApi(SearchApi):
         if search_parameters.tags:
             search = search.filter("terms", tags=search_parameters.tags)
 
-        search.aggs.bucket("content_types", "terms", field="content_type")
+        search.aggs.bucket("content_types", "terms", field="content_type", size=DEFAULT_BUCKET_SIZE)
         search.aggs.bucket(
-            "workspace_names", "terms", field="workspace.label.{}".format(EXACT_FIELD)
+            "workspace_names",
+            "terms",
+            field="workspace.label.{}".format(EXACT_FIELD),
+            size=DEFAULT_BUCKET_SIZE,
         )
         search.aggs.bucket(
-            "author__public_names", "terms", field="author.public_name.{}".format(EXACT_FIELD)
+            "author__public_names",
+            "terms",
+            field="author.public_name.{}".format(EXACT_FIELD),
+            size=DEFAULT_BUCKET_SIZE,
         )
         search.aggs.bucket(
             "last_modifier__public_names",
             "terms",
             field="last_modifier.public_name.{}".format(EXACT_FIELD),
+            size=DEFAULT_BUCKET_SIZE,
         )
         search.aggs.bucket(
-            "file_extensions", "terms", field="file_extension.{}".format(EXACT_FIELD)
+            "file_extensions",
+            "terms",
+            field="file_extension.{}".format(EXACT_FIELD),
+            size=DEFAULT_BUCKET_SIZE,
         )
-        search.aggs.bucket("statuses", "terms", field="status")
-        search.aggs.bucket("tags", "terms", field="tags")
+        search.aggs.bucket("statuses", "terms", field="status", size=DEFAULT_BUCKET_SIZE)
+        search.aggs.bucket("tags", "terms", field="tags", size=DEFAULT_BUCKET_SIZE)
         search.aggs.metric("created_from", "min", field="created")
         search.aggs.metric("created_to", "max", field="created")
         search.aggs.metric("modified_from", "min", field="modified")
@@ -696,7 +709,9 @@ class ESSearchApi(SearchApi):
         if page_nb:
             search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
 
-        search.aggs.bucket("workspace_ids", "terms", field="workspace_ids")
+        search.aggs.bucket(
+            "workspace_ids", "terms", field="workspace_ids", size=DEFAULT_BUCKET_SIZE
+        )
         search.aggs.metric(
             "newest_authored_content_date_from", "min", field="newest_authored_content_date",
         )
@@ -766,8 +781,8 @@ class ESSearchApi(SearchApi):
             search = search.exclude("term", is_deleted=True)
         if page_nb:
             search = search.extra(from_=self.offset_from_pagination(size, page_nb), size=size)
-        search.aggs.bucket("member_ids", "terms", field="member_ids")
-        search.aggs.bucket("owner_ids", "terms", field="owner_id")
+        search.aggs.bucket("member_ids", "terms", field="member_ids", size=DEFAULT_BUCKET_SIZE)
+        search.aggs.bucket("owner_ids", "terms", field="owner_id", size=DEFAULT_BUCKET_SIZE)
         response = search.execute()
         known_users = UserApi(
             current_user=None, session=self._session, config=self._config

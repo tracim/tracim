@@ -1,10 +1,11 @@
-import i18n, { getBrowserLang } from './i18n.js'
+import i18n from './i18n.js'
 import {
   FETCH_CONFIG as LIB_FETCH_CONFIG,
   naturalCompareLabels,
   PAGE,
   PROFILE_LIST,
-  ROLE
+  ROLE,
+  getBrowserLang
 } from 'tracim_frontend_lib'
 
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')

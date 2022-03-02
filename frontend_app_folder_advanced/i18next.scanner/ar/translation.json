@@ -1,0 +1,17 @@
+{
+  "This folder is archived": "تمت أرشفة هذا المجلد",
+  "Restore": "استعد",
+  "This folder is deleted": "تم حذف هذا المجلد",
+  "The content has been modified by {{author}}": "تم تعديل المحتوى عبر{{author}}",
+  "Allowed content type for this folder": "نوع المحتوى المسموح به لهذا المجلد",
+  "Create a folder": "انشاء مجلد",
+  "Folder": "مجلد",
+  "Error while loading folder details": "خطأ أثناء تحميل تفاصيل المجلد",
+  "Error while loading Tracim's content type list": "خطأ أثناء تحميل قائمة نوع محتوى تراسيم",
+  "Error while saving new available apps list": "خطأ أثناء حفظ قائمة التطبيقات المتوفرة",
+  "Delete": "احذف",
+  "New folder": "مجلد جديد",
+  "Error while saving new folder": "خطأ أثناء حفظ المجلد الجديد",
+  "Validate and create": "اعتماد و انشاء",
+  "Folder's name": "اسم المجلد"
+}

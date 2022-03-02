@@ -23,7 +23,7 @@ describe('In a file', function () {
     cy.loginAs('users')
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'file', contentId: fileId }
+      params: { contentId: fileId }
     })
   })
 

@@ -48,7 +48,7 @@ describe('<Home />', () => {
   })
 
   describe('its internal functions', () => {
-    describe('checkUsernameValidity', () => {
+    describe('checkUsername', () => {
       afterEach(() => {
         wrapper.instance().setState({
           isUsernameValid: true
@@ -56,27 +56,32 @@ describe('<Home />', () => {
       })
 
       it('should have the isUsernameValid state as true if username is not set yet', async () => {
-        await wrapper.instance().checkUsernameValidity('')
+        wrapper.instance().setState({ newUsername: '' })
+        await wrapper.instance().checkUsername()
         expect(wrapper.state('isUsernameValid')).to.equal(true)
       })
 
       it('should have the isUsernameValid state as false if username is shorter than MINIMUM_CHARACTERS_USERNAME', async () => {
-        await wrapper.instance().checkUsernameValidity('aa')
+        wrapper.instance().setState({ newUsername: 'aa' })
+        await wrapper.instance().checkUsername()
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username has a space', async () => {
-        await wrapper.instance().checkUsernameValidity('user name')
+        wrapper.instance().setState({ newUsername: 'user name' })
+        await wrapper.instance().checkUsername()
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
       it('should have the isUsernameValid state as false if username has a not allowed character', async () => {
-        await wrapper.instance().checkUsernameValidity('usern@me!')
+        wrapper.instance().setState({ newUsername: 'usern@me!' })
+        await wrapper.instance().checkUsername()
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
 
-      it('should have the isUsernameValid state as false if username start with @', async () => {
-        await wrapper.instance().checkUsernameValidity('@username')
+      it('should have the isUsernameValid state as false if username starts with @', async () => {
+        wrapper.instance().setState({ newUsername: '@username' })
+        await wrapper.instance().checkUsername()
         expect(wrapper.state('isUsernameValid')).to.equal(false)
       })
     })

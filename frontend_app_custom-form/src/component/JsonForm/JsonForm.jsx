@@ -45,7 +45,7 @@ export class JsonForm extends React.Component {
             >
               <button
                 type='button'
-                className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn mr-3`}
+                className={`${props.customClass}__cancel editionmode__button__cancel btn outlineTextBtn`}
                 onClick={props.onClickCancelBtn}
                 style={{
                   backgroundColor: '#fdfdfd',

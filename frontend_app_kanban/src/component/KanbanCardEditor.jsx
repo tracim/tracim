@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
+  tinymceRemove,
   AutoComplete,
   DateInput,
   IconButton,
@@ -32,7 +33,7 @@ function KanbanCardEditor (props) {
       props.focusOnDescription
     )
 
-    return () => globalThis.tinymce.remove(descriptionEditionSelector)
+    return () => tinymceRemove(descriptionEditionSelector)
   }, [])
 
   function handleValidate (e) {

@@ -10,6 +10,7 @@ import {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
+import { autoCompleteItem } from '../../helper.js'
 import {
   getLocalStorageItem,
   LOCAL_STORAGE_FIELD,
@@ -19,16 +20,6 @@ import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
-
-const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z\-_]/
-
-const seekUsernameEnd = (text, offset) => {
-  while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
-    offset++
-  }
-
-  return offset
-}
 
 export class CommentArea extends React.Component {
   constructor (props) {
@@ -40,7 +31,7 @@ export class CommentArea extends React.Component {
       isAutoCompleteActivated: false,
       autoCompleteItemList: [],
       autoCompleteCursorPosition: 0,
-      newComment: props.newComment || '',
+      newComment: '',
       newCommentAsFileList: [],
       tinymcePosition: {}
     }
@@ -49,35 +40,10 @@ export class CommentArea extends React.Component {
   componentDidMount () {
     const { props } = this
 
-    if (props.wysiwyg) {
-      this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
-    }
-
-    const localStorage = getLocalStorageItem(
-      props.contentType,
-      {
-        content_id: props.contentId,
-        workspace_id: props.workspaceId
-      },
-      LOCAL_STORAGE_FIELD.COMMENT
-    )
-    if (!!localStorage && localStorage !== this.state.newComment) {
-      this.setState({ newComment: localStorage })
-    }
-  }
-
-  async componentDidUpdate (prevProps, prevState) {
-    const { props } = this
-    if (!prevProps.wysiwyg && props.wysiwyg) {
-      this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
-    }
-
-    if (!props.wysiwyg && prevState.newComment !== this.state.newComment) {
-      this.searchForMentionOrLinkCandidate()
-    }
-
-    if (prevProps.contentType !== props.contentType) {
-      const localStorage = getLocalStorageItem(
+    if (props.newComment) {
+      this.setState({ newComment: props.newComment })
+    } else {
+      const savedComment = getLocalStorageItem(
         props.contentType,
         {
           content_id: props.contentId,
@@ -85,8 +51,44 @@ export class CommentArea extends React.Component {
         },
         LOCAL_STORAGE_FIELD.COMMENT
       )
-      if (!!localStorage && localStorage !== this.state.newComment) {
-        this.setState({ newComment: localStorage })
+
+      if (!!savedComment && savedComment !== this.state.newComment) {
+        this.setState({ newComment: savedComment })
+      }
+    }
+
+    if (props.wysiwyg) {
+      // RJ - NOTE - 2022-02-16 - ensure TinyMCE loads with the comment in the local storage
+      // TinyMCE will be loaded after in componentDidUpdate, after render,
+      // so the textarea has the right value
+      this.setState({ shouldLoadWysiwyg: true })
+    }
+  }
+
+  async componentDidUpdate (prevProps, prevState) {
+    const { props } = this
+    if (props.wysiwyg && (!prevProps.wysiwyg || this.state.shouldLoadWysiwyg || prevProps.lang !== props.lang)) {
+      this.handleInitTimelineCommentWysiwyg(this.handleTinyMceInput, this.handleTinyMceKeyDown, this.handleTinyMceKeyUp, this.handleTinyMceSelectionChange)
+      if (this.state.shouldLoadWysiwyg) {
+        this.setState({ shouldLoadWysiwyg: false })
+      }
+    }
+
+    if (!props.wysiwyg && prevState.newComment !== this.state.newComment) {
+      this.searchForMentionOrLinkCandidate()
+    }
+
+    if (prevProps.contentType !== props.contentType) {
+      const savedComment = getLocalStorageItem(
+        props.contentType,
+        {
+          content_id: props.contentId,
+          workspace_id: props.workspaceId
+        },
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+      if (!!savedComment && savedComment !== this.state.newComment) {
+        this.setState({ newComment: savedComment })
       }
     }
   }
@@ -155,37 +157,11 @@ export class CommentArea extends React.Component {
     }
   }
 
-  // RJ - 2020-09-25 - FIXME
-  // Duplicate code with tinymceAutoCompleteHelper.js
-  // See https://github.com/tracim/tracim/issues/3639
-  handleClickAutoCompleteItem = (autoCompleteItem) => {
-    let character, keyword
-
-    if (autoCompleteItem.content_id) {
-      character = '#'
-      keyword = autoCompleteItem.content_id
-    } else {
-      character = '@'
-      keyword = autoCompleteItem.mention
-    }
-
+  handleClickAutoCompleteItem = (item) => {
     const cursorPos = this.textAreaRef.selectionStart
-    const endSpace = ' '
-
-    const charAtCursor = cursorPos - 1
     const text = this.state.newComment
-    const posAt = text.lastIndexOf(character, charAtCursor)
-    let textBegin, textEnd
 
-    if (posAt > -1) {
-      const end = seekUsernameEnd(text, cursorPos)
-      textBegin = text.substring(0, posAt) + character + keyword + endSpace
-      textEnd = text.substring(end)
-    } else {
-      console.log(`Error in autocompletion: did not find ${character}`)
-      textBegin = `${text} ${character}${keyword}${endSpace}`
-      textEnd = ''
-    }
+    const { textBegin, textEnd } = autoCompleteItem(text, item, cursorPos, ' ')
 
     this.commentCursorPos = textBegin.length
 
@@ -348,13 +324,14 @@ export class CommentArea extends React.Component {
         <div
           className={classnames(
             `${props.customClass}__texteditor__textinput`,
-            'commentArea__textinput'
+            'commentArea__textinput',
+            { richtextedition: props.wysiwyg }
           )}
         >
           {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
             <AutoComplete
               autoCompleteItemList={state.autoCompleteItemList}
-              style={props.disableAutocompletePosition ? {} : style}
+              style={style}
               apiUrl={props.apiUrl}
               autoCompleteCursorPosition={state.autoCompleteCursorPosition}
               onClickAutoCompleteItem={(m) => props.wysiwyg
@@ -446,7 +423,6 @@ CommentArea.propTypes = {
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customClass: PropTypes.string,
-  disableAutocompletePosition: PropTypes.bool,
   disableComment: PropTypes.bool,
   hideSendButtonAndOptions: PropTypes.bool,
   icon: PropTypes.string,
@@ -472,7 +448,6 @@ CommentArea.defaultProps = {
   contentId: 0,
   contentType: '',
   customClass: '',
-  disableAutocompletePosition: false,
   disableComment: false,
   hideSendButtonAndOptions: false,
   icon: 'far fa-paper-plane',

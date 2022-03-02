@@ -1,0 +1,13 @@
+{
+  "Agenda": "مفكرة",
+  "My agendas": "",
+  "Error while loading space list": "خطأ أثناء تحميل لائحة الفضاء",
+  "Some agenda could not be loaded": "",
+  "All my agendas": "",
+  "User": "مستخدم",
+  "Spaces": "فضاءات",
+  "Space": "فضاء",
+  "Agenda of space {{workspaceLabel}}": "",
+  "Some information was modified by {{author}}": "تم تعديل بعض المعلومات من طرف {{author}}",
+  "Error while loading pre-filled agenda event information": ""
+}

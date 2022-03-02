@@ -31,7 +31,7 @@ user.custom_properties.translations_dir_path = %(user.custom_properties.dir)s/lo
 See the [provided files](../tracim_backend/templates/user_custom_properties) as examples.
 
 
-### JSONSchema
+## JSONSchema
 
 Configurable through:
 ```ini
@@ -65,6 +65,13 @@ To display a property in the `Personal data` column, use `"tracim:display_group"
 
 See [ui schema](../examples/user_custom_properties/organization/ui.json) for an example.
 
+## Validation
+
+To verify if the schemas provided will be valid for tracim, there is a command line to do so:
+
+```shell
+tracimcli dev custom-properties checker -s path/to/json_schema_path -u path/to/ui_schema_path
+```
 
 ## Translations
 

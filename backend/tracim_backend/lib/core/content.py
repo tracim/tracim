@@ -1488,7 +1488,7 @@ class ContentApi(object):
             ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
-                raise SameValueError("The content did not changed")
+                raise SameValueError("The content did not change")
 
         filename = self._prepare_filename(new_label, item.file_extension)
         content_type_slug = item.type
@@ -1531,7 +1531,7 @@ class ContentApi(object):
         # using read can be used everytime.
         # if new_mimetype == item.file_mimetype and \
         #         new_content == item.depot_file.file.read():
-        #     raise SameValueError('The content did not changed')
+        #     raise SameValueError('The content did not change')
         if self._user:
             item.owner = self._user
         content_type_slug = item.type

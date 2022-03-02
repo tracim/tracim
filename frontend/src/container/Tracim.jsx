@@ -1,4 +1,5 @@
 import React from 'react'
+import i18next from 'i18next'
 import { connect } from 'react-redux'
 import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
@@ -589,7 +590,7 @@ export class Tracim extends React.Component {
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
-      <div className='tracim fullWidthFullHeight'>
+      <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
         <Header
           onClickNotification={this.handleClickNotificationButton}
           unreadNotificationCount={props.notificationPage.unreadNotificationCount}

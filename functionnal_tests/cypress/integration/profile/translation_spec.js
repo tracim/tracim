@@ -11,15 +11,19 @@ describe('Profile', () => {
 
   it('should have translations', () => {
     cy.changeLanguage('en')
+    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'profile').should('be.visible')
 
     cy.changeLanguage('fr')
+    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Profil').should('be.visible')
 
     cy.changeLanguage('pt')
+    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Perfil').should('be.visible')
 
     cy.changeLanguage('de')
+    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Profil').should('be.visible')
   })
 })

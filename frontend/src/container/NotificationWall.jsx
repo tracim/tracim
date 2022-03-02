@@ -19,16 +19,16 @@ import {
 } from '../util/helper.js'
 import {
   CONTENT_TYPE,
-  IconButton,
   GROUP_MENTION_TRANSLATION_LIST,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
   PROFILE,
-  ListItemWrapper,
+  SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
-  SUBSCRIPTION_TYPE,
-  NUMBER_RESULTS_BY_PAGE,
-  PAGE,
+  IconButton,
+  ListItemWrapper,
   PopinFixedHeader,
   TracimComponent
 } from 'tracim_frontend_lib'
@@ -37,7 +37,7 @@ import NotificationItem from '../component/NotificationItem.jsx'
 import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export class NotificationWall extends React.Component {
-  shortDate = date => {
+  computeShortDate = date => {
     const { props } = this
 
     const msElapsed = Date.now() - new Date(date).getTime()
@@ -60,6 +60,14 @@ export class NotificationWall extends React.Component {
       e.preventDefault()
     }
 
+    this.handleReadNotification(notificationId)
+
+    props.onCloseNotificationWall()
+  }
+
+  handleReadNotification = async (notificationId) => {
+    const { props } = this
+
     const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
     switch (fetchPutNotificationAsRead.status) {
       case 204: {
@@ -69,8 +77,6 @@ export class NotificationWall extends React.Component {
       default:
         props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     }
-
-    props.onCloseNotificationWall()
   }
 
   handleClickSeeMore = async () => {
@@ -187,10 +193,15 @@ export class NotificationWall extends React.Component {
       const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
+      const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT
+
       return {
         title: props.t('Mention'),
         text: groupMention ? mentionEveryone : mentionYou,
-        url: PAGE.CONTENT(notification.content.parentId),
+        url: PAGE.CONTENT(isHtmlDocument
+          ? notification.content.id
+          : notification.content.parentId
+        ),
         isMention: true
       }
     }
@@ -450,6 +461,12 @@ export class NotificationWall extends React.Component {
 
         <div className='notification__list'>
           {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
+            // HACK - MP - 2022-02-22 - We know this component is rendered every time we click on the
+            // notification button. We know the NotificationItem is rendered everytime too but not the
+            // GroupedNotificationItem. To enable GroupedNotificationItem to be rendered everytime, we
+            // need to change one props each time. That's why we are calculating it here.
+            const shortDate = this.computeShortDate(notification.created, props.user.lang)
+
             return (
               <ListItemWrapper
                 isLast={i === props.notificationPage.list.length - 1}
@@ -462,17 +479,19 @@ export class NotificationWall extends React.Component {
                     <GroupedNotificationItem
                       getNotificationDetails={this.getNotificationDetails}
                       notification={notification}
+                      onClickCircle={this.handleReadNotification}
                       onClickNotification={this.handleClickNotification}
-                      shortDate={this.shortDate}
+                      shortDate={shortDate}
                     />
                   )
                   : (
                     <NotificationItem
                       getNotificationDetails={this.getNotificationDetails}
                       notification={notification}
+                      onClickCircle={this.handleReadNotification}
                       onClickNotification={this.handleClickNotification}
-                      shortDate={this.shortDate}
                       user={props.user}
+                      shortDate={shortDate}
                     />
                   )}
               </ListItemWrapper>

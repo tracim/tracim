@@ -9,9 +9,11 @@
       "title": "Property1"
     },
     "date": {
-      "type": "string"
+      "type": "string",
+      "title": "Date"
     },
     "fields": {
+      "title": "Fields",
       "type": "object",
       "properties": {
         "subfield1": { "type": "string" },

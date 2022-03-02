@@ -5,6 +5,7 @@ describe('App Kanban', () => {
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
   const kanbantitle = 'Kanban'
+  let kanbanId
   let workspaceId
 
   before(() => {
@@ -15,9 +16,10 @@ describe('App Kanban', () => {
     cy.fixture('baseWorkspace').as('workspace').then(workspace => {
       workspaceId = workspace.workspace_id
       cy.createKanban(fullFilename, contentType, kanbantitle, workspaceId).then(content => {
+        kanbanId = content.content_id
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId: workspaceId, contentType: 'kanban', contentId: content.content_id }
+          params: { contentId: kanbanId }
         })
       })
     })
@@ -25,15 +27,19 @@ describe('App Kanban', () => {
 
   it('should have translations', () => {
     cy.changeLanguage('en')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Fullscreen')
 
     cy.changeLanguage('fr')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Plein écran')
 
     cy.changeLanguage('pt')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Ecrã inteiro')
 
     cy.changeLanguage('de')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Vollbild')
   })
 })

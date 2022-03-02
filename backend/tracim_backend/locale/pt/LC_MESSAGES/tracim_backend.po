@@ -9,14 +9,16 @@ msgstr ""
 "Project-Id-Version: tracim_backend 2.6.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2021-06-29 12:15+0200\n"
-"PO-Revision-Date: 2020-04-15 16:26+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2022-02-15 09:55+0000\n"
+"Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
+"Language-Team: Portuguese <https://hosted.weblate.org/projects/tracim/"
+"backend/pt/>\n"
 "Language: pt\n"
-"Language-Team: pt <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.11-dev\n"
 "Generated-By: Babel 2.6.0\n"
 
 #: tracim_backend/config.py:651
@@ -24,6 +26,8 @@ msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
 
 #: tracim_backend/config.py:660
 msgid "[{website_title}] Someone created an account for you"
@@ -346,13 +350,12 @@ msgid "{username} (through tracim)"
 msgstr "{username} (através de Tracim)"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
-#, fuzzy
 msgid ""
 "You have invited {nb_receivers} people to upload files in this space <a "
 "href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
-"Você convidou {nb_receivers} pessoas a carregar ficheiros neste espaço <a"
-" href={sharedspace_url}>{sharedspace_name}</a>:"
+"Você convidou {nb_receivers} pessoas a carregar ficheiros neste espaço <a "
+"href={sharedspace_url}>{sharedspace_name}</a>:"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
 msgid ""

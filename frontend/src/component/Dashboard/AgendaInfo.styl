@@ -8,23 +8,21 @@
   &__content
     &__text
       margin-bottom standardSpacing
-      &__help
-        margin-left 5px
     &__link
       display flex
       align-items center
       &__icon
         padding standardSpacing
-        border-top-left-radius standardBorderRadius
-        border-bottom-left-radius standardBorderRadius
+        border-start-start-radius standardBorderRadius
+        border-end-start-radius standardBorderRadius
         border-width 1px
         border-style solid
-        border-right-width 0
+        border-inline-end-width 0
         background-color offWhite
       &__url
         padding standardSpacing
-        border-top-right-radius standardBorderRadius
-        border-bottom-right-radius standardBorderRadius
+        border-start-end-radius standardBorderRadius
+        border-end-end-radius standardBorderRadius
         border-width 1px
         border-style solid
         background-color offWhite
@@ -34,3 +32,21 @@
 @media (max-width: max-xs)
   .agendaInfo__content
     font-size metadataFontSize
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius, border-end-start-radius
+// border-start-start-radius and border-end-end-radius are new and have a global usage below 90% according to
+// https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+[dir=ltr] .agendaInfo__content__link
+  &__icon
+    border-top-left-radius standardBorderRadius
+    border-bottom-left-radius standardBorderRadius
+  &__url
+    border-top-right-radius standardBorderRadius
+    border-bottom-right-radius standardBorderRadius
+[dir=rtl] .agendaInfo__content__link
+  &__icon
+    border-top-right-radius standardBorderRadius
+    border-bottom-right-radius standardBorderRadius
+  &__url
+    border-top-left-radius standardBorderRadius
+    border-bottom-left-radius standardBorderRadius

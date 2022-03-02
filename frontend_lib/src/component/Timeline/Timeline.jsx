@@ -142,7 +142,7 @@ export class Timeline extends React.Component {
         <ScrollToBottomWrapper
           customClass={classnames(`${props.customClass}__messagelist`, 'timeline__messagelist')}
           shouldScrollToBottom={props.shouldScrollToBottom}
-          isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken && props.newComment === ''}
+          isLastItemAddedFromCurrentToken={props.isLastTimelineItemCurrentToken}
         >
           {!props.loading && props.canLoadMoreTimelineItems() && (
             <IconButton
@@ -242,7 +242,6 @@ export class Timeline extends React.Component {
               id={`wysiwygTimelineComment${props.id}`}
               invalidMentionList={props.invalidMentionList}
               lang={props.loggedUser.lang}
-              newComment={props.newComment}
               placeHolder={props.t('Write an answer...')}
               onClickCancelSave={props.onClickCancelSave}
               onClickSaveAnyway={props.onClickSaveAnyway}
@@ -267,7 +266,6 @@ Timeline.propTypes = {
   timelineData: PropTypes.array.isRequired,
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  newComment: PropTypes.string.isRequired,
   onClickValidateNewCommentBtn: PropTypes.func.isRequired,
   availableStatusList: PropTypes.array,
   deprecatedStatus: PropTypes.object,

@@ -19,8 +19,6 @@ import {
   PopinFixedRightPart,
   Timeline,
   displayDistanceDate,
-  LOCAL_STORAGE_FIELD,
-  getLocalStorageItem,
   FilenameWithExtension,
   CUSTOM_EVENT,
   ShareDownload,
@@ -30,6 +28,7 @@ import {
   removeExtensionOfFilename,
   buildFilePreviewUrl,
   buildHeadTitle,
+  tinymceRemove,
   ROLE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
@@ -78,7 +77,6 @@ export class File extends React.Component {
         props.t('files'),
         props.t('Upload files')
       ],
-      newComment: '',
       newContent: {},
       loadingContent: true,
       newFile: '',
@@ -212,14 +210,6 @@ export class File extends React.Component {
 
   async updateTimelineAndContent (pageToLoad = null) {
     const { props } = this
-    this.setState({
-      newComment: getLocalStorageItem(
-        this.state.appName,
-        this.state.content,
-        LOCAL_STORAGE_FIELD.COMMENT
-      ) || ''
-    })
-
     this.loadContent(pageToLoad)
     props.loadTimeline(getFileRevision, this.state.content)
 
@@ -237,12 +227,12 @@ export class File extends React.Component {
       this.updateTimelineAndContent(1)
     }
 
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
-    globalThis.tinymce.remove('#wysiwygTimelineComment')
+    tinymceRemove('#wysiwygTimelineComment')
   }
 
   setHeadTitle = (contentName) => {
@@ -822,7 +812,6 @@ export class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
-            newComment={state.newComment}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}

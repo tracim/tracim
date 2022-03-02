@@ -22,10 +22,7 @@ describe('In Html Document', () => {
 
     beforeEach(function () {
       cy.loginAs('administrators')
-      cy.visitPage({
-        pageName: p.CONTENT_OPEN,
-        params: { workspaceId: workspaceId, contentType: 'html-document', contentId: contentId }
-      })
+      cy.visitPage({ pageName: p.CONTENT_OPEN, params: { contentId } })
     })
 
     afterEach(function () {
@@ -33,7 +30,8 @@ describe('In Html Document', () => {
     })
 
     describe('clicking at "notify all" message', () => {
-      it('should send a comment with a @all mention', () => {
+      it.skip('should send a comment with a @all mention', () => {
+        // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
         cy.waitForTinyMCELoaded()
           .then(() => cy.typeInTinyMCE(HtmlDocContent))
           .then(() => {

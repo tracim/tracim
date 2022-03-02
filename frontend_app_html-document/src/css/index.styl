@@ -55,11 +55,11 @@
         background-color #fee498
         border-radius standardBorderRadius
         &__msg > i
-          margin-right 8px
+          margin-inline-end textSpacing
         &__btnrestore
           cursor pointer
           & > i
-            margin-right 8px
+            margin-inline-end textSpacing
           &.link
             color #453d9b
             &:hover
@@ -72,9 +72,9 @@
       &__edition
         display none
       &__text_translated
-        border-left-width 2px
-        border-left-style solid
-        padding-left 5px
+        border-inline-start-width 2px
+        border-inline-start-style solid
+        padding-inline-start textSpacing
         color lightDarkGrey
     &__messagelist
       min-height 70px
@@ -92,7 +92,7 @@
           color white
           font-size standardFontSize
           & > i
-            margin-right standardSpacing
+            margin-inline-end standardSpacing
             color darkGrey
             font-size titleFontSize
         &__date

@@ -1,4 +1,5 @@
 import React from 'react'
+import i18next from 'i18next'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router-dom'
 import { translate } from 'react-i18next'
@@ -452,7 +453,7 @@ class Login extends React.Component {
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
-      <div className='loginpage'>
+      <div className='loginpage' dir={i18next.dir()}>
         <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
         <section className='loginpage__main'>
           {state.displayedOption === DISPLAY.SIGN_IN && (

@@ -23,6 +23,7 @@ import {
   handleTranslateComment,
   handleTranslateHtmlContent,
   getDefaultTranslationState,
+  tinymceRemove,
   PAGE,
   Comment,
   Timeline,
@@ -42,7 +43,6 @@ export class FeedItemWithPreview extends React.Component {
       invalidMentionList: [],
       isDiscussionDisplayed: false,
       discussionToggleButtonLabel: '',
-      newComment: '',
       translatedRawContent: '',
       contentTranslationState: this.getInitialTranslationState(props),
       translationStateByCommentId: {},
@@ -78,20 +78,20 @@ export class FeedItemWithPreview extends React.Component {
     }
 
     if (props.showTimeline && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
-      globalThis.tinymce.remove(this.getWysiwygId(props.content.id))
+      tinymceRemove(this.getWysiwygId(props.content.id))
     }
   }
 
   componentWillUnmount () {
     const { props } = this
-    if (props.showTimeline) globalThis.tinymce.remove(this.getWysiwygId(props.content.id))
+    if (props.showTimeline) tinymceRemove(this.getWysiwygId(props.content.id))
   }
 
   handleAllAppChangeLanguage = (data) => {
     const { props, state } = this
     if (state.timelineWysiwyg) {
       const wysiwygId = this.getWysiwygId(props.content.id)
-      globalThis.tinymce.remove(wysiwygId)
+      tinymceRemove(wysiwygId)
       globalThis.wysiwyg(wysiwygId, data, this.handleChangeNewComment)
     }
   }
@@ -283,7 +283,7 @@ export class FeedItemWithPreview extends React.Component {
     } else {
       return state.isDiscussionDisplayed
         ? props.t('Hide comment area')
-        : props.t('Comment')
+        : props.t('Comment', { context: 'verb' })
     }
   }
 
@@ -422,7 +422,6 @@ export class FeedItemWithPreview extends React.Component {
                 invalidMentionList={state.invalidMentionList}
                 loggedUser={loggedUser}
                 memberList={props.memberList}
-                newComment={state.newComment}
                 onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}

@@ -17,17 +17,14 @@ describe('At the autocompletion popup', function () {
 
   beforeEach(function () {
     cy.loginAs('users')
-    cy.visitPage({
-      pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
-    })
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: threadId } })
   })
 
   describe('the group mention (all)', function () {
     it('should be translated in English', function () {
       cy.get('.commentArea__advancedtext__btn').should('be.visible')
       cy.changeLanguage('en')
-      cy.contains('.dropdownlang__dropdown__btnlanguage', 'English')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: threadId } })
       cy.contains('.commentArea__advancedtext__btn', 'Advanced edition')
       cy.get('.commentArea__textinput #wysiwygTimelineComment')
         .should('be.visible')
@@ -39,8 +36,8 @@ describe('At the autocompletion popup', function () {
     it('should be translated in French', function () {
       cy.get('.commentArea__advancedtext__btn').should('be.visible')
       cy.changeLanguage('fr')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: threadId } })
       cy.contains('.commentArea__advancedtext__btn', 'Édition avancée')
-      cy.contains('.dropdownlang__dropdown__btnlanguage', 'Français')
       cy.get('.commentArea__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type(' @')
@@ -51,8 +48,8 @@ describe('At the autocompletion popup', function () {
     it('should be translated in Portuguese', function () {
       cy.get('.commentArea__advancedtext__btn').should('be.visible')
       cy.changeLanguage('pt')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: threadId } })
       cy.contains('.commentArea__advancedtext__btn', 'Edição avançada')
-      cy.contains('.dropdownlang__dropdown__btnlanguage', 'Português')
       cy.get('.commentArea__textinput #wysiwygTimelineComment')
         .should('be.visible')
         .type(' @')

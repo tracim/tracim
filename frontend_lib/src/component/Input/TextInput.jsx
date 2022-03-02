@@ -16,11 +16,11 @@ export class TextInput extends React.Component {
   render () {
     const { props } = this
     return (
-      <div className='textinput__box'>
+      <div className='textinput__box primaryColorBorder'>
         <input
           autoFocus={props.autoFocus}
           type='text'
-          className='textinput__text form-control primaryColorBorder'
+          className='textinput__text'
           onChange={props.onChange}
           disabled={props.disabled}
           placeholder={props.placeholder}

@@ -10,5 +10,6 @@
   "Thread": "Diskussion",
   "thread": "Diskussion",
   "threads": "Diskussionen",
-  "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}"
+  "The content has been modified by {{author}}": "Der Inhalt wurde geändert von {{author}}",
+  "Delete": "Löschen"
 }

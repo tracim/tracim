@@ -4,6 +4,7 @@ import { shallow } from 'enzyme'
 import { IconButton } from 'tracim_frontend_lib'
 import sinon from 'sinon'
 import { PersonalData as PersonalDataWithoutHOC } from '../../../src/component/Account/PersonalData.jsx'
+import { user } from '../../hocMock/redux/user/user.js'
 
 describe('<PersonalData />', () => {
   const onClickSubmitCallBack = sinon.spy()
@@ -14,7 +15,15 @@ describe('<PersonalData />', () => {
     displayAdminInfo: false,
     userAuthType: 'randomUserAuthType',
     isUsernameValid: true,
-    onChangeUsername: onChangeUsernameCallBack
+    langList: [{
+      id: 'fr',
+      label: 'French'
+    }, {
+      id: 'en',
+      label: 'English'
+    }],
+    onChangeUsername: onChangeUsernameCallBack,
+    user: user
   }
 
   const wrapper = shallow(<PersonalDataWithoutHOC {...props} t={key => key} />)

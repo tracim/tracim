@@ -1,0 +1,372 @@
+# Arabic translations for tracim_backend.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the tracim_backend
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tracim_backend 4.1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-01-25 09:53+0100\n"
+"PO-Revision-Date: 2022-02-27 23:58+0000\n"
+"Last-Translator: Myriam Rabhi <myriamrabhi6@gmail.com>\n"
+"Language-Team: Arabic <https://hosted.weblate.org/projects/tracim/backend/ar/"
+">\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=0 && n%100<=2 ? 4 : 5);\n"
+"X-Generator: Weblate 4.11.1-dev\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: tracim_backend/config.py:667
+msgid ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
+msgstr ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
+
+#: tracim_backend/config.py:676
+msgid "[{website_title}] Someone created an account for you"
+msgstr "[{website_title}] أحدهم أنشأ لك حسابا"
+
+#: tracim_backend/config.py:686
+msgid "[{website_title}] A password reset has been requested"
+msgstr "[{website_title}] لقد تم طلب تغيير كلمة العبور"
+
+#: tracim_backend/app_models/contents.py:47
+msgid "Opened"
+msgstr "مفتوح"
+
+#: tracim_backend/app_models/contents.py:55
+msgid "Validated"
+msgstr "تم القبول"
+
+#: tracim_backend/app_models/contents.py:63
+msgid "Cancelled"
+msgstr "تم الالغاء"
+
+#: tracim_backend/app_models/contents.py:71
+msgid "Deprecated"
+msgstr "تم الرفض"
+
+#: tracim_backend/applications/share/application.py:25
+msgid ""
+"[{website_title}] {emitter_name} shared the file \"{content_filename}\" "
+"with you"
+msgstr "[{website_title}] {emitter_name} شارك ملف \"{content_filename}\" معك"
+
+#: tracim_backend/applications/share/application.py:33
+msgid ""
+"[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
+"people"
+msgstr "[{website_title}] لقد شاركت\"{content_filename}\" مع{nb_receivers}أشخاص"
+
+#: tracim_backend/applications/upload_permissions/application.py:24
+msgid "{emitter_name} invited you to upload files on \"{website_title}\""
+msgstr "{emitter_name} دعاك لتحميل ملفات على \"{website_title}\""
+
+#: tracim_backend/applications/upload_permissions/application.py:32
+msgid ""
+"[{website_title}] You invited {nb_receivers} people to upload files on "
+"\"{workspace_name}\""
+msgstr ""
+"[{website_title}] لقد دعوت {nb_receivers} شخصا لتحميل ملفات على \""
+"{workspace_name}\""
+
+#: tracim_backend/applications/upload_permissions/application.py:42
+msgid ""
+"[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
+" in \"{workspace_name}\""
+msgstr ""
+"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفا في \""
+"{workspace_name}\""
+
+#: tracim_backend/applications/upload_permissions/lib.py:258
+msgid "Files uploaded by {username} on {date} at {time}"
+msgstr "ملفات تم تحميلها من طرف {username} يوم {date} على الساعة {time}"
+
+#: tracim_backend/applications/upload_permissions/lib.py:280
+msgid "Message from {username}: {message}"
+msgstr "رسالة من {username}: {message}"
+
+#: tracim_backend/applications/upload_permissions/lib.py:284
+msgid "Uploaded by {username}."
+msgstr "تم التحميل من طرف {username}."
+
+#: tracim_backend/lib/core/content.py:1906
+msgid "New folder"
+msgstr "ملف جديد"
+
+#: tracim_backend/lib/core/content.py:1911
+msgid "New folder {0}"
+msgstr "ملف جديد {0}"
+
+#: tracim_backend/lib/core/workspace.py:497
+msgid "Space"
+msgstr "مساحة"
+
+#: tracim_backend/lib/core/workspace.py:500
+msgid "Space {}"
+msgstr "مساحة"
+
+#: tracim_backend/lib/mail_notifier/notifier.py:280
+msgid "{username} & all members of {workspace}"
+msgstr "{username} و كل أعضاء {workspace}"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:31
+msgid ""
+"I modified the status of {content_name}. The new status is "
+"<i>{new_status}</i>"
+msgstr "لقد عدلت حالة {content_name}. الحالة الجديدة هي <i>{new_status}</i>"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:35
+msgid "I added an item entitled {content_name}."
+msgstr "لقد أضفت مادة بعنوان {content_name}."
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:41
+msgid "I updated {content_name}."
+msgstr "لقد حدثت {content_name}."
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:48
+msgid "Here is an overview of the changes:"
+msgstr "هاهي لمحة على التغييرات:"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:61
+msgid ""
+"Reply to this email directly or <a href=\"{call_to_action_url}\">view it "
+"on tracim</a>"
+msgstr ""
+"أجب على هذا البريد الالكتروني مبشارة أو <a href=\"{call_to_action_url}\"> "
+"تفحصه على tracim </a>"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:63
+msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
+msgstr "<a href=\"{call_to_action_url}\"> اذهب للمشاهدة على تراسيم</a>"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:65
+msgid "You're receiving this email because of your account on {website_title}."
+msgstr "يصلك هذا البريد الالكتروني نظرا لامتلاكك حسابا في {website_title}."
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:66
+msgid ""
+"If you'd like to receive fewer emails, you can <a "
+"href=\"{website_title}/ui/account\">unsubscribe from notifications</a>."
+msgstr ""
+"اذا أردت أن يصلك عدد أقل من الرسائل البريدية الالكترونية، بامكانك <a href=\""
+"{website_title}/ui/account\"> أن تلغي خدمة الاشعارات."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:5
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:4
+#: tracim_backend/templates/mail/reset_password_body_html.mak:4
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:4
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:5
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:4
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:5
+msgid "Hello {username},"
+msgstr "مرحبا {username}،"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:8
+msgid "{origin_user_name} invited you to join <i>{website_title}</i>."
+msgstr "{origin_user_name} دعاك لتنضم الى<i>{website_title}</i>."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:10
+msgid "Someone invited you to join <i>{website_title}</i>."
+msgstr "أحدهم دعاك لتنضم الى<i>{website_title}</i>."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:13
+msgid "Your credentials are:"
+msgstr "بياناتك:"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:16
+msgid "login: {email_address}"
+msgstr "تسجيل الدخول:{email_address}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:17
+msgid "password: {password}"
+msgstr "كلمة العبور: {password}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:21
+msgid ""
+"Let start to discuss, share files, agenda and documentation with "
+"collaborators by logging into your space: {a_link}"
+msgstr ""
+"بامكانك أن تتفاعل، تشارك ملفات، أجندا و وثائق مع المساهمين عبر الولوج الى "
+"حسابك:{a_link}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:23
+msgid ""
+"note: as soon as you are connected, we strongly recommend that you change"
+" your password and delete this email."
+msgstr ""
+"ملاحظة: بمجرد دخولك، ننصحك بشدة أن تغير كلمة العبور و أن تمحو هذا البريد "
+"الالكتروني."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:24
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:16
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:16
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:16
+msgid "Enjoy your day :)"
+msgstr "يوما طيبا :)"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:25
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
+#: tracim_backend/templates/mail/reset_password_body_html.mak:21
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
+msgid "Suricat', your digital assistant"
+msgstr "سوريكات، مساعدك الرقمي"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:29
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
+#: tracim_backend/templates/mail/reset_password_body_html.mak:25
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
+msgid "Suricat', the bot"
+msgstr "سوريكات، البوت"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:32
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
+#: tracim_backend/templates/mail/reset_password_body_html.mak:28
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
+msgid "powered by tracim software"
+msgstr "يتم تشغيله بواسطة برنامج تراسيم"
+
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:5
+msgid ""
+"{username} (<a href=\"{email_link}\">{email}</a>) shared one or several "
+"files with you in this space: <a "
+"href={sharedspace_url}>{sharedspace_name}</a>"
+msgstr ""
+"{username} (<a href=\"{email_link}\">{email}</a>)شارك ملفا أو ملفات معك في "
+"هذا الفضاء: <a href={sharedspace_url}>{sharedspace_name}</a>"
+
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:12
+msgid "Message:"
+msgstr "رسالة:"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:6
+msgid ""
+"Someone has requested to reset the password for your account on "
+"<i>{website_title}</i>."
+msgstr "أحدهم طلب اعادة ضبط كلمة المرور لحسابك على <i>{website_title}</i>."
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:8
+msgid "If you did not perform this request, you can safely ignore this email."
+msgstr ""
+"ان لم تكن أنت من قدم هذا الطلب، بامكانك أن تتجاهل هذه الرسالة الالكترونية "
+"بأمان."
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:11
+msgid "In order to reset your password, please click on following link :"
+msgstr "لاعادة ضبط كلمة المرور الخاصة بك، انقر على الرابط التالي من فضلك:"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:12
+msgid "Reset my password"
+msgstr "اعادة ضبط كلمة المرور الخاصة بي"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:14
+msgid "If the link is not working, I suggest to copy/paste the full url: "
+msgstr "ان كان الرابط لا يعمل، أقترح أن تنسخ/تلصق الurl كاملا: "
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:19
+msgid "The link is valid for {} minutes."
+msgstr "الرابط صالح للاستعمال لمدة {} دقائق."
+
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
+msgid "You shared the file <i>{content_filename}</i> with:"
+msgstr "لقد شاركت الملف <i>{content_filename}</i> مع:"
+
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:8
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:8
+msgid ""
+"<i><a href=\"{email_link}\">{email}</a></i> at this link: <a "
+"href=\"{url}\">{url}</a>"
+msgstr ""
+"<i><a href=\"{email_link}\">{email}</a></i> على هذا الرابط: <a href=\"{url}\""
+">{url}</a>"
+
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
+msgid "This file is protected by this password: \"{share_password}\""
+msgstr "هذا الملف محمي بكلمة المرور الموالية: \"{share_password}\""
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:7
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
+msgid "Hello,"
+msgstr "مرحبا،"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:9
+msgid "I share a file with you, download it here:"
+msgstr "لقد شاركت ملفا معك، بامكانك تنزيله هنا:"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:11
+msgid ""
+"<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> "
+"({file_size})"
+msgstr ""
+"<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> ({file_size})"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:18
+msgid ""
+"This file is protected by a password, please contact me (<a "
+"href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
+msgstr ""
+"هذا الملف محمي بواسطة كلمة مرور، اتصل بي من فضلك على (<a href=\"mailto"
+":{emitter_email}\">{username}</a>) للحصول على كلمة المرور."
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:19
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:16
+msgid "Note: You can also use this link: {url}"
+msgstr "ملاحظة: بامكانك أيضا أن تستعمل هذا الرابط: {url}"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:21
+msgid "Note: You can also use this direct link: {direct_url}"
+msgstr "ملاحظة: يمكنك أيضا أن تستعمل هذا الرابط المباشر: {direct_url}"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:24
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:18
+msgid "Thanks a lot"
+msgstr "شكرا جزيلا"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:25
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:19
+#, fuzzy
+msgid "{username} (through tracim)"
+msgstr "{username} (عبر تراسيم)"
+
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
+msgid ""
+"You have invited {nb_receivers} people to upload files in this space <a "
+"href={sharedspace_url}>{sharedspace_name}</a>:"
+msgstr ""
+"لقد دعوت {nb_receivers} شخصا لتحميل الملفات في هذا الفضاء <a "
+"href={sharedspace_url}>{sharedspace_name}</a>:"
+
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
+msgid ""
+"This upload is protected by this password: "
+"\"{upload_permission_password}\""
+msgstr "هذا التحميل محمي بكلمة المرور التالية: \"{upload_permission_password}\""
+
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:9
+msgid "I invited you to upload files here:"
+msgstr "لقد دعوتك لتحميل الملفات هنا:"
+
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
+msgid "Upload files"
+msgstr "تحميل الملفات"
+
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:13
+msgid ""
+"This upload is protected by a password, please contact me (<a "
+"href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
+msgstr ""
+"هذا التحميل محمي بكلمة مرور، اتصل بي من فضلك على (<a href=\"mailto"
+":{emitter_email}\">{username}</a>) للحصول على كلمة المرور."

@@ -156,6 +156,7 @@ class TestAboutEndpoint(object):
         assert res.json_body["version"]
         assert res.json_body["datetime"]
         assert res.json_body["website"] == "https://www.algoo.fr/fr/tracim"
+        assert res.json_body["database_schema_version"] is None
 
     def test_api__get_about__err_401__unregistered_user(self, web_testapp):
         """
@@ -324,6 +325,7 @@ class TestConfigEndpoint(object):
             {"code": "en", "display": "English"},
             {"code": "pt", "display": "Português"},
             {"code": "de", "display": "Deutsch"},
+            {"code": "ar", "display": "العربية"},
         ]
         assert res.json_body["user__self_registration__enabled"] is False
         assert res.json_body["ui__spaces__creation__parent_space_choice__visible"] is True

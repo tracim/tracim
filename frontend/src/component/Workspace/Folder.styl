@@ -23,8 +23,14 @@ folderopen()
   visibility visible
   transition opacity 0.3s
 
+[dir=ltr] .folder__header__triangleborder
+  left -1px
+
+[dir=rtl] .folder__header__triangleborder
+  right -1px
+
 .folder
-  padding-left 20px
+  padding-inline-start 20px
   .folder__header
     folderopen()
     &:hover
@@ -42,7 +48,7 @@ folderopen()
     position relative
     display flex
     align-items center
-    margin-left -20px
+    margin-inline-start -20px
     border-bottom 0
     padding standardSpacing 0
     background-color lightGrey
@@ -59,7 +65,6 @@ folderopen()
       display none
       position absolute
       bottom -16px
-      left -1px
       border-style solid
       border-width 16px 21px 0 21px
       border-color grey transparent transparent transparent
@@ -106,7 +111,7 @@ folderopen()
         text-overflow ellipsis
         overflow hidden
       i
-        margin-right: 1ex
+        margin-inline-end 1ex
       color darkGrey
       font-weight bold
       ^[0].read > div > ^[1] &, ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name
@@ -124,9 +129,9 @@ folderopen()
         &:hover > .folder__header__name__addbtn__text
           color offWhite
         &__text
-          margin-right standardSpacing
+          margin-inline-end standardSpacing
           &::after
-            margin-left 20px
+            margin-inline-start 20px
           &-desktop
             display inline
           &-responsive
@@ -144,7 +149,7 @@ folderopen()
   .folder
     &__header
       &__button__addbtn__text
-        margin-right standardSpacing
+        margin-inline-end standardSpacing
       &__status
         display none
 
@@ -152,7 +157,7 @@ folderopen()
   .folder
     &__header
       &__button__addbtn__text
-        margin-right standardSpacing
+        margin-inline-end standardSpacing
       &__status
         display none
       &__button__addbtn__text

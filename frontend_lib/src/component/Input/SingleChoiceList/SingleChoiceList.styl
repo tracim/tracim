@@ -6,17 +6,20 @@
   list-style none
   &__item
     display flex
-    margin standardSpacing 25px 0px 0
+    margin-top standardSpacing
+    margin-inline-end 25px
+    margin-bottom 0px
+    margin-inline-start 0px
     cursor pointer
     &__radioButton
       cursor pointer
-      margin-right 0.5rem
+      margin-inline-end 0.5rem
       & > input
         cursor pointer
     &__text
       display flex
       &__icon
-        margin-right 0.25rem
+        margin-inline-end 0.25rem
       &__content
         &__description
           font-size metadataFontSize

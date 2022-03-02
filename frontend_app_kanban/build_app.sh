@@ -46,6 +46,7 @@ if [ "$only_utils" != "--only-utils" ]; then
     cp dist/kanban.app.optimized.js ../frontend/dist/app/kanban.app.optimized.js && loggood "success" || logerror "some error"
 fi
 
-for lang in en fr pt de; do
-    cp i18next.scanner/${lang}/translation.json ../frontend/dist/app/kanban_${lang}_translation.json && loggood "success" || logerror "some error"
+for lang in $(ls i18next.scanner); do
+    log "copying ${lang}/translation.json"
+    cp i18next.scanner/"${lang}"/translation.json ../frontend/dist/app/kanban_"${lang}"_translation.json && loggood "success" || logerror "some error"
 done

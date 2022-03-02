@@ -31,7 +31,7 @@ export const CheckboxFilter = props => {
             name={item.id}
             onClickCheckbox={() => props.onChangeSearchFacets(item.id)}
             checked={props.checkedFilterIdList.findIndex(filter => filter === item.id) !== -1}
-            styleLabel={{ marginLeft: '5px', marginRight: '10px' }}
+            styleLabel={{ marginInlineStart: '5px', marginInlineEnd: '10px' }}
             styleCheck={{ top: '-5px' }}
           />
           <label htmlFor={`checkbox-${item.id}`}>
