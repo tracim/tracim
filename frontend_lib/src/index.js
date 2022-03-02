@@ -102,6 +102,7 @@ import {
 
 import { defaultDebug } from './debug.js'
 
+import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -276,6 +277,7 @@ export {
 } from './translation.js'
 
 export {
+  AgendaInfo,
   appContentFactory,
   DateInput,
   TIMELINE_ITEM_COUNT_PER_PAGE,

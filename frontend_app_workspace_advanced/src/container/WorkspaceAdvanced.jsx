@@ -280,15 +280,16 @@ export class WorkspaceAdvanced extends React.Component {
       resAppList.body = []
     }
 
-    this.setState({
+    this.setState(prev => ({
       content: {
+        ...prev.content,
         ...resDetail.body,
         memberList: resMember.body,
         appAgendaAvailable: resAppList.body.some(a => a.slug === 'agenda'),
         appDownloadAvailable: resAppList.body.some(a => a.slug === 'share_content'),
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
-    })
+    }))
   }
 
   loadSubscriptionRequestList = async () => {
@@ -838,6 +839,7 @@ export class WorkspaceAdvanced extends React.Component {
           }
         >
           <WorkspaceAdvancedConfiguration
+            agendaUrl={state.content.agendaUrl}
             apiUrl={state.config.apiUrl}
             lang={state.loggedUser.lang}
             isReadOnlyMode={
@@ -851,7 +853,9 @@ export class WorkspaceAdvanced extends React.Component {
             description={state.content.description}
             defaultRole={state.content.default_user_role}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
+            isAppAgendaAvailable={state.content.appAgendaAvailable}
             isAutoCompleteActivated={state.isAutoCompleteActivated}
+            isCurrentSpaceAgendaEnabled={state.content.agenda_enabled}
             onClickAutoCompleteItem={(item) => {
               tinymceAutoCompleteHandleClickItem(item, this.setState.bind(this))
             }}

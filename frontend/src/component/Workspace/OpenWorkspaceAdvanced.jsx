@@ -13,8 +13,7 @@ export class OpenWorkspaceAdvanced extends React.Component {
       !props.match || isNaN(props.match.params.idws) ||
       (prevProps.match && props.match.params.idws === prevProps.match.params.idws)
     ) return
-
-    if (props.user && props.currentWorkspace) {
+    if (props.user && props.currentWorkspace && props.currentWorkspace.agendaUrl) {
       props.renderAppFeature(
         {
           label: 'Advanced dashboard',
