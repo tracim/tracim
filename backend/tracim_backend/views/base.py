@@ -11,7 +11,7 @@ from tracim_backend.views.errors import ErrorSchema
 
 class BaseController(Controller):
     def not_found_view(self, context, request: TracimRequest):
-        # FIXME  - G.M - 2022-02-24 - Explicit error return as the global handle_exception does 
+        # FIXME  - G.M - 2022-02-24 - Explicit error return as the global handle_exception does
         # not work for notfound_view in pyramid 2,
         # see https://github.com/tracim/tracim/issues/5487
         error_body = ErrorSchema().build_from_exception(
