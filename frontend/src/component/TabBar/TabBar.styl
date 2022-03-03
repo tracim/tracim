@@ -1,12 +1,13 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-tabWidth = 160 //160px
+tabWidth = 160 // 160px
 
 .tabBar
   display flex
   background-color offWhite
   & .pageTitleGeneric
     flex 1
+    max-width "calc(100% - %s)" % (3*tabWidth)px
     &__title__label
       font-weight bold
   // INFO - GB - 2020-12-09 - The style below means that for 4 items the label "Home"
