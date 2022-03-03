@@ -51,7 +51,9 @@ colorlog==5.0.1
 colour==0.1.5
     # via tracim-backend (setup.py)
 defusedxml==0.7.1
-    # via wsgidav
+    # via
+    #   radicale
+    #   wsgidav
 elasticsearch==7.13.1
     # via
     #   elasticsearch-dsl
@@ -114,6 +116,8 @@ multidict==5.1.0
     # via hapic
 packaging==20.9
     # via sqlakeyset
+passlib==1.7.4
+    # via radicale
 pastedeploy==2.1.1
     # via plaster-pastedeploy
 pbr==5.6.0
@@ -210,7 +214,7 @@ pyyaml==5.4.1
     #   wsgidav
 pyzmq==22.1.0
     # via tracim-backend (setup.py)
-radicale==2.1.12
+radicale==3.1.0
     # via tracim-backend (setup.py)
 redis==3.5.3
     # via
