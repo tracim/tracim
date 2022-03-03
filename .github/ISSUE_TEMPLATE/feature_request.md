@@ -10,6 +10,8 @@ assignees: ""
 
 <!-- Explain why we want this feature and describe it. -->
 
+<!-- Add a user case. -->
+
 ## Prerequisites
 
 <!-- Optional - list the issues that must be solved or what needs to be done before handling this issue. -->
