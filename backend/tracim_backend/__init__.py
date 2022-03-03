@@ -7,6 +7,7 @@ import warnings
 
 from hapic.ext.pyramid import PyramidContext
 from pyramid.config import Configurator
+from pyramid.events import NewResponse
 from pyramid.request import Request
 from pyramid.router import Router
 import pyramid_beaker
@@ -51,6 +52,7 @@ from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticat
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.utils.http_cache import default_to_cache_control_no_store
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import sliced_dict
@@ -198,6 +200,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
+    # Ensure a "Cache-Control: no-store" is setup by default on all responses
+    # Avoid a bug with Firefox: https://github.com/tracim/tracim/issues/5334
+    configurator.add_subscriber(default_to_cache_control_no_store, NewResponse)
     # Default authorization : Accept anything.
     configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
     authn_policy = MultiAuthenticationPolicy(policies)
