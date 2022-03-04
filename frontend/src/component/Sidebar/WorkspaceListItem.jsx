@@ -82,23 +82,22 @@ class WorkspaceListItem extends React.Component {
 
   handleMouseLeaveItem = () => this.setState(prev => ({ showDropdownMenuButton: isMobile ? true : prev.dropdownMenuIsActive }))
 
-  handleReadSpaceNotifications = () => {
+  handleReadSpaceNotifications = async () => {
     const { props } = this
 
-    props.unreadNotificationsId.forEach(async (notificationId) => {
+    await Promise.all(props.unreadNotificationsId.map(async (notificationId) => {
       const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
       switch (fetchPutNotificationAsRead.status) {
         case 204: {
+          console.log("I've read notification: " + notificationId)
           props.dispatch(readNotification(notificationId))
-          console.log(notificationId)
           break
         }
         default:
           props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
       }
-    });
+    }))
 
-    console.log(props.unreadNotificationsId)
   }
 
   render () {

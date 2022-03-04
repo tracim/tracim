@@ -286,12 +286,38 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     }
 
     case `${READ}/${NOTIFICATION}`: {
-      const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
-      if (!notification) return state
-      const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount - 1 : state.unreadMentionCount
+      let notification
+      let replaceList
+      let newUnreadMentionCount
+
+      for (const element of state.list) {
+        if (element.group) {
+          notification = element.group.find(n => n.id === action.notificationId && !n.read)
+          if (notification) {
+            newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount - 1 : state.unreadMentionCount
+
+            element.group = element.group.map(n => n.id === action.notificationId ? { ...notification, read: true } : n)
+
+            replaceList = state.list.map(g => g.group && g.id === element.id ? element : n)
+
+            break
+          }
+        }
+      }
+
+      if (!notification) {
+        notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
+
+        if (!notification) return state
+
+        newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount - 1 : state.unreadMentionCount
+
+        replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
+      }
+
       return {
         ...state,
-        list: state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no),
+        list: replaceList,
         unreadMentionCount: newUnreadMentionCount,
         unreadNotificationCount: state.unreadNotificationCount - 1
       }
