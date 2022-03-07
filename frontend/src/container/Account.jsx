@@ -72,10 +72,10 @@ export class Account extends React.Component {
       translationKey: props.t('Password'),
       display: editableUserAuthTypeList.includes(props.user.authType) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
-      name: 'synchronizationLinks',
+      name: 'configurationLinks',
       active: false,
-      label: 'Synchronization links',
-      translationKey: props.t('Synchronization links'),
+      label: 'Configuration links',
+      translationKey: props.t('Configuration links'),
       display: props.appList.some(a => a.slug === 'agenda') || props.system.config.webdav_url
     }]
 
@@ -332,7 +332,7 @@ export class Account extends React.Component {
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} />
 
-                      case 'synchronizationLinks':
+                      case 'configurationLinks':
                         return (
                           <div>
                             {props.appList.some(a => a.slug === 'agenda') && (
