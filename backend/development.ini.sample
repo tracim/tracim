@@ -730,12 +730,12 @@ webdav.listen = localhost:3030
 ##     param_name = value
 ## ```
 
-caldav.radicale.server.host = localhost:5232
+caldav.radicale.server.hosts = localhost:5232
 ## To make Tracim work, we need to disable auth and rights.
-caldav.radicale.auth.type = None
-caldav.radicale.rights.type = None
+caldav.radicale.auth.type = none
+caldav.radicale.rights.type = tracim_backend.radicale_plugins.allow_all_access_rights
 ## We do not need radicale web ui
-caldav.radicale.web.type = None
+caldav.radicale.web.type = none
 ## for Tracim we do use file storage.
 caldav.radicale.storage.type = multifilesystem
 ; caldav.radicale.storage.filesystem_folder = %(here)s/radicale_storage
@@ -934,7 +934,7 @@ listen = %(webdav.listen)s
 
 [server:caldav]
 use = egg:waitress#main
-listen = %(caldav.radicale.server.host)s
+listen = %(caldav.radicale.server.hosts)s
 ######################
 # DATABASE MIGRATION #
 ######################

@@ -96,7 +96,7 @@ const mockGetMyselfKnownMember200 = (apiUrl, workspaceId, knownMemberList) => {
 const mockGetReservedUsernames200 = (apiUrl) => {
   return nock(apiUrl)
     .get('/system/reserved-usernames')
-    .reply(200, { items: ['all', 'tous', 'todos'] })
+    .reply(200, { items: ['all', 'tous', 'todos', 'alle', 'الكل'] })
 }
 
 const mockGetReservedUsernames500 = (apiUrl) => {

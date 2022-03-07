@@ -1,13 +1,13 @@
 {
   "Agenda": "مفكرة",
-  "My agendas": "__NOT_TRANSLATED__",
+  "My agendas": "مفكراتي",
   "Error while loading space list": "خطأ أثناء تحميل لائحة الفضاء",
-  "Some agenda could not be loaded": "__NOT_TRANSLATED__",
-  "All my agendas": "__NOT_TRANSLATED__",
+  "Some agenda could not be loaded": "تعذر تحميل بعض المفكرات",
+  "All my agendas": "كافة مفكراتي",
   "User": "مستخدم",
   "Spaces": "فضاءات",
   "Space": "فضاء",
-  "Agenda of space {{workspaceLabel}}": "__NOT_TRANSLATED__",
+  "Agenda of space {{workspaceLabel}}": "مفكرة فضاء {{workspaceLabel}}",
   "Some information was modified by {{author}}": "تم تعديل بعض المعلومات من طرف {{author}}",
-  "Error while loading pre-filled agenda event information": "__NOT_TRANSLATED__"
+  "Error while loading pre-filled agenda event information": ""
 }
