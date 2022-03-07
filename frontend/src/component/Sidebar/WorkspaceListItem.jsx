@@ -23,12 +23,37 @@ class WorkspaceListItem extends React.Component {
     super(props)
     this.state = {
       showDropdownMenuButton: isMobile,
-      dropdownMenuIsActive: isMobile
+      dropdownMenuIsActive: isMobile,
+      isUnread: false
     }
+  }
+
+  // NOTE - MP - 07-03-2022 - This function allow me to use a flat list from redux
+  // (currently giving me a list that can contains other lists)
+  // This will be fix with the notification refactorisation #5497
+  getNotificationList = (state) => {
+    const notificationList = []
+    if (state.list) {
+      for (const element of state.list) {
+        if (element.group) {
+          element.group.forEach(notification => {
+            notificationList.push(notification)
+          })
+        } else {
+          notificationList.push(element)
+        }
+      }
+    }
+    return notificationList
   }
 
   componentDidMount () {
     document.addEventListener('mousedown', this.handleClickOutsideDropdownMenu)
+  }
+
+  componentDidUpdate () {
+    this.state.isUnread = this.getNotificationList(this.props.notificationPage)
+      .filter(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId)).length > 0
   }
 
   componentWillUnmount () {
@@ -73,6 +98,7 @@ class WorkspaceListItem extends React.Component {
 
   handleClickSpace = () => {
     this.handleReadSpaceNotifications()
+
     if (isMobile) {
       this.props.onClickToggleSidebar()
     }
@@ -85,11 +111,12 @@ class WorkspaceListItem extends React.Component {
   handleReadSpaceNotifications = async () => {
     const { props } = this
 
-    await Promise.all(props.unreadNotificationsId.map(async (notificationId) => {
+    const notificationToRead = this.getNotificationList(this.props.notificationPage).filter(n => !n.mention && !n.read).map(n => n.id)
+
+    await Promise.all(notificationToRead.map(async (notificationId) => {
       const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
       switch (fetchPutNotificationAsRead.status) {
         case 204: {
-          console.log("I've read notification: " + notificationId)
           props.dispatch(readNotification(notificationId))
           break
         }
@@ -97,7 +124,6 @@ class WorkspaceListItem extends React.Component {
           props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
       }
     }))
-
   }
 
   render () {
@@ -116,7 +142,7 @@ class WorkspaceListItem extends React.Component {
           },
           {
             'sidebar__content__navigation__item__unread':
-              props.isUnread
+              state.isUnread
           }
         )}
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
@@ -167,10 +193,7 @@ class WorkspaceListItem extends React.Component {
             >
               {props.label}
             </div>
-            {props.unreadMentionCount > 0
-              ? <i className='mention fas fa-circle' />
-              : (props.isUnread && (<i className='activity fas fa-circle' />))
-            }
+            {props.unreadMentionCount > 0 && <div class="mention">{props.unreadMentionCount}</div>}
           </div>
         </Link>
 
@@ -212,7 +235,7 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
   draggedItem: monitor.getItem()
 })
 
-const mapStateToProps = ({ user }) => ({ user })
+const mapStateToProps = ({ notificationPage, user }) => ({ notificationPage, user })
 export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(WorkspaceListItem))))
 
 WorkspaceListItem.propTypes = {
@@ -221,14 +244,13 @@ WorkspaceListItem.propTypes = {
   foldChildren: PropTypes.bool,
   hasChildren: PropTypes.bool,
   id: PropTypes.string.isRequired,
-  isUnread: PropTypes.bool,
+  //isUnread: PropTypes.bool,
   label: PropTypes.string.isRequired,
   level: PropTypes.number,
   onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   unreadMentionCount: PropTypes.number,
-  unreadNotificationsId: PropTypes.number,
   userRoleIdInWorkspace: PropTypes.array,
   workspaceId: PropTypes.number.isRequired
 }
@@ -238,12 +260,11 @@ WorkspaceListItem.defaultProps = {
   allowedAppList: [],
   foldChildren: false,
   hasChildren: false,
-  isUnread: false,
+  //isUnread: false,
   level: 0,
   onClickAllContent: () => { },
   onClickToggleSidebar: () => {},
   onToggleFoldChildren: () => {},
   unreadMentionCount: 0,
-  unreadNotificationsId: [],
   userRoleIdInWorkspace: ROLE.reader.id
 }

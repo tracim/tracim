@@ -72,7 +72,6 @@ export class Sidebar extends React.Component {
     const { props, state } = this
     const {
       unreadSpaceList,
-      unreadNotificationsIdByWorkspace,
       unreadMentionCountByWorkspace
     } = this.handleReadNotification(props.notificationPage.list)
 
@@ -84,15 +83,13 @@ export class Sidebar extends React.Component {
           foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
           hasChildren={space.children.length > 0}
           id={this.spaceItemId(space.id)}
-          // Not sure this is usefull
-          isUnread={unreadSpaceList.includes(space.id)}
+          // isUnread={unreadSpaceList.includes(space.id)}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
           onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
           unreadMentionCount={unreadMentionCountByWorkspace[space.id] || 0}
-          unreadNotificationsId={unreadNotificationsIdByWorkspace[space.id] || []}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
         />
@@ -191,7 +188,6 @@ export class Sidebar extends React.Component {
 
   handleReadNotification = (notificationList) => {
     const unreadSpaceList = []
-    const unreadNotificationsIdByWorkspace = {}
     const unreadMentionCountByWorkspace = {}
 
     const fillParameters = (notification) => {
@@ -200,11 +196,8 @@ export class Sidebar extends React.Component {
 
       if (!unreadSpaceList.includes(workspaceId)) {
         unreadSpaceList.push(workspaceId)
-        unreadNotificationsIdByWorkspace[workspaceId] = []
         unreadMentionCountByWorkspace[workspaceId] = 0
       }
-
-      unreadNotificationsIdByWorkspace[workspaceId].push(notification.id)
 
       if (entityType === TLM_ET.MENTION) {
         unreadMentionCountByWorkspace[workspaceId]++
@@ -225,7 +218,6 @@ export class Sidebar extends React.Component {
 
     return {
       unreadSpaceList,
-      unreadNotificationsIdByWorkspace,
       unreadMentionCountByWorkspace
     }
   }

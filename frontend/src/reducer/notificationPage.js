@@ -289,17 +289,17 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       let notification
       let replaceList
       let newUnreadMentionCount
+      let newUnreadNotificationCount
 
+      // NOTE - MP - 07-03-2022 - This is code allow me to read a notification even in a group
+      // This will be fix with the notification refactorisation #5497
       for (const element of state.list) {
         if (element.group) {
           notification = element.group.find(n => n.id === action.notificationId && !n.read)
           if (notification) {
-            newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount - 1 : state.unreadMentionCount
-
+            newUnreadMentionCount = (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) ? state.unreadMentionCount - 1 : state.unreadMentionCount
             element.group = element.group.map(n => n.id === action.notificationId ? { ...notification, read: true } : n)
-
-            replaceList = state.list.map(g => g.group && g.id === element.id ? element : n)
-
+            replaceList = state.list.map(g => g.group && g.id === element.id ? element : g)
             break
           }
         }
@@ -310,16 +310,17 @@ export default function notificationPage (state = defaultNotificationsObject, ac
 
         if (!notification) return state
 
-        newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount - 1 : state.unreadMentionCount
-
+        newUnreadMentionCount = (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) ? state.unreadMentionCount - 1 : state.unreadMentionCount
         replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
       }
+
+      newUnreadNotificationCount = state.unreadNotificationCount - 1
 
       return {
         ...state,
         list: replaceList,
         unreadMentionCount: newUnreadMentionCount,
-        unreadNotificationCount: state.unreadNotificationCount - 1
+        unreadNotificationCount: newUnreadNotificationCount
       }
     }
 
