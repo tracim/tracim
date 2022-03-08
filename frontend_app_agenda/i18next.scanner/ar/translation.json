@@ -1,13 +1,13 @@
 {
   "Agenda": "مفكرة",
-  "My agendas": "مفكراتي",
+  "My agendas": "مفكّراتي",
   "Error while loading space list": "خطأ أثناء تحميل لائحة الفضاء",
-  "Some agenda could not be loaded": "تعذر تحميل بعض المفكرات",
-  "All my agendas": "كافة مفكراتي",
+  "Some agenda could not be loaded": "تعذّر تحميل بعض المفكرات",
+  "All my agendas": "كل مفكّراتي",
   "User": "مستخدم",
   "Spaces": "فضاءات",
   "Space": "فضاء",
   "Agenda of space {{workspaceLabel}}": "مفكرة فضاء {{workspaceLabel}}",
-  "Some information was modified by {{author}}": "تم تعديل بعض المعلومات من طرف {{author}}",
-  "Error while loading pre-filled agenda event information": ""
+  "Some information was modified by {{author}}": "تم تعديل بعض المعلومات بواسطة {{author}}",
+  "Error while loading pre-filled agenda event information": "خطأ أثناء تحميل نموذج مملوء مسبقا لمناسبة بمفكّرة"
 }
