@@ -4,8 +4,7 @@ import {
   naturalCompareLabels,
   PAGE,
   PROFILE_LIST,
-  ROLE,
-  getBrowserLang
+  ROLE
 } from 'tracim_frontend_lib'
 
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
@@ -17,9 +16,6 @@ export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const NO_ACTIVE_SPACE_ID = -1
 
 export const history = require('history').createBrowserHistory()
-
-// this function is declared in i18n to avoid cyclic imports and reexported here for consistency
-export { getBrowserLang }
 
 export const FETCH_CONFIG = {
   headers: LIB_FETCH_CONFIG.headers,
