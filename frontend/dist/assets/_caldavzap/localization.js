@@ -22,6 +22,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 // NOTE: console.log(...) messages are not translated
 var localization = new Object();
 
+localization['ar']=	/* thanks Myriam Rabhi */
+{
+	txtResources: 'الموارد',
+	txtNote: 'ملاحظة',
+
+	errUnableSync: "خطأ	:	/مزامنة	المورد غير ممكنة/'	: حاول	مجددا لاحقا!",
+
+	loadingResources: ')%فعل%على%مجموع%"تحميل	الموارد (',
+
+	loadingCollectionList: 'تحميل	قائمة الموارد',
+
+	txtCacheText: 'هنالك	تحديث متوفر على الخادم، تفضل بإعادة	تحميل الصفحة',
+	txtCacheButton: 'إعادة تحميل',
+
+	fullscreenBtn: 'ملء الشاشة'
+};
+
 localization['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 {
 	txtResources: 'Prostředky',
@@ -236,6 +253,41 @@ localization['zh_CN']=	/* thanks Fandy */
 	txtCacheButton: '刷新'
 };
 var localizationShared = new Object();
+
+localizationShared['ar']=	/* Thanks Myriam Rabhi */
+{
+	_name_: 'العربية',
+	_default_datepicker_format_: 'يوم/شهر/سنة',
+	_default_AMPM_format_: true,
+
+	altLogo: 'شعار',
+	altLogout: 'تسجيل الخروج',
+	buttonLogin: 'تسجيل الدخول',
+	pholderUsername: 'اسم المستخدم',
+	pholderPassword: 'كلمة عبور',
+	txtSearch: 'بحث',
+	txtError: 'خطأ',
+	txtRefresh: 'تحديث',
+
+	buttonEdit: 'تعديل',
+	buttonSave: 'حفظ',
+	buttonReset: 'رجوع',
+	buttonCancel: 'الغاء',
+	buttonDelete: 'حذف',
+
+	errCollectionLoad: 'Error: \'unable to save settings\'!',
+	errHttpCommon: "خطأ: /'حفظ الاعدادات غير ممكن/' رمز الخطأ %%",
+	errHttp401: 'غير مسموح به',
+	errHttp403: 'ممنوع',
+	errHttp405: 'طريقة غير مسموح بها',
+	errHttp408: 'انتهاء مدة الطلب',
+	errHttp412: 'أحدهم قام بتعديله على الخادم',
+	errHttp500: 'خطأ داخلي في الخادم',
+	errHttp501: 'غير مطبق',
+
+	unsupportedBrowser: 'ملاحظة : لا يمكن تحمل المتصفح الذي تستعمله',
+	updateNotification: '%name% %new_ver% available (you have %curr_ver%) - %url%'
+};
 
 localizationShared['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 {
@@ -765,6 +817,25 @@ localizationShared['zh_CN']=	/* thanks Fandy */
 $.extend(true, localization, localizationShared);
 var localizationSharedCalDAV = new Object();
 
+localizationSharedCalDAV['ar']=	/* Thanks Myriam Rabhi */
+{
+	txtCalendars: 'رزنامات',
+	txtTodos: 'مهام',
+	localTime: 'التوقيت المحلي',
+	fullCalendarMonth: 'الشهر',
+	fullCalendarMultiWeek: 'mweek',
+	fullCalendarAgendaWeek: 'الأسبوع',
+	fullCalendarAgendaDay: 'اليوم',
+
+	monthNames: ['جانفي', 'فيفري', 'مارس', 'أفريل', 'ماي',
+	'جوان', 'جويلية', 'أوت', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+	monthNamesShort: ['جانفي', 'فيفري', 'مارس', 'أفريل', 'ماي', 'جوان',
+	'جويلية', 'أوت', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+	dayNames: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+	dayNamesShort: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],
+	dayNamesMin: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت']
+};
+
 localizationSharedCalDAV['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 {
 	txtCalendars: 'Kalendáře',
@@ -1053,6 +1124,252 @@ localizationSharedCalDAV['zh_CN']=	/* thanks Fandy */
 $.extend(true, localization, localizationSharedCalDAV);
 
 var localizationCalDAV = new Object();
+
+localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
+{
+	_default_title_format_month_: 'yyyy MMM',
+	_default_title_format_week_: 'yyyy MMM d{ \'–\'[ yyyy][ MMM] d}',
+	_default_title_format_day_: 'yyyy MMM d, ddd',
+	_default_title_format_table_: 'yyyy MMM, ddd',
+	_default_column_format_agenda_: 'ddd, MMM d',
+
+	txtCalendar: 'رزنامة',
+	txtEnabledCalendars: 'Enabled Calendars',
+	txtTodo: 'للقيام به',
+	txtTodoList: 'قائمة المهام',
+	txtTodoLists: 'قائمات المهام',
+	txtEnabledTodoLists: 'قائمات المهام مفعلة',
+	txtSubscribed: 'انخراطات',
+	fullCalendarTable: 'جدول',
+	fullCalendarTodayButton: 'اليوم',
+	fullCalendarAllDay: 'كامل اليوم',
+	CalDAVsearch: 'Search',
+	resourceEnable: 'تفعيل كل الرزنامات لهذا المورد',
+	resourceDisable: 'تعطيل كل الرزنامات لهذا المورد',
+	allEnable: 'تفعيل كل الرزنامات',
+	allDisable: 'تعطيل كل الرزنامات',
+	timezone: 'المنطقة الزمنية',
+	txtTimezonePicker: 'المنطقة الزمنية:',
+	loadingRList: 'تحميل قائمة الموارد',
+	renderingE: 'معاينة الرزنامات',
+	timezoneChange: 'تحميل المنطقة الزمنية',
+	customTimezone: 'مخصص (التوقيت المحلي)',
+	customRepeat: 'آخر (لم يتم تحمل التغيير)',
+	loadPrevMonth: 'تحميل الشهر السابق',
+	loadNextMonth: 'تحميل الشهر الموالي',
+	repeatBoxButton: 'تكرر',
+	repeatBoxContent: 'مناسبة متكررة',
+	repeatBoxQuestion: 'تريد العمل مع أي مناسابات؟',
+	allEvsButton: 'كل المناسبات',
+	allFutureButton: 'كل المناسبات القادمة',
+	eventOnlyButton: 'هذه المناسبة فقط',
+	repeatBoxContentTODO: 'مهمة متكررة,',
+	repeatBoxQuestionTODO: 'تريد المشاركة في أي مهام؟',
+	allEvsButtonTODO: 'كل المهام',
+	allFutureButtonTODO: 'كل المهام القادمة',
+	eventOnlyButtonTODO: 'هذه المهمة فقط',
+	txtStatus: 'حالة',
+	eventAvailability : 'توافر',
+	eventAvailabilityBusy : 'مشغول',
+	eventAvailabilityFree : 'متاح',
+	eventType: 'خصوصية',
+	eventTypePublic: 'مفتوح للعموم',
+	eventTypePrivate: 'خاص',
+	eventTypeConfidential: 'سري',
+	txtPriority: 'أولوية',
+	txtPriorityNone: 'لا شيء',
+	txtPriorityLow: 'منخفضة',
+	txtPriorityMedium: 'متوسطة',
+	txtPriorityHigh: 'عالية',
+	eventURL : 'URL',
+	repeatInterval: 'كل',
+	repeatDays: 'أيام',
+	repeatWeeks: 'أسابيع',
+	repeatMonths: 'أشهر',
+	repeatYears: 'سنوات',
+	repeatChangeTxt: 'تم تغييره على الخادم',
+	repeatChangeTxtClose: 'غلق الإستمارة و إعادة فتح هذه المناسبة',
+	repeatTodoChangeTxtClose: 'غلق مربع الحوار و إعادة فتح المهمة',
+	calendarLoader: 'إعادة تحميل',
+	resizeLoader: 'إعادة تحجيم...',
+
+	// TODOS
+	pholderNameTODO: 'الإسم',
+	pholderNewTODO: 'مهمة جديدة',
+	txtTypeTODO: 'نوع',
+	txtTypeTODONone: 'بسيط',
+	txtTypeTODOStart: 'مع تاريخ البداية',
+	txtTypeTODODue: 'مع تاريخ النهاية',
+	txtTypeTODOBoth: 'مع تواريخ البداية و النهاية',
+	txtDateFromTODO: 'من',
+	txtDateToTODO: 'الى',
+	txtCompletedOn: 'ينتهي يوم',
+
+	pholderDateFromTODO: 'تاريخ البداية',
+	pholderTimeFromTODO: 'ساعة البداية',
+	pholderDateToTODO: 'تاريخ النهاية',
+	pholderTimeToTODO: 'ساعة النهاية',
+	pholderCompletedOnDate: 'التاريخ',
+	pholderCompletedOnTime: 'الساعة',
+
+	txtStatusFiltersHeaderTODO: 'Filters',
+	txtStatusFiltersFooterTODO: 'أو بعده"%date%""ينتهي يوم',
+	txtStatusNeedsActionTODO: 'بانتظار إجراء',
+	txtStatusCompletedTODO: 'منتهي',
+	txtStatusInProcessTODO: 'جاري',
+	txtStatusCancelledTODO: 'ملغى',
+	txtPercentCompletedTODO: 'Completed', // no trad ?
+
+	txtCalendarTODO: 'Calendar',
+	txtSelectCalendarTODO: 'اختيار رزنامة',
+	txtAlertTODO: 'إخطار',
+	txtAlertNoneTODO: 'None',
+	txtAlertMessageTODO: 'رسالة',
+	txtAlertOnDateTODO: 'بتاريخ',
+	txtAlertWeeksBeforeTODO: 'أسابيع قبل',
+	txtAlertDaysBeforeTODO: 'أيام قبل',
+	txtAlertHoursBeforeTODO: 'ساعات قبل',
+	txtAlertMinutesBeforeTODO: 'دقائق قبل',
+	txtAlertSecondsBeforeTODO: 'ثواني قبل',
+	txtAlertWeeksAfterTODO: 'أسابيع بعد',
+	txtAlertDaysAfterTODO: 'أيام بعد',
+	txtAlertHoursAfterTODO: 'ساعات بعد',
+	txtAlertMinutesAfterTODO: 'دقائق بعد',
+	txtAlertSecondsAfterTODO: 'ثواني بعد',
+
+	pholderAfterBeforeValTODO: 'قيمة',
+	pholderAlarmDateTODO: 'تاريخ التنبيه',
+	pholderAlarmTimeTODO: 'ساعة التنبيه',
+
+	pholderNoteTODO: 'Note', // find trad
+	txtNoteTODO: 'Note',  // find trad
+
+	todoPrevNav: 'Show previous instance',
+	todoNextNav: 'Show next instance',
+	todoUncompletedPrevNav: 'Show previous uncompleted instance',
+	todoUncompletedNextNav: 'Show next uncompleted instance',
+
+	buttonSaveTODO: 'Save',
+	buttonEditTODO: 'Edit',
+	buttonDuplicateTODO: 'مضاعفة',
+	buttonResetTODO: 'Revert',
+	buttonCloseTODO: 'غلق',
+	buttonDeleteTODO: 'Delete',
+
+	// EVENTS
+	pholderName: 'Name',
+	pholderNewEvent: 'مناسبة جديدة',
+	txtLocation: 'المكان',
+	pholderLocation: 'المكان',
+
+	txtAllDay: 'كامل اليوم',
+	from: 'From',
+	to: 'To',
+
+	pholderDateFrom: 'Date from',
+	pholderTimeFrom: 'Time from',
+	pholderDateTo: 'Date to',
+	pholderTimeTo: 'Time to',
+
+	txtStatusNone: 'غير مخصص',
+	txtStatusTentative: 'محاولة',
+	txtStatusConfirmed: 'مؤكد',
+	txtStatusCancelled: 'ملغى',
+
+	txtRepeat: 'تكرار',
+	txtNoRepeat: 'عدم تكرار',
+	txtRepeatDay: 'يومي',
+	txtRepeatWeek: 'أسبوعي',
+	txtRepeatWeekend: 'كل نهاية أسبوع',
+	txtRepeatMonth: 'شهري',
+	txtRepeatTwoWeek: 'نصف شهري',
+	txtRepeatYear: 'سنوي',
+	txtRepeatCustomWeek: 'أسبوعي مخصص',
+	txtRepeatCustomMonth: 'شهري مخصص',
+	txtRepeatCustomYear: 'سنوي مخصص',
+	txtRepeatWork: 'كل أيام العمل',
+	txtRepeatOnDate: 'On date', // no trad ?
+	txtRepeatAfter: 'عدد المرات',
+	txtRepeatNever: 'أبدا',
+	pholderUntilDate: 'إلى حين تاريخ',
+	pholderRepeatCount: 'عدد مرات التكرار',
+	txtRepeatCustomWeekLabel: 'يوم',
+	txtRepeatCustomMonthLabel: 'أيام',
+	txtRepeatCustomMonthEvery: 'كل',
+	txtRepeatCustomMonthFirst: 'أول',
+	txtRepeatCustomMonthSecond: 'ثاني',
+	txtRepeatCustomMonthThird: 'ثالث',
+	txtRepeatCustomMonthFourth: 'رابع',
+	txtRepeatCustomMonthFifth: 'خامس',
+	txtRepeatCustomMonthLast: 'آخر',
+	txtRepeatCustomMonthCustom: 'مخصص',
+	txtRepeatCustomMonthMonth: 'اليوم من الشهر',
+	txtRepeatCustomYearLabel1: 'every', // no trad ?
+	txtRepeatCustomYearLabel2: 'of',
+
+	txtRepeatEnd: 'end',
+	txtEventCalendar: 'Calendar',
+	txtSelectCalendar: 'Select a calendar',
+	txtAlert: 'Alert',
+	txtAlertNone: 'None',
+	txtAlertMessage: 'Message',
+	txtAlertOnDate: 'On date',
+	txtAlertWeeksBefore: 'Weeks before',
+	txtAlertDaysBefore: 'Days before',
+	txtAlertHoursBefore: 'Hours before',
+	txtAlertMinutesBefore: 'Minutes before',
+	txtAlertSecondsBefore: 'Seconds before',
+	txtAlertWeeksAfter: 'Weeks after',
+	txtAlertDaysAfter: 'Days after',
+	txtAlertHoursAfter: 'Hours after',
+	txtAlertMinutesAfter: 'Minutes after',
+	txtAlertSecondsAfter: 'Seconds after',
+
+	pholderAfterBeforeVal: 'Value',
+	pholderAlarmDate: 'Alarm date',
+	pholderAlarmTime: 'Alarm time',
+
+	pholderNote: 'Note',
+
+	eventPrevNav: 'Show previous instance',
+	eventNextNav: 'Show next instance',
+
+	buttonClose: 'Close',
+	buttonDuplicate: 'Duplicate',
+
+	txtAllSavedTodo: 'Success: Todo Saved!',
+	txtAllSaved: 'Success: Event Saved!',
+
+	txtAllDeletedTodo: 'Success: Todo Deleted!',
+	txtAllDeleted: 'Success: Event Deleted!',
+
+	txtNotChooseTodo: 'Error: Have to choose calendar!',
+	txtNotChoose: 'Error: Have to choose calendar!',
+
+	txtErrorDates: 'Error: Start date must precede the end date!',
+	txtErrorDatesTodo: 'Error: Start date must precede the end date!',
+
+	txtErorInputTodo: 'Unable to save: correct invalid values!',
+	txtDateTimeErrorTodo: 'Have to choose date and time!',
+
+	txtErorInput: 'Error: \'unable to save\': correct the highlighted invalid values!',
+
+	txtAlertsH: 'Alerts',
+	buttonAlert: 'Clear Alerts',
+
+	altAddEvent: 'Add Event',
+	altAddTodo: 'Add Todo',
+
+	loadingCalendars: 'Loading calendars (%act% of %total%) ...',
+	unloadingCalendars: 'Unloading calendars ...',
+
+	errUnableSaveBeginCalDAV: 'Error: \'unable to save the event\': %%!',
+	errUnableDeleteBeginCalDAV: 'Error: \'unable to delete the event\': %%!',
+	CalDAVerrHttp410: 'Event is no longer available at the server',
+	errUnableSaveTodoBeginCalDAV: 'Error: \'unable to save the todo\': %%!',
+	errUnableDeleteTodoBeginCalDAV: 'Error: \'unable to delete todo\': %%!',
+	CalDAVerrTodoHttp410: 'Todo is no longer available at the server'
+};
 
 localizationCalDAV['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 {
