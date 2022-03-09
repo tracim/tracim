@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import { 
+import {
   DRAG_AND_DROP,
   NO_ACTIVE_SPACE_ID,
   getNotificationList
@@ -17,7 +17,7 @@ import {
 } from '../../action-creator.async.js'
 import {
   newFlashMessage,
-  readNotification,
+  readNotification
 } from '../../action-creator.sync.js'
 
 const qs = require('query-string')
@@ -126,7 +126,7 @@ class WorkspaceListItem extends React.Component {
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           },
           {
-            'sidebar__content__navigation__item__unread':
+            sidebar__content__navigation__item__unread:
               state.isUnread
           }
         )}
@@ -178,7 +178,7 @@ class WorkspaceListItem extends React.Component {
             >
               {props.label}
             </div>
-            {props.unreadMentionCount > 0 && <div class="mention">{props.unreadMentionCount}</div>}
+            {props.unreadMentionCount > 0 && <div class='sidebar_mention'>{props.unreadMentionCount}</div>}
           </div>
         </Link>
 
@@ -229,7 +229,6 @@ WorkspaceListItem.propTypes = {
   foldChildren: PropTypes.bool,
   hasChildren: PropTypes.bool,
   id: PropTypes.string.isRequired,
-  //isUnread: PropTypes.bool,
   label: PropTypes.string.isRequired,
   level: PropTypes.number,
   onClickAllContent: PropTypes.func,
@@ -245,7 +244,6 @@ WorkspaceListItem.defaultProps = {
   allowedAppList: [],
   foldChildren: false,
   hasChildren: false,
-  //isUnread: false,
   level: 0,
   onClickAllContent: () => { },
   onClickToggleSidebar: () => {},

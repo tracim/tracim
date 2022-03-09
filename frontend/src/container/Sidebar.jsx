@@ -70,10 +70,7 @@ export class Sidebar extends React.Component {
 
   displaySpace = (spaceLevel, spaceList) => {
     const { props, state } = this
-    const {
-      unreadSpaceList,
-      unreadMentionCountByWorkspace
-    } = this.handleReadNotification(props.notificationPage.list)
+    const unreadMentionCountByWorkspace = this.getMentionBySpace(props.notificationPage.list)
 
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
@@ -83,7 +80,6 @@ export class Sidebar extends React.Component {
           foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
           hasChildren={space.children.length > 0}
           id={this.spaceItemId(space.id)}
-          // isUnread={unreadSpaceList.includes(space.id)}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
@@ -186,7 +182,7 @@ export class Sidebar extends React.Component {
 
   handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
 
-  handleReadNotification = (notificationList) => {
+  getMentionBySpace = (notificationList) => {
     const unreadSpaceList = []
     const unreadMentionCountByWorkspace = {}
 
@@ -216,10 +212,7 @@ export class Sidebar extends React.Component {
       }
     })
 
-    return {
-      unreadSpaceList,
-      unreadMentionCountByWorkspace
-    }
+    return unreadMentionCountByWorkspace
   }
 
   render () {

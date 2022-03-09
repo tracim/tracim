@@ -289,7 +289,6 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       let notification
       let replaceList
       let newUnreadMentionCount
-      let newUnreadNotificationCount
 
       // NOTE - MP - 07-03-2022 - This is code allow me to read a notification even in a group
       // This will be fix with the notification refactorisation #5497
@@ -314,7 +313,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
       }
 
-      newUnreadNotificationCount = state.unreadNotificationCount - 1
+      const newUnreadNotificationCount = state.unreadNotificationCount - 1
 
       return {
         ...state,
