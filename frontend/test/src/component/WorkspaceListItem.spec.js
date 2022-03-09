@@ -7,17 +7,26 @@ import { mount } from 'enzyme'
 import { dropTargetMock } from '../../hocMock/dragAndDrop.js'
 import { RouterMock, withRouterMock } from '../../hocMock/withRouter.js'
 import { translateMock } from '../../hocMock/translate.js'
+import { user } from '../../hocMock/redux/user/user.js'
 import { firstWorkspace } from '../../fixture/workspace/firstWorkspace.js'
 import { ROLE } from 'tracim_frontend_lib'
 
 describe('<WorkspaceListItem />', () => {
   const props = {
+    activeIdWorkspace: 1,
     workspaceId: firstWorkspace.id,
     userWorkspaceRoleId: ROLE.reader.id,
     label: firstWorkspace.label,
     allowedAppList: firstWorkspace.sidebarEntry,
     onClickTitle: () => {},
-    activeIdWorkspace: 1
+    notificationPage: {
+      list: [],
+      hasNextPage: false,
+      nextPageToken: '',
+      unreadMentionCount: 0,
+      unreadNotificationCount: 0
+    },
+    user: user
   }
 
   const dropTarget = {
