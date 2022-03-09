@@ -22,9 +22,7 @@ export const ForgotPasswordNoEmailNotif = props => {
     if (!props.system.config.instance_name) loadConfig()
   }, [])
 
-  useEffect(() => {
-    updateHeadTitle()
-  }, [props.system.config.instance_name])
+  useEffect(updateHeadTitle, [props.system.config.instance_name])
 
   const customEventReducer = ({ detail: { type } }) => {
     switch (type) {
