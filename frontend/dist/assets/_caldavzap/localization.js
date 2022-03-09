@@ -27,11 +27,11 @@ localization['ar']=	/* thanks Myriam Rabhi */
 	txtResources: 'الموارد',
 	txtNote: 'ملاحظة',
 
-	errUnableSync: "خطأ	:	/مزامنة	المورد غير ممكنة/'	: حاول	مجددا لاحقا!",
+	errUnableSync: "خطأ : /مزامنة المورد غير ممكنة/' : حاول مجددا لاحقا!",
 
-	loadingResources: ')%فعل%على%مجموع%"تحميل	الموارد (',
+	loadingResources: ')%فعل%على%مجموع%"تحميل الموارد (',
 
-	loadingCollectionList: 'تحميل	قائمة الموارد',
+	loadingCollectionList: 'تحميل قائمة الموارد',
 
 	txtCacheText: 'هنالك	تحديث متوفر على الخادم، تفضل بإعادة	تحميل الصفحة',
 	txtCacheButton: 'إعادة تحميل',
@@ -258,7 +258,7 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 {
 	_name_: 'العربية',
 	_default_datepicker_format_: 'يوم/شهر/سنة',
-	_default_AMPM_format_: true,
+	_default_AMPM_format_: false,
 
 	altLogo: 'شعار',
 	altLogout: 'تسجيل الخروج',
@@ -275,7 +275,7 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	buttonCancel: 'الغاء',
 	buttonDelete: 'حذف',
 
-	errCollectionLoad: 'Error: \'unable to save settings\'!',
+	errCollectionLoad: 'Error: \'unable to save settings\'!', // need trad
 	errHttpCommon: "خطأ: /'حفظ الاعدادات غير ممكن/' رمز الخطأ %%",
 	errHttp401: 'غير مسموح به',
 	errHttp403: 'ممنوع',
@@ -286,7 +286,7 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	errHttp501: 'غير مطبق',
 
 	unsupportedBrowser: 'ملاحظة : لا يمكن تحمل المتصفح الذي تستعمله',
-	updateNotification: '%name% %new_ver% available (you have %curr_ver%) - %url%'
+	updateNotification: 'متوفر (أنت الآن في نسخة %curr_ver%) - %url'
 };
 
 localizationShared['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
@@ -1143,7 +1143,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	fullCalendarTable: 'جدول',
 	fullCalendarTodayButton: 'اليوم',
 	fullCalendarAllDay: 'كامل اليوم',
-	CalDAVsearch: 'Search',
+	CalDAVsearch: 'بحث',
 	resourceEnable: 'تفعيل كل الرزنامات لهذا المورد',
 	resourceDisable: 'تعطيل كل الرزنامات لهذا المورد',
 	allEnable: 'تفعيل كل الرزنامات',
@@ -1212,18 +1212,18 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	pholderCompletedOnDate: 'التاريخ',
 	pholderCompletedOnTime: 'الساعة',
 
-	txtStatusFiltersHeaderTODO: 'Filters',
+	txtStatusFiltersHeaderTODO: 'Filters', // need translation
 	txtStatusFiltersFooterTODO: 'أو بعده"%date%""ينتهي يوم',
 	txtStatusNeedsActionTODO: 'بانتظار إجراء',
 	txtStatusCompletedTODO: 'منتهي',
 	txtStatusInProcessTODO: 'جاري',
 	txtStatusCancelledTODO: 'ملغى',
-	txtPercentCompletedTODO: 'Completed', // no trad ?
+	txtPercentCompletedTODO: 'منتهي',
 
 	txtCalendarTODO: 'Calendar',
 	txtSelectCalendarTODO: 'اختيار رزنامة',
 	txtAlertTODO: 'إخطار',
-	txtAlertNoneTODO: 'None',
+	txtAlertNoneTODO: 'ا شيء',
 	txtAlertMessageTODO: 'رسالة',
 	txtAlertOnDateTODO: 'بتاريخ',
 	txtAlertWeeksBeforeTODO: 'أسابيع قبل',
@@ -1241,30 +1241,30 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	pholderAlarmDateTODO: 'تاريخ التنبيه',
 	pholderAlarmTimeTODO: 'ساعة التنبيه',
 
-	pholderNoteTODO: 'Note', // find trad
-	txtNoteTODO: 'Note',  // find trad
+	pholderNoteTODO: 'ملاحظة',
+	txtNoteTODO: 'ملاحظة',
 
 	todoPrevNav: 'Show previous instance',
 	todoNextNav: 'Show next instance',
 	todoUncompletedPrevNav: 'Show previous uncompleted instance',
 	todoUncompletedNextNav: 'Show next uncompleted instance',
 
-	buttonSaveTODO: 'Save',
-	buttonEditTODO: 'Edit',
+	buttonSaveTODO: 'حفظ',
+	buttonEditTODO: 'تعديل',
 	buttonDuplicateTODO: 'مضاعفة',
-	buttonResetTODO: 'Revert',
+	buttonResetTODO: 'رجوع',
 	buttonCloseTODO: 'غلق',
-	buttonDeleteTODO: 'Delete',
+	buttonDeleteTODO: 'حذف',
 
 	// EVENTS
-	pholderName: 'Name',
+	pholderName: 'الإسم',
 	pholderNewEvent: 'مناسبة جديدة',
 	txtLocation: 'المكان',
 	pholderLocation: 'المكان',
 
 	txtAllDay: 'كامل اليوم',
-	from: 'From',
-	to: 'To',
+	from: 'من',
+	to: 'الى',
 
 	pholderDateFrom: 'Date from',
 	pholderTimeFrom: 'Time from',
@@ -1288,7 +1288,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtRepeatCustomMonth: 'شهري مخصص',
 	txtRepeatCustomYear: 'سنوي مخصص',
 	txtRepeatWork: 'كل أيام العمل',
-	txtRepeatOnDate: 'On date', // no trad ?
+	txtRepeatOnDate: 'بتاريخ',
 	txtRepeatAfter: 'عدد المرات',
 	txtRepeatNever: 'أبدا',
 	pholderUntilDate: 'إلى حين تاريخ',
@@ -1304,71 +1304,71 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtRepeatCustomMonthLast: 'آخر',
 	txtRepeatCustomMonthCustom: 'مخصص',
 	txtRepeatCustomMonthMonth: 'اليوم من الشهر',
-	txtRepeatCustomYearLabel1: 'every', // no trad ?
-	txtRepeatCustomYearLabel2: 'of',
+	txtRepeatCustomYearLabel1: 'كل',
+	txtRepeatCustomYearLabel2: 'من',
 
-	txtRepeatEnd: 'end',
+	txtRepeatEnd: 'نهاية',
 	txtEventCalendar: 'Calendar',
 	txtSelectCalendar: 'Select a calendar',
-	txtAlert: 'Alert',
-	txtAlertNone: 'None',
-	txtAlertMessage: 'Message',
-	txtAlertOnDate: 'On date',
-	txtAlertWeeksBefore: 'Weeks before',
-	txtAlertDaysBefore: 'Days before',
-	txtAlertHoursBefore: 'Hours before',
-	txtAlertMinutesBefore: 'Minutes before',
-	txtAlertSecondsBefore: 'Seconds before',
-	txtAlertWeeksAfter: 'Weeks after',
-	txtAlertDaysAfter: 'Days after',
-	txtAlertHoursAfter: 'Hours after',
-	txtAlertMinutesAfter: 'Minutes after',
-	txtAlertSecondsAfter: 'Seconds after',
+	txtAlert: 'إخطار',
+	txtAlertNone: 'ا شيء',
+	txtAlertMessage: 'رسالة',
+	txtAlertOnDate: 'بتاريخ',
+	txtAlertWeeksBefore: 'أسابيع قبل',
+	txtAlertDaysBefore: 'أيام قبل',
+	txtAlertHoursBefore: 'ساعات قبل',
+	txtAlertMinutesBefore: 'دقائق قبل',
+	txtAlertSecondsBefore: 'ثواني قبل',
+	txtAlertWeeksAfter: 'أسابيع بعد',
+	txtAlertDaysAfter: 'أيام بعد',
+	txtAlertHoursAfter: 'ساعات بعد',
+	txtAlertMinutesAfter: 'دقائق بعد',
+	txtAlertSecondsAfter: 'ثواني بعد',
 
-	pholderAfterBeforeVal: 'Value',
-	pholderAlarmDate: 'Alarm date',
-	pholderAlarmTime: 'Alarm time',
+	pholderAfterBeforeVal: 'قيمة',
+	pholderAlarmDate: 'تاريخ التنبيه',
+	pholderAlarmTime: 'ساعة التنبيه',
 
-	pholderNote: 'Note',
+	pholderNote: 'ملاحظة',
 
 	eventPrevNav: 'Show previous instance',
 	eventNextNav: 'Show next instance',
 
-	buttonClose: 'Close',
-	buttonDuplicate: 'Duplicate',
+	buttonClose: 'غلق',
+	buttonDuplicate: 'مضاعفة',
 
-	txtAllSavedTodo: 'Success: Todo Saved!',
-	txtAllSaved: 'Success: Event Saved!',
+	txtAllSavedTodo: 'نجاح: تم تسجيل المهمة',
+	txtAllSaved: 'نجاح: تم تسجيل المناسبة',
 
-	txtAllDeletedTodo: 'Success: Todo Deleted!',
-	txtAllDeleted: 'Success: Event Deleted!',
+	txtAllDeletedTodo: 'نجاح: تم حذف المهمة',
+	txtAllDeleted: 'نجاح: تم حذف المناسبة',
 
 	txtNotChooseTodo: 'Error: Have to choose calendar!',
 	txtNotChoose: 'Error: Have to choose calendar!',
 
-	txtErrorDates: 'Error: Start date must precede the end date!',
+	txtErrorDates: 'خطأ: تاريخ البداية يجب أن يسبق تاريخ النهاية',
 	txtErrorDatesTodo: 'Error: Start date must precede the end date!',
 
-	txtErorInputTodo: 'Unable to save: correct invalid values!',
-	txtDateTimeErrorTodo: 'Have to choose date and time!',
+	txtErorInputTodo: 'التسجيل غير ممكن : الرجاء تصحيح القيم غير الصحيحة',
+	txtDateTimeErrorTodo: 'يجب اختيار تاريخ و ساعة!',
 
-	txtErorInput: 'Error: \'unable to save\': correct the highlighted invalid values!',
+	txtErorInput: "خطأ : /التسجيل غير ممكن/' الرجاء تصحيح القيم المبرزة",
 
-	txtAlertsH: 'Alerts',
-	buttonAlert: 'Clear Alerts',
+	txtAlertsH: 'اخطارات',
+	buttonAlert: 'إزالة الاخطارات',
 
-	altAddEvent: 'Add Event',
-	altAddTodo: 'Add Todo',
+	altAddEvent: 'اضافة مناسبة',
+	altAddTodo: 'اضافة مهمة',
 
 	loadingCalendars: 'Loading calendars (%act% of %total%) ...',
 	unloadingCalendars: 'Unloading calendars ...',
 
-	errUnableSaveBeginCalDAV: 'Error: \'unable to save the event\': %%!',
-	errUnableDeleteBeginCalDAV: 'Error: \'unable to delete the event\': %%!',
-	CalDAVerrHttp410: 'Event is no longer available at the server',
-	errUnableSaveTodoBeginCalDAV: 'Error: \'unable to save the todo\': %%!',
-	errUnableDeleteTodoBeginCalDAV: 'Error: \'unable to delete todo\': %%!',
-	CalDAVerrTodoHttp410: 'Todo is no longer available at the server'
+	errUnableSaveBeginCalDAV: "خطأ: /'تسجيل المناسبة غير ممكن/' %% !",
+	errUnableDeleteBeginCalDAV: "خطأ : /حذف المناسبة غير ممكن/' %% !",
+	CalDAVerrHttp410: 'المناسبة غير موجودة على الخادم',
+	errUnableSaveTodoBeginCalDAV: "خطأ : /'حفظ المهمة غير ممكن/' : %% !",
+	errUnableDeleteTodoBeginCalDAV: "خطأ : /'حذف المهمة غير ممكن/'%% !",
+	CalDAVerrTodoHttp410: 'المهمة لم تعد متوفرة على الخادم'
 };
 
 localizationCalDAV['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
