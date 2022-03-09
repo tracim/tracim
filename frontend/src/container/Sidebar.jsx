@@ -202,7 +202,7 @@ export class Sidebar extends React.Component {
 
     notificationList.forEach(notification => {
       if (notification.workspace && !notification.read) {
-          fillParameters(notification)
+        fillParameters(notification)
       } else if (notification.group) {
         notification.group.forEach(n => {
           if (n.workspace && !n.read) {
