@@ -5,7 +5,11 @@ import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
+import { 
+  DRAG_AND_DROP,
+  NO_ACTIVE_SPACE_ID,
+  getNotificationList
+} from '../../util/helper.js'
 import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
 import {
@@ -28,31 +32,12 @@ class WorkspaceListItem extends React.Component {
     }
   }
 
-  // NOTE - MP - 07-03-2022 - This function allow me to use a flat list from redux
-  // (currently giving me a list that can contains other lists)
-  // This will be fix with the notification refactorisation #5497
-  getNotificationList = (state) => {
-    const notificationList = []
-    if (state.list) {
-      for (const element of state.list) {
-        if (element.group) {
-          element.group.forEach(notification => {
-            notificationList.push(notification)
-          })
-        } else {
-          notificationList.push(element)
-        }
-      }
-    }
-    return notificationList
-  }
-
   componentDidMount () {
     document.addEventListener('mousedown', this.handleClickOutsideDropdownMenu)
   }
 
   componentDidUpdate () {
-    this.state.isUnread = this.getNotificationList(this.props.notificationPage)
+    this.state.isUnread = getNotificationList(this.props.notificationPage)
       .filter(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId)).length > 0
   }
 
@@ -111,7 +96,7 @@ class WorkspaceListItem extends React.Component {
   handleReadSpaceNotifications = async () => {
     const { props } = this
 
-    const notificationToRead = this.getNotificationList(this.props.notificationPage).filter(n => !n.mention && !n.read).map(n => n.id)
+    const notificationToRead = getNotificationList(props.notificationPage).filter(n => !n.mention && !n.read).map(n => n.id)
 
     await Promise.all(notificationToRead.map(async (notificationId) => {
       const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))

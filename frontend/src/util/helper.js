@@ -293,3 +293,22 @@ export const getRevisionTypeLabel = (revisionType, t) => {
 }
 
 export const WELCOME_ELEMENT_ID = 'welcome'
+
+// NOTE - MP - 07-03-2022 - This function allow me to use a flat list from redux
+// (currently giving me a list that can contains other lists)
+// This will be fix with the notification refactorisation #5497
+export const getNotificationList = (state) => {
+  const notificationList = []
+  if (state.list) {
+    for (const element of state.list) {
+      if (element.group) {
+        element.group.forEach(notification => {
+          notificationList.push(notification)
+        })
+      } else {
+        notificationList.push(element)
+      }
+    }
+  }
+  return notificationList
+}
