@@ -10,7 +10,9 @@ import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 import UserSpacesConfig from '../component/Account/UserSpacesConfig.jsx'
 import Password from '../component/Account/Password.jsx'
+import WebdavInfo from '../component/Account/WebdavInfo.jsx'
 import {
+  AgendaInfo,
   Delimiter,
   PageWrapper,
   PageTitle,
@@ -46,7 +48,6 @@ import {
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   FETCH_CONFIG
 } from '../util/helper.js'
-import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 export class Account extends React.Component {
   constructor (props) {
@@ -71,11 +72,11 @@ export class Account extends React.Component {
       translationKey: props.t('Password'),
       display: editableUserAuthTypeList.includes(props.user.authType) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
-      name: 'agenda',
+      name: 'configurationLinks',
       active: false,
-      label: 'Agenda',
-      translationKey: props.t('Agenda'),
-      display: props.appList.some(a => a.slug === 'agenda')
+      label: 'Configuration links',
+      translationKey: props.t('Configuration links'),
+      display: props.appList.some(a => a.slug === 'agenda') || props.system.config.webdav_url
     }]
 
     this.state = {
@@ -331,14 +332,24 @@ export class Account extends React.Component {
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} />
 
-                      case 'agenda':
+                      case 'configurationLinks':
                         return (
-                          <AgendaInfo
-                            customClass='account__agenda'
-                            introText={props.t('Use this link to integrate this agenda to your')}
-                            caldavText={props.t('CalDAV compatible software')}
-                            agendaUrl={props.user.agendaUrl}
-                          />
+                          <div>
+                            {props.appList.some(a => a.slug === 'agenda') && (
+                              <AgendaInfo
+                                introText={props.t('Use this link to integrate this agenda to your')}
+                                caldavText={props.t('CalDAV compatible software')}
+                                agendaUrl={props.user.agendaUrl}
+                              />
+                            )}
+                            {props.system.config.webdav_enabled && (
+                              <WebdavInfo
+                                introText={props.t('Use this link to integrate Tracim in your file explorer')}
+                                webdavText={props.t('(protocole WebDAV)')}
+                                webdavUrl={props.system.config.webdav_url}
+                              />
+                            )}
+                          </div>
                         )
                     }
                   })()}

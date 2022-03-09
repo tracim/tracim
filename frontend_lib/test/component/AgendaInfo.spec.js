@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { AgendaInfo as AgendaInfoWithoutHOC } from '../../../src/component/Dashboard/AgendaInfo.jsx'
+import { AgendaInfo as AgendaInfoWithoutHOC } from '../../src/component/AgendaInfo/AgendaInfo.jsx'
 
 describe('<AgendaInfo />', () => {
   const props = {

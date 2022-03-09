@@ -2,6 +2,7 @@ import React from 'react'
 import Radium from 'radium'
 import PropTypes from 'prop-types'
 import {
+  AgendaInfo,
   tinymceRemove,
   AutoComplete,
   BtnSwitch,
@@ -128,6 +129,15 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
               </div>
             </div>
 
+            {props.isAppAgendaAvailable && props.isCurrentSpaceAgendaEnabled && (
+              <AgendaInfo
+                customClass='formBlock workspace_advanced__agenda'
+                introText={props.t('Use this link to integrate this agenda to your')}
+                caldavText={props.t('CalDAV compatible software')}
+                agendaUrl={props.agendaUrl}
+              />
+            )}
+
             <div className='formBlock workspace_advanced__delete'>
               <div className='formBlock__title workspace_advanced__delete__title'>
                 {props.t('Delete space')}
@@ -197,13 +207,19 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 export default translate()(Radium(WorkspaceAdvancedConfiguration))
 
 WorkspaceAdvancedConfiguration.propTypes = {
+  agendaUrl: PropTypes.string,
   description: PropTypes.string,
   lang: PropTypes.string,
-  isReadOnlyMode: PropTypes.bool
+  isReadOnlyMode: PropTypes.bool,
+  isAppAgendaAvailable: PropTypes.bool,
+  isCurrentSpaceAgendaEnabled: PropTypes.bool
 }
 
 WorkspaceAdvancedConfiguration.defaultProps = {
+  agendaUrl: '',
   description: '',
   lang: '',
-  isReadOnlyMode: true
+  isReadOnlyMode: true,
+  isAppAgendaAvailable: false,
+  isCurrentSpaceAgendaEnabled: false
 }

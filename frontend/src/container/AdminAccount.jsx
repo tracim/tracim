@@ -9,6 +9,7 @@ import PersonalData from '../component/Account/PersonalData.jsx'
 import UserSpacesConfig from '../component/Account/UserSpacesConfig.jsx'
 import Password from '../component/Account/Password.jsx'
 import {
+  AgendaInfo,
   Delimiter,
   PageWrapper,
   PageTitle,
@@ -46,7 +47,6 @@ import {
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   FETCH_CONFIG
 } from '../util/helper.js'
-import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 import { serializeUserProps } from '../reducer/user.js'
 
 export class Account extends React.Component {
