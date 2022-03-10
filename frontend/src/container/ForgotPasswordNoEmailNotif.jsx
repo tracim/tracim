@@ -22,16 +22,6 @@ export const ForgotPasswordNoEmailNotif = props => {
     if (!props.system.config.instance_name) loadConfig()
   }, [])
 
-  useEffect(updateHeadTitle, [props.system.config.instance_name])
-
-  const customEventReducer = ({ detail: { type } }) => {
-    switch (type) {
-      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
-        updateHeadTitle()
-        break
-    }
-  }
-
   const loadConfig = async () => {
     const fetchGetConfig = await props.dispatch(getConfig())
     if (fetchGetConfig.status === 200) {
@@ -41,6 +31,15 @@ export const ForgotPasswordNoEmailNotif = props => {
 
   const updateHeadTitle = () => {
     props.dispatch(setHeadTitle(props.t('Forgotten password')))
+  }
+  useEffect(updateHeadTitle, [props.system.config.instance_name])
+
+  const customEventReducer = ({ detail: { type } }) => {
+    switch (type) {
+      case CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE:
+        updateHeadTitle()
+        break
+    }
   }
 
   const handleClickBack = () => props.history.push(PAGE.LOGIN)
