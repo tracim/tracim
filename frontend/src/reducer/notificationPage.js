@@ -26,6 +26,10 @@ import {
 
 const defaultNotificationsObject = {
   list: [],
+  // NOTE - MP - 07-03-2022 - This function allow me to use a flat list from redux
+  // (currently giving me a list that can contains other lists)
+  // This will be fix with the notification refactorisation #5497
+  flattenList: [],
   hasNextPage: false,
   nextPageToken: '',
   unreadMentionCount: 0,
@@ -245,7 +249,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       const notificationList = action.notificationList
         .map(notification => (serializeNotification(notification)))
       const groupedNotificationList = sortByCreatedDate(groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id')))
-      return { ...state, list: groupedNotificationList }
+      return { ...state, list: groupedNotificationList, flattenList: notificationList }
     }
 
     case `${APPEND}/${NOTIFICATION_LIST}`: {
@@ -254,7 +258,8 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       const groupedNotificationList = sortByCreatedDate(groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id')))
       return {
         ...state,
-        list: [...state.list, ...groupedNotificationList]
+        list: [...state.list, ...groupedNotificationList],
+        flattenList: [...state.flattenList, ...notificationList]
       }
     }
 
@@ -270,6 +275,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       return {
         ...state,
         list: sortByCreatedDate(newNotificationList),
+        flattenList: sortByCreatedDate([...state.flattenList, notification]),
         unreadMentionCount: newUnreadMentionCount,
         unreadNotificationCount: state.unreadNotificationCount + 1
       }
@@ -282,7 +288,16 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         ...action.notificationList,
         ...state.list.slice(index + 1, state.list.length)
       ]
-      return { ...state, list: newNotificationList }
+      const newFlattenList = [
+        ...state.flattenList.slice(0, index),
+        ...action.notificationList,
+        ...state.flattenList.slice(index + 1, state.flattenList.length)
+      ]
+      return {
+        ...state,
+        list: newNotificationList,
+        flattenList: newFlattenList
+      }
     }
 
     case `${READ}/${NOTIFICATION}`: {
@@ -290,15 +305,15 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       let replaceList
       let newUnreadMentionCount
 
-      // NOTE - MP - 07-03-2022 - This is code allow me to read a notification even in a group
+      // FIXME - MP - 07-03-2022 - This is code allow me to read a notification even in a group
       // This will be fix with the notification refactorisation #5497
-      for (const element of state.list) {
-        if (element.group) {
-          notification = element.group.find(n => n.id === action.notificationId && !n.read)
+      for (const notificationOrGroup of state.list) {
+        if (notificationOrGroup.group) {
+          notification = notificationOrGroup.group.find(n => n.id === action.notificationId && !n.read)
           if (notification) {
             newUnreadMentionCount = (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) ? state.unreadMentionCount - 1 : state.unreadMentionCount
-            element.group = element.group.map(n => n.id === action.notificationId ? { ...notification, read: true } : n)
-            replaceList = state.list.map(g => g.group && g.id === element.id ? element : g)
+            notificationOrGroup.group = notificationOrGroup.group.map(n => n.id === action.notificationId ? { ...notification, read: true } : n)
+            replaceList = state.list.map(g => g.group && g.id === notificationOrGroup.id ? notificationOrGroup : g)
             break
           }
         }
@@ -313,11 +328,14 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
       }
 
+      const replaceFlattenList = state.flattenList.map(no => (no.id === action.notificationId && !no.read) ? { ...no, read: true } : no)
+
       const newUnreadNotificationCount = state.unreadNotificationCount - 1
 
       return {
         ...state,
         list: replaceList,
+        flattenList: replaceFlattenList,
         unreadMentionCount: newUnreadMentionCount,
         unreadNotificationCount: newUnreadNotificationCount
       }
@@ -328,7 +346,8 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         ? { ...notification, group: notification.group.map(notification => ({ ...notification, read: true })) }
         : { ...notification, read: true }
       )
-      return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
+      const notificationFlattenList = state.flattenList.map(notification => ({ ...notification, read: true }))
+      return { ...state, list: uniqBy(notificationList, 'id'), flattenList: uniqBy(notificationFlattenList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
     }
 
     case `${READ}/${CONTENT}/${NOTIFICATION}`: {
@@ -346,6 +365,18 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         return notification
       }
 
+      // FIXME - MP - 11-03-2022 - This code allow me to read a notification without
+      // decreasing unreadNotificationCount since it's already decreased with the
+      // markNotificationAsRead above.
+      // This will be fix with the notification refactorisation #5497
+      const markFlattenNotificationAsRead = (notification) => {
+        if (!notification.content) return notification
+        if (getMainContentId(notification) === action.contentId) {
+          return { ...notification, read: true }
+        }
+        return notification
+      }
+
       const newNotificationList = state.list.map(notification => {
         if (notification.group) {
           return {
@@ -354,7 +385,11 @@ export default function notificationPage (state = defaultNotificationsObject, ac
           }
         } else return markNotificationAsRead(notification)
       })
-      return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount, unreadNotificationCount }
+      const newFlattenList = state.flattenList.map(notification => {
+        return markFlattenNotificationAsRead(notification)
+      })
+
+      return { ...state, list: uniqBy(newNotificationList, 'id'), flattenList: uniqBy(newFlattenList, 'id'), unreadMentionCount, unreadNotificationCount }
     }
 
     case `${SET}/${NEXT_PAGE}`:

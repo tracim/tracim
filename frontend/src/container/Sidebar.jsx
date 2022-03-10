@@ -9,11 +9,12 @@ import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { addWorkspaceList } from '../action-creator.sync.js'
 import {
   NO_ACTIVE_SPACE_ID,
-  workspaceConfig,
+  TRACIM_APP_VERSION,
+  findUserRoleIdInWorkspace,
+  // flattenNotificationAndGroupList,
   getUserProfile,
   unLoggedAllowedPageList,
-  findUserRoleIdInWorkspace,
-  TRACIM_APP_VERSION
+  workspaceConfig
 } from '../util/helper.js'
 import {
   createSpaceTree,
@@ -70,7 +71,10 @@ export class Sidebar extends React.Component {
 
   displaySpace = (spaceLevel, spaceList) => {
     const { props, state } = this
-    const unreadMentionCountBySpace = this.getMentionBySpace(props.notificationPage.list)
+    /* const {
+      spaceHasUnreadNotification,
+      unreadMentionCountBySpace
+    } = this.getMentionCountBySpace(props.notificationPage.list) */
 
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
@@ -85,8 +89,7 @@ export class Sidebar extends React.Component {
           onClickAllContent={this.handleClickAllContent}
           onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
-          unreadMentionCount={unreadMentionCountBySpace[space.id] || 0}
-          userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
+          userRoleIdInWorkspace={[findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)]}
           workspaceId={space.id}
         />
         {!state.foldedSpaceList.find(id => id === space.id) &&
@@ -182,38 +185,31 @@ export class Sidebar extends React.Component {
 
   handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
 
-  getMentionBySpace = (notificationList) => {
-    const unreadSpaceList = []
+  /* getMentionCountBySpace = (notificationList) => {
+    const spaceHasUnreadNotification = {}
     const unreadMentionCountBySpace = {}
 
-    const updateUnreadSpaceListAndMentionCount = (notification) => {
+    const flattenNotificationList = flattenNotificationAndGroupList(notificationList)
+
+    flattenNotificationList.forEach((notification) => {
       const workspaceId = notification.workspace.id
       const [entityType] = notification.type.split('.')
 
-      if (!unreadSpaceList.includes(workspaceId)) {
-        unreadSpaceList.push(workspaceId)
+      if (spaceHasUnreadNotification[workspaceId] !== undefined) {
+        spaceHasUnreadNotification[workspaceId] = true
         unreadMentionCountBySpace[workspaceId] = 0
       }
 
       if (entityType === TLM_ET.MENTION) {
         unreadMentionCountBySpace[workspaceId]++
       }
-    }
-
-    notificationList.forEach(notification => {
-      if (notification.workspace && !notification.read) {
-        updateUnreadSpaceListAndMentionCount(notification)
-      } else if (notification.group) {
-        notification.group.forEach(n => {
-          if (n.workspace && !n.read) {
-            updateUnreadSpaceListAndMentionCount(n)
-          }
-        })
-      }
     })
 
-    return unreadMentionCountBySpace
-  }
+    return {
+      spaceHasUnreadNotification,
+      unreadMentionCountBySpace
+    }
+  } */
 
   render () {
     const { props, state } = this

@@ -7,8 +7,8 @@ import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
 import {
   DRAG_AND_DROP,
-  NO_ACTIVE_SPACE_ID,
-  getNotificationList
+  NO_ACTIVE_SPACE_ID
+  // flattenNotificationAndGroupList
 } from '../../util/helper.js'
 import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
@@ -28,7 +28,8 @@ class WorkspaceListItem extends React.Component {
     this.state = {
       showDropdownMenuButton: isMobile,
       dropdownMenuIsActive: isMobile,
-      isUnread: false
+      isUnread: false,
+      mentionCount: 0
     }
   }
 
@@ -37,9 +38,13 @@ class WorkspaceListItem extends React.Component {
   }
 
   componentDidUpdate () {
-    const isUnread = getNotificationList(this.props.notificationPage)
-      .filter(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId)).length > 0
-    this.setState({ isUnread: isUnread })
+    const isUnread = this.props.notificationPage.flattenList.some(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId))
+    const mentionCount = this.props.notificationPage.flattenList.filter(n => n.mention && !n.read && (n.workspace.id === this.props.workspaceId)).length
+
+    if (this.state.isUnread !== isUnread || this.state.mentionCount !== mentionCount) {
+      this.setState({ isUnread: isUnread })
+      this.setState({ mentionCount: mentionCount })
+    }
   }
 
   componentWillUnmount () {
@@ -97,19 +102,22 @@ class WorkspaceListItem extends React.Component {
   handleReadSpaceNotifications = async () => {
     const { props } = this
 
-    const notificationToRead = getNotificationList(props.notificationPage).filter(n => !n.mention && !n.read).map(n => n.id)
-
-    await Promise.all(notificationToRead.map(async (notificationId) => {
-      const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
-      switch (fetchPutNotificationAsRead.status) {
-        case 204: {
-          props.dispatch(readNotification(notificationId))
-          break
-        }
-        default:
-          props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-      }
-    }))
+    await Promise.all(
+      this.props.notificationPage.flattenList
+        .filter(n => !n.mention && !n.read)
+        .map(n => n.id)
+        .map(async (notificationId) => {
+          const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
+          switch (fetchPutNotificationAsRead.status) {
+            case 204: {
+              props.dispatch(readNotification(notificationId))
+              break
+            }
+            default:
+              props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
+          }
+        })
+    )
   }
 
   render () {
@@ -127,8 +135,7 @@ class WorkspaceListItem extends React.Component {
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           },
           {
-            sidebar__content__navigation__item__unread:
-              state.isUnread
+            sidebar__content__navigation__item__unread: state.isUnread
           }
         )}
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
@@ -179,7 +186,7 @@ class WorkspaceListItem extends React.Component {
             >
               {props.label}
             </div>
-            {props.unreadMentionCount > 0 && <div className='sidebar_mention'>{props.unreadMentionCount}</div>}
+            {state.mentionCount > 0 && <div className='sidebar__mention'>{state.mentionCount}</div>}
           </div>
         </Link>
 
@@ -235,7 +242,6 @@ WorkspaceListItem.propTypes = {
   onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
-  unreadMentionCount: PropTypes.number,
   userRoleIdInWorkspace: PropTypes.array,
   workspaceId: PropTypes.number.isRequired
 }
@@ -249,6 +255,5 @@ WorkspaceListItem.defaultProps = {
   onClickAllContent: () => { },
   onClickToggleSidebar: () => {},
   onToggleFoldChildren: () => {},
-  unreadMentionCount: 0,
   userRoleIdInWorkspace: ROLE.reader.id
 }

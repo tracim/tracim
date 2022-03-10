@@ -43,6 +43,16 @@ sidebar-animate-speed = 0.5s
     &.sidebarclose
       width 0
       overflow hidden
+
+  &__mention
+    background-color errorRed
+    border-radius 50%
+    font-size metadataFontSize
+    font-weight bold
+    line-height sideBarCircleSize
+    margin-inline-start standardSpacing
+    min-width sideBarCircleSize
+    text-align center
   &__scrollview
     height 100%
     overflow-y auto
@@ -130,15 +140,6 @@ sidebar-animate-speed = 0.5s
         & .label
           overflow hidden
           text-overflow ellipsis
-        & .sidebar_mention
-          background-color errorRed
-          border-radius 50%
-          font-size metadataFontSize
-          font-weight bold
-          line-height wallCircleSize
-          margin-inline-start standardSpacing
-          min-width wallCircleSize
-          text-align center
       &__current
         padding-inline-start 0
         border-inline-start-style solid
