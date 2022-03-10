@@ -37,8 +37,9 @@ class WorkspaceListItem extends React.Component {
   }
 
   componentDidUpdate () {
-    this.state.isUnread = getNotificationList(this.props.notificationPage)
+    const isUnread = getNotificationList(this.props.notificationPage)
       .filter(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId)).length > 0
+    this.setState({ isUnread: isUnread })
   }
 
   componentWillUnmount () {
@@ -178,7 +179,7 @@ class WorkspaceListItem extends React.Component {
             >
               {props.label}
             </div>
-            {props.unreadMentionCount > 0 && <div class='sidebar_mention'>{props.unreadMentionCount}</div>}
+            {props.unreadMentionCount > 0 && <div className='sidebar_mention'>{props.unreadMentionCount}</div>}
           </div>
         </Link>
 

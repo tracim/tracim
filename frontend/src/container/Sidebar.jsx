@@ -70,7 +70,7 @@ export class Sidebar extends React.Component {
 
   displaySpace = (spaceLevel, spaceList) => {
     const { props, state } = this
-    const unreadMentionCountByWorkspace = this.getMentionBySpace(props.notificationPage.list)
+    const unreadMentionCountBySpace = this.getMentionBySpace(props.notificationPage.list)
 
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
@@ -85,7 +85,7 @@ export class Sidebar extends React.Component {
           onClickAllContent={this.handleClickAllContent}
           onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
-          unreadMentionCount={unreadMentionCountByWorkspace[space.id] || 0}
+          unreadMentionCount={unreadMentionCountBySpace[space.id] || 0}
           userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
           workspaceId={space.id}
         />
@@ -184,35 +184,35 @@ export class Sidebar extends React.Component {
 
   getMentionBySpace = (notificationList) => {
     const unreadSpaceList = []
-    const unreadMentionCountByWorkspace = {}
+    const unreadMentionCountBySpace = {}
 
-    const fillParameters = (notification) => {
+    const updateUnreadSpaceListAndMentionCount = (notification) => {
       const workspaceId = notification.workspace.id
       const [entityType] = notification.type.split('.')
 
       if (!unreadSpaceList.includes(workspaceId)) {
         unreadSpaceList.push(workspaceId)
-        unreadMentionCountByWorkspace[workspaceId] = 0
+        unreadMentionCountBySpace[workspaceId] = 0
       }
 
       if (entityType === TLM_ET.MENTION) {
-        unreadMentionCountByWorkspace[workspaceId]++
+        unreadMentionCountBySpace[workspaceId]++
       }
     }
 
     notificationList.forEach(notification => {
       if (notification.workspace && !notification.read) {
-        fillParameters(notification)
+        updateUnreadSpaceListAndMentionCount(notification)
       } else if (notification.group) {
         notification.group.forEach(n => {
           if (n.workspace && !n.read) {
-            fillParameters(n)
+            updateUnreadSpaceListAndMentionCount(n)
           }
         })
       }
     })
 
-    return unreadMentionCountByWorkspace
+    return unreadMentionCountBySpace
   }
 
   render () {
