@@ -11,7 +11,7 @@ describe('Comment translation', function () {
     cy.createComment(1, 1, 'A beautiful comment')
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: 1, contentId: 1, contentType: 'html-document' }
+      params: { contentId: 1 }
     })
   })
 

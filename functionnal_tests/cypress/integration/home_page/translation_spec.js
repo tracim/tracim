@@ -7,16 +7,19 @@ describe('content :: home_page', function () {
     cy.createRandomUser('administrators').then(user => cy.login(user))
     cy.visitPage({ pageName: PAGES.HOME })
 
-    cy.get('#content').contains('Create a space')
+    cy.contains('#content', 'Create a space')
 
     cy.changeLanguage('fr')
-    cy.get('#content').contains('Créer un espace')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Créer un espace')
 
     cy.changeLanguage('pt')
-    cy.get('#content').contains('Criar um espaço')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Criar um espaço')
 
     cy.changeLanguage('de')
-    cy.get('#content').contains('Einen Bereich schaffen')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Einen Bereich schaffen')
   })
 
   it('should have translations', () => {
@@ -26,15 +29,18 @@ describe('content :: home_page', function () {
     cy.createRandomUser().then(user => cy.login(user))
     cy.visitPage({ pageName: PAGES.HOME })
 
-    cy.get('#content').contains('Welcome to Tracim')
+    cy.contains('#content', 'Welcome to Tracim')
 
     cy.changeLanguage('fr')
-    cy.get('#content').contains('Bienvenue sur Tracim')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Bienvenue sur Tracim')
 
     cy.changeLanguage('pt')
-    cy.get('#content').contains('Bem-vindo ao Tracim')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Bem-vindo ao Tracim')
 
     cy.changeLanguage('de')
-    cy.get('#content').contains('Willkommen bei Tracim')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Willkommen bei Tracim')
   })
 })

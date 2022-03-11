@@ -24,10 +24,7 @@ describe('In File', () => {
 
     beforeEach(function () {
       cy.loginAs('administrators')
-      cy.visitPage({
-        pageName: p.CONTENT_OPEN,
-        params: { workspaceId: workspaceId, contentType: 'file', contentId: contentId }
-      })
+      cy.visitPage({ pageName: p.CONTENT_OPEN, params: { contentId } })
     })
 
     afterEach(function () {
@@ -45,10 +42,10 @@ describe('In File', () => {
         it(`should send a comment with a translated @all mention (${testCase.code})`, () => {
           cy.get('.wsContentGeneric__content__right__content__title').should('be.visible')
           cy.changeLanguage(testCase.code)
+          cy.visitPage({ pageName: p.CONTENT_OPEN, params: { contentId } })
           cy.contains('.wsContentGeneric__content__right__content__title', testCase.timeline)
           cy.get('[data-cy=popin_right_part_properties]').should('be.visible').click()
           cy.get('.fileProperties__content__detail__btndesc').should('be.visible').click()
-          cy.contains('.dropdownlang__dropdown__btnlanguage', testCase.label)
           cy.get('textarea').type(fileDescription)
           cy.get('.fileProperties__content__detail__description__editiondesc__btn__validate').should('not.be.disabled').click()
           cy.get('[data-cy=popin_right_part_timeline]').should('not.be.disabled').click()

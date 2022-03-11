@@ -41,7 +41,7 @@ describe('Create tags', () => {
     it('should create the tag and show it in space settings', () => {
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType: 'file', contentId }
+        params: { contentId }
       })
       cy.get('[data-cy=popin_right_part_tag]').click()
 
@@ -75,7 +75,7 @@ describe('Create tags', () => {
 
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType: 'file', contentId }
+        params: { contentId }
       })
       cy.get('[data-cy=popin_right_part_tag]').click()
 

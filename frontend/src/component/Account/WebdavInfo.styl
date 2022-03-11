@@ -1,8 +1,8 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
-.agendaInfo
+.webdavInfo
   &__header
-    font-weight bold
+    font-size titleFontSize
     margin-bottom standardSpacing
     margin-top standardSpacing
   &__content
@@ -30,20 +30,20 @@
         word-break break-word
 
 @media (max-width: max-xs)
-  .agendaInfo__content
+  .webdavInfo__content
     font-size metadataFontSize
 
 // INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius, border-end-start-radius
 // border-start-start-radius and border-end-end-radius are new and have a global usage below 90% according to
 // https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
-[dir=ltr] .agendaInfo__content__link
+[dir=ltr] .webdavInfo__content__link
   &__icon
     border-top-left-radius standardBorderRadius
     border-bottom-left-radius standardBorderRadius
   &__url
     border-top-right-radius standardBorderRadius
     border-bottom-right-radius standardBorderRadius
-[dir=rtl] .agendaInfo__content__link
+[dir=rtl] .webdavInfo__content__link
   &__icon
     border-top-right-radius standardBorderRadius
     border-bottom-right-radius standardBorderRadius

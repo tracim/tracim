@@ -37,7 +37,7 @@ describe.skip('A comment in advanced edition', () => {
     cy.loginAs('administrators')
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+      params: { contentId: threadId }
     })
     cy.get('.commentArea__advancedtext__btn')
       .should('be.visible')

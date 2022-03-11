@@ -6,7 +6,7 @@ import { isMobile } from 'react-device-detect'
 const DropdownLang = props => {
   const activeLang = props.langList.find(lang => lang.id === props.langActiveId)
   return (
-    <li className='dropdownlang'>
+    <div className='dropdownlang'>
       <DropdownMenu
         buttonIcon='fas fa-globe'
         buttonLabel={activeLang.label}
@@ -28,7 +28,7 @@ const DropdownLang = props => {
           </button>
         )}
       </DropdownMenu>
-    </li>
+    </div>
   )
 }
 export default DropdownLang

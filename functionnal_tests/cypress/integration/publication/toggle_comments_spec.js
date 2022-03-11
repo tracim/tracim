@@ -9,13 +9,13 @@ describe('Publications page', () => {
     cy.setupBaseDB()
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then((workspace) => {
+      cy.changeLanguage('fr')
       cy.visitPage({
         pageName: PAGES.PUBLICATION,
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
     })
-    cy.changeLanguage('fr')
   })
 
   it("should change button's label according to its state", () => {

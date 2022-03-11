@@ -60,7 +60,7 @@ describe('Reactions', function () {
       cy.loginAs('administrators')
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType, contentId },
+        params: { contentId },
         waitForTlm: true
       })
     })
@@ -99,7 +99,7 @@ describe('Reactions', function () {
         cy.loginAs('administrators')
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId, contentType, contentId },
+          params: { contentId },
           waitForTlm: true
         })
         cy.contains('.wsContentGeneric__header__title', contentName)
@@ -120,7 +120,7 @@ describe('Reactions', function () {
       cy.loginAs('administrators')
       cy.visitPage({
         pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType: 'file', contentId: contentIdByType['file'] }
+        params: { contentId: contentIdByType['file'] }
       })
       cy.contains('.wsContentGeneric__header__title', contentName)
       addEmojiReaction(headerClassName, 'grinning', '😀')

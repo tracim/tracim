@@ -1,4 +1,4 @@
-import i18n from './i18n.js'
+import i18n, { getBrowserLang } from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
@@ -102,6 +102,7 @@ import {
 
 import { defaultDebug } from './debug.js'
 
+import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -276,6 +277,7 @@ export {
 } from './translation.js'
 
 export {
+  AgendaInfo,
   appContentFactory,
   DateInput,
   TIMELINE_ITEM_COUNT_PER_PAGE,
@@ -458,5 +460,6 @@ export {
   putRawFileContent,
   postRawFileContent,
   tinymceRemove,
-  Popover
+  Popover,
+  getBrowserLang
 }

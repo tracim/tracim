@@ -517,7 +517,7 @@
   "Spaces membership": "Spaces membership",
   "Uploading…": "Uploading…",
   "You cannot change this member role because there are no other space managers.": "You cannot change this member role because there are no other space managers.",
-  "Share a news...": "Share a news…",
+  "Share a news...": "Share news…",
   "Sunday": "Sunday",
   "Monday": "Monday",
   "Tuesday": "Tuesday",
@@ -546,5 +546,7 @@
   "December": "December",
   "MM/dd/yyyy": "MM/dd/yyyy",
   "Comment_verb": "Comment",
-  "Image": "Image"
+  "Image": "Image",
+  "New language:": "New language:",
+  "Configuration links": ""
 }
