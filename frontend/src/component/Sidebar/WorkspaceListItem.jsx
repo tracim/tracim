@@ -8,7 +8,6 @@ import { DropTarget } from 'react-dnd'
 import {
   DRAG_AND_DROP,
   NO_ACTIVE_SPACE_ID
-  // flattenNotificationAndGroupList
 } from '../../util/helper.js'
 import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'

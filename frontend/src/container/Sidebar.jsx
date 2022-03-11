@@ -11,7 +11,6 @@ import {
   NO_ACTIVE_SPACE_ID,
   TRACIM_APP_VERSION,
   findUserRoleIdInWorkspace,
-  // flattenNotificationAndGroupList,
   getUserProfile,
   unLoggedAllowedPageList,
   workspaceConfig
@@ -71,10 +70,6 @@ export class Sidebar extends React.Component {
 
   displaySpace = (spaceLevel, spaceList) => {
     const { props, state } = this
-    /* const {
-      spaceHasUnreadNotification,
-      unreadMentionCountBySpace
-    } = this.getMentionCountBySpace(props.notificationPage.list) */
 
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
@@ -184,32 +179,6 @@ export class Sidebar extends React.Component {
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
-
-  /* getMentionCountBySpace = (notificationList) => {
-    const spaceHasUnreadNotification = {}
-    const unreadMentionCountBySpace = {}
-
-    const flattenNotificationList = flattenNotificationAndGroupList(notificationList)
-
-    flattenNotificationList.forEach((notification) => {
-      const workspaceId = notification.workspace.id
-      const [entityType] = notification.type.split('.')
-
-      if (spaceHasUnreadNotification[workspaceId] !== undefined) {
-        spaceHasUnreadNotification[workspaceId] = true
-        unreadMentionCountBySpace[workspaceId] = 0
-      }
-
-      if (entityType === TLM_ET.MENTION) {
-        unreadMentionCountBySpace[workspaceId]++
-      }
-    })
-
-    return {
-      spaceHasUnreadNotification,
-      unreadMentionCountBySpace
-    }
-  } */
 
   render () {
     const { props, state } = this
