@@ -10,7 +10,7 @@ assignees: ""
 
 <!-- Explain why we want this feature and describe it. -->
 
-<!-- Add a user case. -->
+<!-- Describe the use cases. -->
 
 ## Prerequisites
 
