@@ -21,6 +21,7 @@ require('./ContentListItem.styl')
 const numberCommentsTitle = (numberComments, t) => {
   if (numberComments === 0) return t('0 comments')
   if (numberComments === 1) return t('{{numberComments}} comment', { numberComments: numberComments })
+  if (numberComments >= 10) return t('{{numberComments}} commentsMoreThanTen', { numberComments: numberComments })
   else return t('{{numberComments}} comments', { numberComments: numberComments })
 }
 

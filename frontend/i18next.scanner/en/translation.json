@@ -548,5 +548,6 @@
   "Comment_verb": "Comment",
   "Image": "Image",
   "New language:": "New language:",
-  "Configuration links": ""
+  "Configuration links": "",
+  "{{numberMembers}} membersMoreThanTen": "{{numberMembers}} members"
 }
