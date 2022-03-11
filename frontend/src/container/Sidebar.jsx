@@ -255,5 +255,5 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ accessibleWorkspaceList, notificationPage, system, user, workspaceList }) => ({ accessibleWorkspaceList, notificationPage, system, user, workspaceList })
+const mapStateToProps = ({ accessibleWorkspaceList, system, user, workspaceList }) => ({ accessibleWorkspaceList, system, user, workspaceList })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))

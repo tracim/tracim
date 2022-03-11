@@ -41,8 +41,10 @@ class WorkspaceListItem extends React.Component {
     const mentionCount = this.props.notificationPage.flattenList.filter(n => n.mention && !n.read && (n.workspace.id === this.props.workspaceId)).length
 
     if (this.state.isUnread !== isUnread || this.state.mentionCount !== mentionCount) {
-      this.setState({ isUnread: isUnread })
-      this.setState({ mentionCount: mentionCount })
+      this.setState({
+        isUnread: isUnread,
+        mentionCount: mentionCount
+      })
     }
   }
 
@@ -101,22 +103,24 @@ class WorkspaceListItem extends React.Component {
   handleReadSpaceNotifications = async () => {
     const { props } = this
 
-    await Promise.all(
-      this.props.notificationPage.flattenList
-        .filter(n => !n.mention && !n.read)
-        .map(n => n.id)
-        .map(async (notificationId) => {
-          const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
-          switch (fetchPutNotificationAsRead.status) {
-            case 204: {
-              props.dispatch(readNotification(notificationId))
-              break
+    if (this.state.isUnread) {
+      await Promise.all(
+        this.props.notificationPage.flattenList
+          .filter(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId))
+          .map(n => n.id)
+          .map(async (notificationId) => {
+            const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
+            switch (fetchPutNotificationAsRead.status) {
+              case 204: {
+                props.dispatch(readNotification(notificationId))
+                break
+              }
+              default:
+                props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
             }
-            default:
-              props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-          }
-        })
-    )
+          })
+      )
+    }
   }
 
   render () {
