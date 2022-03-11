@@ -11,9 +11,16 @@ describe('<Sidebar />', () => {
   const dispatchCallBack = sinon.stub()
 
   const props = {
+    currentWorkspace: { id: 1 },
+    notificationPage: {
+      list: [],
+      hasNextPage: false,
+      nextPageToken: '',
+      unreadMentionCount: 0,
+      unreadNotificationCount: 0
+    },
     user: user,
     workspaceList: workspaceList.workspaceList,
-    currentWorkspace: { id: 1 },
     system: {},
     dispatch: dispatchCallBack,
     match: {

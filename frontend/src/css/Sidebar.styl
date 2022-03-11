@@ -43,6 +43,16 @@ sidebar-animate-speed = 0.5s
     &.sidebarclose
       width 0
       overflow hidden
+
+  &__mention
+    background-color errorRed
+    border-radius 50%
+    font-size metadataFontSize
+    font-weight bold
+    line-height sideBarCircleSize
+    margin-inline-start standardSpacing
+    min-width sideBarCircleSize
+    text-align center
   &__scrollview
     height 100%
     overflow-y auto
@@ -80,6 +90,8 @@ sidebar-animate-speed = 0.5s
       border-bottom 1px solid var(--sidebarColorDarken)
       display flex
       padding-inline-start textSpacing
+      &__unread
+        font-weight bold
       &:hover
         background-color var(--sidebarColorDarken)
       &__withoutChildren
@@ -121,10 +133,13 @@ sidebar-animate-speed = 0.5s
         & .fas
           font-size bigIconSize
       &__name
+        align-items center
+        display inline-flex
         padding standardSpacing
         width 100%
-        overflow hidden
-        text-overflow ellipsis
+        & .label
+          overflow hidden
+          text-overflow ellipsis
       &__current
         padding-inline-start 0
         border-inline-start-style solid
