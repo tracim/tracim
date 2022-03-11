@@ -37,8 +37,12 @@ class WorkspaceListItem extends React.Component {
   }
 
   componentDidUpdate () {
-    const isUnread = this.props.notificationPage.flattenList.some(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId))
-    const mentionCount = this.props.notificationPage.flattenList.filter(n => n.mention && !n.read && (n.workspace.id === this.props.workspaceId)).length
+    const isUnread = this.props.notificationPage.flattenList.some(
+      n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
+    )
+    const mentionCount = this.props.notificationPage.flattenList.filter(
+      n => n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
+    ).length
 
     if (this.state.isUnread !== isUnread || this.state.mentionCount !== mentionCount) {
       this.setState({
@@ -106,7 +110,7 @@ class WorkspaceListItem extends React.Component {
     if (this.state.isUnread) {
       await Promise.all(
         this.props.notificationPage.flattenList
-          .filter(n => !n.mention && !n.read && (n.workspace.id === this.props.workspaceId))
+          .filter(n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId))
           .map(n => n.id)
           .map(async (notificationId) => {
             const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
