@@ -275,7 +275,7 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	buttonCancel: 'الغاء',
 	buttonDelete: 'حذف',
 
-	errCollectionLoad: 'Error: \'unable to save settings\'!', // need trad
+	errCollectionLoad: 'Error: \'unable to save settings\'!',
 	errHttpCommon: "خطأ: /'حفظ الاعدادات غير ممكن/' رمز الخطأ %%",
 	errHttp401: 'غير مسموح به',
 	errHttp403: 'ممنوع',
@@ -1212,7 +1212,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	pholderCompletedOnDate: 'التاريخ',
 	pholderCompletedOnTime: 'الساعة',
 
-	txtStatusFiltersHeaderTODO: 'Filters', // need translation
+	txtStatusFiltersHeaderTODO: 'Filters',
 	txtStatusFiltersFooterTODO: 'أو بعده"%date%""ينتهي يوم',
 	txtStatusNeedsActionTODO: 'بانتظار إجراء',
 	txtStatusCompletedTODO: 'منتهي',
