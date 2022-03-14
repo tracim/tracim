@@ -290,3 +290,14 @@ export const getRevisionTypeLabel = (revisionType, t) => {
 }
 
 export const WELCOME_ELEMENT_ID = 'welcome'
+
+export const computeShortDate = (date, t) => {
+  const msElapsed = Date.now() - new Date(date).getTime()
+  if (msElapsed < 60000) return Math.round(msElapsed / 1000) + ' ' + t('sec')
+  if (msElapsed < 3600000) return Math.round(msElapsed / 60000) + ' ' + t('min')
+  if (msElapsed < 3600000 * 24) return Math.round(msElapsed / 3600000) + ' ' + t('hr')
+  if (msElapsed < 3600000 * 24 * 7) return Math.round(msElapsed / (3600000 * 24)) + ' ' + t('d')
+  if (msElapsed < 3600000 * 24 * 30) return Math.round(msElapsed / (3600000 * 24 * 7)) + ' ' + t('w')
+  if (msElapsed < 3600000 * 24 * 365) return Math.round(msElapsed / (3600000 * 24 * 20)) + ' ' + t('mth')
+  return Math.round(msElapsed / (3600000 * 24 * 365)) + ' ' + t('y')
+}

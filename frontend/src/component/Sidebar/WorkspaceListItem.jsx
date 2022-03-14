@@ -37,10 +37,10 @@ class WorkspaceListItem extends React.Component {
   }
 
   componentDidUpdate () {
-    const isUnread = this.props.notificationPage.flattenList.some(
+    const isUnread = this.props.notificationPage.list.some(
       n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
     )
-    const mentionCount = this.props.notificationPage.flattenList.filter(
+    const mentionCount = this.props.notificationPage.list.filter(
       n => n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
     ).length
 
@@ -109,7 +109,7 @@ class WorkspaceListItem extends React.Component {
 
     if (this.state.isUnread) {
       await Promise.all(
-        this.props.notificationPage.flattenList
+        this.props.notificationPage.list
           .filter(n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId))
           .map(n => n.id)
           .map(async (notificationId) => {

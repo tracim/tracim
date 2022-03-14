@@ -94,7 +94,6 @@ describe('reducer notificationPage.js', () => {
   describe('actions', () => {
     const initialState = {
       list: [],
-      flattenList: [],
       hasNextPage: false,
       nextPageToken: '',
       unreadNotificationCount: 0,
@@ -107,8 +106,7 @@ describe('reducer notificationPage.js', () => {
       it('should return the list of notification from the objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({
           ...initialState,
-          list: [notification],
-          flattenList: [notification]
+          list: [notification]
         })
       })
     })
@@ -121,7 +119,6 @@ describe('reducer notificationPage.js', () => {
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [notification],
-          flattenList: [notification],
           unreadMentionCount: 0,
           unreadNotificationCount: 1
         })
@@ -131,7 +128,6 @@ describe('reducer notificationPage.js', () => {
         expect(listOfMention).to.deep.equal({
           ...initialState,
           list: [mention],
-          flattenList: [mention],
           unreadMentionCount: 1,
           unreadNotificationCount: 1
         })
@@ -144,56 +140,18 @@ describe('reducer notificationPage.js', () => {
       it('should return the list of notification with the notification replaced by the list', () => {
         expect(listOfNotification).to.deep.equal({
           ...initialState,
-          list: [notification, notification],
-          flattenList: [notification, notification]
+          list: [notification, notification]
         })
       })
     })
 
     describe(`${READ}/${NOTIFICATION}`, () => {
       it('should read a notification in a flat list', () => {
-        const initState = { ...initialState, list: [notification], flattenList: [notification], unreadNotificationCount: 1 }
+        const initState = { ...initialState, list: [notification], unreadNotificationCount: 1 }
         const listOfNotification = notificationPage(initState, readNotification(notification.id))
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [{ ...notification, read: true }],
-          flattenList: [{ ...notification, read: true }],
-          unreadNotificationCount: 0
-        })
-      })
-
-      it('should read a notification in a group', () => {
-        const initGroup = {
-          author: [
-            {
-              publicName: globalManagerFromApi.public_name,
-              userId: globalManagerFromApi.user_id,
-              hasAvatar: false,
-              hasCover: false
-            }
-          ],
-          created: '2020-07-23T12:44:50Z',
-          id: 583, // NOTE - MP - 10-03-2022 - Group id must match notification id
-          type: '2.author.workspace',
-          group: [notification]
-        }
-
-        const initState = { ...initialState, list: [initGroup], flattenList: [notification], unreadNotificationCount: 1 }
-        const listOfNotification = notificationPage(initState, readNotification(notification.id))
-
-        expect(listOfNotification).to.deep.equal({
-          ...initState,
-          list: [{
-            ...initGroup,
-            group: [{
-              ...notification,
-              read: true
-            }]
-          }],
-          flattenList: [{
-            ...notification,
-            read: true
-          }],
           unreadNotificationCount: 0
         })
       })
@@ -205,29 +163,29 @@ describe('reducer notificationPage.js', () => {
         content: { label: 'test', id: 5 }
       }
       const listOfNotification = notificationPage(
-        { ...initialState, list: [notificationWithContent], flattenList: [notificationWithContent], unreadNotificationCount: 1 },
+        { ...initialState, list: [notificationWithContent], unreadNotificationCount: 1 },
         readContentNotification(5)
       )
 
       it('should return the list of objects with read set as true and counts as 0', () => {
         expect(listOfNotification).to.deep.equal(
-          { ...initialState, list: [{ ...notificationWithContent, read: true }], flattenList: [{ ...notificationWithContent, read: true }], unreadNotificationCount: 0 })
+          { ...initialState, list: [{ ...notificationWithContent, read: true }], unreadNotificationCount: 0 })
       })
     })
 
     describe(`${READ}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], flattenList: [notification], unreadNotificationCount: 1 }, readNotificationList())
+      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotificationList())
 
       it('should return the list of objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], flattenList: [{ ...notification, read: true }], unreadNotificationCount: 0 })
+        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
       })
     })
 
     describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], flattenList: [notification] }, appendNotificationList([{ ...TLM, event_id: 999 }]))
+      const listOfNotification = notificationPage({ ...initialState, list: [notification] }, appendNotificationList([{ ...TLM, event_id: 999 }]))
 
       it('should return the list of notifications appended with the list passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, { ...notification, id: 999 }], flattenList: [notification, { ...notification, id: 999 }] })
+        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, { ...notification, id: 999 }] })
       })
     })
 
