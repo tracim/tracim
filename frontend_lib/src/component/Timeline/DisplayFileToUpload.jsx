@@ -28,7 +28,19 @@ export class DisplayFileToUpload extends React.Component {
 
   render () {
     const { props, state } = this
-    if (props.fileList.length === 0) return null
+    const fileLengthString = () => {
+      let fileString
+      if (props.fileList.length === 0) return null
+      if (props.fileList.length === 1) {
+        fileString = props.t('1 file selected')
+      } else if (props.fileList.length > 10) {
+        fileString = props.t('{{numberOfFile}} filesMoreThanTen selected', { numberOfFile: props.fileList.length })
+      } else {
+        fileString = props.t('{{numberOfFile}} files selected', { numberOfFile: props.fileList.length })
+      }
+      return fileString
+    }
+
     return (
       <div className='DisplayFileToUpload'>
         <div
@@ -42,11 +54,7 @@ export class DisplayFileToUpload extends React.Component {
             title={props.t('See files')}
           />
           <div className='DisplayFileToUpload__message__text'>
-            {(
-              props.fileList.length === 1
-                ? props.t('1 file selected')
-                : props.t('{{numberOfFile}} files selected', { numberOfFile: props.fileList.length })
-            )}
+            {fileLengthString()}
           </div>
           <Icon
             icon='fas fa-th-list'
