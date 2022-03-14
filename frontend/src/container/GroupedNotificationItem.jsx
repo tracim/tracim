@@ -39,7 +39,11 @@ function getGroupedNotificationDetails (props, notification) {
     } else if (notification.author.length === 2) {
       escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${t('and')} ${escapeHtml(notification.author[1].publicName)}`
     } else {
-      escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${t('and {{numberOfAuthors}} other people', { numberOfAuthors: notification.author.length - 1 })}`
+      if (notification.author.length > 10) {
+        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${t('and {{numberOfAuthors}} other peopleMoreThanTen', { numberOfAuthors: notification.author.length - 1 })}`
+      } else {
+        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${t('and {{numberOfAuthors}} other people', { numberOfAuthors: notification.author.length - 1 })}`
+      }
     }
   }
 

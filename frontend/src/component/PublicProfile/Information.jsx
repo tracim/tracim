@@ -6,6 +6,25 @@ import CustomFormManager from './CustomFormManager.jsx'
 require('./Information.styl')
 
 export const Information = props => {
+  const getInterventionString = () => {
+    let interventionString
+
+    if (props.authoredContentRevisionsCount === 0 || props.authoredContentRevisionsCount === 1) {
+      interventionString = props.t('{{ count }} intervention ', { count: props.authoredContentRevisionsCount })
+    } else if (props.authoredContentRevisionsCount > 10) {
+      interventionString = props.t('{{ count }} interventionMoreThanTen ', { count: props.authoredContentRevisionsCount })
+    } else {
+      interventionString = props.t('{{ count }} intervention _plural', { count: props.authoredContentRevisionsCount })
+    }
+    return interventionString
+  }
+
+  const getSpaceString = () => {
+    return props.authoredContentRevisionsSpaceCount > 1
+      ? props.t('in {{ count }} space_plural', { count: props.authoredContentRevisionsSpaceCount })
+      : props.t('in {{ count }} space', { count: props.authoredContentRevisionsSpaceCount })
+  }
+
   return (
     <div className='Information__dynamicData'>
       <CustomFormManager
@@ -28,8 +47,8 @@ export const Information = props => {
           </div>
         </div>
         <div>
-          {props.t('{{ count }} intervention ', { count: props.authoredContentRevisionsCount })}
-          {props.t('in {{ count }} space', { count: props.authoredContentRevisionsSpaceCount })}
+          {getInterventionString()}
+          {getSpaceString()}
         </div>
       </div>
     </div>
