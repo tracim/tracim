@@ -554,6 +554,6 @@
   "and {{numberOfAuthors}} other peopleMoreThanTen": "and {{numberOfAuthors}} other peopleMoreThanTen",
   "{{ count }} interventionMoreThanTen ": "{{ count }} interventionMoreThanTen ",
   "{{ count }} interventionMoreThanTen _plural": "{{ count }} interventionMoreThanTen ",
-  "{{ count }} intervention _plural_plural": "{{ count }} intervention _plural",
-  "in {{ count }} space_plural_plural": "in {{ count }} space_plural"
+  "in {{ count }} spaceMoreThanTen": "in {{ count }} spaceMoreThanTen",
+  "in {{ count }} spaceMoreThanTen_plural": "in {{ count }} spaceMoreThanTen"
 }

@@ -561,6 +561,5 @@
   "{{numberComments}} commentsMoreThanTen": "",
   "and {{numberOfAuthors}} other peopleMoreThanTen": "",
   "{{ count }} interventionMoreThanTen ": "",
-  "{{ count }} intervention _plural": "",
-  "in {{ count }} space_plural": ""
+  "in {{ count }} spaceMoreThanTen": ""
 }

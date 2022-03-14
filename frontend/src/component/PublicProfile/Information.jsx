@@ -9,19 +9,17 @@ export const Information = props => {
   const getInterventionString = () => {
     let interventionString
 
-    if (props.authoredContentRevisionsCount === 0 || props.authoredContentRevisionsCount === 1) {
-      interventionString = props.t('{{ count }} intervention ', { count: props.authoredContentRevisionsCount })
-    } else if (props.authoredContentRevisionsCount > 10) {
+    if (props.authoredContentRevisionsCount > 10) {
       interventionString = props.t('{{ count }} interventionMoreThanTen ', { count: props.authoredContentRevisionsCount })
     } else {
-      interventionString = props.t('{{ count }} intervention _plural', { count: props.authoredContentRevisionsCount })
+      interventionString = props.t('{{ count }} intervention ', { count: props.authoredContentRevisionsCount })
     }
     return interventionString
   }
 
   const getSpaceString = () => {
-    return props.authoredContentRevisionsSpaceCount > 1
-      ? props.t('in {{ count }} space_plural', { count: props.authoredContentRevisionsSpaceCount })
+    return props.authoredContentRevisionsSpaceCount > 10
+      ? props.t('in {{ count }} spaceMoreThanTen', { count: props.authoredContentRevisionsSpaceCount })
       : props.t('in {{ count }} space', { count: props.authoredContentRevisionsSpaceCount })
   }
 
