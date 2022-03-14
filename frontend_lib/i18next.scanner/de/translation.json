@@ -217,5 +217,7 @@
   "This content has no associated tags yet.": "Dieser Inhalt hat noch keine zugehörigen Markierungen.",
   "This space has no tags yet.": "Dieser Bereich hat noch keine Markierungen.",
   "See more": "Mehr sehen",
-  "Error while loading timeline": "Fehler beim Laden der Zeitleiste"
+  "Error while loading timeline": "Fehler beim Laden der Zeitleiste",
+  "Agenda": "",
+  "{{numberOfFile}} filesMoreThanTen selected": ""
 }

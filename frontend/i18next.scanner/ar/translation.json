@@ -557,5 +557,10 @@
   "Comment_verb": "تعليق",
   "Image": "صورة",
   "New language:": "لغة جديدة:",
-  "{{numberMembers}} membersMoreThanTen": ""
+  "{{numberMembers}} membersMoreThanTen": "",
+  "{{numberComments}} commentsMoreThanTen": "",
+  "and {{numberOfAuthors}} other peopleMoreThanTen": "",
+  "{{ count }} interventionMoreThanTen ": "",
+  "{{ count }} intervention _plural": "",
+  "in {{ count }} space_plural": ""
 }

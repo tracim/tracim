@@ -217,5 +217,7 @@
   "Your tag has been added": "Your tag has been added",
   "Your tag has been created": "Your tag has been created",
   "See more": "See more",
-  "Error while loading timeline": "Error while loading timeline"
+  "Error while loading timeline": "Error while loading timeline",
+  "Agenda": "Agenda",
+  "{{numberOfFile}} filesMoreThanTen selected": "{{numberOfFile}} filesMoreThanTen selected"
 }

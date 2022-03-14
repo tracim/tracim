@@ -217,5 +217,7 @@
   "Your tag has been added": "A sua etiqueta foi adicionada",
   "Your tag has been created": "A sua etiqueta foi criada",
   "See more": "Ver mais",
-  "Error while loading timeline": "Erro ao carregar a linha cronológica"
+  "Error while loading timeline": "Erro ao carregar a linha cronológica",
+  "Agenda": "",
+  "{{numberOfFile}} filesMoreThanTen selected": ""
 }

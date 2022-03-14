@@ -217,5 +217,7 @@
   "Error while detecting the links": "خطأ أثناء التعرف على الروابط",
   "Translation is not available": "الترجمة غير متاحة",
   "Unknown error": "خطأ غير معروف",
-  "Error while translating the document: {{details}}": "خطأ أثناء ترجمة الوثيقة:{{details}}"
+  "Error while translating the document: {{details}}": "خطأ أثناء ترجمة الوثيقة:{{details}}",
+  "Agenda": "",
+  "{{numberOfFile}} filesMoreThanTen selected": ""
 }

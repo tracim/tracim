@@ -217,5 +217,7 @@
   "Your tag has been added": "Votre étiquette a été ajoutée",
   "Your tag has been created": "Votre étiquette a été créée",
   "See more": "Voir plus",
-  "Error while loading timeline": "Erreur lors du chargement de l'historique"
+  "Error while loading timeline": "Erreur lors du chargement de l'historique",
+  "Agenda": "",
+  "{{numberOfFile}} filesMoreThanTen selected": ""
 }

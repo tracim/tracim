@@ -549,5 +549,11 @@
   "Image": "Image",
   "New language:": "New language:",
   "Configuration links": "",
-  "{{numberMembers}} membersMoreThanTen": "{{numberMembers}} members"
+  "{{numberMembers}} membersMoreThanTen": "{{numberMembers}} members",
+  "{{numberComments}} commentsMoreThanTen": "{{numberComments}} commentsMoreThanTen",
+  "and {{numberOfAuthors}} other peopleMoreThanTen": "and {{numberOfAuthors}} other peopleMoreThanTen",
+  "{{ count }} interventionMoreThanTen ": "{{ count }} interventionMoreThanTen ",
+  "{{ count }} interventionMoreThanTen _plural": "{{ count }} interventionMoreThanTen ",
+  "{{ count }} intervention _plural_plural": "{{ count }} intervention _plural",
+  "in {{ count }} space_plural_plural": "in {{ count }} space_plural"
 }
