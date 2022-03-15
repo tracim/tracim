@@ -1266,10 +1266,10 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	from: 'من',
 	to: 'الى',
 
-	pholderDateFrom: 'Date from',
-	pholderTimeFrom: 'Time from',
-	pholderDateTo: 'Date to',
-	pholderTimeTo: 'Time to',
+	pholderDateFrom: 'تاريخ البداية',
+	pholderTimeFrom: 'ساعة البداية',
+	pholderDateTo: 'تاريخ النهاية',
+	pholderTimeTo: 'ساعة النهاية',
 
 	txtStatusNone: 'غير مخصص',
 	txtStatusTentative: 'محاولة',
