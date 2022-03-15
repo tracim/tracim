@@ -275,7 +275,7 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	buttonCancel: 'الغاء',
 	buttonDelete: 'حذف',
 
-	errCollectionLoad: 'Error: \'unable to save settings\'!',
+	errCollectionLoad: 'خطأ: '\حفظ الإعدادات غير ممكن\'!',
 	errHttpCommon: "خطأ: /'حفظ الاعدادات غير ممكن/' رمز الخطأ %%",
 	errHttp401: 'غير مسموح به',
 	errHttp403: 'ممنوع',
