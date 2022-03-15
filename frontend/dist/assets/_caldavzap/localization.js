@@ -1338,7 +1338,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	buttonDuplicate: 'مضاعفة',
 
 	txtAllSavedTodo: 'نجاح: تم تسجيل المهمة!',
-	txtAllSaved: 'نجاح: تم تسجيل المناسبة',
+	txtAllSaved: 'جاح: تم تسجيل المناسبة!',
 
 	txtAllDeletedTodo: 'نجاح: تم حذف المهمة',
 	txtAllDeleted: 'نجاح: تم حذف المناسبة',
