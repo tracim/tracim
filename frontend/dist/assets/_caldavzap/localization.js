@@ -1244,10 +1244,10 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	pholderNoteTODO: 'ملاحظة',
 	txtNoteTODO: 'ملاحظة',
 
-	todoPrevNav: 'Show previous instance',
-	todoNextNav: 'Show next instance',
-	todoUncompletedPrevNav: 'Show previous uncompleted instance',
-	todoUncompletedNextNav: 'Show next uncompleted instance',
+	todoPrevNav: 'عرض المنصّة السابقة',
+	todoNextNav: 'عرض المنصّة الموالية',
+	todoUncompletedPrevNav: 'عرض المنصّة السابقة غير المكتملة',
+	todoUncompletedNextNav: 'عرض المنصّة الموالية غير المكتملة',
 
 	buttonSaveTODO: 'حفظ',
 	buttonEditTODO: 'تعديل',
