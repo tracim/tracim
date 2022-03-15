@@ -26,11 +26,7 @@ describe('Create tags', () => {
           cy.loginAs('administrators')
 
           cy.fixture('baseWorkspace').as('workspace').then(({ workspace_id: workspaceId }) => {
-            cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
-            cy.contains('.userstatus__role__text', 'Space manager')
-            cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })
-              .find('.dashboard__workspace__detail__buttons .iconbutton')
-              .click()
+            cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
             cy.get('[data-cy=popin_right_part_tag')
               .should('be.visible')
               .click()
@@ -65,9 +61,7 @@ describe('Create tags', () => {
                   params: { contentId }
                 })
                 cy.contains('.html-document__contentpage__edition__header__title', 'A note')
-                cy.waitForTinyMCELoaded()
-                  .then(() => cy.typeInTinyMCE('Bar'))
-                cy.get('[data-cy=editionmode__button__submit]').should('be.visible').click()
+                cy.get('.html-document__editionmode__cancel').should('be.visible').click()
                 cy.get('[data-cy=popin_right_part_tag]').should('be.visible').click()
               })
             }
