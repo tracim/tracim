@@ -29,7 +29,14 @@ const wrapMentionsFromText = (text, doc, invalidMentionList) => {
   // INFO - GB - 2022-02-28 - takes a text as string, and returns a document fragment
   // containing this text, with tags added for the mentions
   // The second RegEx support arabic group mention
-  const match = text.match(MENTION_REGEX) || text.match(/@(الكل)(?=\s|$)/)
+  const matchMention = text.match(MENTION_REGEX)
+  const matchArabic = text.match(/@(الكل)(?=\s|$)/)
+  let match
+
+  if (matchArabic && matchMention) {
+    match = matchArabic.index < matchMention.index ? matchArabic : matchMention
+  } else match = matchArabic || matchMention
+
   if (!match || (match.index > 0 && (text[match.index - 1].trim()))) {
     return doc.createTextNode(text)
   }
