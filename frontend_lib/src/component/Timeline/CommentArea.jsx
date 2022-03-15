@@ -285,14 +285,14 @@ export class CommentArea extends React.Component {
     const invalidMentionList = props.invalidMentionList || []
 
     const style = {
-      transform: 'translateY(-100%)',
+      transform: props.bottomAutocomplete ? 'none' : 'translateY(-100%)',
       position: 'absolute',
       ...(props.wysiwyg && {
         top: state.tinymcePosition.isFullscreen && state.tinymcePosition.isSelectionToTheTop
           ? state.tinymcePosition.bottom
           : state.tinymcePosition.top,
         position: state.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
-        transform: state.tinymcePosition.isFullscreen && state.tinymcePosition.isSelectionToTheTop
+        transform: (state.tinymcePosition.isFullscreen || props.bottomAutocomplete) && state.tinymcePosition.isSelectionToTheTop
           ? 'none'
           : 'translateY(-100%)',
         zIndex: state.tinymcePosition.isFullscreen ? 1061 : 20

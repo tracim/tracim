@@ -544,6 +544,7 @@ export class Publications extends React.Component {
           <div className='publishAreaContainer'>
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
+              bottomAutocomplete
               buttonLabel={props.t('Publish')}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
