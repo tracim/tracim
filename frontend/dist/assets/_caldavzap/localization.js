@@ -257,7 +257,7 @@ var localizationShared = new Object();
 localizationShared['ar']=	/* Thanks Myriam Rabhi */
 {
 	_name_: 'العربية',
-	_default_datepicker_format_: 'يوم/شهر/سنة',
+	_default_datepicker_format_: 'dd/mm/yyyy',
 	_default_AMPM_format_: false,
 
 	altLogo: 'شعار',
