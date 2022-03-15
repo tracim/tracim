@@ -1331,8 +1331,8 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 
 	pholderNote: 'ملاحظة',
 
-	eventPrevNav: 'Show previous instance',
-	eventNextNav: 'Show next instance',
+	eventPrevNav: 'عرض المنصّة السابقة',
+	eventNextNav: 'عرض المنصّة الموالية',
 
 	buttonClose: 'غلق',
 	buttonDuplicate: 'مضاعفة',
