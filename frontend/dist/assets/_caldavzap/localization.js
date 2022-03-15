@@ -285,7 +285,7 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	errHttp500: 'خطأ داخلي في الخادم',
 	errHttp501: 'غير مطبق',
 
-	unsupportedBrowser: 'ملاحظة : لا يمكن تحمل المتصفح الذي تستعمله',
+	unsupportedBrowser: 'ملاحظة: لا يمكن تحمل المتصفح الذي تستخدمه!',
 	updateNotification: 'متوفر (أنت الآن في نسخة %curr_ver%) - %url'
 };
 
