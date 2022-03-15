@@ -22,4 +22,4 @@ If the translation you want to add is a caldav file (named `frontend_lib/caldav_
       - localizationShared[`{language code}`]
       - localizationSharedCalDAV[`{language code}`]
       - localizationCalDAV[`{language code}`]
-    - For each object add the good keys and translations, with escape characters and without simple quotes for true/false values (e.g. `_default_AMPM_format_` key)
+    - Add the right keys and translations in each object. Don't forget to escape special characters and do not quote `true`/`false` values (e.g. `_default_AMPM_format_` key).
