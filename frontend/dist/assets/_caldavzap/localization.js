@@ -823,7 +823,7 @@ localizationSharedCalDAV['ar']=	/* Thanks Myriam Rabhi */
 	txtTodos: 'مهام',
 	localTime: 'التوقيت المحلي',
 	fullCalendarMonth: 'الشهر',
-	fullCalendarMultiWeek: 'mweek',
+	fullCalendarMultiWeek: 'متعدد الأسابيع',
 	fullCalendarAgendaWeek: 'الأسبوع',
 	fullCalendarAgendaDay: 'اليوم',
 
