@@ -1340,19 +1340,19 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtAllSavedTodo: 'نجاح: تم تسجيل المهمة!',
 	txtAllSaved: 'جاح: تم تسجيل المناسبة!',
 
-	txtAllDeletedTodo: 'نجاح: تم حذف المهمة',
-	txtAllDeleted: 'نجاح: تم حذف المناسبة',
+	txtAllDeletedTodo: 'نجاح: تم حذف المهمة!',
+	txtAllDeleted: 'نجاح: تم حذف المناسبة!',
 
-	txtNotChooseTodo: 'Error: Have to choose calendar!',
-	txtNotChoose: 'Error: Have to choose calendar!',
+	txtNotChooseTodo: 'خطأ: يجب اختيار رزنامة!',
+	txtNotChoose: 'خطأ: يجب اختيار رزنامة!',
 
-	txtErrorDates: 'خطأ: تاريخ البداية يجب أن يسبق تاريخ النهاية',
-	txtErrorDatesTodo: 'Error: Start date must precede the end date!',
+	txtErrorDates: 'خطأ: تاريخ البداية يجب أن يسبق تاريخ النهاية!',
+	txtErrorDatesTodo: 'خطأ: تاريخ البداية يجب أن يسبق تاريخ النهاية!',
 
-	txtErorInputTodo: 'التسجيل غير ممكن : الرجاء تصحيح القيم غير الصحيحة',
+	txtErorInputTodo: 'التسجيل غير ممكن: الرجاء تصحيح القيم غير الصحيحة!',
 	txtDateTimeErrorTodo: 'يجب اختيار تاريخ و ساعة!',
 
-	txtErorInput: "خطأ : /التسجيل غير ممكن/' الرجاء تصحيح القيم المبرزة",
+	txtErorInput: "خطأ: /التسجيل غير ممكن'\ : الرجاء تصحيح القيم المبرزة!",
 
 	txtAlertsH: 'اخطارات',
 	buttonAlert: 'إزالة الاخطارات',
