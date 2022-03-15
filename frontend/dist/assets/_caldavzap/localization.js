@@ -1220,7 +1220,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtStatusCancelledTODO: 'ملغى',
 	txtPercentCompletedTODO: 'منتهي',
 
-	txtCalendarTODO: 'Calendar',
+	txtCalendarTODO: 'رزنامة',
 	txtSelectCalendarTODO: 'اختيار رزنامة',
 	txtAlertTODO: 'إخطار',
 	txtAlertNoneTODO: 'ا شيء',
