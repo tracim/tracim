@@ -1360,14 +1360,14 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	altAddEvent: 'اضافة مناسبة',
 	altAddTodo: 'اضافة مهمة',
 
-	loadingCalendars: 'Loading calendars (%act% of %total%) ...',
-	unloadingCalendars: 'Unloading calendars ...',
+	loadingCalendars: 'تحميل الرزنامات )%إجراء% من %مجموع%(',
+	unloadingCalendars: 'إلغاء تحميل الرزنامات...',
 
-	errUnableSaveBeginCalDAV: "خطأ: /'تسجيل المناسبة غير ممكن/' %% !",
-	errUnableDeleteBeginCalDAV: "خطأ : /حذف المناسبة غير ممكن/' %% !",
-	CalDAVerrHttp410: 'المناسبة غير موجودة على الخادم',
-	errUnableSaveTodoBeginCalDAV: "خطأ : /'حفظ المهمة غير ممكن/' : %% !",
-	errUnableDeleteTodoBeginCalDAV: "خطأ : /'حذف المهمة غير ممكن/'%% !",
+	errUnableSaveBeginCalDAV: "خطأ: '\تسجيل المناسبة غير ممكن\'%%!",
+	errUnableDeleteBeginCalDAV: "خطأ: '\حذف المناسبة غير ممكن/ :%%!",
+	CalDAVerrHttp410: 'المناسبة لم تعد موجودة على الخادم',
+	errUnableSaveTodoBeginCalDAV: "خطأ: '\حفظ المهمة غير ممكن\' :%%!",
+	errUnableDeleteTodoBeginCalDAV: "خطأ: '\حذف المهمة غير ممكن\' :%%!",
 	CalDAVerrTodoHttp410: 'المهمة لم تعد متوفرة على الخادم'
 };
 
