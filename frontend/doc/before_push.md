@@ -12,7 +12,7 @@ Run the translation generation script and if you want to contribute to the keys 
 
     yarn run build:translation
 
-If the translation you want to add is in the `frontend_lib/caldav_translation/{language code}/translation.json`, in addition to translating on the Weblate platform is required:
+If the translation you want to add is a caldav file (named `frontend_lib/caldav_translation/{language code}/translation.json`), in addition to translating on the Weblate platform you will have to modify `frontend_lib/dist/assets/_caldavzap/localization.js`:
 
   - If the language already exists
     - and the key also exists, update the string at `frontend_lib/dist/assets/_caldavzap/localization.js` to the json file version escaping special characters (e.g. `'` => `\'`)
