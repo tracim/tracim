@@ -1212,7 +1212,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	pholderCompletedOnDate: 'التاريخ',
 	pholderCompletedOnTime: 'الساعة',
 
-	txtStatusFiltersHeaderTODO: 'Filters',
+	txtStatusFiltersHeaderTODO: 'فلاتر',
 	txtStatusFiltersFooterTODO: 'أو بعده"%date%""ينتهي يوم',
 	txtStatusNeedsActionTODO: 'بانتظار إجراء',
 	txtStatusCompletedTODO: 'منتهي',
