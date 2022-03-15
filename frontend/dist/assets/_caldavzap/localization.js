@@ -1308,8 +1308,8 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtRepeatCustomYearLabel2: 'من',
 
 	txtRepeatEnd: 'نهاية',
-	txtEventCalendar: 'Calendar',
-	txtSelectCalendar: 'Select a calendar',
+	txtEventCalendar: 'رزنامة',
+	txtSelectCalendar: 'اختيار رزنامة',
 	txtAlert: 'إخطار',
 	txtAlertNone: 'ا شيء',
 	txtAlertMessage: 'رسالة',
