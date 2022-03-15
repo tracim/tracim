@@ -1134,7 +1134,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	_default_column_format_agenda_: 'ddd, MMM d',
 
 	txtCalendar: 'رزنامة',
-	txtEnabledCalendars: 'Enabled Calendars',
+	txtEnabledCalendars: 'تفعيل الرزنامات',
 	txtTodo: 'للقيام به',
 	txtTodoList: 'قائمة المهام',
 	txtTodoLists: 'قائمات المهام',
