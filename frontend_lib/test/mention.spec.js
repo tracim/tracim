@@ -41,6 +41,19 @@ describe('mentions on mentionOrLink.js', () => {
           )
         })
 
+        describe('with the Arabic group mention at the middle of a sentence', () => {
+          const docBody = getWrappedDocument('This is a text with a mention @الكل that should be wrapped')
+          const addedSpanList = docBody.getElementsByTagName('span')
+          const addedSpanListId = addedSpanList[0].id
+
+          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
+          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@الكل'))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
+          it('should have the span id with a non-empty uuid', () => expect(
+            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
+          )
+        })
+
         describe('with the mention at the beginning of a sentence', () => {
           const docBody = getWrappedDocument('@admin')
           const addedSpanList = docBody.getElementsByTagName('span')
@@ -48,6 +61,19 @@ describe('mentions on mentionOrLink.js', () => {
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
           it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
+          it('should have the span id with a non-empty uuid', () => expect(
+            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
+          )
+        })
+
+        describe('with the Arabic group mention at the beginning of a sentence', () => {
+          const docBody = getWrappedDocument('@الكل')
+          const addedSpanList = docBody.getElementsByTagName('span')
+          const addedSpanListId = addedSpanList[0].id
+
+          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
+          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@الكل'))
           it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
           it('should have the span id with a non-empty uuid', () => expect(
             addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
@@ -69,6 +95,19 @@ describe('mentions on mentionOrLink.js', () => {
           )
         })
 
+        describe('with the Arabic group mention at the middle of a sentence', () => {
+          const docBody = getWrappedDocument('<div class="someClass">"This is a text with <p>a mention @الكل that</p> should be wrapped"</div>')
+          const addedSpanList = docBody.getElementsByTagName('span')
+          const addedSpanListId = addedSpanList[0].id
+
+          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
+          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@الكل'))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
+          it('should have the span id with a non-empty uuid', () => expect(
+            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
+          )
+        })
+
         describe('with the mention at the beginning of a sentence', () => {
           const docBody = getWrappedDocument('<div class="someClass">@admin is a <p>mention</p> that should be wrapped"</div>')
           const addedSpanList = docBody.getElementsByTagName('span')
@@ -76,6 +115,19 @@ describe('mentions on mentionOrLink.js', () => {
 
           it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
           it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@admin'))
+          it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
+          it('should have the span id with a non-empty uuid', () => expect(
+            addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
+          )
+        })
+
+        describe('with the mention at the beginning of a sentence', () => {
+          const docBody = getWrappedDocument('<div class="someClass">@الكل is a <p>mention</p> that should be wrapped"</div>')
+          const addedSpanList = docBody.getElementsByTagName('span')
+          const addedSpanListId = addedSpanList[0].id
+
+          it('should only have one span tag', () => expect(addedSpanList).to.have.lengthOf(1))
+          it('should contain the username in the span tag', () => expect(addedSpanList[0].textContent).to.equal('@الكل'))
           it(`should have the span id starting with "${MENTION_ID_PREFIX}"`, () => expect(addedSpanListId.startsWith(MENTION_ID_PREFIX)).to.equal(true))
           it('should have the span id with a non-empty uuid', () => expect(
             addedSpanListId.substring(addedSpanListId.lastIndexOf('-') + 1)).to.not.equal('')
@@ -102,6 +154,23 @@ describe('mentions on mentionOrLink.js', () => {
         })
       })
 
+      describe('with source as simple text an one Arabic group mention', () => {
+        const docBody = getWrappedDocument('This is a text @user1 with 3 mention @admin that should be @الكل wrapped')
+        const addedSpanList = docBody.getElementsByTagName('span')
+
+        it('should have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
+        it('should contain the username in each span tag', () => {
+          expect(addedSpanList[0].textContent).to.equal('@user1')
+          expect(addedSpanList[1].textContent).to.equal('@admin')
+          expect(addedSpanList[2].textContent).to.equal('@الكل')
+        })
+        it(`should have each span id starting with "${MENTION_ID_PREFIX}"`, () => {
+          expect(addedSpanList[0].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[1].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[2].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+        })
+      })
+
       describe('with source as HTML text', () => {
         const docBody = getWrappedDocument('<div class="someClass">"This is @user1 a text with <p>a mention @admin that</p> should be @user2 wrapped"</div>')
         const addedSpanList = docBody.getElementsByTagName('span')
@@ -111,6 +180,23 @@ describe('mentions on mentionOrLink.js', () => {
           expect(addedSpanList[0].textContent).to.equal('@user1')
           expect(addedSpanList[1].textContent).to.equal('@admin')
           expect(addedSpanList[2].textContent).to.equal('@user2')
+        })
+        it(`should have each span id starting with "${MENTION_ID_PREFIX}"`, () => {
+          expect(addedSpanList[0].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[1].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+          expect(addedSpanList[2].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
+        })
+      })
+
+      describe('with source as HTML text an one Arabic group mention', () => {
+        const docBody = getWrappedDocument('<div class="someClass">"This is @الكل a text with <p>a mention @admin that</p> should be @user1 wrapped"</div>')
+        const addedSpanList = docBody.getElementsByTagName('span')
+
+        it('should only have 3 span tags', () => expect(addedSpanList).to.have.lengthOf(3))
+        it('should contain the username in the span tag', () => {
+          expect(addedSpanList[0].textContent).to.equal('@الكل')
+          expect(addedSpanList[1].textContent).to.equal('@admin')
+          expect(addedSpanList[2].textContent).to.equal('@user1')
         })
         it(`should have each span id starting with "${MENTION_ID_PREFIX}"`, () => {
           expect(addedSpanList[0].id.startsWith(MENTION_ID_PREFIX)).to.equal(true)
@@ -135,7 +221,7 @@ describe('mentions on mentionOrLink.js', () => {
 
     it('should not add text between mentions', () => {
       expect(getWrappedDocument('@mention').textContent).to.equal('@mention')
-      expect(getWrappedDocument('@all @all @bob @claudine').textContent).to.equal('@all @all @bob @claudine')
+      expect(getWrappedDocument('@all @all @bob @الكل @claudine').textContent).to.equal('@all @all @bob @الكل @claudine')
     })
 
     it('should not wrap invalid mentions', () => {
