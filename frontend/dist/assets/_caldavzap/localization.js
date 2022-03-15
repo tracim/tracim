@@ -27,7 +27,7 @@ localization['ar']=	/* thanks Myriam Rabhi */
 	txtResources: 'الموارد',
 	txtNote: 'ملاحظة',
 
-	errUnableSync: "خطأ : /مزامنة المورد غير ممكنة/' : حاول مجددا لاحقا!",
+	errUnableSync: "خطأ : /مزامنة المورد غير ممكنة\' : حاول مجددا لاحقا!",
 
 	loadingResources: ')%فعل%على%مجموع%"تحميل الموارد (',
 
@@ -275,8 +275,8 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	buttonCancel: 'الغاء',
 	buttonDelete: 'حذف',
 
-	errCollectionLoad: 'خطأ: '\حفظ الإعدادات غير ممكن\'!',
-	errHttpCommon: "خطأ: /'حفظ الاعدادات غير ممكن/' رمز الخطأ %%",
+	errCollectionLoad: 'خطأ: \'حفظ الإعدادات غير ممكن\'!',
+	errHttpCommon: "خطأ: \'حفظ الاعدادات غير ممكن\' رمز الخطأ %%",
 	errHttp401: 'غير مسموح به',
 	errHttp403: 'ممنوع',
 	errHttp405: 'طريقة غير مسموح بها',
@@ -1352,7 +1352,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtErorInputTodo: 'التسجيل غير ممكن: الرجاء تصحيح القيم غير الصحيحة!',
 	txtDateTimeErrorTodo: 'يجب اختيار تاريخ و ساعة!',
 
-	txtErorInput: "خطأ: /التسجيل غير ممكن'\ : الرجاء تصحيح القيم المبرزة!",
+	txtErorInput: "خطأ: \'التسجيل غير ممكن\' : الرجاء تصحيح القيم المبرزة!",
 
 	txtAlertsH: 'اخطارات',
 	buttonAlert: 'إزالة الاخطارات',
@@ -1363,11 +1363,11 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	loadingCalendars: 'تحميل الرزنامات )%إجراء% من %مجموع%(',
 	unloadingCalendars: 'إلغاء تحميل الرزنامات...',
 
-	errUnableSaveBeginCalDAV: "خطأ: '\تسجيل المناسبة غير ممكن\'%%!",
-	errUnableDeleteBeginCalDAV: "خطأ: '\حذف المناسبة غير ممكن/ :%%!",
+	errUnableSaveBeginCalDAV: "خطأ: \'تسجيل المناسبة غير ممكن\'%%!",
+	errUnableDeleteBeginCalDAV: "خطأ: \'حذف المناسبة غير ممكن/ :%%!",
 	CalDAVerrHttp410: 'المناسبة لم تعد موجودة على الخادم',
-	errUnableSaveTodoBeginCalDAV: "خطأ: '\حفظ المهمة غير ممكن\' :%%!",
-	errUnableDeleteTodoBeginCalDAV: "خطأ: '\حذف المهمة غير ممكن\' :%%!",
+	errUnableSaveTodoBeginCalDAV: "خطأ: \'حفظ المهمة غير ممكن\' :%%!",
+	errUnableDeleteTodoBeginCalDAV: "خطأ: \'حذف المهمة غير ممكن\' :%%!",
 	CalDAVerrTodoHttp410: 'المهمة لم تعد متوفرة على الخادم'
 };
 

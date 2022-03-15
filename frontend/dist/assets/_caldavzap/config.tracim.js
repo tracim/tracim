@@ -42,18 +42,21 @@ var globalInterfaceLanguage = (function (lang) {
       return 'de_DE'
     case 'en':
       return 'en_US'
+    case 'ar':
+      return 'ar'
     default:
       return 'en_US'
   }
 })(configObj.userLang)
 
-var globalInterfaceCustomLanguages=['en_US', 'fr_FR', 'de_DE']
+var globalInterfaceCustomLanguages=['en_US', 'fr_FR', 'de_DE', 'ar']
 var globalSortAlphabet=' 0123456789'+
   'AÀÁÂÄÆÃÅĀBCÇĆČDĎEÈÉÊËĒĖĘĚFGĞHIÌÍÎİÏĪĮJKLŁĹĽMNŃÑŇOÒÓÔÖŐŒØÕŌ'+
   'PQRŔŘSŚŠȘșŞşẞTŤȚțŢţUÙÚÛÜŰŮŪVWXYÝŸZŹŻŽ'+
   'aàáâäæãåābcçćčdďeèéêëēėęěfgğhiìíîïīįıjklłĺľmnńñňoòóôöőœøõō'+
   'pqrŕřsśšßtťuùúûüűůūvwxyýÿzźżžАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЮЯ'+
-  'Ьабвгґдеєжзиіїйклмнопрстуфхцчшщюяь'
+  'Ьабвгґдеєжзиіїйклмнопрстуфхцчшщюяь'+
+  'غظضذخثتشرقصفعسنملكيطحزوهدجبأ'
 var globalSearchTransformAlphabet={
   '[ÀàÁáÂâÄäÆæÃãÅåĀā]': 'a', '[ÇçĆćČč]': 'c', '[Ďď]': 'd',
   '[ÈèÉéÊêËëĒēĖėĘęĚě]': 'e', '[Ğğ]': 'g', '[ÌìÍíÎîİıÏïĪīĮį]': 'i',
