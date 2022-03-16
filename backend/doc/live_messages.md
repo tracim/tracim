@@ -97,7 +97,7 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 }
 ```
 
-### content/thread, content/html-document, content/folder (same as TextBaseContentSchema in API)
+### content/thread, content/html-document, content/folder (same as ContentSchema in API)
 
 ```
 {
@@ -125,7 +125,7 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
 }
 ```
 
-### content/file (same as FileContentSchema in API)
+### content/file, content/kanban (same as FileContentSchema in API)
 
 ```
 {
@@ -150,11 +150,8 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
      "current_revision_type": "edition",
     "content_type": "html-document",
      "raw_content": "Hello, world",
-     "page_nb": 1,
      "mimetype": "text/plain",
      "size": 120,
-     "has_pdf_preview": true,
-     "has_html_preview": false
 }
 ```
 ### content/comment (same as CommentSchema in API)

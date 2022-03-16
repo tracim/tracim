@@ -241,3 +241,6 @@ export const postRawFileContent = (
   if (parentId) formData.append('parent_id', parentId)
   return baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/files`, formData)
 }
+
+export const getFileRevisionPreviewInfo = (apiUrl, workspaceId, contentId, revisionId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/files/${contentId}/revisions/${revisionId}/preview_info`)
