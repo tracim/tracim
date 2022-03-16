@@ -45,12 +45,11 @@ export const NotificationWall = props => {
 
   useEffect(() => {
     let tmpNotificationList = []
-    const reversedSortedList = sortByCreatedDateReversed(props.notificationPage.list)
-    reversedSortedList.forEach(notification => {
+    props.notificationPage.list.forEach(notification => {
       let newNotificationList = cloneDeep(tmpNotificationList)
       if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
         if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
-          newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([notification, ...newNotificationList], 'id'))
+          newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([...newNotificationList, notification], 'id'))
         }
       }
       tmpNotificationList = newNotificationList
@@ -235,14 +234,6 @@ export const NotificationWall = props => {
     return arrayToSort.sort(function (a, b) {
       if (a.created < b.created) return 1
       if (a.created > b.created) return -1
-      return 0
-    })
-  }
-
-  const sortByCreatedDateReversed = (arrayToSort) => {
-    return arrayToSort.sort(function (a, b) {
-      if (a.created < b.created) return -1
-      if (a.created > b.created) return 1
       return 0
     })
   }
