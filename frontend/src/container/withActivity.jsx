@@ -236,25 +236,27 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
       const { props } = this
       const initialActivityListLength = activityList.length
-      while (hasNextPage && activityList.length < initialActivityListLength + ACTIVITY_BATCH_COUNT) {
-        const messageListResponse = await props.dispatch(getNotificationList(
-          props.user.userId,
-          {
-            nextPageToken: nextPageToken,
-            notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
-            recentActivitiesEvents: true,
-            workspaceId: workspaceId,
-            includeNotSent: true
-          }
-        ))
-        activityList = await mergeWithActivityList(
-          messageListResponse.json.items,
-          activityList,
-          FETCH_CONFIG.apiUrl
-        )
-        activityList = activityList.filter(this.activityDisplayFilter)
-        hasNextPage = messageListResponse.json.has_next
-        nextPageToken = messageListResponse.json.next_page_token
+      if (props.user) {
+        while (hasNextPage && activityList.length < initialActivityListLength + ACTIVITY_BATCH_COUNT) {
+          const messageListResponse = await props.dispatch(getNotificationList(
+            props.user.userId,
+            {
+              nextPageToken: nextPageToken,
+              notificationsPerPage: NOTIFICATION_COUNT_PER_REQUEST,
+              recentActivitiesEvents: true,
+              workspaceId: workspaceId,
+              includeNotSent: true
+            }
+          ))
+          activityList = await mergeWithActivityList(
+            messageListResponse.json.items,
+            activityList,
+            FETCH_CONFIG.apiUrl
+          )
+          activityList = activityList.filter(this.activityDisplayFilter)
+          hasNextPage = messageListResponse.json.has_next
+          nextPageToken = messageListResponse.json.next_page_token
+        }
       }
       return {
         activityList,
