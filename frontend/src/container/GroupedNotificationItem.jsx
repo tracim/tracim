@@ -1,23 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import {
-  FETCH_CONFIG,
-  computeShortDate
-} from '../util/helper.js'
-import {
-  AVATAR_SIZE,
   PAGE,
   TLM_SUB_TYPE as TLM_SUB,
-  Avatar,
-  Icon,
-  TracimComponent,
-  formatAbsoluteDate
+  TracimComponent
 } from 'tracim_frontend_lib'
 import NotificationItem from '../component/NotificationItem.jsx'
+import GroupRender from '../../GroupedNotificationItem/GroupRender.jsx'
 // import putNotificationAsRead from '../action-creator.async.js'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 
@@ -135,7 +126,7 @@ export const GroupedNotificationItem = props => {
   //   }
   }
 
-  const handleClickGroupedNotification = (e, notification) => {
+  const handleClickGroupedNotification = () => {
     // NOTE - MP - 14-03-2022 - Since we redirect to the content if this is a group about a content
     // we close the wall, then we ungroup the group
     if (notificationDetails.url) {
@@ -144,81 +135,8 @@ export const GroupedNotificationItem = props => {
     setIsGrouped(false)
   }
 
-  const { user } = props
   const notificationDetails = getGroupedNotificationDetails(props.groupedNotifications)
   if (Object.keys(notificationDetails).length === 0) return null
-
-  const numberOfWorkspaces = uniqBy(props.groupedNotifications.group.map(notification => notification.workspace), 'id').length
-  const numberOfAuthors = props.groupedNotifications.author.length
-  const readStatus = props.groupedNotifications.group.map(notification => notification.read)
-    .reduce((acc, current) => acc && current)
-
-  const groupRender =
-    <Link
-      to={notificationDetails.url || '#'}
-      onClick={(e) => handleClickGroupedNotification(props, e, props.groupedNotifications)}
-      className={classnames('notification__list__item',
-        { itemRead: readStatus, isMention: notificationDetails.isMention }
-      )}
-      key={props.groupedNotifications.id}
-    >
-      <div className='notification__list__item__text'>
-        {numberOfAuthors <= 2
-          ? (
-            <div className='notification__list__item__text__avatars'>
-              <Avatar
-                size={numberOfAuthors === 2 ? AVATAR_SIZE.MINI : AVATAR_SIZE.SMALL}
-                apiUrl={FETCH_CONFIG.apiUrl}
-                user={props.groupedNotifications.author[0]}
-              />
-              {numberOfAuthors === 2 && (
-                <Avatar
-                  size={AVATAR_SIZE.MINI}
-                  apiUrl={FETCH_CONFIG.apiUrl}
-                  user={props.groupedNotifications.author[1]}
-                  customClass='notification__list__item__text__avatars__second'
-                />
-              )}
-            </div>
-          ) : (
-            <Icon
-              customClass='notification__list__item__text__usersAvatar'
-              icon='fas fa-fw fa-users'
-              color='#fdfdfd' // INFO - GB - 2021-08-26 - offWhite color
-              title={props.groupedNotifications.author.map(author => author.publicName)}
-            />
-          )}
-        <span
-          className='notification__list__item__text__content'
-          dangerouslySetInnerHTML={{
-            __html: (
-              notificationDetails.text + ' ' +
-              `<span title='${escapeHtml(formatAbsoluteDate(props.groupedNotifications.created, user.lang))}'></span>`
-            )
-          }}
-        />
-      </div>
-      <div className='notification__list__item__meta'>
-        <div
-          className='notification__list__item__meta__date'
-          title={formatAbsoluteDate(props.groupedNotifications.created, user.lang)}
-        >
-          {computeShortDate(props.groupedNotifications.created, props.t)}
-        </div>
-        <div className='notification__list__item__meta__space'>
-          {(numberOfWorkspaces === 1 && props.groupedNotifications.group[0].workspace &&
-            props.groupedNotifications.group[0].workspace.label
-          )}
-        </div>
-      </div>
-      <div className='notification__list__item__circle__wrapper'>
-        {!readStatus &&
-          <i
-            className='notification__list__item__circle fas fa-circle'
-            onClick={(e) => handleReadGroupNotification(props.groupedNotifications)}
-          />}
-      </div>
-    </Link>
 
   const listRender =
     notificationList.map((notification) => {
@@ -232,7 +150,19 @@ export const GroupedNotificationItem = props => {
       )
     })
 
-  return isGrouped ? groupRender : listRender
+  return isGrouped
+    ? (
+      <GroupRender
+        groupedNotifications={props.groupedNotifications}
+        notificationDetails={notificationDetails}
+        handleClickGroupedNotification={handleClickGroupedNotification}
+        readStatus={props.groupedNotifications.group.map(notification => notification.read).reduce((acc, current) => acc && current)}
+        numberOfAuthors={props.groupedNotifications.author.length}
+        numberOfWorkspaces={uniqBy(props.groupedNotifications.group.map(notification => notification.workspace), 'id').length}
+        handleReadGroupNotification={handleReadGroupNotification}
+      />
+    )
+    : listRender
 }
 
 const mapStateToProps = ({ user }) => ({ user })
@@ -241,10 +171,5 @@ export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotif
 GroupedNotificationItem.propTypes = {
   onCloseNotificationWall: PropTypes.func.isRequired,
   getNotificationDetails: PropTypes.func.isRequired,
-  groupedNotifications: PropTypes.object.isRequired,
-  isSameContent: PropTypes.bool
-}
-
-GroupedNotificationItem.defaultProps = {
-  isSameContent: false
+  groupedNotifications: PropTypes.object.isRequired
 }

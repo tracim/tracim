@@ -27,8 +27,8 @@ class WorkspaceListItem extends React.Component {
     this.state = {
       showDropdownMenuButton: isMobile,
       dropdownMenuIsActive: isMobile,
-      isUnread: false,
-      mentionCount: 0
+      unreadNotifications: [],
+      unreadMentionCount: 0
     }
   }
 
@@ -37,17 +37,17 @@ class WorkspaceListItem extends React.Component {
   }
 
   componentDidUpdate () {
-    const isUnread = this.props.notificationPage.list.some(
+    const unreadNotifications = this.props.notificationPage.list.filter(
       n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
     )
-    const mentionCount = this.props.notificationPage.list.filter(
+    const unreadMentionCount = this.props.notificationPage.list.filter(
       n => n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
     ).length
 
-    if (this.state.isUnread !== isUnread || this.state.mentionCount !== mentionCount) {
+    if (this.state.unreadNotifications.length !== unreadNotifications.length || this.state.unreadMentionCount !== unreadMentionCount) {
       this.setState({
-        isUnread: isUnread,
-        mentionCount: mentionCount
+        unreadNotifications: unreadNotifications,
+        unreadMentionCount: unreadMentionCount
       })
     }
   }
@@ -107,10 +107,9 @@ class WorkspaceListItem extends React.Component {
   handleReadSpaceNotifications = async () => {
     const { props } = this
 
-    if (this.state.isUnread) {
+    if (this.state.unreadNotifications.length > 0) {
       await Promise.all(
-        this.props.notificationPage.list
-          .filter(n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId))
+        this.state.unreadNotifications
           .map(n => n.id)
           .map(async (notificationId) => {
             const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
@@ -142,7 +141,7 @@ class WorkspaceListItem extends React.Component {
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
           },
           {
-            sidebar__content__navigation__item__unread: state.isUnread
+            sidebar__content__navigation__item__unread: state.unreadNotifications.length > 0
           }
         )}
         data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
@@ -193,7 +192,7 @@ class WorkspaceListItem extends React.Component {
             >
               {props.label}
             </div>
-            {state.mentionCount > 0 && <div className='sidebar__mention'>{state.mentionCount}</div>}
+            {state.unreadMentionCount > 0 && <div className='sidebar__mention'>{state.unreadMentionCount}</div>}
           </div>
         </Link>
 
