@@ -117,10 +117,12 @@ export const GroupedNotificationItem = props => {
 
   // FIXME - MP - 14-03-2022 - Function removed so I can safely push
   // However this is a regression, we can't put a group notification as read
+  // Issue : https://github.com/tracim/tracim/issues/5526
   const handleReadGroupNotification = async (groupNotification) => {
   //   // TODO - MP - 14-03-2022
   //   // Create a props.dispatch(putGroupNotificationsAsRead(props.user.userId, groupNotification.group))
   //   // Where it will read every notification in groupNotification.group
+  //   // related to https://github.com/tracim/tracim/issues/5526
   //
   //   const fetchPutNotificationAsRead = { status = 404 }
   //   switch (fetchPutNotificationAsRead.status) {
