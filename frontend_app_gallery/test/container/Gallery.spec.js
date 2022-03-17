@@ -1,10 +1,11 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { Gallery } from '../../src/container/Gallery.jsx'
-import { defaultDebug } from 'tracim_frontend_lib'
-import pictures from '../fixture/content/pictures.js'
 import { cloneDeep } from 'lodash'
+import { defaultDebug } from 'tracim_frontend_lib'
+import { Gallery } from '../../src/container/Gallery.jsx'
+import pictures from '../fixture/content/pictures.js'
+import { mockGetFileRevisionPreviewInfo200 } from '../apiMock.js'
 
 describe('<Gallery />', () => {
   const folderId = 1
@@ -48,7 +49,7 @@ describe('<Gallery />', () => {
       label: picture.label,
       contentId: picture.content_id,
       fileName: picture.filename,
-      lightBoxUrlList: [picture.filename],
+      lightBoxUrl: picture.filename,
       previewUrlForThumbnail: [picture.filename],
       rotationAngle: 0,
       rawFileUrl: [picture.filename]
@@ -168,14 +169,18 @@ describe('<Gallery />', () => {
       describe('modifying the current picture', () => {
         it('should not keep the old label in the picture list anymore but the new one, yes after rename', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[1], label: 'betterversion' } } })
-          expect(wrapper.state().imagePreviewList.every(image => image.label !== pictures[1].label))
+          const content = pictures[1]
+          mockGetFileRevisionPreviewInfo200(props.data.config.apiUrl, content.workspace_id, content.content_id, content.current_revision_id)
+          wrapper.instance().handleContentModified({ fields: { content: { ...content, label: 'betterversion' } } })
+          expect(wrapper.state().imagePreviewList.every(image => image.label !== content.label))
           expect(wrapper.state().imagePreviewList.some(image => image.label === 'betterversion'))
         })
 
         it('should keep the picture list sorted', () => {
           wrapper.setState(stateMock)
-          wrapper.instance().handleContentModified({ fields: { content: { ...pictures[1], label: 'betterversion' } } })
+          const content = pictures[1]
+          mockGetFileRevisionPreviewInfo200(props.data.config.apiUrl, content.workspace_id, content.content_id, content.current_revision_id)
+          wrapper.instance().handleContentModified({ fields: { content: { ...content, label: 'betterversion' } } })
           const sortedImagesPreviews = [...wrapper.state().imagePreviewList]
           sortedImagesPreviews.sort((a, b) => (a.label.localeCompare(b.label)))
           expect(sortedImagesPreviews).to.be.deep.equal(wrapper.state().imagePreviewList)
@@ -183,14 +188,17 @@ describe('<Gallery />', () => {
 
         it('should stay at the same picture if the displayed picture is not touched', () => {
           wrapper.setState({ ...stateMock, displayedPictureIndex: 2 })
-          wrapper.instance().handleContentModified({ fields: { content: pictures[1] } })
+          const content = pictures[1]
+          mockGetFileRevisionPreviewInfo200(props.data.config.apiUrl, content.workspace_id, content.content_id, content.current_revision_id).persist()
+          wrapper.instance().handleContentModified({ fields: { content } })
           expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[2].label)
 
           wrapper.setState({ ...stateMock, displayedPictureIndex: 0 })
-          wrapper.instance().handleContentModified({ fields: { content: pictures[1] } })
+          wrapper.instance().handleContentModified({ fields: { content } })
           expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[0].label)
 
           wrapper.setState({ ...stateMock, displayedPictureIndex: 1 })
+          mockGetFileRevisionPreviewInfo200(props.data.config.apiUrl, pictures[0].workspace_id, pictures[0].content_id, pictures[0].current_revision_id)
           wrapper.instance().handleContentModified({ fields: { content: pictures[0] } })
           expect(wrapper.state().imagePreviewList[wrapper.state().displayedPictureIndex].label).to.equal(pictures[1].label)
         })

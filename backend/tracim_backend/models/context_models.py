@@ -607,7 +607,6 @@ class ContentFilter(object):
         show_active: Optional[int] = 1,
         content_type: Optional[str] = None,
         label: Optional[str] = None,
-        page_nb: Optional[int] = None,
         limit: Optional[int] = None,
         namespaces_filter: Optional[str] = None,
         sort: Optional[ContentSortOrder] = None,
@@ -622,7 +621,6 @@ class ContentFilter(object):
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
         self.limit = limit
-        self.page_nb = page_nb
         self.label = label
         self.content_type = content_type
         self.sort = sort or ContentSortOrder.LABEL_ASC

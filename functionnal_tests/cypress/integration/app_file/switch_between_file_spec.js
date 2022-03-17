@@ -37,10 +37,10 @@ describe('App File', () => {
           params: { contentId: secondContentId }
         })
 
+        cy.contains('.breadcrumbs__item', fileTitle_2).should('be.visible')
+
         cy.get('[data-cy="revision_data_2"]')
           .click()
-
-        cy.contains('.breadcrumbs__item', fileTitle_2)
 
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.visible')

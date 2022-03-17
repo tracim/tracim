@@ -224,7 +224,8 @@ import {
   getGenericWorkspaceContent,
   getRawFileContent,
   putRawFileContent,
-  postRawFileContent
+  postRawFileContent,
+  getFileRevisionPreviewInfo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -459,6 +460,7 @@ export {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
+  getFileRevisionPreviewInfo,
   tinymceRemove,
   Popover,
   getBrowserLang
