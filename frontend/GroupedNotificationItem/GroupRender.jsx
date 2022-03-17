@@ -21,13 +21,34 @@ const GroupRender = props => {
     groupedNotifications,
     notificationDetails,
     handleClickGroupedNotification,
-    readStatus,
-    numberOfAuthors,
     user,
-    numberOfWorkspaces,
-    handleReadGroupNotification,
     t
   } = props
+
+  const numberOfAuthors = groupedNotifications.author.length
+  const numberOfWorkspaces = uniqBy(groupedNotifications.group.map(notification => notification.workspace), 'id').length
+  const readStatus = groupedNotifications.group.map(notification => notification.read).reduce((acc, current) => acc && current)
+
+  // FIXME - MP - 14-03-2022 - Function removed so I can safely push
+  // However this is a regression, we can't put a group notification as read
+  // Issue : https://github.com/tracim/tracim/issues/5526
+  const handleReadGroupNotification = async (groupNotification) => {
+    //   // TODO - MP - 14-03-2022
+    //   // Create a props.dispatch(putGroupNotificationsAsRead(props.user.userId, groupNotification.group))
+    //   // Where it will read every notification in groupNotification.group
+    //   // related to https://github.com/tracim/tracim/issues/5526
+    //
+    //   const fetchPutNotificationAsRead = { status = 404 }
+    //   switch (fetchPutNotificationAsRead.status) {
+    //     case 204: {
+    //       props.dispatch(readGroupNotification(notificationId))
+    //       break
+    //     }
+    //     default:
+    //       props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
+    //   }
+    }
+  
   return (
     <Link
       to={notificationDetails.url || '#'}
@@ -102,10 +123,6 @@ export default connect(mapStateToProps)(translate()(GroupRender))
 
 GroupRender.propTypes = {
   groupedNotifications: PropTypes.object.isRequired,
-  notificationDetails: PropTypes.object.isRequired,
   handleClickGroupedNotification: PropTypes.func.isRequired,
-  readStatus: PropTypes.bool.isRequired,
-  numberOfAuthors: PropTypes.number.isRequired,
-  numberOfWorkspaces: PropTypes.number.isRequired,
-  handleReadGroupNotification: PropTypes.func.isRequired
+  notificationDetails: PropTypes.object.isRequired
 }

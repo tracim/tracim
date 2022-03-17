@@ -9,20 +9,10 @@ import {
 } from 'tracim_frontend_lib'
 import NotificationItem from '../component/NotificationItem.jsx'
 import GroupRender from '../../GroupedNotificationItem/GroupRender.jsx'
-// import putNotificationAsRead from '../action-creator.async.js'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 
 export const GroupedNotificationItem = props => {
-  const [notificationList, setNotificationList] = useState([])
   const [isGrouped, setIsGrouped] = useState(true)
-
-  useEffect(() => {
-    const tmpNotificationList = []
-    props.groupedNotifications.group.forEach(notification => {
-      tmpNotificationList.push(notification)
-    })
-    setNotificationList(tmpNotificationList)
-  }, [props.groupedNotifications])
 
   const getGroupedNotificationDetails = (notification) => {
     const numberOfContributionTypes = uniqBy(notification.group, 'type').length
@@ -106,26 +96,6 @@ export const GroupedNotificationItem = props => {
     }
   }
 
-  // FIXME - MP - 14-03-2022 - Function removed so I can safely push
-  // However this is a regression, we can't put a group notification as read
-  // Issue : https://github.com/tracim/tracim/issues/5526
-  const handleReadGroupNotification = async (groupNotification) => {
-  //   // TODO - MP - 14-03-2022
-  //   // Create a props.dispatch(putGroupNotificationsAsRead(props.user.userId, groupNotification.group))
-  //   // Where it will read every notification in groupNotification.group
-  //   // related to https://github.com/tracim/tracim/issues/5526
-  //
-  //   const fetchPutNotificationAsRead = { status = 404 }
-  //   switch (fetchPutNotificationAsRead.status) {
-  //     case 204: {
-  //       props.dispatch(readGroupNotification(notificationId))
-  //       break
-  //     }
-  //     default:
-  //       props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-  //   }
-  }
-
   const handleClickGroupedNotification = () => {
     // NOTE - MP - 14-03-2022 - Since we redirect to the content if this is a group about a content
     // we close the wall, then we ungroup the group
@@ -139,7 +109,7 @@ export const GroupedNotificationItem = props => {
   if (Object.keys(notificationDetails).length === 0) return null
 
   const listRender =
-    notificationList.map((notification) => {
+    props.groupedNotifications.group.map((notification) => {
       return (
         <NotificationItem
           onCloseNotificationWall={props.onCloseNotificationWall}
@@ -156,10 +126,6 @@ export const GroupedNotificationItem = props => {
         groupedNotifications={props.groupedNotifications}
         notificationDetails={notificationDetails}
         handleClickGroupedNotification={handleClickGroupedNotification}
-        readStatus={props.groupedNotifications.group.map(notification => notification.read).reduce((acc, current) => acc && current)}
-        numberOfAuthors={props.groupedNotifications.author.length}
-        numberOfWorkspaces={uniqBy(props.groupedNotifications.group.map(notification => notification.workspace), 'id').length}
-        handleReadGroupNotification={handleReadGroupNotification}
       />
     )
     : listRender
