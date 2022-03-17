@@ -14,7 +14,7 @@ import {
   Icon,
   formatAbsoluteDate
 } from 'tracim_frontend_lib'
-import { escape as escapeHtml } from 'lodash'
+import { escape as escapeHtml, uniqBy } from 'lodash'
 
 const GroupRender = props => {
   const {
@@ -47,8 +47,8 @@ const GroupRender = props => {
     //     default:
     //       props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
     //   }
-    }
-  
+  }
+
   return (
     <Link
       to={notificationDetails.url || '#'}
