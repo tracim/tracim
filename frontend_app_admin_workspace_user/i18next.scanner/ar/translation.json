@@ -14,7 +14,7 @@
   "An administrator can always create spaces": "يمكن للمدير إنشاء فضاءات دائمًا",
   "You can't remove yourself from Administrator": "ليس بإمكانك أن تحذف نفسك من دور المدير",
   "User account management": "الإشراف على حسابات المستخدمين",
-  "On this page you can manage the users of your Tracim instance.": "يمكنك على هذه الصفحة إدارة مستخدمي منتداك على Tracim.",
+  "On this page you can manage the users of your Tracim instance.": "يمكنك على هذه الصفحة إدارة مستخدمي مثيل خادم Tracim الخاص بك.",
   "Create a user": "إنشاء مستخدم",
   "Email notification are disabled, please manually notify users of any change": "إشعارات البريد الإلكتروني معطلة، تفضل بإعلام المستخدمين يدويا بأي تغيير",
   "Active": "نشط",
@@ -45,8 +45,8 @@
   "User created and email sent": "تم إنشاء المستخدم وإرسال البريد الإلكتروني",
   "User created": "تم إنشاء المستخدم",
   "Error, invalid email address": "خطأ، عنوان البريد الإلكتروني غير صحيح",
-  "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "اسم المستخدم يجب أن يتكون من {{minimumCharactersUsername}} حرفا على الأقل و من {{maximumCharactersUsername}} حرفا على الأكثر",
+  "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "يجب أن يكون طول اسم المستخدم بين {{minimumCharactersUsername}} و {{maximumCharactersUsername}} حرفا",
   "Error while saving new user": "خطأ أثناء حفظ مستخدم جديد",
   "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "اسم المستخدم الخاص بك غير صحيح، الحروف المسموح بها هي {{allowedCharactersUsername}}",
-  "Email already exists": "تم استخدام نفس عنوان البريد الإلكتروني مِن قَبل"
+  "Email already exists": "عنوان البريد الإلكتروني موجود بالفعل"
 }
