@@ -29,11 +29,11 @@ localization['ar']=	/* thanks Myriam Rabhi */
 
 	errUnableSync: "خطأ : /مزامنة المورد غير ممكنة\' : حاول مجددا لاحقا!",
 
-	loadingResources: ')%فعل%على%مجموع%"تحميل الموارد (',
+	loadingResources: 'جارٍ تحميل الموارد (%act% من %total%)…',
 
 	loadingCollectionList: 'تحميل قائمة الموارد',
 
-	txtCacheText: 'هنالك	تحديث متوفر على الخادم، تفضل بإعادة	تحميل الصفحة',
+	txtCacheText: 'هنالك تحديث متوفر على الخادم، الرجاء إعادة تحميل الصفحة!',
 	txtCacheButton: 'إعادة تحميل',
 
 	fullscreenBtn: 'ملء الشاشة'
@@ -72,12 +72,12 @@ localization['de_DE']=	/* thanks Marten Gajda and Thomas Scheel */
 	txtResources: 'Ressourcen',
 	txtNote: 'Notiz',
 
-	errUnableSync: 'Fehler: \'Ressource konnte nicht syncronisiert werden\': Versuchen Sie es später noch einmal!',
+	errUnableSync: 'Fehler: „Ressource konnte nicht syncronisiert werden“: Versuchen Sie es später noch einmal!',
 
-	loadingResources: 'Lade Ressourcen (%act% von %total%) ...',
+	loadingResources: 'Lade Ressourcen (%act% von %total%) …',
 	loadingCollectionList: 'Lade Ressourcenliste',
 
-	txtCacheText: 'Auf dem Server ist ein Update verfügbar. Bitte laden Sie die Seite neu!',
+	txtCacheText: 'Auf dem Server ist eine Aktualisierung verfügbar. Bitte laden Sie die Seite neu!',
 	txtCacheButton: 'Seite neu laden'
 };
 
@@ -257,14 +257,14 @@ var localizationShared = new Object();
 localizationShared['ar']=	/* Thanks Myriam Rabhi */
 {
 	_name_: 'العربية',
-	_default_datepicker_format_: 'dd/mm/yyyy',
+	_default_datepicker_format_: 'yyyy/mm/dd',
 	_default_AMPM_format_: false,
 
 	altLogo: 'شعار',
 	altLogout: 'تسجيل الخروج',
 	buttonLogin: 'تسجيل الدخول',
 	pholderUsername: 'اسم المستخدم',
-	pholderPassword: 'كلمة عبور',
+	pholderPassword: 'كلمة المرور',
 	txtSearch: 'بحث',
 	txtError: 'خطأ',
 	txtRefresh: 'تحديث',
@@ -281,12 +281,12 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	errHttp403: 'ممنوع',
 	errHttp405: 'طريقة غير مسموح بها',
 	errHttp408: 'انتهاء مدة الطلب',
-	errHttp412: 'أحدهم قام بتعديله على الخادم',
+	errHttp412: 'قام أحدهم بتعديله على الخادم مسبقا',
 	errHttp500: 'خطأ داخلي في الخادم',
 	errHttp501: 'غير مطبق',
 
 	unsupportedBrowser: 'ملاحظة: لا يمكن تحمل المتصفح الذي تستخدمه!',
-	updateNotification: 'متوفر (أنت الآن في نسخة %curr_ver%) - %url'
+	updateNotification: '%new_ver% %name% متوفرة (أنت حاليا في النسخة %curr_ver%) - %url%'
 };
 
 localizationShared['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
@@ -387,8 +387,8 @@ localizationShared['de_DE']=	/* thanks Marten Gajda and Thomas Scheel */
 	errHttp405: 'Befehl nicht erlaubt',
 	errHttp408: 'Anfrage-Timeout',
 	errHttp412: 'Kontakt wurde zwischenzeitlich auf der Server geändert',
-	errHttp500: 'Interner Server Fehler',
-	errHttp501: 'Nicht unterstützt',
+	errHttp500: 'Interner Serverfehler',
+	errHttp501: 'nicht unterstützt',
 
 	unsupportedBrowser: 'Hinweis: Der verwendete Browser wird nicht unterstützt!',
 	updateNotification: '%name% %new_ver% verfügbar (Sie haben %curr_ver%) - %url%'
@@ -819,8 +819,8 @@ var localizationSharedCalDAV = new Object();
 
 localizationSharedCalDAV['ar']=	/* Thanks Myriam Rabhi */
 {
-	txtCalendars: 'رزنامات',
-	txtTodos: 'مهام',
+	txtCalendars: 'تقويمات',
+	txtTodos: 'المهام',
 	localTime: 'التوقيت المحلي',
 	fullCalendarMonth: 'الشهر',
 	fullCalendarMultiWeek: 'متعدد الأسابيع',
@@ -1127,14 +1127,14 @@ var localizationCalDAV = new Object();
 
 localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 {
-	_default_title_format_month_: 'yyyy MMM',
+	_default_title_format_month_: 'yyyyy MMM',
 	_default_title_format_week_: 'yyyy MMM d{ \'–\'[ yyyy][ MMM] d}',
 	_default_title_format_day_: 'yyyy MMM d, ddd',
 	_default_title_format_table_: 'yyyy MMM, ddd',
 	_default_column_format_agenda_: 'ddd, MMM d',
 
-	txtCalendar: 'رزنامة',
-	txtEnabledCalendars: 'تفعيل الرزنامات',
+	txtCalendar: 'تقويم',
+	txtEnabledCalendars: 'تفعيل التقويمات',
 	txtTodo: 'للقيام به',
 	txtTodoList: 'قائمة المهام',
 	txtTodoLists: 'قائمات المهام',
@@ -1144,21 +1144,21 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	fullCalendarTodayButton: 'اليوم',
 	fullCalendarAllDay: 'كامل اليوم',
 	CalDAVsearch: 'بحث',
-	resourceEnable: 'تفعيل كل الرزنامات لهذا المورد',
-	resourceDisable: 'تعطيل كل الرزنامات لهذا المورد',
-	allEnable: 'تفعيل كل الرزنامات',
-	allDisable: 'تعطيل كل الرزنامات',
+	resourceEnable: 'تفعيل كل التقويمات لهذا المورد',
+	resourceDisable: 'تعطيل كل التقويمات لهذا المورد',
+	allEnable: 'تفعيل كل التقويمات',
+	allDisable: 'تعطيل كل التقويمات',
 	timezone: 'المنطقة الزمنية',
 	txtTimezonePicker: 'المنطقة الزمنية:',
-	loadingRList: 'تحميل قائمة الموارد',
-	renderingE: 'معاينة الرزنامات',
-	timezoneChange: 'تحميل المنطقة الزمنية',
+	loadingRList: 'جارٍ تحميل قائمة الموارد…',
+	renderingE: 'معاينة التقويمات…',
+	timezoneChange: 'معاينة التقويمات…',
 	customTimezone: 'مخصص (التوقيت المحلي)',
 	customRepeat: 'آخر (لم يتم تحمل التغيير)',
 	loadPrevMonth: 'تحميل الشهر السابق',
 	loadNextMonth: 'تحميل الشهر الموالي',
 	repeatBoxButton: 'تكرر',
-	repeatBoxContent: 'مناسبة متكررة',
+	repeatBoxContent: 'هي فعالية متكرّرة',
 	repeatBoxQuestion: 'تريد العمل مع أي مناسابات؟',
 	allEvsButton: 'كل المناسبات',
 	allFutureButton: 'كل المناسبات القادمة',
@@ -1187,7 +1187,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	repeatWeeks: 'أسابيع',
 	repeatMonths: 'أشهر',
 	repeatYears: 'سنوات',
-	repeatChangeTxt: 'تم تغييره على الخادم',
+	repeatChangeTxt: 'تم تغييره على الخادم!',
 	repeatChangeTxtClose: 'غلق الإستمارة و إعادة فتح هذه المناسبة',
 	repeatTodoChangeTxtClose: 'غلق مربع الحوار و إعادة فتح المهمة',
 	calendarLoader: 'إعادة تحميل',
@@ -1213,17 +1213,17 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	pholderCompletedOnTime: 'الساعة',
 
 	txtStatusFiltersHeaderTODO: 'فلاتر',
-	txtStatusFiltersFooterTODO: 'أو بعده"%date%""ينتهي يوم',
+	txtStatusFiltersFooterTODO: '*ينتهي يوم %date% أو بعده',
 	txtStatusNeedsActionTODO: 'بانتظار إجراء',
 	txtStatusCompletedTODO: 'منتهي',
 	txtStatusInProcessTODO: 'جاري',
 	txtStatusCancelledTODO: 'ملغى',
 	txtPercentCompletedTODO: 'منتهي',
 
-	txtCalendarTODO: 'رزنامة',
-	txtSelectCalendarTODO: 'اختيار رزنامة',
+	txtCalendarTODO: 'تقويم',
+	txtSelectCalendarTODO: 'اختيار تقويم',
 	txtAlertTODO: 'إخطار',
-	txtAlertNoneTODO: 'ا شيء',
+	txtAlertNoneTODO: 'فارغ',
 	txtAlertMessageTODO: 'رسالة',
 	txtAlertOnDateTODO: 'بتاريخ',
 	txtAlertWeeksBeforeTODO: 'أسابيع قبل',
@@ -1308,8 +1308,8 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtRepeatCustomYearLabel2: 'من',
 
 	txtRepeatEnd: 'نهاية',
-	txtEventCalendar: 'رزنامة',
-	txtSelectCalendar: 'اختيار رزنامة',
+	txtEventCalendar: 'تقويم',
+	txtSelectCalendar: 'اختيار تقويم',
 	txtAlert: 'إخطار',
 	txtAlertNone: 'ا شيء',
 	txtAlertMessage: 'رسالة',
@@ -1326,7 +1326,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtAlertSecondsAfter: 'ثواني بعد',
 
 	pholderAfterBeforeVal: 'قيمة',
-	pholderAlarmDate: 'تاريخ التنبيه',
+	pholderAlarmDate: 'تاريخ تقويم',
 	pholderAlarmTime: 'ساعة التنبيه',
 
 	pholderNote: 'ملاحظة',
@@ -1343,8 +1343,8 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtAllDeletedTodo: 'نجاح: تم حذف المهمة!',
 	txtAllDeleted: 'نجاح: تم حذف المناسبة!',
 
-	txtNotChooseTodo: 'خطأ: يجب اختيار رزنامة!',
-	txtNotChoose: 'خطأ: يجب اختيار رزنامة!',
+	txtNotChooseTodo: 'خطأ: يجب اختيار تقويم!',
+	txtNotChoose: 'خطأ: يجب اختيار تقويم!',
 
 	txtErrorDates: 'خطأ: تاريخ البداية يجب أن يسبق تاريخ النهاية!',
 	txtErrorDatesTodo: 'خطأ: تاريخ البداية يجب أن يسبق تاريخ النهاية!',
@@ -1360,13 +1360,13 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	altAddEvent: 'اضافة مناسبة',
 	altAddTodo: 'اضافة مهمة',
 
-	loadingCalendars: 'تحميل الرزنامات )%إجراء% من %مجموع%(',
-	unloadingCalendars: 'إلغاء تحميل الرزنامات...',
+	loadingCalendars: 'تحميل التقويمات (%act% من %total%) …',
+	unloadingCalendars: 'إلغاء تحميل التقويمات...',
 
-	errUnableSaveBeginCalDAV: "خطأ: \'تسجيل المناسبة غير ممكن\'%%!",
-	errUnableDeleteBeginCalDAV: "خطأ: \'حذف المناسبة غير ممكن/ :%%!",
+	errUnableSaveBeginCalDAV: "خطأ: 'تسجيل الفعالية غير ممكن': %%!",
+	errUnableDeleteBeginCalDAV: "خطأ: 'حذف الفعالية غير ممكن' : %%!",
 	CalDAVerrHttp410: 'المناسبة لم تعد موجودة على الخادم',
-	errUnableSaveTodoBeginCalDAV: "خطأ: \'حفظ المهمة غير ممكن\' :%%!",
+	errUnableSaveTodoBeginCalDAV: "خطأ: 'حفظ المهمة غير ممكن' : %%!",
 	errUnableDeleteTodoBeginCalDAV: "خطأ: \'حذف المهمة غير ممكن\' :%%!",
 	CalDAVerrTodoHttp410: 'المهمة لم تعد متوفرة على الخادم'
 };
