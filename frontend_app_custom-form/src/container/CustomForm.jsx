@@ -65,7 +65,6 @@ class CustomForm extends React.Component {
       ],
       rawContentBeforeEdit: '',
       timeline: props.data ? [] : [], // debug.timeline,
-      newComment: '',
       timelineWysiwyg: false,
       mode: MODE.VIEW,
       key: props.data ? props.data.content ? props.data.content.content_id : undefined : undefined,
@@ -121,8 +120,6 @@ class CustomForm extends React.Component {
       case 'allApp_changeLang':
         console.log('%c<CustomForm> Custom event', 'color: #28a745', type, data)
 
-        initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
-
         this.setState(prev => ({
           loggedUser: {
             ...prev.loggedUser,
@@ -158,14 +155,6 @@ class CustomForm extends React.Component {
     if (state.mode === MODE.EDIT && prevState.mode !== MODE.EDIT) {
       // tinymce.remove('#wysiwygNewVersion')
       wysiwyg('#wysiwygNewVersion', state.loggedUser.lang, this.handleChangeText)
-    }
-
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) wysiwyg('#wysiwygTimelineComment', state.loggedUser.lang, this.handleChangeNewComment)
-    else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymce.remove('#wysiwygTimelineComment')
-
-    // INFO - CH - 2019-05-06 - bellow is to properly init wysiwyg editor when reopening the same content
-    if (!prevState.isVisible && state.isVisible) {
-      initWysiwyg(state, state.loggedUser.lang, this.handleChangeNewComment, this.handleChangeText)
     }
   }
 
@@ -228,8 +217,6 @@ class CustomForm extends React.Component {
         }))
       ], [])
 
-    const localStorageComment = getLocalStorageItem(appName, resCustomForm.body, LOCAL_STORAGE_FIELD.COMMENT)
-
     // first time editing the doc, open in edit mode, unless it has been created with webdav or db imported from tracim v1
     // see https://github.com/tracim/tracim/issues/1206
     // @fixme Côme - 2018/12/04 - this might not be a great idea
@@ -264,7 +251,6 @@ class CustomForm extends React.Component {
       },
       schema: rawContent.schema,
       uiSchema: rawContent.uischema,
-      newComment: localStorageComment || '',
       rawContentBeforeEdit: rawContent.formData,
       timeline: revisionWithComment,
       hexcolor: rawContent.hexcolor,
@@ -378,13 +364,6 @@ class CustomForm extends React.Component {
     // const newText = JSON.stringify(e.formData) // because SyntheticEvent is pooled (react specificity)
     this.setState(prev => ({ content: { ...prev.content, raw_content: e.formData } }))
     // setLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT, e.formData)
-  }
-
-  handleChangeNewComment = e => {
-    const newComment = e.target.value
-    this.setState({ newComment })
-
-    setLocalStorageItem(this.state.appName, this.state.content.content_id, this.state.content.workspace_id, LOCAL_STORAGE_FIELD.COMMENT, newComment)
   }
 
   handleClickValidateNewCommentBtn = async (comment) => {

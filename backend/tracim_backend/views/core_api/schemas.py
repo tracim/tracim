@@ -1567,6 +1567,9 @@ class AboutSchema(marshmallow.Schema):
     )
     datetime = marshmallow.fields.DateTime(format=DATETIME_FORMAT)
     website = marshmallow.fields.URL()
+    database_schema_version = StrippedString(
+        example="8382e5a19f0d", description="Database schema version", allow_none=True
+    )
 
 
 class ReservedUsernamesSchema(marshmallow.Schema):
@@ -1783,17 +1786,11 @@ class ContentSchema(ContentDigestSchema):
     )
 
 
-class FileInfoAbstractSchema(marshmallow.Schema):
+class PreviewInfoSchema(marshmallow.Schema):
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    revision_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
     page_nb = marshmallow.fields.Int(
         description="number of pages, return null value if unaivalable", example=1, allow_none=True
-    )
-    mimetype = StrippedString(
-        description="file content mimetype", example="image/jpeg", required=True
-    )
-    size = marshmallow.fields.Int(
-        description="file size in byte, return null value if unaivalable",
-        example=1024,
-        allow_none=True,
     )
     has_pdf_preview = marshmallow.fields.Bool(
         description="true if a pdf preview is available or false", example=True
@@ -1803,8 +1800,15 @@ class FileInfoAbstractSchema(marshmallow.Schema):
     )
 
 
-class FileContentSchema(ContentSchema, FileInfoAbstractSchema):
-    pass
+class FileContentSchema(ContentSchema):
+    mimetype = StrippedString(
+        description="file content mimetype", example="image/jpeg", required=True
+    )
+    size = marshmallow.fields.Int(
+        description="file size in byte, return null value if unavailable",
+        example=1024,
+        allow_none=True,
+    )
 
 
 #####
@@ -1836,8 +1840,15 @@ class RevisionPageSchema(BasePaginatedSchemaPage):
     items = marshmallow.fields.Nested(RevisionSchema(many=True))
 
 
-class FileRevisionSchema(RevisionSchema, FileInfoAbstractSchema):
-    pass
+class FileRevisionSchema(RevisionSchema):
+    mimetype = StrippedString(
+        description="file content mimetype", example="image/jpeg", required=True
+    )
+    size = marshmallow.fields.Int(
+        description="file size in byte, return null value if unaivalable",
+        example=1024,
+        allow_none=True,
+    )
 
 
 class FileRevisionPageSchema(BasePaginatedSchemaPage):

@@ -1,9 +1,11 @@
 import pytest
 
+from tracim_backend.exceptions import UnvalidCustomPropertiesSchema
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.utils.dict_parsing import translate_dict
 from tracim_backend.lib.utils.utils import ALLOWED_AUTOGEN_PASSWORD_CHAR
 from tracim_backend.lib.utils.utils import DEFAULT_PASSWORD_GEN_CHAR_LENGTH
+from tracim_backend.lib.utils.utils import CustomPropertiesValidator
 from tracim_backend.lib.utils.utils import ExtendedColor
 from tracim_backend.lib.utils.utils import clamp
 from tracim_backend.lib.utils.utils import password_generator
@@ -198,3 +200,30 @@ class TestEmailAddress(object):
         assert john_address.email == "john.doe@domainame.ndl"
         assert john_address.force_angle_bracket is False
         assert john_address.address == "John Doe <john.doe@domainame.ndl>"
+
+
+class TestCustomPropertiesCheck(object):
+    def test_unit__validate_json_schema__ok__nominal_case(self):
+        json_schema = {
+            "properties": {"super": {"title": "Super"}, "something": {"title": "Something"}}
+        }
+        CustomPropertiesValidator().validate_json_schema(json_schema)
+
+    def test_unit__validate_json_schema__err__missing_title(self):
+        json_schema = {
+            "properties": {"super": {"section": "a long text"}, "something": {"title": "Something"}}
+        }
+        with pytest.raises(UnvalidCustomPropertiesSchema):
+            CustomPropertiesValidator().validate_json_schema(json_schema)
+
+    def test_unit__validate_json_schema__err__empty_title(self):
+        json_schema = {"properties": {"super": {"title": ""}, "something": {"title": "Something"}}}
+        with pytest.raises(UnvalidCustomPropertiesSchema):
+            CustomPropertiesValidator().validate_json_schema(json_schema)
+
+    def test_unit__validate_json_schema__err__missing_properties(self):
+        json_schema = {
+            "super_section": {"super": {"title": ""}, "something": {"title": "Something"}}
+        }
+        with pytest.raises(UnvalidCustomPropertiesSchema):
+            CustomPropertiesValidator().validate_json_schema(json_schema)

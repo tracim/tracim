@@ -1,0 +1,19 @@
+{
+  "None": "لا شيء",
+  "Error while getting user spaces": "خطأ أثناء محاولة الحصول على فضاءات المستخدم",
+  "Some input are invalid": "بعض الإدخالات غير صحيحة",
+  "A space with that name already exists": "فضاء بهذا الإسم موجود مسبقا",
+  "You cannot create anymore space": "لا يمكنك إنشاء فضاء آخر",
+  "Error while saving new space": "خطأ أثناء حفظ فضاء جديد",
+  "New space": "فضاء جديد",
+  "Space's name:": "اسم الفضاء:",
+  "Space's name": "اسم الفضاء",
+  "Space's type:": "نوع الفضاء:",
+  "Next": "التالي",
+  "Parent space:": "الفضاء الأول:",
+  "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.": "احذر، لا ننصح بإنشاء أكثر من مستووين من الفضاءات لأن ذلك يجعل الوصول الى المعلومة أصعب بكثير.",
+  "Default role:": "الدور الإفتراضي:",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "هذا هو الدور الذي سيتم منحه افتراضيا للأعضاء حين ينضمون إلى فضائك (للفضاءات المفتوحة و الفضاءات تحت الطلب فقط).",
+  "Back": "رجوع",
+  "Create": "إنشاء"
+}

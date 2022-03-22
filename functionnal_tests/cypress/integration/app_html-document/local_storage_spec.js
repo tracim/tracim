@@ -21,7 +21,8 @@ describe('Notes', () => {
     cy.cancelXHR()
   })
 
-  it('should save the note draft', () => {
+  it.skip('should save the note draft', () => {
+    // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
     cy.contains('[data-cy=FilenameWithExtension__label]', noteTitle).click()
     cy.waitForTinyMCELoaded()
       .then(() => cy.typeInTinyMCE(text))

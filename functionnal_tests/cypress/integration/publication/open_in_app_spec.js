@@ -16,6 +16,7 @@ describe('Open publications in the thread app', () => {
         })
 
         cy.get('#wysiwygTimelineCommentPublication').type(' @' + user.username + '  ')
+        cy.get('.autocomplete__item__active').should('be.visible').click()
         cy.get('.commentArea__submit__btn').click()
         cy.get('.feedItem__publication__body__content').should('be.visible')
         cy.clearCookies()

@@ -46,11 +46,7 @@ if [ "$only_utils" != "--only-utils" ]; then
     cp dist/share_folder.app.optimized.js ../frontend/dist/app/share_folder.app.optimized.js && loggood "success" || logerror "some error"
 fi
 
-log "copying en translation.json"
-cp i18next.scanner/en/translation.json ../frontend/dist/app/share_folder_en_translation.json && loggood "success" || logerror "some error"
-log "copying fr translation.json"
-cp i18next.scanner/fr/translation.json ../frontend/dist/app/share_folder_fr_translation.json && loggood "success" || logerror "some error"
-log "copying pt translation.json"
-cp i18next.scanner/pt/translation.json ../frontend/dist/app/share_folder_pt_translation.json && loggood "success" || logerror "some error"
-log "copying de translation.json"
-cp i18next.scanner/de/translation.json ../frontend/dist/app/share_folder_de_translation.json && loggood "success" || logerror "some error"
+for lang in $(ls i18next.scanner); do
+    log "copying ${lang}/translation.json"
+    cp i18next.scanner/"${lang}"/translation.json ../frontend/dist/app/share_folder_"${lang}"_translation.json && loggood "success" || logerror "some error"
+done

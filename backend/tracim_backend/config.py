@@ -6,7 +6,6 @@ import typing
 
 from depot.manager import DepotManager
 from jsonschema import SchemaError
-from jsonschema.validators import validator_for
 from paste.deploy.converters import asbool
 from paste.deploy.converters import asint
 
@@ -27,6 +26,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import CustomPropertiesValidator
 from tracim_backend.lib.utils.utils import get_build_version
 from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
@@ -35,6 +35,7 @@ from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import is_file_exist
 from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
+from tracim_backend.lib.utils.utils import validate_json
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.call import CallProvider
@@ -887,7 +888,7 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
-        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch"
+        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch,ar:العربية"
         target_language_pairs = string_to_unique_item_list(
             self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
             separator=",",
@@ -1054,11 +1055,7 @@ class CFG(object):
                 self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH,
             )
             try:
-                # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
-                # - prevent an invalid json-schema
-                # - ensure that validation of content will not failed due to invalid schema.
-                cls = validator_for(json_schema)
-                cls.check_schema(json_schema)
+                CustomPropertiesValidator().validate_json_schema(json_schema)
             except SchemaError as exc:
                 raise ConfigurationError(
                     'ERROR  "{}" is not a valid JSONSchema : {}'.format(
@@ -1442,8 +1439,7 @@ class CFG(object):
         :return: json content as dictionnary
         """
         try:
-            with open(path) as json_file:
-                return json.load(json_file)
+            return validate_json(path)
         except json.JSONDecodeError as exc:
             not_a_valid_json_file_msg = (
                 'ERROR: "{}" is not a valid json file path, '

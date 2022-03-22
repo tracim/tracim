@@ -2,12 +2,17 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import debounce from 'lodash/debounce'
+import i18n from '../util/i18n.js'
+import * as Cookies from 'js-cookie'
+import appFactory from '../util/appFactory.js'
 import UserInfo from '../component/Account/UserInfo.jsx'
 import MenuSubComponent from '../component/Account/MenuSubComponent.jsx'
 import PersonalData from '../component/Account/PersonalData.jsx'
 import UserSpacesConfig from '../component/Account/UserSpacesConfig.jsx'
 import Password from '../component/Account/Password.jsx'
+import WebdavInfo from '../component/Account/WebdavInfo.jsx'
 import {
+  AgendaInfo,
   Delimiter,
   PageWrapper,
   PageTitle,
@@ -34,14 +39,15 @@ import {
   putUserUsername,
   putMyselfPassword,
   putMyselfWorkspaceDoNotify,
-  getLoggedUserCalendar
+  getLoggedUserCalendar,
+  putUserLang
 } from '../action-creator.async.js'
 import {
+  COOKIE_FRONTEND,
   editableUserAuthTypeList,
   MINIMUM_CHARACTERS_PUBLIC_NAME,
   FETCH_CONFIG
 } from '../util/helper.js'
-import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
 
 export class Account extends React.Component {
   constructor (props) {
@@ -66,11 +72,11 @@ export class Account extends React.Component {
       translationKey: props.t('Password'),
       display: editableUserAuthTypeList.includes(props.user.authType) // allow pw change only for users in tracim's db (eg. not from ldap)
     }, {
-      name: 'agenda',
+      name: 'configurationLinks',
       active: false,
-      label: 'Agenda',
-      translationKey: props.t('Agenda'),
-      display: props.appList.some(a => a.slug === 'agenda')
+      label: 'Configuration links',
+      translationKey: props.t('Configuration links'),
+      display: props.appList.some(a => a.slug === 'agenda') || props.system.config.webdav_url
     }]
 
     this.state = {
@@ -139,7 +145,7 @@ export class Account extends React.Component {
     isUsernameValid: true
   }))
 
-  handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword, newLang) => {
     const { props } = this
 
     if (newPublicName !== '') {
@@ -212,6 +218,18 @@ export class Account extends React.Component {
           else props.dispatch(newFlashMessage(props.t('Your email has been changed'), 'info'))
           return true
         default: props.dispatch(newFlashMessage(props.t('Error while changing email'), 'warning')); return false
+      }
+    }
+
+    if (newLang !== props.user.lang) {
+      const fetchPutUserLang = await props.dispatch(putUserLang(props.user, newLang))
+      switch (fetchPutUserLang.status) {
+        case 200:
+          i18n.changeLanguage(newLang)
+          Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, newLang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+          props.dispatchCustomEvent(CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, newLang)
+          return true
+        default: props.dispatch(newFlashMessage(props.t('Error while saving new lang'))); return false
       }
     }
   }
@@ -290,6 +308,7 @@ export class Account extends React.Component {
                       case 'personalData':
                         return (
                           <PersonalData
+                            langList={props.lang}
                             userEmail={props.user.email}
                             userUsername={props.user.username}
                             userPublicName={props.user.publicName}
@@ -313,14 +332,24 @@ export class Account extends React.Component {
                       case 'password':
                         return <Password onClickSubmit={this.handleSubmitPassword} />
 
-                      case 'agenda':
+                      case 'configurationLinks':
                         return (
-                          <AgendaInfo
-                            customClass='account__agenda'
-                            introText={props.t('Use this link to integrate this agenda to your')}
-                            caldavText={props.t('CalDAV compatible software')}
-                            agendaUrl={props.user.agendaUrl}
-                          />
+                          <div>
+                            {props.appList.some(a => a.slug === 'agenda') && (
+                              <AgendaInfo
+                                introText={props.t('Use this link to integrate this agenda to your')}
+                                caldavText={props.t('CalDAV compatible software')}
+                                agendaUrl={props.user.agendaUrl}
+                              />
+                            )}
+                            {props.system.config.webdav_enabled && (
+                              <WebdavInfo
+                                introText={props.t('Use this link to integrate Tracim in your file explorer')}
+                                webdavText={props.t('(protocole WebDAV)')}
+                                webdavUrl={props.system.config.webdav_url}
+                              />
+                            )}
+                          </div>
                         )
                     }
                   })()}
@@ -335,7 +364,7 @@ export class Account extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, timezone, system, appList }) => ({
-  breadcrumbs, user, timezone, system, appList
+const mapStateToProps = ({ breadcrumbs, user, timezone, system, appList, lang }) => ({
+  breadcrumbs, user, timezone, system, appList, lang
 })
-export default connect(mapStateToProps)(translate()(TracimComponent(Account)))
+export default connect(mapStateToProps)(translate()(appFactory(TracimComponent(Account))))

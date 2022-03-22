@@ -27,6 +27,8 @@
         white-space nowrap
         overflow hidden
         text-overflow ellipsis
+  &__table__delete__icon
+    margin-inline-end 0.75rem
 
 .adminUser
   & .table
@@ -36,11 +38,14 @@
       overflow hidden
     & th
       vertical-align middle
+      text-align start
   &__description
     margin-bottom standardSpacing
   &__adduser
     display flex
     align-items center
+    &__button
+      margin-inline-end standardSpacing
     &__emailstate
       margin-inline-end standardSpacing
       color fontColor
@@ -63,14 +68,14 @@
               &__errorMsg
                 width 300px
                 font-size metadataFontSize
-                text-align right
+                text-align end
                 color errorRed
               &__errorIcon
-                margin-right textSpacing
+                margin-inline-end textSpacing
               &__errorInfo
                 width 300px
                 font-size metadataFontSize
-                text-align right
+                text-align end
           &__info
             color grey
             &__icon
@@ -119,7 +124,7 @@
         &:not(:hover)
           color inherit
         & > i
-          margin-right textSpacing
+          margin-inline-end textSpacing
         & .profileNavigation:hover
           text-decoration underline
     &__active
@@ -142,9 +147,16 @@
       width 15%
     &__administrator
       width 15%
+    &__line
+      &__username
+        direction ltr
+      &__email
+        direction ltr
 
 .adminWorkspace
   &__workspaceTable
+    & th
+      text-align start
     & .table
       &__id
         width 5%
@@ -176,11 +188,11 @@
     float left
 
 .formInfo > span
-  margin-right 0.5%
-  margin-left 0.5%
+  margin-inline-start 0.5%
+  margin-inline-end 0.5%
 
 .formInfo > button
-  margin-left 2%
+  margin-inline-start 2%
 
 .fieldInfo
   & input

@@ -1,12 +1,17 @@
 @import '../../css/Variable.styl'
 
+[dir=ltr] .wsContentGeneric
+  right 0
+
+[dir=rtl] .wsContentGeneric
+  left 0
+
 .wsContentGeneric
+  background-color lightGrey
+  height "calc(100% - %s)" % headerHeight
   position fixed
   top headerHeight
-  right 0
   width 100%
-  height "calc(100% - %s)" % headerHeight
-  background-color lightGrey
   z-index 9
   &.sidebarVisible
     max-width "calc(100% - %s)" % sidebarWidth
@@ -58,7 +63,7 @@
         text-overflow ellipsis
         overflow hidden
       & > input
-        padding-left textSpacing
+        padding-inline-start textSpacing
         border-radius standardBorderRadius
         border borderStyle
     &__reactions
@@ -119,10 +124,10 @@
           margin-inline-end auto
           overflow auto
         &__version
-          margin-left auto
+          margin-inline-start auto
           display flex
         &__lastversion
-          margin-left 15px
+          margin-inline-start 15px
           font-weight bold
     &__right
       display flex
@@ -150,7 +155,7 @@
           border none
           height 65px
           background-color mediumGrey
-          border-left 5px solid transparent
+          border-inline-start 5px solid transparent
           &:focus
             border-color transparent
             outline 0
@@ -188,8 +193,8 @@ responsiveColumnStyle()
       justify-content flex-end
       &__icon
         transform none
-        border-left-width 0
-        margin-left 5px
+        border-inline-start-width 0
+        margin-inline-start textSpacing
         padding standardSpacing
         width 65px
         border-top 5px solid

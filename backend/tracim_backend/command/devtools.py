@@ -8,6 +8,11 @@ from tracim_backend.config import CFG
 from tracim_backend.config import ConfigParam
 from tracim_backend.lib.core.live_messages import LiveMessagesLib
 from tracim_backend.lib.core.user_custom_properties import UserCustomPropertiesApi
+from tracim_backend.lib.mail_notifier.sender import EmailSender
+from tracim_backend.lib.mail_notifier.utils import EmailAddress
+from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
+from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
+from tracim_backend.lib.utils.utils import CustomPropertiesValidator
 
 
 class ParametersListCommand(AppContextCommand):
@@ -189,6 +194,63 @@ class LiveMessageTesterCommand(AppContextCommand):
         print("test message (id=-1) send to user {}".format(parsed_args.user_id))
 
 
+class SMTPMailCheckerCommand(AppContextCommand):
+    """ Check SMTP configuration by sending test email to given email address"""
+
+    def get_description(self) -> str:
+        return "check tracim smtp configuration by sending test email"
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "-r",
+            "--receiver",
+            help="email of the test mail receiver",
+            dest="receiver",
+            required=True,
+        )
+        return parser
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        # TODO - G.M - 05-04-2018 -Refactor this in order
+        # to not setup object var outside of __init__ .
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]  # type: CFG
+
+        if not self._app_config.EMAIL__NOTIFICATION__ACTIVATED:
+            print("Email notification are disabled")
+            return
+        smtp_config = SmtpConfiguration(
+            self._app_config.EMAIL__NOTIFICATION__SMTP__SERVER,
+            self._app_config.EMAIL__NOTIFICATION__SMTP__PORT,
+            self._app_config.EMAIL__NOTIFICATION__SMTP__USER,
+            self._app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+            self._app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+        )
+        sender = EmailSender(self._app_config, smtp_config, True)
+        html = """\
+        <html>
+          <head></head>
+          <body>
+            <p>This is just a test email from Tracim</p>
+          </body>
+        </html>
+        """
+
+        msg = EmailNotificationMessage(
+            subject="Test Email from Tracim",
+            from_header=EmailAddress("", self._app_config.EMAIL__NOTIFICATION__FROM__EMAIL),
+            to_header=EmailAddress("", parsed_args.receiver),
+            reply_to=EmailAddress("", self._app_config.EMAIL__NOTIFICATION__FROM__EMAIL),
+            references=EmailAddress("", "references-test@localhost"),
+            lang="en",
+            body_html=html,
+        )
+        sender.send_mail(msg)
+        sender.disconnect()
+        print("Email sended")
+
+
 class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
     """
     Tool to generate a json usable as template for translation of loaded user custom properties
@@ -206,3 +268,43 @@ class ExtractCustomPropertiesTranslationsCommand(AppContextCommand):
             current_user=None, app_config=self._app_config, session=self._session
         )
         print(json.dumps(custom_properties_api.get_translation_template()))
+
+
+class CustomPropertiesCheckerCommand(AppContextCommand):
+    """
+    Tool to validate custom properties
+    """
+
+    auto_setup_context = False
+
+    def get_description(self) -> str:
+        return "Check custom properties"
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "-s", "--json-schema", help="path of the json schema", dest="json_schema",
+        )
+        parser.add_argument(
+            "-u", "--ui-schema", help="path of the ui schema", dest="ui_schema",
+        )
+        return parser
+
+    def take_action(self, parsed_args: argparse.Namespace) -> None:
+        super(CustomPropertiesCheckerCommand, self).take_action(parsed_args)
+        custom_propertie_validator = CustomPropertiesValidator()
+        if not parsed_args.json_schema and not parsed_args.ui_schema:
+            print("No schema provided, skip checking.")
+            return
+        if parsed_args.json_schema:
+            print("Checking json schema at {}".format(parsed_args.json_schema))
+            json_content = custom_propertie_validator.validate_valid_json_file(
+                parsed_args.json_schema
+            )
+            custom_propertie_validator.validate_json_schema(json_content)
+        if parsed_args.ui_schema:
+            print("Checking ui schema at {}".format(parsed_args.ui_schema))
+            json_content = custom_propertie_validator.validate_valid_json_file(
+                parsed_args.ui_schema
+            )
+        print("Schema validated without any issues")

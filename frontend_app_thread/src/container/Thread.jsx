@@ -17,8 +17,6 @@ import {
   PopinFixedContent,
   Timeline,
   CUSTOM_EVENT,
-  LOCAL_STORAGE_FIELD,
-  getLocalStorageItem,
   buildHeadTitle,
   RefreshWarningMessage,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -27,6 +25,7 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   sendGlobalFlashMessage,
+  tinymceRemove,
   FAVORITE_STATE,
   ROLE,
   COLORS,
@@ -52,7 +51,6 @@ export class Thread extends React.Component {
       config: param.config,
       loggedUser: param.loggedUser,
       content: param.content,
-      newComment: '',
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
@@ -147,14 +145,6 @@ export class Thread extends React.Component {
 
   updateTimelineAndContent () {
     const { props } = this
-    this.setState({
-      newComment: getLocalStorageItem(
-        this.state.appName,
-        this.state.content,
-        LOCAL_STORAGE_FIELD.COMMENT
-      ) || ''
-    })
-
     this.loadContent()
     props.loadTimeline(getThreadRevision, this.state.content)
   }
@@ -169,12 +159,12 @@ export class Thread extends React.Component {
       this.updateTimelineAndContent()
     }
 
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
-    globalThis.tinymce.remove('#wysiwygTimelineComment')
+    tinymceRemove('#wysiwygTimelineComment')
   }
 
   setHeadTitle = (contentName) => {
@@ -455,7 +445,6 @@ export class Thread extends React.Component {
                 memberList={state.config.workspace && state.config.workspace.memberList}
                 apiUrl={state.config.apiUrl}
                 timelineData={props.timeline}
-                newComment={state.newComment}
                 disableComment={!state.content.is_editable}
                 availableStatusList={state.config.availableStatuses}
                 wysiwyg={state.timelineWysiwyg}

@@ -1,4 +1,5 @@
 import React from 'react'
+import i18next from 'i18next'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router-dom'
 import { translate } from 'react-i18next'
@@ -267,6 +268,17 @@ class Login extends React.Component {
 
   handleUserConnection = async () => {
     const { props } = this
+
+    if (window.Notification) {
+      try {
+        if (Notification.permission !== 'denied') {
+          Notification.requestPermission()
+        }
+      } catch (e) {
+        console.error('Could not show notification', e)
+      }
+    }
+
     props.dispatch(setUserConnected({ ...props.user, logged: true }))
     if (props.system.redirectLogin !== '') {
       props.history.push(props.system.redirectLogin)
@@ -441,7 +453,7 @@ class Login extends React.Component {
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
-      <div className='loginpage'>
+      <div className='loginpage' dir={i18next.dir()}>
         <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
         <section className='loginpage__main'>
           {state.displayedOption === DISPLAY.SIGN_IN && (

@@ -6,8 +6,8 @@ import sys
 import warnings
 
 from hapic.ext.pyramid import PyramidContext
-from preview_generator.preview.builder.office__libreoffice import LO_MIMETYPES
 from pyramid.config import Configurator
+from pyramid.events import NewResponse
 from pyramid.request import Request
 from pyramid.router import Router
 import pyramid_beaker
@@ -52,6 +52,7 @@ from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticat
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
+from tracim_backend.lib.utils.http_cache import default_to_cache_control_no_store
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import sliced_dict
@@ -78,41 +79,6 @@ from tracim_backend.views.frontend import FrontendController
 # useful to avoid apispec error
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
-
-
-# HACK - G.M - 2021-06-14 - disable spreadsheet support for preview by overriding
-# Preview generator Libreoffice mimetype list.
-spreadsheet_mimetypes = (
-    # Excel file mimetypes:
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # .xslx
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.template",  # .xlst
-    "application/vnd.ms-excel.sheet.binary.macroEnabled.12",  # .xlsb
-    "application/vnd.ms-excel.sheet.macroEnabled.12",  # .xlsm
-    "application/vnd.ms-excel.template.macroEnabled.12",  # .xltm
-    "application/wps-office.xls",  # .xls
-    "application/wps-office.xlsx",  # .xlsx
-    # Openoffice calc mimetypes:
-    "application/vnd.oasis.opendocument.spreadsheet",  # .ods
-    "application/vnd.oasis.opendocument.spreadsheet-template",  # .ots
-    "application/vnd.oasis.opendocument.spreadsheet-flat-xml",  # .fods
-    # Staroffice
-    "application/vnd.sun.xml.calc",
-    "application/vnd.sun.xml.calc.template",
-    "application/vnd.stardivision.calc",
-    "application/x-starcalc",
-    # Apple numbers
-    "application/x-iwork-numbers-sffnumbers",
-    "application/vnd.apple.numbers",
-    # others:
-    "application/x-gnumeric",
-    "text/spreadsheet",
-    "application/vnd.lotus-1-2-3",
-)
-for mimetype in spreadsheet_mimetypes:
-    try:
-        LO_MIMETYPES.pop(mimetype)
-    except KeyError:
-        pass
 
 
 class TracimPyramidContext(PyramidContext):
@@ -234,6 +200,9 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     configurator.include(add_cors_support)
     # make sure to add this before other routes to intercept OPTIONS
     configurator.add_cors_preflight_handler()
+    # Ensure a "Cache-Control: no-store" is setup by default on all responses
+    # Avoid a bug with Firefox: https://github.com/tracim/tracim/issues/5334
+    configurator.add_subscriber(default_to_cache_control_no_store, NewResponse)
     # Default authorization : Accept anything.
     configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
     authn_policy = MultiAuthenticationPolicy(policies)

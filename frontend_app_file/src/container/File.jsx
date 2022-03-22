@@ -19,8 +19,6 @@ import {
   PopinFixedRightPart,
   Timeline,
   displayDistanceDate,
-  LOCAL_STORAGE_FIELD,
-  getLocalStorageItem,
   FilenameWithExtension,
   CUSTOM_EVENT,
   ShareDownload,
@@ -30,6 +28,7 @@ import {
   removeExtensionOfFilename,
   buildFilePreviewUrl,
   buildHeadTitle,
+  tinymceRemove,
   ROLE,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
@@ -45,7 +44,8 @@ import {
   FAVORITE_STATE,
   PopinFixedRightPartContent,
   sendGlobalFlashMessage,
-  TagList
+  TagList,
+  getFileRevisionPreviewInfo
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -78,7 +78,6 @@ export class File extends React.Component {
         props.t('files'),
         props.t('Upload files')
       ],
-      newComment: '',
       newContent: {},
       loadingContent: true,
       newFile: '',
@@ -98,7 +97,14 @@ export class File extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      previewInfo: {
+        has_jpeg_preview: false,
+        has_pdf_preview: false,
+        content_id: param.content.content_id,
+        revision_id: param.content.current_revision_id,
+        page_nb: 1
+      }
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -162,11 +168,7 @@ export class File extends React.Component {
     const filenameNoExtension = removeExtensionOfFilename(data.fields.content.filename)
     const newContentObject = {
       ...state.content,
-      ...data.fields.content,
-      previewUrl: buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.fields.content.content_id, data.fields.content.current_revision_id, filenameNoExtension, 1, 500, 500),
-      lightboxUrlList: (new Array(data.fields.content.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
-        buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, data.fields.content.content_id, data.fields.content.current_revision_id, filenameNoExtension, pageNb, 1920, 1080)
-      )
+      ...data.fields.content
     }
 
     this.setState(prev => ({
@@ -190,14 +192,15 @@ export class File extends React.Component {
     if (!isTlmAboutCurrentContent) return
 
     const clientToken = this.sessionClientToken
+    const newContentObject = {
+      ...state.content,
+      ...data.fields.content
+    }
     this.setState(prev => ({
       content: clientToken === data.fields.client_token
-        ? { ...prev.content, ...data.fields.content }
+        ? newContentObject
         : prev.content,
-      newContent: {
-        ...prev.content,
-        ...data.fields.content
-      },
+      newContent: newContentObject,
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: clientToken !== data.fields.client_token,
       mode: clientToken === data.fields.client_token ? APP_FEATURE_MODE.VIEW : prev.mode
@@ -210,23 +213,15 @@ export class File extends React.Component {
     this.props.loadFavoriteContentList(this.state.loggedUser, this.setState.bind(this))
   }
 
-  async updateTimelineAndContent (pageToLoad = null) {
+  async updateTimelineAndContent () {
     const { props } = this
-    this.setState({
-      newComment: getLocalStorageItem(
-        this.state.appName,
-        this.state.content,
-        LOCAL_STORAGE_FIELD.COMMENT
-      ) || ''
-    })
-
-    this.loadContent(pageToLoad)
+    this.loadContent()
     props.loadTimeline(getFileRevision, this.state.content)
 
     if (this.state.config.workspace.downloadEnabled) this.loadShareLinkList()
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps, prevState) {
     const { state } = this
 
     // console.log('%c<File> did update', `color: ${this.state.config.hexcolor}`, prevState, state)
@@ -234,15 +229,27 @@ export class File extends React.Component {
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.setState({ fileCurrentPage: 1 })
-      this.updateTimelineAndContent(1)
+      this.updateTimelineAndContent()
+    } else if (prevState.content.current_revision_id !== state.content.current_revision_id) {
+      this.setState({ fileCurrentPage: 1 })
+      // User selected a revision in the timeline, update the preview info to get the right page number
+      const previewInfoResponse = await handleFetchResult(
+        await getFileRevisionPreviewInfo(
+          state.config.apiUrl,
+          state.content.workspace_id,
+          state.content.content_id,
+          state.content.current_revision_id
+        )
+      )
+      this.setState({ previewInfo: previewInfoResponse.body })
     }
 
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) globalThis.tinymce.remove('#wysiwygTimelineComment')
+    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
   }
 
   componentWillUnmount () {
     console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
-    globalThis.tinymce.remove('#wysiwygTimelineComment')
+    tinymceRemove('#wysiwygTimelineComment')
   }
 
   setHeadTitle = (contentName) => {
@@ -256,34 +263,33 @@ export class File extends React.Component {
     }
   }
 
-  loadContent = async (pageToLoad = null) => {
+  loadContent = async () => {
     const { state, props } = this
 
     // RJ - 2021-08-07 the state is set before the await, and is therefore not redundant
     // with the setState at the end of the function
     this.setState({ loadingContent: true })
     const response = await handleFetchResult(await getFileContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
-
+    const content = response.body
     switch (response.apiResponse.status) {
       case 200: {
+        const previewInfoResponse = await handleFetchResult(
+          await getFileRevisionPreviewInfo(
+            state.config.apiUrl,
+            content.workspace_id,
+            content.content_id,
+            content.current_revision_id
+          )
+        )
         const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
-        const pageForPreview = pageToLoad || state.fileCurrentPage
         this.setState({
           loadingContent: false,
-          content: {
-            ...response.body,
-            filenameNoExtension: filenameNoExtension,
-            // FIXME - b.l - refactor urls
-            previewUrl: `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/500x500/${filenameNoExtension + '.jpg'}?page=${pageForPreview}&revision_id=${response.body.current_revision_id}`,
-            lightboxUrlList: (new Array(response.body.page_nb)).fill('').map((n, i) =>
-              // FIXME - b.l - refactor urls
-              `${state.config.apiUrl}/workspaces/${state.content.workspace_id}/files/${state.content.content_id}/revisions/${response.body.current_revision_id}/preview/jpg/1920x1080/${filenameNoExtension + '.jpg'}?page=${i + 1}`
-            )
-          },
-          mode: APP_FEATURE_MODE.VIEW
+          content,
+          mode: APP_FEATURE_MODE.VIEW,
+          previewInfo: previewInfoResponse.body
         })
         this.setHeadTitle(filenameNoExtension)
-        this.buildBreadcrumbs(response.body)
+        this.buildBreadcrumbs(content)
         break
       }
       default:
@@ -507,23 +513,14 @@ export class File extends React.Component {
 
     if (state.mode === APP_FEATURE_MODE.VIEW && isLastRevision) return
 
-    const filenameNoExtension = removeExtensionOfFilename(revision.filename)
-
     this.setState(prev => ({
       content: {
         ...prev.content,
         ...revision,
         workspace_id: state.content.workspace_id, // don't overrides workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
-        filenameNoExtension: filenameNoExtension,
         current_revision_id: revision.revision_id,
-        contentFull: null,
         is_archived: prev.is_archived, // archived and delete should always be taken from last version
-        is_deleted: prev.is_deleted,
-        // use state.content.workspace_id instead of revision.workspace_id because if file has been moved to a different workspace, workspace_id will change and break image urls
-        previewUrl: buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, revision.content_id, revision.revision_id, filenameNoExtension, 1, 500, 500),
-        lightboxUrlList: (new Array(revision.page_nb)).fill(null).map((n, i) => i + 1).map(pageNb => // create an array [1..revision.page_nb]
-          buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, revision.content_id, revision.revision_id, filenameNoExtension, pageNb, 1920, 1080)
-        )
+        is_deleted: prev.is_deleted
       },
       fileCurrentPage: 1, // always set to first page on revision switch
       mode: APP_FEATURE_MODE.REVISION
@@ -535,7 +532,7 @@ export class File extends React.Component {
       fileCurrentPage: 1,
       mode: APP_FEATURE_MODE.VIEW
     })
-    this.loadContent(1)
+    this.loadContent()
   }
 
   handleChangeFile = newFile => {
@@ -626,16 +623,12 @@ export class File extends React.Component {
 
     if (!['previous', 'next'].includes(previousNext)) return
     if (previousNext === 'previous' && state.fileCurrentPage === 0) return
-    if (previousNext === 'next' && state.fileCurrentPage > state.content.page_nb) return
+    if (previousNext === 'next' && state.fileCurrentPage > state.previewInfo.page_nb) return
 
     const nextPageNumber = previousNext === 'previous' ? state.fileCurrentPage - 1 : state.fileCurrentPage + 1
 
     this.setState(prev => ({
-      fileCurrentPage: nextPageNumber,
-      content: {
-        ...prev.content,
-        previewUrl: buildFilePreviewUrl(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.current_revision_id, state.content.filenameNoExtension, nextPageNumber, 500, 500)
-      }
+      fileCurrentPage: nextPageNumber
     }))
   }
 
@@ -822,7 +815,6 @@ export class File extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
-            newComment={state.newComment}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
@@ -887,7 +879,7 @@ export class File extends React.Component {
             color={state.config.hexcolor}
             fileType={state.content.mimetype}
             fileSize={displayFileSize(state.content.size)}
-            filePageNb={state.content.page_nb}
+            filePageNb={state.previewInfo.page_nb}
             activesShares={state.content.actives_shares}
             creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
             creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
@@ -1001,6 +993,31 @@ export class File extends React.Component {
     const revisionList = props.timeline.filter(t => t.timelineType === 'revision')
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
+    const filenameWithoutExtension = state.loadingContent ? '' : removeExtensionOfFilename(state.content.filename)
+    const previewUrl = buildFilePreviewUrl(
+      state.config.apiUrl,
+      state.content.workspace_id,
+      state.content.content_id,
+      state.content.current_revision_id,
+      filenameWithoutExtension,
+      state.fileCurrentPage,
+      500,
+      500
+    )
+    const lightboxUrlList = (new Array(state.previewInfo.page_nb))
+      .fill(null)
+      .map((n, index) => // create an array [1..revision.page_nb]
+        buildFilePreviewUrl(
+          state.config.apiUrl,
+          state.content.workspace_id,
+          state.content.content_id,
+          state.content.current_revision_id,
+          filenameWithoutExtension,
+          index + 1,
+          1920,
+          1080
+        )
+      )
 
     return (
       <PopinFixed
@@ -1068,13 +1085,13 @@ export class File extends React.Component {
               icon: 'far fa-file',
               label: props.t('Download current page as PDF'),
               downloadLink: this.getDownloadPdfPageUrl(state),
-              showAction: state.content.has_pdf_preview,
+              showAction: state.previewInfo.has_pdf_preview,
               dataCy: 'popinListItem__downloadPageAsPdf'
             }, {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
               downloadLink: this.getDownloadPdfFullUrl(state),
-              showAction: state.content.has_pdf_preview,
+              showAction: state.previewInfo.has_pdf_preview,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'fas fa-download',
@@ -1110,9 +1127,9 @@ export class File extends React.Component {
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
-            previewUrl={state.content.previewUrl ? state.content.previewUrl : ''}
-            isJpegAvailable={state.content.has_jpeg_preview}
-            filePageNb={state.content.page_nb}
+            previewUrl={previewUrl}
+            isJpegAvailable={state.previewInfo.has_jpeg_preview}
+            filePageNb={state.previewInfo.page_nb}
             fileCurrentPage={state.fileCurrentPage}
             mimeType={state.content.mimetype}
             isArchived={state.content.is_archived}
@@ -1122,10 +1139,10 @@ export class File extends React.Component {
             onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             downloadRawUrl={this.getDownloadRawUrl(state)}
-            isPdfAvailable={state.content.has_pdf_preview}
+            isPdfAvailable={state.previewInfo.has_pdf_preview}
             downloadPdfPageUrl={this.getDownloadPdfPageUrl(state)}
             downloadPdfFullUrl={this.getDownloadPdfFullUrl(state)}
-            lightboxUrlList={state.content.lightboxUrlList}
+            lightboxUrlList={lightboxUrlList}
             onChangeFile={this.handleChangeFile}
             onClickDropzoneCancel={this.handleClickDropzoneCancel}
             onClickDropzoneValidate={this.handleClickDropzoneValidate}

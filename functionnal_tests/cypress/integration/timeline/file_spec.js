@@ -18,7 +18,7 @@ describe('Timeline', () => {
       cy.createThread(threadTitle, workspace.workspace_id).then(thread => {
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId: workspace.workspace_id, contentType: 'thread', contentId: thread.content_id }
+          params: { contentId: thread.content_id }
         })
       })
       cy.get(addFileButton).should('be.enabled').click()

@@ -13,11 +13,35 @@ from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import KANBAN_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
+from tracim_backend.models.data import Content
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 from tracim_backend.tests.utils import create_1000px_png_test_image
 from tracim_backend.tests.utils import set_html_document_slug_to_legacy
 from tracim_backend.views.core_api.schemas import UserDigestSchema
+
+
+@pytest.fixture
+def test_file(workspace_api_factory, content_api_factory, content_type_list, session) -> Content:
+    workspace_api = workspace_api_factory.get()
+    content_api = content_api_factory.get()
+    business_workspace = workspace_api.get_one(1)
+    test_file = content_api.create(
+        content_type_slug=content_type_list.File.slug,
+        workspace=business_workspace,
+        label="Test file",
+        do_save=True,
+        do_notify=False,
+    )
+    with new_revision(session=session, tm=transaction.manager, content=test_file):
+        content_api.update_file_data(
+            test_file, "Test_file.txt", new_mimetype="plain/text", new_content=b"Test file"
+        )
+    with new_revision(session=session, tm=transaction.manager, content=test_file):
+        content_api.update_content(test_file, "Test_file", "<p>description</p>")
+        session.flush()
+    transaction.commit()
+    return test_file
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -1485,11 +1509,7 @@ class TestHtmlDocuments(object):
 @pytest.mark.usefixtures("default_content_fixture")
 @pytest.mark.parametrize(
     "config_section",
-    [
-        {"name": "functional_test"},
-        {"name": "functional_s3_storage_test"},
-        {"name": "functional_memory_storage_test"},
-    ],
+    [{"name": "functional_test"}, {"name": "functional_s3_storage_test"}],
     indirect=True,
 )
 class TestFiles(object):
@@ -1556,9 +1576,36 @@ class TestFiles(object):
         assert content["size"] == len(b"Test file")
         assert content["file_extension"] == ".txt"
         assert content["filename"] == "Test_file.txt"
-        assert content["page_nb"] == 1
-        assert content["has_pdf_preview"] is True
-        assert content["has_jpeg_preview"] is True
+
+    def test_api__get_preview_info__ok_200__nominal_case(
+        self, test_file: Content, web_testapp
+    ) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            f"/api/workspaces/{test_file.workspace_id}/files/{test_file.content_id}/preview_info",
+            status=200,
+        )
+        info = res.json_body
+        assert info["content_id"] == test_file.content_id
+        assert info["has_pdf_preview"]
+        assert info["has_jpeg_preview"]
+        assert info["page_nb"] == 1
+        assert info["revision_id"] == test_file.revision_id
+
+    def test_api__get_revision_preview_info__ok_200__nominal_case(
+        self, test_file: Content, web_testapp
+    ) -> None:
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get(
+            f"/api/workspaces/{test_file.workspace_id}/files/{test_file.content_id}/revisions/{test_file.revision_id}/preview_info",
+            status=200,
+        )
+        info = res.json_body
+        assert info["content_id"] == test_file.content_id
+        assert info["has_pdf_preview"]
+        assert info["has_jpeg_preview"]
+        assert info["page_nb"] == 1
+        assert info["revision_id"] == test_file.revision_id
 
     def test_api__get_kanban__ok_200__nominal_case(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -1641,9 +1688,6 @@ class TestFiles(object):
         assert content["file_extension"] == ""
         assert content["filename"] == "Test file"
         assert content["size"] == 0
-        assert content["page_nb"] is None
-        assert content["has_pdf_preview"] is False
-        assert content["has_jpeg_preview"] is False
 
     def test_api__get_file__ok_200__binary_file(
         self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
@@ -1705,9 +1749,6 @@ class TestFiles(object):
         assert content["size"] == 100
         assert content["file_extension"] == ".bin"
         assert content["filename"] == "Test_file.bin"
-        assert content["page_nb"] is None
-        assert content["has_pdf_preview"] is False
-        assert content["has_jpeg_preview"] is False
 
     def test_api__get_files__err_400__wrong_content_type(self, web_testapp) -> None:
         """
@@ -1888,9 +1929,6 @@ class TestFiles(object):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["mimetype"] == "plain/text"
         assert content["size"] == len(b"Test file")
-        assert content["page_nb"] == 1
-        assert content["has_pdf_preview"] is True
-        assert content["has_jpeg_preview"] is True
         assert content["current_revision_type"] == "edition"
 
         res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
@@ -1920,9 +1958,6 @@ class TestFiles(object):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["mimetype"] == "plain/text"
         assert content["size"] == len(b"Test file")
-        assert content["page_nb"] == 1
-        assert content["has_pdf_preview"] is True
-        assert content["has_jpeg_preview"] is True
         assert content["current_revision_type"] == "edition"
 
     def test_api__update_file_info__err_400__content_status_closed(
@@ -2101,9 +2136,6 @@ class TestFiles(object):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["mimetype"] == "plain/text"
         assert content["size"] == len(b"Test file")
-        assert content["page_nb"] == 1
-        assert content["has_pdf_preview"] is True
-        assert content["has_jpeg_preview"] is True
 
         res = web_testapp.get("/api/workspaces/1/files/{}".format(test_file.content_id), status=200)
         content = res.json_body
@@ -2132,9 +2164,6 @@ class TestFiles(object):
         assert content["raw_content"] == "<p> Le nouveau contenu </p>"
         assert content["mimetype"] == "plain/text"
         assert content["size"] == len(b"Test file")
-        assert content["page_nb"] == 1
-        assert content["has_pdf_preview"] is True
-        assert content["has_jpeg_preview"] is True
 
         res = web_testapp.put_json(
             "/api/workspaces/1/files/{}".format(test_file.content_id), params=params, status=400
@@ -2258,8 +2287,6 @@ class TestFiles(object):
         assert revision["author"]["username"] == "TheAdmin"
         assert revision["mimetype"] == "plain/text"
         assert revision["size"] == len(b"Test file")
-        assert revision["page_nb"] == 1
-        assert revision["has_pdf_preview"] is True
         assert revision["version_number"] == 1
 
     def test_api__set_file_status__ok_200__nominal_case(
@@ -2543,7 +2570,6 @@ class TestFiles(object):
         assert content["label"] == "test_image"
         assert content["slug"] == "test-image"
         assert content["author"]["user_id"] == admin_user.user_id
-        assert content["page_nb"] == 1
         assert content["mimetype"] == "image/png"
 
     def test_api__create_file_as_publication__err__400__publications_disabled(
@@ -2713,7 +2739,6 @@ class TestFiles(object):
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
         assert res["author"]["user_id"] == admin_user.user_id
-        assert res["page_nb"] == 1
         assert res["mimetype"] == "image/png"
 
     def test_api__create_file__ok__200__in_file(
@@ -2781,7 +2806,6 @@ class TestFiles(object):
         assert res["label"] == "test_image"
         assert res["slug"] == "test-image"
         assert res["author"]["user_id"] == admin_user.user_id
-        assert res["page_nb"] == 1
         assert res["mimetype"] == "image/png"
 
     def test_api__create_file__err__400__unallow_subcontent(

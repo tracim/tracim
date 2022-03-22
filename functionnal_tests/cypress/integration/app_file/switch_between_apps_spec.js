@@ -39,7 +39,7 @@ describe('App File', () => {
       it('should write a comment and check if it is there after switching apps, as well as the revisions', () => {
         cy.visitPage({
           pageName: p.CONTENT_OPEN,
-          params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+          params: { contentId: secondContentId }
         })
 
         cy.contains('.breadcrumbs__item', fullFilename_3)

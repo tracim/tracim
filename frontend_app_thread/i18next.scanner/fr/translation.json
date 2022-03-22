@@ -6,9 +6,10 @@
   "Start a topic": "Lancer une discussion",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
   "Error while creating thread": "Erreur lors de la création de la discussion",
-  "Error while saving the comment": "Erreur lors de l'enregistrement du commentaire",
+  "Error while saving the comment": "Erreur pendant la sauvegarde du commentaire",
   "Thread": "Discussion",
   "thread": "discussion",
   "threads": "discussions",
-  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}"
+  "The content has been modified by {{author}}": "Le contenu a été modifié par {{author}}",
+  "Delete": "Supprimer"
 }

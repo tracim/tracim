@@ -3,6 +3,7 @@ from collections import OrderedDict
 import datetime
 import email
 import importlib
+import json
 import os
 from os.path import normpath as base_normpath
 import pkgutil
@@ -22,7 +23,11 @@ import uuid
 
 from colour import Color
 from git import InvalidGitRepositoryError
-from marshmallow import ValidationError
+import jsonschema
+from jsonschema import SchemaError
+from jsonschema import ValidationError as JsonSchemaValidationError
+from jsonschema.validators import validator_for
+from marshmallow import ValidationError as MarshmallowValidationError
 import pytz
 from sqlakeyset import unserialize_bookmark
 
@@ -30,6 +35,9 @@ from tracim_backend.exceptions import NotAFileError
 from tracim_backend.exceptions import NotReadableDirectory
 from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
+from tracim_backend.exceptions import TracimValidationFailed
+from tracim_backend.exceptions import UnvalidCustomPropertiesSchema
+from tracim_backend.exceptions import UnvalidJsonFile
 
 if TYPE_CHECKING:
     from tracim_backend.config import CFG
@@ -478,4 +486,58 @@ def validate_page_token(page_token: str) -> None:
     try:
         unserialize_bookmark(page_token)
     except Exception as e:
-        raise ValidationError('Page token "{}" is not a valid page token'.format(page_token)) from e
+        raise MarshmallowValidationError(
+            'Page token "{}" is not a valid page token'.format(page_token)
+        ) from e
+
+
+def validate_json(json_file_path: str) -> Dict[str, Any]:
+    with open(json_file_path) as json_file:
+        return json.load(json_file)
+
+
+class CustomPropertiesValidator:
+    def validate_valid_json_file(self, file_path: str) -> Dict[str, Any]:
+        is_file_exist(file_path)
+        is_file_readable(file_path)
+        try:
+            return validate_json(file_path)
+        except json.JSONDecodeError as exc:
+            raise UnvalidJsonFile("{} is not a valid json file".format(file_path)) from exc
+
+    def validate_json_schema(self, json_schema: Dict[str, Any]):
+        # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
+        # - prevent an invalid json-schema
+        # - ensure that validation of content will not failed due to invalid schema.
+        # - ensure the json-schema will be correctly processed by the frontend (specific tracim constraints)
+        try:
+            cls = validator_for(json_schema)
+            cls.check_schema(json_schema)
+        except SchemaError as exc:
+            raise UnvalidCustomPropertiesSchema("Unvalid json-schema.") from exc
+
+        properties = json_schema.get("properties")
+        if not properties:
+            raise UnvalidCustomPropertiesSchema('Missing "properties" key at json root.')
+
+        missing_or_empty_title_properties = []
+        for property_name, value in properties.items():
+            if "title" not in value or not value.get("title"):
+                missing_or_empty_title_properties.append(property_name)
+
+        if missing_or_empty_title_properties:
+            raise UnvalidCustomPropertiesSchema(
+                'Missing or empty "title" key in these properties : {}.'.format(
+                    ",".join(missing_or_empty_title_properties)
+                )
+            )
+
+    def validate_data(self, params: Dict[str, Any], json_schema: Dict[str, Any]):
+        try:
+            jsonschema.validate(params, schema=json_schema)
+        except JsonSchemaValidationError as exc:
+            raise TracimValidationFailed(
+                'JSONSchema Validation Failed: {}: "{}"'.format(
+                    "> ".join([str(item) for item in exc.absolute_path]), exc.message
+                )
+            ) from exc

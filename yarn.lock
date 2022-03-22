@@ -1401,6 +1401,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.16.0":
+  version: 7.17.2
+  resolution: "@babel/runtime@npm:7.17.2"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 40a24ffea416acffc8ee7956ea587bcf4de7d5e980085cf73827fb346304d4aedb3e33340ba1b63ce3ca35c5bb72983f342c22384d8dd1b4219c0ab10d8231eb
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.10.1":
   version: 7.10.1
   resolution: "@babel/template@npm:7.10.1"
@@ -2970,18 +2979,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"broadcast-channel@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "broadcast-channel@npm:3.1.0"
+"broadcast-channel@npm:^4.10.0":
+  version: 4.10.0
+  resolution: "broadcast-channel@npm:4.10.0"
   dependencies:
-    "@babel/runtime": ^7.7.2
-    detect-node: ^2.0.4
-    js-sha3: 0.8.0
+    "@babel/runtime": ^7.16.0
+    detect-node: ^2.1.0
     microseconds: 0.2.0
     nano-time: 1.0.0
+    oblivious-set: 1.0.0
+    p-queue: 6.6.2
     rimraf: 3.0.2
-    unload: 2.2.0
-  checksum: 55bdea7ebf5039c35a0bb920ea5d25fd57d95f9302c9e8803cfdaf2fded2a282158b63082737f6b612d17e52d6d9d74c8065f3aa58249b14cf6aebf6af088664
+    unload: 2.3.1
+  checksum: b2caba9d54e47cae7267973c54605fe0c4441fd46932aa956cb2b5c36936904b3492dca8cc0830ee79b83a679f6438382e6c50e00d8642a7aef1415222503109
   languageName: node
   linkType: hard
 
@@ -4609,6 +4619,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"detect-node@npm:2.1.0, detect-node@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "detect-node@npm:2.1.0"
+  checksum: 5100c924d74bdc2cf861af88dce6618abbbb95e3b71047f1eac7e475981416aa2c208c7153fd830df372f8ce324a207adb1c9f56884fa94bcb820b8406dd9e6f
+  languageName: node
+  linkType: hard
+
 "detect-node@npm:^2.0.4":
   version: 2.0.4
   resolution: "detect-node@npm:2.0.4"
@@ -5554,6 +5571,13 @@ __metadata:
   version: 4.0.4
   resolution: "eventemitter3@npm:4.0.4"
   checksum: 6693972304a7bf91aea3727d83803e1b38819ee0ed628ed842ac909284dedd1f3a7aa0ab4ccdd332bfcb9720138c9021b7b4737259e9fe8d70f7f25c57b9f0ad
+  languageName: node
+  linkType: hard
+
+"eventemitter3@npm:^4.0.4":
+  version: 4.0.7
+  resolution: "eventemitter3@npm:4.0.7"
+  checksum: 1fc12c7bc3b4194c50975827e72d56ff57c32b75a4c7dbf4d5eebf3c8371f6f1aad6799150b609de1b867c0d8a9885c08b6ca5e7e0dc437d6152f3063b2607dd
   languageName: node
   linkType: hard
 
@@ -7809,13 +7833,6 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"js-sha3@npm:0.8.0":
-  version: 0.8.0
-  resolution: "js-sha3@npm:0.8.0"
-  checksum: 21d7129a634d7e9072a00fa0c037a3f7192d9a2d85377ecbbc7a614fbf523d31cc7489c74adfa84d606d58eb5bffb9dbfbe53bb618ec371942e63070559f3719
-  languageName: node
-  linkType: hard
-
 "js-tokens@npm:^3.0.0 || ^4.0.0, js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -9768,6 +9785,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"oblivious-set@npm:1.0.0":
+  version: 1.0.0
+  resolution: "oblivious-set@npm:1.0.0"
+  checksum: 8309f38148ac63b3b421759d490afb613ea2375b2c55b9acffa62382b012fe768c88bb1e63ff068dd225a9153e3e684f9964c03f08bec06347cc17b6800dc7e9
+  languageName: node
+  linkType: hard
+
 "obuf@npm:^1.0.0, obuf@npm:^1.1.2":
   version: 1.1.2
   resolution: "obuf@npm:1.1.2"
@@ -9973,12 +9997,31 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"p-queue@npm:6.6.2":
+  version: 6.6.2
+  resolution: "p-queue@npm:6.6.2"
+  dependencies:
+    eventemitter3: ^4.0.4
+    p-timeout: ^3.2.0
+  checksum: e95a48f421589ac95dc8913bc949e4c73cfc40c294580f176d2e1af6fa525459ed340c9e8d72a9947ca25e5f79f1d5cfbc10f546f958a324704bfcc838340cee
+  languageName: node
+  linkType: hard
+
 "p-retry@npm:^3.0.1":
   version: 3.0.1
   resolution: "p-retry@npm:3.0.1"
   dependencies:
     retry: ^0.12.0
   checksum: 26c888de4e64e62e9b6112219fae2c2f45ddc2face5d6c7c98e1b8762bcd4a54bea4f50cdff275b2ee5ebb11b633bfb16f4dd473ecd4d07081385cb716e961cf
+  languageName: node
+  linkType: hard
+
+"p-timeout@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "p-timeout@npm:3.2.0"
+  dependencies:
+    p-finally: ^1.0.0
+  checksum: d7e71c1547736ecd392be3c4ea956af1abd2b6f56179f37443672cfaccb41383533cdf2e927890bb5282e1eb41c979be133eef26a6a84a8224ff4f5c9455b517
   languageName: node
   linkType: hard
 
@@ -11238,9 +11281,9 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-slick@npm:^0.25.2":
-  version: 0.25.2
-  resolution: "react-slick@npm:0.25.2"
+"react-slick@npm:0.28":
+  version: 0.28.1
+  resolution: "react-slick@npm:0.28.1"
   dependencies:
     classnames: ^2.2.5
     enquire.js: ^2.1.6
@@ -11248,9 +11291,9 @@ fsevents@^1.2.7:
     lodash.debounce: ^4.0.8
     resize-observer-polyfill: ^1.5.0
   peerDependencies:
-    react: ^0.14.0 || ^15.0.1 || ^16.0.0
-    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0
-  checksum: b4313df728a53d2c26b0d501f89a50f91354e8ee09cd04c3cf703791e782843697f4ec996a3f187fd5570e0a204d2803d9fc20efb1c18f22a53ac269db59b8bb
+    react: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+  checksum: fa9694f2e8ce05ab2e19acb577bed85433be4a0a7dca8ee5888090c6bc171f3417d957b8097fdd3a08284fa96e1c621585313431a9e8c2c138a4acbb9e318321
   languageName: node
   linkType: hard
 
@@ -13365,7 +13408,6 @@ fsevents@^1.2.7:
     "@babel/register": ^7.12.10
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
-    broadcast-channel: ^3.1.0
     chai: ^4.2.0
     chai-enzyme: ^1.0.0-beta.1
     classnames: ^2.2.6
@@ -13797,7 +13839,7 @@ fsevents@^1.2.7:
     react-i18next: 7.4.0
     react-image-lightbox: ^5.1.0
     react-router-dom: ^5.2.0
-    react-slick: ^0.25.2
+    react-slick: 0.28
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     slick-carousel: ^1.8.1
@@ -14152,6 +14194,7 @@ fsevents@^1.2.7:
     autolinker: ^3.13.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
+    broadcast-channel: ^4.10.0
     chai: ^4.2.0
     chai-enzyme: ^1.0.0-beta.1
     classnames: ^2.2.6
@@ -14460,13 +14503,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"unload@npm:2.2.0":
-  version: 2.2.0
-  resolution: "unload@npm:2.2.0"
+"unload@npm:2.3.1":
+  version: 2.3.1
+  resolution: "unload@npm:2.3.1"
   dependencies:
     "@babel/runtime": ^7.6.2
-    detect-node: ^2.0.4
-  checksum: 618ba99792546b1cef7abe8e8a100a6ed0a34d3a5a64908857b065eabc427c80e2e70eaf5d70d36842efe9654682423719b1e8c3de72dbe720b1a0a074cfe0ae
+    detect-node: 2.1.0
+  checksum: 54269dcba3e7773468fbfc141dfde33375b40982bb5fe6791cae2cf4b2c9ddb013d13aa2f72395ae7473e38fe668d35dac98bccbb9eb2760b4239258238c6f88
   languageName: node
   linkType: hard
 

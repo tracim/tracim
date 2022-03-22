@@ -1,0 +1,22 @@
+{
+  "alex.doe@jco.co": "alejandra.garcia@alm.es",
+  "New full name:": "Nuevo nombre completo:",
+  "New email:": "Nueva dirección de correo electrónico:",
+  "New password:": "Nueva contraseña:",
+  "d": "d",
+  "Log in": "Inicia sesión",
+  "y": "a",
+  "{{author}} commented on {{content}}{{workspaceInfo}}": "{{author}} comentó en {{content}}{{workspaceInfo}}",
+  "Administrator's password:": "Contraseña de administrador:",
+  "w": "sem",
+  "mth": "mese",
+  "Type your password:": "Escribe tu contraseña:",
+  "Current password:": "Contraseña actual:",
+  "Alex Doe": "Alejandra García",
+  "sec": "s",
+  "New username:": "Nuevo nombre de usuario:",
+  "Repeat new password:": "Repite la nueva contraseña:",
+  "min": "min",
+  "{{author}} created {{content}}{{workspaceInfo}}": "{{author}} creó {{content}}{{workspaceInfo}}",
+  "hr": "h"
+}

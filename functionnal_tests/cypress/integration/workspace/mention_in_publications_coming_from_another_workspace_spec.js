@@ -39,6 +39,7 @@ describe('Mentions in publications', () => {
       cy.get('.feedItem__publication__body__content a').click()
       cy.get('.publications__empty').should('be.visible')
       cy.get('#wysiwygTimelineCommentPublication').type('@' + otherUserName)
+      cy.get('.autocomplete__item__active').should('be.visible').click()
       cy.get('.commentArea__submit__btn').click()
       cy.get('.feedItem__publication__body__content').contains('@' + otherUserName)
       // INFO - RJ - 2021-09-07 - The logic here is that an invalid mention message would prevent

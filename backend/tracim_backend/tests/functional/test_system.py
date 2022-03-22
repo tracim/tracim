@@ -156,6 +156,7 @@ class TestAboutEndpoint(object):
         assert res.json_body["version"]
         assert res.json_body["datetime"]
         assert res.json_body["website"] == "https://www.algoo.fr/fr/tracim"
+        assert res.json_body["database_schema_version"] is None
 
     def test_api__get_about__err_401__unregistered_user(self, web_testapp):
         """
@@ -187,6 +188,8 @@ class TestUsernameEndpoints(object):
             ("all", False),
             ("tous", False),
             ("todos", False),
+            ("alle", False),
+            ("الكل", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
@@ -201,7 +204,7 @@ class TestUsernameEndpoints(object):
     def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/reserved-usernames", status=200)
-        assert set(res.json["items"]) == set(("all", "tous", "todos"))
+        assert set(res.json["items"]) == set(("all", "tous", "todos", "alle", "الكل"))
 
 
 @pytest.mark.usefixtures("test_fixture")
@@ -324,6 +327,7 @@ class TestConfigEndpoint(object):
             {"code": "en", "display": "English"},
             {"code": "pt", "display": "Português"},
             {"code": "de", "display": "Deutsch"},
+            {"code": "ar", "display": "العربية"},
         ]
         assert res.json_body["user__self_registration__enabled"] is False
         assert res.json_body["ui__spaces__creation__parent_space_choice__visible"] is True

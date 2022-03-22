@@ -38,6 +38,7 @@ import {
   handleTranslateHtmlContent,
   getDefaultTranslationState,
   sendGlobalFlashMessage,
+  tinymceRemove,
   FAVORITE_STATE,
   addExternalLinksIcons,
   PopinFixedRightPartContent
@@ -71,7 +72,6 @@ export class HtmlDocument extends React.Component {
         props.t('Write a note')
       ],
       rawContentBeforeEdit: '',
-      newComment: '',
       newContent: {},
       loadingContent: true,
       timelineWysiwyg: false,
@@ -163,7 +163,7 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP, data)
 
     props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-    globalThis.tinymce.remove('#wysiwygNewVersion')
+    tinymceRemove('#wysiwygNewVersion')
   }
 
   handleReloadContent = data => {
@@ -171,7 +171,7 @@ export class HtmlDocument extends React.Component {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT, data)
 
     props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-    globalThis.tinymce.remove('#wysiwygNewVersion')
+    tinymceRemove('#wysiwygNewVersion')
   }
 
   handleAllAppChangeLanguage = data => {
@@ -197,16 +197,16 @@ export class HtmlDocument extends React.Component {
     }
 
     if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
-      globalThis.tinymce.remove('#wysiwygNewVersion')
+      tinymceRemove('#wysiwygNewVersion')
     } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) {
-      globalThis.tinymce.remove('#wysiwygTimelineComment')
+      tinymceRemove('#wysiwygTimelineComment')
     }
   }
 
   componentWillUnmount () {
     console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
-    globalThis.tinymce.remove('#wysiwygNewVersion')
-    globalThis.tinymce.remove('#wysiwygTimelineComment')
+    tinymceRemove('#wysiwygNewVersion')
+    tinymceRemove('#wysiwygTimelineComment')
   }
 
   setHeadTitle = (contentName) => {
@@ -246,11 +246,6 @@ export class HtmlDocument extends React.Component {
 
     this.setState({ loadingContent: true, mode: APP_FEATURE_MODE.VIEW })
     const resHtmlDocument = await handleFetchResult(await getHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id))
-    const localStorageComment = getLocalStorageItem(
-      state.appName,
-      resHtmlDocument.body,
-      LOCAL_STORAGE_FIELD.COMMENT
-    )
 
     const localStorageRawContent = getLocalStorageItem(
       state.appName,
@@ -285,7 +280,6 @@ export class HtmlDocument extends React.Component {
           ? localStorageRawContent
           : rawContentBeforeEdit
       },
-      newComment: localStorageComment || '',
       rawContentBeforeEdit: rawContentBeforeEdit,
       translationState: getDefaultTranslationState(previousState.config.system.config),
       translatedRawContent: null,
@@ -333,7 +327,7 @@ export class HtmlDocument extends React.Component {
   }
 
   handleCloseNewVersion = () => {
-    globalThis.tinymce.remove('#wysiwygNewVersion')
+    tinymceRemove('#wysiwygNewVersion')
 
     this.setState(prev => ({
       content: {
@@ -405,7 +399,7 @@ export class HtmlDocument extends React.Component {
         )
 
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
-        globalThis.tinymce.remove('#wysiwygNewVersion')
+        tinymceRemove('#wysiwygNewVersion')
         this.setState(previousState => {
           return {
             mode: APP_FEATURE_MODE.VIEW,
@@ -570,7 +564,7 @@ export class HtmlDocument extends React.Component {
 
   handleClickRefresh = () => {
     const { state } = this
-    globalThis.tinymce.remove('#wysiwygNewVersion')
+    tinymceRemove('#wysiwygNewVersion')
 
     const newObjectContent = {
       ...state.content,
@@ -712,7 +706,6 @@ export class HtmlDocument extends React.Component {
             loggedUser={state.loggedUser}
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
-            newComment={state.newComment}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}

@@ -64,7 +64,7 @@ describe('Account page', () => {
         .find('[data-cy=menusubcomponent__list__password]')
         .should('be.visible')
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('[data-cy=menusubcomponent__list__agenda]')
+        .find('[data-cy=menusubcomponent__list__configurationLinks]')
         .should('be.visible')
     })
     it('should have profile field visible', () => {
@@ -127,12 +127,21 @@ describe('Account page', () => {
         .should('have.class', 'fa-check')
     })
 
-    it('should have agenda field visible', () => {
+    it('should have agenda link visible', () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
-        .find('[data-cy=menusubcomponent__list__agenda]')
+        .find('[data-cy=menusubcomponent__list__configurationLinks]')
         .click()
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.agendaInfo__content__link__url')
+        .click()
+    })
+
+    it('should have webdav link visible', () => {
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('[data-cy=menusubcomponent__list__configurationLinks]')
+        .click()
+      cy.getTag({ selectorName: s.TRACIM_CONTENT })
+        .find('.webdavInfo__content__link__url')
         .click()
     })
   })

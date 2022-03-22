@@ -32,40 +32,50 @@ describe('Tags', () => {
 
   describe('in a content', () => {
     it('should have translations', () => {
-      cy.visitPage({
-        pageName: PAGES.CONTENT_OPEN,
-        params: { workspaceId, contentType: 'file', contentId }
-      })
-      cy.get('[data-cy=popin_right_part_tag]').click()
-
       cy.changeLanguage('en')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
+      cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Tags')
+
       cy.changeLanguage('fr')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
+      cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Étiquettes')
+
       cy.changeLanguage('pt')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
+      cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')
+
       cy.changeLanguage('de')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
+      cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Markierungen')
+
       cy.changeLanguage('en')
     })
   })
 
   describe('in a space', () => {
     it('should have translations', () => {
-      cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
-      cy.contains('.userstatus__role__text', 'Space manager')
-      cy.getTag({ selectorName: SELECTORS.WORKSPACE_DASHBOARD })
-        .find('.dashboard__workspace__detail__buttons .iconbutton')
-        .click()
-      cy.get('[data-cy=popin_right_part_tag').click()
-
       cy.changeLanguage('en')
+      cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+      cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Tags')
+
       cy.changeLanguage('fr')
+      cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+      cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Étiquettes')
+
       cy.changeLanguage('pt')
+      cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+      cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')
+
       cy.changeLanguage('de')
+      cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+      cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Markierungen')
     })
   })
