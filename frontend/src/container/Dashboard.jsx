@@ -501,6 +501,7 @@ export class Dashboard extends React.Component {
                           onClickBtn={() => props.history.push(app.route)}
                           appSlug={app.slug}
                           key={app.slug}
+                          dataCy={`create_${app.slug}`}
                         />
                       )
                     })}
