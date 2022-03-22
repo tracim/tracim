@@ -8,7 +8,7 @@
   "{{numberOfContents}} contents": "{{numberOfContents}} conteúdos",
   "{{numberOfUsers}} users": "{{numberOfUsers}} utilizadores",
   "and": "e",
-  "and {{count}} other people": "e {{count}} outras pessoas",
+  "and {{count}} other people": "e {{count}} outra pessoa",
   " in {{numberOfWorkspaces}} spaces": " em {{numberOfWorkspaces}} espaços",
   "Reaction created": "Reacção criada",
   "Reaction deleted": "Reacção eliminada",
@@ -16,7 +16,7 @@
   "{{numberContents}} content": "{{numberContents}} conteúdo",
   "{{numberContents}} contents": "{{numberContents}} conteúdos",
   "{{numberMembers}} member": "{{numberMembers}} membro",
-  "{{count}} members": "{{count}} membros",
+  "{{count}} members": "{{count}} membro",
   "0 comments": "0 comentário",
   "0 contents": "0 conteúdo",
   "0 members": "0 membro",
@@ -548,5 +548,7 @@
   "Comment_verb": "Comentar",
   "Image": "Imagem",
   "New language:": "Novo idioma:",
-  "Configuration links": "Links de configuração"
+  "Configuration links": "Links de configuração",
+  "and {{count}} other people_plural": "e {{count}} outras pessoas",
+  "{{count}} members_plural": "{{count}} membros"
 }

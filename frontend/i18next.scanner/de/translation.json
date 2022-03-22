@@ -548,5 +548,7 @@
   "Comment_verb": "Kommentieren",
   "Image": "Bild",
   "New language:": "Neue Sprache:",
-  "Configuration links": "Links zur Konfiguration"
+  "Configuration links": "Links zur Konfiguration",
+  "and {{count}} other people_plural": "",
+  "{{count}} members_plural": ""
 }

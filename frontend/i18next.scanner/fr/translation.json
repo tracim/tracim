@@ -8,7 +8,7 @@
   "{{numberContents}} content": "{{numberContents}} contenu",
   "{{numberContents}} contents": "{{numberContents}} contenus",
   "{{numberMembers}} member": "{{numberMembers}} membre",
-  "{{count}} members": "{{count}} membres",
+  "{{count}} members": "{{count}} membre",
   "0 comments": "0 commentaire",
   "0 contents": "0 contenu",
   "0 members": "0 membre",
@@ -467,7 +467,7 @@
   "{{author}} requested access to a space": "{{author}} a demandé l'accès à un espace",
   "Tags": "Étiquettes",
   "and": "et",
-  "and {{count}} other people": "et {{count}} autres personnes",
+  "and {{count}} other people": "et {{count}} autre personne",
   "{{numberOfContents}} contents": "{{numberOfContents}} contenus",
   "{{numberOfUsers}} users": "{{numberOfUsers}} utilisateurs",
   "{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces": "{{author}} a fait {{numberOfContribution}} contributions dans {{numberOfWorkspaces}} espaces",
@@ -548,5 +548,7 @@
   "Comment": "Commentaire",
   "Image": "Image",
   "New language:": "Nouvelle langue :",
-  "Configuration links": "Liens de configuration"
+  "Configuration links": "Liens de configuration",
+  "and {{count}} other people_plural": "et {{count}} autres personnes",
+  "{{count}} members_plural": "{{count}} membres"
 }
