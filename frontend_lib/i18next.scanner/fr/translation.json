@@ -187,7 +187,7 @@
   "Dark Skin Tone": "Peau foncée",
   "Upload a file": "Téléverser un fichier",
   "See files": "Voir les fichiers",
-  "{{numberOfFile}} files selected": "{{numberOfFile}} fichiers sélectionnés",
+  "{{count}} files selected": "{{count}} fichiers sélectionnés",
   "1 file selected": "1 fichier sélectionné",
   "Remove file": "Supprimer le fichier",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
@@ -217,5 +217,7 @@
   "Your tag has been added": "Votre étiquette a été ajoutée",
   "Your tag has been created": "Votre étiquette a été créée",
   "See more": "Voir plus",
-  "Error while loading timeline": "Erreur lors du chargement de l'historique"
+  "Error while loading timeline": "Erreur lors du chargement de l'historique",
+  "Agenda": "",
+  "{{count}} files selected_plural": "{{count}} fichiers sélectionnés"
 }

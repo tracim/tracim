@@ -187,7 +187,7 @@
   "Dark Skin Tone": "Tom de pele escuro",
   "Upload a file": "Subir ficheiro",
   "See files": "Ver ficheiros",
-  "{{numberOfFile}} files selected": "{{numberOfFile}} ficheiros seleccionados",
+  "{{count}} files selected": "{{count}} ficheiros seleccionados",
   "1 file selected": "1 ficheiro seleccionado",
   "Remove file": "Remover ficheiro",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
@@ -217,5 +217,7 @@
   "Your tag has been added": "A sua etiqueta foi adicionada",
   "Your tag has been created": "A sua etiqueta foi criada",
   "See more": "Ver mais",
-  "Error while loading timeline": "Erro ao carregar a linha cronológica"
+  "Error while loading timeline": "Erro ao carregar a linha cronológica",
+  "Agenda": "",
+  "{{count}} files selected_plural": "{{count}} ficheiros seleccionados"
 }

@@ -1,7 +1,6 @@
 {
   "0 comments": "0 تعليق",
   "{{numberComments}} comment": "{{numberComments}} تعليق",
-  "{{numberComments}} comments": "{{numberComments}} تعليقات",
   "Warning": "تحذير",
   "Error": "خطأ",
   "by": "بواسطة",
@@ -555,16 +554,22 @@
   "Comment_verb": "تعليق",
   "Image": "صورة",
   "New language:": "لغة جديدة:",
-  "and {{count}} other people_0": "",
+  "and {{count}} other people_0": "و {{count}} أشخاص آخرون",
   "and {{count}} other people_1": "",
   "and {{count}} other people_2": "",
   "and {{count}} other people_3": "",
   "and {{count}} other people_4": "",
   "and {{count}} other people_5": "",
-  "{{count}} members_0": "",
+  "{{count}} members_0": "{{count}} أعضاء",
   "{{count}} members_1": "",
   "{{count}} members_2": "",
   "{{count}} members_3": "",
   "{{count}} members_4": "",
-  "{{count}} members_5": ""
+  "{{count}} members_5": "",
+  "{{count}} comments_0": "{{count}} تعليقات",
+  "{{count}} comments_1": "",
+  "{{count}} comments_2": "",
+  "{{count}} comments_3": "",
+  "{{count}} comments_4": "",
+  "{{count}} comments_5": ""
 }
