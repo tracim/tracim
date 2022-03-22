@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-01-25 09:53+0100\n"
-"PO-Revision-Date: 2022-03-08 05:27+0000\n"
+"PO-Revision-Date: 2022-03-21 10:58+0000\n"
 "Last-Translator: Myriam Rabhi <myriamrabhi6@gmail.com>\n"
 "Language-Team: Arabic <https://hosted.weblate.org/projects/tracim/backend/ar/"
 ">\n"
@@ -193,7 +193,6 @@ msgid "password: {password}"
 msgstr "كلمة المرور: {password}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:21
-#, fuzzy
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your space: {a_link}"
