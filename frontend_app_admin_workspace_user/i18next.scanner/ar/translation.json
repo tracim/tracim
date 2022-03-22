@@ -48,5 +48,5 @@
   "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "يجب أن يكون طول اسم المستخدم بين {{minimumCharactersUsername}} و {{maximumCharactersUsername}} حرفا",
   "Error while saving new user": "خطأ أثناء حفظ مستخدم جديد",
   "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "اسم المستخدم الخاص بك غير صحيح، الحروف المسموح بها هي {{allowedCharactersUsername}}",
-  "Email already exists": "عنوان البريد الإلكتروني موجود بالفعل"
+  "Email already exists": "عنوان البريد الإلكتروني موجود مسبقا"
 }
