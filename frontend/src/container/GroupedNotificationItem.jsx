@@ -31,7 +31,7 @@ export const GroupedNotificationItem = props => {
       } else if (notification.author.length === 2) {
         escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${props.t('and')} ${escapeHtml(notification.author[1].publicName)}`
       } else {
-        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${props.t('and {{numberOfAuthors}} other people', { numberOfAuthors: notification.author.length - 1 })}`
+        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${props.t('and {{count}} other people', { count: notification.author.length - 1 })}`
       }
     }
 
