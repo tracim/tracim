@@ -27,7 +27,7 @@ localization['ar']=	/* thanks Myriam Rabhi */
 	txtResources: 'الموارد',
 	txtNote: 'ملاحظة',
 
-	errUnableSync: "خطأ : /مزامنة المورد غير ممكنة\' : حاول مجددا لاحقا!",
+	errUnableSync: 'خطأ : /مزامنة المورد غير ممكنة\' : حاول مجددا لاحقا!',
 
 	loadingResources: 'جارٍ تحميل الموارد (%act% من %total%)…',
 
@@ -276,7 +276,7 @@ localizationShared['ar']=	/* Thanks Myriam Rabhi */
 	buttonDelete: 'حذف',
 
 	errCollectionLoad: 'خطأ: \'حفظ الإعدادات غير ممكن\'!',
-	errHttpCommon: "خطأ: \'حفظ الاعدادات غير ممكن\' رمز الخطأ %%",
+	errHttpCommon: 'خطأ: \'حفظ الاعدادات غير ممكن\' رمز الخطأ %%',
 	errHttp401: 'غير مسموح به',
 	errHttp403: 'ممنوع',
 	errHttp405: 'طريقة غير مسموح بها',
@@ -1127,7 +1127,7 @@ var localizationCalDAV = new Object();
 
 localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 {
-	_default_title_format_month_: 'yyyyy MMM',
+	_default_title_format_month_: 'yyyy MMM',
 	_default_title_format_week_: 'yyyy MMM d{ \'–\'[ yyyy][ MMM] d}',
 	_default_title_format_day_: 'yyyy MMM d, ddd',
 	_default_title_format_table_: 'yyyy MMM, ddd',
@@ -1352,7 +1352,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	txtErorInputTodo: 'التسجيل غير ممكن: الرجاء تصحيح القيم غير الصحيحة!',
 	txtDateTimeErrorTodo: 'يجب اختيار تاريخ و ساعة!',
 
-	txtErorInput: "خطأ: \'التسجيل غير ممكن\' : الرجاء تصحيح القيم المبرزة!",
+	txtErorInput: 'خطأ: \'التسجيل غير ممكن\' : الرجاء تصحيح القيم المبرزة!',
 
 	txtAlertsH: 'اخطارات',
 	buttonAlert: 'إزالة الاخطارات',
@@ -1363,11 +1363,11 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	loadingCalendars: 'تحميل التقويمات (%act% من %total%) …',
 	unloadingCalendars: 'إلغاء تحميل التقويمات...',
 
-	errUnableSaveBeginCalDAV: "خطأ: 'تسجيل الفعالية غير ممكن': %%!",
-	errUnableDeleteBeginCalDAV: "خطأ: 'حذف الفعالية غير ممكن' : %%!",
+	errUnableSaveBeginCalDAV: 'خطأ: \'تسجيل الفعالية غير ممكن\' : %%!',
+	errUnableDeleteBeginCalDAV: 'خطأ: \'حذف الفعالية غير ممكن\' : %%!',
 	CalDAVerrHttp410: 'المناسبة لم تعد موجودة على الخادم',
-	errUnableSaveTodoBeginCalDAV: "خطأ: 'حفظ المهمة غير ممكن' : %%!",
-	errUnableDeleteTodoBeginCalDAV: "خطأ: \'حذف المهمة غير ممكن\' :%%!",
+	errUnableSaveTodoBeginCalDAV: 'خطأ: \'حفظ المهمة غير ممكن\' : %%!',
+	errUnableDeleteTodoBeginCalDAV: 'خطأ: \'حذف المهمة غير ممكن\' :%%!',
 	CalDAVerrTodoHttp410: 'المهمة لم تعد متوفرة على الخادم'
 };
 
