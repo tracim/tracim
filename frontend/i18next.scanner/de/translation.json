@@ -308,7 +308,7 @@
   "Change cover": "Abdeckung ändern",
   "0 comments": "0 Kommentare",
   "{{numberComments}} comment": "{{numberComments}} Kommentar",
-  "{{numberComments}} comments": "{{numberComments}} Kommentare",
+  "{{count}} comments": "{{count}} Kommentare",
   "Showing {{displayedResults}} of {{totalResults}} results": "Zeigt {{displayedResults}} von {{totalResults}} Ergebnissen",
   "Result for: {{keywords}}": "Ergebnis für: {{keywords}}",
   "Results for: {{keywords}}": "Ergebnisse für: {{keywords}}",
@@ -549,6 +549,7 @@
   "Image": "Bild",
   "New language:": "Neue Sprache:",
   "Configuration links": "Links zur Konfiguration",
-  "and {{count}} other people_plural": "",
-  "{{count}} members_plural": ""
+  "and {{count}} other people_plural": "und {{count}} andere Leute",
+  "{{count}} members_plural": "{{count}} Mitglieder",
+  "{{count}} comments_plural": "{{count}} Kommentare"
 }

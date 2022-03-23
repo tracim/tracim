@@ -352,7 +352,7 @@
   "by": "av",
   "commented": "kommentert",
   "Error while saving public profile": "Kunne ikke lagre offentlig profil",
-  "{{numberComments}} comments": "{{numberComments}} kommentarer",
+  "{{count}} comments": "{{count}} kommentarer",
   "Comments": "Kommentarer",
   "open": "Åpnet",
   "file_search": "Fil",

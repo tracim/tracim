@@ -348,7 +348,7 @@
   "Change avatar": "Changer l'avatar",
   "Maximum size: {{size}} MB": "Taille maximale : {{size}} Mo",
   "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
-  "{{numberComments}} comments": "{{numberComments}} commentaires",
+  "{{count}} comments": "{{count}} commentaires",
   "Change cover": "Changer la couverture",
   "Close": "Fermer",
   "mm/dd/yyyy": "jj/mm/aaaa",
@@ -550,5 +550,6 @@
   "New language:": "Nouvelle langue :",
   "Configuration links": "Liens de configuration",
   "and {{count}} other people_plural": "et {{count}} autres personnes",
-  "{{count}} members_plural": "{{count}} membres"
+  "{{count}} members_plural": "{{count}} membres",
+  "{{count}} comments_plural": "{{count}} commentaires"
 }

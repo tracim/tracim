@@ -357,7 +357,7 @@
   "Maximum size: {{size}} MB": "Tamanho máximo: {{size}} MB",
   "Registration date:": "Data de subscrição:",
   "Cover image of {{publicName}}": "Imagem de capa de {{publicName}}",
-  "{{numberComments}} comments": "{{numberComments}} comentários",
+  "{{count}} comments": "{{count}} comentários",
   "Change cover": "Mudar a capa",
   "Close": "Fechar",
   "mm/dd/yyyy": "dd/mm/aaaa",
@@ -550,5 +550,6 @@
   "New language:": "Novo idioma:",
   "Configuration links": "Links de configuração",
   "and {{count}} other people_plural": "e {{count}} outras pessoas",
-  "{{count}} members_plural": "{{count}} membros"
+  "{{count}} members_plural": "{{count}} membros",
+  "{{count}} comments_plural": "{{count}} comentários"
 }

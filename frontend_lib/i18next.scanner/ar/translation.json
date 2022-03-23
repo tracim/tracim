@@ -127,7 +127,6 @@
   "Download {{filename}}": "تنزيل{{filename}}",
   "See files": "الاطلاع على الملفات",
   "1 file selected": "تم اختيار 1 ملف",
-  "{{numberOfFile}} files selected": "تم اختيار {{numberOfFile}} ملف",
   "Remove file": "حذف الملف",
   "by {{author}}": "بواسطة {{author}}",
   "This content is deprecated": "هذا المحتوى مهمل",
@@ -217,5 +216,12 @@
   "Error while detecting the links": "خطأ أثناء التعرف على الروابط",
   "Translation is not available": "الترجمة غير متاحة",
   "Unknown error": "خطأ غير معروف",
-  "Error while translating the document: {{details}}": "خطأ أثناء ترجمة الوثيقة:{{details}}"
+  "Error while translating the document: {{details}}": "خطأ أثناء ترجمة الوثيقة:{{details}}",
+  "Agenda": "",
+  "{{count}} files selected_0": "تم اختيار {{count}} ملف",
+  "{{count}} files selected_1": "",
+  "{{count}} files selected_2": "",
+  "{{count}} files selected_3": "",
+  "{{count}} files selected_4": "",
+  "{{count}} files selected_5": ""
 }

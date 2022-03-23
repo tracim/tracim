@@ -343,7 +343,7 @@
   "Maximum size: {{size}} MB": "Maximum size: {{size}} MB",
   "Registration date:": "Registration date:",
   "Cover image of {{publicName}}": "Cover image of {{publicName}}",
-  "{{numberComments}} comments": "{{numberComments}} comments",
+  "{{count}} comments": "{{count}} comments",
   "Change cover": "Change cover",
   "Close": "Close",
   "mm/dd/yyyy": "mm/dd/yyyy",
@@ -550,5 +550,6 @@
   "New language:": "New language:",
   "Configuration links": "Configuration links",
   "and {{count}} other people_plural": "and {{count}} other people",
-  "{{count}} members_plural": "{{count}} members"
+  "{{count}} members_plural": "{{count}} members",
+  "{{count}} comments_plural": "{{count}} comments"
 }
