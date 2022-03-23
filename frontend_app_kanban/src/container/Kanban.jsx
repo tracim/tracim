@@ -519,7 +519,7 @@ export class Kanban extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
           content={state.content}
           config={state.config}
-          componentTitle={<div>{state.content.label}</div>}
+          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
           isRefreshNeeded={state.showRefreshWarning}

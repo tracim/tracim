@@ -601,7 +601,7 @@ export const NotificationWall = props => {
         customClass='notification'
         faIcon='far fa-bell'
         rawTitle={props.t('Notifications')}
-        componentTitle={<div>{props.t('Notifications')}</div>}
+        componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
         onClickCloseBtn={props.onCloseNotificationWall}
       >
         <IconButton
