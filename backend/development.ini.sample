@@ -912,6 +912,7 @@ pyramid.default_locale_name = en
 #   pyramid.includes =
 #       pyramid_debugtoolbar
 # ```
+# WARNING: pyramid_debugtoolbar won't work in Tracim's official docker image (multiple problems of multiprocess and reverse-proxy).
 
 
 [pipeline:webdav]
