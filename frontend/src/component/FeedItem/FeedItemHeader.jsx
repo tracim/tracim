@@ -54,7 +54,17 @@ export class FeedItemHeader extends React.Component {
     const { props } = this
     return contentType === CONTENT_TYPE.FILE
       ? <FilenameWithExtension file={props.content} customClass='content__name' />
-      : <span className='feedItemHeader__label' data-cy='feedItemHeader__label' title={contentLabel}>{contentLabel}</span>
+      : (
+        <div className='feedItemHeader__label'>
+          <span
+            className='componentTitle'
+            data-cy='feedItemHeader__label'
+            title={contentLabel}
+          >
+            {contentLabel}
+          </span>
+        </div>
+      )
   }
 
   render () {
