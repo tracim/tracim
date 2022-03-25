@@ -9,6 +9,7 @@
   "{{numberContents}} contents": "{{numberContents}} contenus",
   "{{numberMembers}} member": "{{numberMembers}} membre",
   "{{count}} members": "{{count}} membre",
+  "{{count}} members_plural": "{{count}} membres",
   "0 comments": "0 commentaire",
   "0 contents": "0 contenu",
   "0 members": "0 membre",
@@ -95,7 +96,7 @@
   "Name has been changed": "Le nom a été changé",
   "Email has been changed": "L'adresse email a été modifiée",
   "Password has been changed": "Le mot de passe a été changé",
-  "Error while loading read status list": "Erreur lors du chargement de l'activité récente",
+  "Error while loading read status list": "Erreur lors du chargement de la liste de statuts lus",
   "Create": "Créer",
   "Validate": "Valider",
   "Users": "Utilisateurs",
@@ -349,6 +350,7 @@
   "Maximum size: {{size}} MB": "Taille maximale : {{size}} Mo",
   "Cover image of {{publicName}}": "Image de couverture de {{publicName}}",
   "{{count}} comments": "{{count}} commentaires",
+  "{{count}} comments_plural": "{{count}} commentaires",
   "Change cover": "Changer la couverture",
   "Close": "Fermer",
   "mm/dd/yyyy": "jj/mm/aaaa",
@@ -468,6 +470,7 @@
   "Tags": "Étiquettes",
   "and": "et",
   "and {{count}} other people": "et {{count}} autre personne",
+  "and {{count}} other people_plural": "et {{count}} autres personnes",
   "{{numberOfContents}} contents": "{{numberOfContents}} contenus",
   "{{numberOfUsers}} users": "{{numberOfUsers}} utilisateurs",
   "{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces": "{{author}} a fait {{numberOfContribution}} contributions dans {{numberOfWorkspaces}} espaces",
@@ -548,8 +551,5 @@
   "Comment": "Commentaire",
   "Image": "Image",
   "New language:": "Nouvelle langue :",
-  "Configuration links": "Liens de configuration",
-  "and {{count}} other people_plural": "et {{count}} autres personnes",
-  "{{count}} members_plural": "{{count}} membres",
-  "{{count}} comments_plural": "{{count}} commentaires"
+  "Configuration links": "Liens de configuration"
 }
