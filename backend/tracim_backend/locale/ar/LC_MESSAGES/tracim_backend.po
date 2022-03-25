@@ -68,6 +68,11 @@ msgid_plural ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
 "people"
 msgstr[0] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} أشخاص"
+msgstr[1] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} أشخاص"
+msgstr[2] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} أشخاص"
+msgstr[3] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} أشخاص"
+msgstr[4] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} أشخاص"
+msgstr[5] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} أشخاص"
 
 #: tracim_backend/applications/upload_permissions/application.py:24
 msgid "{emitter_name} invited you to upload files on \"{website_title}\""
