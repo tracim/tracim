@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-01-25 09:53+0100\n"
-"PO-Revision-Date: 2022-03-21 10:58+0000\n"
+"PO-Revision-Date: 2022-03-25 15:33+0000\n"
 "Last-Translator: Myriam Rabhi <myriamrabhi6@gmail.com>\n"
 "Language-Team: Arabic <https://hosted.weblate.org/projects/tracim/backend/ar/"
 ">\n"
@@ -83,6 +83,7 @@ msgid "{emitter_name} invited you to upload files on \"{website_title}\""
 msgstr "{emitter_name} دعاك لتحميل ملفات على \"{website_title}\""
 
 #: tracim_backend/applications/upload_permissions/application.py:32
+#, fuzzy
 msgid ""
 "[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
@@ -106,6 +107,7 @@ msgstr[5] ""
 "{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/application.py:42
+#, fuzzy
 msgid ""
 "[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
 " in \"{workspace_name}\""
@@ -383,6 +385,7 @@ msgid "{username} (through tracim)"
 msgstr "{username} (عبر Tracim)"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
+#, fuzzy
 msgid ""
 "You have invited {nb_receivers} people to upload files in this space <a "
 "href={sharedspace_url}>{sharedspace_name}</a>:"
