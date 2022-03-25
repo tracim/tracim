@@ -202,7 +202,7 @@
   "ZB": "زيتابايت",
   "YB": "يوتابايت",
   "Username must be at least {{minimumCharactersUsername}} characters long": "اسم المستخدم يجب أن يحتوي على الأقل على{{minimumCharactersUsername}}حرفا",
-  "Username must be at maximum {{maximumCharactersUsername}} characters long": "يجب ألا يزيد طول اسم المستخدم عن {{maximumCharactersUsername}} حرفاً",
+  "Username must be at maximum {{maximumCharactersUsername}} characters long": "يجب ألاّ يزيد طول اسم المستخدم عن {{maximumCharactersUsername}} حرفاً",
   "Username can't contain any whitespace": "لا يمكن لإسم المستخدم أن يحتوي على أي مسافة بيضاء",
   "Allowed characters: {{allowedCharactersUsername}}": "الحروف المسموح بها: {{allowedCharactersUsername}}",
   "Error while checking reserved usernames": "خطأ أثناء التثبت من أسامي المستخدمين المحجوزة",
