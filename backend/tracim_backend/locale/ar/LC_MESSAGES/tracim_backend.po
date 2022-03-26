@@ -161,7 +161,7 @@ msgstr "فضاء"
 
 #: tracim_backend/lib/core/workspace.py:500
 msgid "Space {}"
-msgstr "مساحة"
+msgstr "فضاء {}"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:280
 msgid "{username} & all members of {workspace}"
@@ -191,11 +191,11 @@ msgid ""
 "tracim</a>"
 msgstr ""
 "أجب على هذا البريد الإلكتروني مباشرة أو <a href=\"{call_to_action_url}\"> "
-"اطلع عليه في Tracim</a>"
+"اطّلع عليه في Tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:63
 msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
-msgstr "<a href=\"{call_to_action_url}\"> اطلع عليه في Tracim</a>"
+msgstr "<a href=\"{call_to_action_url}\"> اطّلع عليه في Tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:65
 msgid "You're receiving this email because of your account on {website_title}."
@@ -294,8 +294,8 @@ msgid ""
 "files with you in this space: <a href={sharedspace_url}>{sharedspace_name}</"
 "a>"
 msgstr ""
-"{username} (<a href=\"{email_link}\">{email}</a>)شارك ملفا أو ملفات معك في "
-"هذا الفضاء: <a href={sharedspace_url}>{sharedspace_name}</a>"
+"{username} (<a href=\"{email_link}\">{email}</a>)شارك ملفا أو عدّة ملفات معك "
+"في هذا الفضاء: <a href={sharedspace_url}>{sharedspace_name}</a>"
 
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:12
 msgid "Message:"
