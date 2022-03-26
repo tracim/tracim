@@ -67,7 +67,7 @@
   "Search user...": "بحث عن مستخدم…",
   "Send an invitational email to this user": "إرسال دعوة إلكترونية لهذا المستخدم",
   "I know this user exists": "أعرف أن هذا المستخدم موجود",
-  "If you type an email that isn't associated to an account, an invitational email will be sent": "اذا أدخلت بريدا إلكترونيا غير مقرون بأي حساب، سيتم إرسال دعوة الكترونية لهذا العنوان.",
+  "If you type an email that isn't associated to an account, an invitational email will be sent": "اذا أدخلت بريدا إلكترونيا غير مقرون بأي حساب، سيتم إرسال دعوة الكترونية إلى هذا العنوان",
   "Email notifications are disabled, you can't create new users from here": "إشعارات البريد الإلكتروني معطلة، لا يمكنك إنشاء مستخدمين جدد من هنا",
   "Choose the role of the member": "اختر دور العضو",
   "Archive": "أرشفة",
