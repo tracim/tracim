@@ -253,7 +253,7 @@ export class ShareFolderAdvanced extends React.Component {
           customClass='folderAdvanced'
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
-          componentTitle={<div>{props.t('Received files')}</div>}
+          componentTitle={<span className='componentTitle'>{props.t('Received files')}</span>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           showChangeTitleButton={false}
