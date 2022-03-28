@@ -524,7 +524,6 @@ class CustomForm extends React.Component {
       workspaceId: content.workspace_id
     }
     if (!isVisible) return null
-    // console.log('COMPARE0', rawContentBeforeEdit, content.raw_content, rawContentBeforeEdit === content.raw_content)
     return (
       <PopinFixed
         customClass={`${config.slug}`}
@@ -535,7 +534,7 @@ class CustomForm extends React.Component {
           customColor={this.state.hexcolor}
           faIcon={this.state.faIcon}
           rawTitle={content.label}
-          componentTitle={<div>{content.label}</div>}
+          componentTitle={<span className='componentTitle'>{content.label}</span>}
           userRoleIdInWorkspace={loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}

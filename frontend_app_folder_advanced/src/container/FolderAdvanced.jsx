@@ -278,7 +278,7 @@ export class FolderAdvanced extends React.Component {
           customColor={state.config.hexcolor}
           faIcon={state.config.faIcon}
           rawTitle={state.content.label}
-          componentTitle={<div>{state.content.label}</div>}
+          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditLabel}

@@ -53,12 +53,13 @@
       font-size titleFontSize
       margin-inline-end standardSpacing
     &__title
+      display flex
       flex 2
+      font-size titleFontSize
+      font-weight bold
       text-overflow ellipsis
       overflow hidden
       white-space nowrap
-      font-size titleFontSize
-      font-weight bold
       & > div
         text-overflow ellipsis
         overflow hidden
@@ -208,6 +209,11 @@ responsiveColumnStyle()
   .rightPartClose
     .wsContentGeneric__content__right__header__icon.active
       border-top 5px solid
+
+.componentTitle
+  overflow hidden
+  text-overflow ellipsis
+  unicode-bidi plaintext
 
 @media (max-width: max-lg)
   .rightPartClose

@@ -785,7 +785,7 @@ export class HtmlDocument extends React.Component {
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<div>{state.content.label}</div>}
+          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           content={state.content}
           config={state.config}
           customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
