@@ -6,7 +6,7 @@
   "{{numberOfUsers}} users": "{{numberOfUsers}} utilizadores",
   "and": "e",
   "and {{count}} other people": "e {{count}} outra pessoa",
-  " in {{numberOfWorkspaces}} spaces": " em {{numberOfWorkspaces}} espaços",
+  " in {{count}} spaces": " em {{count}} espaço",
   "Reaction created": "Reacção criada",
   "Reaction deleted": "Reacção eliminada",
   "{{numberComments}} comment": "{{numberComments}} comentário",
@@ -551,8 +551,7 @@
   "{{count}} comments_plural": "{{count}} comentários",
   "Showing {{displayedResults}} of {{count}} results_plural": "Mostrando {{displayedResults}} de {{count}} resultados",
   "{{author}} made {{count}} contributions": "",
-  " in {{count}} spaces": "",
   " on {{content}}": "",
   "{{author}} made {{count}} contributions_plural": "",
-  " in {{count}} spaces_plural": ""
+  " in {{count}} spaces_plural": " em {{count}} espaços"
 }

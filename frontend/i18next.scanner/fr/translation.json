@@ -474,7 +474,7 @@
   "{{numberOfContents}} contents": "{{numberOfContents}} contenus",
   "{{numberOfUsers}} users": "{{numberOfUsers}} utilisateurs",
   "Set your username": "Définissez votre identifiant",
-  " in {{numberOfWorkspaces}} spaces": " dans {{numberOfWorkspaces}} espaces",
+  " in {{count}} spaces": " dans {{count}} espaces",
   "{{author}} created their account": "{{author}} a créé son compte",
   "{{author}} modified their account": "{{author}} a modifié son compte",
   "{{author}} deleted their account": "{{author}} a supprimé son compte",
@@ -551,8 +551,7 @@
   "Configuration links": "Liens de configuration",
   "Showing {{displayedResults}} of {{count}} results_plural": "{{displayedResults}} résultats affichés sur {{count}}",
   "{{author}} made {{count}} contributions": "",
-  " in {{count}} spaces": "",
   " on {{content}}": "",
   "{{author}} made {{count}} contributions_plural": "",
-  " in {{count}} spaces_plural": ""
+  " in {{count}} spaces_plural": " dans {{count}} espaces"
 }

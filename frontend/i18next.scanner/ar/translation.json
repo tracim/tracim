@@ -199,7 +199,6 @@
   "mth": "ش",
   "y": "سنة",
   "Error while marking the notification as read": "خطأ أثناء الإشارة بأن الإشعار مقروء",
-  " in {{numberOfWorkspaces}} spaces": " في {{numberOfWorkspaces}} فضاءات",
   "Comment_noun": "تعليق",
   "{{author}} commented on {{content}}{{workspaceInfo}}": "{{author}} علّق على {{content}}{{workspaceInfo}}",
   "New publication": "منشور جديد",
@@ -581,10 +580,10 @@
   "{{author}} made {{count}} contributions_3": "",
   "{{author}} made {{count}} contributions_4": "",
   "{{author}} made {{count}} contributions_5": "",
-  " in {{count}} spaces_0": "",
-  " in {{count}} spaces_1": "",
-  " in {{count}} spaces_2": "",
-  " in {{count}} spaces_3": "",
-  " in {{count}} spaces_4": "",
-  " in {{count}} spaces_5": ""
+  " in {{count}} spaces_0": " في {{numberOfWorkspaces}} فضاءات",
+  " in {{count}} spaces_1": " في {{numberOfWorkspaces}} فضاءات",
+  " in {{count}} spaces_2": " في {{numberOfWorkspaces}} فضاءات",
+  " in {{count}} spaces_3": " في {{numberOfWorkspaces}} فضاءات",
+  " in {{count}} spaces_4": " في {{numberOfWorkspaces}} فضاءات",
+  " in {{count}} spaces_5": " في {{numberOfWorkspaces}} فضاءات"
 }

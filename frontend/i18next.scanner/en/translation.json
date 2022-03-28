@@ -470,7 +470,7 @@
   "{{numberOfContents}} contents": "{{numberOfContents}} contents",
   "{{numberOfUsers}} users": "{{numberOfUsers}} users",
   "Set your username": "Set your username",
-  " in {{numberOfWorkspaces}} spaces": " in {{numberOfWorkspaces}} spaces",
+  " in {{count}} spaces": " in {{count}} spaces",
   "{{author}} created their account": "{{author}} created their account",
   "{{author}} modified their account": "{{author}} modified their account",
   "{{author}} deleted their account": "{{author}} deleted their account",
@@ -551,7 +551,6 @@
   "{{count}} comments_plural": "{{count}} comments",
   "Showing {{displayedResults}} of {{count}} results_plural": "Showing {{displayedResults}} of {{count}} results",
   "{{author}} made {{count}} contributions": "{{author}} made {{count}} contributions",
-  " in {{count}} spaces": " in {{count}} spaces",
   " on {{content}}": " on {{content}}",
   "{{author}} made {{count}} contributions_plural": "{{author}} made {{count}} contributions",
   " in {{count}} spaces_plural": " in {{count}} spaces"

@@ -469,7 +469,7 @@
   "and {{count}} other people": "und {{count}} andere Leute",
   "{{numberOfContents}} contents": "{{numberOfContents}} Inhalte",
   "{{numberOfUsers}} users": "{{numberOfUsers}} Benutzer",
-  " in {{numberOfWorkspaces}} spaces": " in {{numberOfWorkspaces}} Bereichen",
+  " in {{count}} spaces": " in {{count}} Bereichen",
   "{{author}} created their account": "{{author}} hat sein Konto erstellt",
   "{{author}} modified their account": "{{author}} hat sein Konto geändert",
   "{{author}} deleted their account": "{{author}} hat sein Konto gelöscht",
@@ -551,8 +551,7 @@
   "{{count}} comments_plural": "{{count}} Kommentare",
   "Showing {{displayedResults}} of {{count}} results_plural": "Zeigt {{displayedResults}} von {{count}} Ergebnissen",
   "{{author}} made {{count}} contributions": "",
-  " in {{count}} spaces": "",
   " on {{content}}": "",
   "{{author}} made {{count}} contributions_plural": "",
-  " in {{count}} spaces_plural": ""
+  " in {{count}} spaces_plural": " in {{count}} Bereichen"
 }

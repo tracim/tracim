@@ -293,7 +293,7 @@ export const NotificationWall = props => {
 
     if (notification.numberOfWorkspaces > 1) {
       i18nOpts.workspaceInfo = `<span title='${notification.numberOfWorkspaces}'>${
-        props.t(' in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
+        props.t(' in {{count}} spaces', { count: notification.numberOfWorkspaces })
       }</span>`
     }
 
