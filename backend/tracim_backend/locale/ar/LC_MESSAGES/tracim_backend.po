@@ -327,7 +327,13 @@ msgstr "إن كان الرابط لا يعمل، أقترح أن تنسخ/تلص
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:19
 msgid "The link is valid for {} minutes."
-msgstr "الرابط صالح للإستعمال لمدة {} دقائق."
+msgid_plural "The link is valid for {} minutes."
+msgstr[0] "الرابط صالح للإستعمال لمدة {} دقائق."
+msgstr[1] "الرابط صالح للإستعمال لمدة {} دقائق."
+msgstr[2] "الرابط صالح للإستعمال لمدة {} دقائق."
+msgstr[3] "الرابط صالح للإستعمال لمدة {} دقائق."
+msgstr[4] "الرابط صالح للإستعمال لمدة {} دقائق."
+msgstr[5] "الرابط صالح للإستعمال لمدة {} دقائق."
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
 msgid "You shared the file <i>{content_filename}</i> with:"
