@@ -11,8 +11,6 @@ from webpreview import web_preview
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UnavailableURLPreview
 
-MAX_CONTENT_LENGTH_FOR_URL_PREVIEW = 1048576  # 1Mo
-
 # NOTE - SG - 2021-04-16: uncomment those lines to debug the request headers/response
 # import http.client
 # import logging
@@ -87,7 +85,7 @@ class URLPreviewLib(object):
                         # See https://github.com/tracim/tracim/issues/4470
                         "Cookie": "CONSENT=PENDING+999",
                     },
-                    content_length_limit=MAX_CONTENT_LENGTH_FOR_URL_PREVIEW,
+                    content_length_limit=self.app_config.URL_PREVIEW__MAX_CONTENT_LENGTH,
                 )
             )
             # INFO - GM - 2022-02-22 - Default case: preview from html metadata

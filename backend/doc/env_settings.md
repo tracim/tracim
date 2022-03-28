@@ -54,6 +54,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
 | TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               | frontend.custom_toolbox_folder_path                            | FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               |
 | TRACIM_URL_PREVIEW__FETCH_TIMEOUT                                         | url_preview.fetch_timeout                                      | URL_PREVIEW__FETCH_TIMEOUT                                         |
+| TRACIM_URL_PREVIEW__MAX_CONTENT_LENGTH                                    | url_preview.max_content_length                                 | URL_PREVIEW__MAX_CONTENT_LENGTH                                    |
 | TRACIM_UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 | ui.spaces.creation.parent_space_choice.visible                 | UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 |
 | TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
 | TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
