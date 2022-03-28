@@ -362,7 +362,7 @@
   "modified": "endret",
   "deleted": "slettet",
   "Preview of {{content}}": "Forhåndsvisning av {{content}}",
-  "Showing {{displayedResults}} of {{totalResults}} results": "Viser {{displayedResults}} av {{totalResults}} resultater",
+  "Showing {{displayedResults}} of {{count}} results": "Viser {{displayedResults}} av {{count}} resultater",
   "Name": "Navn",
   "unknown": "ukjent",
   "No activity": "Ingen aktivitet",

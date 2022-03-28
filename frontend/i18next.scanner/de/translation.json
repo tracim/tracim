@@ -309,7 +309,7 @@
   "0 comments": "0 Kommentare",
   "{{numberComments}} comment": "{{numberComments}} Kommentar",
   "{{count}} comments": "{{count}} Kommentare",
-  "Showing {{displayedResults}} of {{totalResults}} results": "Zeigt {{displayedResults}} von {{totalResults}} Ergebnissen",
+  "Showing {{displayedResults}} of {{count}} results": "Zeigt {{displayedResults}} von {{count}} Ergebnissen",
   "Result for: {{keywords}}": "Ergebnis für: {{keywords}}",
   "Results for: {{keywords}}": "Ergebnisse für: {{keywords}}",
   "Filter": "Filter",
@@ -469,9 +469,6 @@
   "and {{count}} other people": "und {{count}} andere Leute",
   "{{numberOfContents}} contents": "{{numberOfContents}} Inhalte",
   "{{numberOfUsers}} users": "{{numberOfUsers}} Benutzer",
-  "{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces": "{{author}} hat {{numberOfContribution}} Beiträge in {{numberOfWorkspaces}} Bereichen geleistet",
-  "{{author}} made {{numberOfContribution}} contributions on {{content}}": "{{author}} hat {{numberOfContribution}} Beiträge zu {{content}} geleistet",
-  "{{author}} made {{numberOfContribution}} contributions": "{{author}} hat {{numberOfContribution}} Beiträge geleistet",
   " in {{numberOfWorkspaces}} spaces": " in {{numberOfWorkspaces}} Bereichen",
   "{{author}} created their account": "{{author}} hat sein Konto erstellt",
   "{{author}} modified their account": "{{author}} hat sein Konto geändert",
@@ -551,5 +548,11 @@
   "Configuration links": "Links zur Konfiguration",
   "and {{count}} other people_plural": "und {{count}} andere Leute",
   "{{count}} members_plural": "{{count}} Mitglieder",
-  "{{count}} comments_plural": "{{count}} Kommentare"
+  "{{count}} comments_plural": "{{count}} Kommentare",
+  "Showing {{displayedResults}} of {{count}} results_plural": "Zeigt {{displayedResults}} von {{count}} Ergebnissen",
+  "{{author}} made {{count}} contributions": "",
+  " in {{count}} spaces": "",
+  " on {{content}}": "",
+  "{{author}} made {{count}} contributions_plural": "",
+  " in {{count}} spaces_plural": ""
 }
