@@ -187,7 +187,8 @@
   "Dark Skin Tone": "Peau foncée",
   "Upload a file": "Téléverser un fichier",
   "See files": "Voir les fichiers",
-  "{{numberOfFile}} files selected": "{{numberOfFile}} fichiers sélectionnés",
+  "{{count}} files selected": "{{count}} fichiers sélectionnés",
+  "{{count}} files selected_plural": "{{count}} fichiers sélectionnés",
   "1 file selected": "1 fichier sélectionné",
   "Remove file": "Supprimer le fichier",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",
@@ -210,12 +211,13 @@
   "Error while fetching a list of tags": "Erreur pendant la récupération d'une liste d'étiquettes",
   "Remove tag from content": "Retirer l'étiquette du contenu",
   "Tag removed": "Étiquette retirée",
-  "This content has no associated tags yet.": "Ce contenu n'a pas encore de étiquettes associées.",
+  "This content has no associated tags yet.": "Ce contenu n’a pas encore d’étiquettes associées.",
   "This space has no tags yet.": "Cet espace n'a pas encore d'étiquettes.",
   "This tag already exists": "Cette étiquette existe déjà",
   "Version #{{versionNumber}}": "Version n°{{versionNumber}}",
   "Your tag has been added": "Votre étiquette a été ajoutée",
   "Your tag has been created": "Votre étiquette a été créée",
   "See more": "Voir plus",
-  "Error while loading timeline": "Erreur lors du chargement de l'historique"
+  "Error while loading timeline": "Erreur lors du chargement de l'historique",
+  "Agenda": ""
 }

@@ -30,7 +30,7 @@ export const AdvancedSearchContentList = props => {
   const numberCommentsTitle = (numberComments) => {
     if (numberComments === 0) return props.t('0 comments')
     if (numberComments === 1) return props.t('{{numberComments}} comment', { numberComments: numberComments })
-    else return props.t('{{numberComments}} comments', { numberComments: numberComments })
+    else return props.t('{{count}} comments', { count: numberComments })
   }
 
   return (

@@ -198,7 +198,7 @@
   "Download {{filename}}": "Herunterladen {{filename}}",
   "Translate to {{language}}": "Übersetzen in {{language}}",
   "1 file selected": "1 Datei ausgewählt",
-  "{{numberOfFile}} files selected": "{{numberOfFile}} ausgewählte Dateien",
+  "{{count}} files selected": "{{count}} ausgewählte Dateien",
   "Error while adding a tag to the content": "Fehler beim Hinzufügen einer Markierung zum Inhalt",
   "Error while fetching a list of tags": "Fehler beim Holen einer Liste von Markierungen",
   "Your tag has been added": "Ihre Markierung wurde hinzugefügt",
@@ -217,5 +217,7 @@
   "This content has no associated tags yet.": "Dieser Inhalt hat noch keine zugehörigen Markierungen.",
   "This space has no tags yet.": "Dieser Bereich hat noch keine Markierungen.",
   "See more": "Mehr sehen",
-  "Error while loading timeline": "Fehler beim Laden der Zeitleiste"
+  "Error while loading timeline": "Fehler beim Laden der Zeitleiste",
+  "Agenda": "",
+  "{{count}} files selected_plural": "{{count}} ausgewählte Dateien"
 }
