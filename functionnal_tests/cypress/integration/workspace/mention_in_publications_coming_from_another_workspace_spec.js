@@ -38,8 +38,13 @@ describe('Mentions in publications', () => {
       cy.contains('.pageTitleGeneric__title__label', 'My OPEN space')
       cy.get('.publications__empty').should('be.visible')
       cy.get('#wysiwygTimelineCommentPublication').type('@' + otherUserName)
-      cy.get('.autocomplete__item__active').should('be.visible').click()
-      cy.get('.commentArea__submit__btn').click()
+      cy.get('.autocomplete__item')
+        .contains('@' + otherUserName)
+        .should('be.visible')
+        .click()
+      cy.get('.commentArea__submit__btn')
+        .should('be.visible')
+        .click()
       cy.get('.feedItem__publication__body__content').contains('@' + otherUserName)
       // INFO - RJ - 2021-09-07 - The logic here is that an invalid mention message would prevent
       // posting and make the test fail
