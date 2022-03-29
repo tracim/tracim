@@ -29,7 +29,9 @@ describe('Open publications in the thread app', () => {
     cy.cancelXHR()
   })
 
-  it('should redirect to the thread app with the right icon', () => {
+  it.skip('should redirect to the thread app with the right icon', () => {
+    // FIXME MB - 2022-03-29 - Unstable test
+    // See https://github.com/tracim/tracim/issues/5344
     function checkAndCloseThreadApp () {
         cy.get('.wsContentGeneric.thread .wsContentGeneric__header__icon i.fa-stream').should('have.attr', 'style', 'color: rgb(102, 31, 152);')
         cy.get('.wsContentGeneric.thread .wsContentGeneric__header__close').click()

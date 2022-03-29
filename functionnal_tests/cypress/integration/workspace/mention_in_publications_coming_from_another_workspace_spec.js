@@ -29,7 +29,9 @@ describe('Mentions in publications', () => {
   })
 
   describe('publications, coming from an other workspace', () => {
-    it('should allow mentioning a user not in that other workspace', () => {
+    it.skip('should allow mentioning a user not in that other workspace', () => {
+      // FIXME MB - 2022-03-29 - Unstable test
+      // See https://github.com/tracim/tracim/issues/5344
       cy.window().then((win) => {
         cy.get('#wysiwygTimelineCommentPublication').type(`${win.location.origin}/ui/workspaces/${workspaceId}/publications`)
       })
