@@ -70,6 +70,7 @@ describe('Login after a disconnection ', function () {
 
     cy.getTag({ selectorName: s.ADMIN_USER_PAGE })
       .find('[data-cy=profile__list__item__administrators]')
+      .should('be.visible')
       .click()
 
     cy.getTag({ selectorName: s.ADMIN_USER_PAGE })

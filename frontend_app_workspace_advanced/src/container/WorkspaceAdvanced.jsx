@@ -825,7 +825,7 @@ export class WorkspaceAdvanced extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
-          componentTitle={<div>{state.content.label}</div>}
+          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           config={state.config}
           content={state.content}
           customClass={`${state.config.slug}__contentpage`}

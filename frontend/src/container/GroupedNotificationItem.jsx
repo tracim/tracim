@@ -53,15 +53,6 @@ export const GroupedNotificationItem = props => {
       ? escapeHtml(userList[0].publicName)
       : props.t('{{numberOfUsers}} users', { numberOfUsers: userList.length })
 
-    const i18nOpts = {
-      user: `<span title='${escapedUser}'>${escapedUser}</span>`,
-      author: `<span title='${escapedAuthorList}'>${escapedAuthorList}</span>`,
-      content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
-      numberOfContribution: notification.group.length,
-      numberOfWorkspaces: numberOfWorkspaces,
-      interpolation: { escapeValue: false }
-    }
-
     if (numberOfContributionTypes > 1) {
       let contentUrl
       if (numberOfContents === 1) {
@@ -72,14 +63,21 @@ export const GroupedNotificationItem = props => {
         )
       }
 
-      return {
-        text: numberOfWorkspaces > 1
-          ? props.t('{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces', i18nOpts)
-          : numberOfContents === 1
-            ? props.t('{{author}} made {{numberOfContribution}} contributions on {{content}}', i18nOpts)
-            : props.t('{{author}} made {{numberOfContribution}} contributions', i18nOpts),
-        url: contentUrl
+      let text = props.t('{{author}} made {{count}} contributions', {
+        author: `<span title='${escapedAuthorList}'>${escapedAuthorList}</span>`,
+        count: notification.group.length,
+        interpolation: { escapeValue: false }
+      })
+
+      if (numberOfWorkspaces > 1) text = text + props.t(' in {{count}} spaces', { count: numberOfWorkspaces, interpolation: { escapeValue: false } })
+      else if (numberOfContents === 1) {
+        text = text + props.t(' on {{content}}', {
+          content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
+          interpolation: { escapeValue: false }
+        })
       }
+
+      return { text, url: contentUrl }
     } else {
       const notificationDetails = props.getNotificationDetails({
         ...notification.group[0],
