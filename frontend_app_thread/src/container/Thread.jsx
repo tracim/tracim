@@ -381,7 +381,7 @@ export class Thread extends React.Component {
           customColor={color}
           faIcon={isPublication ? 'fas fa-stream' : state.config.faIcon}
           rawTitle={state.content.label}
-          componentTitle={<div>{state.content.label}</div>}
+          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
           onClickCloseBtn={this.handleClickBtnCloseApp}
           onValidateChangeTitle={this.handleSaveEditTitle}

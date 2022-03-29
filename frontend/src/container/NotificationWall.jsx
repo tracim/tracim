@@ -293,7 +293,7 @@ export const NotificationWall = props => {
 
     if (notification.numberOfWorkspaces > 1) {
       i18nOpts.workspaceInfo = `<span title='${notification.numberOfWorkspaces}'>${
-        props.t(' in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
+        props.t(' in {{count}} spaces', { count: notification.numberOfWorkspaces })
       }</span>`
     }
 
@@ -601,7 +601,7 @@ export const NotificationWall = props => {
         customClass='notification'
         faIcon='far fa-bell'
         rawTitle={props.t('Notifications')}
-        componentTitle={<div>{props.t('Notifications')}</div>}
+        componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
         onClickCloseBtn={props.onCloseNotificationWall}
       >
         <IconButton

@@ -1,15 +1,12 @@
 {
   "{{label}}: ": "{{label}}: ",
-  "{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces": "{{author}} fez {{numberOfContribution}} contribuições em {{numberOfWorkspaces}} espaços",
-  "{{author}} made {{numberOfContribution}} contributions on {{content}}": "{{author}} fez {{numberOfContribution}} contribuições em {{content}}",
-  "{{author}} made {{numberOfContribution}} contributions": "{{author}} fez {{numberOfContribution}} contribuições",
   "{{author}} reacted to {{content}} with {{reaction}}": "{{author}} reagiu a {{content}} com {{reaction}}",
   "{{author}} removed their reaction {{reaction}} to {{content}}": "{{author}} eliminou sua reacção {{reaction}} a {{content}}",
   "{{numberOfContents}} contents": "{{numberOfContents}} conteúdos",
   "{{numberOfUsers}} users": "{{numberOfUsers}} utilizadores",
   "and": "e",
   "and {{count}} other people": "e {{count}} outra pessoa",
-  " in {{numberOfWorkspaces}} spaces": " em {{numberOfWorkspaces}} espaços",
+  " in {{count}} spaces": " em {{count}} espaço",
   "Reaction created": "Reacção criada",
   "Reaction deleted": "Reacção eliminada",
   "{{numberComments}} comment": "{{numberComments}} comentário",
@@ -330,7 +327,7 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> deseja juntar-se ao espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "O pedido de <0><0>{{userPublicName}}</0></0> para se juntar ao espaço foi <2>{{state}}</2>",
   "Account": "Conta",
-  "Showing {{displayedResults}} of {{totalResults}} results": "Mostrando {{displayedResults}} de {{totalResults}} resultados",
+  "Showing {{displayedResults}} of {{count}} results": "Mostrando {{displayedResults}} de {{count}} resultado",
   "Result for: {{keywords}}": "Resultado para: {{keywords}}",
   "Results for: {{keywords}}": "Resultados para: {{keywords}}",
   "Filter": "Filtrar",
@@ -551,5 +548,10 @@
   "Configuration links": "Links de configuração",
   "and {{count}} other people_plural": "e {{count}} outras pessoas",
   "{{count}} members_plural": "{{count}} membros",
-  "{{count}} comments_plural": "{{count}} comentários"
+  "{{count}} comments_plural": "{{count}} comentários",
+  "Showing {{displayedResults}} of {{count}} results_plural": "Mostrando {{displayedResults}} de {{count}} resultados",
+  "{{author}} made {{count}} contributions": "",
+  " on {{content}}": "",
+  "{{author}} made {{count}} contributions_plural": "",
+  " in {{count}} spaces_plural": " em {{count}} espaços"
 }
