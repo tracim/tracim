@@ -151,6 +151,11 @@ Cypress.Commands.add('waitForTinyMCELoaded', () => {
   })
 })
 
+Cypress.Commands.add('getActiveTinyMCEEditor', () => {
+  cy.window().its('tinyMCE.activeEditor.initialized').should('be.true')
+  return cy.window().its('tinyMCE.activeEditor')
+})
+
 Cypress.Commands.add('form_request', (method, url, formData) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
