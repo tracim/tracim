@@ -58,6 +58,6 @@
   "Error while activating news": "Fehler beim Aktivieren von Nachrichten",
   "Error while deactivating news": "Fehler beim Deaktivieren von Nachrichten",
   "You cannot change this member role because there are no other space managers.": "Sie können diese Mitgliederrolle nicht ändern, da es keine anderen Bereichsmanager gibt.",
-  "Use this link to integrate this agenda to your": "",
-  "CalDAV compatible software": ""
+  "Use this link to integrate this agenda to your": "Verwenden Sie diesen Link, um den Kalender zu integrieren in",
+  "CalDAV compatible software": "CalDAV-kompatible Software"
 }
