@@ -61,11 +61,13 @@
     display block
     top 0
     z-index 1
-    & i
+    & i.fa
       position absolute
       top calc(50% - 20px)
       left 50%
-      transform translateX(-50%)
+      // INFO - SG - 2022-02-16 - forcing the scale to (1, 1)
+      // as the prev/next arrows aren't reversed with react-slick when dir="rtl"
+      transform translateX(-50%) scale(1, 1)
       font-size bigIconSize
     &:hover
       background-color rgba(0, 0, 0, 0.1)
@@ -163,6 +165,10 @@
 
 .slick-slide > div
   height 100%
+
+// NOTE 2022-02-17 - SG - disable react-slick rtl handling as it is buggy.
+[dir='rtl'] .slick-slide
+  float left !important
 
 .carousel__main .slick-track
   // INFO - GM - 2019-01-20 - 391px is the size of others elements which aren't responsive (header, app header, thumbnails...)

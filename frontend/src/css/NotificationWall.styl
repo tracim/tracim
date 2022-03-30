@@ -37,16 +37,15 @@
         & .avatar
           margin-inline-end standardSpacing
         &__avatars
-          width 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
-          height 30px
+          width oneAuthorAvatarSize
+          height oneAuthorAvatarSize
           margin-inline-end standardSpacing
           &__second
             position absolute
             top 20px
-            left 20px // INFO - GB - 2021-08-26 - 20px is two authors avatar's size
         &__usersAvatar
-          min-width 30px
-          min-height 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          min-width oneAuthorAvatarSize
+          min-height oneAuthorAvatarSize
           display flex
           border-radius 50%
           margin-inline-end standardSpacing
@@ -114,10 +113,14 @@
 [dir=ltr] .notification
   right 0
   box-shadow shadow-right
+  &__list__item__text__avatars__second
+    left twoAuthorsAvatarSize
 
 [dir=rtl] .notification
   left 0
   box-shadow shadow-left
+  &__list__item__text__avatars__second
+    right twoAuthorsAvatarSize
 
 @media (min-width: min-md) and (max-width: max-md)
   .notification

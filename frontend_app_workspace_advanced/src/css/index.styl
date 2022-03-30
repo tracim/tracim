@@ -25,7 +25,10 @@
   &__description
     &__text
       padding standardSpacing
+      position relative
+      height 200px
       &__textarea
+        height 200px
         width 100%
     &__bottom
       display flex
@@ -44,6 +47,11 @@
       padding-inline-end standardSpacing
       &__btn
         margin-inline-start auto
+  &__agenda
+    .agendaInfo__header
+      padding standardSpacing
+      border-bottom borderStyle
+      font-size titleFontSize
   &__userlist
     &__list
       margin 0
@@ -67,6 +75,7 @@
             font-size metadataFontSize
             overflow hidden
             text-overflow ellipsis
+            unicode-bidi plaintext
         &__role
           flex 2
           .btndropdown

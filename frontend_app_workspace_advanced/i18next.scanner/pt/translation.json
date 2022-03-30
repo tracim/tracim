@@ -11,7 +11,7 @@
   "Error while loading members list": "Erro ao carregamento da lista de membros",
   "Save successful": "Salvo com sucesso",
   "Error while saving the new description": "Erro ao salvar a nova descrição",
-  "Error while saving new role for member": "Erro ao salvar a nova função para o membro",
+  "Error while saving new role for member": "Erro ao guardar nova função para membro",
   "Error while fetching known members list": "Erro ao buscar a lista de membros conhecidos",
   "Please set a name, an email or a username": "Defina um nome, um e-mail ou um identificador",
   "Please set a role": "Defina uma função",
@@ -19,7 +19,7 @@
   "Member added": "Membro acrescentado",
   "Error while loading space details": "Erro ao carregar detalhes do espaço",
   "Error while saving new space label": "Erro ao salvar a nova etiqueta do espaço",
-  "Error while adding the member to the space": "Erro ao acrescentar o membro no espaço",
+  "Error while adding the member to the space": "Erro ao acrescentar o membro ao espaço",
   "Space's description": "Descrição do espaço",
   "Delete space": "Eliminar espaço",
   "Delete": "Eliminar",
@@ -27,7 +27,7 @@
   "Error while deleting space": "Erro ao eliminar o espaço",
   "This account is deactivated": "Esta conta está desativada",
   "Error while removing member": "Erro ao eliminar o membro",
-  "Note, only administrators can send invitational email": "Nota, só os administradores podem enviar e-mail de convite",
+  "Note, only administrators can send invitational email": "Nota, só os administradores podem enviar e-mails de convite",
   "This user already is in the space": "Este utilizador já está no espaço",
   "Error while loading app list": "Erro ao cargar a lista de aplicações",
   "Agenda activated": "Agenda activada",
@@ -57,5 +57,7 @@
   "News deactivated": "Notícias desactivadas",
   "Error while activating news": "Erro ao activar notícia",
   "Error while deactivating news": "Erro ao desactivar notícias",
-  "You cannot change this member role because there are no other space managers.": "Não se pode alterar a função deste membro porque não há outros gestores de espaço."
+  "You cannot change this member role because there are no other space managers.": "Não se pode alterar a função deste membro porque não há outros gestores de espaço.",
+  "Use this link to integrate this agenda to your": "",
+  "CalDAV compatible software": ""
 }

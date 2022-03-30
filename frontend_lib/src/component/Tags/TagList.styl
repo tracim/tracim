@@ -46,14 +46,15 @@
         margin-inline-start standardSpacing
         margin-bottom standardSpacing
 
-[dir=rtl] .tagList__list__item
-  &__circle
-    right 10px
-  &__triangleIcon
-    transform rotate(0deg)
-    left 9px
-    top 2px
-
+[dir=rtl]
+  .tagList__list__item
+    &__circle
+      right 10px
+    &__triangleIcon
+      left 9px
+      top 2px
+  #triangeIcon
+    transform none
 
 @media (max-width: max-lg)
   .tagList

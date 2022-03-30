@@ -1,7 +1,7 @@
 {
   "{{user}}'s profile": "Perfil de {{user}}",
   "Add": "Adicionar",
-  "Add a tag here...": "Adicionar uma etiqueta aqui...",
+  "Add a tag here...": "Adicionar uma etiqueta aqui…",
   "Add a tag to your content. To see the list of tags available in this space, go to space settings.": "Acrescente uma etiqueta ao seu conteúdo. Para ver a lista de etiquetas disponíveis neste espaço, vá a definições do espaço.",
   "all": "todos",
   "An error has happened while getting the known content list": "Aconteceu um erro ao obter a lista de conteúdos conhecidos",
@@ -16,8 +16,8 @@
   "Open as content": "Abrir como conteúdo",
   "Restore": "Restaurar",
   "Send": "Enviar",
-  "Your message...": "Sua mensagem...",
-  "Write an answer...": "Escrever uma resposta...",
+  "Your message...": "Sua mensagem…",
+  "Write an answer...": "Escrever uma resposta…",
   "Validate the title": "Validar o título",
   "Edit title": "Editar o título",
   "Undo change in title": "Desfazer alteração no título",
@@ -43,7 +43,7 @@
   "Send an invitational email to this user": "Enviar um e-mail de convite a este utilizador",
   "I know this user exists": "Eu sei que este utilizador existe",
   "Cancel": "Anular",
-  "Search user...": "Procurar usuário...",
+  "Search user...": "Procurar usuário…",
   "Unknown": "Desconhecido",
   "Unknown error, please inform an administrator": "Erro desconhecido, informe um administrador",
   "Error detail": "Detalhes do erro",
@@ -187,7 +187,7 @@
   "Dark Skin Tone": "Tom de pele escuro",
   "Upload a file": "Subir ficheiro",
   "See files": "Ver ficheiros",
-  "{{numberOfFile}} files selected": "{{numberOfFile}} ficheiros seleccionados",
+  "{{count}} files selected": "{{count}} ficheiros seleccionados",
   "1 file selected": "1 ficheiro seleccionado",
   "Remove file": "Remover ficheiro",
   "A content with the same name already exists": "Um conteúdo com o mesmo nome já existe",
@@ -217,5 +217,7 @@
   "Your tag has been added": "A sua etiqueta foi adicionada",
   "Your tag has been created": "A sua etiqueta foi criada",
   "See more": "Ver mais",
-  "Error while loading timeline": "Erro ao carregar a linha cronológica"
+  "Error while loading timeline": "Erro ao carregar a linha cronológica",
+  "Agenda": "",
+  "{{count}} files selected_plural": "{{count}} ficheiros seleccionados"
 }

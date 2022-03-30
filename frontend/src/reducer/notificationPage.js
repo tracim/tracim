@@ -1,4 +1,4 @@
-import { uniqBy, cloneDeep } from 'lodash'
+import { uniqBy } from 'lodash'
 import {
   ADD,
   APPEND,
@@ -13,7 +13,6 @@ import {
   UPDATE,
   USER_DISCONNECTED
 } from '../action-creator.sync.js'
-import { GROUP_NOTIFICATION_CRITERIA } from '../util/helper.js'
 import { serializeContentProps } from './workspaceContentList.js'
 import { serializeWorkspaceListProps } from './workspaceList.js'
 import { serializeUserProps } from './user.js'
@@ -30,11 +29,6 @@ const defaultNotificationsObject = {
   nextPageToken: '',
   unreadMentionCount: 0,
   unreadNotificationCount: 0
-}
-
-const NUMBER_OF_CRITERIA = {
-  ONE: 1,
-  TWO: 2
 }
 
 // FIXME - GB - 2020-07-30 - We can't use the global serializer in this case because it doesn't handle nested object
@@ -62,175 +56,12 @@ export const serializeNotification = notification => {
   }
 }
 
-export function sortByCreatedDate (arrayToSort) {
+function sortByCreatedDate (arrayToSort) {
   return arrayToSort.sort(function (a, b) {
     if (a.created < b.created) return 1
     if (a.created > b.created) return -1
     return 0
   })
-}
-
-export const hasSameAuthor = authorList => {
-  return !authorList.some((author, index) => {
-    return !author || (index && author.userId !== authorList[index - 1].userId)
-  })
-}
-
-export const hasSameWorkspace = workspaceList => {
-  return !workspaceList.some((workspace, index) => {
-    return !workspace || (index && workspace.id !== workspaceList[index - 1].id)
-  })
-}
-
-export const hasSameContent = notificationList => {
-  if (notificationList.some(notification => !notification.content)) return false
-  return notificationList.every((notification, index) => {
-    if (index === 0) return true
-    return getMainContentId(notification) === getMainContentId(notificationList[index - 1])
-  })
-}
-
-const addNewNotificationGroup = (notification, newNotificationList, indexInNewList, numberOfNotificationsToGroup, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
-  if (
-    indexInNewList >= (numberOfNotificationsToGroup - 1) &&
-    !newNotificationList
-      .slice(indexInNewList - (numberOfNotificationsToGroup - 1), indexInNewList)
-      .some(notification => notification.group)
-  ) {
-    const previousNotificationList = newNotificationList
-      .slice(indexInNewList - (numberOfNotificationsToGroup - 1), indexInNewList)
-    const isGroupedByAuthor = hasSameAuthor([notification.author, ...previousNotificationList.map(notification => notification.author)])
-    const isGroupedByWorkspace = hasSameWorkspace([notification.workspace, ...previousNotificationList.map(notification => notification.workspace)])
-    const isGroupedByContent = hasSameContent([notification, ...previousNotificationList])
-
-    if (
-      ((numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
-        (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace))) ||
-        (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
-      ) &&
-      (!previousNotificationList.some(notification => notification.type.includes(TLM_ET.MENTION)))
-    ) {
-      const authorList = uniqBy([
-        notification.author,
-        ...previousNotificationList.map(notification => notification.author)
-      ], 'userId')
-
-      for (let i = 0; i < (numberOfNotificationsToGroup - 1); i++) newNotificationList.pop()
-      const notificationGroupList = sortByCreatedDate([notification, ...previousNotificationList])
-      const groupedByContent = `${numberOfCriteria}
-                                ${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}
-                                ${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}
-                                ${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
-
-      newNotificationList.push({
-        author: authorList,
-        created: notificationGroupList[0].created,
-        id: notification.id,
-        type: groupedByContent,
-        group: notificationGroupList
-      })
-    }
-  }
-}
-
-export const belongsToGroup = (notification, groupedNotification, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
-  if (!groupedNotification || !groupedNotification.group) return false
-
-  const isGroupedByContent = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT) &&
-    hasSameContent([notification, groupedNotification])
-
-  const isGroupedByWorkspace = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.WORKSPACE) &&
-    hasSameWorkspace([notification.workspace, groupedNotification.group[0].workspace])
-
-  const isGroupedByAuthor = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.AUTHOR) &&
-    hasSameAuthor([notification.author, groupedNotification.group[0].author])
-
-  if ((numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
-    (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace))) ||
-    (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
-  ) {
-    groupedNotification.group = sortByCreatedDate([notification, ...groupedNotification.group])
-    groupedNotification.type =
-      `${numberOfCriteria}${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
-    groupedNotification.created = new Date(notification.created).getTime() < new Date(groupedNotification.created).getTime()
-      ? groupedNotification.created
-      : notification.created
-    return true
-  }
-}
-
-export const groupNotificationListWithTwoCriteria = (notificationList) => {
-  const numberOfNotificationsToGroup = 3
-  const newNotificationList = []
-  let indexInNewList = 0
-
-  notificationList.forEach((notification, index) => {
-    if (index < (numberOfNotificationsToGroup - 1) || notification.type.includes(TLM_ET.MENTION)) {
-      indexInNewList++
-      newNotificationList.push(notification)
-      return
-    }
-
-    const previousNotificationInNewList = newNotificationList[indexInNewList - 1]
-    if (belongsToGroup(notification, previousNotificationInNewList, NUMBER_OF_CRITERIA.TWO)) return
-    else {
-      addNewNotificationGroup(
-        notification,
-        newNotificationList,
-        indexInNewList,
-        numberOfNotificationsToGroup,
-        NUMBER_OF_CRITERIA.TWO
-      )
-      if (newNotificationList.length !== indexInNewList) {
-        indexInNewList = newNotificationList.length
-        return
-      }
-    }
-
-    indexInNewList++
-    newNotificationList.push(notification)
-  })
-  return groupNotificationListWithOneCriteria(newNotificationList)
-}
-
-export const groupNotificationListWithOneCriteria = (notificationList) => {
-  const numberOfNotificationsToGroup = 6
-  const newNotificationList = []
-  let indexInNewList = 0
-
-  notificationList.forEach((notification, index) => {
-    if (index < numberOfNotificationsToGroup - 1 || notification.type.includes(TLM_ET.MENTION) || notification.group) {
-      indexInNewList++
-      newNotificationList.push(notification)
-      return
-    }
-
-    const previousNotificationInNewList = newNotificationList[indexInNewList - 1]
-
-    if (previousNotificationInNewList.type.startsWith(NUMBER_OF_CRITERIA.TWO)) {
-      indexInNewList++
-      newNotificationList.push(notification)
-      return
-    }
-    if (belongsToGroup(notification, previousNotificationInNewList, NUMBER_OF_CRITERIA.ONE)) return
-    else {
-      addNewNotificationGroup(
-        notification,
-        newNotificationList,
-        indexInNewList,
-        numberOfNotificationsToGroup,
-        NUMBER_OF_CRITERIA.ONE
-      )
-      if (newNotificationList.length !== indexInNewList) {
-        indexInNewList = newNotificationList.length
-        return
-      }
-    }
-
-    indexInNewList++
-    newNotificationList.push(notification)
-  })
-  return newNotificationList
 }
 
 function getMainContentId (notification) {
@@ -244,32 +75,24 @@ export default function notificationPage (state = defaultNotificationsObject, ac
     case `${SET}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
         .map(notification => (serializeNotification(notification)))
-      const groupedNotificationList = sortByCreatedDate(groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id')))
-      return { ...state, list: groupedNotificationList }
+      return { ...state, list: notificationList }
     }
 
     case `${APPEND}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
         .map(notification => (serializeNotification(notification)))
-      const groupedNotificationList = sortByCreatedDate(groupNotificationListWithTwoCriteria(uniqBy(notificationList, 'id')))
       return {
         ...state,
-        list: [...state.list, ...groupedNotificationList]
+        list: [...state.list, ...notificationList]
       }
     }
 
     case `${ADD}/${NOTIFICATION}`: {
       const notification = serializeNotification(action.notification)
       const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount + 1 : state.unreadMentionCount
-      let newNotificationList = cloneDeep(state.list)
-      if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
-        if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
-          newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([notification, ...state.list], 'id'))
-        }
-      }
       return {
         ...state,
-        list: sortByCreatedDate(newNotificationList),
+        list: sortByCreatedDate([...state.list, notification]),
         unreadMentionCount: newUnreadMentionCount,
         unreadNotificationCount: state.unreadNotificationCount + 1
       }
@@ -282,26 +105,32 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         ...action.notificationList,
         ...state.list.slice(index + 1, state.list.length)
       ]
-      return { ...state, list: newNotificationList }
+      return {
+        ...state,
+        list: newNotificationList
+      }
     }
 
     case `${READ}/${NOTIFICATION}`: {
       const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
+
       if (!notification) return state
-      const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount - 1 : state.unreadMentionCount
+
+      const newUnreadMentionCount = (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) ? state.unreadMentionCount - 1 : state.unreadMentionCount
+      const replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
+
+      const newUnreadNotificationCount = state.unreadNotificationCount - 1
+
       return {
         ...state,
-        list: state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no),
+        list: replaceList,
         unreadMentionCount: newUnreadMentionCount,
-        unreadNotificationCount: state.unreadNotificationCount - 1
+        unreadNotificationCount: newUnreadNotificationCount
       }
     }
 
     case `${READ}/${NOTIFICATION_LIST}`: {
-      const notificationList = state.list.map(notification => notification.group
-        ? { ...notification, group: notification.group.map(notification => ({ ...notification, read: true })) }
-        : { ...notification, read: true }
-      )
+      const notificationList = state.list.map(notification => ({ ...notification, read: true }))
       return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
     }
 
@@ -321,13 +150,9 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
 
       const newNotificationList = state.list.map(notification => {
-        if (notification.group) {
-          return {
-            ...notification,
-            group: notification.group.map(notification => markNotificationAsRead(notification))
-          }
-        } else return markNotificationAsRead(notification)
+        return markNotificationAsRead(notification)
       })
+
       return { ...state, list: uniqBy(newNotificationList, 'id'), unreadMentionCount, unreadNotificationCount }
     }
 

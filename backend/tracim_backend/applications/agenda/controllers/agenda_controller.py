@@ -3,6 +3,7 @@ from pyramid.config import Configurator
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.schemas import AgendaFilterQuerySchema
 from tracim_backend.applications.agenda.schemas import AgendaSchema
+from tracim_backend.applications.agenda.schemas import PreFilledAgendaEventSchema
 from tracim_backend.config import CFG
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.utils.authorization import check_right
@@ -54,6 +55,13 @@ class AgendaController(Controller):
             resource_types_filter=hapic_data.query.resource_types,
         )
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__AGENDA_SECTION])
+    @check_right(is_user)
+    @hapic.output_body(PreFilledAgendaEventSchema())
+    def pre_filled_agenda_event(self, context, request: TracimRequest, hapic_data=None):
+        app_config = request.registry.settings["CFG"]  # type : CFG
+        return {"description": app_config.CALDAV__PRE_FILLED_EVENT__DESCRIPTION}
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using pyramid configurator
@@ -69,3 +77,9 @@ class AgendaController(Controller):
         # INFO - G.M - 2019-04-01 - own user agenda
         configurator.add_route("account_agendas", "/users/me/agenda", request_method="GET")
         configurator.add_view(self.account_agendas, route_name="account_agendas")
+
+        # pre-filled agenda event
+        configurator.add_route(
+            "pre_filled_agenda_event", "/system/pre-filled-agenda-event", request_method="GET",
+        )
+        configurator.add_view(self.pre_filled_agenda_event, route_name="pre_filled_agenda_event")

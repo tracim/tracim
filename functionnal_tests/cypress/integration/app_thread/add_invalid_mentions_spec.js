@@ -20,7 +20,7 @@ describe('In a thread', function () {
     cy.loginAs('users')
     cy.visitPage({
       pageName: PAGES.CONTENT_OPEN,
-      params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+      params: { contentId: threadId }
     })
   })
 

@@ -24,7 +24,7 @@ export const AdvancedSearchSpaceList = props => {
   const numberMembersTitle = (numberMembers) => {
     if (numberMembers === 0) return props.t('0 members')
     if (numberMembers === 1) return props.t('{{numberMembers}} member', { numberMembers: numberMembers })
-    else return props.t('{{numberMembers}} members', { numberMembers: numberMembers })
+    else return props.t('{{count}} members', { count: numberMembers })
   }
 
   const numberContentsTitle = (numberContents) => {

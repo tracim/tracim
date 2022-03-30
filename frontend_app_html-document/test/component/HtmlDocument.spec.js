@@ -45,7 +45,8 @@ const props = {
       s = s.replace('{{' + p + '}}', opts[p])
     }
     return s
-  }
+  },
+  workspaceId: 1
 }
 
 describe('<HtmlDocument />', () => {

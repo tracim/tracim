@@ -42,8 +42,6 @@ import {
 import UserStatus from '../component/Dashboard/UserStatus.jsx'
 import ContentTypeBtn from '../component/Dashboard/ContentTypeBtn.jsx'
 import MemberList from '../component/Dashboard/MemberList.jsx'
-import AgendaInfo from '../component/Dashboard/AgendaInfo.jsx'
-import WebdavInfo from '../component/Dashboard/WebdavInfo.jsx'
 import TabBar from '../component/TabBar/TabBar.jsx'
 import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
@@ -503,6 +501,7 @@ export class Dashboard extends React.Component {
                           onClickBtn={() => props.history.push(app.route)}
                           appSlug={app.slug}
                           key={app.slug}
+                          dataCy={`create_${app.slug}`}
                         />
                       )
                     })}
@@ -536,24 +535,6 @@ export class Dashboard extends React.Component {
                     onClickAutoComplete={this.handleClickAutoComplete}
                     t={props.t}
                   />
-
-                  {props.appList.some(a => a.slug === 'agenda') && props.currentWorkspace.agendaEnabled && (
-                    <AgendaInfo
-                      customClass='dashboard__section'
-                      introText={props.t('Use this link to integrate this agenda to your')}
-                      caldavText={props.t('CalDAV compatible software')}
-                      agendaUrl={props.currentWorkspace.agendaUrl}
-                    />
-                  )}
-
-                  {props.system.config.webdav_enabled && (
-                    <WebdavInfo
-                      customClass='dashboard__section'
-                      introText={props.t('Use this link to integrate Tracim in your file explorer')}
-                      webdavText={props.t('(protocole WebDAV)')}
-                      webdavUrl={props.system.config.webdav_url}
-                    />
-                  )}
                 </div>
               </div>
             </PageContent>

@@ -10,8 +10,11 @@ import {
   USER_PROFILE_AVATAR_NAME,
   USER_PROFILE_COVER_NAME
 } from '../action-creator.sync.js'
-import { getBrowserLang } from '../util/helper.js'
-import { PROFILE, serialize } from 'tracim_frontend_lib'
+import {
+  getBrowserLang,
+  PROFILE,
+  serialize
+} from 'tracim_frontend_lib'
 
 export const serializeUserProps = {
   config: 'config',

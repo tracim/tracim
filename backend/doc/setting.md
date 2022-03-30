@@ -253,8 +253,14 @@ To enable mail notification, the smallest config is:
 Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
 link the frontend in emails.
 
-:warning: It is necessary to check if your SMTP configuration is working correctly before using Tracim.
-In the next release we will include a quick solution to test if your STMP configuration works properly.
+:warning: It is necessary to check if your SMTP configuration is working correctly before using Tracim. To do so,
+we do provide this command:
+
+    tracimcli dev test smtp -r myemailadress@mydomain.local
+
+This will send a test email to the provided email address (here: myemailadress@mydomain.local)
+with the same parameters as tracim config.
+
 
 ### Configuring Invitations in Spaces
 
@@ -544,6 +550,15 @@ The default value is 30 seconds.
 
 It's possible to configure custom properties attached to user per instance, [read specific documentation
 to know more about this feature](./user_custom_properties.md).
+
+
+## Default agenda event description in the Frontend
+
+It's possible to set a default agenda event description when creating an event in the agenda from Tracim.
+Write the text you which to have as the defaut event description in a file and put its path in the corresponding parameter.
+For instance:
+
+    agenda.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event_description.txt
 
 ## Security settings
 

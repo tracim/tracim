@@ -1,5 +1,6 @@
 import 'cypress-wait-until'
 import 'cypress-file-upload'
+import { PAGES } from './urls_commands'
 
 let LOGIN_URL = '/api/auth/login'
 
@@ -127,14 +128,14 @@ Cypress.Commands.add('dropFixtureInDropZone', (fixturePath, fixtureMime, dropZon
   cy.removeAllListeners('uncaught:exception')
 })
 
-// FIXME - GB - 2019-07-02 - This events are hardcoded strings because cypress doesn't have the
+// FIXME - GB - 2019-07-02 - These events are hardcoded strings because cypress doesn't have the
 // @babel/polyfill loaded and crash when using something from tracim_frontend_lib
 // https://github.com/tracim/tracim/issues/2041
 Cypress.Commands.add('waitForTinyMCELoaded', () => {
   let isTinyMCEActive = false
 
   cy.window().its('tinyMCE').its('activeEditor').then(activeEditor => {
-    if (activeEditor.getContent()) isTinyMCEActive = true
+    if (activeEditor) isTinyMCEActive = true
   })
 
   cy.document().then( $doc => {
@@ -199,6 +200,20 @@ Cypress.Commands.add('cancelXHR', () => {
 })
 
 Cypress.Commands.add('changeLanguage', (langCode) => {
+  cy.visitPage({ pageName: PAGES.ACCOUNT })
+  cy.get('.dropdownlang').then(elements => {
+    const dropdown = elements[0]
+    const button = dropdown.getElementsByTagName('button')[0]
+    if (button && button.getAttribute('data-cy') === `${langCode}-active`) return
+    cy.wrap(dropdown)
+      .click('left')
+      .find(`[data-cy="${langCode}"]`)
+      .click()
+    cy.get('[data-cy=IconButton_PersonalData]').click()
+  })
+})
+
+Cypress.Commands.add('changeLanguageUnloggedPages', (langCode) => {
   cy.get('.dropdownlang').then(elements => {
     const dropdown = elements[0]
     const button = dropdown.getElementsByTagName('button')[0]

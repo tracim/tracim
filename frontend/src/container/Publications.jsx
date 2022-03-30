@@ -15,6 +15,7 @@ import {
   getOrCreateSessionClientToken,
   handleFetchResult,
   handleInvalidMentionInComment,
+  tinymceRemove,
   IconButton,
   Loading,
   PAGE,
@@ -138,7 +139,7 @@ export class Publications extends React.Component {
     }
 
     if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
-      globalThis.tinymce.remove(`#${wysiwygId}`)
+      tinymceRemove(`#${wysiwygId}`)
     }
 
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
@@ -147,12 +148,12 @@ export class Publications extends React.Component {
   }
 
   componentWillUnmount () {
-    globalThis.tinymce.remove(`#${wysiwygId}`)
+    tinymceRemove(`#${wysiwygId}`)
   }
 
   handleAllAppChangeLanguage = (data) => {
     if (this.state.publicationWysiwyg) {
-      globalThis.tinymce.remove(`#${wysiwygId}`)
+      tinymceRemove(`#${wysiwygId}`)
       globalThis.wysiwyg(`#${wysiwygId}`, data, this.handleChangeNewPublication)
     }
     this.buildBreadcrumbs()
@@ -543,12 +544,12 @@ export class Publications extends React.Component {
           <div className='publishAreaContainer'>
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
+              bottomAutocomplete
               buttonLabel={props.t('Publish')}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
               customColor={COLORS.PUBLICATION}
               customClass='publishArea'
-              disableAutocompletePosition
               icon='fa-fw far fa-paper-plane'
               id={wysiwygId}
               invalidMentionList={state.invalidMentionList}

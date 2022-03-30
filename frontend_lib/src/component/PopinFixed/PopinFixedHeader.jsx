@@ -215,6 +215,7 @@ class PopinFixedHeader extends React.Component {
                   download
                   title={action.label}
                   key={action.label}
+                  data-cy={action.dataCy}
                 >
                   <i className={`fa-fw fa-fw ${action.icon}`} />
                   {action.label}

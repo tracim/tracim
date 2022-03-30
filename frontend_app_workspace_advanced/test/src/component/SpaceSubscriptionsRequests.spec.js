@@ -5,6 +5,7 @@ import { SpaceSubscriptionsRequests } from '../../../src/component/SpaceSubscrip
 
 describe('<SpaceSubscriptionsRequests />', () => {
   const props = {
+    apiUrl: '',
     subscriptionRequestList: []
   }
 

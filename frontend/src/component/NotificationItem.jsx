@@ -1,26 +1,63 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import { FETCH_CONFIG } from '../util/helper.js'
 import {
-  Avatar,
+  FETCH_CONFIG,
+  computeShortDate
+} from '../util/helper.js'
+import {
+  putNotificationAsRead
+} from '../action-creator.async.js'
+import {
+  newFlashMessage,
+  readNotification
+} from '../action-creator.sync.js'
+import {
   AVATAR_SIZE,
-  formatAbsoluteDate,
-  TracimComponent
+  Avatar,
+  TracimComponent,
+  formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml } from 'lodash'
 
-const NotificationItem = props => {
+export const NotificationItem = props => {
   const { notification, user } = props
   const notificationDetails = props.getNotificationDetails(notification)
+
+  const handleClickNotification = async (e, notificationId, notificationDetails) => {
+    if (!notificationDetails.url) {
+      if (notificationDetails.emptyUrlMsg) {
+        props.dispatch(newFlashMessage(notificationDetails.emptyUrlMsg, notificationDetails.msgType || 'warning'))
+      }
+      e.preventDefault()
+    }
+
+    handleReadNotification(notificationId)
+
+    props.onCloseNotificationWall()
+  }
+
+  const handleReadNotification = async (notificationId) => {
+    const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
+    switch (fetchPutNotificationAsRead.status) {
+      case 204: {
+        props.dispatch(readNotification(notificationId))
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
+    }
+  }
+
   if (Object.keys(notificationDetails).length === 0) return null
 
   return (
     <Link
       to={notificationDetails.url || '#'}
-      onClick={(e) => props.onClickNotification(e, notification.id, notificationDetails)}
+      onClick={(e) => handleClickNotification(e, notification.id, notificationDetails)}
       className={classnames('notification__list__item',
         { itemRead: notification.read, isMention: notificationDetails.isMention }
       )}
@@ -37,7 +74,7 @@ const NotificationItem = props => {
           dangerouslySetInnerHTML={{
             __html: (
               notificationDetails.text + ' ' +
-              `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'\\>`
+              `<span title='${escapeHtml(formatAbsoluteDate(notification.created, user.lang))}'></span>`
             )
           }}
         />
@@ -47,7 +84,7 @@ const NotificationItem = props => {
           className='notification__list__item__meta__date'
           title={formatAbsoluteDate(notification.created, user.lang)}
         >
-          {props.shortDate(notification.created)}
+          {computeShortDate(props.notification.created, props.t)}
         </div>
         <div className='notification__list__item__meta__space'>
           {(notification.workspace &&
@@ -62,7 +99,7 @@ const NotificationItem = props => {
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
-              props.onClickCircle(notification.id)
+              handleReadNotification(notification.id)
             }}
           />}
       </div>
@@ -70,13 +107,12 @@ const NotificationItem = props => {
 
   )
 }
-export default translate()(TracimComponent(NotificationItem))
+
+const mapStateToProps = ({ user }) => ({ user })
+export default connect(mapStateToProps)(translate()(TracimComponent(NotificationItem)))
 
 NotificationItem.propTypes = {
+  onCloseNotificationWall: PropTypes.func.isRequired,
   getNotificationDetails: PropTypes.func.isRequired,
-  notification: PropTypes.object.isRequired,
-  onClickCircle: PropTypes.func.isRequired,
-  onClickNotification: PropTypes.func.isRequired,
-  shortDate: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired
+  notification: PropTypes.object.isRequired
 }

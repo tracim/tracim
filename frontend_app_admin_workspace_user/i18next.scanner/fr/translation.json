@@ -1,5 +1,5 @@
 {
-  "Email": "Email",
+  "Email": "Adresse email",
   "Active": "Actif",
   "Administrator": "Administrateur",
   "Description": "Description",
@@ -47,6 +47,6 @@
   "Allowed characters: {{allowedCharactersUsername}}": "Caractères autorisés : {{allowedCharactersUsername}}",
   "Choose the user's type": "Choisir le type d'utilisateur",
   "Type": "Type",
-  "Create and add to spaces": "__NOT_TRANSLATED__",
+  "Create and add to spaces": "Créer et ajouter aux espaces",
   "Create": "Créer"
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import i18next from 'i18next'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
@@ -26,7 +27,8 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   BREADCRUMBS_TYPE,
   PAGE,
-  ROLE
+  ROLE,
+  getFileRevisionPreviewInfo
 } from 'tracim_frontend_lib'
 import Carousel from '../component/Carousel.jsx'
 import { DIRECTION, buildRawFileUrl } from '../helper.js'
@@ -127,16 +129,16 @@ export class Gallery extends React.Component {
     this.updateBreadcrumbsAndTitle(data.fields.workspace.label, state.folderDetail)
   }
 
-  handleContentCreatedOrUndeleted = data => {
+  handleContentCreatedOrUndeleted = async data => {
     if (this.liveMessageNotRelevant(data, this.state)) return
 
-    const preview = this.buildPreview(data.content)
+    const preview = await this.buildPreview(data.fields.content)
     if (preview) {
       this.setNewPicturesPreviews([preview, ...this.state.imagePreviewList].sort(this.sortPreviews))
     }
   }
 
-  handleContentModified = data => {
+  handleContentModified = async data => {
     const { state } = this
     if (this.liveMessageNotRelevant(data, state)) {
       // INFO - GM - 2020-07-20 - The if below covers the move functionality.
@@ -155,7 +157,7 @@ export class Gallery extends React.Component {
       image => image.contentId !== data.fields.content.content_id
     )
 
-    const preview = this.buildPreview(data.fields.content)
+    const preview = await this.buildPreview(data.fields.content)
     if (preview) {
       // RJ - 2020-06-15 - NOTE
       // Unlikely, but a picture could be replaced by a file of another type
@@ -414,10 +416,17 @@ export class Gallery extends React.Component {
     }
   }
 
-  buildPreview = (file) => {
-    if (!file.has_jpeg_preview) return false
-
+  buildPreview = async (file) => {
     const { state } = this
+    const previewInfoResponse = await handleFetchResult(
+      await getFileRevisionPreviewInfo(
+        state.config.apiUrl,
+        file.workspace_id,
+        file.content_id,
+        file.current_revision_id
+      )
+    )
+    if (!previewInfoResponse.body.has_jpeg_preview) return false
 
     const filenameNoExtension = removeExtensionOfFilename(file.filename)
 
@@ -443,19 +452,15 @@ export class Gallery extends React.Component {
       125
     )
 
-    const lightBoxUrlList = (
-      new Array(file.page_nb)
-        .fill('')
-        .map((n, j) => buildFilePreviewUrl(
-          state.config.apiUrl,
-          state.config.appConfig.workspaceId,
-          file.content_id,
-          file.current_revision_id,
-          filenameNoExtension,
-          j + 1,
-          1920,
-          1920
-        ))
+    const lightBoxUrl = buildFilePreviewUrl(
+      state.config.apiUrl,
+      state.config.appConfig.workspaceId,
+      file.content_id,
+      file.current_revision_id,
+      filenameNoExtension,
+      1,
+      1920,
+      1920
     )
 
     const rawFileUrl = buildRawFileUrl(
@@ -470,7 +475,7 @@ export class Gallery extends React.Component {
       label: file.label,
       src: previewUrl,
       fileName: file.filename,
-      lightBoxUrlList,
+      lightBoxUrl,
       previewUrlForThumbnail,
       rotationAngle: 0,
       rawFileUrl
@@ -488,7 +493,7 @@ export class Gallery extends React.Component {
       )
 
       if (fetchFileContent.apiResponse.status === 200) {
-        return this.buildPreview(fetchFileContent.body)
+        return await this.buildPreview(fetchFileContent.body)
       }
 
       sendGlobalFlashMessage(this.props.t('Error while loading file preview'))
@@ -550,8 +555,8 @@ export class Gallery extends React.Component {
 
     if (state.imagePreviewList.length <= 1) return
 
-    if (state.displayedPictureIndex === 0) return state.imagePreviewList[state.imagePreviewList.length - 1].lightBoxUrlList[0]
-    return state.imagePreviewList[state.displayedPictureIndex - 1].lightBoxUrlList[0]
+    if (state.displayedPictureIndex === 0) return state.imagePreviewList[state.imagePreviewList.length - 1].lightBoxUrl
+    return state.imagePreviewList[state.displayedPictureIndex - 1].lightBoxUrl
   }
 
   getNextImageUrl = () => {
@@ -559,8 +564,8 @@ export class Gallery extends React.Component {
 
     if (state.imagePreviewList.length <= 1) return
 
-    if (state.displayedPictureIndex === state.imagePreviewList.length - 1) return state.imagePreviewList[0].lightBoxUrlList[0]
-    return state.imagePreviewList[state.displayedPictureIndex + 1].lightBoxUrlList[0]
+    if (state.displayedPictureIndex === state.imagePreviewList.length - 1) return state.imagePreviewList[0].lightBoxUrl
+    return state.imagePreviewList[state.displayedPictureIndex + 1].lightBoxUrl
   }
 
   handleCarouselPositionChange = (pictureIndex) => {
@@ -768,6 +773,7 @@ export class Gallery extends React.Component {
                   disableAnimation={state.displayLightbox}
                   isWorkspaceRoot={state.folderId === 0}
                   autoPlay={state.autoPlay}
+                  dir={i18next.dir()}
                 />
               ) : (
                 <div className='gallery__loader'>
@@ -786,7 +792,7 @@ export class Gallery extends React.Component {
                 <div className='gallery__mouse__listener' onMouseMove={this.handleMouseMove}>
                   <ReactImageLightbox
                     prevSrc={this.getPreviousImageUrl()}
-                    mainSrc={this.displayedPicture().lightBoxUrlList[0]}
+                    mainSrc={this.displayedPicture().lightBoxUrl}
                     nextSrc={this.getNextImageUrl()}
                     onCloseRequest={this.handleClickHideImageRaw}
                     onMovePrevRequest={() => { this.handleClickPreviousNextPage(DIRECTION.LEFT) }}

@@ -53,7 +53,6 @@
       &__changeBtn
         position absolute
         bottom -15px
-        right -5px
         width 25px
         height 25px
         & .iconbutton__icon
@@ -75,6 +74,7 @@
           white-space pre
         &__username
           overflow hidden
+          unicode-bidi plaintext
           text-overflow ellipsis
           &__wrapper
             max-width 50%
@@ -115,17 +115,22 @@
     top 0
 
 [dir=ltr] .profile
-  &__customForm__submit
-    right 0
   &__cover__changeBtn
     right pageSpacing
-[dir=rtl] .profile
   &__customForm__submit
-    left 0
+    right 0
+  &__mainBar__avatar__changeBtn
+    right -5px
+
+[dir=rtl] .profile
   &__cover__changeBtn
     left pageSpacing
+  &__customForm__submit
+    left 0
   &__popup_select_cover
     left 25%
+  &__mainBar__avatar__changeBtn
+    left -5px
 
 @media (max-width: max-sm)
   .profile

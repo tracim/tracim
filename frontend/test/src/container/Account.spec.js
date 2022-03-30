@@ -70,6 +70,14 @@ describe('In <Account />', () => {
 
   const props = {
     breadcrumbs: [],
+    dispatchCustomEvent: dispatchMock,
+    langList: [{
+      id: 'fr',
+      label: 'French'
+    }, {
+      id: 'en',
+      label: 'English'
+    }],
     user: user,
     appList: appList,
     workspaceList: workspaceList.workspaceList,

@@ -4,4 +4,4 @@ set -e
 packages_dir="$(realpath $(dirname $0))/../../system_packages/debian"
 
 apt-get update
-apt-get install -qy $(cat "$packages_dir/build_backend_packages.list") $(cat "$packages_dir/run_backend_packages.list") $(cat "$packages_dir/optional_preview_packages.list")
+apt-get install -qy $(cat "$packages_dir/build_backend_packages.list" "$packages_dir/run_backend_packages.list" "$packages_dir/optional_preview_packages.list")

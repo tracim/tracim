@@ -34,7 +34,7 @@ export const CheckboxFilter = props => {
             styleLabel={{ marginInlineStart: '5px', marginInlineEnd: '10px' }}
             styleCheck={{ top: '-5px' }}
           />
-          <label htmlFor={`checkbox-${item.id}`}>
+          <label className='checkboxFilter__checkbox__label' htmlFor={`checkbox-${item.id}`}>
             {props.t(item.value)}{item.count && ` (${item.count})`}
           </label>
         </div>

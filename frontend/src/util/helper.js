@@ -1,4 +1,4 @@
-import i18n, { getBrowserLang } from './i18n.js'
+import i18n from './i18n.js'
 import {
   FETCH_CONFIG as LIB_FETCH_CONFIG,
   naturalCompareLabels,
@@ -16,9 +16,6 @@ export const MINIMUM_CHARACTERS_PUBLIC_NAME = 3
 export const NO_ACTIVE_SPACE_ID = -1
 
 export const history = require('history').createBrowserHistory()
-
-// this function is declared in i18n to avoid cyclic imports and reexported here for consistency
-export { getBrowserLang }
 
 export const FETCH_CONFIG = {
   headers: LIB_FETCH_CONFIG.headers,
@@ -293,3 +290,14 @@ export const getRevisionTypeLabel = (revisionType, t) => {
 }
 
 export const WELCOME_ELEMENT_ID = 'welcome'
+
+export const computeShortDate = (date, t) => {
+  const msElapsed = Date.now() - new Date(date).getTime()
+  if (msElapsed < 60000) return Math.round(msElapsed / 1000) + ' ' + t('sec')
+  if (msElapsed < 3600000) return Math.round(msElapsed / 60000) + ' ' + t('min')
+  if (msElapsed < 3600000 * 24) return Math.round(msElapsed / 3600000) + ' ' + t('hr')
+  if (msElapsed < 3600000 * 24 * 7) return Math.round(msElapsed / (3600000 * 24)) + ' ' + t('d')
+  if (msElapsed < 3600000 * 24 * 30) return Math.round(msElapsed / (3600000 * 24 * 7)) + ' ' + t('w')
+  if (msElapsed < 3600000 * 24 * 365) return Math.round(msElapsed / (3600000 * 24 * 20)) + ' ' + t('mth')
+  return Math.round(msElapsed / (3600000 * 24 * 365)) + ' ' + t('y')
+}

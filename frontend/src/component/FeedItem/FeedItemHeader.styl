@@ -9,6 +9,8 @@
   &__icon
     font-size bigIconSize
     margin-inline-end standardSpacing
+  &__label
+    display flex
   &__title
     margin-inline-end auto
     white-space nowrap
@@ -23,6 +25,7 @@
     margin-inline-start standardSpacing
     text-align end
     align-items flex-end
+    flex 1
   &__unavailable
     font-style italic
     padding-inline-end standardSpacing
@@ -39,7 +42,8 @@
       border none
       & .iconbutton__text
         padding 0
-
+  & .profileNavigation
+    max-width 100px
   & .breadcrumbs
     position relative
     top 0
