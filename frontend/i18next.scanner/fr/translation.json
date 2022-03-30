@@ -323,6 +323,7 @@
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "La demande de <0><0>{{userPublicName}}</0></0> pour rejoindre l'espace a été <2>{{state}}</2>",
   "Account": "Compte",
   "Showing {{displayedResults}} of {{count}} results": "{{displayedResults}} résultats affichés sur {{count}}",
+  "Showing {{displayedResults}} of {{count}} results_plural": "{{displayedResults}} résultats affichés sur {{count}}",
   "Result for: {{keywords}}": "Résultat pour : {{keywords}}",
   "Results for: {{keywords}}": "Résultats pour : {{keywords}}",
   "Filter": "Filtrer",
@@ -474,7 +475,8 @@
   "{{numberOfContents}} contents": "{{numberOfContents}} contenus",
   "{{numberOfUsers}} users": "{{numberOfUsers}} utilisateurs",
   "Set your username": "Définissez votre identifiant",
-  " in {{count}} spaces": " dans {{count}} espaces",
+  " in {{count}} spaces": " dans {{count}} espace",
+  " in {{count}} spaces_plural": " dans {{count}} espaces",
   "{{author}} created their account": "{{author}} a créé son compte",
   "{{author}} modified their account": "{{author}} a modifié son compte",
   "{{author}} deleted their account": "{{author}} a supprimé son compte",
@@ -549,9 +551,7 @@
   "Image": "Image",
   "New language:": "Nouvelle langue :",
   "Configuration links": "Liens de configuration",
-  "Showing {{displayedResults}} of {{count}} results_plural": "{{displayedResults}} résultats affichés sur {{count}}",
-  "{{author}} made {{count}} contributions": "",
-  " on {{content}}": "",
-  "{{author}} made {{count}} contributions_plural": "",
-  " in {{count}} spaces_plural": " dans {{count}} espaces"
+  "{{author}} made {{count}} contributions": "{{author}} a fait {{count}} contribution",
+  "{{author}} made {{count}} contributions_plural": "{{author}} a fait {{count}} contributions",
+  " on {{content}}": " dans {{content}}"
 }

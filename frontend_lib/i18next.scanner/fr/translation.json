@@ -187,7 +187,7 @@
   "Dark Skin Tone": "Peau foncée",
   "Upload a file": "Téléverser un fichier",
   "See files": "Voir les fichiers",
-  "{{count}} files selected": "{{count}} fichiers sélectionnés",
+  "{{count}} files selected": "{{count}} fichier sélectionné",
   "{{count}} files selected_plural": "{{count}} fichiers sélectionnés",
   "1 file selected": "1 fichier sélectionné",
   "Remove file": "Supprimer le fichier",
@@ -219,5 +219,5 @@
   "Your tag has been created": "Votre étiquette a été créée",
   "See more": "Voir plus",
   "Error while loading timeline": "Erreur lors du chargement de l'historique",
-  "Agenda": ""
+  "Agenda": "Agenda"
 }

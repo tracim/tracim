@@ -9,16 +9,17 @@ msgstr ""
 "Project-Id-Version: tracim_backend 4.1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-03-25 17:31+0100\n"
-"PO-Revision-Date: 2022-03-25 15:33+0000\n"
-"Last-Translator: Myriam Rabhi <myriamrabhi6@gmail.com>\n"
-"Language: ar\n"
+"PO-Revision-Date: 2022-03-29 14:08+0000\n"
+"Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language-Team: Arabic <https://hosted.weblate.org/projects/tracim/backend/ar/"
 ">\n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5\n"
+"Language: ar\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+"X-Generator: Weblate 4.12-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:668
@@ -46,10 +47,12 @@ msgid "Validated"
 msgstr "تم القبول"
 
 #: tracim_backend/app_models/contents.py:63
+#, fuzzy
 msgid "Cancelled"
 msgstr "ألغي"
 
 #: tracim_backend/app_models/contents.py:71
+#, fuzzy
 msgid "Deprecated"
 msgstr "مُهمَل"
 
@@ -60,16 +63,15 @@ msgid ""
 msgstr "[{website_title}] {emitter_name} شارك الملف \"{content_filename}\" معك"
 
 #: tracim_backend/applications/share/application.py:33
+#, fuzzy
 msgid ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
 "people"
 msgid_plural ""
 "[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
 "people"
-msgstr[0] ""
-"[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} شخص"
-msgstr[1] ""
-"[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} شخص"
+msgstr[0] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} شخص"
+msgstr[1] "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} شخص"
 msgstr[2] ""
 "[{website_title}] لقد شاركت\"{content_filename}\" مع {nb_receivers} شخصين"
 msgstr[3] ""
@@ -84,6 +86,7 @@ msgid "{emitter_name} invited you to upload files on \"{website_title}\""
 msgstr "{emitter_name} دعاك لتحميل ملفات على \"{website_title}\""
 
 #: tracim_backend/applications/upload_permissions/application.py:32
+#, fuzzy
 msgid ""
 "[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
@@ -91,25 +94,26 @@ msgid_plural ""
 "[{website_title}] You invited {nb_receivers} people to upload files on "
 "\"{workspace_name}\""
 msgstr[0] ""
-"[{website_title}] لقد دعوت {nb_receivers} شخص لتحميل ملفات على "
-"\"{workspace_name}\""
+"[{website_title}] لقد دعوت {nb_receivers} شخص لتحميل ملفات على \""
+"{workspace_name}\""
 msgstr[1] ""
-"[{website_title}] لقد دعوت {nb_receivers} شخصا لتحميل ملفات على "
-"\"{workspace_name}\""
+"[{website_title}] لقد دعوت {nb_receivers} شخصا لتحميل ملفات على \""
+"{workspace_name}\""
 msgstr[2] ""
-"[{website_title}] لقد دعوت {nb_receivers} شخصين لتحميل ملفات على "
-"\"{workspace_name}\""
+"[{website_title}] لقد دعوت {nb_receivers} شخصين لتحميل ملفات على \""
+"{workspace_name}\""
 msgstr[3] ""
-"[{website_title}] لقد دعوت {nb_receivers} أشخاص لتحميل ملفات على "
-"\"{workspace_name}\""
+"[{website_title}] لقد دعوت {nb_receivers} أشخاص لتحميل ملفات على \""
+"{workspace_name}\""
 msgstr[4] ""
-"[{website_title}] لقد دعوت {nb_receivers} شخصا لتحميل ملفات على "
-"\"{workspace_name}\""
+"[{website_title}] لقد دعوت {nb_receivers} شخصا لتحميل ملفات على \""
+"{workspace_name}\""
 msgstr[5] ""
-"[{website_title}] لقد دعوت {nb_receivers} شخصا آخر لتحميل ملفات على "
-"\"{workspace_name}\""
+"[{website_title}] لقد دعوت {nb_receivers} شخصا آخر لتحميل ملفات على \""
+"{workspace_name}\""
 
 #: tracim_backend/applications/upload_permissions/application.py:42
+#, fuzzy
 msgid ""
 "[{website_title}] {uploader_username} shared {nb_uploaded_contents} files in "
 "\"{workspace_name}\""
@@ -117,20 +121,20 @@ msgid_plural ""
 "[{website_title}] {uploader_username} shared {nb_uploaded_contents} files in "
 "\"{workspace_name}\""
 msgstr[0] ""
-"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملف في "
-"\"{workspace_name}\""
+"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملف في \""
+"{workspace_name}\""
 msgstr[1] ""
-"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفا في "
-"\"{workspace_name}\""
+"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفا في \""
+"{workspace_name}\""
 msgstr[2] ""
-"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفّين في "
-"\"{workspace_name}\""
+"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفّين في \""
+"{workspace_name}\""
 msgstr[3] ""
-"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفّات في "
-"\"{workspace_name}\""
+"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفّات في \""
+"{workspace_name}\""
 msgstr[4] ""
-"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفا في "
-"\"{workspace_name}\""
+"[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفا في \""
+"{workspace_name}\""
 msgstr[5] ""
 "[{website_title}] {uploader_username} شارك{nb_uploaded_contents} ملفا آخرا "
 "في \"{workspace_name}\""
@@ -148,10 +152,12 @@ msgid "Uploaded by {username}."
 msgstr "تم التحميل بواسطة {username}."
 
 #: tracim_backend/lib/core/content.py:1906
+#, fuzzy
 msgid "New folder"
 msgstr "مجلد جديد"
 
 #: tracim_backend/lib/core/content.py:1911
+#, fuzzy
 msgid "New folder {0}"
 msgstr "ملف جديد {0}"
 
@@ -202,12 +208,13 @@ msgid "You're receiving this email because of your account on {website_title}."
 msgstr "يصلك هذا البريد الإلكتروني نظرا لإمتلاكك حسابا في {website_title}."
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:66
+#, fuzzy
 msgid ""
 "If you'd like to receive fewer emails, you can <a href=\"{website_title}/ui/"
 "account\">unsubscribe from notifications</a>."
 msgstr ""
-"اذا أردت أن يصلك عدد أقل من رسائل البريدية الإلكترونية، بإمكانك <a href="
-"\"{website_title}/ui/account\"> أن تلغي خدمة الإشعارات</a>."
+"اذا أردت أن يصلك عدد أقل من رسائل البريدية الإلكترونية، بإمكانك <a href=\""
+"{website_title}/ui/account\"> أن تلغي خدمة الإشعارات</a>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:5
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:4
@@ -240,6 +247,7 @@ msgid "password: {password}"
 msgstr "كلمة المرور: {password}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:21
+#, fuzzy
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your space: {a_link}"
@@ -431,6 +439,7 @@ msgid "I invited you to upload files here:"
 msgstr "لقد دعوتك لتحميل الملفات هنا:"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
+#, fuzzy
 msgid "Upload files"
 msgstr "تحميل ملفات"
 
