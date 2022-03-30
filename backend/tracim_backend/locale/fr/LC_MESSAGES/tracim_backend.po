@@ -386,4 +386,3 @@ msgstr ""
 "Le téléversement est protégé par un mot de passe, merci de me contacter "
 "(<a href=\"mailto:{emitter_email}\">{username}</a>) pour avoir le mot de "
 "passe."
-

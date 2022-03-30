@@ -537,6 +537,10 @@ class CFG(object):
             self.get_raw_config("url_preview.fetch_timeout", "30")
         )
 
+        self.URL_PREVIEW__MAX_CONTENT_LENGTH = int(
+            self.get_raw_config("url_preview.max_content_length", "1048576")
+        )
+
         self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
@@ -1089,6 +1093,13 @@ class CFG(object):
             raise ConfigurationError(
                 'ERROR  "{}" should be a strictly positive value (currently "{}")'.format(
                     "URL_PREVIEW__FETCH_TIMEOUT", self.URL_PREVIEW__FETCH_TIMEOUT
+                )
+            )
+
+        if self.URL_PREVIEW__MAX_CONTENT_LENGTH < 0:
+            raise ConfigurationError(
+                'ERROR  "{}" should be a positive value (currently "{}")'.format(
+                    "URL_PREVIEW__MAX_CONTENT_LENGTH", self.URL_PREVIEW__MAX_CONTENT_LENGTH
                 )
             )
 

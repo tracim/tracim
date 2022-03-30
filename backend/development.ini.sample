@@ -179,6 +179,11 @@ workspace.join.max_messages_history_count = -1
 # timeout for fetching URL preview (in sec).
 ; url_preview.fetch_timeout = 30
 
+# max content length parsed for fetching URL preview (in bytes), default to 1048576 (1 Mo)
+# note: setting to 0 will disallow the limitation, but is not recommanded for security and performance
+# reason.
+; url_preview.max_content_length = 1048576
+
 ####
 # LIMITATION
 ####

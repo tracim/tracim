@@ -380,4 +380,3 @@ msgstr ""
 "Esse upload é protegido por uma palavra-passe, por favor contacte-me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) para obter a palavra-"
 "passe."
-

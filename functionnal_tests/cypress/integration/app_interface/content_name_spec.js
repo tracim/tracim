@@ -49,4 +49,3 @@ describe("A content's name inside an app", () => {
     cy.get('.FilenameWithExtension').should('not.exist')
   })
 })
-

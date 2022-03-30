@@ -378,4 +378,3 @@ msgstr ""
 #~ "to upload files in this shared "
 #~ "space <a href={sharedspace_url}>{sharedspace_name}</a>:"
 #~ msgstr ""
-

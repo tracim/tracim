@@ -387,4 +387,3 @@ msgstr ""
 "Dieser Upload ist durch ein Passwort geschützt, bitte kontaktieren Sie "
 "mich (<a href=\"mailto:{emitter_email}\">{username}</a>), um das Passwort"
 " zu erhalten."
-
