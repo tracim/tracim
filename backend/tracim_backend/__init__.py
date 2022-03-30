@@ -51,6 +51,7 @@ from tracim_backend.lib.utils.authentification import RemoteAuthentificationPoli
 from tracim_backend.lib.utils.authentification import TracimBasicAuthAuthenticationPolicy
 from tracim_backend.lib.utils.authorization import TRACIM_DEFAULT_PERM
 from tracim_backend.lib.utils.authorization import AcceptAllAuthorizationPolicy
+from tracim_backend.lib.utils.authorization import TracimSecurityPolicy
 from tracim_backend.lib.utils.cors import add_cors_support
 from tracim_backend.lib.utils.http_cache import default_to_cache_control_no_store
 from tracim_backend.lib.utils.logger import logger
@@ -204,9 +205,12 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     # Avoid a bug with Firefox: https://github.com/tracim/tracim/issues/5334
     configurator.add_subscriber(default_to_cache_control_no_store, NewResponse)
     # Default authorization : Accept anything.
-    configurator.set_authorization_policy(AcceptAllAuthorizationPolicy())
-    authn_policy = MultiAuthenticationPolicy(policies)
-    configurator.set_authentication_policy(authn_policy)
+    configurator.set_security_policy(
+        TracimSecurityPolicy(
+            authentification_policy=MultiAuthenticationPolicy(policies),
+            authorization_policy=AcceptAllAuthorizationPolicy(),
+        )
+    )
     # INFO - GM - 11-04-2018 - set default perm
     # setting default perm is needed to force authentification
     # mechanism in all views.

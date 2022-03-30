@@ -122,9 +122,6 @@ def init_models(configurator: Configurator, app_config: "CFG") -> None:
     # use pyramid_tm to hook the transaction lifecycle to the request
     configurator.include("pyramid_tm")
 
-    # use pyramid_retry to retry a request when transient exceptions occur
-    configurator.include("pyramid_retry")
-
     session_factory = get_session_factory(get_engine(app_config))
     configurator.registry["dbsession_factory"] = session_factory
 

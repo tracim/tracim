@@ -162,14 +162,13 @@ pyparsing==2.4.7
     #   packaging
 pyperclip==1.8.2
     # via cmd2
-pyramid==1.10.8
+pyramid==2.0
     # via
     #   pyramid-beaker
     #   pyramid-debugtoolbar
     #   pyramid-ldap3
     #   pyramid-mako
     #   pyramid-multiauth
-    #   pyramid-retry
     #   pyramid-tm
     #   tracim-backend (setup.py)
 pyramid-beaker==0.8
@@ -183,8 +182,6 @@ pyramid-mako==1.1.0
     #   pyramid-debugtoolbar
     #   tracim-backend (setup.py)
 pyramid-multiauth==0.9.0
-    # via tracim-backend (setup.py)
-pyramid-retry==1.0
     # via tracim-backend (setup.py)
 pyramid-tm==2.4
     # via tracim-backend (setup.py)
@@ -220,7 +217,7 @@ redis==3.5.3
     # via
     #   rq
     #   tracim-backend (setup.py)
-repoze.lru==0.7
+repoze-lru==0.7
     # via pyramid-debugtoolbar
 requests==2.25.1
     # via
@@ -249,7 +246,7 @@ sqlalchemy==1.3.24
     #   alembic
     #   sqlakeyset
     #   tracim-backend (setup.py)
-    #   zope.sqlalchemy
+    #   zope-sqlalchemy
 stevedore==3.3.0
     # via cliff
 text-unidecode==1.3
@@ -260,7 +257,7 @@ transaction==3.0.1
     # via
     #   pyramid-tm
     #   tracim-backend (setup.py)
-    #   zope.sqlalchemy
+    #   zope-sqlalchemy
 translationstring==1.4
     # via pyramid
 urllib3==1.26.6
@@ -289,15 +286,14 @@ wsgidav==2.4.1
     # via tracim-backend (setup.py)
 zipp==3.4.1
     # via importlib-metadata
-zope.deprecation==4.4.0
+zope-deprecation==4.4.0
     # via pyramid
-zope.interface==5.4.0
+zope-interface==5.4.0
     # via
     #   pyramid
-    #   pyramid-retry
     #   transaction
-    #   zope.sqlalchemy
-zope.sqlalchemy==1.4
+    #   zope-sqlalchemy
+zope-sqlalchemy==1.4
     # via tracim-backend (setup.py)
 
 # The following packages are considered to be unsafe in a requirements file:
