@@ -250,6 +250,31 @@ import { htmlCodeToDocumentFragment, tinymceRemove } from 'tracim_frontend_lib'
           .on('drop', function (e) {
             base64EncodeAndTinyMceInsert(e.dataTransfer.files)
           })
+
+        // INFO - CH - 2022-03-30 - Overrides commands InsertUnorderedList and InsertOrderedList to add the attribute
+        // dir='auto' on the <ul> and <ol> tags to fix rtl display of lists
+        // see https://github.com/tracim/tracim/issues/5534
+        let avoidLoopInBeforeExecCommand = 0
+        $editor.on('BeforeExecCommand', event => {
+          if (event.command === 'InsertUnorderedList' || event.command === 'InsertOrderedList') {
+            if (avoidLoopInBeforeExecCommand === 0) {
+              event.preventDefault()
+
+              avoidLoopInBeforeExecCommand = 1
+
+              const newListAttributes = event.value
+                ? { ...event.value['list-attributes'], dir: 'auto' }
+                : { dir: 'auto' }
+              const newValue = {
+                ...event.value,
+                'list-attributes': newListAttributes
+              }
+              $editor.execCommand(event.command, false, newValue)
+            } else {
+              avoidLoopInBeforeExecCommand = 0
+            }
+          }
+        })
       }
     })
   }
