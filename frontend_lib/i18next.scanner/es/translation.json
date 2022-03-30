@@ -1,1 +1,8 @@
-{}
+{
+  "Validate": "Validar",
+  "Add a member": "Añadir un miembro",
+  "Password": "Contraseña",
+  "Loading…": "Cargando…",
+  "Allowed characters: {{allowedCharactersUsername}}": "Caracteres permitidos: {{allowedCharactersUsername}}",
+  "See more": "Ver más"
+}
