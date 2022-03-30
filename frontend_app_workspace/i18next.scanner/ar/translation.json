@@ -2,7 +2,7 @@
   "None": "لا شيء",
   "Error while getting user spaces": "خطأ أثناء محاولة الحصول على فضاءات المستخدم",
   "Some input are invalid": "بعض الإدخالات غير صحيحة",
-  "A space with that name already exists": "فضاء بهذا الإسم موجود مسبقا",
+  "A space with that name already exists": "فضاء بهذا الاسم موجود مسبقا",
   "You cannot create anymore space": "لا يمكنك إنشاء فضاء آخر",
   "Error while saving new space": "خطأ أثناء حفظ فضاء جديد",
   "New space": "فضاء جديد",

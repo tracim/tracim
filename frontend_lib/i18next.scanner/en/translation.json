@@ -187,7 +187,8 @@
   "Dark Skin Tone": "Dark Skin Tone",
   "Upload a file": "Upload a file",
   "See files": "See files",
-  "{{count}} files selected": "{{count}} files selected",
+  "{{count}} files selected": "{{count}} file selected",
+  "{{count}} files selected_plural": "{{count}} files selected",
   "1 file selected": "1 file selected",
   "Remove file": "Remove file",
   "A content with the same name already exists": "A content with the same name already exists",
@@ -218,6 +219,5 @@
   "Your tag has been created": "Your tag has been created",
   "See more": "See more",
   "Error while loading timeline": "Error while loading timeline",
-  "Agenda": "Agenda",
-  "{{count}} files selected_plural": "{{count}} files selected"
+  "Agenda": "Agenda"
 }

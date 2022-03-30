@@ -38,7 +38,7 @@
   "Error while saving the user configuration": "خطأ أثناء حفظ إعدادات المستخدم",
   "Error while saving the new description": "خطأ أثناء حفظ الوصف الجديد",
   "Error while saving the comment": "خطأ أثناء حفظ التعليق",
-  "A content with the same name already exists": "محتوى بنفس الإسم موجود مسبقا",
+  "A content with the same name already exists": "محتوى بنفس الاسم موجود مسبقا",
   "The file is larger than the maximum file size allowed": "حجم الملف يتجاوز الحجم الأقصى المسموح به",
   "Error, the space exceed its maximum size": "خطأ، الفضاء تجاوز حده الأقصى",
   "You have reached your storage limit, you cannot add new files": "لقد بلغت الحد الأقصى من التخزين، لم يعد بإمكانك إضافة ملفات جديدة",

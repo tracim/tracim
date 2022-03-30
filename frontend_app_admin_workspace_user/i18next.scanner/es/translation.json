@@ -1,1 +1,7 @@
-{}
+{
+  "Space": "Espacio",
+  "New password is too short (minimum 6 characters)": "La nueva contraseña es demasiado corta (mínimo 6 caracteres)",
+  "New password is too long (maximum 512 characters)": "La nueva contraseña es demasiado larga (máximo 512 caracteres)",
+  "Password": "Contraseña",
+  "Allowed characters: {{allowedCharactersUsername}}": "Caracteres permitidos: {{allowedCharactersUsername}}"
+}

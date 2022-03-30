@@ -1,17 +1,18 @@
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-03-25 17:31+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2022-03-29 14:08+0000\n"
+"Last-Translator: Alfonso <alfonso@el-magnifico.org>\n"
+"Language-Team: Spanish <https://hosted.weblate.org/projects/tracim/backend/"
+"es/>\n"
 "Language: es\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.12-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:668
@@ -30,19 +31,19 @@ msgstr ""
 
 #: tracim_backend/app_models/contents.py:47
 msgid "Opened"
-msgstr ""
+msgstr "Abierto"
 
 #: tracim_backend/app_models/contents.py:55
 msgid "Validated"
-msgstr ""
+msgstr "Validado"
 
 #: tracim_backend/app_models/contents.py:63
 msgid "Cancelled"
-msgstr ""
+msgstr "Anulado"
 
 #: tracim_backend/app_models/contents.py:71
 msgid "Deprecated"
-msgstr ""
+msgstr "Obsoleto"
 
 #: tracim_backend/applications/share/application.py:25
 msgid ""
@@ -94,7 +95,7 @@ msgstr ""
 
 #: tracim_backend/lib/core/workspace.py:497
 msgid "Space"
-msgstr ""
+msgstr "Espacio"
 
 #: tracim_backend/lib/core/workspace.py:500
 msgid "Space {}"
@@ -334,4 +335,3 @@ msgid ""
 "This upload is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
-
