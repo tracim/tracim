@@ -1,4 +1,6 @@
 # coding=utf-8
+from urllib.parse import quote
+
 from mock import patch
 import pytest
 import transaction
@@ -197,7 +199,7 @@ class TestUsernameEndpoints(object):
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/system/username-availability?username={}".format(username), status=200
+            "/api/system/username-availability?username={}".format(quote(username)), status=200
         )
         assert res.json["available"] == is_available
 
