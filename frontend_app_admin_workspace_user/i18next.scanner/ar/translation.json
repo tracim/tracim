@@ -1,6 +1,6 @@
 {
   "Please enter a name, an email, a password and select a type": "أدخل من فضلك اسما، بريدا إلكترونيا، كلمة مرور و اختر نوعا",
-  "Full name": "الإسم الكامل",
+  "Full name": "الاسم الكامل",
   "Username": "إسم المستخدم",
   "Allowed characters: {{allowedCharactersUsername}}": "الحروف المسموح بها: {{allowedCharactersUsername}}",
   "Email": "البريد الإلكتروني",
@@ -38,7 +38,7 @@
   "Error while deleting space": "خطأ أثناء حذف الفضاء",
   "Error while enabling or disabling user": "خطأ أثناء تمكين أو تعطيل مستخدم",
   "Error while saving new profile": "خطأ أثناء حفظ ملف شخصي جديد",
-  "Full name must be at least {{minimumCharactersPublicName}} characters": "الإسم الكامل يجب أن يحتوي على الأقل على{{minimumCharactersPublicName}} حرفا",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "الاسم الكامل يجب أن يحتوي على الأقل على{{minimumCharactersPublicName}} حرفا",
   "Please set a password": "يرجى إدخال كلمة مرور",
   "New password is too short (minimum 6 characters)": "كلمة المرور الجديدة قصيرة جدا (ستة حروف على الأقل)",
   "New password is too long (maximum 512 characters)": "كلمة المرور الجديدة طويلة جدا (512 حرفا على الأقصى)",
