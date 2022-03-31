@@ -628,7 +628,7 @@ export const NotificationWall = props => {
                 read={false}
               />
             )
-          }  else {
+          } else {
             return (
               <ListItemWrapper
                 isFirst={i === 0}

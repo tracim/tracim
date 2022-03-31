@@ -111,7 +111,7 @@ export const GroupedNotificationItem = props => {
     props.groupedNotifications.group.map((notification, i) => {
       return (
         <ListItemWrapper
-          isLast={props.isLast &&  i === props.groupedNotifications.group.length - 1}
+          isLast={props.isLast && i === props.groupedNotifications.group.length - 1}
           isFirst={props.isFirst && i === 0}
           read={props.read}
           key={notification.id}
