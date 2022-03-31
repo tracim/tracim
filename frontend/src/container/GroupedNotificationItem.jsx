@@ -5,10 +5,11 @@ import PropTypes from 'prop-types'
 import {
   PAGE,
   TLM_SUB_TYPE as TLM_SUB,
+  ListItemWrapper,
   TracimComponent
 } from 'tracim_frontend_lib'
 import NotificationItem from '../component/NotificationItem.jsx'
-import GroupRender from '../../GroupedNotificationItem/GroupRender.jsx'
+import GroupRender from '../component/GroupedNotificationItem/GroupRender.jsx'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 
 export const GroupedNotificationItem = props => {
@@ -107,24 +108,36 @@ export const GroupedNotificationItem = props => {
   if (Object.keys(notificationDetails).length === 0) return null
 
   const listRender =
-    props.groupedNotifications.group.map((notification) => {
+    props.groupedNotifications.group.map((notification, i) => {
       return (
-        <NotificationItem
-          onCloseNotificationWall={props.onCloseNotificationWall}
-          getNotificationDetails={props.getNotificationDetails}
+        <ListItemWrapper
+          isLast={props.isLast &&  i === props.groupedNotifications.group.length - 1}
+          isFirst={props.isFirst && i === 0}
+          read={props.read}
           key={notification.id}
-          notification={notification}
-        />
+        >
+          <NotificationItem
+            onCloseNotificationWall={props.onCloseNotificationWall}
+            getNotificationDetails={props.getNotificationDetails}
+            notification={notification}
+          />
+        </ListItemWrapper>
       )
     })
 
   return isGrouped
     ? (
-      <GroupRender
-        groupedNotifications={props.groupedNotifications}
-        notificationDetails={notificationDetails}
-        handleClickGroupedNotification={handleClickGroupedNotification}
-      />
+      <ListItemWrapper
+        isLast={props.isLast}
+        isFirst={props.isFirst}
+        read={props.read}
+      >
+        <GroupRender
+          groupedNotifications={props.groupedNotifications}
+          notificationDetails={notificationDetails}
+          handleClickGroupedNotification={handleClickGroupedNotification}
+        />
+      </ListItemWrapper>
     )
     : listRender
 }
@@ -133,7 +146,16 @@ const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
 
 GroupedNotificationItem.propTypes = {
-  onCloseNotificationWall: PropTypes.func.isRequired,
   getNotificationDetails: PropTypes.func.isRequired,
-  groupedNotifications: PropTypes.object.isRequired
+  groupedNotifications: PropTypes.object.isRequired,
+  isFirst: PropTypes.bool,
+  isLast: PropTypes.bool,
+  onCloseNotificationWall: PropTypes.func.isRequired,
+  read: PropTypes.bool
+}
+
+GroupedNotificationItem.defaultProps = {
+  isFirst: false,
+  isLast: false,
+  read: false
 }
