@@ -42,7 +42,7 @@ describe('App File', () => {
           params: { contentId: secondContentId }
         })
 
-        cy.contains('.breadcrumbs__item', fullFilename_3)
+        cy.contains('.wsContentGeneric__header__titleWrapper', fullFilename_3)
 
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')

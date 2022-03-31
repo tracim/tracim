@@ -16,10 +16,11 @@ def get_public_name(user_id: int) -> str:
         return user_api.get_one(user_id).public_name
 
 
+@pytest.mark.timeout(45)
 @pytest.mark.usefixtures("base_fixture")
 class TestRQDatabaseWorker(object):
 
-    JOB_EXECUTION_TIMEOUT = 2
+    JOB_EXECUTION_TIMEOUT = 30
 
     def test_unit__submit_job__OK_nominal_case(
         self, app_config, session, rq_database_worker

@@ -293,7 +293,7 @@ export const NotificationWall = props => {
 
     if (notification.numberOfWorkspaces > 1) {
       i18nOpts.workspaceInfo = `<span title='${notification.numberOfWorkspaces}'>${
-        props.t(' in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
+        props.t(' in {{count}} spaces', { count: notification.numberOfWorkspaces })
       }</span>`
     }
 
@@ -601,7 +601,7 @@ export const NotificationWall = props => {
         customClass='notification'
         faIcon='far fa-bell'
         rawTitle={props.t('Notifications')}
-        componentTitle={<div>{props.t('Notifications')}</div>}
+        componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
         onClickCloseBtn={props.onCloseNotificationWall}
       >
         <IconButton
@@ -615,31 +615,35 @@ export const NotificationWall = props => {
 
       <div className='notification__list'>
         {notificationList.length !== 0 && notificationList.map((notification, i) => {
-          return (
-            <ListItemWrapper
-              isLast={i === notificationList.length - 1}
-              isFirst={i === 0}
-              read={false}
-              key={notification.id}
-            >
-              {notification.group
-                ? (
-                  <GroupedNotificationItem
-                    onCloseNotificationWall={props.onCloseNotificationWall}
-                    getNotificationDetails={getNotificationDetails}
-                    groupedNotifications={notification}
-                    isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
-                  />
-                )
-                : (
-                  <NotificationItem
-                    onCloseNotificationWall={props.onCloseNotificationWall}
-                    getNotificationDetails={getNotificationDetails}
-                    notification={notification}
-                  />
-                )}
-            </ListItemWrapper>
-          )
+          if (notification.group) {
+            return (
+              <GroupedNotificationItem
+                getNotificationDetails={getNotificationDetails}
+                groupedNotifications={notification}
+                isFirst={i === 0}
+                isLast={i === notificationList.length - 1}
+                isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
+                key={notification.id}
+                onCloseNotificationWall={props.onCloseNotificationWall}
+                read={false}
+              />
+            )
+          } else {
+            return (
+              <ListItemWrapper
+                isFirst={i === 0}
+                isLast={i === notificationList.length - 1}
+                read={false}
+                key={notification.id}
+              >
+                <NotificationItem
+                  onCloseNotificationWall={props.onCloseNotificationWall}
+                  getNotificationDetails={getNotificationDetails}
+                  notification={notification}
+                />
+              </ListItemWrapper>
+            )
+          }
         })}
 
         {props.notificationPage.hasNextPage &&

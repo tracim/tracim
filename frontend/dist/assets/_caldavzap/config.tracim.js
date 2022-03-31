@@ -66,7 +66,7 @@ var globalSearchTransformAlphabet={
 }
 var globalResourceAlphabetSorting=true
 var globalNewVersionNotifyUsers=[]
-var globalDatepickerFirstDayOfWeek=1
+var globalDatepickerFirstDayOfWeek = configObj.userLang === 'ar' ? 6 : 1
 var globalHideInfoMessageAfter=1800
 var globalEditorFadeAnimation=666
 var globalEventStartPastLimit=3

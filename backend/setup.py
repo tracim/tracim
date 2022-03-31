@@ -6,9 +6,8 @@ from setuptools import setup
 requires = [
     # pyramid
     "plaster_pastedeploy",
-    "pyramid <2.0",
+    "pyramid>=2.0.0",
     "pyramid_debugtoolbar",
-    "pyramid_retry<2.0",
     "waitress",
     # Database
     "pyramid_tm",
@@ -78,9 +77,10 @@ requires = [
     "tnetstring3",
     "pyzmq",
     "jsonschema",
-    "webpreview",
+    # INFO - G.M - 2022-02-28 - Use algoo fork of webpreview for now:
+    "webpreview @ git+https://github.com/algoo/webpreview@v0.1",
     # importlib
-    "importlib_metadata",
+    "importlib_metadata==4.6.0",
 ]
 
 tests_require = [

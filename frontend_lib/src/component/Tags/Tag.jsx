@@ -9,7 +9,7 @@ export const Tag = props => {
   return (
     <div className='tagList__list__item__wrapper'>
       <div className='tagList__list__item__triangle'>
-        <i className='fas fa-play tagList__list__item__triangleIcon' id="triangeIcon"/>
+        <i className='fas fa-play tagList__list__item__triangleIcon' id='triangeIcon' />
         <span className='tagList__list__item__circle' />
       </div>
       <div className='tagList__list__item'>

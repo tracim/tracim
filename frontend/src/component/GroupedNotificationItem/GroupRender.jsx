@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import {
   FETCH_CONFIG,
   computeShortDate
-} from '../src/util/helper.js'
+} from '../../util/helper.js'
 import {
   AVATAR_SIZE,
   Avatar,

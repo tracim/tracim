@@ -5,10 +5,11 @@ import PropTypes from 'prop-types'
 import {
   PAGE,
   TLM_SUB_TYPE as TLM_SUB,
+  ListItemWrapper,
   TracimComponent
 } from 'tracim_frontend_lib'
 import NotificationItem from '../component/NotificationItem.jsx'
-import GroupRender from '../../GroupedNotificationItem/GroupRender.jsx'
+import GroupRender from '../component/GroupedNotificationItem/GroupRender.jsx'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 
 export const GroupedNotificationItem = props => {
@@ -31,7 +32,7 @@ export const GroupedNotificationItem = props => {
       } else if (notification.author.length === 2) {
         escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${props.t('and')} ${escapeHtml(notification.author[1].publicName)}`
       } else {
-        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${props.t('and {{numberOfAuthors}} other people', { numberOfAuthors: notification.author.length - 1 })}`
+        escapedAuthorList = `${escapeHtml(notification.author[0].publicName)} ${props.t('and {{count}} other people', { count: notification.author.length - 1 })}`
       }
     }
 
@@ -53,15 +54,6 @@ export const GroupedNotificationItem = props => {
       ? escapeHtml(userList[0].publicName)
       : props.t('{{numberOfUsers}} users', { numberOfUsers: userList.length })
 
-    const i18nOpts = {
-      user: `<span title='${escapedUser}'>${escapedUser}</span>`,
-      author: `<span title='${escapedAuthorList}'>${escapedAuthorList}</span>`,
-      content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
-      numberOfContribution: notification.group.length,
-      numberOfWorkspaces: numberOfWorkspaces,
-      interpolation: { escapeValue: false }
-    }
-
     if (numberOfContributionTypes > 1) {
       let contentUrl
       if (numberOfContents === 1) {
@@ -72,14 +64,21 @@ export const GroupedNotificationItem = props => {
         )
       }
 
-      return {
-        text: numberOfWorkspaces > 1
-          ? props.t('{{author}} made {{numberOfContribution}} contributions in {{numberOfWorkspaces}} spaces', i18nOpts)
-          : numberOfContents === 1
-            ? props.t('{{author}} made {{numberOfContribution}} contributions on {{content}}', i18nOpts)
-            : props.t('{{author}} made {{numberOfContribution}} contributions', i18nOpts),
-        url: contentUrl
+      let text = props.t('{{author}} made {{count}} contributions', {
+        author: `<span title='${escapedAuthorList}'>${escapedAuthorList}</span>`,
+        count: notification.group.length,
+        interpolation: { escapeValue: false }
+      })
+
+      if (numberOfWorkspaces > 1) text = text + props.t(' in {{count}} spaces', { count: numberOfWorkspaces, interpolation: { escapeValue: false } })
+      else if (numberOfContents === 1) {
+        text = text + props.t(' on {{content}}', {
+          content: `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`,
+          interpolation: { escapeValue: false }
+        })
       }
+
+      return { text, url: contentUrl }
     } else {
       const notificationDetails = props.getNotificationDetails({
         ...notification.group[0],
@@ -109,24 +108,36 @@ export const GroupedNotificationItem = props => {
   if (Object.keys(notificationDetails).length === 0) return null
 
   const listRender =
-    props.groupedNotifications.group.map((notification) => {
+    props.groupedNotifications.group.map((notification, i) => {
       return (
-        <NotificationItem
-          onCloseNotificationWall={props.onCloseNotificationWall}
-          getNotificationDetails={props.getNotificationDetails}
+        <ListItemWrapper
+          isLast={props.isLast && i === props.groupedNotifications.group.length - 1}
+          isFirst={props.isFirst && i === 0}
+          read={props.read}
           key={notification.id}
-          notification={notification}
-        />
+        >
+          <NotificationItem
+            onCloseNotificationWall={props.onCloseNotificationWall}
+            getNotificationDetails={props.getNotificationDetails}
+            notification={notification}
+          />
+        </ListItemWrapper>
       )
     })
 
   return isGrouped
     ? (
-      <GroupRender
-        groupedNotifications={props.groupedNotifications}
-        notificationDetails={notificationDetails}
-        handleClickGroupedNotification={handleClickGroupedNotification}
-      />
+      <ListItemWrapper
+        isLast={props.isLast}
+        isFirst={props.isFirst}
+        read={props.read}
+      >
+        <GroupRender
+          groupedNotifications={props.groupedNotifications}
+          notificationDetails={notificationDetails}
+          handleClickGroupedNotification={handleClickGroupedNotification}
+        />
+      </ListItemWrapper>
     )
     : listRender
 }
@@ -135,7 +146,16 @@ const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(TracimComponent(GroupedNotificationItem)))
 
 GroupedNotificationItem.propTypes = {
-  onCloseNotificationWall: PropTypes.func.isRequired,
   getNotificationDetails: PropTypes.func.isRequired,
-  groupedNotifications: PropTypes.object.isRequired
+  groupedNotifications: PropTypes.object.isRequired,
+  isFirst: PropTypes.bool,
+  isLast: PropTypes.bool,
+  onCloseNotificationWall: PropTypes.func.isRequired,
+  read: PropTypes.bool
+}
+
+GroupedNotificationItem.defaultProps = {
+  isFirst: false,
+  isLast: false,
+  read: false
 }

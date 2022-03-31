@@ -417,9 +417,9 @@ export class AdvancedSearch extends React.Component {
 
     if (totalResultsNumber <= 0) return ''
 
-    return props.t('Showing {{displayedResults}} of {{totalResults}} results', {
+    return props.t('Showing {{displayedResults}} of {{count}} results', {
       displayedResults: currentSearch.resultList.length,
-      totalResults: totalResultsNumber
+      count: totalResultsNumber
     })
   }
 

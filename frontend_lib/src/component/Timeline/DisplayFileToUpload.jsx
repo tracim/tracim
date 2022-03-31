@@ -45,7 +45,7 @@ export class DisplayFileToUpload extends React.Component {
             {(
               props.fileList.length === 1
                 ? props.t('1 file selected')
-                : props.t('{{numberOfFile}} files selected', { numberOfFile: props.fileList.length })
+                : props.t('{{count}} files selected', { count: props.fileList.length })
             )}
           </div>
           <Icon

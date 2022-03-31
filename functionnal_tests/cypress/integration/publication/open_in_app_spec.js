@@ -29,26 +29,28 @@ describe('Open publications in the thread app', () => {
     cy.cancelXHR()
   })
 
-  it('should redirect to the thread app with the right icon', () => {
+  it.skip('should redirect to the thread app with the right icon', () => {
+    // FIXME MB - 2022-03-29 - Unstable test
+    // See https://github.com/tracim/tracim/issues/5344
     function checkAndCloseThreadApp () {
         cy.get('.wsContentGeneric.thread .wsContentGeneric__header__icon i.fa-stream').should('have.attr', 'style', 'color: rgb(102, 31, 152);')
-        cy.get('.wsContentGeneric.thread .wsContentGeneric__header__close').click()
+        cy.get('.wsContentGeneric.thread .wsContentGeneric__header__close').should('be.visible').click()
     }
 
-    cy.get('.notificationButton__btn').click()
-    cy.get('.notification__list__item.isMention').click()
+    cy.get('.notificationButton__btn').should('be.visible').click()
+    cy.get('.notification__list__item.isMention').should('be.visible').click()
     checkAndCloseThreadApp()
 
-    cy.get('.notificationButton__btn').click()
-    cy.get('.notification__list__item:not(.isMention)').contains('commented on').click()
+    cy.get('.notificationButton__btn').should('be.visible').click()
+    cy.get('.notification__list__item:not(.isMention)').contains('commented on').should('be.visible').click()
     checkAndCloseThreadApp()
 
-    cy.get('.sidebar__content__navigation__item').first().click() // recent activities
-    cy.get('.feedItemHeader__title a').contains('News').click()
+    cy.get('.sidebar__content__navigation__item').first().should('be.visible').click() // recent activities
+    cy.get('.feedItemHeader__title a').contains('News').should('be.visible').click()
     checkAndCloseThreadApp()
 
-    cy.get('.sidebar__content__navigation__item[href="/ui/recent-activities"]').first().click() // recent activities
-    cy.get('.feedItemHeader__title a').contains('News').click()
+    cy.get('.sidebar__content__navigation__item[href="/ui/recent-activities"]').first().should('be.visible').click() // recent activities
+    cy.get('.feedItemHeader__title a').contains('News').should('be.visible').click()
     checkAndCloseThreadApp()
   })
 })

@@ -763,15 +763,19 @@ export class File extends React.Component {
   // see https://github.com/tracim/tracim/issues/1804
   getDownloadRawUrl = ({ config: { apiUrl }, content, mode }) =>
     // FIXME - b.l - refactor urls
-    `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${encodeURIComponent(content.filenameNoExtension + content.file_extension)}?force_download=1&revision_id=${content.current_revision_id}`
+    `${this.getDownloadBaseUrl(apiUrl, content, mode)}raw/${encodeURIComponent(content.filename)}?force_download=1&revision_id=${content.current_revision_id}`
 
-  getDownloadPdfPageUrl = ({ config: { apiUrl }, content, mode, fileCurrentPage }) =>
+  getDownloadPdfPageUrl = ({ config: { apiUrl }, content, mode, fileCurrentPage }) => {
     // FIXME - b.l - refactor urls
-    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${encodeURIComponent(content.filenameNoExtension) + '.pdf'}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
+    const filenameNoExtension = content.filename ? encodeURIComponent(removeExtensionOfFilename(content.filename) + '.pdf') : 'unknown.pdf'
+    return `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/${filenameNoExtension}?page=${fileCurrentPage}&force_download=1&revision_id=${content.current_revision_id}`
+  }
 
-  getDownloadPdfFullUrl = ({ config: { apiUrl }, content, mode }) =>
+  getDownloadPdfFullUrl = ({ config: { apiUrl }, content, mode }) => {
     // FIXME - b.l - refactor urls
-    `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${encodeURIComponent(content.filenameNoExtension) + '.pdf'}?force_download=1&revision_id=${content.current_revision_id}`
+    const filenameNoExtension = content.filename ? encodeURIComponent(removeExtensionOfFilename(content.filename) + '.pdf') : 'unknown.pdf'
+    return `${this.getDownloadBaseUrl(apiUrl, content, mode)}preview/pdf/full/${filenameNoExtension}?force_download=1&revision_id=${content.current_revision_id}`
+  }
 
   getOnlineEditionAction = () => {
     const { state } = this
