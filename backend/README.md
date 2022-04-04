@@ -313,66 +313,6 @@ Then run flake8:
 
     flake8
 
-## Run Tests
-
-First setup the needed tools and directories (only needed once):
-
-    # from backend directory
-    python3 ./setup_dev_env.py
-    ./create_test_storage_dir.sh
-    # several external services (mail/databases/…) are started through a docker compose file
-    # please install it by following their instructions:
-    # - https://docs.docker.com/engine/install/
-    # - https://docs.docker.com/compose/install/
-    # On Debian systems the following lines are enough
-    sudo apt install docker.io docker-compose
-    # add the current user to docker group, you'll need to use a new login shell for this change to be taken into account
-    sudo usermod -a -G docker $USER
-
-Running tests can be done with:
-
-    docker-compose up -d
-    pytest
-    docker-compose down
-
-
-By default the tests will be executed with the `sqlite` database, this can be changed using the `--database` argument of pytest:
-
-    pytest --database=postgresql
-
-Possible databases are `sqlite`, `postgresql`, `mysql` and `mariadb`.
-It is possible to specify several databases or even `all`:
-
-    # Needs the pytest-forked plugin (pip install pytest-forked)
-    # as some test fixtures do modify static variables.
-    pytest --forked --database=sqlite --database=postgresql
-    # Run tests on all databases
-    pytest --forked --database=all
-
-### Docker-compose test file
-
-The [docker-compose.yml](docker-compose.yml) file lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the [.env](.env) file next to `docker-compose.yml`.
-
-### About Pytest Tests Config
-
-For running tests, Tracim tests need config to be set:
-- specific config for specific tests is
-available in TEST_CONFIG_FILE_PATH (by default: "./tests_configs.ini" in backend folder).
-- For more general config, pytest rely on dotenv .env file (by default ".test.env" in backend folder)
-- If you want to change general config like paths used or database, you should better use env var
-instead of modifying "TEST_CONFIG_FILE_PATH" file or ".test.env".
-
-for example, if you want to use another database, you can do this:
-
-    export TRACIM_SQLALCHEMY__URL=sqlite:////tmp/mydatabase
-    python3 ./setup_dev_env.py
-    pytest
-
-Order of usage is (from less to more important, last is used if set):
-- specific TEST_CONFIG_FILE_PATH config (different for each test)
-- default env var setting in .test.env
-- env var set by user
-
 ## The Tracim API
 
 Tracim_backend gives access to a REST API in */api*.
@@ -392,9 +332,9 @@ In Tracim, only some users can access to some information, this is also true in
 the Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
 what a specific user can do.
 
-## Known Issues
+<!-- ## Known Issues
 
-see [here](doc/known_issues.md)
+see [here](doc/known_issues.md) -->
 
 ## Other Documentation
 

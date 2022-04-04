@@ -1,6 +1,10 @@
 Tracim is distributed under the terms of 4 distinct licenses:
 
-- AGPLv3 for the Agenda application (`frontend_app_agenda` folder). The text of this license can be found in [LICENSE_AGPLv3](LICENSE_AGPLv3).
-- LGPL for other frontend parts (`frontend` and `frontend_xxx` folders). The text of this license can be found in [LICENSE_LGPLv3](LICENSE_LGPLv3).
-- CC-BY-SA 3.0 Unported for the provided welcome page background images (These are all the images whose path starts with `frontend/dist/assets/branding/welcome-simple-bg` in this repository). They are Copyright (c) Guénael Muller. The text of this license can be found in [LICENSE_CC_BY_SA](LICENSE_CC_BY_SA).
-- MIT License for all the remaining parts (backend code, functionnal tests, docker recipes, documentation, etc). The text of this license can be found in [LICENSE_MIT](LICENSE_MIT).
+ - [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) for the [agenda application](https://github.com/tracim/tracim/tree/develop/frontend_app_agenda)
+ - [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) for every other frontend application (except the agenda)
+ - [MIT](https://opensource.org/licenses/MIT) for the [backend](https://github.com/tracim/tracim/tree/develop/backend), functionnal tests, docker recipes, documentation, etc.
+ - [CC-BY-SA](https://creativecommons.org/licenses/by-sa/4.0/) for the provided welcome page background images. They are Copyright (c) Guénael Muller.
+    - [welcome-simple-bg](https://github.com/tracim/tracim/blob/develop/frontend/dist/assets/branding.sample/welcome-simple-bg.jpg)
+    - [welcome-simple-bg-house](https://github.com/tracim/tracim/blob/develop/frontend/dist/assets/branding.sample/welcome-simple-bg-house.jpg)
+    - [welcome-simple-bg-rocks](https://github.com/tracim/tracim/blob/develop/frontend/dist/assets/branding.sample/welcome-simple-bg-rocks.jpg)
+    - [welcome-simple-bg-wheat](https://github.com/tracim/tracim/blob/develop/frontend/dist/assets/branding.sample/welcome-simple-bg-wheat.jpg)

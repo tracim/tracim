@@ -2,250 +2,70 @@
 
 ![logo_tracim](logo_tracim.png)
 
-develop branch status:
-[![Build Status](https://app.travis-ci.com/tracim/tracim.svg?branch=develop)](https://app.travis-ci.com/tracim/tracim)
-[![Coverage Status](https://coveralls.io/repos/github/tracim/tracim/badge.svg?branch=develop)](https://coveralls.io/github/tracim/tracim?branch=develop)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/tracim/tracim/badges/quality-score.png?b=develop)](https://scrutinizer-ci.com/g/tracim/tracim/?branch=develop)
+<!-- Display code coverage here -->
 
 ## What is Tracim?
 
-Tracim is a collaborative platform software intended for (not only technical) team collaboration. It is simple to use, offers a user-friendly interface and runs on every computer. It is very valuable for R&D teams, assocations, remote collaboration.
+[Tracim](https://www.algoo.fr/fr/tracim) is a **free** and **open source** collaborative platform software intended for team collaboration. Providing a lot of [features](), it is simple to use, offers a user-friendly interface and runs on every computer.
 
-More information on the website: https://www.tracim.fr (in French)
+<!-- Add better description here -->
+
+[Tracim](https://www.algoo.fr/fr/tracim) is officially supported in Arabic, English, French, German and Portuguese.
+
+
+<!-- To move to the bottom (and add english version) -->
+More information on the website: https://www.tracim.fr
 
 ## Quick start (using Docker)
 
-Test Tracim on your computer with Docker:
+An easy way to start using Tracim is to use the [Docker image](https://hub.docker.com/r/algoo/tracim/).
 
 ```
 mkdir -p ~/tracim/etc
 mkdir -p ~/tracim/var
 docker run -e DATABASE_TYPE=sqlite -p 8080:80 -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 ```
+Then, you can access the application at http://localhost:8080
 
-Then visit http://localhost:8080 and log in:
+The credentials to access the application are:
 
 - email: `admin@admin.admin`
 - password: `admin@admin.admin`
 
-For advanced docker-based usage, look at the full [Tracim Docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker),
+<!-- We have to update Docker documentation according to this one -->
+For more advanced docker-based usage, look at the full [Tracim Docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker)
 
 ## Contribute
 
-In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
+There are several ways to contribute to Tracim, here are some tips:
+ - Submit [bugs and feature requests](https://github.com/tracim/tracim/issues)
+ - Review the [code and propose changes](https://github.com/tracim/tracim/pulls)
+ - Contribute to the [translations](https://hosted.weblate.org/projects/tracim/)
 
-### Translation
+<!-- We should explain in CONTRIBUTING.md how to build from source,   -->
+<!-- how to start tests, the code guidelines we respect how to submit -->
+<!-- a pull requrest, how to find an issue to work on and how to      -->
+<!-- contribute to the translations.                                  -->
+For more information about contributing to Tracim, see the [Contributing to Tracim](./CONTRIBUTING.md) page.
 
-You can help us with Tracim's translation! If you want to contribute a new language, if you see missing or wrong translations, head over to [Weblate](https://hosted.weblate.org/projects/tracim/).
+## Translation status
 
-Our current translation status:
+![Translation status](https://hosted.weblate.org/widgets/tracim/en/multi-auto.svg)
 
-![Weblate translation status](https://hosted.weblate.org/widgets/tracim/-/frontend/horizontal-auto.svg)
+## Licence
+See [LICENCE.md](./LICENCE.md)
 
-## Advanced - Install Tracim from Source
+## Build Tracim from source
+See [Building Tracim from source](./doc/BUILD.md)
 
-OS compatibility (tested with Python >= 3.6.14):
+## Testing Tracim
+See [Testing Tracim](./doc/TESTING.md)
 
-- Debian:
-  - Buster (10)
-  - Bullseye (11)
-- Ubuntu:
-  - Bionic (18.04)
-  - Focal (20.04)
+## Run Tracim for production
+See [Running Tracim for production](./doc/PRODUCTION.md)
 
-Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.6 is used.
+<!-- END -->
 
-### Get the source code
+<!-- [![logo_browserstack](logo_browserstack.png)](https://www.browserstack.com)
 
-Get the source code from GitHub (you need git):
-
-    git clone https://github.com/tracim/tracim.git
-    cd tracim/
-
-### Install the backend
-
-#### Option 1: Install the backend manually
-
-See the [Backend README](backend/README.md).
-
-#### Option2: Install backend: Automated script for easy setup
-
-Ensure your shell has an UTF-8 locale (it should be the case for any recent distribution)
-
-    echo $LANG
-
-should return a string like `en_EN.UTF-8`.
-
-This script runs the backend with a simple default configuration: development.ini conf file. It uses
-the default config file, sqlite database, etc.
-
-    ./setup_default_backend.sh
-
-This script uses sudo. Make sure it is installed and configured.
-Alternatively, under root:
-
-    ./setup_default_backend.sh root
-
-For each missing configuration file, this script will generate them from the default configuration.
-If the default SQLite database is missing, the script will generate it.
-This script may also be used for updates. To update a script
-generated by the Tracim installation, update the source code with git pull and
-rerun the same script to update the database model, the system and Python dependencies.
-
-Note: In case you do not want or can not install (for example, if you are using arm64) some dependencies for previews,
- like LibreOffice, Inkscape, FFmpeg, VTK, etc... You can install with the minimal requirements for previews,
- which means fewer working previews but also fewer problems in specific environments:
-
-```shell
-IGNORE_FULL_PREVIEW_GENERATOR=1 ./setup_default_backend.sh
-```
-
-For more information about configuring the backend, see [Backend README](backend/README.md).
-For more information about the configuration files, see development.ini.sample and the [backend setting documentation](backend/doc/setting.md).
-
-
-### Install the frontend
-
-    ./install_frontend_dependencies.sh
-    ./build_full_frontend.sh
-
-This script uses sudo. Make sure it is installed and configured.
-Alternatively, under root:
-
-    ./install_frontend_dependencies.sh root
-
-You can add "-d" to build_full_frontend.sh to disable obfuscation and reduce build time.
-
-### Run Tracim for development
-
-    # runs the needed services using docker and a tracim web app
-    ./run_dev_backend.sh
-
-This script will launch the minimal services for a functional backend: pushpin + web application.
-The application will then be available on [http://localhost:7999](http://localhost:7999).
-
-### Run Tracim for production
-
-Tracim is composed of multiples services, some are web wsgi applications and others
-are daemons (servers not web-related to do some task like sending email).
-
-You should install pushpin, see [their installation procedure](https://pushpin.org/docs/install/) for your OS.
-We recommend to use pushpin version 1.30 as this version has been extensively tested and is in use in our official docker image.
-
-You then need to configure pushpin to proxy tracim (by default tracim web run on port 6543):
-
-    echo "* localhost:6543" | sudo tee /etc/pushpin/routes
-
-and after this change you need to restart your pushpin service:
-
-    sudo systemctl restart pushpin
-
- Tracim WSGI apps with pastedeploy (config in development.ini):
-
-    cd backend/
-    source env/bin/activate
-
-    # running web server
-    pserve development.ini
-
-You can run other WSGI services with pastedeploy using the `tracimcli` command:
-
-    # running webdav server
-    tracimcli webdav start
-
-    # running caldav server (for agendas)
-    tracimcli caldav start
-    tracimcli caldav sync  # sync Tracim data with radicale caldav server
-
-You can run some Tracim daemons too if you want those features:
-
-    # set tracim_conf_file path
-    export TRACIM_CONF_PATH="$(pwd)/development.ini"
-
-    ## DAEMONS SERVICES
-    # email notifier (if async email notification is enabled)
-    python3 daemons/mail_notifier.py &
-
-    # email fetcher (if email reply is enabled)
-    python3 daemons/mail_fetcher.py &
-
-You can now head to (if pushpin is correctly configured and use default port 7999)
-[http://localhost:7999](http://localhost:7999) and login with the admin account:
-
- * user: `admin@admin.admin`
- * password: `admin@admin.admin`
-
-:warning: If this does not work, you can try to access [http://localhost:6543](http://localhost:6543). If it works, the issue is related to the configuration of pushpin.
-
-The full documentation about running the Tracim services with uWSGI and supervisor is available in the [Backend README](backend/README.md), sections `Running Tracim Backend Daemon`
-and `Running Tracim Backend WSGI APP`.
-
-### Upkeep
-
-When the default "file" storage is used for session files you need to regularly remove old sessions files as they aren't removed automatically when the session expires (either of old age or when a user logs out). Other session storage (e.g. redis) do not have this behavior.
-Please read the [session documentation](backend/doc/setting.md#User_sessions_in_Tracim) for more information and recommended ways to remove the unused session files.
-
-
-
-### Running tests with Cypress
-
-#### Installation of Cypress: Automated script for easy setup
-
-This script installs some system dependencies of Cypress and checks whether files package.json and cypress.json exist in 'functionnal_tests' folder. If not, the script installs the necessary files.
-
-    ./setup_functionnal_tests.sh
-
-This script uses sudo, make sure it is installed and configured.
-Alternatively, under root:
-
-    ./setup_functionnal_tests.sh root
-
-If you need to run Cypress with an external server of Tracim, modify "baseurl" in cypress.json (for more details, see: https://docs.cypress.io/guides/references/configuration.html#Options ).
-
-
-#### Run tests from the command line ##
-
-To runs all the tests in the 'functionnal_tests/cypress/integration' folder:
-
-    # runs the needed services using docker and a tracim web app, then runs the cypress tests
-    ./run_dev_backend.sh cypress run
-
-#### Run tests with Cypress GUI ##
-
-You can watch the tests running directly from a (graphical) web interface:
-
-    # runs the needed services using docker and a tracim web app, then starts cypress in GUI mode
-    ./run_dev_backend.sh cypress open
-
-### Running frontend unit tests
-
-#### Prerequisite for unit tests
-
-To run unit tests, you need to install frontend dependencies and build the full frontend:
-
-    ./install_frontend_dependencies.sh
-    ./build_full_frontend.sh
-
-This first script uses sudo, make sure it is installed and configured.
-Alternatively, under root:
-
-    ./install_frontend_dependencies.sh root
-
-#### Run tests
-
-To run all the unit tests:
-
-    ./run_frontend_unit_test.sh
-
-To run the unit tests of a specific frontend app or of frontend_lib:
-
-    cd frontend_app_file # (or any frontend app)
-    yarn run test
-
-Note: to retrieve all frontend apps, run this command:
-
-    ls -d frontend*
-
-[![logo_browserstack](logo_browserstack.png)](https://www.browserstack.com)
-
-BrowserStack supports open source projects and graciously helps us testing Tracim on every devices.
+BrowserStack supports open source projects and graciously helps us testing Tracim on every devices. -->

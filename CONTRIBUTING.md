@@ -1,14 +1,46 @@
-## Contribute to Tracim
+# Contribute
 
-In order to contribute to Tracim, please accept the licenses ([MIT](./LICENSE_MIT), [LGPLv3](LICENSE_LGPLv3) and [AGPLv3](LICENSE_AGPLv3)) and [Developer Certificate of Origin](./DCO).
+Thanks for taking the time to contribute :D
 
-To accept, sign all your commits with the `-s` arg of `git commit` command ([more info here](https://git-scm.com/docs/git-commit#git-commit--s)).
+## How to
 
-## Tests
+### Opening an issue
 
-- For backend tests, check [backend/README.txt]('./backend/README.txt)
-- For cypress tests, check [README.txt]('./README.txt')
+Before opening an issue, please check that the issue is not already opened.
+If there is no issue similar to yours, feel free to create an issue and follow the template.
 
+### Create a pull request
+
+Once you have finished your development and you want to merge it on `develop`, please create a pull request. The pull request must have a title explicit, for example: `feat(frontend): <your feature>`. Once the pull request is created, follow the template.
+
+### Contribute to the translation
+
+[Tracim](https://www.algoo.fr/fr/tracim) translation is done through [Weblate](https://weblate.org/tracim/tracim/).<br>
+Head over to [Weblate](https://weblate.org/tracim/tracim/) and contribute to the translation.
+
+### Develop a new feature
+
+You have a new feature to develop?<br>
+Let's start by opening an issue with the feature template.<br>
+Then create a branch from develop, which should be named `feat/<your ticket title>`.<br>
+Now you can start coding :)
+
+#### Development journey
+
+##### Build
+See [build](./doc/BUILD.md) to see how to build [Tracim](https://www.algoo.fr/fr/tracim). Especially the [development build section](./doc/BUILD.md#development-build).
+
+##### Testing
+See [testing](./doc/TESTING.md) to see how to test [Tracim](https://www.algoo.fr/fr/tracim) and your developments.
+
+##### Commiting to the repository
+
+First, you need to sign every commit you make with the `-s` arg of `git commit` command.<br>
+See [git signature](https://git-scm.com/docs/git-commit#git-commit--s).
+
+This will prove that you are the author of the commit and you have accepted the licenses ([MIT](https://opensource.org/licenses/MIT), [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) and [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)) and [Developer Certificate of Origin](./DCO).
+
+<!-- To remove -->
 ## Code Formatting and Others Checks
 
 ### Pre-commit
@@ -25,6 +57,3 @@ you can then install hooks with:
 Then, you will be able to notice the automatic checks when running `git commit`.
 
 Note: the pre-commit hook requires Python 3.6 or later to work.
-
-### More Information
-- see [backend/README.md](backend/README.txt) for more information about formatting checks work for the backend.
