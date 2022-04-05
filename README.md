@@ -1,6 +1,6 @@
 # Tracim
 
-![logo_tracim](logo_tracim.png)
+![logo_tracim](/doc/logos/logo_tracim.png)
 
 <!-- Display code coverage here -->
 
@@ -13,9 +13,7 @@
 [Tracim](https://www.algoo.fr/fr/tracim) is officially supported in Arabic, English, French, German and Portuguese.
 
 
-<!-- To move to the bottom (and add english version) -->
-More information on the website: https://www.tracim.fr
-
+More information on our [website](https://www.algoo.fr/fr/tracim).
 ## Quick start (using Docker)
 
 An easy way to start using Tracim is to use the [Docker image](https://hub.docker.com/r/algoo/tracim/).
@@ -64,8 +62,19 @@ See [Testing Tracim](./doc/TESTING.md)
 ## Run Tracim for production
 See [Running Tracim for production](./doc/PRODUCTION.md)
 
+## Support
+
+<img src="doc/logos/logo_weblate.png" alt="logo_weblate" width="200"/>
+
+[Weblate](https://weblate.org) is an open source translation service, they are helping us to translate Tracim by providing a hosting service.
+
+<br>
+
+<img src="doc/logos/logo_browserstack.png" alt="logo_browserstack" width="150"/>
+<br>
+<br>
+
+[BrowserStack](https://www.browserstack.com) supports open source projects, and graciously helps us testing Tracim on every devices.
+
+
 <!-- END -->
-
-<!-- [![logo_browserstack](logo_browserstack.png)](https://www.browserstack.com)
-
-BrowserStack supports open source projects and graciously helps us testing Tracim on every devices. -->
