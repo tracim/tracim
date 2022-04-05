@@ -3,7 +3,7 @@ import {
   USERNAME_ALLOWED_CHARACTERS_REGEX
 } from './helper.js'
 
-const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-Z0-9\-_]*)$/
+const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-ZÀ-ȕ\u0621-\u064A0-9\-_]*)$/
 
 let previousSelAndOffset = null
 
