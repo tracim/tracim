@@ -1,13 +1,3 @@
-# Tracim
-
-![logo_tracim](/doc/logos/logo_tracim.png)
-
-<!-- Display code coverage here -->
-
-## What is Tracim?
-
-[Tracim](https://www.algoo.fr/fr/tracim) is a **free** and **open source** collaborative platform software intended for team collaboration. Providing a lot of [features](), it is simple to use, offers a user-friendly interface and runs on every computer.
-
 <!-- Add better description here -->
 
 [Tracim](https://www.algoo.fr/fr/tracim) is officially supported in Arabic, English, French, German and Portuguese.
@@ -33,6 +23,15 @@ The credentials to access the application are:
 <!-- We have to update Docker documentation according to this one -->
 For more advanced docker-based usage, look at the full [Tracim Docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker)
 
+## Build Tracim from source
+See [Building Tracim from source](./doc/BUILD.md)
+
+## Testing Tracim
+See [Testing Tracim](./doc/TESTING.md)
+
+## Run Tracim for production
+See [Running Tracim for production](./doc/PRODUCTION.md)
+
 ## Contribute
 
 There are several ways to contribute to Tracim, here are some tips:
@@ -52,15 +51,6 @@ For more information about contributing to Tracim, see the [Contributing to Trac
 
 ## Licence
 See [LICENCE.md](./LICENCE.md)
-
-## Build Tracim from source
-See [Building Tracim from source](./doc/BUILD.md)
-
-## Testing Tracim
-See [Testing Tracim](./doc/TESTING.md)
-
-## Run Tracim for production
-See [Running Tracim for production](./doc/PRODUCTION.md)
 
 ## Support
 
