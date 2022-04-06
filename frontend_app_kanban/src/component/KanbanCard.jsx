@@ -5,12 +5,13 @@ import { translate } from 'react-i18next'
 import {
   CardPopup,
   DropdownMenu,
-  IconButton
+  IconButton,
+  Icon
 } from 'tracim_frontend_lib'
 
 require('./KanbanCard.styl')
 
-function KanbanCard (props) {
+function KanbanCard(props) {
   const DESCRIPTION_BUTTON = {
     HIDDEN: 'hidden',
     SEE_MORE: 'seeMore',
@@ -139,6 +140,24 @@ function KanbanCard (props) {
               : props.t('See less')}
           />
         )}
+      </div>
+      <div
+        className='kanban__contentpage__wrapper__board__card__options'
+      >
+        {props.card.deadline !== '' && (
+          <div
+            className='deadline'
+          >
+            <Icon
+              icon={`far fa-calendar-minus`}
+              title={props.card.deadline}
+            />
+            {props.card.deadline}
+          </div>
+        )}
+        <div>
+          {props.card.freeInput}
+        </div>
       </div>
     </div>
   )
