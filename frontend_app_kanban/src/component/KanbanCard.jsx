@@ -11,7 +11,7 @@ import {
 
 require('./KanbanCard.styl')
 
-function KanbanCard(props) {
+function KanbanCard (props) {
   const DESCRIPTION_BUTTON = {
     HIDDEN: 'hidden',
     SEE_MORE: 'seeMore',
