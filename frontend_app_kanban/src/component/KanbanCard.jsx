@@ -149,7 +149,7 @@ function KanbanCard(props) {
             className='deadline'
           >
             <Icon
-              icon={`far fa-calendar`}
+              icon='far fa-calendar'
               title={props.card.deadline}
             />
             {props.card.deadline}
