@@ -146,7 +146,7 @@ function KanbanCard (props) {
       >
         {props.card.deadline !== '' && (
           <div
-            className='deadline'
+            className='kanban__contentpage__wrapper__board__card__options__deadline'
           >
             <Icon
               icon='far fa-calendar'
