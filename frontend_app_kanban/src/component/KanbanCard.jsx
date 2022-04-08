@@ -155,7 +155,7 @@ function KanbanCard (props) {
             {props.card.deadline}
           </div>
         )}
-        <div>
+        <div className='kanban__contentpage__wrapper__board__card__options__freeInput'>
           {props.card.freeInput}
         </div>
       </div>
