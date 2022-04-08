@@ -14191,7 +14191,6 @@ fsevents@^1.2.7:
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     radium: ^0.25.2
-    react: ^16.13.1
     react-device-detect: ^1.7.5
     react-dom: ^16.13.1
     react-dropzone: ^7.0.1
@@ -14214,6 +14213,7 @@ fsevents@^1.2.7:
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
+    react: ^16.13.1
     react-dom: ^16.13.1
     webpack: ^4.42.1
   languageName: unknown
