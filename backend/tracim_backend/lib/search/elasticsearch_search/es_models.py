@@ -28,9 +28,15 @@ EXACT_FIELD = "exact"
 # that's why we set different analyzer for search (we search word given) and indexing (we index ngram
 # of label of content to allow autocompletion)
 
+# INFO - G.M - 2022-04-08 - Elasticsearch "pipeline" for analyser is :
+# - char_filter : modify the entry
+# - tokenizer : split the entry into token
+# - filter/token_filter : modify the token
+# As existing tokenizer doesn't look to be extendable with new separator, the workaround used here to
+# be able to split on "_" is to replace them in char_filter to "-" which is an existing separator.
 underscore_as_minus = analysis.char_filter("underscore_as_space", type="mapping", mappings=["_=>-"])
 
-# INFO - G.M - 2022-04-07 - Locally  Testing analyser withotu running tracim is possible with elyzer
+# INFO - G.M - 2022-04-07 - Locally  Testing analyser without running tracim is possible with elyzer
 # (need same name python package)  with command like :
 #  elyzer --es "http://localhost:9200" --index my-tracim-content --analyzer folding "Mary had_a little lamb"
 # This permit to better understand each step of the analyzer process.
