@@ -57,6 +57,22 @@ have `agenda` app in `app.enabled` list, you MUST have `START_CALDAV=0`.
 If you want to use plugins and/or custom_toolbox you need to add files in `~/tracim/etc/plugins/` and `~/tracim/etc/custom_toolbox/` (default configuration). This two path are created when you start docker image for the first time.
 
 
+### Tracimcli inside docker
+
+For maintenance purpose you can use tracimcli command line in the docker this way:
+
+```bash
+docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli
+```
+
+for the interactive mode
+
+or launching command directly:
+
+```bash
+docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
+```
+
 #### Updating index of ElasticSearch
 
 ⚠ Prerequiste: elasticsearch is running and you have starting Tracim with parameter to communicate with elasticsearch
@@ -73,6 +89,7 @@ Now you are in your Tracim container.
         search index-populate -d
 
 When is finished, you can quit your container. Index is now updated with all of your tracim content.
+
 
 #### Example commands
 
