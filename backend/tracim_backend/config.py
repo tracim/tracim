@@ -1400,6 +1400,10 @@ class CFG(object):
                 "depot.backend": DepotFileStorageType.MEMORY.depot_storage_backend
             }
 
+        # INFO - G.M - 2020-04-03 - Clear Depot Manager to avoid issue with
+        # Tracimcli interactive shell.
+        DepotManager._clear()
+
         DepotManager.configure(
             name=self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
             config=uploaded_files_settings,

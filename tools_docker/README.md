@@ -64,14 +64,13 @@ If you want to use plugins and/or custom_toolbox you need to add files in `~/tra
 To make an update of elasticsearch index you need to go inside you Tracim container running:
 
         docker ps
-        docker exec -it {CONTAINER ID} /bin/bash
+        docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli
 
 Now you are in your Tracim container.
 
-        cd /tracim/backend
-        tracimcli search index-drop -c /etc/tracim/development.ini -d
-        tracimcli search index-create -c /etc/tracim/development.ini -d
-        tracimcli search index-populate -c /etc/tracim/development.ini -d
+        search index-drop -d
+        search index-create -d
+        search index-populate -d
 
 When is finished, you can quit your container. Index is now updated with all of your tracim content.
 
@@ -159,9 +158,7 @@ Example with basic instance of Tracim (local usage with webdav and caldav) with 
 Note: with this new docker, all tracimcli and alembic command should be runned as
 user www-data, example:
 
-```bash
-su www-data -s /bin/bash -c "tracimcli dev parameters value -f -d -c /etc/tracim/development.ini"
-```
+docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
 
 for this example,
 you first need to write password you want in `~/tracim/secret/password.txt` file.
