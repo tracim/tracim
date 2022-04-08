@@ -158,7 +158,9 @@ Example with basic instance of Tracim (local usage with webdav and caldav) with 
 Note: with this new docker, all tracimcli and alembic command should be runned as
 user www-data, example:
 
+```bash
 docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
+```
 
 for this example,
 you first need to write password you want in `~/tracim/secret/password.txt` file.
