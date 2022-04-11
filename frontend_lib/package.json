@@ -36,7 +36,6 @@
     "i18next": "10.5.0",
     "prop-types": "^15.7.2",
     "radium": "^0.25.2",
-    "react": "^16.13.1",
     "react-device-detect": "^1.7.5",
     "react-dropzone": "^7.0.1",
     "react-i18next": "7.4.0",
@@ -48,6 +47,7 @@
   "peerDependencies": {
     "cheerio": "^1.0.0",
     "eslint": "^6.8.0",
+    "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "webpack": "^4.42.1"
   },
@@ -56,7 +56,7 @@
     "chai": "^4.2.0",
     "chai-enzyme": "^1.0.0-beta.1",
     "css-loader": "^3.5.1",
-    "enzyme": "^3.10.0",
+    "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "es6-promise": "^4.2.8",
     "eslint": "^6.8.0",

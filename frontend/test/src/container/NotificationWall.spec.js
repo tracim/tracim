@@ -1,6 +1,8 @@
 // FIXME - MP - 16-03-2022 - We use enzime 3.10. The hooks support is in 3.11
 // These tests are being removed since they are not working.
 // https://github.com/tracim/tracim/issues/5223
+// UPDATE - CH - 2022-04-07 - The above statement seems wrong, see comment at
+// https://github.com/tracim/tracim/issues/5223#issuecomment-1091805956 for details and for how to fix theses tests
 
 /*
 import React from 'react'
