@@ -155,16 +155,16 @@ class Login extends React.Component {
 
     event.preventDefault()
 
-    const { name, login, password } = event.target
+    const { name, loginWithoutStrip, password } = event.target
 
-    const email = login.value.trim()
+    const login = loginWithoutStrip.value.trim()
 
-    if (name.value === '' || email === '' || password.value === '') {
+    if (name.value === '' || login === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
       return
     }
 
-    if (!checkEmailValidity(email)) {
+    if (!checkEmailValidity(login)) {
       props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
       return
     }
@@ -187,7 +187,7 @@ class Login extends React.Component {
     }
 
     const fetchPostUserRegister = await props.dispatch(postUserRegister({
-      email: email,
+      email: login,
       password: password.value,
       public_name: name.value
     }))
@@ -195,7 +195,7 @@ class Login extends React.Component {
     switch (fetchPostUserRegister.status) {
       case 200:
         this.handleClickSignIn({
-          login: email,
+          login: login,
           password: password
         })
         break
@@ -211,11 +211,11 @@ class Login extends React.Component {
   }
 
   handleClickSignInEvent = async (event) => {
-    const email = event.target.login.trim()
+    const login = event.target.login.trim()
     event.preventDefault()
 
     this.handleClickSignIn({
-      login: email,
+      login: login,
       password: event.target.password
     })
   }

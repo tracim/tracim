@@ -80,11 +80,11 @@ export class ForgotPassword extends React.Component {
 
   handleClickSubmit = async () => {
     const { props, state } = this
-    const email = state.backupLogin.value.trim()
+    const backupLogin = state.backupLogin.value.trim()
 
     const fetchPostResetPassword = await props.dispatch(
       postForgotPassword(
-        checkEmailValidity(email) ? { email: email } : { username: state.backupLogin.value }
+        checkEmailValidity(backupLogin) ? { email: backupLogin } : { username: backupLogin }
       )
     )
     switch (fetchPostResetPassword.status) {
