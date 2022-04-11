@@ -155,9 +155,9 @@ class Login extends React.Component {
 
     event.preventDefault()
 
-    const { name, loginWithoutStrip, password } = event.target
+    const { name, loginWithoutTrim, password } = event.target
 
-    const login = loginWithoutStrip.value.trim()
+    const login = loginWithoutTrim.value.trim()
 
     if (name.value === '' || login === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
@@ -222,8 +222,8 @@ class Login extends React.Component {
 
   handleClickSignIn = async (signInObject) => {
     const { props, state } = this
-    const { loginWithoutStrip, password } = signInObject
-    const login = loginWithoutStrip.value.trim()
+    const { loginWithoutTrim, password } = signInObject
+    const login = loginWithoutTrim.value.trim()
 
     if (login === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
