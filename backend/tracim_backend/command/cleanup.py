@@ -4,18 +4,27 @@ import typing
 
 from pyramid.scripting import AppEnvironment
 
-from tracim_backend import UserDoesNotExist
 from tracim_backend.applications.agenda.models import AgendaResourceType
 from tracim_backend.apps import AGENDA__APP_SLUG
 from tracim_backend.command import AppContextCommand
 from tracim_backend.exceptions import AgendaNotFoundError
+from tracim_backend.exceptions import CannotDeleteUniqueRevisionWithoutDeletingContent
+from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import UserCannotBeDeleted
+from tracim_backend.exceptions import UserDoesNotExist
+from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.cleanup.cleanup import CleanupLib
 from tracim_backend.lib.cleanup.cleanup import UserNeedAnonymization
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.user import UserApi
+from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.models.auth import User
+from tracim_backend.models.data import Content
+from tracim_backend.models.data import ContentRevisionRO
+from tracim_backend.models.data import Workspace
 from tracim_backend.models.tracim_session import unprotected_content_revision
 
 
@@ -348,6 +357,187 @@ class DeleteUserCommand(AppContextCommand):
 
         self._session.flush()
         return DeleteResultIds(deleted_user_id, deleted_workspace_ids)
+
+
+class DeleteContentRevisionCommand(AppContextCommand):
+    def get_description(self) -> str:
+        return """delete content_revision from database"""
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "--dry-run",
+            help="dry-run mode",
+            dest="dry_run_mode",
+            default=False,
+            action="store_true",
+        )
+        parser.add_argument(
+            "-r",
+            "--content-revision-id",
+            nargs="+",
+            help="content revision ids",
+            dest="revision_ids",
+            required=True,
+        )
+        return parser
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+
+        if parsed_args.dry_run_mode:
+            print("(!) Running in dry-run mode, not change will be applied.")
+            app_context["request"].tm.doom()
+
+        with unprotected_content_revision(self._session) as session:
+            capi = ContentApi(
+                config=self._app_config, session=session, current_user=None, show_deleted=True,
+            )
+            revision_list = []  # type: typing.List[ContentRevisionRO]
+            for revision_id in parsed_args.revision_ids:
+                try:
+                    revision = capi.get_one_revision(revision_id)
+                    revision_list.append(revision)
+                except ContentRevisionNotFound as exc:
+                    print('ERROR: revision with id "{}" does not exist'.format(revision_id))
+                    raise exc
+
+            for revision in revision_list:
+                print("~~~~~~~~~~")
+                cleanup_lib = CleanupLib(
+                    session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+                )
+                print("delete revision {}.".format(revision.revision_id))
+                try:
+                    cleanup_lib.delete_revision(revision)
+                except CannotDeleteUniqueRevisionWithoutDeletingContent as exc:
+                    print(
+                        "ERROR: You should explictly delete content instead of trying removing the"
+                        ' last revision of a content. You should delete content "{}" instead of revision "{}".'.format(
+                            revision.content_id, revision.revision_id
+                        )
+                    )
+                    raise exc
+                self._session.flush()
+                print('revision "{}" deleted".'.format(revision.revision_id,))
+                print("~~~~~~~~~~")
+
+
+class DeleteContentCommand(AppContextCommand):
+    def get_description(self) -> str:
+        return """delete content from database"""
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "--dry-run",
+            help="dry-run mode",
+            dest="dry_run_mode",
+            default=False,
+            action="store_true",
+        )
+        parser.add_argument(
+            "-f", "--content-id", nargs="+", help="content ids", dest="content_ids", required=True,
+        )
+        return parser
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+
+        if parsed_args.dry_run_mode:
+            print("(!) Running in dry-run mode, not change will be applied.")
+            app_context["request"].tm.doom()
+
+        capi = ContentApi(
+            config=self._app_config, session=self._session, current_user=None, show_deleted=True,
+        )
+        content_list = []  # type: typing.List[Content]
+        for content_id in parsed_args.content_ids:
+            try:
+                content = capi.get_one(content_id)
+                content_list.append(content)
+            except ContentNotFound as exc:
+                print('ERROR: content with id "{}" does not exist'.format(content_id))
+                raise exc
+
+        for content in content_list:
+            print("~~~~~~~~~~")
+            cleanup_lib = CleanupLib(
+                self._session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+            )
+            print("delete content {}.".format(content.id))
+            # FIXME - G.M - 2022-04-11 - For unclear reason doing soft delete in dry_run
+            # give Attribute error in recursive children.
+            if not parsed_args.dry_run_mode:
+                cleanup_lib.soft_delete_content(content)
+            self._session.flush()
+            self._session.expire_all()
+            with unprotected_content_revision(self._session) as session:
+                cleanup_lib_unprotected = CleanupLib(
+                    session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+                )
+                cleanup_lib_unprotected.delete_content(content)
+                session.flush()
+            print('content "{}" deleted".'.format(content.content_id,))
+            print("~~~~~~~~~~")
+
+
+class DeleteSpaceCommand(AppContextCommand):
+    def get_description(self) -> str:
+        return """delete space from database"""
+
+    def get_parser(self, prog_name: str) -> argparse.ArgumentParser:
+        parser = super().get_parser(prog_name)
+        parser.add_argument(
+            "--dry-run",
+            help="dry-run mode",
+            dest="dry_run_mode",
+            default=False,
+            action="store_true",
+        )
+        parser.add_argument(
+            "-s", "--space-id", nargs="+", help="space ids", dest="space_ids", required=True,
+        )
+        return parser
+
+    def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
+        self._session = app_context["request"].dbsession
+        self._app_config = app_context["registry"].settings["CFG"]
+
+        if parsed_args.dry_run_mode:
+            print("(!) Running in dry-run mode, not change will be applied.")
+            app_context["request"].tm.doom()
+
+        with unprotected_content_revision(self._session) as session:
+            wapi = WorkspaceApi(
+                config=self._app_config, session=session, current_user=None, show_deleted=True,
+            )
+            space_list = []  # type: typing.List[Workspace]
+            for space_id in parsed_args.space_ids:
+                try:
+                    space = wapi.get_one(space_id)
+                    space_list.append(space)
+                except WorkspaceNotFound as exc:
+                    print('ERROR: space with id "{}" does not exist'.format(space_id))
+                    raise exc
+            for space in space_list:
+                print("~~~~~~~~~~")
+                cleanup_lib = CleanupLib(
+                    session, self._app_config, dry_run_mode=parsed_args.dry_run_mode
+                )
+                # FIXME - G.M - 2022-04-11 - For unclear reason doing soft delete in dry_run
+                # give DetachedInstanceError.
+                if not parsed_args.dry_run_mode:
+                    cleanup_lib.soft_delete_workspace(space)
+                session.flush()
+                session.expire_all()
+                print("delete space {}.".format(space.workspace_id))
+                cleanup_lib.delete_workspace(space)
+                session.flush()
+                print('space "{}" deleted".'.format(space.workspace_id,))
+                print("~~~~~~~~~~")
 
 
 class AnonymizeUserCommand(AppContextCommand):

@@ -533,7 +533,10 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         api = WorkspaceApi(
-            current_user=current_user, session=context.dbsession, config=self._config
+            current_user=current_user,
+            session=context.dbsession,
+            config=self._config,
+            show_deleted=True,
         )
         workspace_in_context = api.get_workspace_with_context(workspace)
         fields = {Event.WORKSPACE_FIELD: EventApi.workspace_schema.dump(workspace_in_context).data}
@@ -723,7 +726,7 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(subscription.workspace_id)
@@ -752,7 +755,7 @@ class EventBuilder:
     ) -> None:
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(reaction.content.workspace_id)
@@ -784,7 +787,7 @@ class EventBuilder:
         """Create an event for a tag operation (create/update/delete)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(tag.workspace_id)
@@ -809,7 +812,7 @@ class EventBuilder:
         """Create an event for a tag operation on a content (add/remove)."""
         current_user = context.safe_current_user()
         workspace_api = WorkspaceApi(
-            session=context.dbsession, config=self._config, current_user=None,
+            session=context.dbsession, config=self._config, current_user=None, show_deleted=True
         )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_tag.content.workspace_id)

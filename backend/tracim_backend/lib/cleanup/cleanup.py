@@ -5,6 +5,7 @@ import uuid
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
+import transaction
 
 from tracim_backend.applications.agenda.lib import AgendaApi
 from tracim_backend.applications.agenda.models import AgendaResourceType
@@ -13,6 +14,7 @@ from tracim_backend.applications.upload_permissions.models import UploadPermissi
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import AgendaNotFoundError
 from tracim_backend.exceptions import CannotDeleteUniqueRevisionWithoutDeletingContent
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.models.auth import User
@@ -24,6 +26,8 @@ from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.meta import DeclarativeBase
 from tracim_backend.models.reaction import Reaction
+from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tag import TagOnContent
 
 ANONYMIZED_USER_EMAIL_PATTERN = "anonymous_{hash}@anonymous.local"
 
@@ -148,6 +152,14 @@ class CleanupLib(object):
         self.safe_delete(revision)
         return revision_id
 
+    def soft_delete_content(self, content: Content):
+        capi = ContentApi(
+            config=self.app_config, session=self.session, current_user=None, show_deleted=True
+        )
+        with new_revision(session=self.session, content=content, tm=transaction.manager):
+            capi.delete(content)
+        self.safe_update(content)
+
     def delete_content(self, content: Content, recursively: bool = True) -> typing.List[str]:
         """
         Delete content and associated stuff:
@@ -170,6 +182,18 @@ class CleanupLib(object):
             )
             self.safe_delete(share)
 
+        # INFO - G.M - 2019-12-11 - delete content_tag
+        tags_on_content = self.session.query(TagOnContent).filter(
+            TagOnContent.content_id == content.content_id
+        )
+        for tag_on_content in tags_on_content:
+            logger.info(
+                self,
+                "delete tag {} from content {}".format(
+                    tag_on_content.tag_id, tag_on_content.content_id
+                ),
+            )
+            self.safe_delete(tag_on_content)
         # INFO - G.M - 2019-12-11 - delete children of content
         if recursively:
             for children in content.get_children(recursively=recursively):
@@ -184,6 +208,13 @@ class CleanupLib(object):
         deleted_contents.append(content.content_id)
         self.safe_delete(content)
         return deleted_contents
+
+    def soft_delete_workspace(self, workspace: Workspace):
+        wapi = WorkspaceApi(
+            config=self.app_config, session=self.session, current_user=None, show_deleted=True
+        )
+        wapi.delete(workspace=workspace)
+        self.safe_update(workspace)
 
     def delete_workspace(self, workspace: Workspace) -> int:
         """

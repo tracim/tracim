@@ -199,7 +199,9 @@ class MentionBuilder:
         current_user = context.safe_current_user()
         content_api = ContentApi(context.dbsession, current_user, context.app_config)
         content_in_context = content_api.get_content_in_context(content)
-        workspace_api = WorkspaceApi(context.dbsession, current_user, context.app_config)
+        workspace_api = WorkspaceApi(
+            context.dbsession, current_user, context.app_config, show_deleted=True
+        )
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content_in_context.workspace.workspace_id)
         )

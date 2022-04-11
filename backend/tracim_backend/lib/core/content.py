@@ -32,6 +32,7 @@ from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentInNotEditableState
 from tracim_backend.exceptions import ContentNamespaceDoNotMatch
 from tracim_backend.exceptions import ContentNotFound
+from tracim_backend.exceptions import ContentRevisionNotFound
 from tracim_backend.exceptions import ContentTypeNotExist
 from tracim_backend.exceptions import EmptyCommentContentNotAllowed
 from tracim_backend.exceptions import EmptyLabelNotAllowed
@@ -570,11 +571,16 @@ class ContentApi(object):
         """
         assert revision_id is not None  # DYN_REMOVE
 
-        revision = (
-            self._session.query(ContentRevisionRO)
-            .filter(ContentRevisionRO.revision_id == revision_id)
-            .one()
-        )
+        try:
+            revision = (
+                self._session.query(ContentRevisionRO)
+                .filter(ContentRevisionRO.revision_id == revision_id)
+                .one()
+            )
+        except NoResultFound as exc:
+            raise ContentRevisionNotFound(
+                'Content revision "{}" not found'.format(revision_id)
+            ) from exc
         if content and revision.content_id != content.content_id:
             raise RevisionDoesNotMatchThisContent(
                 "revision {revision_id} is not a revision of content {content_id}".format(
