@@ -2,8 +2,12 @@
 
 .cardPopup
   display flex
-  position fixed
   justify-content center
+  left 0
+  margin-inline-end "calc(%s / 2)" % pageSpacing
+  margin-inline-start "calc(%s / 2)" % pageSpacing
+  position fixed
+  right 0
   top calc(50% - 113px)
   z-index 32
   &__container
