@@ -801,6 +801,7 @@ export class File extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
+
     const timelineObject = {
       id: 'timeline',
       label: props.t('Timeline'),
