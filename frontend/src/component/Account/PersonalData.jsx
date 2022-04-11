@@ -35,7 +35,10 @@ export class PersonalData extends React.Component {
 
   handleChangeLang = newLang => this.setState({ newLang })
 
-  handleChangeEmail = e => this.setState({ newEmail: e.target.value })
+  handleChangeEmail = e => {
+    const email = e.target.value.trim()
+    this.setState({ newEmail: email })
+  }
 
   handleChangeCheckPassword = e => this.setState({ checkPassword: e.target.value })
 
