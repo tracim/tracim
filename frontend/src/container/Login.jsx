@@ -152,17 +152,17 @@ class Login extends React.Component {
 
   handleClickCreateAccount = async (event) => {
     const { props } = this
+    const { name, login, password } = event.target
+    const loginTrimmed = login.value.trim()
 
     event.preventDefault()
 
-    const { name, login, password } = event.target
-
-    if (name.value === '' || login.value === '' || password.value === '') {
+    if (name.value === '' || loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
       return
     }
 
-    if (!checkEmailValidity(login.value)) {
+    if (!checkEmailValidity(loginTrimmed)) {
       props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
       return
     }
@@ -185,7 +185,7 @@ class Login extends React.Component {
     }
 
     const fetchPostUserRegister = await props.dispatch(postUserRegister({
-      email: login.value,
+      email: loginTrimmed,
       password: password.value,
       public_name: name.value
     }))
@@ -195,7 +195,6 @@ class Login extends React.Component {
         this.handleClickSignIn({
           login: login,
           password: password
-
         })
         break
       case 400:
@@ -211,6 +210,7 @@ class Login extends React.Component {
 
   handleClickSignInEvent = async (event) => {
     event.preventDefault()
+
     this.handleClickSignIn({
       login: event.target.login,
       password: event.target.password
@@ -219,16 +219,16 @@ class Login extends React.Component {
 
   handleClickSignIn = async (signInObject) => {
     const { props, state } = this
-
     const { login, password } = signInObject
+    const loginTrimmed = login.value.trim()
 
-    if (login.value === '' || password.value === '') {
+    if (loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
     const credentials = {
-      ...(checkEmailValidity(login.value) ? { email: login.value } : { username: login.value }),
+      ...(checkEmailValidity(loginTrimmed) ? { email: loginTrimmed } : { username: loginTrimmed }),
       password: password.value
     }
 
