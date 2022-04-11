@@ -1,6 +1,10 @@
 @import '../../css/Variable.styl'
 
 .editCommentPopup
+  left 0
+  padding-inline-end "calc(%s / 2)" % pageSpacing
+  padding-inline-start "calc(%s / 2)" % pageSpacing
+  right 0
   & .cardPopup__container
     width auto
   & .cardPopup__body
@@ -17,6 +21,8 @@
     margin-top standardSpacing
     & .iconbutton
       margin-inline-start standardSpacing
+  &__texteditor
+    max-width "calc(100vw - %s)" % pageSpacing
   & .autocomplete
     width auto
     left unset
