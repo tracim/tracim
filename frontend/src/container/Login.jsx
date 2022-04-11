@@ -152,19 +152,17 @@ class Login extends React.Component {
 
   handleClickCreateAccount = async (event) => {
     const { props } = this
+    const { name, login, password } = event.target
+    const loginTrimmed = login.value.trim()
 
     event.preventDefault()
 
-    const { name, loginWithoutTrim, password } = event.target
-
-    const login = loginWithoutTrim.value.trim()
-
-    if (name.value === '' || login === '' || password.value === '') {
+    if (name.value === '' || loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
       return
     }
 
-    if (!checkEmailValidity(login)) {
+    if (!checkEmailValidity(loginTrimmed)) {
       props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
       return
     }
@@ -187,7 +185,7 @@ class Login extends React.Component {
     }
 
     const fetchPostUserRegister = await props.dispatch(postUserRegister({
-      email: login,
+      email: loginTrimmed,
       password: password.value,
       public_name: name.value
     }))
@@ -211,27 +209,26 @@ class Login extends React.Component {
   }
 
   handleClickSignInEvent = async (event) => {
-    const login = event.target.login.trim()
     event.preventDefault()
 
     this.handleClickSignIn({
-      login: login,
+      login: event.target.login,
       password: event.target.password
     })
   }
 
   handleClickSignIn = async (signInObject) => {
     const { props, state } = this
-    const { loginWithoutTrim, password } = signInObject
-    const login = loginWithoutTrim.value.trim()
+    const { login, password } = signInObject
+    const loginTrimmed = login.value.trim()
 
-    if (login === '' || password.value === '') {
+    if (loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
     const credentials = {
-      ...(checkEmailValidity(login) ? { email: login } : { username: login }),
+      ...(checkEmailValidity(loginTrimmed) ? { email: loginTrimmed } : { username: loginTrimmed }),
       password: password.value
     }
 
