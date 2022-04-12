@@ -70,7 +70,7 @@ for the interactive mode
 or launching command directly:
 
 ```bash
-docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
+docker exec -i -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
 ```
 
 #### Updating index of ElasticSearch
@@ -176,7 +176,7 @@ Note: with this new docker, all tracimcli and alembic command should be runned a
 user www-data, example:
 
 ```bash
-docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
+docker exec -i -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
 ```
 
 for this example,
