@@ -55,6 +55,7 @@ export class EditCommentPopup extends React.Component {
           apiUrl={props.apiUrl}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
+          customClass='editCommentPopup'
           hideSendButtonAndOptions
           id={wysiwygId}
           lang={props.loggedUserLanguage}
