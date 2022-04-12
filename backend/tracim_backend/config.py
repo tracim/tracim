@@ -1217,16 +1217,6 @@ class CFG(object):
                 self.EMAIL__NOTIFICATION__SMTP__PORT,
                 when_str="when email notification is activated",
             )
-            self.check_mandatory_param(
-                "EMAIL__NOTIFICATION__SMTP__USER",
-                self.EMAIL__NOTIFICATION__SMTP__USER,
-                when_str="when email notification is activated",
-            )
-            self.check_mandatory_param(
-                "EMAIL__NOTIFICATION__SMTP__PASSWORD",
-                self.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-                when_str="when email notification is activated",
-            )
             # INFO - G.M - 2019-12-10 - check value provided for headers
             self.check_mandatory_param(
                 "EMAIL__NOTIFICATION__FROM__EMAIL",
