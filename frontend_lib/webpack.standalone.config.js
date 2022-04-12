@@ -22,6 +22,12 @@ module.exports = {
     umdNamedDefine: true
   },
   externals: {
+    'react': {
+      root: 'React',
+      commonjs2: 'react',
+      commonjs: 'react',
+      amd: 'react',
+    },
     'react-router-dom': { // INFO - CH - this is required for using <Link> in frontend_lib
       root: 'ReactRouterDom',
       commonjs2: 'react-router-dom',

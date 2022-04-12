@@ -2523,7 +2523,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"array.prototype.flat@npm:^1.2.1, array.prototype.flat@npm:^1.2.3":
+"array.prototype.flat@npm:^1.2.3":
   version: 1.2.3
   resolution: "array.prototype.flat@npm:1.2.3"
   dependencies:
@@ -3386,7 +3386,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:^1.0.0-rc.2, cheerio@npm:^1.0.0-rc.3":
+"cheerio@npm:^1.0.0-rc.3":
   version: 1.0.0-rc.3
   resolution: "cheerio@npm:1.0.0-rc.3"
   dependencies:
@@ -5053,36 +5053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enzyme@npm:3.10.0":
-  version: 3.10.0
-  resolution: "enzyme@npm:3.10.0"
-  dependencies:
-    array.prototype.flat: ^1.2.1
-    cheerio: ^1.0.0-rc.2
-    function.prototype.name: ^1.1.0
-    has: ^1.0.3
-    html-element-map: ^1.0.0
-    is-boolean-object: ^1.0.0
-    is-callable: ^1.1.4
-    is-number-object: ^1.0.3
-    is-regex: ^1.0.4
-    is-string: ^1.0.4
-    is-subset: ^0.1.1
-    lodash.escape: ^4.0.1
-    lodash.isequal: ^4.5.0
-    object-inspect: ^1.6.0
-    object-is: ^1.0.1
-    object.assign: ^4.1.0
-    object.entries: ^1.0.4
-    object.values: ^1.0.4
-    raf: ^3.4.0
-    rst-selector-parser: ^2.2.3
-    string.prototype.trim: ^1.1.2
-  checksum: 3367e0108634ee29492b8c2497fbf0fe035c6e079967a2fd44d0622dac9c65c44671c902171fcd02cf121774952d2f201f080e67b64eea6264168decb9a66a90
-  languageName: node
-  linkType: hard
-
-"enzyme@npm:^3.10.0":
+"enzyme@npm:3.11.0":
   version: 3.11.0
   resolution: "enzyme@npm:3.11.0"
   dependencies:
@@ -6259,7 +6230,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"function.prototype.name@npm:^1.1.0, function.prototype.name@npm:^1.1.1, function.prototype.name@npm:^1.1.2":
+"function.prototype.name@npm:^1.1.1, function.prototype.name@npm:^1.1.2":
   version: 1.1.2
   resolution: "function.prototype.name@npm:1.1.2"
   dependencies:
@@ -6849,7 +6820,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"html-element-map@npm:^1.0.0, html-element-map@npm:^1.2.0":
+"html-element-map@npm:^1.2.0":
   version: 1.2.0
   resolution: "html-element-map@npm:1.2.0"
   dependencies:
@@ -7348,7 +7319,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"is-boolean-object@npm:^1.0.0, is-boolean-object@npm:^1.0.1":
+"is-boolean-object@npm:^1.0.1":
   version: 1.0.1
   resolution: "is-boolean-object@npm:1.0.1"
   checksum: 903b6ce93c64dd22fb7eb878c5d4a20c5ec7bf273ee921a9e506a8c77b511037be708f215a080387bc4a422b88c21b38debae637ca95f09ab8cb5fec81a8324a
@@ -7563,7 +7534,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"is-number-object@npm:^1.0.3, is-number-object@npm:^1.0.4":
+"is-number-object@npm:^1.0.4":
   version: 1.0.4
   resolution: "is-number-object@npm:1.0.4"
   checksum: 5bae52129f0e097485da25cbe89307dd46cf5ce7640edb6fcf40350d59c9f909039713d35fbeb0f1de1df817da6ec6e88aceca41b01e5ac989f6fdfc15c438a7
@@ -7677,7 +7648,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"is-string@npm:^1.0.4, is-string@npm:^1.0.5":
+"is-string@npm:^1.0.5":
   version: 1.0.5
   resolution: "is-string@npm:1.0.5"
   checksum: c64c791eb75935db9055291bc598edc22f03d3879b8a050b2955ba8087642d006338a1dedf7ac414c95f985c77c2d6fce655498d33c0df248fa92228a9945720
@@ -9655,7 +9626,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"object-inspect@npm:^1.6.0, object-inspect@npm:^1.7.0":
+"object-inspect@npm:^1.7.0":
   version: 1.7.0
   resolution: "object-inspect@npm:1.7.0"
   checksum: 9f479ca1002fedbf4e1c5dec908477d1a7a2dd4466af0b4cf5886d269db54d8310544dfb7670a17a4c5d6a7a3dd3c346be38ea6b3541330551900a3134dec662
@@ -9719,7 +9690,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"object.entries@npm:^1.0.4, object.entries@npm:^1.1.0, object.entries@npm:^1.1.1":
+"object.entries@npm:^1.1.0, object.entries@npm:^1.1.1":
   version: 1.1.2
   resolution: "object.entries@npm:1.1.2"
   dependencies:
@@ -9773,7 +9744,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"object.values@npm:^1.0.4, object.values@npm:^1.1.0, object.values@npm:^1.1.1":
+"object.values@npm:^1.1.0, object.values@npm:^1.1.1":
   version: 1.1.1
   resolution: "object.values@npm:1.1.1"
   dependencies:
@@ -10772,7 +10743,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"raf@npm:^3.4.0, raf@npm:^3.4.1":
+"raf@npm:^3.4.1":
   version: 3.4.1
   resolution: "raf@npm:3.4.1"
   dependencies:
@@ -12881,7 +12852,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"string.prototype.trim@npm:^1.1.2, string.prototype.trim@npm:^1.2.1":
+"string.prototype.trim@npm:^1.2.1":
   version: 1.2.1
   resolution: "string.prototype.trim@npm:1.2.1"
   dependencies:
@@ -13414,7 +13385,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: 3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13490,7 +13461,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13548,7 +13519,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13601,7 +13572,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     es6-promise: ^4.2.8
     eslint: ^6.8.0
@@ -13709,7 +13680,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13763,7 +13734,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13816,7 +13787,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13878,7 +13849,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13932,7 +13903,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13986,7 +13957,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -14040,7 +14011,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -14093,7 +14064,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -14144,7 +14115,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -14203,7 +14174,7 @@ fsevents@^1.2.7:
     css-loader: ^3.5.1
     date-fns: ^2.19.0
     emoji-mart: ^3.0.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     es6-promise: ^4.2.8
     eslint: ^6.8.0
@@ -14220,7 +14191,6 @@ fsevents@^1.2.7:
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     radium: ^0.25.2
-    react: ^16.13.1
     react-device-detect: ^1.7.5
     react-dom: ^16.13.1
     react-dropzone: ^7.0.1
@@ -14243,6 +14213,7 @@ fsevents@^1.2.7:
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
+    react: ^16.13.1
     react-dom: ^16.13.1
     webpack: ^4.42.1
   languageName: unknown

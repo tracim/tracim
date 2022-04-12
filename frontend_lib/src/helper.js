@@ -447,10 +447,12 @@ export const displayFileSize = (bytes, decimals) => {
 
 export const parserStringToList = (string, separatorList = [',', ';', '\n']) => {
   let parsedString = string
+
   separatorList.forEach(separator => {
     parsedString = parsedString.split(separator).join(',')
   })
-  return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
+
+  return parsedString.split(',').map(str => str.trim()).filter(notEmptyString => notEmptyString !== '')
 }
 
 // INFO - GB - 2021-09-16 - This function checks if the string looks like an email (username@domain)
