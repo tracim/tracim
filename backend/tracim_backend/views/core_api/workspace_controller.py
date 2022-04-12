@@ -374,11 +374,19 @@ class WorkspaceController(Controller):
             show_deactivated=True,
             show_deleted=True,
         )
+
+        email = hapic_data.body.user_email.email_address if hapic_data.body.user_email else None
+        public_name = (
+            hapic_data.body.user_username
+            or (hapic_data.body.user_email.username if hapic_data.body.user_email else None)
+            or None
+        )
+
         try:
             if hapic_data.body.user_id:
                 user = uapi.get_one(hapic_data.body.user_id)
-            elif hapic_data.body.user_email:
-                user = uapi.get_one_by_email(hapic_data.body.user_email)
+            elif email:
+                user = uapi.get_one_by_email(email)
             else:
                 user = uapi.get_one_by_username(hapic_data.body.user_username)
             if user.is_deleted:
@@ -386,13 +394,14 @@ class WorkspaceController(Controller):
             if not user.is_active:
                 raise UserIsNotActive("This user is not activated. Unable to invite him")
         except UserDoesNotExist as exc:
-            if not uapi.allowed_to_invite_new_user(hapic_data.body.user_email):
+            if not uapi.allowed_to_invite_new_user(email):
                 raise exc
 
             if app_config.NEW_USER__INVITATION__DO_NOTIFY:
                 user = uapi.create_user(
                     auth_type=AuthType.UNKNOWN,
-                    email=hapic_data.body.user_email,
+                    email=email,
+                    name=public_name,
                     password=password_generator(),
                     do_notify=True,
                     creation_type=UserCreationType.INVITATION,
@@ -407,7 +416,8 @@ class WorkspaceController(Controller):
             else:
                 user = uapi.create_user(
                     auth_type=AuthType.UNKNOWN,
-                    email=hapic_data.body.user_email,
+                    email=email,
+                    name=public_name,
                     password=None,
                     do_notify=False,
                     creation_type=UserCreationType.INVITATION,
