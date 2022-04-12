@@ -64,8 +64,9 @@ For maintenance purpose you can use tracimcli command line in the docker this wa
 ```bash
 docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli
 ```
-note: /etc/tracim is the folder where the config file is stored.
 for the interactive mode
+note: /etc/tracim is the folder where the config file is stored.
+
 
 or launching command directly:
 
