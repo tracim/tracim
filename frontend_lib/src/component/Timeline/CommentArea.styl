@@ -49,11 +49,8 @@ textarea
       position relative
       width 100%
       min-height 80px
-      &.richtextedition
-        min-height 180px
-        height 180px
-        // NOTE - RJ - 2022-02-11 - TinyMCE' UI without the content is 96px
-        // TinyMCE 5 is not high enough with 80px anymore
+      & .tox-edit-area
+        min-height 80px
       & > textarea
         border-radius standardBorderRadius
         border borderStyle
@@ -79,8 +76,3 @@ textarea
       display flex
       align-items center
 
-@media (max-width: max-xs)
-  .commentArea__textinput.richtextedition
-    height auto
-    & > .tox-tinymce
-      min-height 300px
