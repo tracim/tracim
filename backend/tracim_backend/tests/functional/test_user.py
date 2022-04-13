@@ -2446,7 +2446,7 @@ class TestUserEndpointWithRegistrationActive(object):
         response = mailhog.get_mailhog_mails()
         assert len(response) == 1
 
-    def test_api__register_user__ok_200__minimal(self, web_testapp, user_api_factory):
+    def test_api__register_user__ok_200__simple(self, web_testapp, user_api_factory):
         params = {
             "email": "test@test.test",
             "password": "mysuperpassword",
@@ -2460,6 +2460,41 @@ class TestUserEndpointWithRegistrationActive(object):
         assert res["profile"] == "users"
         assert res["email"] == "test@test.test"
         assert res["public_name"] == "test user"
+        assert res["username"] is None
+        assert res["timezone"] == ""
+        assert res["lang"] is None
+        assert res["allowed_space"] == 134217728
+
+    def test_api__register_user__ok_200__minimal(self, web_testapp, user_api_factory):
+        params = {
+            "email": "test@test.test",
+        }
+        res = web_testapp.post_json("/api/users/register", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test"
+        assert res["username"] is None
+        assert res["timezone"] == ""
+        assert res["lang"] is None
+        assert res["allowed_space"] == 134217728
+
+    def test_api__register_user__ok_200__minimal_rfc_email(self, web_testapp, user_api_factory):
+        params = {
+            "email": "test_user <test@test.test>",
+            "password": "mysuperpassword",
+        }
+        res = web_testapp.post_json("/api/users/register", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["profile"] == "users"
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "test_user"
         assert res["username"] is None
         assert res["timezone"] == ""
         assert res["lang"] is None
@@ -2682,6 +2717,29 @@ class TestUserEndpoint(object):
         assert res["timezone"] == "Europe/Paris"
         assert res["lang"] == "fr"
         assert res["allowed_space"] == 0
+
+        last_event = event_helper.last_event
+        assert last_event.event_type == "user.created"
+        assert last_event.fields["user"] == UserDigestSchema().dump(res).data
+        assert last_event.fields["client_token"] is None
+        author = web_testapp.get("/api/users/1", status=200).json_body
+        assert last_event.fields["author"] == UserDigestSchema().dump(author).data
+
+    def test_api__create_user__ok_200__minimal_rfc_email(
+        self, web_testapp, user_api_factory, event_helper
+    ):
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "email": "toto <test@test.test>",
+            "email_notification": False,
+        }
+        res = web_testapp.post_json("/api/users", status=200, params=params)
+        res = res.json_body
+        assert res["user_id"]
+        assert res["created"]
+        assert res["is_active"] is True
+        assert res["email"] == "test@test.test"
+        assert res["public_name"] == "toto"
 
         last_event = event_helper.last_event
         assert last_event.event_type == "user.created"
