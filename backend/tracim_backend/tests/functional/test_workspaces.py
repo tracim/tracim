@@ -151,11 +151,11 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["owner"]
         assert workspace["parent_id"] is None
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
-        (user_role_created, workspace_created) = event_helper.last_events(2)
+        (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == UserDigestSchema().dump(author).data
-        assert workspace_created.workspace == workspace
+        assert workspace_created.workspace["workspace_id"] == workspace["workspace_id"]
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
@@ -206,7 +206,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == UserDigestSchema().dump(author).data
-        assert workspace_created.workspace == workspace
+        assert workspace_created.workspace["workspace_id"] == workspace["workspace_id"]
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
@@ -735,11 +735,11 @@ class TestWorkspaceEndpoint(object):
         assert workspace["owner"]
         assert workspace["publication_enabled"] is False
         workspace_id = res.json_body["workspace_id"]
-        (user_role_created, workspace_created) = event_helper.last_events(2)
+        (workspace_created, user_role_created) = event_helper.last_events(2)
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == UserDigestSchema().dump(author).data
-        assert workspace_created.workspace == workspace
+
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
         assert workspace["access_type"] == WorkspaceAccessType.OPEN.value
@@ -791,7 +791,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_created.event_type == "workspace.created"
         author = web_testapp.get("/api/users/1", status=200).json_body
         assert workspace_created.author == UserDigestSchema().dump(author).data
-        assert workspace_created.workspace == workspace
+        assert workspace_created.workspace["workspace_id"] == workspace["workspace_id"]
         assert user_role_created.event_type == "workspace_member.created"
         assert workspace_created.author["user_id"] == workspace["owner"]["user_id"]
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
