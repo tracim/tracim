@@ -400,18 +400,40 @@ to have more/less log about something.
     ...
     level = INFO
 
-## Configure indexing and search to use Elasticsearch (Tracim v2.3+)
+## Configure indexing and search to use Elasticsearch/Opensearch (Tracim v2.3+)
 
 First, you need an Elasticsearch server. An easy way to have one with docker can be (don't use this for production):
 
-    docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" elasticsearch:7.0.0
+```shell
+# First build the elasticsearch-ingest image provided in tracim repository
+cd tools_docker/elasticsearch_ingest
+docker build -t elasticsearch-ingest .
+
+# run the image
+docker run -d -p 9200:9200 -p 9300:9300 -v esdata:/usr/share/elasticsearch -v esconfig:/usr/share/elasticsearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" -e "ES_JAVA_OPTS=-Xms4g -Xmx4g" elasticsearch-ingest
+```
+
+Alternatively you can you Opensearch server instead:
+
+```shell
+# First build the opensearch-ingest image provided in tracim repository
+cd tools_docker/opensearch_ingest
+docker build -t opensearch-ingest .
+
+# run the image
+docker run -d -p 9200:9200 -p 9300:9300 -v osdata:/usr/share/opensearch -v osconfig:/usr/share/opensearch/config -e "discovery.type=single-node" -e "cluster.routing.allocation.disk.threshold_enabled=false" -e "DISABLE_INSTALL_DEMO_CONFIG=true" -e "DISABLE_SECURITY_PLUGIN=true" opensearch-ingest
+```
+
 
 You then need to setup the configuration file:
 
-    search.engine = elasticsearch
-    search.elasticsearch.host = localhost
-    search.elasticsearch.port = 9200
-    search.elasticsearch.index_alias_prefix = tracim
+```ini
+search.engine = elasticsearch
+search.elasticsearch.host = localhost
+search.elasticsearch.port = 9200
+search.elasticsearch.index_alias_prefix = tracim
+search.elasticsearch.use_ingest = True
+```
 
 Your Elasticsearch server needs to be running. You can then set up the index with:
 

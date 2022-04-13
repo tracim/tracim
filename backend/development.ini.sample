@@ -759,11 +759,11 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # caldav.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event/test/description.txt
 
 ####
-# SEARCH (ElasticSearch)
+# SEARCH (ElasticSearch/OpenSearch)
 ####
 # choose search engine to use, available value are: simple, elasticsearch.
 # simple need nothing more than Tracim but features are limited,
-# elasticsearch is more effective but need an elasticsearch server.
+# elasticsearch is more effective but need an elasticsearch/opensearch server.
 ; search.engine = simple
 # elasticsearch configuration
 ; search.elasticsearch.host = localhost
