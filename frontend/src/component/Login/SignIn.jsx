@@ -27,7 +27,7 @@ const SignIn = props => {
         <InputGroupText
           parentClassName='loginpage__main__form__groupelogin'
           icon='fa-user'
-          type='text'
+          type='email'
           placeHolder={props.t('Email address or username')}
           invalidMsg={props.t('Invalid email or username')}
           maxLength={512}
