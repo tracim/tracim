@@ -605,7 +605,7 @@ export class WorkspaceAdvanced extends React.Component {
 
     const fetchWorkspaceNewMember = await handleFetchResult(await postWorkspaceMember(state.config.apiUrl, state.content.workspace_id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      email: state.newMember.isEmail ? state.newMember.personalData : '',
+      email: state.newMember.isEmail ? state.newMember.personalData.trim() : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
       role: state.newMember.role
     }))

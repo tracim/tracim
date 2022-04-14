@@ -26,6 +26,7 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
@@ -286,7 +287,7 @@ class UserCreation(object):
         email_notification: bool = True,
         allowed_space: Optional[int] = None,
     ) -> None:
-        self.email = email
+        self.email = EmailUser(email) if email else None
         # INFO - G.M - 2018-08-16 - cleartext password, default value
         # is auto-generated.
         self.password = password or None
@@ -655,7 +656,7 @@ class WorkspaceMemberInvitation(object):
         role: str = None,
     ) -> None:
         self.role = role
-        self.user_email = user_email
+        self.user_email = EmailUser(user_email) if user_email else None
         self.user_username = user_username
         self.user_id = user_id
 
