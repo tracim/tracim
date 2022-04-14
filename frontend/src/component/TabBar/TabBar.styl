@@ -5,8 +5,12 @@ tabWidth = 160 // 160px
 .tabBar
   display flex
   background-color offWhite
+  &__tabs
+    display flex
+    flex-basis content
   & .pageTitleGeneric
     flex 1
+    min-width 0
     &__title__label
       font-weight bold
   // INFO - GB - 2020-12-09 - The style below means that for 4 items the label "Home"
@@ -54,8 +58,6 @@ tabWidth = 160 // 160px
   .tabBar
     .breadcrumbs
       display none
-    .pageTitleGeneric
-      max-width "calc(100% - %s)" % (3*tabWidth)px
 
 @media (max-width: max-xs)
   .tabBar
