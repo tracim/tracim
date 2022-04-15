@@ -1273,6 +1273,14 @@ class CFG(object):
                 "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
             )
             self.check_mandatory_param(
+                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
+                "LDAP_BIND_PASS",
+                self.LDAP_BIND_PASS,
+                when_str="when ldap is in available auth method",
+            )
+            self.check_mandatory_param(
                 "LDAP_USER_BASE_DN",
                 self.LDAP_USER_BASE_DN,
                 when_str="when ldap is in available auth method",
