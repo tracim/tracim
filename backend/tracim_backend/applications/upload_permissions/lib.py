@@ -130,7 +130,8 @@ class UploadPermissionLib(object):
             config.EMAIL__NOTIFICATION__SMTP__PORT,
             config.EMAIL__NOTIFICATION__SMTP__USER,
             config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            config.EMAIL__NOTIFICATION__SMTP__CONNECT_METHOD,
+            config.EMAIL__NOTIFICATION__SMTP__ANONYMOUS,
         )
 
         return UploadPermissionEmailManager(config=config, smtp_config=smtp_config, session=session)
