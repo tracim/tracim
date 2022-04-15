@@ -440,19 +440,6 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleChangeText = e => {
-    const { state } = this
-    const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
-    this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
-
-    setLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
-  }
-
-  handleChangeNewComment = e => {
-    const { props, state } = this
-    props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
-  }
-
   searchForMentionOrLinkInQuery = async (query) => {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
