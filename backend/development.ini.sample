@@ -352,6 +352,8 @@ api.key = %(basic_setup.api_key)s
 # If auth_type is ldap, uncomment following ldap_* parameters
 ## LDAP server address
 ; ldap_url = ldap://localhost:389
+## ldap_bind anonymous mode : if true bind as anonymous, password and dn will not been checked.
+; ldap_bind_anonymous = False
 ## Bind dn to identify the search
 ; ldap_bind_dn =
 # example:
