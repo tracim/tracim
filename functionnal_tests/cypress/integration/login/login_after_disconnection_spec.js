@@ -23,7 +23,7 @@ describe('Login after a disconnection ', function () {
       .click()
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .type(login)
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
