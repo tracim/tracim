@@ -37,7 +37,7 @@ export const ContentItemSearch = props => {
           apiUrl={FETCH_CONFIG.apiUrl}
           style={{
             display: 'inline-block',
-            marginRight: '10px'
+            marginInlineEnd: '10px'
           }}
         />
         {props.lastModificationTime}

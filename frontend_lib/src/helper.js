@@ -7,6 +7,7 @@ import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
+import dateFnsAr from 'date-fns/locale/ar-SA'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -62,7 +63,8 @@ export const DATE_FNS_LOCALE = {
   fr: dateFnsFr,
   en: dateFnsEn,
   pt: dateFnsPt,
-  de: dateFnsDe
+  de: dateFnsDe,
+  ar: dateFnsAr
 }
 
 export const generateFetchResponse = async fetchResult => {
@@ -445,10 +447,12 @@ export const displayFileSize = (bytes, decimals) => {
 
 export const parserStringToList = (string, separatorList = [',', ';', '\n']) => {
   let parsedString = string
+
   separatorList.forEach(separator => {
     parsedString = parsedString.split(separator).join(',')
   })
-  return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
+
+  return parsedString.split(',').map(str => str.trim()).filter(notEmptyString => notEmptyString !== '')
 }
 
 // INFO - GB - 2021-09-16 - This function checks if the string looks like an email (username@domain)
@@ -843,4 +847,54 @@ export const USER_CALL_STATE = {
   DECLINED: 'declined',
   CANCELLED: 'cancelled',
   UNANSWERED: 'unanswered'
+}
+
+export const USERNAME_ALLOWED_CHARACTERS_REGEX = /[a-zA-Z0-9\-_]/
+
+const seekUsernameEnd = (text, offset) => {
+  while (offset < text.length && USERNAME_ALLOWED_CHARACTERS_REGEX.test(text[offset])) {
+    offset++
+  }
+
+  return offset
+}
+
+export const tinymceRemove = (selector) => {
+  try {
+    globalThis.tinymce.remove(selector)
+  } catch (e) {
+    if (e instanceof TypeError) {
+      console.error('HACK(#5437): removing TinyMCE raised a TypeError exception. If the message looks like "Can\'t access dead object". Ignoring the exception but please fix this.', e)
+    } else {
+      throw e
+    }
+  }
+}
+
+export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
+  let character, keyword
+  let textBegin, textEnd
+
+  if (item.content_id) {
+    character = '#'
+    keyword = item.content_id
+  } else {
+    character = '@'
+    keyword = item.mention
+  }
+
+  const charAtCursor = cursorPos - 1
+  const posAt = text.lastIndexOf(character, charAtCursor)
+
+  if (posAt > -1) {
+    const end = seekUsernameEnd(text, cursorPos)
+    textBegin = text.substring(0, posAt) + character + keyword + endCharacter
+    textEnd = text.substring(end)
+  } else {
+    console.log(`Error in autocompletion: did not find ${character}`)
+    textBegin = `${text} ${character}${keyword}${endCharacter}`
+    textEnd = ''
+  }
+
+  return { textBegin, textEnd }
 }

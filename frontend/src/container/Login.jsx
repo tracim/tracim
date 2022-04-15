@@ -1,4 +1,5 @@
 import React from 'react'
+import i18next from 'i18next'
 import { connect } from 'react-redux'
 import { withRouter, Redirect } from 'react-router-dom'
 import { translate } from 'react-i18next'
@@ -151,17 +152,17 @@ class Login extends React.Component {
 
   handleClickCreateAccount = async (event) => {
     const { props } = this
+    const { name, login, password } = event.target
+    const loginTrimmed = login.value.trim()
 
     event.preventDefault()
 
-    const { name, login, password } = event.target
-
-    if (name.value === '' || login.value === '' || password.value === '') {
+    if (name.value === '' || loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
       return
     }
 
-    if (!checkEmailValidity(login.value)) {
+    if (!checkEmailValidity(loginTrimmed)) {
       props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
       return
     }
@@ -184,7 +185,7 @@ class Login extends React.Component {
     }
 
     const fetchPostUserRegister = await props.dispatch(postUserRegister({
-      email: login.value,
+      email: loginTrimmed,
       password: password.value,
       public_name: name.value
     }))
@@ -194,7 +195,6 @@ class Login extends React.Component {
         this.handleClickSignIn({
           login: login,
           password: password
-
         })
         break
       case 400:
@@ -210,6 +210,7 @@ class Login extends React.Component {
 
   handleClickSignInEvent = async (event) => {
     event.preventDefault()
+
     this.handleClickSignIn({
       login: event.target.login,
       password: event.target.password
@@ -218,16 +219,16 @@ class Login extends React.Component {
 
   handleClickSignIn = async (signInObject) => {
     const { props, state } = this
-
     const { login, password } = signInObject
+    const loginTrimmed = login.value.trim()
 
-    if (login.value === '' || password.value === '') {
+    if (loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
     const credentials = {
-      ...(checkEmailValidity(login.value) ? { email: login.value } : { username: login.value }),
+      ...(checkEmailValidity(loginTrimmed) ? { email: loginTrimmed } : { username: loginTrimmed }),
       password: password.value
     }
 
@@ -267,6 +268,17 @@ class Login extends React.Component {
 
   handleUserConnection = async () => {
     const { props } = this
+
+    if (window.Notification) {
+      try {
+        if (Notification.permission !== 'denied') {
+          Notification.requestPermission()
+        }
+      } catch (e) {
+        console.error('Could not show notification', e)
+      }
+    }
+
     props.dispatch(setUserConnected({ ...props.user, logged: true }))
     if (props.system.redirectLogin !== '') {
       props.history.push(props.system.redirectLogin)
@@ -441,7 +453,7 @@ class Login extends React.Component {
     if (props.user.logged) return <Redirect to={{ pathname: '/ui' }} />
 
     return (
-      <div className='loginpage'>
+      <div className='loginpage' dir={i18next.dir()}>
         <div className='loginpage__welcome' dangerouslySetInnerHTML={{ __html: state.welcomeHtml }} />
         <section className='loginpage__main'>
           {state.displayedOption === DISPLAY.SIGN_IN && (

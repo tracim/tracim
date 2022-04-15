@@ -213,6 +213,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_root_agenda)
     @hapic.input_path(RadicaleUserResourceWorkspaceSubItemPathSchema())
     def radicale_proxy__user_resource_workspace_subitems(
@@ -242,6 +243,7 @@ class RadicaleProxyController(Controller):
         )
 
     @hapic.with_api_doc(disable_doc=True)
+    @hapic.handle_exception(WorkspaceAgendaDisabledException, http_code=HTTPStatus.NOT_FOUND)
     @check_right(can_access_workspace_event_agenda)
     @hapic.input_path(RadicaleUserResourceWorkspaceSubItemPathSchema())
     def radicale_proxy__user_resource_workspace_subitems_x(

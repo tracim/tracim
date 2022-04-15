@@ -2,6 +2,8 @@ import React from 'react'
 import Radium from 'radium'
 import PropTypes from 'prop-types'
 import {
+  AgendaInfo,
+  tinymceRemove,
   AutoComplete,
   BtnSwitch,
   ConfirmPopup,
@@ -13,11 +15,15 @@ import { translate } from 'react-i18next'
 
 export class WorkspaceAdvancedConfiguration extends React.Component {
   componentDidMount () {
+    this.updateWysiwyg()
+  }
+
+  updateWysiwyg () {
     const { props } = this
     if (!props.isReadOnlyMode) {
       globalThis.wysiwyg(
         `#${props.textareaId}`,
-        props.i18n.language,
+        props.lang,
         props.onChangeDescription,
         props.onTinyMceInput,
         props.onTinyMceKeyDown,
@@ -27,9 +33,15 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
     }
   }
 
+  componentDidUpdate (prevProps) {
+    if (this.props.lang !== prevProps.lang) {
+      this.updateWysiwyg()
+    }
+  }
+
   componentWillUnmount () {
     const { props } = this
-    if (!props.isReadOnlyMode) globalThis.tinymce.remove(`#${props.textareaId}`)
+    if (!props.isReadOnlyMode) tinymceRemove(`#${props.textareaId}`)
   }
 
   render () {
@@ -46,15 +58,6 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
             : (
               <div>
                 <div className='formBlock__field workspace_advanced__description__text '>
-                  {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-                    <AutoComplete
-                      apiUrl={props.apiUrl}
-                      autoCompleteItemList={props.autoCompleteItemList}
-                      autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                      onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                      delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-                    />
-                  )}
                   <textarea
                     id={props.textareaId}
                     className='workspace_advanced__description__text__textarea'
@@ -64,6 +67,15 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
                     rows='3'
                   />
                 </div>
+                {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+                  <AutoComplete
+                    apiUrl={props.apiUrl}
+                    autoCompleteItemList={props.autoCompleteItemList}
+                    autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                    onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                    delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+                  />
+                )}
 
                 <div className='workspace_advanced__description__bottom'>
                   <button
@@ -80,43 +92,54 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
         </div>
 
         {!props.isReadOnlyMode && (
-          <div>
-            <div className='workspace_advanced__defaultRole formBlock'>
-              <div className='formBlock__title'>
-                {props.t('Default role:')}
-                <button
-                  type='button'
-                  className='btn transparentButton workspace_advanced__defaultRole__info'
-                  id='popoverDefaultRoleInfo'
-                >
-                  <i className='fas fa-fw fa-question-circle' />
-                </button>
+          <div className='workspace_advanced__defaultRole formBlock'>
+            <div className='formBlock__title'>
+              {props.t('Default role:')}
+              <button
+                type='button'
+                className='btn transparentButton workspace_advanced__defaultRole__info'
+                id='popoverDefaultRoleInfo'
+              >
+                <i className='fas fa-fw fa-question-circle' />
+              </button>
 
-                <Popover
-                  targetId='popoverDefaultRoleInfo'
-                  popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
-                />
-              </div>
-
-              <div className='workspace_advanced__defaultRole__list'>
-                <SingleChoiceList
-                  list={ROLE_LIST}
-                  onChange={props.onChangeNewDefaultRole}
-                  currentValue={props.defaultRole}
-                />
-              </div>
-
-              <div className='workspace_advanced__defaultRole__bottom'>
-                <button
-                  type='button'
-                  className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                  onClick={props.onClickValidateNewDefaultRole}
-                >
-                  {props.t('Confirm')}
-                </button>
-              </div>
+              <Popover
+                targetId='popoverDefaultRoleInfo'
+                popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
+              />
             </div>
 
+            <div className='workspace_advanced__defaultRole__list'>
+              <SingleChoiceList
+                list={ROLE_LIST}
+                onChange={props.onChangeNewDefaultRole}
+                currentValue={props.defaultRole}
+              />
+            </div>
+
+            <div className='workspace_advanced__defaultRole__bottom'>
+              <button
+                type='button'
+                className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                onClick={props.onClickValidateNewDefaultRole}
+              >
+                {props.t('Confirm')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {props.isAppAgendaAvailable && props.isCurrentSpaceAgendaEnabled && (
+          <AgendaInfo
+            customClass='formBlock workspace_advanced__agenda'
+            introText={props.t('Use this link to integrate this agenda to your')}
+            caldavText={props.t('CalDAV compatible software')}
+            agendaUrl={props.agendaUrl}
+          />
+        )}
+
+        {!props.isReadOnlyMode && (
+          <div>
             <div className='formBlock workspace_advanced__delete'>
               <div className='formBlock__title workspace_advanced__delete__title'>
                 {props.t('Delete space')}
@@ -186,11 +209,19 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 export default translate()(Radium(WorkspaceAdvancedConfiguration))
 
 WorkspaceAdvancedConfiguration.propTypes = {
+  agendaUrl: PropTypes.string,
   description: PropTypes.string,
-  isReadOnlyMode: PropTypes.bool
+  lang: PropTypes.string,
+  isReadOnlyMode: PropTypes.bool,
+  isAppAgendaAvailable: PropTypes.bool,
+  isCurrentSpaceAgendaEnabled: PropTypes.bool
 }
 
 WorkspaceAdvancedConfiguration.defaultProps = {
+  agendaUrl: '',
   description: '',
-  isReadOnlyMode: true
+  lang: '',
+  isReadOnlyMode: true,
+  isAppAgendaAvailable: false,
+  isCurrentSpaceAgendaEnabled: false
 }

@@ -32,17 +32,6 @@ describe('<DropdownMenu />', () => {
       expect(wrapper.find('button.dropdown-toggle > i')).to.have.length(0)
     })
 
-    it('if it has a buttonImage prop, the dropdown button should have this image', () => {
-      const image = 'imageSrc'
-      wrapper.setProps({ buttonImage: image })
-      expect(wrapper.find('button.dropdown-toggle > img').prop('src')).to.equal(image)
-    })
-
-    it('if it has not a buttonImage prop, the dropdown button should not have a image', () => {
-      wrapper.setProps({ buttonImage: undefined })
-      expect(wrapper.find('button.dropdown-toggle > img')).to.have.length(0)
-    })
-
     it('if it has a buttonLabel prop, the dropdown button should have this text', () => {
       const label = 'just a text'
       wrapper.setProps({ buttonLabel: label })

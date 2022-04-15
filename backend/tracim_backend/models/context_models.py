@@ -26,6 +26,7 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
@@ -52,12 +53,14 @@ class AboutModel(object):
         build_version: str,
         datetime: datetime,
         website: str,
+        database_schema_version: Optional[str],
     ) -> None:
         self.name = name
         self.version = version
         self.build_version = build_version
         self.datetime = datetime
         self.website = website
+        self.database_schema_version = database_schema_version
 
 
 class ConfigModel(object):
@@ -284,7 +287,7 @@ class UserCreation(object):
         email_notification: bool = True,
         allowed_space: Optional[int] = None,
     ) -> None:
-        self.email = email
+        self.email = EmailUser(email) if email else None
         # INFO - G.M - 2018-08-16 - cleartext password, default value
         # is auto-generated.
         self.password = password or None
@@ -605,7 +608,6 @@ class ContentFilter(object):
         show_active: Optional[int] = 1,
         content_type: Optional[str] = None,
         label: Optional[str] = None,
-        page_nb: Optional[int] = None,
         limit: Optional[int] = None,
         namespaces_filter: Optional[str] = None,
         sort: Optional[ContentSortOrder] = None,
@@ -620,7 +622,6 @@ class ContentFilter(object):
         self.show_deleted = bool(show_deleted)
         self.show_active = bool(show_active)
         self.limit = limit
-        self.page_nb = page_nb
         self.label = label
         self.content_type = content_type
         self.sort = sort or ContentSortOrder.LABEL_ASC
@@ -655,7 +656,7 @@ class WorkspaceMemberInvitation(object):
         role: str = None,
     ) -> None:
         self.role = role
-        self.user_email = user_email
+        self.user_email = EmailUser(user_email) if user_email else None
         self.user_username = user_username
         self.user_id = user_id
 

@@ -28,12 +28,11 @@
   "You can't deactivate your own account": "Sie können Ihr eigenes Konto nicht deaktivieren",
   "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "Ihr Benutzername ist falsch, die erlaubten Zeichen sind {{allowedCharactersUsername}}",
   "New password is too short (minimum 6 characters)": "Neues Passwort ist zu kurz (mindestens 6 Zeichen)",
-  "New password is too long (maximum 512 characters)": "Neues Passwort ist zu lang (maximal 512 Zeichen)",
+  "New password is too long (maximum 512 characters)": "Neues Passwort ist zu lang (maximum 512 Zeichen)",
   "User created and email sent": "Benutzer angelegt und E-Mail gesendet",
   "User created": "Benutzer erstellt",
-  "Email already exists": "E-Mail ist bereits vorhanden",
+  "Email already exists": "Diese E-Mail-Adresse existiert bereits",
   "Password": "Passwort",
-  "Create the user": "Erstellen Sie den Benutzer",
   "Create a user": "Einen Benutzer erstellen",
   "Please set a password": "Bitte setzen Sie ein Passwort",
   "Full name": "Vollständiger Name",
@@ -47,5 +46,7 @@
   "Allowed characters: {{allowedCharactersUsername}}": "Erlaubte Zeichen: {{allowedCharactersUsername}}",
   "Please enter a name, an email, a password and select a type": "Bitte geben Sie einen Namen, eine E-Mail, ein Passwort ein und wählen Sie eine Art",
   "Choose the user's type": "Wählen Sie die Art des Benutzers",
-  "Type": "Art"
+  "Type": "Art",
+  "Create and add to spaces": "Bereiche erstellen und hinzufügen",
+  "Create": "Erstellen"
 }

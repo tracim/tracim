@@ -46,7 +46,7 @@ describe('Check notification dot', () => {
           threadId = note.content_id
           cy.visitPage({
             pageName: PAGES.CONTENT_OPEN,
-            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+            params: { contentId: threadId }
           })
         })
         cy.contains('.menuprofil__dropdown__name', baseUser.public_name)
@@ -69,7 +69,7 @@ describe('Check notification dot', () => {
           workspaceId = workspace.workspace_id
           cy.visitPage({
             pageName: PAGES.CONTENT_OPEN,
-            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+            params: { contentId: threadId }
           })
         })
         cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
@@ -95,7 +95,7 @@ describe('Check notification dot', () => {
           workspaceId = workspace.workspace_id
           cy.visitPage({
             pageName: PAGES.CONTENT_OPEN,
-            params: { workspaceId: workspaceId, contentType: 'thread', contentId: threadId }
+            params: { contentId: threadId }
           })
         })
         cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)

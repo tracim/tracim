@@ -33,8 +33,13 @@ import {
   mockPutMyselfPassword204,
   mockPutMyselfPassword403
 } from '../../apiMock'
+import { reactstrapPopoverHack } from 'tracim_frontend_lib/dist/tracim_frontend_lib.test_utils.standalone.js'
 
 describe('In <Account />', () => {
+  reactstrapPopoverHack(document, 'popoverFullName')
+  reactstrapPopoverHack(document, 'popoverUsername')
+  reactstrapPopoverHack(document, 'popoverPageTitle')
+
   const setWorkspaceListMemberListCallBack = sinon.spy()
   const newFlashMessageWarningCallBack = sinon.spy()
   const updateUserCallBack = sinon.spy()
@@ -70,6 +75,14 @@ describe('In <Account />', () => {
 
   const props = {
     breadcrumbs: [],
+    dispatchCustomEvent: dispatchMock,
+    langList: [{
+      id: 'fr',
+      label: 'French'
+    }, {
+      id: 'en',
+      label: 'English'
+    }],
     user: user,
     appList: appList,
     workspaceList: workspaceList.workspaceList,
@@ -85,19 +98,10 @@ describe('In <Account />', () => {
     registerLiveMessageHandlerList: () => { }
   }
 
-  // INFO - GB - 2020-11-09 - The lines below are to fix the problem:
-  // Error: The target 'popoverSpaceTitle' could not be identified in the dom
-  // see https://github.com/reactstrap/reactstrap/issues/773
-  const tooltipDiv = document.createElement('div')
-  const innerTooltipDiv = document.createElement('div')
-  innerTooltipDiv.setAttribute('id', 'popoverSpaceTitle')
-  tooltipDiv.appendChild(innerTooltipDiv)
-  document.body.appendChild(tooltipDiv)
-
   const AccountWithHOC1 = withRouterMock(translateMock()(AccountWithoutHOC))
   const AccountWithHOC2 = () => <Provider store={store}><AccountWithHOC1 {...props} /></Provider>
 
-  const wrapper = mount(<AccountWithHOC2 {...props} />, { attachTo: innerTooltipDiv })
+  const wrapper = mount(<AccountWithHOC2 {...props} />)
   const accountWrapper = wrapper.find(AccountWithoutHOC)
   const accountInstance = accountWrapper.instance()
 

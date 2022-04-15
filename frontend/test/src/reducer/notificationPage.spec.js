@@ -19,12 +19,7 @@ import {
   updateNotification
 } from '../../../src/action-creator.sync.js'
 import notificationPage, {
-  belongsToGroup,
-  hasSameAuthor,
-  hasSameContent,
-  hasSameWorkspace,
-  serializeNotification,
-  sortByCreatedDate
+  serializeNotification
 } from '../../../src/reducer/notificationPage.js'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
@@ -104,7 +99,10 @@ describe('reducer notificationPage.js', () => {
       const listOfNotification = notificationPage(initialState, setNotificationList([TLM]))
 
       it('should return the list of notification from the objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification] })
+        expect(listOfNotification).to.deep.equal({
+          ...initialState,
+          list: [notification]
+        })
       })
     })
 
@@ -135,15 +133,22 @@ describe('reducer notificationPage.js', () => {
       const listOfNotification = notificationPage(initialState, updateNotification(notification.id, [notification, notification]))
 
       it('should return the list of notification with the notification replaced by the list', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, notification] })
+        expect(listOfNotification).to.deep.equal({
+          ...initialState,
+          list: [notification, notification]
+        })
       })
     })
 
     describe(`${READ}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotification(notification.id))
-
-      it('should return the list of objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
+      it('should read a notification in a flat list', () => {
+        const initState = { ...initialState, list: [notification], unreadNotificationCount: 1 }
+        const listOfNotification = notificationPage(initState, readNotification(notification.id))
+        expect(listOfNotification).to.deep.equal({
+          ...initialState,
+          list: [{ ...notification, read: true }],
+          unreadNotificationCount: 0
+        })
       })
     })
 
@@ -196,114 +201,5 @@ describe('serializeNotification', () => {
 
   it('should return an object (in camelCase)', () => {
     expect(serializeNotification(TLMMention)).to.deep.equal(mention)
-  })
-})
-
-describe('hasSameAuthor', () => {
-  it('should return false if list has a null or undefined element', () => {
-    expect(hasSameAuthor([null, { userId: 1 }, { userId: 1 }])).to.be.equal(false)
-  })
-
-  it('should return false if a element has a different author id', () => {
-    expect(hasSameAuthor([{ userId: 2 }, { userId: 1 }])).to.be.equal(false)
-  })
-
-  it('should return true if all elements has same authorid', () => {
-    expect(hasSameAuthor([{ userId: 1 }, { userId: 1 }])).to.be.equal(true)
-  })
-})
-
-describe('hasSameWorkspace', () => {
-  it('should return false if list has a null or undefined element', () => {
-    expect(hasSameWorkspace([null, { id: 1 }, { id: 1 }])).to.be.equal(false)
-  })
-
-  it('should return false if a element has a different workspace id', () => {
-    expect(hasSameWorkspace([{ id: 2 }, { id: 1 }])).to.be.equal(false)
-  })
-
-  it('should return true if all elements has same workspace id', () => {
-    expect(hasSameWorkspace([{ id: 1 }, { id: 1 }])).to.be.equal(true)
-  })
-})
-
-describe('hasSameContent', () => {
-  it('should return false if list has a element with null or undefined content', () => {
-    expect(hasSameContent([
-      { content: null },
-      { content: { id: 1, parentId: 2 }, type: 'content' },
-      { content: { id: 1, parentId: 2 }, type: 'content' }
-    ])).to.be.equal(false)
-  })
-
-  describe('only with contents', () => {
-    it('should return false if a element has a different content id', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 2 }, type: 'content' },
-        { content: { id: 1, parentId: 2 }, type: 'content' }
-      ])).to.be.equal(false)
-    })
-
-    it('should return true if all elements has same content id', () => {
-      expect(hasSameContent([
-        { content: { id: 1, parentId: 2 }, type: 'content' },
-        { content: { id: 1, parentId: 3 }, type: 'content' }
-      ])).to.be.equal(true)
-    })
-  })
-
-  describe('with contents and comments', () => {
-    it('should return false if a element has a different content id or parentId', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 3 }, type: 'content' },
-        { content: { id: 1, parentId: 3 }, type: 'comment' }
-      ])).to.be.equal(false)
-    })
-
-    it('should return true if all elements has same content', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 3 }, type: 'content' },
-        { content: { id: 1, parentId: 2 }, type: 'comment' }
-      ])).to.be.equal(true)
-    })
-  })
-
-  describe('only with comments', () => {
-    it('should return false if a element has a different content id or parentId', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 1 }, type: 'comment' },
-        { content: { id: 1, parentId: 2 }, type: 'comment' }
-      ])).to.be.equal(false)
-    })
-
-    it('should return true if all elements has same content', () => {
-      expect(hasSameContent([
-        { content: { id: 2, parentId: 3 }, type: 'comment' },
-        { content: { id: 1, parentId: 3 }, type: 'comment' }
-      ])).to.be.equal(true)
-    })
-  })
-})
-
-describe('belongsToGroup', () => {
-  const defaultElement = {
-    author: { userId: 1 },
-    content: { id: 2 },
-    type: 'content',
-    workspace: { id: 3 }
-  }
-
-  it('should return false if groupedNotification is null', () => {
-    expect(belongsToGroup(defaultElement, null, 2)).to.be.equal(false)
-  })
-
-  it('should return false if groupedNotification has no group', () => {
-    expect(belongsToGroup(defaultElement, {}, 2)).to.be.equal(false)
-  })
-})
-
-describe('sortByCreatedDate', () => {
-  it('should return the array sorted by created', () => {
-    expect(sortByCreatedDate([{ created: 5 }, { created: 2 }, { created: 9 }])).to.deep.equal([{ created: 9 }, { created: 5 }, { created: 2 }])
   })
 })

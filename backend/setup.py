@@ -6,9 +6,8 @@ from setuptools import setup
 requires = [
     # pyramid
     "plaster_pastedeploy",
-    "pyramid <2.0",
+    "pyramid>=2.0.0",
     "pyramid_debugtoolbar",
-    "pyramid_retry<2.0",
     "waitress",
     # Database
     "pyramid_tm",
@@ -62,7 +61,7 @@ requires = [
     "Babel",
     "requests",
     # caldav support
-    "radicale<3.0.0",
+    "radicale>=3.0.6",
     "caldav",
     # search support
     "elasticsearch",
@@ -78,9 +77,10 @@ requires = [
     "tnetstring3",
     "pyzmq",
     "jsonschema",
-    "webpreview",
+    # INFO - G.M - 2022-02-28 - Use algoo fork of webpreview for now:
+    "webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo",
     # importlib
-    "importlib_metadata",
+    "importlib_metadata==4.6.0",
 ]
 
 tests_require = [
@@ -171,7 +171,9 @@ setup(
             "dev parameters list = tracim_backend.command.devtools:ParametersListCommand",
             "dev parameters value = tracim_backend.command.devtools:ParametersValueCommand",
             "dev test live-messages = tracim_backend.command.devtools:LiveMessageTesterCommand",
+            "dev test smtp = tracim_backend.command.devtools:SMTPMailCheckerCommand",
             "dev custom-properties extract-translation-source = tracim_backend.command.devtools:ExtractCustomPropertiesTranslationsCommand",
+            "dev custom-properties checker = tracim_backend.command.devtools:CustomPropertiesCheckerCommand",
         ],
     },
     message_extractors={

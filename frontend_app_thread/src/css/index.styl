@@ -4,12 +4,12 @@
   .comment
     &.received
       .comment__header__text
-        padding-left calc(5% + 4px)
-        padding-right 0
+        padding-inline-start calc(5% + 4px)
+        padding-inline-end 0
     &.sent
       .comment__header__text
-        padding-right calc(5% + 4px)
-        padding-left 0
+        padding-inline-end calc(5% + 4px)
+        padding-inline-start 0
   &__header
     &__editionmode
       display none
@@ -29,8 +29,8 @@
         justify-content flex-end
         padding standardSpacing pageSpacing 0
       &__messagelist
-        padding-left pageSpacing
-        padding-right pageSpacing
+        padding-inline-start pageSpacing
+        padding-inline-end pageSpacing
       &__content
         width 100%
       &__texteditor
@@ -44,3 +44,5 @@
 @media (max-width: max-xs)
   .thread .timeline
     height "calc(100vh - %s)" % (headerHeight * 2 + 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
+  .thread .thread__contentpage .timeline__texteditor
+    padding-bottom 60px // INFO - 2022-02-10 - MB - This is a workaround, not a fix

@@ -5,12 +5,13 @@
   flex-direction row-reverse
 
 .previewcomponent
-  height calc(100% - 130px)
   overflow-x hidden
   display flex
   width 100%
   align-items center
   justify-content center
+  flex-direction column
+  flex 1
   &__fileimg
     display flex
     flex-direction column
@@ -38,9 +39,14 @@
       box-shadow 0 0 0 0
       outline 0
   &__pagecount
-    position absolute
-    right 5px
-    bottom 5px
     font-size metadataFontSize
+    align-self end
+    padding-bottom pageSpacing
+    padding-inline-end pageSpacing
   &__filepreview
     display flex
+    flex 1
+
+@media (min-width: max-xs) and (max-width: max-lg)
+  .previewcomponent
+    height 100%

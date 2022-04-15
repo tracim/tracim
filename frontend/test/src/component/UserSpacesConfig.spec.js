@@ -1,12 +1,20 @@
 import React from 'react'
 import { expect } from 'chai'
-import { mount } from 'enzyme'
+import { shallow } from 'enzyme'
 import sinon from 'sinon'
 import { UserSpacesConfig as UserSpacesConfigWithoutHOC } from '../../../src/component/Account/UserSpacesConfig.jsx'
 import { userFromApi } from '../../hocMock/redux/user/user.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
+import { FETCH_CONFIG } from '../../../src/util/helper.js'
+import { mockGetUserWorkspaceList200 } from '../../apiMock.js'
+import { isFunction } from '../../hocMock/helper'
 
 describe('<UserSpacesConfig />', () => {
+  const dispatchMock = params => {
+    if (isFunction(params)) return params(dispatchMock)
+    return params
+  }
+
   const onChangeSubscriptionNotifCallBack = sinon.spy()
 
   const props = {
@@ -15,10 +23,11 @@ describe('<UserSpacesConfig />', () => {
     onChangeSubscriptionNotif: onChangeSubscriptionNotifCallBack,
     system: { config: {} },
     admin: true,
-    dispatch: () => {}
+    dispatch: dispatchMock,
+    t: key => key
   }
 
-  const wrapper = mount(<UserSpacesConfigWithoutHOC {...props} t={key => key} />)
+  const wrapper = shallow(<UserSpacesConfigWithoutHOC {...props} />)
   const workspaceList = [
     {
       memberList: [
@@ -46,20 +55,7 @@ describe('<UserSpacesConfig />', () => {
       label: 'randomLabel2'
     }
   ]
-
-  wrapper.setState({ workspaceList })
-
-  describe('static design', () => {
-    it(`should display ${workspaceList.length} spaces`, () => {
-      expect(wrapper.find('.spaceconfig__table__spacename')).to.have.length(workspaceList.length)
-    })
-
-    it('should display labels of spaces', () => {
-      for (let i = 0; i < workspaceList.length; i++) {
-        expect(wrapper.find('div.spaceconfig__table__spacename').at(i)).to.text().equal(workspaceList[i].label)
-      }
-    })
-  })
+  mockGetUserWorkspaceList200(FETCH_CONFIG.apiUrl, false, workspaceList)
 
   describe('eventType space member', () => {
     describe('handleMemberModified', () => {

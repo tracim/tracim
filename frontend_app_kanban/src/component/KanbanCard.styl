@@ -24,6 +24,7 @@ cardWidth = 280px
         overflow-wrap anywhere
         hyphens auto
         margin-bottom textSpacing
+        unicode-bidi plaintext
 
       & > button
         font-size metadataFontSize
@@ -40,6 +41,18 @@ cardWidth = 280px
         &::after
           display none
 
+    &__options
+      font-weight bold
+      font-size metadataFontSize
+
+      &__deadline
+          display inline
+          & i
+            margin-inline-end textSpacing
+
+      &__freeInput
+        unicode-bidi plaintext
+
     &__description
       overflow-wrap break-word
       display flex
@@ -50,6 +63,8 @@ cardWidth = 280px
           object-fit contain
           max-width 100%
           display block // INFO - RJ - 2021-01-19 - without this, the card wrapper from react-kanban is weirdly sized
+        & > p
+          unicode-bidi plaintext
 
       &.kanban__contentpage__wrapper__board__card__description__overflow > div
         max-height (3 * standardFontSize)

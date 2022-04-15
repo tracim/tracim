@@ -28,7 +28,10 @@ export class AddUserForm extends React.Component {
     this.props.onChangeUsername(e.target.value)
   }
 
-  handleChangeNewUserEmail = e => this.setState({ newUserEmail: e.target.value })
+  handleChangeNewUserEmail = e => {
+    const email = e.target.value.trim()
+    this.setState({ newUserEmail: email })
+  }
 
   handleChangeNewUserPassword = e => this.setState({ newUserPassword: e.target.value })
 
@@ -36,8 +39,9 @@ export class AddUserForm extends React.Component {
 
   handleClickAddUser = () => {
     const { props, state } = this
+    const email = state.newUserEmail.trim()
 
-    if (state.newUserName === '' || (state.newUserUsername === '' && state.newUserEmail === '') || state.newUserType === '') {
+    if (state.newUserName === '' || (state.newUserUsername === '' && email === '') || state.newUserType === '') {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {
@@ -52,7 +56,7 @@ export class AddUserForm extends React.Component {
     props.onClickAddUser(
       state.newUserName,
       state.newUserUsername,
-      state.newUserEmail,
+      email,
       state.newUserType,
       state.newUserPassword
     )
@@ -138,7 +142,7 @@ export class AddUserForm extends React.Component {
           </div>
 
           <input
-            type='text'
+            type='email'
             className='userData__input form-control primaryColorBorderLighten'
             id='adduser_email'
             placeholder={props.t('Email')}

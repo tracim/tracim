@@ -1,9 +1,9 @@
 @import '../../css/Variable.styl'
 
+textarea
+  unicode-bidi plaintext
+
 .textarea
-  position relative
-  flex 0 1 auto
-  margin 20px
   &__autocomplete
     position absolute
     width 100%
@@ -38,7 +38,7 @@
       border-radius standardBorderRadius
       &__delimiter
         height 2px
-        margin 5px 20px
+        margin textSpacing standardSpacing
         background-color grey
       &__item
         padding 1px standardSpacing
@@ -46,8 +46,13 @@
         &__active
           background-color grey-hover
     &__textinput
+      position relative
       width 100%
       min-height 80px
+      // NOTE - GB - 2022-04-12 - TinyMCE' UI without the content is 96px
+      // TinyMCE 5 is not high enough so we fixed 80px for text edition area
+      & .tox-edit-area
+        min-height 80px
       & > textarea
         border-radius standardBorderRadius
         border borderStyle

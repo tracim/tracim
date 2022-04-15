@@ -1401,6 +1401,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.16.0":
+  version: 7.17.2
+  resolution: "@babel/runtime@npm:7.17.2"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 40a24ffea416acffc8ee7956ea587bcf4de7d5e980085cf73827fb346304d4aedb3e33340ba1b63ce3ca35c5bb72983f342c22384d8dd1b4219c0ab10d8231eb
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.10.1":
   version: 7.10.1
   resolution: "@babel/template@npm:7.10.1"
@@ -2514,7 +2523,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"array.prototype.flat@npm:^1.2.1, array.prototype.flat@npm:^1.2.3":
+"array.prototype.flat@npm:^1.2.3":
   version: 1.2.3
   resolution: "array.prototype.flat@npm:1.2.3"
   dependencies:
@@ -2970,18 +2979,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"broadcast-channel@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "broadcast-channel@npm:3.1.0"
+"broadcast-channel@npm:^4.10.0":
+  version: 4.10.0
+  resolution: "broadcast-channel@npm:4.10.0"
   dependencies:
-    "@babel/runtime": ^7.7.2
-    detect-node: ^2.0.4
-    js-sha3: 0.8.0
+    "@babel/runtime": ^7.16.0
+    detect-node: ^2.1.0
     microseconds: 0.2.0
     nano-time: 1.0.0
+    oblivious-set: 1.0.0
+    p-queue: 6.6.2
     rimraf: 3.0.2
-    unload: 2.2.0
-  checksum: 55bdea7ebf5039c35a0bb920ea5d25fd57d95f9302c9e8803cfdaf2fded2a282158b63082737f6b612d17e52d6d9d74c8065f3aa58249b14cf6aebf6af088664
+    unload: 2.3.1
+  checksum: b2caba9d54e47cae7267973c54605fe0c4441fd46932aa956cb2b5c36936904b3492dca8cc0830ee79b83a679f6438382e6c50e00d8642a7aef1415222503109
   languageName: node
   linkType: hard
 
@@ -3376,7 +3386,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cheerio@npm:^1.0.0-rc.2, cheerio@npm:^1.0.0-rc.3":
+"cheerio@npm:^1.0.0-rc.3":
   version: 1.0.0-rc.3
   resolution: "cheerio@npm:1.0.0-rc.3"
   dependencies:
@@ -4609,6 +4619,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"detect-node@npm:2.1.0, detect-node@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "detect-node@npm:2.1.0"
+  checksum: 5100c924d74bdc2cf861af88dce6618abbbb95e3b71047f1eac7e475981416aa2c208c7153fd830df372f8ce324a207adb1c9f56884fa94bcb820b8406dd9e6f
+  languageName: node
+  linkType: hard
+
 "detect-node@npm:^2.0.4":
   version: 2.0.4
   resolution: "detect-node@npm:2.0.4"
@@ -5036,36 +5053,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enzyme@npm:3.10.0":
-  version: 3.10.0
-  resolution: "enzyme@npm:3.10.0"
-  dependencies:
-    array.prototype.flat: ^1.2.1
-    cheerio: ^1.0.0-rc.2
-    function.prototype.name: ^1.1.0
-    has: ^1.0.3
-    html-element-map: ^1.0.0
-    is-boolean-object: ^1.0.0
-    is-callable: ^1.1.4
-    is-number-object: ^1.0.3
-    is-regex: ^1.0.4
-    is-string: ^1.0.4
-    is-subset: ^0.1.1
-    lodash.escape: ^4.0.1
-    lodash.isequal: ^4.5.0
-    object-inspect: ^1.6.0
-    object-is: ^1.0.1
-    object.assign: ^4.1.0
-    object.entries: ^1.0.4
-    object.values: ^1.0.4
-    raf: ^3.4.0
-    rst-selector-parser: ^2.2.3
-    string.prototype.trim: ^1.1.2
-  checksum: 3367e0108634ee29492b8c2497fbf0fe035c6e079967a2fd44d0622dac9c65c44671c902171fcd02cf121774952d2f201f080e67b64eea6264168decb9a66a90
-  languageName: node
-  linkType: hard
-
-"enzyme@npm:^3.10.0":
+"enzyme@npm:3.11.0":
   version: 3.11.0
   resolution: "enzyme@npm:3.11.0"
   dependencies:
@@ -5554,6 +5542,13 @@ __metadata:
   version: 4.0.4
   resolution: "eventemitter3@npm:4.0.4"
   checksum: 6693972304a7bf91aea3727d83803e1b38819ee0ed628ed842ac909284dedd1f3a7aa0ab4ccdd332bfcb9720138c9021b7b4737259e9fe8d70f7f25c57b9f0ad
+  languageName: node
+  linkType: hard
+
+"eventemitter3@npm:^4.0.4":
+  version: 4.0.7
+  resolution: "eventemitter3@npm:4.0.7"
+  checksum: 1fc12c7bc3b4194c50975827e72d56ff57c32b75a4c7dbf4d5eebf3c8371f6f1aad6799150b609de1b867c0d8a9885c08b6ca5e7e0dc437d6152f3063b2607dd
   languageName: node
   linkType: hard
 
@@ -6235,7 +6230,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"function.prototype.name@npm:^1.1.0, function.prototype.name@npm:^1.1.1, function.prototype.name@npm:^1.1.2":
+"function.prototype.name@npm:^1.1.1, function.prototype.name@npm:^1.1.2":
   version: 1.1.2
   resolution: "function.prototype.name@npm:1.1.2"
   dependencies:
@@ -6825,7 +6820,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"html-element-map@npm:^1.0.0, html-element-map@npm:^1.2.0":
+"html-element-map@npm:^1.2.0":
   version: 1.2.0
   resolution: "html-element-map@npm:1.2.0"
   dependencies:
@@ -7324,7 +7319,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"is-boolean-object@npm:^1.0.0, is-boolean-object@npm:^1.0.1":
+"is-boolean-object@npm:^1.0.1":
   version: 1.0.1
   resolution: "is-boolean-object@npm:1.0.1"
   checksum: 903b6ce93c64dd22fb7eb878c5d4a20c5ec7bf273ee921a9e506a8c77b511037be708f215a080387bc4a422b88c21b38debae637ca95f09ab8cb5fec81a8324a
@@ -7539,7 +7534,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"is-number-object@npm:^1.0.3, is-number-object@npm:^1.0.4":
+"is-number-object@npm:^1.0.4":
   version: 1.0.4
   resolution: "is-number-object@npm:1.0.4"
   checksum: 5bae52129f0e097485da25cbe89307dd46cf5ce7640edb6fcf40350d59c9f909039713d35fbeb0f1de1df817da6ec6e88aceca41b01e5ac989f6fdfc15c438a7
@@ -7653,7 +7648,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"is-string@npm:^1.0.4, is-string@npm:^1.0.5":
+"is-string@npm:^1.0.5":
   version: 1.0.5
   resolution: "is-string@npm:1.0.5"
   checksum: c64c791eb75935db9055291bc598edc22f03d3879b8a050b2955ba8087642d006338a1dedf7ac414c95f985c77c2d6fce655498d33c0df248fa92228a9945720
@@ -7806,13 +7801,6 @@ fsevents@^1.2.7:
   version: 2.2.1
   resolution: "js-cookie@npm:2.2.1"
   checksum: c110f78427cb7715f67c69df0b3430f7cf9dafb5ddb13014df171d4fb61ccda0b1caf9767412cde63cab4bad697a5d4ce83b0c2e7ec650ec9929ed70750d20ae
-  languageName: node
-  linkType: hard
-
-"js-sha3@npm:0.8.0":
-  version: 0.8.0
-  resolution: "js-sha3@npm:0.8.0"
-  checksum: 21d7129a634d7e9072a00fa0c037a3f7192d9a2d85377ecbbc7a614fbf523d31cc7489c74adfa84d606d58eb5bffb9dbfbe53bb618ec371942e63070559f3719
   languageName: node
   linkType: hard
 
@@ -9638,7 +9626,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"object-inspect@npm:^1.6.0, object-inspect@npm:^1.7.0":
+"object-inspect@npm:^1.7.0":
   version: 1.7.0
   resolution: "object-inspect@npm:1.7.0"
   checksum: 9f479ca1002fedbf4e1c5dec908477d1a7a2dd4466af0b4cf5886d269db54d8310544dfb7670a17a4c5d6a7a3dd3c346be38ea6b3541330551900a3134dec662
@@ -9702,7 +9690,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"object.entries@npm:^1.0.4, object.entries@npm:^1.1.0, object.entries@npm:^1.1.1":
+"object.entries@npm:^1.1.0, object.entries@npm:^1.1.1":
   version: 1.1.2
   resolution: "object.entries@npm:1.1.2"
   dependencies:
@@ -9756,7 +9744,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"object.values@npm:^1.0.4, object.values@npm:^1.1.0, object.values@npm:^1.1.1":
+"object.values@npm:^1.1.0, object.values@npm:^1.1.1":
   version: 1.1.1
   resolution: "object.values@npm:1.1.1"
   dependencies:
@@ -9765,6 +9753,13 @@ fsevents@^1.2.7:
     function-bind: ^1.1.1
     has: ^1.0.3
   checksum: 33e99ceb5cdb4c4b43372aa133ecb1d73d5cf73ebbbe9ec64f45cd39c87d0226ca88d6a354cd8b819fbde6b9ebbc7df1a6a093f91d2c951c51a07546f54fe33d
+  languageName: node
+  linkType: hard
+
+"oblivious-set@npm:1.0.0":
+  version: 1.0.0
+  resolution: "oblivious-set@npm:1.0.0"
+  checksum: 8309f38148ac63b3b421759d490afb613ea2375b2c55b9acffa62382b012fe768c88bb1e63ff068dd225a9153e3e684f9964c03f08bec06347cc17b6800dc7e9
   languageName: node
   linkType: hard
 
@@ -9973,12 +9968,31 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"p-queue@npm:6.6.2":
+  version: 6.6.2
+  resolution: "p-queue@npm:6.6.2"
+  dependencies:
+    eventemitter3: ^4.0.4
+    p-timeout: ^3.2.0
+  checksum: e95a48f421589ac95dc8913bc949e4c73cfc40c294580f176d2e1af6fa525459ed340c9e8d72a9947ca25e5f79f1d5cfbc10f546f958a324704bfcc838340cee
+  languageName: node
+  linkType: hard
+
 "p-retry@npm:^3.0.1":
   version: 3.0.1
   resolution: "p-retry@npm:3.0.1"
   dependencies:
     retry: ^0.12.0
   checksum: 26c888de4e64e62e9b6112219fae2c2f45ddc2face5d6c7c98e1b8762bcd4a54bea4f50cdff275b2ee5ebb11b633bfb16f4dd473ecd4d07081385cb716e961cf
+  languageName: node
+  linkType: hard
+
+"p-timeout@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "p-timeout@npm:3.2.0"
+  dependencies:
+    p-finally: ^1.0.0
+  checksum: d7e71c1547736ecd392be3c4ea956af1abd2b6f56179f37443672cfaccb41383533cdf2e927890bb5282e1eb41c979be133eef26a6a84a8224ff4f5c9455b517
   languageName: node
   linkType: hard
 
@@ -10729,7 +10743,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"raf@npm:^3.4.0, raf@npm:^3.4.1":
+"raf@npm:^3.4.1":
   version: 3.4.1
   resolution: "raf@npm:3.4.1"
   dependencies:
@@ -11238,9 +11252,9 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-slick@npm:^0.25.2":
-  version: 0.25.2
-  resolution: "react-slick@npm:0.25.2"
+"react-slick@npm:0.28":
+  version: 0.28.1
+  resolution: "react-slick@npm:0.28.1"
   dependencies:
     classnames: ^2.2.5
     enquire.js: ^2.1.6
@@ -11248,9 +11262,9 @@ fsevents@^1.2.7:
     lodash.debounce: ^4.0.8
     resize-observer-polyfill: ^1.5.0
   peerDependencies:
-    react: ^0.14.0 || ^15.0.1 || ^16.0.0
-    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0
-  checksum: b4313df728a53d2c26b0d501f89a50f91354e8ee09cd04c3cf703791e782843697f4ec996a3f187fd5570e0a204d2803d9fc20efb1c18f22a53ac269db59b8bb
+    react: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+    react-dom: ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0
+  checksum: fa9694f2e8ce05ab2e19acb577bed85433be4a0a7dca8ee5888090c6bc171f3417d957b8097fdd3a08284fa96e1c621585313431a9e8c2c138a4acbb9e318321
   languageName: node
   linkType: hard
 
@@ -12838,7 +12852,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"string.prototype.trim@npm:^1.1.2, string.prototype.trim@npm:^1.2.1":
+"string.prototype.trim@npm:^1.2.1":
   version: 1.2.1
   resolution: "string.prototype.trim@npm:1.2.1"
   dependencies:
@@ -13365,14 +13379,13 @@ fsevents@^1.2.7:
     "@babel/register": ^7.12.10
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
-    broadcast-channel: ^3.1.0
     chai: ^4.2.0
     chai-enzyme: ^1.0.0-beta.1
     classnames: ^2.2.6
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: 3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13448,7 +13461,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13506,7 +13519,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13559,7 +13572,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     es6-promise: ^4.2.8
     eslint: ^6.8.0
@@ -13667,7 +13680,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13721,7 +13734,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13774,7 +13787,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13797,7 +13810,7 @@ fsevents@^1.2.7:
     react-i18next: 7.4.0
     react-image-lightbox: ^5.1.0
     react-router-dom: ^5.2.0
-    react-slick: ^0.25.2
+    react-slick: 0.28
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     slick-carousel: ^1.8.1
@@ -13836,7 +13849,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13890,7 +13903,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13944,7 +13957,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -13998,7 +14011,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -14051,7 +14064,7 @@ fsevents@^1.2.7:
     classnames: ^2.2.6
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -14102,7 +14115,7 @@ fsevents@^1.2.7:
     color: ^3.1.2
     core-js: ^3.6.4
     css-loader: ^3.5.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     eslint: ^6.8.0
     eslint-import-resolver-node: ^0.3.3
@@ -14152,6 +14165,7 @@ fsevents@^1.2.7:
     autolinker: ^3.13.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
+    broadcast-channel: ^4.10.0
     chai: ^4.2.0
     chai-enzyme: ^1.0.0-beta.1
     classnames: ^2.2.6
@@ -14160,7 +14174,7 @@ fsevents@^1.2.7:
     css-loader: ^3.5.1
     date-fns: ^2.19.0
     emoji-mart: ^3.0.1
-    enzyme: ^3.10.0
+    enzyme: 3.11.0
     enzyme-adapter-react-16: ^1.15.2
     es6-promise: ^4.2.8
     eslint: ^6.8.0
@@ -14177,7 +14191,6 @@ fsevents@^1.2.7:
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     radium: ^0.25.2
-    react: ^16.13.1
     react-device-detect: ^1.7.5
     react-dom: ^16.13.1
     react-dropzone: ^7.0.1
@@ -14200,6 +14213,7 @@ fsevents@^1.2.7:
   peerDependencies:
     cheerio: ^1.0.0
     eslint: ^6.8.0
+    react: ^16.13.1
     react-dom: ^16.13.1
     webpack: ^4.42.1
   languageName: unknown
@@ -14460,13 +14474,13 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"unload@npm:2.2.0":
-  version: 2.2.0
-  resolution: "unload@npm:2.2.0"
+"unload@npm:2.3.1":
+  version: 2.3.1
+  resolution: "unload@npm:2.3.1"
   dependencies:
     "@babel/runtime": ^7.6.2
-    detect-node: ^2.0.4
-  checksum: 618ba99792546b1cef7abe8e8a100a6ed0a34d3a5a64908857b065eabc427c80e2e70eaf5d70d36842efe9654682423719b1e8c3de72dbe720b1a0a074cfe0ae
+    detect-node: 2.1.0
+  checksum: 54269dcba3e7773468fbfc141dfde33375b40982bb5fe6791cae2cf4b2c9ddb013d13aa2f72395ae7473e38fe668d35dac98bccbb9eb2760b4239258238c6f88
   languageName: node
   linkType: hard
 

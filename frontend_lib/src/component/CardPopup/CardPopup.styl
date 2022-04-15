@@ -1,22 +1,24 @@
 @import '../../css/Variable.styl'
 
 .cardPopup
-  position fixed
-  top calc(50% - 113px)
-  left 0
   display flex
   justify-content center
-  width 100%
+  left 0
+  margin-inline-end "calc(%s / 2)" % pageSpacing
+  margin-inline-start "calc(%s / 2)" % pageSpacing
+  position fixed
+  right 0
+  top calc(50% - 113px)
   z-index 32
   &__container
+    background lightGrey
     border 0
     border-radius standardBorderRadius
-    width 800px
-    background lightGrey
     box-shadow shadow-all
+    width 800px
   &__border
-    border-top-right-radius standardBorderRadius
-    border-top-left-radius standardBorderRadius
+    border-start-end-radius standardBorderRadius
+    border-start-start-radius standardBorderRadius
     width 100%
     height standardSpacing
   &__header
@@ -54,7 +56,7 @@
         margin-inline-start standardSpacing
 
 .openCallButton
-  margin-left standardSpacing
+  margin-inline-start standardSpacing
   // FIXME - MB - 2022-01-05 - this should be removed when a LinkButton is created
   // see https://github.com/tracim/tracim/issues/5242
 
@@ -64,3 +66,10 @@
       padding standardSpacing
     &__body
       padding 0 standardSpacing standardSpacing
+
+
+// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-start-end-radius and border-start-start-radius are new
+// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
+.cardPopup__border
+  border-top-right-radius standardBorderRadius
+  border-top-left-radius standardBorderRadius

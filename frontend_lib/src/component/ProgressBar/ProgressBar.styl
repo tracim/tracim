@@ -8,6 +8,7 @@
   margin 0 auto
   position relative
 
+
 .progress > span
   width 50%
   height 100%
@@ -15,9 +16,6 @@
   position absolute
   top 0
   z-index 1
-
-.progress .progress-left
-  left 0
 
 .progress .progress-bar
   width 100%
@@ -29,15 +27,9 @@
   top 0
 
 .progress .progress-left .progress-bar
-  left 100%
-  border-top-right-radius 80px
-  border-bottom-right-radius 80px
-  border-left 0
-  -webkit-transform-origin center left
-  transform-origin center left
-
-.progress .progress-right
-  right 0
+  border-start-end-radius 80px
+  border-end-end-radius 80px
+  border-inline-start 0
 
 .progress .progress-value
   display flex
@@ -59,9 +51,55 @@
   border-color mediumGrey
 
 .progress .progress-right .progress-bar
-  left -100%
-  border-top-left-radius 80px
-  border-bottom-left-radius 80px
-  border-right 0
-  -webkit-transform-origin center right
-  transform-origin center right
+  border-start-start-radius 80px
+  border-end-start-radius 80px
+  border-inline-end 0
+
+// INFO - RJ - 2022-02-01 -
+// the right ⟷ left changes in [dir=rtl] blocks below fix the broken appearance
+// of the progress bar for RTL languages, but make the progress go from
+// south, to west, to north, to west, to south.
+// Arabic clocks still turn clockwise, from the top, so lets reflect that by
+// rotating this.
+// https://marvelapp.com/blog/mirroring-designing-for-arab-users/
+[dir=rtl] .progress
+  transform rotate(180deg)
+  .progress-value
+    transform rotate(180deg)
+  .progress-left
+    right 0
+    .progress-bar
+      right 100%
+      transform-origin center right
+      border-top-left-radius 80px
+      border-bottom-left-radius 80px
+  .progress-right
+    left 0
+    .progress-bar
+      right -100%
+      transform-origin center left
+      border-top-right-radius 80px
+      border-bottom-right-radius 80px
+
+[dir=ltr] .progress
+  .progress-left
+    left 0
+    .progress-bar
+      left 100%
+      transform-origin center left
+      border-top-right-radius 80px
+      border-bottom-right-radius 80px
+
+  .progress-right
+    right 0
+    .progress-bar
+      left -100%
+      transform-origin center right
+      border-top-left-radius 80px
+      border-bottom-left-radius 80px
+
+// INFO - GB and RJ - 2022-01-27 - border-{top,bottom}-{left,right}-radius
+// properties are fallbacks because border-start-end-radius, border-end-start-radius
+// border-start-start-radius and border-end-end-radius are new and have a global
+// support below 90% according to https://caniuse.com/.
+// When the global support is higher, we can delete the fallbacks.

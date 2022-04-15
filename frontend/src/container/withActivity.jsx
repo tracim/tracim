@@ -208,7 +208,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
       const { props } = this
       if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-          !activity.newestMessage.fields.workspace) return true
+        !activity.newestMessage.fields.workspace) return true
       const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
       if (!currentWorkspace) return true
       return currentWorkspace.publicationEnabled

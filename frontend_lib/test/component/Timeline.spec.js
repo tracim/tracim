@@ -8,6 +8,8 @@ import { ROLE } from '../../src/helper.js'
 import { commentList } from '../fixture/contentCommentList.js'
 import { revisionList } from '../fixture/contentRevisionList.js'
 
+const nock = require('nock')
+
 describe('<Timeline />', () => {
   const onClickWysiwygBtnCallBack = sinon.spy()
   const onClickRevisionBtnCallBack = sinon.spy()
@@ -17,7 +19,7 @@ describe('<Timeline />', () => {
   const props = {
     timelineData: [...revisionList, ...commentList],
     newComment: 'randomNewComment',
-    apiUrl: '/',
+    apiUrl: 'http://fake.url/api',
     disableComment: false,
     customClass: 'randomCustomClass',
     customColor: 'red',
@@ -48,6 +50,14 @@ describe('<Timeline />', () => {
     fetchMoreTimelineItems: () => {},
     canFetchMoreTimelineItems: () => false
   }
+
+  function mockReactions () {
+    for (const comment of commentList) {
+      nock(props.apiUrl).get(`/workspaces/${props.workspaceId}/contents/${comment.content_id}/reactions`).reply(200, [])
+    }
+  }
+
+  mockReactions()
 
   const TimelineWithHOC = withRouterMock(Timeline)
   const wrapper = mount(<TimelineWithHOC {...props} />, { wrappingComponent: RouterMock })

@@ -3075,6 +3075,27 @@ class TestUserInvitationWithMailActivatedASync(object):
         assert user_role_found["newly_created"] is True
         assert user_role_found["email_sent"] is False
 
+    def test_api__create_workspace_member_role__ok_200__new_user_rfc_email(self, web_testapp):
+        """
+        Create workspace member role
+        :return:
+        """
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        # create workspace role
+        params = {
+            "user_id": None,
+            "user_email": "Bob ! <bob@bob.bob>",
+            "role": "content-manager",
+        }
+        res = web_testapp.post_json("/api/workspaces/1/members", status=200, params=params)
+        user_role_found = res.json_body
+        assert user_role_found["newly_created"] is True
+        assert user_role_found["email_sent"] is False
+        assert user_role_found["user"]["public_name"] == "Bob !"
+        user_id = user_role_found["user_id"]
+        res = web_testapp.get("/api/users/{}".format(user_id), status=200, params=params)
+        assert res.json_body["email"] == "bob@bob.bob"
+
 
 @pytest.mark.usefixtures("base_fixture")
 # TODO - G.M - 2020-12-10 - remove need of this fixture here, better to generate data in test itself.
