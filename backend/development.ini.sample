@@ -547,14 +547,14 @@ website.usage_conditions =
 # email.notification.smtp.password = your_smtp_password
 
 # anonymous smtp connection: skip user/password login step.
-; email.notification.smtp.anonymous = False
+; email.notification.smtp.authentication = False
 
-# SMTP connection method valid values are:
+# SMTP encryption method valid values are:
 # - default: use smtp encryption using starttls, and unencrypted connection as fallback.
 # - SMTPS: use encrypted connection directly on port like 465
-# - unsecure: use unencrypted connection, use it with caution !
+# - unencrypted: use unencrypted connection, use it with caution !
 # default value: default
-; email.notification.smtp.connection_method = default
+; email.notification.smtp.encryption = default
 
 ### Headers ###
 ; email.notification.from.default_label = Tracim Notifications

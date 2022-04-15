@@ -5,7 +5,7 @@ import typing
 
 from tracim_backend.config import CFG
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
-from tracim_backend.lib.mail_notifier.utils import SmtpConnectMethod
+from tracim_backend.lib.mail_notifier.utils import SmtpEncryption
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_redis_connection
 from tracim_backend.lib.rq import get_rq_queue
@@ -61,7 +61,7 @@ class EmailSender(object):
         if not self._smtp_connection:
             log = "Connecting to SMTP server {}"
             logger.info(self, log.format(self._smtp_config.server))
-            if self._smtp_config.connect_method == SmtpConnectMethod.SMTPS:
+            if self._smtp_config.encryption == SmtpEncryption.SMTPS:
                 self._smtp_connection = smtplib.SMTP_SSL(
                     self._smtp_config.server, self._smtp_config.port
                 )
@@ -71,7 +71,7 @@ class EmailSender(object):
                 )
             self._smtp_connection.ehlo()
 
-            if self._smtp_config.connect_method == SmtpConnectMethod.DEFAULT:
+            if self._smtp_config.encryption == SmtpEncryption.DEFAULT:
                 try:
                     starttls_result = self._smtp_connection.starttls()
 
@@ -89,7 +89,7 @@ class EmailSender(object):
                     log = "Unexpected exception during SMTP start TLS process"
                     logger.exception(self, log)
 
-            if not self._smtp_config.anonymous:
+            if self._smtp_config.authentication:
                 try:
                     login_res = self._smtp_connection.login(
                         self._smtp_config.login, self._smtp_config.password

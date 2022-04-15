@@ -51,8 +51,8 @@ class EmailNotifier(INotifier):
             self.config.EMAIL__NOTIFICATION__SMTP__PORT,
             self.config.EMAIL__NOTIFICATION__SMTP__USER,
             self.config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            self.config.EMAIL__NOTIFICATION__SMTP__CONNECT_METHOD,
-            self.config.EMAIL__NOTIFICATION__SMTP__ANONYMOUS,
+            self.config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            self.config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
 
     def notify_content_update(self, content: Content):
@@ -544,8 +544,8 @@ def get_email_manager(config: CFG, session: Session):
         config.EMAIL__NOTIFICATION__SMTP__PORT,
         config.EMAIL__NOTIFICATION__SMTP__USER,
         config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-        config.EMAIL__NOTIFICATION__SMTP__CONNECT_METHOD,
-        config.EMAIL__NOTIFICATION__SMTP__ANONYMOUS,
+        config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+        config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
     )
 
     return EmailManager(config=config, smtp_config=smtp_config, session=session)

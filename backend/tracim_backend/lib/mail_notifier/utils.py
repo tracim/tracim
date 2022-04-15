@@ -12,14 +12,14 @@ import html2text
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 
 
-class SmtpConnectMethod(str, enum.Enum):
+class SmtpEncryption(str, enum.Enum):
     DEFAULT = "default"  # use starttls, fallback to unencrypted
-    UNSECURE = "unsecure"  # unencrypted
+    NO = "no"  # unencrypted
     SMTPS = "smtps"  # use direct encryption
 
     @classmethod
     def get_all_values(cls) -> typing.List[str]:
-        return [cm.value for cm in SmtpConnectMethod]
+        return [cm.value for cm in SmtpEncryption]
 
 
 class SmtpConfiguration(object):
@@ -31,15 +31,15 @@ class SmtpConfiguration(object):
         port: int,
         login: str,
         password: str,
-        connect_method: SmtpConnectMethod,
-        anonymous: bool,
+        encryption: SmtpEncryption,
+        authentication: bool,
     ):
         self.server = server
         self.port = port
         self.login = login
         self.password = password
-        self.connect_method = connect_method
-        self.anonymous = anonymous
+        self.encryption = encryption
+        self.authentication = authentication
 
 
 class EST(object):

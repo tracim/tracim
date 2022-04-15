@@ -225,8 +225,8 @@ class SMTPMailCheckerCommand(AppContextCommand):
             self._app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             self._app_config.EMAIL__NOTIFICATION__SMTP__USER,
             self._app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            self._app_config.EMAIL__NOTIFICATION__SMTP__CONNECT_METHOD,
-            self._app_config.EMAIL__NOTIFICATION__SMTP__ANONYMOUS,
+            self._app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            self._app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(self._app_config, smtp_config, True)
         html = """\
