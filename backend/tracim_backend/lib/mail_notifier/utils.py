@@ -14,7 +14,7 @@ from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 
 class SmtpEncryption(str, enum.Enum):
     DEFAULT = "default"  # use starttls, fallback to unencrypted
-    NO = "no"  # unencrypted
+    UNSECURE = "unsecure"  # unencrypted
     SMTPS = "smtps"  # use direct encryption
 
     @classmethod
