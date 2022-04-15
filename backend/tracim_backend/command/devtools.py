@@ -224,6 +224,7 @@ class SMTPMailCheckerCommand(AppContextCommand):
             self._app_config.EMAIL__NOTIFICATION__SMTP__SERVER,
             self._app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             self._app_config.EMAIL__NOTIFICATION__SMTP__USER,
+            self._app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
             self._app_config.EMAIL__NOTIFICATION__SMTP__CONNECT_METHOD,
             self._app_config.EMAIL__NOTIFICATION__SMTP__ANONYMOUS,
         )
