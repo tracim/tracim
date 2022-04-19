@@ -28,7 +28,6 @@ import {
   tinymceAutoCompleteHandleClickItem,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  setLocalStorageItem,
   removeLocalStorageItem,
   handleMentionsBeforeSave,
   handleLinksBeforeSave,
