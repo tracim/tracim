@@ -6,16 +6,22 @@
   padding 0
   list-style none
   font-size metadataFontSize
+  unicode-bidi plaintext
   &.hidden
     display none
   &__item
     white-space nowrap
     text-overflow ellipsis
     overflow hidden
+    border 1px solid yellow
+    unicode-bidi plaintext
     &:not(:first-child)::before
       content '>'
       margin 0 textSpacing
       color fontColor
+    [dir=rtl] &:not(:first-child)::before
+      border 1px solid blue
+      content '<'
     & > a
       color inherit !important
       &:hover
@@ -24,6 +30,8 @@
         margin-inline-end textSpacing
     &.root
       white-space nowrap
+    &__text
+      border 1px solid red
 
 @media (max-width: max-md)
   .breadcrumbs__item

@@ -34,42 +34,44 @@ export const Breadcrumbs = props => {
   }
 
   return (
-    <ul className={classnames('breadcrumbs', { hidden: props.hidden })}>
-      {props.root && (props.root.isALink
-        ? (
-          <li key='root'>
-            <Link
-              to={props.root.link}
-              className='breadcrumbs__item root primaryColorFont primaryColorFontDarkenHover'
-            >
-              {props.root.icon && <i className={`${props.root.icon}`} />}
-              <span className='breadcrumbs__item__text'>{props.root.label}</span>
-            </Link>
-          </li>
-        )
-        : (
-          <li>
-            <span>
-              {props.root.icon && <i className={`fas fa-${props.root.icon}`} />}
-              {props.root.label}
-            </span>
-          </li>
-        )
-      )}
+    <div>
+      <ul className={classnames('breadcrumbs', { hidden: props.hidden })}>
+        {props.root && (props.root.isALink
+          ? (
+            <li key='root'>
+              <Link
+                to={props.root.link}
+                className='breadcrumbs__item root primaryColorFont primaryColorFontDarkenHover'
+              >
+                {props.root.icon && <i className={`${props.root.icon}`} />}
+                <span className='breadcrumbs__item__text'>{props.root.label}</span>
+              </Link>
+            </li>
+          )
+          : (
+            <li>
+              <span>
+                {props.root.icon && <i className={`fas fa-${props.root.icon}`} />}
+                {props.root.label}
+              </span>
+            </li>
+          )
+        )}
 
-      {breadcrumbsList.map((crumb, i) =>
-        <li
-          className={`breadcrumbs__item ${crumb.isALink ? 'primaryColorFont primaryColorFontDarkenHover' : ''}`}
-          key={`breadcrumbs_${i}`}
-          title={crumb.htmlTitle || crumb.label || ''}
-        >
-          {(crumb.isALink
-            ? <Link to={crumb.link}>{crumb.label}</Link>
-            : <span>{crumb.label}</span>
-          )}
-        </li>
-      )}
-    </ul>
+        {breadcrumbsList.map((crumb, i) =>
+          <li
+            className={`breadcrumbs__item ${crumb.isALink ? 'primaryColorFont primaryColorFontDarkenHover' : ''}`}
+            key={`breadcrumbs_${i}`}
+            title={crumb.htmlTitle || crumb.label || ''}
+          >
+            {(crumb.isALink
+              ? <Link to={crumb.link}>{crumb.label}</Link>
+              : <span>{crumb.label}</span>
+            )}
+          </li>
+        )}
+      </ul>
+    </div>
   )
 }
 
