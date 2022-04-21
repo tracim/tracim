@@ -1,3 +1,33 @@
+# 4.2.0 / YYYY-MM-DD
+
+### New Features
+
+- Handle right-to-left (rtl) languages on interface
+- Introduce arab language selection, and add arabic translation via Weblate
+- Notification can be marked as read without redirection
+- UI/UX improvement (responsive, buttons, redirections)
+
+
+
+### Fixed Issues
+
+- Backend: [#5559](https://github.com/tracim/tracim/issues/5559),
+- Frontend: [#5313](https://github.com/tracim/tracim/issues/5313),
+
+### Breaking/Important change
+
+- :warning: You need to adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- Advanced search has been improved, you will need to rebuild the
+  Elastic search index by running the following commands in the backend folder:
+
+  ```sh
+  tracimcli search index-drop
+  tracimcli search index-create
+  tracimcli search index-populate
+  ```
+### Known Issues
+
+
 # 4.1.3 / 2022-03-02
 
 ### Fixed Issues
@@ -291,9 +321,9 @@ For administrators:
   Elastic search index by running the following commands in the backend folder:
 
   ```sh
-  tracimcli index-drop
-  tracimcli index-create
-  tracimcli index-populate
+  tracimcli search index-drop
+  tracimcli search index-create
+  tracimcli search index-populate
   ```
 
 
