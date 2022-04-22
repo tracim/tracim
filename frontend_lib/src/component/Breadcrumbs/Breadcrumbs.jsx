@@ -50,25 +50,29 @@ export const Breadcrumbs = props => {
           )
           : (
             <li>
-              <span>
+              <div>
                 {props.root.icon && <i className={`fas fa-${props.root.icon}`} />}
                 {props.root.label}
-              </span>
+              </div>
             </li>
           )
         )}
 
         {breadcrumbsList.map((crumb, i) =>
-          <li
-            className={`breadcrumbs__item ${crumb.isALink ? 'primaryColorFont primaryColorFontDarkenHover' : ''}`}
-            key={`breadcrumbs_${i}`}
-            title={crumb.htmlTitle || crumb.label || ''}
-          >
-            {(crumb.isALink
-              ? <Link to={crumb.link}>{crumb.label}</Link>
-              : <span>{crumb.label}</span>
-            )}
-          </li>
+          // <span className='toto'>
+            <li
+              className={`breadcrumbs__item ${crumb.isALink ? 'primaryColorFont primaryColorFontDarkenHover' : ''}`}
+              key={`breadcrumbs_${i}`}
+              title={crumb.htmlTitle || crumb.label || ''}
+            >
+              {/* <div> */}
+                {(crumb.isALink
+                  ? <Link to={crumb.link}><div className='toto'>{crumb.label}</div></Link>
+                  : <div className='toto'>{crumb.label}</div>
+                )}
+              {/* </div> */}
+            </li>
+          // </span>
         )}
       </ul>
     </div>

@@ -21,7 +21,6 @@
       color fontColor
     [dir=rtl] &:not(:first-child)::before
       border 1px solid blue
-      content '<'
     & > a
       color inherit !important
       &:hover
@@ -32,6 +31,9 @@
       white-space nowrap
     &__text
       border 1px solid red
+
+.toto
+  unicode-bidi plaintext
 
 @media (max-width: max-md)
   .breadcrumbs__item
