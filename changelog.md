@@ -7,11 +7,10 @@
 - Notification can be marked as read without redirection
 - UI/UX improvement (responsive, buttons, redirections)
 
-
-
 ### Fixed Issues
 
 - Backend: [#5559](https://github.com/tracim/tracim/issues/5559),
+[#5378](https://github.com/tracim/tracim/issues/5378)
 - Frontend: [#5313](https://github.com/tracim/tracim/issues/5313),
 
 ### Breaking/Important change
