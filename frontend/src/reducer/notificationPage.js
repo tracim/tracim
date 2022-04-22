@@ -70,20 +70,43 @@ function getMainContentId (notification) {
     : notification.content.id
 }
 
+// FIXME - GB - 2022-04-21 - this code is very similar to activityDisplayFilter
+// in withActivity and ActivityList, and can be refactor
+// See https://github.com/tracim/tracim/issues/4677
+function notificationListDisplayFilter (notificationList, spaceList, unreadNotificationCount) {
+  let newUnreadNotificationCount = unreadNotificationCount
+  const newNotificationList = notificationList.map((notification) => {
+    const [entityType] = notification.type.split('.')
+
+    if (
+      (entityType === TLM_ET.SHAREDSPACE_MEMBER || entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION) &&
+      !(spaceList.find(space => space.id === notification.workspace.id))
+    ) {
+      if (!notification.read) newUnreadNotificationCount--
+      return null
+    }
+    return notification
+  })
+  return { list: newNotificationList.filter(notification => !!notification), unreadNotificationCount: newUnreadNotificationCount }
+}
+
 export default function notificationPage (state = defaultNotificationsObject, action) {
   switch (action.type) {
     case `${SET}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
-        .map(notification => (serializeNotification(notification)))
-      return { ...state, list: notificationList }
+        .map(notification => serializeNotification(notification))
+      return {
+        ...state,
+        ...notificationListDisplayFilter(notificationList, action.spaceList, state.unreadNotificationCount)
+      }
     }
 
     case `${APPEND}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
-        .map(notification => (serializeNotification(notification)))
+        .map(notification => serializeNotification(notification))
       return {
         ...state,
-        list: [...state.list, ...notificationList]
+        ...notificationListDisplayFilter([...state.list, ...notificationList], action.spaceList, state.unreadNotificationCount)
       }
     }
 
@@ -92,9 +115,8 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       const newUnreadMentionCount = notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}` ? state.unreadMentionCount + 1 : state.unreadMentionCount
       return {
         ...state,
-        list: sortByCreatedDate([...state.list, notification]),
         unreadMentionCount: newUnreadMentionCount,
-        unreadNotificationCount: state.unreadNotificationCount + 1
+        ...notificationListDisplayFilter(sortByCreatedDate([...state.list, notification]), action.spaceList, state.unreadNotificationCount + 1)
       }
     }
 
@@ -163,7 +185,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       return { ...state, unreadMentionCount: action.count }
 
     case `${SET}/${UNREAD_NOTIFICATION_COUNT}`:
-      return { ...state, unreadNotificationCount: action.count }
+      return { ...state, unreadNotificationCount: action.count + state.unreadNotificationCount }
 
     case `${SET}/${USER_DISCONNECTED}`:
       return defaultNotificationsObject
