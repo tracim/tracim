@@ -9,6 +9,7 @@ describe('Account page', function () {
   beforeEach(() => {
     cy.loginAs('administrators')
     cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.contains('.userinfo__name', 'Global manager')
   })
 
   it('should have english translations', () => {

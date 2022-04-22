@@ -565,12 +565,6 @@
   "{{count}} comments_3": "{{count}} تعليقات",
   "{{count}} comments_4": "{{count}} تعليقا",
   "{{count}} comments_5": "{{count}} تعليق آخر",
-  "Information_0": "معلومة",
-  "Information_1": "معلومة",
-  "Information_2": "معلومتان",
-  "Information_3": "معلومات",
-  "Information_4": "معلومة",
-  "Information_5": "معلومة أخرى",
   "Showing {{displayedResults}} of {{count}} results_0": "عرض {{displayedResults}} من {{count}} نتيجة",
   "Showing {{displayedResults}} of {{count}} results_1": "عرض {{displayedResults}} من {{count}} نتيجة",
   "Showing {{displayedResults}} of {{count}} results_2": "عرض {{displayedResults}} من {{count}} نتيجتين",
@@ -589,5 +583,10 @@
   " in {{count}} spaces_2": " في {{count}} فضاءين",
   " in {{count}} spaces_3": " في {{count}} فضاءات",
   " in {{count}} spaces_4": " في {{count}} فضاء",
-  " in {{count}} spaces_5": " في {{count}} فضاء آخر"
+  " in {{count}} spaces_5": " في {{count}} فضاء آخر",
+  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "Information": "",
+  "Information_plural": "",
+  "Error loading unread notification number": ""
 }
