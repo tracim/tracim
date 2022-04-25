@@ -6,34 +6,28 @@
   padding 0
   list-style none
   font-size metadataFontSize
-  unicode-bidi plaintext
   &.hidden
     display none
   &__item
-    white-space nowrap
-    text-overflow ellipsis
     overflow hidden
-    border 1px solid yellow
-    unicode-bidi plaintext
-    &:not(:first-child)::before
-      content '>'
-      margin 0 textSpacing
+    display flex
+    flex-shrink 1
+    align-items center
+    &__separator
       color fontColor
-    [dir=rtl] &:not(:first-child)::before
-      border 1px solid blue
+      margin 0 textSpacing
+    &__label
+      unicode-bidi plaintext
+      overflow hidden
+      text-overflow ellipsis
     & > a
-      color inherit !important
+      overflow hidden
       &:hover
-        border-bottom 1px solid
+        text-decoration underline
     & i
-        margin-inline-end textSpacing
+      margin-inline-end textSpacing
     &.root
       white-space nowrap
-    &__text
-      border 1px solid red
-
-.toto
-  unicode-bidi plaintext
 
 @media (max-width: max-md)
   .breadcrumbs__item

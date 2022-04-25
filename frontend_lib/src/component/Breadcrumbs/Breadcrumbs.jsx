@@ -38,14 +38,14 @@ export const Breadcrumbs = props => {
       <ul className={classnames('breadcrumbs', { hidden: props.hidden })}>
         {props.root && (props.root.isALink
           ? (
-            <li key='root'>
+            <li className='breadcrumbs__item' key='root'>
               <Link
                 to={props.root.link}
-                className='breadcrumbs__item root primaryColorFont primaryColorFontDarkenHover'
+                className='root primaryColorFont primaryColorFontDarkenHover'
               >
                 {props.root.icon && <i className={`${props.root.icon}`} />}
-                <span className='breadcrumbs__item__text'>{props.root.label}</span>
-              </Link>
+                <span className='breadcrumbs__item__text'>{props.root.label}&nbsp;</span>
+              </Link>&gt;&nbsp;
             </li>
           )
           : (
@@ -59,20 +59,21 @@ export const Breadcrumbs = props => {
         )}
 
         {breadcrumbsList.map((crumb, i) =>
-          // <span className='toto'>
             <li
-              className={`breadcrumbs__item ${crumb.isALink ? 'primaryColorFont primaryColorFontDarkenHover' : ''}`}
+              className='breadcrumbs__item'
               key={`breadcrumbs_${i}`}
               title={crumb.htmlTitle || crumb.label || ''}
             >
-              {/* <div> */}
                 {(crumb.isALink
-                  ? <Link to={crumb.link}><div className='toto'>{crumb.label}</div></Link>
-                  : <div className='toto'>{crumb.label}</div>
+                  ? <Link to={crumb.link} className='primaryColorFont primaryColorFontDarkenHover'>
+                      <div className='breadcrumbs__item__label'>{crumb.label}</div>
+                    </Link>
+                  : <div className='breadcrumbs__item__label'>{crumb.label}</div>
                 )}
-              {/* </div> */}
+                {i !== breadcrumbsList.length - 1 && (
+                  <div className='breadcrumbs__item__separator'>&gt;</div>
+                )}
             </li>
-          // </span>
         )}
       </ul>
     </div>
