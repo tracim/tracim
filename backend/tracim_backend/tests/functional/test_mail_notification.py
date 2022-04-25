@@ -19,7 +19,14 @@ from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("config_section", [{"name": "mail_test"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section",
+    [
+        {"name": "mail_test"},  # unencrypted, authenticated
+        {"name": "mail_test_anonymous"},  # unencrypted, anonymous
+    ],
+    indirect=True,
+)
 class TestEmailSender(object):
     def test__func__connect_disconnect__ok__nominal_case(self, app_config, mailhog):
         smtp_config = SmtpConfiguration(
@@ -27,7 +34,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
         sender.connect()
@@ -39,7 +47,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
 
@@ -84,7 +93,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
         html = """\

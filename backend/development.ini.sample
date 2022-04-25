@@ -548,10 +548,16 @@ website.usage_conditions =
 # email.notification.smtp.user = your_smtp_user
 # email.notification.smtp.password = your_smtp_password
 
-# enable implicit ssl if you are using implicit smtp with encryption port like 465
-# by default, Tracim will try to use explicit smtp encryption using starttls, and unencrypted
-# connection as fallback.
-; email.notification.smtp.use_implicit_ssl = False
+# Enable/disable authentification.
+# False mean anonymous smtp connection, it skip user/password login step.
+; email.notification.smtp.authentication = False
+
+# SMTP encryption method valid values are:
+# - default: use smtp encryption using starttls, and unencrypted connection as fallback.
+# - SMTPS: use encrypted connection directly on port like 465
+# - unsecure: don't use encryption, use it with caution !
+# default value: default
+; email.notification.smtp.encryption = default
 
 ### Headers ###
 ; email.notification.from.default_label = Tracim Notifications
