@@ -125,6 +125,11 @@ class TestLoginEndpoint(object):
     "config_section", [{"name": "functional_ldap_anonymous_test"}], indirect=True
 )
 class TestLDAPAuthOnlyEndpointAnonymous(object):
+    @pytest.mark.skip(
+        "This test does not work as expected if not run alone due to some kind"
+        "of side effect when reloading multiple LDAP configuration in a same test "
+        "session"
+    )
     def test_api__try_login_enpoint_ldap_auth_anonymous__ok_200__valid_ldap_user(self, web_testapp):
         params = {"username": "hubert@planetexpress.com", "password": "professor"}
         # user creation
