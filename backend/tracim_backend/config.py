@@ -796,6 +796,7 @@ class CFG(object):
         self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
         self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
         self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
+        self.LDAP_BIND_ANONYMOUS = asbool(self.get_raw_config("ldap_bind_anonymous", "False"))
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
         self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
@@ -1280,14 +1281,17 @@ class CFG(object):
             self.check_mandatory_param(
                 "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
             )
-            self.check_mandatory_param(
-                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method",
-            )
-            self.check_mandatory_param(
-                "LDAP_BIND_PASS",
-                self.LDAP_BIND_PASS,
-                when_str="when ldap is in available auth method",
-            )
+            if not self.LDAP_BIND_ANONYMOUS:
+                self.check_mandatory_param(
+                    "LDAP_BIND_DN",
+                    self.LDAP_BIND_DN,
+                    when_str="when ldap is in available auth method (not anonymous)",
+                )
+                self.check_mandatory_param(
+                    "LDAP_BIND_PASS",
+                    self.LDAP_BIND_PASS,
+                    when_str="when ldap is in available auth method (not anonymous)",
+                )
             self.check_mandatory_param(
                 "LDAP_USER_BASE_DN",
                 self.LDAP_USER_BASE_DN,

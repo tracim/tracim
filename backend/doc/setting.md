@@ -67,6 +67,7 @@ Example of the LDAP config working with
 ```
 auth_types=ldap
 ldap_url = ldap://localhost:389
+ldap_bind_anonymous = False
 ldap_bind_dn = cn=admin,dc=planetexpress,dc=com
 ldap_bind_pass = GoodNewsEveryone
 ldap_user_base_dn = ou=people,dc=planetexpress,dc=com
