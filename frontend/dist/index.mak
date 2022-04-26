@@ -117,8 +117,8 @@
     <script type="text/javascript" src="/custom_toolbox-assets/${custom_toolbox_file.name}?token=${cache_token}" nonce="${csp_nonce}"></script>
     % endfor
 
-    <script type="text/javascript" src="/assets/tracim.vendors~app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tracim.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.vendors~main.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.main.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     <script type="text/javascript" src="/app/workspace.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 

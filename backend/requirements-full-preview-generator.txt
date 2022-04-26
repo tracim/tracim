@@ -1,5 +1,5 @@
 # VTK (3D)
-vtk==9.0.2              # via preview-generator
+vtk==9.1.0             # via preview-generator
 # Scribus,drawio
 xvfbwrapper==0.2.9        # via preview-generator
 # CairoSVG (disabled for now)
@@ -15,5 +15,5 @@ xvfbwrapper==0.2.9        # via preview-generator
 # FFMPEG (video)
 ffmpeg-python==0.2.0      # via preview-generator
 future==0.18.2            # via ffmpeg-python
-rawpy==0.16.0             # via preview-generator
-numpy==1.21.4             # via rawpy
+rawpy==0.17.1             # via preview-generator
+numpy==1.21.6            # via rawpy

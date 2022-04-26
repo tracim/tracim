@@ -17,18 +17,14 @@ import {
   convertBackslashNToBr,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  setLocalStorageItem,
   removeLocalStorageItem,
   BREADCRUMBS_TYPE,
   appFeatureCustomEventHandlerShowApp,
-  getContentComment,
-  sendGlobalFlashMessage,
-  PAGE
+  sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import {
   MODE,
-  debug,
-  initWysiwyg
+  debug
 } from '../helper.js'
 import {
   getCustomFormContent,
@@ -139,7 +135,7 @@ class CustomForm extends React.Component {
   }
 
   async componentDidUpdate (prevProps, prevState) {
-    const { state } = this
+    const { props, state } = this
 
     // console.log('%c<CustomForm> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
@@ -184,20 +180,12 @@ class CustomForm extends React.Component {
     const { loggedUser, content, config, appName } = this.state
 
     const fetchResultCustomForm = getCustomFormContent(config.apiUrl, content.workspace_id, content.content_id)
-    const fetchResultComment = getContentComment(config.apiUrl, content.workspace_id, content.content_id)
     const fetchResultRevision = getCustomFormRevision(config.apiUrl, content.workspace_id, content.content_id)
 
-    const [resCustomForm, resComment, resRevision] = await Promise.all([
+    const [resCustomForm, resRevision] = await Promise.all([
       handleFetchResult(await fetchResultCustomForm),
-      handleFetchResult(await fetchResultComment),
       handleFetchResult(await fetchResultRevision)
     ])
-
-    const resCommentWithProperDate = resComment.body.map(c => ({
-      ...c,
-      created_raw: c.created,
-      created: displayDistanceDate(c.created, loggedUser.lang)
-    }))
 
     const revisionWithComment = resRevision.body
       .map((r, i) => ({
@@ -621,12 +609,12 @@ class CustomForm extends React.Component {
             />
           )}
 
-          {state.config.apiUrl ? (
+          {this.state.config.apiUrl ? (
             <Timeline
               customClass={`${config.slug}__contentpage`}
               customColor={this.state.hexcolor}
               loggedUser={loggedUser}
-              apiUrl={state.config.apiUrl}
+              apiUrl={this.state.config.apiUrl}
               timelineData={timeline}
               showHeader
               newComment={newComment}
