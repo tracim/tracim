@@ -1,14 +1,13 @@
-import sys
-
 from setuptools import find_packages
 from setuptools import setup
+import sys
 
 requires = [
     # pyramid
     "plaster_pastedeploy",
     "pyramid>=2.0.0",
     "pyramid_debugtoolbar",
-    "waitress",
+    "waitress>=2.1.1",
     # Database
     "pyramid_tm",
     "SQLAlchemy<1.4.0",
@@ -32,13 +31,13 @@ requires = [
     "filedepot>=0.8.0",
     "babel",
     "python-slugify",
-    "preview-generator>=0.28",
+    "preview-generator>=0.29",
     "colour",
     "python-dateutil",
     "gitpython",
     # mail-notifier
     "mako",
-    "lxml",
+    "lxml>=4.8.0",
     "redis>=3.5.3",
     "rq>=1.9.0",
     "html2text",
@@ -99,17 +98,7 @@ tests_require = [
     "sseclient-py",
 ]
 
-devtools_require = [
-    "flake8",
-    "isort",
-    "mypy",
-    "pre-commit",
-]
-
-
-# add black for python 3.6+
-if sys.version_info.major == 3 and sys.version_info.minor >= 6:
-    devtools_require.append("black==19.10b0")
+devtools_require = ["flake8", "isort", "mypy", "pre-commit", "black==19.10b0"]
 
 mysql_require = ["PyMySQL[rsa]"]
 
