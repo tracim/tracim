@@ -1,14 +1,14 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-const PnpWebpackPlugin = require('pnp-webpack-plugin')
-
 module.exports = {
   mode: isProduction ? 'production' : 'development',
-  entry: './src/index.js',
+  entry: {
+    app: './src/index.js'
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'html-document.app.standalone.js',
+    filename: 'html-document.[name].standalone.js',
     pathinfo: !isProduction,
     library: 'appHtmlDocument',
     libraryTarget: isProduction ? 'var' : undefined
@@ -46,26 +46,20 @@ module.exports = {
       use: ['style-loader', 'css-loader', 'stylus-native-loader']
     }, {
       test: /\.(jpg|png|svg)$/,
-      loader: 'url-loader',
-      options: {
-        limit: 25000
+      type: 'asset',
+      parser: {
+        dataUrlCondition: {
+          maxSize: 25 * 1024 // 25KB
+        }
       }
     }]
   },
   resolve: {
-    plugins: [
-      PnpWebpackPlugin
-    ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
       '~tracim_frontend_lib': path.dirname(path.dirname(require.resolve('tracim_frontend_lib')))
     },
     extensions: ['.js', '.jsx']
-  },
-  resolveLoader: {
-    plugins: [
-      PnpWebpackPlugin.moduleLoader(module)
-    ]
   },
   plugins: [
     ...[], // generic plugins always present

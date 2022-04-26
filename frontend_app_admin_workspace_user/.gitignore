@@ -3,6 +3,6 @@
 .git/
 dist/admin_workspace_user.app.js
 dist/admin_workspace_user.app.standalone.js
-dist/admin_workspace_user.app.optimized.js
+dist/admin_workspace_user.app.optimized.js*
 node_modules/
 src/debug.js
