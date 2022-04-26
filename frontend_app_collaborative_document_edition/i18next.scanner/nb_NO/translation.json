@@ -1,1 +1,14 @@
-{}
+{
+  "Error while creating document": "Kunne ikke opprette dokument",
+  "Spreadsheet": "Regneark",
+  "Text": "Tekst",
+  "A content with the same name already exists": "Innhold med samme navn finnes allerede",
+  "Presentation": "Presentasjon",
+  "You cannot edit this type of file online": "Du kan ikke redigere denne filtypen på nett",
+  "Unknown error": "Ukjent feil",
+  "Unknown url": "Ukjent nettadresse",
+  "Edit online": "Rediger på nett",
+  "View online": "Vis på nett",
+  "Validate and create": "Bekreft og opprett",
+  "Content not found": "Fant ikke innholdet"
+}
