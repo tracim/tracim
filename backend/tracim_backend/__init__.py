@@ -183,8 +183,8 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
         configurator.include("pyramid_ldap3")
         configurator.ldap_setup(
             app_config.LDAP_URL,
-            bind=app_config.LDAP_BIND_DN,
-            passwd=app_config.LDAP_BIND_PASS,
+            bind=app_config.LDAP_BIND_DN if not app_config.LDAP_BIND_ANONYMOUS else "",
+            passwd=app_config.LDAP_BIND_PASS if not app_config.LDAP_BIND_ANONYMOUS else "",
             use_tls=app_config.LDAP_TLS,
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,

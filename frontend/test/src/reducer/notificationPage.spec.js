@@ -26,6 +26,7 @@ import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js
 import { serialize } from 'tracim_frontend_lib'
 import { serializeUserProps } from '../../../src/reducer/user.js'
 import { serializeWorkspaceListProps } from '../../../src/reducer/workspaceList.js'
+import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList.js'
 
 const TLM = {
   created: '2020-07-23T12:44:50Z',
@@ -96,7 +97,7 @@ describe('reducer notificationPage.js', () => {
     }
 
     describe(`${SET}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage(initialState, setNotificationList([TLM]))
+      const listOfNotification = notificationPage(initialState, setNotificationList([TLM], workspaceList.workspaceList))
 
       it('should return the list of notification from the objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({
@@ -107,8 +108,8 @@ describe('reducer notificationPage.js', () => {
     })
 
     describe(`${ADD}/${NOTIFICATION}`, () => {
-      const listOfNotification = notificationPage(initialState, addNotification(TLM))
-      const listOfMention = notificationPage(initialState, addNotification(TLMMention))
+      const listOfNotification = notificationPage(initialState, addNotification(TLM, workspaceList.workspaceList))
+      const listOfMention = notificationPage(initialState, addNotification(TLMMention, workspaceList.workspaceList))
 
       it('should return the list of notification added from the object passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({
@@ -177,7 +178,10 @@ describe('reducer notificationPage.js', () => {
     })
 
     describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification] }, appendNotificationList([{ ...TLM, event_id: 999 }]))
+      const listOfNotification = notificationPage(
+        { ...initialState, list: [notification] },
+        appendNotificationList([{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
+      )
 
       it('should return the list of notifications appended with the list passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, { ...notification, id: 999 }] })

@@ -1,12 +1,10 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
-const PnpWebpackPlugin = require('pnp-webpack-plugin')
-
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
-    app: ['./src/index.js']
+    main: './src/index.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist/assets'),
@@ -16,12 +14,15 @@ module.exports = {
   },
   optimization: {
     splitChunks: {
-      chunks: 'all'
+      chunks: 'all',
+      name: 'vendors~main'
     }
   },
   devtool: isProduction ? false : 'eval-cheap-module-source-map',
-  node: { // https://github.com/josephsavona/valuable/issues/9#issuecomment-65000999
-    fs: 'empty'
+  resolve: {
+    fallback: {
+      fs: false
+    }
   },
   performance: {
     hints: false
@@ -55,28 +56,23 @@ module.exports = {
       use: ['style-loader', 'css-loader', 'stylus-native-loader']
     }, {
       test: /\.(jpg|png|svg)$/,
-      loader: 'file-loader',
-      options: {
-        name: '[name].[ext]',
-        outputPath: 'images/', // assets/ is in output.path
-        limit: 2000
+      type: 'asset',
+      generator: {
+        filename: 'images/[name][ext]' // assets/ is in output.path
+      },
+      parser: {
+        dataUrlCondition: {
+          maxSize: 2 * 1024 // 2KB
+        }
       }
     }]
   },
   resolve: {
-    plugins: [
-      PnpWebpackPlugin
-    ],
     alias: {
       // Make ~tracim_frontend_lib work in stylus files
       '~tracim_frontend_lib': path.dirname(path.dirname(require.resolve('tracim_frontend_lib')))
     },
     extensions: ['.js', '.jsx']
-  },
-  resolveLoader: {
-    plugins: [
-      PnpWebpackPlugin.moduleLoader(module)
-    ]
   },
   plugins: [
     ...[], // generic plugins always present

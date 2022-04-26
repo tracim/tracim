@@ -507,7 +507,7 @@ export class Tracim extends React.Component {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:

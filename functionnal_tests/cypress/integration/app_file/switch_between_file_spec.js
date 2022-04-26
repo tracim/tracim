@@ -70,7 +70,10 @@ describe('App File', () => {
         cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
-        cy.get('.file__contentpage__header ul > li.breadcrumbs__item.primaryColorFont.primaryColorFontDarkenHover')
+        cy.contains('.FilenameWithExtension__label', fileTitle_1)
+
+        cy.get('.file__contentpage__header ul > li.breadcrumbs__item')
+          .first()
           .click()
 
         cy.get('[data-cy="popinFixed"]')

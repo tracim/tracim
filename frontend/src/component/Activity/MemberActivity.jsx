@@ -73,17 +73,43 @@ export class MemberActivity extends React.Component {
     return ''
   }
 
-  getText () {
+  getSpaceText (coreEventType, userPublicName, workspaceLabel, workspaceId) {
+    switch (coreEventType) {
+      case TLM_CET.CREATED:
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>&nbsp;
+            created the space&nbsp;
+            <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
+              <span className='memberActivity__workspace'>{{ workspaceLabel }}</span>
+            </Link>
+          </Trans>
+        )
+      case TLM_CET.DELETED:
+        return (
+          <Trans>
+            <span className='memberActivity__user'>{{ userPublicName }}</span>&nbsp;
+            deleted the space&nbsp;
+            <Link to={PAGE.WORKSPACE.DASHBOARD(workspaceId)}>
+              <span className='memberActivity__workspace'>{{ workspaceLabel }}</span>
+            </Link>
+          </Trans>
+        )
+    }
+    return ''
+  }
+
+  getText (userPublicName, workspaceLabel, workspaceId) {
     const { props } = this
-    const userPublicName = props.activity.newestMessage.fields.user.public_name
-    const workspaceLabel = props.activity.newestMessage.fields.workspace.label
-    const workspaceId = props.activity.newestMessage.fields.workspace.workspace_id
     const [entityType, coreEventType] = props.activity.newestMessage.event_type.split('.')
+
     switch (entityType) {
       case TLM_ET.SHAREDSPACE_MEMBER:
         return this.getSpaceMemberText(coreEventType, userPublicName, workspaceLabel, workspaceId)
       case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
         return this.getSpaceSubscriptionText(coreEventType, userPublicName, workspaceLabel, workspaceId)
+      case TLM_ET.SHAREDSPACE:
+        return this.getSpaceText(coreEventType, userPublicName, workspaceLabel, workspaceId)
     }
     return <Trans>Unknown entity type</Trans>
   }
@@ -91,9 +117,13 @@ export class MemberActivity extends React.Component {
   render () {
     const { props } = this
     const newestMessage = props.activity.newestMessage
+    const [entityType] = newestMessage.event_type.split('.')
 
     const workspaceId = newestMessage.fields.workspace.workspace_id
     const workspaceLabel = newestMessage.fields.workspace.label
+    const user = entityType === TLM_ET.SHAREDSPACE
+      ? newestMessage.fields.author
+      : newestMessage.fields.user
     const breadcrumbsList = [
       {
         link: PAGE.WORKSPACE.DASHBOARD(workspaceId),
@@ -107,11 +137,11 @@ export class MemberActivity extends React.Component {
       <div className='memberActivity feedItem'>
         <Avatar
           size={AVATAR_SIZE.SMALL}
-          user={newestMessage.fields.user}
+          user={user}
           apiUrl={FETCH_CONFIG.apiUrl}
         />
         <div className='memberActivity__title'>
-          {this.getText()}
+          {this.getText(user.public_name, workspaceLabel, workspaceId)}
           <Breadcrumbs breadcrumbsList={breadcrumbsList} keepLastBreadcrumbAsLink />
         </div>
         <TimedEvent

@@ -7,8 +7,8 @@ source "$script_dir/util-lib.sh"
 skip_if_no_changed_file_match "^(frontend|concourse)"
 
 ./install_frontend_dependencies.sh root
-cd "$tracim_root_dir"/frontend_vendors && ./build_vendors.sh && cd ..
-yarn run --cwd frontend_lib/ build:standalone
+cd "$tracim_root_dir"/frontend_vendors && ./build_vendors.sh && cd ../frontend_lib/
+yarn run --cwd . build:standalone
 
 
 for app in "$tracim_root_dir"/frontend_app_*; do

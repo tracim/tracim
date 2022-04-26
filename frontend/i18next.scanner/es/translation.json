@@ -57,7 +57,7 @@
   "Cancelled": "Anulado",
   "Deprecated": "Obsoleto",
   "Information": "Información",
-  "Information_plural": "Información",
+  "Information_plural": "Informaciones",
   "Warning": "Aviso",
   "Error": "Error",
   "Retry": "Reintentar",
@@ -109,5 +109,14 @@
   "Mark all as read": "Marcar todo como leído",
   "See more": "Ver más",
   "Email has been changed": "La dirección de correo electrónica ha sido cambiada",
-  "Member added": "Miembro añadido"
+  "Member added": "Miembro añadido",
+  "0 comments": "0 comentario",
+  "Add to space": "Añadir al espacio",
+  "Already have an account?": "¿Ya tiene una cuenta?",
+  "0 contents": "0 contenidos",
+  "0 members": "0 miembros",
+  "Account Settings": "Ajustes de la Cuenta",
+  "All fields are required. Please enter a name, an email and a password.": "Todos los datos son imprescindibles. Por favor, introduzca un nombre, un correo electrónico y una contraseña.",
+  "Available spaces": "Espacios disponibles",
+  "Create a space": "Crear un espacio"
 }
