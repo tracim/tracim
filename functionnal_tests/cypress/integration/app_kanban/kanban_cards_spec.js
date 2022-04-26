@@ -46,7 +46,7 @@ describe('App Kanban (cards)', () => {
     cy.get('[data-cy=cardActions]').click()
     cy.get('[data-cy=editCard]').click()
     cy.contains('.cardPopup__header', 'Editing Card')
-    cy.get('.kanban__KanbanPopup__freeInput').type('toto')
+    cy.get('.kanban__KanbanPopup__freeInput .textinput__box').type('toto')
     cy.get('.kanban__KanbanPopup__form_buttons .iconbutton').last().should('be.visible').click()
     cy.contains('.kanban__contentpage__wrapper__board__card__options__freeInput', 'toto')
   })

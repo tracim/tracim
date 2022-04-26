@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-python_version=${1:-3.6.14}
+python_version=${1:-3.7.11}
 docker_registry=${2:-""}
 
 script_dir="$(realpath $(dirname $0))"

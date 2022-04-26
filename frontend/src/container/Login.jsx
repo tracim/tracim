@@ -414,7 +414,7 @@ class Login extends React.Component {
     const fetchUnreadMessageCount = await props.dispatch(getUserMessagesSummary(userId))
     switch (fetchUnreadMessageCount.status) {
       case 200: props.dispatch(setUnreadNotificationCount(fetchUnreadMessageCount.json.unread_messages_count)); break
-      default: props.dispatch(newFlashMessage(props.t('Error loading unread mention number')))
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
     }
   }
 
@@ -430,7 +430,7 @@ class Login extends React.Component {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:
@@ -484,5 +484,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system, breadcrumbs, tlm }) => ({ user, system, breadcrumbs, tlm })
+const mapStateToProps = ({ user, system, breadcrumbs, tlm, workspaceList }) => ({ user, system, breadcrumbs, tlm, workspaceList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Login))))

@@ -1,6 +1,6 @@
 import i18n from './i18n.js'
 import { uniqueId } from 'lodash'
-import { htmlCodeToDocumentFragment, tinymceRemove } from 'tracim_frontend_lib'
+import { tinymceRemove } from 'tracim_frontend_lib'
 
 (function () {
   // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
@@ -75,10 +75,6 @@ import { htmlCodeToDocumentFragment, tinymceRemove } from 'tracim_frontend_lib'
 
     document.body.append(hiddenTinymceFileInput)
 
-    const textarea = document.querySelector(selector)
-    const content = htmlCodeToDocumentFragment(textarea.value)
-    textarea.value = ''
-
     const language = TINY_MCE_LANGUAGE[lang] || lang
 
     // NOTE/HACK - 2O22-02-10 - RJ
@@ -127,14 +123,6 @@ import { htmlCodeToDocumentFragment, tinymceRemove } from 'tracim_frontend_lib'
         })
 
         $editor.on('init', function (e) {
-          // NOTE - RJ - 2021-04-28 - appending the content of the textarea
-          // after initialization instead of using TinyMCE's own mechanism works
-          // around a performance issue in Chrome with big base64 images.
-          // See https://github.com/tracim/tracim/issues/4591
-          const body = $editor.contentDocument.body
-          body.textContent = ''
-          body.appendChild(content)
-
           // INFO - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag at the end of the text in order to start the text outside the other existing tags
           const id = uniqueId()
           if ($editor.getBody().textContent) {

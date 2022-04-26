@@ -1,5 +1,5 @@
 {
-  "A content with the same name already exists": "A content with the same name already exists",
+  "A content with the same name already exists": "Content with the same name already exists",
   "Error while creating document": "Error while creating document",
   "New Office Document": "New Office Document",
   "Validate and create": "Validate and create",
@@ -13,7 +13,7 @@
   "Space not found": "Space not found",
   "You cannot edit this type of file online": "You cannot edit this type of file online",
   "Unknown error": "Unknown error",
-  "Unknown url": "Unknown url",
+  "Unknown url": "Unknown URL",
   "Edit online": "Edit online",
   "View online": "View online",
   "New Office document": "New Office document"

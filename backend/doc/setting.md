@@ -67,6 +67,7 @@ Example of the LDAP config working with
 ```
 auth_types=ldap
 ldap_url = ldap://localhost:389
+ldap_bind_anonymous = False
 ldap_bind_dn = cn=admin,dc=planetexpress,dc=com
 ldap_bind_pass = GoodNewsEveryone
 ldap_user_base_dn = ou=people,dc=planetexpress,dc=com
@@ -245,10 +246,12 @@ To enable mail notification, the smallest config is:
     email.notification.smtp.port = 1025
     email.notification.smtp.user = test_user
     email.notification.smtp.password = just_a_password
-    # active implicit ssl if you are using implicit smtp with encryption port like 465
-    # by default, tracim will try to use explicit smtp encryption using starttls, and unencrypted
-    # connection as fallback.
-    email.notification.smtp.use_implicit_ssl = false
+    # SMTP encryption method valid values are:
+    # - default: use smtp encryption using starttls, and unencrypted connection as fallback.
+    # - SMTPS: use encrypted connection directly on port like 465
+    # - unsecure: don't use encryption, use it with caution !
+    # default value: default
+    email.notification.smtp.encryption = default
 
 Don't forget to set `website.base_url` and `website.title` for the frontend, as some features use them to
 link the frontend in emails.
