@@ -9,19 +9,23 @@
   &.hidden
     display none
   &__item
-    white-space nowrap
-    text-overflow ellipsis
     overflow hidden
-    &:not(:first-child)::before
-      content '>'
-      margin 0 textSpacing
+    display flex
+    flex-shrink 1
+    align-items center
+    &__separator
       color fontColor
+      margin 0 textSpacing
+    &__label
+      unicode-bidi plaintext
+      overflow hidden
+      text-overflow ellipsis
     & > a
-      color inherit !important
+      overflow hidden
       &:hover
-        border-bottom 1px solid
+        text-decoration underline
     & i
-        margin-inline-end textSpacing
+      margin-inline-end textSpacing
     &.root
       white-space nowrap
 
