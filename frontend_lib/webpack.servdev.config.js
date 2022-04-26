@@ -3,19 +3,23 @@ module.exports = require('./webpack.optimized.config.js')
 
 module.exports.entry.lib = './src/index.dev.js'
 module.exports.output.library = undefined
+module.exports.output.libraryTarget = undefined
+module.exports.output.umdNamedDefine = undefined
 
 module.exports.devServer = {
-  contentBase: path.join(__dirname, 'dist/'),
-  proxy: { '/api': 'http://127.0.0.1:7999' },
-  port: 8070,
-  hot: true,
-  noInfo: true,
-  overlay: {
-  warnings: false,
-    errors: true
+  client: {
+    overlay: {
+      errors: true,
+      warnings: false
+    },
+    progress: true
   },
-  historyApiFallback: true
-  // headers: {
-  //   'Access-Control-Allow-Origin': '*'
-  // }
+  compress: false,
+  proxy: { '/api': 'http://127.0.0.1:7999' },
+  historyApiFallback: true,
+  hot: true,
+  port: 8070,
+  static: {
+    directory: path.resolve(__dirname, 'dist/'),
+  }
 }

@@ -2,10 +2,6 @@ const path = require('path')
 const glob = require('glob')
 const isProduction = process.env.NODE_ENV === 'production'
 
-// const isStylusFileRegex = /.+\.styl$/gm
-
-const PnpWebpackPlugin = require('pnp-webpack-plugin')
-
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: {
@@ -36,19 +32,7 @@ module.exports = {
     },
   },
   optimization: {
-    namedModules: true
-    // splitChunks: {
-    //   chunks: 'all',
-    //   cacheGroups: {
-    //     default: false,
-    //     vendors: false,
-    //     style: {
-    //       test: isStylusFileRegex,
-    //       enforce: true,
-    //       filename: 'tracim_frontend_lib.style.js'
-    //     }
-    //   }
-    // }
+    moduleIds: 'named'
   },
   devtool: false,
   // RJ - 2020-06-11 - source maps disabled for frontend_lib for now,
@@ -81,25 +65,11 @@ module.exports = {
       }, {
         test: /\.styl$/,
         use: ['style-loader', 'css-loader', 'stylus-native-loader']
-        // }, {
-        //   test: /\.(jpg|png|svg)$/,
-        //   loader: 'url-loader',
-        //   options: {
-        //     limit: 25000
-        //   }
       }
     ]
   },
   resolve: {
-    plugins: [
-      PnpWebpackPlugin
-    ],
     extensions: ['.js', '.jsx']
-  },
-  resolveLoader: {
-    plugins: [
-      PnpWebpackPlugin.moduleLoader(module)
-    ]
   },
   plugins: [
     ...[], // generic plugins always present

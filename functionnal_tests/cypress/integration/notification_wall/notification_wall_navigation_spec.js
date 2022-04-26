@@ -1,12 +1,16 @@
 import { PAGES } from '../../support/urls_commands'
 
 describe('Notification wall', () => {
-  before(function () {
+  beforeEach(function () {
     cy.resetDB()
     cy.setupBaseDB()
-  })
-
-  beforeEach(function () {
+    cy.loginAs('administrators')
+    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
+      cy.createHtmlDocument('title', workspace.workspace_id).then(content => {
+        cy.createComment(workspace.workspace_id, content.content_id, 'test')
+      })
+    })
+    cy.logout()
     cy.loginAs('users')
     cy.visitPage({ pageName: PAGES.HOME })
     cy.get('.notificationButton').click()
