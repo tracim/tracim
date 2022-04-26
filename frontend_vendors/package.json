@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/tracim_frontend_vendors.js",
   "scripts": {
-    "build-list": "webpack-cli -p --config webpack.list.config.js",
+    "build-list": "webpack-cli --config webpack.list.config.js",
     "build": "NODE_ENV=production webpack-cli && yarn run build-list",
     "build:dev": "NODE_ENV=development webpack-cli && yarn run build-list"
   },
@@ -24,8 +24,8 @@
     "react-router-dom": "^5.2.0",
     "reactstrap": "^8.9.0",
     "regenerator-runtime": "^0.13.2",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
