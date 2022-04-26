@@ -13,27 +13,15 @@ from elasticsearch_dsl import Object
 from elasticsearch_dsl import Text
 
 from tracim_backend.config import CFG
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import (
-    edge_ngram_folding,
-)
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import folding
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import (
-    html_exact_folding,
-)
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import html_folding
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import (
-    tracim_arabic_analyzer,
-)
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import (
-    tracim_english_analyzer,
-)
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import (
-    tracim_french_analyzer,
-)
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import (
-    tracim_german_analyzer,
-)
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es_analyzers import (
+from tracim_backend.lib.search.elasticsearch_search.default_analyzers import edge_ngram_folding
+from tracim_backend.lib.search.elasticsearch_search.default_analyzers import folding
+from tracim_backend.lib.search.elasticsearch_search.default_analyzers import html_exact_folding
+from tracim_backend.lib.search.elasticsearch_search.default_analyzers import html_folding
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.ar import tracim_arabic_analyzer
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.de import tracim_german_analyzer
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.en import tracim_english_analyzer
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.fr import tracim_french_analyzer
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.pt import (
     tracim_portuguese_analyzer,
 )
 
