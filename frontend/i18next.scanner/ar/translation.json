@@ -586,7 +586,11 @@
   " in {{count}} spaces_5": " في {{count}} فضاء آخر",
   "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "Information": "",
-  "Information_plural": "",
+  "Information_0": "معلومة",
+  "Information_1": "معلومة",
+  "Information_2": "معلومتان",
+  "Information_3": "معلومات",
+  "Information_4": "معلومة",
+  "Information_5": "معلومة أخرى",
   "Error loading unread notification number": ""
 }
