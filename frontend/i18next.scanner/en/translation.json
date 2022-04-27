@@ -553,8 +553,8 @@
   "Configuration links": "Configuration links",
   "{{author}} made {{count}} contributions": "{{author}} made {{count}} contributions",
   "{{author}} made {{count}} contributions_plural": "{{author}} made {{count}} contributions",
-  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> created the space <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "Error loading unread notification number": "Error loading unread notification number",
   " on {{content}}": " on {{content}}"
 }

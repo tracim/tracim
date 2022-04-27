@@ -198,7 +198,7 @@
   "Download {{filename}}": "Herunterladen {{filename}}",
   "Translate to {{language}}": "Übersetzen in {{language}}",
   "1 file selected": "1 Datei ausgewählt",
-  "{{count}} files selected": "{{count}} ausgewählte Dateien",
+  "{{count}} files selected": "{{count}} ausgewählte Datei",
   "{{count}} files selected_plural": "{{count}} ausgewählte Dateien",
   "Error while adding a tag to the content": "Fehler beim Hinzufügen einer Markierung zum Inhalt",
   "Error while fetching a list of tags": "Fehler beim Holen einer Liste von Markierungen",
