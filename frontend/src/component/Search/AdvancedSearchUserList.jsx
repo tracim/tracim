@@ -24,7 +24,7 @@ export const AdvancedSearchUserList = props => {
             {props.t('Full name')}
           </div>
           <div className='advancedSearchUser__information'>
-            {props.t('Information_plural')}
+            {props.t('Information__plural')}
           </div>
         </div>
       )}

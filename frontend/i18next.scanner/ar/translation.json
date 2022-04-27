@@ -588,5 +588,5 @@
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "Error loading unread notification number": "",
   "Information": "معلومة",
-  "Information_plural": "معلومات"
+  "Information__plural": "معلومات"
 }

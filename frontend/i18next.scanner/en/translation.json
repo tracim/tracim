@@ -55,7 +55,7 @@
   "Cancelled": "Cancelled",
   "Deprecated": "Deprecated",
   "Information": "Information",
-  "Information_plural": "Information",
+  "Information__plural": "Information",
   "Warning": "Warning",
   "Error": "Error",
   "Retry": "Retry",
