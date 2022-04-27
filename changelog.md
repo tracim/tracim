@@ -4,22 +4,14 @@
 
 For users:
 - The user interface is now available in Arabic, using the new translation tool: Weblate
-- Handle right-to-left (rtl) languages on interface
-- Language switch button is now displayed in the account settings
-- Mentions are displayed in the sidebar, and spaces with notifications are highlighted
-- Notification can be marked as read without redirection
+- Handle right-to-left languages on interface
+- Feature improvement: Notifications, Kanban, Agenda
 - UI/UX improvement (responsive, buttons, redirections)
-- Event descriptions can have a default text in the web interface
-- New interface for advances text edition (TinyMCE has been updated to version 5.10)
-- Caldav and Webdav links are displayed in the space settings
 - External links to pictures now have a preview in comments
-- Kanban cards now display deadline and value fields
-- The underscore counts as a separator in advanced search
 
 For admins:
-- Tracimcli command lines have been added to validate custom properties schema, and mail configuration validation (question: should I add the commands or the ticket? #2827 #5104)
-- The kanban feature can now be easily activated by docker,  see [#5607](https://github.com/tracim/tracim/issues/5607)
-- Some support for anonymous LDAP and anonymous SMTP authentication has been added
+- Tracimcli command lines have been added to validate custom properties schema and mail configuration validation
+- Add support for anonymous LDAP and anonymous SMTP authentication has been added
 
 ### Fixed Issues
 
@@ -30,7 +22,8 @@ For admins:
 [#5378](https://github.com/tracim/tracim/issues/5378),
 [#5495](https://github.com/tracim/tracim/issues/5495),
 [#5539](https://github.com/tracim/tracim/issues/5539),
-[#5559](https://github.com/tracim/tracim/issues/5559)
+[#5558](https://github.com/tracim/tracim/issues/5558)
+[#5559](https://github.com/tracim/tracim/issues/5559),
 - Frontend: [#4813](https://github.com/tracim/tracim/issues/4813),
 [#5313](https://github.com/tracim/tracim/issues/5313),
 [#5333](https://github.com/tracim/tracim/issues/5333),
@@ -40,6 +33,7 @@ For admins:
 [#5507](https://github.com/tracim/tracim/issues/5507),
 [#5513](https://github.com/tracim/tracim/issues/5513),
 [#5535](https://github.com/tracim/tracim/issues/5535),
+[#5558](https://github.com/tracim/tracim/issues/5558),
 [#5575](https://github.com/tracim/tracim/issues/5575),
 [#5593](https://github.com/tracim/tracim/issues/5593)
 - Documentation: [#4578](https://github.com/tracim/tracim/issues/4578),
@@ -49,21 +43,18 @@ For admins:
 
 ### Breaking/Important change
 
-- :warning: You need to adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
-- Advanced search has been improved, you will need to rebuild the
-  Elastic search index by running the following commands in the backend folder:
-
-  ```sh
-  tracimcli search index-drop
-  tracimcli search index-create
-  tracimcli search index-populate
-  ```
-- Radicale has been updated to 3.*, see [#4789](https://github.com/tracim/tracim/issues/4789)
+- :warning: Radicale has been updated to 3.*. You need to adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479).
+- :warning: Advanced Search (Elasticsearch) has been improved. If you use it, You need to you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479).
+- Language switch button is now displayed in the account settings
+- Caldav and Webdav links are displayed in the space settings
+- New interface for advanced text edition (TinyMCE has been updated to version 5.10)
+- Kanban is activated by default in docker,  see [#5607](https://github.com/tracim/tracim/issues/5607)
 - Pyramid has been updated to 2.*, see [#5047](https://github.com/tracim/tracim/issues/5047)
 
 ### Known Issues
 
-- WIP : new issue to come (Côme) // ref : https://github.com/tracim/tracim/issues/5535
+- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622),
+- Sometimes, the header disappears on mobile, see [#5117](https://github.com/tracim/tracim/issues/5117)
 
 
 # 4.1.3 / 2022-03-02
