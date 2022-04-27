@@ -1,17 +1,51 @@
-# 4.2.0 / YYYY-MM-DD
+# 4.2.0 / 2022-04-29
 
 ### New Features
 
+For users:
+- The user interface is now available in Arabic, using the new translation tool: Weblate
 - Handle right-to-left (rtl) languages on interface
-- Introduce arab language selection, and add arabic translation via Weblate
+- Language switch button is now displayed in the account settings
+- Mentions are displayed in the sidebar, and spaces with notifications are highlighted
 - Notification can be marked as read without redirection
 - UI/UX improvement (responsive, buttons, redirections)
+- Event descriptions can have a default text in the web interface
+- New interface for advances text edition (TinyMCE has been updated to version 5.10)
+- Caldav and Webdav links are displayed in the space settings
+- External links to pictures now have a preview in comments
+- Kanban cards now display deadline and value fields
+- The underscore counts as a separator in advanced search
+
+For admins:
+- Tracimcli command lines have been added to validate custom properties schema, and mail configuration validation (question: should I add the commands or the ticket? #2827 #5104)
+- The kanban feature can now be easily activated by docker,  see [#5607](https://github.com/tracim/tracim/issues/5607)
+- Some support for anonymous LDAP and anonymous SMTP authentication has been added
 
 ### Fixed Issues
 
-- Backend: [#5559](https://github.com/tracim/tracim/issues/5559),
-[#5378](https://github.com/tracim/tracim/issues/5378)
-- Frontend: [#5313](https://github.com/tracim/tracim/issues/5313),
+- Backend: [#3929](https://github.com/tracim/tracim/issues/3929),
+[#4536](https://github.com/tracim/tracim/issues/4536),
+[#4706](https://github.com/tracim/tracim/issues/4706),
+[#5334](https://github.com/tracim/tracim/issues/5334),
+[#5378](https://github.com/tracim/tracim/issues/5378),
+[#5495](https://github.com/tracim/tracim/issues/5495),
+[#5539](https://github.com/tracim/tracim/issues/5539),
+[#5559](https://github.com/tracim/tracim/issues/5559)
+- Frontend: [#4813](https://github.com/tracim/tracim/issues/4813),
+[#5313](https://github.com/tracim/tracim/issues/5313),
+[#5333](https://github.com/tracim/tracim/issues/5333),
+[#5471](https://github.com/tracim/tracim/issues/5471),
+[#5494](https://github.com/tracim/tracim/issues/5494),
+[#5506](https://github.com/tracim/tracim/issues/5506),
+[#5507](https://github.com/tracim/tracim/issues/5507),
+[#5513](https://github.com/tracim/tracim/issues/5513),
+[#5535](https://github.com/tracim/tracim/issues/5535),
+[#5575](https://github.com/tracim/tracim/issues/5575),
+[#5593](https://github.com/tracim/tracim/issues/5593)
+- Documentation: [#4578](https://github.com/tracim/tracim/issues/4578),
+[#4862](https://github.com/tracim/tracim/issues/4862),
+[#5360](https://github.com/tracim/tracim/issues/5360),
+[#5573](https://github.com/tracim/tracim/issues/5573)
 
 ### Breaking/Important change
 
@@ -24,7 +58,12 @@
   tracimcli search index-create
   tracimcli search index-populate
   ```
+- Radicale has been updated to 3.*, see [#4789](https://github.com/tracim/tracim/issues/4789)
+- Pyramid has been updated to 2.*, see [#5047](https://github.com/tracim/tracim/issues/5047)
+
 ### Known Issues
+
+- WIP : new issue to come (Côme) // ref : https://github.com/tracim/tracim/issues/5535
 
 
 # 4.1.3 / 2022-03-02
