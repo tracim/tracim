@@ -322,7 +322,7 @@
   "<0><0>{{userPublicName}}</0></0>  wants to join the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  souhaite rejoindre l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>'s  request to join the space has been <2>{{state}}</2>": "La demande de <0><0>{{userPublicName}}</0></0> pour rejoindre l'espace a été <2>{{state}}</2>",
   "Account": "Compte",
-  "Showing {{displayedResults}} of {{count}} results": "{{displayedResults}} résultats affichés sur {{count}}",
+  "Showing {{displayedResults}} of {{count}} results": "{{displayedResults}} résultat affichés sur {{count}}",
   "Showing {{displayedResults}} of {{count}} results_plural": "{{displayedResults}} résultats affichés sur {{count}}",
   "Result for: {{keywords}}": "Résultat pour : {{keywords}}",
   "Results for: {{keywords}}": "Résultats pour : {{keywords}}",
@@ -554,7 +554,7 @@
   "{{author}} made {{count}} contributions": "{{author}} a fait {{count}} contribution",
   "{{author}} made {{count}} contributions_plural": "{{author}} a fait {{count}} contributions",
   " on {{content}}": " dans {{content}}",
-  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "Error loading unread notification number": ""
+  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> a créé l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> a supprimé l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "Error loading unread notification number": "Erreur de chargement du nombre de notifications non lues"
 }
