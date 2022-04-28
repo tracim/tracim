@@ -3,10 +3,10 @@
 ### New Features
 
 For users:
-- The user interface is now available in Arabic, using the new translation tool: Weblate
+- The user interface is now available in Arabic
 - Handle right-to-left languages on interface
-- Feature improvement: Notifications, Kanban, Agenda
-- UI/UX improvement (responsive, buttons, redirections)
+- Feature improvements: Notifications, Kanban, Agenda
+- UI/UX improvements (responsive, buttons, redirections)
 - External links to pictures now have a preview in comments
 
 For admins:
@@ -43,8 +43,9 @@ For admins:
 
 ### Breaking/Important change
 
-- :warning: Radicale has been updated to 3.*. You need to adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479).
-- :warning: Advanced Search (Elasticsearch) has been improved. If you use it, You need to you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479).
+- :warning: Radicale has been updated to 3.*. You need to adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- :warning: Advanced Search (Elasticsearch) has been improved. If you use it, You need to you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- Translations are now handled via Weblate. If you want to contribute, check out this [link](https://github.com/tracim/tracim#translation)
 - Language switch button is now displayed in the account settings
 - Caldav and Webdav links are displayed in the space settings
 - New interface for advanced text edition (TinyMCE has been updated to version 5.10)
