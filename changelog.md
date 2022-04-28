@@ -21,8 +21,8 @@ For technical users:
 [#5378](https://github.com/tracim/tracim/issues/5378),
 [#5495](https://github.com/tracim/tracim/issues/5495),
 [#5539](https://github.com/tracim/tracim/issues/5539),
-[#5558](https://github.com/tracim/tracim/issues/5558)
-[#5559](https://github.com/tracim/tracim/issues/5559),
+[#5558](https://github.com/tracim/tracim/issues/5558),
+[#5559](https://github.com/tracim/tracim/issues/5559)
 - Frontend: [#4813](https://github.com/tracim/tracim/issues/4813),
 [#5313](https://github.com/tracim/tracim/issues/5313),
 [#5333](https://github.com/tracim/tracim/issues/5333),
@@ -42,7 +42,7 @@ For technical users:
 
 ### Breaking/Important change
 
-- :warning: Radicale has been updated from version 2 to version 3.1. You need to adjust some settings before running this version if you want to be able to run Tracim. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- :warning: Radicale has been updated from version 2 to version 3.1. Tracim can't start if you do not adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
 - :warning: Advanced Search (Elasticsearch) has been improved. If you use it, you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
 - Translations are now handled via Weblate. If you want to contribute, check out this [link](https://github.com/tracim/tracim#translation)
 - Language switch button moved in the account settings
@@ -50,12 +50,12 @@ For technical users:
 - New interface for advanced text edition (TinyMCE has been updated from version 4 to version 5.10)
 - Kanban is activated by default in docker, see [#5607](https://github.com/tracim/tracim/issues/5607)
 - To avoid right issues with `tracimcli` command used in the docker image, the process to properly run `tracimcli` inside official docker image has been clarified, [see here](https://github.com/tracim/tracim/blob/develop/tools_docker/README.md#tracimcli-inside-docker)
-- Pyramid has been updated to 2.*, see [#5047](https://github.com/tracim/tracim/issues/5047)
+- Pyramid has been updated from 1.10.8 to 2.*, see [#5047](https://github.com/tracim/tracim/issues/5047)
 
 ### Known Issues
 
-- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622)
-- Sometimes, the header disappears on mobile, see [#5117](https://github.com/tracim/tracim/issues/5117)
+- Chrome performance issue for images in advanced edition (TinyMCE), see [#5622](https://github.com/tracim/tracim/issues/5622)
+- Sometimes, the header disappears on mobile devices, see [#5117](https://github.com/tracim/tracim/issues/5117)
 
 
 # 4.1.3 / 2022-03-02
