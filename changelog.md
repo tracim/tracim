@@ -56,6 +56,7 @@ For technical users:
 
 - Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622)
 - Sometimes, the header disappears on mobile, see [#5117](https://github.com/tracim/tracim/issues/5117)
+- Creation popups are not centered on mobile, see [#5625](https://github.com/tracim/tracim/issues/5625)
 
 
 # 4.1.3 / 2022-03-02
