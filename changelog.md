@@ -1,15 +1,14 @@
-# 4.2.0 / 2022-04-29
+# 4.2.0 / 2022-04-28
 
 ### New Features
 
-For users:
 - The user interface is now available in Arabic
 - Handle right-to-left languages on interface
 - Feature improvements: Notifications, Kanban, Agenda
 - UI/UX improvements (responsive, buttons, redirections)
 - External links to pictures now have a preview in comments
 
-For admins:
+For technical users:
 - Tracimcli command lines have been added to validate custom properties schema and mail configuration validation
 - Add support for anonymous LDAP and anonymous SMTP authentication has been added
 
@@ -43,18 +42,19 @@ For admins:
 
 ### Breaking/Important change
 
-- :warning: Radicale has been updated to 3.*. You need to adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
-- :warning: Advanced Search (Elasticsearch) has been improved. If you use it, You need to you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- :warning: Radicale has been updated from version 2 to version 3.1. You need to adjust some settings before running this version if you want to be able to run Tracim. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- :warning: Advanced Search (Elasticsearch) has been improved. If you use it, you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
 - Translations are now handled via Weblate. If you want to contribute, check out this [link](https://github.com/tracim/tracim#translation)
-- Language switch button is now displayed in the account settings
-- Caldav and Webdav links are displayed in the space settings
-- New interface for advanced text edition (TinyMCE has been updated to version 5.10)
-- Kanban is activated by default in docker,  see [#5607](https://github.com/tracim/tracim/issues/5607)
+- Language switch button moved in the account settings
+- Caldav and Webdav links are displayed in the account settings
+- New interface for advanced text edition (TinyMCE has been updated from version 4 to version 5.10)
+- Kanban is activated by default in docker, see [#5607](https://github.com/tracim/tracim/issues/5607)
+- To avoid right issues with `tracimcli` command used in the docker image, the process to properly run `tracimcli` inside official docker image has been clarified, [see here](https://github.com/tracim/tracim/blob/develop/tools_docker/README.md#tracimcli-inside-docker)
 - Pyramid has been updated to 2.*, see [#5047](https://github.com/tracim/tracim/issues/5047)
 
 ### Known Issues
 
-- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622),
+- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622)
 - Sometimes, the header disappears on mobile, see [#5117](https://github.com/tracim/tracim/issues/5117)
 
 
