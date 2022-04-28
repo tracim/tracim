@@ -11,6 +11,7 @@
 For technical users:
 - Tracimcli command lines have been added to validate custom properties schema and mail configuration validation
 - Add support for anonymous LDAP and anonymous SMTP authentication has been added
+- Creation popups are not centered on mobile, see [#5625](https://github.com/tracim/tracim/issues/5625)
 
 ### Fixed Issues
 
