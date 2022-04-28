@@ -20,7 +20,7 @@
         text-overflow ellipsis
         overflow hidden
         flex 1
-        text-align left
+        text-align start
         white-space pre
       &__circle
         width 10px
@@ -34,7 +34,7 @@
         font-size 40px
         transform rotate(58deg)
         transform-origin top
-        margin-right -14px
+        margin-inline-end -14px
         position relative
         left 16px
         top 15px
@@ -43,8 +43,18 @@
         position relative
         display flex
         flex-direction row
-        margin-left standardSpacing
+        margin-inline-start standardSpacing
         margin-bottom standardSpacing
+
+[dir=rtl]
+  .tagList__list__item
+    &__circle
+      right 10px
+    &__triangleIcon
+      left 9px
+      top 2px
+  #triangeIcon
+    transform none
 
 @media (max-width: max-lg)
   .tagList

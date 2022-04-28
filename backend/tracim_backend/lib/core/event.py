@@ -404,6 +404,20 @@ class EventApi:
         session.add_all(messages)
         return messages
 
+    def delete_message_for_workspace(self, workspace_id: int) -> None:
+        query = self._session.query(Message).join(Event)
+        query = query.filter(Event.workspace_id == workspace_id)
+        for message in query:
+            self._session.delete(message)
+
+    def delete_message_for_user_in_workspace(self, workspace_id: int, user_id: int) -> None:
+        query = self._session.query(Message).join(Event)
+        query = query.filter(
+            and_(Event.workspace_id == workspace_id, Message.receiver_id == user_id)
+        )
+        for message in query:
+            self._session.delete(message)
+
     @classmethod
     def get_content_schema_for_type(cls, content_type: str) -> ContentSchema:
         try:
@@ -472,9 +486,9 @@ class EventBuilder:
 
     @hookimpl
     def on_user_modified(self, user: User, context: TracimContext) -> None:
-        if self._has_just_been_deleted(user):
+        if has_just_been_deleted(user):
             self._create_user_event(OperationType.DELETED, user, context)
-        elif self._has_just_been_undeleted(user):
+        elif has_just_been_undeleted(user):
             self._create_user_event(OperationType.UNDELETED, user, context)
         else:
             self._create_user_event(OperationType.MODIFIED, user, context)
@@ -507,9 +521,9 @@ class EventBuilder:
 
     @hookimpl
     def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
-        if self._has_just_been_deleted(workspace):
+        if has_just_been_deleted(workspace):
             self._create_workspace_event(OperationType.DELETED, workspace, context)
-        elif self._has_just_been_undeleted(workspace):
+        elif has_just_been_undeleted(workspace):
             self._create_workspace_event(OperationType.UNDELETED, workspace, context)
         else:
             self._create_workspace_event(OperationType.MODIFIED, workspace, context)
@@ -580,19 +594,7 @@ class EventBuilder:
     def on_user_role_in_workspace_created(
         self, role: UserRoleInWorkspace, context: TracimContext
     ) -> None:
-        self._create_workspace_historic_messages_for_current_user(role, context)
         self._create_role_event(OperationType.CREATED, role, context)
-
-    def _create_workspace_historic_messages_for_current_user(
-        self, role: UserRoleInWorkspace, context: TracimContext
-    ):
-        current_user = context.safe_current_user()
-        event_api = EventApi(current_user, context.dbsession, self._config)
-        event_api.create_messages_history_for_user(
-            user_id=role.user_id,
-            workspace_ids=[role.workspace_id],
-            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
-        )
 
     @hookimpl
     def on_user_role_in_workspace_modified(
@@ -848,21 +850,23 @@ class EventBuilder:
             context=context,
         )
 
-    def _has_just_been_deleted(self, obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
-        """Check that an object has been deleted since it has been queried from database."""
-        if obj.is_deleted:
-            history = inspect(obj).attrs.is_deleted.history
-            was_changed = not history.unchanged and (history.deleted or history.added)
-            return was_changed
-        return False
 
-    def _has_just_been_undeleted(self, obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
-        """Check whether an object has been undeleted since queried from database."""
-        if not obj.is_deleted:
-            history = inspect(obj).attrs.is_deleted.history
-            was_changed = not history.unchanged and (history.deleted or history.added)
-            return was_changed
-        return False
+def has_just_been_deleted(obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
+    """Check that an object has been deleted since it has been queried from database."""
+    if obj.is_deleted:
+        history = inspect(obj).attrs.is_deleted.history
+        was_changed = not history.unchanged and (history.deleted or history.added)
+        return was_changed
+    return False
+
+
+def has_just_been_undeleted(obj: Union[User, Workspace, ContentRevisionRO]) -> bool:
+    """Check whether an object has been undeleted since queried from database."""
+    if not obj.is_deleted:
+        history = inspect(obj).attrs.is_deleted.history
+        was_changed = not history.unchanged and (history.deleted or history.added)
+        return was_changed
+    return False
 
 
 def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[int]:
@@ -877,6 +881,12 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
 
 
 def _get_user_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
+    """
+    User event are received by :
+    - the user themself
+    - administrators
+    - users knowing the user (in same workspace)
+    """
     user_api = UserApi(current_user=event.user, session=session, config=config)
     receiver_ids = user_api.get_user_ids_from_profile(Profile.ADMIN)
     event_user_id = get_event_user_id(session, event)
@@ -926,6 +936,12 @@ def _get_workspace_event_receiver_ids(
 def _get_workspace_subscription_event_receiver_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> Set[int]:
+    """
+    Workspace subscription are readable by
+    - subscription author
+    - administrators
+    - workspace manager of the workspace the subscription took place
+    """
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
     author = event.subscription["author"]["user_id"]
@@ -937,6 +953,9 @@ def _get_workspace_subscription_event_receiver_ids(
 
 
 def _get_content_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
+    """
+    Content event are returned to workspace members only
+    """
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
     return set(workspace_members)
@@ -1055,3 +1074,52 @@ class SyncLiveMessageBuilder(BaseLiveMessageBuilder):
     def publish_messages_for_event(self, event_id: int) -> None:
         logger.debug(self, "publish event(id={}) synchronously".format(event_id))
         self._publish_messages_for_event(event_id)
+
+
+class MessageHooks:
+    def _create_workspace_historic_messages_for_current_user(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ):
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        event_api.create_messages_history_for_user(
+            user_id=role.user_id,
+            workspace_ids=[role.workspace_id],
+            max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+        )
+
+    @hookimpl
+    def on_user_role_in_workspace_created(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        self._create_workspace_historic_messages_for_current_user(role, context)
+
+    @hookimpl
+    def on_workspace_deleted(self, workspace: Workspace, context: TracimContext) -> None:
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        event_api.delete_message_for_workspace(workspace.workspace_id)
+
+    @hookimpl
+    def on_workspace_modified(self, workspace: Workspace, context: TracimContext) -> None:
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        if has_just_been_deleted(workspace):
+            event_api.delete_message_for_workspace(workspace.workspace_id)
+        elif has_just_been_undeleted(workspace):
+            for role in workspace.roles:
+                event_api.create_messages_history_for_user(
+                    user_id=role.user_id,
+                    workspace_ids=[workspace.workspace_id],
+                    max_messages_count=context.app_config.WORKSPACE__JOIN__MAX_MESSAGES_HISTORY_COUNT,
+                )
+
+    @hookimpl
+    def on_user_role_in_workspace_deleted(
+        self, role: UserRoleInWorkspace, context: TracimContext
+    ) -> None:
+        current_user = context.safe_current_user()
+        event_api = EventApi(current_user, context.dbsession, context.app_config)
+        event_api.delete_message_for_user_in_workspace(
+            user_id=role.user_id, workspace_id=role.workspace_id
+        )

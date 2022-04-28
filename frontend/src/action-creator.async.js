@@ -372,7 +372,9 @@ export const putUserUsername = (user, newUsername, checkPassword) => dispatch =>
   })
 }
 
-export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
+export const putMyselfEmail = (newEmailWithoutTrim, checkPassword) => dispatch => {
+  const newEmail = newEmailWithoutTrim.trim()
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/email`,
     param: {
@@ -391,7 +393,9 @@ export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
   })
 }
 
-export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
+export const putUserEmail = (user, newEmailWithoutTrim, checkPassword) => dispatch => {
+  const newEmail = newEmailWithoutTrim.trim()
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/email`,
     param: {

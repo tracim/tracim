@@ -42,6 +42,31 @@ if TYPE_CHECKING:
 TRACIM_DEFAULT_PERM = "tracim"
 
 
+class TracimSecurityPolicy:
+    """
+    Adapter to keep existing authentification method compatible with pyramid 2.0
+    source:
+    https://docs.pylonsproject.org/projects/pyramid/en/latest/whatsnew-2.0.html#upgrading-from-third-party-policies
+    """
+
+    def __init__(self, authentification_policy, authorization_policy):
+        self.authentification_policy = authentification_policy
+        self.authorization_policy = authorization_policy
+
+    def authenticated_userid(self, request):
+        return self.authentification_policy.authenticated_userid(request)
+
+    def permits(self, request, context, permission):
+        principals = self.authentification_policy.effective_principals(request)
+        return self.authorization_policy.permits(context, principals, permission)
+
+    def remember(self, request, userid, **kw):
+        return self.authentification_policy.remember(request, userid, **kw)
+
+    def forget(self, request, **kw):
+        return self.authentification_policy.forget(request, **kw)
+
+
 @implementer(IAuthorizationPolicy)
 class AcceptAllAuthorizationPolicy(object):
     """

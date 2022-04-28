@@ -8,28 +8,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tracim_backend 2.6.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2021-06-29 12:15+0200\n"
-"PO-Revision-Date: 2020-04-15 16:26+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2022-03-25 17:31+0100\n"
+"PO-Revision-Date: 2022-02-15 09:55+0000\n"
+"Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
 "Language: pt\n"
-"Language-Team: pt <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language-Team: Portuguese "
+"<https://hosted.weblate.org/projects/tracim/backend/pt/>\n"
+"Plural-Forms: nplurals=2; plural=n != 1\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"Generated-By: Babel 2.9.1\n"
 
-#: tracim_backend/config.py:651
+#: tracim_backend/config.py:668
 msgid ""
 "[{website_title}] [{workspace_label}] {content_label} "
 "({content_status_label})"
 msgstr ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
 
-#: tracim_backend/config.py:660
+#: tracim_backend/config.py:677
 msgid "[{website_title}] Someone created an account for you"
 msgstr "[{website_title}] Alguém criou uma conta para você"
 
-#: tracim_backend/config.py:670
+#: tracim_backend/config.py:687
 msgid "[{website_title}] A password reset has been requested"
 msgstr "[{website_title}] Uma reposição da palavra-passe foi pedida"
 
@@ -97,19 +100,19 @@ msgstr "Mensagem de {username}: {message}"
 msgid "Uploaded by {username}."
 msgstr "Subido por {username}."
 
-#: tracim_backend/lib/core/content.py:1896
+#: tracim_backend/lib/core/content.py:1906
 msgid "New folder"
 msgstr "Nova pasta"
 
-#: tracim_backend/lib/core/content.py:1901
+#: tracim_backend/lib/core/content.py:1911
 msgid "New folder {0}"
 msgstr "Nova pasta {0}"
 
-#: tracim_backend/lib/core/workspace.py:546
+#: tracim_backend/lib/core/workspace.py:497
 msgid "Space"
 msgstr "Espaço"
 
-#: tracim_backend/lib/core/workspace.py:549
+#: tracim_backend/lib/core/workspace.py:500
 msgid "Space {}"
 msgstr "Espaço {}"
 
@@ -217,7 +220,7 @@ msgstr "Aproveite o seu dia :)"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:25
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
-#: tracim_backend/templates/mail/reset_password_body_html.mak:20
+#: tracim_backend/templates/mail/reset_password_body_html.mak:21
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
 msgid "Suricat', your digital assistant"
@@ -225,7 +228,7 @@ msgstr "Suricato, o seu assistente digital"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:29
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
-#: tracim_backend/templates/mail/reset_password_body_html.mak:24
+#: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
 msgid "Suricat', the bot"
@@ -233,7 +236,7 @@ msgstr "Suricato, o robô"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:32
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
-#: tracim_backend/templates/mail/reset_password_body_html.mak:27
+#: tracim_backend/templates/mail/reset_password_body_html.mak:28
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
@@ -279,7 +282,7 @@ msgstr "Repor minha palavra-passe"
 msgid "If the link is not working, I suggest to copy/paste the full url: "
 msgstr "Se o link não estiver funcionando, sugiro copiar/colar a url completa: "
 
-#: tracim_backend/templates/mail/reset_password_body_html.mak:18
+#: tracim_backend/templates/mail/reset_password_body_html.mak:19
 msgid "The link is valid for {} minutes."
 msgstr "A ligação é válida por {} minutos."
 
@@ -346,7 +349,6 @@ msgid "{username} (through tracim)"
 msgstr "{username} (através de Tracim)"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
-#, fuzzy
 msgid ""
 "You have invited {nb_receivers} people to upload files in this space <a "
 "href={sharedspace_url}>{sharedspace_name}</a>:"

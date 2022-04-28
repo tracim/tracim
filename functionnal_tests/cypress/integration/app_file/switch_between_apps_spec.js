@@ -39,10 +39,10 @@ describe('App File', () => {
       it('should write a comment and check if it is there after switching apps, as well as the revisions', () => {
         cy.visitPage({
           pageName: p.CONTENT_OPEN,
-          params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+          params: { contentId: secondContentId }
         })
 
-        cy.contains('.breadcrumbs__item', fullFilename_3)
+        cy.contains('.wsContentGeneric__header__titleWrapper', fullFilename_3)
 
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')

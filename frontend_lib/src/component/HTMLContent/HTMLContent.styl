@@ -5,9 +5,11 @@
   overflow-wrap anywhere
   & > *
     white-space inherit
-
-.html-content--translated
-  border-left-width 2px
-  border-left-style solid
-  padding-left 5px
-  color lightDarkGrey
+  &--translated
+    border-inline-start-width 2px
+    border-inline-start-style solid
+    padding-inline-start textSpacing
+    color lightDarkGrey
+    overflow-wrap anywhere
+  & *
+    unicode-bidi plaintext

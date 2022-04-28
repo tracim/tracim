@@ -117,8 +117,8 @@
     <script type="text/javascript" src="/custom_toolbox-assets/${custom_toolbox_file.name}?token=${cache_token}" nonce="${csp_nonce}"></script>
     % endfor
 
-    <script type="text/javascript" src="/assets/tracim.vendors~app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tracim.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.vendors~main.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tracim.main.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     <script type="text/javascript" src="/app/workspace.app.optimized.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
@@ -133,15 +133,15 @@
     <script type="text/javascript" src="/assets/bootstrap/popper-1.12.3.js?token=${cache_token}" nonce="${csp_nonce}"></script>
     <script type="text/javascript" src="/assets/bootstrap/bootstrap-4.0.0-beta.2.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
-    <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/jquery.tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-    <script type="text/javascript" src="/assets/tinymce-4.7.13/js/tinymce/themes/modern/theme.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
-
-    % for plugin in glob("assets/tinymce-4.7.13/js/tinymce/plugins/*/plugin.min.js"):
+    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/jquery.tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/tinymce.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/themes/silver/theme.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/icons/default/icons.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+    % for plugin in glob("assets/tinymce-5.10.3/js/tinymce/plugins/*/plugin.min.js"):
     <script type="text/javascript" src="/${plugin}?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
 
-    % for lang in glob("assets/tinymce-4.7.13/js/tinymce/langs/*.js"):
+    % for lang in glob("assets/tinymce-5.10.3/js/tinymce/langs/*.js"):
     <script type="text/javascript" src="/${lang}?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
 

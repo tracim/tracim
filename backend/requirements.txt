@@ -51,7 +51,9 @@ colorlog==5.0.1
 colour==0.1.5
     # via tracim-backend (setup.py)
 defusedxml==0.7.1
-    # via wsgidav
+    # via
+    #   radicale
+    #   wsgidav
 elasticsearch==7.13.1
     # via
     #   elasticsearch-dsl
@@ -92,7 +94,7 @@ jsonschema==3.2.0
     # via tracim-backend (setup.py)
 ldap3==2.9
     # via pyramid-ldap3
-lxml==4.6.3
+lxml==4.8.0
     # via
     #   caldav
     #   tracim-backend (setup.py)
@@ -114,18 +116,14 @@ multidict==5.1.0
     # via hapic
 packaging==20.9
     # via sqlakeyset
+passlib==1.7.4
+    # via radicale
 pastedeploy==2.1.1
     # via plaster-pastedeploy
 pbr==5.6.0
     # via
     #   cliff
     #   stevedore
-pdf2image==1.16.0
-    # via preview-generator
-pillow==8.2.0
-    # via
-    #   pdf2image
-    #   preview-generator
 plaster==1.0
     # via
     #   plaster-pastedeploy
@@ -138,7 +136,7 @@ pluggy==0.13.1
     # via tracim-backend (setup.py)
 prettytable==2.1.0
     # via cliff
-preview-generator==0.28
+preview-generator==0.29
     # via tracim-backend (setup.py)
 pubcontrol==3.2.0
     # via gripcontrol
@@ -158,14 +156,13 @@ pyparsing==2.4.7
     #   packaging
 pyperclip==1.8.2
     # via cmd2
-pyramid==1.10.8
+pyramid==2.0
     # via
     #   pyramid-beaker
     #   pyramid-debugtoolbar
     #   pyramid-ldap3
     #   pyramid-mako
     #   pyramid-multiauth
-    #   pyramid-retry
     #   pyramid-tm
     #   tracim-backend (setup.py)
 pyramid-beaker==0.8
@@ -179,8 +176,6 @@ pyramid-mako==1.1.0
     #   pyramid-debugtoolbar
     #   tracim-backend (setup.py)
 pyramid-multiauth==0.9.0
-    # via tracim-backend (setup.py)
-pyramid-retry==1.0
     # via tracim-backend (setup.py)
 pyramid-tm==2.4
     # via tracim-backend (setup.py)
@@ -210,7 +205,7 @@ pyyaml==5.4.1
     #   wsgidav
 pyzmq==22.1.0
     # via tracim-backend (setup.py)
-radicale==2.1.12
+radicale==3.1.0
     # via tracim-backend (setup.py)
 redis==3.5.3
     # via
@@ -269,7 +264,7 @@ vobject==0.9.6.1
     # via
     #   caldav
     #   radicale
-waitress==2.0.0
+waitress==2.1.1
     # via tracim-backend (setup.py)
 wand==0.6.6
     # via preview-generator
@@ -279,7 +274,7 @@ wcwidth==0.2.5
     #   prettytable
 webob==1.8.7
     # via pyramid
-webpreview==1.6.0
+webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo
     # via tracim-backend (setup.py)
 wsgidav==2.4.1
     # via tracim-backend (setup.py)
@@ -290,10 +285,9 @@ zope.deprecation==4.4.0
 zope.interface==5.4.0
     # via
     #   pyramid
-    #   pyramid-retry
     #   transaction
     #   zope.sqlalchemy
-zope.sqlalchemy==1.4
+zope.sqlalchemy==1.6
     # via tracim-backend (setup.py)
 
 # The following packages are considered to be unsafe in a requirements file:

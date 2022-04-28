@@ -9,10 +9,6 @@
   &__workspace
     display flex
     justify-content space-around
-    &__subtitle
-      font-size titleFontSize
-      font-weight bold
-      margin-left standardSpacing
     &__content
       width 70%
       & .activityList
@@ -30,6 +26,8 @@
       &__description
         overflow hidden
         text-overflow ellipsis
+        & *
+          unicode-bidi plaintext
         &__missing
           color mediumDarkGrey
           font-style italic
@@ -47,8 +45,8 @@
         margin-top standardSpacing
         width 55%
         text-align start
-        margin-left auto
-        margin-right auto
+        margin-inline-start auto
+        margin-inline-end auto
         max-width 100%
         text-overflow ellipsis
         overflow hidden
@@ -93,7 +91,10 @@
           width 100%
         & .workspaceRecentActivities__header
           font-size unset
-          margin 0px auto standardSpacing standardSpacing
+          margin-top 0px
+          margin-inline-end auto
+          margin-bottom standardSpacing
+          margin-inline-start standardSpacing
       &__rightMenu
         width 100%
         margin 0

@@ -49,10 +49,11 @@ describe('Publications page', () => {
 
     it('should be able to copy content link', () => {
       cy.get('.feedItemHeader__actionMenu__item[title="Copy content link"]').click()
-      cy.contains('.flashmessage__container__content__text__paragraph', 'The link has been copied to clipboard')
+      cy.contains('.flashmessage__container__content__text__paragraph', 'Link copied to clipboard')
     })
 
-    it('should be able to edit publication', () => {
+    it.skip('should be able to edit publication', () => {
+      // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
       cy.contains('.feedItem__publication__body__content__text', text)
       cy.get('.feedItemHeader__actionMenu__item[title="Edit"]').click()
       cy.get('.cardPopup__header__title').should('be.visible')

@@ -5,8 +5,8 @@ smallScreenFeedWidth = 400px
 .feedItem
   background-color backgroundColor
   border borderStyle
-  padding standardSpacing 0 standardSpacing standardSpacing
   margin-bottom standardSpacing
+  padding standardSpacing
   border-radius standardBorderRadius
   margin-inline-end auto
   margin-inline-start auto
@@ -17,21 +17,17 @@ smallScreenFeedWidth = 400px
     background-color offWhite
     margin-top standardSpacing
     border-radius standardBorderRadius
-    margin-right standardSpacing
   & .timeline
     width 100%
     height unset
+  & .timeline__texteditor
+    margin standardSpacing 0 0
   &__timeline
-    &__texteditor.timeline__texteditor
-      margin standardSpacing 0 0
     &__messagelist
       padding 0
-    &__comment.sent
-      margin-inline-end standardSpacing
   &__publication
     &__messagelist__item
       margin-bottom 0
-      padding-inline-end standardSpacing
     &.comment
       border 0
       &.sent, &.received

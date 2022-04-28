@@ -7,7 +7,7 @@ import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import Logo from '../component/Header/Logo.jsx'
 import NavbarToggler from '../component/Header/NavbarToggler.jsx'
-import DropdownLang from '../component/Header/MenuActionListItem/DropdownLang.jsx'
+import DropdownLang from '../component/DropdownLang.jsx'
 import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import NotificationButton from '../component/Header/MenuActionListItem/NotificationButton.jsx'
 import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
@@ -170,11 +170,13 @@ export class Header extends React.Component {
                 </li>
               )}
 
-              <DropdownLang
-                langList={props.lang}
-                langActiveId={props.user.lang}
-                onChangeLang={this.handleChangeLang}
-              />
+              {!props.user.logged && (
+                <DropdownLang
+                  langList={props.lang}
+                  langActiveId={props.user.lang}
+                  onChangeLang={this.handleChangeLang}
+                />
+              )}
 
               <MenuProfil
                 user={props.user}

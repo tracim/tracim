@@ -46,9 +46,10 @@ def workspace_search_fixture(
     rapi.create_one(
         riyad_user, bob_and_riyad, role_level=UserRoleInWorkspace.CONTRIBUTOR, with_notif=False,
     )
+    private = wapi.create_workspace(label="private", description="private")
     transaction.commit()
     elasticsearch.refresh_elasticsearch()
-    return (bob_only, bob_and_riyad)
+    return (bob_only, bob_and_riyad, private)
 
 
 @pytest.fixture
@@ -58,7 +59,7 @@ def content_search_fixture(
     content_api_factory: ContentApiFactory,
     workspace_search_fixture: typing.Tuple[Workspace, Workspace],
 ) -> Content:
-    (bob_only, _) = workspace_search_fixture
+    (bob_only, _, _) = workspace_search_fixture
     capi = content_api_factory.get(bob_only.owner)
     content = capi.create(
         content_type_slug="html-document",
@@ -1201,19 +1202,19 @@ class TestElasticSearchWorkspaceSearch:
     def test_api__elasticsearch_workspace_search__ok__check_result(
         self, web_testapp, workspace_search_fixture: typing.Tuple[User, User],
     ) -> None:
-        (bob_only_workspace, _) = workspace_search_fixture
-        bob = bob_only_workspace.owner
+        (_, _, private_workspace) = workspace_search_fixture
+        bob = private_workspace.owner
         web_testapp.authorization = ("Basic", (bob.username, "password"))
-        parameters = {"search_string": bob_only_workspace.label}
+        parameters = {"search_string": private_workspace.label}
         search_result = web_testapp.get(
             "/api/advanced_search/workspace", params=parameters, status=200
         ).json_body
         workspaces = search_result["workspaces"]
         assert len(workspaces) == 1
         assert workspaces[0] == {
-            "workspace_id": bob_only_workspace.workspace_id,
-            "access_type": bob_only_workspace.access_type.value,
-            "label": bob_only_workspace.label,
+            "workspace_id": private_workspace.workspace_id,
+            "access_type": private_workspace.access_type.value,
+            "label": private_workspace.label,
             "content_count": 0,
             "member_count": 1,
         }
@@ -1250,7 +1251,7 @@ class TestElasticSearchWorkspaceSearch:
     @pytest.mark.parametrize(
         "authorization, query_parameters, expected_workspace_ids, total_hits",
         [
-            (("bob", "password"), {"search_string": "bob_only"}, [1], 1),
+            (("bob", "password"), {"search_string": "bob_only"}, [1, 2], 2),
             (("bob", "password"), {"search_string": "bob"}, [1, 2], 2),
             (("bob", "password"), {"search_string": "bob", "member_ids": [3]}, [2], 1),
             (("bob", "password"), {"search_string": "bloody"}, [1], 1),

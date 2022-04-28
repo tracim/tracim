@@ -27,13 +27,7 @@ if [ "$1" = "-d" ]; then
     dev="-dev"
 fi
 
-log "build frontend_app_custom-form"
-yarn run buildoptimized$dev && loggood "success" || logerror "some error"
-log "copying built file to frontend/"
-cp dist/custom-form.app.js ../frontend/dist/app/custom-form.app.js && loggood "success" || logerror "some error"
-log "copying en translation.json"
-cp i18next.scanner/en/translation.json ../frontend/dist/app/custom-form_en_translation.json && loggood "success" || logerror "some error"
-log "copying fr translation.json"
-cp i18next.scanner/fr/translation.json ../frontend/dist/app/custom-form_fr_translation.json && loggood "success" || logerror "some error"
-log "copying de translation.json"
-cp i18next.scanner/de/translation.json ../frontend/dist/app/custom-form_de_translation.json && loggood "success" || logerror "some error"
+for lang in $(ls i18next.scanner); do
+    log "copying ${lang}/translation.json"
+    cp i18next.scanner/"${lang}"/translation.json ../frontend/dist/app/custom-form_"${lang}"_translation.json && loggood "success" || logerror "some error"
+done

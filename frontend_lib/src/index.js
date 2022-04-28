@@ -1,4 +1,4 @@
-import i18n from './i18n.js'
+import i18n, { getBrowserLang } from './i18n.js'
 import {
   addAllResourceI18n,
   addRevisionFromTLM,
@@ -55,7 +55,6 @@ import {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
-  htmlCodeToDocumentFragment,
   sendGlobalFlashMessage,
   PAGE,
   getAvatarBaseUrl,
@@ -63,6 +62,7 @@ import {
   DATE_FNS_LOCALE,
   getFileDownloadUrl,
   htmlToText,
+  tinymceRemove,
   addExternalLinksIcons,
   USER_CALL_STATE
 } from './helper.js'
@@ -101,6 +101,7 @@ import {
 
 import { defaultDebug } from './debug.js'
 
+import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
@@ -222,7 +223,8 @@ import {
   getGenericWorkspaceContent,
   getRawFileContent,
   putRawFileContent,
-  postRawFileContent
+  postRawFileContent,
+  getFileRevisionPreviewInfo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -239,6 +241,7 @@ export const enTranslation = require('../i18next.scanner/en/translation.json')
 export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
+export const arTranslation = require('../i18next.scanner/ar/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
@@ -274,6 +277,7 @@ export {
 } from './translation.js'
 
 export {
+  AgendaInfo,
   appContentFactory,
   DateInput,
   TIMELINE_ITEM_COUNT_PER_PAGE,
@@ -425,7 +429,6 @@ export {
   scrollIntoViewIfNeeded,
   darkenColor,
   lightenColor,
-  htmlCodeToDocumentFragment,
   sendGlobalFlashMessage,
   LiveMessageManager,
   LIVE_MESSAGE_STATUS,
@@ -455,5 +458,8 @@ export {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
-  Popover
+  getFileRevisionPreviewInfo,
+  tinymceRemove,
+  Popover,
+  getBrowserLang
 }

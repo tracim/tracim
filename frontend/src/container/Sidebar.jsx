@@ -9,11 +9,11 @@ import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { addWorkspaceList } from '../action-creator.sync.js'
 import {
   NO_ACTIVE_SPACE_ID,
-  workspaceConfig,
+  TRACIM_APP_VERSION,
+  findUserRoleIdInWorkspace,
   getUserProfile,
   unLoggedAllowedPageList,
-  findUserRoleIdInWorkspace,
-  TRACIM_APP_VERSION
+  workspaceConfig
 } from '../util/helper.js'
 import {
   createSpaceTree,
@@ -78,14 +78,14 @@ export class Sidebar extends React.Component {
           allowedAppList={space.sidebarEntryList}
           foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
           hasChildren={space.children.length > 0}
+          id={this.spaceItemId(space.id)}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={this.handleClickAllContent}
-          userRoleIdInWorkspace={findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)}
-          workspaceId={space.id}
-          id={this.spaceItemId(space.id)}
           onClickToggleSidebar={this.handleClickToggleSidebar}
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
+          userRoleIdInWorkspace={[findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)]}
+          workspaceId={space.id}
         />
         {!state.foldedSpaceList.find(id => id === space.id) &&
           space.children.length !== 0 &&
@@ -189,8 +189,8 @@ export class Sidebar extends React.Component {
       <div className='sidebar'>
         <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {state.sidebarClose
-            ? <i className={classnames('fas fa-chevron-right')} title={props.t('See sidebar')} />
-            : <i className={classnames('fas fa-chevron-left')} title={props.t('Hide sidebar')} />}
+            ? <i className={classnames('fas', 'fa-chevron-right')} title={props.t('See sidebar')} />
+            : <i className={classnames('fas', 'fa-chevron-left')} title={props.t('Hide sidebar')} />}
         </div>
         <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
           <div className='sidebar__scrollview'>
@@ -255,5 +255,5 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, workspaceList, system, accessibleWorkspaceList }) => ({ user, workspaceList, system, accessibleWorkspaceList })
+const mapStateToProps = ({ accessibleWorkspaceList, system, user, workspaceList }) => ({ accessibleWorkspaceList, system, user, workspaceList })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))

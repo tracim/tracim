@@ -8,6 +8,8 @@ GREEN='\033[1;32m'
 RED='\033[1;31m'
 NC='\033[0m' # No Color
 
+DESIRED_YARN_VERSION=3.2
+
 function log {
     echo -e "\n${YELLOW}[$(date +'%H:%M:%S')]${BROWN} $ $1${NC}"
 }
@@ -120,44 +122,39 @@ debian_install() {
     fi
 }
 
-yarn_expected_version() {
-    min_yarn2_rc_version=34
-    # RJ - 2020-06-12 - NOTE: Yarn 2.0.0-rc.33 and earlier had issues related
-    # to rewritting the checksums of the whole yarn.lock by prefixing them
-    # with 2/ or 3/. We could not find anything about this issue on the web.
-    case "$1" in
-        2.0.*)
-            [ "$(printf "$1" | awk -F'rc.' '{print $2}')" -ge "$min_yarn2_rc_version" ];
-            return $?
-        ;;
-        2.*)
-            return 0
-        ;;
-    esac
-    return 1
-}
-
 setup_yarn() {
     yarn_version="$(yarn -v)"
+    node_major_version=$(node -v | cut -d. -f1 | sed 's/v//g')
+    node_minor_version=$(node -v | cut -d. -f2)
 
-    if ! yarn_expected_version "$yarn_version" ; then
-        log "You have Yarn $yarn_version. Setting up Yarn 2 to version 2.1.1."
+    if [[ "$yarn_version" != "$DESIRED_YARN_VERSION"* ]]; then
+        log "Yarn is installed but doesn't match the desired version. Trying to update…"
 
-        # RJ - 2020-08-31 - FIXME (#2953)
-        # We cap the version of Yarn to 2.1.1 because later versions require node
-        # version 10.17 or more. Unfortunately, Travis installs node 10.16.
-        # We need to upgrade Node version to 12 or 14 to use later versions of Yarn.
-        # Locally, the version of Node is not enforced, later versions of Yarn
-        # would work since the installed version of Node if usually 10.17 or later.
+        if ! command -v corepack &> /dev/null
+        then
+            log "Installing corepack…"
+            if [ "$node_major_version" -lt 16 ]; then
+                log "Node < 16.x, installing corepack…"
+                npm i -g corepack
+            else
+                if [ "$node_minor_version" -lt 10 ]; then
+                    log "Node < 16.10.x, installing corepack…"
+                    npm i -g corepack
+                fi
+            fi
+        fi
 
-        case "$yarn_version" in
-            2.*) YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
-            *) yarn policies set-version berry; YARN_IGNORE_NODE=1 yarn set version 2.1.1 ;;
-        esac
+        log "Enabling corepack…"
+        corepack enable
+
+        # NOTE - MP - 2022-04-22 - Support for ranges got removed, so we have to update to an exact version.
+        log "Updating yarn to version $DESIRED_YARN_VERSION.0…"
+
+        yarn set version $DESIRED_YARN_VERSION.0
 
         yarn_version="$(yarn -v)"
-        if ! yarn_expected_version "$yarn_version" ; then
-            logerror "We expected Yarn 2 ≥ 2.0.0-rc.33, we got $yarn_version."
+        if [[ "$yarn_version" != "$DESIRED_YARN_VERSION"* ]]; then
+            logerror "We expected Yarn 3.2.0, we got $yarn_version."
         fi
     fi
 

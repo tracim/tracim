@@ -8,7 +8,7 @@
       color white
   &__lastversionbtn
     cursor pointer
-    margin-right standardSpacing
+    margin-inline-end standardSpacing
   &__option
     &__menu
       &__addversion
@@ -19,7 +19,7 @@
         background-color transparent
         cursor pointer
         & > i
-          margin-left standardSpacing
+          margin-inline-start standardSpacing
   &__contentpage
     width 100%
     &__option
@@ -28,10 +28,14 @@
     &__content
       &__left
         background-color offWhite
+        display flex
+        flex-direction column
     &__statewrapper
       overflow-y auto
       position relative
-      height 100%
+      display flex
+      flex-direction column
+      flex 1
       &.promptMessageWrapper > .previewcomponent // render .file__contentpage__statewrapper.promptMessageWrapper .file__contentpage__preview
         height calc(100% - 68px) // 100% - file__contentpage__preview__state height
     &__wrapper
@@ -42,12 +46,15 @@
         &__messagelist
           min-height 300px
     &__dropzone
-      padding 20px 15px 20px 20px
+      padding-top 20px
+      padding-inline-end 15px
+      padding-bottom 20px
+      padding-inline-start 20px
       &__btn
         display flex
         justify-content flex-end
         &__cancel
-          margin-right 15px
+          margin-inline-end 15px
     &__rightContent
       width 100%
     &__messagelist
@@ -94,8 +101,16 @@
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .file
+    height "calc(100% - %s)" % headerHeight
     &__contentpage
       display block
+      &__messagelist
+        overflow-y visible
+      &__content
+        &__left
+          min-height 60%
+        &__right
+          min-height 40%
       &__preview
         display flex
         flex-direction column
@@ -111,31 +126,15 @@
             margin standardSpacing 0
             &__btn
               display flex
-              margin-left 35px
+              margin-inline-start 35px
               &__icon
-                margin-left 15px
+                margin-inline-start 15px
       &__statewrapper
         padding 0
-
-@media (min-width: min-lg) and (max-width: max-lg)
-  .file
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-md) and (max-width: max-md)
-  .file
-    &__contentpage__content__left
-      min-height 250px
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .file
-    height "calc(100% - %s)" % headerHeight
-    &__contentpage__content__left
-      min-height 250px
+        height calc(100% - 88px)
 
 @media (max-width: max-xs)
   .file
-    height "calc(100% - %s)" % headerHeight
     &__lastversionbtn
       > span
         display none
@@ -156,7 +155,6 @@
       &__content
         &__left
           width 100%
-          min-height 250px
         &__right
           width 100%
           height 100%
@@ -169,12 +167,12 @@
           &__simpletext
             display inline-flex
             width 60%
-            margin-right 0
+            margin-inline-end 0
           &__submit
             display inline-flex
             margin standardSpacing 0
             &__btn
               display flex
-              margin-left standardSpacing
+              margin-inline-start standardSpacing
               &__icon
-                margin-left 15px
+                margin-inline-start 15px

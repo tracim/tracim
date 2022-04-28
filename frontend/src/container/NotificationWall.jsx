@@ -1,81 +1,250 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import {
   getNotificationList,
-  putAllNotificationAsRead,
-  putNotificationAsRead
+  putAllNotificationAsRead
 } from '../action-creator.async.js'
 import {
   appendNotificationList,
   newFlashMessage,
-  readNotification,
   readNotificationList,
   setNextPage
 } from '../action-creator.sync.js'
 import {
-  CONTENT_NAMESPACE
+  CONTENT_NAMESPACE,
+  GROUP_NOTIFICATION_CRITERIA
 } from '../util/helper.js'
 import {
   CONTENT_TYPE,
-  IconButton,
   GROUP_MENTION_TRANSLATION_LIST,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
   PROFILE,
-  ListItemWrapper,
+  SUBSCRIPTION_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_EVENT,
   TLM_ENTITY_TYPE as TLM_ENTITY,
   TLM_SUB_TYPE as TLM_SUB,
-  SUBSCRIPTION_TYPE,
-  NUMBER_RESULTS_BY_PAGE,
-  PAGE,
+  IconButton,
+  ListItemWrapper,
   PopinFixedHeader,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { escape as escapeHtml } from 'lodash'
+import { cloneDeep, escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
 import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
-export class NotificationWall extends React.Component {
-  shortDate = date => {
-    const { props } = this
+export const NotificationWall = props => {
+  const [notificationList, setNotificationList] = useState([])
 
-    const msElapsed = Date.now() - new Date(date).getTime()
-    if (msElapsed < 60000) return Math.round(msElapsed / 1000) + ' ' + props.t('sec')
-    if (msElapsed < 3600000) return Math.round(msElapsed / 60000) + ' ' + props.t('min')
-    if (msElapsed < 3600000 * 24) return Math.round(msElapsed / 3600000) + ' ' + props.t('hr')
-    if (msElapsed < 3600000 * 24 * 7) return Math.round(msElapsed / (3600000 * 24)) + ' ' + props.t('d')
-    if (msElapsed < 3600000 * 24 * 30) return Math.round(msElapsed / (3600000 * 24 * 7)) + ' ' + props.t('w')
-    if (msElapsed < 3600000 * 24 * 365) return Math.round(msElapsed / (3600000 * 24 * 20)) + ' ' + props.t('mth')
-    return Math.round(msElapsed / (3600000 * 24 * 365)) + ' ' + props.t('y')
+  const NUMBER_OF_CRITERIA = {
+    ONE: 1,
+    TWO: 2
   }
 
-  handleClickNotification = async (e, notificationId, notificationDetails) => {
-    const { props } = this
-
-    if (!notificationDetails.url) {
-      if (notificationDetails.emptyUrlMsg) {
-        props.dispatch(newFlashMessage(notificationDetails.emptyUrlMsg, notificationDetails.msgType || 'warning'))
+  useEffect(() => {
+    let tmpNotificationList = []
+    props.notificationPage.list.forEach(notification => {
+      let newNotificationList = cloneDeep(tmpNotificationList)
+      if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
+        if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
+          newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([...newNotificationList, notification], 'id'))
+        }
       }
-      e.preventDefault()
-    }
+      tmpNotificationList = newNotificationList
+    })
 
-    const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
-    switch (fetchPutNotificationAsRead.status) {
-      case 204: {
-        props.dispatch(readNotification(notificationId))
-        break
-      }
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-    }
+    setNotificationList(tmpNotificationList)
+  }, [props.notificationPage.list])
 
-    props.onCloseNotificationWall()
+  const hasSameAuthor = authorList => {
+    return !authorList.some((author, index) => {
+      return !author || (index && author.userId !== authorList[index - 1].userId)
+    })
   }
 
-  handleClickSeeMore = async () => {
-    const { props } = this
+  const hasSameWorkspace = workspaceList => {
+    return !workspaceList.some((workspace, index) => {
+      return !workspace || (index && workspace.id !== workspaceList[index - 1].id)
+    })
+  }
 
+  const hasSameContent = notificationList => {
+    if (notificationList.some(notification => !notification.content)) return false
+    return notificationList.every((notification, index) => {
+      if (index === 0) return true
+      return getMainContentId(notification) === getMainContentId(notificationList[index - 1])
+    })
+  }
+
+  const belongsToGroup = (notification, groupedNotification, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
+    if (!groupedNotification || !groupedNotification.group) return false
+
+    const isGroupedByContent = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT) &&
+      hasSameContent([notification, groupedNotification])
+
+    const isGroupedByWorkspace = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.WORKSPACE) &&
+      hasSameWorkspace([notification.workspace, groupedNotification.group[0].workspace])
+
+    const isGroupedByAuthor = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.AUTHOR) &&
+      hasSameAuthor([notification.author, groupedNotification.group[0].author])
+
+    const groupedByOneCriteria =
+      (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
+
+    const groupedByTwoCriteria =
+      (numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
+        (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace)))
+
+    if (groupedByOneCriteria || groupedByTwoCriteria) {
+      groupedNotification.group = sortByCreatedDate([notification, ...groupedNotification.group])
+
+      groupedNotification.type = `${numberOfCriteria}` +
+        `${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}` +
+        `${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}` +
+        `${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
+
+      groupedNotification.created = new Date(notification.created).getTime() < new Date(groupedNotification.created).getTime()
+        ? groupedNotification.created
+        : notification.created
+      return true
+    }
+  }
+
+  const groupNotificationListWithTwoCriteria = (notificationList) => {
+    const numberOfNotificationsToGroup = 3
+    const newNotificationList = []
+    let indexInNewList = 0
+
+    notificationList.forEach((notification, index) => {
+      if (index < (numberOfNotificationsToGroup - 1) || notification.type.includes(TLM_ENTITY.MENTION)) {
+        indexInNewList++
+        newNotificationList.push(notification)
+        return
+      }
+
+      const previousNotificationInNewList = newNotificationList[indexInNewList - 1]
+      if (belongsToGroup(notification, previousNotificationInNewList, NUMBER_OF_CRITERIA.TWO)) return
+      else {
+        addNewNotificationGroup(
+          notification,
+          newNotificationList,
+          indexInNewList,
+          numberOfNotificationsToGroup,
+          NUMBER_OF_CRITERIA.TWO
+        )
+        if (newNotificationList.length !== indexInNewList) {
+          indexInNewList = newNotificationList.length
+          return
+        }
+      }
+
+      indexInNewList++
+      newNotificationList.push(notification)
+    })
+
+    return groupNotificationListWithOneCriteria(newNotificationList)
+  }
+
+  const groupNotificationListWithOneCriteria = (notificationList) => {
+    const numberOfNotificationsToGroup = 6
+    const newNotificationList = []
+    let indexInNewList = 0
+
+    notificationList.forEach((notification, index) => {
+      if (index < numberOfNotificationsToGroup - 1 || notification.type.includes(TLM_ENTITY.MENTION) || notification.group) {
+        indexInNewList++
+        newNotificationList.push(notification)
+        return
+      }
+
+      const previousNotificationInNewList = newNotificationList[indexInNewList - 1]
+
+      if (previousNotificationInNewList.type.startsWith(NUMBER_OF_CRITERIA.TWO)) {
+        indexInNewList++
+        newNotificationList.push(notification)
+        return
+      }
+      if (belongsToGroup(notification, previousNotificationInNewList, NUMBER_OF_CRITERIA.ONE)) return
+      else {
+        addNewNotificationGroup(
+          notification,
+          newNotificationList,
+          indexInNewList,
+          numberOfNotificationsToGroup,
+          NUMBER_OF_CRITERIA.ONE
+        )
+        if (newNotificationList.length !== indexInNewList) {
+          indexInNewList = newNotificationList.length
+          return
+        }
+      }
+
+      indexInNewList++
+      newNotificationList.push(notification)
+    })
+    return newNotificationList
+  }
+
+  const addNewNotificationGroup = (notification, newNotificationList, indexInNewList, numberOfNotificationsToGroup, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
+    if (
+      indexInNewList >= (numberOfNotificationsToGroup - 1) &&
+      !newNotificationList
+        .slice(indexInNewList - (numberOfNotificationsToGroup - 1), indexInNewList)
+        .some(notification => notification.group)
+    ) {
+      const previousNotificationList = newNotificationList
+        .slice(indexInNewList - (numberOfNotificationsToGroup - 1), indexInNewList)
+      const isGroupedByAuthor = hasSameAuthor([notification.author, ...previousNotificationList.map(notification => notification.author)])
+      const isGroupedByWorkspace = hasSameWorkspace([notification.workspace, ...previousNotificationList.map(notification => notification.workspace)])
+      const isGroupedByContent = hasSameContent([notification, ...previousNotificationList])
+
+      if (
+        ((numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
+          (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace))) ||
+          (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
+        ) &&
+        (!previousNotificationList.some(notification => notification.type.includes(TLM_ENTITY.MENTION)))
+      ) {
+        const authorList = uniqBy([
+          notification.author,
+          ...previousNotificationList.map(notification => notification.author)
+        ], 'userId')
+
+        for (let i = 0; i < (numberOfNotificationsToGroup - 1); i++) newNotificationList.pop()
+        const notificationGroupList = sortByCreatedDate([notification, ...previousNotificationList])
+        const groupType = `${numberOfCriteria}` +
+          `${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}` +
+          `${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}` +
+          `${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
+
+        newNotificationList.push({
+          author: authorList,
+          created: notificationGroupList[0].created,
+          id: notification.id,
+          type: groupType,
+          group: notificationGroupList
+        })
+      }
+    }
+  }
+
+  const sortByCreatedDate = (arrayToSort) => {
+    return arrayToSort.sort(function (a, b) {
+      if (a.created < b.created) return 1
+      if (a.created > b.created) return -1
+      return 0
+    })
+  }
+
+  const getMainContentId = (notification) => {
+    return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ENTITY.MENTION)
+      ? notification.content.parentId
+      : notification.content.id
+  }
+
+  const handleClickSeeMore = async () => {
     const fetchGetNotificationWall = await props.dispatch(getNotificationList(
       props.user.userId,
       {
@@ -86,7 +255,7 @@ export class NotificationWall extends React.Component {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:
@@ -94,9 +263,7 @@ export class NotificationWall extends React.Component {
     }
   }
 
-  getNotificationDetails = notification => {
-    const { props } = this
-
+  const getNotificationDetails = notification => {
     const [entityType, eventType, contentType] = notification.type.split('.')
 
     const escapedAuthor = notification.author ? escapeHtml(notification.author.publicName) : ''
@@ -126,7 +293,7 @@ export class NotificationWall extends React.Component {
 
     if (notification.numberOfWorkspaces > 1) {
       i18nOpts.workspaceInfo = `<span title='${notification.numberOfWorkspaces}'>${
-        props.t(' in {{numberOfWorkspaces}} spaces', { numberOfWorkspaces: notification.numberOfWorkspaces })
+        props.t(' in {{count}} spaces', { count: notification.numberOfWorkspaces })
       }</span>`
     }
 
@@ -141,7 +308,7 @@ export class NotificationWall extends React.Component {
             return {
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}}{{workspaceInfo}}', i18nOpts),
-              url: this.linkToComment(notification)
+              url: linkToComment(notification)
             }
           }
 
@@ -187,10 +354,15 @@ export class NotificationWall extends React.Component {
       const groupMention = GROUP_MENTION_TRANSLATION_LIST.includes(notification.mention.recipient)
       const mentionEveryone = props.t('{{author}} mentioned everyone in {{content}}', i18nOpts)
       const mentionYou = props.t('{{author}} mentioned you in {{content}}', i18nOpts)
+      const isHtmlDocument = notification.content.type === CONTENT_TYPE.HTML_DOCUMENT
+
       return {
         title: props.t('Mention'),
         text: groupMention ? mentionEveryone : mentionYou,
-        url: PAGE.CONTENT(notification.content.parentId),
+        url: PAGE.CONTENT(isHtmlDocument
+          ? notification.content.id
+          : notification.content.parentId
+        ),
         isMention: true
       }
     }
@@ -408,9 +580,7 @@ export class NotificationWall extends React.Component {
     }
   }
 
-  handleClickMarkAllAsRead = async () => {
-    const { props } = this
-
+  const handleClickMarkAllAsRead = async () => {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
     switch (fetchAllPutNotificationAsRead.status) {
       case 204:
@@ -421,78 +591,74 @@ export class NotificationWall extends React.Component {
     }
   }
 
-  linkToComment (notification) {
+  const linkToComment = notification => {
     return PAGE.CONTENT(notification.content.parentId)
   }
 
-  render () {
-    const { props } = this
+  return (
+    <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
+      <PopinFixedHeader
+        customClass='notification'
+        faIcon='far fa-bell'
+        rawTitle={props.t('Notifications')}
+        componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
+        onClickCloseBtn={props.onCloseNotificationWall}
+      >
+        <IconButton
+          mode='dark'
+          onClick={handleClickMarkAllAsRead}
+          icon='far fa-envelope-open'
+          text={props.t('Mark all as read')}
+          dataCy='markAllAsReadButton'
+        />
+      </PopinFixedHeader>
 
-    if (!props.notificationPage.list) return null
-
-    return (
-      <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
-        <PopinFixedHeader
-          customClass='notification'
-          faIcon='far fa-bell'
-          rawTitle={props.t('Notifications')}
-          componentTitle={<div>{props.t('Notifications')}</div>}
-          onClickCloseBtn={props.onCloseNotificationWall}
-        >
-          <IconButton
-            mode='dark'
-            onClick={this.handleClickMarkAllAsRead}
-            icon='far fa-envelope-open'
-            text={props.t('Mark all as read')}
-            dataCy='markAllAsReadButton'
-          />
-        </PopinFixedHeader>
-
-        <div className='notification__list'>
-          {props.notificationPage.list.length !== 0 && props.notificationPage.list.map((notification, i) => {
+      <div className='notification__list'>
+        {notificationList.length !== 0 && notificationList.map((notification, i) => {
+          if (notification.group) {
+            return (
+              <GroupedNotificationItem
+                getNotificationDetails={getNotificationDetails}
+                groupedNotifications={notification}
+                isFirst={i === 0}
+                isLast={i === notificationList.length - 1}
+                isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
+                key={notification.id}
+                onCloseNotificationWall={props.onCloseNotificationWall}
+                read={false}
+              />
+            )
+          } else {
             return (
               <ListItemWrapper
-                isLast={i === props.notificationPage.list.length - 1}
                 isFirst={i === 0}
+                isLast={i === notificationList.length - 1}
                 read={false}
                 key={notification.id}
               >
-                {notification.group
-                  ? (
-                    <GroupedNotificationItem
-                      getNotificationDetails={this.getNotificationDetails}
-                      notification={notification}
-                      onClickNotification={this.handleClickNotification}
-                      shortDate={this.shortDate}
-                    />
-                  )
-                  : (
-                    <NotificationItem
-                      getNotificationDetails={this.getNotificationDetails}
-                      notification={notification}
-                      onClickNotification={this.handleClickNotification}
-                      shortDate={this.shortDate}
-                      user={props.user}
-                    />
-                  )}
+                <NotificationItem
+                  onCloseNotificationWall={props.onCloseNotificationWall}
+                  getNotificationDetails={getNotificationDetails}
+                  notification={notification}
+                />
               </ListItemWrapper>
             )
-          })}
+          }
+        })}
 
-          {props.notificationPage.hasNextPage &&
-            <div className='notification__footer'>
-              <IconButton
-                mode='dark'
-                onClick={this.handleClickSeeMore}
-                icon='fas fa-chevron-down'
-                text={props.t('See more')}
-              />
-            </div>}
-        </div>
+        {props.notificationPage.hasNextPage &&
+          <div className='notification__footer'>
+            <IconButton
+              mode='dark'
+              onClick={handleClickSeeMore}
+              icon='fas fa-chevron-down'
+              text={props.t('See more')}
+            />
+          </div>}
       </div>
-    )
-  }
+    </div>
+  )
 }
 
-const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
+const mapStateToProps = ({ user, notificationPage, workspaceList }) => ({ user, notificationPage, workspaceList })
 export default connect(mapStateToProps)(translate()(TracimComponent(NotificationWall)))

@@ -23,12 +23,20 @@ export const LINK_REGEX = /#([0-9]+)(?=\s|$)/
 export const LINK_TAG_NAME = 'a'
 export const LINK_CLASS = 'internal_link primaryColorFont'
 
-export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos', 'alle']
+export const GROUP_MENTION_TRANSLATION_LIST = ['all', 'tous', 'todos', 'alle', 'الكل']
 
 const wrapMentionsFromText = (text, doc, invalidMentionList) => {
-  // takes a text as string, and returns a document fragment
+  // INFO - GB - 2022-02-28 - takes a text as string, and returns a document fragment
   // containing this text, with tags added for the mentions
-  const match = text.match(MENTION_REGEX)
+  // The second RegEx support arabic group mention
+  const matchMention = text.match(MENTION_REGEX)
+  const matchArabic = text.match(/@(الكل)(?=\s|$)/)
+  let match
+
+  if (matchArabic && matchMention) {
+    match = matchArabic.index < matchMention.index ? matchArabic : matchMention
+  } else match = matchArabic || matchMention
+
   if (!match || (match.index > 0 && (text[match.index - 1].trim()))) {
     return doc.createTextNode(text)
   }

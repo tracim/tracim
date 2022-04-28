@@ -39,6 +39,7 @@ from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import PaginatedObject
+from tracim_backend.models.context_models import RevisionInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
@@ -56,9 +57,11 @@ from tracim_backend.views.core_api.schemas import FileRevisionPathSchema
 from tracim_backend.views.core_api.schemas import FileRevisionPreviewSizedPathSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PageQuerySchema
+from tracim_backend.views.core_api.schemas import PreviewInfoSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
+from tracim_backend.views.core_api.schemas import WorkspaceAndContentRevisionIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -542,13 +545,15 @@ class FileController(Controller):
         )
         return api.get_jpg_preview_allowed_dim()
 
-    # File infos
+    # File content
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
     @check_right(is_file_content)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.output_body(FileContentSchema())
-    def get_file_infos(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
+    def get_file_content(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> ContentInContext:
         """
         Get file content
         """
@@ -571,7 +576,7 @@ class FileController(Controller):
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(ContentModifySchema())
     @hapic.output_body(FileContentSchema())
-    def update_file_info(
+    def update_file_content(
         self, context, request: TracimRequest, hapic_data=None
     ) -> ContentInContext:
         """
@@ -657,6 +662,51 @@ class FileController(Controller):
             api.save(content)
         return
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @check_right(is_reader)
+    @check_right(is_file_content)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(PreviewInfoSchema())
+    def get_file_preview_info(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> RevisionInContext:
+        """
+        Get file preview infos
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        return api.get_revision_in_context(content.current_revision)
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @check_right(is_reader)
+    @check_right(is_file_content)
+    @hapic.input_path(WorkspaceAndContentRevisionIdPathSchema())
+    @hapic.output_body(PreviewInfoSchema())
+    def get_file_revision_preview_info(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> RevisionInContext:
+        """
+        Get a revision preview infos
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        revision = api.get_one_revision(revision_id=hapic_data.path.revision_id, content=content)
+        return api.get_revision_in_context(revision)
+
     def bind(self, configurator: Configurator) -> None:
         """
         Add route to configurator.
@@ -665,16 +715,16 @@ class FileController(Controller):
         # file info #
         # Get file info
         configurator.add_route(
-            "file_info", "/workspaces/{workspace_id}/files/{content_id}", request_method="GET"
+            "file_content", "/workspaces/{workspace_id}/files/{content_id}", request_method="GET"
         )
-        configurator.add_view(self.get_file_infos, route_name="file_info")
+        configurator.add_view(self.get_file_content, route_name="file_content")
         # update file
         configurator.add_route(
-            "update_file_info",
+            "update_file_content",
             "/workspaces/{workspace_id}/files/{content_id}",
             request_method="PUT",
         )
-        configurator.add_view(self.update_file_info, route_name="update_file_info")
+        configurator.add_view(self.update_file_content, route_name="update_file_content")
 
         # raw file #
         # create file
@@ -747,6 +797,13 @@ class FileController(Controller):
             "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/jpg/{width}x{height}/{filename:[^/]*}",
             request_method="GET",
         )
+        # get preview info for content
+        configurator.add_route(
+            "preview_info",
+            "/workspaces/{workspace_id}/files/{content_id}/preview_info",
+            request_method="GET",
+        )
+        configurator.add_view(self.get_file_preview_info, route_name="preview_info")
         configurator.add_view(
             self.sized_preview_jpg_revision, route_name="sized_preview_jpg_revision"
         )
@@ -766,6 +823,15 @@ class FileController(Controller):
             request_method="GET",
         )
         configurator.add_view(self.preview_pdf_revision, route_name="preview_pdf_revision")
+        # get preview info for revision
+        configurator.add_route(
+            "preview_info_revision",
+            "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview_info",
+            request_method="GET",
+        )
+        configurator.add_view(
+            self.get_file_revision_preview_info, route_name="preview_info_revision"
+        )
         # others #
         # get file revisions
         configurator.add_route(

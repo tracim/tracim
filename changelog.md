@@ -1,3 +1,97 @@
+# 4.2.0 / 2022-04-28
+
+### New Features
+
+- The user interface is now available in Arabic
+- Handle right-to-left languages on interface
+- Feature improvements: Notifications, Kanban, Agenda
+- UI/UX improvements (responsive, buttons, redirections)
+- External links to pictures now have a preview in comments
+
+For technical users:
+- Tracimcli command lines have been added to validate custom properties schema and mail config validation
+- Add support for anonymous LDAP and anonymous SMTP authentication has been added
+
+### Fixed Issues
+
+- Backend: [#3929](https://github.com/tracim/tracim/issues/3929),
+[#4536](https://github.com/tracim/tracim/issues/4536),
+[#4706](https://github.com/tracim/tracim/issues/4706),
+[#5334](https://github.com/tracim/tracim/issues/5334),
+[#5378](https://github.com/tracim/tracim/issues/5378),
+[#5495](https://github.com/tracim/tracim/issues/5495),
+[#5539](https://github.com/tracim/tracim/issues/5539),
+[#5558](https://github.com/tracim/tracim/issues/5558),
+[#5559](https://github.com/tracim/tracim/issues/5559)
+- Frontend: [#4813](https://github.com/tracim/tracim/issues/4813),
+[#5313](https://github.com/tracim/tracim/issues/5313),
+[#5333](https://github.com/tracim/tracim/issues/5333),
+[#5471](https://github.com/tracim/tracim/issues/5471),
+[#5494](https://github.com/tracim/tracim/issues/5494),
+[#5506](https://github.com/tracim/tracim/issues/5506),
+[#5507](https://github.com/tracim/tracim/issues/5507),
+[#5513](https://github.com/tracim/tracim/issues/5513),
+[#5535](https://github.com/tracim/tracim/issues/5535),
+[#5558](https://github.com/tracim/tracim/issues/5558),
+[#5575](https://github.com/tracim/tracim/issues/5575),
+[#5593](https://github.com/tracim/tracim/issues/5593)
+- Documentation: [#4578](https://github.com/tracim/tracim/issues/4578),
+[#4862](https://github.com/tracim/tracim/issues/4862),
+[#5360](https://github.com/tracim/tracim/issues/5360),
+[#5573](https://github.com/tracim/tracim/issues/5573)
+
+### Breaking/Important change
+
+- :warning: Radicale has been updated from version 2 to version 3.1. Tracim can't start if you do not adjust some settings before running this version. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- :warning: Advanced Search (Elasticsearch) has been improved. If you use it, you will need to rebuild the index. For more information see: [#5479](https://github.com/tracim/tracim/issues/5479)
+- Translations are now handled via Weblate. If you want to contribute, check out this [link](https://github.com/tracim/tracim#translation)
+- Language switch button moved in the account settings
+- Caldav and Webdav links are displayed in the account settings
+- New interface for advanced text edition (TinyMCE has been updated from version 4 to version 5.10)
+- Kanban is activated by default in docker, see [#5607](https://github.com/tracim/tracim/issues/5607)
+- To avoid right issues with `tracimcli` command used in the docker image, the process to properly run `tracimcli` inside official docker image has been clarified, [see here](https://github.com/tracim/tracim/blob/develop/tools_docker/README.md#tracimcli-inside-docker)
+- Pyramid has been updated from 1.10.8 to 2.*, see [#5047](https://github.com/tracim/tracim/issues/5047)
+
+### Known Issues
+
+- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622)
+- Sometimes, the header disappears on mobile devices, see [#5117](https://github.com/tracim/tracim/issues/5117)
+- Creation popups are not centered on mobile devices, see [#5625](https://github.com/tracim/tracim/issues/5625)
+
+
+# 4.1.3 / 2022-03-02
+
+### Fixed Issues
+
+- Frontend: [#5430](https://github.com/tracim/tracim/issues/5430),
+[#5453](https://github.com/tracim/tracim/issues/5453),
+[#5455](https://github.com/tracim/tracim/issues/5455)
+
+
+# 4.1.2 / 2022-02-15
+
+This maintenance release fixes a few things:
+ - the experimental Docker image for arm64, broken after a setuptools update, once again works
+ - on mobile devices, a workaround prevents the send button to be covered by the browser's native UI
+ - a dependency has been updated, hoping this prevents the connection error popup from showing up when everything actually works correctly
+
+### Fixed Issues
+
+- Backend: [#5183](https://github.com/tracim/tracim/issues/5183)
+- Frontend: [#5370](https://github.com/tracim/tracim/issues/5370),
+[#5175](https://github.com/tracim/tracim/issues/5175)
+
+
+# 4.1.1 / 2022-02-03
+
+### Fixed Issues
+
+- Backend: [#5263](https://github.com/tracim/tracim/issues/5263)
+- Frontend: [#5286](https://github.com/tracim/tracim/issues/5286),
+[#5285](https://github.com/tracim/tracim/issues/5285),
+[#5315](https://github.com/tracim/tracim/issues/5315)
+
+
 # 4.1.0 / 2022-01-21
 
 ### New Features
@@ -258,9 +352,9 @@ For administrators:
   Elastic search index by running the following commands in the backend folder:
 
   ```sh
-  tracimcli index-drop
-  tracimcli index-create
-  tracimcli index-populate
+  tracimcli search index-drop
+  tracimcli search index-create
+  tracimcli search index-populate
   ```
 
 

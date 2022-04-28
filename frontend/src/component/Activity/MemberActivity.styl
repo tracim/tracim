@@ -6,9 +6,9 @@
   justify-content space-between
   align-items center
   & .avatar
-    margin-right standardSpacing
+    margin-inline-end standardSpacing
   &__title
-    margin-right auto
+    margin-inline-end auto
     overflow hidden
     text-overflow ellipsis
   &__text
@@ -18,15 +18,14 @@
   &__user
     font-weight bold
   &__workspace
-    text-decoration underline
     color fontColor
     &:hover
       color fontColor
       text-decoration underline
   &__right
-    margin-left standardSpacing
-    margin-right standardSpacing
+    margin-inline-start standardSpacing
+    margin-inline-end standardSpacing
     font-size metadataFontSize
-    text-align right
+    text-align end
     white-space nowrap
     align-items flex-end

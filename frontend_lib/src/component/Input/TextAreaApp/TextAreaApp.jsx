@@ -15,7 +15,7 @@ import {
 } from '../../../localStorage.js'
 import AutoComplete from '../AutoComplete/AutoComplete.jsx'
 import IconButton from '../../Button/IconButton.jsx'
-import { APP_FEATURE_MODE, CONTENT_TYPE } from '../../../helper.js'
+import { APP_FEATURE_MODE, CONTENT_TYPE, tinymceRemove } from '../../../helper.js'
 import { TracimComponent } from '../../../tracimComponent.js'
 import { CUSTOM_EVENT } from '../../../customEvent.js'
 
@@ -41,7 +41,7 @@ export class TextAreaApp extends React.Component {
   componentDidMount () {
     const { props, state } = this
     this.reloadWysiwyg()
-    const localStorage = getLocalStorageItem(
+    const savedText = getLocalStorageItem(
       props.contentType,
       {
         content_id: props.contentId,
@@ -49,8 +49,8 @@ export class TextAreaApp extends React.Component {
       },
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
-    if (!!localStorage && localStorage !== state.text) {
-      this.setState({ text: localStorage })
+    if (!!savedText && savedText !== state.text) {
+      this.setState({ text: savedText })
     }
   }
 
@@ -59,7 +59,7 @@ export class TextAreaApp extends React.Component {
     const becameVisible = !prevProps.isVisible && props.isVisible
 
     if (props.mode === APP_FEATURE_MODE.EDIT && (becameVisible || prevProps.mode !== APP_FEATURE_MODE.EDIT)) {
-      globalThis.tinymce.remove('#wysiwygTimelineComment')
+      tinymceRemove('#wysiwygTimelineComment')
       this.reloadWysiwyg()
     }
 
@@ -75,7 +75,7 @@ export class TextAreaApp extends React.Component {
   reloadWysiwyg = () => {
     const { props } = this
     if (!document.getElementById(props.elementId) || props.mode !== APP_FEATURE_MODE.EDIT) return
-    globalThis.tinymce.remove(`#${props.elementId}`)
+    tinymceRemove(`#${props.elementId}`)
     globalThis.wysiwyg(
       `#${props.elementId}`,
       props.lang,

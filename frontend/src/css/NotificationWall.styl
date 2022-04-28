@@ -1,11 +1,9 @@
 .notification
   position fixed
   top headerHeight
-  right 0
   width 40%
   height "calc(100% - %s)" % headerHeight
   background-color offWhite
-  box-shadow shadow-right
   z-index 26
   display flex
   flex-direction column
@@ -39,16 +37,15 @@
         & .avatar
           margin-inline-end standardSpacing
         &__avatars
-          width 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
-          height 30px
+          width oneAuthorAvatarSize
+          height oneAuthorAvatarSize
           margin-inline-end standardSpacing
           &__second
             position absolute
             top 20px
-            left 20px // INFO - GB - 2021-08-26 - 20px is two authors avatar's size
         &__usersAvatar
-          min-width 30px
-          min-height 30px // INFO - GB - 2021-08-26 - 30px is one author avatar's size
+          min-width oneAuthorAvatarSize
+          min-height oneAuthorAvatarSize
           display flex
           border-radius 50%
           margin-inline-end standardSpacing
@@ -56,25 +53,30 @@
           justify-content center
           background-color lightDarkGrey
       &__meta
-        padding-right textSpacing
+        padding-inline-end textSpacing
         color lightDarkGrey
         flex 1
         overflow hidden
         font-size metadataFontSize
         white-space nowrap
-        text-align right
+        text-align end
         &__space
           text-overflow ellipsis
           overflow hidden
           font-weight bold
+          unicode-bidi plaintext
       &__circle
+        font-size wallCircleSize
+        transition 300ms font-size color
+        color lightBlue
+        margin -20px -10px
+        padding 20px 10px
+        &:hover
+            filter brightness(0.7)
         &__wrapper
           margin 0
           min-width 1em
           text-align center
-        font-size 8px
-        transition 300ms font-size color
-        color lightBlue
       &.itemRead
         color lightDarkGrey
         background-color offWhite
@@ -108,6 +110,18 @@
 // INFO - MB - 20210204 - overrides ListItemWrapper styles because .content is used in many places
 .notification > .notification__list > .content
   border none
+
+[dir=ltr] .notification
+  right 0
+  box-shadow shadow-right
+  &__list__item__text__avatars__second
+    left twoAuthorsAvatarSize
+
+[dir=rtl] .notification
+  left 0
+  box-shadow shadow-left
+  &__list__item__text__avatars__second
+    right twoAuthorsAvatarSize
 
 @media (min-width: min-md) and (max-width: max-md)
   .notification

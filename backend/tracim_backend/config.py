@@ -6,7 +6,6 @@ import typing
 
 from depot.manager import DepotManager
 from jsonschema import SchemaError
-from jsonschema.validators import validator_for
 from paste.deploy.converters import asbool
 from paste.deploy.converters import asint
 
@@ -20,6 +19,7 @@ from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.mail_notifier.utils import SmtpEncryption
 from tracim_backend.lib.translate.providers import TRANSLATION_SERVICE_CLASSES
 from tracim_backend.lib.translate.providers import TranslationProvider
 from tracim_backend.lib.utils.app import TracimApplication
@@ -27,6 +27,7 @@ from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.translation import DEFAULT_FALLBACK_LANG
 from tracim_backend.lib.utils.translation import Translator
 from tracim_backend.lib.utils.translation import translator_marker as _
+from tracim_backend.lib.utils.utils import CustomPropertiesValidator
 from tracim_backend.lib.utils.utils import get_build_version
 from tracim_backend.lib.utils.utils import get_cache_token
 from tracim_backend.lib.utils.utils import is_dir_exist
@@ -35,6 +36,7 @@ from tracim_backend.lib.utils.utils import is_dir_writable
 from tracim_backend.lib.utils.utils import is_file_exist
 from tracim_backend.lib.utils.utils import is_file_readable
 from tracim_backend.lib.utils.utils import string_to_unique_item_list
+from tracim_backend.lib.utils.utils import validate_json
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.call import CallProvider
@@ -536,6 +538,10 @@ class CFG(object):
             self.get_raw_config("url_preview.fetch_timeout", "30")
         )
 
+        self.URL_PREVIEW__MAX_CONTENT_LENGTH = int(
+            self.get_raw_config("url_preview.max_content_length", "1048576")
+        )
+
         self.UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE = asbool(
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
@@ -700,8 +706,22 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__SMTP__PASSWORD = self.get_raw_config(
             "email.notification.smtp.password", secret=True
         )
+        self.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION = asbool(
+            self.get_raw_config("email.notification.smtp.authentication", "True")
+        )
         self.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL = asbool(
-            self.get_raw_config("email.notification.smtp.use_implicit_ssl", "false")
+            self.get_raw_config(
+                "email.notification.smtp.use_implicit_ssl",
+                "false",
+                deprecated=True,
+                deprecated_extended_information="Use EMAIL__NOTIFICATION__SMTP__CONNECT_METHOD parameter instead.",
+            )
+        )
+        default_smtp_encryption = "default"
+        if self.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL:
+            default_smtp_encryption = "smtps"
+        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION = self.get_raw_config(
+            "email.notification.smtp.encryption", default_smtp_encryption
         )
 
         self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "False"))
@@ -791,6 +811,7 @@ class CFG(object):
         self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
         self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
         self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
+        self.LDAP_BIND_ANONYMOUS = asbool(self.get_raw_config("ldap_bind_anonymous", "False"))
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
         self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
@@ -887,7 +908,7 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
-        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch"
+        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch,ar:العربية"
         target_language_pairs = string_to_unique_item_list(
             self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
             separator=",",
@@ -1054,11 +1075,7 @@ class CFG(object):
                 self.USER__CUSTOM_PROPERTIES__JSON_SCHEMA_FILE_PATH,
             )
             try:
-                # INFO - G.M - 2021-01-13 Check here schema with jsonschema meta-schema to:
-                # - prevent an invalid json-schema
-                # - ensure that validation of content will not failed due to invalid schema.
-                cls = validator_for(json_schema)
-                cls.check_schema(json_schema)
+                CustomPropertiesValidator().validate_json_schema(json_schema)
             except SchemaError as exc:
                 raise ConfigurationError(
                     'ERROR  "{}" is not a valid JSONSchema : {}'.format(
@@ -1092,6 +1109,13 @@ class CFG(object):
             raise ConfigurationError(
                 'ERROR  "{}" should be a strictly positive value (currently "{}")'.format(
                     "URL_PREVIEW__FETCH_TIMEOUT", self.URL_PREVIEW__FETCH_TIMEOUT
+                )
+            )
+
+        if self.URL_PREVIEW__MAX_CONTENT_LENGTH < 0:
+            raise ConfigurationError(
+                'ERROR  "{}" should be a positive value (currently "{}")'.format(
+                    "URL_PREVIEW__MAX_CONTENT_LENGTH", self.URL_PREVIEW__MAX_CONTENT_LENGTH
                 )
             )
 
@@ -1209,16 +1233,32 @@ class CFG(object):
                 self.EMAIL__NOTIFICATION__SMTP__PORT,
                 when_str="when email notification is activated",
             )
-            self.check_mandatory_param(
-                "EMAIL__NOTIFICATION__SMTP__USER",
-                self.EMAIL__NOTIFICATION__SMTP__USER,
-                when_str="when email notification is activated",
-            )
-            self.check_mandatory_param(
-                "EMAIL__NOTIFICATION__SMTP__PASSWORD",
-                self.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-                when_str="when email notification is activated",
-            )
+            if self.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION:
+                self.check_mandatory_param(
+                    "EMAIL__NOTIFICATION__SMTP__USER",
+                    self.EMAIL__NOTIFICATION__SMTP__USER,
+                    when_str="when email notification is activated and smtp config not set as anonymous",
+                )
+                self.check_mandatory_param(
+                    "EMAIL__NOTIFICATION__SMTP__PASSWORD",
+                    self.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+                    when_str="when email notification is activated and smtp config not set as anonymous",
+                )
+
+            if self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION not in SmtpEncryption.get_all_values():
+                smtp_encryption_str_list = ", ".join(
+                    [
+                        '"{}"'.format(smtp_connect_method_name)
+                        for smtp_connect_method_name in SmtpEncryption.get_all_values()
+                    ]
+                )
+                raise ConfigurationError(
+                    'ERROR email.notification.smtp.encryption given "{}" is invalid,'
+                    "valids values are {}.".format(
+                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION, smtp_encryption_str_list
+                    )
+                )
+
             # INFO - G.M - 2019-12-10 - check value provided for headers
             self.check_mandatory_param(
                 "EMAIL__NOTIFICATION__FROM__EMAIL",
@@ -1272,14 +1312,17 @@ class CFG(object):
             self.check_mandatory_param(
                 "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
             )
-            self.check_mandatory_param(
-                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method",
-            )
-            self.check_mandatory_param(
-                "LDAP_BIND_PASS",
-                self.LDAP_BIND_PASS,
-                when_str="when ldap is in available auth method",
-            )
+            if not self.LDAP_BIND_ANONYMOUS:
+                self.check_mandatory_param(
+                    "LDAP_BIND_DN",
+                    self.LDAP_BIND_DN,
+                    when_str="when ldap is in available auth method (not anonymous)",
+                )
+                self.check_mandatory_param(
+                    "LDAP_BIND_PASS",
+                    self.LDAP_BIND_PASS,
+                    when_str="when ldap is in available auth method (not anonymous)",
+                )
             self.check_mandatory_param(
                 "LDAP_USER_BASE_DN",
                 self.LDAP_USER_BASE_DN,
@@ -1400,6 +1443,10 @@ class CFG(object):
                 "depot.backend": DepotFileStorageType.MEMORY.depot_storage_backend
             }
 
+        # INFO - G.M - 2022-04-08 - Clear Depot Manager to avoid issue with
+        # Tracimcli interactive shell.
+        DepotManager._clear()
+
         DepotManager.configure(
             name=self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
             config=uploaded_files_settings,
@@ -1442,8 +1489,7 @@ class CFG(object):
         :return: json content as dictionnary
         """
         try:
-            with open(path) as json_file:
-                return json.load(json_file)
+            return validate_json(path)
         except json.JSONDecodeError as exc:
             not_a_valid_json_file_msg = (
                 'ERROR: "{}" is not a valid json file path, '

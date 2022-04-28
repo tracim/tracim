@@ -34,18 +34,25 @@ For advanced docker-based usage, look at the full [Tracim Docker documentation](
 
 In order to contribute to the Tracim source code, please read [CONTRIBUTING.md](./CONTRIBUTING.md) file
 
+### Translation
+
+You can help us with Tracim's translation! If you want to contribute a new language, if you see missing or wrong translations, head over to [Weblate](https://hosted.weblate.org/projects/tracim/).
+
+Our current translation status:
+
+![Weblate translation status](https://hosted.weblate.org/widgets/tracim/-/frontend/horizontal-auto.svg)
+
 ## Advanced - Install Tracim from Source
 
-OS compatibility (tested with Python >= 3.6.14):
+OS compatibility (tested with Python >= 3.7):
 
 - Debian:
   - Buster (10)
   - Bullseye (11)
 - Ubuntu:
-  - Bionic (18.04)
   - Focal (20.04)
 
-Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.6 is used.
+Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.7 is used.
 
 ### Get the source code
 

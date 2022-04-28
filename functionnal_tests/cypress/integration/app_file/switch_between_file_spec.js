@@ -34,13 +34,17 @@ describe('App File', () => {
       it('should open app in VIEW mode and update the breadcrumbs correctly', () => {
         cy.visitPage({
           pageName: p.CONTENT_OPEN,
-          params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+          params: { contentId: secondContentId }
         })
 
-        cy.get('[data-cy="revision_data_2"]')
-          .click()
+        cy.contains('.breadcrumbs__item', fileTitle_2).should('be.visible')
 
-        cy.contains('.breadcrumbs__item', fileTitle_2)
+        cy.get('.previewcomponent__filepreview')
+          .should('be.visible')
+
+        cy.get('[data-cy="revision_data_2"]')
+          .should('be.visible')
+          .click()
 
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.visible')
@@ -66,7 +70,10 @@ describe('App File', () => {
         cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
           .click()
 
-        cy.get('.file__contentpage__header ul > li.breadcrumbs__item.primaryColorFont.primaryColorFontDarkenHover')
+        cy.contains('.FilenameWithExtension__label', fileTitle_1)
+
+        cy.get('.file__contentpage__header ul > li.breadcrumbs__item')
+          .first()
           .click()
 
         cy.get('[data-cy="popinFixed"]')
@@ -80,7 +87,7 @@ describe('App File', () => {
       cy.loginAs('administrators')
       cy.visitPage({
         pageName: p.CONTENT_OPEN,
-        params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+        params: { contentId: secondContentId }
       })
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .get('[data-cy=popin_right_part_share]').should('be.visible')
@@ -90,7 +97,7 @@ describe('App File', () => {
       cy.loginAs('users')
       cy.visitPage({
         pageName: p.CONTENT_OPEN,
-        params: { workspaceId: workspaceId, contentType: 'file', contentId: secondContentId }
+        params: { contentId: secondContentId }
       })
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .get('[data-cy=popin_right_part_share]').should('be.not.visible')

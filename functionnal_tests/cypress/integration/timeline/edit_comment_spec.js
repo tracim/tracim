@@ -13,7 +13,7 @@ describe('Timeline', () => {
       cy.createThread(threadTitle, workspace.workspace_id).then(thread => {
         cy.visitPage({
           pageName: PAGES.CONTENT_OPEN,
-          params: { workspaceId: workspace.workspace_id, contentType: 'thread', contentId: thread.content_id }
+          params: { contentId: thread.content_id }
         })
       })
       cy.get('#wysiwygTimelineComment').type(text)
@@ -22,7 +22,8 @@ describe('Timeline', () => {
   })
 
   describe('edit a comment', () => {
-    it('should show new comment', () => {
+    it.skip('should show new comment', () => {
+      // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
       cy.get('.comment__body__content__header__actions').click()
       cy.contains('.comment__body__content__textAndPreview', text)
       cy.get('.iconbutton[title="Edit comment"]').click()

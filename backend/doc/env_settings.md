@@ -54,6 +54,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |
 | TRACIM_FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               | frontend.custom_toolbox_folder_path                            | FRONTEND__CUSTOM_TOOLBOX_FOLDER_PATH                               |
 | TRACIM_URL_PREVIEW__FETCH_TIMEOUT                                         | url_preview.fetch_timeout                                      | URL_PREVIEW__FETCH_TIMEOUT                                         |
+| TRACIM_URL_PREVIEW__MAX_CONTENT_LENGTH                                    | url_preview.max_content_length                                 | URL_PREVIEW__MAX_CONTENT_LENGTH                                    |
 | TRACIM_UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 | ui.spaces.creation.parent_space_choice.visible                 | UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 |
 | TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
 | TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
@@ -96,7 +97,9 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_EMAIL__NOTIFICATION__SMTP__PORT                                    | email.notification.smtp.port                                   | EMAIL__NOTIFICATION__SMTP__PORT                                    |
 | TRACIM_EMAIL__NOTIFICATION__SMTP__USER                                    | email.notification.smtp.user                                   | EMAIL__NOTIFICATION__SMTP__USER                                    |
 | TRACIM_EMAIL__NOTIFICATION__SMTP__PASSWORD                                | email.notification.smtp.password                               | EMAIL__NOTIFICATION__SMTP__PASSWORD                                |
+| TRACIM_EMAIL__NOTIFICATION__SMTP__AUTHENTICATION                          | email.notification.smtp.authentication                         | EMAIL__NOTIFICATION__SMTP__AUTHENTICATION                          |
 | TRACIM_EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL                        | email.notification.smtp.use_implicit_ssl                       | EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL                        |
+| TRACIM_EMAIL__NOTIFICATION__SMTP__ENCRYPTION                              | email.notification.smtp.encryption                             | EMAIL__NOTIFICATION__SMTP__ENCRYPTION                              |
 | TRACIM_EMAIL__REPLY__ACTIVATED                                            | email.reply.activated                                          | EMAIL__REPLY__ACTIVATED                                            |
 | TRACIM_EMAIL__REPLY__IMAP__SERVER                                         | email.reply.imap.server                                        | EMAIL__REPLY__IMAP__SERVER                                         |
 | TRACIM_EMAIL__REPLY__IMAP__PORT                                           | email.reply.imap.port                                          | EMAIL__REPLY__IMAP__PORT                                           |
@@ -116,6 +119,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_LDAP_URL                                                           | ldap_url                                                       | LDAP_URL                                                           |
 | TRACIM_LDAP_BIND_DN                                                       | ldap_bind_dn                                                   | LDAP_BIND_DN                                                       |
 | TRACIM_LDAP_BIND_PASS                                                     | ldap_bind_pass                                                 | LDAP_BIND_PASS                                                     |
+| TRACIM_LDAP_BIND_ANONYMOUS                                                | ldap_bind_anonymous                                            | LDAP_BIND_ANONYMOUS                                                |
 | TRACIM_LDAP_TLS                                                           | ldap_tls                                                       | LDAP_TLS                                                           |
 | TRACIM_LDAP_USER_BASE_DN                                                  | ldap_user_base_dn                                              | LDAP_USER_BASE_DN                                                  |
 | TRACIM_LDAP_LOGIN_ATTRIBUTE                                               | ldap_login_attribute                                           | LDAP_LOGIN_ATTRIBUTE                                               |
@@ -153,6 +157,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_CALL__UNANSWERED_TIMEOUT                                           | call.unanswered_timeout                                        | CALL__UNANSWERED_TIMEOUT                                           |
 | TRACIM_CALDAV__RADICALE_PROXY__BASE_URL                                   | caldav.radicale_proxy.base_url                                 | CALDAV__RADICALE_PROXY__BASE_URL                                   |
 | TRACIM_CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       | caldav.radicale.storage.filesystem_folder                      | CALDAV__RADICALE__STORAGE__FILESYSTEM_FOLDER                       |
+| TRACIM_CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    | caldav.pre_filled_event.description_file_path                  | CALDAV__PRE_FILLED_EVENT__DESCRIPTION_FILE_PATH                    |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           | collaborative_document_edition.software                        | COLLABORATIVE_DOCUMENT_EDITION__SOFTWARE                           |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                | collaborative_document_edition.collabora.base_url              | COLLABORATIVE_DOCUMENT_EDITION__COLLABORA__BASE_URL                |
 | TRACIM_COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  | collaborative_document_edition.file_template_dir               | COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR                  |

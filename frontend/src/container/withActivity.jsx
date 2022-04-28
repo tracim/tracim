@@ -205,24 +205,30 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
     }
 
+    isLoggedUserMember = (activity) => this.props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
+
     isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
       const { props } = this
       if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-          !activity.newestMessage.fields.workspace) return true
+        !activity.newestMessage.fields.workspace) return true
       const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
       if (!currentWorkspace) return true
       return currentWorkspace.publicationEnabled
     }
 
     activityDisplayFilter = (activity) => {
-      const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION]
+      const { props } = this
+      const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION, TLM_ET.SHAREDSPACE]
+
       return entityType.includes(activity.entityType) &&
-        (
-          (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-          this.isSubscriptionRequestOrRejection(activity) ||
-          this.isMemberCreatedOrModified(activity)
-        )
+      (
+        (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
+        (this.isSubscriptionRequestOrRejection(activity) && this.isLoggedUserMember(activity)) ||
+        (this.isMemberCreatedOrModified(activity) && this.isLoggedUserMember(activity)) ||
+        (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.user.userId)
+      )
     }
+
     /**
      * DOC - SG - 2021-05-05
      * Load a batch of activities and merge them into the given list

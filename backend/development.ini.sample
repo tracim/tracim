@@ -63,9 +63,9 @@ basic_setup.session_secret = change_this_value_please!
 ; debug = False
 
 
-### Lang ###
-## default lang used in backend if user doesn't provided any lang.
-# Available parameter: en, fr, pt, de
+### Language ###
+## default language used in backend if user do not set any language.
+# Available parameter: en, fr, pt, de, ar
 ; default_lang = en
 
 ### Apps ###
@@ -178,6 +178,11 @@ workspace.join.max_messages_history_count = -1
 ###
 # timeout for fetching URL preview (in sec).
 ; url_preview.fetch_timeout = 30
+
+# max content length parsed for fetching URL preview (in bytes), default to 1048576 (1 Mo)
+# note: setting to 0 will disallow the limitation, but is not recommanded for security and performance
+# reason.
+; url_preview.max_content_length = 1048576
 
 ####
 # LIMITATION
@@ -347,6 +352,8 @@ api.key = %(basic_setup.api_key)s
 # If auth_type is ldap, uncomment following ldap_* parameters
 ## LDAP server address
 ; ldap_url = ldap://localhost:389
+## ldap_bind anonymous mode : if true bind as anonymous, password and dn will not been checked.
+; ldap_bind_anonymous = False
 ## Bind dn to identify the search
 ; ldap_bind_dn =
 # example:
@@ -541,10 +548,16 @@ website.usage_conditions =
 # email.notification.smtp.user = your_smtp_user
 # email.notification.smtp.password = your_smtp_password
 
-# enable implicit ssl if you are using implicit smtp with encryption port like 465
-# by default, Tracim will try to use explicit smtp encryption using starttls, and unencrypted
-# connection as fallback.
-; email.notification.smtp.use_implicit_ssl = False
+# Enable/disable authentification.
+# False mean anonymous smtp connection, it skip user/password login step.
+; email.notification.smtp.authentication = False
+
+# SMTP encryption method valid values are:
+# - default: use smtp encryption using starttls, and unencrypted connection as fallback.
+# - SMTPS: use encrypted connection directly on port like 465
+# - unsecure: don't use encryption, use it with caution !
+# default value: default
+; email.notification.smtp.encryption = default
 
 ### Headers ###
 ; email.notification.from.default_label = Tracim Notifications
@@ -730,12 +743,12 @@ webdav.listen = localhost:3030
 ##     param_name = value
 ## ```
 
-caldav.radicale.server.host = localhost:5232
+caldav.radicale.server.hosts = localhost:5232
 ## To make Tracim work, we need to disable auth and rights.
-caldav.radicale.auth.type = None
-caldav.radicale.rights.type = None
+caldav.radicale.auth.type = none
+caldav.radicale.rights.type = tracim_backend.radicale_plugins.allow_all_access_rights
 ## We do not need radicale web ui
-caldav.radicale.web.type = None
+caldav.radicale.web.type = none
 ## for Tracim we do use file storage.
 caldav.radicale.storage.type = multifilesystem
 ; caldav.radicale.storage.filesystem_folder = %(here)s/radicale_storage
@@ -745,6 +758,13 @@ caldav.radicale.headers.Access-Control-Allow-Origin = *
 caldav.radicale.headers.Access-Control-Allow-Methods =  GET, POST, OPTIONS, PROPFIND, PROPPATCH, REPORT, PUT, MOVE, DELETE, LOCK, UNLOCK
 caldav.radicale.headers.Access-Control-Allow-Headers =  User-Agent, Authorization, Content-type, Depth, If-match, If-None-Match, Lock-Token, Timeout, Destination, Overwrite, X-client, X-Requested-With, Prefer
 caldav.radicale.headers.Access-Control-Expose-Headers = Etag
+
+# in Tracim's Frontend, when creating a new event, the description (note) of the event will be pre-filled with the content
+# of the file given in the following parameter. Leave empty if you don't want any pre-filling.
+; caldav.pre_filled_event.description_file_path =
+
+## example:
+# caldav.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event/test/description.txt
 
 ####
 # SEARCH (ElasticSearch)
@@ -831,7 +851,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ## Translation service target languages that will be proposed in Tracim's interface
 # It is a comma-separated list of <ISO-639-1 language code>:<Language string to display> pairs.
 # The string can use any UTF-8 character.
-; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch
+; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch,ar:العربية
 # example:
 # translation_service.target_languages = fr:Français,ar:العربية,ja:日本語
 
@@ -905,6 +925,7 @@ pyramid.default_locale_name = en
 #   pyramid.includes =
 #       pyramid_debugtoolbar
 # ```
+# WARNING: pyramid_debugtoolbar won't work in Tracim's official docker image (multiple problems of multiprocess and reverse-proxy).
 
 
 [pipeline:webdav]
@@ -927,7 +948,7 @@ listen = %(webdav.listen)s
 
 [server:caldav]
 use = egg:waitress#main
-listen = %(caldav.radicale.server.host)s
+listen = %(caldav.radicale.server.hosts)s
 ######################
 # DATABASE MIGRATION #
 ######################

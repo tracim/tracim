@@ -5,7 +5,8 @@ import { translate } from 'react-i18next'
 import {
   CardPopup,
   DropdownMenu,
-  IconButton
+  IconButton,
+  Icon
 } from 'tracim_frontend_lib'
 
 require('./KanbanCard.styl')
@@ -139,6 +140,24 @@ function KanbanCard (props) {
               : props.t('See less')}
           />
         )}
+      </div>
+      <div
+        className='kanban__contentpage__wrapper__board__card__options'
+      >
+        {props.card.deadline !== '' && (
+          <div
+            className='kanban__contentpage__wrapper__board__card__options__deadline'
+          >
+            <Icon
+              icon='far fa-calendar'
+              title={props.card.deadline}
+            />
+            {props.card.deadline}
+          </div>
+        )}
+        <div className='kanban__contentpage__wrapper__board__card__options__freeInput'>
+          {props.card.freeInput}
+        </div>
       </div>
     </div>
   )

@@ -79,6 +79,7 @@ export class ResetPassword extends React.Component {
 
   handleClickSubmit = async () => {
     const { props, state } = this
+    const email = state.userEmail.trim()
 
     if (state.newPassword.length < 6) {
       props.dispatch(newFlashMessage(props.t('New password is too short (minimum 6 characters)'), 'warning'))
@@ -95,12 +96,12 @@ export class ResetPassword extends React.Component {
       return
     }
 
-    if (state.userEmail === '' || state.userToken === '') {
+    if (email === '' || state.userToken === '') {
       props.dispatch(newFlashMessage(props.t('Information are missing, please use the link in the email your should have received to reset your password'), 'warning'))
       return
     }
 
-    const fetchPostResetPassword = await props.dispatch(postResetPassword(state.newPassword, state.newPassword2, state.userEmail, state.userToken))
+    const fetchPostResetPassword = await props.dispatch(postResetPassword(state.newPassword, state.newPassword2, email, state.userToken))
     switch (fetchPostResetPassword.status) {
       case 204:
         props.history.push(PAGE.LOGIN)

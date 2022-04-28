@@ -1,9 +1,11 @@
 import React from 'react'
+import i18next from 'i18next'
 import { connect } from 'react-redux'
 import { translate, Trans } from 'react-i18next'
 import * as Cookies from 'js-cookie'
 import i18n from '../util/i18n.js'
 import { isEqual } from 'lodash'
+import { isMobile } from 'react-device-detect'
 import {
   Route, withRouter, Redirect
 } from 'react-router-dom'
@@ -178,6 +180,7 @@ export class Tracim extends React.Component {
         this.currentTime = 0
         this.play()
       }, false)
+      if (isMobile) return
       this.audioCall.play()
     }
     if (tlm.fields.user_call.caller.user_id === props.user.userId) {
@@ -504,7 +507,7 @@ export class Tracim extends React.Component {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:
@@ -587,7 +590,7 @@ export class Tracim extends React.Component {
     ) return null // @TODO Côme - 2018/08/22 - should show loader here
 
     return (
-      <div className='tracim fullWidthFullHeight'>
+      <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
         <Header
           onClickNotification={this.handleClickNotificationButton}
           unreadNotificationCount={props.notificationPage.unreadNotificationCount}

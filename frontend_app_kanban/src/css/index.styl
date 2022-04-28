@@ -17,7 +17,6 @@ cardWidth = 280px
       &.fullscreen
         position fixed
         top headerHeight
-        left 0
         width 100%
         height "calc(100% - %s)" % headerHeight
         z-index 1
@@ -52,6 +51,7 @@ cardWidth = 280px
             overflow hidden
             white-space nowrap
             flex 1
+            unicode-bidi plaintext
             & > strong
               font-size titleFontSize
               flex 1
@@ -72,9 +72,9 @@ cardWidth = 280px
               cursor auto
 
         & .react-kanban-board
-          overflow-y visible !important
-          overflow-x visible
+          direction ltr
           height 100%
+          overflow-x visible
           padding standardSpacing
           & > div
             height 100%
@@ -82,7 +82,6 @@ cardWidth = 280px
       &__toolbar
         position absolute
         top standardSpacing
-        right standardSpacing
         z-index 1
         & .iconbutton
           background-color offWhite
@@ -128,7 +127,7 @@ cardWidth = 280px
 
     & .cardPopup__container
       width unset
-      min-width 500px
+      min-width 550px
       display flex
       flex-direction column
 
@@ -138,6 +137,9 @@ cardWidth = 280px
     & [type=text], textarea
       width 100%
 
+    & [type=color]
+      margin-bottom textSpacing
+
     & label
       white-space pre
       font-weight bold
@@ -145,8 +147,12 @@ cardWidth = 280px
     & input
       vertical-align middle
 
-    &__description, &__title, &__freeInput
+    &__description, &__deadline, &__title, &__freeInput
       margin-bottom standardSpacing
+
+    &__description
+      > div
+        height 200px
 
     &__form
       overflow-y auto
@@ -155,15 +161,19 @@ cardWidth = 280px
       &__fields
           width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
         label
-          padding-right textSpacing
-        input
-            margin-bottom textSpacing
+          padding-inline-end textSpacing
+        
+        & .form-control
+          color unset
+          font-size standardFontSize
+          padding-inline-start textSpacing
+          
       &_buttons
         margin-bottom 0
         padding-bottom 0
-        text-align right
+        text-align end
         button:last-child, input:last-child
-          margin-left standardSpacing
+          margin-inline-start standardSpacing
 
     &__confirm
       display flex
@@ -191,6 +201,22 @@ cardWidth = 280px
     & > *
       margin auto
 
+[dir=ltr] .kanban
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        left 0
+      &__toolbar
+        right standardSpacing
+
+[dir=rtl] .kanban
+  &__contentpage
+    &__wrapper
+      &.fullscreen
+        right 0
+      &__toolbar
+        left standardSpacing
+
 @media (min-width: max-xs) and (max-width: max-lg)
   .kanban
     &__contentpage
@@ -211,6 +237,7 @@ cardWidth = 280px
   .kanban__KanbanPopup
     top 10%
     max-height "calc(100% - %s)" % (headerHeight + standardSpacing)
+
     & .cardPopup__container
       min-width 100%
       max-height 100%

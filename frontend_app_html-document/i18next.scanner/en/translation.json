@@ -3,12 +3,10 @@
   "Last version": "Last version",
   "Validate and create": "Validate and create",
   "Note's title": "Note's title",
-  "latest version: {{versionNumber}}": "latest version: {{versionNumber}}",
-  "Version #{{versionNumber}}": "Version #{{versionNumber}}",
   "Write a note": "Write a note",
   "Notes": "Notes",
   "Edit": "Edit",
-  "A content with the same name already exists": "A content with the same name already exists",
+  "A content with the same name already exists": "Content with the same name already exists",
   "Error while creating note": "Error while creating note",
   "Error while saving the comment": "Error while saving the comment",
   "This content is archived": "This content is archived",
@@ -30,5 +28,6 @@
   "Error while saving the user configuration": "Error while saving the user configuration",
   "Your text contains mentions that do not match any member of this space:": "Your text contains mentions that do not match any member of this space:",
   "Validate anyway": "Validate anyway",
-  "Tags": "Tags"
+  "Tags": "Tags",
+  "Delete": "Delete"
 }

@@ -9,7 +9,7 @@
     "build:dev": "NODE_ENV=development webpack-cli",
     "build:optimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
     "build:optimized:dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
-    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
+    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --color",
     "build:translation": "node ../i18next.scanner.js",
     "lint": "cd src && yarn standard --parser babel-eslint --plugin react && cd ../test && yarn standard --env mocha --parser babel-eslint --plugin react",
     "test": "yarn run lint && yarn run test:quick",
@@ -18,7 +18,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "broadcast-channel": "^3.1.0",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
     "core-js": "^3.6.4",
@@ -49,9 +48,7 @@
     "redux-thunk": "^2.3.0",
     "regenerator-runtime": "^0.13.2",
     "tracim_frontend_lib": "^1.1.9",
-    "vinyl-fs": "^3.0.3",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11"
+    "vinyl-fs": "^3.0.3"
   },
   "peerDependencies": {
     "cheerio": "^1.0.0",
@@ -70,7 +67,7 @@
     "chai": "^4.2.0",
     "chai-enzyme": "^1.0.0-beta.1",
     "css-loader": "^3.5.1",
-    "enzyme": "3.10.0",
+    "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "eslint": "^6.8.0",
     "file-loader": "^6.0.0",
@@ -78,8 +75,7 @@
     "ignore-styles": "^5.0.1",
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^15.1.1",
-    "json-server": "^0.15.0",
-    "mocha": "^7.1.1",
+    "mocha": "^9.2.2",
     "nock": "^10.0.6",
     "pnp-webpack-plugin": "^1.6.4",
     "redux-mock-store": "^1.5.3",
@@ -90,7 +86,9 @@
     "stylus": "^0.54.5",
     "stylus-native-loader": "^1.1.0",
     "url-loader": "^2.0.1",
-    "webpack-dev-server": "^3.11.0"
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.8.1"
   },
   "standard": {
     "globals": [

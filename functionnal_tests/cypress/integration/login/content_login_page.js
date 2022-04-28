@@ -22,18 +22,18 @@ describe('Login page', function () {
       .should('be.visible')
 
     cy.getTag({ selectorName: s.HEADER })
-      .find('.dropdownMenu__image')
+      .find('.dropdownMenuButton')
       .should('be.visible')
 
     cy.get('.loginpage__main__footer__text')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .should('be.visible')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
-      .find('input[type=text]')
+      .find('input[type=email]')
       .should('have.attr', 'placeholder')
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })

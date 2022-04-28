@@ -1488,7 +1488,7 @@ class ContentApi(object):
             ):
                 # TODO - G.M - 20-03-2018 - Fix internatization for webdav access.
                 # Internatization disabled in libcontent for now.
-                raise SameValueError("The content did not changed")
+                raise SameValueError("The content did not change")
 
         filename = self._prepare_filename(new_label, item.file_extension)
         content_type_slug = item.type
@@ -1531,7 +1531,7 @@ class ContentApi(object):
         # using read can be used everytime.
         # if new_mimetype == item.file_mimetype and \
         #         new_content == item.depot_file.file.read():
-        #     raise SameValueError('The content did not changed')
+        #     raise SameValueError('The content did not change')
         if self._user:
             item.owner = self._user
         content_type_slug = item.type
@@ -1573,11 +1573,11 @@ class ContentApi(object):
             )
 
     def check_workspace_size_limitation(self, content_length: int, workspace: Workspace) -> None:
-        workspace_size = workspace.get_size()
         # INFO - G.M - 2019-08-23 - 0 mean no size limit
         if self._config.LIMITATION__WORKSPACE_SIZE == 0:
             return
-        elif workspace_size > self._config.LIMITATION__WORKSPACE_SIZE:
+        workspace_size = workspace.get_size()
+        if workspace_size > self._config.LIMITATION__WORKSPACE_SIZE:
             raise FileSizeOverWorkspaceEmptySpace(
                 'File cannot be added (size "{}") because workspace is full: "{}/{}"'.format(
                     content_length, workspace_size, self._config.LIMITATION__WORKSPACE_SIZE

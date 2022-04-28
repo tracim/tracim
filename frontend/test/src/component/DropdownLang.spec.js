@@ -1,7 +1,7 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import DropdownLang from '../../../src/component/Header/MenuActionListItem/DropdownLang.jsx'
+import DropdownLang from '../../../src/component/DropdownLang.jsx'
 import sinon from 'sinon'
 
 describe('<DropdownLang />', () => {
@@ -10,16 +10,13 @@ describe('<DropdownLang />', () => {
   const props = {
     langList: [{
       id: 'fr',
-      label: 'French',
-      icon: 'iconFrench'
+      label: 'French'
     }, {
       id: 'en',
-      label: 'English',
-      icon: 'iconEnglish'
+      label: 'English'
     }, {
       id: 'cn',
-      label: '中文',
-      icon: 'iconChinese'
+      label: '中文'
     }],
     langActiveId: 'fr',
     onChangeLang: onChangeLangCallBack
@@ -35,12 +32,6 @@ describe('<DropdownLang />', () => {
     it('should display the label of each other language', () => {
       for (let i = 1; i < props.langList.length; i++) {
         expect(wrapper.find('button.transparentButton').at(i - 1)).to.text().equal(props.langList[i].label)
-      }
-    })
-
-    it('should display the icon of each other language', () => {
-      for (let i = 1; i < props.langList.length; i++) {
-        expect(wrapper.find('img.dropdownlang__dropdown__subdropdown__link__flag').at(i - 1).prop('src')).to.equal(props.langList[i].icon)
       }
     })
   })

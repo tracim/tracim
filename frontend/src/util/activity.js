@@ -98,6 +98,7 @@ const getActivityParams = (message) => {
         : message.fields.content.content_id
       return { id: `${TLM_ET.CONTENT}-${id}`, entityType: TLM_ET.CONTENT }
     }
+    case TLM_ET.SHAREDSPACE:
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
       return { id: `${entityType}-e${message.event_id}`, entityType: entityType }
@@ -109,6 +110,7 @@ const createActivity = async (activityParams, activityMessageList, apiUrl) => {
   switch (activityParams.entityType) {
     case TLM_ET.CONTENT:
       return await createContentActivity(activityParams, activityMessageList, apiUrl)
+    case TLM_ET.SHAREDSPACE:
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
     default:

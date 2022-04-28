@@ -5,9 +5,10 @@
     width auto
   & .cardPopup__body
     flex-direction column
+    overflow visible
   &__title
     font-size titleFontSize
-    margin-right auto
+    margin-inline-end auto
     margin-bottom standardSpacing
   &__buttons
     display flex
@@ -15,7 +16,9 @@
     width 100%
     margin-top standardSpacing
     & .iconbutton
-      margin-left standardSpacing
+      margin-inline-start standardSpacing
+  &__texteditor
+    max-width "calc(100vw - %s)" % pageSpacing
   & .autocomplete
     width auto
     left unset

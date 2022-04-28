@@ -135,7 +135,7 @@ describe('In <AdvancedSearch />', () => {
     describe('getDisplayDetail()', () => {
       it('should return the subtitle according to resultList size', () => {
         expect(advancedSearchInstance.getDisplayDetail()).to.equal(
-          'Showing {{displayedResults}} of {{totalResults}} results'
+          'Showing {{displayedResults}} of {{count}} results'
         )
       })
     })

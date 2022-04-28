@@ -205,7 +205,9 @@ class DeleteUserCommand(AppContextCommand):
                     print("delete agenda of users {}".format(", ".join(deleted_user_ids_str)))
                     for user_id in deleted_user_ids:
                         try:
-                            cleanup_lib.delete_user_agenda(user_id)
+                            cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.calendar)
+                            cleanup_lib.delete_user_agenda(user_id, AgendaResourceType.addressbook)
+                            cleanup_lib.delete_user_dav_symlinks(user_id)
                         except AgendaNotFoundError:
                             print(
                                 'Warning: Cannot delete agenda for user "{}", agenda not found. Agenda path may be incorrect or agenda not created'.format(
