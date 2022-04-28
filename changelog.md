@@ -9,7 +9,7 @@
 - External links to pictures now have a preview in comments
 
 For technical users:
-- Tracimcli command lines have been added to validate custom properties schema and mail configuration validation
+- Tracimcli command lines have been added to validate custom properties schema and mail confirelease/5611__prepare_new_release_4.2.0validation
 - Add support for anonymous LDAP and anonymous SMTP authentication has been added
 - Creation popups are not centered on mobile, see [#5625](https://github.com/tracim/tracim/issues/5625)
 
@@ -55,8 +55,9 @@ For technical users:
 
 ### Known Issues
 
-- Chrome performance issue for images in advanced edition (TinyMCE), see [#5622](https://github.com/tracim/tracim/issues/5622)
+- Chrome performance issue for images in advanced edition, see [#5622](https://github.com/tracim/tracim/issues/5622)
 - Sometimes, the header disappears on mobile devices, see [#5117](https://github.com/tracim/tracim/issues/5117)
+- Creation popups are not centered on mobile devices, see [#5625](https://github.com/tracim/tracim/issues/5625)
 
 
 # 4.1.3 / 2022-03-02
