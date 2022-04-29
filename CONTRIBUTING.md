@@ -38,7 +38,7 @@ See [testing](./doc/TESTING.md) to see how to test [Tracim](https://www.algoo.fr
 First, you need to sign every commit you make with the `-s` arg of `git commit` command.<br>
 See [git signature](https://git-scm.com/docs/git-commit#git-commit--s).
 
-This will prove that you are the author of the commit and you have accepted the licenses ([MIT](https://opensource.org/licenses/MIT), [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) and [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)) and [Developer Certificate of Origin](./DCO).
+This will prove that you are the author of the commit and you have accepted the licenses ([MIT](https://opensource.org/licenses/MIT), [LGPLv3](https://www.gnu.org/licenses/lgpl-3.0.html) and [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html)) and [Developer Certificate of Origin](./doc/DCO).
 
 <!-- To remove -->
 ## Code Formatting and Others Checks

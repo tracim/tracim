@@ -4,87 +4,13 @@ Backend source code of Tracim, using Pyramid Framework.
 
 ## Installation
 
-### Distribution dependencies
-
-On Debian Bullseye (11) with sudo:
-
-```shell
-sudo apt update
-sudo apt install system_packages/debian/build_backend_packages.list
-sudo apt install system_packages/debian/run_backend_packages.list
-```
-
-
-(Optional) Add optional preview dependencies for better preview support (LibreOffice, Inkscape, FFmpeg,...):
-
-```shell
-sudo apt install system_packages/debian/optional_preview_packages.list
-```
-
-
 ### Supported database engines
 
+<!-- Remove the one that we don't support -->
 - SQLite 3.22(2018-01-22)+ with JSON1 extension
 - PostgreSQL 9.6+
 - MySQL 8.0.1+
 - MariaDB 10.3+
-
-### Get the source
-
-get source from github:
-
-    git clone https://github.com/tracim/tracim.git
-
-go to *backend* subdirectory:
-
-    cd backend
-
-### Setup Python Virtualenv
-
-Create a Python virtual environment:
-
-    python3 -m venv env
-
-Activate it in your terminal session (**all Tracim command execution must be executed under this virtual environment**):
-
-    source env/bin/activate
-
-Install packaging tools:
-
-    pip install -r requirements-build.txt
-
-(Optional) Install strict supported version of dependencies with requirement.txt:
-
-    pip install -r requirements.txt
-
-(Optional) Install all preview builders to be able to generate preview for most file formats:
-
-    pip install -r requirements-full-preview-generator.txt
-
-Install the project in editable mode with its develop requirements:
-
-    pip install -r requirements-test.txt
-    pip install -e "."
-
-If you want to use PostgreSQL, MySQL or MariaDB database engine instead of
-the default one (SQLite bundled with python), you need to install the python driver for those databases
-that are supported by SQLAlchemy.
-
-For PostgreSQL and MariaDB/MySQL, those are shortcuts to install Tracim with test and
-specific driver.
-
-For PostgreSQL:
-
-    pip install -r requirements-db-postgres.txt
-
-For MySQL/MariaDB:
-
-    pip install -r requirements-db-mysql.txt
-
-If you want to store files on s3, you need to install the S3 driver:
-
-    pip install -r requirements-storage-s3.txt
-
 
 ## Configuration
 

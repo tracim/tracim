@@ -1,9 +1,11 @@
+# Tracim
 <!-- Add better description here -->
 
-[Tracim](https://www.algoo.fr/fr/tracim) is officially supported in Arabic, English, French, German and Portuguese.
+[Tracim](https://www.algoo.fr/fr/tracim) is a tool designed to help you and your team to a better collaboration.<br>
+It's officially supported in Arabic, English, French, German and Portuguese.
 
-
-More information on our [website](https://www.algoo.fr/fr/tracim).
+Any questions, remarks? Reach us on [Tracim Community](https://community.tracim.fr).<br>
+More informations on our [website](https://www.algoo.fr/fr/tracim).
 ## Quick start (using Docker)
 
 An easy way to start using Tracim is to use the [Docker image](https://hub.docker.com/r/algoo/tracim/).
@@ -21,7 +23,7 @@ The credentials to access the application are:
 - password: `admin@admin.admin`
 
 <!-- We have to update Docker documentation according to this one -->
-For more advanced docker-based usage, look at the full [Tracim Docker documentation](https://github.com/tracim/tracim/tree/develop/tools_docker)
+For more advanced docker-based usage, look at the full [Tracim Docker documentation](./tools_docker/)
 
 ## Build Tracim from source
 See [Building Tracim from source](./doc/BUILD.md)

@@ -1,4 +1,0 @@
-1.9.1
----
-
-- Begin Pyramid Project for Tracim v2 : Prototype step
