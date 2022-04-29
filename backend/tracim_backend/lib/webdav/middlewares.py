@@ -294,8 +294,8 @@ class TracimEnv(BaseMiddleware):
     def setup_ldap(self, registry: Registry, app_config: CFG):
         manager = ConnectionManager(
             uri=app_config.LDAP_URL,
-            bind=app_config.LDAP_BIND_DN,
-            passwd=app_config.LDAP_BIND_PASS,
+            bind=app_config.LDAP_BIND_DN if not app_config.LDAP_BIND_ANONYMOUS else "",
+            passwd=app_config.LDAP_BIND_PASS if not app_config.LDAP_BIND_ANONYMOUS else "",
             tls=app_config.LDAP_TLS,
             use_pool=app_config.LDAP_USE_POOL,
             pool_size=app_config.LDAP_POOL_SIZE,

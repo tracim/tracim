@@ -260,6 +260,10 @@ class TracimEmail(Email):
             return None
         return TracimEmailValidator(error=self.error_messages["invalid"])(value)
 
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        return value.strip()
+
 
 class RFCEmail(ValidatedField, String):
     """A validated email rfc style "john <john@john.ndd>" field.
@@ -282,6 +286,10 @@ class RFCEmail(ValidatedField, String):
         if value is None:
             return None
         return RFCEmailValidator(error=self.error_messages["invalid"])(value)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        return value.strip()
 
 
 class BasePaginatedQuerySchema(marshmallow.Schema):
@@ -620,7 +628,7 @@ class UserRegistrationSchema(marshmallow.Schema):
 
 
 class UserCreationSchema(marshmallow.Schema):
-    email = TracimEmail(
+    email = RFCEmail(
         required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
     )
     username = String(
@@ -1189,7 +1197,7 @@ class RoleUpdateSchema(marshmallow.Schema):
 class WorkspaceMemberInviteSchema(marshmallow.Schema):
     role = StrippedString(example="contributor", validate=user_role_validator, required=True)
     user_id = marshmallow.fields.Int(example=5, default=None, allow_none=True)
-    user_email = TracimEmail(
+    user_email = RFCEmail(
         example="suri@cate.fr", default=None, allow_none=True, validate=user_email_validator
     )
     user_username = StrippedString(

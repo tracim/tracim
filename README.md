@@ -23,7 +23,7 @@ The credentials to access the application are:
 - password: `admin@admin.admin`
 
 <!-- We have to update Docker documentation according to this one -->
-For more advanced docker-based usage, look at the full [Tracim Docker documentation](./tools_docker/)
+For advanced docker-based usage, look at the full [Tracim Docker documentation](./tools_docker/)
 
 ## Build Tracim from source
 See [Building Tracim from source](./doc/BUILD.md)

@@ -191,7 +191,7 @@
   "{{count}} files selected_plural": "{{count}} files selected",
   "1 file selected": "1 file selected",
   "Remove file": "Remove file",
-  "A content with the same name already exists": "A content with the same name already exists",
+  "A content with the same name already exists": "Content with the same name already exists",
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
   "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
   "Remove from favorites": "Remove from favourites",

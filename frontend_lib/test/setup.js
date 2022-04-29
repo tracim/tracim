@@ -49,6 +49,7 @@ if (!global.window && !global.document) {
   global.lastCustomEventTypes = new Set()
   global.GLOBAL_dispatchEvent = sinon.spy()
   global.FormData = window.FormData
+  global.self = global
   document.dispatchEvent = sinon.spy()
 }
 

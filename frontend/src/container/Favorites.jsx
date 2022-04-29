@@ -54,7 +54,7 @@ const FavoritesHeader = translate()(props => {
         {props.t('Last Modification')}
       </div>
       <div className='favoritesHeader__information'>
-        {props.t('Information_plural')}
+        {props.t('Information')}
       </div>
       <div className='favoritesHeader__favoriteButton'>
         {props.t('Favorite')}

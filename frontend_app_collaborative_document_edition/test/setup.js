@@ -27,6 +27,7 @@ if (!global.window && !global.document) {
   global.GLOBAL_dispatchEvent = () => {}
   global.GLOBAL_primaryColor = '#aaaaaa'
   global.FormData = window.FormData
+  global.self = global
 
   const nodeCrypto = require('crypto')
   global.crypto = {

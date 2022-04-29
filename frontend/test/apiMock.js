@@ -171,6 +171,12 @@ const mockGetMyselfWorkspaceList200 = (apiUrl, showOwnedWorkspace, workspaceList
     .reply(200, workspaceList)
 }
 
+const mockGetUserWorkspaceList200 = (apiUrl, userId, showOwnedWorkspace, workspaceList) => {
+  return nock(apiUrl)
+    .get(`/users/${userId}/workspaces?show_owned_workspace=${showOwnedWorkspace ? 1 : 0}`)
+    .reply(200, workspaceList)
+}
+
 const mockGetWorkspaceDetail200 = (apiUrl, workspaceId, workspaceDetail) => {
   return nock(apiUrl)
     .get(`/workspaces/${workspaceId}`)
@@ -256,6 +262,18 @@ const mockGenericGetContent400 = (apiUrl, contentId) => {
     .reply(400, {})
 }
 
+const mockGetCustomPropertiesSchema200 = (apiUrl, schema) => {
+  return nock(apiUrl)
+    .get('/system/user-custom-properties-schema')
+    .reply(200, schema)
+}
+
+const mockGetAboutUser200 = (apiUrl, userId, aboutUser) => {
+  return nock(apiUrl)
+    .get(`/users/${userId}/about`)
+    .reply(200, aboutUser)
+}
+
 export {
   mockGetFileChildContent200,
   mockGetPublicationList200,
@@ -292,5 +310,8 @@ export {
   mockGetContent400,
   mockGetContentPath200,
   mockPostThreadPublication204,
-  mockGenericGetContent400
+  mockGenericGetContent400,
+  mockGetCustomPropertiesSchema200,
+  mockGetAboutUser200,
+  mockGetUserWorkspaceList200
 }

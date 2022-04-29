@@ -447,10 +447,12 @@ export const displayFileSize = (bytes, decimals) => {
 
 export const parserStringToList = (string, separatorList = [',', ';', '\n']) => {
   let parsedString = string
+
   separatorList.forEach(separator => {
     parsedString = parsedString.split(separator).join(',')
   })
-  return parsedString.split(',').filter(notEmptyString => notEmptyString !== '')
+
+  return parsedString.split(',').map(str => str.trim()).filter(notEmptyString => notEmptyString !== '')
 }
 
 // INFO - GB - 2021-09-16 - This function checks if the string looks like an email (username@domain)
@@ -760,14 +762,6 @@ export const scrollIntoViewIfNeeded = (elementToScrollTo, fixedContainer) => {
 
 export const darkenColor = (c) => color(c).darken(0.15).hex()
 export const lightenColor = (c) => color(c).lighten(0.15).hex()
-
-export const htmlCodeToDocumentFragment = (htmlCode) => {
-  // NOTE - RJ - 2021-04-28 - <template> provides a convenient content property.
-  // See https://stackoverflow.com/questions/8202195/using-document-createdocumentfragment-and-innerhtml-to-manipulate-a-dom
-  const template = document.createElement('template')
-  template.innerHTML = htmlCode
-  return template.content
-}
 
 export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const workspaceId = content.workspace_id || content.workspaceId

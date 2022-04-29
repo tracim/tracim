@@ -44,7 +44,7 @@ export const AdvancedSearchSpaceList = props => {
             {props.t('Name')}
           </div>
           <div className='advancedSearchSpace__information'>
-            {props.t('Information_plural')}
+            {props.t('Information__plural')}
           </div>
         </div>
       )}

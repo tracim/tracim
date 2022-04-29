@@ -42,6 +42,7 @@ if (!global.window && !global.document) {
   global.Audio = window.Audio
   global.Notification = window.Notification
   global.FormData = window.FormData
+  global.self = global
 }
 
 Enzyme.configure({ adapter: new Adapter() })

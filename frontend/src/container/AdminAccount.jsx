@@ -211,8 +211,9 @@ export class Account extends React.Component {
     userToEdit: { ...prev.userToEdit, isUsernameValid: true }
   }))
 
-  handleSubmitPersonalData = async (newPublicName, newUsername, newEmail, checkPassword) => {
+  handleSubmitPersonalData = async (newPublicName, newUsername, newEmailWithoutTrim, checkPassword) => {
     const { props, state } = this
+    const newEmail = newEmailWithoutTrim.trim()
 
     if (newPublicName !== '') {
       if (newPublicName.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {

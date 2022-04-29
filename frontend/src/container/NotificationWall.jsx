@@ -255,7 +255,7 @@ export const NotificationWall = props => {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:
@@ -660,5 +660,5 @@ export const NotificationWall = props => {
   )
 }
 
-const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
+const mapStateToProps = ({ user, notificationPage, workspaceList }) => ({ user, notificationPage, workspaceList })
 export default connect(mapStateToProps)(translate()(TracimComponent(NotificationWall)))

@@ -106,6 +106,7 @@ export class PersonalRecentActivities extends React.Component {
             onCopyLinkClicked={props.onCopyLinkClicked}
             onEventClicked={props.onEventClicked}
             showRefresh={props.showRefresh}
+            userId={props.user.userId}
             workspaceList={props.workspaceList}
           />
         </PageContent>

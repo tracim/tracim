@@ -35,6 +35,7 @@ import { reactstrapPopoverHack } from 'tracim_frontend_lib/dist/tracim_frontend_
 describe('In <Account /> at AdminAccount.jsx', () => {
   reactstrapPopoverHack(document, 'popoverFullName')
   reactstrapPopoverHack(document, 'popoverUsername')
+  reactstrapPopoverHack(document, 'popoverPageTitle')
 
   const newFlashMessageInfoCallBack = sinon.spy()
   const newFlashMessageWarningCallBack = sinon.spy()

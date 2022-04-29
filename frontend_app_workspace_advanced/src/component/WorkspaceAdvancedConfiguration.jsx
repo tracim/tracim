@@ -92,52 +92,54 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
         </div>
 
         {!props.isReadOnlyMode && (
-          <div>
-            <div className='workspace_advanced__defaultRole formBlock'>
-              <div className='formBlock__title'>
-                {props.t('Default role:')}
-                <button
-                  type='button'
-                  className='btn transparentButton workspace_advanced__defaultRole__info'
-                  id='popoverDefaultRoleInfo'
-                >
-                  <i className='fas fa-fw fa-question-circle' />
-                </button>
+          <div className='workspace_advanced__defaultRole formBlock'>
+            <div className='formBlock__title'>
+              {props.t('Default role:')}
+              <button
+                type='button'
+                className='btn transparentButton workspace_advanced__defaultRole__info'
+                id='popoverDefaultRoleInfo'
+              >
+                <i className='fas fa-fw fa-question-circle' />
+              </button>
 
-                <Popover
-                  targetId='popoverDefaultRoleInfo'
-                  popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
-                />
-              </div>
-
-              <div className='workspace_advanced__defaultRole__list'>
-                <SingleChoiceList
-                  list={ROLE_LIST}
-                  onChange={props.onChangeNewDefaultRole}
-                  currentValue={props.defaultRole}
-                />
-              </div>
-
-              <div className='workspace_advanced__defaultRole__bottom'>
-                <button
-                  type='button'
-                  className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
-                  onClick={props.onClickValidateNewDefaultRole}
-                >
-                  {props.t('Confirm')}
-                </button>
-              </div>
+              <Popover
+                targetId='popoverDefaultRoleInfo'
+                popoverBody={props.t('This is the role that members will have by default when they join your space (for open and on request spaces only).')}
+              />
             </div>
 
-            {props.isAppAgendaAvailable && props.isCurrentSpaceAgendaEnabled && (
-              <AgendaInfo
-                customClass='formBlock workspace_advanced__agenda'
-                introText={props.t('Use this link to integrate this agenda to your')}
-                caldavText={props.t('CalDAV compatible software')}
-                agendaUrl={props.agendaUrl}
+            <div className='workspace_advanced__defaultRole__list'>
+              <SingleChoiceList
+                list={ROLE_LIST}
+                onChange={props.onChangeNewDefaultRole}
+                currentValue={props.defaultRole}
               />
-            )}
+            </div>
 
+            <div className='workspace_advanced__defaultRole__bottom'>
+              <button
+                type='button'
+                className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+                onClick={props.onClickValidateNewDefaultRole}
+              >
+                {props.t('Confirm')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {props.isAppAgendaAvailable && props.isCurrentSpaceAgendaEnabled && (
+          <AgendaInfo
+            customClass='formBlock workspace_advanced__agenda'
+            introText={props.t('Use this link to integrate this agenda to your')}
+            caldavText={props.t('CalDAV compatible software')}
+            agendaUrl={props.agendaUrl}
+          />
+        )}
+
+        {!props.isReadOnlyMode && (
+          <div>
             <div className='formBlock workspace_advanced__delete'>
               <div className='formBlock__title workspace_advanced__delete__title'>
                 {props.t('Delete space')}

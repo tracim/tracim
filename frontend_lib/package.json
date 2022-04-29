@@ -7,7 +7,7 @@
     "build:standalone:dev": "NODE_ENV=development webpack-cli --config webpack.standalone.config.js",
     "build:optimized": "NODE_ENV=production webpack-cli --config webpack.optimized.config.js",
     "build:optimized:dev": "NODE_ENV=development webpack-cli --config webpack.optimized.config.js",
-    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --watch --colors --inline --hot --progress",
+    "servdev": "NODE_ENV=development webpack-dev-server --config webpack.servdev.config.js --color",
     "build:translation": "node ../i18next.scanner.js",
     "lint": "cd src && standard --parser babel-eslint --plugin react && cd ../test && standard --env mocha --parser babel-eslint --plugin react",
     "test": "yarn run lint && yarn run test:quick",
@@ -36,7 +36,6 @@
     "i18next": "10.5.0",
     "prop-types": "^15.7.2",
     "radium": "^0.25.2",
-    "react": "^16.13.1",
     "react-device-detect": "^1.7.5",
     "react-dropzone": "^7.0.1",
     "react-i18next": "7.4.0",
@@ -48,15 +47,15 @@
   "peerDependencies": {
     "cheerio": "^1.0.0",
     "eslint": "^6.8.0",
-    "react-dom": "^16.13.1",
-    "webpack": "^4.42.1"
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "abort-controller": "^3.0.0",
     "chai": "^4.2.0",
     "chai-enzyme": "^1.0.0-beta.1",
     "css-loader": "^3.5.1",
-    "enzyme": "^3.10.0",
+    "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
     "es6-promise": "^4.2.8",
     "eslint": "^6.8.0",
@@ -66,9 +65,8 @@
     "ignore-styles": "^5.0.1",
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^15.1.1",
-    "mocha": "^7.1.1",
+    "mocha": "^9.2.2",
     "nock": "^11.7.1",
-    "pnp-webpack-plugin": "^1.6.4",
     "react-dom": "^16.13.1",
     "reactstrap": "^8.9.0",
     "sinon": "^7.4.1",
@@ -78,9 +76,9 @@
     "stylus": "^0.54.5",
     "stylus-native-loader": "^1.1.0",
     "url-loader": "^2.0.1",
-    "webpack": "^4.42.1",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0"
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.8.1"
   },
   "standard": {
     "globals": [

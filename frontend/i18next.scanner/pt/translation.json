@@ -67,7 +67,7 @@
   "Cancelled": "Cancelado",
   "Deprecated": "Obsoleto",
   "Information": "Informação",
-  "Information_plural": "Informações",
+  "Information__plural": "Informações",
   "Warning": "Aviso",
   "Error": "Erro",
   "Your name has been changed": "Seu nome foi mudado",
@@ -553,5 +553,8 @@
   "Configuration links": "Links de configuração",
   "{{author}} made {{count}} contributions": "{{author}} fez {{count}} contribuição",
   "{{author}} made {{count}} contributions_plural": "{{author}} fez {{count}} contribuições",
-  " on {{content}}": " em {{content}}"
+  " on {{content}}": " em {{content}}",
+  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> criou o espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> eliminou o espaço <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "Error loading unread notification number": "Erro ao carregar o número de notificações não lidas"
 }

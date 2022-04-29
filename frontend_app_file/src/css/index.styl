@@ -28,10 +28,14 @@
     &__content
       &__left
         background-color offWhite
+        display flex
+        flex-direction column
     &__statewrapper
       overflow-y auto
       position relative
-      height 100%
+      display flex
+      flex-direction column
+      flex 1
       &.promptMessageWrapper > .previewcomponent // render .file__contentpage__statewrapper.promptMessageWrapper .file__contentpage__preview
         height calc(100% - 68px) // 100% - file__contentpage__preview__state height
     &__wrapper
