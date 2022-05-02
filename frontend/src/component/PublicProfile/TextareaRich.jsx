@@ -44,6 +44,7 @@ export class TextareaRich extends React.Component {
     const { props } = this
     return (
       <textarea
+        hidden
         id={this.editorId}
         defaultValue={props.value}
       />
