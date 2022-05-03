@@ -1,6 +1,6 @@
 import i18n from './i18n.js'
-import { uniqueId } from 'lodash'
 import { tinymceRemove } from 'tracim_frontend_lib'
+import { v4 as uniqueId } from 'uuid'
 
 (function () {
   // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
@@ -123,7 +123,8 @@ import { tinymceRemove } from 'tracim_frontend_lib'
         })
 
         $editor.on('init', function (e) {
-          // INFO - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag at the end of the text in order to start the text outside the other existing tags
+          // HACK - GB - 2020-08-24 - The manipulation below is a hack to add a <p> tag at the end of the text in order to
+          // start the text outside the other existing tags. Made for issue https://github.com/tracim/tracim/issues/3411
           const id = uniqueId()
           if ($editor.getBody().textContent) {
             $editor.dom.add($editor.getBody(), 'p', { id: id }, '&nbsp;')
