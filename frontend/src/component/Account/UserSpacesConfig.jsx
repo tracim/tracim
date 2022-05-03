@@ -20,6 +20,16 @@ import { deleteWorkspaceMember, getUserWorkspaceList, getWorkspaceMemberList } f
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
+export const onlyManager = (userToEditId, member, memberList) => {
+  const manager = ROLE.workspaceManager.slug
+
+  if (member.role !== manager) {
+    return false
+  }
+
+  return !memberList.some(m => m.user_id !== userToEditId && m.role === manager)
+}
+
 export const UserSpacesConfig = (props) => {
   const [spaceList, setSpaceList] = useState([])
   const [spaceBeingDeleted, setSpaceBeingDeleted] = useState(null)
@@ -52,7 +62,7 @@ export const UserSpacesConfig = (props) => {
               onLeaveSpace={handleLeaveSpace}
               admin={props.admin}
               system={props.system}
-              onlyManager={onlyManager(member, space.memberList)}
+              onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
             />
           )
         }
@@ -135,7 +145,7 @@ export const UserSpacesConfig = (props) => {
   }
 
   const getUserSpaceListMemberList = async (fetchedSpaceList) => {
-    const spaceListResult = await Promise.all(fetchedSpaceList.map(fillMemberList))
+    const spaceListResult = await Promise.all(fetchedSpaceList.map((space) => fillMemberList(props, space)))
     setSpaceList(spaceListResult)
 
     setIsLoading(false)
@@ -155,16 +165,6 @@ export const UserSpacesConfig = (props) => {
 
   const handleLeaveSpace = (spaceBeingDeleted) => {
     setSpaceBeingDeleted(spaceBeingDeleted)
-  }
-
-  const onlyManager = (member, memberList) => {
-    const manager = ROLE.workspaceManager.slug
-
-    if (member.role !== manager) {
-      return false
-    }
-
-    return !memberList.some(u => u.user_id !== props.userToEditId && u.role === manager)
   }
 
   return (
