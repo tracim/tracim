@@ -357,7 +357,7 @@ export class CommentArea extends React.Component {
               }
             }}
             data-cy='commentArea__textinput'
-            hidden={props.wysiwyg}
+            hidden={state.shouldLoadWysiwyg}
           />
         </div>
 
