@@ -74,18 +74,18 @@ describe('<UserSpacesConfig />', () => {
 
   describe('onlyManager', () => {
     it('should return false if the member is not manager', () => {
-      const result = onlyManager({ userToEditId: 1 }, memberNotManager, [])
+      const result = onlyManager(memberNotManager.user_id, memberNotManager, [])
       expect(result).to.equal(false)
     })
 
     it('should return true if the member is the only manager', () => {
-      const result = onlyManager(props, memberManager1, memberListOneManager)
+      const result = onlyManager(props.userToEditId, memberManager1, memberListOneManager)
       console.log(memberManager1)
       expect(result).to.equal(true)
     })
 
     it('should return false if the member is not the only manager', () => {
-      const result = onlyManager(props, memberManager1, memberListTwoManagers)
+      const result = onlyManager(props.userToEditId, memberManager1, memberListTwoManagers)
       expect(result).to.equal(false)
     })
   })

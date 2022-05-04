@@ -145,7 +145,7 @@ export const UserSpacesConfig = (props) => {
   }
 
   const getUserSpaceListMemberList = async (fetchedSpaceList) => {
-    const spaceListResult = await Promise.all(fetchedSpaceList.map((space) => fillMemberList(props, space)))
+    const spaceListResult = await Promise.all(fetchedSpaceList.map(fillMemberList))
     setSpaceList(spaceListResult)
 
     setIsLoading(false)
