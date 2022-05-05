@@ -14,7 +14,7 @@
     "classnames": "^2.2.6",
     "core-js": "^3.6.4",
     "date-fns": "^2.19.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "pnp-webpack-plugin": "^1.6.4",
     "prop-types": "^15.7.2",
     "radium": "^0.25.2",

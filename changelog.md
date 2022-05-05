@@ -1,3 +1,11 @@
+# 4.2.1 / 2022-05-03
+
+### Fixed Issues
+
+ - Frontend: [#5622](https://github.com/tracim/tracim/issues/5622),
+[#5637](https://github.com/tracim/tracim/issues/5637)
+
+
 # 4.2.0 / 2022-04-28
 
 ### New Features
