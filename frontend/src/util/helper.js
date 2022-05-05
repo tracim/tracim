@@ -182,14 +182,17 @@ export const sortContentList = (workspaceContents, lang) => {
 export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'
 
-  document.getElementsByClassName('tracim__favicon').forEach(favicon => {
+  const favicons = document.getElementsByClassName('tracim__favicon')
+  for (let i = 0; i < favicons.length; i++) {
+    const favicon = favicons[i]
+
     if (!(hasUnreadNotification || hasUnreadMention)) {
       favicon.href = favicon.getAttribute(originalHrefAttribute)
       favicon.removeAttribute(originalHrefAttribute)
       return
     }
-    const faviconSize = favicon.sizes[0].split('x')[0]
 
+    const faviconSize = favicon.sizes[0].split('x')[0]
     const canvas = document.createElement('canvas')
     canvas.width = faviconSize
     canvas.height = faviconSize
@@ -221,7 +224,7 @@ export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
       if (!favicon.getAttribute(originalHrefAttribute)) favicon.setAttribute(originalHrefAttribute, favicon.href)
       favicon.href = canvas.toDataURL('image/png')
     }
-  })
+  }
 }
 
 export const parseSearchUrl = (parsedQuery) => {
