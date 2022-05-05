@@ -680,7 +680,7 @@ export class Gallery extends React.Component {
       document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
       Array.from(document.getElementsByClassName('ril__navButtons')).forEach(navButton => {
         navButton.style['transition-duration'] = '0.5s'
-        navButton.style.transform = 'translateY(0px)'
+        navButton.style.transform = 'translateX(0px)'
       })
       this.reactImageLightBoxModalRoot.style.cursor = 'default'
     }
