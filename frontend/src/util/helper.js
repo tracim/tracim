@@ -182,14 +182,14 @@ export const sortContentList = (workspaceContents, lang) => {
 export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'
 
-  document.getElementsByClassName('tracim__favicon').forEach(favicon => {
+  Array.from(document.getElementsByClassName('tracim__favicon')).forEach(favicon => {
     if (!(hasUnreadNotification || hasUnreadMention)) {
       favicon.href = favicon.getAttribute(originalHrefAttribute)
       favicon.removeAttribute(originalHrefAttribute)
       return
     }
-    const faviconSize = favicon.sizes[0].split('x')[0]
 
+    const faviconSize = favicon.sizes[0].split('x')[0]
     const canvas = document.createElement('canvas')
     canvas.width = faviconSize
     canvas.height = faviconSize
