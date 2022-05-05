@@ -631,11 +631,9 @@ export class Gallery extends React.Component {
   }
 
   displayReactImageLightBoxArrows (display) {
-    const navButtons = document.getElementsByClassName('ril__navButtons')
-    for (let i = 0; i < navButtons.length; i++) {
-      const navButton = navButtons[i]
+    Array.from(document.getElementsByClassName('ril__navButtons')).forEach(navButton => {
       if (navButton.style) navButton.style.visibility = display ? 'visible' : 'hidden'
-    }
+    })
   }
 
   rotateImg (pictureId, direction) {
@@ -680,12 +678,10 @@ export class Gallery extends React.Component {
       // INFO - GM - 2019-12-11 - It use dom manipulation instead of react state because ReactImageLightBox doesn't offer custom style props for the toolbar
       document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(0px)'
       document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
-      const navButtons = document.getElementsByClassName('ril__navButtons')
-      for (let i = 0; i < navButtons.length; i++) {
-        const navButton = navButtons[i]
+      Array.from(document.getElementsByClassName('ril__navButtons')).forEach(navButton => {
         navButton.style['transition-duration'] = '0.5s'
         navButton.style.transform = 'translateY(0px)'
-      }
+      })
       this.reactImageLightBoxModalRoot.style.cursor = 'default'
     }
     this.mouseMoveTimeout = setInterval(() => {
@@ -694,11 +690,9 @@ export class Gallery extends React.Component {
         document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
         document.getElementsByClassName('ril__navButtonNext')[0].style.transform = 'translateX(100%)'
         document.getElementsByClassName('ril__navButtonPrev')[0].style.transform = 'translateX(-100%)'
-        const navButtons = document.getElementsByClassName('ril__navButtons')
-        for (let i = 0; i < navButtons.length; i++) {
-          const navButton = navButtons[i]
+        Array.from(document.getElementsByClassName('ril__navButtons')).forEach(navButton => {
           navButton.style['transition-duration'] = '0.5s'
-        }
+        })
         this.reactImageLightBoxModalRoot.style.cursor = 'none'
       }
     }, 2000)

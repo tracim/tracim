@@ -182,10 +182,7 @@ export const sortContentList = (workspaceContents, lang) => {
 export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'
 
-  const favicons = document.getElementsByClassName('tracim__favicon')
-  for (let i = 0; i < favicons.length; i++) {
-    const favicon = favicons[i]
-
+  Array.from(document.getElementsByClassName('tracim__favicon')).forEach(favicon => {
     if (!(hasUnreadNotification || hasUnreadMention)) {
       favicon.href = favicon.getAttribute(originalHrefAttribute)
       favicon.removeAttribute(originalHrefAttribute)
@@ -224,7 +221,7 @@ export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
       if (!favicon.getAttribute(originalHrefAttribute)) favicon.setAttribute(originalHrefAttribute, favicon.href)
       favicon.href = canvas.toDataURL('image/png')
     }
-  }
+  })
 }
 
 export const parseSearchUrl = (parsedQuery) => {
