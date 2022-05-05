@@ -634,8 +634,7 @@ export class Gallery extends React.Component {
     const navButtons = document.getElementsByClassName('ril__navButtons')
     for (let i = 0; i < navButtons.length; i++) {
       const navButton = navButtons[i]
-      if (navButton.style)
-        navButton.style.visibility = display ? 'visible' : 'hidden'
+      if (navButton.style) navButton.style.visibility = display ? 'visible' : 'hidden'
     }
   }
 
