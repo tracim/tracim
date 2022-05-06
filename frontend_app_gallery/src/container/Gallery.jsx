@@ -631,8 +631,8 @@ export class Gallery extends React.Component {
   }
 
   displayReactImageLightBoxArrows (display) {
-    document.getElementsByClassName('ril__navButtons').forEach(arrow => {
-      if (arrow.style) arrow.style.visibility = display ? 'visible' : 'hidden'
+    Array.from(document.getElementsByClassName('ril__navButtons')).forEach(navButton => {
+      if (navButton.style) navButton.style.visibility = display ? 'visible' : 'hidden'
     })
   }
 
@@ -678,9 +678,9 @@ export class Gallery extends React.Component {
       // INFO - GM - 2019-12-11 - It use dom manipulation instead of react state because ReactImageLightBox doesn't offer custom style props for the toolbar
       document.getElementsByClassName('ril__toolbar')[0].style.transform = 'translateY(0px)'
       document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
-      document.getElementsByClassName('ril__navButtons').forEach(e => {
-        e.style['transition-duration'] = '0.5s'
-        e.style.transform = 'translateX(0px)'
+      Array.from(document.getElementsByClassName('ril__navButtons')).forEach(navButton => {
+        navButton.style['transition-duration'] = '0.5s'
+        navButton.style.transform = 'translateX(0px)'
       })
       this.reactImageLightBoxModalRoot.style.cursor = 'default'
     }
@@ -690,8 +690,8 @@ export class Gallery extends React.Component {
         document.getElementsByClassName('ril__toolbar')[0].style['transition-duration'] = '0.5s'
         document.getElementsByClassName('ril__navButtonNext')[0].style.transform = 'translateX(100%)'
         document.getElementsByClassName('ril__navButtonPrev')[0].style.transform = 'translateX(-100%)'
-        document.getElementsByClassName('ril__navButtons').forEach(e => {
-          e.style['transition-duration'] = '0.5s'
+        Array.from(document.getElementsByClassName('ril__navButtons')).forEach(navButton => {
+          navButton.style['transition-duration'] = '0.5s'
         })
         this.reactImageLightBoxModalRoot.style.cursor = 'none'
       }
