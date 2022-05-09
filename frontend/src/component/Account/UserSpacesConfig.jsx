@@ -9,6 +9,7 @@ import {
   PAGE,
   PROFILE,
   ROLE,
+  serialize,
   ConfirmPopup,
   IconButton,
   Loading,
@@ -17,6 +18,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
+import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
+import { serializeMember } from '../../reducer/currentWorkspace.js'
 import { FETCH_CONFIG } from '../../util/helper.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
@@ -30,7 +33,7 @@ export const onlyManager = (userToEditId, member, memberList) => {
     return false
   }
 
-  return !memberList.some(m => m.user_id !== userToEditId && m.role === manager)
+  return !memberList.some(m => m.id !== userToEditId && m.role === manager)
 }
 
 export const UserSpacesConfig = (props) => {
@@ -45,22 +48,18 @@ export const UserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-
-    return () => {
-      // unregisterLiveMessageHandlerList
-    }
-  }, [])
+  }, [spaceList]) // TODO GIULIA TLM problem
 
   useEffect(() => {
     const entries = spaceList.reduce((res, space) => {
       if (space.memberList.length > 0) {
-        const member = space.memberList.find(u => u.user_id === props.userToEditId)
+        const member = space.memberList.find(u => u.id === props.userToEditId)
         if (member) {
           res.push(
             <UserSpacesConfigLine
               space={space}
               member={member}
-              key={space.workspace_id}
+              key={space.id}
               onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
               onLeaveSpace={handleLeaveSpace}
               admin={props.admin}
@@ -73,21 +72,24 @@ export const UserSpacesConfig = (props) => {
       }
     }, [])
 
-    setEntries(entries)
+    setEntries(entries) // Mathis acha que é aqui
   }, [spaceList])
 
   useEffect(() => {
-    getSpaceList()
-  }, [props.userToEditId])
+    if (props.userToEditId === props.user.userId && props.workspaceList) {
+      setSpaceList(props.workspaceList)
+      setIsLoading(false)
+    } else getSpaceList()
+  }, [props.userToEditId]) // Mathis acha que é aqui
 
   const handleMemberModified = (data) => {
     setSpaceList(spaceList.map(space => {
-      if (space.workspace_id === data.workspace_id) {
+      if (space.id === data.fields.workspace.workspace_id) {
         return {
           ...space,
           memberList: space.memberList.map(member => {
-            if (member.user_id === data.fields.user.user_id) {
-              return { ...member, ...data.fields.user }
+            if (member.id === data.fields.user.user_id) {
+              return { ...member, ...data.fields.member }
             } else {
               return member
             }
@@ -100,31 +102,36 @@ export const UserSpacesConfig = (props) => {
   }
 
   const handleMemberDeleted = async (data) => {
-    if (Number(props.userToEditId) === data.fields.user.user_id) {
-      setSpaceList(spaceList.filter(space => space.workspace_id !== data.workspace_id))
-    } else {
-      updateMemberList(data)
-    }
+    setSpaceList(spaceList.map(space => {
+      if (space.id === data.fields.workspace.workspace_id) {
+        return {
+          ...space,
+          memberList: space.memberList.filter(member => member.id !== data.fields.user.user_id)
+        }
+      } else {
+        return space
+      }
+    }))
   }
 
   const handleMemberCreated = async (data) => {
-    updateMemberList(data)
-  }
+    const spaceIndex = spaceList.findIndex(space => space.id === data.fields.workspace.workspace_id)
 
-  const updateMemberList = async (data) => {
-    // RJ - 2020-10-28 - FIXME - https://github.com/tracim/tracim/issues/3740
-    // We should update the member list with using information in data instead of re-fetching it
-
-    const spaceIndex = spaceList.findIndex(s => s.workspace_id === data.fields.workspace.workspace_id)
-    const space = await fillMemberList(data.fields.workspace)
-
-    if (spaceIndex === -1 && Number(props.userToEditId) !== data.fields.user.user_id) return
-
-    setSpaceList(
-      spaceIndex === -1
-        ? sortWorkspaceList([...spaceList, space])
-        : [...spaceList.slice(0, spaceIndex), space, ...spaceList.slice(spaceIndex + 1)]
-    )
+    if (spaceIndex) {
+      setSpaceList(spaceList.map(space => {
+        if (space.id === data.fields.workspace.workspace_id) {
+          return {
+            ...space,
+            memberList: [...space.memberList, data.fields.user.user_id]
+          }
+        } else {
+          return space
+        }
+      }))
+    } else {
+      const space = await fillMemberList(data.fields.workspace)
+      setSpaceList(sortWorkspaceList([...spaceList, space]))
+    }
   }
 
   const getSpaceList = async () => {
@@ -132,7 +139,8 @@ export const UserSpacesConfig = (props) => {
 
     switch (fetchGetUserWorkspaceList.status) {
       case 200: {
-        getUserSpaceListMemberList(fetchGetUserWorkspaceList.json)
+        const userSpaceList = fetchGetUserWorkspaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
+        getUserSpaceListMemberList(userSpaceList)
         break
       }
       default: props.dispatch(newFlashMessage(props.t('Error while loading user')))
@@ -140,17 +148,19 @@ export const UserSpacesConfig = (props) => {
   }
 
   const fillMemberList = async (space) => {
-    const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.workspace_id))
+    const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.id))
     return {
       ...space,
-      memberList: fetchMemberList.body || []
+      memberList: fetchMemberList.body.map(member => serialize(member, serializeMember)) || []
     }
   }
 
   const getUserSpaceListMemberList = async (fetchedSpaceList) => {
-    const spaceListResult = await Promise.all(fetchedSpaceList.map(fillMemberList))
-    setSpaceList(spaceListResult)
+    const spaceListResult = await Promise.all(fetchedSpaceList.map(userSpace => {
+      return props.workspaceList.find(space => space.id === userSpace.id) || fillMemberList(userSpace)
+    })) // TODO GIULIA Not working
 
+    setSpaceList(sortWorkspaceList(spaceListResult))
     setIsLoading(false)
   }
 
@@ -244,7 +254,7 @@ export const UserSpacesConfig = (props) => {
   )
 }
 
-const mapStateToProps = ({ system, user }) => ({ system, user })
+const mapStateToProps = ({ system, user, workspaceList }) => ({ system, user, workspaceList })
 export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(UserSpacesConfig))))
 
 UserSpacesConfig.propTypes = {
