@@ -9,6 +9,7 @@ import * as Cookies from 'js-cookie'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  getWorkspaceMemberList,
   handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
@@ -46,7 +47,6 @@ import {
   getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
-  getWorkspaceMemberList,
   postUserLogout,
   postUserLogin,
   putUserLang,
@@ -356,13 +356,13 @@ class Login extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
       workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))

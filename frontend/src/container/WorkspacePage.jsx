@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 
 import {
   getLoggedUserCalendar,
-  getWorkspaceMemberList,
   getWorkspaceDetail
 } from '../action-creator.async.js'
 import {
@@ -15,8 +14,12 @@ import {
   setWorkspaceLoaded,
   setWorkspaceMemberList
 } from '../action-creator.sync.js'
-
-import { PAGE } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../util/helper.js'
+import {
+  getWorkspaceMemberList,
+  handleFetchResult,
+  PAGE
+} from 'tracim_frontend_lib'
 
 class WorkspacePage extends React.Component {
   constructor (props) {
@@ -27,15 +30,15 @@ class WorkspacePage extends React.Component {
   async updateCurrentWorkspace () {
     const { props } = this
 
-    const requestMemberList = props.dispatch(getWorkspaceMemberList(props.workspaceId))
+    const requestMemberList = handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, props.workspaceId))
     const requestWorkspaceDetail = props.dispatch(getWorkspaceDetail(props.workspaceId))
 
     const [responseMemberList, responseWorkspaceDetail] = await Promise.all([
       requestMemberList, requestWorkspaceDetail
     ])
 
-    if (responseMemberList.status === 200 && responseWorkspaceDetail.status === 200) {
-      props.dispatch(setWorkspaceMemberList(responseMemberList.json))
+    if (responseMemberList.apiResponse.status === 200 && responseWorkspaceDetail.status === 200) {
+      props.dispatch(setWorkspaceMemberList(responseMemberList.body))
       props.dispatch(setWorkspaceDetail(responseWorkspaceDetail.json))
       props.dispatch(setWorkspaceLoaded())
 
@@ -43,7 +46,7 @@ class WorkspacePage extends React.Component {
         this.loadCalendarDetail()
       }
     } else {
-      switch (responseMemberList.status) {
+      switch (responseMemberList.apiResponse.status) {
         case 200: break
         case 400: break
         default: props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('member list')}`, 'warning')); break

@@ -4,6 +4,8 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
+  getWorkspaceMemberList,
+  handleFetchResult,
   PAGE,
   PROFILE,
   ROLE,
@@ -15,8 +17,9 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../../util/helper.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
-import { deleteWorkspaceMember, getUserWorkspaceList, getWorkspaceMemberList } from '../../action-creator.async.js'
+import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 
@@ -137,10 +140,10 @@ export const UserSpacesConfig = (props) => {
   }
 
   const fillMemberList = async (space) => {
-    const fetchMemberList = await props.dispatch(getWorkspaceMemberList(space.workspace_id))
+    const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.workspace_id))
     return {
       ...space,
-      memberList: fetchMemberList.json || [] // handle error?
+      memberList: fetchMemberList.body || []
     }
   }
 

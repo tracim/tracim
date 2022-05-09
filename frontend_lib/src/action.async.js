@@ -111,8 +111,8 @@ export const getReservedUsernames = async (apiUrl) =>
 export const getWorkspaceDetail = (apiUrl, workspaceId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}`)
 
-export const getWorkspaceMemberList = (apiUrl, workspaceId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members`)
+export const getWorkspaceMemberList = (apiUrl, workspaceId, showDisabledUser = false) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
 
 export const deleteWorkspace = (apiUrl, workspaceId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/trashed`)

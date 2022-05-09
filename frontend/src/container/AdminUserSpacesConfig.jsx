@@ -4,6 +4,8 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   CardPopup,
+  getWorkspaceMemberList,
+  handleFetchResult,
   IconButton,
   PROFILE,
   ROLE,
@@ -14,11 +16,11 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TracimComponent
 } from 'tracim_frontend_lib'
+import { FETCH_CONFIG } from '../util/helper.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 import {
   deleteWorkspaceMember,
   getWorkspaceList,
-  getWorkspaceMemberList,
   postWorkspaceMember,
   updateWorkspaceMember
 } from '../action-creator.async.js'
@@ -105,11 +107,11 @@ export class AdminUserSpacesConfig extends React.Component {
   }
 
   fillMemberList = async (space) => {
-    const fetchMemberList = await this.props.dispatch(getWorkspaceMemberList(space.workspace_id))
+    const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.workspace_id))
 
     return {
       ...space,
-      memberList: fetchMemberList.json || []
+      memberList: fetchMemberList.body || []
     }
   }
 

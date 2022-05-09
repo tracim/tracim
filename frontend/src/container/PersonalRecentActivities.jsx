@@ -2,11 +2,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-
+import { FETCH_CONFIG } from '../util/helper.js'
 import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CUSTOM_EVENT,
+  getWorkspaceMemberList,
+  handleFetchResult,
   PAGE,
   PageContent,
   PageTitle,
@@ -24,7 +26,6 @@ import {
   setUserActivityEventList
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
-import { getWorkspaceMemberList } from '../action-creator.async.js'
 
 export class PersonalRecentActivities extends React.Component {
   constructor (props) {
@@ -45,10 +46,10 @@ export class PersonalRecentActivities extends React.Component {
   handleTlm = async (data) => {
     const { props } = this
     if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
-      const fetchGetWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(data.fields.workspace.workspace_id))
-      if (fetchGetWorkspaceMemberList.status !== 200) return
+      const fetchGetWorkspaceMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id))
+      if (fetchGetWorkspaceMemberList.apiResponse.status !== 200) return
 
-      const member = fetchGetWorkspaceMemberList.json.find(user => user.id === data.fields.user.user_id)
+      const member = fetchGetWorkspaceMemberList.body.find(user => user.id === data.fields.user.user_id)
       if (!member || member.role === data.fields.member.role) return
     }
     props.handleTlm(data)
