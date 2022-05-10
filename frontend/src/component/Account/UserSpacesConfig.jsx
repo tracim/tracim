@@ -36,6 +36,14 @@ export const onlyManager = (userToEditId, member, memberList) => {
   return !memberList.some(m => m.id !== userToEditId && m.role === manager)
 }
 
+export const fillMemberList = async (space) => {
+  const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.id))
+  return {
+    ...space,
+    memberList: fetchMemberList.body.map(member => serializeMember(member)) || []
+  }
+}
+
 export const UserSpacesConfig = (props) => {
   const [spaceList, setSpaceList] = useState([])
   const [spaceBeingDeleted, setSpaceBeingDeleted] = useState(null)
@@ -48,10 +56,10 @@ export const UserSpacesConfig = (props) => {
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: handleMemberModified },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.DELETED, handler: handleMemberDeleted }
     ])
-  }, [spaceList]) // TODO GIULIA TLM problem
+  }, [spaceList])
 
   useEffect(() => {
-    const entries = spaceList.reduce((res, space) => {
+    const entrieList = spaceList.reduce((res, space) => {
       if (space.memberList.length > 0) {
         const member = space.memberList.find(u => u.id === props.userToEditId)
         if (member) {
@@ -72,7 +80,7 @@ export const UserSpacesConfig = (props) => {
       }
     }, [])
 
-    setEntries(entries) // Mathis acha que é aqui
+    setEntries(entrieList)
   }, [spaceList])
 
   useEffect(() => {
@@ -80,7 +88,7 @@ export const UserSpacesConfig = (props) => {
       setSpaceList(props.workspaceList)
       setIsLoading(false)
     } else getSpaceList()
-  }, [props.userToEditId]) // Mathis acha que é aqui
+  }, [props.userToEditId])
 
   const handleMemberModified = (data) => {
     setSpaceList(spaceList.map(space => {
@@ -89,7 +97,7 @@ export const UserSpacesConfig = (props) => {
           ...space,
           memberList: space.memberList.map(member => {
             if (member.id === data.fields.user.user_id) {
-              return { ...member, ...data.fields.member }
+              return { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
             } else {
               return member
             }
@@ -122,7 +130,7 @@ export const UserSpacesConfig = (props) => {
         if (space.id === data.fields.workspace.workspace_id) {
           return {
             ...space,
-            memberList: [...space.memberList, data.fields.user.user_id]
+            memberList: [...space.memberList, serializeMember({ user: data.fields.user, ...data.fields.member })]
           }
         } else {
           return space
@@ -147,21 +155,13 @@ export const UserSpacesConfig = (props) => {
     }
   }
 
-  const fillMemberList = async (space) => {
-    const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.id))
-    return {
-      ...space,
-      memberList: fetchMemberList.body.map(member => serialize(member, serializeMember)) || []
-    }
-  }
-
   const getUserSpaceListMemberList = async (fetchedSpaceList) => {
-    const spaceListResult = await Promise.all(fetchedSpaceList.map(userSpace => {
+    Promise.all(fetchedSpaceList.map(userSpace => {
       return props.workspaceList.find(space => space.id === userSpace.id) || fillMemberList(userSpace)
-    })) // TODO GIULIA Not working
-
-    setSpaceList(sortWorkspaceList(spaceListResult))
-    setIsLoading(false)
+    })).then((spaceListResult) => {
+      setSpaceList(sortWorkspaceList(spaceListResult))
+      setIsLoading(false)
+    })
   }
 
   const handleConfirmDeleteSpace = async () => {
