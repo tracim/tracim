@@ -33,7 +33,7 @@ export const onlyManager = (userToEditId, member, memberList) => {
     return false
   }
 
-  return !memberList.some(m => m.id !== userToEditId && m.role === manager)
+  return (memberList.filter(m => m.id !== userToEditId && m.role === manager)).length === 1
 }
 
 export const fillMemberList = async (space) => {
