@@ -88,7 +88,7 @@ export const AdminUserSpacesConfig = (props) => {
       case 200: {
         const spaceList = fetchGetSpaceList.json.map(space => serialize(space, serializeWorkspaceListProps))
         Promise.all(spaceList.map(userSpace => {
-          return props.workspaceList.find(space => space.id === userSpace.id) || fillMemberList(userSpace)
+          return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
         })).then((spaceListResult) => {
           setSpaceList(sortWorkspaceList(spaceListResult))
         })
