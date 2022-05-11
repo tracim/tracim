@@ -452,61 +452,60 @@ export class AdvancedSearch extends React.Component {
     }
 
     return (
-      state.isLoading
-        ? <Loading />
-        : (
-          <div className='tracim__content fullWidthFullHeight'>
-            <div className='tracim__content-scrollview'>
-              <PageWrapper customClass='advancedSearch__wrapper'>
-                <PageTitle
-                  title={(currentNumberSearchResults === 1
-                    ? props.t('Result for: {{keywords}}', i18nOpts)
-                    : props.t('Results for: {{keywords}}', i18nOpts)
-                  )}
-                  icon='fas fa-search'
-                  breadcrumbsList={props.breadcrumbs}
+      <div className='tracim__content fullWidthFullHeight'>
+        <div className='tracim__content-scrollview'>
+          <PageWrapper customClass='advancedSearch__wrapper'>
+            <PageTitle
+              title={(currentNumberSearchResults === 1
+                ? props.t('Result for: {{keywords}}', i18nOpts)
+                : props.t('Results for: {{keywords}}', i18nOpts)
+              )}
+              icon='fas fa-search'
+              breadcrumbsList={props.breadcrumbs}
+            />
+
+            <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>
+              <div className='advancedSearch__input'>
+                <div className='advancedSearch__input__type'>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={ADVANCED_SEARCH_TYPE.CONTENT}
+                    checked={state.searchType === ADVANCED_SEARCH_TYPE.CONTENT}
+                    type='radio'
+                    id={`radio-${ADVANCED_SEARCH_TYPE.CONTENT}`}
+                  />
+                  <label htmlFor={`radio-${ADVANCED_SEARCH_TYPE.CONTENT}`}>
+                    {props.t('Contents')}
+                  </label>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={ADVANCED_SEARCH_TYPE.SPACE}
+                    checked={state.searchType === ADVANCED_SEARCH_TYPE.SPACE}
+                    type='radio'
+                    id={`radio-${ADVANCED_SEARCH_TYPE.SPACE}`}
+                  />
+                  <label htmlFor={`radio-${ADVANCED_SEARCH_TYPE.SPACE}`}>
+                    {props.t('Spaces')}
+                  </label>
+                  <input
+                    onChange={this.handleChangeSearchType}
+                    value={ADVANCED_SEARCH_TYPE.USER}
+                    checked={state.searchType === ADVANCED_SEARCH_TYPE.USER}
+                    type='radio'
+                    id={`radio-${ADVANCED_SEARCH_TYPE.USER}`}
+                  />
+                  <label htmlFor={`radio-${ADVANCED_SEARCH_TYPE.USER}`}>
+                    {props.t('Users')}
+                  </label>
+                </div>
+                <SearchInput
+                  onClickSearch={this.handleClickSearch}
+                  searchString={currentSearch.searchString}
                 />
-
-                <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>
-                  <div className='advancedSearch__input'>
-                    <div className='advancedSearch__input__type'>
-                      <input
-                        onChange={this.handleChangeSearchType}
-                        value={ADVANCED_SEARCH_TYPE.CONTENT}
-                        checked={state.searchType === ADVANCED_SEARCH_TYPE.CONTENT}
-                        type='radio'
-                        id={`radio-${ADVANCED_SEARCH_TYPE.CONTENT}`}
-                      />
-                      <label htmlFor={`radio-${ADVANCED_SEARCH_TYPE.CONTENT}`}>
-                        {props.t('Contents')}
-                      </label>
-                      <input
-                        onChange={this.handleChangeSearchType}
-                        value={ADVANCED_SEARCH_TYPE.SPACE}
-                        checked={state.searchType === ADVANCED_SEARCH_TYPE.SPACE}
-                        type='radio'
-                        id={`radio-${ADVANCED_SEARCH_TYPE.SPACE}`}
-                      />
-                      <label htmlFor={`radio-${ADVANCED_SEARCH_TYPE.SPACE}`}>
-                        {props.t('Spaces')}
-                      </label>
-                      <input
-                        onChange={this.handleChangeSearchType}
-                        value={ADVANCED_SEARCH_TYPE.USER}
-                        checked={state.searchType === ADVANCED_SEARCH_TYPE.USER}
-                        type='radio'
-                        id={`radio-${ADVANCED_SEARCH_TYPE.USER}`}
-                      />
-                      <label htmlFor={`radio-${ADVANCED_SEARCH_TYPE.USER}`}>
-                        {props.t('Users')}
-                      </label>
-                    </div>
-                    <SearchInput
-                      onClickSearch={this.handleClickSearch}
-                      searchString={currentSearch.searchString}
-                    />
-                  </div>
-
+              </div>
+              {state.isLoading
+                ? <Loading />
+                : (
                   <div className='advancedSearch__page'>
                     <div className='advancedSearch__content'>
                       <div className='advancedSearch__content__detail'>
@@ -528,7 +527,6 @@ export class AdvancedSearch extends React.Component {
                       </div>
 
                       {currentNumberSearchResults === 0 && (
-                        // ADD LOADER
                         <div className='advancedSearch__content__empty'>
                           {`${props.t('No results for the search terms:')} ${currentSearch.searchString}`}
                         </div>
@@ -583,11 +581,11 @@ export class AdvancedSearch extends React.Component {
                       />
                     )}
                   </div>
-                </PageContent>
-              </PageWrapper>
-            </div>
-          </div>
-        )
+                )}
+            </PageContent>
+          </PageWrapper>
+        </div>
+      </div>
     )
   }
 }

@@ -239,33 +239,33 @@ export class Favorites extends React.Component {
     }
     const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
     return (
-        <ContentListItem
-          content={favorite.content}
-          contentTypeInfo={contentTypeInfo}
-          userLang={props.user.lang}
-          key={favorite.contentId}
-          isLast={isLast}
-          isFirst={isFirst}
-          breadcrumbsList={state.contentBreadcrumbsList[index]}
-          commentsCount={state.contentCommentsCountList[index]}
-          customClass='favorites__item'
-          dataCy='favorites__item'
-        >
-          {favoriteButton}
-        </ContentListItem>
-      )
+      <ContentListItem
+        content={favorite.content}
+        contentTypeInfo={contentTypeInfo}
+        userLang={props.user.lang}
+        key={favorite.contentId}
+        isLast={isLast}
+        isFirst={isFirst}
+        breadcrumbsList={state.contentBreadcrumbsList[index]}
+        commentsCount={state.contentCommentsCountList[index]}
+        customClass='favorites__item'
+        dataCy='favorites__item'
+      >
+        {favoriteButton}
+      </ContentListItem>
+    )
   }
 
   render () {
     const { props, state } = this
     return (
       <div className='tracim__content-scrollview'>
-          <PageWrapper customClass='favorites__wrapper'>
-            <PageTitle
-              title={props.t('Favorites')}
-              icon='far fa-star'
-              breadcrumbsList={props.breadcrumbs}
-              />
+        <PageWrapper customClass='favorites__wrapper'>
+          <PageTitle
+            title={props.t('Favorites')}
+            icon='far fa-star'
+            breadcrumbsList={props.breadcrumbs}
+          />
 
           {state.isLoading
             ? <Loading />
@@ -282,8 +282,7 @@ export class Favorites extends React.Component {
                     {props.t('You did not add any content as favorite yet.')}
                   </div>
                 )
-            )
-          }
+            )}
         </PageWrapper>
       </div>
     )
