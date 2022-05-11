@@ -47,6 +47,9 @@ describe('In <AdvancedSearch />', () => {
     system: {
       config: { }
     },
+    location: {
+      search: 'https://localhost:7999/ui/search-result?act=1&arc=0&del=0&nr=15&p= 1&q=test&s=content&t=html-document%2Cfile%2Cthread%2Cfolder%2Ccomment%2Ckanban'
+    },
     t: key => key,
     dispatch: dispatchMock,
     registerCustomEventHandlerList: () => { }
