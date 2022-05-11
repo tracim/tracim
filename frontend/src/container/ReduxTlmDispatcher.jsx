@@ -147,6 +147,7 @@ export class ReduxTlmDispatcher extends React.Component {
       // In this case, addWorkspaceMember does nothing.
       // We actually noticed that the member created TLM arrives before the workspace created TLM.
       // Let's add the workpace first to avoid this.
+      // See https://github.com/tracim/tracim/issues/5451
       props.dispatch(addWorkspaceList([data.fields.workspace]))
 
       props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))

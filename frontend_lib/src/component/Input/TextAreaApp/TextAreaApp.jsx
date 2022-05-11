@@ -167,6 +167,7 @@ export class TextAreaApp extends React.Component {
             value={state.text}
             onChange={this.handleChangeText}
             autoFocus
+            hidden
           />
 
           <div className={`${props.customClass}__button editionmode__button`}>

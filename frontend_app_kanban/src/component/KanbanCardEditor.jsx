@@ -84,6 +84,7 @@ function KanbanCardEditor (props) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows='3'
+              hidden
             />
           </div>
         </div>
