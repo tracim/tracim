@@ -156,13 +156,13 @@ export const AdminUserSpacesConfig = (props) => {
     if (!space.id) return
 
     try {
-        const fetchResult = await props.dispatch(deleteWorkspaceMember(space.id, props.userToEditId))
-        if (fetchResult.status !== 204) {
-            props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
-        }
+      const fetchResult = await props.dispatch(deleteWorkspaceMember(space.id, props.userToEditId))
+      if (fetchResult.status !== 204) {
+        props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
+      }
     } catch (e) {
-        console.log('Something when wrong when trying to leave the space.')
-        console.log('Error:', e)
+      console.log('Something when wrong when trying to leave the space.')
+      console.log('Error:', e)
     }
   }
 
