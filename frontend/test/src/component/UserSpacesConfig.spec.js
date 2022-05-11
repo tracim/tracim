@@ -80,7 +80,6 @@ describe('<UserSpacesConfig />', () => {
 
     it('should return true if the member is the only manager', () => {
       const result = onlyManager(props.userToEditId, memberManager1, memberListOneManager)
-      console.log(memberManager1)
       expect(result).to.equal(true)
     })
 
