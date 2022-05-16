@@ -347,7 +347,7 @@ class TestWorkspaceEndpoint(object):
         parent_workspace = workspace_api.create_workspace("test_parent", save_now=True)
         workspace = workspace_api.create_workspace("test", parent=parent_workspace, save_now=True)
         rapi = role_api_factory.get()
-        rapi.create_one(user, workspace, UserRoleInWorkspace.READER, False)
+        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTRIBUTOR, False)
         workspace_api = workspace_api_factory.get()
         workspace = workspace_api.get_one(workspace.workspace_id)
         app_api = application_api_factory.get()
@@ -364,6 +364,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_dict["description"] == workspace.description
         assert workspace_dict["is_deleted"] is False
         assert workspace_dict["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace_dict["current_user_role"] == WorkspaceRoles.WORKSPACE_MANAGER.slug
         assert workspace_dict["default_user_role"] == WorkspaceRoles.READER.slug
         assert workspace_dict["parent_id"] == parent_workspace.workspace_id
 
@@ -410,6 +411,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace_dict["description"] == workspace.description
         assert workspace_dict["is_deleted"] is False
         assert workspace_dict["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace_dict["current_user_role"] == WorkspaceRoles.WORKSPACE_MANAGER.slug
         assert workspace_dict["default_user_role"] == WorkspaceRoles.READER.slug
 
         assert len(workspace_dict["sidebar_entries"]) == len(default_sidebar_entry)
@@ -458,6 +460,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_upload_enabled"] is True
         assert workspace["public_download_enabled"] is True
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace["current_user_role"] == WorkspaceRoles.WORKSPACE_MANAGER.slug
         assert workspace["default_user_role"] == WorkspaceRoles.READER.slug
         assert workspace["publication_enabled"] is True
 
@@ -476,6 +479,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace["current_user_role"] == WorkspaceRoles.WORKSPACE_MANAGER.slug
         assert workspace["default_user_role"] == WorkspaceRoles.CONTRIBUTOR.slug
         last_event = event_helper.last_event
         assert last_event.event_type == "workspace.modified"
@@ -496,6 +500,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_upload_enabled"] is False
         assert workspace["public_download_enabled"] is False
         assert workspace["access_type"] == WorkspaceAccessType.CONFIDENTIAL.value
+        assert workspace["current_user_role"] == WorkspaceRoles.WORKSPACE_MANAGER.slug
         assert workspace["default_user_role"] == WorkspaceRoles.CONTRIBUTOR.slug
         assert workspace["publication_enabled"] is False
 

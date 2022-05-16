@@ -1442,6 +1442,12 @@ class WorkspaceWithoutDescriptionSchema(WorkspaceDigestSchema):
         required=True,
         description="default role for new users in this workspace",
     )
+    current_user_role = StrippedString(
+        example=WorkspaceRoles.READER.slug,
+        validate=user_role_validator,
+        required=False,
+        description="current user role in this space",
+    )
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="Workspace creation date"
     )

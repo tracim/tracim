@@ -821,7 +821,8 @@ class WorkspaceController(Controller):
             "update_workspace", "/workspaces/{workspace_id}", request_method="PUT"
         )
         configurator.add_view(self.update_workspace, route_name="update_workspace")
-        # Workspace Members (Roles)
+
+        # GET the role of every members of a space <workspace_id>
         configurator.add_route(
             "workspace_members", "/workspaces/{workspace_id}/members", request_method="GET"
         )

@@ -2,6 +2,7 @@
 import base64
 import cgi
 from datetime import datetime
+import typing
 from typing import Dict
 from typing import Generic
 from typing import List
@@ -987,10 +988,13 @@ class WorkspaceInContext(object):
     Interface to get Workspace data and Workspace data related to context.
     """
 
-    def __init__(self, workspace: Workspace, dbsession: Session, config: CFG) -> None:
-        self.workspace = workspace
+    def __init__(
+        self, space: Workspace, dbsession: Session, config: CFG, user: Optional[User] = None
+    ) -> None:
+        self.workspace = space
         self.dbsession = dbsession
         self.config = config
+        self.user = user
 
     @property
     def workspace_in_context(self) -> "WorkspaceInContext":
@@ -1005,13 +1009,29 @@ class WorkspaceInContext(object):
 
     @property
     def access_type(self) -> str:
-        """access type of the workspace"""
+        """access type of the space"""
         return self.workspace.access_type.value
 
     @property
     def default_user_role(self) -> str:
-        """default user role of the workspace"""
+        """default user role of the space"""
         return self.workspace.default_user_role.slug
+
+    @property
+    def current_user_role(self) -> str:
+        """current user role of the space"""
+        if self.user:
+            result = (
+                self.dbsession.query(UserRoleInWorkspace)
+                .filter(
+                    UserRoleInWorkspace.workspace_id == self.workspace.workspace_id
+                    and UserRoleInWorkspace.user_id == self.user.user_id
+                )
+                .first()
+            ).role_as_label()
+            return result
+        else:
+            return ""
 
     @property
     def id(self) -> int:

@@ -177,13 +177,13 @@ class UserController(Controller):
             config=app_config,
         )
 
-        workspaces = wapi.get_all_for_user(
+        spaces = wapi.get_all_for_user(
             request.candidate_user,
             include_owned=hapic_data.query.show_owned_workspace,
             include_with_role=hapic_data.query.show_workspace_with_role,
             parents_ids=hapic_data.query.parent_ids,
         )
-        return [wapi.get_workspace_with_context(workspace) for workspace in workspaces]
+        return [wapi.get_workspace_with_context(space) for space in spaces]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @hapic.handle_exception(WorkspaceNotFound, HTTPStatus.BAD_REQUEST)
@@ -1343,7 +1343,7 @@ class UserController(Controller):
         for this controller
         """
 
-        # user workspace
+        # GET/PUT user space
         configurator.add_route(
             "get_user_workspace",
             "/users/{user_id:\d+}/workspaces",
