@@ -94,7 +94,7 @@ Then activate it in your terminal session:
 
 Note: Every Tracim command execution must be executed under this virtual environment.
 
-### Autre chose
+### Others
 
 Install packaging tools:
 

@@ -1,3 +1,5 @@
+![logo_tracim](./doc/logos/logo_tracim.png)
+
 # Tracim
 <!-- Add better description here -->
 

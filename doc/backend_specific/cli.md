@@ -1,8 +1,8 @@
-# Controlling Tracim from the Command Line Using `tracimcli` #
+# Controlling Tracim from the Command Line Using `tracimcli`
 
 Tracim has a build-in command line tool.
 
-## Introduction ##
+## Introduction
 
 This document is intended to developers or sysadmin.
 
@@ -12,7 +12,7 @@ and active the Tracim virtualenv:
     user@host:~/tracim_backend$ source env/bin/activate
     (env) user@host:~/tracim_backend$
 
-## Database ##
+## Database
 
 ### Create the database
 
@@ -52,7 +52,7 @@ For mariadb 10.3+ (use collation `utf8mb4_unicode_520_ci` by default):
 tracimcli db migrate-mysql-charset -d
 ```
 
-## User ##
+## User
 
 ### add a user
 
@@ -227,13 +227,13 @@ optional arguments:
                         user logins (email or username)
 ```
 
-## Caldav ##
+## Caldav
 
-### Run the Service ###
+### Run the Service
 
     tracimcli caldav start
 
-### Check and Recreate the Agenda for a User/Workspace ###
+### Check and Recreate the Agenda for a User/Workspace
 
 In some cases, creating the agenda of an user or a workspace can fail.
 To check if all agendas are created and to force their creation if they are not,
@@ -241,17 +241,17 @@ you can run:
 
     tracimcli caldav sync
 
-## WebDAV ##
+## WebDAV
 
-### Run the Service ###
+### Run the Service
 
     tracimcli webdav start
 
-## Help ##
+## Help
 
     tracimcli -h
 
-## Dev/Support Tools ##
+## Dev/Support Tools
 
 :warning: These tools are only for dev or support and are experimental, syntax and behaviour may change in future tracim version.
 

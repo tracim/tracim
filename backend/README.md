@@ -14,12 +14,12 @@ Backend source code of Tracim, using Pyramid Framework.
 
 ## Configuration
 
-Create [configuration file](doc/setting.md) for a development environment:
+Create configuration file for a development environment:
 
     cp development.ini.sample development.ini
 
 The provided default configuration is suitable for local-test. If you need to run Tracim
-over network, see [configuration file documentation](doc/setting.md).
+over network, see [configuration file documentation](../doc/backend_specific/setting.md).
 
 You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
@@ -29,7 +29,7 @@ You should also create requested folder for running Tracim:
 
     mkdir sessions_data sessions_lock depot previews radicale_storage
 
-Initialize the database using [tracimcli](doc/cli.md) tool
+Initialize the database using [tracimcli](../doc/backend_specific/cli.md) tool
 
     tracimcli db init
 
@@ -223,12 +223,6 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
     supervisord
 
 
-## Running Pushpin Service
-
-For a working Tracim instance, you need to setup pushpin as proxy for tracim web service.
-
-See [main readme](../README.md)  section _Install and run pushpin for UI updates_
-
 ## Lint the code
 
 Install the required tool, `flake8` and its dependencies:
@@ -255,13 +249,9 @@ For example, with the default configuration:
 ## Roles, Profile and Access Rights
 
 In Tracim, only some users can access to some information, this is also true in
-the Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
+the Tracim REST API. you can check the [roles documentation](../doc/backend_specific/roles.md) to check
 what a specific user can do.
-
-<!-- ## Known Issues
-
-see [here](doc/known_issues.md) -->
 
 ## Other Documentation
 
-Detailed documentation on several topics is available in the [doc](doc) directory.
+Detailed documentation on several topics is available in the [doc/backend_specific](../doc/backend_specific/) directory.
