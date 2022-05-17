@@ -70,6 +70,7 @@ from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import MessageContentSchema
 from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import TagSchema
 from tracim_backend.views.core_api.schemas import UserCallSchema
@@ -90,10 +91,10 @@ class EventApi:
     workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
         COMMENT_TYPE: CommentSchema(),
-        HTML_DOCUMENTS_TYPE: ContentSchema(),
+        HTML_DOCUMENTS_TYPE: MessageContentSchema(),
         FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: ContentSchema(),
-        THREAD_TYPE: ContentSchema(),
+        FOLDER_TYPE: MessageContentSchema(),
+        THREAD_TYPE: MessageContentSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()

@@ -1780,17 +1780,20 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
-class ContentSchema(ContentDigestSchema):
+class MessageContentSchema(ContentDigestSchema):
     description = StrippedString(
         required=True, description="raw text or html description of the content"
-    )
-    raw_content = StrippedString(
-        required=True,
-        description="Content of the object, may be raw text or <b>html</b> for example",
     )
     version_number = marshmallow.fields.Int(
         description="Version number of the content, starting at 1 and incremented by 1 for each revision",
         validate=strictly_positive_int_validator,
+    )
+
+
+class ContentSchema(MessageContentSchema):
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
     )
 
 
@@ -1808,7 +1811,7 @@ class PreviewInfoSchema(marshmallow.Schema):
     )
 
 
-class FileContentSchema(ContentSchema):
+class MessageFileContentSchem(ContentSchema):
     mimetype = StrippedString(
         description="file content mimetype", example="image/jpeg", required=True
     )
@@ -1816,6 +1819,13 @@ class FileContentSchema(ContentSchema):
         description="file size in byte, return null value if unavailable",
         example=1024,
         allow_none=True,
+    )
+
+
+class FileContentSchema(MessageFileContentSchem):
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
     )
 
 
