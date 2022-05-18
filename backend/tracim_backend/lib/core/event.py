@@ -66,10 +66,10 @@ from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import MessageCommentSchema
 from tracim_backend.views.core_api.schemas import MessageContentSchema
 from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import TagSchema
@@ -90,7 +90,7 @@ class EventApi:
     workspace_schema = WorkspaceSchema()
     workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
-        COMMENT_TYPE: CommentSchema(),
+        COMMENT_TYPE: MessageCommentSchema(),
         HTML_DOCUMENTS_TYPE: MessageContentSchema(),
         FILE_TYPE: FileContentSchema(),
         FOLDER_TYPE: MessageContentSchema(),

@@ -1896,7 +1896,7 @@ class TagSchema(marshmallow.Schema):
     tag_name = StrippedString(example="todo")
 
 
-class CommentSchema(marshmallow.Schema):
+class MessageCommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
@@ -1905,12 +1905,15 @@ class CommentSchema(marshmallow.Schema):
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
     parent_label = String(example="This is a label")
-    raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     description = StrippedString(example="This is a description")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
     )
+
+
+class CommentSchema(MessageCommentSchema):
+    raw_content = StrippedString(example="<p>This is just an html comment !</p>")
 
 
 class SetCommentSchema(marshmallow.Schema):
