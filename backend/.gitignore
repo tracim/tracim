@@ -13,7 +13,7 @@ develop-eggs/
 eggs/
 #lib/
 lib64/
-parts/
+parttest_api__update_folder__ok_200__nominal_cases/
 sdist/
 var/
 *.egg-info/

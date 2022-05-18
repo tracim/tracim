@@ -377,7 +377,9 @@ class TestFolder(object):
         modified_event = event_helper.last_event
         assert modified_event.client_token == "justaclienttoken"
         assert modified_event.event_type == "content.modified.folder"
-        assert modified_event.content == content
+        content_without_raw_content = content.copy()
+        del content_without_raw_content["raw_content"]
+        assert modified_event.content == content_without_raw_content
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
