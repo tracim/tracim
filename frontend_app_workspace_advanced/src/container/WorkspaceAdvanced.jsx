@@ -30,7 +30,8 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  TagList
+  TagList,
+  Loading
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -81,6 +82,7 @@ export class WorkspaceAdvanced extends React.Component {
         avatarUrl: '',
         isEmail: false
       },
+      isLoadingMembers: true,
       autoCompleteFormNewMemberActive: false,
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
@@ -290,6 +292,7 @@ export class WorkspaceAdvanced extends React.Component {
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
     }))
+    this.setState({isLoadingMembers: false})
   }
 
   loadSubscriptionRequestList = async () => {
@@ -708,6 +711,10 @@ export class WorkspaceAdvanced extends React.Component {
           label={props.t('Members List')}
           showTitle={!state.displayFormNewMember}
         >
+          {
+            state.isLoadingMembers
+            ? <Loading />
+            : (
           <WorkspaceMembersList
             displayFormNewMember={state.displayFormNewMember}
             memberList={state.content.memberList}
@@ -735,6 +742,7 @@ export class WorkspaceAdvanced extends React.Component {
             autoCompleteClicked={state.autoCompleteClicked}
             onClickAutoComplete={this.handleClickAutoComplete}
           />
+          )}
         </PopinFixedRightPartContent>
       )
     }
