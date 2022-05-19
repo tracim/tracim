@@ -51,7 +51,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
 
   let content = newestMessage.fields.content
 
-  if (content.content_type === TLM_ST.COMMENT) {
+  if (content.content_type === TLM_ST.COMMENT || content.content_type === TLM_ST.MENTION) {
     // INFO - SG - 2021-04-16
     // We have to get the parent content as comments shall produce an activity
     // for it and not for the comment.
@@ -60,7 +60,11 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     if (!(parentContentType && parentId)) return null
     const response = await handleFetchResult(await getContent(apiUrl, parentId))
     if (!response.apiResponse.ok) return null
-    content = response.body
+    content = { ...content, ...response.body }
+  } else {
+    const response = await handleFetchResult(await getContent(apiUrl, content.content_id))
+    if (!response.apiResponse.ok) return null
+    content = { ...content, ...response.body }
   }
 
   const fetchGetContentPath = await handleFetchResult(

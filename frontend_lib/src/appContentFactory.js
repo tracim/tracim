@@ -41,6 +41,8 @@ import {
 
 import {
   deleteComment,
+  getComment,
+  getContent,
   putEditContent,
   putComment,
   postNewComment,
@@ -107,7 +109,7 @@ export function appContentFactory (WrappedComponent) {
 
       props.registerLiveMessageHandlerList([
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
-        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
@@ -130,6 +132,44 @@ export function appContentFactory (WrappedComponent) {
     }
 
     setApiUrl = url => { this.apiUrl = url }
+
+    getContent = async (contentId) => {
+      const fetchGetContent = await handleFetchResult(await getContent(this.apiUrl, contentId))
+
+      switch (fetchGetContent.apiResponse.status) {
+        case 200: return fetchGetContent.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown content'))
+          return {}
+      }
+    }
+
+    getComment = async (workspaceId, contentId, commentId) => {
+      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, workspaceId, contentId, commentId))
+
+      switch (fetchGetComment.apiResponse.status) {
+        case 200: return fetchGetComment.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown content'))
+          return {}
+      }
+    }
+
+    handleCommentCreated = async (tlm) => {
+      const { state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+      this.handleChildContentCreated({
+        ...tlm,
+        fields: {
+          ...tlm.fields,
+          content: {
+            ...tlm.fields.content,
+            ...comment
+          }
+        }
+      })
+    }
 
     handleChildContentCreated = (tlm) => {
       const { state } = this
@@ -155,12 +195,15 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentCommentModified = (tlm) => {
+    handleContentCommentModified = async (tlm) => {
       const { state } = this
       if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const wholeTimeline = this.updateCommentOnTimeline(
-          tlm.fields.content,
+          { ...tlm.fields.content, ...comment },
           prevState.wholeTimeline,
           prevState.loggedUser.username
         )
@@ -181,15 +224,23 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentModified = (tlm) => {
+    handleContentModified = async (tlm) => {
       const { state } = this
       // Not our content
       if (!state.content || !permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
 
+      const content = await this.getContent(tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
         const wholeTimeline = addRevisionFromTLM(
-          tlm.fields,
+          {
+            ...tlm.fields,
+            content: {
+              ...tlm.fields.content,
+              ...content
+            }
+          },
           prevState.wholeTimeline,
           prevState.loggedUser.lang,
           isFromCurrentToken
