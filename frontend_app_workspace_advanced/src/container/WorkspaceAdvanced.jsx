@@ -292,7 +292,7 @@ export class WorkspaceAdvanced extends React.Component {
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
     }))
-    this.setState({isLoadingMembers: false})
+    this.setState({ isLoadingMembers: false })
   }
 
   loadSubscriptionRequestList = async () => {
@@ -713,36 +713,37 @@ export class WorkspaceAdvanced extends React.Component {
         >
           {
             state.isLoadingMembers
-            ? <Loading />
-            : (
-          <WorkspaceMembersList
-            displayFormNewMember={state.displayFormNewMember}
-            memberList={state.content.memberList}
-            roleList={state.config.roleList}
-            apiUrl={props.data.config.apiUrl}
-            onClickNewRole={this.handleClickNewRole}
-            loggedUser={state.loggedUser}
-            onClickDeleteMember={this.handleClickDeleteMember}
-            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-            newMemberName={state.newMember.publicName}
-            isEmail={state.newMember.isEmail}
-            onChangeNewMemberName={this.handleChangeNewMemberName}
-            searchedKnownMemberList={state.searchedKnownMemberList}
-            onClickKnownMember={this.handleClickKnownMember}
-            newMemberRole={state.newMember.role}
-            onClickNewMemberRole={this.handleClickNewMemberRole}
-            onClickValidateNewMember={this.handleClickValidateNewMember}
-            autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-            emailNotifActivated={state.config.system.config.email_notification_activated}
-            canSendInviteNewUser={
-              [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
-            }
-            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-            userProfile={state.loggedUser.profile}
-            autoCompleteClicked={state.autoCompleteClicked}
-            onClickAutoComplete={this.handleClickAutoComplete}
-          />
-          )}
+              ? <Loading />
+              : (
+                <WorkspaceMembersList
+                  displayFormNewMember={state.displayFormNewMember}
+                  memberList={state.content.memberList}
+                  roleList={state.config.roleList}
+                  apiUrl={props.data.config.apiUrl}
+                  onClickNewRole={this.handleClickNewRole}
+                  loggedUser={state.loggedUser}
+                  onClickDeleteMember={this.handleClickDeleteMember}
+                  onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+                  newMemberName={state.newMember.publicName}
+                  isEmail={state.newMember.isEmail}
+                  onChangeNewMemberName={this.handleChangeNewMemberName}
+                  searchedKnownMemberList={state.searchedKnownMemberList}
+                  onClickKnownMember={this.handleClickKnownMember}
+                  newMemberRole={state.newMember.role}
+                  onClickNewMemberRole={this.handleClickNewMemberRole}
+                  onClickValidateNewMember={this.handleClickValidateNewMember}
+                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                  emailNotifActivated={state.config.system.config.email_notification_activated}
+                  canSendInviteNewUser={
+                    [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
+                  }
+                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                  userProfile={state.loggedUser.profile}
+                  autoCompleteClicked={state.autoCompleteClicked}
+                  onClickAutoComplete={this.handleClickAutoComplete}
+                />
+              )
+          }
         </PopinFixedRightPartContent>
       )
     }
