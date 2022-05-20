@@ -44,6 +44,8 @@ export const NotificationWall = props => {
     TWO: 2
   }
 
+  // NOTE - MP - 2022-05-20 - If we change the height, we need to change the
+  // height of notification item in the css.
   const NOTIFICATION_ITEM_HEIGHT = 60
 
   useEffect(() => {
