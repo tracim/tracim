@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -37,11 +37,14 @@ import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
+  const notificationListRef = useRef(null)
 
   const NUMBER_OF_CRITERIA = {
     ONE: 1,
     TWO: 2
   }
+
+  const NOTIFICATION_ITEM_HEIGHT = 60
 
   useEffect(() => {
     let tmpNotificationList = []
@@ -57,6 +60,16 @@ export const NotificationWall = props => {
 
     setNotificationList(tmpNotificationList)
   }, [props.notificationPage.list])
+
+  useEffect(() => {
+    if (notificationList.length > 0) {
+      const notificationListHeight = notificationList.length * NOTIFICATION_ITEM_HEIGHT
+      const shouldLoadMore = notificationListHeight < window.innerHeight
+      if (shouldLoadMore && props.notificationPage.hasNextPage) {
+        loadMoreNotifications()
+      }
+    }
+  }, [notificationList])
 
   const hasSameAuthor = authorList => {
     return !authorList.some((author, index) => {
@@ -242,25 +255,6 @@ export const NotificationWall = props => {
     return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ENTITY.MENTION)
       ? notification.content.parentId
       : notification.content.id
-  }
-
-  const handleClickSeeMore = async () => {
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      props.user.userId,
-      {
-        excludeAuthorId: props.user.userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
-        nextPageToken: props.notificationPage.nextPageToken
-      }
-    ))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-    }
   }
 
   const getNotificationDetails = notification => {
@@ -595,6 +589,32 @@ export const NotificationWall = props => {
     return PAGE.CONTENT(notification.content.parentId)
   }
 
+  const loadMoreNotifications = async () => {
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+      props.user.userId,
+      {
+        excludeAuthorId: props.user.userId,
+        notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
+        nextPageToken: props.notificationPage.nextPageToken
+      }
+    ))
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
+        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
+    }
+  }
+
+  const handleScroll = (e) => {
+    const element = e.target
+    if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+      loadMoreNotifications()
+    }
+  }
+
   return (
     <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
       <PopinFixedHeader
@@ -613,7 +633,7 @@ export const NotificationWall = props => {
         />
       </PopinFixedHeader>
 
-      <div className='notification__list'>
+      <div className='notification__list' onScroll={handleScroll} ref={notificationListRef}>
         {notificationList.length !== 0 && notificationList.map((notification, i) => {
           if (notification.group) {
             return (
@@ -646,15 +666,6 @@ export const NotificationWall = props => {
           }
         })}
 
-        {props.notificationPage.hasNextPage &&
-          <div className='notification__footer'>
-            <IconButton
-              mode='dark'
-              onClick={handleClickSeeMore}
-              icon='fas fa-chevron-down'
-              text={props.t('See more')}
-            />
-          </div>}
       </div>
     </div>
   )
