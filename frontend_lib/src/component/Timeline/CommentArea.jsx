@@ -20,6 +20,7 @@ import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
+import Loading from '../Loading/Loading.jsx'
 
 export class CommentArea extends React.Component {
   constructor (props) {
@@ -377,11 +378,15 @@ export class CommentArea extends React.Component {
               />
 
               <div>
-                <DisplayFileToUpload
+                {/* {props.isFileCommentLoading ? */}
+                <Loading />
+                {/* // : ( */}
+                  {/* <DisplayFileToUpload
                   fileList={state.newCommentAsFileList}
                   onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                   color={props.customColor}
-                />
+                  /> */}
+                {/* )} */}
               </div>
             </div>
 

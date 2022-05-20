@@ -85,7 +85,8 @@ const DEFAULT_TIMELINE_STATE = {
   filePageToken: '',
   hasMoreFiles: true,
   isLastTimelineItemCurrentToken: false,
-  loadingTimeline: true
+  loadingTimeline: true,
+  isFileCommentLoading: false
 }
 
 // INFO - CH - 2019-12-31 - Careful, for setState to work, it must have "this" bind to it when passing it by reference from the app
@@ -476,6 +477,7 @@ export function appContentFactory (WrappedComponent) {
       }
 
       if (newCommentAsFileList && newCommentAsFileList.length > 0) {
+        setState({isFileCommentLoading: true})
         const responseList = await Promise.all(
           newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
         )
@@ -483,6 +485,7 @@ export function appContentFactory (WrappedComponent) {
         uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
 
         setState({ newCommentAsFileList: uploadFailedList })
+        setState({ isFileCommentLoading: false})
       }
     }
 
