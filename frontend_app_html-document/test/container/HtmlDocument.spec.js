@@ -65,10 +65,10 @@ describe('<HtmlDocument />', () => {
             }
           }
 
-          before(() => {
+          before(async () => {
             resetSpiesHistory()
-            wrapper.instance().handleContentModified(tlmData)
-            mockGetContent200(debug.config.apiUrl, props.content.content_id, props.content)
+            mockGetContent200(debug.config.apiUrl, props.content.content_id, tlmData.fields.content)
+            await wrapper.instance().handleContentModified(tlmData)
           })
 
           after(() => {
@@ -97,14 +97,16 @@ describe('<HtmlDocument />', () => {
             }
           }
 
-          it('should update the document with the new content', () => {
-            wrapper.instance().handleContentModified(tlmData)
+          it('should update the document with the new content', async () => {
+            mockGetContent200(debug.config.apiUrl, props.content.content_id, tlmData.fields.content)
+            await wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('newContent').raw_content).to.equal(tlmData.fields.content.raw_content)
           })
 
-          it('should stay in edit mode if the user is editing', () => {
+          it('should stay in edit mode if the user is editing', async () => {
             wrapper.setState({ mode: APP_FEATURE_MODE.EDIT })
-            wrapper.instance().handleContentModified(tlmData)
+            mockGetContent200(debug.config.apiUrl, props.content.content_id, tlmData.fields.content)
+            await wrapper.instance().handleContentModified(tlmData)
 
             expect(wrapper.state('showRefreshWarning')).to.equal(true)
             expect(wrapper.state('mode')).to.equal(APP_FEATURE_MODE.EDIT)
@@ -122,8 +124,9 @@ describe('<HtmlDocument />', () => {
             }
           }
 
-          it('should not update when the modification that do not concern the current content', () => {
-            wrapper.instance().handleContentModified(tlmData)
+          it('should not update when the modification that do not concern the current content', async () => {
+            mockGetContent200(debug.config.apiUrl, props.content.content_id, tlmData.fields.content)
+            await wrapper.instance().handleContentModified(tlmData)
             expect(wrapper.state('newContent').raw_content).to.not.equal(tlmData.fields.content.raw_content)
           })
         })
@@ -165,7 +168,7 @@ describe('<HtmlDocument />', () => {
         })
       })
 
-      describe.only('handleContentRestore', () => {
+      describe('handleContentRestore', () => {
         describe('when restoring the current content', () => {
           const tlmData = {
             fields: {
@@ -178,13 +181,15 @@ describe('<HtmlDocument />', () => {
             wrapper.setState({ content: contentHtmlDocument.htmlDocument })
           })
 
-          it('should be restored correctly', () => {
+          it('should be restored correctly', async () => {
             wrapper.setState(prev => ({ content: { ...prev.content, is_deleted: true } }))
+
             mockGetContent200(debug.config.apiUrl, props.content.content_id, {
               ...props.content,
               is_deleted: false
             })
-            wrapper.instance().handleContentRestore(tlmData)
+
+            await wrapper.instance().handleContentRestore(tlmData)
 
             expect(wrapper.state('newContent').is_deleted).to.equal(false)
           })
