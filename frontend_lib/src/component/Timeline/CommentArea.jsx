@@ -378,17 +378,17 @@ export class CommentArea extends React.Component {
               />
 
               <div>
-                {/* {props.isFileCommentLoading ? */}
-                <Loading />
-                {/* // : ( */}
-                  {/* <DisplayFileToUpload
+                  <DisplayFileToUpload
                   fileList={state.newCommentAsFileList}
                   onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                   color={props.customColor}
-                  /> */}
-                {/* )} */}
+                  />
               </div>
             </div>
+
+            {props.isFileCommentLoading && (
+              <Loading />
+            )}
 
             <div className={classnames(`${props.customClass}__texteditor__submit`, 'commentArea__submit')}>
               <div>
@@ -398,21 +398,21 @@ export class CommentArea extends React.Component {
                   disabled={props.disableComment}
                   onValidateCommentFileToUpload={this.handleValidateCommentFileToUpload}
                   multipleFiles={props.multipleFiles}
-                />
+                  />
               </div>
-              <IconButton
-                color={props.customColor}
-                customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'commentArea__submit__btn')}
-                disabled={props.disableComment || (state.newComment === '' && state.newCommentAsFileList.length === 0)}
-                icon={props.icon}
-                intent='primary'
-                mode='light'
-                onClick={this.handleClickSend}
-                text={props.buttonLabel || props.t('Send')}
-                type='button'
-                key='commentArea__comment__send'
-                dataCy='commentArea__comment__send'
-              />
+                    <IconButton
+                    color={props.customColor}
+                    customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'commentArea__submit__btn')}
+                    disabled={props.disableComment || (state.newComment === '' && state.newCommentAsFileList.length === 0)}
+                    icon={props.icon}
+                    intent='primary'
+                    mode='light'
+                    onClick={this.handleClickSend}
+                    text={props.buttonLabel || props.t('Send')}
+                    type='button'
+                    key='commentArea__comment__send'
+                    dataCy='commentArea__comment__send'
+                    />
             </div>
           </div>
         )}
@@ -446,7 +446,8 @@ CommentArea.propTypes = {
   showInvalidMentionPopup: PropTypes.bool,
   workspaceId: PropTypes.number,
   wysiwyg: PropTypes.bool,
-  wysiwygIdSelector: PropTypes.string
+  wysiwygIdSelector: PropTypes.string,
+  isFileCommentLoading: PropTypes.bool
 }
 
 CommentArea.defaultProps = {
@@ -471,5 +472,6 @@ CommentArea.defaultProps = {
   showInvalidMentionPopup: false,
   workspaceId: 0,
   wysiwyg: false,
-  wysiwygIdSelector: ''
+  wysiwygIdSelector: '',
+  isFileCommentLoading: false
 }
