@@ -226,6 +226,12 @@ const mockGetFileChildContent200 = (apiUrl, workspaceId, contentId, files, pageQ
     .reply(200, { items: files, has_next: false, next_page_token: '' })
 }
 
+const mockGetComment200 = (apiUrl, workspaceId, contentId, commentId, content) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
+    .reply(200, content)
+}
+
 const mockGetContent200 = (apiUrl, contentId, content) => {
   return nock(apiUrl)
     .get(`/contents/${contentId}`)
@@ -275,6 +281,7 @@ const mockGetAboutUser200 = (apiUrl, userId, aboutUser) => {
 }
 
 export {
+  mockGetComment200,
   mockGetFileChildContent200,
   mockGetPublicationList200,
   mockGetWorkspaceDetail200,
