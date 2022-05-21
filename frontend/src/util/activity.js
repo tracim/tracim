@@ -4,7 +4,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getContent,
+  getWorkspaceContent,
   getContentPath
 } from 'tracim_frontend_lib'
 
@@ -58,11 +58,22 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     const parentContentType = content.parent_content_type
     const parentId = content.parent_id
     if (!(parentContentType && parentId)) return null
-    const response = await handleFetchResult(await getContent(apiUrl, parentId))
+
+    const response = await handleFetchResult(await getWorkspaceContent(
+      apiUrl,
+      newestMessage.fields.workspace.workspace_id,
+      parentContentType,
+      parentId
+    ))
     if (!response.apiResponse.ok) return null
     content = { ...content, ...response.body }
   } else {
-    const response = await handleFetchResult(await getContent(apiUrl, content.content_id))
+    const response = await handleFetchResult(await getWorkspaceContent(
+      apiUrl,
+      newestMessage.fields.workspace.workspace_id,
+      content.content_type,
+      content.content_id
+    ))
     if (!response.apiResponse.ok) return null
     content = { ...content, ...response.body }
   }
