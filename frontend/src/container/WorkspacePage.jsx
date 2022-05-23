@@ -98,7 +98,7 @@ class WorkspacePage extends React.Component {
       props.contentType.length > 0 &&
       Number(props.workspaceId) === Number(props.currentWorkspace.id)
       ? this.props.children
-      : <div className='workSpace__loader'><Loading /></div>
+      : <div className='spacePage__loader'><Loading /></div>
   }
 }
 
