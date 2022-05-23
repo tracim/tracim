@@ -125,7 +125,7 @@ class TagList extends React.Component {
 
       tagList = fetchGetContentTagList.body
     }
-    state.isLoading = false
+    this.setState({ isLoading: false })
     this.setState({ tagList: this.sortTagList(tagList), spaceTagList })
   }
 
