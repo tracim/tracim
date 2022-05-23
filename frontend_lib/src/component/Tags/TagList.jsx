@@ -17,6 +17,7 @@ import classnames from 'classnames'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import NewTagForm from './NewTagForm.jsx'
 import Tag from './Tag.jsx'
+import Loading from '../Loading/Loading.jsx'
 import {
   deleteContentTag,
   deleteWorkspaceTag,
@@ -32,6 +33,7 @@ class TagList extends React.Component {
 
     this.state = {
       tagList: [],
+      isLoading: true,
       spaceTagList: [],
       workspaceTagToDeleteId: 0
     }
@@ -97,17 +99,18 @@ class TagList extends React.Component {
   }
 
   async updateTagList () {
-    const { props } = this
+    const { props, state } = this
     let tagList = []
-    const fetchGetWsTagList = await handleFetchResult(
+    state.isLoading = true
+    const fetchGetSpaceTagList = await handleFetchResult(
       await getWorkspaceTagList(props.apiUrl, props.workspaceId)
     )
 
-    if (!fetchGetWsTagList.apiResponse.ok) {
+    if (!fetchGetSpaceTagList.apiResponse.ok) {
       sendGlobalFlashMessage(props.t('Error while fetching a list of tags'))
       return
     }
-    const spaceTagList = fetchGetWsTagList.body
+    const spaceTagList = fetchGetSpaceTagList.body
     tagList = spaceTagList
 
     if (props.contentId) {
@@ -122,6 +125,7 @@ class TagList extends React.Component {
 
       tagList = fetchGetContentTagList.body
     }
+    state.isLoading = false
     this.setState({ tagList: this.sortTagList(tagList), spaceTagList })
   }
 
@@ -173,55 +177,58 @@ class TagList extends React.Component {
 
     return (
       <div className='tagList' data-cy='tag_list'>
-        <div className='tagList__wrapper'>
-          {!isReadOnlyMode && (
-            <NewTagForm
-              apiUrl={props.apiUrl}
-              contentId={props.contentId}
-              contentTagList={state.tagList}
-              spaceTagList={state.spaceTagList}
-              userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-              userProfile={props.userProfile}
-              workspaceId={props.workspaceId}
-            />
-          )}
-          <ul className='tagList__list'>
-            {state.tagList && state.tagList.map((tag, index) =>
-              <li
-                className={classnames(
-                  { tagList__list__item__last: state.tagList.length === index + 1 }
-                )}
-                key={tag.tag_id}
-              >
-                <Tag
-                  isContent={!!props.contentId}
-                  isReadOnlyMode={isReadOnlyMode}
-                  name={tag.tag_name}
-                  onClickDeleteTag={() => props.contentId
-                    ? this.handleClickDeleteTag(tag.tag_id)
-                    : this.setState({ workspaceTagToDeleteId: tag.tag_id })}
-                />
-              </li>
+        {state.isLoading
+          ? <Loading />
+          :
+          <div className='tagList__wrapper'>
+            {!isReadOnlyMode && (
+              <NewTagForm
+                apiUrl={props.apiUrl}
+                contentId={props.contentId}
+                contentTagList={state.tagList}
+                spaceTagList={state.spaceTagList}
+                userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+                userProfile={props.userProfile}
+                workspaceId={props.workspaceId}
+              />
             )}
-          </ul>
+            <ul className='tagList__list'>
+              {state.tagList && state.tagList.map((tag, index) =>
+                <li
+                  className={classnames(
+                    { tagList__list__item__last: state.tagList.length === index + 1 }
+                  )}
+                  key={tag.tag_id}
+                >
+                  <Tag
+                    isContent={!!props.contentId}
+                    isReadOnlyMode={isReadOnlyMode}
+                    name={tag.tag_name}
+                    onClickDeleteTag={() => props.contentId
+                      ? this.handleClickDeleteTag(tag.tag_id)
+                      : this.setState({ workspaceTagToDeleteId: tag.tag_id })}
+                  />
+                </li>
+              )}
+            </ul>
 
-          {state.tagList && state.tagList.length === 0 && (
-            <span className='tagList__list'>
-              {props.contentId
-                ? props.t('This content has no associated tags yet.')
-                : props.t('This space has no tags yet.')}
-            </span>
-          )}
+            {state.tagList && state.tagList.length === 0 && (
+              <span className='tagList__list'>
+                {props.contentId
+                  ? props.t('This content has no associated tags yet.')
+                  : props.t('This space has no tags yet.')}
+              </span>
+            )}
 
-          {!!state.workspaceTagToDeleteId && (
-            <ConfirmPopup
-              confirmLabel={props.t('Delete')}
-              confirmIcon='far fa-fw fa-trash-alt'
-              onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
-              onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
-            />
-          )}
-        </div>
+            {!!state.workspaceTagToDeleteId && (
+              <ConfirmPopup
+                confirmLabel={props.t('Delete')}
+                confirmIcon='far fa-fw fa-trash-alt'
+                onCancel={() => this.setState({ workspaceTagToDeleteId: 0 })}
+                onConfirm={() => this.handleClickDeleteTag(this.state.workspaceTagToDeleteId)}
+              />
+            )}
+          </div>}
       </div>
     )
   }
