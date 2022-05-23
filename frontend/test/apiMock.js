@@ -244,6 +244,18 @@ const mockGetContent400 = (apiUrl, contentId) => {
     .reply(400, {})
 }
 
+const mockGetWorkspaceContent200 = (apiUrl, workspaceId, contentType, contentId, content) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/${contentType}s/${contentId}`)
+    .reply(200, content)
+}
+
+const mockGetWorkspaceContent400 = (apiUrl, workspaceId, contentType, contentId) => {
+  return nock(apiUrl)
+    .get(`/workspaces/${workspaceId}/${contentType}s/${contentId}`)
+    .reply(400, {})
+}
+
 const mockGetContentPath200 = (apiUrl, contentId, contentPath) => {
   return nock(apiUrl)
     .get(`/contents/${contentId}/path`)
@@ -320,5 +332,7 @@ export {
   mockGenericGetContent400,
   mockGetCustomPropertiesSchema200,
   mockGetAboutUser200,
-  mockGetUserWorkspaceList200
+  mockGetUserWorkspaceList200,
+  mockGetWorkspaceContent200,
+  mockGetWorkspaceContent400
 }

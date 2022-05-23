@@ -8,10 +8,10 @@ import {
 import { mergeWithActivityList, addMessageToActivityList } from '../../src/util/activity.js'
 
 import {
-  mockGetContent200,
-  mockGetContent400,
   mockGetContentComments200,
-  mockGetContentPath200
+  mockGetContentPath200,
+  mockGetWorkspaceContent200,
+  mockGetWorkspaceContent400
 } from '../apiMock.js'
 
 const createMessage = (eventId, entityType, coreEventType, subEntityType, fields) => {
@@ -111,7 +111,7 @@ describe('In activity.js module', () => {
 
   describe('mergeWithActivityList() function', () => {
     it('should build an activity list', async () => {
-      mockGetContent200(apiUrl, fileContent.content_id, fileContent)
+      mockGetWorkspaceContent200(apiUrl, fileContent.workspace_id, fileContent.content_type, fileContent.content_id, fileContent)
       const mockContentPath = mockGetContentPath200(apiUrl, fileContent.content_id, [])
       const mock = mockGetContentComments200(apiUrl, fileContent.workspace_id, fileContent.content_id, [])
 
@@ -127,7 +127,7 @@ describe('In activity.js module', () => {
         content: commentContent,
         workspace: workspace
       })
-      const mock = mockGetContent400(apiUrl, fileContent.content_id)
+      const mock = mockGetWorkspaceContent400(apiUrl, fileContent.workspace_id, fileContent.content_type, fileContent.content_id)
       const mockContentPath = mockGetContentPath200(apiUrl, commentContent.workspace_id, commentContent.content_id, [])
       mockGetContentComments200(apiUrl, fileContent.workspace_id, fileContent.content_id, [])
       const resultActivityList = await mergeWithActivityList([message], [], apiUrl)
@@ -193,7 +193,7 @@ describe('In activity.js module', () => {
 
     it('should create a new activity if the message is not part of any activity', async () => {
       const otherFileContent = { ...fileContent, workspace_id: workspace.workspace_id, content_id: 12 }
-      mockGetContent200(apiUrl, otherFileContent.content_id, otherFileContent)
+      mockGetWorkspaceContent200(apiUrl, otherFileContent.workspace_id, otherFileContent.content_type, otherFileContent.content_id, otherFileContent)
       const mockContentPath = mockGetContentPath200(apiUrl, otherFileContent.content_id, [])
       const mock = mockGetContentComments200(apiUrl, otherFileContent.workspace_id, otherFileContent.content_id, [])
 
@@ -229,7 +229,7 @@ describe('In activity.js module', () => {
         workspace: workspace
       })
       const mockContentPath = mockGetContentPath200(apiUrl, commentContent.content_id, [])
-      const mock = mockGetContent400(apiUrl, fileContent.content_id)
+      const mock = mockGetWorkspaceContent400(apiUrl, fileContent.workspace_id, fileContent.content_type, fileContent.content_id)
       const resultActivityList = await addMessageToActivityList(message, [], apiUrl)
       expect(mock.isDone()).to.equal(true)
       expect(mockContentPath.isDone()).to.equal(false)
