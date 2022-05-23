@@ -101,7 +101,7 @@ class TagList extends React.Component {
   async updateTagList () {
     const { props, state } = this
     let tagList = []
-    state.isLoading = true
+    this.setState({ isLoading: true })
     const fetchGetSpaceTagList = await handleFetchResult(
       await getWorkspaceTagList(props.apiUrl, props.workspaceId)
     )
