@@ -83,7 +83,8 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      isFileCommentLoading: false
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -722,6 +723,7 @@ export class HtmlDocument extends React.Component {
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            isFileCommentLoading={state.isFileCommentLoading}
           />
         </PopinFixedRightPartContent>
       ) : null
