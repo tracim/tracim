@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
@@ -38,7 +38,6 @@ import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-  const notificationListRef = useRef(null)
 
   const NUMBER_OF_CRITERIA = {
     ONE: 1,
@@ -653,7 +652,7 @@ export const NotificationWall = props => {
         />
       </PopinFixedHeader>
 
-      <div className='notification__list' onScroll={handleScroll} ref={notificationListRef}>
+      <div className='notification__list' onScroll={handleScroll}>
         {notificationList.length !== 0 && notificationList.map((notification, i) => {
           if (notification.group) {
             return (
