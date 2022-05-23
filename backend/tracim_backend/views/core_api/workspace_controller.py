@@ -599,7 +599,11 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         content = api.get_one(
             content_id=hapic_data.path["content_id"], content_type=content_type_list.Any_SLUG
