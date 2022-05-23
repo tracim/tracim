@@ -37,6 +37,7 @@ import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
   const notificationListRef = useRef(null)
 
   const NUMBER_OF_CRITERIA = {
@@ -49,27 +50,33 @@ export const NotificationWall = props => {
   const NOTIFICATION_ITEM_HEIGHT = 60
 
   useEffect(() => {
-    let tmpNotificationList = []
+    loadNotifications()
+  }, [])
+
+  // NOTE - MP - 2022-05-20 - This effect is used to recreate the notification
+  // list with groups and fetch more notifications if needed.
+  useEffect(() => {
+    let newNotificationList = []
     props.notificationPage.list.forEach(notification => {
-      let newNotificationList = cloneDeep(tmpNotificationList)
-      if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
-        if (!belongsToGroup(notification, newNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
-          newNotificationList = groupNotificationListWithTwoCriteria(uniqBy([...newNotificationList, notification], 'id'))
+      let tmpNotificationList = cloneDeep(newNotificationList)
+      if (!belongsToGroup(notification, tmpNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
+        if (!belongsToGroup(notification, tmpNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
+          const uniqList = uniqBy([...tmpNotificationList, notification], 'id')
+          tmpNotificationList = groupNotificationListWithTwoCriteria(uniqList)
         }
       }
-      tmpNotificationList = newNotificationList
+      newNotificationList = tmpNotificationList
     })
 
-    setNotificationList(tmpNotificationList)
+    setNotificationList(newNotificationList)
   }, [props.notificationPage.list])
 
   useEffect(() => {
-    if (notificationList.length > 0) {
-      const notificationListHeight = notificationList.length * NOTIFICATION_ITEM_HEIGHT
-      const shouldLoadMore = notificationListHeight < window.innerHeight
-      if (shouldLoadMore && props.notificationPage.hasNextPage) {
-        loadMoreNotifications()
-      }
+    const notificationListHeight = notificationList.length * NOTIFICATION_ITEM_HEIGHT
+    const shouldLoadMore = notificationListHeight < window.innerHeight
+    if (shouldLoadMore && props.notificationPage.hasNextPage) {
+      setIsLoading(true)
+      loadNotifications()
     }
   }, [notificationList])
 
@@ -113,7 +120,7 @@ export const NotificationWall = props => {
         (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace)))
 
     if (groupedByOneCriteria || groupedByTwoCriteria) {
-      groupedNotification.group = sortByCreatedDate([notification, ...groupedNotification.group])
+      groupedNotification.group = sortByCreatedDateAndID([notification, ...groupedNotification.group])
 
       groupedNotification.type = `${numberOfCriteria}` +
         `${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}` +
@@ -159,7 +166,7 @@ export const NotificationWall = props => {
       newNotificationList.push(notification)
     })
 
-    return groupNotificationListWithOneCriteria(newNotificationList)
+    return groupNotificationListWithOneCriteria(uniqBy(newNotificationList, 'id'))
   }
 
   const groupNotificationListWithOneCriteria = (notificationList) => {
@@ -199,7 +206,8 @@ export const NotificationWall = props => {
       indexInNewList++
       newNotificationList.push(notification)
     })
-    return newNotificationList
+
+    return uniqBy(newNotificationList, 'id')
   }
 
   const addNewNotificationGroup = (notification, newNotificationList, indexInNewList, numberOfNotificationsToGroup, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
@@ -228,7 +236,7 @@ export const NotificationWall = props => {
         ], 'userId')
 
         for (let i = 0; i < (numberOfNotificationsToGroup - 1); i++) newNotificationList.pop()
-        const notificationGroupList = sortByCreatedDate([notification, ...previousNotificationList])
+        const notificationGroupList = sortByCreatedDateAndID([notification, ...previousNotificationList])
         const groupType = `${numberOfCriteria}` +
           `${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}` +
           `${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}` +
@@ -239,16 +247,20 @@ export const NotificationWall = props => {
           created: notificationGroupList[0].created,
           id: notification.id,
           type: groupType,
-          group: notificationGroupList
+          group: uniqBy(notificationGroupList, 'id')
         })
       }
     }
   }
 
-  const sortByCreatedDate = (arrayToSort) => {
+  const sortByCreatedDateAndID = (arrayToSort) => {
     return arrayToSort.sort(function (a, b) {
       if (a.created < b.created) return 1
       if (a.created > b.created) return -1
+      if (a.created === b.created) {
+        if (a.id < b.id) return 1
+        if (a.id > b.id) return -1
+      }
       return 0
     })
   }
@@ -591,7 +603,7 @@ export const NotificationWall = props => {
     return PAGE.CONTENT(notification.content.parentId)
   }
 
-  const loadMoreNotifications = async () => {
+  const loadNotifications = async () => {
     const fetchGetNotificationWall = await props.dispatch(getNotificationList(
       props.user.userId,
       {
@@ -600,10 +612,13 @@ export const NotificationWall = props => {
         nextPageToken: props.notificationPage.nextPageToken
       }
     ))
+    setIsLoading(false)
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
+        // NOTE - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
+        // after, so the hook isn't triggered too early.
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         break
       default:
         props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
@@ -612,8 +627,11 @@ export const NotificationWall = props => {
 
   const handleScroll = (e) => {
     const element = e.target
-    if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-      loadMoreNotifications()
+    if (props.notificationPage.hasNextPage && !isLoading) {
+      if (element.scrollHeight - element.scrollTop <= element.clientHeight + 2 * NOTIFICATION_ITEM_HEIGHT) {
+        setIsLoading(true)
+        loadNotifications()
+      }
     }
   }
 
