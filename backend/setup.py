@@ -146,6 +146,7 @@ setup(
         "tracimcli": [
             # content
             "content_delete = tracim_backend.command.cleanup:DeleteContentCommand",
+            "content_show = tracim_backend.command.content:ShowContentTreeCommand",
             # revision
             "revision_delete = tracim_backend.command.cleanup:DeleteContentRevisionCommand",
             # workspace
