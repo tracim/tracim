@@ -378,11 +378,11 @@ export class CommentArea extends React.Component {
               />
 
               <div>
-                  <DisplayFileToUpload
+                <DisplayFileToUpload
                   fileList={state.newCommentAsFileList}
                   onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
                   color={props.customColor}
-                  />
+                />
               </div>
             </div>
 
@@ -398,21 +398,21 @@ export class CommentArea extends React.Component {
                   disabled={props.disableComment}
                   onValidateCommentFileToUpload={this.handleValidateCommentFileToUpload}
                   multipleFiles={props.multipleFiles}
-                  />
+                />
               </div>
-                    <IconButton
-                    color={props.customColor}
-                    customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'commentArea__submit__btn')}
-                    disabled={props.disableComment || (state.newComment === '' && state.newCommentAsFileList.length === 0)}
-                    icon={props.icon}
-                    intent='primary'
-                    mode='light'
-                    onClick={this.handleClickSend}
-                    text={props.buttonLabel || props.t('Send')}
-                    type='button'
-                    key='commentArea__comment__send'
-                    dataCy='commentArea__comment__send'
-                    />
+              <IconButton
+                color={props.customColor}
+                customClass={classnames(`${props.customClass}__texteditor__submit__btn `, 'commentArea__submit__btn')}
+                disabled={props.disableComment || (state.newComment === '' && state.newCommentAsFileList.length === 0)}
+                icon={props.icon}
+                intent='primary'
+                mode='light'
+                onClick={this.handleClickSend}
+                text={props.buttonLabel || props.t('Send')}
+                type='button'
+                key='commentArea__comment__send'
+                dataCy='commentArea__comment__send'
+              />
             </div>
           </div>
         )}
