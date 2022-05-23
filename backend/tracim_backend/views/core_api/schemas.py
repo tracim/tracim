@@ -1811,7 +1811,7 @@ class PreviewInfoSchema(marshmallow.Schema):
     )
 
 
-class MessageFileContentSchem(ContentSchema):
+class MessageFileContentSchema(ContentSchema):
     mimetype = StrippedString(
         description="file content mimetype", example="image/jpeg", required=True
     )
@@ -1822,7 +1822,7 @@ class MessageFileContentSchem(ContentSchema):
     )
 
 
-class FileContentSchema(MessageFileContentSchem):
+class FileContentSchema(MessageFileContentSchema):
     raw_content = StrippedString(
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
