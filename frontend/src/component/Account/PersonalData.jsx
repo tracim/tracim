@@ -123,6 +123,17 @@ export class PersonalData extends React.Component {
             </div>
           )}
 
+          {!props.displayAdminInfo && (
+            <div>
+              {props.t('New language:')}
+              <DropdownLang
+                langList={props.langList}
+                langActiveId={state.newLang}
+                onChangeLang={this.handleChangeLang}
+              />
+            </div>
+          )}
+
           {(state.newEmail !== '' || state.newUsername !== '') && (
             <div>
               <label>
@@ -135,17 +146,6 @@ export class PersonalData extends React.Component {
                   disabled={state.newEmail === '' && state.newUsername === ''}
                 />
               </label>
-            </div>
-          )}
-
-          {!props.displayAdminInfo && (
-            <div>
-              {props.t('New language:')}
-              <DropdownLang
-                langList={props.langList}
-                langActiveId={state.newLang}
-                onChangeLang={this.handleChangeLang}
-              />
             </div>
           )}
 
