@@ -1,9 +1,10 @@
 import React from 'react'
 
 import { BtnSwitch } from 'tracim_frontend_lib'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
-const OptionalFeatures = props => {
+export const OptionalFeatures = (props) => {
   return (
     <div className='formBlock workspace_advanced__optionalfunctionalities'>
       {props.appAgendaAvailable && (
@@ -13,6 +14,7 @@ const OptionalFeatures = props => {
             onChange={props.onToggleAgendaEnabled}
             activeLabel={props.t('Agenda activated')}
             inactiveLabel={props.t('Agenda deactivated')}
+            disabled={props.isLoading}
           />
         </div>
       )}
@@ -24,6 +26,7 @@ const OptionalFeatures = props => {
             onChange={props.onToggleDownloadEnabled}
             activeLabel={props.t('Download activated')}
             inactiveLabel={props.t('Download deactivated')}
+            disabled={props.isLoading}
           />
         </div>
       )}
@@ -35,6 +38,7 @@ const OptionalFeatures = props => {
             onChange={props.onToggleUploadEnabled}
             activeLabel={props.t('Upload activated')}
             inactiveLabel={props.t('Upload deactivated')}
+            disabled={props.isLoading}
           />
         </div>
       )}
@@ -45,6 +49,7 @@ const OptionalFeatures = props => {
           onChange={props.onTogglePublicationEnabled}
           activeLabel={props.t('News activated')}
           inactiveLabel={props.t('News deactivated')}
+          disabled={props.isLoading}
         />
       </div>
     </div>
@@ -52,3 +57,11 @@ const OptionalFeatures = props => {
 }
 
 export default translate()(OptionalFeatures)
+
+OptionalFeatures.propTypes = {
+  isLoading: PropTypes.bool
+}
+
+OptionalFeatures.defaultProps = {
+  isLoading: false
+}
