@@ -373,7 +373,7 @@ class DeleteContentRevisionCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-r",
+            "-z",
             "--content-revision-id",
             nargs="+",
             help="content revision ids",
@@ -438,7 +438,7 @@ class DeleteContentCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-f", "--content-id", nargs="+", help="content ids", dest="content_ids", required=True,
+            "-z", "--content-id", nargs="+", help="content ids", dest="content_ids", required=True,
         )
         return parser
 
@@ -498,7 +498,7 @@ class DeleteSpaceCommand(AppContextCommand):
             action="store_true",
         )
         parser.add_argument(
-            "-s", "--space-id", nargs="+", help="space ids", dest="space_ids", required=True,
+            "-z", "--space-id", nargs="+", help="space ids", dest="space_ids", required=True,
         )
         return parser
 
