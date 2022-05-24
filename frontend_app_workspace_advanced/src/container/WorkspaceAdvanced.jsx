@@ -68,6 +68,7 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
       isAutoCompleteActivated: false,
+      isOptionalFeaturesLoading: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -388,6 +389,8 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     const newAgendaEnabledValue = !state.content.agenda_enabled
 
+    this.setState({ isOptionalFeaturesLoading: true })
+
     const fetchToggleAgendaEnabled = await handleFetchResult(await putAgendaEnabled(state.config.apiUrl, state.content, newAgendaEnabledValue))
 
     switch (fetchToggleAgendaEnabled.apiResponse.status) {
@@ -405,11 +408,14 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleToggleUploadEnabled = async () => {
     const { props, state } = this
     const newUploadEnabledValue = !state.content.public_upload_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
 
@@ -428,11 +434,15 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleToggleDownloadEnabled = async () => {
     const { props, state } = this
     const newDownloadEnabledValue = !state.content.public_download_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
 
@@ -451,11 +461,15 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleTogglePublicationEnabled = async () => {
     const { props, state } = this
     const newPublicationEnabledValue = !state.content.publication_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchTogglePublicationEnabled = await handleFetchResult(await putPublicationEnabled(state.config.apiUrl, state.content, newPublicationEnabledValue))
 
@@ -474,6 +488,8 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
@@ -775,6 +791,7 @@ export class WorkspaceAdvanced extends React.Component {
             onToggleUploadEnabled={this.handleToggleUploadEnabled}
             publicationEnabled={state.content.publication_enabled}
             onTogglePublicationEnabled={this.handleTogglePublicationEnabled}
+            isLoading={state.isOptionalFeaturesLoading}
           />
         </PopinFixedRightPartContent>
       )

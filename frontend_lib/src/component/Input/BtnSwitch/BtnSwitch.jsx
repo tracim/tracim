@@ -28,9 +28,9 @@ export const BtnSwitch = props =>
         }}
         disabled={props.disabled}
       />
-      <span className={classnames('slider round', { primaryColorBg: props.checked && !props.disabled, defaultBg: !props.checked || props.disabled })} />
+      <span className={classnames('slider round', { primaryColorBg: props.checked, defaultBg: !props.checked, disabled: props.disabled })} />
     </label>
-    <div className='btnswitch__text'>
+    <div className={classnames('btnswitch__text', { disabled: props.disabled })}>
       {props.checked ? props.activeLabel : props.inactiveLabel}
     </div>
   </div>
