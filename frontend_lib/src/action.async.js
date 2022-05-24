@@ -156,6 +156,9 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
+export const getComment = (apiUrl, workspaceId, contentId, commentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
+
 export const getContentReactionList = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`)
 
@@ -166,7 +169,7 @@ export const deleteContentReaction = (apiUrl, workspaceId, contentId, reactionId
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions/${reactionId}`)
 
 export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}`)
 
 export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, targetLanguageCode) => {
   const name = `comment-${commentId}.html`

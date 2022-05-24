@@ -168,7 +168,7 @@ HtmlDocument.propTypes = {
   contentType: PropTypes.string,
   customColor: PropTypes.string,
   disableValidateBtn: PropTypes.func,
-  displayNotifyAllMessage: PropTypes.func,
+  displayNotifyAllMessage: PropTypes.bool,
   editionAuthor: PropTypes.string,
   text: PropTypes.string,
   invalidMentionList: PropTypes.array,
