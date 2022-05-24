@@ -521,19 +521,19 @@ export function appContentFactory (WrappedComponent) {
       content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername, id = ''
     ) => {
       this.checkApiUrl()
-
       if (newComment) {
         await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id)
       }
 
       if (newCommentAsFileList && newCommentAsFileList.length > 0) {
+        setState({ isFileCommentLoading: true })
         const responseList = await Promise.all(
           newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
         )
         const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
         uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
 
-        setState({ newCommentAsFileList: uploadFailedList })
+        setState({ newCommentAsFileList: uploadFailedList, isFileCommentLoading: false })
       }
     }
 

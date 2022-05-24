@@ -20,6 +20,7 @@ import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
+import Loading from '../Loading/Loading.jsx'
 
 export class CommentArea extends React.Component {
   constructor (props) {
@@ -385,6 +386,10 @@ export class CommentArea extends React.Component {
               </div>
             </div>
 
+            {props.isFileCommentLoading && (
+              <Loading />
+            )}
+
             <div className={classnames(`${props.customClass}__texteditor__submit`, 'commentArea__submit')}>
               <div>
                 <AddFileToUploadButton
@@ -441,7 +446,8 @@ CommentArea.propTypes = {
   showInvalidMentionPopup: PropTypes.bool,
   workspaceId: PropTypes.number,
   wysiwyg: PropTypes.bool,
-  wysiwygIdSelector: PropTypes.string
+  wysiwygIdSelector: PropTypes.string,
+  isFileCommentLoading: PropTypes.bool
 }
 
 CommentArea.defaultProps = {
@@ -466,5 +472,6 @@ CommentArea.defaultProps = {
   showInvalidMentionPopup: false,
   workspaceId: 0,
   wysiwyg: false,
-  wysiwygIdSelector: ''
+  wysiwygIdSelector: '',
+  isFileCommentLoading: false
 }
