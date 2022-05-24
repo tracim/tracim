@@ -18,7 +18,8 @@ import { FETCH_CONFIG } from '../util/helper.js'
 import {
   getWorkspaceMemberList,
   handleFetchResult,
-  PAGE
+  PAGE,
+  Loading
 } from 'tracim_frontend_lib'
 
 class WorkspacePage extends React.Component {
@@ -97,7 +98,7 @@ class WorkspacePage extends React.Component {
       props.contentType.length > 0 &&
       Number(props.workspaceId) === Number(props.currentWorkspace.id)
       ? this.props.children
-      : null
+      : <div className='spacePage__loader'><Loading /></div>
   }
 }
 
