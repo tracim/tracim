@@ -31,18 +31,174 @@ import {
   PopinFixedHeader,
   TracimComponent
 } from 'tracim_frontend_lib'
-import { cloneDeep, escape as escapeHtml, uniqBy } from 'lodash'
+import { escape as escapeHtml, uniqBy } from 'lodash'
 import NotificationItem from '../component/NotificationItem.jsx'
 import GroupedNotificationItem from './GroupedNotificationItem.jsx'
+
+const NUMBER_OF_CRITERIA = {
+  ONE: 1,
+  TWO: 2
+}
+
+const getMainContentId = (notification) => {
+  return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ENTITY.MENTION)
+    ? notification.content.parentId
+    : notification.content.id
+}
+
+const hasSameAuthor = (authorList) => {
+  return !authorList.some((author, index) => {
+    return !author || (index && author.userId !== authorList[index - 1].userId)
+  })
+}
+
+const hasSameSpace = (spaceList) => {
+  return !spaceList.some((space, index) => {
+    return !space || (index && space.id !== spaceList[index - 1].id)
+  })
+}
+
+const hasSameContent = (notificationList) => {
+  if (notificationList.some(notification => !notification.content)) return false
+  return notificationList.every((notification, index) => {
+    if (index === 0) return true
+    return getMainContentId(notification) === getMainContentId(notificationList[index - 1])
+  })
+}
+
+const sortByCreatedDateAndID = (arrayToSort) => {
+  return arrayToSort.sort(function (a, b) {
+    if (a.created < b.created) return 1
+    if (a.created > b.created) return -1
+    if (a.created === b.created) {
+      if (a.id < b.id) return 1
+      if (a.id > b.id) return -1
+    }
+    return 0
+  })
+}
+
+// NOTE - MP - 2022-05-24 - Return true if the notification list can be grouped
+const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
+  const isSameContent = hasSameContent(notificationList)
+  const isSameAuthor = hasSameAuthor(notificationList.map(notification => notification.author))
+  const isSameSpace = hasSameSpace(notificationList.map(notification => notification.workspace))
+
+  const groupedByOneCriteria =
+    (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isSameContent || isSameAuthor || isSameSpace))
+
+  // NOTE - MP - 2022-05-24 - Content && Author or Content && Workspace or Author && Workspace
+  const groupedByTwoCriteria =
+    (numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
+      (isSameContent ? (isSameAuthor || isSameSpace) : (isSameAuthor && isSameSpace)))
+
+  return groupedByOneCriteria || groupedByTwoCriteria
+}
+
+// NODE - MP - 2022-05-24 - Add a notification to an existing group
+const addNotificationToGroup = (notification, notificationGroup) => {
+  notificationGroup.group = sortByCreatedDateAndID([notification, ...notificationGroup.group])
+
+  notificationGroup.created = new Date(notification.created).getTime() < new Date(notificationGroup.created).getTime()
+    ? notificationGroup.created
+    : notification.created
+}
+
+// NOTE - MP - 2022-05-24 - Check if I can create a group with the three notifications with two criterias
+// or six notifications with one criteria
+const tryGroupingNotification = (notificationList) => {
+  const twoCriteriaList = notificationList.slice(notificationList.length - 3)
+  const twoCriteriaListContainsGroup = twoCriteriaList.some(notification => notification.group)
+  const oneCriteriaList = notificationList.slice(notificationList.length - 6)
+  const oneCriteriaListContainsGroup = oneCriteriaList.some(notification => notification.group)
+
+  let notificationListToReturn = notificationList
+
+  if (!twoCriteriaListContainsGroup) {
+    if (canBeGrouped(twoCriteriaList, NUMBER_OF_CRITERIA.TWO)) {
+      const notificationGrouped = createGroupNotificationFromNotificationList(twoCriteriaList)
+      notificationListToReturn = [...notificationList.slice(0, notificationList.length - 3), notificationGrouped]
+    } else if (!oneCriteriaListContainsGroup && canBeGrouped(oneCriteriaList, NUMBER_OF_CRITERIA.ONE)) {
+      const notificationGrouped = createGroupNotificationFromNotificationList(oneCriteriaList)
+      notificationListToReturn = [...notificationList.slice(0, notificationList.length - 6), notificationGrouped]
+    }
+  }
+
+  return notificationListToReturn
+}
+
+// NODE - MP - 2022-05-24 - Create a notification group from a notification list
+const createGroupNotificationFromNotificationList = (notificationList) => {
+  const groupedNotification = {
+    created: notificationList[0].created,
+    group: [],
+    id: notificationList[0].id,
+    type: ''
+  }
+
+  const isGroupedByContent = hasSameContent(notificationList)
+  const isGroupedByAuthor = hasSameAuthor(notificationList.map(notification => notification.author))
+  const isGroupedBySpace = hasSameSpace(notificationList.map(notification => notification.workspace))
+  const numberOfCriteria =
+    (isGroupedByContent ? 1 : 0) +
+    (isGroupedByAuthor ? 1 : 0) +
+    (isGroupedBySpace ? 1 : 0)
+
+  groupedNotification.type = `${numberOfCriteria}` +
+    `${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}` +
+    `${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}` +
+    `${isGroupedBySpace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
+
+  notificationList.forEach(notification => {
+    addNotificationToGroup(notification, groupedNotification)
+  })
+
+  const authorList = uniqBy(notificationList.map(notification => notification.author), 'userId')
+  groupedNotification.author = authorList
+
+  return groupedNotification
+}
+
+const createNotificationListWithGroupsFromFlatNotificationList = (notificationList) => {
+  const numberOfNotificationsToGroup = 3
+  let groupedNotificationList = []
+
+  notificationList.forEach((notification, index) => {
+    const listLenght = groupedNotificationList.length
+    if (notification.type.includes(TLM_ENTITY.MENTION) || index < numberOfNotificationsToGroup - 1) {
+      groupedNotificationList.push(notification)
+      return
+    }
+
+    const previousNotification = groupedNotificationList[listLenght - 1]
+    if (previousNotification.group) {
+      // NOTE - MP - 2022-05-25 - Because it's a group I can check if the first notification is groupable
+      // to my current notification
+      if (canBeGrouped([previousNotification.group[0], notification])) {
+        groupedNotificationList[listLenght - 1] = {
+          ...previousNotification,
+          group: [...previousNotification.group, notification]
+        }
+      } else {
+        groupedNotificationList.push(notification)
+      }
+    } else {
+      groupedNotificationList.push(notification)
+
+      groupedNotificationList = tryGroupingNotification(groupedNotificationList)
+    }
+  })
+
+  return groupedNotificationList
+}
+
+const linkToComment = (notification) => {
+  return PAGE.CONTENT(notification.content.parentId)
+}
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-
-  const NUMBER_OF_CRITERIA = {
-    ONE: 1,
-    TWO: 2
-  }
 
   // NOTE - MP - 2022-05-20 - If we change the height, we need to change the
   // height of notification item in the css.
@@ -55,17 +211,7 @@ export const NotificationWall = props => {
   // NOTE - MP - 2022-05-20 - This effect is used to recreate the notification
   // list with groups and fetch more notifications if needed.
   useEffect(() => {
-    let newNotificationList = []
-    props.notificationPage.list.forEach(notification => {
-      let tmpNotificationList = cloneDeep(newNotificationList)
-      if (!belongsToGroup(notification, tmpNotificationList[0], NUMBER_OF_CRITERIA.TWO)) {
-        if (!belongsToGroup(notification, tmpNotificationList[0], NUMBER_OF_CRITERIA.ONE)) {
-          const uniqList = uniqBy([...tmpNotificationList, notification], 'id')
-          tmpNotificationList = groupNotificationListWithTwoCriteria(uniqList)
-        }
-      }
-      newNotificationList = tmpNotificationList
-    })
+    const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(props.notificationPage.list)
 
     setNotificationList(newNotificationList)
   }, [props.notificationPage.list])
@@ -79,203 +225,53 @@ export const NotificationWall = props => {
     }
   }, [notificationList])
 
-  const hasSameAuthor = authorList => {
-    return !authorList.some((author, index) => {
-      return !author || (index && author.userId !== authorList[index - 1].userId)
-    })
-  }
-
-  const hasSameWorkspace = workspaceList => {
-    return !workspaceList.some((workspace, index) => {
-      return !workspace || (index && workspace.id !== workspaceList[index - 1].id)
-    })
-  }
-
-  const hasSameContent = notificationList => {
-    if (notificationList.some(notification => !notification.content)) return false
-    return notificationList.every((notification, index) => {
-      if (index === 0) return true
-      return getMainContentId(notification) === getMainContentId(notificationList[index - 1])
-    })
-  }
-
-  const belongsToGroup = (notification, groupedNotification, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
-    if (!groupedNotification || !groupedNotification.group) return false
-
-    const isGroupedByContent = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT) &&
-      hasSameContent([notification, groupedNotification])
-
-    const isGroupedByWorkspace = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.WORKSPACE) &&
-      hasSameWorkspace([notification.workspace, groupedNotification.group[0].workspace])
-
-    const isGroupedByAuthor = groupedNotification.type.includes(GROUP_NOTIFICATION_CRITERIA.AUTHOR) &&
-      hasSameAuthor([notification.author, groupedNotification.group[0].author])
-
-    const groupedByOneCriteria =
-      (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
-
-    const groupedByTwoCriteria =
-      (numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
-        (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace)))
-
-    if (groupedByOneCriteria || groupedByTwoCriteria) {
-      groupedNotification.group = sortByCreatedDateAndID([notification, ...groupedNotification.group])
-
-      groupedNotification.type = `${numberOfCriteria}` +
-        `${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}` +
-        `${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}` +
-        `${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
-
-      groupedNotification.created = new Date(notification.created).getTime() < new Date(groupedNotification.created).getTime()
-        ? groupedNotification.created
-        : notification.created
-      return true
+  const handleClickMarkAllAsRead = async () => {
+    const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
+    switch (fetchAllPutNotificationAsRead.status) {
+      case 204:
+        props.dispatch(readNotificationList())
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
     }
   }
 
-  const groupNotificationListWithTwoCriteria = (notificationList) => {
-    const numberOfNotificationsToGroup = 3
-    const newNotificationList = []
-    let indexInNewList = 0
-
-    notificationList.forEach((notification, index) => {
-      if (index < (numberOfNotificationsToGroup - 1) || notification.type.includes(TLM_ENTITY.MENTION)) {
-        indexInNewList++
-        newNotificationList.push(notification)
-        return
+  const loadNotifications = async () => {
+    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+      props.user.userId,
+      {
+        excludeAuthorId: props.user.userId,
+        notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
+        nextPageToken: props.notificationPage.nextPageToken
       }
-
-      const previousNotificationInNewList = newNotificationList[indexInNewList - 1]
-      if (belongsToGroup(notification, previousNotificationInNewList, NUMBER_OF_CRITERIA.TWO)) return
-      else {
-        addNewNotificationGroup(
-          notification,
-          newNotificationList,
-          indexInNewList,
-          numberOfNotificationsToGroup,
-          NUMBER_OF_CRITERIA.TWO
-        )
-        if (newNotificationList.length !== indexInNewList) {
-          indexInNewList = newNotificationList.length
-          return
-        }
-      }
-
-      indexInNewList++
-      newNotificationList.push(notification)
-    })
-
-    return groupNotificationListWithOneCriteria(uniqBy(newNotificationList, 'id'))
+    ))
+    setIsLoading(false)
+    switch (fetchGetNotificationWall.status) {
+      case 200:
+        // NOTE - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
+        // after, so the hook isn't triggered too early.
+        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
+        break
+      default:
+        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
+    }
   }
 
-  const groupNotificationListWithOneCriteria = (notificationList) => {
-    const numberOfNotificationsToGroup = 6
-    const newNotificationList = []
-    let indexInNewList = 0
-
-    notificationList.forEach((notification, index) => {
-      if (index < numberOfNotificationsToGroup - 1 || notification.type.includes(TLM_ENTITY.MENTION) || notification.group) {
-        indexInNewList++
-        newNotificationList.push(notification)
-        return
-      }
-
-      const previousNotificationInNewList = newNotificationList[indexInNewList - 1]
-
-      if (previousNotificationInNewList.type.startsWith(NUMBER_OF_CRITERIA.TWO)) {
-        indexInNewList++
-        newNotificationList.push(notification)
-        return
-      }
-      if (belongsToGroup(notification, previousNotificationInNewList, NUMBER_OF_CRITERIA.ONE)) return
-      else {
-        addNewNotificationGroup(
-          notification,
-          newNotificationList,
-          indexInNewList,
-          numberOfNotificationsToGroup,
-          NUMBER_OF_CRITERIA.ONE
-        )
-        if (newNotificationList.length !== indexInNewList) {
-          indexInNewList = newNotificationList.length
-          return
-        }
-      }
-
-      indexInNewList++
-      newNotificationList.push(notification)
-    })
-
-    return uniqBy(newNotificationList, 'id')
-  }
-
-  const addNewNotificationGroup = (notification, newNotificationList, indexInNewList, numberOfNotificationsToGroup, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
-    if (
-      indexInNewList >= (numberOfNotificationsToGroup - 1) &&
-      !newNotificationList
-        .slice(indexInNewList - (numberOfNotificationsToGroup - 1), indexInNewList)
-        .some(notification => notification.group)
-    ) {
-      const previousNotificationList = newNotificationList
-        .slice(indexInNewList - (numberOfNotificationsToGroup - 1), indexInNewList)
-      const isGroupedByAuthor = hasSameAuthor([notification.author, ...previousNotificationList.map(notification => notification.author)])
-      const isGroupedByWorkspace = hasSameWorkspace([notification.workspace, ...previousNotificationList.map(notification => notification.workspace)])
-      const isGroupedByContent = hasSameContent([notification, ...previousNotificationList])
-
-      if (
-        ((numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
-          (isGroupedByContent ? (isGroupedByAuthor || isGroupedByWorkspace) : (isGroupedByAuthor && isGroupedByWorkspace))) ||
-          (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isGroupedByContent || isGroupedByAuthor || isGroupedByWorkspace))
-        ) &&
-        (!previousNotificationList.some(notification => notification.type.includes(TLM_ENTITY.MENTION)))
-      ) {
-        const authorList = uniqBy([
-          notification.author,
-          ...previousNotificationList.map(notification => notification.author)
-        ], 'userId')
-
-        for (let i = 0; i < (numberOfNotificationsToGroup - 1); i++) newNotificationList.pop()
-        const notificationGroupList = sortByCreatedDateAndID([notification, ...previousNotificationList])
-        const groupType = `${numberOfCriteria}` +
-          `${isGroupedByContent ? `.${GROUP_NOTIFICATION_CRITERIA.CONTENT}` : ''}` +
-          `${isGroupedByAuthor ? `.${GROUP_NOTIFICATION_CRITERIA.AUTHOR}` : ''}` +
-          `${isGroupedByWorkspace ? `.${GROUP_NOTIFICATION_CRITERIA.WORKSPACE}` : ''}`
-
-        newNotificationList.push({
-          author: authorList,
-          created: notificationGroupList[0].created,
-          id: notification.id,
-          type: groupType,
-          group: uniqBy(notificationGroupList, 'id')
-        })
+  const handleScroll = (e) => {
+    const element = e.target
+    if (props.notificationPage.hasNextPage && !isLoading) {
+      if (element.scrollHeight - element.scrollTop <= element.clientHeight + 2 * NOTIFICATION_ITEM_HEIGHT) {
+        setIsLoading(true)
+        loadNotifications()
       }
     }
   }
 
-  const sortByCreatedDateAndID = (arrayToSort) => {
-    return arrayToSort.sort(function (a, b) {
-      if (a.created < b.created) return 1
-      if (a.created > b.created) return -1
-      if (a.created === b.created) {
-        if (a.id < b.id) return 1
-        if (a.id > b.id) return -1
-      }
-      return 0
-    })
-  }
-
-  const getMainContentId = (notification) => {
-    return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ENTITY.MENTION)
-      ? notification.content.parentId
-      : notification.content.id
-  }
-
-  const getNotificationDetails = notification => {
+  const getNotificationDetails = (notification) => {
     const [entityType, eventType, contentType] = notification.type.split('.')
-
     const escapedAuthor = notification.author ? escapeHtml(notification.author.publicName) : ''
     const escapedUser = notification.user ? escapeHtml(notification.user.publicName) : ''
-
     const escapedContentLabel = (
       notification.content
         ? escapeHtml(
@@ -287,7 +283,6 @@ export const NotificationWall = props => {
     )
 
     const numberOfContents = notification.numberOfContents || 1
-
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
@@ -305,7 +300,6 @@ export const NotificationWall = props => {
     }
 
     const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
-
     const contentUrl = notification.content ? PAGE.CONTENT(notification.content.id) : ''
 
     if (entityType === TLM_ENTITY.CONTENT) {
@@ -584,53 +578,6 @@ export const NotificationWall = props => {
       url: contentUrl,
       emptyUrlMsg: defaultEmptyUrlMsg,
       msgType: 'warning'
-    }
-  }
-
-  const handleClickMarkAllAsRead = async () => {
-    const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
-    switch (fetchAllPutNotificationAsRead.status) {
-      case 204:
-        props.dispatch(readNotificationList())
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
-    }
-  }
-
-  const linkToComment = notification => {
-    return PAGE.CONTENT(notification.content.parentId)
-  }
-
-  const loadNotifications = async () => {
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      props.user.userId,
-      {
-        excludeAuthorId: props.user.userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
-        nextPageToken: props.notificationPage.nextPageToken
-      }
-    ))
-    setIsLoading(false)
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        // NOTE - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
-        // after, so the hook isn't triggered too early.
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-    }
-  }
-
-  const handleScroll = (e) => {
-    const element = e.target
-    if (props.notificationPage.hasNextPage && !isLoading) {
-      if (element.scrollHeight - element.scrollTop <= element.clientHeight + 2 * NOTIFICATION_ITEM_HEIGHT) {
-        setIsLoading(true)
-        loadNotifications()
-      }
     }
   }
 
