@@ -1,4 +1,11 @@
 {
   "Validate": "Validar",
-  "See more": "Ver más"
+  "See more": "Ver más",
+  "Delete": "Suprimir",
+  "Edit": "Editar",
+  "Cancel": "Cancelar",
+  "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
+  "Actions": "Acciones",
+  "The file is larger than the maximum file size allowed": "El archivo es mayor que el tamaño máximo permitido",
+  "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo"
 }

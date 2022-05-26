@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-03-25 17:31+0100\n"
-"PO-Revision-Date: 2022-03-29 14:08+0000\n"
-"Last-Translator: Alfonso <alfonso@el-magnifico.org>\n"
+"PO-Revision-Date: 2022-05-03 14:11+0000\n"
+"Last-Translator: Quiwy <github@quiwy.ninja>\n"
 "Language-Team: Spanish <https://hosted.weblate.org/projects/tracim/backend/"
 "es/>\n"
 "Language: es\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.12-dev\n"
+"X-Generator: Weblate 4.12.1\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:668
@@ -328,7 +328,7 @@ msgstr ""
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
 msgid "Upload files"
-msgstr ""
+msgstr "Cargar archivos"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:13
 msgid ""
