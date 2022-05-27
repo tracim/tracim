@@ -1,4 +1,7 @@
 {
   "Password": "Contraseña",
-  "Validate": "Validar"
+  "Validate": "Validar",
+  "Cancel": "Cancelar",
+  "Error in the URL": "Error en la URL",
+  "Received files": "Archivos recibidos"
 }

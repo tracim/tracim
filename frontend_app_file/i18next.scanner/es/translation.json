@@ -1,4 +1,13 @@
 {
   "Validate": "Validar",
-  "Error while saving the user configuration": "Error al guardar la configuración de usuario"
+  "Error while saving the user configuration": "Error al guardar la configuración de usuario",
+  "Delete": "Suprimir",
+  "Cancel": "Cancelar",
+  "Download file": "Descargar archivo",
+  "Error while uploading file": "Error al cargar el archivo",
+  "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
+  "Error in the URL": "Error en la URL",
+  "Upload files": "Cargar archivos",
+  "The file is larger than the maximum file size allowed": "El archivo es mayor que el tamaño máximo permitido",
+  "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo"
 }

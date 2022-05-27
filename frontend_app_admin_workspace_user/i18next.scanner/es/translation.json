@@ -4,5 +4,11 @@
   "New password is too long (maximum 512 characters)": "La nueva contraseña es demasiado larga (máximo 512 caracteres)",
   "Password": "Contraseña",
   "Allowed characters: {{allowedCharactersUsername}}": "Caracteres permitidos: {{allowedCharactersUsername}}",
-  "Create a space": "Crear un espacio"
+  "Create a space": "Crear un espacio",
+  "Create": "Crear",
+  "Delete": "Suprimir",
+  "Type": "Tipo",
+  "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "Su nombre de usuario es incorrecto, los caracteres permitidos son {{allowedCharactersUsername}}",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "El nombre completo debe tener al menos {{minimumCharactersPublicName}} caracteres",
+  "Email": "Correo electrónico"
 }

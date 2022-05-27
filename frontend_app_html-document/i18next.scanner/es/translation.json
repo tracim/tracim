@@ -1,3 +1,6 @@
 {
-  "Error while saving the user configuration": "Error al guardar la configuración de usuario"
+  "Error while saving the user configuration": "Error al guardar la configuración de usuario",
+  "Edit": "Editar",
+  "Delete": "Suprimir",
+  "A content with the same name already exists": "Ya existe un contenido con el mismo nombre"
 }
