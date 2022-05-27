@@ -40,7 +40,7 @@ describe('<BtnSwitch />', () => {
     })
 
     it('should have a div with the class disabled when disabled is true', () => {
-      expect(wrapper.find('div.disabled')).to.have.lengthOf(1)
+      expect(wrapper.find('div.disabled')).to.have.lengthOf(2)
     })
 
     it('should have a div without the class disabled when disabled is false', () => {

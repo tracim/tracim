@@ -6,28 +6,28 @@ import { translate } from 'react-i18next'
 import FeedItemHeader from '../component/FeedItem/FeedItemHeader.jsx'
 import FeedItemFooter from '../component/FeedItem/FeedItemFooter.jsx'
 import Preview, { LINK_TYPE } from '../component/FeedItem/Preview.jsx'
-
 import {
   findUserRoleIdInWorkspace,
   FETCH_CONFIG
 } from '../util/helper.js'
-
 import {
   appContentFactory,
+  Comment,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  TRANSLATION_STATE,
-  ROLE,
-  ROLE_LIST,
+  getDefaultTranslationState,
   handleInvalidMentionInComment,
   handleTranslateComment,
   handleTranslateHtmlContent,
-  getDefaultTranslationState,
-  tinymceRemove,
   PAGE,
-  Comment,
+  ROLE,
+  ROLE_LIST,
   Timeline,
-  TracimComponent
+  tinymceRemove,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TracimComponent,
+  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 
 export class FeedItemWithPreview extends React.Component {
@@ -316,9 +316,11 @@ export class FeedItemWithPreview extends React.Component {
         : null
     )
 
+    const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || { memberList: [] }).memberList
+
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(
       props.user.userId,
-      (props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || {}).memberList || [],
+      spaceMemberList,
       ROLE_LIST
     ) || ROLE.reader.id
 
@@ -326,6 +328,8 @@ export class FeedItemWithPreview extends React.Component {
       ...props.user,
       userRoleIdInWorkspace
     }
+
+    const isContentDeleted = props.lastModificationEntityType === TLM_ET.CONTENT && props.lastModificationType === TLM_CET.DELETED
 
     return (
       <div className='feedItem' ref={props.innerRef}>
@@ -347,7 +351,7 @@ export class FeedItemWithPreview extends React.Component {
           workspaceId={props.workspaceId}
           titleLink={props.titleLink}
         />
-        {props.contentAvailable && (
+        {props.contentAvailable && !isContentDeleted && (
           <>
             {(shouldShowComment
               ? (commentToShow &&

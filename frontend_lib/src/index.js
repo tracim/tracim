@@ -189,6 +189,7 @@ import {
 
 import {
   baseFetch,
+  getComment,
   getContentPath,
   putEditContent,
   postNewEmptyContent,
@@ -391,6 +392,7 @@ export {
   tinymceAutoCompleteHandleSelectionChange,
   updateTLMUser,
   baseFetch,
+  getComment,
   putEditContent,
   postNewEmptyContent,
   postNewComment,

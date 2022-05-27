@@ -104,7 +104,8 @@ export class File extends React.Component {
         content_id: param.content.content_id,
         revision_id: param.content.current_revision_id,
         page_nb: 1
-      }
+      },
+      isFileCommentLoading: false
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -850,6 +851,7 @@ export class File extends React.Component {
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            isFileCommentLoading={state.isFileCommentLoading}
           />
         </PopinFixedRightPartContent>
       ) : null

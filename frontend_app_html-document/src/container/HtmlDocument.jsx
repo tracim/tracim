@@ -11,6 +11,7 @@ import {
   buildHeadTitle,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  getContent,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
   handleFetchResult,
@@ -83,7 +84,8 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      isFileCommentLoading: false
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -101,39 +103,48 @@ export class HtmlDocument extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentRestore }
     ])
   }
 
   // TLM Handlers
-  handleContentModified = data => {
-    const { state } = this
+  handleContentModified = async data => {
+    const { props, state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
 
-    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-    const newContentObject = {
-      ...state.content,
-      ...data.fields.content,
-      raw_content: addClassToMentionsOfUser(data.fields.content.raw_content, state.loggedUser.username)
-    }
-    this.setState(prev => ({
-      ...prev,
-      content: clientToken === data.fields.client_token
-        ? newContentObject
-        : prev.content,
-      newContent: newContentObject,
-      editionAuthor: data.fields.author.public_name,
-      showRefreshWarning: clientToken !== data.fields.client_token,
-      rawContentBeforeEdit: newContentObject.raw_content
-    }))
-    if (clientToken === data.fields.client_token) {
-      this.setHeadTitle(newContentObject.label)
-      this.buildBreadcrumbs(newContentObject)
+    const fetchGetContent = await handleFetchResult(await getContent(this.state.config.apiUrl, data.fields.content.content_id))
+    switch (fetchGetContent.apiResponse.status) {
+      case 200: {
+        const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+        const newContentObject = {
+          ...state.content,
+          ...fetchGetContent.body,
+          raw_content: addClassToMentionsOfUser(fetchGetContent.body.raw_content, state.loggedUser.username)
+        }
+        this.setState(prev => ({
+          ...prev,
+          content: clientToken === data.fields.client_token
+            ? newContentObject
+            : prev.content,
+          newContent: newContentObject,
+          editionAuthor: data.fields.author.public_name,
+          showRefreshWarning: clientToken !== data.fields.client_token,
+          rawContentBeforeEdit: newContentObject.raw_content
+        }))
+        if (clientToken === data.fields.client_token) {
+          this.setHeadTitle(newContentObject.label)
+          this.buildBreadcrumbs(newContentObject)
+        }
+        break
+      }
+      default:
+        sendGlobalFlashMessage(props.t('Unknown content'))
+        break
     }
   }
 
-  handleContentDeletedOrRestore = data => {
+  handleContentDeleted = data => {
     const { state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
 
@@ -146,6 +157,29 @@ export class HtmlDocument extends React.Component {
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: this.sessionClientToken !== data.fields.client_token
     }))
+  }
+
+  handleContentRestore = async data => {
+    const { props, state } = this
+    if (data.fields.content.content_id !== state.content.content_id) return
+    const fetchGetContent = await handleFetchResult(await getContent(state.config.apiUrl, data.fields.content.content_id))
+    switch (fetchGetContent.apiResponse.status) {
+      case 200: {
+        this.setState(prev => ({
+          ...prev,
+          content: this.sessionClientToken === data.fields.client_token
+            ? { ...prev.content, ...fetchGetContent.body }
+            : prev.content,
+          newContent: { ...prev.content, ...fetchGetContent.body },
+          editionAuthor: data.fields.author.public_name,
+          showRefreshWarning: this.sessionClientToken !== data.fields.client_token
+        }))
+        break
+      }
+      default:
+        sendGlobalFlashMessage(props.t('Unknown content'))
+        break
+    }
   }
 
   // Custom Event Handlers
@@ -722,6 +756,7 @@ export class HtmlDocument extends React.Component {
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            isFileCommentLoading={state.isFileCommentLoading}
           />
         </PopinFixedRightPartContent>
       ) : null

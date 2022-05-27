@@ -65,6 +65,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
                     value={props.description}
                     onChange={props.onChangeDescription}
                     rows='3'
+                    hidden
                   />
                 </div>
                 {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (

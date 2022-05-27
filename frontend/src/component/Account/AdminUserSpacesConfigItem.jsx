@@ -18,7 +18,7 @@ export const AdminUserSpacesConfigItem = props => {
   return (
     <tr>
       <td>
-        {props.space.workspace_id}
+        {props.space.id}
       </td>
       <td className='adminUserSpacesConfig__zones__table__spaceName'>
         {props.space.label}
@@ -48,8 +48,8 @@ export const AdminUserSpacesConfigItem = props => {
         <td className='adminUserSpacesConfig__zones__table__notifications'>
           <div>{props.t('Email notif.')}</div>
           <BtnSwitch
-            checked={props.member.do_notify}
-            onChange={() => props.onChangeSubscriptionNotif(props.space.workspace_id, !props.member.do_notify)}
+            checked={props.member.doNotify}
+            onChange={() => props.onChangeSubscriptionNotif(props.space.id, !props.member.doNotify)}
           />
         </td>
       )}
@@ -86,7 +86,7 @@ AdminUserSpacesConfigItem.defaultProps = {
   onlyManager: false,
   onChangeSubscriptionNotif: () => { },
   member: {
-    do_notify: false
+    doNotify: false
   },
   onClickChangeRole: () => { }
 }

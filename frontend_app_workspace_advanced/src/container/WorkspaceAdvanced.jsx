@@ -9,6 +9,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   appContentFactory,
   addAllResourceI18n,
+  getWorkspaceMemberList,
   handleFetchResult,
   PopinFixed,
   PopinFixedContent,
@@ -29,12 +30,12 @@ import {
   tinymceAutoCompleteHandleKeyDown,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
-  TagList
+  TagList,
+  Loading
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
   getSubscriptionRequestList,
-  getWorkspaceMember,
   putLabel,
   putDefaultRole,
   putDescription,
@@ -68,6 +69,7 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteCursorPosition: 0,
       autoCompleteItemList: [],
       isAutoCompleteActivated: false,
+      isOptionalFeaturesLoading: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -81,6 +83,7 @@ export class WorkspaceAdvanced extends React.Component {
         avatarUrl: '',
         isEmail: false
       },
+      isLoadingMembers: true,
       autoCompleteFormNewMemberActive: false,
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
@@ -262,7 +265,7 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
-    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMember(state.config.apiUrl, state.content.workspace_id, false))
+    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, state.content.workspace_id, false))
     const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
@@ -290,6 +293,7 @@ export class WorkspaceAdvanced extends React.Component {
         appUploadAvailable: resAppList.body.some(a => a.slug === 'upload_permission')
       }
     }))
+    this.setState({ isLoadingMembers: false })
   }
 
   loadSubscriptionRequestList = async () => {
@@ -388,6 +392,8 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
     const newAgendaEnabledValue = !state.content.agenda_enabled
 
+    this.setState({ isOptionalFeaturesLoading: true })
+
     const fetchToggleAgendaEnabled = await handleFetchResult(await putAgendaEnabled(state.config.apiUrl, state.content, newAgendaEnabledValue))
 
     switch (fetchToggleAgendaEnabled.apiResponse.status) {
@@ -405,11 +411,14 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleToggleUploadEnabled = async () => {
     const { props, state } = this
     const newUploadEnabledValue = !state.content.public_upload_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchToggleUploadEnabled = await handleFetchResult(await putUploadEnabled(state.config.apiUrl, state.content, newUploadEnabledValue))
 
@@ -428,11 +437,15 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleToggleDownloadEnabled = async () => {
     const { props, state } = this
     const newDownloadEnabledValue = !state.content.public_download_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchToggleDownloadEnabled = await handleFetchResult(await putDownloadEnabled(state.config.apiUrl, state.content, newDownloadEnabledValue))
 
@@ -451,11 +464,15 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleTogglePublicationEnabled = async () => {
     const { props, state } = this
     const newPublicationEnabledValue = !state.content.publication_enabled
+
+    this.setState({ isOptionalFeaturesLoading: true })
 
     const fetchTogglePublicationEnabled = await handleFetchResult(await putPublicationEnabled(state.config.apiUrl, state.content, newPublicationEnabledValue))
 
@@ -474,6 +491,8 @@ export class WorkspaceAdvanced extends React.Component {
           'warning'
         )
     }
+
+    this.setState({ isOptionalFeaturesLoading: false })
   }
 
   handleClickNewMemberRole = slugRole => this.setState(prev => ({ newMember: { ...prev.newMember, role: slugRole } }))
@@ -708,33 +727,39 @@ export class WorkspaceAdvanced extends React.Component {
           label={props.t('Members List')}
           showTitle={!state.displayFormNewMember}
         >
-          <WorkspaceMembersList
-            displayFormNewMember={state.displayFormNewMember}
-            memberList={state.content.memberList}
-            roleList={state.config.roleList}
-            apiUrl={props.data.config.apiUrl}
-            onClickNewRole={this.handleClickNewRole}
-            loggedUser={state.loggedUser}
-            onClickDeleteMember={this.handleClickDeleteMember}
-            onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
-            newMemberName={state.newMember.publicName}
-            isEmail={state.newMember.isEmail}
-            onChangeNewMemberName={this.handleChangeNewMemberName}
-            searchedKnownMemberList={state.searchedKnownMemberList}
-            onClickKnownMember={this.handleClickKnownMember}
-            newMemberRole={state.newMember.role}
-            onClickNewMemberRole={this.handleClickNewMemberRole}
-            onClickValidateNewMember={this.handleClickValidateNewMember}
-            autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-            emailNotifActivated={state.config.system.config.email_notification_activated}
-            canSendInviteNewUser={
-              [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
-            }
-            userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-            userProfile={state.loggedUser.profile}
-            autoCompleteClicked={state.autoCompleteClicked}
-            onClickAutoComplete={this.handleClickAutoComplete}
-          />
+          {
+            state.isLoadingMembers
+              ? <Loading />
+              : (
+                <WorkspaceMembersList
+                  displayFormNewMember={state.displayFormNewMember}
+                  memberList={state.content.memberList}
+                  roleList={state.config.roleList}
+                  apiUrl={props.data.config.apiUrl}
+                  onClickNewRole={this.handleClickNewRole}
+                  loggedUser={state.loggedUser}
+                  onClickDeleteMember={this.handleClickDeleteMember}
+                  onClickToggleFormNewMember={this.handleClickToggleFormNewMember}
+                  newMemberName={state.newMember.publicName}
+                  isEmail={state.newMember.isEmail}
+                  onChangeNewMemberName={this.handleChangeNewMemberName}
+                  searchedKnownMemberList={state.searchedKnownMemberList}
+                  onClickKnownMember={this.handleClickKnownMember}
+                  newMemberRole={state.newMember.role}
+                  onClickNewMemberRole={this.handleClickNewMemberRole}
+                  onClickValidateNewMember={this.handleClickValidateNewMember}
+                  autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
+                  emailNotifActivated={state.config.system.config.email_notification_activated}
+                  canSendInviteNewUser={
+                    [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
+                  }
+                  userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+                  userProfile={state.loggedUser.profile}
+                  autoCompleteClicked={state.autoCompleteClicked}
+                  onClickAutoComplete={this.handleClickAutoComplete}
+                />
+              )
+          }
         </PopinFixedRightPartContent>
       )
     }
@@ -775,6 +800,7 @@ export class WorkspaceAdvanced extends React.Component {
             onToggleUploadEnabled={this.handleToggleUploadEnabled}
             publicationEnabled={state.content.publication_enabled}
             onTogglePublicationEnabled={this.handleTogglePublicationEnabled}
+            isLoading={state.isOptionalFeaturesLoading}
           />
         </PopinFixedRightPartContent>
       )

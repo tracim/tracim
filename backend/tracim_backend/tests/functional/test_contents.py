@@ -377,7 +377,9 @@ class TestFolder(object):
         modified_event = event_helper.last_event
         assert modified_event.client_token == "justaclienttoken"
         assert modified_event.event_type == "content.modified.folder"
-        assert modified_event.content == content
+        content_without_raw_content = content.copy()
+        del content_without_raw_content["raw_content"]
+        assert modified_event.content == content_without_raw_content
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(test_workspace.workspace_id), status=200
         ).json_body
@@ -1627,6 +1629,36 @@ class TestFiles(object):
             do_notify=False,
         )
 
+        transaction.commit()
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        res = web_testapp.get("/api/contents/{}".format(test_file.content_id), status=302).follow(
+            status=200
+        )
+        content = res.json_body
+        assert content["content_type"] == KANBAN_TYPE
+
+    def test_api__get_kanban__ok_200__deleted_kanban(
+        self, workspace_api_factory, content_api_factory, session, web_testapp, content_type_list
+    ) -> None:
+        """
+        Get a kanban from content endpoint
+        """
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        business_workspace = workspace_api.get_one(1)
+        tool_folder = content_api.get_one(1, content_type=content_type_list.Any_SLUG)
+        test_file = content_api.create(
+            content_type_slug=KANBAN_TYPE,
+            workspace=business_workspace,
+            parent=tool_folder,
+            label="Test file",
+            do_save=False,
+            do_notify=False,
+        )
+        with new_revision(session=session, tm=transaction.manager, content=test_file):
+            content_api.delete(test_file)
         transaction.commit()
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

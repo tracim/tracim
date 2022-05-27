@@ -22,6 +22,9 @@
     text-overflow ellipsis
     overflow hidden
 
+    &.disabled
+      color mediumDarkGrey
+
 .switch
   position relative
   display inline-block
@@ -42,19 +45,23 @@
   -webkit-transition .4s
   transition .4s
 
-.slider:before
-  position absolute
-  content ""
-  height 26px
-  width 26px
-  left 4px
-  bottom 4px
-  background-color white
-  -webkit-transition .4s
-  transition .4s
+  &.defaultBg
+    background-color mediumDarkGrey
 
-.slider.defaultBg
-  background-color #ccc
+  &.disabled
+    background-color mediumGrey
+    cursor not-allowed
+  
+  &:before
+    position absolute
+    content ""
+    height 26px
+    width 26px
+    left 4px
+    bottom 4px
+    background-color white
+    -webkit-transition .4s
+    transition .4s
 
 input:focus + .slider
   box-shadow 0 0 1px offWhite
