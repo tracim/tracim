@@ -29,5 +29,6 @@
   "Your text contains mentions that do not match any member of this space:": "Ihr Text enthält Erwähnungen, die mit keinem Mitglied dieses Bereichs übereinstimmen:",
   "Validate anyway": "Trotzdem validieren",
   "Tags": "Markierungen",
-  "Delete": "Löschen"
+  "Delete": "Löschen",
+  "Unknown content": ""
 }
