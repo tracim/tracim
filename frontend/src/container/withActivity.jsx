@@ -136,7 +136,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       await this.waitForNoChange()
       this.changingActivityList = true
       let activity = data
-      if (data.event_type.includes(TLM_ET.CONTENT) && !data.event_type.includes(TLM_SUB.COMMENT)) {
+      if ((data.event_type.includes(TLM_ET.CONTENT) && !data.event_type.includes(TLM_SUB.COMMENT)) || data.event_type.includes(TLM_ET.MENTION)) {
         activity = {
           ...data,
           fields: {
