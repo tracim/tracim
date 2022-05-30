@@ -179,9 +179,22 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleMentionCreated = async data => {
-    const content = await handleFetchResult(
-      await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
-    )
+    const { props } = this
+    let content
+    if (data.fields.content.content_type === TLM_ST.COMMENT) {
+      const fetchGetComment = await handleFetchResult(
+        await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
+      )
+      switch (fetchGetComment.apiResponse.status) {
+        case 200:
+          content = fetchGetComment.body
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Unknown comment')))
+          return
+      }
+    } else content = await this.getContent(data.fields.content.content_id)
+
     this.handleNotification({
       ...data,
       fields: {
