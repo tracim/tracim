@@ -83,6 +83,7 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
   const isSameContent = hasSameContent(notificationList)
   const isSameAuthor = hasSameAuthor(notificationList.map(notification => notification.author))
   const isSameSpace = hasSameSpace(notificationList.map(notification => notification.workspace))
+  const hasMention = notificationList.some(notification => notification.type.includes(TLM_ENTITY.MENTION))
 
   const groupedByOneCriteria =
     (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isSameContent || isSameAuthor || isSameSpace))
@@ -92,7 +93,7 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
     (numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
       (isSameContent ? (isSameAuthor || isSameSpace) : (isSameAuthor && isSameSpace)))
 
-  return groupedByOneCriteria || groupedByTwoCriteria
+  return !hasMention && (groupedByOneCriteria || groupedByTwoCriteria)
 }
 
 // NODE - MP - 2022-05-24 - Add a notification to an existing group
