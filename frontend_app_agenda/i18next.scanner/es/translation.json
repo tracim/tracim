@@ -1,5 +1,13 @@
 {
   "Space": "Espacio",
   "Spaces": "Espacios",
-  "Agenda": "Agenda"
+  "Agenda": "Agenda",
+  "Error while loading pre-filled agenda event information": "Error al cargar la información precargada de eventos de la agenda",
+  "My agendas": "Mis agendas",
+  "Error while loading space list": "Error al cargar la lista de espacios",
+  "User": "Usuario",
+  "All my agendas": "Todas mis agendas",
+  "Agenda of space {{workspaceLabel}}": "Agenda del espacio {{workspaceLabel}}",
+  "Some agenda could not be loaded": "No se ha podido cargar alguna agenda",
+  "Some information was modified by {{author}}": "Alguna información fue modificada por {{author}}"
 }

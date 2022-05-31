@@ -9,5 +9,10 @@
   "Error in the URL": "Error en la URL",
   "Upload files": "Cargar archivos",
   "The file is larger than the maximum file size allowed": "El archivo es mayor que el tamaño máximo permitido",
-  "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo"
+  "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo",
+  "No preview available": "Vista previa no disponible",
+  "Validate and create": "Validar y crear",
+  "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
+  "Preview loading...": "Vista previa cargando…",
+  "Error while saving the comment": "Error al guardar el comentario"
 }

@@ -10,5 +10,10 @@
   "Type": "Tipo",
   "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "Su nombre de usuario es incorrecto, los caracteres permitidos son {{allowedCharactersUsername}}",
   "Full name must be at least {{minimumCharactersPublicName}} characters": "El nombre completo debe tener al menos {{minimumCharactersPublicName}} caracteres",
-  "Email": "Correo electrónico"
+  "Email": "Correo electrónico",
+  "Full name": "Nombre completo",
+  "Username": "Nombre de usuario",
+  "Description": "Descripción",
+  "User account management": "Gestión de cuentas de usuario",
+  "User": "Usuario"
 }

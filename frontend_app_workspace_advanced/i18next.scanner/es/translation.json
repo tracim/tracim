@@ -13,5 +13,7 @@
   "This account is deactivated": "Esta cuenta está desactivada",
   "Error while removing member": "Error al eliminar el miembro",
   "This user already is in the space": "Este usuario ya está en el espacio",
-  "Note, only administrators can send invitational email": "\n"
+  "Note, only administrators can send invitational email": "\n",
+  "Description": "Descripción",
+  "Request accepted": "Solicitud aceptada"
 }
