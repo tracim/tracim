@@ -1,5 +1,7 @@
 {
   "Delete": "Suprimir",
   "Folder": "Carpeta",
-  "Validate and create": "Validar y crear"
+  "Validate and create": "Validar y crear",
+  "New folder": "Carpeta nueva",
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}"
 }
