@@ -11,5 +11,6 @@
   "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
   "Error while saving the comment": "Error al guardar el comentario",
   "Validate and create": "Validar y crear",
-  "Description": "Descripción"
+  "Description": "Descripción",
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}"
 }

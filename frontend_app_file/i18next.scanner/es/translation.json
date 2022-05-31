@@ -14,5 +14,6 @@
   "Validate and create": "Validar y crear",
   "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
   "Preview loading...": "Vista previa cargando…",
-  "Error while saving the comment": "Error al guardar el comentario"
+  "Error while saving the comment": "Error al guardar el comentario",
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}"
 }
