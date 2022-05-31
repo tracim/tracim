@@ -67,10 +67,11 @@ export class File extends React.Component {
     this.state = {
       appName: 'file',
       breadcrumbsList: [],
-      isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
+      disableChangeIsTemplate: false,
+      isVisible: true,
+      loggedUser: param.loggedUser,
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -406,6 +407,16 @@ export class File extends React.Component {
     const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
     if (response.apiResponse.status === 200) {
       if (state.config.workspace.downloadEnabled) this.loadShareLinkList()
+    }
+  }
+
+  handleChangeMarkedTemplate = async (isTemplate) => {
+    const { props, state } = this
+    this.setState({ disableChangeIsTemplate: true })
+    const response = await props.appContentMarkAsTemplate(state.content, isTemplate)
+    this.setState({ disableChangeIsTemplate: false })
+    if (response.apiResponse.status === 200) {
+      console.log('handleChangeMarkedTemplate', isTemplate)
     }
   }
 
@@ -1032,40 +1043,6 @@ export class File extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
-          loading={state.loadingContent}
-          appMode={state.mode}
-          availableStatuses={state.config.availableStatuses}
-          breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<FilenameWithExtension file={state.content} />}
-          content={state.content}
-          config={state.config}
-          customClass={`${state.config.slug}__contentpage`}
-          disableChangeTitle={!state.content.is_editable}
-          headerButtons={[
-            {
-              icon: 'fas fa-edit',
-              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
-              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
-              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'wsContentGeneric__option__menu__addversion'
-            }, {
-              icon: 'fas fa-upload',
-              label: props.t('Upload a new version'),
-              onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
-                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'newVersionBtn'
-            }
-          ]}
-          isRefreshNeeded={state.showRefreshWarning}
-          contentVersionNumber={contentVersionNumber}
-          lastVersion={lastVersionNumber}
-          loggedUser={state.loggedUser}
-          onChangeStatus={this.handleChangeStatus}
-          onClickCloseBtn={this.handleClickBtnCloseApp}
-          onValidateChangeTitle={this.handleSaveEditTitle}
           actionList={[
             {
               icon: 'fas fa-upload',
@@ -1115,6 +1092,43 @@ export class File extends React.Component {
               dataCy: 'popinListItem__delete'
             }
           ]}
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
+          componentTitle={<FilenameWithExtension file={state.content} />}
+          content={state.content}
+          config={state.config}
+          contentVersionNumber={contentVersionNumber}
+          customClass={`${state.config.slug}__contentpage`}
+          disableChangeIsTemplate={state.disableChangeIsTemplate}
+          disableChangeTitle={!state.content.is_editable}
+          headerButtons={[
+            {
+              icon: 'fas fa-edit',
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'wsContentGeneric__option__menu__addversion'
+            }, {
+              icon: 'fas fa-upload',
+              label: props.t('Upload a new version'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+              (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'newVersionBtn'
+            }
+          ]}
+          isRefreshNeeded={state.showRefreshWarning}
+          isTemplate={true}
+          lastVersion={lastVersionNumber}
+          loading={state.loadingContent}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
+          onClickCloseBtn={this.handleClickBtnCloseApp}
+          onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
+          onValidateChangeTitle={this.handleSaveEditTitle}
           showReactions
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE

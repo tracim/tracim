@@ -51,6 +51,7 @@ import {
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
+  putContentTemplate,
   getMyselfKnownContents,
   getMyselfKnownMember,
   getCommentTranslated,
@@ -343,6 +344,29 @@ export function appContentFactory (WrappedComponent) {
           default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
+      return response
+    }
+
+    appContentMarkAsTemplate = async (content, isTemplate = false) => {
+      this.checkApiUrl()
+
+      if (!content) {
+        return
+      }
+
+      const response = await handleFetchResult(
+        await putContentTemplate(this.apiUrl, content.workspace_id, content.content_id, isTemplate)
+      )
+      
+      switch (response.apiResponse.status) {
+        case 200:
+          sendGlobalFlashMessage(i18n.t('Content has been marked as a template'))
+          break
+        default:
+          sendGlobalFlashMessage('Error while marking this as a template');
+          break
+      }
+
       return response
     }
 

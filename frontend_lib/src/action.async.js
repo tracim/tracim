@@ -66,6 +66,11 @@ export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus
     status: newStatus
   })
 
+export const putContentTemplate = (apiUrl, workspaceId, contentId, isTemplate) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/template`, {
+    is_template: isTemplate
+  })
+
 export const putContentArchived = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`)
 
