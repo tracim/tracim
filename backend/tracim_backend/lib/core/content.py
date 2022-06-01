@@ -10,9 +10,9 @@ from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlakeyset import Page
 from sqlakeyset import get_page
-from sqlalchemy import desc
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy import text
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.attributes import QueryableAttribute
@@ -878,92 +878,61 @@ class ContentApi(object):
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
 
-    def get_last_active(
+    def get_read_status(
         self,
-        workspace: typing.Optional[Workspace] = None,
-        limit: typing.Optional[int] = None,
-        before_content: typing.Optional[Content] = None,
-        content_ids: typing.Optional[typing.List[int]] = None,
-    ) -> typing.List[Content]:
+        user: User,
+        workspace: Workspace,
+        # TODO: reintroduce pagination and filtering by content_ids
+        # limit: typing.Optional[int] = None,
+        # before_content: typing.Optional[Content] = None,
+        # content_ids: typing.Optional[typing.List[int]] = None,
+    ) -> typing.List[dict[str, typing.Any]]:
+        statement = text(
+            """
+with content_read_status as (
+    select c.id                                                      as content_id,
+           cr.parent_id                                              as parent_id,
+           rrs.view_datetime                                         as view_datetime,
+           case when rrs.view_datetime is not NULL then 1 else 0 END as read
+    from content c
+             join content_revisions cr on c.cached_revision_id = cr.revision_id
+             left outer join revision_read_status rrs on cr.revision_id = rrs.revision_id and rrs.user_id = :user_id
+    where workspace_id  = :workspace_id --in (1,2) and content_namespace in ("content")
+), temp_read_status as
+(
+  select
+      crs.content_id,
+      crs.view_datetime,
+      crs.read,
+      crs.content_id as root_id
+  from content_read_status crs
+  union all
+  select crs.content_id,
+         crs.view_datetime,
+         crs.read,
+         trs.root_id as root_id
+  from content_read_status crs
+    inner join temp_read_status trs
+      on crs.parent_id = trs.content_id
+)
+select
+       trs.root_id as content_id,
+       max(trs.view_datetime) as sum_view_datetime,
+       min(trs.read) as read
+from temp_read_status trs
+group by root_id
+;
         """
-        get contents list sorted by last update
-        (last modification of content itself or one of this comment)
-        :param workspace: Workspace to check
-        :param limit: maximum number of elements to return
-        :param before_content: last_active content are only those updated
-         before this content given.
-        :param content_ids: restrict selection to some content ids and
-        related Comments
-        :return: list of content
-        """
-
-        resultset = (
-            self.get_all_query(workspaces=[workspace] if workspace else None)
-            .outerjoin(
-                RevisionReadStatus,
-                and_(
-                    RevisionReadStatus.revision_id == Content.cached_revision_id,
-                    RevisionReadStatus.user_id == self._user_id,
-                ),
-            )
-            .options(
-                contains_eager(Content.current_revision).contains_eager(
-                    ContentRevisionRO.revision_read_statuses
-                )
-            )
         )
-
-        if content_ids:
-            resultset = resultset.filter(
-                or_(
-                    Content.content_id.in_(content_ids),
-                    and_(
-                        Content.parent_id.in_(content_ids),
-                        Content.type == content_type_list.Comment.slug,
-                    ),
-                )
+        tuples_result = self._session.execute(
+            statement, {"user_id": user.user_id, "workspace_id": workspace.workspace_id}
+        ).fetchall()
+        result = []
+        for tuple in tuples_result:
+            result.append(
+                {"content_id": tuple[0], "last_view_datetime": tuple[1], "read_by_user": tuple[2]}
             )
-
-        resultset = resultset.order_by(
-            desc(ContentRevisionRO.updated),
-            desc(ContentRevisionRO.revision_id),
-            desc(ContentRevisionRO.content_id),
-        )
-
-        active_contents = []
-        too_recent_content = []
-        before_content_find = False
-        for content in resultset:
-            related_active_content = None
-            if content_type_list.Comment.slug == content.type:
-                related_active_content = content.parent
-            else:
-                related_active_content = content
-
-            # INFO - G.M - 2018-08-10 - re-apply general filters here to avoid
-            # issue with comments
-            if not self._show_deleted and related_active_content.is_deleted:
-                continue
-            if not self._show_archived and related_active_content.is_archived:
-                continue
-
-            if (
-                related_active_content not in active_contents
-                and related_active_content not in too_recent_content
-            ):
-
-                if not before_content or before_content_find:
-                    active_contents.append(related_active_content)
-                else:
-                    too_recent_content.append(related_active_content)
-
-                if before_content and related_active_content == before_content:
-                    before_content_find = True
-
-            if limit and len(active_contents) >= limit:
-                break
-
-        return active_contents
+        return result
 
     def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:
         """
