@@ -8,6 +8,7 @@ import {
   ROLE
 } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
@@ -96,7 +97,7 @@ export const PopinFixedHeader = (props) => {
       icon: 'fab fa-phoenix-framework',
       label: props.isTemplate ? 'Unmark template' : 'Mark template',
       onClick: handleClickChangeMarkedTemplate,
-      showAction: userRoleIdInWorkspace >= ROLE.contributor.id,
+      showAction: (userRoleIdInWorkspace >= ROLE.contributor.id) && props.showMarkedTemplate,
       disabled: props.disableChangeIsTemplate
     },
     ...actionList
@@ -287,6 +288,7 @@ PopinFixedHeader.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   rawTitle: PropTypes.string,
   showChangeTitleButton: PropTypes.bool,
+  showMarkedTemplate: PropTypes.bool,
   showReactions: PropTypes.bool,
   userRoleIdInWorkspace: PropTypes.number
 }
@@ -315,6 +317,7 @@ PopinFixedHeader.defaultProps = {
   onClickRemoveFromFavoriteList: () => { },
   rawTitle: '',
   showChangeTitleButton: true,
+  showMarkedTemplate: true,
   showReactions: false,
   userRoleIdInWorkspace: ROLE.reader.id
 }

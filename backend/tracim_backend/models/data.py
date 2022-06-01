@@ -491,6 +491,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         default=str(content_status_list.get_default_status().slug),
     )
     is_archived = Column(Boolean, unique=False, nullable=False, default=False)
+    is_template = Column(Boolean, unique=False, nullable=False, default=False)
     is_temporary = Column(Boolean, unique=False, nullable=False, default=False)
     revision_type = Column(
         Unicode(MAX_REVISION_TYPE_LENGTH), unique=False, nullable=False, default=""
@@ -520,6 +521,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         "file_mimetype",
         "is_archived",
         "is_deleted",
+        "is_template",
         "is_temporary",
         "label",
         "owner_id",
@@ -934,6 +936,18 @@ class Content(DeclarativeBase):
     @status.expression
     def status(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.status
+    
+    @hybrid_property
+    def is_template(self) -> bool:
+        return self.revision.is_template
+    
+    @is_template.setter
+    def is_template(self, value: bool) -> None:
+        self.revision.is_template = value
+
+    @is_template.expression
+    def is_template(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.is_template
 
     @hybrid_property
     def created(self) -> datetime:

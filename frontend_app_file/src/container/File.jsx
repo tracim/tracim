@@ -71,6 +71,7 @@ export class File extends React.Component {
       content: param.content,
       disableChangeIsTemplate: false,
       isVisible: true,
+      isTemplate: false,
       loggedUser: param.loggedUser,
       externalTranslationList: [
         props.t('File'),
@@ -285,8 +286,9 @@ export class File extends React.Component {
         )
         const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
         this.setState({
-          loadingContent: false,
           content,
+          isTemplate: response.body.is_template,
+          loadingContent: false,
           mode: APP_FEATURE_MODE.VIEW,
           previewInfo: previewInfoResponse.body
         })
@@ -410,14 +412,9 @@ export class File extends React.Component {
     }
   }
 
-  handleChangeMarkedTemplate = async (isTemplate) => {
+  handleChangeMarkedTemplate = (isTemplate) => {
     const { props, state } = this
-    this.setState({ disableChangeIsTemplate: true })
-    const response = await props.appContentMarkAsTemplate(state.content, isTemplate)
-    this.setState({ disableChangeIsTemplate: false })
-    if (response.apiResponse.status === 200) {
-      console.log('handleChangeMarkedTemplate', isTemplate)
-    }
+    props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
   }
 
   searchForMentionOrLinkInQuery = async (query) => {
@@ -1037,6 +1034,9 @@ export class File extends React.Component {
         )
       )
 
+      // faire les modifications partout : html doc ; kanban
+      // cacher dans les threads
+      // voir pour les .odt
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
@@ -1121,7 +1121,7 @@ export class File extends React.Component {
             }
           ]}
           isRefreshNeeded={state.showRefreshWarning}
-          isTemplate={true}
+          isTemplate={state.isTemplate}
           lastVersion={lastVersionNumber}
           loading={state.loadingContent}
           loggedUser={state.loggedUser}

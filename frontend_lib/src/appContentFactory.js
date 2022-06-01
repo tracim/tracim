@@ -347,7 +347,8 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentMarkAsTemplate = async (content, isTemplate = false) => {
+    appContentMarkAsTemplate = async (setState, content, isTemplate = false) => {
+      setState({ disableChangeIsTemplate: true })
       this.checkApiUrl()
 
       if (!content) {
@@ -358,15 +359,21 @@ export function appContentFactory (WrappedComponent) {
         await putContentTemplate(this.apiUrl, content.workspace_id, content.content_id, isTemplate)
       )
       
-      switch (response.apiResponse.status) {
-        case 200:
-          sendGlobalFlashMessage(i18n.t('Content has been marked as a template'))
+      switch (response.status) {
+        case 204:
+          setState({ isTemplate: isTemplate})
+          if (isTemplate) {
+            sendGlobalFlashMessage('Content has been marked as a template', 'info')
+          } else {
+            sendGlobalFlashMessage('Content has been marked as not a template', 'info')
+          }
           break
         default:
           sendGlobalFlashMessage('Error while marking this as a template');
           break
       }
 
+      setState({ disableChangeIsTemplate: false })
       return response
     }
 
@@ -1022,6 +1029,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeComment={this.appContentChangeComment}
           appContentDeleteComment={this.appContentDeleteComment}
           appContentEditComment={this.appContentEditComment}
+          appContentMarkAsTemplate={this.appContentMarkAsTemplate}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}

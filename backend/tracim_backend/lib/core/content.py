@@ -1597,6 +1597,15 @@ class ContentApi(object):
                     content_length, owner_used_space, owner_allowed_space
                 )
             )
+    
+    def mark_as_template(self, content: Content, is_template: bool) -> Content:
+        if not self.is_editable(content):
+            raise ContentInNotEditableState(
+                "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
+            )
+        content.is_template = is_template
+        content.revision_type = ActionDescription.REVISION
+        return content
 
     def archive(self, content: Content):
         if self._user:

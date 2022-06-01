@@ -770,6 +770,15 @@ class SetContentStatus(object):
         self.status = status
 
 
+class SetContentMarkedAsTemplate(object):
+    """
+    Set content marked as template
+    """
+
+    def __init__(self, is_template: bool) -> None:
+        self.is_template = is_template
+
+
 class ContentUpdate(object):
     """
     Content update model
@@ -1336,6 +1345,10 @@ class ContentInContext(object):
         return self.content.status
 
     @property
+    def is_template(self) -> bool:
+        return self.content.is_template
+
+    @property
     def is_archived(self) -> bool:
         return self.content.is_archived
 
@@ -1658,6 +1671,10 @@ class RevisionInContext(object):
     @property
     def status(self) -> str:
         return self.revision.status
+    
+    @property
+    def is_template(self) -> bool:
+        return self.revision.is_template
 
     @property
     def is_archived(self) -> bool:

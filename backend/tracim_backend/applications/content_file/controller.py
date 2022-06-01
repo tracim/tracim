@@ -58,6 +58,7 @@ from tracim_backend.views.core_api.schemas import FileRevisionPreviewSizedPathSc
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PageQuerySchema
 from tracim_backend.views.core_api.schemas import PreviewInfoSchema
+from tracim_backend.views.core_api.schemas import SetContentMarkedAsTemplateSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
@@ -661,6 +662,31 @@ class FileController(Controller):
             api.set_status(content, hapic_data.body.status)
             api.save(content)
         return
+    
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
+    @check_right(is_contributor)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_body(SetContentMarkedAsTemplateSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def mark_content_as_template(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        Mark content as template
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+            api.mark_as_template(content, hapic_data.body.is_template)
+            api.save(content)
+        return
+
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
     @check_right(is_reader)
@@ -848,3 +874,13 @@ class FileController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.set_file_status, route_name="set_file_status")
+
+        # Mark Content as template
+        configurator.add_route(
+            "mark_content_as_template",
+            "/workspaces/{workspace_id}/contents/{content_id}/template",
+            request_method="PUT",
+        )
+        configurator.add_view(
+            self.mark_content_as_template, route_name="mark_content_as_template"
+        )

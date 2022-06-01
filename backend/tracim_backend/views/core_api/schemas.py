@@ -80,6 +80,7 @@ from tracim_backend.models.context_models import ResetPasswordRequest
 from tracim_backend.models.context_models import RevisionPreviewSizedPath
 from tracim_backend.models.context_models import RoleUpdate
 from tracim_backend.models.context_models import SetContentStatus
+from tracim_backend.models.context_models import SetContentMarkedAsTemplate
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
@@ -1733,6 +1734,7 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
     is_archived = marshmallow.fields.Bool(example=False, default=False)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     is_editable = marshmallow.fields.Bool(example=True, default=True)
+    is_template = marshmallow.fields.Bool(example=False, default=False)
     show_in_ui = marshmallow.fields.Bool(
         example=True,
         description="if false, then do not show content in the treeview. "
@@ -1992,6 +1994,16 @@ class SetContentStatusSchema(marshmallow.Schema):
     @post_load
     def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentStatus(**data)
+
+
+class SetContentMarkedAsTemplateSchema(marshmallow.Schema):
+    is_template = marshmallow.fields.Boolean(
+        description="set content as a template", default=False
+    )
+
+    @post_load
+    def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SetContentMarkedAsTemplate(**data)
 
 
 class TargetLanguageSchema(marshmallow.Schema):

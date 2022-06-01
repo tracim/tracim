@@ -782,6 +782,7 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   }
 }
 
+// NOTE - MP - 2022-05-31 - Type can be 'info', 'warning' or 'error'
 export const sendGlobalFlashMessage = (msg, type = 'warning', delay = undefined) => GLOBAL_dispatchEvent({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {
