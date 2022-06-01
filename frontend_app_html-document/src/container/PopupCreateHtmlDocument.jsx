@@ -19,13 +19,18 @@ import { debug } from '../debug.js'
 class PopupCreateHtmlDocument extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'html-document', // must remain 'html-document' because it is the name of the react built app (which contains HtmlDocument and PopupCreateHtmlDocument)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
       folderId: props.data ? props.data.folderId : debug.folderId,
-      newContentName: ''
+      newContentName: '',
+      templateList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -47,6 +52,15 @@ class PopupCreateHtmlDocument extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
+    this.getTemplateList()
+  }
+
+  getTemplateList = async () => {
+    console.log('before')
+    const result = await this.props.getTemplateList()
+    console.log('after', result)
+    this.setState({ templateList: result })
+    console.log('stat', this.state.templateList)
   }
 
   setHeadTitle = () => {
@@ -104,15 +118,16 @@ class PopupCreateHtmlDocument extends React.Component {
   render () {
     return (
       <CardPopupCreateContent
-        onClose={this.handleClose}
-        onValidate={this.handleValidate}
-        label={this.props.t('New note')}
+        btnValidateLabel={this.props.t('Validate and create')}
+        contentName={this.state.newContentName}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
-        contentName={this.state.newContentName}
-        onChangeContentName={this.handleChangeNewContentName}
-        btnValidateLabel={this.props.t('Validate and create')}
         inputPlaceholder={this.props.t("Note's title")}
+        label={this.props.t('New note')}
+        onChangeContentName={this.handleChangeNewContentName}
+        onClose={this.handleClose}
+        onValidate={this.handleValidate}
+        templateList={this.state.templateList}
       />
     )
   }

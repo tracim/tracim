@@ -41,25 +41,26 @@ import {
 
 import {
   deleteComment,
+  deleteContentFromFavoriteList,
   getComment,
+  getCommentTranslated,
   getContent,
-  putEditContent,
+  getContentComment,
+  getFavoriteContentList,
+  getFileChildContent,
+  getMyselfKnownContents,
+  getMyselfKnownMember,
+  getTemplateList,
+  postContentToFavoriteList,
   putComment,
-  postNewComment,
-  putEditStatus,
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
   putContentTemplate,
-  getMyselfKnownContents,
-  getMyselfKnownMember,
-  getCommentTranslated,
-  postContentToFavoriteList,
-  getFavoriteContentList,
-  deleteContentFromFavoriteList,
-  getContentComment,
-  getFileChildContent
+  putEditContent,
+  putEditStatus,
+  postNewComment
 } from './action.async.js'
 
 import {
@@ -145,13 +146,29 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
+    getTemplateList = async () => {
+      console.log('getTemplateList avant')
+      const result = await getTemplateList(this.apiUrl)
+      console.log('getTemplateList pendant', result)
+      const fetchGetTemplates = await handleFetchResult(result)
+
+      console.log('getTemplateList after', fetchGetTemplates)
+      switch (fetchGetTemplates.apiResponse.status) {
+        case 200:
+          return fetchGetTemplates.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          return []
+      }
+    }
+
     getComment = async (workspaceId, contentId, commentId) => {
       const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, workspaceId, contentId, commentId))
 
       switch (fetchGetComment.apiResponse.status) {
         case 200: return fetchGetComment.body
         default:
-          sendGlobalFlashMessage(i18n.t('Unknown content'))
+          sendGlobalFlashMessage(i18n.t('Unknown comment'))
           return {}
       }
     }
@@ -1020,6 +1037,7 @@ export function appContentFactory (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           setApiUrl={this.setApiUrl}
+          addContentToFavoriteList={this.addContentToFavoriteList}
           appContentCustomEventHandlerShowApp={this.appContentCustomEventHandlerShowApp}
           appContentCustomEventHandlerHideApp={this.appContentCustomEventHandlerHideApp}
           appContentCustomEventHandlerReloadAppFeatureData={this.appContentCustomEventHandlerReloadAppFeatureData}
@@ -1038,11 +1056,11 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          getTemplateList={this.getTemplateList}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           isContentInFavoriteList={this.isContentInFavoriteList}
-          addContentToFavoriteList={this.addContentToFavoriteList}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
           buildChildContentTimelineItem={this.buildChildContentTimelineItem}

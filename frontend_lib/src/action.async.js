@@ -161,6 +161,9 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
+export const getTemplateList = (apiUrl) =>
+  baseFetch('GET', `${apiUrl}/users/me/contents/templates`)
+
 export const getComment = (apiUrl, workspaceId, contentId, commentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
 

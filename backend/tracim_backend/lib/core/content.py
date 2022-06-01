@@ -1606,6 +1606,30 @@ class ContentApi(object):
         content.is_template = is_template
         content.revision_type = ActionDescription.REVISION
         return content
+    
+    def get_template_list(self, user_id: int) -> typing.List[Content]:
+        # get user from user_id
+        user = self._session.query(User).get(user_id)
+
+        # get every workspace where user is member
+        space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
+        space_list = space_api.get_all_for_user(user)
+        space_ids = [space.workspace_id for space in space_list]
+
+        # space_ids = self._session.query(Workspace.workspace_id).filter(
+        #     Workspace.members.any(User.user_id == user_id)
+        # )
+
+        # get every tempate where workspace is in space_ids
+        content_list = self._session.query(Content).join(
+            ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+        ).filter(
+            Content.workspace_id.in_(space_ids), Content.is_template == True, Content.is_deleted == False,
+            Content.is_archived == False
+        ).all()
+
+        return content_list
+
 
     def archive(self, content: Content):
         if self._user:
