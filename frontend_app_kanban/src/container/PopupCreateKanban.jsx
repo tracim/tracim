@@ -32,7 +32,8 @@ export class PopupCreateKanban extends React.Component {
       loggedUser: param.loggedUser,
       workspaceId: param.workspaceId,
       folderId: param.folderId,
-      newContentName: ''
+      newContentName: '',
+      templateList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -46,6 +47,7 @@ export class PopupCreateKanban extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
+    this.props.getTemplateList(this.setState.bind(this))
   }
 
   handleAllAppChangeLanguage = data => {
@@ -67,6 +69,13 @@ export class PopupCreateKanban extends React.Component {
   }
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
+
+  handleChangeTemplate = (template) => {
+    this.setState({ templateId: template.content_id })
+    if (this.state.newContentName === '') {
+      this.setState({ newContentName: template.label })
+    }
+  }
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
@@ -140,15 +149,17 @@ export class PopupCreateKanban extends React.Component {
   render () {
     return (
       <CardPopupCreateContent
-        onClose={this.handleClose}
-        onValidate={this.handleValidate}
-        label={this.props.t('New Kanban board')}
+        btnValidateLabel={this.props.t('Validate and create')}
+        contentName={this.state.newContentName}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
-        contentName={this.state.newContentName}
-        onChangeContentName={this.handleChangeNewContentName}
-        btnValidateLabel={this.props.t('Validate and create')}
         inputPlaceholder={this.props.t("Board's name")}
+        label={this.props.t('New Kanban board')}
+        onChangeContentName={this.handleChangeNewContentName}
+        onChangeTemplate={this.handleChangeTemplate}
+        onClose={this.handleClose}
+        onValidate={this.handleValidate}
+        templateList={this.state.templateList}
       />
     )
   }

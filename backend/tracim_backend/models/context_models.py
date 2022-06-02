@@ -726,11 +726,13 @@ class ContentCreation(object):
         content_type: str,
         content_namespace: ContentNamespaces,
         parent_id: Optional[int] = None,
+        template_id: Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
         self.content_namespace = content_namespace
+        self.template_id = template_id
 
 
 class CommentCreation(object):

@@ -1687,6 +1687,14 @@ class ContentCreationSchema(marshmallow.Schema):
         default=None,
         validate=strictly_positive_int_validator,
     )
+    template_id = marshmallow.fields.Integer(
+        example=42,
+        description="content_id of template content, if content should be created "
+        "from a template, this should be template content_id.",
+        allow_none=True,
+        default=None,
+        validate=strictly_positive_int_validator,
+    )
 
     @post_load
     def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:

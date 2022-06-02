@@ -8,10 +8,6 @@ import CardPopup from './CardPopup.jsx'
 const color = require('color')
 
 export const PopupCreateContent = (props) => {
-  const handleChangeModel = (event) => {
-    console.log('handleChangeModel', event)
-  }
-
   const handleInputKeyDown = e => {
     switch (e.key) {
       case 'Enter':
@@ -52,11 +48,10 @@ export const PopupCreateContent = (props) => {
                 />
               )}
             <span>À partir d'un model</span>
-            {/* <span>À partir d'un model {modelName}</span> */}
             <Select
               className='newSpace__input'
               isSearchable
-              onChange={handleChangeModel}
+              onChange={props.onChangeTemplate}
               options={props.templateList}
               defaultValue={props.templateList[0]}
             />
@@ -93,6 +88,7 @@ PopupCreateContent.propTypes = {
   faIcon: PropTypes.string,
   inputPlaceholder: PropTypes.string,
   onChangeContentName: PropTypes.func.isRequired,
+  onChangeTemplate: PropTypes.func,
   onClose: PropTypes.func.isRequired,
   onValidate: PropTypes.func.isRequired,
   label: PropTypes.string,
@@ -105,6 +101,7 @@ PopupCreateContent.defaultProps = {
   faIcon: '',
   inputPlaceHolder: '',
   label: '',
+  onChangeTemplate: () => {},
   templateList: []
 }
 

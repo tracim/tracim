@@ -46,6 +46,7 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.storage import StorageLib
+from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.app import TracimContentType
@@ -70,6 +71,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -381,6 +383,7 @@ class ContentApi(object):
         self,
         content_type_slug: str,
         workspace: Workspace,
+        template_id: int = None,
         parent: Content = None,
         label: str = "",
         filename: str = "",
@@ -452,9 +455,38 @@ class ContentApi(object):
         content.revision_type = ActionDescription.CREATION
         content.content_namespace = content_namespace
 
+        if template_id:
+            template_values = self._session.query(Content.description, Content.raw_content).select_from(
+                Content
+            ).join(
+                ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+            ).filter(
+                Content.content_id == template_id
+            ).one()
+
+            content.description = template_values.description
+            content.raw_content = template_values.raw_content
+
         if do_save:
             self._session.add(content)
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
+
+            if template_id:
+                tags_values = self._session.query(TagOnContent.tag_id).select_from(
+                    TagOnContent
+                ).join(
+                    Content, Content.id == TagOnContent.content_id
+                ).join(
+                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
+                ).filter(
+                    TagOnContent.content_id == template_id
+                ).all()
+
+                tag_lib = TagLib(self._session)
+
+                for tag_id in tags_values:
+                    tag_lib.add_tag_to_content(user = self._user, content = content, tag_id = tag_id[0])
+
         return content
 
     def create_comment(

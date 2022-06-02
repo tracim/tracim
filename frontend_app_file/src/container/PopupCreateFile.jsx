@@ -3,6 +3,7 @@ import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
   addAllResourceI18n,
+  appContentFactory,
   CUSTOM_EVENT,
   buildHeadTitle,
   TracimComponent,
@@ -16,12 +17,17 @@ import { debug } from '../debug.js'
 class PopupCreateFile extends React.Component {
   constructor (props) {
     super(props)
+    
+    const param = props.data
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'file', // INFO - CH - 2018-08-28 - must remain 'file' because it is the name of the react built app (which contains File and PopupCreateFile)
       config: props.data ? props.data.config : debug.config,
       loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
       workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
-      folderId: props.data ? props.data.folderId : debug.folderId
+      folderId: props.data ? props.data.folderId : debug.folderId,
+      templateList: []
     }
     this.createFileUrl = `${props.data.config.apiUrl}/workspaces/${props.data.workspaceId}/files`
 
@@ -46,6 +52,7 @@ class PopupCreateFile extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
+    this.props.getTemplateList(this.setState.bind(this))
   }
 
   setHeadTitle = () => {
@@ -108,20 +115,21 @@ class PopupCreateFile extends React.Component {
 
     return (
       <PopupUploadFile
-        label={props.t(state.config.creationLabel)}
-        validateLabel={props.t('Validate and create')}
-        uploadUrl={this.createFileUrl}
+        additionalFormData={additionalFormData}
         color={state.config.hexcolor}
+        defaultUploadErrorMessage={defaultErrorMessage}
         faIcon={state.config.faIcon}
+        label={props.t(state.config.creationLabel)}
+        multipleFiles
         onClose={this.handleClosePopup}
         onSuccess={this.handleUploadSuccess}
         uploadErrorMessageList={errorMessageList}
-        defaultUploadErrorMessage={defaultErrorMessage}
-        additionalFormData={additionalFormData}
-        multipleFiles
+        uploadUrl={this.createFileUrl}
+        validateLabel={props.t('Validate and create')}
+        templateList={this.state.templateList}
       />
     )
   }
 }
 
-export default translate()(TracimComponent(PopupCreateFile))
+export default translate()(appContentFactory(TracimComponent(PopupCreateFile)))

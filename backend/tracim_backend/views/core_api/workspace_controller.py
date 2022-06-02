@@ -560,14 +560,17 @@ class WorkspaceController(Controller):
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(creation_data.parent_id)
                 ) from exc
+        
         content = api.create(
-            label=creation_data.label,
             content_type_slug=creation_data.content_type,
+            do_save=True,
+            label=creation_data.label,
+            template_id=creation_data.template_id,
             workspace=request.current_workspace,
             parent=parent,
             content_namespace=creation_data.content_namespace,
         )
-        api.save(content, ActionDescription.CREATION)
+        # api.save(content, ActionDescription.CREATION)
         content = api.get_content_in_context(content)
         return content
 
