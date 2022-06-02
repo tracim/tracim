@@ -1,11 +1,12 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
   addAllResourceI18n,
   appContentFactory,
   buildHeadTitle,
   CardPopupCreateContent,
-  CUSTOM_EVENT,
   handleFetchResult,
   sendGlobalFlashMessage,
   TracimComponent
@@ -53,7 +54,7 @@ class PopupCreateHtmlDocument extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.props.getTemplateList(this.setState.bind(this))
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.HTML_DOCUMENT)
   }
 
   setHeadTitle = () => {

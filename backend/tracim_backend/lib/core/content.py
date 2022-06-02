@@ -1639,7 +1639,7 @@ class ContentApi(object):
         content.revision_type = ActionDescription.REVISION
         return content
     
-    def get_template_list(self, user_id: int) -> typing.List[Content]:
+    def get_template_list(self, user_id: int, template_type: str) -> typing.List[Content]:
         # get user from user_id
         user = self._session.query(User).get(user_id)
 
@@ -1656,7 +1656,10 @@ class ContentApi(object):
         content_list = self._session.query(Content).join(
             ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
         ).filter(
-            Content.workspace_id.in_(space_ids), Content.is_template == True, Content.is_deleted == False,
+            Content.workspace_id.in_(space_ids),
+            Content.is_template == True,
+            Content.type == template_type,
+            Content.is_deleted == False,
             Content.is_archived == False
         ).all()
 

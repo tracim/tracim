@@ -2,9 +2,10 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
   addAllResourceI18n,
   appContentFactory,
-  CUSTOM_EVENT,
   buildHeadTitle,
   TracimComponent,
   putMyselfFileRead,
@@ -17,7 +18,7 @@ import { debug } from '../debug.js'
 class PopupCreateFile extends React.Component {
   constructor (props) {
     super(props)
-    
+
     const param = props.data
     props.setApiUrl(param.config.apiUrl)
 
@@ -52,7 +53,7 @@ class PopupCreateFile extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.props.getTemplateList(this.setState.bind(this))
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.FILE)
   }
 
   setHeadTitle = () => {
@@ -99,6 +100,10 @@ class PopupCreateFile extends React.Component {
     })
   }
 
+  handleChangeTemplate = (template) => {
+    this.setState({ templateId: template.content_id })
+  }
+
   render () {
     const { props, state } = this
 
@@ -121,6 +126,7 @@ class PopupCreateFile extends React.Component {
         faIcon={state.config.faIcon}
         label={props.t(state.config.creationLabel)}
         multipleFiles
+        onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClosePopup}
         onSuccess={this.handleUploadSuccess}
         uploadErrorMessageList={errorMessageList}

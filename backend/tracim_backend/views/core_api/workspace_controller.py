@@ -73,6 +73,7 @@ from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PaginatedContentDigestSchema
 from tracim_backend.views.core_api.schemas import RoleUpdateSchema
 from tracim_backend.views.core_api.schemas import SetContentMarkedAsTemplateSchema
+from tracim_backend.views.core_api.schemas import TemplateQuerySchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
@@ -823,6 +824,7 @@ class WorkspaceController(Controller):
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(TemplateQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True), default_http_code=HTTPStatus.OK)
     def get_template_list(self, context, request: TracimRequest, hapic_data=None) -> typing.List[ContentDigestSchema]:
         """
@@ -836,7 +838,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        return api.get_template_list(user_id=hapic_data.path['user_id'])
+        return api.get_template_list(user_id=hapic_data.path['user_id'], template_type=hapic_data.query['type'])
 
     def bind(self, configurator: Configurator) -> None:
         """

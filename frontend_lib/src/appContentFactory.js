@@ -146,12 +146,9 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    getTemplateList = async (setState) => {
-      console.log('getTemplateList avant')
-      const result = await getTemplateList(this.apiUrl)
-      console.log('getTemplateList pendant', result)
+    getTemplateList = async (setState, templateType) => {
+      const result = await getTemplateList(this.apiUrl, templateType)
       const fetchGetTemplates = await handleFetchResult(result)
-      console.log('getTemplateList after', fetchGetTemplates)
 
       switch (fetchGetTemplates.apiResponse.status) {
         case 200:

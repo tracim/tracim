@@ -2013,6 +2013,8 @@ class SetContentMarkedAsTemplateSchema(marshmallow.Schema):
     def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentMarkedAsTemplate(**data)
 
+class TemplateQuerySchema(marshmallow.Schema):
+    type = StrippedString(example="html-document", validate=all_content_types_validator)
 
 class TargetLanguageSchema(marshmallow.Schema):
     code = marshmallow.fields.String(required=True, example="fr")

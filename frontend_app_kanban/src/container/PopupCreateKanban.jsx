@@ -2,10 +2,11 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
   addAllResourceI18n,
   CardPopupCreateContent,
   handleFetchResult,
-  CUSTOM_EVENT,
   buildHeadTitle,
   appContentFactory,
   TracimComponent,
@@ -47,7 +48,7 @@ export class PopupCreateKanban extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
-    this.props.getTemplateList(this.setState.bind(this))
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.KANBAN)
   }
 
   handleAllAppChangeLanguage = data => {
