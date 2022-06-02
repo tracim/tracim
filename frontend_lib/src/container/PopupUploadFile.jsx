@@ -182,8 +182,10 @@ class PopupUploadFile extends React.Component {
         faIcon={props.faIcon}
         contentName={this.isValidateButtonDisabled() ? '' : 'allowValidate'} // hack to update the "disabled" state of the button
         onChangeContentName={() => {}}
+        onChangeTemplate={props.onChangeTemplate}
         btnValidateLabel={props.validateLabel || props.t('Validate')}
         customStyle={{ top: '50%', transform: 'translateY(-50%)' }}
+        templateList={props.templateList}
       >
         <div>
           {state.uploadStarted && (
@@ -218,16 +220,18 @@ PopupUploadFile.propTypes = {
   httpMethod: PropTypes.string,
   color: PropTypes.string.isRequired,
   multipleFiles: PropTypes.bool,
-  onSuccess: PropTypes.func,
-  onFailure: PropTypes.func,
+  onChangeTemplate: PropTypes.func,
   onClose: PropTypes.func,
+  onFailure: PropTypes.func,
+  onSuccess: PropTypes.func,
+  onValidateOverride: PropTypes.func,
   additionalFormData: PropTypes.object,
   allowedMimeTypes: PropTypes.array,
   maximumFileSize: PropTypes.number,
   uploadErrorMessageList: PropTypes.array,
   defaultUploadErrorMessage: PropTypes.string,
+  templateList: PropTypes.array,
   validateLabel: PropTypes.string,
-  onValidateOverride: PropTypes.func
 }
 
 PopupUploadFile.defaultProps = {
@@ -237,11 +241,13 @@ PopupUploadFile.defaultProps = {
   faIcon: 'fas fa-upload',
   httpMethod: 'POST',
   maximumFileSize: 0,
-  onSuccess: () => {},
-  onFailure: () => {},
+  onChangeTemplate: () => {},
   onClose: () => {},
+  onFailure: () => {},
+  onSuccess: () => {},
+  onValidateOverride: undefined,
+  templateList: [],
   uploadErrorMessageList: [],
-  onValidateOverride: undefined
 }
 
 export default translate()(TracimComponent(PopupUploadFile))
