@@ -242,6 +242,7 @@ export const postRawFileContent = (
   content,
   mimetype = 'text/plain',
   parentId = null,
+  templateId = null,
   contentType = CONTENT_TYPE.FILE,
   contentNamespace = CONTENT_NAMESPACE.CONTENT
 ) => {
@@ -250,6 +251,7 @@ export const postRawFileContent = (
   formData.append('content_namespace', contentNamespace)
   formData.append('content_type', contentType)
   if (parentId) formData.append('parent_id', parentId)
+  if (templateId) formData.append('template_id', templateId)
   return baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/files`, formData)
 }
 

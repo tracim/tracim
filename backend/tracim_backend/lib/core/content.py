@@ -71,6 +71,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
 
@@ -472,8 +473,10 @@ class ContentApi(object):
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
 
             if template_id:
-                tags_values = self._session.query(TagOnContent.tag_id).select_from(
-                    TagOnContent
+                tags_values = self._session.query(Tag).select_from(
+                    Tag
+                ).join(
+                    TagOnContent, Tag.tag_id == TagOnContent.tag_id
                 ).join(
                     Content, Content.id == TagOnContent.content_id
                 ).join(
@@ -484,8 +487,8 @@ class ContentApi(object):
 
                 tag_lib = TagLib(self._session)
 
-                for tag_id in tags_values:
-                    tag_lib.add_tag_to_content(user = self._user, content = content, tag_id = tag_id[0])
+                for tag in tags_values:
+                    tag_lib.add_tag_to_content(user = self._user, content = content, tag_name=tag.tag_name, tag_id = tag.tag_id)
 
         return content
 

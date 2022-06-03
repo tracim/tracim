@@ -104,6 +104,7 @@ export class PopupCreateKanban extends React.Component {
       JSON.stringify(defaultKanbanBoard),
       KANBAN_MIME_TYPE,
       state.folderId,
+      state.templateId,
       state.config.slug
     )
 
