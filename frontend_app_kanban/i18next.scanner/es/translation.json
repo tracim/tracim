@@ -12,5 +12,7 @@
   "Error while saving the comment": "Error al guardar el comentario",
   "Validate and create": "Validar y crear",
   "Description": "Descripción",
-  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}"
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
+  "Restore": "Restaurar",
+  "Are you sure?": "¿Está seguro?"
 }

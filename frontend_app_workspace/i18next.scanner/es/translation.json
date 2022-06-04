@@ -1,4 +1,19 @@
 {
   "Create": "Crear",
-  "New space": "Nuevo espacio"
+  "New space": "Nuevo espacio",
+  "Back": "Volver",
+  "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.": "Cuidado, no recomendamos crear más de dos niveles de espacios porque hace que la información sea mucho menos accesible.",
+  "Parent space:": "Espacio padre:",
+  "Some input are invalid": "Algunas entradas no son válidas",
+  "Space's name:": "Nombre del espacio:",
+  "Space's type:": "Tipo de espacio:",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Este es el rol que los miembros tendrán por defecto cuando se unan a su espacio (sólo para espacios abiertos y bajo petición).",
+  "You cannot create anymore space": "No puedes crear más espacio",
+  "Next": "Siguiente",
+  "Default role:": "Rol por defecto:",
+  "Error while getting user spaces": "Error al obtener los espacios de los usuarios",
+  "Space's name": "Nombre del espacio",
+  "A space with that name already exists": "Ya existe un espacio con ese nombre",
+  "Error while saving new space": "Error al guardar un nuevo espacio",
+  "None": "Ninguno"
 }
