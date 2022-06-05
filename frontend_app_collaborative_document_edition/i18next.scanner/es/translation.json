@@ -2,5 +2,19 @@
   "Content not found": "Contenido no encontrado",
   "Space not found": "Espacio no encontrado",
   "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
-  "Create an office document": "Crear un documento de oficina"
+  "Create an office document": "Crear un documento de oficina",
+  "Unknown error": "Error desconocido",
+  "Error while creating document": "Error al crear el documento",
+  "New Office Document": "Nuevo documento de oficina",
+  "Validate and create": "Validar y crear",
+  "Office Document's title": "Título del documento de oficina",
+  "Spreadsheet": "Hoja de cálculo",
+  "Text": "Texto",
+  "Presentation": "Presentación",
+  "Draw": "Gráfico",
+  "You cannot edit this type of file online": "No se puede editar este tipo de archivos en línea",
+  "Unknown url": "URL desconocida",
+  "Edit online": "Editar en línea",
+  "View online": "Ver en línea",
+  "New Office document": "Nuevo documento de oficina"
 }
