@@ -827,7 +827,7 @@ export class HtmlDocument extends React.Component {
             <div>
               <span className='componentTitle'>{state.content.label}</span>
               {state.isTemplate && (
-                <Badge text='template' />
+                <Badge text={props.t('Template')} />
               )}
             </div>
             

@@ -132,7 +132,7 @@ class PopupCreateFile extends React.Component {
         uploadErrorMessageList={errorMessageList}
         uploadUrl={this.createFileUrl}
         validateLabel={props.t('Validate and create')}
-        templateList={this.state.templateList}
+        templateList={state.templateList}
       />
     )
   }

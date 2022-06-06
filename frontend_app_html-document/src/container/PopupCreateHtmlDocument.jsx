@@ -89,10 +89,10 @@ class PopupCreateHtmlDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, appName, workspaceId, folderId, newContentName } = this.state
+    const { config, appName, templateId, workspaceId, folderId, newContentName } = this.state
 
     const fetchSaveNewHtmlDoc = postHtmlDocContent(
-      config.apiUrl, workspaceId, folderId, config.slug, newContentName, this.state.templateId
+      config.apiUrl, workspaceId, folderId, config.slug, newContentName, templateId
     )
 
     const resSave = await handleFetchResult(await fetchSaveNewHtmlDoc)
@@ -128,6 +128,7 @@ class PopupCreateHtmlDocument extends React.Component {
         btnValidateLabel={this.props.t('Validate and create')}
         contentName={this.state.newContentName}
         customColor={this.state.config.hexcolor}
+        displayTemplateList
         faIcon={this.state.config.faIcon}
         inputPlaceholder={this.props.t("Note's title")}
         label={this.props.t('New note')}

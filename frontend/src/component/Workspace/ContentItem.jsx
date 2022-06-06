@@ -74,7 +74,7 @@ class ContentItem extends React.Component {
               )}
             </div>
             <FilenameWithExtension file={props} customClass='content__name' />
-            {props.isTemplate && (<Badge text='template' />)}
+            {props.isTemplate && (<Badge text={props.t('Template')} />)}
           </div>
 
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (

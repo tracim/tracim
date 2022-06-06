@@ -48,15 +48,19 @@ export const PopupCreateContent = (props) => {
                   autoFocus
                 />
               )}
-            <div className='createcontent__form__label'> {props.t('From a model:')} </div>
-            <Select
-              className='createcontent__form__template'
-              defaultValue={props.templateList[0]}
-              isClearable
-              isSearchable
-              onChange={props.onChangeTemplate}
-              options={props.templateList}
-            />
+            {(props.displayTemplateList && (props.templateList.length > 0)) && (
+              <div>
+                <div className='createcontent__form__label'>{props.t('From a template:')}</div>
+                <Select
+                  className='createcontent__form__template'
+                  defaultValue={props.templateList[0]}
+                  isClearable
+                  isSearchable
+                  onChange={props.onChangeTemplate}
+                  options={props.templateList}
+                />
+              </div>
+            )}
             <div className='createcontent__form__button'>
               <button
                 type='button' // do neither remove this nor set it to 'submit' otherwise clicking the btn will submit the form and reload the page
@@ -87,6 +91,7 @@ PopupCreateContent.propTypes = {
   btnValidateLabel: PropTypes.string,
   contentName: PropTypes.string.isRequired,
   customColor: PropTypes.string,
+  displayTemplateList: PropTypes.bool,
   faIcon: PropTypes.string,
   inputPlaceholder: PropTypes.string,
   onChangeContentName: PropTypes.func.isRequired,
@@ -100,6 +105,7 @@ PopupCreateContent.propTypes = {
 PopupCreateContent.defaultProps = {
   btnValidateLabel: '',
   customColor: '#333',
+  displayTemplateList: false,
   faIcon: '',
   inputPlaceHolder: '',
   label: '',
