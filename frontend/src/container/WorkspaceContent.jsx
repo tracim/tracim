@@ -630,7 +630,9 @@ export class WorkspaceContent extends React.Component {
     const htmlContentIdToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentIdToScrollTo}`
     const domElementToScrollTo = document.getElementById(htmlContentIdToScrollTo)
     if (domElementToScrollTo) {
-      domElementToScrollTo.parentNode.scrollTop = domElementToScrollTo.offsetTop
+      const headerHeight = 60 // 60px is Tracim's header height
+      const scrollableElement = document.getElementById('scrollableElement')
+      scrollableElement.scrollTop = domElementToScrollTo.offsetTop - headerHeight
     }
   }
 
@@ -671,7 +673,7 @@ export class WorkspaceContent extends React.Component {
     const isFilteredWorkspaceEmpty = rootContentList.length === 0
 
     return (
-      <div className='tracim__content-scrollview fullWidthFullHeight'>
+      <div className='tracim__content-scrollview fullWidthFullHeight' id='scrollableElement'>
         <div className='WorkspaceContent'>
           {state.contentLoaded && (
             <OpenContentApp

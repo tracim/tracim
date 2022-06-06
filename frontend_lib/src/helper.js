@@ -770,7 +770,7 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const fetchGetContentPath = await handleFetchResult(await getContentPath(apiUrl, contentId))
 
   switch (fetchGetContentPath.apiResponse.status) {
-    case 200:
+    case 200: {
       const contentPathList = fetchGetContentPath.body.items.map(content => content.content_id)
       return fetchGetContentPath.body.items.map(crumb => ({
         link: crumb.content_type === CONTENT_TYPE.FOLDER
@@ -780,6 +780,7 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true
       }))
+    }
     default:
       console.error('Error getting breadcrumbs data', fetchGetContentPath)
       throw new Error('Error getting breadcrumbs data')
