@@ -5,7 +5,7 @@ let workspace2
 let workspace3
 let workspace4
 
-const fileLabel = '.FilenameWithExtension__label'
+const fileLabel = '.FilenameWithBadges__label'
 const defaultLabel = '.feedItemHeader__label'
 
 const contentWorkspace1 = 'Thread'

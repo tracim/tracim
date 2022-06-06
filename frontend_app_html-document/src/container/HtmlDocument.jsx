@@ -3,15 +3,15 @@ import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  addAllResourceI18n,
   APP_FEATURE_MODE,
-  appContentFactory,
-  Badge,
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
-  buildHeadTitle,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  FilenameWithBadges,
+  addAllResourceI18n,
+  appContentFactory,
+  buildContentPathBreadcrumbs,
+  buildHeadTitle,
   getContent,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
@@ -823,14 +823,15 @@ export class HtmlDocument extends React.Component {
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={(
-            <div>
-              <span className='componentTitle'>{state.content.label}</span>
-              {state.isTemplate && (
-                <Badge text={props.t('Template')} />
-              )}
-            </div>
-          )}
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
+          // (
+          //   <div>
+          //     <span className='componentTitle'>{state.content.label}</span>
+          //     {state.isTemplate && (
+          //       <Badge text={props.t('Template')} />
+          //     )}
+          //   </div>
+          // )
           content={state.content}
           config={state.config}
           contentVersionNumber={contentVersionNumber}

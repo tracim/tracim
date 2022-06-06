@@ -13,7 +13,7 @@ import {
   COLORS,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  FilenameWithExtension
+  FilenameWithBadges
 } from 'tracim_frontend_lib'
 import TimedEvent from '../TimedEvent.jsx'
 
@@ -50,23 +50,6 @@ export class FeedItemHeader extends React.Component {
     return props.t('unknown')
   }
 
-  getTitleComponent (contentType, contentLabel) {
-    const { props } = this
-    return contentType === CONTENT_TYPE.FILE
-      ? <FilenameWithExtension file={props.content} customClass='content__name' />
-      : (
-        <div className='feedItemHeader__label'>
-          <span
-            className='componentTitle'
-            data-cy='feedItemHeader__label'
-            title={contentLabel}
-          >
-            {contentLabel}
-          </span>
-        </div>
-      )
-  }
-
   render () {
     const { props } = this
     const contentId = props.content.id
@@ -98,8 +81,12 @@ export class FeedItemHeader extends React.Component {
         />
         <div className='feedItemHeader__title'>
           {props.titleLink
-            ? <Link to={props.titleLink}>{this.getTitleComponent(contentType, contentLabel)}</Link>
-            : <span>{this.getTitleComponent(contentType, contentLabel)}</span>}
+            ? (
+              <Link to={props.titleLink}>
+                <FilenameWithBadges file={props.content} isTemplate={props.content.isTemplate} customClass='content__name' />
+              </Link>
+            )
+            : <FilenameWithBadges file={props.content} isTemplate={props.content.isTemplate} customClass='content__name' />}
           {props.breadcrumbsList && (
             <Breadcrumbs breadcrumbsList={props.breadcrumbsList} keepLastBreadcrumbAsLink />
           )}

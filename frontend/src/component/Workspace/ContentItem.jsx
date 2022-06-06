@@ -12,7 +12,7 @@ import {
   ROLE,
   Badge,
   ComposedIcon,
-  FilenameWithExtension,
+  FilenameWithBadges,
   ListItemWrapper
 } from 'tracim_frontend_lib'
 
@@ -73,8 +73,7 @@ class ContentItem extends React.Component {
                 )
               )}
             </div>
-            <FilenameWithExtension file={props} customClass='content__name' />
-            {props.isTemplate && (<Badge text={props.t('Template')} />)}
+            <FilenameWithBadges file={props} isTemplate={props.isTemplate} customClass='content__name' />
           </div>
 
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (

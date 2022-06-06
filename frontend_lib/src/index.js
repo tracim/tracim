@@ -259,7 +259,7 @@ export {
 } from './localStorage.js'
 
 export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
-export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+export { default as FilenameWithBadges } from './component/FilenameWithBadges/FilenameWithBadges.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
 export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'

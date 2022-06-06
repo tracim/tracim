@@ -20,7 +20,7 @@ import {
   PopinFixedRightPart,
   Timeline,
   displayDistanceDate,
-  FilenameWithExtension,
+  FilenameWithBadges,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -1093,14 +1093,7 @@ export class File extends React.Component {
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={
-            <div>
-              <FilenameWithExtension file={state.content} />
-              {state.isTemplate && (
-                <Badge text={props.t('Template')} />
-              )}
-            </div>
-          }
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
           content={state.content}
           config={state.config}
           contentVersionNumber={contentVersionNumber}

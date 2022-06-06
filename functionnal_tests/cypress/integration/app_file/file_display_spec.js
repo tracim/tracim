@@ -26,7 +26,7 @@ context('Open a file', function () {
 
   describe('File app', () => {
     it('should should display file name', () => {
-      cy.contains('.FilenameWithExtension__label', filenameWithoutExtension)
+      cy.contains('.FilenameWithBadges__label', filenameWithoutExtension)
     })
 
     it('should should display file extension', () => {
