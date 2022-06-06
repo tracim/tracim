@@ -150,13 +150,21 @@ export function appContentFactory (WrappedComponent) {
       const result = await getTemplateList(this.apiUrl, templateType)
       const fetchGetTemplates = await handleFetchResult(result)
 
+      const templateList = []
+
       switch (fetchGetTemplates.apiResponse.status) {
         case 200:
-          setState({ templateList: fetchGetTemplates.body })
+          fetchGetTemplates.body.forEach(template => {
+            templateList.push({
+              value: template.content_id,
+              ...template
+            })
+          })
+          setState({ templateList: templateList })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
-          setState({ templateList: [] })
+          setState({ templateList: templateList })
           break
       }
     }
@@ -374,18 +382,13 @@ export function appContentFactory (WrappedComponent) {
       const response = await handleFetchResult(
         await putContentTemplate(this.apiUrl, content.workspace_id, content.content_id, isTemplate)
       )
-      
+
       switch (response.status) {
         case 204:
-          setState({ isTemplate: isTemplate})
-          if (isTemplate) {
-            sendGlobalFlashMessage('Content has been marked as a template', 'info')
-          } else {
-            sendGlobalFlashMessage('Content has been marked as not a template', 'info')
-          }
+          setState({ isTemplate: isTemplate })
           break
         default:
-          sendGlobalFlashMessage('Error while marking this as a template');
+          sendGlobalFlashMessage('Error while marking this as a template')
           break
       }
 

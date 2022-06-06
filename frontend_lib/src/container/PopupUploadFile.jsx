@@ -231,7 +231,7 @@ PopupUploadFile.propTypes = {
   uploadErrorMessageList: PropTypes.array,
   defaultUploadErrorMessage: PropTypes.string,
   templateList: PropTypes.array,
-  validateLabel: PropTypes.string,
+  validateLabel: PropTypes.string
 }
 
 PopupUploadFile.defaultProps = {
@@ -247,7 +247,7 @@ PopupUploadFile.defaultProps = {
   onSuccess: () => {},
   onValidateOverride: undefined,
   templateList: [],
-  uploadErrorMessageList: [],
+  uploadErrorMessageList: []
 }
 
 export default translate()(TracimComponent(PopupUploadFile))

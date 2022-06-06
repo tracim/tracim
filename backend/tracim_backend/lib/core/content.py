@@ -488,7 +488,7 @@ class ContentApi(object):
                 tag_lib = TagLib(self._session)
 
                 for tag in tags_values:
-                    tag_lib.add_tag_to_content(user = self._user, content = content, tag_name=tag.tag_name, tag_id = tag.tag_id)
+                    tag_lib.add_tag_to_content(user = self._user, content = content, tag_name=tag.tag_name)
 
         return content
 

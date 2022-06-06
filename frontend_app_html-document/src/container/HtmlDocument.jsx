@@ -6,6 +6,7 @@ import {
   addAllResourceI18n,
   APP_FEATURE_MODE,
   appContentFactory,
+  Badge,
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
@@ -822,7 +823,15 @@ export class HtmlDocument extends React.Component {
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
+          componentTitle={(
+            <div>
+              <span className='componentTitle'>{state.content.label}</span>
+              {state.isTemplate && (
+                <Badge text='template' />
+              )}
+            </div>
+            
+          )}
           content={state.content}
           config={state.config}
           contentVersionNumber={contentVersionNumber}

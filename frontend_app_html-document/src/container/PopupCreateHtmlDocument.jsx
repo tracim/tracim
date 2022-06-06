@@ -70,10 +70,14 @@ class PopupCreateHtmlDocument extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  handleChangeTemplate = (template) => {
-    this.setState({ templateId: template.content_id })
-    if (this.state.newContentName === '') {
-      this.setState({ newContentName: template.label })
+  handleChangeTemplate = (template, {action}) => {
+    if (action !== 'clear') {
+      if (template.content_id != -1) {
+        this.setState({ templateId: template.content_id })
+        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
+      }
+    } else {
+      this.setState({ templateId: null })
     }
   }
 

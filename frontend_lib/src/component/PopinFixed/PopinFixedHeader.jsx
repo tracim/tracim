@@ -8,7 +8,6 @@ import {
   ROLE
 } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
-import ComposedIcon from '../Icon/ComposedIcon.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import Icon from '../Icon/Icon.jsx'
@@ -105,20 +104,13 @@ export const PopinFixedHeader = (props) => {
   const filteredActionList = actionListWithEditTitle.filter(action => action.showAction)
   const filteredHeaderButtons = headerButtons ? headerButtons.filter(action => action.showAction) : []
 
-
   return (
     <div className={classnames('wsContentGeneric__header', `${customClass}__header`)}>
       <div className='wsContentGeneric__header__titleWithBreadcrumbs'>
         <div className='wsContentGeneric__header__titleWrapper'>
-          {props.isTemplate
-            ? <ComposedIcon mainIcon={`fa-fw ${faIcon}`} smallIcon='fab fa-phoenix-framework' title={rawTitle} />
-            : (
-              <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
-                <i className={`fa-fw ${faIcon}`} title={rawTitle} style={{ color: customColor }} />
-              </div>
-            )
-          }
-
+          <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
+            <i className={`fa-fw ${faIcon}`} title={rawTitle} style={{ color: customColor }} />
+          </div>
           {props.loading ? <Icon icon='fa-fw fas fa-spin fa-spinner' title={props.t('Loading…')} /> : (
             <>
               <div

@@ -1,4 +1,5 @@
 import React from 'react'
+import { translate } from 'react-i18next'
 import Select from 'react-select'
 import PropTypes from 'prop-types'
 import Radium from 'radium'
@@ -47,13 +48,14 @@ export const PopupCreateContent = (props) => {
                   autoFocus
                 />
               )}
-            <span>À partir d'un model</span>
+            <div className='createcontent__form__label'> {props.t('From a model:')} </div>
             <Select
-              className='newSpace__input'
+              className='createcontent__form__template'
+              defaultValue={props.templateList[0]}
+              isClearable
               isSearchable
               onChange={props.onChangeTemplate}
               options={props.templateList}
-              defaultValue={props.templateList[0]}
             />
             <div className='createcontent__form__button'>
               <button
@@ -105,4 +107,4 @@ PopupCreateContent.defaultProps = {
   templateList: []
 }
 
-export default Radium(PopupCreateContent)
+export default translate()(Radium(PopupCreateContent))
