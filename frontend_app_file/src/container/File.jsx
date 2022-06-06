@@ -1034,9 +1034,6 @@ export class File extends React.Component {
         )
       )
 
-      // faire les modifications partout : html doc ; kanban
-      // cacher dans les threads
-      // voir pour les .odt
     return (
       <PopinFixed
         customClass={`${state.config.slug}`}
