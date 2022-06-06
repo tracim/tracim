@@ -4,12 +4,13 @@ import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
   CONTENT_TYPE,
-  TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
+  Badge,
+  TracimComponent,
+  buildContentPathBreadcrumbs,
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
@@ -1092,7 +1093,14 @@ export class File extends React.Component {
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<FilenameWithExtension file={state.content} />}
+          componentTitle={
+            <div>
+              <FilenameWithExtension file={state.content} />
+              {state.isTemplate && (
+                <Badge text={props.t('Template')} />
+              )}
+            </div>
+          }
           content={state.content}
           config={state.config}
           contentVersionNumber={contentVersionNumber}

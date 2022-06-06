@@ -93,8 +93,8 @@ export const PopinFixedHeader = (props) => {
       dataCy: 'popinListItem__editTitle'
     },
     {
-      icon: 'fab fa-phoenix-framework',
-      label: props.isTemplate ? 'Unmark template' : 'Mark template',
+      icon: props.isTemplate ? 'fas fa-paste' : 'fas fa-clipboard',
+      label: props.isTemplate ? props.t('Unmark template') : props.t('Mark template'),
       onClick: handleClickChangeMarkedTemplate,
       showAction: (userRoleIdInWorkspace >= ROLE.contributor.id) && props.showMarkedTemplate,
       disabled: props.disableChangeIsTemplate

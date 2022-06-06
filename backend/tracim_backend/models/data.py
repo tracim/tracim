@@ -602,6 +602,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         revision: "ContentRevisionRO",
         parent: "Content",
         new_content_namespace: ContentNamespaces,
+        copy_as_template: bool = False,
     ) -> "ContentRevisionRO":
 
         copy_rev = cls()
@@ -616,6 +617,8 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
                 column_value = copy.copy(parent)
             elif column_name == "content_namespace":
                 column_value = new_content_namespace
+            elif column_name == "is_template" and copy_as_template:
+                column_value = False
             else:
                 column_value = copy.copy(getattr(revision, column_name))
             setattr(copy_rev, column_name, column_value)

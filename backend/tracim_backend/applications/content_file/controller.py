@@ -98,6 +98,7 @@ class FileController(Controller):
     @hapic.input_forms(FileCreationFormSchema())
     @hapic.input_files(SimpleFileSchema())
     def create_file(self, context, request: TracimRequest, hapic_data=None):
+        ## TODO : LA SUITE
         """
         Create a file. This will create 2 revisions.
         """

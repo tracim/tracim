@@ -1198,6 +1198,7 @@ class ContentApi(object):
         new_workspace: Workspace = None,
         new_file_extension: str = None,
         new_content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
+        copy_revision: bool = True,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> Content:
@@ -1284,7 +1285,7 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        copy_result = self._copy(item, content_namespace, parent)
+        copy_result = self._copy(item, content_namespace, parent, copy_revision)
         copy_result = self._add_copy_revisions(
             original_content=item,
             new_content=copy_result.new_content,
@@ -1305,6 +1306,7 @@ class ContentApi(object):
         content: Content,
         new_content_namespace: ContentNamespaces = None,
         new_parent: Content = None,
+        copy_revisions: bool = True,
     ) -> AddCopyRevisionsResult:
         """
         Create new content for content and his children, recreate all revision in order and
@@ -1323,28 +1325,38 @@ class ContentApi(object):
         # revision related to old data. key of dict is original content id.
         original_content_children = {}  # type: typing.Dict[int,Content]
 
-        for rev, is_current_rev in content.get_tree_revisions_advanced():
+        if copy_revisions:
+            for rev, is_current_rev in content.get_tree_revisions_advanced():
 
-            if rev.content_id == content.content_id:
-                related_content = new_content  # type: Content
-                related_parent = new_parent
-            else:
-                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
-                # we create it.
-                if rev.content_id not in new_content_children:
-                    new_content_children[rev.content_id] = Content()
-                    original_content_children[rev.content_id] = rev.node
-                related_content = new_content_children[rev.content_id]
-                if rev.parent_id == content.content_id:
-                    related_parent = new_content
+                if rev.content_id == content.content_id:
+                    related_content = new_content  # type: Content
+                    related_parent = new_parent
                 else:
-                    related_parent = new_content_children[rev.parent_id]
-            # INFO - G.M - 2019-04-30 - copy of revision itself.
-            cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
+                    # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+                    # we create it.
+                    if rev.content_id not in new_content_children:
+                        new_content_children[rev.content_id] = Content()
+                        original_content_children[rev.content_id] = rev.node
+                    related_content = new_content_children[rev.content_id]
+                    if rev.parent_id == content.content_id:
+                        related_parent = new_content
+                    else:
+                        related_parent = new_content_children[rev.parent_id]
+                # INFO - G.M - 2019-04-30 - copy of revision itself.
+                cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
+                cpy_rev.node = related_content
+                related_content.current_revision = cpy_rev
+                self._session.add(related_content)
+                self._session.flush()
+        else:
+            related_content = new_content
+            related_parent = new_parent
+            cpy_rev = ContentRevisionRO.copy(content.last_revision, related_parent, new_content_namespace, not copy_revisions)
             cpy_rev.node = related_content
             related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
+        
         return AddCopyRevisionsResult(
             new_content=new_content,
             new_children_dict=new_content_children,

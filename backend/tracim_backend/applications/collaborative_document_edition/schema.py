@@ -6,6 +6,7 @@ from marshmallow import post_load
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.views.core_api.schemas import StrippedString
 
+from typing import Optional
 
 class CollaborativeDocumentEditionTokenSchema(marshmallow.Schema):
     access_token = marshmallow.fields.String(
@@ -20,10 +21,11 @@ class FileCreateFromTemplate(object):
     Create From Template model
     """
 
-    def __init__(self, template: str, filename: str, parent_id: int) -> None:
+    def __init__(self, template: str, filename: str, parent_id: Optional[int] = None, template_id: Optional[int] = None) -> None:
         self.template = template
         self.filename = filename
         self.parent_id = parent_id
+        self.template_id = template_id
 
 
 class FileTemplateSchema(marshmallow.Schema):
@@ -49,6 +51,14 @@ class FileCreateFromTemplateSchema(marshmallow.Schema):
     parent_id = marshmallow.fields.Int(
         example=42,
         description="id of the new parent content id.",
+        default=None,
+        allow_none=True,
+        validate=positive_int_validator,
+    )
+    template_id = marshmallow.fields.Int(
+        example=1,
+        description="The id of the template you want to create"
+        " the id must be a content id of a file marked as a template",
         default=None,
         allow_none=True,
         validate=positive_int_validator,

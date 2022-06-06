@@ -830,7 +830,6 @@ export class HtmlDocument extends React.Component {
                 <Badge text={props.t('Template')} />
               )}
             </div>
-            
           )}
           content={state.content}
           config={state.config}

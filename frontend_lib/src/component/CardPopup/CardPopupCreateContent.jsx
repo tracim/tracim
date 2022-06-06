@@ -53,7 +53,6 @@ export const PopupCreateContent = (props) => {
                 <div className='createcontent__form__label'>{props.t('From a template:')}</div>
                 <Select
                   className='createcontent__form__template'
-                  defaultValue={props.templateList[0]}
                   isClearable
                   isSearchable
                   onChange={props.onChangeTemplate}
