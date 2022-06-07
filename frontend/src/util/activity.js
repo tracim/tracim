@@ -186,7 +186,7 @@ const updateActivity = (message, activity) => {
   const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
   const isMentionOnComment = (
     message.event_type.startsWith(`${TLM_ET.MENTION}.`) &&
-    message.content.content_type === TLM_ST.COMMENT
+    message.fields.content.content_type === TLM_ST.COMMENT
   )
   // NOTE SG 2020-11-12: keep the existing content
   // if the message is a comment as a comment cannot change anything
