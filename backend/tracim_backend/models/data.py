@@ -939,11 +939,11 @@ class Content(DeclarativeBase):
     @status.expression
     def status(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.status
-    
+
     @hybrid_property
     def is_template(self) -> bool:
         return self.revision.is_template
-    
+
     @is_template.setter
     def is_template(self, value: bool) -> None:
         self.revision.is_template = value

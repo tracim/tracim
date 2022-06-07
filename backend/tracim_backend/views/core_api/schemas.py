@@ -79,8 +79,8 @@ from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
 from tracim_backend.models.context_models import RevisionPreviewSizedPath
 from tracim_backend.models.context_models import RoleUpdate
-from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetContentMarkedAsTemplate
+from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
 from tracim_backend.models.context_models import SetUsername
@@ -2013,8 +2013,10 @@ class SetContentMarkedAsTemplateSchema(marshmallow.Schema):
     def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentMarkedAsTemplate(**data)
 
+
 class TemplateQuerySchema(marshmallow.Schema):
     type = StrippedString(example="html-document", validate=all_content_types_validator)
+
 
 class TargetLanguageSchema(marshmallow.Schema):
     code = marshmallow.fields.String(required=True, example="fr")

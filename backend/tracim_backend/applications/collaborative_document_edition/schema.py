@@ -8,6 +8,7 @@ from tracim_backend.views.core_api.schemas import StrippedString
 
 from typing import Optional
 
+
 class CollaborativeDocumentEditionTokenSchema(marshmallow.Schema):
     access_token = marshmallow.fields.String(
         required=True,

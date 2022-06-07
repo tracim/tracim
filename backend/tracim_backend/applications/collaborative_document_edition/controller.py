@@ -42,7 +42,6 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.models.context_models import ContentInContext
-from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentDigestSchema

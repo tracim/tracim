@@ -54,7 +54,6 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
-from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import WorkspaceSubscription

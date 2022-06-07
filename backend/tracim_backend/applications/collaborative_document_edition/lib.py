@@ -108,7 +108,7 @@ class CollaborativeDocumentEditionLib(ABC):
         return path of the file template
         """
         file_path = self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR
-        
+
         template_path = os.path.join(
             file_path, template_filename
         )

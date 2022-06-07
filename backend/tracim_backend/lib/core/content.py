@@ -1670,10 +1670,10 @@ class ContentApi(object):
             .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
             .filter(
                 Content.workspace_id.in_(space_ids),
-                Content.is_template == True,
+                Content.is_template is True,
                 Content.type == template_type,
-                Content.is_deleted == False,
-                Content.is_archived == False,
+                Content.is_deleted is False,
+                Content.is_archived is False,
             )
             .all()
         )

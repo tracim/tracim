@@ -1673,7 +1673,7 @@ class RevisionInContext(object):
     @property
     def status(self) -> str:
         return self.revision.status
-    
+
     @property
     def is_template(self) -> bool:
         return self.revision.is_template
