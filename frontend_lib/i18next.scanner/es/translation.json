@@ -31,5 +31,16 @@
   "Close": "Cerrar",
   "Unknown error": "Error desconocido",
   "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
-  "Download {{filename}}": "Descargar {{filename}}"
+  "Download {{filename}}": "Descargar {{filename}}",
+  "Restore": "Restaurar",
+  "New": "Nuevo",
+  "Recipient's email addresses": "Direcciones de correo electrónico de los destinatarios",
+  "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "Para añadir varios destinatarios, separe las direcciones de correo electrónico con una coma, un punto y coma o un salto de línea.",
+  "Administrator": "Administrador",
+  "Are you sure?": "¿Está seguro?",
+  "Protect by password": "Proteger con contraseña",
+  "Email notification are disabled, please manually share the link": "Las notificaciones por correo electrónico están deshabilitadas, por favor comparta el enlace manualmente",
+  "Generate random password": "Generar contraseña aleatoria",
+  "Cancel protection by password": "Cancelar la protección por contraseña",
+  "Show password": "Mostrar contraseña"
 }

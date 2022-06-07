@@ -463,5 +463,6 @@
   "{{author}} updated {{content}}{{workspaceInfo}}": "{{author}} actualizó {{content}}{{workspaceInfo}}",
   "{{author}} joined a space": "{{author}} se unió a un espacio",
   "{{author}} rejected your access to a space": "{{author}} rechazó su acceso a un espacio",
-  "{{author}} restored {{content}}{{workspaceInfo}}": "{{author}} restauró {{content}}{{workspaceInfo}}"
+  "{{author}} restored {{content}}{{workspaceInfo}}": "{{author}} restauró {{content}}{{workspaceInfo}}",
+  "Back": "Volver"
 }
