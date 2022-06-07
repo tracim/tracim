@@ -1,12 +1,11 @@
 import typing
+from typing import Optional
 
 import marshmallow
 from marshmallow import post_load
 
 from tracim_backend.app_models.validator import positive_int_validator
 from tracim_backend.views.core_api.schemas import StrippedString
-
-from typing import Optional
 
 
 class CollaborativeDocumentEditionTokenSchema(marshmallow.Schema):
@@ -22,7 +21,13 @@ class FileCreateFromTemplate(object):
     Create From Template model
     """
 
-    def __init__(self, template: str, filename: str, parent_id: Optional[int] = None, template_id: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        template: str,
+        filename: str,
+        parent_id: Optional[int] = None,
+        template_id: Optional[int] = None,
+    ) -> None:
         self.template = template
         self.filename = filename
         self.parent_id = parent_id
