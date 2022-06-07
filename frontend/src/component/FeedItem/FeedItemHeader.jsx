@@ -53,7 +53,6 @@ export class FeedItemHeader extends React.Component {
   render () {
     const { props } = this
     const contentId = props.content.id
-    const contentLabel = props.content.label
     const contentType = props.content.type
     const showLastModification = (
       props.contentAvailable &&

@@ -10,7 +10,6 @@ import {
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import {
   ROLE,
-  Badge,
   ComposedIcon,
   FilenameWithBadges,
   ListItemWrapper

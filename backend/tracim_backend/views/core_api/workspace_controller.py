@@ -71,7 +71,7 @@ from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PaginatedContentDigestSchema
 from tracim_backend.views.core_api.schemas import RoleUpdateSchema
-from tracim_backend.views.core_api.schemas import SetContentMarkedAsTemplateSchema
+from tracim_backend.views.core_api.schemas import SetContentIsTemplateSchema
 from tracim_backend.views.core_api.schemas import TemplateQuerySchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
@@ -799,7 +799,7 @@ class WorkspaceController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.input_body(SetContentMarkedAsTemplateSchema())
+    @hapic.input_body(SetContentIsTemplateSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_content_template(self, context, request: TracimRequest, hapic_data=None) -> None:
         """

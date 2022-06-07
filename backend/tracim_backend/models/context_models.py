@@ -772,9 +772,9 @@ class SetContentStatus(object):
         self.status = status
 
 
-class SetContentMarkedAsTemplate(object):
+class SetContentIsTemplate(object):
     """
-    Set content marked as template
+    Set the is_template property of a content.
     """
 
     def __init__(self, is_template: bool) -> None:

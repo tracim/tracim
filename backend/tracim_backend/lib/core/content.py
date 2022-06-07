@@ -71,8 +71,6 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.tag import Tag
-from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -472,20 +470,23 @@ class ContentApi(object):
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
 
             if template_id:
-                tags_values = (
-                    self._session.query(Tag)
-                    .select_from(Tag)
-                    .join(TagOnContent, Tag.tag_id == TagOnContent.tag_id)
-                    .join(Content, Content.id == TagOnContent.content_id)
-                    .join(
-                        ContentRevisionRO,
-                        Content.cached_revision_id == ContentRevisionRO.revision_id,
-                    )
-                    .filter(TagOnContent.content_id == template_id)
-                    .all()
-                )
-
                 tag_lib = TagLib(self._session)
+
+                tags_values = tag_lib.get_all(content_id=template_id)
+                # tags_values = (
+                #     self._session.query(Tag)
+                #     .select_from(Tag)
+                #     .join(TagOnContent, Tag.tag_id == TagOnContent.tag_id)
+                #     .join(Content, Content.id == TagOnContent.content_id)
+                #     .join(
+                #         ContentRevisionRO,
+                #         Content.cached_revision_id == ContentRevisionRO.revision_id,
+                #     )
+                #     .filter(TagOnContent.content_id == template_id)
+                #     .all()
+                # )
+
+                # tag_lib = TagLib(self._session)
 
                 for tag in tags_values:
                     tag_lib.add_tag_to_content(
@@ -1662,18 +1663,17 @@ class ContentApi(object):
         user = self._session.query(User).get(user_id)
 
         space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
-        space_list = space_api.get_all_for_user(user)
-        space_ids = [space.workspace_id for space in space_list]
+        space_ids = [space.workspace_id for space in space_api.get_all_for_user(user)]
 
         content_list = (
             self._session.query(Content)
             .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
             .filter(
                 Content.workspace_id.in_(space_ids),
-                Content.is_template is True,
+                Content.is_template == int(True),
                 Content.type == template_type,
-                Content.is_deleted is False,
-                Content.is_archived is False,
+                Content.is_deleted == int(False),
+                Content.is_archived == int(False),
             )
             .all()
         )
@@ -1918,8 +1918,6 @@ class ContentApi(object):
                 action_description = ActionDescription.EDITION
 
         if action_description:
-            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACTION")
-            print(action_description)
             content.revision_type = action_description
 
         if do_flush:

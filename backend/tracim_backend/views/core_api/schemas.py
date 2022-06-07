@@ -79,7 +79,7 @@ from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
 from tracim_backend.models.context_models import RevisionPreviewSizedPath
 from tracim_backend.models.context_models import RoleUpdate
-from tracim_backend.models.context_models import SetContentMarkedAsTemplate
+from tracim_backend.models.context_models import SetContentIsTemplate
 from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
@@ -2004,14 +2004,12 @@ class SetContentStatusSchema(marshmallow.Schema):
         return SetContentStatus(**data)
 
 
-class SetContentMarkedAsTemplateSchema(marshmallow.Schema):
-    is_template = marshmallow.fields.Boolean(
-        description="set content as a template", default=False
-    )
+class SetContentIsTemplateSchema(marshmallow.Schema):
+    is_template = marshmallow.fields.Boolean(description="set content as a template", default=False)
 
     @post_load
     def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
-        return SetContentMarkedAsTemplate(**data)
+        return SetContentIsTemplate(**data)
 
 
 class TemplateQuerySchema(marshmallow.Schema):

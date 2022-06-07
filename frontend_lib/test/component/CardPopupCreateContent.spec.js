@@ -5,7 +5,8 @@ import CardPopupCreateContent from '../../src/component/CardPopup/CardPopupCreat
 import sinon from 'sinon'
 require('../../src/component/CardPopup/CardPopupCreateContent.styl')
 
-describe('<CardPopupCreateContent />', () => {
+// TODO - MP - 2022-06-07 - https://github.com/tracim/tracim/issues/5697
+describe.skip('<CardPopupCreateContent />', () => {
   const onCloseCallBack = sinon.spy()
   const onValidateCallBack = sinon.spy()
   const onChangeContentNameCallBack = sinon.spy()
