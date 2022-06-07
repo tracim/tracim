@@ -471,22 +471,7 @@ class ContentApi(object):
 
             if template_id:
                 tag_lib = TagLib(self._session)
-
                 tags_values = tag_lib.get_all(content_id=template_id)
-                # tags_values = (
-                #     self._session.query(Tag)
-                #     .select_from(Tag)
-                #     .join(TagOnContent, Tag.tag_id == TagOnContent.tag_id)
-                #     .join(Content, Content.id == TagOnContent.content_id)
-                #     .join(
-                #         ContentRevisionRO,
-                #         Content.cached_revision_id == ContentRevisionRO.revision_id,
-                #     )
-                #     .filter(TagOnContent.content_id == template_id)
-                #     .all()
-                # )
-
-                # tag_lib = TagLib(self._session)
 
                 for tag in tags_values:
                     tag_lib.add_tag_to_content(
