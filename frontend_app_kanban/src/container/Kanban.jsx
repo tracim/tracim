@@ -119,7 +119,6 @@ export class Kanban extends React.Component {
     )
   }
 
-
   handleChangeMarkedTemplate = (isTemplate) => {
     const { props, state } = this
     props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)

@@ -148,11 +148,8 @@ export function appContentFactory (WrappedComponent) {
 
     getTemplateList = async (setState, templateType) => {
       const result = await getTemplateList(this.apiUrl, templateType)
-      console.log('getTemplateList result', result)
       const fetchGetTemplates = await handleFetchResult(result)
       const templateList = []
-
-      console.log('getTemplateList', fetchGetTemplates)
 
       switch (fetchGetTemplates.apiResponse.status) {
         case 200:
@@ -378,7 +375,7 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
 
       if (!content) {
-        return
+        return {}
       }
 
       const response = await handleFetchResult(

@@ -71,6 +71,8 @@ class PopupCreateHtmlDocument extends React.Component {
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
   handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
     if (action !== 'clear') {
       if (template.content_id !== -1) {
         this.setState({ templateId: template.content_id })

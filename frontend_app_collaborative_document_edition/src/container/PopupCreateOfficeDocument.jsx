@@ -102,9 +102,11 @@ export class PopupCreateCollaborativeDocument extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  handleChangeTemplate = (template, {action}) => {
+  handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
     if (action !== 'clear') {
-      if (template.content_id != -1) {
+      if (template.content_id !== -1) {
         this.setState({ templateId: template.content_id })
         this.setState({ templateName: template.label })
         this.setState(prevState => ({ newContentName: `${template.label} ${prevState.newContentName}` }))
@@ -122,10 +124,10 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     let filename
     let templateName
     if (state.templateId) {
-      filename= state.newContentName
+      filename = state.newContentName
       templateName = `${state.templateName}${FILE_TYPES.collabora[state.selectedOption.value].ext}`
     } else {
-      filename= state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
+      filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
       templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
     }
 

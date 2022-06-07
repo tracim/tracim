@@ -824,14 +824,6 @@ export class HtmlDocument extends React.Component {
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
           componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
-          // (
-          //   <div>
-          //     <span className='componentTitle'>{state.content.label}</span>
-          //     {state.isTemplate && (
-          //       <Badge text={props.t('Template')} />
-          //     )}
-          //   </div>
-          // )
           content={state.content}
           config={state.config}
           contentVersionNumber={contentVersionNumber}
