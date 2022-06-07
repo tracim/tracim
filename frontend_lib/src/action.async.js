@@ -162,7 +162,7 @@ export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
 export const getTemplateList = (apiUrl, templateType) =>
-  baseFetch('GET', `${apiUrl}/users/me/contents/templates?type=${templateType}`)
+  baseFetch('GET', `${apiUrl}/users/me/template_contents?type=${templateType}`)
 
 export const getComment = (apiUrl, workspaceId, contentId, commentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)

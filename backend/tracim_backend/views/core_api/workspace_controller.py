@@ -561,7 +561,7 @@ class WorkspaceController(Controller):
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(creation_data.parent_id)
                 ) from exc
-        
+
         content = api.create(
             content_type_slug=creation_data.content_type,
             do_save=True,
@@ -571,7 +571,6 @@ class WorkspaceController(Controller):
             parent=parent,
             content_namespace=creation_data.content_namespace,
         )
-        # api.save(content, ActionDescription.CREATION)
         content = api.get_content_in_context(content)
         return content
 
@@ -797,18 +796,17 @@ class WorkspaceController(Controller):
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.unarchive(content)
         return
-    
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetContentMarkedAsTemplateSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def mark_content_as_template(self, context, request: TracimRequest, hapic_data=None) -> None:
+    def set_content_template(self, context, request: TracimRequest, hapic_data=None) -> None:
         """
-        Mark content as template
+        Set content as template
         """
-        app_config = request.registry.settings["CFG"]   # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=True,
             show_deleted=True,
@@ -818,7 +816,7 @@ class WorkspaceController(Controller):
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            api.mark_as_template(content, hapic_data.body.is_template)
+            api.set_template(content, hapic_data.body.is_template)
             api.save(content)
         return
 
@@ -826,11 +824,13 @@ class WorkspaceController(Controller):
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(TemplateQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True), default_http_code=HTTPStatus.OK)
-    def get_template_list(self, context, request: TracimRequest, hapic_data=None) -> typing.List[ContentDigestSchema]:
+    def get_templates(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[ContentDigestSchema]:
         """
         Get all templates
         """
-        app_config = request.registry.settings["CFG"]   # type: CFG
+        app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
             show_archived=False,
             show_deleted=False,
@@ -838,7 +838,9 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        return api.get_template_list(user_id=hapic_data.path['user_id'], template_type=hapic_data.query['type'])
+        return api.get_templates(
+            user_id=hapic_data.path["user_id"], template_type=hapic_data.query["type"]
+        )
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -971,19 +973,17 @@ class WorkspaceController(Controller):
 
         # Mark/unmark Content as template
         configurator.add_route(
-            "mark_content_as_template",
+            "set_content_template",
             "/workspaces/{workspace_id}/contents/{content_id}/template",
             request_method="PUT",
         )
-        configurator.add_view(
-            self.mark_content_as_template, route_name="mark_content_as_template"
-        )
+        configurator.add_view(self.set_content_template, route_name="set_content_template")
 
         # Get every templates
         configurator.add_route(
-            "get_template_list", "/users/{user_id}/contents/templates", request_method="GET"
+            "get_templates", "/users/{user_id}/template_contents", request_method="GET"
         )
-        configurator.add_view(self.get_template_list, route_name="get_template_list")
+        configurator.add_view(self.get_templates, route_name="get_templates")
 
         # Subscriptions
         configurator.add_route(

@@ -95,44 +95,48 @@ class CollaborativeDocumentEditionController(Controller):
     def create_file_from_template(
         self, context: DefaultRootFactory, request: TracimRequest, hapic_data: HapicData = None
     ) -> ContentInContext:
+        """
+        Create a file.
+        """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            current_user=request.current_user, session=request.dbsession, config=app_config,
         )
         collaborative_document_edition_api = CollaborativeDocumentEditionFactory().get_lib(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
 
-        content = None # type: typing.Optional['Content']
+        content = None  # type: typing.Optional['Content']
         parent = None  # type: typing.Optional['Content']
 
-        if hapic_data.body.template_id:
-            template = api.get_one(hapic_data.body.template_id)
-            content = api.copy(template, new_label=hapic_data.body.filename, copy_revision=False)
-        else:
+        if not hapic_data.body.template_id:
             collaborative_document_edition_api.check_template_available(hapic_data.body.template)
-            if hapic_data.body.parent_id:
-                try:
-                    parent = api.get_one(
-                        content_id=hapic_data.body.parent_id, content_type=content_type_list.Any_SLUG
-                    )
-                except ContentNotFound as exc:
-                    raise ParentNotFound(
-                        "Parent with content_id {} not found".format(hapic_data.body.parent_id)
-                    ) from exc
 
-            content = api.create(
-                filename=hapic_data.body.filename,
-                content_type_slug=FILE_TYPE,
-                workspace=request.current_workspace,
-                parent=parent,
-            )
-        
-            api.save(content, ActionDescription.CREATION)
+        if hapic_data.body.parent_id:
+            try:
+                parent = api.get_one(
+                    content_id=hapic_data.body.parent_id, content_type=content_type_list.Any_SLUG
+                )
+            except ContentNotFound as exc:
+                raise ParentNotFound(
+                    "Parent with content_id {} not found".format(hapic_data.body.parent_id)
+                ) from exc
+
+        content = api.create(
+            content_type_slug=FILE_TYPE,
+            do_save=True,
+            filename=hapic_data.body.filename,
+            template_id=hapic_data.body.template_id,
+            workspace=request.current_workspace,
+            parent=parent,
+        )
+
+        if not hapic_data.body.template_id:
             with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
                 collaborative_document_edition_api.update_content_from_template(
                     content=content, template_filename=hapic_data.body.template
                 )
+
         return api.get_content_in_context(content)
 
     def bind(self, configurator: Configurator) -> None:

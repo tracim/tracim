@@ -421,6 +421,7 @@ class ContentApi(object):
 
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
+
         if label:
             file_extension = ""
             if content_type.file_extension:
@@ -457,38 +458,39 @@ class ContentApi(object):
         content.content_namespace = content_namespace
 
         if template_id:
-            template_values = self._session.query(Content.description, Content.raw_content).select_from(
-                Content
-            ).join(
-                ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
-            ).filter(
-                Content.content_id == template_id
-            ).one()
+            template = self.get_one(template_id)
 
-            content.description = template_values.description
-            content.raw_content = template_values.raw_content
+            if label:
+                content = self.copy(template, new_label=label, copy_revision=False, do_save=False)
+            elif filename:
+                content = self.copy(
+                    template, new_label=filename, copy_revision=False, do_save=False
+                )
 
         if do_save:
             self._session.add(content)
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
 
             if template_id:
-                tags_values = self._session.query(Tag).select_from(
-                    Tag
-                ).join(
-                    TagOnContent, Tag.tag_id == TagOnContent.tag_id
-                ).join(
-                    Content, Content.id == TagOnContent.content_id
-                ).join(
-                    ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
-                ).filter(
-                    TagOnContent.content_id == template_id
-                ).all()
+                tags_values = (
+                    self._session.query(Tag)
+                    .select_from(Tag)
+                    .join(TagOnContent, Tag.tag_id == TagOnContent.tag_id)
+                    .join(Content, Content.id == TagOnContent.content_id)
+                    .join(
+                        ContentRevisionRO,
+                        Content.cached_revision_id == ContentRevisionRO.revision_id,
+                    )
+                    .filter(TagOnContent.content_id == template_id)
+                    .all()
+                )
 
                 tag_lib = TagLib(self._session)
 
                 for tag in tags_values:
-                    tag_lib.add_tag_to_content(user = self._user, content = content, tag_name=tag.tag_name)
+                    tag_lib.add_tag_to_content(
+                        user=self._user, content=content, tag_name=tag.tag_name
+                    )
 
         return content
 
@@ -1351,12 +1353,14 @@ class ContentApi(object):
         else:
             related_content = new_content
             related_parent = new_parent
-            cpy_rev = ContentRevisionRO.copy(content.last_revision, related_parent, new_content_namespace, not copy_revisions)
+            cpy_rev = ContentRevisionRO.copy(
+                content.last_revision, related_parent, new_content_namespace, not copy_revisions
+            )
             cpy_rev.node = related_content
             related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
-        
+
         return AddCopyRevisionsResult(
             new_content=new_content,
             new_children_dict=new_content_children,
@@ -1644,8 +1648,8 @@ class ContentApi(object):
                     content_length, owner_used_space, owner_allowed_space
                 )
             )
-    
-    def mark_as_template(self, content: Content, is_template: bool) -> Content:
+
+    def set_template(self, content: Content, is_template: bool) -> Content:
         if not self.is_editable(content):
             raise ContentInNotEditableState(
                 "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
@@ -1653,33 +1657,28 @@ class ContentApi(object):
         content.is_template = is_template
         content.revision_type = ActionDescription.REVISION
         return content
-    
-    def get_template_list(self, user_id: int, template_type: str) -> typing.List[Content]:
-        # get user from user_id
+
+    def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:
         user = self._session.query(User).get(user_id)
 
-        # get every workspace where user is member
         space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
         space_list = space_api.get_all_for_user(user)
         space_ids = [space.workspace_id for space in space_list]
 
-        # space_ids = self._session.query(Workspace.workspace_id).filter(
-        #     Workspace.members.any(User.user_id == user_id)
-        # )
-
-        # get every tempate where workspace is in space_ids
-        content_list = self._session.query(Content).join(
-            ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id
-        ).filter(
-            Content.workspace_id.in_(space_ids),
-            Content.is_template == True,
-            Content.type == template_type,
-            Content.is_deleted == False,
-            Content.is_archived == False
-        ).all()
+        content_list = (
+            self._session.query(Content)
+            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
+            .filter(
+                Content.workspace_id.in_(space_ids),
+                Content.is_template == True,
+                Content.type == template_type,
+                Content.is_deleted == False,
+                Content.is_archived == False,
+            )
+            .all()
+        )
 
         return content_list
-
 
     def archive(self, content: Content):
         if self._user:
@@ -1919,6 +1918,8 @@ class ContentApi(object):
                 action_description = ActionDescription.EDITION
 
         if action_description:
+            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACTION")
+            print(action_description)
             content.revision_type = action_description
 
         if do_flush:
