@@ -107,13 +107,17 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     // see https://react-select.com/props#prop-types
     if (action !== 'clear') {
       if (template.content_id !== -1) {
-        this.setState({ templateId: template.content_id })
-        this.setState({ templateName: template.label })
-        this.setState(prevState => ({ newContentName: `${template.label} ${prevState.newContentName}` }))
+        this.setState(prevState => ({ 
+          templateId: template.content_id,
+          templateName: template.label,
+          newContentName: `${template.label} ${prevState.newContentName}` 
+        }))
       }
     } else {
-      this.setState({ templateId: null })
-      this.setState({ templateName: null })
+      this.setState({ 
+        templateId: null,
+        templateName: null
+      })
     }
   }
 
