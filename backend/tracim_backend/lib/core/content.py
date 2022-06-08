@@ -464,7 +464,7 @@ class ContentApi(object):
                     new_label=label,
                     new_workspace=workspace,
                     copy_revision=False,
-                    do_save=False
+                    do_save=False,
                 )
             elif filename:
                 content = self.copy(
@@ -472,7 +472,7 @@ class ContentApi(object):
                     new_label=filename,
                     new_workspace=workspace,
                     copy_revision=False,
-                    do_save=False
+                    do_save=False,
                 )
 
         if do_save:
