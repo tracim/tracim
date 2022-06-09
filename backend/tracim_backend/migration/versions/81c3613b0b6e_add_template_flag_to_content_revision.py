@@ -1,4 +1,4 @@
-"""migration label
+"""Add template flag to content revision
 
 Revision ID: 81c3613b0b6e
 Revises: 6f36ee7d829e
@@ -22,7 +22,7 @@ def upgrade():
                 sa.Boolean(),
                 server_default=sa.sql.expression.literal(False),
                 nullable=False,
-            )
+            ),
         )
     # ### end Alembic commands ###
 

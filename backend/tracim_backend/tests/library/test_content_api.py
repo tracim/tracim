@@ -2922,7 +2922,7 @@ class TestContentApi(object):
         # update order test
         firstly_created_but_recently_updated = api.create(
             content_type_slug=content_type_list.Page.slug,
-            workspacec=workspace,
+            workspace=workspace,
             parent=main_folder,
             label="update_order_test",
             do_save=True,
