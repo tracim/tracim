@@ -15,15 +15,12 @@ import json
 
 from alembic import op
 import sqlalchemy as sa
-
 from sqlalchemy import Column
 from sqlalchemy import Integer
 from sqlalchemy import MetaData
 from sqlalchemy import Table
 from sqlalchemy import Text
 from sqlalchemy import Unicode
-
-from tracim_backend.models.meta import metadata
 
 # revision identifiers, used by Alembic.
 revision = "ae30497b6168"
@@ -38,6 +35,7 @@ content_revisions_table = Table(
     Column("type", Unicode()),
     Column("revision_id", Integer()),
 )
+
 
 def remove_allowed_content_property_in_all_but_folders_and_events():
     connection = op.get_bind()
