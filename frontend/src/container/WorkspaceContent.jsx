@@ -145,14 +145,14 @@ export class WorkspaceContent extends React.Component {
 
     this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
 
-    let wsToLoad = null
+    let spaceToLoad = null
 
     if (props.match.params.idws === undefined) {
-      if (props.workspaceList.length > 0) wsToLoad = props.workspaceList[0].id
+      if (props.workspaceList.length > 0) spaceToLoad = props.workspaceList[0].id
       else return
-    } else wsToLoad = props.match.params.idws
+    } else spaceToLoad = props.match.params.idws
 
-    this.loadAllWorkspaceContent(wsToLoad, true, true)
+    this.loadAllWorkspaceContent(spaceToLoad, true, true)
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -239,11 +239,10 @@ export class WorkspaceContent extends React.Component {
   }
 
   loadContentList = async (workspaceId, shouldLoadReadStatusList) => {
-    console.log(`%c<WorkspaceContent> loadContentList (with read status list: ${shouldLoadReadStatusList})`, 'color: #c17838')
     const { props } = this
+    console.log(`%c<WorkspaceContent> loadContentList (with read status list: ${shouldLoadReadStatusList})`, 'color: #c17838')
 
     const folderIdInUrl = [0, ...this.getFolderIdToOpenInUrl(props.location.search)] // add 0 to get workspace's root
-
     const contentIdInUrl = (props.match && props.match.params.idcts) || null
 
     if (contentIdInUrl && contentIdInUrl !== 'new' && props.match && props.match.params.type === CONTENT_TYPE.FOLDER) folderIdInUrl.push(contentIdInUrl)
@@ -806,6 +805,7 @@ export class WorkspaceContent extends React.Component {
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
                         isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
+                        isTemplate={content.isTemplate}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === rootContentList.length - 1}

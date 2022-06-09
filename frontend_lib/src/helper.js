@@ -68,6 +68,14 @@ export const DATE_FNS_LOCALE = {
   ar: dateFnsAr
 }
 
+// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+export const COLLABORA_EXTENSIONS = [
+  '.odg',
+  '.odp',
+  '.ods',
+  '.odt'
+]
+
 export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
   return new Promise((resolve, reject) => resolve({
@@ -787,6 +795,7 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   }
 }
 
+// NOTE - MP - 2022-05-31 - Type can be 'info', 'warning' or 'error'
 export const sendGlobalFlashMessage = (msg, type = 'warning', delay = undefined) => GLOBAL_dispatchEvent({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {

@@ -220,5 +220,11 @@
   "See more": "Ver mais",
   "Error while loading timeline": "Erro ao carregar a linha cronológica",
   "Agenda": "Agenda",
-  "Unknown content": "Conteúdo desconhecido"
+  "Unknown content": "Conteúdo desconhecido",
+  "From a template:": "",
+  "Template": "",
+  "Unmark template": "",
+  "Mark template": "",
+  "Something went wrong": "",
+  "Unknown comment": ""
 }

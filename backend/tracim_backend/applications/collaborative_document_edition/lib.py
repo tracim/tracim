@@ -104,12 +104,14 @@ class CollaborativeDocumentEditionLib(ABC):
         ]
 
     def _get_file_template_path(self, template_filename: str) -> str:
-        template_path = os.path.join(
-            self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR, template_filename
-        )
+        """
+        return path of the file template
+        """
+        file_path = self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR
+        template_path = os.path.join(file_path, template_filename)
         try:
-            is_dir_exist(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
-            is_dir_readable(self._config.COLLABORATIVE_DOCUMENT_EDITION__FILE_TEMPLATE_DIR)
+            is_dir_exist(file_path)
+            is_dir_readable(file_path)
             is_file_exist(template_path)
             is_file_readable(template_path)
         except (NotADirectoryError, NotAFileError, NotReadableFile) as exc:

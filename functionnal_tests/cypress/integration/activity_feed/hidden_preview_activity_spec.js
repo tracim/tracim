@@ -31,20 +31,20 @@ describe('At the recent activities page', () => {
 
     describe('If file is not deleted', () => {
       it("should show activity's preview", () => {
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.get('.feedItem__preview__image').should('be.visible')
       })
     })
 
     describe('If file is deleted', () => {
       it("should not show activity's preview", () => {
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.get('.wsContentGeneric__header__actions').click()
         cy.get('[data-cy=popinListItem__delete]').click()
         cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.get('.feedItem__preview__image').should('not.exist')
       })
     })
@@ -62,20 +62,20 @@ describe('At the recent activities page', () => {
 
     describe('If file is not deleted', () => {
       it("should show activity's preview", () => {
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.get('.feedItem__preview__image').should('be.visible')
       })
     })
 
     describe('If file is deleted', () => {
       it("should not show activity's preview", () => {
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.get('.wsContentGeneric__header__actions').click()
         cy.get('[data-cy=popinListItem__delete]').click()
         cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
-        cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle)
+        cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
         cy.get('.feedItem__preview__image').should('not.exist')
       })
     })

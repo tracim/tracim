@@ -2,10 +2,10 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  CUSTOM_EVENT,
   addAllResourceI18n,
   CardPopupCreateContent,
   handleFetchResult,
-  CUSTOM_EVENT,
   buildHeadTitle,
   appContentFactory,
   TracimComponent,
@@ -32,7 +32,8 @@ export class PopupCreateKanban extends React.Component {
       loggedUser: param.loggedUser,
       workspaceId: param.workspaceId,
       folderId: param.folderId,
-      newContentName: ''
+      newContentName: '',
+      templateList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -68,6 +69,13 @@ export class PopupCreateKanban extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
+  handleChangeTemplate = (template) => {
+    this.setState({ templateId: template.content_id })
+    if (this.state.newContentName === '') {
+      this.setState({ newContentName: template.label })
+    }
+  }
+
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
     data: {
@@ -94,6 +102,7 @@ export class PopupCreateKanban extends React.Component {
       JSON.stringify(defaultKanbanBoard),
       KANBAN_MIME_TYPE,
       state.folderId,
+      state.templateId,
       state.config.slug
     )
 
@@ -140,15 +149,16 @@ export class PopupCreateKanban extends React.Component {
   render () {
     return (
       <CardPopupCreateContent
-        onClose={this.handleClose}
-        onValidate={this.handleValidate}
-        label={this.props.t('New Kanban board')}
+        btnValidateLabel={this.props.t('Validate and create')}
+        contentName={this.state.newContentName}
         customColor={this.state.config.hexcolor}
         faIcon={this.state.config.faIcon}
-        contentName={this.state.newContentName}
-        onChangeContentName={this.handleChangeNewContentName}
-        btnValidateLabel={this.props.t('Validate and create')}
         inputPlaceholder={this.props.t("Board's name")}
+        label={this.props.t('New Kanban board')}
+        onChangeContentName={this.handleChangeNewContentName}
+        onChangeTemplate={this.handleChangeTemplate}
+        onClose={this.handleClose}
+        onValidate={this.handleValidate}
       />
     )
   }

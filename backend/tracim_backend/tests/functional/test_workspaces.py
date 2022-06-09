@@ -5326,21 +5326,35 @@ class TestWorkspaceContents(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         first_dir = api.create(
-            content_type_list.Folder.slug, workspace, None, "First Dir", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="First Dir",
+            do_save=True,
         )
         # create another content to prevent false positive:
         # - non linear id result for path.
         # - not catch all function.
         another_content = api.create(
-            content_type_list.Page.slug, workspace, None, "Another Content", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="Another Content",
+            do_save=True,
         )
 
         second_dir = api.create(
-            content_type_list.Folder.slug, workspace, first_dir, "Second Content", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=first_dir,
+            label="Second Content",
+            do_save=True,
         )
 
         my_file = api.create(
-            content_type_list.Page.slug, workspace, second_dir, "my file", "", True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=second_dir,
+            label="my file",
+            do_save=True,
         )
         user_api = user_api_factory.get()
         profile = Profile.USER
@@ -5405,21 +5419,35 @@ class TestWorkspaceContents(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         first_dir = api.create(
-            content_type_list.Folder.slug, workspace, None, "First Dir", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="First Dir",
+            do_save=True,
         )
         # create another content to prevent false positive:
         # - non linear id result for path.
         # - not catch all function.
         another_content = api.create(
-            content_type_list.Page.slug, workspace, None, "Another Content", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="Another Content",
+            do_save=True,
         )
 
         second_dir = api.create(
-            content_type_list.Folder.slug, workspace, first_dir, "Second Content", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=first_dir,
+            label="Second Content",
+            do_save=True,
         )
 
         my_file = api.create(
-            content_type_list.Page.slug, workspace, second_dir, "my file", "", True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=second_dir,
+            label="my file",
+            do_save=True,
         )
         user_api = user_api_factory.get()
         profile = Profile.USER

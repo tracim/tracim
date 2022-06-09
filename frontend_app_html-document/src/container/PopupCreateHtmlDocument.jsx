@@ -1,11 +1,12 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
   addAllResourceI18n,
   appContentFactory,
   buildHeadTitle,
   CardPopupCreateContent,
-  CUSTOM_EVENT,
   handleFetchResult,
   sendGlobalFlashMessage,
   TracimComponent
@@ -19,13 +20,19 @@ import { debug } from '../debug.js'
 class PopupCreateHtmlDocument extends React.Component {
   constructor (props) {
     super(props)
+
+    const param = props.data || debug
+    props.setApiUrl(param.config.apiUrl)
+
     this.state = {
       appName: 'html-document', // must remain 'html-document' because it is the name of the react built app (which contains HtmlDocument and PopupCreateHtmlDocument)
-      config: props.data ? props.data.config : debug.config,
-      loggedUser: props.data ? props.data.loggedUser : debug.loggedUser,
-      workspaceId: props.data ? props.data.workspaceId : debug.workspaceId,
-      folderId: props.data ? props.data.folderId : debug.folderId,
-      newContentName: ''
+      config: param.config,
+      templateId: null,
+      folderId: param.folderId,
+      loggedUser: param.loggedUser,
+      newContentName: '',
+      templateList: [],
+      workspaceId: param.workspaceId
     }
 
     // i18n has been init, add resources from frontend
@@ -47,6 +54,7 @@ class PopupCreateHtmlDocument extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.HTML_DOCUMENT)
   }
 
   setHeadTitle = () => {
@@ -62,6 +70,19 @@ class PopupCreateHtmlDocument extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
+  handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
+    if (action !== 'clear') {
+      if (template.content_id !== -1) {
+        this.setState({ templateId: template.content_id })
+        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
+      }
+    } else {
+      this.setState({ templateId: null })
+    }
+  }
+
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
     data: {
@@ -70,9 +91,11 @@ class PopupCreateHtmlDocument extends React.Component {
   })
 
   handleValidate = async () => {
-    const { config, appName, workspaceId, folderId, newContentName } = this.state
+    const { config, appName, templateId, workspaceId, folderId, newContentName } = this.state
 
-    const fetchSaveNewHtmlDoc = postHtmlDocContent(config.apiUrl, workspaceId, folderId, config.slug, newContentName)
+    const fetchSaveNewHtmlDoc = postHtmlDocContent(
+      config.apiUrl, workspaceId, folderId, config.slug, newContentName, templateId
+    )
 
     const resSave = await handleFetchResult(await fetchSaveNewHtmlDoc)
 
@@ -104,15 +127,18 @@ class PopupCreateHtmlDocument extends React.Component {
   render () {
     return (
       <CardPopupCreateContent
+        btnValidateLabel={this.props.t('Validate and create')}
+        contentName={this.state.newContentName}
+        customColor={this.state.config.hexcolor}
+        displayTemplateList
+        faIcon={this.state.config.faIcon}
+        inputPlaceholder={this.props.t("Note's title")}
+        label={this.props.t('New note')}
+        onChangeContentName={this.handleChangeNewContentName}
+        onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New note')}
-        customColor={this.state.config.hexcolor}
-        faIcon={this.state.config.faIcon}
-        contentName={this.state.newContentName}
-        onChangeContentName={this.handleChangeNewContentName}
-        btnValidateLabel={this.props.t('Validate and create')}
-        inputPlaceholder={this.props.t("Note's title")}
+        templateList={this.state.templateList}
       />
     )
   }

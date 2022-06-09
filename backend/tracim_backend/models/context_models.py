@@ -726,11 +726,13 @@ class ContentCreation(object):
         content_type: str,
         content_namespace: ContentNamespaces,
         parent_id: Optional[int] = None,
+        template_id: Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
         self.content_namespace = content_namespace
+        self.template_id = template_id
 
 
 class CommentCreation(object):
@@ -768,6 +770,15 @@ class SetContentStatus(object):
 
     def __init__(self, status: str) -> None:
         self.status = status
+
+
+class SetContentIsTemplate(object):
+    """
+    Set the is_template property of a content.
+    """
+
+    def __init__(self, is_template: bool) -> None:
+        self.is_template = is_template
 
 
 class ContentUpdate(object):
@@ -1336,6 +1347,10 @@ class ContentInContext(object):
         return self.content.status
 
     @property
+    def is_template(self) -> bool:
+        return self.content.is_template
+
+    @property
     def is_archived(self) -> bool:
         return self.content.is_archived
 
@@ -1658,6 +1673,10 @@ class RevisionInContext(object):
     @property
     def status(self) -> str:
         return self.revision.status
+
+    @property
+    def is_template(self) -> bool:
+        return self.revision.is_template
 
     @property
     def is_archived(self) -> bool:
