@@ -411,7 +411,7 @@ export class Thread extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
           breadcrumbsList={state.breadcrumbsList}
-          showMarkedTemplate={false}
+          showMarkedAsTemplate={false}
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>

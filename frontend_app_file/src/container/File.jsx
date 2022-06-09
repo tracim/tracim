@@ -4,6 +4,7 @@ import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
   BREADCRUMBS_TYPE,
+  COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -1127,6 +1128,7 @@ export class File extends React.Component {
           onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onValidateChangeTitle={this.handleSaveEditTitle}
           showReactions
+          showMarkedAsTemplate={COLLABORA_EXTENSIONS.includes(state.content.file_extension)}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
             : FAVORITE_STATE.NOT_FAVORITE}

@@ -67,6 +67,14 @@ export const DATE_FNS_LOCALE = {
   ar: dateFnsAr
 }
 
+// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+export const COLLABORA_EXTENSIONS = [
+  '.odg',
+  '.odp',
+  '.ods',
+  '.odt'
+]
+
 export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
   return new Promise((resolve, reject) => resolve({

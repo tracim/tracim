@@ -39,7 +39,6 @@ export const PopinFixedHeader = (props) => {
   }
 
   const handleClickChangeMarkedTemplate = () => {
-    console.log('marked from ', props.isTemplate, ' to ', !props.isTemplate)
     props.onClickChangeMarkedTemplate(!props.isTemplate)
   }
 
@@ -96,7 +95,7 @@ export const PopinFixedHeader = (props) => {
       icon: props.isTemplate ? 'fas fa-paste' : 'fas fa-clipboard',
       label: props.isTemplate ? props.t('Unmark template') : props.t('Mark template'),
       onClick: handleClickChangeMarkedTemplate,
-      showAction: (userRoleIdInWorkspace >= ROLE.contributor.id) && props.showMarkedTemplate,
+      showAction: (userRoleIdInWorkspace >= ROLE.contributor.id) && props.showMarkedAsTemplate,
       disabled: props.disableChangeIsTemplate
     },
     ...actionList
@@ -280,7 +279,7 @@ PopinFixedHeader.propTypes = {
   onValidateChangeTitle: PropTypes.func,
   rawTitle: PropTypes.string,
   showChangeTitleButton: PropTypes.bool,
-  showMarkedTemplate: PropTypes.bool,
+  showMarkedAsTemplate: PropTypes.bool,
   showReactions: PropTypes.bool,
   userRoleIdInWorkspace: PropTypes.number
 }
@@ -309,7 +308,7 @@ PopinFixedHeader.defaultProps = {
   onClickRemoveFromFavoriteList: () => { },
   rawTitle: '',
   showChangeTitleButton: true,
-  showMarkedTemplate: true,
+  showMarkedAsTemplate: true,
   showReactions: false,
   userRoleIdInWorkspace: ROLE.reader.id
 }

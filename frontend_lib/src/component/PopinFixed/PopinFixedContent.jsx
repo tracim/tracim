@@ -61,7 +61,7 @@ class PopinFixedContent extends React.Component {
               loggedUser={props.loggedUser}
               rawTitle={props.content.label}
               showChangeTitleButton={props.showChangeTitleButton}
-              showMarkedTemplate={props.showMarkedTemplate}
+              showMarkedAsTemplate={props.showMarkedAsTemplate}
               showReactions={props.showReactions}
               userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
             />
@@ -183,7 +183,7 @@ PopinFixedContent.propTypes = {
   onClickTranslateDocument: PropTypes.func,
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
-  showMarkedTemplate: PropTypes.bool,
+  showMarkedAsTemplate: PropTypes.bool,
   showReactions: PropTypes.bool,
   showTranslateButton: PropTypes.bool,
   contentVersionNumber: PropTypes.number,
@@ -227,7 +227,7 @@ PopinFixedContent.defaultProps = {
   onClickRemoveFromFavoriteList: () => {},
   onValidateChangeTitle: () => {},
   showChangeTitleButton: true,
-  showMarkedTemplate: true,
+  showMarkedAsTemplate: true,
   showReactions: false,
   showTranslateButton: false
 }

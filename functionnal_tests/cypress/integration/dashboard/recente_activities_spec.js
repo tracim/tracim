@@ -5,8 +5,7 @@ let workspace2
 let workspace3
 let workspace4
 
-const fileLabel = '.FilenameWithBadges__label'
-const defaultLabel = '.feedItemHeader__label'
+const defaultLabel = '.FilenameWithBadges__label'
 
 const contentWorkspace1 = 'Thread'
 const contentWorkspace2 = 'File'
@@ -54,37 +53,37 @@ describe('Dashboard', () => {
   it('should have only the recent activities from its own space', () => {
     goToSpace(workspace1)
     cy.contains(defaultLabel, contentWorkspace1)
-    cy.contains(fileLabel, contentWorkspace2).should('not.exist')
+    cy.contains(defaultLabel, contentWorkspace2).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace3).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace4).should('not.exist')
 
     goToSpace(workspace2)
-    cy.contains(fileLabel, contentWorkspace2)
+    cy.contains(defaultLabel, contentWorkspace2)
     cy.contains(defaultLabel, contentWorkspace1).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace3).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace4).should('not.exist')
 
     goToSpace(workspace4)
     cy.contains(defaultLabel, contentWorkspace4)
-    cy.contains(fileLabel, contentWorkspace2).should('not.exist')
+    cy.contains(defaultLabel, contentWorkspace2).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace3).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace1).should('not.exist')
 
     goToSpace(workspace3)
     cy.contains(defaultLabel, contentWorkspace3)
-    cy.contains(fileLabel, contentWorkspace2).should('not.exist')
+    cy.contains(defaultLabel, contentWorkspace2).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace4).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace1).should('not.exist')
 
     goToSpace(workspace2)
-    cy.contains(fileLabel, contentWorkspace2)
+    cy.contains(defaultLabel, contentWorkspace2)
     cy.contains(defaultLabel, contentWorkspace1).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace3).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace4).should('not.exist')
 
     goToSpace(workspace1)
     cy.contains(defaultLabel, contentWorkspace1)
-    cy.contains(fileLabel, contentWorkspace2).should('not.exist')
+    cy.contains(defaultLabel, contentWorkspace2).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace3).should('not.exist')
     cy.contains(defaultLabel, contentWorkspace4).should('not.exist')
   })
