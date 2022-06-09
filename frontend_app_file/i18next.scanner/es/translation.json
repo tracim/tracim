@@ -1,4 +1,21 @@
 {
   "Validate": "Validar",
-  "Error while saving the user configuration": "Error al guardar la configuración de usuario"
+  "Error while saving the user configuration": "Error al guardar la configuración de usuario",
+  "Delete": "Suprimir",
+  "Cancel": "Cancelar",
+  "Download file": "Descargar archivo",
+  "Error while uploading file": "Error al cargar el archivo",
+  "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
+  "Error in the URL": "Error en la URL",
+  "Upload files": "Cargar archivos",
+  "The file is larger than the maximum file size allowed": "El archivo es mayor que el tamaño máximo permitido",
+  "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo",
+  "No preview available": "Vista previa no disponible",
+  "Validate and create": "Validar y crear",
+  "You have reached your storage limit, you cannot add new files": "Has alcanzado su límite de almacenamiento, no puede añadir nuevos archivos",
+  "Preview loading...": "Vista previa cargando…",
+  "Error while saving the comment": "Error al guardar el comentario",
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "La longitud de la contraseña debe estar entre 6 y 512 caracteres y el correo electrónico debe ser válido",
+  "Restore": "Restaurar"
 }

@@ -219,5 +219,12 @@
   "Your tag has been created": "Your tag has been created",
   "See more": "See more",
   "Error while loading timeline": "Error while loading timeline",
-  "Agenda": "Agenda"
+  "Agenda": "Agenda",
+  "Unknown content": "Unknown content",
+  "From a template:": "From a template:",
+  "Template": "Template",
+  "Unmark template": "Unmark template",
+  "Mark template": "Mark template",
+  "Something went wrong": "Something went wrong",
+  "Unknown comment": "Unknown comment"
 }

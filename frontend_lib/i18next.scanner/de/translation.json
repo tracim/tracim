@@ -219,5 +219,12 @@
   "This space has no tags yet.": "Dieser Bereich hat noch keine Markierungen.",
   "See more": "Mehr sehen",
   "Error while loading timeline": "Fehler beim Laden der Zeitleiste",
-  "Agenda": "Kalender"
+  "Agenda": "Kalender",
+  "Unknown content": "Unbekannter Inhalt",
+  "From a template:": "",
+  "Template": "",
+  "Unmark template": "",
+  "Mark template": "",
+  "Something went wrong": "",
+  "Unknown comment": ""
 }

@@ -45,7 +45,7 @@ describe('Searching keywords', () => {
       cy.get(contentThreadGetter).click()
 
       cy.url().should('include', `/workspaces/${workspaceId}/contents/thread/`)
-      cy.contains('.FilenameWithExtension', threadTitle).should('be.visible')
+      cy.contains('.FilenameWithBadges', threadTitle).should('be.visible')
     })
   })
 
@@ -56,7 +56,7 @@ describe('Searching keywords', () => {
       cy.get(contentFileGetter).click()
 
       cy.url().should('include', `/workspaces/${workspaceId}/contents/file/`)
-      cy.contains('.FilenameWithExtension', fileTitle).should('be.visible')
+      cy.contains('.FilenameWithBadges', fileTitle).should('be.visible')
     })
   })
 
@@ -67,7 +67,7 @@ describe('Searching keywords', () => {
       cy.get(contentHtmlDocGetter).click()
 
       cy.url().should('include', `/workspaces/${workspaceId}/contents/html-document/`)
-      cy.contains('.FilenameWithExtension', htmlDocTitle).should('be.visible')
+      cy.contains('.FilenameWithBadges', htmlDocTitle).should('be.visible')
     })
   })
 })

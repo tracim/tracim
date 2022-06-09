@@ -1,4 +1,26 @@
 {
   "Password": "Contraseña",
-  "Validate": "Validar"
+  "Validate": "Validar",
+  "Cancel": "Cancelar",
+  "Error in the URL": "Error en la URL",
+  "Received files": "Archivos recibidos",
+  "New": "Nuevo",
+  "No upload link has been created yet": "Todavía no se ha creado ningún enlace de carga",
+  "Email notification are disabled, please manually share the link": "Las notificaciones por correo electrónico están deshabilitadas, por favor comparta el enlace manualmente",
+  "Show password": "Mostrar contraseña",
+  "Generate random password": "Generar contraseña aleatoria",
+  "Protect by password": "Proteger con contraseña",
+  "Cancel protection by password": "Cancelar la protección por contraseña",
+  "Public upload link has been created.": "Se ha creado un enlace de carga público.",
+  "Error while deleting public upload link": "Error al borrar el enlace público de carga",
+  "Error while creating new public upload link": "Error al crear un nuevo enlace público de carga",
+  "Error, these emails are invalid: ": "Error, estos correos electrónicos no son válidos: ",
+  "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "Para añadir varios destinatarios, separe las direcciones de correo electrónico con una coma, un punto y coma o un salto de línea.",
+  "Public upload links": "Enlaces públicos de carga",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "La longitud de la contraseña debe estar entre 6 y 512 caracteres y el correo electrónico debe ser válido",
+  "Error while loading Tracim's content type list": "Error al cargar la lista de tipos de contenido de Tracim",
+  "Error while loading list of public upload links": "Error al cargar la lista de enlaces públicos de carga",
+  "Recipient's email addresses": "Direcciones de correo electrónico de los destinatarios",
+  "Public upload link has been created. Don't forget to share the password to the recipients.": "Se ha creado un enlace de carga público. No olvides compartir la contraseña con los destinatarios.",
+  "New public upload link": "Nuevo enlace de carga pública"
 }

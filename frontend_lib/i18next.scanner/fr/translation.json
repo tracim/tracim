@@ -219,5 +219,12 @@
   "Your tag has been created": "Votre étiquette a été créée",
   "See more": "Voir plus",
   "Error while loading timeline": "Erreur lors du chargement de l'historique",
-  "Agenda": "Agenda"
+  "Agenda": "Agenda",
+  "Unknown content": "Contenu inconnu",
+  "From a template:": "",
+  "Template": "",
+  "Unmark template": "",
+  "Mark template": "",
+  "Something went wrong": "",
+  "Unknown comment": ""
 }

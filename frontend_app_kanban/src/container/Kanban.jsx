@@ -49,6 +49,8 @@ export class Kanban extends React.Component {
       appName: 'kanban',
       breadcrumbsList: [],
       fullscreen: false,
+      isFileCommentLoading: false,
+      isTemplate: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -64,8 +66,7 @@ export class Kanban extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
-      translationTargetLanguageCode: param.loggedUser.lang,
-      isFileCommentLoading: false
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -116,6 +117,11 @@ export class Kanban extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
+  }
+
+  handleChangeMarkedTemplate = (isTemplate) => {
+    const { props, state } = this
+    props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
   }
 
   handleClickShowRevision = async revision => {
@@ -313,6 +319,7 @@ export class Kanban extends React.Component {
     )
     this.setState({
       content: response.body,
+      isTemplate: response.body.is_template,
       currentContentRevisionId: response.body.current_revision_id,
       loadingContent: false
     })
@@ -507,6 +514,16 @@ export class Kanban extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
+          actionList={[
+            {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: readOnly,
+              dataCy: 'popinListItem__delete'
+            }
+          ]}
           headerButtons={[
             {
               icon: 'fas fa-expand-arrows-alt',
@@ -525,23 +542,16 @@ export class Kanban extends React.Component {
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
           isRefreshNeeded={state.showRefreshWarning}
+          isTemplate={state.isTemplate}
           contentVersionNumber={contentVersionNumber}
           lastVersion={lastVersionNumber}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onValidateChangeTitle={this.handleSaveEditTitle}
-          actionList={[
-            {
-              icon: 'far fa-trash-alt',
-              label: props.t('Delete'),
-              onClick: this.handleClickDelete,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-              disabled: readOnly,
-              dataCy: 'popinListItem__delete'
-            }
-          ]}
           showReactions
+          showMarkedAsTemplate={false}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
             : FAVORITE_STATE.NOT_FAVORITE}

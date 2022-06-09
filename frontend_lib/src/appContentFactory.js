@@ -41,24 +41,26 @@ import {
 
 import {
   deleteComment,
+  deleteContentFromFavoriteList,
   getComment,
+  getCommentTranslated,
   getContent,
-  putEditContent,
+  getContentComment,
+  getFavoriteContentList,
+  getFileChildContent,
+  getMyselfKnownContents,
+  getMyselfKnownMember,
+  getTemplateList,
+  postContentToFavoriteList,
   putComment,
-  postNewComment,
-  putEditStatus,
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownContents,
-  getMyselfKnownMember,
-  getCommentTranslated,
-  postContentToFavoriteList,
-  getFavoriteContentList,
-  deleteContentFromFavoriteList,
-  getContentComment,
-  getFileChildContent
+  putContentTemplate,
+  putEditContent,
+  putEditStatus,
+  postNewComment
 } from './action.async.js'
 
 import {
@@ -144,13 +146,35 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
+    getTemplateList = async (setState, templateType) => {
+      const result = await getTemplateList(this.apiUrl, templateType)
+      const fetchGetTemplates = await handleFetchResult(result)
+      const templateList = []
+
+      switch (fetchGetTemplates.apiResponse.status) {
+        case 200:
+          fetchGetTemplates.body.forEach(template => {
+            templateList.push({
+              ...template,
+              value: template.content_id
+            })
+          })
+          setState({ templateList: templateList })
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          setState({ templateList: templateList })
+          break
+      }
+    }
+
     getComment = async (workspaceId, contentId, commentId) => {
       const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, workspaceId, contentId, commentId))
 
       switch (fetchGetComment.apiResponse.status) {
         case 200: return fetchGetComment.body
         default:
-          sendGlobalFlashMessage(i18n.t('Unknown content'))
+          sendGlobalFlashMessage(i18n.t('Unknown comment'))
           return {}
       }
     }
@@ -343,6 +367,31 @@ export function appContentFactory (WrappedComponent) {
           default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
+      return response
+    }
+
+    appContentMarkAsTemplate = async (setState, content, isTemplate = false) => {
+      setState({ disableChangeIsTemplate: true })
+      this.checkApiUrl()
+
+      if (!content) {
+        return {}
+      }
+
+      const response = await handleFetchResult(
+        await putContentTemplate(this.apiUrl, content.workspace_id, content.content_id, isTemplate)
+      )
+
+      switch (response.status) {
+        case 204:
+          setState({ isTemplate: isTemplate })
+          break
+        default:
+          sendGlobalFlashMessage('Error while marking this as a template')
+          break
+      }
+
+      setState({ disableChangeIsTemplate: false })
       return response
     }
 
@@ -989,6 +1038,7 @@ export function appContentFactory (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           setApiUrl={this.setApiUrl}
+          addContentToFavoriteList={this.addContentToFavoriteList}
           appContentCustomEventHandlerShowApp={this.appContentCustomEventHandlerShowApp}
           appContentCustomEventHandlerHideApp={this.appContentCustomEventHandlerHideApp}
           appContentCustomEventHandlerReloadAppFeatureData={this.appContentCustomEventHandlerReloadAppFeatureData}
@@ -998,6 +1048,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeComment={this.appContentChangeComment}
           appContentDeleteComment={this.appContentDeleteComment}
           appContentEditComment={this.appContentEditComment}
+          appContentMarkAsTemplate={this.appContentMarkAsTemplate}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
@@ -1006,11 +1057,11 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          getTemplateList={this.getTemplateList}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           isContentInFavoriteList={this.isContentInFavoriteList}
-          addContentToFavoriteList={this.addContentToFavoriteList}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
           buildChildContentTimelineItem={this.buildChildContentTimelineItem}

@@ -34,7 +34,8 @@ export const PAGE = {
     GALLERY: (idws = ':idws') => `/ui/workspaces/${idws}/gallery`,
     RECENT_ACTIVITIES: (idws = ':idws') => `/ui/workspaces/${idws}/recent-activities`,
     PUBLICATION: (idws = ':idws', idcts = ':idcts') => `/ui/workspaces/${idws}/publications/${idcts}`,
-    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`
+    PUBLICATIONS: (idws = ':idws') => `/ui/workspaces/${idws}/publications`,
+    FOLDER_OPEN: (idws = ':idws', folderList) => `/ui/workspaces/${idws}/contents?folder_open=${folderList.toString()}`
   },
   LOGIN: '/ui/login',
   FORGOT_PASSWORD: '/ui/forgot-password',
@@ -66,6 +67,14 @@ export const DATE_FNS_LOCALE = {
   de: dateFnsDe,
   ar: dateFnsAr
 }
+
+// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+export const COLLABORA_EXTENSIONS = [
+  '.odg',
+  '.odp',
+  '.ods',
+  '.odt'
+]
 
 export const generateFetchResponse = async fetchResult => {
   const resultJson = await fetchResult.clone().json()
@@ -769,19 +778,24 @@ export const buildContentPathBreadcrumbs = async (apiUrl, content) => {
   const fetchGetContentPath = await handleFetchResult(await getContentPath(apiUrl, contentId))
 
   switch (fetchGetContentPath.apiResponse.status) {
-    case 200:
+    case 200: {
+      const contentPathList = fetchGetContentPath.body.items.map(content => content.content_id)
       return fetchGetContentPath.body.items.map(crumb => ({
-        link: PAGE.WORKSPACE.CONTENT(workspaceId, crumb.content_type, crumb.content_id),
+        link: crumb.content_type === CONTENT_TYPE.FOLDER
+          ? PAGE.WORKSPACE.FOLDER_OPEN(workspaceId, contentPathList)
+          : PAGE.WORKSPACE.CONTENT(workspaceId, crumb.content_type, crumb.content_id),
         label: crumb.label,
         type: BREADCRUMBS_TYPE.APP_FEATURE,
         isALink: true
       }))
+    }
     default:
       console.error('Error getting breadcrumbs data', fetchGetContentPath)
       throw new Error('Error getting breadcrumbs data')
   }
 }
 
+// NOTE - MP - 2022-05-31 - Type can be 'info', 'warning' or 'error'
 export const sendGlobalFlashMessage = (msg, type = 'warning', delay = undefined) => GLOBAL_dispatchEvent({
   type: CUSTOM_EVENT.ADD_FLASH_MSG,
   data: {

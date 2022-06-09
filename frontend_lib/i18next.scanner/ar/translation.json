@@ -223,5 +223,12 @@
   "{{count}} files selected_2": "تم اختيار {{count}} ملفّان",
   "{{count}} files selected_3": "تم اختيار {{count}} ملفّات",
   "{{count}} files selected_4": "تم اختيار {{count}} ملفّا",
-  "{{count}} files selected_5": "تم اختيار {{count}} ملف آخر"
+  "{{count}} files selected_5": "تم اختيار {{count}} ملف آخر",
+  "Unknown content": "",
+  "From a template:": "",
+  "Template": "",
+  "Unmark template": "",
+  "Mark template": "",
+  "Something went wrong": "",
+  "Unknown comment": ""
 }
