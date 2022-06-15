@@ -1037,6 +1037,17 @@ class CFG(object):
                     )
                 ) from e
 
+        self.check_mandatory_param(
+            "RICH_TEXT_PREVIEW__TEMPLATE_PATH", self.RICH_TEXT_PREVIEW__TEMPLATE_PATH
+        )
+        self.check_file_path_param(
+            "RICH_TEXT_PREVIEW__TEMPLATE_PATH", self.RICH_TEXT_PREVIEW__TEMPLATE_PATH, readable=True
+        )
+        self.check_mandatory_param("RICH_TEXT_PREVIEW__CSS_PATH", self.RICH_TEXT_PREVIEW__CSS_PATH)
+        self.check_file_path_param(
+            "RICH_TEXT_PREVIEW__CSS_PATH", self.RICH_TEXT_PREVIEW__CSS_PATH, readable=True
+        )
+
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
         self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
 
