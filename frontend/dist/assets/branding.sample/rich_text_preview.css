@@ -1,0 +1,91 @@
+:root {
+  --blue: #3465A4;
+  --red: red;
+  --green: green;
+}
+
+h1 {
+  color: var(--blue);
+}
+h2 {
+  color: var(--red);
+}
+h3 {
+  color: var(--green);
+}
+
+#toc {
+    width: auto;
+}
+
+#toc h1 {
+    font-weight: 700;
+    text-align: center;
+}
+
+#toc li, #toc ul, #toc ul li{
+    list-style: outside none none !important;
+}
+
+pre {
+    background-color: rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 1em;
+  }
+
+blockquote {
+    background-color: rgba(0,0,0,0.05);
+    border-left: 5px solid rgba(0,0,0,0.1);
+    padding: 0.1em 0.75em;
+}
+
+section {
+  break-after: always;
+}
+
+@page {
+        size: A4 portrait; /* can use also 'landscape' for orientation */
+        margin: 100px 1cm 150px 1cm;
+        counter-increment: page;
+        @top-left {
+          content: element(logo_block);
+        }
+        @top-center{
+            content: element(header);
+        }
+        @top-right {
+          content: element(author_block);
+        }
+        @bottom-left{
+            content: element(footer);
+        }
+        @bottom-right{
+          content: element(page_block);
+        }
+}
+#pageNumber { content: counter(page) "/" counter(pages) }
+
+header {
+    position: running(header);
+}
+
+footer {
+    position: running(footer);
+}
+
+.logo_block {
+    position: running(logo_block);
+}
+.author_block {
+    position: running(author_block);
+}
+.page_block {
+    position: running(page_block);
+}
+
+#first_page_content{
+  width: 100%;
+  padding-top: 25%;
+  height: 100vh;
+  text-align: center;
+}
