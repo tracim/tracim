@@ -19,17 +19,25 @@ h3 {
   color: var(--green);
 }
 
-#toc {
-    width: auto;
-}
 
 #toc h1 {
     font-weight: 700;
     text-align: center;
 }
 
-#toc li, #toc ul, #toc ul li{
-    list-style: outside none none !important;
+#toc ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  page-break-after: always;
+}
+
+#toc ul li a {
+  color: inherit;
+  text-decoration: none;
+}
+#toc ul li a::after {
+  content: leader('.') target-counter(attr(href), page);
 }
 
 pre {
