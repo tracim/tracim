@@ -49,6 +49,7 @@ from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rich_text_preview.html_preview import RichTextPreviewLib
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
@@ -711,6 +712,23 @@ class ContentApi(object):
             page_number=page_number,
             original_file_extension=revision.file_extension,
             force_download=force_download,
+        )
+
+    def get_full_pdf_preview_from_html_raw_content(
+        self,
+        revision: ContentRevisionRO,
+        filename: str,
+        default_filename: str,
+        metadata: typing.Dict[str, typing.Any],
+        force_download: bool = None,
+    ):
+        return RichTextPreviewLib(self._config).get_full_pdf_preview(
+            content=revision.raw_content,
+            default_filename=default_filename,
+            filename=filename,
+            force_download=force_download,
+            last_modified=revision.updated,
+            metadata=metadata,
         )
 
     def get_full_pdf_preview(
