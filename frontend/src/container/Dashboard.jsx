@@ -247,17 +247,17 @@ export class Dashboard extends React.Component {
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
-    this.setState({ isMemberListLoading: true })
-
     if (state.newMember.personalData === '') {
       props.dispatch(newFlashMessage(props.t('Please set a name, an email or a username'), 'warning'))
       return false
     }
-
+    
     if (state.newMember.role === '') {
       props.dispatch(newFlashMessage(props.t('Please set a role'), 'warning'))
       return false
     }
+
+    this.setState({ isMemberListLoading: true })
 
     const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
@@ -543,6 +543,7 @@ export class Dashboard extends React.Component {
                     emailNotifActivated={props.system.config.email_notification_activated}
                     autoCompleteClicked={state.autoCompleteClicked}
                     onClickAutoComplete={this.handleClickAutoComplete}
+                    defaultRole={props.currentWorkspace.defaultRole}
                     t={props.t}
                   />
                 </div>

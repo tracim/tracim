@@ -757,6 +757,7 @@ export class WorkspaceAdvanced extends React.Component {
                   userProfile={state.loggedUser.profile}
                   autoCompleteClicked={state.autoCompleteClicked}
                   onClickAutoComplete={this.handleClickAutoComplete}
+                  defaultRole={state.content.default_user_role}
                 />
               )
           }
