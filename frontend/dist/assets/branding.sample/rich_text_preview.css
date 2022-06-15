@@ -4,6 +4,11 @@
   --green: green;
 }
 
+a:link { text-decoration: none;}
+a:visited { text-decoration: none; }
+
+
+
 h1 {
   color: var(--blue);
 }
@@ -86,6 +91,5 @@ footer {
 #first_page_content{
   width: 100%;
   padding-top: 25%;
-  height: 100vh;
   text-align: center;
 }

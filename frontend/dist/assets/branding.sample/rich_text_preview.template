@@ -35,7 +35,7 @@ $endfor$
 </head>
 <body><div class="logo_block"><a href="$website_url$"><img src="$logo_url$"></img></a></div>
 <header>
-$title$
+  <a href="$content_url$">$title$</a>
 </header>
 <div class="author_block">$author-meta$</div>
 
