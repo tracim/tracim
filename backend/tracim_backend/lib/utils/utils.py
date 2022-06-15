@@ -21,6 +21,8 @@ from urllib.parse import urlencode
 from urllib.parse import urljoin
 import uuid
 
+from babel import UnknownLocaleError
+from babel.dates import format_date
 from colour import Color
 from git import InvalidGitRepositoryError
 import jsonschema
@@ -541,3 +543,18 @@ class CustomPropertiesValidator:
                     "> ".join([str(item) for item in exc.absolute_path]), exc.message
                 )
             ) from exc
+
+
+def date_as_lang(datetime_obj: datetime, locale: str = None, default_locale: str = None):
+    """Helper to ensure the date conversion to language format does not fail"""
+    if locale:
+        try:
+            return format_date(datetime_obj, locale=locale)
+        except UnknownLocaleError:
+            pass
+    if default_locale:
+        try:
+            return format_date(datetime_obj, locale=default_locale)
+        except UnknownLocaleError:
+            pass
+    return format_date(datetime_obj)
