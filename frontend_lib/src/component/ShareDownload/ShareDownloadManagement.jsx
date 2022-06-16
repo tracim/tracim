@@ -5,8 +5,7 @@ import Radium from 'radium'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import ShareLink from '../ShareLink/ShareLink.jsx'
 import { ROLE } from '../../helper.js'
-
-const color = require('color')
+import IconButton from '../Button/IconButton.jsx'
 
 class ShareDownloadManagement extends React.Component {
   constructor (props) {
@@ -35,21 +34,18 @@ class ShareDownloadManagement extends React.Component {
     return (
       <>
         <div className='shareDownload__management__header'>
-          {props.userRoleIdInWorkspace >= ROLE.contentManager.id &&
-            <button
-              className='shareDownload__btn btn highlightBtn'
+          {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
+            <IconButton
+              color={props.hexcolor}
+              customClass='shareDownload__btn'
               key='newShareDownload'
+              icon='fas fa-plus-circle'
+              intent='primary'
+              mode='light'
               onClick={props.onClickNewShareDownload}
-              style={{
-                backgroundColor: props.hexcolor,
-                ':hover': {
-                  backgroundColor: color(props.hexcolor).darken(0.15).hex()
-                }
-              }}
-            >
-              {props.t('New')}
-              <i className='fas fa-fw fa-plus-circle' />
-            </button>}
+              text={props.t('New')}
+             />
+          )}
         </div>
 
         {shareLinkList.length > 0 && props.userRoleIdInWorkspace >= ROLE.contributor.id &&

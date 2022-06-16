@@ -42,7 +42,8 @@ import {
   tinymceRemove,
   FAVORITE_STATE,
   addExternalLinksIcons,
-  PopinFixedRightPartContent
+  PopinFixedRightPartContent,
+  ToDoManagement
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -769,6 +770,23 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
+
+    const todo = {
+      id: 'todo',
+      label: props.t('To Do'),
+      icon: 'fas fa-check-square',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('To Do')}
+        >
+          <ToDoManagement
+            apiUrl={state.config.apiUrl}
+            contentId={state.content.content_id}
+            customColor={state.config.hexcolor}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
     const tag = {
       id: 'tag',
       label: props.t('Tags'),
@@ -787,7 +805,7 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, tag]
+    return [timelineObject, todo, tag]
   }
 
   render () {

@@ -180,6 +180,10 @@ import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
 import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
+import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
+import NewToDo from './component/ToDo/NewToDo.jsx'
+import ToDoItem from './component/ToDo/ToDoItem.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -465,5 +469,8 @@ export {
   getFileRevisionPreviewInfo,
   tinymceRemove,
   Popover,
-  getBrowserLang
+  getBrowserLang,
+  NewToDo,
+  ToDoItem,
+  ToDoManagement
 }

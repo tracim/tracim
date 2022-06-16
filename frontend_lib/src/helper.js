@@ -514,7 +514,8 @@ export const CONTENT_TYPE = {
   THREAD: 'thread',
   FOLDER: 'folder',
   COMMENT: 'comment',
-  KANBAN: 'kanban'
+  KANBAN: 'kanban',
+  TODO: 'todo'
 }
 
 // FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
