@@ -44,7 +44,6 @@ export const MemberList = (props) => {
                   userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   autoCompleteClicked={props.autoCompleteClicked}
                   onClickAutoComplete={props.onClickAutoComplete}
-                  defaultRole={props.defaultRole}
                 />
               )
               : (

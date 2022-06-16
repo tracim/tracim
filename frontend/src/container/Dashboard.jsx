@@ -45,6 +45,7 @@ import MemberList from '../component/Dashboard/MemberList.jsx'
 import TabBar from '../component/TabBar/TabBar.jsx'
 import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
+import currentWorkspace from '../reducer/currentWorkspace.js'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
 
@@ -58,7 +59,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
       isMemberListLoading: false,
@@ -99,8 +100,13 @@ export class Dashboard extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
-    const { props } = this
+  async componentDidUpdate (prevProps) {
+    const { props, state } = this
+
+    // INFO - CH - 2022 06 16 - empty string is the default value for the property currentWorkspace.defaultRole in the reducer
+    if (prevProps.currentWorkspace.defaultRole === '' && props.currentWorkspace.defaultRole !== '') {
+      this.setState({ newMember: { ...state.newMember, role: props.currentWorkspace.defaultRole } })
+    }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
@@ -114,7 +120,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       }
     })
@@ -543,7 +549,6 @@ export class Dashboard extends React.Component {
                     emailNotifActivated={props.system.config.email_notification_activated}
                     autoCompleteClicked={state.autoCompleteClicked}
                     onClickAutoComplete={this.handleClickAutoComplete}
-                    defaultRole={props.currentWorkspace.defaultRole}
                     t={props.t}
                   />
                 </div>
