@@ -303,6 +303,7 @@ export class FolderAdvanced extends React.Component {
           onClickRemoveFromFavoriteList={() => props.removeContentFromFavoriteList(
             state.content, state.loggedUser, this.setState.bind(this)
           )}
+          showMarkedAsTemplate={false}
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>

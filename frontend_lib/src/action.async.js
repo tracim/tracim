@@ -66,6 +66,11 @@ export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus
     status: newStatus
   })
 
+export const putContentTemplate = (apiUrl, workspaceId, contentId, isTemplate) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/template`, {
+    is_template: isTemplate
+  })
+
 export const putContentArchived = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`)
 
@@ -156,6 +161,9 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
+export const getTemplateList = (apiUrl, templateType) =>
+  baseFetch('GET', `${apiUrl}/users/me/template_contents?type=${templateType}`)
+
 export const getComment = (apiUrl, workspaceId, contentId, commentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
 
@@ -234,6 +242,7 @@ export const postRawFileContent = (
   content,
   mimetype = 'text/plain',
   parentId = null,
+  templateId = null,
   contentType = CONTENT_TYPE.FILE,
   contentNamespace = CONTENT_NAMESPACE.CONTENT
 ) => {
@@ -242,6 +251,7 @@ export const postRawFileContent = (
   formData.append('content_namespace', contentNamespace)
   formData.append('content_type', contentType)
   if (parentId) formData.append('parent_id', parentId)
+  if (templateId) formData.append('template_id', templateId)
   return baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/files`, formData)
 }
 

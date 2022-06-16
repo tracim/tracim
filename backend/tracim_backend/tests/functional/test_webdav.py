@@ -455,10 +455,9 @@ class TestFunctionalWebdavGet(object):
         api = content_api_factory.get()
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                None,
-                filename=content_filename,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                filname=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -530,13 +529,17 @@ class TestFunctionalWebdavGet(object):
         workspace = workspace_api.create_workspace(workspace_label, save_now=True)
         api = content_api_factory.get()
         folder = api.create(
-            content_type_list.Folder.slug, workspace, None, dir_label, do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label=dir_label,
+            do_save=True,
+            do_notify=False,
         )
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                folder,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=folder,
                 filename=content_filename,
                 do_save=False,
                 do_notify=False,
@@ -573,10 +576,9 @@ class TestFunctionalWebdavGet(object):
         workspace = workspace_api.create_workspace("workspace1", save_now=True)
         api = content_api_factory.get()
         api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
-            "examples",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="examples",
             do_save=True,
             do_notify=False,
         )
@@ -691,26 +693,24 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = content_api_factory.get()
         dir1_folder = api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
             label=dir1_label,
             do_save=True,
             do_notify=False,
         )
         api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
             label=dir2_label,
             do_save=True,
             do_notify=False,
         )
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                dir1_folder,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=dir1_folder,
                 filename=content_filename,
                 do_save=False,
                 do_notify=False,
@@ -889,28 +889,26 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = content_api_factory.get()
         example_folder = api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
             label=dir1_label,
             do_save=True,
             do_notify=False,
         )
         api.create(
-            content_type_list.Folder.slug,
-            workspace2,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
             label=dir2_label,
             do_save=True,
             do_notify=False,
         )
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                example_folder,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=example_folder,
                 filename=content_filename,
-                do_save=False,
+                do_save=True,
                 do_notify=False,
             )
             api.update_file_data(file, content_filename, "text/plain", b"test_content")
@@ -1064,19 +1062,17 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = content_api_factory.get()
         api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
             label=dir1_label,
             do_save=True,
             do_notify=False,
         )
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                None,
-                filename=content_filename,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                filname=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -1241,19 +1237,17 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = content_api_factory.get()
         api.create(
-            content_type_list.Folder.slug,
-            workspace2,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
             label=dir2_label,
             do_save=True,
             do_notify=False,
         )
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                None,
-                filename=content_filename,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                filname=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -1395,20 +1389,19 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = content_api_factory.get()
         example_folder = api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
             label=dir1_label,
             do_save=True,
             do_notify=False,
         )
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                example_folder,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=example_folder,
                 filename=content_filename,
-                do_save=False,
+                do_save=True,
                 do_notify=False,
             )
             api.update_file_data(file, content_filename, "text/plain", b"test_content")
@@ -1562,20 +1555,19 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         rapi.create_one(user, workspace2, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api = content_api_factory.get()
         example_folder = api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
             label=dir1_label,
             do_save=True,
             do_notify=False,
         )
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                example_folder,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                parent=example_folder,
                 filename=content_filename,
-                do_save=False,
+                do_save=True,
                 do_notify=False,
             )
             api.update_file_data(file, content_filename, "text/plain", b"test_content")
@@ -1709,10 +1701,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         api = content_api_factory.get()
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                None,
-                filename=content_filename,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                filname=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -1847,10 +1838,9 @@ class TestFunctionalWebdavMoveSimpleFile(object):
         api = content_api_factory.get()
         with session.no_autoflush:
             file = api.create(
-                content_type_list.File.slug,
-                workspace,
-                None,
-                filename=content_filename,
+                content_type_slug=content_type_list.File.slug,
+                workspace=workspace,
+                filname=content_filename,
                 do_save=False,
                 do_notify=False,
             )

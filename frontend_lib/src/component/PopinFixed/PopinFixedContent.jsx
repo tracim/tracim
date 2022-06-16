@@ -39,27 +39,31 @@ class PopinFixedContent extends React.Component {
         >
           <div className={classnames('wsContentGeneric__content__left', `${props.customClass}__content__left`)}>
             <PopinFixedHeader
-              loading={props.loading}
+              actionList={props.actionList}
+              apiUrl={props.config.apiUrl}
               breadcrumbsList={props.breadcrumbsList}
+              componentTitle={props.componentTitle}
+              content={props.content}
               customClass={props.customClass}
               customColor={props.config.hexcolor}
-              faIcon={props.config.faIcon}
-              headerButtons={props.headerButtons}
-              rawTitle={props.content.label}
-              componentTitle={props.componentTitle}
-              userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
-              onClickCloseBtn={props.onClickCloseBtn}
-              onValidateChangeTitle={props.onValidateChangeTitle}
+              disableChangeIsTemplate={props.disableChangeIsTemplate}
               disableChangeTitle={props.disableChangeTitle}
-              actionList={props.actionList}
-              showReactions={props.showReactions}
-              apiUrl={props.config.apiUrl}
-              loggedUser={props.loggedUser}
-              content={props.content}
+              faIcon={props.config.faIcon}
               favoriteState={props.favoriteState}
+              headerButtons={props.headerButtons}
+              isTemplate={props.isTemplate}
               onClickAddToFavoriteList={props.onClickAddToFavoriteList}
+              onClickChangeMarkedTemplate={props.onClickChangeMarkedTemplate}
+              onClickCloseBtn={props.onClickCloseBtn}
               onClickRemoveFromFavoriteList={props.onClickRemoveFromFavoriteList}
+              onValidateChangeTitle={props.onValidateChangeTitle}
+              loading={props.loading}
+              loggedUser={props.loggedUser}
+              rawTitle={props.content.label}
               showChangeTitleButton={props.showChangeTitleButton}
+              showMarkedAsTemplate={props.showMarkedAsTemplate}
+              showReactions={props.showReactions}
+              userRoleIdInWorkspace={props.loggedUser.userRoleIdInWorkspace}
             />
             <div className={classnames('wsContentGeneric__content__left__top', `${props.customClass}__content__left__top`)}>
               {!props.loading && (
@@ -166,27 +170,29 @@ PopinFixedContent.propTypes = {
   headerButtons: PropTypes.array,
   favoriteState: PropTypes.string,
   isRefreshNeeded: PropTypes.bool,
+  isTemplate: PropTypes.bool,
   lastVersion: PropTypes.number,
   loggedUser: PropTypes.object,
   onChangeStatus: PropTypes.func,
+  onChangeTranslationTargetLanguageCode: PropTypes.func,
   onClickAddToFavoriteList: PropTypes.func,
+  onClickChangeMarkedTemplate: PropTypes.func,
   onClickCloseBtn: PropTypes.func,
   onClickRemoveFromFavoriteList: PropTypes.func,
+  onClickRestoreDocument: PropTypes.func,
+  onClickTranslateDocument: PropTypes.func,
   onValidateChangeTitle: PropTypes.func,
   showChangeTitleButton: PropTypes.bool,
+  showMarkedAsTemplate: PropTypes.bool,
   showReactions: PropTypes.bool,
-  contentVersionNumber: PropTypes.number,
   showTranslateButton: PropTypes.bool,
-  onClickTranslateDocument: PropTypes.func,
-  onClickRestoreDocument: PropTypes.func,
-  onChangeTranslationTargetLanguageCode: PropTypes.func,
+  contentVersionNumber: PropTypes.number,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object),
   translationTargetLanguageCode: PropTypes.string,
   translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }
 
 PopinFixedContent.defaultProps = {
-  loading: false,
   actionList: [],
   appMode: APP_FEATURE_MODE.VIEW,
   availableStatuses: [],
@@ -208,16 +214,20 @@ PopinFixedContent.defaultProps = {
   favoriteState: '',
   headerButtons: [],
   isRefreshNeeded: false,
+  isTemplate: false,
+  loading: false,
   loggedUser: {
     userRoleIdInWorkspace: 0
   },
   lastVersion: 0,
   onChangeStatus: () => {},
   onClickAddToFavoriteList: () => {},
+  onClickChangeMarkedTemplate: () => {},
   onClickCloseBtn: () => {},
   onClickRemoveFromFavoriteList: () => {},
   onValidateChangeTitle: () => {},
   showChangeTitleButton: true,
+  showMarkedAsTemplate: true,
   showReactions: false,
   showTranslateButton: false
 }

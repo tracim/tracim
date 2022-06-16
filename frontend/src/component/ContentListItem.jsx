@@ -9,7 +9,7 @@ import {
   CONTENT_TYPE,
   Icon,
   ListItemWrapper,
-  FilenameWithExtension,
+  FilenameWithBadges,
   PAGE
 } from 'tracim_frontend_lib'
 import ContentType from './ContentType.jsx'
@@ -61,7 +61,7 @@ const ContentListItem = (props) => {
       />
 
       <div className='contentListItem__name_path'>
-        <FilenameWithExtension file={content} />
+        <FilenameWithBadges file={content} />
         <Breadcrumbs
           breadcrumbsList={props.breadcrumbsList}
           keepLastBreadcrumbAsLink

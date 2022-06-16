@@ -10,9 +10,9 @@ import {
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import {
   ROLE,
-  FilenameWithExtension,
-  ListItemWrapper,
-  ComposedIcon
+  ComposedIcon,
+  FilenameWithBadges,
+  ListItemWrapper
 } from 'tracim_frontend_lib'
 
 class ContentItem extends React.Component {
@@ -72,7 +72,7 @@ class ContentItem extends React.Component {
                 )
               )}
             </div>
-            <FilenameWithExtension file={props} customClass='content__name' />
+            <FilenameWithBadges file={props} isTemplate={props.isTemplate} customClass='content__name' />
           </div>
 
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (
@@ -151,26 +151,28 @@ const contentItemDragAndDropSourceCollect = (connect, monitor) => ({
 export default DragSource(DRAG_AND_DROP.CONTENT_ITEM, contentItemDragAndDropSource, contentItemDragAndDropSourceCollect)(translate()(ContentItem))
 
 ContentItem.propTypes = {
-  statusSlug: PropTypes.string.isRequired,
+  contentType: PropTypes.object,
   customClass: PropTypes.string,
   label: PropTypes.string,
+  faIcon: PropTypes.string,
   fileName: PropTypes.string,
   fileExtension: PropTypes.string,
-  contentType: PropTypes.object,
+  isShared: PropTypes.bool,
+  isTemplate: PropTypes.bool,
   onClickItem: PropTypes.func,
-  faIcon: PropTypes.string,
   read: PropTypes.bool,
+  statusSlug: PropTypes.string.isRequired,
   urlContent: PropTypes.string,
-  userRoleIdInWorkspace: PropTypes.number,
-  isShared: PropTypes.bool
+  userRoleIdInWorkspace: PropTypes.number
 }
 
 ContentItem.defaultProps = {
-  label: '',
   customClass: '',
+  isShared: false,
+  isTemplate: false,
+  label: '',
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: ROLE.reader.id,
-  isShared: false
+  userRoleIdInWorkspace: ROLE.reader.id
 }

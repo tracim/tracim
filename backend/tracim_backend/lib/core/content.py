@@ -48,6 +48,7 @@ from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
 from tracim_backend.lib.core.storage import StorageLib
+from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.app import TracimContentType
@@ -383,6 +384,7 @@ class ContentApi(object):
         self,
         content_type_slug: str,
         workspace: Workspace,
+        template_id: int = None,
         parent: Content = None,
         label: str = "",
         filename: str = "",
@@ -419,6 +421,7 @@ class ContentApi(object):
 
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
+
         if label:
             file_extension = ""
             if content_type.file_extension:
@@ -454,9 +457,39 @@ class ContentApi(object):
         content.revision_type = ActionDescription.CREATION
         content.content_namespace = content_namespace
 
+        if template_id:
+            template = self.get_one(template_id)
+
+            if label:
+                content = self.copy(
+                    template,
+                    new_label=label,
+                    new_workspace=workspace,
+                    copy_revision=False,
+                    do_save=False,
+                )
+            elif filename:
+                content = self.copy(
+                    template,
+                    new_label=filename,
+                    new_workspace=workspace,
+                    copy_revision=False,
+                    do_save=False,
+                )
+
         if do_save:
             self._session.add(content)
             self.save(content, ActionDescription.CREATION, do_notify=do_notify)
+
+            if template_id:
+                tag_lib = TagLib(self._session)
+                tags_values = tag_lib.get_all(content_id=template_id)
+
+                for tag in tags_values:
+                    tag_lib.add_tag_to_content(
+                        user=self._user, content=content, tag_name=tag.tag_name
+                    )
+
         return content
 
     def create_comment(
@@ -1184,6 +1217,7 @@ class ContentApi(object):
         new_workspace: Workspace = None,
         new_file_extension: str = None,
         new_content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
+        copy_revision: bool = True,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> Content:
@@ -1270,7 +1304,7 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        copy_result = self._copy(item, content_namespace, parent)
+        copy_result = self._copy(item, content_namespace, parent, copy_revision)
         copy_result = self._add_copy_revisions(
             original_content=item,
             new_content=copy_result.new_content,
@@ -1291,6 +1325,7 @@ class ContentApi(object):
         content: Content,
         new_content_namespace: ContentNamespaces = None,
         new_parent: Content = None,
+        copy_revisions: bool = True,
     ) -> AddCopyRevisionsResult:
         """
         Create new content for content and his children, recreate all revision in order and
@@ -1309,28 +1344,40 @@ class ContentApi(object):
         # revision related to old data. key of dict is original content id.
         original_content_children = {}  # type: typing.Dict[int,Content]
 
-        for rev, is_current_rev in content.get_tree_revisions_advanced():
+        if copy_revisions:
+            for rev, is_current_rev in content.get_tree_revisions_advanced():
 
-            if rev.content_id == content.content_id:
-                related_content = new_content  # type: Content
-                related_parent = new_parent
-            else:
-                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
-                # we create it.
-                if rev.content_id not in new_content_children:
-                    new_content_children[rev.content_id] = Content()
-                    original_content_children[rev.content_id] = rev.node
-                related_content = new_content_children[rev.content_id]
-                if rev.parent_id == content.content_id:
-                    related_parent = new_content
+                if rev.content_id == content.content_id:
+                    related_content = new_content  # type: Content
+                    related_parent = new_parent
                 else:
-                    related_parent = new_content_children[rev.parent_id]
-            # INFO - G.M - 2019-04-30 - copy of revision itself.
-            cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
+                    # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+                    # we create it.
+                    if rev.content_id not in new_content_children:
+                        new_content_children[rev.content_id] = Content()
+                        original_content_children[rev.content_id] = rev.node
+                    related_content = new_content_children[rev.content_id]
+                    if rev.parent_id == content.content_id:
+                        related_parent = new_content
+                    else:
+                        related_parent = new_content_children[rev.parent_id]
+                # INFO - G.M - 2019-04-30 - copy of revision itself.
+                cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
+                cpy_rev.node = related_content
+                related_content.current_revision = cpy_rev
+                self._session.add(related_content)
+                self._session.flush()
+        else:
+            related_content = new_content
+            related_parent = new_parent
+            cpy_rev = ContentRevisionRO.copy(
+                content.last_revision, related_parent, new_content_namespace, not copy_revisions
+            )
             cpy_rev.node = related_content
             related_content.current_revision = cpy_rev
             self._session.add(related_content)
             self._session.flush()
+
         return AddCopyRevisionsResult(
             new_content=new_content,
             new_children_dict=new_content_children,
@@ -1618,6 +1665,41 @@ class ContentApi(object):
                     content_length, owner_used_space, owner_allowed_space
                 )
             )
+
+    def set_template(self, content: Content, is_template: bool) -> Content:
+        if not self.is_editable(content):
+            raise ContentInNotEditableState(
+                "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
+            )
+        # INFO - MP - 2022-06-09 - Hacky way to disable to set a template that aren't supported
+        if content.file_extension not in [".document.html", ".odt", ".ods", ".odp", ".odg"]:
+            raise ContentInNotEditableState(
+                "Can't mark this kind file as a template. Files supported: .document.html, .odt, .ods, .odp, .odg"
+            )
+        content.is_template = is_template
+        content.revision_type = ActionDescription.REVISION
+        return content
+
+    def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:
+        user = self._session.query(User).get(user_id)
+
+        space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
+        space_ids = [space.workspace_id for space in space_api.get_all_for_user(user)]
+
+        content_list = (
+            self._session.query(Content)
+            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
+            .filter(
+                Content.workspace_id.in_(space_ids),
+                Content.is_template.is_(True),
+                Content.type == template_type,
+                Content.is_deleted.is_(False),
+                Content.is_archived.is_(False),
+            )
+            .all()
+        )
+
+        return content_list
 
     def archive(self, content: Content):
         if self._user:

@@ -3,14 +3,15 @@ import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  addAllResourceI18n,
   APP_FEATURE_MODE,
-  appContentFactory,
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
-  buildHeadTitle,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  FilenameWithBadges,
+  addAllResourceI18n,
+  appContentFactory,
+  buildContentPathBreadcrumbs,
+  buildHeadTitle,
   getContent,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
@@ -60,6 +61,8 @@ export class HtmlDocument extends React.Component {
     this.state = {
       appName: 'html-document',
       breadcrumbsList: [],
+      isFileCommentLoading: false,
+      isTemplate: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -84,8 +87,7 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
-      translationTargetLanguageCode: param.loggedUser.lang,
-      isFileCommentLoading: false
+      translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -313,6 +315,7 @@ export class HtmlDocument extends React.Component {
           ? localStorageRawContent
           : rawContentBeforeEdit
       },
+      isTemplate: resHtmlDocument.body.is_template,
       rawContentBeforeEdit: rawContentBeforeEdit,
       translationState: getDefaultTranslationState(previousState.config.system.config),
       translatedRawContent: null,
@@ -344,6 +347,11 @@ export class HtmlDocument extends React.Component {
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+  }
+
+  handleChangeMarkedTemplate = (isTemplate) => {
+    const { props, state } = this
+    props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
   }
 
   handleClickNewVersion = () => {
@@ -802,14 +810,25 @@ export class HtmlDocument extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
-          loading={state.loadingContent}
+          actionList={[
+            {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
+            }
+          ]}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
           content={state.content}
           config={state.config}
+          contentVersionNumber={contentVersionNumber}
           customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          disableChangeIsTemplate={state.disableChangeIsTemplate}
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
@@ -822,12 +841,17 @@ export class HtmlDocument extends React.Component {
               dataCy: 'newVersionButton'
             }
           ]}
+          isTemplate={state.isTemplate}
           isRefreshNeeded={state.showRefreshWarning}
-          contentVersionNumber={contentVersionNumber}
+          loading={state.loadingContent}
           lastVersion={lastVersionNumber}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
+          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+          onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          onClickRestoreDocument={this.handleRestoreDocument}
+          onClickTranslateDocument={this.handleTranslateDocument}
           onValidateChangeTitle={this.handleSaveEditTitle}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
@@ -839,22 +863,10 @@ export class HtmlDocument extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
           showReactions
-          actionList={[{
-            icon: 'far fa-trash-alt',
-            label: props.t('Delete'),
-            onClick: this.handleClickDelete,
-            showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-            disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
-            dataCy: 'popinListItem__delete'
-          }
-          ]}
           showTranslateButton={state.mode === APP_FEATURE_MODE.VIEW || state.mode === APP_FEATURE_MODE.REVISION}
           translationState={state.translationState}
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
           translationTargetLanguageCode={state.translationTargetLanguageCode}
-          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-          onClickTranslateDocument={this.handleTranslateDocument}
-          onClickRestoreDocument={this.handleRestoreDocument}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug

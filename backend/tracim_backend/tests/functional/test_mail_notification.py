@@ -188,10 +188,19 @@ class TestNotificationsSync(object):
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=True,
         )
 
         # check mail received
@@ -226,10 +235,19 @@ class TestNotificationsSync(object):
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         item2 = api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=False
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=False,
         )
         api.create_comment(parent=item2, content="My super comment", do_save=True, do_notify=True)
         transaction.commit()
@@ -314,10 +332,19 @@ class TestNotificationsAsync(object):
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=True,
         )
         # Send mail async from redis queue
         redis = get_redis_connection(app_config)

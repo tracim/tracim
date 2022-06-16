@@ -79,6 +79,7 @@ from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
 from tracim_backend.models.context_models import RevisionPreviewSizedPath
 from tracim_backend.models.context_models import RoleUpdate
+from tracim_backend.models.context_models import SetContentIsTemplate
 from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
@@ -1686,6 +1687,14 @@ class ContentCreationSchema(marshmallow.Schema):
         default=None,
         validate=strictly_positive_int_validator,
     )
+    template_id = marshmallow.fields.Integer(
+        example=42,
+        description="content_id of template content, if content should be created "
+        "from a template, this should be template content_id.",
+        allow_none=True,
+        default=None,
+        validate=strictly_positive_int_validator,
+    )
 
     @post_load
     def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1733,6 +1742,7 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
     is_archived = marshmallow.fields.Bool(example=False, default=False)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     is_editable = marshmallow.fields.Bool(example=True, default=True)
+    is_template = marshmallow.fields.Bool(example=False, default=False)
     show_in_ui = marshmallow.fields.Bool(
         example=True,
         description="if false, then do not show content in the treeview. "
@@ -1992,6 +2002,18 @@ class SetContentStatusSchema(marshmallow.Schema):
     @post_load
     def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentStatus(**data)
+
+
+class SetContentIsTemplateSchema(marshmallow.Schema):
+    is_template = marshmallow.fields.Boolean(description="set content as a template", default=False)
+
+    @post_load
+    def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SetContentIsTemplate(**data)
+
+
+class TemplateQuerySchema(marshmallow.Schema):
+    type = StrippedString(example="html-document", validate=all_content_types_validator)
 
 
 class TargetLanguageSchema(marshmallow.Schema):

@@ -3,5 +3,15 @@
   "Folder": "Carpeta",
   "Validate and create": "Validar y crear",
   "New folder": "Carpeta nueva",
-  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}"
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
+  "Folder's name": "Nombre de la carpeta",
+  "Error while saving new folder": "Error al guardar una nueva carpeta",
+  "Allowed content type for this folder": "Allowed content type for this folder",
+  "Error while loading folder details": "Error al cargar los detalles de la carpeta",
+  "Error while saving new available apps list": "Error al guardar la lista de nuevas aplicaciones disponibles",
+  "This folder is archived": "Esta carpeta está archivada",
+  "This folder is deleted": "Esta carpeta ha sido eliminada",
+  "Error while loading Tracim's content type list": "Error al cargar la lista de tipos de contenido de Tracim",
+  "Restore": "Restaurar",
+  "Create a folder": "Crear una carpeta"
 }

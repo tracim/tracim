@@ -33,9 +33,18 @@ class TestSimpleSearchApi(object):
 
         api = content_api_factory.get(user)
         a = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
-        p = api.create(content_type_list.Page.slug, workspace, a, "this is another thing", "", True)
+        p = api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=a,
+            label="this is another thing",
+            do_save=True,
+        )
 
         with new_revision(session=session, tm=transaction.manager, content=p):
             p.description = "This is some other test"
@@ -70,10 +79,17 @@ class TestSimpleSearchApi(object):
 
         api = content_api_factory.get(user)
         a = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         p = api.create(
-            content_type_list.Page.slug, workspace, a, "this is dummy label content", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=a,
+            label="this is dummy label content",
+            do_save=True,
         )
 
         with new_revision(tm=transaction.manager, session=session, content=p):

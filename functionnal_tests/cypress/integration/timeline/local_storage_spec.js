@@ -23,13 +23,13 @@ describe('Timeline', () => {
   })
 
   it('should save the comment draft', () => {
-    cy.contains('[data-cy=FilenameWithExtension__label]', noteTitle).click()
+    cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle).click()
     cy.get('.editionmode__button__cancel').click()
     cy.get(commentField).type(text)
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.contains('.account__userpreference__setting', 'Change my account settings')
     cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
-    cy.contains('[data-cy=FilenameWithExtension__label]', noteTitle).click()
+    cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle).click()
     cy.get('.editionmode__button__cancel').click()
     cy.contains(commentField, text)
   })
