@@ -121,7 +121,7 @@ class TestUserReadStatusEndpoint(object):
             "",
             True,
         )
-        api.create_comment(
+        comment = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
         api.create(
@@ -143,22 +143,27 @@ class TestUserReadStatusEndpoint(object):
             status=200,
         )
         res = res.json_body
-        assert len(res) == 7
+        assert len(res) == 8
+        parsed_elems = []
         for elem in res:
             assert isinstance(elem["content_id"], int)
             assert isinstance(elem["read_by_user"], bool)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[2]["content_id"] == firstly_created_but_recently_updated.content_id
-        assert res[3]["content_id"] == secondly_created_but_not_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[4]["content_id"] == secondly_created.content_id
-        assert res[5]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[6]["content_id"] == main_folder.content_id
+            # check only valid content
+            assert elem["content_id"] in (
+                firstly_created_but_recently_commented.content_id,
+                secondly_created_but_not_commented.content_id,
+                firstly_created_but_recently_updated.content_id,
+                secondly_created_but_not_updated.content_id,
+                secondly_created.content_id,
+                firstly_created.content_id,
+                main_folder.content_id,
+                comment.content_id,
+            )
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(elem)
 
     def test_api__get_read_status__ok__200__user_itself(
         self,
@@ -276,19 +281,19 @@ class TestUserReadStatusEndpoint(object):
         )
         res = web_testapp.get(url=url, status=200, params=params)
         res = res.json_body
+
         assert len(res) == 4
+        parsed_elems = []
         for elem in res:
             assert isinstance(elem["content_id"], int)
             assert isinstance(elem["read_by_user"], bool)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[1]["content_id"] == firstly_created_but_recently_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[2]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[3]["content_id"] == main_folder.content_id
+            # check only valid content
+            assert elem["content_id"] in selected_contents_id
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(elem)
 
     def test_api__get_read_status__err__403__other_user(
         self,

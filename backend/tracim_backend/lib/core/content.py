@@ -10,6 +10,8 @@ from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlakeyset import Page
 from sqlakeyset import get_page
+from sqlalchemy import Integer
+from sqlalchemy import bindparam
 from sqlalchemy import func
 from sqlalchemy import or_
 from sqlalchemy import text
@@ -878,54 +880,104 @@ class ContentApi(object):
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
 
+    def _text_filter_generator(
+        self, filters: typing.List[str], prefix: str = "where ", separator: str = " and "
+    ):
+        if not filters:
+            return ""
+        text = prefix
+        text = prefix + separator.join(filters)
+        return text
+
     def get_read_status(
         self,
         user: User,
-        workspace: Workspace,
-        # TODO: reintroduce pagination and filtering by content_ids
-        # limit: typing.Optional[int] = None,
-        # before_content: typing.Optional[Content] = None,
-        # content_ids: typing.Optional[typing.List[int]] = None,
+        workspace: typing.Optional[Workspace] = None,
+        content_ids: typing.Optional[typing.List[int]] = None,
     ) -> typing.List[dict[str, typing.Any]]:
+        """
+        Return read status for a user of a content
+        :param user: user concerned by these read status
+        :param workspace: workspace to check for read status
+        :param content_ids: list of content to check for read status
+        :return: list of read status
+
+        :warning: This method does not use standard security filter, so be careful with
+        access right.
+
+        Result is dependant of show_deleted, show_archived and show_active filters
+        """
+
+        optional_begin_filters = []
+        optional_end_filters = []
+        if content_ids:
+            optional_end_filters.append("content_id in :content_ids")
+
+        if workspace:
+            optional_begin_filters.append("cr.workspace_id = :workspace_id")
+
+        if not self._show_deleted:
+            optional_begin_filters.append("cr.is_deleted = 0")
+        if not self._show_archived:
+            optional_begin_filters.append("cr.is_archived = 0")
+        if not self._show_active:
+            optional_begin_filters.append("(cr.is_archived = 1 or cr.is_deleted = 1)")
+
         statement = text(
             """
-with content_read_status as (
-    select c.id                                                      as content_id,
-           cr.parent_id                                              as parent_id,
-           rrs.view_datetime                                         as view_datetime,
-           case when rrs.view_datetime is not NULL then 1 else 0 END as read
-    from content c
-             join content_revisions cr on c.cached_revision_id = cr.revision_id
-             left outer join revision_read_status rrs on cr.revision_id = rrs.revision_id and rrs.user_id = :user_id
-    where workspace_id  = :workspace_id --in (1,2) and content_namespace in ("content")
-), temp_read_status as
-(
-  select
-      crs.content_id,
-      crs.view_datetime,
-      crs.read,
-      crs.content_id as root_id
-  from content_read_status crs
-  union all
-  select crs.content_id,
-         crs.view_datetime,
-         crs.read,
-         trs.root_id as root_id
-  from content_read_status crs
-    inner join temp_read_status trs
-      on crs.parent_id = trs.content_id
-)
-select
-       trs.root_id as content_id,
-       max(trs.view_datetime) as sum_view_datetime,
-       min(trs.read) as read
-from temp_read_status trs
-group by root_id
-;
-        """
+            with content_read_status as (
+                select c.id                                                      as content_id,
+                       cr.parent_id                                              as parent_id,
+                       rrs.view_datetime                                         as view_datetime,
+                       case when rrs.view_datetime is not NULL then 1 else 0 END as read
+                from content c
+                         join content_revisions cr on c.cached_revision_id = cr.revision_id
+                         left outer join revision_read_status rrs on cr.revision_id = rrs.revision_id and rrs.user_id = :user_id
+                {optional_begin_filter}
+            ), temp_read_status as
+            (
+              select
+                  crs.content_id,
+                  crs.view_datetime,
+                  crs.read,
+                  crs.content_id as root_id
+              from content_read_status crs
+              union all
+              select crs.content_id,
+                     crs.view_datetime,
+                     crs.read,
+                     trs.root_id as root_id
+              from content_read_status crs
+                inner join temp_read_status trs
+                  on crs.parent_id = trs.content_id
+            )
+            select
+                   trs.root_id as content_id,
+                   max(trs.view_datetime) as last_view_datetime,
+                   min(trs.read) as read
+            from temp_read_status trs
+            group by content_id
+            {optional_end_filter}
+            ;
+        """.format(
+                optional_begin_filter=self._text_filter_generator(optional_begin_filters),
+                optional_end_filter=self._text_filter_generator(
+                    prefix="having ", filters=optional_end_filters
+                ),
+            )
         )
+        if content_ids:
+            statement = statement.bindparams(
+                bindparam("content_ids", expanding=True, type_=Integer())
+            )
+
         tuples_result = self._session.execute(
-            statement, {"user_id": user.user_id, "workspace_id": workspace.workspace_id}
+            statement,
+            {
+                "user_id": user.user_id,
+                "workspace_id": workspace.workspace_id if workspace else None,
+                "content_ids": content_ids or [],
+            },
         ).fetchall()
         result = []
         for tuple in tuples_result:
