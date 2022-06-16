@@ -2,12 +2,12 @@
 from contextlib import contextmanager
 import datetime
 from datetime import timezone
-from importlib.metadata import metadata
 import os
 import typing
 
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
+from importlib_metadata import metadata
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlakeyset import Page
