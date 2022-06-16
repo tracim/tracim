@@ -251,7 +251,7 @@ export class Dashboard extends React.Component {
       props.dispatch(newFlashMessage(props.t('Please set a name, an email or a username'), 'warning'))
       return false
     }
-    
+
     if (state.newMember.role === '') {
       props.dispatch(newFlashMessage(props.t('Please set a role'), 'warning'))
       return false

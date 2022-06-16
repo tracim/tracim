@@ -361,7 +361,6 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   handleChangeNewDefaultRole = newDefaultRole => {
-    const { state } = this
     this.setState(prev => ({ content: { ...prev.content, default_temp_user_role: newDefaultRole } }))
   }
 
@@ -372,9 +371,10 @@ export class WorkspaceAdvanced extends React.Component {
     )
 
     switch (fetchPutDefaultRole.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info')
-      this.setState(prev => ({ content: { ...prev.content, default_user_role: state.content.default_temp_user_role } }))
-      break
+      case 200:
+        sendGlobalFlashMessage(props.t('Save successful'), 'info')
+        this.setState(prev => ({ content: { ...prev.content, default_user_role: state.content.default_temp_user_role } }))
+        break
       default: sendGlobalFlashMessage(props.t('Error while saving new default role'))
     }
   }
