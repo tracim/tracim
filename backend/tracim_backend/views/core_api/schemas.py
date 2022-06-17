@@ -87,6 +87,7 @@ from tracim_backend.models.context_models import SetUsername
 from tracim_backend.models.context_models import SimpleFile
 from tracim_backend.models.context_models import TagCreation
 from tracim_backend.models.context_models import TagPath
+from tracim_backend.models.context_models import TodoPath
 from tracim_backend.models.context_models import TranslationQuery
 from tracim_backend.models.context_models import UserAllowedSpace
 from tracim_backend.models.context_models import UserCreation
@@ -2329,6 +2330,11 @@ class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
     )
 
 
+###
+# UserCall
+###
+
+
 class CreateUserCallSchema(marshmallow.Schema):
     callee_id = marshmallow.fields.Integer(description="Id of the user to call", example=42)
 
@@ -2369,3 +2375,67 @@ class UserCallsSchema(marshmallow.Schema):
 
 class UpdateUserCallStateSchema(marshmallow.Schema):
     state = EnumField(UserCallState, description="New call state")
+
+
+###
+# Todos
+###
+
+
+class TodoIdSchema(marshmallow.Schema):
+    todo_id = marshmallow.fields.Integer(example=42, description="Id of the todo",)
+
+
+class TodoSchema(TodoIdSchema):
+    parent_id = marshmallow.fields.Integer(
+        example=42, description="Id of the parent content of the todo", allow_none=True,
+    )
+    assignee_id = marshmallow.fields.Integer(
+        example=42,
+        description="Id of the user who is assigned to the todo",
+        validate=strictly_positive_int_validator,
+        allow_none=False,
+        required=True,
+    )
+    status = StrippedString(
+        example="open",
+        validate=content_status_validator,
+        description="Status of the todo",
+        allow_none=False,
+        required=True,
+    )
+
+
+class TodoSchemaWithContent(TodoSchema):
+    raw_content = StrippedString(
+        example="This is a todo",
+        description="Raw content of the todo",
+        allow_none=False,
+        required=True,
+    )
+
+
+class SetTodoSchema(marshmallow.Schema):
+    raw_content = StrippedString(
+        example="This is a todo",
+        description="Raw content of the todo",
+        allow_none=False,
+        required=True,
+    )
+    assignee_id = marshmallow.fields.Integer(
+        example=42,
+        description="Id of the user who is assigned to the todo",
+        validate=strictly_positive_int_validator,
+        allow_none=False,
+        required=True,
+    )
+
+
+class TodoIdPathSchema(TodoIdSchema):
+    todo_id = marshmallow.fields.Integer(example=42, description="Id of the todo")
+
+
+class TodoPathSchema(WorkspaceAndContentIdPathSchema, TodoIdPathSchema):
+    @post_load
+    def make_path_object(self, data: typing.Dict[str, typing.Any]):
+        return TodoPath(**data)

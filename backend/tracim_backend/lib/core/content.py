@@ -42,6 +42,7 @@ from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
+from tracim_backend.exceptions import TodoNotFound
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
@@ -62,6 +63,7 @@ from tracim_backend.models.context_models import FavoriteContentInContext
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import RevisionInContext
+from tracim_backend.models.context_models import TodoInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
@@ -71,6 +73,7 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.todo import Todo
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -1996,6 +1999,8 @@ class ContentApi(object):
         if (
             content_type_list.get_one_by_slug(content_type_slug).slug
             == content_type_list.Comment.slug
+            or content_type_list.get_one_by_slug(content_type_slug).slug
+            == content_type_list.Todo.slug
         ):
             return True
         return False
@@ -2134,5 +2139,62 @@ class ContentApi(object):
         self._session.query(FavoriteContent).filter(
             FavoriteContent.user_id == self._user.user_id, FavoriteContent.content_id == content_id,
         ).delete()
+        if do_save:
+            self._session.flush()
+
+    def create_todo(
+        self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
+    ) -> Todo:
+        item = self.create(
+            content_type_slug=content_type_list.Todo.slug,
+            workspace=parent.workspace,
+            parent=parent,
+        )
+        item.raw_content = raw_content
+        self._session.add(item)
+        self.save(item, ActionDescription.CREATION, do_notify=do_notify)
+
+        todo = Todo()
+        todo.assignee_id = assignee.user_id
+        todo.content_id = item.content_id
+
+        self._session.add(todo)
+        self._session.flush()
+
+        return todo
+
+    def get_todo(self, todo_id: int) -> Todo:
+        try:
+            return self._session.query(Todo).filter(Todo.todo_id == todo_id).one()
+        except TodoNotFound:
+            raise TodoNotFound("Todo {} was not found".format(todo_id))
+
+    def get_todos_by_content_id(self, content_id: int) -> typing.List[Todo]:
+        return self._session.query(Todo).filter(Todo.content_id == content_id).all()
+
+    def get_all_todos(self) -> typing.List[Todo]:
+        """
+        Return every todos in the database, with the limitation
+        of the content API.
+        :return: List of todos
+        """
+        contents = self.get_all(content_type=content_type_list.Todo.slug,)
+
+        todos = []
+        for content in contents:
+            todos.extend(self.get_todos_by_content_id(content.content_id))
+
+        return todos
+
+    def get_todo_in_context(self, todo: Todo) -> TodoInContext:
+        """
+        Transform a Todo object into a TodoInContext object
+        :param todo: Todo object
+        :return: TodoInContext object
+        """
+        return TodoInContext(todo, self._session, self._config, self._user)
+
+    def remove_todo(self, todo: Todo, do_save: bool = True) -> None:
+        self._session.query(Todo).filter(Todo.todo_id == todo.todo_id).delete()
         if do_save:
             self._session.flush()

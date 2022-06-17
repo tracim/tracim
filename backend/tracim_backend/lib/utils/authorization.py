@@ -254,6 +254,38 @@ class CommentOwnerChecker(AuthorizationChecker):
         )
 
 
+class TodoOwnerChecker(AuthorizationChecker):
+    """
+    Check if current_user is owner of current_todo
+    """
+
+    def check(self, tracim_context: TracimContext) -> bool:
+
+        if tracim_context.current_content.owner.user_id == tracim_context.current_user.user_id:
+            return True
+        raise UserIsNotContentOwner(
+            "user {} is not owner of todo {}".format(
+                tracim_context.current_user.user_id, tracim_context.current_content.content_id,
+            )
+        )
+
+
+class TodoAssigneeChecker(AuthorizationChecker):
+    """
+    Check if current_user is assignee of current_todo
+    """
+
+    def check(self, tracim_context: TracimContext) -> bool:
+
+        if tracim_context.current_todo.owner.user_id == tracim_context.current_user.user_id:
+            return True
+        raise UserIsNotContentOwner(
+            "user {} is not owner of todo {}".format(
+                tracim_context.current_user.user_id, tracim_context.current_todo.content_id,
+            )
+        )
+
+
 class ReactionAuthorChecker(AuthorizationChecker):
     """
     Check if current_user is author of current_reaction
@@ -388,6 +420,18 @@ can_create_content = ContentTypeCreationChecker(content_type_list)
 is_comment_owner = CommentOwnerChecker()
 can_edit_comment = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
+)
+# todos
+is_todo_owner = TodoOwnerChecker()
+is_assignee = TodoAssigneeChecker()
+can_edit_todo = OrAuthorizationChecker(
+    AndAuthorizationChecker(is_contributor, is_todo_owner),
+    AndAuthorizationChecker(is_contributor, is_assignee),
+    is_content_manager,
+    is_workspace_manager,
+)
+can_delete_todo = OrAuthorizationChecker(
+    AndAuthorizationChecker(is_contributor, is_todo_owner), is_content_manager, is_workspace_manager
 )
 # reaction
 is_reaction_author = ReactionAuthorChecker()

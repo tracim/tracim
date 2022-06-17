@@ -103,8 +103,10 @@ class ContentStatusList(object):
 content_status_list = ContentStatusList(
     [closed_validated_status, closed_unvalidated_status, closed_deprecated_status]
 )
+
 ####
 # ContentType
+####
 
 
 class ContentTypeInContext(object):
@@ -158,13 +160,14 @@ class ContentTypeInContext(object):
         return self.content_type.file_extension
 
 
-THREAD_TYPE = "thread"
-FILE_TYPE = "file"
-MARKDOWNPLUSPAGE_TYPE = "markdownpage"
-HTML_DOCUMENTS_TYPE = "html-document"
-FOLDER_TYPE = "folder"
 COMMENT_TYPE = "comment"
+FILE_TYPE = "file"
+FOLDER_TYPE = "folder"
+HTML_DOCUMENTS_TYPE = "html-document"
 KANBAN_TYPE = "kanban"
+MARKDOWNPLUSPAGE_TYPE = "markdownpage"
+THREAD_TYPE = "thread"
+TODO_TYPE = "todo"
 
 
 # TODO - G.M - 31-05-2018 - Set Better Comment params
@@ -176,6 +179,14 @@ comment_type = TracimContentType(
     available_statuses=content_status_list.get_all(),
 )
 
+todo_type = TracimContentType(
+    slug=TODO_TYPE,
+    fa_icon="",
+    label="Todo",
+    creation_label="Todo",
+    available_statuses=content_status_list.get_all(),
+)
+
 
 class ContentTypeList(object):
     """
@@ -184,6 +195,7 @@ class ContentTypeList(object):
 
     Any_SLUG = "any"
     Comment = comment_type
+    Todo = todo_type
 
     @property
     def Folder(self) -> TracimContentType:
@@ -203,7 +215,7 @@ class ContentTypeList(object):
 
     def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
-        self._special_contents_types = [self.Comment]
+        self._special_contents_types = [self.Comment, self.Todo]
         self._extra_slugs = [self.Any_SLUG]
 
     @property
