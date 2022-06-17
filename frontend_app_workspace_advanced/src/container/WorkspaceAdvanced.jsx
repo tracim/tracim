@@ -257,7 +257,7 @@ export class WorkspaceAdvanced extends React.Component {
 
     // INFO - AJ (from CH) - 2022 06 17 - empty string is the default value for the property content.defaultRole in the state
     if (prevState.content.defaultRole === '' && state.content.defaultRole !== '') {
-      this.setState({ newMember: { ...state.newMember, role: state.content.defaultRole } })
+      this.setState( prev => ({newMember: { ...prev.newMember, role: state.content.defaultRole } }))
     }
   }
 
