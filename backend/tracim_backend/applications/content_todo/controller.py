@@ -152,13 +152,12 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todo = content_api.get_one(
-            hapic_data.path.content_id, content_type=content_type_list.Todo.slug
-        )
+        todo = content_api.get_todo(hapic_data.path.todo_id)
+        todo_content = content_api.get_one(todo.content_id)
 
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=todo):
-            content_api.set_status(todo, hapic_data.body.status)
-            content_api.save(todo)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=todo_content):
+            content_api.set_status(todo_content, hapic_data.body.status)
+            content_api.save(todo_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
@@ -172,26 +171,20 @@ class TodoController(Controller):
         app_config = request.registry.settings["CFG"]
 
         content_api = ContentApi(
-            current_user=request.current_user,
-            session=request.dbsession,
-            config=app_config,
-            show_deleted=True,
-            show_archived=True,
+            current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
         todo = None  # type: typing.Optional['Todo']
         try:
-            todo = content_api.get_one(
-                content_id=request.current_content.content_id,
-                content_type=content_type_list.Todo.slug,
-            )
+            todo = content_api.get_todo(hapic_data.path.todo_id)
+            todo_content = content_api.get_one(todo.content_id)
         except ContentNotFound as exc:
             raise TodoNotFound(
                 "Todo with content_id {} not found".format(request.current_content.content_id)
             ) from exc
 
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=todo):
-            content_api.delete(todo)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=todo_content):
+            content_api.delete(todo_content)
 
     def bind(self, configurator: Configurator):
         # Get every todos of a content
