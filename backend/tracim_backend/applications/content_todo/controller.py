@@ -6,6 +6,10 @@ from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.applications.content_todo.models_in_context import TodoInContext
+from tracim_backend.applications.content_todo.schema import SetTodoSchema
+from tracim_backend.applications.content_todo.schema import TodoPathSchema
+from tracim_backend.applications.content_todo.schema import TodoSchemaWithContent
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import TodoNotFound
@@ -21,14 +25,10 @@ from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
-from tracim_backend.models.context_models import TodoInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
-from tracim_backend.views.core_api.schemas import SetTodoSchema
-from tracim_backend.views.core_api.schemas import TodoPathSchema
-from tracim_backend.views.core_api.schemas import TodoSchemaWithContent
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -57,7 +57,9 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todos = content_api.get_all_todos()
+        todos = content_api.get_all_todos_for_content_id(hapic_data.path.content_id)
+
+        print("todos", todos)
 
         todos_in_context = []
         for todo in todos:
@@ -68,9 +70,9 @@ class TodoController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_reader)
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_path(TodoPathSchema())
     @hapic.output_body(TodoSchemaWithContent())
-    def get_todo(self, context, request: TracimRequest, hapic_data=None):
+    def get_todo(self, context, request: TracimRequest, hapic_data=None) -> TodoInContext:
         """
         Get a todo
         """
@@ -91,8 +93,8 @@ class TodoController(Controller):
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetTodoSchema())
-    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
-    def create_todo(self, context, request: TracimRequest, hapic_data=None):
+    @hapic.output_body(TodoSchemaWithContent())
+    def create_todo(self, context, request: TracimRequest, hapic_data=None) -> TodoInContext:
         """
         Create a todo
         """
@@ -126,9 +128,13 @@ class TodoController(Controller):
                 )
             ) from exc
 
-        content_api.create_todo(
+        todo = content_api.create_todo(
             parent=parent, raw_content=hapic_data.body["raw_content"], assignee=assignee,
         )
+
+        todo_in_context = content_api.get_todo_in_context(todo)
+
+        return todo_in_context
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)

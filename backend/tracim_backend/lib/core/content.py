@@ -24,6 +24,8 @@ import transaction
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.applications.content_todo.models import Todo
+from tracim_backend.applications.content_todo.models_in_context import TodoInContext
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -63,7 +65,6 @@ from tracim_backend.models.context_models import FavoriteContentInContext
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import PreviewAllowedDim
 from tracim_backend.models.context_models import RevisionInContext
-from tracim_backend.models.context_models import TodoInContext
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
@@ -73,7 +74,6 @@ from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
-from tracim_backend.models.todo import Todo
 from tracim_backend.models.tracim_session import TracimSession
 
 __author__ = "damien"
@@ -2169,9 +2169,6 @@ class ContentApi(object):
         except TodoNotFound:
             raise TodoNotFound("Todo {} was not found".format(todo_id))
 
-    def get_todos_by_content_id(self, content_id: int) -> typing.List[Todo]:
-        return self._session.query(Todo).filter(Todo.content_id == content_id).all()
-
     def get_all_todos(self) -> typing.List[Todo]:
         """
         Return every todos in the database, with the limitation
@@ -2182,7 +2179,30 @@ class ContentApi(object):
 
         todos = []
         for content in contents:
-            todos.extend(self.get_todos_by_content_id(content.content_id))
+            todos.extend(self.get_all_todos_for_content_id(content.content_id))
+
+        return todos
+
+    def get_all_todos_for_content_id(self, content_id: int) -> typing.List[Todo]:
+        """
+        Return every todos in the database, with the limitation
+        of the content API.
+        :param content_id: Content id
+        :return: List of todos
+        """
+
+        base_query = self._base_query()
+        todo_contents = base_query.filter(
+            and_(
+                Content.parent_id == content_id,
+                Content.type == content_type_list.Todo.slug,
+                Content.is_deleted.is_(False),
+                Content.is_archived.is_(False),
+            ),
+        ).all()
+
+        todo_contents_ids = [content.id for content in todo_contents]
+        todos = self._session.query(Todo).filter(Todo.content_id.in_(todo_contents_ids)).all()
 
         return todos
 

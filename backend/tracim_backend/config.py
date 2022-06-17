@@ -261,6 +261,7 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "contents/kanban,"
+            "contents/todo,"
             "agenda,"
             "share_content,"
             "upload_permission,"
@@ -292,6 +293,7 @@ class CFG(object):
             "contents/html-document",
             "contents/folder",
             "contents/kanban",
+            "contents/todo",
             "agenda",
             "collaborative_document_edition",
             "share_content",

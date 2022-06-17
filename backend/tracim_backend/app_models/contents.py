@@ -179,14 +179,6 @@ comment_type = TracimContentType(
     available_statuses=content_status_list.get_all(),
 )
 
-todo_type = TracimContentType(
-    slug=TODO_TYPE,
-    fa_icon="",
-    label="Todo",
-    creation_label="Todo",
-    available_statuses=content_status_list.get_all(),
-)
-
 
 class ContentTypeList(object):
     """
@@ -195,7 +187,6 @@ class ContentTypeList(object):
 
     Any_SLUG = "any"
     Comment = comment_type
-    Todo = todo_type
 
     @property
     def Folder(self) -> TracimContentType:
@@ -213,9 +204,13 @@ class ContentTypeList(object):
     def Thread(self) -> TracimContentType:
         return self.get_one_by_slug(THREAD_TYPE)
 
+    @property
+    def Todo(self) -> TracimContentType:
+        return self.get_one_by_slug(TODO_TYPE)
+
     def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
-        self._special_contents_types = [self.Comment, self.Todo]
+        self._special_contents_types = [self.Comment]
         self._extra_slugs = [self.Any_SLUG]
 
     @property

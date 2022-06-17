@@ -9,6 +9,7 @@ from pyramid.request import Request
 from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.applications.content_todo.models import Todo
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
 from tracim_backend.exceptions import ContentTypeNotInTracimRequest
@@ -31,7 +32,6 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.event import Event
 from tracim_backend.models.reaction import Reaction
-from tracim_backend.models.todo import Todo
 
 
 class TracimContext(ABC):
