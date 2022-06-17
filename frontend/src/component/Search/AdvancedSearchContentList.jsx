@@ -78,7 +78,7 @@ export const AdvancedSearchContentList = props => {
               <div className='advancedSearchContent__wrapper'>
                 <div className='advancedSearchContent__type__content'>
                   <Icon
-                    icon={`fa-fw ${searchItem.contentType.faIcon}`}
+                    icon={searchItem.contentType.faIcon}
                     title={props.t(searchItem.contentType.label)}
                     color={searchItem.contentType.hexcolor}
                   />
@@ -109,7 +109,7 @@ export const AdvancedSearchContentList = props => {
                     <div>
                       <span className='advancedSearchContent__information__comments'>
                         <Icon
-                          icon='fa-fw far fa-comment'
+                          icon='far fa-comment'
                           title={numberCommentsTitle(searchItem.commentCount)}
                         />
                         <span
@@ -120,7 +120,7 @@ export const AdvancedSearchContentList = props => {
                       </span>
                       <span className='advancedSearchContent__information__status'>
                         <Icon
-                          icon={`fa-fw ${searchItem.contentType.status.faIcon}`}
+                          icon={searchItem.contentType.status.faIcon}
                           title={props.t(searchItem.contentType.status.label)}
                           color={searchItem.contentType.status.hexcolor}
                         />

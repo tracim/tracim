@@ -88,7 +88,8 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      toDoList: []
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -331,8 +332,10 @@ export class HtmlDocument extends React.Component {
   }
 
   loadContent = () => {
+    const { state } = this
     this.loadHtmlDocument()
     this.props.loadTimeline(getHtmlDocRevision, this.state.content)
+    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
   }
 
   handleLoadMoreTimelineItems = async () => {
@@ -637,6 +640,21 @@ export class HtmlDocument extends React.Component {
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInContent: false, showInvalidMentionPopupInComment: false })
 
+  handleSaveNewToDo = (assignedUserId, toDo) => {
+    const { state, props } = this
+    props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+  }
+
+  handleDeleteToDo = (toDoId) => {
+    const { state, props } = this
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDoId, this.setState.bind(this))
+  }
+
+  handleChangeStatusToDo = (toDoId, status) => {
+    const { state, props } = this
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
+  }
+
   handleClickNotifyAll = async () => {
     const { state, props } = this
 
@@ -783,6 +801,12 @@ export class HtmlDocument extends React.Component {
             apiUrl={state.config.apiUrl}
             contentId={state.content.content_id}
             customColor={state.config.hexcolor}
+            memberList={state.config.workspace.memberList}
+            onClickChangeStatusToDo={this.handleChangeStatusToDo}
+            onClickDeleteToDo={this.handleDeleteToDo}
+            onClickSaveNewToDo={this.handleSaveNewToDo}
+            toDoList={state.toDoList}
+            workspaceId={state.content.workspace_id}
           />
         </PopinFixedRightPartContent>
       )

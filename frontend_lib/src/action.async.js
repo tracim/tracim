@@ -60,6 +60,23 @@ export const getFileChildContent = (apiUrl, workspaceId, contentId, pageToken = 
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
 }
 
+export const postToDo = (apiUrl, workspaceId, contentId, assignedUserId, toDo) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`, {
+    assignee_id: assignedUserId,
+    raw_content: toDo
+  })
+
+export const deleteToDo = (apiUrl, workspaceId, contentId, todoId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${todoId}`)
+
+export const putToDo = (apiUrl, workspaceId, contentId, toDoId, status) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${todoId}`, {
+    status: status
+  })
+
+export const getToDoList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`)
+
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/${appSlug}s/${contentId}/status`, {

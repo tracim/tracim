@@ -110,7 +110,7 @@ export const PopinFixedHeader = (props) => {
           <div className={classnames('wsContentGeneric__header__icon', `${customClass}__header__icon`)}>
             <i className={`fa-fw ${faIcon}`} title={rawTitle} style={{ color: customColor }} />
           </div>
-          {props.loading ? <Icon icon='fa-fw fas fa-spin fa-spinner' title={props.t('Loading…')} /> : (
+          {props.loading ? <Icon icon='fas fa-spin fa-spinner' title={props.t('Loading…')} /> : (
             <>
               <div
                 className={classnames('wsContentGeneric__header__title', `${customClass}__header__title`)}
