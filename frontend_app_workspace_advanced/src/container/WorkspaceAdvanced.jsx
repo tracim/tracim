@@ -248,7 +248,7 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  componentDidUpdate (prevState) {
+  componentDidUpdate (prevProps, prevState) {
     const { state } = this
     // console.log('%c<WorkspaceAdvanced> did update', `color: ${state.config.hexcolor}`, prevState.content.memberList, state.content.memberList)
     if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
@@ -257,7 +257,7 @@ export class WorkspaceAdvanced extends React.Component {
 
     // INFO - AJ (from CH) - 2022 06 17 - empty string is the default value for the property content.defaultRole in the state
     if (prevState.content.defaultRole === '' && state.content.defaultRole !== '') {
-      this.setState( prev => ({newMember: { ...prev.newMember, role: state.content.defaultRole } }))
+      this.setState(prev => ({newMember: { ...prev.newMember, role: prev.content.defaultRole } }))
     }
   }
 
@@ -635,18 +635,18 @@ export class WorkspaceAdvanced extends React.Component {
       role: state.newMember.role
     }))
 
-    this.setState({
+    this.setState(prev => ({
       newMember: {
         id: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: prev.content ? prev.content.defaultRole : prev.newMember.role,
         avatarUrl: '',
         isEmail: false
       },
       autoCompleteFormNewMemberActive: false,
       displayFormNewMember: false
-    })
+    }))
 
     switch (fetchWorkspaceNewMember.apiResponse.status) {
       case 200:
@@ -884,7 +884,7 @@ export class WorkspaceAdvanced extends React.Component {
             autoCompleteItemList={state.autoCompleteItemList}
             customColor={state.config.hexcolor}
             description={state.content.description}
-            defaultRole={state.content.default_user_role} 
+            defaultRole={state.content.default_user_role}
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
             isAppAgendaAvailable={state.content.appAgendaAvailable}
             isAutoCompleteActivated={state.isAutoCompleteActivated}

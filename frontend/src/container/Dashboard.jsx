@@ -107,6 +107,10 @@ export class Dashboard extends React.Component {
       this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
     }
 
+    if (prevProps.currentWorkspace.defaultRole !== '' && props.currentWorkspace.defaultRole === '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
 
@@ -283,7 +287,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
       autoCompleteFormNewMemberActive: false,
