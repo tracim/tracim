@@ -45,7 +45,6 @@ import MemberList from '../component/Dashboard/MemberList.jsx'
 import TabBar from '../component/TabBar/TabBar.jsx'
 import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
-import currentWorkspace from '../reducer/currentWorkspace.js'
 
 const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
 

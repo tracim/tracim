@@ -79,7 +79,7 @@ export class WorkspaceAdvanced extends React.Component {
         id: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: param.content.defaultRole,
         avatarUrl: '',
         isEmail: false
       },
@@ -248,11 +248,16 @@ export class WorkspaceAdvanced extends React.Component {
     }
   }
 
-  componentDidUpdate (prevProps, prevState) {
+  componentDidUpdate (prevState) {
     const { state } = this
     // console.log('%c<WorkspaceAdvanced> did update', `color: ${state.config.hexcolor}`, prevState.content.memberList, state.content.memberList)
     if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
       this.loadContent()
+    }
+
+    // INFO - AJ (from CH) - 2022 06 17 - empty string is the default value for the property content.defaultRole in the state
+    if (prevState.content.defaultRole === '' && state.content.defaultRole !== '') {
+      this.setState({ newMember: { ...state.newMember, role: state.content.defaultRole } })
     }
   }
 
@@ -294,7 +299,6 @@ export class WorkspaceAdvanced extends React.Component {
       }
     }))
     this.setState({ isLoadingMembers: false })
-    this.setState({ default_temp_user_role: content.default_user_role})
   }
 
   loadSubscriptionRequestList = async () => {
@@ -361,20 +365,18 @@ export class WorkspaceAdvanced extends React.Component {
   }
 
   handleChangeNewDefaultRole = newDefaultRole => {
-    this.setState(prev => ({ content: { ...prev.content, default_temp_user_role: newDefaultRole } }))
+    this.setState(prev => ({ content: { ...prev.content, default_user_role: newDefaultRole } }))
   }
 
   handleClickValidateNewDefaultRole = async () => {
     const { props, state } = this
     const fetchPutDefaultRole = await handleFetchResult(
-      await putDefaultRole(state.config.apiUrl, state.content, state.content.default_temp_user_role)
+      await putDefaultRole(state.config.apiUrl, state.content, state.content.default_user_role)
     )
 
     switch (fetchPutDefaultRole.apiResponse.status) {
       case 200:
-        sendGlobalFlashMessage(props.t('Save successful'), 'info')
-        this.setState(prev => ({ content: { ...prev.content, default_user_role: state.content.default_temp_user_role } }))
-        break
+        sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
       default: sendGlobalFlashMessage(props.t('Error while saving new default role'))
     }
   }
@@ -761,7 +763,7 @@ export class WorkspaceAdvanced extends React.Component {
                   userProfile={state.loggedUser.profile}
                   autoCompleteClicked={state.autoCompleteClicked}
                   onClickAutoComplete={this.handleClickAutoComplete}
-                  defaultRole={state.content.default_user_role}
+                  role={state.newMember.role}
                 />
               )
           }
@@ -882,7 +884,7 @@ export class WorkspaceAdvanced extends React.Component {
             autoCompleteItemList={state.autoCompleteItemList}
             customColor={state.config.hexcolor}
             description={state.content.description}
-            defaultRole={state.content.default_temp_user_role || state.content.default_user_role} 
+            defaultRole={state.content.default_user_role} 
             displayPopupValidateDeleteWorkspace={state.displayPopupValidateDeleteWorkspace}
             isAppAgendaAvailable={state.content.appAgendaAvailable}
             isAutoCompleteActivated={state.isAutoCompleteActivated}
