@@ -18,6 +18,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import eq_
 
@@ -53,6 +54,7 @@ class TestContentApi(object):
         self,
         user_api_factory,
         workspace_api_factory,
+        role_api_factory,
         admin_user,
         session,
         app_config,
@@ -64,8 +66,11 @@ class TestContentApi(object):
         template_workspace = workspace_api_factory.get(user).create_workspace(
             "template_workspace", save_now=True
         )
-        workspace = workspace_api_factory.get(user).create_workspace(
+        workspace = workspace_api_factory.get(admin_user).create_workspace(
             "template_workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
+            admin_user, template_workspace, WorkspaceRoles.CONTRIBUTOR.level, False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         folder = api.create(
@@ -88,6 +93,7 @@ class TestContentApi(object):
                 content=template, action_description=ActionDescription.EDITION, do_notify=False
             )
         transaction.commit()
+        api = ContentApi(current_user=admin_user, session=session, config=app_config)
         with session.no_autoflush:
             new_content = api.create(
                 content_type_slug="html-document",
@@ -114,6 +120,10 @@ class TestContentApi(object):
             },
             "origin": {"content": 2, "revision": 3},
         }
+        assert new_content.owner == admin_user
+        assert template.owner == user
+        assert new_content.revision_type == ActionDescription.COPY
+        assert template.revision_type == ActionDescription.EDITION
 
     def test_unit__create_content__err_empty_label(
         self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
