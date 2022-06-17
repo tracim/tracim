@@ -927,7 +927,7 @@ class ContentApi(object):
         user: User,
         workspace: typing.Optional[Workspace] = None,
         content_ids: typing.Optional[typing.List[int]] = None,
-    ) -> typing.List[dict[str, typing.Any]]:
+    ) -> typing.List[typing.Dict[str, typing.Any]]:
         """
         Return read status for a user of a content
         :param user: user concerned by these read status
