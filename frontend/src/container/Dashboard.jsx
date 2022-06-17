@@ -104,7 +104,7 @@ export class Dashboard extends React.Component {
 
     // INFO - CH - 2022 06 16 - empty string is the default value for the property currentWorkspace.defaultRole in the reducer
     if (prevProps.currentWorkspace.defaultRole === '' && props.currentWorkspace.defaultRole !== '') {
-      this.setState({ newMember: { ...state.newMember, role: props.currentWorkspace.defaultRole } })
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
     }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
