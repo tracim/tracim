@@ -11,7 +11,7 @@ const ToDoItem = props => {
       customClass='toDo__checkbox'
       icon={`far ${props.toDo.status === 'open' ? 'fa-square' : 'fa-check-square'}`}
       title={props.toDo.status === 'open' ? props.t('Check') : props.t('Uncheck')}
-      onClick={() => props.onClickChangeStatusToDo(props.toDo.todo_id, )}
+      onClick={() => props.onClickChangeStatusToDo(props.toDo.todo_id, props.toDo.status === 'open' ? 'closed-validated' : 'open')}
       disabled={false} // TODO
       intent='link'
     />
@@ -24,7 +24,7 @@ const ToDoItem = props => {
       disabled={false} // TODO
       icon='far fa-trash-alt'
       intent='link'
-      onClick={props.onClickDeleteToDo}
+      onClick={() => props.onClickDeleteToDo(props.toDo.todo_id)}
       title={props.t('Delete')}
     />
 </div>

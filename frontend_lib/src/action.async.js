@@ -66,11 +66,11 @@ export const postToDo = (apiUrl, workspaceId, contentId, assignedUserId, toDo) =
     raw_content: toDo
   })
 
-export const deleteToDo = (apiUrl, workspaceId, contentId, todoId) =>
-  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${todoId}`)
+export const deleteToDo = (apiUrl, workspaceId, contentId, toDoId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`)
 
 export const putToDo = (apiUrl, workspaceId, contentId, toDoId, status) =>
-  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${todoId}`, {
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`, {
     status: status
   })
 
