@@ -432,8 +432,7 @@ export function appContentFactory (WrappedComponent) {
     appContentSaveNewToDo = async (workspaceId, contentId, assignedUserId, toDo, setState) => {
       this.checkApiUrl()
       const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
-
-      if (response.status === 200) {
+      if (response.apiResponse.status === 200) {
         setState(prev => ({ toDoList: [...prev.toDoList, response.body] }))
       } else {
         sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
