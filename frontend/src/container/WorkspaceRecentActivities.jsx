@@ -4,12 +4,16 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
 import {
+  getComment,
+  getContent,
+  handleFetchResult,
   TracimComponent,
   permissiveNumberEqual,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_SUB
 } from 'tracim_frontend_lib'
-
+import { FETCH_CONFIG } from '../util/helper.js'
 import {
   setWorkspaceActivityList,
   setWorkspaceActivityNextPage,
@@ -41,16 +45,27 @@ export class WorkspaceRecentActivities extends React.Component {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
   }
 
-  handleTlm = (data) => {
+  handleTlm = async (data) => {
     const { props } = this
+    let tlm = data
     if (!data.fields.workspace ||
       !permissiveNumberEqual(data.fields.workspace.workspace_id, props.workspaceId)) return
     if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
       const member = props.currentWorkspace.memberList.find(user => user.id === data.fields.user.user_id)
       if (!member || member.role === data.fields.member.role) return
     }
-
-    props.handleTlm(data)
+    if (data.event_type.includes(TLM_ET.MENTION) || data.event_type.includes(TLM_SUB.COMMENT)) {
+      const comment = await handleFetchResult(
+        await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
+      )
+      tlm = { ...data, fields: { ...data.fields, content: { ...data.fields.content, ...comment.body } } }
+    } else if (data.event_type.includes(TLM_ET.CONTENT)) {
+      const content = await handleFetchResult(
+        await getContent(FETCH_CONFIG.apiUrl, data.fields.content.content_id)
+      )
+      tlm = { ...data, fields: { ...data.fields, content: { ...data.fields.content, ...content.body } } }
+    }
+    props.handleTlm(tlm)
   }
 
   handleClickLoadMore = async () => {
@@ -79,6 +94,7 @@ export class WorkspaceRecentActivities extends React.Component {
           onCopyLinkClicked={props.onCopyLinkClicked}
           onEventClicked={props.onEventClicked}
           showRefresh={props.showRefresh}
+          userId={props.user.userId}
           workspaceList={props.workspaceList}
         />
       </div>

@@ -4,7 +4,7 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
   handleFetchResult,
-  getContent,
+  getWorkspaceContent,
   getContentPath
 } from 'tracim_frontend_lib'
 
@@ -51,16 +51,31 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
 
   let content = newestMessage.fields.content
 
-  if (content.content_type === TLM_ST.COMMENT) {
+  if (content.content_type === TLM_ST.COMMENT || content.content_type === TLM_ST.MENTION) {
     // INFO - SG - 2021-04-16
     // We have to get the parent content as comments shall produce an activity
     // for it and not for the comment.
     const parentContentType = content.parent_content_type
     const parentId = content.parent_id
     if (!(parentContentType && parentId)) return null
-    const response = await handleFetchResult(await getContent(apiUrl, parentId))
+
+    const response = await handleFetchResult(await getWorkspaceContent(
+      apiUrl,
+      newestMessage.fields.workspace.workspace_id,
+      parentContentType,
+      parentId
+    ))
     if (!response.apiResponse.ok) return null
-    content = response.body
+    content = { ...content, ...response.body }
+  } else {
+    const response = await handleFetchResult(await getWorkspaceContent(
+      apiUrl,
+      newestMessage.fields.workspace.workspace_id,
+      content.content_type,
+      content.content_id
+    ))
+    if (!response.apiResponse.ok) return null
+    content = { ...content, ...response.body }
   }
 
   const fetchGetContentPath = await handleFetchResult(
@@ -98,6 +113,7 @@ const getActivityParams = (message) => {
         : message.fields.content.content_id
       return { id: `${TLM_ET.CONTENT}-${id}`, entityType: TLM_ET.CONTENT }
     }
+    case TLM_ET.SHAREDSPACE:
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
       return { id: `${entityType}-e${message.event_id}`, entityType: entityType }
@@ -109,6 +125,7 @@ const createActivity = async (activityParams, activityMessageList, apiUrl) => {
   switch (activityParams.entityType) {
     case TLM_ET.CONTENT:
       return await createContentActivity(activityParams, activityMessageList, apiUrl)
+    case TLM_ET.SHAREDSPACE:
     case TLM_ET.SHAREDSPACE_MEMBER:
     case TLM_ET.SHAREDSPACE_SUBSCRIPTION:
     default:
@@ -169,7 +186,7 @@ const updateActivity = (message, activity) => {
   const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
   const isMentionOnComment = (
     message.event_type.startsWith(`${TLM_ET.MENTION}.`) &&
-    message.content.content_type === TLM_ST.COMMENT
+    message.fields.content.content_type === TLM_ST.COMMENT
   )
   // NOTE SG 2020-11-12: keep the existing content
   // if the message is a comment as a comment cannot change anything

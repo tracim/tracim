@@ -407,8 +407,9 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  handleClickAddUser = async (name, username, email, profile, password) => {
+  handleClickAddUser = async (name, username, emailWithoutTrim, profile, password) => {
     const { props, state } = this
+    const email = emailWithoutTrim.trim()
 
     if (name.length < MINIMUM_CHARACTERS_PUBLIC_NAME) {
       sendGlobalFlashMessage(
@@ -469,7 +470,8 @@ export class AdminWorkspaceUser extends React.Component {
     }
   }
 
-  handleClickCreateUserAndAddToSpaces = async (publicName, username, email, profile, password) => {
+  handleClickCreateUserAndAddToSpaces = async (publicName, username, emailWithoutTrim, profile, password) => {
+    const email = emailWithoutTrim.trim()
     const userId = await this.handleClickAddUser(publicName, username, email, profile, password)
     if (userId > 0) this.state.config.history.push(PAGE.ADMIN.USER_EDIT(userId), 'spacesConfig')
   }

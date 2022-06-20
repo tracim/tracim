@@ -79,6 +79,7 @@ from tracim_backend.models.context_models import ResetPasswordModify
 from tracim_backend.models.context_models import ResetPasswordRequest
 from tracim_backend.models.context_models import RevisionPreviewSizedPath
 from tracim_backend.models.context_models import RoleUpdate
+from tracim_backend.models.context_models import SetContentIsTemplate
 from tracim_backend.models.context_models import SetContentStatus
 from tracim_backend.models.context_models import SetEmail
 from tracim_backend.models.context_models import SetPassword
@@ -260,6 +261,10 @@ class TracimEmail(Email):
             return None
         return TracimEmailValidator(error=self.error_messages["invalid"])(value)
 
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        return value.strip()
+
 
 class RFCEmail(ValidatedField, String):
     """A validated email rfc style "john <john@john.ndd>" field.
@@ -282,6 +287,10 @@ class RFCEmail(ValidatedField, String):
         if value is None:
             return None
         return RFCEmailValidator(error=self.error_messages["invalid"])(value)
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        value = super()._deserialize(value, attr, data, **kwargs)
+        return value.strip()
 
 
 class BasePaginatedQuerySchema(marshmallow.Schema):
@@ -620,7 +629,7 @@ class UserRegistrationSchema(marshmallow.Schema):
 
 
 class UserCreationSchema(marshmallow.Schema):
-    email = TracimEmail(
+    email = RFCEmail(
         required=False, example="hello@tracim.fr", validate=user_email_validator, allow_none=True
     )
     username = String(
@@ -1189,7 +1198,7 @@ class RoleUpdateSchema(marshmallow.Schema):
 class WorkspaceMemberInviteSchema(marshmallow.Schema):
     role = StrippedString(example="contributor", validate=user_role_validator, required=True)
     user_id = marshmallow.fields.Int(example=5, default=None, allow_none=True)
-    user_email = TracimEmail(
+    user_email = RFCEmail(
         example="suri@cate.fr", default=None, allow_none=True, validate=user_email_validator
     )
     user_username = StrippedString(
@@ -1678,6 +1687,14 @@ class ContentCreationSchema(marshmallow.Schema):
         default=None,
         validate=strictly_positive_int_validator,
     )
+    template_id = marshmallow.fields.Integer(
+        example=42,
+        description="content_id of template content, if content should be created "
+        "from a template, this should be template content_id.",
+        allow_none=True,
+        default=None,
+        validate=strictly_positive_int_validator,
+    )
 
     @post_load
     def make_content_creation(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1725,6 +1742,7 @@ class ContentDigestSchema(UserInfoContentAbstractSchema):
     is_archived = marshmallow.fields.Bool(example=False, default=False)
     is_deleted = marshmallow.fields.Bool(example=False, default=False)
     is_editable = marshmallow.fields.Bool(example=True, default=True)
+    is_template = marshmallow.fields.Bool(example=False, default=False)
     show_in_ui = marshmallow.fields.Bool(
         example=True,
         description="if false, then do not show content in the treeview. "
@@ -1772,17 +1790,20 @@ class ReadStatusSchema(marshmallow.Schema):
 #####
 # Content
 #####
-class ContentSchema(ContentDigestSchema):
+class MessageContentSchema(ContentDigestSchema):
     description = StrippedString(
         required=True, description="raw text or html description of the content"
-    )
-    raw_content = StrippedString(
-        required=True,
-        description="Content of the object, may be raw text or <b>html</b> for example",
     )
     version_number = marshmallow.fields.Int(
         description="Version number of the content, starting at 1 and incremented by 1 for each revision",
         validate=strictly_positive_int_validator,
+    )
+
+
+class ContentSchema(MessageContentSchema):
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
     )
 
 
@@ -1800,7 +1821,7 @@ class PreviewInfoSchema(marshmallow.Schema):
     )
 
 
-class FileContentSchema(ContentSchema):
+class MessageFileContentSchema(ContentSchema):
     mimetype = StrippedString(
         description="file content mimetype", example="image/jpeg", required=True
     )
@@ -1808,6 +1829,13 @@ class FileContentSchema(ContentSchema):
         description="file size in byte, return null value if unavailable",
         example=1024,
         allow_none=True,
+    )
+
+
+class FileContentSchema(MessageFileContentSchema):
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
     )
 
 
@@ -1878,7 +1906,7 @@ class TagSchema(marshmallow.Schema):
     tag_name = StrippedString(example="todo")
 
 
-class CommentSchema(marshmallow.Schema):
+class MessageCommentSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
     content_type = StrippedString(example="html-document", validate=all_content_types_validator)
@@ -1887,12 +1915,15 @@ class CommentSchema(marshmallow.Schema):
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
     parent_label = String(example="This is a label")
-    raw_content = StrippedString(example="<p>This is just an html comment !</p>")
     description = StrippedString(example="This is a description")
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
     )
+
+
+class CommentSchema(MessageCommentSchema):
+    raw_content = StrippedString(example="<p>This is just an html comment !</p>")
 
 
 class SetCommentSchema(marshmallow.Schema):
@@ -1971,6 +2002,18 @@ class SetContentStatusSchema(marshmallow.Schema):
     @post_load
     def set_status(self, data: typing.Dict[str, typing.Any]) -> object:
         return SetContentStatus(**data)
+
+
+class SetContentIsTemplateSchema(marshmallow.Schema):
+    is_template = marshmallow.fields.Boolean(description="set content as a template", default=False)
+
+    @post_load
+    def set_marked_as_template(self, data: typing.Dict[str, typing.Any]) -> object:
+        return SetContentIsTemplate(**data)
+
+
+class TemplateQuerySchema(marshmallow.Schema):
+    type = StrippedString(example="html-document", validate=all_content_types_validator)
 
 
 class TargetLanguageSchema(marshmallow.Schema):

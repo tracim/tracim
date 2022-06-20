@@ -58,10 +58,19 @@ class TestMailNotifyDaemon(object):
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=True,
         )
         # Send mail async from redis queue with daemon
         daemon = MailSenderDaemon(app_config, burst=True)

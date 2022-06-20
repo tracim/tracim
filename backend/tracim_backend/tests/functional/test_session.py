@@ -121,6 +121,56 @@ class TestLoginEndpoint(object):
 
 
 @pytest.mark.usefixtures("base_fixture")
+@pytest.mark.parametrize(
+    "config_section", [{"name": "functional_ldap_anonymous_test"}], indirect=True
+)
+class TestLDAPAuthOnlyEndpointAnonymous(object):
+    @pytest.mark.skip(
+        "This test does not work as expected if not run alone due to some kind"
+        "of side effect when reloading multiple LDAP configuration in a same test "
+        "session"
+    )
+    def test_api__try_login_enpoint_ldap_auth_anonymous__ok_200__valid_ldap_user(self, web_testapp):
+        params = {"username": "hubert@planetexpress.com", "password": "professor"}
+        # user creation
+        with freeze_time("1999-12-31 23:59:59"):
+            creation_date = datetime.datetime.utcnow()
+            res = web_testapp.post_json("/api/auth/login", params=params, status=200)
+            assert res.json_body["created"]
+            assert (
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
+                == datetime.datetime.utcnow()
+            )
+            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["email"] == "hubert@planetexpress.com"
+            assert res.json_body["is_active"]
+            assert res.json_body["profile"]
+            assert res.json_body["profile"] == "users"
+            assert res.json_body["has_avatar"] is False
+            assert res.json_body["auth_type"] == "ldap"
+
+        with freeze_time("2002-01-01 12:00:00"):
+            # normal login
+            res = web_testapp.post_json("/api/auth/login", params=params, status=200)
+            assert res.json_body["created"]
+            assert (
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
+                == creation_date
+            )
+            assert (
+                datetime.datetime.strptime(res.json_body["created"], "%Y-%m-%dT%H:%M:%SZ")
+                != datetime.datetime.utcnow()
+            )
+            assert res.json_body["public_name"] == "Hubert"
+            assert res.json_body["email"] == "hubert@planetexpress.com"
+            assert res.json_body["is_active"]
+            assert res.json_body["profile"]
+            assert res.json_body["profile"] == "users"
+            assert res.json_body["has_avatar"] is False
+            assert res.json_body["auth_type"] == "ldap"
+
+
+@pytest.mark.usefixtures("base_fixture")
 @pytest.mark.parametrize("config_section", [{"name": "functional_ldap_test"}], indirect=True)
 class TestLDAPAuthOnlyEndpoint(object):
     def test_api__try_login_enpoint_ldap_auth__ok_200__valid_ldap_user(self, web_testapp):

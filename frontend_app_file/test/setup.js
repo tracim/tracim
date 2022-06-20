@@ -18,6 +18,7 @@ if (!global.window && !global.document) {
     url: 'http://localhost'
   })
 
+  global.self = global
   global.window = window
   global.document = window.document
   global.navigator = window.navigator

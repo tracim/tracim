@@ -53,7 +53,7 @@ class TagLib:
     def get_one(
         self,
         tag_id: typing.Optional[int] = None,
-        tag_name: typing.Optional[int] = None,
+        tag_name: typing.Optional[str] = None,
         workspace_id: typing.Optional[int] = None,
         content_id: typing.Optional[int] = None,
     ) -> Tag:

@@ -422,13 +422,19 @@ class UserController(Controller):
         if not password and hapic_data.body.email_notification:
             password = password_generator()
 
+        email = hapic_data.body.email.email_address if hapic_data.body.email else None
+        public_name = (
+            hapic_data.body.public_name
+            or (hapic_data.body.email.username if hapic_data.body.email else None)
+            or None
+        )
         user = uapi.create_user(
             auth_type=AuthType.UNKNOWN,
-            email=hapic_data.body.email,
+            email=email,
             password=password,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
-            name=hapic_data.body.public_name,
+            name=public_name,
             username=hapic_data.body.username,
             do_notify=hapic_data.body.email_notification,
             allowed_space=hapic_data.body.allowed_space,
@@ -461,13 +467,20 @@ class UserController(Controller):
             and request.app_config.NEW_USER__INVITATION__DO_NOTIFY
             and request.app_config.JOBS__PROCESSING_MODE == request.app_config.CST.SYNC
         )
+
+        email = hapic_data.body.email.email_address if hapic_data.body.email else None
+        public_name = (
+            hapic_data.body.public_name
+            or (hapic_data.body.email.username if hapic_data.body.email else None)
+            or None
+        )
         user = uapi.create_user(
             auth_type=AuthType.UNKNOWN,
-            email=hapic_data.body.email,
+            email=email,
             password=hapic_data.body.password,
             timezone=hapic_data.body.timezone,
             lang=hapic_data.body.lang,
-            name=hapic_data.body.public_name,
+            name=public_name,
             username=hapic_data.body.username,
             creation_type=UserCreationType.REGISTER,
             do_save=True,

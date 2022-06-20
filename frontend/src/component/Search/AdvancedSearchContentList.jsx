@@ -6,7 +6,7 @@ import {
   CONTENT_TYPE,
   Icon,
   ListItemWrapper,
-  FilenameWithExtension,
+  FilenameWithBadges,
   PAGE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
@@ -50,7 +50,7 @@ export const AdvancedSearchContentList = props => {
             {props.t('Last Modification')}
           </div>
           <div className='advancedSearchContent__information'>
-            {props.t('Information_plural')}
+            {props.t('Information__plural')}
           </div>
         </div>
       )}
@@ -86,7 +86,7 @@ export const AdvancedSearchContentList = props => {
                 </div>
 
                 <div className='advancedSearchContent__name_path'>
-                  <FilenameWithExtension file={searchItem} />
+                  <FilenameWithBadges file={searchItem} />
                   <Breadcrumbs
                     breadcrumbsList={searchItem.breadcrumbsList || []}
                     keepLastBreadcrumbAsLink

@@ -1,5 +1,11 @@
 import React from 'react'
-import { BtnSwitch, Icon, ROLE_LIST } from 'tracim_frontend_lib'
+import { Link } from 'react-router-dom'
+import {
+  BtnSwitch,
+  Icon,
+  PAGE,
+  ROLE_LIST
+} from 'tracim_frontend_lib'
 
 require('./UserStatus.styl')
 
@@ -44,7 +50,10 @@ export const UserStatus = props => {
         )}
 
         {props.displaySubscriptionRequestsInformation && (
-          <div className='userstatus__informations__requests'>
+          <Link
+            className='userstatus__informations__requests'
+            to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
+          >
             <Icon
               icon='fa-fw fas fa-sign-in-alt'
               title={props.t('{{newRequests}} new requests', {
@@ -56,7 +65,7 @@ export const UserStatus = props => {
                 newRequests: props.newSubscriptionRequestsNumber
               })}
             </div>
-          </div>
+          </Link>
         )}
       </div>
     </div>

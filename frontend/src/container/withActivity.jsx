@@ -2,6 +2,8 @@ import React from 'react'
 
 import {
   CONTENT_TYPE,
+  getContent,
+  handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -114,6 +116,17 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       props.dispatch(setActivityEventList(activity.id, messageListResponse.json.items))
     }
 
+    getContent = async (contentId) => {
+      const { props } = this
+      const fetchGetContent = await handleFetchResult(await getContent(FETCH_CONFIG.apiUrl, contentId))
+      switch (fetchGetContent.apiResponse.status) {
+        case 200: return fetchGetContent.body
+        default:
+          props.dispatch(newFlashMessage(props.t('Unknown content')))
+          return {}
+      }
+    }
+
     updateActivityListFromTlm = async (data) => {
       const { props } = this
       if (
@@ -122,7 +135,23 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       ) return
       await this.waitForNoChange()
       this.changingActivityList = true
-      const updatedActivityList = await addMessageToActivityList(data, props.activity.list, FETCH_CONFIG.apiUrl)
+      let activity = data
+      if (
+        (data.event_type.includes(TLM_ET.CONTENT) && !data.event_type.includes(TLM_SUB.COMMENT)) ||
+        (data.event_type.includes(TLM_ET.MENTION) && data.fields.content.content_type !== TLM_SUB.COMMENT)
+      ) {
+        activity = {
+          ...data,
+          fields: {
+            ...data.fields,
+            content: {
+              ...data.fields.content,
+              ...await this.getContent(data.fields.content.content_id)
+            }
+          }
+        }
+      }
+      const updatedActivityList = await addMessageToActivityList(activity, props.activity.list, FETCH_CONFIG.apiUrl)
       props.dispatch(setActivityList(updatedActivityList))
       const showRefresh = (
         updatedActivityList.length > 0 &&
@@ -205,6 +234,8 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
     }
 
+    isLoggedUserMember = (activity) => this.props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
+
     isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
       const { props } = this
       if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
@@ -215,14 +246,18 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     }
 
     activityDisplayFilter = (activity) => {
-      const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION]
+      const { props } = this
+      const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION, TLM_ET.SHAREDSPACE]
+
       return entityType.includes(activity.entityType) &&
         (
           (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-          this.isSubscriptionRequestOrRejection(activity) ||
-          this.isMemberCreatedOrModified(activity)
+          (this.isSubscriptionRequestOrRejection(activity) && this.isLoggedUserMember(activity)) ||
+          (this.isMemberCreatedOrModified(activity) && this.isLoggedUserMember(activity)) ||
+          (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.user.userId)
         )
     }
+
     /**
      * DOC - SG - 2021-05-05
      * Load a batch of activities and merge them into the given list

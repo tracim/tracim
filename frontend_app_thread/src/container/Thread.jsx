@@ -65,7 +65,8 @@ export class Thread extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      isFileCommentLoading: false
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -410,6 +411,7 @@ export class Thread extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
           breadcrumbsList={state.breadcrumbsList}
+          showMarkedAsTemplate={false}
         />
 
         <PopinFixedContent customClass={`${state.config.slug}__contentpage`}>
@@ -481,6 +483,7 @@ export class Thread extends React.Component {
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+                isFileCommentLoading={state.isFileCommentLoading}
               />
             ) : null}
           </div>

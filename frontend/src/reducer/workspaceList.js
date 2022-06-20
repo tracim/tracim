@@ -15,6 +15,7 @@ import { uniqBy } from 'lodash'
 
 export const serializeWorkspaceListProps = {
   agenda_enabled: 'agendaEnabled',
+  default_user_role: 'defaultRole',
   is_deleted: 'isDeleted',
   label: 'label',
   parent_id: 'parentId',

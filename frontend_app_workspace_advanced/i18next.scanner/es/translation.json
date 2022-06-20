@@ -3,5 +3,20 @@
   "Error while saving new role for member": "Error al guardar el nuevo rol del miembro",
   "Please set a role": "Por favor, establezca un rol",
   "Member removed": "Miembro eliminado",
-  "Member added": "Miembro añadido"
+  "Member added": "Miembro añadido",
+  "Delete": "Suprimir",
+  "CalDAV compatible software": "Software compatible con CalDAV",
+  "Use this link to integrate this agenda to your": "Utilice este enlace para integrar esta agenda en su",
+  "Confirm": "Confirmar",
+  "Error while adding the member to the space": "Error al añadir el miembro al espacio",
+  "Unknown user": "Usuario desconocido",
+  "This account is deactivated": "Esta cuenta está desactivada",
+  "Error while removing member": "Error al eliminar el miembro",
+  "This user already is in the space": "Este usuario ya está en el espacio",
+  "Note, only administrators can send invitational email": "\n",
+  "Description": "Descripción",
+  "Request accepted": "Solicitud aceptada",
+  "Default role:": "Rol por defecto:",
+  "Error while deleting space": "Error al borrar el espacio",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Este es el rol que los miembros tendrán por defecto cuando se unan a su espacio (sólo para espacios abiertos y bajo petición)."
 }

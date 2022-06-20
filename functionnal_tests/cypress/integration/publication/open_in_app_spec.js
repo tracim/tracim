@@ -2,7 +2,9 @@ import { PAGES as p } from '../../support/urls_commands'
 import baseWorkspace from '../../fixtures/baseWorkspace.json'
 import baseOtherUser from '../../fixtures/baseOtherUser.json'
 
-describe('Open publications in the thread app', () => {
+describe.skip('Open publications in the thread app', () => {
+  // FIXME MB - 2022-03-29 - Unstable test
+  // See https://github.com/tracim/tracim/issues/5344
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
@@ -29,9 +31,7 @@ describe('Open publications in the thread app', () => {
     cy.cancelXHR()
   })
 
-  it.skip('should redirect to the thread app with the right icon', () => {
-    // FIXME MB - 2022-03-29 - Unstable test
-    // See https://github.com/tracim/tracim/issues/5344
+  it('should redirect to the thread app with the right icon', () => {
     function checkAndCloseThreadApp () {
         cy.get('.wsContentGeneric.thread .wsContentGeneric__header__icon i.fa-stream').should('have.attr', 'style', 'color: rgb(102, 31, 152);')
         cy.get('.wsContentGeneric.thread .wsContentGeneric__header__close').should('be.visible').click()

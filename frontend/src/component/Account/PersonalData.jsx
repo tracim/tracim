@@ -35,7 +35,10 @@ export class PersonalData extends React.Component {
 
   handleChangeLang = newLang => this.setState({ newLang })
 
-  handleChangeEmail = e => this.setState({ newEmail: e.target.value })
+  handleChangeEmail = e => {
+    const email = e.target.value.trim()
+    this.setState({ newEmail: email })
+  }
 
   handleChangeCheckPassword = e => this.setState({ checkPassword: e.target.value })
 
@@ -120,6 +123,17 @@ export class PersonalData extends React.Component {
             </div>
           )}
 
+          {!props.displayAdminInfo && (
+            <div>
+              {props.t('New language:')}
+              <DropdownLang
+                langList={props.langList}
+                langActiveId={state.newLang}
+                onChangeLang={this.handleChangeLang}
+              />
+            </div>
+          )}
+
           {(state.newEmail !== '' || state.newUsername !== '') && (
             <div>
               <label>
@@ -132,17 +146,6 @@ export class PersonalData extends React.Component {
                   disabled={state.newEmail === '' && state.newUsername === ''}
                 />
               </label>
-            </div>
-          )}
-
-          {!props.displayAdminInfo && (
-            <div>
-              {props.t('New language:')}
-              <DropdownLang
-                langList={props.langList}
-                langActiveId={state.newLang}
-                onChangeLang={this.handleChangeLang}
-              />
             </div>
           )}
 

@@ -24,25 +24,27 @@ export const TabBar = props => {
         iconTooltip={spaceType.label}
       />
 
-      <Tab
-        page={PAGE.WORKSPACE.DASHBOARD(props.currentSpace.id)}
-        icon='fas fa-fw fa-tachometer-alt'
-        label={props.t('Dashboard')}
-      />
-
-      {props.currentSpace.publicationEnabled && (
+      <div className='tabBar__tabs'>
         <Tab
-          page={PAGE.WORKSPACE.PUBLICATIONS(props.currentSpace.id)}
-          icon='fas fa-fw fa-stream'
-          label={props.t('News')}
+          page={PAGE.WORKSPACE.DASHBOARD(props.currentSpace.id)}
+          icon='fas fa-fw fa-tachometer-alt'
+          label={props.t('Dashboard')}
         />
-      )}
 
-      <Tab
-        page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
-        icon='fas fa-fw fa-th'
-        label={props.t('Contents')}
-      />
+        {props.currentSpace.publicationEnabled && (
+          <Tab
+            page={PAGE.WORKSPACE.PUBLICATIONS(props.currentSpace.id)}
+            icon='fas fa-fw fa-stream'
+            label={props.t('News')}
+          />
+        )}
+
+        <Tab
+          page={PAGE.WORKSPACE.CONTENT_LIST(props.currentSpace.id)}
+          icon='fas fa-fw fa-th'
+          label={props.t('Contents')}
+        />
+      </div>
     </div>
   )
 }

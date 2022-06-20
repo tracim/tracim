@@ -51,7 +51,6 @@ import {
   WORKSPACE_DETAIL,
   WORKSPACE_LIST,
   WORKSPACE_MEMBER_ADD,
-  WORKSPACE_MEMBER_LIST,
   WORKSPACE_MEMBER_REMOVE,
   WORKSPACE_MEMBER_UPDATE,
   WORKSPACE_PUBLICATION_LIST,
@@ -372,7 +371,9 @@ export const putUserUsername = (user, newUsername, checkPassword) => dispatch =>
   })
 }
 
-export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
+export const putMyselfEmail = (newEmailWithoutTrim, checkPassword) => dispatch => {
+  const newEmail = newEmailWithoutTrim.trim()
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/me/email`,
     param: {
@@ -391,7 +392,9 @@ export const putMyselfEmail = (newEmail, checkPassword) => dispatch => {
   })
 }
 
-export const putUserEmail = (user, newEmail, checkPassword) => dispatch => {
+export const putUserEmail = (user, newEmailWithoutTrim, checkPassword) => dispatch => {
+  const newEmail = newEmailWithoutTrim.trim()
+
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${user.userId}/email`,
     param: {
@@ -541,21 +544,6 @@ export const getWorkspaceDetail = (workspaceId) => dispatch => {
       method: 'GET'
     },
     actionName: WORKSPACE_DETAIL,
-    dispatch
-  })
-}
-
-export const getWorkspaceMemberList = (workspaceId, showDisabledUser = false) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`,
-    param: {
-      credentials: 'include',
-      headers: {
-        ...FETCH_CONFIG.headers
-      },
-      method: 'GET'
-    },
-    actionName: WORKSPACE_MEMBER_LIST,
     dispatch
   })
 }

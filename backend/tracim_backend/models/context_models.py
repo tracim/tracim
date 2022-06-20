@@ -26,6 +26,7 @@ from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.utils import CONTENT_FRONTEND_URL_SCHEMA
 from tracim_backend.lib.utils.utils import WORKSPACE_FRONTEND_URL_SCHEMA
+from tracim_backend.lib.utils.utils import EmailUser
 from tracim_backend.lib.utils.utils import core_convert_file_name_to_display
 from tracim_backend.lib.utils.utils import get_frontend_ui_base_url
 from tracim_backend.lib.utils.utils import string_to_list
@@ -286,7 +287,7 @@ class UserCreation(object):
         email_notification: bool = True,
         allowed_space: Optional[int] = None,
     ) -> None:
-        self.email = email
+        self.email = EmailUser(email) if email else None
         # INFO - G.M - 2018-08-16 - cleartext password, default value
         # is auto-generated.
         self.password = password or None
@@ -655,7 +656,7 @@ class WorkspaceMemberInvitation(object):
         role: str = None,
     ) -> None:
         self.role = role
-        self.user_email = user_email
+        self.user_email = EmailUser(user_email) if user_email else None
         self.user_username = user_username
         self.user_id = user_id
 
@@ -725,11 +726,13 @@ class ContentCreation(object):
         content_type: str,
         content_namespace: ContentNamespaces,
         parent_id: Optional[int] = None,
+        template_id: Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
         self.content_namespace = content_namespace
+        self.template_id = template_id
 
 
 class CommentCreation(object):
@@ -767,6 +770,15 @@ class SetContentStatus(object):
 
     def __init__(self, status: str) -> None:
         self.status = status
+
+
+class SetContentIsTemplate(object):
+    """
+    Set the is_template property of a content.
+    """
+
+    def __init__(self, is_template: bool) -> None:
+        self.is_template = is_template
 
 
 class ContentUpdate(object):
@@ -1335,6 +1347,10 @@ class ContentInContext(object):
         return self.content.status
 
     @property
+    def is_template(self) -> bool:
+        return self.content.is_template
+
+    @property
     def is_archived(self) -> bool:
         return self.content.is_archived
 
@@ -1657,6 +1673,10 @@ class RevisionInContext(object):
     @property
     def status(self) -> str:
         return self.revision.status
+
+    @property
+    def is_template(self) -> bool:
+        return self.revision.is_template
 
     @property
     def is_archived(self) -> bool:

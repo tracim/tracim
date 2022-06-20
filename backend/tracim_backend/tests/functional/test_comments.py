@@ -176,10 +176,11 @@ class TestCommentsEndpoint(object):
         assert comment["author"]["username"] == admin_user.username
         # TODO - G.M - 2018-06-179 - better check for datetime
         assert comment["created"]
-
         created = event_helper.last_event
         assert created.event_type == "content.created.comment"
-        assert created.content == comment
+        comment_without_raw_content = comment.copy()
+        del comment_without_raw_content["raw_content"]
+        assert created.content == comment_without_raw_content
         workspace = web_testapp.get(
             "/api/workspaces/{}".format(business_workspace.workspace_id), status=200
         ).json_body

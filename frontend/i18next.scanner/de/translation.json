@@ -29,7 +29,7 @@
   "Cancelled": "Abgebrochen",
   "Deprecated": "Veraltet",
   "Information": "Information",
-  "Information_plural": "Informationen",
+  "Information__plural": "Informationen",
   "Warning": "Warnung",
   "Error": "Fehler",
   "Loading…": "Laden…",
@@ -553,5 +553,8 @@
   "Configuration links": "Links zur Konfiguration",
   "{{author}} made {{count}} contributions": "{{author}} hat {{count}} Beitrag geleistet",
   "{{author}} made {{count}} contributions_plural": "{{author}} hat {{count}} Beiträge geleistet",
-  " on {{content}}": " in {{content}}"
+  " on {{content}}": " in {{content}}",
+  "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> schuf den Bereich <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> löschte den Bereich <2><0><0>{{workspaceLabel}}</0></0></2>",
+  "Error loading unread notification number": "Fehler beim Laden der Anzahl ungelesener Benachrichtigungen"
 }

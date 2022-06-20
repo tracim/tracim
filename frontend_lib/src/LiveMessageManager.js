@@ -116,7 +116,8 @@ export class LiveMessageManager {
     }
 
     this.eventSource.onerror = (e) => {
-      console.log('%c.:. TLM Connection Error: ', 'color: #ccc0e2', e)
+      console.log('%c.:. TLM Connection Error: ', 'color: #ccc0e2')
+      console.log(e)
       this.broadcastStatus(LIVE_MESSAGE_STATUS.ERROR)
       this.restartEventSourceConnection()
     }

@@ -8,7 +8,7 @@ requires = [
     "plaster_pastedeploy",
     "pyramid>=2.0.0",
     "pyramid_debugtoolbar",
-    "waitress",
+    "waitress>=2.1.1",
     # Database
     "pyramid_tm",
     "SQLAlchemy<1.4.0",
@@ -21,7 +21,8 @@ requires = [
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible
-    "apispec-marshmallow-advanced>=0.4" "apispec==2.0.2",
+    "apispec-marshmallow-advanced>=0.4",
+    "apispec==2.0.2",
     "marshmallow <3.0.0a1,>=2.21.0",
     # CLI
     "cliff",
@@ -32,13 +33,13 @@ requires = [
     "filedepot>=0.8.0",
     "babel",
     "python-slugify",
-    "preview-generator>=0.28",
+    "preview-generator>=0.29",
     "colour",
     "python-dateutil",
     "gitpython",
     # mail-notifier
     "mako",
-    "lxml",
+    "lxml>=4.8.0",
     "redis>=3.5.3",
     "rq>=1.9.0",
     "html2text",
@@ -99,17 +100,7 @@ tests_require = [
     "sseclient-py",
 ]
 
-devtools_require = [
-    "flake8",
-    "isort",
-    "mypy",
-    "pre-commit",
-]
-
-
-# add black for python 3.6+
-if sys.version_info.major == 3 and sys.version_info.minor >= 6:
-    devtools_require.append("black==19.10b0")
+devtools_require = ["flake8", "isort", "mypy", "pre-commit", "black==19.10b0"]
 
 mysql_require = ["PyMySQL[rsa]"]
 

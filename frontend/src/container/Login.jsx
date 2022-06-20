@@ -9,6 +9,7 @@ import * as Cookies from 'js-cookie'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  getWorkspaceMemberList,
   handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
@@ -46,7 +47,6 @@ import {
   getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
-  getWorkspaceMemberList,
   postUserLogout,
   postUserLogin,
   putUserLang,
@@ -152,17 +152,17 @@ class Login extends React.Component {
 
   handleClickCreateAccount = async (event) => {
     const { props } = this
+    const { name, login, password } = event.target
+    const loginTrimmed = login.value.trim()
 
     event.preventDefault()
 
-    const { name, login, password } = event.target
-
-    if (name.value === '' || login.value === '' || password.value === '') {
+    if (name.value === '' || loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('All fields are required. Please enter a name, an email and a password.'), 'warning'))
       return
     }
 
-    if (!checkEmailValidity(login.value)) {
+    if (!checkEmailValidity(loginTrimmed)) {
       props.dispatch(newFlashMessage(props.t('Invalid email. Please enter a valid email.'), 'warning'))
       return
     }
@@ -185,7 +185,7 @@ class Login extends React.Component {
     }
 
     const fetchPostUserRegister = await props.dispatch(postUserRegister({
-      email: login.value,
+      email: loginTrimmed,
       password: password.value,
       public_name: name.value
     }))
@@ -195,7 +195,6 @@ class Login extends React.Component {
         this.handleClickSignIn({
           login: login,
           password: password
-
         })
         break
       case 400:
@@ -211,6 +210,7 @@ class Login extends React.Component {
 
   handleClickSignInEvent = async (event) => {
     event.preventDefault()
+
     this.handleClickSignIn({
       login: event.target.login,
       password: event.target.password
@@ -219,16 +219,16 @@ class Login extends React.Component {
 
   handleClickSignIn = async (signInObject) => {
     const { props, state } = this
-
     const { login, password } = signInObject
+    const loginTrimmed = login.value.trim()
 
-    if (login.value === '' || password.value === '') {
+    if (loginTrimmed === '' || password.value === '') {
       props.dispatch(newFlashMessage(props.t('Please enter a login and a password'), 'warning'))
       return
     }
 
     const credentials = {
-      ...(checkEmailValidity(login.value) ? { email: login.value } : { username: login.value }),
+      ...(checkEmailValidity(loginTrimmed) ? { email: loginTrimmed } : { username: loginTrimmed }),
       password: password.value
     }
 
@@ -356,13 +356,13 @@ class Login extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
       workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
@@ -414,7 +414,7 @@ class Login extends React.Component {
     const fetchUnreadMessageCount = await props.dispatch(getUserMessagesSummary(userId))
     switch (fetchUnreadMessageCount.status) {
       case 200: props.dispatch(setUnreadNotificationCount(fetchUnreadMessageCount.json.unread_messages_count)); break
-      default: props.dispatch(newFlashMessage(props.t('Error loading unread mention number')))
+      default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
     }
   }
 
@@ -430,7 +430,7 @@ class Login extends React.Component {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:
@@ -484,5 +484,5 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, system, breadcrumbs, tlm }) => ({ user, system, breadcrumbs, tlm })
+const mapStateToProps = ({ user, system, breadcrumbs, tlm, workspaceList }) => ({ user, system, breadcrumbs, tlm, workspaceList })
 export default withRouter(connect(mapStateToProps)(translate()(appFactory(Login))))

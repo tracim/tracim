@@ -80,14 +80,18 @@ export class ForgotPassword extends React.Component {
 
   handleClickSubmit = async () => {
     const { props, state } = this
+    const backupLogin = state.backupLogin.value.trim()
 
     const fetchPostResetPassword = await props.dispatch(
       postForgotPassword(
-        checkEmailValidity(state.backupLogin.value) ? { email: state.backupLogin.value } : { username: state.backupLogin.value }
+        checkEmailValidity(backupLogin) ? { email: backupLogin } : { username: backupLogin }
       )
     )
     switch (fetchPostResetPassword.status) {
-      case 204: props.dispatch(newFlashMessage(props.t("Email sent, don't forget to check your spam"), 'info')); break
+      case 204:
+        props.history.push(PAGE.LOGIN)
+        props.dispatch(newFlashMessage(props.t("Email sent, don't forget to check your spam"), 'info'))
+        break
       case 400:
         switch (fetchPostResetPassword.json.code) {
           case 1001: props.dispatch(newFlashMessage(props.t('Unknown email or username'), 'warning')); break

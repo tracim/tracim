@@ -16,6 +16,11 @@ describe('<JoinWorkspace />', () => {
   const props = {
     user: user,
     history: {
+      location: {
+        state: {
+          fromSearch: false
+        }
+      },
       push: () => {}
     },
     t: key => key,

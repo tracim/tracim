@@ -66,6 +66,11 @@ export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus
     status: newStatus
   })
 
+export const putContentTemplate = (apiUrl, workspaceId, contentId, isTemplate) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/template`, {
+    is_template: isTemplate
+  })
+
 export const putContentArchived = (apiUrl, workspaceId, contentId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/archived`)
 
@@ -111,8 +116,8 @@ export const getReservedUsernames = async (apiUrl) =>
 export const getWorkspaceDetail = (apiUrl, workspaceId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}`)
 
-export const getWorkspaceMemberList = (apiUrl, workspaceId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members`)
+export const getWorkspaceMemberList = (apiUrl, workspaceId, showDisabledUser = false) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
 
 export const deleteWorkspace = (apiUrl, workspaceId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/trashed`)
@@ -156,6 +161,12 @@ export const putMyselfFileRead = (apiUrl, workspaceId, contentId) =>
 export const getContent = (apiUrl, contentId) =>
   baseFetch('GET', `${apiUrl}/contents/${contentId}`)
 
+export const getTemplateList = (apiUrl, templateType) =>
+  baseFetch('GET', `${apiUrl}/users/me/template_contents?type=${templateType}`)
+
+export const getComment = (apiUrl, workspaceId, contentId, commentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/comments/${commentId}`)
+
 export const getContentReactionList = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions`)
 
@@ -166,7 +177,7 @@ export const deleteContentReaction = (apiUrl, workspaceId, contentId, reactionId
   baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/reactions/${reactionId}`)
 
 export const getWorkspaceContent = (apiUrl, workspaceId, contentType, contentId) =>
-  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}/${contentId}`)
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/${contentType}s/${contentId}`)
 
 export const getCommentTranslated = (apiUrl, workspaceId, contentId, commentId, targetLanguageCode) => {
   const name = `comment-${commentId}.html`
@@ -231,6 +242,7 @@ export const postRawFileContent = (
   content,
   mimetype = 'text/plain',
   parentId = null,
+  templateId = null,
   contentType = CONTENT_TYPE.FILE,
   contentNamespace = CONTENT_NAMESPACE.CONTENT
 ) => {
@@ -239,6 +251,7 @@ export const postRawFileContent = (
   formData.append('content_namespace', contentNamespace)
   formData.append('content_type', contentType)
   if (parentId) formData.append('parent_id', parentId)
+  if (templateId) formData.append('template_id', templateId)
   return baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/files`, formData)
 }
 

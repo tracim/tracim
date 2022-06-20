@@ -41,22 +41,26 @@ import {
 
 import {
   deleteComment,
-  putEditContent,
+  deleteContentFromFavoriteList,
+  getComment,
+  getCommentTranslated,
+  getContent,
+  getContentComment,
+  getFavoriteContentList,
+  getFileChildContent,
+  getMyselfKnownContents,
+  getMyselfKnownMember,
+  getTemplateList,
+  postContentToFavoriteList,
   putComment,
-  postNewComment,
-  putEditStatus,
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownContents,
-  getMyselfKnownMember,
-  getCommentTranslated,
-  postContentToFavoriteList,
-  getFavoriteContentList,
-  deleteContentFromFavoriteList,
-  getContentComment,
-  getFileChildContent
+  putContentTemplate,
+  putEditContent,
+  putEditStatus,
+  postNewComment
 } from './action.async.js'
 
 import {
@@ -107,7 +111,7 @@ export function appContentFactory (WrappedComponent) {
 
       props.registerLiveMessageHandlerList([
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
-        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
@@ -130,6 +134,66 @@ export function appContentFactory (WrappedComponent) {
     }
 
     setApiUrl = url => { this.apiUrl = url }
+
+    getContent = async (contentId) => {
+      const fetchGetContent = await handleFetchResult(await getContent(this.apiUrl, contentId))
+
+      switch (fetchGetContent.apiResponse.status) {
+        case 200: return fetchGetContent.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown content'))
+          return {}
+      }
+    }
+
+    getTemplateList = async (setState, templateType) => {
+      const result = await getTemplateList(this.apiUrl, templateType)
+      const fetchGetTemplates = await handleFetchResult(result)
+      const templateList = []
+
+      switch (fetchGetTemplates.apiResponse.status) {
+        case 200:
+          fetchGetTemplates.body.forEach(template => {
+            templateList.push({
+              ...template,
+              value: template.content_id
+            })
+          })
+          setState({ templateList: templateList })
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          setState({ templateList: templateList })
+          break
+      }
+    }
+
+    getComment = async (workspaceId, contentId, commentId) => {
+      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, workspaceId, contentId, commentId))
+
+      switch (fetchGetComment.apiResponse.status) {
+        case 200: return fetchGetComment.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown comment'))
+          return {}
+      }
+    }
+
+    handleCommentCreated = async (tlm) => {
+      const { state } = this
+      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+      this.handleChildContentCreated({
+        ...tlm,
+        fields: {
+          ...tlm.fields,
+          content: {
+            ...tlm.fields.content,
+            ...comment
+          }
+        }
+      })
+    }
 
     handleChildContentCreated = (tlm) => {
       const { state } = this
@@ -155,12 +219,15 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentCommentModified = (tlm) => {
+    handleContentCommentModified = async (tlm) => {
       const { state } = this
       if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const wholeTimeline = this.updateCommentOnTimeline(
-          tlm.fields.content,
+          { ...tlm.fields.content, ...comment },
           prevState.wholeTimeline,
           prevState.loggedUser.username
         )
@@ -181,15 +248,23 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentModified = (tlm) => {
+    handleContentModified = async (tlm) => {
       const { state } = this
       // Not our content
       if (!state.content || !permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
 
+      const content = await this.getContent(tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
         const wholeTimeline = addRevisionFromTLM(
-          tlm.fields,
+          {
+            ...tlm.fields,
+            content: {
+              ...tlm.fields.content,
+              ...content
+            }
+          },
           prevState.wholeTimeline,
           prevState.loggedUser.lang,
           isFromCurrentToken
@@ -292,6 +367,31 @@ export function appContentFactory (WrappedComponent) {
           default: sendGlobalFlashMessage(i18n.t('Error while saving the title')); break
         }
       }
+      return response
+    }
+
+    appContentMarkAsTemplate = async (setState, content, isTemplate = false) => {
+      setState({ disableChangeIsTemplate: true })
+      this.checkApiUrl()
+
+      if (!content) {
+        return {}
+      }
+
+      const response = await handleFetchResult(
+        await putContentTemplate(this.apiUrl, content.workspace_id, content.content_id, isTemplate)
+      )
+
+      switch (response.status) {
+        case 204:
+          setState({ isTemplate: isTemplate })
+          break
+        default:
+          sendGlobalFlashMessage('Error while marking this as a template')
+          break
+      }
+
+      setState({ disableChangeIsTemplate: false })
       return response
     }
 
@@ -470,19 +570,19 @@ export function appContentFactory (WrappedComponent) {
       content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername, id = ''
     ) => {
       this.checkApiUrl()
-
       if (newComment) {
         await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id)
       }
 
       if (newCommentAsFileList && newCommentAsFileList.length > 0) {
+        setState({ isFileCommentLoading: true })
         const responseList = await Promise.all(
           newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
         )
         const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
         uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
 
-        setState({ newCommentAsFileList: uploadFailedList })
+        setState({ newCommentAsFileList: uploadFailedList, isFileCommentLoading: false })
       }
     }
 
@@ -938,6 +1038,7 @@ export function appContentFactory (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           setApiUrl={this.setApiUrl}
+          addContentToFavoriteList={this.addContentToFavoriteList}
           appContentCustomEventHandlerShowApp={this.appContentCustomEventHandlerShowApp}
           appContentCustomEventHandlerHideApp={this.appContentCustomEventHandlerHideApp}
           appContentCustomEventHandlerReloadAppFeatureData={this.appContentCustomEventHandlerReloadAppFeatureData}
@@ -947,6 +1048,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeComment={this.appContentChangeComment}
           appContentDeleteComment={this.appContentDeleteComment}
           appContentEditComment={this.appContentEditComment}
+          appContentMarkAsTemplate={this.appContentMarkAsTemplate}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
@@ -955,11 +1057,11 @@ export function appContentFactory (WrappedComponent) {
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          getTemplateList={this.getTemplateList}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           isContentInFavoriteList={this.isContentInFavoriteList}
-          addContentToFavoriteList={this.addContentToFavoriteList}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
           buildChildContentTimelineItem={this.buildChildContentTimelineItem}

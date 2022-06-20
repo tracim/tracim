@@ -46,6 +46,7 @@ describe('<Dashboard />', () => {
   const mockStore = configureMockStore()
   const store = mockStore({
     workspaceActivity: { list: [], hasNextPage: false },
+    user: user,
     currentWorkspace: { label: 'test workspace' }
   })
 

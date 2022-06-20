@@ -19,7 +19,14 @@ from tracim_backend.lib.rq import get_rq_queue
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-@pytest.mark.parametrize("config_section", [{"name": "mail_test"}], indirect=True)
+@pytest.mark.parametrize(
+    "config_section",
+    [
+        {"name": "mail_test"},  # unencrypted, authenticated
+        {"name": "mail_test_anonymous"},  # unencrypted, anonymous
+    ],
+    indirect=True,
+)
 class TestEmailSender(object):
     def test__func__connect_disconnect__ok__nominal_case(self, app_config, mailhog):
         smtp_config = SmtpConfiguration(
@@ -27,7 +34,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
         sender.connect()
@@ -39,7 +47,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
 
@@ -84,7 +93,8 @@ class TestEmailSender(object):
             app_config.EMAIL__NOTIFICATION__SMTP__PORT,
             app_config.EMAIL__NOTIFICATION__SMTP__USER,
             app_config.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-            app_config.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL,
+            app_config.EMAIL__NOTIFICATION__SMTP__ENCRYPTION,
+            app_config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(app_config, smtp_config, True)
         html = """\
@@ -178,10 +188,19 @@ class TestNotificationsSync(object):
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=True,
         )
 
         # check mail received
@@ -216,10 +235,19 @@ class TestNotificationsSync(object):
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         item2 = api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=False
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=False,
         )
         api.create_comment(parent=item2, content="My super comment", do_save=True, do_notify=True)
         transaction.commit()
@@ -304,10 +332,19 @@ class TestNotificationsAsync(object):
 
         api = content_api_factory.get(current_user=user)
         item = api.create(
-            content_type_list.Folder.slug, workspace, None, "parent", do_save=True, do_notify=False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+            do_notify=False,
         )
         api.create(
-            content_type_list.File.slug, workspace, item, "file1", do_save=True, do_notify=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+            do_notify=True,
         )
         # Send mail async from redis queue
         redis = get_redis_connection(app_config)

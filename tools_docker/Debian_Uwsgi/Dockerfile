@@ -81,7 +81,7 @@ FROM base
 
 LABEL org.opencontainers.image.authors="contact@tracim.fr"
 
-ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,share_content,upload_permission,gallery"
+ENV DEFAULT_APP_LIST="contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,share_content,upload_permission,gallery"
 ENV START_WEBDAV=1
 ENV START_CALDAV=1
 ENV ENABLE_COLLABORATIVE_DOCUMENT_EDITION=0

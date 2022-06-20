@@ -3,7 +3,8 @@ import {
   USERNAME_ALLOWED_CHARACTERS_REGEX
 } from './helper.js'
 
-const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-Z0-9\-_]*)$/
+// INFO - CH - 2022-04-08 - À-ȕ is every latin characters with accents. \u0621-\u064A0 is Arabic alphabet
+const AUTOCOMPLETE_REGEX = /(?:^|\s)(@|#)([a-zA-ZÀ-ȕ\u0621-\u064A0-9\-_]*)$/
 
 let previousSelAndOffset = null
 

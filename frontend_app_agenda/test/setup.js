@@ -24,6 +24,8 @@ if (!global.window && !global.document) {
   global.GLOBAL_dispatchEvent = () => {}
   global.GLOBAL_primaryColor = '#aaaaaa'
   const nodeCrypto = require('crypto')
+  global.self = global
+
   global.crypto = {
     getRandomValues: (buffer) => { return nodeCrypto.randomFillSync(buffer) }
   }

@@ -57,6 +57,23 @@ have `agenda` app in `app.enabled` list, you MUST have `START_CALDAV=0`.
 If you want to use plugins and/or custom_toolbox you need to add files in `~/tracim/etc/plugins/` and `~/tracim/etc/custom_toolbox/` (default configuration). This two path are created when you start docker image for the first time.
 
 
+### Tracimcli inside docker
+
+For maintenance purpose you can use tracimcli command line in the docker this way:
+
+```bash
+docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli
+```
+for the interactive mode
+note: /etc/tracim is the folder where the config file is stored.
+
+
+or launching command directly:
+
+```bash
+docker exec -i -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
+```
+
 #### Updating index of ElasticSearch
 
 ⚠ Prerequiste: elasticsearch is running and you have starting Tracim with parameter to communicate with elasticsearch
@@ -64,16 +81,16 @@ If you want to use plugins and/or custom_toolbox you need to add files in `~/tra
 To make an update of elasticsearch index you need to go inside you Tracim container running:
 
         docker ps
-        docker exec -it {CONTAINER ID} /bin/bash
+        docker exec -it -u www-data -w /etc/tracim {CONTAINER ID} tracimcli
 
 Now you are in your Tracim container.
 
-        cd /tracim/backend
-        tracimcli search index-drop -c /etc/tracim/development.ini -d
-        tracimcli search index-create -c /etc/tracim/development.ini -d
-        tracimcli search index-populate -c /etc/tracim/development.ini -d
+        search index-drop -d
+        search index-create -d
+        search index-populate -d
 
 When is finished, you can quit your container. Index is now updated with all of your tracim content.
+
 
 #### Example commands
 
@@ -160,7 +177,7 @@ Note: with this new docker, all tracimcli and alembic command should be runned a
 user www-data, example:
 
 ```bash
-su www-data -s /bin/bash -c "tracimcli dev parameters value -f -d -c /etc/tracim/development.ini"
+docker exec -i -u www-data -w /etc/tracim {CONTAINER ID} tracimcli dev parameters value -f -d
 ```
 
 for this example,

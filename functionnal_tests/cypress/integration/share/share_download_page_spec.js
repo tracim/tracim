@@ -16,7 +16,7 @@ describe('Open a file', () => {
       workspaceId = workspace.workspace_id
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId).then(() => {
           cy.visitPage({ pageName: PAGES.DASHBOARD, params: { workspaceId } })
-          cy.contains('[data-cy=FilenameWithExtension__label]', fileTitle).click()
+          cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle).click()
           cy.get('.wsContentGeneric__content__right__header .fa-share-alt').should('be.visible').click()
         })
     })

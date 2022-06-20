@@ -2,6 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import {
+  getComment,
+  getContent,
+  handleFetchResult,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -32,10 +35,8 @@ import {
   removeWorkspaceSubscription,
   updateWorkspaceSubscription
 } from '../action-creator.sync.js'
-import {
-  getContent,
-  getUser
-} from '../action-creator.async.js'
+import { getUser } from '../action-creator.async.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import { cloneDeep } from 'lodash'
 
 // INFO - RJ - 2021-09-08 - we remove the star from the excluded types since we
@@ -109,7 +110,7 @@ export class ReduxTlmDispatcher extends React.Component {
       this.props.user.userId !== data.fields.author.user_id &&
       !EXCLUDED_NOTIFICATION_TYPE_PREFIXES.some(type => data.event_type.startsWith(type))
     ) {
-      this.props.dispatch(addNotification(data))
+      this.props.dispatch(addNotification(data, this.props.workspaceList))
     }
   }
 
@@ -141,19 +142,21 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleMemberCreated = data => {
     const { props } = this
+    if (props.user.userId === data.fields.user.user_id || props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id)) {
+      // NOTE - RJ & MP - 2022-02-18
+      // When receiving a member created TLM, it is possible that we haven't added the workspace itself yet
+      // In this case, addWorkspaceMember does nothing.
+      // We actually noticed that the member created TLM arrives before the workspace created TLM.
+      // Let's add the workpace first to avoid this.
+      // See https://github.com/tracim/tracim/issues/5451
+      props.dispatch(addWorkspaceList([data.fields.workspace]))
 
-    // NOTE - RJ & MP - 2022-02-18
-    // When receiving a member created TLM, it is possible that we haven't added the workspace itself yet
-    // In this case, addWorkspaceMember does nothing.
-    // We actually noticed that the member created TLM arrives before the workspace created TLM.
-    // Let's add the workpace first to avoid this.
-    props.dispatch(addWorkspaceList([data.fields.workspace]))
-
-    props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
-    if (props.user.userId === data.fields.user.user_id) {
-      props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+      props.dispatch(addWorkspaceMember(data.fields.user, data.fields.workspace.workspace_id, data.fields.member))
+      if (props.user.userId === data.fields.user.user_id) {
+        props.dispatch(removeAccessibleWorkspace(data.fields.workspace))
+      }
+      this.handleNotification(data)
     }
-    this.handleNotification(data)
   }
 
   handleMemberModified = data => {
@@ -175,46 +178,97 @@ export class ReduxTlmDispatcher extends React.Component {
     this.handleNotification(data)
   }
 
-  handleMentionCreated = data => {
-    this.handleNotification(data)
+  handleMentionCreated = async data => {
+    const { props } = this
+    let content
+    if (data.fields.content.content_type === TLM_ST.COMMENT) {
+      const fetchGetComment = await handleFetchResult(
+        await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
+      )
+      switch (fetchGetComment.apiResponse.status) {
+        case 200:
+          content = fetchGetComment.body
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Unknown comment')))
+          return
+      }
+    } else content = await this.getContent(data.fields.content.content_id)
+
+    this.handleNotification({
+      ...data,
+      fields: {
+        ...data.fields,
+        content: content
+      }
+    })
   }
 
-  handleContentCreated = data => {
+  getContent = async (contentId) => {
     const { props } = this
-    props.dispatch(addWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
-    this.handleNotification(data)
+    const fetchGetContent = await handleFetchResult(await getContent(FETCH_CONFIG.apiUrl, contentId))
+    switch (fetchGetContent.apiResponse.status) {
+      case 200: return fetchGetContent.body
+      default:
+        props.dispatch(newFlashMessage(props.t('Unknown content')))
+        return {}
+    }
+  }
+
+  handleContentCreated = async data => {
+    const { props } = this
+    const content = await this.getContent(data.fields.content.content_id)
+    props.dispatch(addWorkspaceContentList([content], data.fields.workspace.workspace_id))
+    this.handleNotification({
+      ...data,
+      fields: {
+        ...data.fields,
+        content: content
+      }
+    })
   }
 
   handleContentCommentCreated = async data => {
     const { props } = this
     if (data.fields.author.user_id === props.user.userId) return
-    const commentParentId = data.fields.content.parent_id
-    const response = await props.dispatch(getContent(commentParentId))
 
-    if (response.status !== 200) return
-    const notificationData = {
+    const fetchGetComment = await handleFetchResult(
+      await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
+    )
+
+    switch (fetchGetComment.apiResponse.status) {
+      case 200: {
+        const notificationData = {
+          ...data,
+          fields: {
+            ...data.fields,
+            content: fetchGetComment.body
+          }
+        }
+        this.handleNotification(notificationData)
+        props.dispatch(removeWorkspaceReadStatus(data.fields.workspace, data.fields.workspace.workspace_id))
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('Unknown content')))
+        break
+    }
+  }
+
+  handleContentModified = async data => {
+    const { props } = this
+    const content = await this.getContent(data.fields.content.content_id)
+    props.dispatch(updateWorkspaceContentList([content], data.fields.workspace.workspace_id))
+    if (data.fields.author.user_id === props.user.userId) {
+      props.dispatch(addWorkspaceReadStatus(content, data.fields.workspace.workspace_id))
+    }
+    this.handleNotification({
       ...data,
       fields: {
         ...data.fields,
-        content: {
-          ...data.fields.content,
-          parent_label: response.json.label,
-          parent_content_type: response.json.content_type,
-          parent_content_namespace: response.json.content_namespace
-        }
+        content: content
       }
-    }
-    this.handleNotification(notificationData)
-    props.dispatch(removeWorkspaceReadStatus(response.json, data.fields.workspace.workspace_id))
-  }
-
-  handleContentModified = data => {
-    const { props } = this
-    props.dispatch(updateWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
-    if (data.fields.author.user_id === props.user.userId) {
-      props.dispatch(addWorkspaceReadStatus(data.fields.content, data.fields.workspace.workspace_id))
-    }
-    this.handleNotification(data)
+    })
   }
 
   handleContentDeleted = data => {
@@ -223,10 +277,17 @@ export class ReduxTlmDispatcher extends React.Component {
     this.handleNotification(data)
   }
 
-  handleContentUnDeleted = data => {
+  handleContentUnDeleted = async data => {
     const { props } = this
-    props.dispatch(unDeleteWorkspaceContentList([data.fields.content], data.fields.workspace.workspace_id))
-    this.handleNotification(data)
+    const content = await this.getContent(data.fields.content.content_id)
+    props.dispatch(unDeleteWorkspaceContentList([content], data.fields.workspace.workspace_id))
+    this.handleNotification({
+      ...data,
+      fields: {
+        ...data.fields,
+        content: content
+      }
+    })
   }
 
   fetchUserDetail = async () => {
@@ -257,7 +318,7 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleUserChanged = data => {
-    this.props.dispatch(addNotification(data))
+    this.props.dispatch(addNotification(data, this.props.workspaceList))
   }
 
   handleWorkspaceSubscriptionCreated = data => {
@@ -299,5 +360,5 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 }
 
-const mapStateToProps = ({ workspaceContentList, user }) => ({ workspaceContentList, user })
+const mapStateToProps = ({ workspaceList, workspaceContentList, user }) => ({ workspaceList, workspaceContentList, user })
 export default translate()(connect(mapStateToProps)(TracimComponent(ReduxTlmDispatcher)))

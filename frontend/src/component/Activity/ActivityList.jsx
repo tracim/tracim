@@ -65,7 +65,8 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
       )
   }],
   [TLM_ET.SHAREDSPACE_MEMBER, (activity) => <MemberActivity activity={activity} key={activity.id} />],
-  [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />]
+  [TLM_ET.SHAREDSPACE_SUBSCRIPTION, (activity) => <MemberActivity activity={activity} key={activity.id} />],
+  [TLM_ET.SHAREDSPACE, (activity) => <MemberActivity activity={activity} key={activity.id} />]
 ])
 const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
 const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
@@ -81,11 +82,14 @@ const ActivityList = (props) => {
     }
 
     if (activity.contentAvailable && activity.contentPath.length > 0) {
+      const contentPathList = activity.contentPath.map(content => content.content_id)
       return [
         dashboardBreadcrumb,
         ...activity.contentPath.map(crumb => ({
           label: crumb.label,
-          link: PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id),
+          link: crumb.content_type === CONTENT_TYPE.FOLDER
+            ? PAGE.WORKSPACE.FOLDER_OPEN(workspace.workspace_id, contentPathList)
+            : PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id),
           type: BREADCRUMBS_TYPE.APP_FEATURE,
           isALink: true
         }))
@@ -132,13 +136,16 @@ const ActivityList = (props) => {
     return activityWorkspace.publicationEnabled
   }
 
+  const isLoggedUserMember = (activity) => props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
+
   const activityDisplayFilter = (activity) => {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
-      (
-        (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-        isSubscriptionRequestOrRejection(activity) ||
-        isMemberCreatedOrModified(activity)
-      )
+    (
+      (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
+      (isSubscriptionRequestOrRejection(activity) && isLoggedUserMember(activity)) ||
+      (isMemberCreatedOrModified(activity) && isLoggedUserMember(activity)) ||
+      (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.userId)
+    )
   }
 
   const activityList = props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent)
@@ -183,6 +190,7 @@ ActivityList.propTypes = {
   onRefreshClicked: PropTypes.func.isRequired,
   onLoadMoreClicked: PropTypes.func.isRequired,
   onCopyLinkClicked: PropTypes.func.isRequired,
+  userId: PropTypes.number.isRequired,
   onEventClicked: PropTypes.func,
   workspaceList: PropTypes.arrayOf(PropTypes.object)
 }

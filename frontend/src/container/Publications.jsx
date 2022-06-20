@@ -10,6 +10,7 @@ import {
   CommentArea,
   CUSTOM_EVENT,
   EditCommentPopup,
+  getComment,
   getContentComment,
   getFileChildContent,
   getOrCreateSessionClientToken,
@@ -86,7 +87,7 @@ export class Publications extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCreatedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommented },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentCommentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
@@ -160,23 +161,35 @@ export class Publications extends React.Component {
     this.setHeadTitle()
   }
 
-  handleContentCommentModified = (data) => {
+  handleContentCommentModified = async (data) => {
     const { props } = this
     const parentPublication = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
 
     if (!parentPublication) return
 
-    if (parentPublication.firstComment && data.fields.content.content_id === parentPublication.firstComment.content_id) {
-      props.dispatch(updatePublication({ ...parentPublication, firstComment: data.fields.content }))
-      return
-    }
-
-    const newTimeline = props.updateCommentOnTimeline(
-      data.fields.content,
-      parentPublication.commentList || [],
-      props.user.username
+    const fetchGetContent = await handleFetchResult(
+      await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
     )
-    props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
+
+    switch (fetchGetContent.apiResponse.status) {
+      case 200: {
+        if (parentPublication.firstComment && fetchGetContent.body.content_id === parentPublication.firstComment.content_id) {
+          props.dispatch(updatePublication({ ...parentPublication, firstComment: fetchGetContent.body }))
+          return
+        }
+
+        const newTimeline = props.updateCommentOnTimeline(
+          fetchGetContent.body,
+          parentPublication.commentList || [],
+          props.user.username
+        )
+        props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('Unknown content')))
+        break
+    }
   }
 
   handleContentCommentDeleted = (data) => {
@@ -212,6 +225,24 @@ export class Publications extends React.Component {
     ) return
     this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
     this.props.dispatch(appendPublication(data.fields.content))
+  }
+
+  handleCommentCreated = async (data) => {
+    const { props } = this
+
+    const fetchGetContent = await handleFetchResult(
+      await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
+    )
+
+    switch (fetchGetContent.apiResponse.status) {
+      case 200: {
+        this.handleContentCommented({ fields: { content: fetchGetContent.body } })
+        break
+      }
+      default:
+        props.dispatch(newFlashMessage(props.t('Unknown content')))
+        break
+    }
   }
 
   handleContentCommented = (data) => {

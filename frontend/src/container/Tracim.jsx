@@ -26,6 +26,8 @@ import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
 import {
   CUSTOM_EVENT,
+  getWorkspaceMemberList,
+  handleFetchResult,
   PROFILE,
   NUMBER_RESULTS_BY_PAGE,
   formatAbsoluteDate,
@@ -56,7 +58,6 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getWorkspaceMemberList,
   getMyselfWorkspaceList,
   getNotificationList,
   getUserConfiguration,
@@ -465,13 +466,13 @@ export class Tracim extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
       workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
@@ -507,7 +508,7 @@ export class Tracim extends React.Component {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:

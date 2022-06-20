@@ -33,8 +33,8 @@ class UserSpacesConfigLine extends React.Component {
         {(props.system.config.email_notification_activated &&
           <td>
             <BtnSwitch
-              checked={member.do_notify}
-              onChange={() => props.onChangeSubscriptionNotif(space.workspace_id, !member.do_notify)}
+              checked={member.doNotify}
+              onChange={() => props.onChangeSubscriptionNotif(space.id, !member.doNotify)}
             />
           </td>
         )}
@@ -44,7 +44,7 @@ class UserSpacesConfigLine extends React.Component {
             mode='dark'
             intent='secondary'
             disabled={props.onlyManager}
-            onClick={(() => props.onLeaveSpace(space.workspace_id))}
+            onClick={(() => props.onLeaveSpace(space.id))}
             icon='fas fa-sign-out-alt'
             text={props.admin ? props.t('Remove from space') : props.t('Leave space')}
             title={

@@ -61,6 +61,7 @@ export class Dashboard extends React.Component {
         role: '',
         isEmail: false
       },
+      isMemberListLoading: false,
       displayNewMemberForm: false,
       autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: [],
@@ -246,6 +247,8 @@ export class Dashboard extends React.Component {
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
+    this.setState({ isMemberListLoading: true })
+
     if (state.newMember.personalData === '') {
       props.dispatch(newFlashMessage(props.t('Please set a name, an email or a username'), 'warning'))
       return false
@@ -264,7 +267,7 @@ export class Dashboard extends React.Component {
 
     const fetchWorkspaceNewMember = await props.dispatch(postWorkspaceMember(props.currentWorkspace.id, {
       id: state.newMember.id || newMemberInKnownMemberList ? newMemberInKnownMemberList.user_id : null,
-      email: state.newMember.isEmail ? state.newMember.personalData : '',
+      email: state.newMember.isEmail ? state.newMember.personalData.trim() : '',
       username: state.newMember.isEmail ? '' : state.newMember.personalData,
       role: state.newMember.role
     }))
@@ -281,6 +284,8 @@ export class Dashboard extends React.Component {
       autoCompleteFormNewMemberActive: false,
       displayNewMemberForm: false
     })
+
+    this.setState({ isMemberListLoading: false })
 
     switch (fetchWorkspaceNewMember.status) {
       case 200:
@@ -317,6 +322,8 @@ export class Dashboard extends React.Component {
   handleClickRemoveMember = async memberId => {
     const { props } = this
 
+    this.setState({ isMemberListLoading: true })
+
     const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.currentWorkspace.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
@@ -324,6 +331,8 @@ export class Dashboard extends React.Component {
         break
       default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
     }
+
+    this.setState({ isMemberListLoading: false })
   }
 
   handleClickOpenAdvancedDashboard = () => {
@@ -517,6 +526,7 @@ export class Dashboard extends React.Component {
                     autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
                     publicName={state.newMember.publicName}
                     isEmail={state.newMember.isEmail}
+                    isLoading={state.isMemberListLoading}
                     onChangePersonalData={this.handleChangePersonalData}
                     onClickKnownMember={this.handleClickKnownMember}
                     // createAccount={state.newMember.createAccount}

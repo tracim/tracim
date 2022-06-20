@@ -3,14 +3,16 @@ import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
-  addAllResourceI18n,
   APP_FEATURE_MODE,
-  appContentFactory,
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
-  buildHeadTitle,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  FilenameWithBadges,
+  addAllResourceI18n,
+  appContentFactory,
+  buildContentPathBreadcrumbs,
+  buildHeadTitle,
+  getContent,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
   handleFetchResult,
@@ -28,7 +30,6 @@ import {
   tinymceAutoCompleteHandleClickItem,
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  setLocalStorageItem,
   removeLocalStorageItem,
   handleMentionsBeforeSave,
   handleLinksBeforeSave,
@@ -60,6 +61,8 @@ export class HtmlDocument extends React.Component {
     this.state = {
       appName: 'html-document',
       breadcrumbsList: [],
+      isFileCommentLoading: false,
+      isTemplate: false,
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -102,39 +105,48 @@ export class HtmlDocument extends React.Component {
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeletedOrRestore }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentRestore }
     ])
   }
 
   // TLM Handlers
-  handleContentModified = data => {
-    const { state } = this
+  handleContentModified = async data => {
+    const { props, state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
 
-    const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
-    const newContentObject = {
-      ...state.content,
-      ...data.fields.content,
-      raw_content: addClassToMentionsOfUser(data.fields.content.raw_content, state.loggedUser.username)
-    }
-    this.setState(prev => ({
-      ...prev,
-      content: clientToken === data.fields.client_token
-        ? newContentObject
-        : prev.content,
-      newContent: newContentObject,
-      editionAuthor: data.fields.author.public_name,
-      showRefreshWarning: clientToken !== data.fields.client_token,
-      rawContentBeforeEdit: newContentObject.raw_content
-    }))
-    if (clientToken === data.fields.client_token) {
-      this.setHeadTitle(newContentObject.label)
-      this.buildBreadcrumbs(newContentObject)
+    const fetchGetContent = await handleFetchResult(await getContent(this.state.config.apiUrl, data.fields.content.content_id))
+    switch (fetchGetContent.apiResponse.status) {
+      case 200: {
+        const clientToken = state.config.apiHeader['X-Tracim-ClientToken']
+        const newContentObject = {
+          ...state.content,
+          ...fetchGetContent.body,
+          raw_content: addClassToMentionsOfUser(fetchGetContent.body.raw_content, state.loggedUser.username)
+        }
+        this.setState(prev => ({
+          ...prev,
+          content: clientToken === data.fields.client_token
+            ? newContentObject
+            : prev.content,
+          newContent: newContentObject,
+          editionAuthor: data.fields.author.public_name,
+          showRefreshWarning: clientToken !== data.fields.client_token,
+          rawContentBeforeEdit: newContentObject.raw_content
+        }))
+        if (clientToken === data.fields.client_token) {
+          this.setHeadTitle(newContentObject.label)
+          this.buildBreadcrumbs(newContentObject)
+        }
+        break
+      }
+      default:
+        sendGlobalFlashMessage(props.t('Unknown content'))
+        break
     }
   }
 
-  handleContentDeletedOrRestore = data => {
+  handleContentDeleted = data => {
     const { state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
 
@@ -147,6 +159,29 @@ export class HtmlDocument extends React.Component {
       editionAuthor: data.fields.author.public_name,
       showRefreshWarning: this.sessionClientToken !== data.fields.client_token
     }))
+  }
+
+  handleContentRestore = async data => {
+    const { props, state } = this
+    if (data.fields.content.content_id !== state.content.content_id) return
+    const fetchGetContent = await handleFetchResult(await getContent(state.config.apiUrl, data.fields.content.content_id))
+    switch (fetchGetContent.apiResponse.status) {
+      case 200: {
+        this.setState(prev => ({
+          ...prev,
+          content: this.sessionClientToken === data.fields.client_token
+            ? { ...prev.content, ...fetchGetContent.body }
+            : prev.content,
+          newContent: { ...prev.content, ...fetchGetContent.body },
+          editionAuthor: data.fields.author.public_name,
+          showRefreshWarning: this.sessionClientToken !== data.fields.client_token
+        }))
+        break
+      }
+      default:
+        sendGlobalFlashMessage(props.t('Unknown content'))
+        break
+    }
   }
 
   // Custom Event Handlers
@@ -280,6 +315,7 @@ export class HtmlDocument extends React.Component {
           ? localStorageRawContent
           : rawContentBeforeEdit
       },
+      isTemplate: resHtmlDocument.body.is_template,
       rawContentBeforeEdit: rawContentBeforeEdit,
       translationState: getDefaultTranslationState(previousState.config.system.config),
       translatedRawContent: null,
@@ -311,6 +347,11 @@ export class HtmlDocument extends React.Component {
   handleClickBtnCloseApp = () => {
     this.setState({ isVisible: false })
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.APP_CLOSED, data: {} })
+  }
+
+  handleChangeMarkedTemplate = (isTemplate) => {
+    const { props, state } = this
+    props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
   }
 
   handleClickNewVersion = () => {
@@ -438,19 +479,6 @@ export class HtmlDocument extends React.Component {
         sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
-  }
-
-  handleChangeText = e => {
-    const { state } = this
-    const newText = e.target.value // because SyntheticEvent is pooled (react specificity)
-    this.setState(prev => ({ content: { ...prev.content, raw_content: newText } }))
-
-    setLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT, newText)
-  }
-
-  handleChangeNewComment = e => {
-    const { props, state } = this
-    props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
   searchForMentionOrLinkInQuery = async (query) => {
@@ -736,6 +764,7 @@ export class HtmlDocument extends React.Component {
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            isFileCommentLoading={state.isFileCommentLoading}
           />
         </PopinFixedRightPartContent>
       ) : null
@@ -781,14 +810,25 @@ export class HtmlDocument extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
-          loading={state.loadingContent}
+          actionList={[
+            {
+              icon: 'far fa-trash-alt',
+              label: props.t('Delete'),
+              onClick: this.handleClickDelete,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
+              disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
+              dataCy: 'popinListItem__delete'
+            }
+          ]}
           appMode={state.mode}
           availableStatuses={state.config.availableStatuses}
           breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
           content={state.content}
           config={state.config}
+          contentVersionNumber={contentVersionNumber}
           customClass={state.mode === APP_FEATURE_MODE.EDIT ? `${state.config.slug}__contentpage__edition` : `${state.config.slug}__contentpage`}
+          disableChangeIsTemplate={state.disableChangeIsTemplate}
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
@@ -801,12 +841,17 @@ export class HtmlDocument extends React.Component {
               dataCy: 'newVersionButton'
             }
           ]}
+          isTemplate={state.isTemplate}
           isRefreshNeeded={state.showRefreshWarning}
-          contentVersionNumber={contentVersionNumber}
+          loading={state.loadingContent}
           lastVersion={lastVersionNumber}
           loggedUser={state.loggedUser}
           onChangeStatus={this.handleChangeStatus}
+          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+          onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onClickCloseBtn={this.handleClickBtnCloseApp}
+          onClickRestoreDocument={this.handleRestoreDocument}
+          onClickTranslateDocument={this.handleTranslateDocument}
           onValidateChangeTitle={this.handleSaveEditTitle}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
@@ -818,22 +863,10 @@ export class HtmlDocument extends React.Component {
             state.content, state.loggedUser, this.setState.bind(this)
           )}
           showReactions
-          actionList={[{
-            icon: 'far fa-trash-alt',
-            label: props.t('Delete'),
-            onClick: this.handleClickDelete,
-            showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id,
-            disabled: state.mode === APP_FEATURE_MODE.REVISION || state.content.is_archived || state.content.is_deleted,
-            dataCy: 'popinListItem__delete'
-          }
-          ]}
           showTranslateButton={state.mode === APP_FEATURE_MODE.VIEW || state.mode === APP_FEATURE_MODE.REVISION}
           translationState={state.translationState}
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
           translationTargetLanguageCode={state.translationTargetLanguageCode}
-          onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-          onClickTranslateDocument={this.handleTranslateDocument}
-          onClickRestoreDocument={this.handleRestoreDocument}
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug

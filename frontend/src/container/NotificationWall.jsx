@@ -14,11 +14,15 @@ import {
 } from '../action-creator.sync.js'
 import {
   CONTENT_NAMESPACE,
-  GROUP_NOTIFICATION_CRITERIA
+  GROUP_NOTIFICATION_CRITERIA,
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
   CONTENT_TYPE,
+  getContentPath,
   GROUP_MENTION_TRANSLATION_LIST,
+  handleFetchResult,
+  Loading,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
@@ -37,11 +41,26 @@ import GroupedNotificationItem from './GroupedNotificationItem.jsx'
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
+  // INFO - GB -2022-06-05 - The no set bellow is not used because folderPath is a dictionary and the manipulations are done directly
+  const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
+  const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
 
   const NUMBER_OF_CRITERIA = {
     ONE: 1,
     TWO: 2
   }
+  useEffect(() => {
+    setIsFolderPathLoading(true)
+    props.notificationPage.list.forEach(async notification => {
+      if (notification.type === `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.FOLDER}`) {
+        const fetchGetContentPath = await handleFetchResult(await getContentPath(FETCH_CONFIG.apiUrl, notification.content.id))
+        if (fetchGetContentPath.apiResponse.status === 200) {
+          folderPath[notification.content.id] = fetchGetContentPath.body.items.map(content => content.content_id)
+        }
+      }
+    })
+    setIsFolderPathLoading(false)
+  }, [props.notificationPage.list])
 
   useEffect(() => {
     let tmpNotificationList = []
@@ -255,7 +274,7 @@ export const NotificationWall = props => {
     ))
     switch (fetchGetNotificationWall.status) {
       case 200:
-        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items))
+        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
         props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
         break
       default:
@@ -299,11 +318,18 @@ export const NotificationWall = props => {
 
     const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
 
-    const contentUrl = notification.content ? PAGE.CONTENT(notification.content.id) : ''
+    let contentUrl = notification.content ? PAGE.CONTENT(notification.content.id) : ''
 
     if (entityType === TLM_ENTITY.CONTENT) {
       switch (eventType) {
         case TLM_EVENT.CREATED: {
+          if (contentType === TLM_SUB.FOLDER && folderPath[notification.content.id]) {
+            contentUrl = PAGE.WORKSPACE.FOLDER_OPEN(
+              notification.workspace.id,
+              folderPath[notification.content.id]
+            )
+          }
+
           if (contentType === TLM_SUB.COMMENT) {
             return {
               title: props.t('Comment_noun'),
@@ -596,69 +622,73 @@ export const NotificationWall = props => {
   }
 
   return (
-    <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
-      <PopinFixedHeader
-        customClass='notification'
-        faIcon='far fa-bell'
-        rawTitle={props.t('Notifications')}
-        componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
-        onClickCloseBtn={props.onCloseNotificationWall}
-      >
-        <IconButton
-          mode='dark'
-          onClick={handleClickMarkAllAsRead}
-          icon='far fa-envelope-open'
-          text={props.t('Mark all as read')}
-          dataCy='markAllAsReadButton'
-        />
-      </PopinFixedHeader>
-
-      <div className='notification__list'>
-        {notificationList.length !== 0 && notificationList.map((notification, i) => {
-          if (notification.group) {
-            return (
-              <GroupedNotificationItem
-                getNotificationDetails={getNotificationDetails}
-                groupedNotifications={notification}
-                isFirst={i === 0}
-                isLast={i === notificationList.length - 1}
-                isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
-                key={notification.id}
-                onCloseNotificationWall={props.onCloseNotificationWall}
-                read={false}
-              />
-            )
-          } else {
-            return (
-              <ListItemWrapper
-                isFirst={i === 0}
-                isLast={i === notificationList.length - 1}
-                read={false}
-                key={notification.id}
-              >
-                <NotificationItem
-                  onCloseNotificationWall={props.onCloseNotificationWall}
-                  getNotificationDetails={getNotificationDetails}
-                  notification={notification}
-                />
-              </ListItemWrapper>
-            )
-          }
-        })}
-
-        {props.notificationPage.hasNextPage &&
-          <div className='notification__footer'>
+    isFolderPathLoading
+      ? <Loading />
+      : (
+        <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
+          <PopinFixedHeader
+            customClass='notification'
+            faIcon='far fa-bell'
+            rawTitle={props.t('Notifications')}
+            componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
+            onClickCloseBtn={props.onCloseNotificationWall}
+          >
             <IconButton
               mode='dark'
-              onClick={handleClickSeeMore}
-              icon='fas fa-chevron-down'
-              text={props.t('See more')}
+              onClick={handleClickMarkAllAsRead}
+              icon='far fa-envelope-open'
+              text={props.t('Mark all as read')}
+              dataCy='markAllAsReadButton'
             />
-          </div>}
-      </div>
-    </div>
+          </PopinFixedHeader>
+
+          <div className='notification__list'>
+            {notificationList.length !== 0 && notificationList.map((notification, i) => {
+              if (notification.group) {
+                return (
+                  <GroupedNotificationItem
+                    getNotificationDetails={getNotificationDetails}
+                    groupedNotifications={notification}
+                    isFirst={i === 0}
+                    isLast={i === notificationList.length - 1}
+                    isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
+                    key={notification.id}
+                    onCloseNotificationWall={props.onCloseNotificationWall}
+                    read={false}
+                  />
+                )
+              } else {
+                return (
+                  <ListItemWrapper
+                    isFirst={i === 0}
+                    isLast={i === notificationList.length - 1}
+                    read={false}
+                    key={notification.id}
+                  >
+                    <NotificationItem
+                      onCloseNotificationWall={props.onCloseNotificationWall}
+                      getNotificationDetails={getNotificationDetails}
+                      notification={notification}
+                    />
+                  </ListItemWrapper>
+                )
+              }
+            })}
+
+            {props.notificationPage.hasNextPage &&
+              <div className='notification__footer'>
+                <IconButton
+                  mode='dark'
+                  onClick={handleClickSeeMore}
+                  icon='fas fa-chevron-down'
+                  text={props.t('See more')}
+                />
+              </div>}
+          </div>
+        </div>
+      )
   )
 }
 
-const mapStateToProps = ({ user, notificationPage }) => ({ user, notificationPage })
+const mapStateToProps = ({ user, notificationPage, workspaceList }) => ({ user, notificationPage, workspaceList })
 export default connect(mapStateToProps)(translate()(TracimComponent(NotificationWall)))

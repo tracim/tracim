@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-
 import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
@@ -24,7 +23,6 @@ import {
   setUserActivityEventList
 } from '../action-creator.sync.js'
 import { withActivity, ACTIVITY_COUNT_PER_PAGE } from './withActivity.jsx'
-import { getWorkspaceMemberList } from '../action-creator.async.js'
 
 export class PersonalRecentActivities extends React.Component {
   constructor (props) {
@@ -45,10 +43,8 @@ export class PersonalRecentActivities extends React.Component {
   handleTlm = async (data) => {
     const { props } = this
     if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
-      const fetchGetWorkspaceMemberList = await props.dispatch(getWorkspaceMemberList(data.fields.workspace.workspace_id))
-      if (fetchGetWorkspaceMemberList.status !== 200) return
-
-      const member = fetchGetWorkspaceMemberList.json.find(user => user.id === data.fields.user.user_id)
+      const space = props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id) || { memberList: [] }
+      const member = space.memberList.find(user => user.id === data.fields.user.user_id)
       if (!member || member.role === data.fields.member.role) return
     }
     props.handleTlm(data)
@@ -106,6 +102,7 @@ export class PersonalRecentActivities extends React.Component {
             onCopyLinkClicked={props.onCopyLinkClicked}
             onEventClicked={props.onEventClicked}
             showRefresh={props.showRefresh}
+            userId={props.user.userId}
             workspaceList={props.workspaceList}
           />
         </PageContent>

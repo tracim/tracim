@@ -22,7 +22,7 @@ const TAGS = {
   [SELECTORS.CARD_POPUP_BODY]: () => '.cardPopup__body',
   [SELECTORS.CONTENT_FRAME]: () => '[data-cy="popinFixed"]',
   [SELECTORS.CONTENT_IN_LIST]: ({ read }) => `.workspace__content__fileandfolder > .content${read ? '.read' : ''}`,
-  [SELECTORS.CONTENT_IN_SEARCH]: () => '.FilenameWithExtension',
+  [SELECTORS.CONTENT_IN_SEARCH]: () => '.FilenameWithBadges',
   [SELECTORS.FLASH_MESSAGE]: () => '[data-cy="flashmessage"]',
   [SELECTORS.FLASH_TYPE]: () => `.flashmessage__container__header`,
   [SELECTORS.FOLDER_IN_LIST]: ({ folderId }) => `[data-cy=folder_${folderId}]`,

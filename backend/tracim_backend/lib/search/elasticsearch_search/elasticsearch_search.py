@@ -62,7 +62,7 @@ from tracim_backend.views.search_api.schemas import AdvancedContentSearchQuery
 FILE_PIPELINE_ID = "attachment"
 FILE_PIPELINE_SOURCE_FIELD = "b64_file"
 FILE_PIPELINE_DESTINATION_FIELD = "file_data"
-FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de"]
+FILE_PIPELINE_LANGS = ["en", "fr", "pt", "de", "ar"]
 
 DEFAULT_CONTENT_SEARCH_FIELDS = list(ContentSearchField)
 DEFAULT_USER_SEARCH_FIELDS = list(UserSearchField)

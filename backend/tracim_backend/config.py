@@ -19,6 +19,7 @@ from tracim_backend.exceptions import NotReadableFile
 from tracim_backend.exceptions import NotWritableDirectory
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
+from tracim_backend.lib.mail_notifier.utils import SmtpEncryption
 from tracim_backend.lib.translate.providers import TRANSLATION_SERVICE_CLASSES
 from tracim_backend.lib.translate.providers import TranslationProvider
 from tracim_backend.lib.utils.app import TracimApplication
@@ -705,8 +706,22 @@ class CFG(object):
         self.EMAIL__NOTIFICATION__SMTP__PASSWORD = self.get_raw_config(
             "email.notification.smtp.password", secret=True
         )
+        self.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION = asbool(
+            self.get_raw_config("email.notification.smtp.authentication", "True")
+        )
         self.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL = asbool(
-            self.get_raw_config("email.notification.smtp.use_implicit_ssl", "false")
+            self.get_raw_config(
+                "email.notification.smtp.use_implicit_ssl",
+                "false",
+                deprecated=True,
+                deprecated_extended_information="Use EMAIL__NOTIFICATION__SMTP__CONNECT_METHOD parameter instead.",
+            )
+        )
+        default_smtp_encryption = "default"
+        if self.EMAIL__NOTIFICATION__SMTP__USE_IMPLICIT_SSL:
+            default_smtp_encryption = "smtps"
+        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION = self.get_raw_config(
+            "email.notification.smtp.encryption", default_smtp_encryption
         )
 
         self.EMAIL__REPLY__ACTIVATED = asbool(self.get_raw_config("email.reply.activated", "False"))
@@ -796,6 +811,7 @@ class CFG(object):
         self.LDAP_URL = self.get_raw_config("ldap_url", "ldap://localhost:389")
         self.LDAP_BIND_DN = self.get_raw_config("ldap_bind_dn")
         self.LDAP_BIND_PASS = self.get_raw_config("ldap_bind_pass", secret=True)
+        self.LDAP_BIND_ANONYMOUS = asbool(self.get_raw_config("ldap_bind_anonymous", "False"))
         self.LDAP_TLS = asbool(self.get_raw_config("ldap_tls", "False"))
         self.LDAP_USER_BASE_DN = self.get_raw_config("ldap_user_base_dn")
         self.LDAP_LOGIN_ATTRIBUTE = self.get_raw_config("ldap_login_attribute", "mail")
@@ -1217,16 +1233,32 @@ class CFG(object):
                 self.EMAIL__NOTIFICATION__SMTP__PORT,
                 when_str="when email notification is activated",
             )
-            self.check_mandatory_param(
-                "EMAIL__NOTIFICATION__SMTP__USER",
-                self.EMAIL__NOTIFICATION__SMTP__USER,
-                when_str="when email notification is activated",
-            )
-            self.check_mandatory_param(
-                "EMAIL__NOTIFICATION__SMTP__PASSWORD",
-                self.EMAIL__NOTIFICATION__SMTP__PASSWORD,
-                when_str="when email notification is activated",
-            )
+            if self.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION:
+                self.check_mandatory_param(
+                    "EMAIL__NOTIFICATION__SMTP__USER",
+                    self.EMAIL__NOTIFICATION__SMTP__USER,
+                    when_str="when email notification is activated and smtp config not set as anonymous",
+                )
+                self.check_mandatory_param(
+                    "EMAIL__NOTIFICATION__SMTP__PASSWORD",
+                    self.EMAIL__NOTIFICATION__SMTP__PASSWORD,
+                    when_str="when email notification is activated and smtp config not set as anonymous",
+                )
+
+            if self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION not in SmtpEncryption.get_all_values():
+                smtp_encryption_str_list = ", ".join(
+                    [
+                        '"{}"'.format(smtp_connect_method_name)
+                        for smtp_connect_method_name in SmtpEncryption.get_all_values()
+                    ]
+                )
+                raise ConfigurationError(
+                    'ERROR email.notification.smtp.encryption given "{}" is invalid,'
+                    "valids values are {}.".format(
+                        self.EMAIL__NOTIFICATION__SMTP__ENCRYPTION, smtp_encryption_str_list
+                    )
+                )
+
             # INFO - G.M - 2019-12-10 - check value provided for headers
             self.check_mandatory_param(
                 "EMAIL__NOTIFICATION__FROM__EMAIL",
@@ -1280,14 +1312,17 @@ class CFG(object):
             self.check_mandatory_param(
                 "LDAP_URL", self.LDAP_URL, when_str="when ldap is in available auth method",
             )
-            self.check_mandatory_param(
-                "LDAP_BIND_DN", self.LDAP_BIND_DN, when_str="when ldap is in available auth method",
-            )
-            self.check_mandatory_param(
-                "LDAP_BIND_PASS",
-                self.LDAP_BIND_PASS,
-                when_str="when ldap is in available auth method",
-            )
+            if not self.LDAP_BIND_ANONYMOUS:
+                self.check_mandatory_param(
+                    "LDAP_BIND_DN",
+                    self.LDAP_BIND_DN,
+                    when_str="when ldap is in available auth method (not anonymous)",
+                )
+                self.check_mandatory_param(
+                    "LDAP_BIND_PASS",
+                    self.LDAP_BIND_PASS,
+                    when_str="when ldap is in available auth method (not anonymous)",
+                )
             self.check_mandatory_param(
                 "LDAP_USER_BASE_DN",
                 self.LDAP_USER_BASE_DN,
@@ -1407,6 +1442,10 @@ class CFG(object):
             uploaded_files_settings = {
                 "depot.backend": DepotFileStorageType.MEMORY.depot_storage_backend
             }
+
+        # INFO - G.M - 2022-04-08 - Clear Depot Manager to avoid issue with
+        # Tracimcli interactive shell.
+        DepotManager._clear()
 
         DepotManager.configure(
             name=self.UPLOADED_FILES__STORAGE__STORAGE_NAME,
