@@ -258,7 +258,9 @@ export const NotificationWall = props => {
   }
 
   const getMainContentId = (notification) => {
-    return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ENTITY.MENTION)
+    return notification.type.includes(CONTENT_TYPE.COMMENT) ||
+      notification.type.includes(CONTENT_TYPE.TODO) ||
+      notification.type.includes(TLM_ENTITY.MENTION)
       ? notification.content.parentId
       : notification.content.id
   }
@@ -291,7 +293,9 @@ export const NotificationWall = props => {
     const escapedContentLabel = (
       notification.content
         ? escapeHtml(
-          ((contentType === TLM_SUB.COMMENT) || (entityType === TLM_ENTITY.MENTION && notification.content.type === CONTENT_TYPE.COMMENT))
+          ((contentType === TLM_SUB.COMMENT) ||
+            (contentType === TLM_SUB.TODO) ||
+            (entityType === TLM_ENTITY.MENTION && notification.content.type === CONTENT_TYPE.COMMENT))
             ? notification.content.parentLabel
             : notification.content.label
         )
@@ -306,7 +310,7 @@ export const NotificationWall = props => {
       content: `<span title='${escapedContentLabel}' class='${numberOfContents === 1
         ? 'contentTitle__highlight'
         : ''
-      }'>${escapedContentLabel}</span>`,
+        }'>${escapedContentLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
@@ -334,7 +338,16 @@ export const NotificationWall = props => {
             return {
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}}{{workspaceInfo}}', i18nOpts),
-              url: linkToComment(notification)
+              url: linkToParentContent(notification)
+            }
+          }
+
+          if (contentType === TLM_SUB.TODO) {
+            console.log('TODO', notification, i18nOpts)
+            return {
+              title: props.t('Task to do created'),
+              text: props.t('{{author}} created a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              url: linkToParentContent(notification)
             }
           }
 
@@ -617,7 +630,7 @@ export const NotificationWall = props => {
     }
   }
 
-  const linkToComment = notification => {
+  const linkToParentContent = notification => {
     return PAGE.CONTENT(notification.content.parentId)
   }
 

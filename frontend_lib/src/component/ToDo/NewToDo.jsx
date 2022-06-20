@@ -11,7 +11,7 @@ const NewToDo = props => {
 
   useEffect(() => {
     setMemberListOptions(props.memberList.filter(member => member.username)
-      .map(member => ({ value: member.id, label: `${member.publicName} - @${member.username}` })))
+      .map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` })))
   }, [props.memberList])
 
   const onChangeAssignedUser = (e) => setAssignedUserId(e.value)
