@@ -72,13 +72,13 @@ class TestUserReadStatusEndpoint(object):
         main_folder_workspace2 = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace2,
-            lavel="Helpa",
+            label="Helpa",
             do_save=True,
         )
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -86,14 +86,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         secondly_created = api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="another creation_order_test",
+            label="another creation_order_test",
             do_save=True,
         )
         # update order test
@@ -101,14 +101,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="update_order_test",
+            label="update_order_test",
             do_save=True,
         )
         secondly_created_but_not_updated = api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="another update_order_test",
+            label="another update_order_test",
             do_save=True,
         )
         with new_revision(
@@ -121,14 +121,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="this is randomized label content",
+            label="this is randomized label content",
             do_save=True,
         )
         secondly_created_but_not_commented = api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="this is another randomized label content",
+            label="this is another randomized label content",
             do_save=True,
         )
         comment = api.create_comment(
@@ -138,7 +138,7 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace2,
             parent=main_folder_workspace2,
-            lavel="content_workspace_2",
+            label="content_workspace_2",
             do_save=True,
         )
         session.flush()
@@ -207,13 +207,13 @@ class TestUserReadStatusEndpoint(object):
         main_folder_workspace2 = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace2,
-            lavel="Helpa",
+            label="Helpa",
             do_save=True,
         )
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -221,14 +221,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="another creation_order_test",
+            label="another creation_order_test",
             do_save=True,
         )
         # update order test
@@ -236,14 +236,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="update_order_test",
+            label="update_order_test",
             do_save=True,
         )
         api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="another update_order_test",
+            label="another update_order_test",
             do_save=True,
         )
         with new_revision(
@@ -256,14 +256,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="this is randomized label content",
+            label="this is randomized label content",
             do_save=True,
         )
         api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="this is another randomized label content",
+            label="this is another randomized label content",
             do_save=True,
         )
         api.create_comment(
@@ -273,7 +273,7 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace2,
             parent=main_folder_workspace2,
-            lavel="content_workspace_2",
+            label="content_workspace_2",
             do_save=True,
         )
         session.flush()
@@ -347,13 +347,13 @@ class TestUserReadStatusEndpoint(object):
         main_folder_workspace2 = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace2,
-            lavel="Helpa",
+            label="Helpa",
             do_save=True,
         )
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -361,14 +361,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="another creation_order_test",
+            label="another creation_order_test",
             do_save=True,
         )
         # update order test
@@ -376,14 +376,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="update_order_test",
+            label="update_order_test",
             do_save=True,
         )
         api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="another update_order_test",
+            label="another update_order_test",
             do_save=True,
         )
         with new_revision(
@@ -396,14 +396,14 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="this is randomized label content",
+            label="this is randomized label content",
             do_save=True,
         )
         api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="this is another randomized label content",
+            label="this is another randomized label content",
             do_save=True,
         )
         api.create_comment(
@@ -413,7 +413,7 @@ class TestUserReadStatusEndpoint(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace2,
             parent=main_folder_workspace2,
-            lavel="content_workspace_2",
+            label="content_workspace_2",
             do_save=True,
         )
         session.flush()
@@ -483,7 +483,7 @@ class TestUserSetContentAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -491,7 +491,7 @@ class TestUserSetContentAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_unread(firstly_created)
@@ -578,7 +578,7 @@ class TestUserSetContentAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -586,7 +586,7 @@ class TestUserSetContentAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_unread(firstly_created)
@@ -639,7 +639,7 @@ class TestUserSetContentAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -647,7 +647,7 @@ class TestUserSetContentAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_unread(firstly_created)
@@ -700,7 +700,7 @@ class TestUserSetContentAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -708,7 +708,7 @@ class TestUserSetContentAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_unread(firstly_created)
@@ -779,7 +779,7 @@ class TestUserSetContentAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -787,7 +787,7 @@ class TestUserSetContentAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_unread(firstly_created)
@@ -842,7 +842,7 @@ class TestUserSetContentAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -850,7 +850,7 @@ class TestUserSetContentAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
@@ -937,7 +937,7 @@ class TestUserSetContentAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -945,7 +945,7 @@ class TestUserSetContentAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
@@ -1041,7 +1041,7 @@ class TestUserSetContentAsUnread(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1049,7 +1049,7 @@ class TestUserSetContentAsUnread(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_read(firstly_created)
@@ -1138,7 +1138,7 @@ class TestUserSetContentAsUnread(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1146,7 +1146,7 @@ class TestUserSetContentAsUnread(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_read(firstly_created)
@@ -1199,7 +1199,7 @@ class TestUserSetContentAsUnread(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1207,7 +1207,7 @@ class TestUserSetContentAsUnread(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_read(firstly_created)
@@ -1261,7 +1261,7 @@ class TestUserSetContentAsUnread(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1269,7 +1269,7 @@ class TestUserSetContentAsUnread(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_read(firstly_created)
@@ -1340,7 +1340,7 @@ class TestUserSetContentAsUnread(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1348,7 +1348,7 @@ class TestUserSetContentAsUnread(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_read(firstly_created)
@@ -1387,7 +1387,7 @@ class TestUserSetContentAsUnread(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1395,7 +1395,7 @@ class TestUserSetContentAsUnread(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
@@ -1441,7 +1441,7 @@ class TestUserSetContentAsUnread(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1449,7 +1449,7 @@ class TestUserSetContentAsUnread(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
@@ -1520,7 +1520,7 @@ class TestUserSetWorkspaceAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1528,7 +1528,7 @@ class TestUserSetWorkspaceAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_unread(main_folder)
@@ -1600,7 +1600,7 @@ class TestUserSetWorkspaceAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
@@ -1608,7 +1608,7 @@ class TestUserSetWorkspaceAsRead(object):
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         api.mark_unread(main_folder)
@@ -1681,12 +1681,16 @@ class TestUserSetWorkspaceAsRead(object):
         main_folder = api.create(
             content_type_slug=content_type_list.Folder.slug,
             workspace=workspace,
-            lavel="this is randomized folder",
+            label="this is randomized folder",
             do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
@@ -5767,13 +5771,13 @@ class TestAboutUserEndpoint(object):
         content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
-            lavel="creation_order_test",
+            label="creation_order_test",
             do_save=True,
         )
         content = content_api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
-            lavel="another creation_order_test",
+            label="another creation_order_test",
             do_save=True,
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
