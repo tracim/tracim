@@ -100,7 +100,7 @@ export class Dashboard extends React.Component {
   }
 
   async componentDidUpdate (prevProps) {
-    const { props, state } = this
+    const { props } = this
 
     // INFO - CH - 2022 06 16 - empty string is the default value for the property currentWorkspace.defaultRole in the reducer
     if (prevProps.currentWorkspace.defaultRole === '' && props.currentWorkspace.defaultRole !== '') {
