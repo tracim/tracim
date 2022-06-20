@@ -899,8 +899,8 @@ export class File extends React.Component {
             onClickChangeStatusToDo={this.handleChangeStatusToDo}
             onClickDeleteToDo={this.handleDeleteToDo}
             onClickSaveNewToDo={this.handleSaveNewToDo}
+            user={state.loggedUser}
             toDoList={state.toDoList}
-            workspaceId={state.content.workspace_id}
           />
         </PopinFixedRightPartContent>
       )

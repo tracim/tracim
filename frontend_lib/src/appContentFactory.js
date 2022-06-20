@@ -445,10 +445,16 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
       const response = await handleFetchResult(await deleteToDo(this.apiUrl, workspaceId, contentId, toDoId))
 
-      if (response.status === 204) {
-        setState(prev => ({ toDoList: prev.toDoList.filter(toDo => toDo.todo_id !== toDoId) }))
-      } else {
-        sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+      switch (response.status) {
+        case 204:
+          setState(prev => ({ toDoList: prev.toDoList.filter(toDo => toDo.todo_id !== toDoId) }))
+          break
+        case 403:
+          sendGlobalFlashMessage(i18n.t('You are not allowed to delete this todo'))
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Error while deleting to do'))
+          break
       }
 
       return response
@@ -458,10 +464,16 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
       const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
 
-      if (response.status === 204) {
-        setState(prev => ({ toDoList: prev.toDoList.map(toDo => toDo.todo_id === toDoId ? { ...toDo, status } : toDo) }))
-      } else {
-        sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+      switch (response.status) {
+        case 204:
+          setState(prev => ({ toDoList: prev.toDoList.map(toDo => toDo.todo_id === toDoId ? { ...toDo, status } : toDo) }))
+          break
+        case 403:
+          sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this todo'))
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+          break
       }
 
       return response

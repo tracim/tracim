@@ -136,6 +136,9 @@ export const getWorkspaceDetail = (apiUrl, workspaceId) =>
 export const getWorkspaceMemberList = (apiUrl, workspaceId, showDisabledUser = false) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
 
+export const getSpaceMemberFromId = (apiUrl, spaceId, userId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${spaceId}/members/${userId}`)
+
 export const deleteWorkspace = (apiUrl, workspaceId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/trashed`)
 

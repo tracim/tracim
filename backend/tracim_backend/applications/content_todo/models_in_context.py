@@ -41,6 +41,23 @@ class TodoInContext(object):
         :return: todo assignee id as integer
         """
         return self.todo.assignee_id
+    
+    @property
+    def owner_id(self) -> int:
+        """
+        Todo owner id
+        :return: todo owner id as integer
+        """
+        from tracim_backend.lib.core.content import ContentApi
+
+        content_api = ContentApi(
+            current_user=self._user, session=self.dbsession, config=self.config,
+        )
+        owner_id = content_api.get_one(
+            self.todo.content_id, content_type=content_type_list.Todo.slug,
+        ).first_revision.owner_id
+
+        return owner_id
 
     @property
     def status(self) -> str:

@@ -25,6 +25,13 @@ class TodoSchema(TodoIdSchema):
         allow_none=False,
         required=True,
     )
+    owner_id = marshmallow.fields.Integer(
+        example=42,
+        description="Id of the user who created the todo",
+        validate=strictly_positive_int_validator,
+        allow_none=False,
+        required=True,
+    )
     status = StrippedString(
         example="open",
         validate=content_status_validator,

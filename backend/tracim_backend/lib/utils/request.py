@@ -271,7 +271,11 @@ class TracimContext(ABC):
 
     def _get_todo(self, todo_id_fetcher: typing.Callable[[], int]) -> Todo:
         todo_id = todo_id_fetcher()
-        content_api = ContentApi(session=self.dbsession)
+        content_api = ContentApi(
+            session=self.dbsession,
+            current_user=self.current_user,
+            config=self.app_config,
+        )
         return content_api.get_todo(todo_id=todo_id)
 
     def _get_content_type(

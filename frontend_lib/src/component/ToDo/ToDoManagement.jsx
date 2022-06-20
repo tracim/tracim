@@ -2,11 +2,13 @@ import React, { useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import IconButton from '../Button/IconButton.jsx'
-import ToDoItem from './ToDoItem.jsx'
+import ToDoItem, { isEditable } from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
+import { ROLE } from '../../helper.js'
 
 const ToDoManagement = (props) => {
-  const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0)
+  const isReader = props.user.userRoleIdInWorkspace === ROLE.reader.id
+  const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
 
   const handleClickCancel = () => setIsNewToDo(false)
   const handleClickSaveToDo = (assignedUserId, toDo) => {
@@ -26,26 +28,27 @@ const ToDoManagement = (props) => {
       />
       : (
         <div className='toDo'>
-          <IconButton
-            color={props.customColor}
-            customClass='toDo__newButton'
-            icon='fas fa-plus-circle'
-            intent='primary'
-            mode='light'
-            onClick={() => setIsNewToDo(true)}
-            text={props.t('New to do')}
-          />
-
+          { !isReader && <IconButton
+              color={props.customColor}
+              customClass='toDo__newButton'
+              icon='fas fa-plus-circle'
+              intent='primary'
+              mode='light'
+              onClick={() => setIsNewToDo(true)}
+              text={props.t('New to do')}
+            />
+          }
           {props.toDoList.length > 0
-            ? props.toDoList.map(toDo =>
+            ? props.toDoList.map(toDo => 
               <ToDoItem
                 key={`toDo_${toDo.todo_id}`}
+                isEditable={isEditable(toDo, props.user, props.user.userRoleIdInWorkspace)}
                 memberList={props.memberList}
                 onClickChangeStatusToDo={props.onClickChangeStatusToDo}
                 onClickDeleteToDo={props.onClickDeleteToDo}
+                user={props.user}
                 toDo={toDo}
               />
-
             )
             : <div>{props.t('This content has no To Do associated. Click on "New to do" button to create a new one.')}</div>}
         </div>
@@ -62,6 +65,7 @@ ToDoManagement.propTypes = {
   onClickDeleteToDo: PropTypes.func.isRequired,
   onClickSaveNewToDo: PropTypes.func.isRequired,
   toDoList: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
   customColor: PropTypes.string,
   memberList: PropTypes.array
 }
