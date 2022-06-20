@@ -46,7 +46,8 @@ import {
   PopinFixedRightPartContent,
   sendGlobalFlashMessage,
   TagList,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  ToDoManagement
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -108,7 +109,8 @@ export class File extends React.Component {
         revision_id: param.content.current_revision_id,
         page_nb: 1
       },
-      isFileCommentLoading: false
+      isFileCommentLoading: false,
+      toDoList: []
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -303,6 +305,7 @@ export class File extends React.Component {
     }
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -474,6 +477,21 @@ export class File extends React.Component {
   handleClickRestoreArchive = async () => {
     const { props, state } = this
     props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+  }
+
+  handleSaveNewToDo = (assignedUserId, toDo) => {
+    const { state, props } = this
+    props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+  }
+
+  handleDeleteToDo = (toDoId) => {
+    const { state, props } = this
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDoId, this.setState.bind(this))
+  }
+
+  handleChangeStatusToDo = (toDoId, status) => {
+    const { state, props } = this
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
   }
 
   handleClickEditComment = (comment) => {
@@ -865,7 +883,29 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const tag = {
+    const todoObject = {
+      id: 'todo',
+      label: props.t('To Do'),
+      icon: 'fas fa-check-square',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('To Do')}
+        >
+          <ToDoManagement
+            apiUrl={state.config.apiUrl}
+            contentId={state.content.content_id}
+            customColor={state.config.hexcolor}
+            memberList={state.config.workspace.memberList}
+            onClickChangeStatusToDo={this.handleChangeStatusToDo}
+            onClickDeleteToDo={this.handleDeleteToDo}
+            onClickSaveNewToDo={this.handleSaveNewToDo}
+            toDoList={state.toDoList}
+            workspaceId={state.content.workspace_id}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -914,7 +954,8 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
       return [
         timelineObject,
-        tag,
+        todoObject,
+        tagObject,
         {
           id: 'share',
           label: props.t('Share'),
@@ -945,7 +986,7 @@ export class File extends React.Component {
 
       ]
     } else {
-      return [timelineObject, tag, propertiesObject]
+      return [timelineObject, todoObject, tagObject, propertiesObject]
     }
   }
 

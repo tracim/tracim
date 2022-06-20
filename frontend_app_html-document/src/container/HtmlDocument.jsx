@@ -789,7 +789,7 @@ export class HtmlDocument extends React.Component {
       ) : null
     }
 
-    const todo = {
+    const todoObject = {
       id: 'todo',
       label: props.t('To Do'),
       icon: 'fas fa-check-square',
@@ -811,7 +811,7 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    const tag = {
+    const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -829,7 +829,7 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, todo, tag]
+    return [timelineObject, todoObject, tagObject]
   }
 
   render () {

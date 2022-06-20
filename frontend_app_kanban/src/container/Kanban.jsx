@@ -29,7 +29,8 @@ import {
   getFileRevision,
   tinymceRemove,
   TagList,
-  putMyselfFileRead
+  putMyselfFileRead,
+  ToDoManagement
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -66,6 +67,7 @@ export class Kanban extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
+      toDoList: [],
       translationTargetLanguageCode: param.loggedUser.lang
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -240,7 +242,29 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const tag = {
+    const todoObject = {
+      id: 'todo',
+      label: props.t('To Do'),
+      icon: 'fas fa-check-square',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('To Do')}
+        >
+          <ToDoManagement
+            apiUrl={state.config.apiUrl}
+            contentId={state.content.content_id}
+            customColor={state.config.hexcolor}
+            memberList={state.config.workspace.memberList}
+            onClickChangeStatusToDo={this.handleChangeStatusToDo}
+            onClickDeleteToDo={this.handleDeleteToDo}
+            onClickSaveNewToDo={this.handleSaveNewToDo}
+            toDoList={state.toDoList}
+            workspaceId={state.content.workspace_id}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -258,7 +282,7 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, tag]
+    return [timelineObject, todoObject, tagObject]
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -327,6 +351,7 @@ export class Kanban extends React.Component {
     this.buildBreadcrumbs(response.body)
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -349,6 +374,21 @@ export class Kanban extends React.Component {
     } catch (e) {
       console.error('Error in app kanban, count not build breadcrumbs', e)
     }
+  }
+
+  handleSaveNewToDo = (assignedUserId, toDo) => {
+    const { state, props } = this
+    props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+  }
+
+  handleDeleteToDo = (toDoId) => {
+    const { state, props } = this
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDoId, this.setState.bind(this))
+  }
+
+  handleChangeStatusToDo = (toDoId, status) => {
+    const { state, props } = this
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
   }
 
   handleClickBtnCloseApp = () => {
