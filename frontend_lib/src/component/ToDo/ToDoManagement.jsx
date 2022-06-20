@@ -1,21 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import Loading from '../Loading/Loading.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ToDoItem from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
 
 const ToDoManagement = (props) => {
-  const [toDoList, setToDoList] = useState([])
-  const [isToDoListLoading, setIsToDoListLoading] = useState(false)
-  const [isNewToDo, setIsNewToDo] = useState(toDoList.length === 0)
-
-  useEffect(() => {
-    setIsToDoListLoading(true)
-    setToDoList(props.toDoList)
-    setIsToDoListLoading(false)
-  }, [props.contentId])
+  const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0)
 
   const handleClickCancel = () => setIsNewToDo(false)
   const handleClickSaveToDo = (assignedUserId, toDo) => {
@@ -44,20 +35,18 @@ const ToDoManagement = (props) => {
             text={props.t('New to do')}
           />
 
-          {isToDoListLoading
-            ? <Loading />
-            : toDoList.length > 0
-              ? toDoList.map(toDo =>
-                <ToDoItem
-                  key={`toDo_${toDo.todo_id}`}
-                  memberList={props.memberList}
-                  onClickChangeStatusToDo={props.onClickChangeStatusToDo}
-                  onClickDeleteToDo={props.onClickDeleteToDo}
-                  toDo={toDo}
-                />
+          {props.toDoList.length > 0
+            ? props.toDoList.map(toDo =>
+              <ToDoItem
+                key={`toDo_${toDo.todo_id}`}
+                memberList={props.memberList}
+                onClickChangeStatusToDo={props.onClickChangeStatusToDo}
+                onClickDeleteToDo={props.onClickDeleteToDo}
+                toDo={toDo}
+              />
 
-              )
-              : <div>{props.t('This content has no To Do associated. Click on "New to do" button to create a new one.')}</div>}
+            )
+            : <div>{props.t('This content has no To Do associated. Click on "New to do" button to create a new one.')}</div>}
         </div>
       )
 
