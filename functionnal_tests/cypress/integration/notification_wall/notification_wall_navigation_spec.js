@@ -40,6 +40,6 @@ describe('Notification wall', () => {
 
   it('should redirect to content when clicked at an other content notification', () => {
     cy.get(notificationItemClass).last().click()
-    cy.contains('.componentTitle', 'title').should('be.visible')
+    cy.contains('.FilenameWithBadges__label', 'title').should('be.visible')
   })
 })
