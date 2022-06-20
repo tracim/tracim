@@ -457,7 +457,7 @@ class TestFunctionalWebdavGet(object):
             file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
-                filname=content_filename,
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -908,7 +908,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
                 workspace=workspace,
                 parent=example_folder,
                 filename=content_filename,
-                do_save=True,
+                do_save=False,
                 do_notify=False,
             )
             api.update_file_data(file, content_filename, "text/plain", b"test_content")
@@ -1072,7 +1072,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
-                filname=content_filename,
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -1247,7 +1247,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
-                filname=content_filename,
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -1401,7 +1401,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
                 workspace=workspace,
                 parent=example_folder,
                 filename=content_filename,
-                do_save=True,
+                do_save=False,
                 do_notify=False,
             )
             api.update_file_data(file, content_filename, "text/plain", b"test_content")
@@ -1567,7 +1567,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
                 workspace=workspace,
                 parent=example_folder,
                 filename=content_filename,
-                do_save=True,
+                do_save=False,
                 do_notify=False,
             )
             api.update_file_data(file, content_filename, "text/plain", b"test_content")
@@ -1703,7 +1703,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
-                filname=content_filename,
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
@@ -1840,7 +1840,7 @@ class TestFunctionalWebdavMoveSimpleFile(object):
             file = api.create(
                 content_type_slug=content_type_list.File.slug,
                 workspace=workspace,
-                filname=content_filename,
+                filename=content_filename,
                 do_save=False,
                 do_notify=False,
             )
