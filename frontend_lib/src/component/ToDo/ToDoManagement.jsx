@@ -25,9 +25,10 @@ const ToDoManagement = (props) => {
         onClickSaveNewToDo={handleClickSaveToDo}
       />
       : (
-        <div>
+        <div className='toDo'>
           <IconButton
             color={props.customColor}
+            customClass='toDo__newButton'
             icon='fas fa-plus-circle'
             intent='primary'
             mode='light'

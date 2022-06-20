@@ -6,21 +6,21 @@ import IconButton from '../Button/IconButton.jsx'
 const ToDoItem = props => {
   const username = (props.memberList.find(member => member.id === props.toDo.assignee_id) || { username: '' }).username
   return (
-    <div className='toDo'>
+    <div className='toDoItem'>
       <IconButton
-        customClass='toDo__checkbox'
+        customClass='toDoItem__checkbox'
         icon={`far ${props.toDo.status === 'open' ? 'fa-square' : 'fa-check-square'}`}
         title={props.toDo.status === 'open' ? props.t('Check') : props.t('Uncheck')}
         onClick={() => props.onClickChangeStatusToDo(props.toDo.todo_id, props.toDo.status === 'open' ? 'closed-validated' : 'open')}
         disabled={false} // TODO
         intent='link'
       />
-      <div className='toDo__content'>
+      <div className='toDoItem__content'>
         <strong>+{username}</strong>
         {props.toDo.raw_content}
       </div>
       <IconButton
-        customClass='toDo__delete'
+        customClass='toDoItem__delete'
         disabled={false} // TODO
         icon='far fa-trash-alt'
         intent='link'

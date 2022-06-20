@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import Select from 'react-select'
 import { translate } from 'react-i18next'
-// import { CONTENT_TYPE } from '../../helper.js'
-// import CommentArea from '../Timeline/CommentArea.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
 const NewToDo = props => {
@@ -20,21 +18,26 @@ const NewToDo = props => {
   const onChangeToDo = (e) => setNewComment(e.target.value)
 
   return (
-    <div>
-      <div>{props.t('Assigned person:')}</div>
+    <div className='toDo__new'>
+      <div className='toDo__new__assignedPerson'>
+        {props.t('Assigned person:')}
+      </div>
       <Select
         isSearchable
         onChange={onChangeAssignedUser}
         options={memberListOptions}
       />
 
-      <div>{props.t('Enter your To Do bellow:')}</div>
+      <div className='toDo__new__toDoText'>
+        {props.t('Enter your To Do bellow:')}
+      </div>
       <textarea
         placeholder={props.placeHolder || props.t('Your message...')}
         value={newComment}
         onChange={onChangeToDo}
       />
 
+      <div className='toDo__new__buttons'>
       <IconButton
         text={props.t('Cancel')}
         icon='fas fa-times'
@@ -52,6 +55,7 @@ const NewToDo = props => {
         intent='primary'
         mode='light'
       />
+      </div>
 
     </div>
   )
