@@ -41,7 +41,7 @@ class TodoInContext(object):
         :return: todo assignee id as integer
         """
         return self.todo.assignee_id
-    
+
     @property
     def owner_id(self) -> int:
         """

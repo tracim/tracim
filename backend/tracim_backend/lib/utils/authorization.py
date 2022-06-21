@@ -425,10 +425,7 @@ can_edit_comment = OrAuthorizationChecker(
 is_todo_owner = TodoOwnerChecker()
 is_assignee = TodoAssigneeChecker()
 can_edit_todo = OrAuthorizationChecker(
-    is_todo_owner,
-    is_assignee,
-    is_content_manager,
-    is_workspace_manager,
+    is_todo_owner, is_assignee, is_content_manager, is_workspace_manager
 )
 can_delete_todo = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_todo_owner), is_content_manager, is_workspace_manager
