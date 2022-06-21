@@ -949,16 +949,19 @@ class ContentApi(object):
         if workspace:
             optional_begin_filters.append("cr.workspace_id = :workspace_id")
 
+        # NOTE - G.M - 2022-06-21: Theses SQL boolean filters use a syntax especially chosen
+        # to be compatible with both postgresql and sqlite, using some other similar syntax
+        # may failed in one or the other database software.
         if not self._show_deleted:
-            optional_begin_filters.append("cr.is_deleted = 0")
+            optional_begin_filters.append("not cr.is_deleted")
         if not self._show_archived:
-            optional_begin_filters.append("cr.is_archived = 0")
+            optional_begin_filters.append("not cr.is_archived")
         if not self._show_active:
-            optional_begin_filters.append("(cr.is_archived = 1 or cr.is_deleted = 1)")
+            optional_begin_filters.append("(cr.is_archived or cr.is_deleted)")
 
         statement = text(
             """
-            with content_read_status as (
+            with recursive content_read_status as (
                 select c.id                                                      as content_id,
                        cr.parent_id                                              as parent_id,
                        rrs.view_datetime                                         as view_datetime,
