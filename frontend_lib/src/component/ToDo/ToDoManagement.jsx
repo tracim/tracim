@@ -2,7 +2,10 @@ import React, { useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import IconButton from '../Button/IconButton.jsx'
-import ToDoItem, { isEditable } from './ToDoItem.jsx'
+import ToDoItem, {
+  isDeletable,
+  isEditable
+} from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
 import { ROLE } from '../../helper.js'
 
@@ -39,9 +42,10 @@ const ToDoManagement = (props) => {
             />
           }
           {props.toDoList.length > 0
-            ? props.toDoList.map(toDo => 
+            ? props.toDoList.map(toDo =>
               <ToDoItem
                 key={`toDo_${toDo.todo_id}`}
+                isDeletable={isDeletable(toDo, props.user, props.user.userRoleIdInWorkspace)}
                 isEditable={isEditable(toDo, props.user, props.user.userRoleIdInWorkspace)}
                 memberList={props.memberList}
                 onClickChangeStatusToDo={props.onClickChangeStatusToDo}
