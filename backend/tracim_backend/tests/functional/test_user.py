@@ -501,10 +501,12 @@ class TestUserSetContentAsRead(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -515,6 +517,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -531,19 +534,11 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
-
-        res = web_testapp.get(
-            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=200,
-        )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
 
     def test_api_set_content_as_read__ok__200__admin_workspace_do_not_exist(
         self,
@@ -718,10 +713,12 @@ class TestUserSetContentAsRead(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -740,6 +737,7 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -861,10 +859,12 @@ class TestUserSetContentAsRead(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -874,6 +874,7 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -891,6 +892,7 @@ class TestUserSetContentAsRead(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -900,6 +902,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -916,7 +919,6 @@ class TestUserSetContentAsRead(object):
         session,
     ):
         # init DB
-
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
@@ -953,13 +955,14 @@ class TestUserSetContentAsRead(object):
         api.mark_unread(comments)
         session.flush()
         transaction.commit()
-
+        params = {"content_ids": firstly_created.content_id}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -970,6 +973,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -986,6 +990,7 @@ class TestUserSetContentAsRead(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -995,6 +1000,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1059,10 +1065,12 @@ class TestUserSetContentAsUnread(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1072,6 +1080,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1090,6 +1099,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1099,6 +1109,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1279,11 +1290,13 @@ class TestUserSetContentAsUnread(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1302,6 +1315,7 @@ class TestUserSetContentAsUnread(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1403,11 +1417,12 @@ class TestUserSetContentAsUnread(object):
         api.mark_read(comments)
         session.flush()
         transaction.commit()
-
+        params = {"content_ids": firstly_created.content_id}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1421,6 +1436,7 @@ class TestUserSetContentAsUnread(object):
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1457,11 +1473,13 @@ class TestUserSetContentAsUnread(object):
         api.mark_read(comments)
         session.flush()
         transaction.commit()
+        params = {"content_ids": firstly_created.content_id}
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1475,6 +1493,7 @@ class TestUserSetContentAsUnread(object):
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1545,10 +1564,10 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is False
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is False
+
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
@@ -1562,10 +1581,9 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is True
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is True
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__ok__200__user_itself(
         self,
@@ -1625,10 +1643,10 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is False
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is False
+
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
@@ -1642,10 +1660,9 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is True
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is True
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__err__403__other_user(
         self,

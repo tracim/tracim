@@ -619,7 +619,7 @@ class UserController(Controller):
             workspace = wapi.get_one(hapic_data.path.workspace_id)
         read_statuses = content_api.get_read_status(
             workspace=workspace,
-            user=request.current_user,
+            user=request.candidate_user,
             content_ids=hapic_data.query.content_ids or None,
         )
         return read_statuses

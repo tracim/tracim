@@ -944,7 +944,7 @@ class ContentApi(object):
         optional_begin_filters = []
         optional_end_filters = []
         if content_ids:
-            optional_end_filters.append("content_id in :content_ids")
+            optional_end_filters.append("root_id in :content_ids")
 
         if workspace:
             optional_begin_filters.append("cr.workspace_id = :workspace_id")
@@ -985,11 +985,11 @@ class ContentApi(object):
                   on crs.parent_id = trs.content_id
             )
             select
-                   trs.root_id as content_id,
+                   trs.root_id as root_id,
                    max(trs.view_datetime) as last_view_datetime,
                    min(trs.read) as read
             from temp_read_status trs
-            group by content_id
+            group by root_id
             {optional_end_filter}
             ;
         """.format(
@@ -1888,7 +1888,6 @@ class ContentApi(object):
 
         if do_flush:
             self.flush()
-
         return content
 
     def mark_unread(self, content: Content, do_flush=True) -> Content:
