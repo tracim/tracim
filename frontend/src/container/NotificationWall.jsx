@@ -343,7 +343,6 @@ export const NotificationWall = props => {
           }
 
           if (contentType === TLM_SUB.TODO) {
-            console.log('TODO', notification, i18nOpts)
             return {
               title: props.t('Task to do created'),
               text: props.t('{{author}} created a task on {{content}}{{workspaceInfo}}', i18nOpts),

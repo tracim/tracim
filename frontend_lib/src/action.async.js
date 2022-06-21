@@ -77,6 +77,9 @@ export const putToDo = (apiUrl, workspaceId, contentId, toDoId, status) =>
 export const getToDoList = (apiUrl, workspaceId, contentId) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`)
 
+export const getToDo = (apiUrl, workspaceId, contentId, toDoId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`)
+
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/${appSlug}s/${contentId}/status`, {

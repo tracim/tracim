@@ -1,6 +1,7 @@
 import React from 'react'
 import i18n from './i18n.js'
 import Autolinker from 'autolinker'
+import { uniqBy } from 'lodash'
 
 import {
   handleFetchResult,
@@ -433,7 +434,7 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
       const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
       if (response.apiResponse.status === 200) {
-        setState(prev => ({ toDoList: [...prev.toDoList, response.body] }))
+        setState(prev => ({ toDoList: uniqBy([response.body, ...prev.toDoList], 'todo_id') }))
       } else {
         sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
       }

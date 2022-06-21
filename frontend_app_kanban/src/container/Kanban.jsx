@@ -1,6 +1,7 @@
 import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
+import { uniqBy } from 'lodash'
 import {
   appContentFactory,
   addAllResourceI18n,
@@ -10,6 +11,7 @@ import {
   CONTENT_TYPE,
   handleFetchResult,
   handleInvalidMentionInComment,
+  getToDo,
   PAGE,
   PopinFixed,
   PopinFixedContent,
@@ -87,7 +89,10 @@ export class Kanban extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreate },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted }
     ])
   }
 
@@ -155,6 +160,47 @@ export class Kanban extends React.Component {
   handleClickLastVersion = () => {
     this.setState({ mode: APP_FEATURE_MODE.VIEW })
     this.loadContent()
+  }
+
+  handleToDoCreate = async data => {
+    const { state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.content.workspace_id,
+      data.fields.content.parent_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({ toDoList:
+      uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
+    }))
+  }
+
+  handleToDoChanged = async data => {
+    const { state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.content.workspace_id,
+      data.fields.content.parent_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({ toDoList:
+      prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    }))
+  }
+
+  handleToDoDeleted = data => {
+    const { state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    this.setState(prevState => ({ toDoList:
+      prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
+    }))
   }
 
   handleContentChanged = data => {

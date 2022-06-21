@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
@@ -130,7 +131,10 @@ export class File extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreate },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted }
     ])
   }
 
@@ -164,6 +168,47 @@ export class File extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
     )
+  }
+
+  handleToDoCreate = async data => {
+    const { state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.content.workspace_id,
+      data.fields.content.parent_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({ toDoList:
+      uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
+    }))
+  }
+
+  handleToDoChanged = async data => {
+    const { state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.content.workspace_id,
+      data.fields.content.parent_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({ toDoList:
+      prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    }))
+  }
+
+  handleToDoDeleted = data => {
+    const { state } = this
+    if (data.fields.content.parent_id !== state.content.content_id) return
+
+    this.setState(prevState => ({ toDoList:
+      prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
+    }))
   }
 
   handleContentModified = (data) => {
