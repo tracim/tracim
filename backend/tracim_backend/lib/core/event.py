@@ -96,7 +96,7 @@ class EventApi:
         FILE_TYPE: FileContentSchema(),
         FOLDER_TYPE: MessageContentSchema(),
         THREAD_TYPE: MessageContentSchema(),
-        TODO_TYPE: MessageCommentSchema(),
+        TODO_TYPE: MessageContentSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()
