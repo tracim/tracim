@@ -16,7 +16,8 @@ import {
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
   tinymceRemove,
-  addRevisionFromTLM
+  addRevisionFromTLM,
+  sortContentByStatus
 } from './helper.js'
 
 import {
@@ -189,7 +190,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: fetchGetToDo.body })
+          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'todo_id')) })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
@@ -434,7 +435,9 @@ export function appContentFactory (WrappedComponent) {
       this.checkApiUrl()
       const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
       if (response.apiResponse.status === 200) {
-        setState(prev => ({ toDoList: uniqBy([response.body, ...prev.toDoList], 'todo_id') }))
+        setState(prev => ({
+          toDoList: sortContentByStatus(uniqBy([response.body, ...prev.toDoList], 'todo_id'))
+        }))
       } else {
         sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
       }
@@ -627,7 +630,7 @@ export function appContentFactory (WrappedComponent) {
             content_namespace: parentNamespace
           },
           httpMethod: 'POST',
-          progressEventHandler: () => {},
+          progressEventHandler: () => { },
           errorMessageList: errorMessageList,
           defaultErrorMessage: i18n.t('Error while uploading file')
         }
@@ -939,9 +942,9 @@ export function appContentFactory (WrappedComponent) {
       const { state } = this
       return (
         state.wholeTimeline.length > state.timeline.length ||
-          state.hasMoreComments ||
-          state.hasMoreFiles ||
-          state.hasMoreRevisions
+        state.hasMoreComments ||
+        state.hasMoreFiles ||
+        state.hasMoreRevisions
       )
     }
 
