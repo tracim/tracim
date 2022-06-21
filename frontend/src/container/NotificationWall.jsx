@@ -358,6 +358,14 @@ export const NotificationWall = props => {
         }
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
+            if (contentType === TLM_SUB.TODO) {
+              return {
+                title: props.t('Task updated'),
+                text: props.t('{{author}} updated a task on {{content}}{{workspaceInfo}}', i18nOpts),
+                url: linkToParentContent(notification)
+              }
+            }
+
             return {
               title: props.t('Status updated'),
               text: props.t('{{author}} changed the status of {{content}}{{workspaceInfo}}', i18nOpts),
@@ -372,6 +380,14 @@ export const NotificationWall = props => {
           }
         }
         case TLM_EVENT.DELETED: {
+          if (contentType === TLM_SUB.TODO) {
+            return {
+              title: props.t('Task deleted'),
+              text: props.t('{{author}} deleted a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              url: linkToParentContent(notification)
+            }
+          }
+
           return {
             title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
             text: props.t('{{author}} deleted {{content}}{{workspaceInfo}}', i18nOpts),
