@@ -18,28 +18,30 @@ const ToDoManagement = (props) => {
 
   return (
     isNewToDo
-      ? <NewToDo
-        apiUrl={props.apiUrl}
-        contentId={props.contentId}
-        customColor={props.customColor}
-        memberList={props.memberList}
-        onClickCancel={handleClickCancel}
-        onClickSaveNewToDo={handleClickSaveToDo}
-      />
-      : (
+      ? (
+        <NewToDo
+          apiUrl={props.apiUrl}
+          contentId={props.contentId}
+          customColor={props.customColor}
+          memberList={props.memberList}
+          onClickCancel={handleClickCancel}
+          onClickSaveNewToDo={handleClickSaveToDo}
+        />
+      ) : (
         <div className='toDo'>
-          { !isReader && <IconButton
+          {!isReader && (
+            <IconButton
               color={props.customColor}
               customClass='toDo__newButton'
               icon='fas fa-plus-circle'
               intent='primary'
               mode='light'
               onClick={() => setIsNewToDo(true)}
-              text={props.t('New to do')}
+              text={props.t('New task')}
             />
-          }
+          )}
           {props.toDoList.length > 0
-            ? props.toDoList.map(toDo => 
+            ? props.toDoList.map(toDo =>
               <ToDoItem
                 key={`toDo_${toDo.todo_id}`}
                 isEditable={isEditable(toDo, props.user, props.user.userRoleIdInWorkspace)}
@@ -50,7 +52,7 @@ const ToDoManagement = (props) => {
                 toDo={toDo}
               />
             )
-            : <div>{props.t('This content has no To Do associated. Click on "New to do" button to create a new one.')}</div>}
+            : <div>{props.t('This content has no task to do associated. Click on "New task" button to create a new one.')}</div>}
         </div>
       )
 

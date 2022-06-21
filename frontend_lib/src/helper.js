@@ -505,6 +505,13 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
+export const STATUSES = {
+  OPEN: 'open',
+  VALIDATED: 'closed-validated',
+  CANCELLED: 'closed-unvalidated',
+  DEPRECATED: 'closed-deprecated'
+}
+
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types

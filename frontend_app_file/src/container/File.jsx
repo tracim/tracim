@@ -16,6 +16,7 @@ import {
   addAllResourceI18n,
   handleFetchResult,
   handleInvalidMentionInComment,
+  getToDo,
   PopinFixed,
   PopinFixedContent,
   PopinFixedRightPart,
@@ -181,8 +182,8 @@ export class File extends React.Component {
       data.fields.content.content_id
     ))
 
-    this.setState(prevState => ({ toDoList:
-      uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
+    this.setState(prevState => ({
+      toDoList: uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
     }))
   }
 
@@ -197,8 +198,8 @@ export class File extends React.Component {
       data.fields.content.content_id
     ))
 
-    this.setState(prevState => ({ toDoList:
-      prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
     }))
   }
 
@@ -206,8 +207,8 @@ export class File extends React.Component {
     const { state } = this
     if (data.fields.content.parent_id !== state.content.content_id) return
 
-    this.setState(prevState => ({ toDoList:
-      prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
     }))
   }
 
@@ -928,7 +929,7 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const todoObject = {
+    const toDoObject = {
       id: 'todo',
       label: props.t('To Do'),
       icon: 'fas fa-check-square',
@@ -999,7 +1000,7 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
       return [
         timelineObject,
-        todoObject,
+        toDoObject,
         tagObject,
         {
           id: 'share',
@@ -1031,7 +1032,7 @@ export class File extends React.Component {
 
       ]
     } else {
-      return [timelineObject, todoObject, tagObject, propertiesObject]
+      return [timelineObject, toDoObject, tagObject, propertiesObject]
     }
   }
 

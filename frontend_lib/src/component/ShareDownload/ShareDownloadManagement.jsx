@@ -44,7 +44,7 @@ class ShareDownloadManagement extends React.Component {
               mode='light'
               onClick={props.onClickNewShareDownload}
               text={props.t('New')}
-             />
+            />
           )}
         </div>
 

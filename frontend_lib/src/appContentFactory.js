@@ -451,7 +451,7 @@ export function appContentFactory (WrappedComponent) {
           setState(prev => ({ toDoList: prev.toDoList.filter(toDo => toDo.todo_id !== toDoId) }))
           break
         case 403:
-          sendGlobalFlashMessage(i18n.t('You are not allowed to delete this todo'))
+          sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
           break
         default:
           sendGlobalFlashMessage(i18n.t('Error while deleting to do'))
@@ -470,7 +470,7 @@ export function appContentFactory (WrappedComponent) {
           setState(prev => ({ toDoList: prev.toDoList.map(toDo => toDo.todo_id === toDoId ? { ...toDo, status } : toDo) }))
           break
         case 403:
-          sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this todo'))
+          sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))
           break
         default:
           sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
