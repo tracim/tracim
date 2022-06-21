@@ -1796,23 +1796,6 @@ class RevisionInContext(object):
         else:
             return None
 
-    # @property
-    # def assignee_id(self) -> Optional[int]:
-    #     """
-    #     :return: assignee_id of content if available, None if unavailable
-    #     """
-    #     from tracim_backend.lib.core.content import ContentApi
-    #     content_api = ContentApi(
-    #         current_user=self._user,
-    #         session=self.dbsession,
-    #         config=self.config,
-    #     )
-    #     try:
-    #         todo = content_api.get_todo(self.revision.content_id)
-    #         return todo.assignee_id
-    #     except TodoNotFound:
-    #         return None
-
     @property
     def mimetype(self) -> str:
         """
