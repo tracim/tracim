@@ -32,6 +32,7 @@ import {
   tinymceRemove,
   TagList,
   putMyselfFileRead,
+  sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
 
@@ -174,7 +175,7 @@ export class Kanban extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
+      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id'))
     }))
   }
 

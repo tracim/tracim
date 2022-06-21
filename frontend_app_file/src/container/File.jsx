@@ -49,6 +49,7 @@ import {
   sendGlobalFlashMessage,
   TagList,
   getFileRevisionPreviewInfo,
+  sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
@@ -183,7 +184,7 @@ export class File extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
+      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id'))
     }))
   }
 

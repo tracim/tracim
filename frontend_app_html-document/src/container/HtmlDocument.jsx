@@ -45,6 +45,7 @@ import {
   FAVORITE_STATE,
   addExternalLinksIcons,
   PopinFixedRightPartContent,
+  sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
 import {
@@ -203,7 +204,7 @@ export class HtmlDocument extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
+      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id'))
     }))
   }
 
