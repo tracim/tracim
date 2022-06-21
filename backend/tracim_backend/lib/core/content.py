@@ -21,7 +21,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 import transaction
 
+from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import TODO_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.content_todo.models import Todo
@@ -1996,12 +1998,7 @@ class ContentApi(object):
         return _("New folder {0}").format(query.count() + 1)
 
     def _allow_empty_label(self, content_type_slug: str) -> bool:
-        if (
-            content_type_list.get_one_by_slug(content_type_slug).slug
-            == content_type_list.Comment.slug
-            or content_type_list.get_one_by_slug(content_type_slug).slug
-            == content_type_list.Todo.slug
-        ):
+        if content_type_list.get_one_by_slug(content_type_slug).slug in [COMMENT_TYPE, TODO_TYPE]:
             return True
         return False
 

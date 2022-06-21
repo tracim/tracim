@@ -59,8 +59,6 @@ class TodoController(Controller):
 
         todos = content_api.get_all_todos_for_content_id(hapic_data.path.content_id)
 
-        print("todos", todos)
-
         todos_in_context = []
         for todo in todos:
             todos_in_context.append(content_api.get_todo_in_context(todo))
