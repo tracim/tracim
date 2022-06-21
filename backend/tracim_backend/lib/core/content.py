@@ -1276,7 +1276,7 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        copy_result = self._copy(item, content_namespace, parent, copy_revision)
+        copy_result = self._copy(item, content_namespace, parent)
         copy_result = self._add_copy_revisions(
             original_content=item,
             new_content=copy_result.new_content,
