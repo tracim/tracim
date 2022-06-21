@@ -6,7 +6,7 @@
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
   "Folder's name": "Nombre de la carpeta",
   "Error while saving new folder": "Error al guardar una nueva carpeta",
-  "Allowed content type for this folder": "Allowed content type for this folder",
+  "Allowed content type for this folder": "Tipo de contenido permitido para esta carpeta",
   "Error while loading folder details": "Error al cargar los detalles de la carpeta",
   "Error while saving new available apps list": "Error al guardar la lista de nuevas aplicaciones disponibles",
   "This folder is archived": "Esta carpeta está archivada",

@@ -17,5 +17,16 @@
   "Error while saving the comment": "Error al guardar el comentario",
   "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
   "The password length must be between 6 and 512 characters and the email(s) must be valid": "La longitud de la contraseña debe estar entre 6 y 512 caracteres y el correo electrónico debe ser válido",
-  "Restore": "Restaurar"
+  "Restore": "Restaurar",
+  "Error while saving the new description": "Error al guardar la nueva descripción",
+  "Please wait until the upload ends": "Por favor, espere hasta que termine la carga",
+  "This content is archived": "Este contenido está archivado",
+  "This content is deleted": "Este contenido es eliminado",
+  "This content is deprecated": "Este contenido está obsoleto",
+  "Description:": "Descripción:",
+  "Timeline": "Línea de tiempo",
+  "To notify all members of the space of your modification": "Para notificar a todos los miembros del espacio su modificación",
+  "Tags": "Etiquetas",
+  "click here!": "¡ haga clic aquí !",
+  "Last version": "Última versión"
 }
