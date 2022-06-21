@@ -221,10 +221,10 @@
   "Error while loading timeline": "Erreur lors du chargement de l'historique",
   "Agenda": "Agenda",
   "Unknown content": "Contenu inconnu",
-  "From a template:": "",
-  "Template": "",
-  "Unmark template": "",
-  "Mark template": "",
-  "Something went wrong": "",
-  "Unknown comment": ""
+  "From a template:": "À partir d'un modèle :",
+  "Template": "Modèle",
+  "Unmark template": "Retirer des modèles",
+  "Mark template": "Ajouter aux modèles",
+  "Something went wrong": "Quelque chose s'est mal passé",
+  "Unknown comment": "Commentaire inconnu"
 }
