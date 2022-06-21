@@ -65,6 +65,7 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
+  sortContentByStatus,
   USER_CALL_STATE
 } from './helper.js'
 
@@ -473,6 +474,7 @@ export {
   Popover,
   getBrowserLang,
   NewToDo,
+  sortContentByStatus,
   ToDoItem,
   ToDoManagement
 }

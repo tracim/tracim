@@ -505,6 +505,23 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
+export const STATUSES = {
+  OPEN: 'open',
+  VALIDATED: 'closed-validated',
+  CANCELLED: 'closed-unvalidated',
+  DEPRECATED: 'closed-deprecated'
+}
+
+export const sortContentByStatus = (contentList) => {
+  return contentList.sort((contantA, contentB) => {
+    if (contantA.status === STATUSES.VALIDATED && contentB.status === STATUSES.OPEN) {
+      return 1
+    } if (contantA.status === STATUSES.OPEN && contentB.status === STATUSES.VALIDATED) {
+      return -1
+    } else return 0
+  })
+}
+
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types

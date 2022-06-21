@@ -38,23 +38,23 @@ const NewToDo = props => {
       />
 
       <div className='toDo__new__buttons'>
-      <IconButton
-        text={props.t('Cancel')}
-        icon='fas fa-times'
-        onClick={props.onClickCancel}
-        color={props.customColor}
-        intent='secondary'
-      />
+        <IconButton
+          text={props.t('Cancel')}
+          icon='fas fa-times'
+          onClick={props.onClickCancel}
+          color={props.customColor}
+          intent='secondary'
+        />
 
-      <IconButton
-        text={props.t('Validate')}
-        icon='fas fa-check'
-        onClick={() => props.onClickSaveNewToDo(assignedUserId, newComment)}
-        disabled={!newComment || !assignedUserId}
-        color={props.customColor}
-        intent='primary'
-        mode='light'
-      />
+        <IconButton
+          text={props.t('Validate')}
+          icon='fas fa-check'
+          onClick={() => props.onClickSaveNewToDo(assignedUserId, newComment)}
+          disabled={!newComment || !assignedUserId}
+          color={props.customColor}
+          intent='primary'
+          mode='light'
+        />
       </div>
 
     </div>

@@ -193,7 +193,7 @@ export class HtmlDocument extends React.Component {
 
   handleToDoCreate = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) retur
+    if (data.fields.content.parent_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
@@ -202,8 +202,8 @@ export class HtmlDocument extends React.Component {
       data.fields.content.content_id
     ))
 
-    this.setState(prevState => ({ toDoList:
-      uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
+    this.setState(prevState => ({
+      toDoList: uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id')
     }))
   }
 
@@ -218,8 +218,8 @@ export class HtmlDocument extends React.Component {
       data.fields.content.content_id
     ))
 
-    this.setState(prevState => ({ toDoList:
-      prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
     }))
   }
 
@@ -227,8 +227,8 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     if (data.fields.content.parent_id !== state.content.content_id) return
 
-    this.setState(prevState => ({ toDoList:
-      prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
     }))
   }
 
@@ -835,7 +835,7 @@ export class HtmlDocument extends React.Component {
       ) : null
     }
 
-    const todoObject = {
+    const toDoObject = {
       id: 'todo',
       label: props.t('To Do'),
       icon: 'fas fa-check-square',
@@ -875,7 +875,7 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, todoObject, tagObject]
+    return [timelineObject, toDoObject, tagObject]
   }
 
   render () {
