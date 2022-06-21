@@ -23,8 +23,8 @@ class Todo(CreationDateMixin, DeclarativeBase):
     )
     assignee_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
 
-    content = relationship("Content", remote_side=[Content.id], lazy="joined")
-    assignee = relationship("User", remote_side=[User.user_id])
+    content = relationship("Content", remote_side=[Content.id], lazy="joined", backref="todos")
+    assignee = relationship("User", remote_side=[User.user_id], backref="todos")
 
     def __repr__(self):
         return "<Todo(content_id=%s, assignee_id=%s)>" % (
