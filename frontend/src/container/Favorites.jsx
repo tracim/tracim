@@ -82,7 +82,7 @@ const UnavailableContent = translate()(props => {
         {props.label}
         <span className='unavailableContent__warning'>
           <Icon
-            icon='fa-fw fas fa-exclamation-triangle'
+            icon='fas fa-exclamation-triangle'
             title={props.t('Warning')}
           />
           &nbsp;

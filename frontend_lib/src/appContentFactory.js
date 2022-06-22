@@ -1,6 +1,7 @@
 import React from 'react'
 import i18n from './i18n.js'
 import Autolinker from 'autolinker'
+import { uniqBy } from 'lodash'
 
 import {
   handleFetchResult,
@@ -15,7 +16,8 @@ import {
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
   tinymceRemove,
-  addRevisionFromTLM
+  addRevisionFromTLM,
+  sortContentByStatus
 } from './helper.js'
 
 import {
@@ -41,6 +43,7 @@ import {
 
 import {
   deleteComment,
+  deleteToDo,
   deleteContentFromFavoriteList,
   getComment,
   getCommentTranslated,
@@ -51,7 +54,10 @@ import {
   getMyselfKnownContents,
   getMyselfKnownMember,
   getTemplateList,
+  getToDoList,
   postContentToFavoriteList,
+  postNewComment,
+  postToDo,
   putComment,
   putContentArchived,
   putContentDeleted,
@@ -60,7 +66,7 @@ import {
   putContentTemplate,
   putEditContent,
   putEditStatus,
-  postNewComment
+  putToDo
 } from './action.async.js'
 
 import {
@@ -176,6 +182,19 @@ export function appContentFactory (WrappedComponent) {
         default:
           sendGlobalFlashMessage(i18n.t('Unknown comment'))
           return {}
+      }
+    }
+
+    getToDoList = async (setState, workspaceId, contentId) => {
+      const fetchGetToDo = await handleFetchResult(await getToDoList(this.apiUrl, workspaceId, contentId))
+
+      switch (fetchGetToDo.apiResponse.status) {
+        case 200:
+          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'todo_id')) })
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          break
       }
     }
 
@@ -412,6 +431,58 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentSaveNewToDo = async (workspaceId, contentId, assignedUserId, toDo, setState) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
+      if (response.apiResponse.status === 200) {
+        setState(prev => ({
+          toDoList: sortContentByStatus(uniqBy([response.body, ...prev.toDoList], 'todo_id'))
+        }))
+      } else {
+        sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+      }
+
+      return response
+    }
+
+    appContentDeleteToDo = async (workspaceId, contentId, toDoId, setState) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(await deleteToDo(this.apiUrl, workspaceId, contentId, toDoId))
+
+      switch (response.status) {
+        case 204:
+          setState(prev => ({ toDoList: prev.toDoList.filter(toDo => toDo.todo_id !== toDoId) }))
+          break
+        case 403:
+          sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Error while deleting to do'))
+          break
+      }
+
+      return response
+    }
+
+    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
+
+      switch (response.status) {
+        case 204:
+          setState(prev => ({ toDoList: prev.toDoList.map(toDo => toDo.todo_id === toDoId ? { ...toDo, status } : toDo) }))
+          break
+        case 403:
+          sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+          break
+      }
+
+      return response
+    }
+
     appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
       this.checkApiUrl()
       const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
@@ -559,7 +630,7 @@ export function appContentFactory (WrappedComponent) {
             content_namespace: parentNamespace
           },
           httpMethod: 'POST',
-          progressEventHandler: () => {},
+          progressEventHandler: () => { },
           errorMessageList: errorMessageList,
           defaultErrorMessage: i18n.t('Error while uploading file')
         }
@@ -871,9 +942,9 @@ export function appContentFactory (WrappedComponent) {
       const { state } = this
       return (
         state.wholeTimeline.length > state.timeline.length ||
-          state.hasMoreComments ||
-          state.hasMoreFiles ||
-          state.hasMoreRevisions
+        state.hasMoreComments ||
+        state.hasMoreFiles ||
+        state.hasMoreRevisions
       )
     }
 
@@ -1039,6 +1110,7 @@ export function appContentFactory (WrappedComponent) {
           {...this.props}
           setApiUrl={this.setApiUrl}
           addContentToFavoriteList={this.addContentToFavoriteList}
+          appContentChangeStatusToDo={this.appContentChangeStatusToDo}
           appContentCustomEventHandlerShowApp={this.appContentCustomEventHandlerShowApp}
           appContentCustomEventHandlerHideApp={this.appContentCustomEventHandlerHideApp}
           appContentCustomEventHandlerReloadAppFeatureData={this.appContentCustomEventHandlerReloadAppFeatureData}
@@ -1047,6 +1119,7 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
           appContentMarkAsTemplate={this.appContentMarkAsTemplate}
           appContentSaveNewComment={this.appContentSaveNewComment}
@@ -1056,8 +1129,10 @@ export function appContentFactory (WrappedComponent) {
           appContentNotifyAll={this.appContentNotifyAll}
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
+          appContentSaveNewToDo={this.appContentSaveNewToDo}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
           getTemplateList={this.getTemplateList}
+          getToDoList={this.getToDoList}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           isContentInFavoriteList={this.isContentInFavoriteList}

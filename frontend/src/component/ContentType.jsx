@@ -15,7 +15,7 @@ const ContentType = props => {
       style={{ color: props.contentTypeInfo.hexcolor }}
     >
       <Icon
-        icon={`fa-fw ${props.contentTypeInfo.faIcon}`}
+        icon={props.contentTypeInfo.faIcon}
         title={props.t(props.contentTypeInfo.label)}
         color={props.contentTypeInfo.hexcolor}
       />

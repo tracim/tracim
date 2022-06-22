@@ -82,6 +82,9 @@ requires = [
     "webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo",
     # importlib
     "importlib_metadata==4.6.0",
+    # note pdf preview
+    "pypandoc",
+    "weasyprint<53",
 ]
 
 tests_require = [

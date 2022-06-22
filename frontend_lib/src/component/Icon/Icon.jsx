@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 const Icon = props => (
   <i
     title={props.title}
-    className={`icon ${props.icon} ${props.customClass}`}
+    className={`fa fa-fw icon ${props.icon} ${props.customClass}`}
     style={{ color: props.color }}
   >
     {props.children}

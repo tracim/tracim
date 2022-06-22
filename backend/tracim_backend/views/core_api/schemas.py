@@ -2329,6 +2329,11 @@ class ContentRevisionsPageQuerySchema(BaseOptionalPaginatedQuerySchema):
     )
 
 
+###
+# UserCall
+###
+
+
 class CreateUserCallSchema(marshmallow.Schema):
     callee_id = marshmallow.fields.Integer(description="Id of the user to call", example=42)
 

@@ -79,7 +79,7 @@ export class WorkspaceAdvanced extends React.Component {
         id: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: param.content.defaultRole,
         avatarUrl: '',
         isEmail: false
       },
@@ -254,6 +254,11 @@ export class WorkspaceAdvanced extends React.Component {
     if (prevState.content && state.content && prevState.content.workspace_id !== state.content.workspace_id) {
       this.loadContent()
     }
+
+    // INFO - AJ (from CH) - 2022 06 17 - empty string is the default value for the property content.defaultRole in the state
+    if (prevState.content.defaultRole === '' && state.content.defaultRole !== '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: prev.content.defaultRole } }))
+    }
   }
 
   componentWillUnmount () {
@@ -370,7 +375,8 @@ export class WorkspaceAdvanced extends React.Component {
     )
 
     switch (fetchPutDefaultRole.apiResponse.status) {
-      case 200: sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
+      case 200:
+        sendGlobalFlashMessage(props.t('Save successful'), 'info'); break
       default: sendGlobalFlashMessage(props.t('Error while saving new default role'))
     }
   }
@@ -629,18 +635,18 @@ export class WorkspaceAdvanced extends React.Component {
       role: state.newMember.role
     }))
 
-    this.setState({
+    this.setState(prev => ({
       newMember: {
         id: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: prev.content ? prev.content.defaultRole : prev.newMember.role,
         avatarUrl: '',
         isEmail: false
       },
       autoCompleteFormNewMemberActive: false,
       displayFormNewMember: false
-    })
+    }))
 
     switch (fetchWorkspaceNewMember.apiResponse.status) {
       case 200:
@@ -757,6 +763,7 @@ export class WorkspaceAdvanced extends React.Component {
                   userProfile={state.loggedUser.profile}
                   autoCompleteClicked={state.autoCompleteClicked}
                   onClickAutoComplete={this.handleClickAutoComplete}
+                  role={state.newMember.role}
                 />
               )
           }

@@ -758,11 +758,11 @@ class FileController(Controller):
         # previews #
         # get preview pdf full
         configurator.add_route(
-            "preview_pdf_full",
+            "full_pdf_preview",
             "/workspaces/{workspace_id}/files/{content_id}/preview/pdf/full/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.preview_pdf_full, route_name="preview_pdf_full")
+        configurator.add_view(self.preview_pdf_full, route_name="full_pdf_preview")
         # get preview pdf
         configurator.add_route(
             "preview_pdf",
@@ -809,12 +809,12 @@ class FileController(Controller):
         )
         # get full pdf preview for revision
         configurator.add_route(
-            "preview_pdf_full_revision",
+            "full_pdf_revision_preview",
             "/workspaces/{workspace_id}/files/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename:[^/]*}",
             request_method="GET",
         )
         configurator.add_view(
-            self.preview_pdf_full_revision, route_name="preview_pdf_full_revision"
+            self.preview_pdf_full_revision, route_name="full_pdf_revision_preview"
         )
         # get pdf preview for revision
         configurator.add_route(

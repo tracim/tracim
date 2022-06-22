@@ -29,6 +29,7 @@ from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import THREAD_TYPE
+from tracim_backend.app_models.contents import TODO_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import UserDoesNotExist
@@ -95,6 +96,7 @@ class EventApi:
         FILE_TYPE: FileContentSchema(),
         FOLDER_TYPE: MessageContentSchema(),
         THREAD_TYPE: MessageContentSchema(),
+        TODO_TYPE: MessageContentSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()

@@ -268,7 +268,7 @@
   "Please confirm your password:": "Veuillez confirmer votre mot de passe :",
   "Unknown email or username": "Adresse email ou identifiant inconnu",
   "This username is not linked to any email, please contact an administrator to reset your password": "Ce nom d'utilisateur n'est lié à aucune adresse email. Veuillez contacter un administrateur pour réinitialiser votre mot de passe.",
-  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "Voulez-vous continuer à télécharger {{filename}} même s'il fait plus de 1 Mo ?",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "Voulez-vous continuer à téléverser {{filename}} même s'il fait plus de 1 Mo ?",
   "Tracim has a connection problem, please wait or restart your browser if the problem persists": "Tracim rencontre un souci de connexion, merci de patienter ou de redémarrer votre navigateur si le problème persiste",
   "Your username": "Votre identifiant",
   "Your username has been set": "Votre identifiant a été défini",
@@ -556,5 +556,12 @@
   " on {{content}}": " dans {{content}}",
   "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> a créé l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> a supprimé l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
-  "Error loading unread notification number": "Erreur de chargement du nombre de notifications non lues"
+  "Error loading unread notification number": "Erreur de chargement du nombre de notifications non lues",
+  "Task to do created": "",
+  "{{author}} created a task on {{content}}{{workspaceInfo}}": "",
+  "Task updated": "",
+  "{{author}} updated a task on {{content}}{{workspaceInfo}}": "",
+  "Task deleted": "",
+  "{{author}} deleted a task on {{content}}{{workspaceInfo}}": "",
+  "Unknown comment": ""
 }

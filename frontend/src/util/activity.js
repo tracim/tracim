@@ -51,7 +51,9 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
 
   let content = newestMessage.fields.content
 
-  if (content.content_type === TLM_ST.COMMENT || content.content_type === TLM_ST.MENTION) {
+  if (content.content_type === TLM_ST.COMMENT ||
+    content.content_type === TLM_ST.MENTION ||
+    content.content_type === TLM_ST.TODO) {
     // INFO - SG - 2021-04-16
     // We have to get the parent content as comments shall produce an activity
     // for it and not for the comment.

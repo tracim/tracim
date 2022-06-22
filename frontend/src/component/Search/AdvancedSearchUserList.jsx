@@ -61,7 +61,7 @@ export const AdvancedSearchUserList = props => {
             {searchItem.username && (
               <div className='advancedSearchUser__information'>
                 <Icon
-                  icon='fa-fw fas fa-at'
+                  icon='fas fa-at'
                   title={props.t('Username')}
                 />
                 <span title={searchItem.username}>{searchItem.username}</span>
