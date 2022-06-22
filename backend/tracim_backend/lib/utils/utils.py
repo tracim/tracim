@@ -11,6 +11,7 @@ import random
 import string
 import sys
 import types
+import typing
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
@@ -545,7 +546,11 @@ class CustomPropertiesValidator:
             ) from exc
 
 
-def date_as_lang(datetime_obj: datetime, locale: str = None, default_locale: str = None):
+def date_as_lang(
+    datetime_obj: datetime,
+    locale: typing.Optional[str] = None,
+    default_locale: typing.Optional[str] = None,
+) -> str:
     """Helper to ensure the date conversion to language format does not fail"""
     if locale:
         try:

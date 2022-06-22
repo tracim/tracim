@@ -723,12 +723,14 @@ class ContentApi(object):
         revision: ContentRevisionRO,
         filename: str,
         default_filename: str,
-        additional_metadata: typing.Dict[str, typing.Any],
+        additional_metadata: typing.Optional[typing.Dict[str, typing.Any]] = None,
         force_download: bool = None,
     ):
+        if not additional_metadata:
+            additional_metadata = {}
         content = revision.node
         revision_in_context = self.get_revision_in_context(revision)
-        space_name = _("espace {workspace_name}").format(workspace_name=content.workspace.label)
+        space_name = _("Space {workspace_name}").format(workspace_name=content.workspace.label)
         tag_lib = TagLib(session=self._session)
         tags_objs = tag_lib.get_all(
             workspace_id=content.workspace_id, content_id=content.content_id

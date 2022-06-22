@@ -291,7 +291,7 @@ class HTMLDocumentController(Controller):
     @hapic.input_query(FileQuerySchema())
     @hapic.input_path(FilePathSchema())
     @hapic.output_file([])
-    def preview_pdf_full(self, context, request: TracimRequest, hapic_data=None):
+    def full_pdf_preview(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain a full pdf preview (all page) of last revision of content.
         Good pratice for filename is filename is `{label}.pdf`.
@@ -312,7 +312,6 @@ class HTMLDocumentController(Controller):
             filename=hapic_data.path.filename,
             default_filename=default_filename,
             force_download=hapic_data.query.force_download,
-            additional_metadata={},
         )
         return result
 
@@ -322,7 +321,7 @@ class HTMLDocumentController(Controller):
     @hapic.input_path(FileRevisionPathSchema())
     @hapic.input_query(FileQuerySchema())
     @hapic.output_file([])
-    def preview_pdf_full_revision(self, context, request: TracimRequest, hapic_data=None):
+    def full_pdf_revision_preview(self, context, request: TracimRequest, hapic_data=None):
         """
         Obtain full pdf preview of a specific revision of content.
         Good pratice for filename is filename is `{label}_r{revision_id}.pdf`.
@@ -346,7 +345,6 @@ class HTMLDocumentController(Controller):
             filename=hapic_data.path.filename,
             default_filename=default_filename,
             force_download=hapic_data.query.force_download,
-            additional_metadata={},
         )
 
     def bind(self, configurator: Configurator) -> None:
@@ -422,18 +420,18 @@ class HTMLDocumentController(Controller):
 
         # get full pdf preview
         configurator.add_route(
-            "preview_pdf_full_note",
+            "full_pdf_preview_note",
             "/workspaces/{workspace_id}/html-documents/{content_id}/preview/pdf/full/{filename:[^/]*}",
             request_method="GET",
         )
-        configurator.add_view(self.preview_pdf_full, route_name="preview_pdf_full_note")
+        configurator.add_view(self.full_pdf_preview, route_name="full_pdf_preview_note")
 
         # get full pdf preview for revision
         configurator.add_route(
-            "preview_pdf_full_revision_note",
+            "full_pdf_revision_preview_note",
             "/workspaces/{workspace_id}/html-documents/{content_id}/revisions/{revision_id}/preview/pdf/full/{filename:[^/]*}",
             request_method="GET",
         )
         configurator.add_view(
-            self.preview_pdf_full_revision, route_name="preview_pdf_full_revision_note"
+            self.full_pdf_revision_preview, route_name="full_pdf_revision_preview_note"
         )

@@ -1,3 +1,4 @@
+import datetime
 import tempfile
 import typing
 
@@ -17,12 +18,12 @@ class RichTextPreviewLib:
         filename: str,
         default_filename: str,
         force_download: bool,
-        last_modified,
+        last_modified: datetime.datetime,
         metadata: typing.Dict[str, typing.Any],
     ):
 
         with tempfile.NamedTemporaryFile(
-            "w+b", prefix="preview-generator-", suffix=".pdf", delete=False
+            "w+b", prefix="tracim-notes-preview-", suffix=".pdf", delete=False
         ) as pdf_preview_path:
             metadata_args = []
             for key, value in metadata.items():
