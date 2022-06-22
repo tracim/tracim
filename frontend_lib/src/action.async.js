@@ -60,6 +60,26 @@ export const getFileChildContent = (apiUrl, workspaceId, contentId, pageToken = 
   return baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents?${queryParam}`)
 }
 
+export const postToDo = (apiUrl, workspaceId, contentId, assignedUserId, toDo) =>
+  baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`, {
+    assignee_id: assignedUserId,
+    raw_content: toDo
+  })
+
+export const deleteToDo = (apiUrl, workspaceId, contentId, toDoId) =>
+  baseFetch('DELETE', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`)
+
+export const putToDo = (apiUrl, workspaceId, contentId, toDoId, status) =>
+  baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`, {
+    status: status
+  })
+
+export const getToDoList = (apiUrl, workspaceId, contentId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos`)
+
+export const getToDo = (apiUrl, workspaceId, contentId, toDoId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/contents/${contentId}/todos/${toDoId}`)
+
 export const putEditStatus = (apiUrl, workspaceId, contentId, appSlug, newStatus) =>
   // INFO - CH - 2019-01-03 - Check the -s added to the app slug. This is and should stay consistent with app features
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/${appSlug}s/${contentId}/status`, {
@@ -118,6 +138,9 @@ export const getWorkspaceDetail = (apiUrl, workspaceId) =>
 
 export const getWorkspaceMemberList = (apiUrl, workspaceId, showDisabledUser = false) =>
   baseFetch('GET', `${apiUrl}/workspaces/${workspaceId}/members${showDisabledUser ? '?show_disabled_user=1' : ''}`)
+
+export const getSpaceMemberFromId = (apiUrl, spaceId, userId) =>
+  baseFetch('GET', `${apiUrl}/workspaces/${spaceId}/members/${userId}`)
 
 export const deleteWorkspace = (apiUrl, workspaceId) =>
   baseFetch('PUT', `${apiUrl}/workspaces/${workspaceId}/trashed`)

@@ -230,7 +230,7 @@ export class SearchFilterMenu extends React.Component {
       <div className='searchFilterMenu'>
         <div className='searchFilterMenu__title'>
           <Icon
-            icon='fa-fw fas fa-sliders-h'
+            icon='fas fa-sliders-h'
             title={props.t('Filters')}
           />
           {props.t('Filters')}
@@ -239,7 +239,7 @@ export class SearchFilterMenu extends React.Component {
             onClick={props.onClickCloseSearchFilterMenu}
           >
             <Icon
-              icon='fa-fw fas fa-times'
+              icon='fas fa-times'
               title={props.t('Close')}
             />
           </button>
@@ -264,8 +264,8 @@ export class SearchFilterMenu extends React.Component {
                 >
                   <Icon
                     icon={state.createdRange.showFilter
-                      ? 'fa-fw fas fa-caret-down'
-                      : 'fa-fw fas fa-caret-right'}
+                      ? 'fas fa-caret-down'
+                      : 'fas fa-caret-right'}
                     title={state.createdRange.showFilter
                       ? props.t('Hide {{filter}}', { filter: props.t('Creation') })
                       : props.t('Show {{filter}}', { filter: props.t('Creation') })}
@@ -298,8 +298,8 @@ export class SearchFilterMenu extends React.Component {
                 >
                   <Icon
                     icon={state.modifiedRange.showFilter
-                      ? 'fa-fw fas fa-caret-down'
-                      : 'fa-fw fas fa-caret-right'}
+                      ? 'fas fa-caret-down'
+                      : 'fas fa-caret-right'}
                     title={state.modifiedRange.showFilter
                       ? props.t('Hide {{filter}}', { filter: props.t('Last Modification') })
                       : props.t('Show {{filter}}', { filter: props.t('Last Modification') })}
@@ -332,8 +332,8 @@ export class SearchFilterMenu extends React.Component {
                 >
                   <Icon
                     icon={state.newestAuthoredContentRange.showFilter
-                      ? 'fa-fw fas fa-caret-down'
-                      : 'fa-fw fas fa-caret-right'}
+                      ? 'fas fa-caret-down'
+                      : 'fas fa-caret-right'}
                     title={state.newestAuthoredContentRange.showFilter
                       ? props.t('Hide {{filter}}', { filter: props.t('Last Intervention') })
                       : props.t('Show {{filter}}', { filter: props.t('Last Intervention') })}

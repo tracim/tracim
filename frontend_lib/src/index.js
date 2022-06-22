@@ -65,6 +65,7 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
+  sortContentByStatus,
   USER_CALL_STATE
 } from './helper.js'
 
@@ -180,6 +181,10 @@ import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
 import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
+import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
+import NewToDo from './component/ToDo/NewToDo.jsx'
+import ToDoItem from './component/ToDo/ToDoItem.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -192,6 +197,7 @@ import {
   baseFetch,
   getComment,
   getContentPath,
+  getToDo,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -282,6 +288,7 @@ export {
   AgendaInfo,
   appContentFactory,
   DateInput,
+  getToDo,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -465,5 +472,9 @@ export {
   getFileRevisionPreviewInfo,
   tinymceRemove,
   Popover,
-  getBrowserLang
+  getBrowserLang,
+  NewToDo,
+  sortContentByStatus,
+  ToDoItem,
+  ToDoManagement
 }

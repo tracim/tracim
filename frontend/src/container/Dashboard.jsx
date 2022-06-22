@@ -399,6 +399,7 @@ export class Dashboard extends React.Component {
         .filter(app => app.slug !== 'contents/share_folder')
         .filter(app => app.slug !== 'share_content')
         .filter(app => app.slug !== 'upload_permission')
+        .filter(app => app.slug !== 'contents/todo')
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications

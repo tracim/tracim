@@ -71,7 +71,7 @@ export const AdvancedSearchSpaceList = props => {
               className='advancedSearchSpace__type__content'
             >
               <Icon
-                icon={`fa-fw ${searchItem.accessType.faIcon}`}
+                icon={searchItem.accessType.faIcon}
                 title={props.t(searchItem.accessType.label)}
                 color={searchItem.accessType.slug !== SPACE_TYPE_LIST.CONFIDENTIAL ? searchItem.accessType.hexcolor : undefined}
               />
@@ -87,7 +87,7 @@ export const AdvancedSearchSpaceList = props => {
 
             <div className='advancedSearchSpace__information'>
               <Icon
-                icon='fa-fw fas fa-th'
+                icon='fas fa-th'
                 title={numberContentsTitle(searchItem.contentCount)}
               />
               <span
@@ -97,7 +97,7 @@ export const AdvancedSearchSpaceList = props => {
               </span>
 
               <Icon
-                icon='fa-fw far fa-user'
+                icon='far fa-user'
                 title={numberMembersTitle(searchItem.memberCount)}
               />
               <span

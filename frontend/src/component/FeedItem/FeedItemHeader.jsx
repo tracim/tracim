@@ -76,7 +76,7 @@ export class FeedItemHeader extends React.Component {
           customClass='feedItemHeader__icon'
           color={props.isPublication ? COLORS.PUBLICATION : app.hexcolor}
           title={props.isPublication ? props.t('Publication') : app.label}
-          icon={`fa-fw ${icon}`}
+          icon={icon}
         />
         <div className='feedItemHeader__title'>
           {props.titleLink

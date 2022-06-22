@@ -65,7 +65,7 @@ const AdminWorkspace = props => {
                     >
                       <span>
                         <Icon
-                          icon={`fa-fw ${spaceType.faIcon}`}
+                          icon={spaceType.faIcon}
                           title={props.t(spaceType.label)}
                           color={spaceType.hexcolor}
                         />
