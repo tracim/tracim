@@ -23,6 +23,7 @@ describe('<HtmlDocument />', () => {
     addCommentToTimeline: sinon.spy((comment, timeline, loggedUser) => timeline),
     content: contentHtmlDocument.htmlDocument,
     i18n: {},
+    getToDoList: () => { },
     registerCustomEventHandlerList: () => { },
     registerLiveMessageHandlerList: () => { },
     loadFavoriteContentList: () => { },
