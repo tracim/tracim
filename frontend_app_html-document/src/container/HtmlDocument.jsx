@@ -587,6 +587,15 @@ export class HtmlDocument extends React.Component {
     props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
+  // see https://github.com/tracim/tracim/issues/1804
+  getDownloadPDFUrl = ({ config: { apiUrl }, content, mode }) => {
+    // FIXME - b.l - refactor urls
+    const label = content.label ? encodeURIComponent(content.label + '.pdf') : 'unknown.pdf'
+    const urlRevisionPart = mode === APP_FEATURE_MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
+    return `${apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}/${urlRevisionPart}preview/pdf/full/${label}?force_download=1&revision_id=${content.current_revision_id}`
+  }
+
   handleClickRestoreDelete = async () => {
     const { props, state } = this
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
@@ -903,6 +912,12 @@ export class HtmlDocument extends React.Component {
         <PopinFixedContent
           actionList={[
             {
+              icon: 'far fa-file-pdf',
+              label: props.t('Download as PDF'),
+              downloadLink: this.getDownloadPDFUrl(state),
+              showAction: true,
+              dataCy: 'popinListItem__downloadAsPdf'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,

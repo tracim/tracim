@@ -476,6 +476,15 @@ website.usage_conditions =
 # example:
 # color.config_file_path = /home/user/tracim/color.json
 
+### Rich Text Preview ###
+# Template and css used for preview of notes files, by default use files from
+# the branding dir (frontend/dist/assets/branding/)
+; rich_text_preview.css_path =
+; rich_text_preview.template_path =
+# example:
+# rich_text_preview.css_path = /home/user/tracim/rich_text_preview.css
+# rich_text_preview.css_path = /home/user/tracim/rich_text_preview.template
+
 ### Webdav ###
 # webdav url for client
 # url can be extended like localhost/webdav by setting webdav.root_path parameter
