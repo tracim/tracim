@@ -20,7 +20,7 @@ class RichTextPreviewLib:
         force_download: bool,
         last_modified: datetime.datetime,
         metadata: typing.Dict[str, typing.Any],
-    ):
+    ) -> HapicFile:
 
         with tempfile.NamedTemporaryFile(
             "w+b", prefix="tracim-notes-preview-", suffix=".pdf", delete=False
