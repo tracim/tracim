@@ -1,0 +1,53 @@
+@import "../../css/Variable.styl"
+
+.toDo
+  display flex
+  flex-direction column
+  margin standardSpacing
+  &__new
+    margin standardSpacing
+    display flex
+    flex-direction column
+    &__toDoText
+      margin-top standardSpacing
+    &__buttons
+      display flex
+      justify-content flex-end
+      margin-top standardSpacing
+      & > .iconbutton
+        margin-inline-start standardSpacing
+    & > textarea
+      border-radius standardBorderRadius
+      border borderStyle
+      padding textSpacing
+    &Button
+      align-self flex-end
+      margin-bottom standardSpacing
+  &Item
+    display flex
+    background-color offWhite
+    min-height headerHeight
+    justify-content flex-start
+    align-content center
+    align-items center
+    border-bottom 1px solid mediumGrey
+    padding standardSpacing
+    &:last-child
+      border none
+    &__checkbox
+      font-size titleFontSize
+      &:focus
+        outline none
+    &__delete:focus
+      outline none
+    &__content
+      flex 1
+      align-items baseline
+      overflow
+      text-overflow ellipsis
+      & strong
+        margin-right textSpacing
+    &Checked
+      color lightDarkGrey
+      & > button
+        color lightDarkGrey

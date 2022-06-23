@@ -221,10 +221,10 @@
   "Error while loading timeline": "Erro ao carregar a linha cronológica",
   "Agenda": "Agenda",
   "Unknown content": "Conteúdo desconhecido",
-  "From a template:": "",
-  "Template": "",
-  "Unmark template": "",
-  "Mark template": "",
-  "Something went wrong": "",
-  "Unknown comment": ""
+  "From a template:": "A partir de um modelo:",
+  "Template": "Modelo",
+  "Unmark template": "Desmarcar como modelo",
+  "Mark template": "Marcar como modelo",
+  "Something went wrong": "Algo correu mal",
+  "Unknown comment": "Comentário desconhecido"
 }

@@ -62,5 +62,6 @@
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
   "Error while saving the user configuration": "Erro ao guardar a configuração do utilizador",
   "Tags": "Etiquetas",
-  "Delete": "Eliminar"
+  "Delete": "Eliminar",
+  "To Do": "A fazer"
 }

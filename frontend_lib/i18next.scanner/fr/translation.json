@@ -139,7 +139,7 @@
   "Home": "Accueil",
   "Only one file is allowed": "Un seul fichier possible",
   "Files already added:": "Fichiers déjà ajoutés :",
-  "The type of this file is not allowed": "Le type de ce fichier n'est pas géré",
+  "The type of this file is not allowed": "Ce type de fichier n'est pas autorisé",
   "The file is too big": "Le fichier est trop gros",
   "Error while uploading file": "Erreur pendant le téléversement du fichier",
   "Error while uploading file(s)": "Erreur pendant le téléversement des fichiers",
@@ -221,10 +221,10 @@
   "Error while loading timeline": "Erreur lors du chargement de l'historique",
   "Agenda": "Agenda",
   "Unknown content": "Contenu inconnu",
-  "From a template:": "",
-  "Template": "",
-  "Unmark template": "",
-  "Mark template": "",
-  "Something went wrong": "",
-  "Unknown comment": ""
+  "From a template:": "À partir d'un modèle :",
+  "Template": "Modèle",
+  "Unmark template": "Retirer des modèles",
+  "Mark template": "Ajouter aux modèles",
+  "Something went wrong": "Quelque chose s'est mal passé",
+  "Unknown comment": "Commentaire inconnu"
 }

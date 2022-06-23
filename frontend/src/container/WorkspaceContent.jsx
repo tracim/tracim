@@ -659,6 +659,7 @@ export class WorkspaceContent extends React.Component {
     const createContentAvailableApp = [
       ...contentType
         .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
+        .filter(ct => ct.slug !== CONTENT_TYPE.TODO)
         .filter(ct => userRoleIdInWorkspace === ROLE.contributor.id ? ct.slug !== CONTENT_TYPE.FOLDER : true),
 
       // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375

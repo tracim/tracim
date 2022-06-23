@@ -2686,7 +2686,7 @@ class TestContentApi(object):
         eq_(ActionDescription.UNDELETION, updated2.revision_type)
         eq_(u1id, updated2.owner_id)
 
-    def test_unit__get_last_active__ok__nominal_case(
+    def test_unit__get_read_status__ok__nominal_case(
         self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -2764,7 +2764,7 @@ class TestContentApi(object):
             label="this is another randomized label content",
             do_save=True,
         )
-        api.create_comment(
+        comment = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
@@ -2775,27 +2775,31 @@ class TestContentApi(object):
             label="content_workspace_2",
             do_save=True,
         )
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 9
-        # workspace_2 content
-        assert last_actives[0] == content_workspace_2
-        # comment is newest than page2
-        assert last_actives[1] == firstly_created_but_recently_commented
-        assert last_actives[2] == secondly_created_but_not_commented
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[3] == firstly_created_but_recently_updated
-        assert last_actives[4] == secondly_created_but_not_updated
-        # creation order is inverted here as last created is last active
-        assert last_actives[5] == secondly_created
-        assert last_actives[6] == firstly_created
-        # folder subcontent modification does not change folder order
-        assert last_actives[7] == main_folder
-        # folder subcontent modification does not change folder order
-        # (workspace2)
-        assert last_actives[8] == main_folder_workspace2
 
-    def test_unit__get_last_active__ok__do_no_show_deleted_archived(
+        valid_content_ids = (
+            firstly_created_but_recently_commented.content_id,
+            firstly_created_but_recently_updated.content_id,
+            secondly_created_but_not_commented.content_id,
+            secondly_created.content_id,
+            firstly_created.content_id,
+            main_folder.content_id,
+            main_folder_workspace2.content_id,
+            comment.content_id,
+            secondly_created_but_not_updated.content_id,
+            content_workspace_2.content_id,
+        )
+
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 10
+        parsed_elems = []
+        for item in read_status:
+            assert item["content_id"] in valid_content_ids
+            assert item["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(item)
+
+    def test_unit__get_read_status__ok__do_no_show_deleted_archived(
         self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -2837,8 +2841,6 @@ class TestContentApi(object):
             label="deleted",
             do_save=True,
         )
-        api.create_comment(workspace, parent=archived, content="just a comment", do_save=True)
-        api.create_comment(workspace, parent=deleted, content="just a comment", do_save=True)
         with new_revision(session=session, tm=transaction.manager, content=archived):
             api.archive(archived)
             api.save(archived)
@@ -2853,39 +2855,53 @@ class TestContentApi(object):
             label="normal",
             do_save=True,
         )
-        api.create_comment(workspace, parent=normal, content="just a comment", do_save=True)
 
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 2
-        assert last_actives[0].content_id == normal.content_id
-        assert last_actives[1].content_id == main_folder.content_id
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 2
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                main_folder.content_id,
+            ]
 
         api._show_deleted = True
         api._show_archived = False
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 3
-        assert last_actives[0] == normal
-        assert last_actives[1] == deleted
-        assert last_actives[2] == main_folder
+
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 3
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                deleted.content_id,
+                main_folder.content_id,
+            ]
 
         api._show_deleted = False
         api._show_archived = True
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 3
-        assert last_actives[0] == normal
-        assert last_actives[1] == archived
-        assert last_actives[2] == main_folder
+
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 3
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                archived.content_id,
+                main_folder.content_id,
+            ]
 
         api._show_deleted = True
         api._show_archived = True
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 4
-        assert last_actives[0] == normal
-        assert last_actives[1] == deleted
-        assert last_actives[2] == archived
-        assert last_actives[3] == main_folder
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_full(
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 4
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                archived.content_id,
+                deleted.content_id,
+                main_folder.content_id,
+            ]
+
+    def test_unit__get_read_status__ok__workspace_filter_workspace_full(
         self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -2954,26 +2970,36 @@ class TestContentApi(object):
             label="this is another randomized label content",
             do_save=True,
         )
-        api.create_comment(
+        comment = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
-        last_actives = api.get_last_active(workspace=workspace)
-        assert len(last_actives) == 7
-        # comment is newest than page2
-        assert last_actives[0] == firstly_created_but_recently_commented
-        assert last_actives[1] == secondly_created_but_not_commented
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[2] == firstly_created_but_recently_updated
-        assert last_actives[3] == secondly_created_but_not_updated
-        # creation order is inverted here as last created is last active
-        assert last_actives[4] == secondly_created
-        assert last_actives[5] == firstly_created
-        # folder subcontent modification does not change folder order
-        assert last_actives[6] == main_folder
+        valid_content_ids = (
+            firstly_created_but_recently_commented.content_id,
+            secondly_created_but_not_commented.content_id,
+            firstly_created_but_recently_updated.content_id,
+            secondly_created_but_not_commented.content_id,
+            secondly_created.content_id,
+            firstly_created.content_id,
+            main_folder.content_id,
+            secondly_created_but_not_updated.content_id,
+            comment.content_id,
+        )
+        read_status = api.get_read_status(user=user, workspace=workspace)
+        assert len(read_status) == 8
+        parsed_elems = []
+        for item in read_status:
+            assert item["content_id"] in valid_content_ids
+            assert item["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(item)
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_content_ids(
+        assert set(valid_content_ids) == set(
+            [parsed_elem["content_id"] for parsed_elem in parsed_elems]
+        )
+
+    def test_unit__get_read_status__ok__workspace_filter_workspace_content_ids(
         self, session, user_api_factory, workspace_api_factory, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -3000,7 +3026,7 @@ class TestContentApi(object):
             label="creation_order_test",
             do_save=True,
         )
-        secondly_created = api.create(
+        api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
@@ -3015,7 +3041,7 @@ class TestContentApi(object):
             label="update_order_test",
             do_save=True,
         )
-        secondly_created_but_not_updated = api.create(
+        api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
@@ -3027,7 +3053,6 @@ class TestContentApi(object):
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
-        # comment change order
         firstly_created_but_recently_commented = api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
@@ -3035,7 +3060,7 @@ class TestContentApi(object):
             label="this is randomized label content",
             do_save=True,
         )
-        secondly_created_but_not_commented = api.create(
+        api.create(
             content_type_slug=content_type_list.Page.slug,
             workspace=workspace,
             parent=main_folder,
@@ -3053,125 +3078,24 @@ class TestContentApi(object):
             main_folder,
         ]
         content_ids = [content.content_id for content in selected_contents]
-        last_actives = api.get_last_active(workspace=workspace, content_ids=content_ids)
-        assert len(last_actives) == 4
-        # comment is newest than page2
-        assert last_actives[0] == firstly_created_but_recently_commented
-        assert secondly_created_but_not_commented not in last_actives
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[1] == firstly_created_but_recently_updated
-        assert secondly_created_but_not_updated not in last_actives
-        # creation order is inverted here as last created is last active
-        assert secondly_created not in last_actives
-        assert last_actives[2] == firstly_created
-        # folder subcontent modification does not change folder order
-        assert last_actives[3] == main_folder
+        read_status = api.get_read_status(user=user, workspace=workspace, content_ids=content_ids)
+        assert len(read_status) == 4
+        parsed_elems = []
+        for elem in read_status:
+            assert elem["read_by_user"] == 1
+            assert elem["last_view_datetime"]
+            assert elem["content_id"] in (
+                firstly_created_but_recently_commented.content_id,
+                firstly_created_but_recently_updated.content_id,
+                firstly_created.content_id,
+                main_folder.content_id,
+            )
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(
-        self, session, user_api_factory, workspace_api_factory, app_config, content_type_list
-    ):
-        uapi = user_api_factory.get()
-
-        profile = Profile.ADMIN
-
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
-        workspace = workspace_api_factory.get(current_user=user).create_workspace(
-            "test workspace", save_now=True
-        )
-
-        api = ContentApi(current_user=user, session=session, config=app_config)
-        main_folder = api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=workspace,
-            label="this is randomized folder",
-            do_save=True,
-        )
-        # creation order test
-        firstly_created = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=main_folder,
-            label="creation_order_test",
-            do_save=True,
-        )
-        secondly_created = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=main_folder,
-            label="another creation_order_test",
-            do_save=True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=main_folder,
-            label="update_order_test",
-            do_save=True,
-        )
-        secondly_created_but_not_updated = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=main_folder,
-            label="another update_order_test",
-            do_save=True,
-        )
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=main_folder,
-            label="this is randomized label content",
-            do_save=True,
-        )
-        secondly_created_but_not_commented = api.create(
-            content_type_slug=content_type_list.Page.slug,
-            workspace=workspace,
-            parent=main_folder,
-            label="this is another randomized label content",
-            do_save=True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-
-        last_actives = api.get_last_active(workspace=workspace, limit=2)
-        assert len(last_actives) == 2
-        # comment is newest than page2
-        assert last_actives[0] == firstly_created_but_recently_commented
-        assert last_actives[1] == secondly_created_but_not_commented
-
-        last_actives = api.get_last_active(
-            workspace=workspace, limit=2, before_content=last_actives[1]
-        )
-        assert len(last_actives) == 2
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[0] == firstly_created_but_recently_updated
-        assert last_actives[1] == secondly_created_but_not_updated
-
-        last_actives = api.get_last_active(
-            workspace=workspace, limit=2, before_content=last_actives[1]
-        )
-        assert len(last_actives) == 2
-        # creation order is inverted here as last created is last active
-        assert last_actives[0] == secondly_created
-        assert last_actives[1] == firstly_created
-
-        last_actives = api.get_last_active(
-            workspace=workspace, limit=2, before_content=last_actives[1]
-        )
-        assert len(last_actives) == 1
-        # folder subcontent modification does not change folder order
-        assert last_actives[0] == main_folder
-
-    def test_unit__get_last_active__ok__workspace_filter_workspace_empty(
+    def test_unit__get_read_status__ok__workspace_filter_workspace_empty(
         self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -3246,8 +3170,8 @@ class TestContentApi(object):
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
-        last_actives = api.get_last_active(workspace=workspace2)
-        assert len(last_actives) == 0
+        read_status = api.get_read_status(user=user, workspace=workspace2)
+        assert len(read_status) == 0
 
     def test_unit__get_all_query__with_user(
         self,

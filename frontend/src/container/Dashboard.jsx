@@ -58,7 +58,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
       isMemberListLoading: false,
@@ -99,8 +99,17 @@ export class Dashboard extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps) {
     const { props } = this
+
+    // INFO - CH - 2022 06 16 - empty string is the default value for the property currentWorkspace.defaultRole in the reducer
+    if (prevProps.currentWorkspace.defaultRole === '' && props.currentWorkspace.defaultRole !== '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+
+    if (prevProps.currentWorkspace.defaultRole !== '' && props.currentWorkspace.defaultRole === '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
@@ -114,7 +123,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       }
     })
@@ -247,8 +256,6 @@ export class Dashboard extends React.Component {
   handleClickValidateNewMember = async () => {
     const { props, state } = this
 
-    this.setState({ isMemberListLoading: true })
-
     if (state.newMember.personalData === '') {
       props.dispatch(newFlashMessage(props.t('Please set a name, an email or a username'), 'warning'))
       return false
@@ -258,6 +265,8 @@ export class Dashboard extends React.Component {
       props.dispatch(newFlashMessage(props.t('Please set a role'), 'warning'))
       return false
     }
+
+    this.setState({ isMemberListLoading: true })
 
     const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
@@ -278,7 +287,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
       autoCompleteFormNewMemberActive: false,
@@ -390,6 +399,7 @@ export class Dashboard extends React.Component {
         .filter(app => app.slug !== 'contents/share_folder')
         .filter(app => app.slug !== 'share_content')
         .filter(app => app.slug !== 'upload_permission')
+        .filter(app => app.slug !== 'contents/todo')
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications

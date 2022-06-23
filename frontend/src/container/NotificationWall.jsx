@@ -258,7 +258,9 @@ export const NotificationWall = props => {
   }
 
   const getMainContentId = (notification) => {
-    return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ENTITY.MENTION)
+    return notification.type.includes(CONTENT_TYPE.COMMENT) ||
+      notification.type.includes(CONTENT_TYPE.TODO) ||
+      notification.type.includes(TLM_ENTITY.MENTION)
       ? notification.content.parentId
       : notification.content.id
   }
@@ -291,7 +293,9 @@ export const NotificationWall = props => {
     const escapedContentLabel = (
       notification.content
         ? escapeHtml(
-          ((contentType === TLM_SUB.COMMENT) || (entityType === TLM_ENTITY.MENTION && notification.content.type === CONTENT_TYPE.COMMENT))
+          ((contentType === TLM_SUB.COMMENT) ||
+            (contentType === TLM_SUB.TODO) ||
+            (entityType === TLM_ENTITY.MENTION && notification.content.type === CONTENT_TYPE.COMMENT))
             ? notification.content.parentLabel
             : notification.content.label
         )
@@ -306,7 +310,7 @@ export const NotificationWall = props => {
       content: `<span title='${escapedContentLabel}' class='${numberOfContents === 1
         ? 'contentTitle__highlight'
         : ''
-      }'>${escapedContentLabel}</span>`,
+        }'>${escapedContentLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
@@ -334,7 +338,15 @@ export const NotificationWall = props => {
             return {
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}}{{workspaceInfo}}', i18nOpts),
-              url: linkToComment(notification)
+              url: linkToParentContent(notification)
+            }
+          }
+
+          if (contentType === TLM_SUB.TODO) {
+            return {
+              title: props.t('Task to do created'),
+              text: props.t('{{author}} created a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              url: linkToParentContent(notification)
             }
           }
 
@@ -346,6 +358,14 @@ export const NotificationWall = props => {
         }
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
+            if (contentType === TLM_SUB.TODO) {
+              return {
+                title: props.t('Task updated'),
+                text: props.t('{{author}} updated a task on {{content}}{{workspaceInfo}}', i18nOpts),
+                url: linkToParentContent(notification)
+              }
+            }
+
             return {
               title: props.t('Status updated'),
               text: props.t('{{author}} changed the status of {{content}}{{workspaceInfo}}', i18nOpts),
@@ -360,6 +380,14 @@ export const NotificationWall = props => {
           }
         }
         case TLM_EVENT.DELETED: {
+          if (contentType === TLM_SUB.TODO) {
+            return {
+              title: props.t('Task deleted'),
+              text: props.t('{{author}} deleted a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              url: linkToParentContent(notification)
+            }
+          }
+
           return {
             title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
             text: props.t('{{author}} deleted {{content}}{{workspaceInfo}}', i18nOpts),
@@ -617,7 +645,7 @@ export const NotificationWall = props => {
     }
   }
 
-  const linkToComment = notification => {
+  const linkToParentContent = notification => {
     return PAGE.CONTENT(notification.content.parentId)
   }
 

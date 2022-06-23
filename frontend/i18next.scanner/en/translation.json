@@ -556,5 +556,12 @@
   "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> created the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "Error loading unread notification number": "Error loading unread notification number",
-  " on {{content}}": " on {{content}}"
+  " on {{content}}": " on {{content}}",
+  "Task to do created": "Task to do created",
+  "{{author}} created a task on {{content}}{{workspaceInfo}}": "{{author}} created a task on {{content}}{{workspaceInfo}}",
+  "Task updated": "Task updated",
+  "{{author}} updated a task on {{content}}{{workspaceInfo}}": "{{author}} updated a task on {{content}}{{workspaceInfo}}",
+  "Task deleted": "Task deleted",
+  "{{author}} deleted a task on {{content}}{{workspaceInfo}}": "{{author}} deleted a task on {{content}}{{workspaceInfo}}",
+  "Unknown comment": "Unknown comment"
 }
