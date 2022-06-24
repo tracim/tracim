@@ -410,7 +410,7 @@ class ContentChecker(object):
     @classmethod
     def check_properties(cls, item):
         properties = item.properties
-        if "allowed_content" in properties.keys():
+        if properties and "allowed_content" in properties.keys():
             for content_slug, value in properties["allowed_content"].items():
                 if not isinstance(value, bool):
                     return False

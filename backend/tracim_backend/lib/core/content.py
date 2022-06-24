@@ -1114,7 +1114,10 @@ class ContentApi(object):
 
         if set(content.all_properties["allowed_content"]) == set(allowed_content_dict):
             raise SameValueError("Content allowed content did not change")
-        properties = content.properties.copy()
+        if content.properties:
+            properties = content.properties.copy()
+        else:
+            properties = {}
         properties["allowed_content"] = allowed_content_dict
         content.properties = properties
         return content
