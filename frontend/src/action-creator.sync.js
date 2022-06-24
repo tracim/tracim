@@ -31,10 +31,12 @@ export const USER_DISCONNECTED = `${USER}/Disconnected`
 export const USER_CONFIGURATION = `${USER}/Configuration`
 export const PUBLIC_PROFILE = 'PublicProfile'
 export const USER_PUBLIC_PROFILE = `${USER}/${PUBLIC_PROFILE}`
+export const USER_USERNAMEPOPUP = `${USER}/UsernamePopup`
 export const setUserConfiguration = userConfig => ({ type: `${SET}/${USER_CONFIGURATION}`, userConfig })
 export const setUserConnected = user => ({ type: `${SET}/${USER_CONNECTED}`, user })
 export const setUserDisconnected = () => ({ type: `${SET}/${USER_DISCONNECTED}` })
 export const setRedirectLogin = url => ({ type: `${SET}/${LOGIN}/Redirect`, url })
+export const setUsernamePopup = (status) => ({ type: `${SET}/${USER_USERNAMEPOPUP}`, status })
 
 export const USER_LANG = `${USER}/Lang`
 export const setUserLang = lang => ({ type: `${SET}/${USER}/Lang`, lang })

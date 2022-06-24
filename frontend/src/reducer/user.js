@@ -8,7 +8,8 @@ import {
   USER_LANG,
   USER_AGENDA_URL,
   USER_PROFILE_AVATAR_NAME,
-  USER_PROFILE_COVER_NAME
+  USER_PROFILE_COVER_NAME,
+  USER_USERNAMEPOPUP
 } from '../action-creator.sync.js'
 import {
   getBrowserLang,
@@ -54,6 +55,7 @@ export const defaultUser = {
   lang: getBrowserLang(),
   agendaUrl: '',
   username: '',
+  usernamePopup: true,
   hasAvatar: false,
   hasCover: false,
   profileAvatarName: 'avatar',
@@ -96,6 +98,9 @@ export default function user (state = defaultUser, action) {
 
     case `${SET}/${USER_PROFILE_COVER_NAME}`:
       return { ...state, profileCoverName: action.newCoverName }
+
+    case `${SET}/${USER_USERNAMEPOPUP}`:
+      return { ...state, usernamePopup: action.status }
 
     default:
       return state
