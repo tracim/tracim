@@ -1714,6 +1714,9 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(UserInfoContentAbstractSchema):
+    assignee_id = marshmallow.fields.Int(
+        example=42, allow_none=True, default=None, validate=strictly_positive_int_validator
+    )
     content_namespace = EnumField(ContentNamespaces, example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     current_revision_id = marshmallow.fields.Int(example=12)
@@ -1919,6 +1922,19 @@ class MessageCommentSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
+    )
+
+
+class MessageTodoSchema(marshmallow.Schema):
+    assignee_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
+    parent_label = String(example="This is a label")
+    status = StrippedString(
+        example="closed-deprecated",
+        validate=content_status_validator,
+        description="this slug is found in content_type available statuses",
+        default=open_status,
     )
 
 

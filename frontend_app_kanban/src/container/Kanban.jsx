@@ -27,6 +27,7 @@ import {
   getOrCreateSessionClientToken,
   FAVORITE_STATE,
   ROLE,
+  ROLE_LIST,
   getFileContent,
   getFileRevision,
   tinymceRemove,
@@ -87,15 +88,14 @@ export class Kanban extends React.Component {
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
-    // FIXME - GB - 2022-06-21 - The empty handlers bellow should be updated to call handleToDoCreate, handleToDoChanged and
-    // handleToDoDeleted when the backend is made. See https://github.com/tracim/tracim/issues/5699
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: () => { } },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: () => { } },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: () => { } }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreate },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -165,19 +165,28 @@ export class Kanban extends React.Component {
     this.loadContent()
   }
 
+  handleMemberModified = async data => {
+    const { state } = this
+    if (data.fields.user.user_id !== state.loggedUser.userId) return
+
+    const newUserRoleId = ROLE_LIST.find(r => data.fields.member.role === r.slug).id
+
+    this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
+  }
+
   handleToDoCreate = async data => {
     const { state } = this
     if (data.fields.content.parent_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
-      data.fields.content.workspace_id,
+      data.fields.workspace.workspace_id,
       data.fields.content.parent_id,
       data.fields.content.content_id
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id'))
+      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
     }))
   }
 
@@ -187,13 +196,13 @@ export class Kanban extends React.Component {
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
-      data.fields.content.workspace_id,
+      data.fields.workspace.workspace_id,
       data.fields.content.parent_id,
       data.fields.content.content_id
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
     }))
   }
 
@@ -202,7 +211,7 @@ export class Kanban extends React.Component {
     if (data.fields.content.parent_id !== state.content.content_id) return
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
     }))
   }
 

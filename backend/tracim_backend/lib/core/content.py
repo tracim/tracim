@@ -30,8 +30,6 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import TODO_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.applications.content_todo.models import Todo
-from tracim_backend.applications.content_todo.models_in_context import TodoInContext
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -50,7 +48,6 @@ from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
-from tracim_backend.exceptions import TodoNotFound
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
@@ -2236,77 +2233,15 @@ class ContentApi(object):
 
     def create_todo(
         self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
-    ) -> Todo:
+    ) -> Content:
         item = self.create(
             content_type_slug=content_type_list.Todo.slug,
             workspace=parent.workspace,
             parent=parent,
         )
         item.raw_content = raw_content
+        item.assignee_id = assignee.user_id
         self._session.add(item)
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 
-        todo = Todo()
-        todo.assignee_id = assignee.user_id
-        todo.content_id = item.content_id
-
-        self._session.add(todo)
-        self._session.flush()
-
-        return todo
-
-    def get_todo(self, todo_id: int) -> Todo:
-        try:
-            return self._session.query(Todo).filter(Todo.todo_id == todo_id).one()
-        except TodoNotFound:
-            raise TodoNotFound("Todo {} was not found".format(todo_id))
-
-    def get_all_todos(self) -> typing.List[Todo]:
-        """
-        Return every todos in the database, with the limitation
-        of the content API.
-        :return: List of todos
-        """
-        contents = self.get_all(content_type=content_type_list.Todo.slug,)
-
-        todos = []
-        for content in contents:
-            todos.extend(self.get_all_todos_for_content_id(content.content_id))
-
-        return todos
-
-    def get_all_todos_for_content_id(self, content_id: int) -> typing.List[Todo]:
-        """
-        Return every todos in the database, with the limitation
-        of the content API.
-        :param content_id: Content id
-        :return: List of todos
-        """
-
-        base_query = self._base_query()
-        todo_contents = base_query.filter(
-            and_(
-                Content.parent_id == content_id,
-                Content.type == content_type_list.Todo.slug,
-                Content.is_deleted.is_(False),
-                Content.is_archived.is_(False),
-            ),
-        ).all()
-
-        todo_contents_ids = [content.id for content in todo_contents]
-        todos = self._session.query(Todo).filter(Todo.content_id.in_(todo_contents_ids)).all()
-
-        return todos
-
-    def get_todo_in_context(self, todo: Todo) -> TodoInContext:
-        """
-        Transform a Todo object into a TodoInContext object
-        :param todo: Todo object
-        :return: TodoInContext object
-        """
-        return TodoInContext(todo, self._session, self._config, self._user)
-
-    def remove_todo(self, todo: Todo, do_save: bool = True) -> None:
-        self._session.query(Todo).filter(Todo.todo_id == todo.todo_id).delete()
-        if do_save:
-            self._session.flush()
+        return item

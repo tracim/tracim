@@ -277,11 +277,11 @@ class TodoAssigneeChecker(AuthorizationChecker):
 
     def check(self, tracim_context: TracimContext) -> bool:
 
-        if tracim_context.current_todo.assignee_id == tracim_context.current_user.user_id:
+        if tracim_context.current_content.assignee_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
             "user {} is not assigned to the todo {}".format(
-                tracim_context.current_user.user_id, tracim_context.current_todo.content_id,
+                tracim_context.current_user.user_id, tracim_context.current_content.content_id,
             )
         )
 
@@ -425,7 +425,10 @@ can_edit_comment = OrAuthorizationChecker(
 is_todo_owner = TodoOwnerChecker()
 is_assignee = TodoAssigneeChecker()
 can_edit_todo = OrAuthorizationChecker(
-    is_todo_owner, is_assignee, is_content_manager, is_workspace_manager
+    AndAuthorizationChecker(is_contributor, is_todo_owner),
+    is_assignee,
+    is_content_manager,
+    is_workspace_manager,
 )
 can_delete_todo = OrAuthorizationChecker(
     AndAuthorizationChecker(is_contributor, is_todo_owner), is_content_manager, is_workspace_manager

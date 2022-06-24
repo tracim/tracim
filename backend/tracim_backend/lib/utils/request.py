@@ -9,7 +9,6 @@ from pyramid.request import Request
 from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.applications.content_todo.models import Todo
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentNotFoundInTracimRequest
 from tracim_backend.exceptions import ContentTypeNotInTracimRequest
@@ -50,8 +49,6 @@ class TracimContext(ABC):
         self._current_comment = None  # type: Content
         # Current reaction, found in request path
         self._current_reaction = None  # type: Reaction
-        # Current todo, found in request path
-        self._current_todo = None  # type: Todo
         # Candidate user found in request body
         self._candidate_user = None  # type: User
         # Candidate workspace found in request body
@@ -141,14 +138,6 @@ class TracimContext(ABC):
         return self._generate_if_none(
             self._current_reaction, self._get_reaction, self._get_current_reaction_id
         )
-
-    @property
-    def current_todo(self) -> Todo:
-        """
-        Current todo if exist, if you are deleting todo 8 of content 21,
-        current todo will be 8.
-        """
-        return self._generate_if_none(self._current_todo, self._get_todo, self._get_current_todo_id)
 
     @property
     def candidate_user(self) -> User:
@@ -268,13 +257,6 @@ class TracimContext(ABC):
         if self._get_content_id_in_request():
             current_content = self.current_content
         return reaction_lib.get_one(reaction_id=reaction_id, content_id=current_content.content_id)
-
-    def _get_todo(self, todo_id_fetcher: typing.Callable[[], int]) -> Todo:
-        todo_id = todo_id_fetcher()
-        content_api = ContentApi(
-            session=self.dbsession, current_user=self.current_user, config=self.app_config
-        )
-        return content_api.get_todo(todo_id=todo_id)
 
     def _get_content_type(
         self, content_type_slug_fetcher: typing.Callable[[], str]
