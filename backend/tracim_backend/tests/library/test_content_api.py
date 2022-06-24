@@ -390,41 +390,6 @@ class TestContentApi(object):
             content_type_list.File.slug: True,
         }
 
-    def test_unit__restore_content_default_allowed_content__ok__nominal_case(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
-    ):
-        uapi = user_api_factory.get()
-
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
-        workspace = workspace_api_factory.get(current_user=user).create_workspace(
-            "test workspace", save_now=True
-        )
-        api = ContentApi(current_user=user, session=session, config=app_config)
-        folder = api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=workspace,
-            parent=None,
-            label="plop",
-            do_save=False,
-        )
-        allowed_content_type_slug_list = [
-            content_type_list.Folder.slug,
-            content_type_list.File.slug,
-        ]
-        api.set_allowed_content(
-            folder, allowed_content_type_slug_list=allowed_content_type_slug_list
-        )
-        assert "allowed_content" in folder.properties
-        assert folder.properties["allowed_content"] == {
-            content_type_list.Folder.slug: True,
-            content_type_list.File.slug: True,
-        }
-        api.restore_content_default_allowed_content(folder)
-        assert "allowed_content" in folder.properties
-        assert folder.properties[
-            "allowed_content"
-        ] == content_type_list.default_allowed_content_properties(folder.type)
-
     def test_unit__get_allowed_content_type__ok__html_document(
         self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
@@ -1241,6 +1206,15 @@ class TestContentApi(object):
         assert text_file_copy.file_mimetype == text_file.file_mimetype
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
+        # check properties
+        assert text_file.properties.get("origin") is None
+        assert text_file.properties.get("allowed_content") is None
+        assert text_file_copy.properties.get("allowed_content") is None
+        assert text_file_copy.properties.get("origin")
+        assert (
+            text_file_copy.all_properties["allowed_content"]
+            == text_file.all_properties["allowed_content"]
+        )
 
     def test_unit_copy_file_same_label_different_namespace(
         self,

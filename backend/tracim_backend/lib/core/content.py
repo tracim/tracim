@@ -1111,9 +1111,10 @@ class ContentApi(object):
             )
         :return: content
         """
-        properties = content.properties.copy()
-        if set(properties["allowed_content"]) == set(allowed_content_dict):
+
+        if set(content.all_properties["allowed_content"]) == set(allowed_content_dict):
             raise SameValueError("Content allowed content did not change")
+        properties = content.properties.copy()
         properties["allowed_content"] = allowed_content_dict
         content.properties = properties
         return content
@@ -1136,17 +1137,6 @@ class ContentApi(object):
             allowed_content_dict[allowed_content_type_slug] = True
 
         return self._set_allowed_content(content, allowed_content_dict)
-
-    def restore_content_default_allowed_content(self, content: Content) -> None:
-        """
-        Return to default allowed_content_types
-        :param content: the given content instance
-        :return: nothing
-        """
-        if content._properties and "allowed_content" in content._properties:
-            properties = content.properties.copy()
-            del properties["allowed_content"]
-            content.properties = properties
 
     def set_status(self, content: Content, new_status: str):
         if new_status in content_status_list.get_all_slugs_values():
@@ -1265,9 +1255,10 @@ class ContentApi(object):
     ) -> None:
         if parent:
             assert workspace == parent.workspace
-            if parent.properties and "allowed_content" in parent.properties:
+            properties = parent.all_properties
+            if properties and "allowed_content" in properties:
                 if content_type not in self._get_allowed_content_type(
-                    parent.properties["allowed_content"]
+                    properties["allowed_content"]
                 ):
                     raise UnallowedSubContent(
                         " SubContent of type {subcontent_type}  not allowed in content {content_id}".format(
