@@ -5,18 +5,25 @@ import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
 
-import { COOKIE_FRONTEND } from '../util/helper.js'
+import {
+  COOKIE_FRONTEND,
+  FETCH_CONFIG
+} from '../util/helper.js'
 import {
   CardPopup,
   IconButton,
   TracimComponent,
+  handleFetchResult,
+  putUserConfiguration,
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   MINIMUM_CHARACTERS_USERNAME
 } from 'tracim_frontend_lib'
 import { putUserUsername } from '../action-creator.async.js'
-import { newFlashMessage, setUsernamePopup } from '../action-creator.sync.js'
-
+import { newFlashMessage } from '../action-creator.sync.js'
+const DISPLAY_USERNAME_POPUP = {
+  FALSE: 'false'
+}
 
 export class CardPopupUsername extends React.Component {
   constructor (props) {
@@ -27,22 +34,27 @@ export class CardPopupUsername extends React.Component {
       newUsername: '',
       isUsernameValid: true,
       password: '',
-      //usernamePopup: false,
-      usernameInvalidMsg: ''
+      usernameInvalidMsg: '',
+      shouldDisplay: true
     }
   }
 
   handleClickCloseUsernamePopup = () => {
-    const { props } = this
-    props.dispatch(setUsernamePopup(false))
-    //this.setState(prevState => ({ usernamePopup: !prevState.usernamePopup }))
+    Cookies.set(COOKIE_FRONTEND.SHOW_USERNAME_POPUP, false, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+    this.setState({ shouldDisplay: false })
   }
 
   handleClickConfirmUsernamePopup = async () => {
     const { props, state } = this
 
     if (state.newUsername === '') {
-      Cookies.set(COOKIE_FRONTEND.HIDE_USERNAME_POPUP, this.state.hidePopupCheckbox, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+      await handleFetchResult(await putUserConfiguration(
+        FETCH_CONFIG.apiUrl,
+        props.user.userId,
+        { ...props.user.config, display_username_popup: DISPLAY_USERNAME_POPUP.FALSE }
+      ))
+      Cookies.set(COOKIE_FRONTEND.SHOW_USERNAME_POPUP, false, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+      this.setState({ shouldDisplay: false })
     } else {
       const fetchPutUsername = await props.dispatch(putUserUsername(props.user, state.newUsername, state.password))
       switch (fetchPutUsername.status) {
@@ -74,8 +86,6 @@ export class CardPopupUsername extends React.Component {
           props.dispatch(newFlashMessage(props.t('Error while changing username'), 'warning'))
           return false
       }
-
-      Cookies.set(COOKIE_FRONTEND.HIDE_USERNAME_POPUP, true, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
     }
     this.handleClickCloseUsernamePopup()
   }
@@ -103,7 +113,10 @@ export class CardPopupUsername extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
+
+    if (!state.shouldDisplay) return null
+
     return (
       <CardPopup
         customClass='homepage__usernamePopup'
@@ -178,7 +191,7 @@ export class CardPopupUsername extends React.Component {
 
           <IconButton
             customClass='homepage__usernamePopup__body__btn'
-            disabled={this.disableConfirmButton}
+            disabled={this.disableConfirmButton()}
             icon='fas fa-check'
             intent='primary'
             mode='light'

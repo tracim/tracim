@@ -1,13 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import debounce from 'lodash/debounce'
-import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
 
 import {
-  COOKIE_FRONTEND,
   workspaceConfig,
   FETCH_CONFIG
 } from '../util/helper.js'
@@ -20,7 +18,6 @@ import {
 } from 'tracim_frontend_lib'
 import { newFlashMessage, setHeadTitle } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
-import CardPopupUsername from './CardPopupUsername'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import HomeNoWorkspace from '../component/Home/HomeNoWorkspace.jsx'
@@ -35,7 +32,6 @@ export class Home extends React.Component {
       newUsername: '',
       isUsernameValid: true,
       password: '',
-      usernamePopup: false,
       usernameInvalidMsg: ''
     }
 
@@ -65,7 +61,6 @@ export class Home extends React.Component {
   }
 
   componentDidMount () {
-    this.setUsernamePopupVisibility()
     this.setHeadTitle()
   }
 
@@ -77,12 +72,6 @@ export class Home extends React.Component {
     const { props } = this
 
     props.dispatch(setHeadTitle(props.t('Home')))
-  }
-
-  setUsernamePopupVisibility () {
-    if (!(this.props.user.username || Cookies.get(COOKIE_FRONTEND.HIDE_USERNAME_POPUP))) {
-      this.setState({ usernamePopup: true })
-    }
   }
 
   checkUsername = async () => {
@@ -133,9 +122,6 @@ export class Home extends React.Component {
                 )}
               </CardBody>
             </Card>
-            {(this.props.user.usernamePopup &&
-              <CardPopupUsername />
-            )}
           </section>
         </div>
       </div>
