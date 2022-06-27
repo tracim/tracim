@@ -479,9 +479,11 @@ website.usage_conditions =
 ### Rich Text Preview ###
 # Template and css used for preview of notes files, by default use files from
 # the branding dir (frontend/dist/assets/branding/)
+; rich_text_preview.enabled = False
 ; rich_text_preview.css_path =
 ; rich_text_preview.template_path =
 # example:
+# rich_text_preview.enabled = True
 # rich_text_preview.css_path = /home/user/tracim/rich_text_preview.css
 # rich_text_preview.css_path = /home/user/tracim/rich_text_preview.template
 

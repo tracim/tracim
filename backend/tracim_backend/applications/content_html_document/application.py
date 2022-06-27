@@ -46,6 +46,13 @@ class ContentHTMLDocumentApp(TracimApplication):
 
         html_document_controller = HTMLDocumentController()
         configurator.include(html_document_controller.bind, route_prefix=route_prefix)
+        if app_config.RICH_TEXT_PREVIEW__ENABLED:
+            from tracim_backend.applications.content_html_document.preview_controller import (
+                HTMLDocumentPreviewController,
+            )
+
+            html_document_preview_controller = HTMLDocumentPreviewController()
+            configurator.include(html_document_preview_controller.bind, route_prefix=route_prefix)
 
 
 def create_app() -> TracimApplication:

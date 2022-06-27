@@ -51,6 +51,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_BACKEND__I18N_FOLDER_PATH                                          | backend.i18n_folder_path                                       | BACKEND__I18N_FOLDER_PATH                                          |
 | TRACIM_FRONTEND__DIST_FOLDER_PATH                                         | frontend.dist_folder_path                                      | FRONTEND__DIST_FOLDER_PATH                                         |
 | TRACIM_COLOR__CONFIG_FILE_PATH                                            | color.config_file_path                                         | COLOR__CONFIG_FILE_PATH                                            |
+| TRACIM_RICH_TEXT_PREVIEW__ENABLED                                         | rich_text_preview.enabled                                      | RICH_TEXT_PREVIEW__ENABLED                                         |
 | TRACIM_RICH_TEXT_PREVIEW__CSS_PATH                                        | rich_text_preview.css_path                                     | RICH_TEXT_PREVIEW__CSS_PATH                                        |
 | TRACIM_RICH_TEXT_PREVIEW__TEMPLATE_PATH                                   | rich_text_preview.template_path                                | RICH_TEXT_PREVIEW__TEMPLATE_PATH                                   |
 | TRACIM_PLUGIN__FOLDER_PATH                                                | plugin.folder_path                                             | PLUGIN__FOLDER_PATH                                                |

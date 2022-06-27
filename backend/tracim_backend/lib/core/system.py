@@ -83,6 +83,7 @@ class SystemApi(object):
             limitation__maximum_online_users_message=self._config.LIMITATION__MAXIMUM_ONLINE_USERS_MESSAGE,
             call__enabled=self._config.CALL__ENABLED,
             call__unanswered_timeout=self._config.CALL__UNANSWERED_TIMEOUT,
+            rich_text_preview__enabled=self._config.RICH_TEXT_PREVIEW__ENABLED,
         )
 
     def get_usage_conditions_files(self) -> typing.List[UsageConditionModel]:

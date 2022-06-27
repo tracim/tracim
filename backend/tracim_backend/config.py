@@ -527,6 +527,10 @@ class CFG(object):
             "color.config_file_path", default_color_config_file_path
         )
 
+        self.RICH_TEXT_PREVIEW__ENABLED = asbool(
+            self.get_raw_config("rich_text_preview.enabled", "False")
+        )
+
         default_rich_text_preview_css_file_path = os.path.join(
             self.branding_folder_path, "rich_text_preview.css"
         )
@@ -1038,6 +1042,16 @@ class CFG(object):
                         required_color, self.COLOR__CONFIG_FILE_PATH
                     )
                 ) from e
+
+        if self.RICH_TEXT_PREVIEW__ENABLED:
+            self.check_file_path_param(
+                "RICH_TEXT_PREVIEW__TEMPLATE_PATH",
+                self.RICH_TEXT_PREVIEW__TEMPLATE_PATH,
+                readable=True,
+            )
+            self.check_file_path_param(
+                "RICH_TEXT_PREVIEW__CSS_PATH", self.RICH_TEXT_PREVIEW__CSS_PATH, readable=True
+            )
 
         self.check_mandatory_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR)
         self.check_directory_path_param("PREVIEW_CACHE_DIR", self.PREVIEW_CACHE_DIR, writable=True)
