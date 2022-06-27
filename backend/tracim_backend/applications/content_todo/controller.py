@@ -58,7 +58,9 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todos = content_api.get_all(parent_ids=[hapic_data.path.content_id])
+        todos = content_api.get_all(
+            parent_ids=[hapic_data.path.content_id], content_type=content_type_list.Todo.slug
+        )
 
         todos_in_context = []
         for todo in todos:
@@ -82,7 +84,9 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todo = content_api.get_one(content_id=hapic_data.path.todo_id)
+        todo = content_api.get_one(
+            content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+        )
         todo_in_context = content_api.get_content_in_context(todo)
 
         return todo_in_context
@@ -151,7 +155,9 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todo_content = content_api.get_one(content_id=hapic_data.path.todo_id)
+        todo_content = content_api.get_one(
+            content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+        )
 
         with new_revision(session=request.dbsession, tm=transaction.manager, content=todo_content):
             content_api.set_status(todo_content, hapic_data.body.status)
@@ -174,7 +180,9 @@ class TodoController(Controller):
 
         todo_content = None  # type: typing.Optional['Content']
         try:
-            todo_content = content_api.get_one(hapic_data.path.todo_id)
+            todo_content = content_api.get_one(
+                content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+            )
         except ContentNotFound as exc:
             raise TodoNotFound(
                 "Todo with content_id {} not found".format(request.current_content.content_id)
