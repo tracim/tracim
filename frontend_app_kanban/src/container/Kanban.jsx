@@ -165,7 +165,7 @@ export class Kanban extends React.Component {
     this.loadContent()
   }
 
-  handleToDoCreate = async data => {
+  handleToDoCreated = async data => {
     const { state } = this
     if (data.fields.content.parent_id !== state.content.content_id) return
 
@@ -430,14 +430,14 @@ export class Kanban extends React.Component {
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
   }
 
-  handleDeleteToDo = (toDoId) => {
+  handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDoId, this.setState.bind(this))
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
   }
 
-  handleChangeStatusToDo = (toDoId, status) => {
+  handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
   }
 
   handleClickBtnCloseApp = () => {

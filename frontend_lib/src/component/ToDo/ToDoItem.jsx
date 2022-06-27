@@ -21,31 +21,48 @@ export const isDeletable = (toDo, user, userRoleId) => {
 }
 
 const ToDoItem = props => {
-  const username = (props.memberList.find(member => member.id === props.toDo.assignee_id) || { username: '' }).username
+  const username = props.username
+    ? props.username
+    : (props.memberList.find(member => member.id === props.toDo.assignee_id) || { username: '' }).username
   const isToDoChecked = props.toDo.status !== STATUSES.OPEN
 
   return (
     <div className={classnames('toDoItem', { toDoItemChecked: isToDoChecked })}>
-      <IconButton
-        customClass='toDoItem__checkbox'
-        icon={`far ${isToDoChecked ? 'fa-check-square' : 'fa-square'}`}
-        title={isToDoChecked ? props.t('Uncheck') : props.t('Check')}
-        onClick={() => props.onClickChangeStatusToDo(
-          props.toDo.todo_id, isToDoChecked ? STATUSES.OPEN : STATUSES.VALIDATED
-        )}
-        disabled={!props.isEditable}
-        intent='link'
-      />
+      <div className='toDoItem__checkbox'>
+        <IconButton
+          customClass='toDoItem__checkbox'
+          icon={`far ${isToDoChecked ? 'fa-check-square' : 'fa-square'}`}
+          title={isToDoChecked ? props.t('Uncheck') : props.t('Check')}
+          onClick={() => props.onClickChangeStatusToDo(
+            props.toDo, isToDoChecked ? STATUSES.OPEN : STATUSES.VALIDATED
+          )}
+          disabled={!props.isEditable}
+          intent='link'
+        />
+      </div>
       <div className='toDoItem__content'>
         <strong>+{username}</strong>
         {props.toDo.raw_content}
       </div>
+      {props.showDetail && (
+        <>
+          <div className='toDoItem__author'>
+            {props.toDo.author.public_name}
+          </div>
+          <div className='toDoItem__path'>
+            {`${props.toDo.workspace.label} > ${props.toDo.content.parent_label}`}
+          </div>
+          <div className='toDoItem__created'>
+            {props.toDo.content.created}
+          </div>
+        </>
+      )}
       {props.isDeletable && (
         <IconButton
           customClass='toDoItem__delete'
           icon='far fa-trash-alt'
           intent='link'
-          onClick={() => props.onClickDeleteToDo(props.toDo.todo_id)}
+          onClick={() => props.onClickDeleteToDo(props.toDo)}
           title={props.t('Delete')}
         />
       )}
@@ -61,11 +78,15 @@ ToDoItem.propTypes = {
   toDo: PropTypes.object.isRequired,
   isDeletable: PropTypes.bool,
   isEditable: PropTypes.bool,
-  memberList: PropTypes.array
+  showDetail: PropTypes.bool,
+  memberList: PropTypes.array,
+  username: PropTypes.string
 }
 
 ToDoItem.defaultProps = {
   isDeletable: false,
   isEditable: true,
-  memberList: []
+  showDetail: false,
+  memberList: [],
+  username: ''
 }
