@@ -178,7 +178,6 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todo_content = None  # type: typing.Optional['Content']
         try:
             todo_content = content_api.get_one(
                 content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug

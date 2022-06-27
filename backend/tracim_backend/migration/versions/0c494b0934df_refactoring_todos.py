@@ -30,7 +30,7 @@ def upgrade():
     with op.batch_alter_table("content_revisions") as batch_op:
         batch_op.add_column(sa.Column("assignee_id", sa.Integer(), nullable=True,),)
         batch_op.create_foreign_key(
-            constraint_name="fk_content_revisions_assignee_id_users",
+            batch_op.f("fk_content_revisions_assignee_id_users"),
             referent_table="users",
             local_cols=["assignee_id"],
             remote_cols=["user_id"],
