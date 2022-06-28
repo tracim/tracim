@@ -46,7 +46,7 @@ const ToDoManagement = (props) => {
           {props.toDoList.length > 0
             ? props.toDoList.map(toDo =>
               <ToDoItem
-                key={`toDo_${toDo.todo_id}`}
+                key={`toDo_${toDo.content_id}`}
                 isDeletable={isDeletable(toDo, props.user, props.user.userRoleIdInWorkspace)}
                 isEditable={isEditable(toDo, props.user, props.user.userRoleIdInWorkspace)}
                 memberList={props.memberList}
