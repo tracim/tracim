@@ -99,9 +99,6 @@ const ToDo = props => {
   }
 
   const handleDeleteToDo = async (toDo) => {
-    // FIXME - GB - 2022-06-27 - This function should use appContentDeleteToDo, but we use Hooks here and we don't have this.setState
-    // See
-    // props.appContentDeleteToDo(toDo.workspace_id, toDo.parent_id, toDo.content_id, this.setState.bind(this))
     const response = await handleFetchResult(await deleteToDo(FETCH_CONFIG.apiUrl, toDo.workspace_id, toDo.parent_id, toDo.content_id))
 
     switch (response.status) {
@@ -118,9 +115,6 @@ const ToDo = props => {
   }
 
   const handleChangeStatusToDo = async (toDo, status) => {
-    // FIXME - GB - 2022-06-27 - This function should use appContentChangeStatusToDo, but we use Hooks here and we don't have this.setState
-    // See
-    // props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
     const response = await handleFetchResult(await putToDo(FETCH_CONFIG.apiUrl, toDo.workspace_id, toDo.parent_id, toDo.content_id, status))
 
     switch (response.status) {
@@ -140,7 +134,7 @@ const ToDo = props => {
     <div className='tracim__content-scrollview'>
       <PageWrapper customClass='toDo__wrapper'>
         <PageTitle
-          title={props.t('Tasks to do')}
+          title={props.t('To do')}
           icon='fas fa-check-square'
           breadcrumbsList={props.breadcrumbs}
         />
@@ -154,7 +148,7 @@ const ToDo = props => {
               {props.t('Author')}
             </div>
             <div className='toDo__header__path'>
-              {props.t('Contenu/Espace')}
+              {props.t('Path')}
             </div>
             <div className='toDo__header__created'>
               {props.t('Last Modification')}
