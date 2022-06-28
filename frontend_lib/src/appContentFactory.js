@@ -190,7 +190,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'todo_id')) })
+          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'content_id')) })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
@@ -436,7 +436,7 @@ export function appContentFactory (WrappedComponent) {
       const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
       if (response.apiResponse.status === 200) {
         setState(prev => ({
-          toDoList: sortContentByStatus(uniqBy([response.body, ...prev.toDoList], 'todo_id'))
+          toDoList: sortContentByStatus(uniqBy([response.body, ...prev.toDoList], 'content_id'))
         }))
       } else {
         sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
@@ -451,7 +451,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (response.status) {
         case 204:
-          setState(prev => ({ toDoList: prev.toDoList.filter(toDo => toDo.todo_id !== toDoId) }))
+          setState(prev => ({ toDoList: prev.toDoList.filter(toDo => toDo.content_id !== toDoId) }))
           break
         case 403:
           sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
@@ -470,7 +470,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (response.status) {
         case 204:
-          setState(prev => ({ toDoList: prev.toDoList.map(toDo => toDo.todo_id === toDoId ? { ...toDo, status } : toDo) }))
+          setState(prev => ({ toDoList: prev.toDoList.map(toDo => toDo.content_id === toDoId ? { ...toDo, status } : toDo) }))
           break
         case 403:
           sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))

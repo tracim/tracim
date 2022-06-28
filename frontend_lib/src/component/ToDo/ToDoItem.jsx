@@ -6,7 +6,7 @@ import IconButton from '../Button/IconButton.jsx'
 import { ROLE, STATUSES } from '../../helper.js'
 
 export const isEditable = (toDo, user, userRoleId) => {
-  const isAuthor = toDo.owner_id === user.userId
+  const isAuthor = toDo.author.user_id === user.userId
   const isAssignee = toDo.assignee_id === user.userId
   const isSpaceManager = userRoleId === ROLE.workspaceManager.id
   const isContentManager = userRoleId === ROLE.contentManager.id
@@ -14,7 +14,7 @@ export const isEditable = (toDo, user, userRoleId) => {
 }
 
 export const isDeletable = (toDo, user, userRoleId) => {
-  const isAuthor = toDo.owner_id === user.userId
+  const isAuthor = toDo.author.user_id === user.userId
   const isSpaceManager = userRoleId === ROLE.workspaceManager.id
   const isContentManager = userRoleId === ROLE.contentManager.id
   return isAuthor || isSpaceManager || isContentManager
@@ -31,7 +31,7 @@ const ToDoItem = props => {
         icon={`far ${isToDoChecked ? 'fa-check-square' : 'fa-square'}`}
         title={isToDoChecked ? props.t('Uncheck') : props.t('Check')}
         onClick={() => props.onClickChangeStatusToDo(
-          props.toDo.todo_id, isToDoChecked ? STATUSES.OPEN : STATUSES.VALIDATED
+          props.toDo.content_id, isToDoChecked ? STATUSES.OPEN : STATUSES.VALIDATED
         )}
         disabled={!props.isEditable}
         intent='link'
@@ -45,7 +45,7 @@ const ToDoItem = props => {
           customClass='toDoItem__delete'
           icon='far fa-trash-alt'
           intent='link'
-          onClick={() => props.onClickDeleteToDo(props.toDo.todo_id)}
+          onClick={() => props.onClickDeleteToDo(props.toDo.content_id)}
           title={props.t('Delete')}
         />
       )}
