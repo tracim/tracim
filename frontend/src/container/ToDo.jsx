@@ -8,7 +8,6 @@ import {
   deleteToDo,
   getToDo,
   getToDoListForUser,
-  getWorkspaceMemberList,
   handleFetchResult,
   PAGE,
   PageContent,
@@ -61,23 +60,23 @@ const ToDo = props => {
   }
 
   const getAllToDosForAnUser = async () => {
-    const fetchGetTodo = await handleFetchResult(await getToDoListForUser(
+    const fetchGetToDo = await handleFetchResult(await getToDoListForUser(
       FETCH_CONFIG.apiUrl,
       props.user.userId
     ))
 
-    const result = []
+    const newToDoList = []
 
-    for (const todo of fetchGetTodo.body) {
-      const space = props.workspaceList.find(space => space.id === todo.workspace_id)
+    for (const toDo of fetchGetToDo.body) {
+      const space = props.workspaceList.find(space => space.id === toDo.workspace_id)
 
-      result.push({
-        ...todo,
+      newToDoList.push({
+        ...toDo,
         workspace: space
       })
     }
 
-    setToDoList(sortContentByStatus(result))
+    setToDoList(sortContentByStatus(newToDoList))
   }
 
   const handleToDoCreated = async data => {
@@ -137,6 +136,7 @@ const ToDo = props => {
   }
 
   const handleChangeStatusToDo = async (toDo, status) => {
+    console.log('TODO', toDo)
     const response = await handleFetchResult(await putToDo(FETCH_CONFIG.apiUrl, toDo.workspace_id, toDo.parent_id, toDo.content_id, status))
 
     switch (response.status) {
@@ -183,21 +183,17 @@ const ToDo = props => {
           <div className='toDo__item'>
             {toDoList.map(toDo => {
               return (
-                <div
-                  key={`todo_id_div__${toDo.content_id}`}
-                >
-                  <div>{toDo.content_id}</div>
-                  <ToDoItem
-                    isDeletable
-                    isEditable
-                    key={`todo_id__${toDo.content_id}`}
-                    onClickChangeStatusToDo={handleChangeStatusToDo}
-                    onClickDeleteToDo={handleDeleteToDo}
-                    showDetail
-                    toDo={toDo}
-                    username={props.user.username}
-                  />
-                </div>
+                <ToDoItem
+                  isDeletable
+                  isEditable
+                  key={`todo_id__${toDo.content_id}`}
+                  lang={props.user.lang}
+                  onClickChangeStatusToDo={handleChangeStatusToDo}
+                  onClickDeleteToDo={handleDeleteToDo}
+                  showDetail
+                  toDo={toDo}
+                  username={props.user.username}
+                />
               )
             }
             )}

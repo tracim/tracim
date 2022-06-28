@@ -195,6 +195,7 @@ import {
 
 import {
   baseFetch,
+  deleteToDo,
   getComment,
   getContentPath,
   getToDo,
@@ -233,7 +234,8 @@ import {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  putToDo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -289,6 +291,7 @@ export {
   AgendaInfo,
   appContentFactory,
   DateInput,
+  deleteToDo,
   getToDo,
   getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,
@@ -476,6 +479,7 @@ export {
   Popover,
   getBrowserLang,
   NewToDo,
+  putToDo,
   sortContentByStatus,
   ToDoItem,
   ToDoManagement

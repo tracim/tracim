@@ -55,7 +55,6 @@ import {
   getMyselfKnownMember,
   getTemplateList,
   getToDoList,
-  getToDoListForUser,
   postContentToFavoriteList,
   postNewComment,
   postToDo,
@@ -198,19 +197,6 @@ export function appContentFactory (WrappedComponent) {
           break
       }
     }
-
-    // getToDoListForUser = async (setState, userId) => {
-    //   const fetchGetToDo = await handleFetchResult(await getToDoListForUser(this.apiUrl, userId))
-
-    //   switch (fetchGetToDo.apiResponse.status) {
-    //     case 200:
-    //       setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'content_id')) })
-    //       break
-    //     default:
-    //       sendGlobalFlashMessage(i18n.t('Something went wrong'))
-    //       break
-    //   }
-    // }
 
     handleCommentCreated = async (tlm) => {
       const { state } = this

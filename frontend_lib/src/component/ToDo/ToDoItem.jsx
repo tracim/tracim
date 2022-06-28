@@ -1,9 +1,17 @@
 import React from 'react'
-import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import { translate } from 'react-i18next'
+import {
+  BREADCRUMBS_TYPE,
+  PAGE,
+  ROLE,
+  STATUSES
+} from '../../helper.js'
+import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
+import DistanceDate from '../DistanceDate.jsx'
 import IconButton from '../Button/IconButton.jsx'
-import { ROLE, STATUSES } from '../../helper.js'
+import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 
 export const isEditable = (toDo, user, userRoleId) => {
   const isAuthor = toDo.author.user_id === user.userId
@@ -47,13 +55,33 @@ const ToDoItem = props => {
       {props.showDetail && (
         <>
           <div className='toDoItem__author'>
-            {props.toDo.author.public_name}
+            <ProfileNavigation
+              user={{
+                userId: props.toDo.author.user_id,
+                publicName: props.toDo.author.public_name
+              }}
+            >
+              {props.toDo.author.public_name}
+            </ProfileNavigation>
           </div>
           <div className='toDoItem__path'>
-            {props.toDo.workspace.label}
+            <Breadcrumbs
+              breadcrumbsList={[{
+                link: PAGE.WORKSPACE.DASHBOARD(props.toDo.workspace_id),
+                label: props.toDo.workspace.label,
+                type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
+                isALink: true
+                // }, {
+                //   link: PAGE.CONTENT(props.toDo.content.parent_id),
+                //   label: props.toDo.content.parent_label,
+                //   type: BREADCRUMBS_TYPE.APP_FEATURE,
+                //   isALink: true
+              }]}
+              keepLastBreadcrumbAsLink
+            />
           </div>
           <div className='toDoItem__created'>
-            {props.toDo.created}
+            <DistanceDate absoluteDate={props.toDo.created} lang={props.lang} />
           </div>
         </>
       )}
@@ -79,6 +107,7 @@ ToDoItem.propTypes = {
   isDeletable: PropTypes.bool,
   isEditable: PropTypes.bool,
   showDetail: PropTypes.bool,
+  lang: PropTypes.string,
   memberList: PropTypes.array,
   username: PropTypes.string
 }
@@ -87,6 +116,7 @@ ToDoItem.defaultProps = {
   isDeletable: false,
   isEditable: true,
   showDetail: false,
+  lang: 'en',
   memberList: [],
   username: ''
 }
