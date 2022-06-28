@@ -1239,6 +1239,10 @@ class ContentInContext(object):
 
     # Default
     @property
+    def assignee_id(self) -> int:
+        return self.content.assignee_id
+
+    @property
     def content_id(self) -> int:
         return self.content.content_id
 
@@ -1639,6 +1643,10 @@ class RevisionInContext(object):
         self._version_number = version_number
 
     # Default
+    @property
+    def assignee_id(self) -> int:
+        return self.revision.assignee_id
+
     @property
     def content_id(self) -> int:
         return self.revision.content_id

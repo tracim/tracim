@@ -49,6 +49,7 @@ content type handled in tlm are:
 - folder
 - comment
 - kanban
+- todo
 
 There are used as sub_type for the event type "content" (see section Entities below).
 
@@ -167,6 +168,17 @@ Each entry in fields is a subset of the corresponding HTTP API structure.
         "public_name": "John Doe"
     },
 "created": "2012-02-23T10:28:43.511Z"
+}
+```
+
+### content/todo
+```
+{
+    "assignee_id": "2",
+    "content_id": 7,
+    "parent_id": 5,
+    "parent_label": "New note",
+    "status": "closed-deprecated"
 }
 ```
 
