@@ -571,8 +571,8 @@ class WorkspaceController(Controller):
             content_namespace=creation_data.content_namespace,
         )
         if creation_data.template_id:
-            api.add_tags_from_template(
-                content=content, template_id=creation_data.template_id,
+            api.copy_tags(
+                destination=content, source_content_id=creation_data.template_id,
             )
         content = api.get_content_in_context(content)
         return content

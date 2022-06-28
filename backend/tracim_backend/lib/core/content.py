@@ -427,6 +427,8 @@ class ContentApi(object):
                 new_parent=parent,
                 new_content_namespace=content_namespace,
             )
+        else:
+            content.revision_type = ActionDescription.CREATION
 
         if label:
             file_extension = ""
@@ -455,16 +457,11 @@ class ContentApi(object):
                 )
         if self._user:
             content.owner = self._user
-        content.parent = parent
 
+        content.parent = parent
         content.workspace = workspace
         content.type = content_type.slug
         content.is_temporary = is_temporary
-        if template_id:
-            content.revision.properties = {}
-            self._flag_revision_as_copy(content, self.get_one(template_id))
-        else:
-            content.revision_type = ActionDescription.CREATION
         content.content_namespace = content_namespace
 
         if do_save:
@@ -473,15 +470,13 @@ class ContentApi(object):
 
         return content
 
-    def add_tags_from_template(
-        self, content: Content, template_id: int,
-    ):
+    def copy_tags(self, destination: Content, source_content_id: int,) -> None:
         """Create extra data for templates: tags"""
         tag_lib = TagLib(self._session)
-        tags_values = tag_lib.get_all(content_id=template_id)
+        tags_values = tag_lib.get_all(content_id=source_content_id)
 
         for tag in tags_values:
-            tag_lib.add_tag_to_content(user=self._user, content=content, tag_name=tag.tag_name)
+            tag_lib.add_tag_to_content(user=self._user, content=destination, tag_name=tag.tag_name)
 
     def create_comment(
         self,
@@ -1305,8 +1300,10 @@ class ContentApi(object):
             new_content_namespace=new_content_namespace,
             copy_as_template=True,
         )
+        cpy_rev.properties = {}
         cpy_rev.node = new_content
         new_content.current_revision = cpy_rev
+        self._flag_revision_as_copy(new_content, source_content)
         return new_content
 
     def _copy(
