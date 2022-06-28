@@ -735,7 +735,7 @@ class ContentApi(object):
     ):
         if not additional_metadata:
             additional_metadata = {}
-        content = revision.node
+        content = self.get_content_in_context(revision.node)
         revision_in_context = self.get_revision_in_context(revision)
         space_name = _("Space {workspace_name}").format(workspace_name=content.workspace.label)
         tag_lib = TagLib(session=self._session)
@@ -765,7 +765,7 @@ class ContentApi(object):
         preview_metadata = {
             "title": content.label,
             "subtitle": space_name,
-            "author": content.owner.public_name,
+            "author": content.author.public_name,
             "keywords": keywords,
             "description": content.description,
             "generator": generator,
