@@ -4,6 +4,7 @@ import * as Cookies from 'js-cookie'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
+import debounce from 'lodash/debounce'
 
 import {
   COOKIE_FRONTEND,
@@ -17,7 +18,9 @@ import {
   putUserConfiguration,
   ALLOWED_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
-  MINIMUM_CHARACTERS_USERNAME
+  MINIMUM_CHARACTERS_USERNAME,
+  checkUsernameValidity,
+  CHECK_USERNAME_DEBOUNCE_WAIT
 } from 'tracim_frontend_lib'
 import { putUserUsername } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -37,6 +40,10 @@ export class CardPopupUsername extends React.Component {
       usernameInvalidMsg: '',
       shouldDisplay: true
     }
+  }
+
+  componentWillUnmount () {
+    this.debouncedCheckUsername.cancel()
   }
 
   handleClickCloseUsernamePopup = () => {
@@ -90,7 +97,24 @@ export class CardPopupUsername extends React.Component {
     this.handleClickCloseUsernamePopup()
   }
 
-  handleChangeNewUsername = async e => {
+  checkUsername = async () => {
+    const { props, state } = this
+
+    if (!state.newUsername) {
+      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
+      return
+    }
+
+    try {
+      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, state.newUsername, props))
+    } catch (errorWhileChecking) {
+      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
+    }
+  }
+
+  debouncedCheckUsername = debounce(this.checkUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
+
+  handleChangeNewUsername = e => {
     const username = e.target.value
     this.setState({ newUsername: username })
     this.debouncedCheckUsername()
@@ -138,25 +162,25 @@ export class CardPopupUsername extends React.Component {
             className='homepage__usernamePopup__body__input form-control'
             type='text'
             placeholder={props.t('Your username')}
-            value={this.state.newUsername}
+            value={state.newUsername}
             onChange={this.handleChangeNewUsername}
             data-cy='usernamePopup_username'
           />
 
-          {!this.state.isUsernameValid && (
+          {!state.isUsernameValid && (
             <div className='homepage__usernamePopup__errorMsg'>
               <i className='homepage__usernamePopup__errorIcon fas fa-times' />
-              {this.state.usernameInvalidMsg}
+              {state.usernameInvalidMsg}
             </div>
           )}
 
-          {this.state.isUsernameValid && (
+          {state.isUsernameValid && (
             <div className='homepage__usernamePopup__infoMsg'>
               {props.t('Allowed characters: {{allowedCharactersUsername}}', { allowedCharactersUsername: ALLOWED_CHARACTERS_USERNAME })}
             </div>
           )}
 
-          {this.state.newUsername !== '' && (
+          {state.newUsername !== '' && (
             <>
               <div className='homepage__usernamePopup__body__msg'>
                 {props.t('Please confirm your password:')}
@@ -166,14 +190,14 @@ export class CardPopupUsername extends React.Component {
                 className='homepage__usernamePopup__body__input form-control'
                 type='password'
                 placeholder={props.t('Password')}
-                value={this.state.password}
+                value={state.password}
                 onChange={this.handleChangePassword}
                 data-cy='usernamePopup_password'
               />
             </>
           )}
 
-          {this.state.newUsername === '' && (
+          {state.newUsername === '' && (
             <div>
               <div className='homepage__usernamePopup__body__checkbox'>
                 <input

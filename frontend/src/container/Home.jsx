@@ -1,22 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import debounce from 'lodash/debounce'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import appFactory from '../util/appFactory.js'
 
 import {
-  workspaceConfig,
-  FETCH_CONFIG
+  workspaceConfig
 } from '../util/helper.js'
 import {
   CUSTOM_EVENT,
   TracimComponent,
-  checkUsernameValidity,
-  CHECK_USERNAME_DEBOUNCE_WAIT,
   PAGE
 } from 'tracim_frontend_lib'
-import { newFlashMessage, setHeadTitle } from '../action-creator.sync.js'
+import { setHeadTitle } from '../action-creator.sync.js'
 import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
@@ -64,32 +60,11 @@ export class Home extends React.Component {
     this.setHeadTitle()
   }
 
-  componentWillUnmount () {
-    this.debouncedCheckUsername.cancel()
-  }
-
   setHeadTitle = () => {
     const { props } = this
 
     props.dispatch(setHeadTitle(props.t('Home')))
   }
-
-  checkUsername = async () => {
-    const { props, state } = this
-
-    if (!state.newUsername) {
-      this.setState({ isUsernameValid: true, usernameInvalidMsg: '' })
-      return
-    }
-
-    try {
-      this.setState(await checkUsernameValidity(FETCH_CONFIG.apiUrl, state.newUsername, props))
-    } catch (errorWhileChecking) {
-      props.dispatch(newFlashMessage(errorWhileChecking.message, 'warning'))
-    }
-  }
-
-  debouncedCheckUsername = debounce(this.checkUsername, CHECK_USERNAME_DEBOUNCE_WAIT)
 
   render () {
     const { props } = this

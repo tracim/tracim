@@ -1,6 +1,3 @@
-/*
-FIXME - RJ - 2020-10-26 - tests in this file are unstable and will be fixed in https://github.com/tracim/tracim/issues/3483
-
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
@@ -55,16 +52,16 @@ describe('Login', function () {
 
   describe('if username is null', function () {
     beforeEach(() => {
-      cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('input[type=text]')
+      cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+        .find('input[type=email]')
         .type(userWithoutUsername.email)
 
-      cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
         .find('input[type=password]')
         .type(userWithoutUsername.password)
 
-      cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('.loginpage__card__form__btnsubmit')
+      cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+        .find('.loginpage__main__form__btnsubmit')
         .click()
     })
 
@@ -98,6 +95,7 @@ describe('Login', function () {
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(newUsername)
       cy.get(confirmButton).click()
+      cy.get('.flashmessage__container__content__text__title').contains('Error').should('not.exist')
       cy.get('.flashmessage').contains('Invalid password')
     })
 
@@ -105,6 +103,7 @@ describe('Login', function () {
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).click()
+      cy.get('.flashmessage__container__content__text__title').contains('Error').should('not.exist')
       cy.get('.flashmessage').contains('Your username has been set')
     })
 
@@ -116,16 +115,16 @@ describe('Login', function () {
         cy.logout()
         cy.visitPage({ pageName: p.LOGIN, params: { loginParam: '' } })
 
-        cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-          .find('input[type=text]')
+        cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+          .find('input[type=email]')
           .type(userWithoutUsername.email)
 
-        cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+        cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
           .find('input[type=password]')
           .type(userWithoutUsername.password)
 
-        cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-          .find('.loginpage__card__form__btnsubmit')
+        cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+          .find('.loginpage__main__form__btnsubmit')
           .click()
 
         cy.get(usernamePopup).should('not.be.visible')
@@ -135,22 +134,20 @@ describe('Login', function () {
 
   describe('if username is not null', function () {
     beforeEach(() => {
-      cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('input[type=text]')
+      cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+        .find('input[type=email]')
         .type(userWithUsernameEmail)
 
-      cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
+      cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
         .find('input[type=password]')
         .type(userWithUsernamePassword)
 
-      cy.getTag({ selectorName: s.LOGIN_PAGE_CARD })
-        .find('.loginpage__card__form__btnsubmit')
+      cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
+        .find('.loginpage__main__form__btnsubmit')
         .click()
     })
     it('should not open the set username popup', function () {
-      this.skip() // FIXME - GB - 2020-09-09 - this test is unstable and it will be fixed at https://github.com/tracim/tracim/issues/3483
       cy.get(usernamePopup).should('not.be.visible')
     })
   })
 })
-*/
