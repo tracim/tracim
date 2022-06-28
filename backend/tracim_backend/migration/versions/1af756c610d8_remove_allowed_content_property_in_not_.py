@@ -27,7 +27,7 @@ from sqlalchemy import Unicode
 
 # revision identifiers, used by Alembic.
 revision = "622464216ab7"
-down_revision = "8cd1d967d000"
+down_revision = "0c494b0934df"
 
 
 metadata = MetaData()
