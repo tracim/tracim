@@ -23,14 +23,6 @@ export class Home extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = {
-      hidePopupCheckbox: false,
-      newUsername: '',
-      isUsernameValid: true,
-      password: '',
-      usernameInvalidMsg: ''
-    }
-
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
