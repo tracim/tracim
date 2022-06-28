@@ -19,13 +19,14 @@
     & > textarea
       border-radius standardBorderRadius
       border borderStyle
+      padding textSpacing
     &Button
       align-self flex-end
       margin-bottom standardSpacing
   &Item
     display flex
     background-color offWhite
-    height headerHeight
+    min-height headerHeight
     justify-content flex-start
     align-content center
     align-items center
@@ -41,11 +42,11 @@
       outline none
     &__content
       flex 1
-      display flex
-      overflow-wrap anywhere
       align-items baseline
+      overflow hidden
+      text-overflow ellipsis
       & strong
-        margin textSpacing
+        margin-right textSpacing
     &Checked
       color lightDarkGrey
       & > button

@@ -464,7 +464,10 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author" ?
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
-    owner = relationship("User", remote_side=[User.user_id])
+    owner = relationship("User", foreign_keys=[owner_id], remote_side=[User.user_id])
+
+    assignee_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+    assignee = relationship("User", foreign_keys=[assignee_id], remote_side=[User.user_id])
 
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
@@ -513,6 +516,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
         # db_column
+        "assignee_id",
         "content_id",
         "content_namespace",
         "created",
@@ -534,6 +538,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         "updated",
         "workspace_id",
         # object
+        "assignee",
         "owner",
         "parent",
         "workspace",
@@ -712,6 +717,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
 
 # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
 Index("idx__content_revisions__owner_id", ContentRevisionRO.owner_id)
+Index("idx__content_revisions__assignee_id", ContentRevisionRO.assignee_id)
 Index("idx__content_revisions__parent_id", ContentRevisionRO.parent_id)
 # INFO - G.M - 2020-04-02 - Theses index may have different name in mysql
 # this is due to the fact, we do not remove automatically created index by mysql
@@ -829,6 +835,18 @@ class Content(DeclarativeBase):
     @owner_id.expression
     def owner_id(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.owner_id
+
+    @hybrid_property
+    def assignee_id(self) -> int:
+        return self.revision.assignee_id
+
+    @assignee_id.setter
+    def assignee_id(self, value: int) -> None:
+        self.revision.assignee_id = value
+
+    @assignee_id.expression
+    def assignee_id(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.assignee_id
 
     @hybrid_property
     def label(self) -> str:

@@ -30,8 +30,6 @@ from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import TODO_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.applications.content_todo.models import Todo
-from tracim_backend.applications.content_todo.models_in_context import TodoInContext
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -50,7 +48,6 @@ from tracim_backend.exceptions import FileSizeOverWorkspaceEmptySpace
 from tracim_backend.exceptions import PreviewDimNotAllowed
 from tracim_backend.exceptions import RevisionDoesNotMatchThisContent
 from tracim_backend.exceptions import SameValueError
-from tracim_backend.exceptions import TodoNotFound
 from tracim_backend.exceptions import UnallowedSubContent
 from tracim_backend.exceptions import WorkspacesDoNotMatch
 from tracim_backend.lib.core.notifications import NotifierFactory
@@ -431,6 +428,16 @@ class ContentApi(object):
 
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
+        if template_id:
+            template = self.get_one(template_id)
+            content = self.copy_as_template(
+                new_content=content,
+                source_content=template,
+                new_parent=parent,
+                new_content_namespace=content_namespace,
+            )
+        else:
+            content.revision_type = ActionDescription.CREATION
 
         if label:
             file_extension = ""
@@ -459,48 +466,26 @@ class ContentApi(object):
                 )
         if self._user:
             content.owner = self._user
-        content.parent = parent
 
+        content.parent = parent
         content.workspace = workspace
         content.type = content_type.slug
         content.is_temporary = is_temporary
-        content.revision_type = ActionDescription.CREATION
         content.content_namespace = content_namespace
-
-        if template_id:
-            template = self.get_one(template_id)
-
-            if label:
-                content = self.copy(
-                    template,
-                    new_label=label,
-                    new_workspace=workspace,
-                    copy_revision=False,
-                    do_save=False,
-                )
-            elif filename:
-                content = self.copy(
-                    template,
-                    new_label=filename,
-                    new_workspace=workspace,
-                    copy_revision=False,
-                    do_save=False,
-                )
 
         if do_save:
             self._session.add(content)
-            self.save(content, ActionDescription.CREATION, do_notify=do_notify)
-
-            if template_id:
-                tag_lib = TagLib(self._session)
-                tags_values = tag_lib.get_all(content_id=template_id)
-
-                for tag in tags_values:
-                    tag_lib.add_tag_to_content(
-                        user=self._user, content=content, tag_name=tag.tag_name
-                    )
+            self.save(content, content.revision_type, do_notify=do_notify)
 
         return content
+
+    def copy_tags(self, destination: Content, source_content_id: int,) -> None:
+        """Create extra data for templates: tags"""
+        tag_lib = TagLib(self._session)
+        tags_values = tag_lib.get_all(content_id=source_content_id)
+
+        for tag in tags_values:
+            tag_lib.add_tag_to_content(user=self._user, content=destination, tag_name=tag.tag_name)
 
     def create_comment(
         self,
@@ -1378,7 +1363,7 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        copy_result = self._copy(item, content_namespace, parent, copy_revision)
+        copy_result = self._copy(item, content_namespace, parent)
         copy_result = self._add_copy_revisions(
             original_content=item,
             new_content=copy_result.new_content,
@@ -1394,12 +1379,30 @@ class ContentApi(object):
         )
         return copy_result.new_content
 
+    def copy_as_template(
+        self,
+        new_content: Content,
+        source_content: Content,
+        new_parent: Content,
+        new_content_namespace: ContentNamespaces = None,
+    ) -> Content:
+        cpy_rev = ContentRevisionRO.copy(
+            revision=source_content.last_revision,
+            parent=new_parent,
+            new_content_namespace=new_content_namespace,
+            copy_as_template=True,
+        )
+        cpy_rev.properties = {}
+        cpy_rev.node = new_content
+        new_content.current_revision = cpy_rev
+        self._flag_revision_as_copy(new_content, source_content)
+        return new_content
+
     def _copy(
         self,
         content: Content,
         new_content_namespace: ContentNamespaces = None,
         new_parent: Content = None,
-        copy_revisions: bool = True,
     ) -> AddCopyRevisionsResult:
         """
         Create new content for content and his children, recreate all revision in order and
@@ -1418,35 +1421,24 @@ class ContentApi(object):
         # revision related to old data. key of dict is original content id.
         original_content_children = {}  # type: typing.Dict[int,Content]
 
-        if copy_revisions:
-            for rev, is_current_rev in content.get_tree_revisions_advanced():
+        for rev, is_current_rev in content.get_tree_revisions_advanced():
 
-                if rev.content_id == content.content_id:
-                    related_content = new_content  # type: Content
-                    related_parent = new_parent
+            if rev.content_id == content.content_id:
+                related_content = new_content  # type: Content
+                related_parent = new_parent
+            else:
+                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+                # we create it.
+                if rev.content_id not in new_content_children:
+                    new_content_children[rev.content_id] = Content()
+                    original_content_children[rev.content_id] = rev.node
+                related_content = new_content_children[rev.content_id]
+                if rev.parent_id == content.content_id:
+                    related_parent = new_content
                 else:
-                    # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
-                    # we create it.
-                    if rev.content_id not in new_content_children:
-                        new_content_children[rev.content_id] = Content()
-                        original_content_children[rev.content_id] = rev.node
-                    related_content = new_content_children[rev.content_id]
-                    if rev.parent_id == content.content_id:
-                        related_parent = new_content
-                    else:
-                        related_parent = new_content_children[rev.parent_id]
-                # INFO - G.M - 2019-04-30 - copy of revision itself.
-                cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
-                cpy_rev.node = related_content
-                related_content.current_revision = cpy_rev
-                self._session.add(related_content)
-                self._session.flush()
-        else:
-            related_content = new_content
-            related_parent = new_parent
-            cpy_rev = ContentRevisionRO.copy(
-                content.last_revision, related_parent, new_content_namespace, not copy_revisions
-            )
+                    related_parent = new_content_children[rev.parent_id]
+            # INFO - G.M - 2019-04-30 - copy of revision itself.
+            cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
             cpy_rev.node = related_content
             related_content.current_revision = cpy_rev
             self._session.add(related_content)
@@ -1457,6 +1449,18 @@ class ContentApi(object):
             new_children_dict=new_content_children,
             original_children_dict=original_content_children,
         )
+
+    def _flag_revision_as_copy(
+        self, content: ContentRevisionRO, original_content: Content,
+    ):
+        properties = content.properties.copy()
+        properties["origin"] = {
+            "content": original_content.id,
+            "revision": original_content.last_revision.revision_id,
+        }
+        content.revision_type = ActionDescription.COPY
+        content.properties = properties
+        return content
 
     def _add_copy_revisions(
         self,
@@ -1495,13 +1499,7 @@ class ContentApi(object):
                 force_create_new_revision=True,
             ) as rev:
                 rev.workspace = new_workspace
-                rev.revision_type = ActionDescription.COPY
-                properties = rev.properties.copy()
-                properties["origin"] = {
-                    "content": original_child.id,
-                    "revision": original_child.last_revision.revision_id,
-                }
-                rev.properties = properties
+                self._flag_revision_as_copy(content=rev, original_content=original_child)
             self.save(new_child, ActionDescription.COPY, do_notify=False)
         with new_revision(
             session=self._session,
@@ -1516,13 +1514,7 @@ class ContentApi(object):
             rev.label = new_label
             rev.file_extension = new_file_extension
             rev.content_namespace = new_content_namespace
-            rev.revision_type = ActionDescription.COPY
-            properties = rev.properties.copy()
-            properties["origin"] = {
-                "content": original_content.id,
-                "revision": original_content.last_revision.revision_id,
-            }
-            rev.properties = properties
+            self._flag_revision_as_copy(content=rev, original_content=original_content)
         if do_save:
             self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
         return AddCopyRevisionsResult(
@@ -2230,77 +2222,15 @@ class ContentApi(object):
 
     def create_todo(
         self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
-    ) -> Todo:
+    ) -> Content:
         item = self.create(
             content_type_slug=content_type_list.Todo.slug,
             workspace=parent.workspace,
             parent=parent,
         )
         item.raw_content = raw_content
+        item.assignee_id = assignee.user_id
         self._session.add(item)
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 
-        todo = Todo()
-        todo.assignee_id = assignee.user_id
-        todo.content_id = item.content_id
-
-        self._session.add(todo)
-        self._session.flush()
-
-        return todo
-
-    def get_todo(self, todo_id: int) -> Todo:
-        try:
-            return self._session.query(Todo).filter(Todo.todo_id == todo_id).one()
-        except TodoNotFound:
-            raise TodoNotFound("Todo {} was not found".format(todo_id))
-
-    def get_all_todos(self) -> typing.List[Todo]:
-        """
-        Return every todos in the database, with the limitation
-        of the content API.
-        :return: List of todos
-        """
-        contents = self.get_all(content_type=content_type_list.Todo.slug,)
-
-        todos = []
-        for content in contents:
-            todos.extend(self.get_all_todos_for_content_id(content.content_id))
-
-        return todos
-
-    def get_all_todos_for_content_id(self, content_id: int) -> typing.List[Todo]:
-        """
-        Return every todos in the database, with the limitation
-        of the content API.
-        :param content_id: Content id
-        :return: List of todos
-        """
-
-        base_query = self._base_query()
-        todo_contents = base_query.filter(
-            and_(
-                Content.parent_id == content_id,
-                Content.type == content_type_list.Todo.slug,
-                Content.is_deleted.is_(False),
-                Content.is_archived.is_(False),
-            ),
-        ).all()
-
-        todo_contents_ids = [content.id for content in todo_contents]
-        todos = self._session.query(Todo).filter(Todo.content_id.in_(todo_contents_ids)).all()
-
-        return todos
-
-    def get_todo_in_context(self, todo: Todo) -> TodoInContext:
-        """
-        Transform a Todo object into a TodoInContext object
-        :param todo: Todo object
-        :return: TodoInContext object
-        """
-        return TodoInContext(todo, self._session, self._config, self._user)
-
-    def remove_todo(self, todo: Todo, do_save: bool = True) -> None:
-        self._session.query(Todo).filter(Todo.todo_id == todo.todo_id).delete()
-        if do_save:
-            self._session.flush()
+        return item
