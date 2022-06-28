@@ -871,6 +871,7 @@ class ContentApi(object):
         ] = None,
         complete_path_to_id: typing.Optional[int] = None,
         user: typing.Optional[User] = None,
+        assignee_id: typing.Optional[int] = None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -882,6 +883,8 @@ class ContentApi(object):
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
+        :param user: user owner of the contents
+        :param assignee_id: assignee of the contents
         :return: Query object
         """
         order_by_properties = order_by_properties or []  # FDV
@@ -946,6 +949,9 @@ class ContentApi(object):
                 .limit(1)
             )
             query = query.filter(or_(Content.owner == user, user.user_id == author_id_query))
+
+        if assignee_id:
+            query = query.filter(Content.assignee_id == assignee_id)
 
         for _property in order_by_properties:
             query = query.order_by(_property)

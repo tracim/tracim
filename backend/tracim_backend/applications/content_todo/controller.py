@@ -21,6 +21,7 @@ from tracim_backend.lib.utils.authorization import can_edit_todo
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
@@ -29,6 +30,7 @@ from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -39,6 +41,34 @@ SWAGGER_TAG__CONTENT_TODO_ENDPOINTS = generate_documentation_swagger_tag(
 
 
 class TodoController(Controller):
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
+    @check_right(is_user)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(ContentSchema(many=True))
+    def get_user_todos(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[ContentInContext]:
+        """
+        Get every todos related to a user
+        user_id: user is that we want to fetch the todos
+        """
+
+        app_config = request.registry.settings["CFG"]
+
+        content_api = ContentApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config,
+        )
+
+        todos = content_api.get_all_query(
+            content_type_slug=content_type_list.Todo.slug, assignee_id=hapic_data.path["user_id"]
+        )
+
+        todos_in_context = []
+        for todo in todos:
+            todos_in_context.append(content_api.get_content_in_context(todo))
+
+        return todos_in_context
+
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_reader)
@@ -191,6 +221,12 @@ class TodoController(Controller):
             content_api.delete(todo_content)
 
     def bind(self, configurator: Configurator):
+        # Get every todos of a user
+        configurator.add_route(
+            "user_todos", "/users/{user_id}/todos", request_method="GET",
+        )
+        configurator.add_view(self.get_user_todos, route_name="user_todos")
+
         # Get every todos of a content
         configurator.add_route(
             "todos", "/workspaces/{workspace_id}/contents/{content_id}/todos", request_method="GET",
