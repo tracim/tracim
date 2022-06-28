@@ -2,6 +2,7 @@ import {
   ADD,
   REMOVE,
   SET,
+  SPACE_ID_MEMBER_LIST,
   UPDATE,
   USER_WORKSPACE_DO_NOTIFY,
   WORKSPACE_LIST,
@@ -106,6 +107,16 @@ export function workspaceList (state = [], action, lang) {
           memberList: ws.memberList.filter(m => m.id !== action.memberId)
         }
         : ws
+      )
+
+    case `${SET}/${SPACE_ID_MEMBER_LIST}`:
+      if (!state.some(space => space.id === action.workspaceId)) return state
+      return state.map(space => space.id === action.workspaceId
+        ? {
+          ...space,
+          memberList: action.spaceMemberList
+        }
+        : space
       )
 
     case `${UPDATE}/${WORKSPACE_DETAIL}`:

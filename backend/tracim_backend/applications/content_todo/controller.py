@@ -28,6 +28,7 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import ContentSchema
+from tracim_backend.views.core_api.schemas import MessageTodoSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
@@ -44,7 +45,7 @@ class TodoController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
     @check_right(is_user)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(ContentSchema(many=True))
+    @hapic.output_body(MessageTodoSchema(many=True))
     def get_user_todos(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[ContentInContext]:

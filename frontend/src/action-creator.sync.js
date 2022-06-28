@@ -97,6 +97,8 @@ export const USER_WORKSPACE_LIST = `${USER}/${WORKSPACE_LIST}`
 
 export const WORKSPACE_LIST_MEMBER = `${WORKSPACE_LIST}/Member/List`
 export const setWorkspaceListMemberList = workspaceListMemberList => ({ type: `${SET}/${WORKSPACE_LIST_MEMBER}`, workspaceListMemberList })
+export const SPACE_ID_MEMBER_LIST = `${WORKSPACE}_id/Member/List`
+export const setSpaceMemberList = (spaceId, spaceMemberList) => ({ type: `${SET}/${SPACE_ID_MEMBER_LIST}`, spaceId, spaceMemberList})
 
 // workspace related const below is for currentWorkspace
 export const WORKSPACE_DETAIL = `${WORKSPACE}/Detail`

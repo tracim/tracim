@@ -7,6 +7,8 @@ import {
   buildHeadTitle,
   deleteToDo,
   getToDo,
+  getToDoListForUser,
+  getWorkspaceMemberList,
   handleFetchResult,
   PAGE,
   PageContent,
@@ -33,7 +35,7 @@ const ToDo = props => {
   useEffect(() => {
     setHeadTitleToDo()
     buildBreadcrumbs()
-    // getAllToDosFromAnUser
+    getAllToDosForAnUser()
   }, [props.user.userId])
 
   useEffect(() => {
@@ -56,6 +58,26 @@ const ToDo = props => {
       label: props.t('To Do'),
       isALink: true
     }]))
+  }
+
+  const getAllToDosForAnUser = async () => {
+    const fetchGetTodo = await handleFetchResult(await getToDoListForUser(
+      FETCH_CONFIG.apiUrl,
+      props.user.userId
+    ))
+
+    const result = []
+
+    for (const todo of fetchGetTodo.body) {
+      const space = props.workspaceList.find(space => space.id === todo.workspace_id)
+
+      result.push({
+        ...todo,
+        workspace: space
+      })
+    }
+
+    setToDoList(sortContentByStatus(result))
   }
 
   const handleToDoCreated = async data => {
@@ -159,17 +181,25 @@ const ToDo = props => {
           </div>
 
           <div className='toDo__item'>
-            {toDoList.map(toDo =>
-              <ToDoItem
-                isDeletable
-                isEditable
-                key={toDo.content_id}
-                onClickChangeStatusToDo={handleChangeStatusToDo}
-                onClickDeleteToDo={handleDeleteToDo}
-                showDetail
-                toDo={toDo}
-                username={props.user.username}
-              />
+            {toDoList.map(toDo => {
+              return (
+                <div
+                  key={`todo_id_div__${toDo.content_id}`}
+                >
+                  <div>{toDo.content_id}</div>
+                  <ToDoItem
+                    isDeletable
+                    isEditable
+                    key={`todo_id__${toDo.content_id}`}
+                    onClickChangeStatusToDo={handleChangeStatusToDo}
+                    onClickDeleteToDo={handleDeleteToDo}
+                    showDetail
+                    toDo={toDo}
+                    username={props.user.username}
+                  />
+                </div>
+              )
+            }
             )}
           </div>
         </PageContent>
@@ -178,5 +208,5 @@ const ToDo = props => {
   )
 }
 
-const mapStateToProps = ({ breadcrumbs, user }) => ({ breadcrumbs, user })
+const mapStateToProps = ({ breadcrumbs, user, workspaceList }) => ({ breadcrumbs, user, workspaceList })
 export default connect(mapStateToProps)(translate()(TracimComponent(ToDo)))

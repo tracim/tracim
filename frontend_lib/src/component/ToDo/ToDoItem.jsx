@@ -50,10 +50,10 @@ const ToDoItem = props => {
             {props.toDo.author.public_name}
           </div>
           <div className='toDoItem__path'>
-            {`${props.toDo.workspace.label} > ${props.toDo.content.parent_label}`}
+            {props.toDo.workspace.label}
           </div>
           <div className='toDoItem__created'>
-            {props.toDo.content.created}
+            {props.toDo.created}
           </div>
         </>
       )}
