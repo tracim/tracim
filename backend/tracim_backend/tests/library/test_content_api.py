@@ -18,6 +18,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import eq_
 
@@ -48,6 +49,81 @@ class TestContentApi(object):
             do_save=True,
         )
         assert isinstance(item, Content)
+
+    def test_unit__create_content_from_template__OK_nominal_case(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        template_workspace = workspace_api_factory.get(user).create_workspace(
+            "template_workspace", save_now=True
+        )
+        workspace = workspace_api_factory.get(admin_user).create_workspace(
+            "template_workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
+            admin_user, template_workspace, WorkspaceRoles.CONTRIBUTOR.level, False
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        folder = api.create(
+            content_type_slug="folder",
+            workspace=template_workspace,
+            parent=None,
+            label="template directory",
+            do_save=True,
+        )
+        template = api.create(
+            content_type_slug="html-document",
+            workspace=template_workspace,
+            parent=folder,
+            label="REPORT: ",
+            do_save=True,
+        )
+        with new_revision(session, transaction.manager, content=template):
+            api.update_content(template, "REPORT: UPDATED", new_description="Template description")
+            api.save(
+                content=template, action_description=ActionDescription.EDITION, do_notify=False
+            )
+        transaction.commit()
+        api = ContentApi(current_user=admin_user, session=session, config=app_config)
+        with session.no_autoflush:
+            new_content = api.create(
+                content_type_slug="html-document",
+                workspace=workspace,
+                template_id=template.content_id,
+                parent=None,
+                label="REPORT: OK",
+                do_save=True,
+            )
+        assert new_content
+        assert len(new_content.revisions) == 1
+        assert new_content.description == template.description
+        assert new_content.workspace_id == workspace.workspace_id
+        assert new_content.parent is None
+        assert new_content.label == "REPORT: OK"
+        assert new_content.content_id != template.content_id
+        assert new_content.properties == {
+            "allowed_content": {
+                "thread": True,
+                "file": True,
+                "html-document": True,
+                "folder": True,
+                "comment": True,
+            },
+            "origin": {"content": 2, "revision": 3},
+        }
+        assert new_content.owner == admin_user
+        assert template.owner == user
+        assert new_content.revision_type == ActionDescription.COPY
+        assert template.revision_type == ActionDescription.EDITION
 
     def test_unit__create_content__err_empty_label(
         self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
