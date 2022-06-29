@@ -1128,6 +1128,18 @@ class Content(DeclarativeBase):
     def owner(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.owner
 
+    @hybrid_property
+    def assignee(self) -> User:
+        return self.revision.assignee
+
+    @assignee.setter
+    def assignee(self, value: User) -> None:
+        self.revision.assignee = value
+
+    @assignee.expression
+    def assignee(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.assignee
+
     @property
     def children(self) -> List["Content"]:
         return (

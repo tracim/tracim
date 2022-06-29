@@ -1810,6 +1810,24 @@ class ContentSchema(MessageContentSchema):
     )
 
 
+class ToDoSchema(marshmallow.Schema):
+    author = marshmallow.fields.Nested(UserDigestSchema())
+    assignee = marshmallow.fields.Nested(UserDigestSchema())
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    parent = marshmallow.fields.Nested(ContentMinimalSchema())
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema())
+    status = StrippedString(
+        example="closed-deprecated",
+        validate=content_status_validator,
+        description="this slug is found in content_type available statuses",
+        default=open_status,
+    )
+
+
 class PreviewInfoSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     revision_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)

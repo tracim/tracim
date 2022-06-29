@@ -27,9 +27,9 @@ from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
 from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
-from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import ToDoSchema
 from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
@@ -44,7 +44,7 @@ class TodoController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
     @check_right(is_user)
     @hapic.input_path(UserIdPathSchema())
-    @hapic.output_body(ContentSchema(many=True))
+    @hapic.output_body(ToDoSchema(many=True))
     def get_user_todos(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[ContentInContext]:
@@ -73,7 +73,7 @@ class TodoController(Controller):
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_reader)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(ContentSchema(many=True))
+    @hapic.output_body(ToDoSchema(many=True))
     def get_todos(
         self, context, request: TracimRequest, hapic_data=None
     ) -> typing.List[ContentInContext]:
@@ -102,7 +102,7 @@ class TodoController(Controller):
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_reader)
     @hapic.input_path(TodoPathSchema())
-    @hapic.output_body(ContentSchema())
+    @hapic.output_body(ToDoSchema())
     def get_todo(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get a todo
@@ -126,7 +126,7 @@ class TodoController(Controller):
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetTodoSchema())
-    @hapic.output_body(ContentSchema())
+    @hapic.output_body(ToDoSchema())
     def create_todo(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Create a todo
