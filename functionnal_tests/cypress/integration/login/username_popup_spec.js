@@ -95,7 +95,7 @@ describe('Login', function () {
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(newUsername)
       cy.get(confirmButton).click()
-      cy.get('.flashmessage__container__content__text__title').contains('Error').should('not.exist')
+      cy.contains('.flashmessage__container__content__text__title', 'Error').should('not.exist')
       cy.get('.flashmessage').contains('Invalid password')
     })
 
@@ -103,7 +103,7 @@ describe('Login', function () {
       cy.get(usernameInput).type(newUsername)
       cy.get(passwordInput).type(userWithoutUsername.password)
       cy.get(confirmButton).click()
-      cy.get('.flashmessage__container__content__text__title').contains('Error').should('not.exist')
+      cy.contains('.flashmessage__container__content__text__title', 'Error').should('not.exist')
       cy.get('.flashmessage').contains('Your username has been set')
     })
 
