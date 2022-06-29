@@ -1814,6 +1814,9 @@ class ToDoSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema())
     assignee = marshmallow.fields.Nested(UserDigestSchema())
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Content creation date"
+    )
     parent = marshmallow.fields.Nested(ContentMinimalSchema())
     raw_content = StrippedString(
         required=True,

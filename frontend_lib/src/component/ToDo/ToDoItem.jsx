@@ -15,7 +15,7 @@ import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigati
 
 export const isEditable = (toDo, user, userRoleId) => {
   const isAuthor = toDo.author.user_id === user.userId
-  const isAssignee = toDo.assignee_id === user.userId
+  const isAssignee = toDo.assignee.user_id  === user.userId
   const isSpaceManager = userRoleId === ROLE.workspaceManager.id
   const isContentManager = userRoleId === ROLE.contentManager.id
   return isAuthor || isAssignee || isSpaceManager || isContentManager
@@ -31,7 +31,7 @@ export const isDeletable = (toDo, user, userRoleId) => {
 const ToDoItem = props => {
   const username = props.username
     ? props.username
-    : (props.memberList.find(member => member.id === props.toDo.assignee_id) || { username: '' }).username
+    : (props.memberList.find(member => member.id === props.toDo.assignee.user_id) || { username: '' }).username
   const isToDoChecked = props.toDo.status !== STATUSES.OPEN
 
   return (
@@ -67,15 +67,15 @@ const ToDoItem = props => {
           <div className='toDoItem__path'>
             <Breadcrumbs
               breadcrumbsList={[{
-                link: PAGE.WORKSPACE.DASHBOARD(props.toDo.workspace_id),
+                link: PAGE.WORKSPACE.DASHBOARD(props.toDo.workspace.workspace_id),
                 label: props.toDo.workspace.label,
                 type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
                 isALink: true
-                // }, {
-                //   link: PAGE.CONTENT(props.toDo.content.parent_id),
-                //   label: props.toDo.content.parent_label,
-                //   type: BREADCRUMBS_TYPE.APP_FEATURE,
-                //   isALink: true
+                }, {
+                  link: PAGE.CONTENT(props.toDo.parent.content_id),
+                  label: props.toDo.parent.label,
+                  type: BREADCRUMBS_TYPE.APP_FEATURE,
+                  isALink: true
               }]}
               keepLastBreadcrumbAsLink
             />

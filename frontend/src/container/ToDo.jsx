@@ -65,30 +65,18 @@ const ToDo = props => {
       props.user.userId
     ))
 
-    const newToDoList = []
-
-    for (const toDo of fetchGetToDo.body) {
-      const space = props.workspaceList.find(space => space.id === toDo.workspace_id)
-
-      newToDoList.push({
-        ...toDo,
-        workspace: space
-      })
-    }
-
-    setToDoList(sortContentByStatus(newToDoList))
+    if (fetchGetToDo.apiResponse.status === 200) {
+      setToDoList(sortContentByStatus(fetchGetToDo.body))
+    } else props.dispatch(newFlashMessage(props.t('Error while loading to do list')))
   }
 
   const handleToDoCreated = async data => {
-    if (
-      data.fields.content.assignee_id !== props.user.userId ||
-      data.fields.author.user_id === props.user.userId
-    ) return
+    if (data.fields.content.assignee.user_id !== props.user.userId) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       FETCH_CONFIG.apiUrl,
       data.fields.workspace.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
@@ -96,31 +84,31 @@ const ToDo = props => {
   }
 
   const handleToDoChanged = async data => {
-    if (
-      data.fields.content.assignee_id !== props.user.userId ||
-      data.fields.author.user_id === props.user.userId
-    ) return
+    if (data.fields.content.assignee.user_id !== props.user.userId) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       FETCH_CONFIG.apiUrl,
       data.fields.workspace.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
-
-    setToDoList(toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo))
+    setToDoList(uniqBy(
+      toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    ), 'content_id')
   }
 
   const handleToDoDeleted = data => {
-    if (
-      data.fields.content.assignee_id !== props.user.userId ||
-      data.fields.author.user_id === props.user.userId
-    ) return
+    if (data.fields.content.assignee.user_id !== props.user.userId) return
     setToDoList(toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id))
   }
 
   const handleDeleteToDo = async (toDo) => {
-    const response = await handleFetchResult(await deleteToDo(FETCH_CONFIG.apiUrl, toDo.workspace_id, toDo.parent_id, toDo.content_id))
+    const response = await handleFetchResult(await deleteToDo(
+      FETCH_CONFIG.apiUrl,
+      toDo.workspace.id,
+      toDo.parent.content_id,
+      toDo.content_id
+    ))
 
     switch (response.status) {
       case 204:
@@ -136,8 +124,13 @@ const ToDo = props => {
   }
 
   const handleChangeStatusToDo = async (toDo, status) => {
-    console.log('TODO', toDo)
-    const response = await handleFetchResult(await putToDo(FETCH_CONFIG.apiUrl, toDo.workspace_id, toDo.parent_id, toDo.content_id, status))
+    const response = await handleFetchResult(await putToDo(
+      FETCH_CONFIG.apiUrl,
+      toDo.workspace.id,
+      toDo.parent.content_id,
+      toDo.content_id,
+      status
+    ))
 
     switch (response.status) {
       case 204:
@@ -156,7 +149,7 @@ const ToDo = props => {
     <div className='tracim__content-scrollview'>
       <PageWrapper customClass='toDo__wrapper'>
         <PageTitle
-          title={props.t('To do')}
+          title={props.t('To Do')}
           icon='fas fa-check-square'
           breadcrumbsList={props.breadcrumbs}
         />
