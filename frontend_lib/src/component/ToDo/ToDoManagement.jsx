@@ -64,9 +64,9 @@ const ToDoManagement = (props) => {
         <div className='toDoManagement__creation'>
           <div className='toDoManagement__creation__btnSwitch'>
             <BtnSwitch
-              activeLabel='Creation multiple'
+              activeLabel={props.t('Creation multiple')}
               checked={isMultiCreationMode}
-              inactiveLabel='Creation unique'
+              inactiveLabel={props.t('Creation unique')}
               isRightAligned
               onChange={handleBtnSwitchChange}
               smallSize
