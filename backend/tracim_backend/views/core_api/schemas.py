@@ -1943,19 +1943,6 @@ class MessageCommentSchema(marshmallow.Schema):
     )
 
 
-class MessageTodoSchema(marshmallow.Schema):
-    assignee_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    parent_label = String(example="This is a label")
-    status = StrippedString(
-        example="closed-deprecated",
-        validate=content_status_validator,
-        description="this slug is found in content_type available statuses",
-        default=open_status,
-    )
-
-
 class CommentSchema(MessageCommentSchema):
     raw_content = StrippedString(example="<p>This is just an html comment !</p>")
 
