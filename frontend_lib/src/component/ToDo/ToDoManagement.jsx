@@ -76,30 +76,20 @@ const ToDoManagement = (props) => {
           {
             isMultiCreationMode
               ? (
-                <div className='toDoManagement__creation__multiple'>
-                  {
-                    newToDoList.map((toDo, index) => {
-                      return (
-                        <NewToDo
-                          apiUrl={props.apiUrl}
-                          onChangeAssignedId={(e) => handleChangeAssignee(e, index)}
-                          onChangeValue={(e) => handleChangeValue(e, index)}
-                          compactMode
-                          contentId={props.contentId}
-                          customColor={props.customColor}
-                          key={`todoList__${index}`}
-                          memberList={props.memberList}
-                        />
-                      )
-                    })
-                  }
-
-                  <IconButton
-                    icon='fas fa-plus'
-                    onClick={addTodo}
-                    color={props.customColor}
-                  />
-                </div>
+                  newToDoList.map((toDo, index) => {
+                    return (
+                      <NewToDo
+                        apiUrl={props.apiUrl}
+                        onChangeAssignedId={(e) => handleChangeAssignee(e, index)}
+                        onChangeValue={(e) => handleChangeValue(e, index)}
+                        compactMode
+                        contentId={props.contentId}
+                        customColor={props.customColor}
+                        key={`todoList__${index}`}
+                        memberList={props.memberList}
+                      />
+                    )
+                  })
               ) : (
                 <NewToDo
                   apiUrl={props.apiUrl}
@@ -113,24 +103,39 @@ const ToDoManagement = (props) => {
               )
           }
 
-          <div className='toDoManagement__new__buttons'>
-            <IconButton
-              text={props.t('Cancel')}
-              icon='fas fa-times'
-              onClick={handleClickCancel}
-              color={props.customColor}
-              intent='secondary'
-            />
 
-            <IconButton
-              text={props.t('Validate')}
-              icon='fas fa-check'
-              onClick={() => handleClickSaveToDo()}
-              disabled={!newToDoList[0].value}
-              color={props.customColor}
-              intent='primary'
-              mode='light'
-            />
+          <div className='toDoManagement__buttons'>
+
+          {
+            isMultiCreationMode && (
+              <IconButton
+                icon='fas fa-plus'
+                onClick={addTodo}
+                color={props.customColor}
+              />
+            )
+          }
+
+            <div className='toDoManagement__buttons__new'>
+              <IconButton
+                text={props.t('Cancel')}
+                icon='fas fa-times'
+                onClick={handleClickCancel}
+                color={props.customColor}
+                intent='secondary'
+              />
+
+              <IconButton
+                text={props.t('Validate')}
+                icon='fas fa-check'
+                onClick={() => handleClickSaveToDo()}
+                disabled={!newToDoList[0].value}
+                color={props.customColor}
+                intent='primary'
+                mode='light'
+              />
+            </div>
+
           </div>
         </div>
       ) : (
