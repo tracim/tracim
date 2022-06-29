@@ -105,6 +105,12 @@ class DigestComments(InnerDoc):
     raw_content = HtmlText()
 
 
+class DigestTodo(InnerDoc):
+    content_id = Integer()
+    parent_id = Integer()
+    raw_content = HtmlText()
+
+
 class FileData(InnerDoc):
     content = Text(analyzer=folding)
     content_de = Text(analyzer=tracim_german_analyzer)
@@ -162,6 +168,10 @@ class IndexedContent(Document):
     # to search into comments content.
     comments = Nested(DigestComments, include_in_parent=True)
     comment_count = Integer()
+
+    todos = Nested(DigestTodo, include_in_parent=True)
+    todo_count = Integer()
+
     author = Object(DigestUser)
     last_modifier = Object(DigestUser)
 

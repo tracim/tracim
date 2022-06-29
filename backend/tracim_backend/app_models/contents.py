@@ -160,19 +160,30 @@ class ContentTypeInContext(object):
         return self.content_type.file_extension
 
 
-COMMENT_TYPE = "comment"
-FILE_TYPE = "file"
-FOLDER_TYPE = "folder"
-HTML_DOCUMENTS_TYPE = "html-document"
-KANBAN_TYPE = "kanban"
-MARKDOWNPLUSPAGE_TYPE = "markdownpage"
-THREAD_TYPE = "thread"
-TODO_TYPE = "todo"
+class ContentTypeSlug(str, Enum):
+    COMMENT = "comment"
+    FILE = "file"
+    FOLDER = "folder"
+    HTML_DOCUMENTS = "html-document"
+    KANBAN = "kanban"
+    THREAD = "thread"
+    TODO = "todo"
+    ANY = "any"
+
+
+# TODO - G.M - 2022-06-29 - Replace these variable by usage of ContentTypeSlug Enum
+COMMENT_TYPE = ContentTypeSlug.COMMENT.value
+FILE_TYPE = ContentTypeSlug.FILE.value
+FOLDER_TYPE = ContentTypeSlug.FOLDER.value
+HTML_DOCUMENTS_TYPE = ContentTypeSlug.HTML_DOCUMENTS.value
+KANBAN_TYPE = ContentTypeSlug.KANBAN.value
+THREAD_TYPE = ContentTypeSlug.THREAD.value
+TODO_TYPE = ContentTypeSlug.TODO.value
 
 
 # TODO - G.M - 31-05-2018 - Set Better Comment params
 comment_type = TracimContentType(
-    slug=COMMENT_TYPE,
+    slug=ContentTypeSlug.COMMENT.value,
     fa_icon="",
     label="Comment",
     creation_label="Comment",
@@ -185,33 +196,35 @@ class ContentTypeList(object):
     ContentType List
     """
 
-    Any_SLUG = "any"
+    # TODO - G.M - 2022-06-29 - Replace this variable by direct usage of ContentTypeSlug.ANY
+    Any_SLUG = ContentTypeSlug.ANY
+
     Comment = comment_type
 
     @property
     def Folder(self) -> TracimContentType:
-        return self.get_one_by_slug(FOLDER_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.FOLDER.value)
 
     @property
     def File(self) -> TracimContentType:
-        return self.get_one_by_slug(FILE_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.FILE.value)
 
     @property
     def Page(self) -> TracimContentType:
-        return self.get_one_by_slug(HTML_DOCUMENTS_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.HTML_DOCUMENTS.value)
 
     @property
     def Thread(self) -> TracimContentType:
-        return self.get_one_by_slug(THREAD_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.THREAD.value)
 
     @property
     def Todo(self) -> TracimContentType:
-        return self.get_one_by_slug(TODO_TYPE)
+        return self.get_one_by_slug(ContentTypeSlug.TODO.value)
 
     def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
         self._special_contents_types = [self.Comment]
-        self._extra_slugs = [self.Any_SLUG]
+        self._extra_slugs = [ContentTypeSlug.ANY]
 
     @property
     def _content_types(self) -> List[TracimContentType]:
