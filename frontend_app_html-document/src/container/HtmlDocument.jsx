@@ -982,6 +982,7 @@ export class HtmlDocument extends React.Component {
           translationState={state.translationState}
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
           translationTargetLanguageCode={state.translationTargetLanguageCode}
+          showMarkedAsTemplate
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
