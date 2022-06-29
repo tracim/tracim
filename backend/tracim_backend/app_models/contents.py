@@ -224,7 +224,7 @@ class ContentTypeList(object):
     def __init__(self, app_list: typing.List["TracimApplication"]):
         self.app_list = app_list
         self._special_contents_types = [self.Comment]
-        self._extra_slugs = [ContentTypeSlug.ANY]
+        self._extra_slugs = [ContentTypeSlug.ANY.value]
 
     @property
     def _content_types(self) -> List[TracimContentType]:
