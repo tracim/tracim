@@ -21,7 +21,7 @@ const ToDoManagement = (props) => {
       assigneeId: null,
       value: null
     }])
-  }, [isMultiCreationMode])
+  }, [isMultiCreationMode, isNewToDo])
 
   const addTodo = () => {
     const tmpToDoList = [...newToDoList]
@@ -37,7 +37,9 @@ const ToDoManagement = (props) => {
   const handleClickCancel = () => setIsNewToDo(false)
   const handleClickSaveToDo = () => {
     newToDoList.forEach(newToDo => {
-      props.onClickSaveNewToDo(newToDo.assigneeId, newToDo.value)
+      if (newToDo.value) {
+        props.onClickSaveNewToDo(newToDo.assigneeId, newToDo.value)
+      }
     })
     setIsNewToDo(false)
   }
@@ -129,7 +131,6 @@ const ToDoManagement = (props) => {
                 text={props.t('Validate')}
                 icon='fas fa-check'
                 onClick={() => handleClickSaveToDo()}
-                disabled={!newToDoList[0].value}
                 color={props.customColor}
                 intent='primary'
                 mode='light'

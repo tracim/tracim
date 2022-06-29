@@ -15,6 +15,11 @@
       flex-direction column
       margin-top standardSpacing
 
+      & > textarea
+        border borderStyle
+        border-radius standardBorderRadius
+        padding textSpacing
+
     &.compactMode
       flex-direction row
 
@@ -26,16 +31,6 @@
           margin-inline-start standardSpacing
           margin-top unset
 
-    &__buttons
-      display flex
-      justify-content flex-end
-      margin-top standardSpacing
-      & > .iconbutton
-        margin-inline-start standardSpacing
-    & > textarea
-      border-radius standardBorderRadius
-      border borderStyle
-      padding textSpacing
     &Button
       align-self flex-end
       margin-bottom standardSpacing
