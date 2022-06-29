@@ -76,47 +76,43 @@ const ToDoManagement = (props) => {
           </div>
 
           {
-            isMultiCreationMode
-              ? (
-                  newToDoList.map((toDo, index) => {
-                    return (
-                      <NewToDo
-                        apiUrl={props.apiUrl}
-                        onChangeAssignedId={(e) => handleChangeAssignee(e, index)}
-                        onChangeValue={(e) => handleChangeValue(e, index)}
-                        compactMode
-                        contentId={props.contentId}
-                        customColor={props.customColor}
-                        key={`todoList__${index}`}
-                        memberList={props.memberList}
-                      />
-                    )
-                  })
-              ) : (
-                <NewToDo
-                  apiUrl={props.apiUrl}
-                  onChangeAssignedId={(e) => handleChangeAssignee(e, 0)}
-                  onChangeValue={(e) => handleChangeValue(e, 0)}
-                  contentId={props.contentId}
-                  customColor={props.customColor}
-                  key={`todoList__${newToDoList.length}`}
-                  memberList={props.memberList}
-                />
-              )
+            isMultiCreationMode ? (
+              newToDoList.map((toDo, index) => {
+                return (
+                  <NewToDo
+                    apiUrl={props.apiUrl}
+                    onChangeAssignedId={(e) => handleChangeAssignee(e, index)}
+                    onChangeValue={(e) => handleChangeValue(e, index)}
+                    compactMode
+                    contentId={props.contentId}
+                    customColor={props.customColor}
+                    key={`todoList__${index}`}
+                    memberList={props.memberList}
+                  />
+                )
+              })
+            ) : (
+              <NewToDo
+                apiUrl={props.apiUrl}
+                onChangeAssignedId={(e) => handleChangeAssignee(e, 0)}
+                onChangeValue={(e) => handleChangeValue(e, 0)}
+                contentId={props.contentId}
+                customColor={props.customColor}
+                key={`todoList__${newToDoList.length}`}
+                memberList={props.memberList}
+              />
+            )
           }
-
 
           <div className='toDoManagement__buttons'>
 
-          {
-            isMultiCreationMode && (
+            {isMultiCreationMode && (
               <IconButton
                 icon='fas fa-plus'
                 onClick={addTodo}
                 color={props.customColor}
               />
-            )
-          }
+            )}
 
             <div className='toDoManagement__buttons__new'>
               <IconButton
