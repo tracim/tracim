@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import IconButton from '../Button/IconButton.jsx'
@@ -7,29 +7,132 @@ import ToDoItem, {
   isEditable
 } from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
+import { BtnSwitch } from '../Input/BtnSwitch/BtnSwitch.jsx'
 import { ROLE } from '../../helper.js'
 
 const ToDoManagement = (props) => {
   const isReader = props.user.userRoleIdInWorkspace === ROLE.reader.id
   const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
+  const [isMultiCreationMode, setIsMultiCreationMode] = useState(false)
+  const [newToDoList, setnewToDoList] = useState([])
+
+  useEffect(() => {
+    setnewToDoList([{
+      assigneeId: null,
+      value: null
+    }])
+  }, [isMultiCreationMode])
+
+  const addTodo = () => {
+    const tmpToDoList = [...newToDoList]
+    tmpToDoList.push(
+      {
+        assigneeId: null,
+        value: null
+      }
+    )
+    setnewToDoList(tmpToDoList)
+  }
 
   const handleClickCancel = () => setIsNewToDo(false)
-  const handleClickSaveToDo = (assignedUserId, toDo) => {
-    props.onClickSaveNewToDo(assignedUserId, toDo)
+  const handleClickSaveToDo = () => {
+    newToDoList.forEach(newToDo => {
+      props.onClickSaveNewToDo(newToDo.assigneeId, newToDo.value)
+    })
     setIsNewToDo(false)
+  }
+
+  const handleChangeAssignee = (e, index) => {
+    const tmpToDoList = [...newToDoList]
+    tmpToDoList[index].assigneeId = e.value
+    setnewToDoList(tmpToDoList)
+  }
+
+  const handleChangeValue = (e, index) => {
+    const tmpToDoList = [...newToDoList]
+    tmpToDoList[index].value = e.target.value
+    setnewToDoList(tmpToDoList)
+  }
+
+  const handleBtnSwitchChange = (event) => {
+    setIsMultiCreationMode(!isMultiCreationMode)
   }
 
   return (
     isNewToDo
       ? (
-        <NewToDo
-          apiUrl={props.apiUrl}
-          contentId={props.contentId}
-          customColor={props.customColor}
-          memberList={props.memberList}
-          onClickCancel={handleClickCancel}
-          onClickSaveNewToDo={handleClickSaveToDo}
-        />
+        <div className='toDoManagement__creation'>
+          <div className='toDoManagement__creation__btnSwitch'>
+            <BtnSwitch
+              activeLabel='Creation multiple'
+              checked={isMultiCreationMode}
+              inactiveLabel='Creation unique'
+              isRightAligned
+              onChange={handleBtnSwitchChange}
+              smallSize
+            />
+          </div>
+
+          {
+            isMultiCreationMode
+              ? (
+                <div className='toDoManagement__creation__multiple'>
+                  {
+                    newToDoList.map((toDo, index) => {
+                      return (
+                        <NewToDo
+                          apiUrl={props.apiUrl}
+                          onChangeAssignedId={(e) => handleChangeAssignee(e, index)}
+                          onChangeValue={(e) => handleChangeValue(e, index)}
+                          compactMode
+                          contentId={props.contentId}
+                          customColor={props.customColor}
+                          key={`todoList__${index}`}
+                          memberList={props.memberList}
+                        />
+                      )
+                    })
+                  }
+
+                  <IconButton
+                    icon='fas fa-plus'
+                    onClick={addTodo}
+                    color={props.customColor}
+                  />
+                </div>
+              ) : (
+                <NewToDo
+                  apiUrl={props.apiUrl}
+                  onChangeAssignedId={(e) => handleChangeAssignee(e, 0)}
+                  onChangeValue={(e) => handleChangeValue(e, 0)}
+                  contentId={props.contentId}
+                  customColor={props.customColor}
+                  key={`todoList__${newToDoList.length}`}
+                  memberList={props.memberList}
+                />
+              )
+          }
+
+          <div className='toDoManagement__new__buttons'>
+            <IconButton
+              text={props.t('Cancel')}
+              icon='fas fa-times'
+              onClick={handleClickCancel}
+              color={props.customColor}
+              intent='secondary'
+            />
+
+            <IconButton
+              text={props.t('Validate')}
+              icon='fas fa-check'
+              onClick={() => handleClickSaveToDo()}
+              disabled={!newToDoList[0].value}
+              color={props.customColor}
+              intent='primary'
+              mode='light'
+            />
+          </div>
+        </div>
       ) : (
         <div className='toDo'>
           {!isReader && (

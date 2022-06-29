@@ -18,12 +18,15 @@
   display flex
   align-items center
   &__text
-    margin-inline-start standardSpacing
+    margin-inline standardSpacing
     text-overflow ellipsis
     overflow hidden
 
     &.disabled
       color mediumDarkGrey
+
+  &.rightAligned
+    flex-direction row-reverse
 
 .switch
   position relative
@@ -32,8 +35,8 @@
   width 60px
   height 34px
 
-.switch input
-  display none
+  & input
+    display none
 
 .slider
   position absolute
@@ -51,7 +54,7 @@
   &.disabled
     background-color mediumGrey
     cursor not-allowed
-  
+
   &:before
     position absolute
     content ""

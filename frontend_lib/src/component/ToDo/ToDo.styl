@@ -4,12 +4,28 @@
   display flex
   flex-direction column
   margin standardSpacing
+
   &__new
     margin standardSpacing
     display flex
     flex-direction column
-    &__toDoText
+
+    &__text
+      display flex
+      flex-direction column
       margin-top standardSpacing
+
+    &.compactMode
+      flex-direction row
+
+      & .toDo__new
+        &__assignedPerson
+          flex-grow 1
+        &__text
+          flex-grow 4
+          margin-inline-start standardSpacing
+          margin-top unset
+
     &__buttons
       display flex
       justify-content flex-end
