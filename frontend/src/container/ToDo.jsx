@@ -105,7 +105,7 @@ const ToDo = props => {
   const handleDeleteToDo = async (toDo) => {
     const response = await handleFetchResult(await deleteToDo(
       FETCH_CONFIG.apiUrl,
-      toDo.workspace.id,
+      toDo.workspace.workspace_id,
       toDo.parent.content_id,
       toDo.content_id
     ))
@@ -126,7 +126,7 @@ const ToDo = props => {
   const handleChangeStatusToDo = async (toDo, status) => {
     const response = await handleFetchResult(await putToDo(
       FETCH_CONFIG.apiUrl,
-      toDo.workspace.id,
+      toDo.workspace.workspace_id,
       toDo.parent.content_id,
       toDo.content_id,
       status

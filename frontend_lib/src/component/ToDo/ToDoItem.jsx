@@ -15,7 +15,7 @@ import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigati
 
 export const isEditable = (toDo, user, userRoleId) => {
   const isAuthor = toDo.author.user_id === user.userId
-  const isAssignee = toDo.assignee.user_id  === user.userId
+  const isAssignee = toDo.assignee.user_id === user.userId
   const isSpaceManager = userRoleId === ROLE.workspaceManager.id
   const isContentManager = userRoleId === ROLE.contentManager.id
   return isAuthor || isAssignee || isSpaceManager || isContentManager
@@ -71,11 +71,11 @@ const ToDoItem = props => {
                 label: props.toDo.workspace.label,
                 type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
                 isALink: true
-                }, {
-                  link: PAGE.CONTENT(props.toDo.parent.content_id),
-                  label: props.toDo.parent.label,
-                  type: BREADCRUMBS_TYPE.APP_FEATURE,
-                  isALink: true
+              }, {
+                link: PAGE.CONTENT(props.toDo.parent.content_id),
+                label: props.toDo.parent.label,
+                type: BREADCRUMBS_TYPE.APP_FEATURE,
+                isALink: true
               }]}
               keepLastBreadcrumbAsLink
             />

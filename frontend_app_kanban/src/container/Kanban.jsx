@@ -176,12 +176,12 @@ export class Kanban extends React.Component {
 
   handleToDoCreated = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
@@ -192,12 +192,12 @@ export class Kanban extends React.Component {
 
   handleToDoChanged = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
@@ -208,7 +208,7 @@ export class Kanban extends React.Component {
 
   handleToDoDeleted = data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
       toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
