@@ -3,7 +3,6 @@ from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 import enum
-import json
 import os
 from typing import Any
 from typing import List
@@ -16,6 +15,7 @@ from depot.io.utils import FileIntent
 from sqlakeyset import Page
 from sqlakeyset import get_page
 import sqlalchemy
+from sqlalchemy import JSON
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -410,7 +410,7 @@ class ContentChecker(object):
     @classmethod
     def check_properties(cls, item):
         properties = item.properties
-        if "allowed_content" in properties.keys():
+        if properties and "allowed_content" in properties.keys():
             for content_slug, value in properties["allowed_content"].items():
                 if not isinstance(value, bool):
                     return False
@@ -481,7 +481,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
     depot_file = Column(TracimUploadedFileField, unique=False, nullable=True)
-    properties = Column("properties", Text(), unique=False, nullable=False, default="")
+    properties = Column("properties", JSON, unique=False, nullable=False, default={})
 
     # INFO - G.M - same type are used for FavoriteContent.
     label = Column(Unicode(MAX_LABEL_LENGTH), unique=False, nullable=False)
@@ -923,15 +923,16 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.file_mimetype
 
     @hybrid_property
-    def _properties(self) -> str:
+    def properties(self) -> str:
         return self.revision.properties
 
-    @_properties.setter
-    def _properties(self, value: str) -> None:
+    @properties.setter
+    def properties(self, value: str) -> None:
+        ContentChecker.check_properties(self)
         self.revision.properties = value
 
-    @_properties.expression
-    def _properties(cls) -> InstrumentedAttribute:
+    @properties.expression
+    def properties(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.properties
 
     @hybrid_property
@@ -1257,25 +1258,21 @@ class Content(DeclarativeBase):
             query = query.filter(ContentRevisionRO.type.in_(content_types))
         return query
 
-    @hybrid_property
-    def properties(self) -> dict:
-        """ return a structure decoded from json content of _properties """
-
-        if not self._properties:
+    @property
+    def all_properties(self) -> dict:
+        """
+        Return a "read-only" dictionnary based on "properties" dict
+        completed with default/generated data
+        """
+        if not self.properties:
             properties = {}
         else:
-            properties = json.loads(self._properties)
+            properties = self.properties
         if "allowed_content" not in properties:
             properties["allowed_content"] = content_type_list.default_allowed_content_properties(
                 self.type
             )
         return properties
-
-    @properties.setter
-    def properties(self, properties_struct: dict) -> None:
-        """ encode a given structure into json and store it in _properties attribute"""
-        self._properties = json.dumps(properties_struct)
-        ContentChecker.check_properties(self)
 
     def created_as_delta(self, delta_from_datetime: datetime = None) -> timedelta:
         if not delta_from_datetime:
@@ -1428,7 +1425,7 @@ class Content(DeclarativeBase):
 
     def get_allowed_content_types(self) -> List[TracimContentType]:
         types = []
-        allowed_types = self.properties["allowed_content"]
+        allowed_types = self.all_properties["allowed_content"]
         for type_label, is_allowed in allowed_types.items():
             if is_allowed:
                 try:
