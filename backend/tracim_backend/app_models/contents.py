@@ -197,7 +197,7 @@ class ContentTypeList(object):
     """
 
     # TODO - G.M - 2022-06-29 - Replace this variable by direct usage of ContentTypeSlug.ANY
-    Any_SLUG = ContentTypeSlug.ANY
+    Any_SLUG = ContentTypeSlug.ANY.value
 
     Comment = comment_type
 
