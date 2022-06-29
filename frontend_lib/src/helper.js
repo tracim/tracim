@@ -95,6 +95,7 @@ export const errorFlashMessageTemplateObject = errorMsg => ({
 })
 
 export const handleFetchResult = async fetchResult => {
+  console.log('handleFetchResult', fetchResult)
   const status = fetchResult.status
 
   if (status === 204) return fetchResult // no result

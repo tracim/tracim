@@ -36,12 +36,12 @@ const ToDoItem = props => {
         disabled={!props.isEditable}
         intent='link'
       />
-      {props.toDo.assignee_id && (
-        <div className='toDoItem__content'>
+      <div className='toDoItem__content'>
+        {props.toDo.assignee_id && (
           <strong>+{username}</strong>
-          {props.toDo.raw_content}
-        </div>
-      )}
+        )}
+        {props.toDo.raw_content}
+      </div>
       {props.isDeletable && (
         <IconButton
           customClass='toDoItem__delete'
