@@ -122,14 +122,15 @@ class TodoController(Controller):
             ) from exc
 
         assignee = None  # type: typing.Optional['User']
-        try:
-            assignee = user_api.get_one(user_id=hapic_data.body["assignee_id"])
-        except UserDoesNotExist as exc:
-            raise UserDoesNotExist(
-                "User with user_id {} not member of workspace".format(
-                    hapic_data.body["assignee_id"]
-                )
-            ) from exc
+        if hapic_data.body["assignee_id"]:
+            try:
+                assignee = user_api.get_one(user_id=hapic_data.body["assignee_id"])
+            except UserDoesNotExist as exc:
+                raise UserDoesNotExist(
+                    "User with user_id {} not member of workspace".format(
+                        hapic_data.body["assignee_id"]
+                    )
+                ) from exc
 
         todo = content_api.create_todo(
             parent=parent, raw_content=hapic_data.body["raw_content"], assignee=assignee,

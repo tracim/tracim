@@ -9,6 +9,7 @@
   "Error while uploading file": "خطأ أثناء تحميل الملف",
   "Error while uploading file(s)": "خطأ أثناء تحميل الملف/الملفات",
   "Please wait until the upload ends": "انتظر من فضلك حتى انتهاء التحميل",
+  "Nobody": "",
   "Validate": "اعتماد",
   "Unknown": "غير معروف",
   "Avatar of {{publicName}}": "أفاتار {{publicName}}",
