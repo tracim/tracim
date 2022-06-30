@@ -1380,6 +1380,7 @@ export const logoutUser = (history) => async (dispatch) => {
     dispatch(setUserDisconnected())
     GLOBAL_dispatchEvent(CUSTOM_EVENT.USER_DISCONNECTED, {})
     history.push(PAGE.LOGIN)
+    Cookies.remove(COOKIE_FRONTEND.SHOW_USERNAME_POPUP)
   } else {
     dispatch(newFlashMessage(i18n.t('Disconnection error', 'danger')))
   }
