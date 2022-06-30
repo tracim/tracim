@@ -93,7 +93,8 @@ export class HtmlDocument extends React.Component {
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
       translationTargetLanguageCode: param.loggedUser.lang,
-      toDoList: []
+      toDoList: [],
+      showProgress: true
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -710,6 +711,7 @@ export class HtmlDocument extends React.Component {
   handleSaveNewToDo = (assignedUserId, toDo) => {
     const { state, props } = this
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
   }
 
   handleDeleteToDo = (toDoId) => {
@@ -720,6 +722,10 @@ export class HtmlDocument extends React.Component {
   handleChangeStatusToDo = (toDoId, status) => {
     const { state, props } = this
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
+  }
+
+  handleAddNewToDo = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickNotifyAll = async () => {
@@ -809,6 +815,9 @@ export class HtmlDocument extends React.Component {
       children: state.config.apiUrl ? (
         <PopinFixedRightPartContent
           label={props.t('Timeline')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+          id='timeline'
         >
           <Timeline
             contentId={state.content.content_id}
@@ -863,6 +872,9 @@ export class HtmlDocument extends React.Component {
       children: (
         <PopinFixedRightPartContent
           label={props.t('To Do')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+          id='todo'
         >
           <ToDoManagement
             apiUrl={state.config.apiUrl}
@@ -872,6 +884,7 @@ export class HtmlDocument extends React.Component {
             onClickChangeStatusToDo={this.handleChangeStatusToDo}
             onClickDeleteToDo={this.handleDeleteToDo}
             onClickSaveNewToDo={this.handleSaveNewToDo}
+            onClickAddNewToDo={this.handleAddNewToDo}
             user={state.loggedUser}
             toDoList={state.toDoList}
           />
@@ -885,6 +898,9 @@ export class HtmlDocument extends React.Component {
       children: (
         <PopinFixedRightPartContent
           label={props.t('Tags')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+          id='tag'
         >
           <TagList
             apiUrl={state.config.apiUrl}

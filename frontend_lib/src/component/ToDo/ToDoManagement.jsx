@@ -13,10 +13,18 @@ const ToDoManagement = (props) => {
   const isReader = props.user.userRoleIdInWorkspace === ROLE.reader.id
   const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
 
-  const handleClickCancel = () => setIsNewToDo(false)
+  const handleClickCancel = () => {
+    props.onClickAddNewToDo(true)
+    setIsNewToDo(false)
+  }
   const handleClickSaveToDo = (assignedUserId, toDo) => {
     props.onClickSaveNewToDo(assignedUserId, toDo)
     setIsNewToDo(false)
+  }
+
+  const handleAddNewToDo = () => {
+    props.onClickAddNewToDo(false)
+    setIsNewToDo(true)
   }
 
   return (
@@ -39,7 +47,8 @@ const ToDoManagement = (props) => {
               icon='fas fa-plus-circle'
               intent='primary'
               mode='light'
-              onClick={() => setIsNewToDo(true)}
+              onClick={handleAddNewToDo}
+              // onClick={() => setIsNewToDo(true)}
               text={props.t('New task')}
             />
           )}
