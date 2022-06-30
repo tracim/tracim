@@ -297,7 +297,7 @@ vobject==0.9.6.1
     # via
     #   caldav
     #   radicale
-waitress==2.1.1
+waitress==2.1.2
     # via tracim-backend (setup.py)
 wand==0.6.6
     # via preview-generator

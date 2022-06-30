@@ -2235,7 +2235,8 @@ class ContentApi(object):
             parent=parent,
         )
         item.raw_content = raw_content
-        item.assignee = assignee
+        if assignee:
+            item.assignee = assignee
         self._session.add(item)
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 
