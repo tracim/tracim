@@ -7,6 +7,7 @@ import transaction
 
 from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import KANBAN_TYPE
+from tracim_backend.app_models.contents import TODO_TYPE
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -27,6 +28,7 @@ from tracim_backend.exceptions import UserNotAllowedToCreateMoreWorkspace
 from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.exceptions import WorkspaceFeatureDisabled
 from tracim_backend.exceptions import WorkspacesDoNotMatch
+from tracim_backend.extensions import app_list
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.subscription import SubscriptionLib
@@ -570,14 +572,17 @@ class WorkspaceController(Controller):
             parent=parent,
             content_namespace=creation_data.content_namespace,
         )
+
         if creation_data.template_id:
             api.copy_tags(
                 destination=content, source_content_id=creation_data.template_id,
             )
 
-            todos = api.get_all(parent_ids=[creation_data.template_id], content_type=content_type_list.Todo.slug)
-            for todo in todos:
-                api.copy(item=todo, new_parent=content)
+            if "contents/todo" in app_list:
+                todos = api.get_all(parent_ids=[creation_data.template_id], content_type=TODO_TYPE)
+                for todo in todos:
+                    api.copy(item=todo, new_parent=content)
+
         content = api.get_content_in_context(content)
         return content
 
