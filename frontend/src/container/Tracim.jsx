@@ -24,6 +24,7 @@ import WorkspaceContent from './WorkspaceContent.jsx'
 import OpenWorkspaceAdvanced from '../component/Workspace/OpenWorkspaceAdvanced.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
+import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
   getWorkspaceMemberList,
@@ -751,6 +752,10 @@ export class Tracim extends React.Component {
             faIcon='fas fa-phone'
             displayCloseButton
           />
+        )}
+
+        {((!props.user.username && Cookies.get(COOKIE_FRONTEND.SHOW_USERNAME_POPUP) === 'true' && props.user.config.display_username_popup !== 'false') &&
+          <CardPopupUsername />
         )}
 
         <ReduxTlmDispatcher />
