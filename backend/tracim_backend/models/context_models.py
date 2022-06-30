@@ -13,6 +13,7 @@ from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.applications.collaborative_document_edition.models import (
@@ -1316,8 +1317,15 @@ class ContentInContext(object):
 
     @property
     def comments(self) -> List["ContentInContext"]:
-        comments_in_context = []
-        for comment in self.content.get_comments():
+        return self.subcontent_in_context([ContentTypeSlug.COMMENT])
+
+    @property
+    def todos(self) -> List["ContentInContext"]:
+        return self.subcontent_in_context([ContentTypeSlug.TODO])
+
+    def subcontent_in_context(self, content_types):
+        subcontents_in_context = []
+        for subcontent in self.content.get_subcontents(content_types=content_types):
             from tracim_backend.lib.core.content import ContentApi
 
             content_api = ContentApi(
@@ -1329,9 +1337,9 @@ class ContentInContext(object):
                 show_active=True,
                 show_temporary=True,
             )
-            comment_in_context = content_api.get_content_in_context(comment)
-            comments_in_context.append(comment_in_context)
-        return comments_in_context
+            subcontent_in_context = content_api.get_content_in_context(subcontent)
+            subcontents_in_context.append(subcontent_in_context)
+        return subcontents_in_context
 
     @property
     def label(self) -> str:
@@ -1423,6 +1431,12 @@ class ContentInContext(object):
     def author(self) -> UserInContext:
         return UserInContext(
             dbsession=self.dbsession, config=self.config, user=self.content.first_revision.owner
+        )
+
+    @property
+    def assignee(self) -> UserInContext:
+        return UserInContext(
+            dbsession=self.dbsession, config=self.config, user=self.content.assignee
         )
 
     @property
