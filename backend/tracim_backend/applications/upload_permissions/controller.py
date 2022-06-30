@@ -180,6 +180,9 @@ class UploadPermissionController(Controller):
         """
         upload files as guest
         """
+        # TODO - G.M - 2022-06-30 - find better solution than this hack to force anonymous context
+        # ensuring TLM are not run with connected user.
+        request.force_anonymous_context = True
         # TODO - G.M - 2019-08-14 - replace UploadFiles Object hack to proper hapic support
         # see
         upload_files = UploadFiles(request, prefix_pattern="file_")
