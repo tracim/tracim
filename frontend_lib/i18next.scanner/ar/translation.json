@@ -226,10 +226,10 @@
   "{{count}} files selected_4": "تم اختيار {{count}} ملفّا",
   "{{count}} files selected_5": "تم اختيار {{count}} ملف آخر",
   "Unknown content": "محتوى غير معروف",
-  "From a template:": "",
-  "Template": "",
-  "Unmark template": "",
-  "Mark template": "",
-  "Something went wrong": "",
-  "Unknown comment": ""
+  "From a template:": "من نموذج:",
+  "Template": "نموذج",
+  "Unmark template": "ازالة علامة عن نموذج",
+  "Mark template": "وضع علامة على نموذج",
+  "Something went wrong": "حدث خطأ ما",
+  "Unknown comment": "تعليق مجهول"
 }
