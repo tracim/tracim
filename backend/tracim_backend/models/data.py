@@ -4,6 +4,7 @@ from datetime import datetime
 from datetime import timedelta
 import enum
 import os
+import typing
 from typing import Any
 from typing import List
 from typing import Optional
@@ -40,6 +41,7 @@ from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
 from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
@@ -1331,14 +1333,17 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(
+    def get_subcontents(
         self,
+        content_types: typing.Optional[typing.List[ContentTypeSlug]] = None,
         page_token: Optional[str] = None,
         count: Optional[int] = None,
         sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
     ) -> Page:
-        """Get the comments of this Content in pages."""
-        query = self.get_valid_children(content_types=[content_type_list.Comment.slug])
+        """Get the subcontent of this Content in pages, by default, comments"""
+        if not content_types:
+            content_types = [ContentTypeSlug.COMMENT]
+        query = self.get_valid_children(content_types=content_types)
         # INFO - 2021-08-16 - S.G. : remove the sort clause as
         # get_valid_children calls children which always sorts by id.
         query = query.order_by(None)
@@ -1400,7 +1405,7 @@ class Content(DeclarativeBase):
 
     def get_first_comment(self) -> Optional["Content"]:
         try:
-            return self.get_comments()[0]
+            return self.get_subcontents([ContentTypeSlug.COMMENT])[0]
         except IndexError:
             return None
 
@@ -1408,7 +1413,7 @@ class Content(DeclarativeBase):
         # TODO - Make this more efficient
         last_comment_updated = None
         last_comment = None
-        for comment in self.get_comments():
+        for comment in self.get_subcontents([ContentTypeSlug.COMMENT]):
             if user.user_id == comment.owner.user_id:
                 if not last_comment or last_comment_updated < comment.updated:
                     # take only the latest comment !
@@ -1460,7 +1465,7 @@ class Content(DeclarativeBase):
     # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     def get_history(self, drop_empty_revision=False) -> List["VirtualEvent"]:
         events = []
-        for comment in self.get_comments():
+        for comment in self.get_subcontents([ContentTypeSlug.COMMENT]):
             events.append(VirtualEvent.create_from_content(comment))
 
         revisions = sorted(self.revisions, key=lambda rev: rev.revision_id)

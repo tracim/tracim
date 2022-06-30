@@ -204,7 +204,8 @@ export class SearchFilterMenu extends React.Component {
       { id: 'raw_content', value: props.t('Content') },
       { id: 'comments', value: props.t('Comments') },
       { id: 'description', value: props.t('Description') },
-      { id: 'tags', value: props.t('Tags') }
+      { id: 'tags', value: props.t('Tags') },
+      { id: 'todos', value: props.t('Tasks') }
     ]
 
     const SPACE_FIELD_LIST = [
