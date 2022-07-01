@@ -2,13 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import {
-  BREADCRUMBS_TYPE,
   PAGE,
   ROLE,
   STATUSES
 } from '../../helper.js'
-import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import DistanceDate from '../DistanceDate.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
@@ -49,43 +48,39 @@ const ToDoItem = props => {
         />
       </div>
       <div className='toDoItem__content'>
-        {props.toDo.assignee_id && (
-          <strong>+{username}</strong>
+        <div className='toDoItem__content__task'>
+          {props.toDo.assignee && !props.isPersonalPage && (
+            <strong>+{username}</strong>
+          )}
+          {props.toDo.raw_content}
+        </div>
+        {props.isPersonalPage && (
+          <div className='toDoItem__content__navigation'>
+            <Link to={PAGE.CONTENT(props.toDo.parent.content_id)}>
+              {props.toDo.parent.label}
+            </Link>
+            <Link to={PAGE.WORKSPACE.DASHBOARD(props.toDo.workspace.workspace_id)}>
+              {props.toDo.workspace.label}
+            </Link>
+          </div>
         )}
-        {props.toDo.raw_content}
       </div>
-      {props.showDetail && (
-        <>
-          <div className='toDoItem__author'>
+      {props.isPersonalPage && (
+        <div className='timedEvent'>
+          <div>created <DistanceDate absoluteDate={props.toDo.created} lang={props.lang} /></div>
+
+          <div className='timedEvent__bottom'>
+            {props.t('by')}&nbsp;
             <ProfileNavigation
               user={{
                 userId: props.toDo.author.user_id,
                 publicName: props.toDo.author.public_name
               }}
             >
-              {props.toDo.author.public_name}
+              <span className='timedEvent__author' title={props.toDo.author.public_name}>{props.toDo.author.public_name}</span>
             </ProfileNavigation>
           </div>
-          <div className='toDoItem__path'>
-            <Breadcrumbs
-              breadcrumbsList={[{
-                link: PAGE.WORKSPACE.DASHBOARD(props.toDo.workspace.workspace_id),
-                label: props.toDo.workspace.label,
-                type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
-                isALink: true
-              }, {
-                link: PAGE.CONTENT(props.toDo.parent.content_id),
-                label: props.toDo.parent.label,
-                type: BREADCRUMBS_TYPE.APP_FEATURE,
-                isALink: true
-              }]}
-              keepLastBreadcrumbAsLink
-            />
-          </div>
-          <div className='toDoItem__created'>
-            <DistanceDate absoluteDate={props.toDo.created} lang={props.lang} />
-          </div>
-        </>
+        </div>
       )}
       {props.isDeletable && (
         <IconButton
@@ -108,7 +103,7 @@ ToDoItem.propTypes = {
   toDo: PropTypes.object.isRequired,
   isDeletable: PropTypes.bool,
   isEditable: PropTypes.bool,
-  showDetail: PropTypes.bool,
+  isPersonalPage: PropTypes.bool,
   lang: PropTypes.string,
   memberList: PropTypes.array,
   username: PropTypes.string
@@ -117,7 +112,7 @@ ToDoItem.propTypes = {
 ToDoItem.defaultProps = {
   isDeletable: false,
   isEditable: true,
-  showDetail: false,
+  isPersonalPage: false,
   lang: 'en',
   memberList: [],
   username: ''

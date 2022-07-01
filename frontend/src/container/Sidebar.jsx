@@ -207,7 +207,7 @@ export class Sidebar extends React.Component {
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
                 {this.getSidebarItem(props.t('Recent activities'), 'far fa-newspaper', PAGE.RECENT_ACTIVITIES)}
-                {this.getSidebarItem(props.t('To Do'), 'fas fa-check-square', PAGE.TODO)}
+                {this.getSidebarItem(props.t('My tasks'), 'fas fa-check-square', PAGE.TODO)}
                 {this.getSidebarItem(props.t('Favorites'), 'far fa-star', PAGE.FAVORITES)}
                 <ul className='sidebar__content__navigation__workspace'>
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}

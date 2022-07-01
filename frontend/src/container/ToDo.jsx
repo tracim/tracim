@@ -46,7 +46,7 @@ const ToDo = props => {
   }, [toDoList])
 
   const setHeadTitleToDo = () => {
-    const headTitle = buildHeadTitle([props.t('To Do')])
+    const headTitle = buildHeadTitle([props.t('My tasks')])
     props.dispatch(setHeadTitle(headTitle))
   }
 
@@ -54,7 +54,7 @@ const ToDo = props => {
     props.dispatch(setBreadcrumbs([{
       link: PAGE.TODO,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('To Do'),
+      label: props.t('My tasks'),
       isALink: true
     }]))
   }
@@ -149,30 +149,11 @@ const ToDo = props => {
     <div className='tracim__content-scrollview'>
       <PageWrapper customClass='toDo__wrapper'>
         <PageTitle
-          title={props.t('To Do')}
+          title={props.t('My tasks')}
           icon='fas fa-check-square'
           breadcrumbsList={props.breadcrumbs}
         />
         <PageContent>
-          <div className='toDo__header'>
-            <div className='toDo__header__checkbox' />
-            <div className='toDo__header__content'>
-              {props.t('Task')}
-            </div>
-            <div className='toDo__header__author'>
-              {props.t('Author')}
-            </div>
-            <div className='toDo__header__path'>
-              {props.t('Path')}
-            </div>
-            <div className='toDo__header__created'>
-              {props.t('Last Modification')}
-            </div>
-            <div className='toDo__header__delete'>
-              {props.t('Delete')}
-            </div>
-          </div>
-
           <div className='toDo__item'>
             {toDoList.map(toDo => {
               return (
@@ -183,7 +164,7 @@ const ToDo = props => {
                   lang={props.user.lang}
                   onClickChangeStatusToDo={handleChangeStatusToDo}
                   onClickDeleteToDo={handleDeleteToDo}
-                  showDetail
+                  isPersonalPage
                   toDo={toDo}
                   username={props.user.username}
                 />

@@ -1,28 +1,9 @@
 .toDo__item
   background-color offWhite
 
-.toDo__item .toDoItem, .toDo__header
+.toDo__item .toDoItem
   display flex
   min-height headerHeight
   align-items center
   padding standardSpacing
-  &__checkbox
-    flex 1
-  &__content
-    flex 8
-  &__author
-    flex 3
-  &__path
-    flex 4
-    & .breadcrumbs
-      font-size standardFontSize
-      & .breadcrumbs__item__label
-        white-space break-spaces
-        color fontColor
-  &__created
-    flex 3
-  &__delete
-    flex 1
 
-.toDo__item .toDoItemChecked .toDoItem__path .breadcrumbs .breadcrumbs__item__label
-  color lightDarkGrey
