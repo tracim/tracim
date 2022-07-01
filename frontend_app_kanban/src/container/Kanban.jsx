@@ -72,7 +72,8 @@ export class Kanban extends React.Component {
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
       toDoList: [],
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      showProgress: true
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -254,6 +255,9 @@ export class Kanban extends React.Component {
       children: state.config.apiUrl ? (
         <PopinFixedRightPartContent
           label={props.t('Timeline')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+          id='timeline'
         >
           <Timeline
             contentId={state.content.content_id}
@@ -307,6 +311,9 @@ export class Kanban extends React.Component {
       children: (
         <PopinFixedRightPartContent
           label={props.t('To Do')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+          id='todo'
         >
           <ToDoManagement
             apiUrl={state.config.apiUrl}
@@ -316,6 +323,7 @@ export class Kanban extends React.Component {
             onClickChangeStatusToDo={this.handleChangeStatusToDo}
             onClickDeleteToDo={this.handleDeleteToDo}
             onClickSaveNewToDo={this.handleSaveNewToDo}
+            onClickAddNewToDo={this.handleAddNewToDo}
             user={state.loggedUser}
             toDoList={state.toDoList}
           />
@@ -329,6 +337,9 @@ export class Kanban extends React.Component {
       children: (
         <PopinFixedRightPartContent
           label={props.t('Tags')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+          id='tag'
         >
           <TagList
             apiUrl={state.config.apiUrl}
@@ -437,6 +448,7 @@ export class Kanban extends React.Component {
   handleSaveNewToDo = (assignedUserId, toDo) => {
     const { state, props } = this
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
   }
 
   handleDeleteToDo = (toDoId) => {
@@ -447,6 +459,10 @@ export class Kanban extends React.Component {
   handleChangeStatusToDo = (toDoId, status) => {
     const { state, props } = this
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
+  }
+
+  handleAddNewToDo = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickBtnCloseApp = () => {
