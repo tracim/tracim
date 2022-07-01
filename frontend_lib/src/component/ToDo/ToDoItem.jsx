@@ -11,6 +11,7 @@ import {
 import DistanceDate from '../DistanceDate.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
+import TimedEvent from '../TimedEvent/TimedEvent.jsx'
 
 export const isEditable = (toDo, user, userRoleId) => {
   const isAuthor = toDo.author.user_id === user.userId
@@ -66,20 +67,17 @@ const ToDoItem = props => {
         )}
       </div>
       {props.isPersonalPage && (
-        <div className='timedEvent'>
-          <div>created <DistanceDate absoluteDate={props.toDo.created} lang={props.lang} /></div>
-
-          <div className='timedEvent__bottom'>
-            {props.t('by')}&nbsp;
-            <ProfileNavigation
-              user={{
-                userId: props.toDo.author.user_id,
-                publicName: props.toDo.author.public_name
-              }}
-            >
-              <span className='timedEvent__author' title={props.toDo.author.public_name}>{props.toDo.author.public_name}</span>
-            </ProfileNavigation>
-          </div>
+        <div className='toDoItem__timedEvent'>
+          <TimedEvent
+            date={props.toDo.created}
+            author={{
+              userId: props.toDo.author.user_id,
+              publicName: props.toDo.author.public_name
+            }}
+            lang={props.lang}
+            operation={props.t('created')}
+            isRoot
+          />
         </div>
       )}
       {props.isDeletable && (

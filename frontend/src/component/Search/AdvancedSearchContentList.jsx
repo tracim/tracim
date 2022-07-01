@@ -7,10 +7,10 @@ import {
   Icon,
   ListItemWrapper,
   FilenameWithBadges,
+  TimedEvent,
   PAGE
 } from 'tracim_frontend_lib'
 import { Link } from 'react-router-dom'
-import TimedEvent from '../TimedEvent.jsx'
 import { getRevisionTypeLabel } from '../../util/helper.js'
 
 require('./AdvancedSearchContentList.styl')

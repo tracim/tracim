@@ -10,10 +10,10 @@ import {
   Icon,
   ListItemWrapper,
   FilenameWithBadges,
-  PAGE
+  PAGE,
+  TimedEvent
 } from 'tracim_frontend_lib'
 import ContentType from './ContentType.jsx'
-import TimedEvent from './TimedEvent.jsx'
 import { getRevisionTypeLabel } from '../util/helper.js'
 
 require('./ContentListItem.styl')

@@ -135,6 +135,8 @@ import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
 import PageContent from './component/Layout/PageContent.jsx'
 
+import TimedEvent from './component/TimedEvent/TimedEvent.jsx'
+
 import Delimiter from './component/Delimiter/Delimiter.jsx'
 
 import CardPopup from './component/CardPopup/CardPopup.jsx'
@@ -481,6 +483,7 @@ export {
   NewToDo,
   putToDo,
   sortContentByStatus,
+  TimedEvent,
   ToDoItem,
   ToDoManagement
 }
