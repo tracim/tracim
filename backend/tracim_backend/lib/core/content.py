@@ -2229,7 +2229,8 @@ class ContentApi(object):
             parent=parent,
         )
         item.raw_content = raw_content
-        item.assignee_id = assignee.user_id
+        if assignee:
+            item.assignee_id = assignee.user_id
         self._session.add(item)
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 

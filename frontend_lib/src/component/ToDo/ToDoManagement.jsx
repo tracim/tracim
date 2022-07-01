@@ -38,7 +38,11 @@ const ToDoManagement = (props) => {
   const handleClickSaveToDo = () => {
     newToDoList.forEach(newToDo => {
       if (newToDo.value) {
-        props.onClickSaveNewToDo(newToDo.assigneeId, newToDo.value)
+        if (newToDo.assigneeId === 0) {
+          props.onClickSaveNewToDo(null, newToDo.value)
+        } else {
+          props.onClickSaveNewToDo(newToDo.assigneeId, newToDo.value)
+        }
       }
     })
     setIsNewToDo(false)

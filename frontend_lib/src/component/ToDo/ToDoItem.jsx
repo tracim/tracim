@@ -37,7 +37,9 @@ const ToDoItem = props => {
         intent='link'
       />
       <div className='toDoItem__content'>
-        <strong>+{username}</strong>
+        {props.toDo.assignee_id && (
+          <strong>+{username}</strong>
+        )}
         {props.toDo.raw_content}
       </div>
       {props.isDeletable && (

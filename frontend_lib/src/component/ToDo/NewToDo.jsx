@@ -5,11 +5,16 @@ import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
 const NewToDo = props => {
-  const [memberListOptions, setMemberListOptions] = useState([])
+  const nobodyValueObject = { value: null, label: props.t('Nobody') }
+  const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
+  const [assignedUserId, setAssignedUserId] = useState(0)
+  const [newComment, setNewComment] = useState('')
 
   useEffect(() => {
-    setMemberListOptions(props.memberList.filter(member => member.username)
-      .map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` })))
+    setMemberListOptions([
+      nobodyValueObject,
+      ...props.memberList.filter(member => member.username)
+        .map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` }))])
   }, [props.memberList])
 
   return (
@@ -19,13 +24,14 @@ const NewToDo = props => {
           {props.t('Assigned person:')}
         </span>
         <Select
+          defaultValue={memberListOptions[0]}
           isSearchable
           onChange={props.onChangeAssignedId}
           options={memberListOptions}
         />
       </div>
 
-      <div className='toDo__new__text'>
+      <div className='toDo__new__toDotext'>
         <span>
           {props.t('Enter your To Do bellow:')}
         </span>
