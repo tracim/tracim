@@ -484,7 +484,7 @@
   "{{author}} made {{count}} contributions_plural": "{{author}} hizo {{count}} contribuciones",
   " on {{content}}": " en {{content}}",
   "New language:": "Nuevo idioma:",
-  "The type of this file is not allowed": "Este tipo de archivo no está permitido",
+  "The type of this file is not allowed": "El tipo de este archivo no está permitido",
   "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> creó el espacio <2><0><0>{{workspaceLabel}}</0></0></2>",
   "Error loading unread notification number": "Error al cargar el número de notificaciones no leídas",
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> borró el espacio <2><0><0>{{workspaceLabel}}</0></0></2>",
