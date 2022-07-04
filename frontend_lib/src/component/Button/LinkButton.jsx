@@ -1,10 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import classnames from 'classnames'
 
 import { darkenColor } from '../../helper.js'
 
-require('./IconButton.styl')
+require('./LinkButton.styl')
 
 const LinkButton = props => {
 

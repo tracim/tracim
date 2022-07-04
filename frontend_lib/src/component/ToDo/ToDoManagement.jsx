@@ -112,7 +112,7 @@ const ToDoManagement = (props) => {
     const lines = e.target.value.split(/\n/g)
     const tmpToDoList = []
     lines.forEach((line, index) => {
-      // NOTE - MP - 2022-07-04 - This regex will:
+      // INFO - MP - 2022-07-04 - This regex will:
       // Look for a +<UserName> followed by the ToDo text
       // Ignoring blank space before the + and between the UserName and the ToDo text
       // Example:

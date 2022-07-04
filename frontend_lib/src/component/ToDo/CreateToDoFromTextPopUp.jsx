@@ -7,7 +7,7 @@ import { tinymceRemove } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
-const wysiwygId = 'wysiwygTimelineCommentEdit'
+const wysiwygId = 'wysiwygTextToToDos'
 const wysiwygIdSelector = `#${wysiwygId}`
 
 const CreateToDoFromTextPopup = (props) => {
@@ -50,7 +50,7 @@ const CreateToDoFromTextPopup = (props) => {
           intent='primary'
           mode='light'
           onClick={props.onClickTransform}
-          text={props.t('Transform to tasks')}
+          text={props.t('Create task from text')}
           type='button'
         />
       </div>
