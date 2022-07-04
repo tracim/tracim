@@ -8,9 +8,7 @@ import {
   ROLE,
   STATUSES
 } from '../../helper.js'
-import DistanceDate from '../DistanceDate.jsx'
 import IconButton from '../Button/IconButton.jsx'
-import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 import TimedEvent from '../TimedEvent/TimedEvent.jsx'
 
 export const isEditable = (toDo, user, userRoleId) => {
