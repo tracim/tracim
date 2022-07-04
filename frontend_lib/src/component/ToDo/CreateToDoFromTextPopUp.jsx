@@ -18,7 +18,7 @@ const CreateToDoFromTextPopup = (props) => {
       customClass='createToDoFromTextPopup'
       customColor={props.customColor}
       onClose={props.onClickClose}
-      label={props.t('Transform todos')}
+      label={props.t('Create task from text')}
       faIcon='fas fa-edit'
     >
       <div className='createToDoFromTextPopup__main'>
