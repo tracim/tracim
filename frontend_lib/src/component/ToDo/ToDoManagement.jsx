@@ -2,39 +2,80 @@ import React, { useEffect, useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import IconButton from '../Button/IconButton.jsx'
+import LinkButton from '../Button/LinkButton.jsx'
 import ToDoItem, {
   isDeletable,
   isEditable
 } from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
-import { BtnSwitch } from '../Input/BtnSwitch/BtnSwitch.jsx'
 import { ROLE } from '../../helper.js'
+import CreateToDoFromTextPopUp from './CreateToDoFromTextPopUp.jsx'
 
 const ToDoManagement = (props) => {
   const isReader = props.user.userRoleIdInWorkspace === ROLE.reader.id
+  const nobodyValueObject = { value: null, label: props.t('Nobody') }
+
+  const [isPopUpDisplayed, setIsPopUpDisplayed] = useState(false)
   const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
-  const [isMultiCreationMode, setIsMultiCreationMode] = useState(false)
-  const [newToDoList, setnewToDoList] = useState([])
+  const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
+  const [newToDoList, setNewToDoList] = useState([])
+  const [newToDoListAsText, setNewToDoListAsText] = useState('')
+  const [newToDoListSave, setNewToDoListSave] = useState([])
+  const [selectedValue, setSelectedValue] = useState([nobodyValueObject])
 
   useEffect(() => {
-    setnewToDoList([{
+    const memberList = props.memberList.filter(member => member.username)
+    const formattedMemberList = memberList.map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` }))
+    setMemberListOptions([nobodyValueObject, ...formattedMemberList])
+  }, [props.memberList])
+
+  useEffect(() => {
+    setNewToDoList([{
       assigneeId: null,
       value: null
     }])
-  }, [isMultiCreationMode, isNewToDo])
+  }, [isNewToDo])
+
+  useEffect(() => {
+    if (!isPopUpDisplayed) {
+      let text = ''
+      newToDoList.forEach((newToDo, index) => {
+        if (index !== 0) {
+          text = text.concat('\n')
+        }
+        if (newToDo.value) {
+          if (newToDo.assigneeId) {
+            const assignee = props.memberList.find(member => member.id === newToDo.assigneeId)
+            text = text.concat(`+${assignee.username} `)
+          }
+          text = text.concat(`${newToDo.value}`)
+        }
+      })
+      setNewToDoListAsText(text)
+    }
+  }, [newToDoList])
 
   const addTodo = () => {
     const tmpToDoList = [...newToDoList]
+    const tmpSelectedValue = [...selectedValue]
+
     tmpToDoList.push(
       {
         assigneeId: null,
         value: null
       }
     )
-    setnewToDoList(tmpToDoList)
+    tmpSelectedValue.push(nobodyValueObject)
+
+    setSelectedValue(tmpSelectedValue)
+    setNewToDoList(tmpToDoList)
   }
 
   const handleClickCancel = () => setIsNewToDo(false)
+  const handleClickClose = () => {
+    setNewToDoList(newToDoListSave)
+    setIsPopUpDisplayed(false)
+  }
   const handleClickSaveToDo = () => {
     newToDoList.forEach(newToDo => {
       if (newToDo.value) {
@@ -45,78 +86,117 @@ const ToDoManagement = (props) => {
         }
       }
     })
+    setIsPopUpDisplayed(false)
     setIsNewToDo(false)
   }
 
-  const handleChangeAssignee = (e, index) => {
+  const handleChangeSelectedValue = (e, index) => {
     const tmpToDoList = [...newToDoList]
+    const tmpSelectedValue = [...selectedValue]
+
     tmpToDoList[index].assigneeId = e.value
-    setnewToDoList(tmpToDoList)
+    tmpSelectedValue[index] = e
+
+    setSelectedValue(tmpSelectedValue)
+    setNewToDoList(tmpToDoList)
   }
 
   const handleChangeValue = (e, index) => {
     const tmpToDoList = [...newToDoList]
     tmpToDoList[index].value = e.target.value
-    setnewToDoList(tmpToDoList)
+    setNewToDoList(tmpToDoList)
   }
 
-  const handleBtnSwitchChange = (event) => {
-    setIsMultiCreationMode(!isMultiCreationMode)
+  const handleChangePopUpValue = (e) => {
+    setNewToDoListAsText(e.target.value)
+    const lines = e.target.value.split(/\n/g)
+    const tmpToDoList = []
+    lines.forEach((line, index) => {
+      // NOTE - MP - 2022-07-04 - This regex will:
+      // Look for a +<UserName> followed by the ToDo text
+      // Ignoring blank space before the + and between the UserName and the ToDo text
+      // Example:
+      // With the string: '  +mathis do this'
+      // The expression will return: match['  ', '+mathis do this', '+mathis', ' ', 'do this']
+      // With the string: 'you have to do this'
+      // The expression will return: match['you have to do this', undefined, undefined, undefined, 'you have to do this']
+      const toDoGroups = line.match(/^([\s]*)([+][a-zA-Z]*)?( +)?(.*)/)
+
+      if (toDoGroups) {
+        let toDoValue = ''
+
+        if (toDoGroups[2] && toDoGroups[2].startsWith('+')) {
+          const todoAssigneeUsername = toDoGroups[2].substring(1)
+          const todoAssignee = props.memberList.find(member => member.username === todoAssigneeUsername)
+
+          if (todoAssignee) {
+            const newSelectedValue = memberListOptions.find(option => option.value === todoAssignee.id)
+            const tmpSelectedValue = [...selectedValue]
+            tmpSelectedValue[index] = newSelectedValue
+            setSelectedValue(tmpSelectedValue)
+          } else {
+            const tmpSelectedValue = [...selectedValue]
+            tmpSelectedValue[index] = nobodyValueObject
+            setSelectedValue(tmpSelectedValue)
+          }
+        } else {
+          const tmpSelectedValue = [...selectedValue]
+          tmpSelectedValue[index] = nobodyValueObject
+          setSelectedValue(tmpSelectedValue)
+        }
+
+        toDoValue = toDoGroups[4]
+
+        tmpToDoList.push(
+          {
+            assigneeId: selectedValue[index] ? selectedValue[index].value : null,
+            value: toDoValue
+          }
+        )
+      }
+    })
+    setNewToDoList(tmpToDoList)
+  }
+
+  const handleOpenPopUp = () => {
+    setNewToDoListSave(newToDoList)
+    setIsPopUpDisplayed(true)
   }
 
   return (
-    isNewToDo
-      ? (
+    <div className='toDoManagement'>
+      {isNewToDo ? (
         <div className='toDoManagement__creation'>
-          <div className='toDoManagement__creation__btnSwitch'>
-            <BtnSwitch
-              activeLabel={props.t('Creation multiple')}
-              checked={isMultiCreationMode}
-              inactiveLabel={props.t('Creation unique')}
-              isRightAligned
-              onChange={handleBtnSwitchChange}
-              smallSize
+          <div className='toDoManagement__creation__linkButton'>
+            <LinkButton
+              onClick={handleOpenPopUp}
+              text={props.t('Create from text')}
             />
           </div>
 
-          {
-            isMultiCreationMode ? (
-              newToDoList.map((toDo, index) => {
-                return (
-                  <NewToDo
-                    apiUrl={props.apiUrl}
-                    onChangeAssignedId={(e) => handleChangeAssignee(e, index)}
-                    onChangeValue={(e) => handleChangeValue(e, index)}
-                    compactMode
-                    contentId={props.contentId}
-                    customColor={props.customColor}
-                    key={`todoList__${index}`}
-                    memberList={props.memberList}
-                  />
-                )
-              })
-            ) : (
+          {newToDoList.map((toDo, index) => {
+            return (
               <NewToDo
                 apiUrl={props.apiUrl}
-                onChangeAssignedId={(e) => handleChangeAssignee(e, 0)}
-                onChangeValue={(e) => handleChangeValue(e, 0)}
+                onChangeSelectedValue={(e) => handleChangeSelectedValue(e, index)}
+                onChangeValue={(e) => handleChangeValue(e, index)}
                 contentId={props.contentId}
                 customColor={props.customColor}
-                key={`todoList__${newToDoList.length}`}
-                memberList={props.memberList}
+                key={`todoList__${index}`}
+                memberListOptions={memberListOptions}
+                selectedValue={selectedValue[index]}
+                value={toDo.value ? toDo.value : ''}
               />
             )
-          }
+          })}
 
           <div className='toDoManagement__buttons'>
 
-            {isMultiCreationMode && (
-              <IconButton
-                icon='fas fa-plus'
-                onClick={addTodo}
-                color={props.customColor}
-              />
-            )}
+            <IconButton
+              icon='fas fa-plus'
+              onClick={addTodo}
+              color={props.customColor}
+            />
 
             <div className='toDoManagement__buttons__new'>
               <IconButton
@@ -130,7 +210,7 @@ const ToDoManagement = (props) => {
               <IconButton
                 text={props.t('Validate')}
                 icon='fas fa-check'
-                onClick={() => handleClickSaveToDo()}
+                onClick={handleClickSaveToDo}
                 color={props.customColor}
                 intent='primary'
                 mode='light'
@@ -167,8 +247,17 @@ const ToDoManagement = (props) => {
             )
             : <div>{props.t('This content has no task to do associated. Click on "New task" button to create a new one.')}</div>}
         </div>
-      )
+      )}
 
+      {isPopUpDisplayed && (
+        <CreateToDoFromTextPopUp
+          onChangeValue={handleChangePopUpValue}
+          onClickTransform={() => setIsPopUpDisplayed(false)}
+          onClickClose={handleClickClose}
+          value={newToDoListAsText}
+        />
+      )}
+    </div>
   )
 }
 export default translate()(ToDoManagement)

@@ -1,43 +1,32 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import Select from 'react-select'
 import { translate } from 'react-i18next'
-import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
-const NewToDo = props => {
-  const nobodyValueObject = { value: null, label: props.t('Nobody') }
-  const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
-  const [assignedUserId, setAssignedUserId] = useState(0)
-  const [newComment, setNewComment] = useState('')
-
-  useEffect(() => {
-    setMemberListOptions([
-      nobodyValueObject,
-      ...props.memberList.filter(member => member.username)
-        .map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` }))])
-  }, [props.memberList])
-
+const NewToDo = (props) => {
   return (
-    <div className={classnames('toDo__new', { compactMode: props.compactMode })}>
+    <div className='toDo__new'>
       <div className='toDo__new__assignedPerson'>
         <span>
           {props.t('Assigned person:')}
         </span>
         <Select
-          defaultValue={memberListOptions[0]}
           isSearchable
-          onChange={props.onChangeAssignedId}
-          options={memberListOptions}
+          onChange={props.onChangeSelectedValue}
+          options={props.memberListOptions}
+          tabSelectsValue
+          value={props.selectedValue}
         />
       </div>
 
-      <div className='toDo__new__toDotext'>
+      <div className='toDo__new__toDoText'>
         <span>
           {props.t('Enter your To Do bellow:')}
         </span>
         <textarea
           placeholder={props.placeHolder || props.t('Your message...')}
           onChange={props.onChangeValue}
+          value={props.value}
         />
       </div>
     </div>
@@ -47,17 +36,23 @@ export default translate()(NewToDo)
 
 NewToDo.propTypes = {
   apiUrl: PropTypes.string.isRequired,
-  onChangeAssignedId: PropTypes.func.isRequired,
+  onChangeSelectedValue: PropTypes.func.isRequired,
   onChangeValue: PropTypes.func.isRequired,
-  compactMode: PropTypes.bool,
+  assigneeId: PropTypes.number,
+  assigneeValue: PropTypes.string,
   contentId: PropTypes.number,
   customColor: PropTypes.string,
-  memberList: PropTypes.array
+  memberListOptions: PropTypes.array,
+  selectedValue: PropTypes.object,
+  value: PropTypes.string
 }
 
 NewToDo.defaultProps = {
-  compactMode: false,
+  assigneeId: 0,
+  assigneeValue: '',
   contentId: 1,
   customColor: '',
-  memberList: []
+  memberListOptions: [],
+  selectedValue: {},
+  value: ''
 }
