@@ -61,5 +61,7 @@
   "The password is too long (maximum 512 characters)": "La contraseña es demasiado larga (máximo 512 caracteres)",
   "Error while loading share links list": "Error al cargar la lista de enlaces compartidos",
   "Error while deleting share link": "Error al borrar el enlace compartido",
-  "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Para descargar el vídeo, salga del modo de pantalla completa y haga clic en el botón de descarga {{icon}}."
+  "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Para descargar el vídeo, salga del modo de pantalla completa y haga clic en el botón de descarga {{icon}}.",
+  " of ": " sobre ",
+  "of": "sobre"
 }
