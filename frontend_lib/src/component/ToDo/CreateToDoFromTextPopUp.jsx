@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { TracimComponent } from '../../tracimComponent.js'
-import { appContentFactory } from '../../appContentFactory.js'
 import { tinymceRemove } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
@@ -20,7 +18,7 @@ const CreateToDoFromTextPopup = (props) => {
       customClass='createToDoFromTextPopup'
       customColor={props.customColor}
       onClose={props.onClickClose}
-      label={props.t('Transorm todos')}
+      label={props.t('Transform todos')}
       faIcon='fas fa-edit'
     >
       <div className='createToDoFromTextPopup__main'>
@@ -58,7 +56,7 @@ const CreateToDoFromTextPopup = (props) => {
   )
 }
 
-export default translate()(appContentFactory(TracimComponent(CreateToDoFromTextPopup)))
+export default translate()(CreateToDoFromTextPopup)
 
 CreateToDoFromTextPopup.propTypes = {
   onChangeValue: PropTypes.func.isRequired,
