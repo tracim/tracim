@@ -5,13 +5,16 @@ import { translate } from 'react-i18next'
 import IconButton from '../Button/IconButton.jsx'
 
 const NewToDo = props => {
-  const [memberListOptions, setMemberListOptions] = useState([])
+  const nobodyValueObject = { value: null, label: props.t('Nobody') }
+  const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
   const [assignedUserId, setAssignedUserId] = useState(0)
   const [newComment, setNewComment] = useState('')
 
   useEffect(() => {
-    setMemberListOptions(props.memberList.filter(member => member.username)
-      .map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` })))
+    setMemberListOptions([
+      nobodyValueObject,
+      ...props.memberList.filter(member => member.username)
+        .map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` }))])
   }, [props.memberList])
 
   const onChangeAssignedUser = (e) => setAssignedUserId(e.value)
@@ -23,6 +26,7 @@ const NewToDo = props => {
         {props.t('Assigned person:')}
       </div>
       <Select
+        defaultValue={memberListOptions[0]}
         isSearchable
         onChange={onChangeAssignedUser}
         options={memberListOptions}
@@ -50,7 +54,7 @@ const NewToDo = props => {
           text={props.t('Validate')}
           icon='fas fa-check'
           onClick={() => props.onClickSaveNewToDo(assignedUserId, newComment)}
-          disabled={!newComment || !assignedUserId}
+          disabled={!newComment}
           color={props.customColor}
           intent='primary'
           mode='light'

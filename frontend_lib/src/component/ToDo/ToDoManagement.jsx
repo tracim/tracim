@@ -15,7 +15,11 @@ const ToDoManagement = (props) => {
 
   const handleClickCancel = () => setIsNewToDo(false)
   const handleClickSaveToDo = (assignedUserId, toDo) => {
-    props.onClickSaveNewToDo(assignedUserId, toDo)
+    if (assignedUserId === 0) {
+      props.onClickSaveNewToDo(null, toDo)
+    } else {
+      props.onClickSaveNewToDo(assignedUserId, toDo)
+    }
     setIsNewToDo(false)
   }
 
