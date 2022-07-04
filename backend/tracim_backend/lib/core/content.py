@@ -428,17 +428,64 @@ class ContentApi(object):
 
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
+
+        # NOTE - MP - 2022-07-04 - We should copy the template, note try to create a copy
         if template_id:
             template = self.get_one(template_id)
-            content = self.copy_as_template(
+            content = self.copy_from_template(
                 new_content=content,
                 source_content=template,
                 new_parent=parent,
                 new_content_namespace=content_namespace,
             )
+
+            with new_revision(session=self._session, tm=transaction.manager, content=content):
+                self.fill_content(
+                    content=content,
+                    workspace=workspace,
+                    content_type_slug=content_type_slug,
+                    label=label,
+                    content_type=content_type,
+                    parent=parent,
+                    is_temporary=is_temporary,
+                    content_namespace=content_namespace,
+                )
+
         else:
             content.revision_type = ActionDescription.CREATION
 
+            self.fill_content(
+                content=content,
+                workspace=workspace,
+                content_type_slug=content_type_slug,
+                label=label,
+                content_type=content_type,
+                parent=parent,
+                is_temporary=is_temporary,
+                content_namespace=content_namespace,
+            )
+
+        if do_save:
+            self._session.add(content)
+            self.save(content, content.revision_type, do_notify=do_notify)
+
+        return content
+
+    # NOTE - MP - 2022-07-04 - This function is used as hacky way to reate/duplicate a template
+    # Actually our template are created in the created function. However it's a copy, we should
+    # remove the copy from template logic in the create function and use the copy function when
+    # we want to create from a template
+    def fill_content(
+        self,
+        content: Content,
+        workspace: Workspace,
+        content_type_slug: str,
+        label: str,
+        content_type: TracimContentType,
+        parent: Content = None,
+        is_temporary: bool = False,
+        content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
+    ) -> None:
         if label:
             file_extension = ""
             if content_type.file_extension:
@@ -472,12 +519,6 @@ class ContentApi(object):
         content.type = content_type.slug
         content.is_temporary = is_temporary
         content.content_namespace = content_namespace
-
-        if do_save:
-            self._session.add(content)
-            self.save(content, content.revision_type, do_notify=do_notify)
-
-        return content
 
     def copy_tags(self, destination: Content, source_content_id: int,) -> None:
         """Create extra data for templates: tags"""
@@ -1364,22 +1405,24 @@ class ContentApi(object):
             )
 
         copy_result = self._copy(item, content_namespace, parent)
-        copy_result = self._add_copy_revisions(
-            original_content=item,
-            new_content=copy_result.new_content,
-            original_content_children=copy_result.original_children_dict,
-            new_content_children=copy_result.new_children_dict,
-            new_parent=parent,
-            new_label=label,
-            new_workspace=workspace,
-            new_file_extension=file_extension,
-            new_content_namespace=content_namespace,
-            do_save=do_save,
-            do_notify=do_notify,
-        )
+
+        if copy_revision:
+            copy_result = self._add_copy_revisions(
+                original_content=item,
+                new_content=copy_result.new_content,
+                original_content_children=copy_result.original_children_dict,
+                new_content_children=copy_result.new_children_dict,
+                new_parent=parent,
+                new_label=label,
+                new_workspace=workspace,
+                new_file_extension=file_extension,
+                new_content_namespace=content_namespace,
+                do_save=do_save,
+                do_notify=do_notify,
+            )
         return copy_result.new_content
 
-    def copy_as_template(
+    def copy_from_template(
         self,
         new_content: Content,
         source_content: Content,
@@ -1394,8 +1437,25 @@ class ContentApi(object):
         )
         cpy_rev.properties = {}
         cpy_rev.node = new_content
+
         new_content.current_revision = cpy_rev
         self._flag_revision_as_copy(new_content, source_content)
+
+        todos = self.get_all_query(
+            parent_ids=[source_content.id],
+            content_type_slug=TODO_TYPE,
+            workspaces=[source_content.workspace],
+        ).all()
+
+        for todo in todos:
+            self.copy(
+                item=todo,
+                new_parent=new_content,
+                copy_revision=False,
+                do_save=True,
+                do_notify=False,
+            )
+
         return new_content
 
     def _copy(
