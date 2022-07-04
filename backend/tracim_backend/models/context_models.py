@@ -1440,12 +1440,6 @@ class ContentInContext(object):
         )
 
     @property
-    def assignee(self) -> UserInContext:
-        return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.content.assignee
-        )
-
-    @property
     def current_revision_id(self) -> int:
         return self.content.cached_revision_id
 
