@@ -40,14 +40,28 @@
         outline none
     &__delete:focus
       outline none
-    &__content
+    &__timedEvent
       flex 1
+    &__content
+      flex 6
       align-items baseline
       overflow hidden
       text-overflow ellipsis
+      &__navigation
+        display flex
+        justify-content space-between
+        margin-inline-end standardSpacing
+        font-weight bold
+        & > *
+          color fontColor
+          font-size metadataFontSize
+          &:hover
+            color fontColor
+            text-decoration underline
       & strong
-        margin-right textSpacing
+        margin-inline-end textSpacing
     &Checked
       color lightDarkGrey
-      & > button
+      background repeating-linear-gradient(25deg, lightGrey, lightGrey 5px, white 5px, white 10px)
+      & *
         color lightDarkGrey

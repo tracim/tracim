@@ -2,13 +2,9 @@ import React from 'react'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import {
-  DistanceDate,
-  DropdownMenu,
-  ProfileNavigation
-} from 'tracim_frontend_lib'
-
-require('./TimedEvent.styl')
+import DistanceDate from '../DistanceDate.jsx'
+import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import ProfileNavigation from '../ProfileNavigation/ProfileNavigation.jsx'
 
 const TimedEvent = (props) => {
   const topContents = (

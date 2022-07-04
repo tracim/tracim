@@ -13,9 +13,9 @@ import {
   COLORS,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  FilenameWithBadges
+  FilenameWithBadges,
+  TimedEvent
 } from 'tracim_frontend_lib'
-import TimedEvent from '../TimedEvent.jsx'
 
 require('./FeedItemHeader.styl')
 

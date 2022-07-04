@@ -595,5 +595,12 @@
   "{{author}} updated a task on {{content}}{{workspaceInfo}}": "",
   "Task deleted": "",
   "{{author}} deleted a task on {{content}}{{workspaceInfo}}": "",
-  "Unknown comment": ""
+  "Unknown comment": "",
+  "To Do": "",
+  "You are not allowed to delete this to do": "",
+  "Error while deleting to do": "",
+  "You are not allowed to change the status of this to do": "",
+  "Error while saving new to do": "",
+  "To do": "",
+  "Task": ""
 }
