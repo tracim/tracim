@@ -21,7 +21,7 @@ const ToDoManagement = (props) => {
   const [newToDoList, setNewToDoList] = useState([])
   const [newToDoListAsText, setNewToDoListAsText] = useState('')
   const [newToDoListSave, setNewToDoListSave] = useState([])
-  const [selectedValue, setSelectedValue] = useState([nobodyValueObject])
+  const [selectedValueList, setSelectedValueList] = useState([nobodyValueObject])
 
   useEffect(() => {
     const memberList = props.memberList.filter(member => member.username)
@@ -57,7 +57,7 @@ const ToDoManagement = (props) => {
 
   const addTodo = () => {
     const tmpToDoList = [...newToDoList]
-    const tmpSelectedValue = [...selectedValue]
+    const tmpSelectedValueList = [...selectedValueList]
 
     tmpToDoList.push(
       {
@@ -65,17 +65,19 @@ const ToDoManagement = (props) => {
         value: null
       }
     )
-    tmpSelectedValue.push(nobodyValueObject)
+    tmpSelectedValueList.push(nobodyValueObject)
 
-    setSelectedValue(tmpSelectedValue)
+    setSelectedValueList(tmpSelectedValueList)
     setNewToDoList(tmpToDoList)
   }
 
   const handleClickCancel = () => setIsNewToDo(false)
+
   const handleClickClose = () => {
     setNewToDoList(newToDoListSave)
     setIsPopUpDisplayed(false)
   }
+
   const handleClickSaveToDo = () => {
     newToDoList.forEach(newToDo => {
       if (newToDo.value) {
@@ -92,12 +94,12 @@ const ToDoManagement = (props) => {
 
   const handleChangeSelectedValue = (e, index) => {
     const tmpToDoList = [...newToDoList]
-    const tmpSelectedValue = [...selectedValue]
+    const tmpSelectedValueList = [...selectedValueList]
 
     tmpToDoList[index].assigneeId = e.value
-    tmpSelectedValue[index] = e
+    tmpSelectedValueList[index] = e
 
-    setSelectedValue(tmpSelectedValue)
+    setSelectedValueList(tmpSelectedValueList)
     setNewToDoList(tmpToDoList)
   }
 
@@ -109,8 +111,11 @@ const ToDoManagement = (props) => {
 
   const handleChangePopUpValue = (e) => {
     setNewToDoListAsText(e.target.value)
+
     const lines = e.target.value.split(/\n/g)
     const tmpToDoList = []
+    const tmpSelectedValueList = [...selectedValueList]
+
     lines.forEach((line, index) => {
       // INFO - MP - 2022-07-04 - This regex will:
       // Look for a +<UserName> followed by the ToDo text
@@ -123,39 +128,30 @@ const ToDoManagement = (props) => {
       const toDoGroups = line.match(/^([\s]*)([+][a-zA-Z]*)?( +)?(.*)/)
 
       if (toDoGroups) {
-        let toDoValue = ''
+        let toDoAssigneeUsername
 
         if (toDoGroups[2] && toDoGroups[2].startsWith('+')) {
-          const todoAssigneeUsername = toDoGroups[2].substring(1)
-          const todoAssignee = props.memberList.find(member => member.username === todoAssigneeUsername)
-
-          if (todoAssignee) {
-            const newSelectedValue = memberListOptions.find(option => option.value === todoAssignee.id)
-            const tmpSelectedValue = [...selectedValue]
-            tmpSelectedValue[index] = newSelectedValue
-            setSelectedValue(tmpSelectedValue)
-          } else {
-            const tmpSelectedValue = [...selectedValue]
-            tmpSelectedValue[index] = nobodyValueObject
-            setSelectedValue(tmpSelectedValue)
-          }
-        } else {
-          const tmpSelectedValue = [...selectedValue]
-          tmpSelectedValue[index] = nobodyValueObject
-          setSelectedValue(tmpSelectedValue)
+          toDoAssigneeUsername = toDoGroups[2].substring(1)
         }
 
-        toDoValue = toDoGroups[4]
+        const toDoAssignee = props.memberList.find(member => member.username && member.username === toDoAssigneeUsername)
+
+        if (toDoAssignee) {
+          tmpSelectedValueList[index] = memberListOptions.find(option => option.value === toDoAssignee.id)
+        } else {
+          tmpSelectedValueList[index] = nobodyValueObject
+        }
 
         tmpToDoList.push(
           {
-            assigneeId: selectedValue[index] ? selectedValue[index].value : null,
-            value: toDoValue
+            assigneeId: tmpSelectedValueList[index] ? tmpSelectedValueList[index].value : null,
+            value: toDoGroups[4]
           }
         )
       }
     })
-    setNewToDoList(tmpToDoList)
+    setSelectedValueList([...tmpSelectedValueList])
+    setNewToDoList([...tmpToDoList])
   }
 
   const handleOpenPopUp = () => {
@@ -184,7 +180,7 @@ const ToDoManagement = (props) => {
                 customColor={props.customColor}
                 key={`todoList__${index}`}
                 memberListOptions={memberListOptions}
-                selectedValue={selectedValue[index]}
+                selectedValue={selectedValueList[index]}
                 value={toDo.value ? toDo.value : ''}
               />
             )
@@ -251,6 +247,7 @@ const ToDoManagement = (props) => {
 
       {isPopUpDisplayed && (
         <CreateToDoFromTextPopUp
+          customColor={props.customColor}
           onChangeValue={handleChangePopUpValue}
           onClickTransform={() => setIsPopUpDisplayed(false)}
           onClickClose={handleClickClose}

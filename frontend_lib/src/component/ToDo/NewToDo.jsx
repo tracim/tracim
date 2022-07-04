@@ -35,23 +35,14 @@ const NewToDo = (props) => {
 export default translate()(NewToDo)
 
 NewToDo.propTypes = {
-  apiUrl: PropTypes.string.isRequired,
   onChangeSelectedValue: PropTypes.func.isRequired,
   onChangeValue: PropTypes.func.isRequired,
-  assigneeId: PropTypes.number,
-  assigneeValue: PropTypes.string,
-  contentId: PropTypes.number,
-  customColor: PropTypes.string,
   memberListOptions: PropTypes.array,
   selectedValue: PropTypes.object,
   value: PropTypes.string
 }
 
 NewToDo.defaultProps = {
-  assigneeId: 0,
-  assigneeValue: '',
-  contentId: 1,
-  customColor: '',
   memberListOptions: [],
   selectedValue: {},
   value: ''

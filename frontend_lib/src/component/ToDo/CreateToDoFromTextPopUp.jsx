@@ -1,18 +1,10 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { tinymceRemove } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 
-const wysiwygId = 'wysiwygTextToToDos'
-const wysiwygIdSelector = `#${wysiwygId}`
-
 const CreateToDoFromTextPopup = (props) => {
-  useEffect(() => {
-    return tinymceRemove(wysiwygIdSelector)
-  }, [])
-
   return (
     <CardPopup
       customClass='createToDoFromTextPopup'
