@@ -116,15 +116,16 @@ const tryGroupingNotification = (notificationList) => {
   let notificationListToReturn = notificationList
 
   if (!twoCriteriaListContainsGroup) {
-    if (canBeGrouped(twoCriteriaList, NUMBER_OF_CRITERIA.TWO)) {
+    if (twoCriteriaList.length >= 3 && canBeGrouped(twoCriteriaList, NUMBER_OF_CRITERIA.TWO)) {
       const notificationGrouped = createGroupNotificationFromNotificationList(twoCriteriaList)
       notificationListToReturn = [...notificationList.slice(0, notificationList.length - 3), notificationGrouped]
-    } else if (!oneCriteriaListContainsGroup && canBeGrouped(oneCriteriaList, NUMBER_OF_CRITERIA.ONE)) {
+    } else if (oneCriteriaList.length >= 6 && !oneCriteriaListContainsGroup && canBeGrouped(oneCriteriaList, NUMBER_OF_CRITERIA.ONE)) {
       const notificationGrouped = createGroupNotificationFromNotificationList(oneCriteriaList)
       notificationListToReturn = [...notificationList.slice(0, notificationList.length - 6), notificationGrouped]
     }
   }
 
+  // NOTE - MP - 2022-07-05 - If there is a group, we add it at the end of the group
   return notificationListToReturn
 }
 
@@ -161,17 +162,20 @@ const createGroupNotificationFromNotificationList = (notificationList) => {
 }
 
 const createNotificationListWithGroupsFromFlatNotificationList = (notificationList) => {
-  const numberOfNotificationsToGroup = 3
+  const minimumOfNotificationsToGroup = 3
   let groupedNotificationList = []
 
   notificationList.forEach((notification, index) => {
     const listLenght = groupedNotificationList.length
-    if (notification.type.includes(TLM_ENTITY.MENTION) || index < numberOfNotificationsToGroup - 1) {
+    // NOTE - MP - 2022-07-05 - We can't group less than 3 notifications and can't group mention
+    if (notification.type.includes(TLM_ENTITY.MENTION) || index < minimumOfNotificationsToGroup - 1) {
       groupedNotificationList.push(notification)
       return
     }
 
     const previousNotification = groupedNotificationList[listLenght - 1]
+    // NOTE - MP - 2022-07-05 - If there is a group, I check if I can add it to the existing group
+    // overwise I'm trying to create a group with the three or six last notifications
     if (previousNotification.group) {
       // NOTE - MP - 2022-05-25 - Because it's a group I can check if the first notification is groupable
       // to my current notification
@@ -185,7 +189,6 @@ const createNotificationListWithGroupsFromFlatNotificationList = (notificationLi
       }
     } else {
       groupedNotificationList.push(notification)
-
       groupedNotificationList = tryGroupingNotification(groupedNotificationList)
     }
   })
@@ -207,7 +210,7 @@ export const NotificationWall = props => {
 
   useEffect(() => {
     loadNotifications()
-  }, [])
+  }, [props.user.userId])
 
   // NOTE - MP - 2022-05-20 - This effect is used to recreate the notification
   // list with groups and fetch more notifications if needed.
