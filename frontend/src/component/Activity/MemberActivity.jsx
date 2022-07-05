@@ -11,13 +11,13 @@ import {
   BREADCRUMBS_TYPE,
   Breadcrumbs,
   PAGE,
+  TimedEvent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   ROLE_LIST,
   SUBSCRIPTION_TYPE_LIST
 } from 'tracim_frontend_lib'
 
-import TimedEvent from '../TimedEvent.jsx'
 require('./MemberActivity.styl')
 
 export class MemberActivity extends React.Component {

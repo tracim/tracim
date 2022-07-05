@@ -10,6 +10,7 @@ from tracim_backend.lib.search.models import DateRange
 from tracim_backend.lib.search.models import SearchedContent
 from tracim_backend.lib.search.models import SearchedDigestComment
 from tracim_backend.lib.search.models import SearchedDigestContent
+from tracim_backend.lib.search.models import SearchedDigestTodo
 from tracim_backend.lib.search.models import SearchedDigestUser
 from tracim_backend.lib.search.models import SearchedDigestWorkspace
 
@@ -91,6 +92,15 @@ class ESContentSearchResponse(ContentSearchResponse):
                 ]
             except KeyError:
                 comments = []
+            try:
+                todos = [
+                    SearchedDigestTodo(
+                        content_id=todo["content_id"], parent_id=todo.get("parent_id")
+                    )
+                    for todo in source["todos"]
+                ]
+            except KeyError:
+                todos = []
             path = [SearchedDigestContent(**component) for component in source["path"]]
 
             dict_workspace = source["workspace"]
@@ -107,6 +117,7 @@ class ESContentSearchResponse(ContentSearchResponse):
                     author=author,
                     last_modifier=last_modifier,
                     comments=comments,
+                    todos=todos,
                     modified=parse(source["modified"]),
                     created=parse(source["created"]),
                     score=hit["_score"],

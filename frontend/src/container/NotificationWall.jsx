@@ -346,7 +346,8 @@ export const NotificationWall = props => {
             return {
               title: props.t('Task to do created'),
               text: props.t('{{author}} created a task on {{content}}{{workspaceInfo}}', i18nOpts),
-              url: linkToParentContent(notification)
+              url: linkToParentContent(notification),
+              isToDo: true
             }
           }
 
@@ -362,7 +363,8 @@ export const NotificationWall = props => {
               return {
                 title: props.t('Task updated'),
                 text: props.t('{{author}} updated a task on {{content}}{{workspaceInfo}}', i18nOpts),
-                url: linkToParentContent(notification)
+                url: linkToParentContent(notification),
+                isToDo: true
               }
             }
 
@@ -384,7 +386,8 @@ export const NotificationWall = props => {
             return {
               title: props.t('Task deleted'),
               text: props.t('{{author}} deleted a task on {{content}}{{workspaceInfo}}', i18nOpts),
-              url: linkToParentContent(notification)
+              url: linkToParentContent(notification),
+              isToDo: true
             }
           }
 

@@ -59,7 +59,7 @@ export const NotificationItem = props => {
       to={notificationDetails.url || '#'}
       onClick={(e) => handleClickNotification(e, notification.id, notificationDetails)}
       className={classnames('notification__list__item',
-        { itemRead: notification.read, isMention: notificationDetails.isMention }
+        { itemRead: notification.read, isMention: notificationDetails.isMention, isToDo: notificationDetails.isToDo }
       )}
       key={notification.id}
     >

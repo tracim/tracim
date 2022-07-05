@@ -115,7 +115,7 @@ class CommentController(Controller):
             config=app_config,
         )
         content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
-        comments_page = content.get_comments(
+        comments_page = content.get_subcontents(
             page_token=hapic_data.query["page_token"],
             count=hapic_data.query["count"],
             sort_order=hapic_data.query["sort"],
