@@ -815,8 +815,6 @@ export class HtmlDocument extends React.Component {
       children: state.config.apiUrl ? (
         <PopinFixedRightPartContent
           label={props.t('Timeline')}
-          showProgress
-          id='timeline'
         >
           <Timeline
             contentId={state.content.content_id}
@@ -897,8 +895,6 @@ export class HtmlDocument extends React.Component {
       children: (
         <PopinFixedRightPartContent
           label={props.t('Tags')}
-          showProgress
-          id='tag'
         >
           <TagList
             apiUrl={state.config.apiUrl}
