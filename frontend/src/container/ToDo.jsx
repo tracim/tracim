@@ -29,8 +29,8 @@ import {
 } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 
-const filterTodoList = (list, filterList) => {
-  return list.filter(todo => todo.raw_content.toUpperCase().includes(filterList.toUpperCase()))
+const filterToDoList = (list, filterList) => {
+  return list.filter(toDo => toDo.raw_content.toUpperCase().includes(filterList.toUpperCase()))
 }
 
 const ToDo = (props) => {
@@ -172,7 +172,7 @@ const ToDo = (props) => {
             const newFilter = e.target.value
             setToDoListFilter(newFilter)
           }}
-          placeholder={props.t('Filter todos')}
+          placeholder={props.t('Filter my tasks')}
           icon='search'
           value={toDoListFilter}
         />
