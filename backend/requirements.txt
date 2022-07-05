@@ -169,7 +169,7 @@ pyexifinfo==0.4.0
     # via preview-generator
 pygments==2.9.0
     # via pyramid-debugtoolbar
-pyjwt==2.1.0
+pyjwt==2.4.0
     # via
     #   gripcontrol
     #   pubcontrol
