@@ -376,8 +376,8 @@ class ActionDescription(object):
         "undeletion": "far fa-trash-alt",
         "move": "fas fa-arrows-alt",
         "copy": "far fa-copy",
-        "mark-as-template": "",
-        "unmark-as-template": "",
+        "mark-as-template": "fas fa-clipboard",
+        "unmark-as-template": "fas fa-paste",
     }
 
     def __init__(self, id):
