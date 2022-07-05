@@ -11,7 +11,6 @@ import {
   CUSTOM_EVENT,
   getWorkspaceMemberList,
   handleFetchResult,
-  NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   PAGE,
   putUserConfiguration,
@@ -33,8 +32,6 @@ import {
   setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
-  setNotificationList,
-  setNextPage,
   setHeadTitle,
   setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
@@ -43,7 +40,6 @@ import {
   getConfig,
   getContentTypeList,
   getMyselfWorkspaceList,
-  getNotificationList,
   getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
