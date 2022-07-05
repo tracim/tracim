@@ -84,7 +84,7 @@ const sortByCreatedDateAndID = (arrayToSort) => {
   })
 }
 
-// NOTE - MP - 2022-05-24 - Return true if the notification list can be grouped
+// INFO - MP - 2022-05-24 - Return true if the notification list can be grouped
 const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
   const isSameContent = hasSameContent(notificationList)
   const isSameAuthor = hasSameAuthor(notificationList.map(notification => notification.author))
@@ -94,7 +94,7 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
   const groupedByOneCriteria =
     (numberOfCriteria === NUMBER_OF_CRITERIA.ONE && (isSameContent || isSameAuthor || isSameSpace))
 
-  // NOTE - MP - 2022-05-24 - Content && Author or Content && Workspace or Author && Workspace
+  // INFO - MP - 2022-05-24 - Content && Author or Content && Workspace or Author && Workspace
   const groupedByTwoCriteria =
     (numberOfCriteria === NUMBER_OF_CRITERIA.TWO &&
       (isSameContent ? (isSameAuthor || isSameSpace) : (isSameAuthor && isSameSpace)))
@@ -102,7 +102,7 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
   return !hasMention && (groupedByOneCriteria || groupedByTwoCriteria)
 }
 
-// NODE - MP - 2022-05-24 - Add a notification to an existing group
+// INFO - MP - 2022-05-24 - Add a notification to an existing group
 const addNotificationToGroup = (notification, notificationGroup) => {
   notificationGroup.group = sortByCreatedDateAndID([notification, ...notificationGroup.group])
 
@@ -111,7 +111,7 @@ const addNotificationToGroup = (notification, notificationGroup) => {
     : notification.created
 }
 
-// NOTE - MP - 2022-05-24 - Check if I can create a group with the three notifications with two criterias
+// INFO - MP - 2022-05-24 - Check if I can create a group with the three notifications with two criterias
 // or six notifications with one criteria
 const tryGroupingNotification = (notificationList) => {
   const twoCriteriaList = notificationList.slice(notificationList.length - 3)
@@ -131,7 +131,7 @@ const tryGroupingNotification = (notificationList) => {
     }
   }
 
-  // NOTE - MP - 2022-07-05 - If there is a group, we add it at the end of the group
+  // INFO - MP - 2022-07-05 - If there is a group, we add it at the end of the group
   return notificationListToReturn
 }
 
@@ -173,17 +173,17 @@ const createNotificationListWithGroupsFromFlatNotificationList = (notificationLi
 
   notificationList.forEach((notification, index) => {
     const listLenght = groupedNotificationList.length
-    // NOTE - MP - 2022-07-05 - We can't group less than 3 notifications and can't group mention
+    // INFO - MP - 2022-07-05 - We can't group less than 3 notifications and can't group mention
     if (notification.type.includes(TLM_ENTITY.MENTION) || index < minimumOfNotificationsToGroup - 1) {
       groupedNotificationList.push(notification)
       return
     }
 
     const previousNotification = groupedNotificationList[listLenght - 1]
-    // NOTE - MP - 2022-07-05 - If there is a group, I check if I can add it to the existing group
+    // INFO - MP - 2022-07-05 - If there is a group, I check if I can add it to the existing group
     // overwise I'm trying to create a group with the three or six last notifications
     if (previousNotification.group) {
-      // NOTE - MP - 2022-05-25 - Because it's a group I can check if the first notification is groupable
+      // INFO - MP - 2022-05-25 - Because it's a group I can check if the first notification is groupable
       // to my current notification
       if (canBeGrouped([previousNotification.group[0], notification])) {
         groupedNotificationList[listLenght - 1] = {
@@ -213,15 +213,17 @@ export const NotificationWall = props => {
   const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  // NOTE - MP - 2022-05-20 - If we change the height, we need to change the
+  // INFO - MP - 2022-05-20 - If we change the height, we need to change the
   // height of notification item in the css.
   const NOTIFICATION_ITEM_HEIGHT = 60
 
   useEffect(() => {
-    loadNotifications()
+    if (props.user.userId !== -1) {
+      loadNotifications()
+    }
   }, [props.user.userId])
 
-  // NOTE - MP - 2022-05-20 - This effect is used to recreate the notification
+  // INFO - MP - 2022-05-20 - This effect is used to recreate the notification
   // list with groups and fetch more notifications if needed.
   useEffect(() => {
     setIsFolderPathLoading(true)
@@ -262,25 +264,27 @@ export const NotificationWall = props => {
   }
 
   const loadNotifications = async () => {
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      props.user.userId,
-      {
-        excludeAuthorId: props.user.userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
-        nextPageToken: props.notificationPage.nextPageToken
+    if (props.notificationPage.hasNextPage || props.notificationPage.list.length === 0) {
+      const fetchGetNotificationWall = await props.dispatch(getNotificationList(
+        props.user.userId,
+        {
+          excludeAuthorId: props.user.userId,
+          notificationsPerPage: NUMBER_RESULTS_BY_PAGE,
+          nextPageToken: props.notificationPage.nextPageToken
+        }
+      ))
+      switch (fetchGetNotificationWall.status) {
+        case 200:
+          // INFO - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
+          // after, so the hook isn't triggered too early.
+          props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
+          props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
       }
-    ))
-    setIsLoading(false)
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        // NOTE - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
-        // after, so the hook isn't triggered too early.
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
     }
+    setIsLoading(false)
   }
 
   const handleScroll = (e) => {

@@ -252,6 +252,7 @@ class Login extends React.Component {
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceLists()
+        this.loadNotificationNotRead(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
         break
       }
@@ -415,27 +416,6 @@ class Login extends React.Component {
     switch (fetchUnreadMessageCount.status) {
       case 200: props.dispatch(setUnreadNotificationCount(fetchUnreadMessageCount.json.unread_messages_count)); break
       default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
-    }
-  }
-
-  loadNotificationList = async (userId) => {
-    const { props } = this
-
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      userId,
-      {
-        excludeAuthorId: userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
-      }
-    ))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-        break
     }
   }
 
