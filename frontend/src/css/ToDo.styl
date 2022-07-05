@@ -1,9 +1,13 @@
-.toDo__item
-  background-color offWhite
+.toDo__wrapper
+  & .toDo__item
+    background-color offWhite
 
-.toDo__item .toDoItem
-  display flex
-  min-height headerHeight
-  align-items center
-  padding standardSpacing
+    & .toDoItem
+      display flex
+      min-height headerHeight
+      align-items center
+      padding standardSpacing
 
+  & .textinput__box
+    flex-grow 1
+    margin pageSpacing pageSpacing 0 pageSpacing
