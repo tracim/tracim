@@ -195,6 +195,16 @@ export const revisionTypeList = [{
   faIcon: 'far fa-copy',
   tradKey: i18n.t('Item copied'),
   label: 'Item copied'
+}, {
+  id: 'mark-as-template',
+  faIcon: 'fas fa-clipboard',
+  tradKey: i18n.t('Item marked as template'),
+  label: 'Item marked as template'
+}, {
+  id: 'unmark-as-template',
+  faIcon: 'fas fa-paste',
+  tradKey: i18n.t('Item unmarked as template'),
+  label: 'Item unmarked as template'
 }]
 
 const WORKSPACE_MANAGER = {

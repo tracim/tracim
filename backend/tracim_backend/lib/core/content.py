@@ -1749,7 +1749,10 @@ class ContentApi(object):
                 "Can't mark this kind file as a template. Files supported: .document.html, .odt, .ods, .odp, .odg"
             )
         content.is_template = is_template
-        content.revision_type = ActionDescription.REVISION
+        if is_template:
+            content.revision_type = ActionDescription.MARK_AS_TEMPLATE
+        else:
+            content.revision_type = ActionDescription.UNMARK_AS_TEMPLATE
         return content
 
     def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:

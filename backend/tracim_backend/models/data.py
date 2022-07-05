@@ -348,11 +348,7 @@ class WorkspaceSubscription(DeclarativeBase):
 
 class ActionDescription(object):
     """
-    Allowed status are:
-    - open
-    - closed-validated
-    - closed-invalidated
-    - closed-deprecated
+    Types of revisions available
     """
 
     COPY = "copy"
@@ -366,6 +362,8 @@ class ActionDescription(object):
     UNARCHIVING = "unarchiving"
     UNDELETION = "undeletion"
     MOVE = "move"
+    MARK_AS_TEMPLATE = "mark-as-template"
+    UNMARK_AS_TEMPLATE = "unmark-as-template"
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
@@ -380,6 +378,8 @@ class ActionDescription(object):
         "undeletion": "far fa-trash-alt",
         "move": "fas fa-arrows-alt",
         "copy": "far fa-copy",
+        "mark-as-template": "fas fa-clipboard",
+        "unmark-as-template": "fas fa-paste",
     }
 
     def __init__(self, id):
@@ -405,6 +405,8 @@ class ActionDescription(object):
             cls.UNDELETION,
             cls.MOVE,
             cls.COPY,
+            cls.MARK_AS_TEMPLATE,
+            cls.UNMARK_AS_TEMPLATE,
         ]
 
 
