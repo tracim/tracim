@@ -227,7 +227,7 @@ PopinFixedContent.defaultProps = {
   onClickRemoveFromFavoriteList: () => {},
   onValidateChangeTitle: () => {},
   showChangeTitleButton: true,
-  showMarkedAsTemplate: true,
+  showMarkedAsTemplate: false,
   showReactions: false,
   showTranslateButton: false
 }

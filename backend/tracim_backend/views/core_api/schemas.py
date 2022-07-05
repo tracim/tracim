@@ -1810,6 +1810,27 @@ class ContentSchema(MessageContentSchema):
     )
 
 
+class ToDoSchema(marshmallow.Schema):
+    author = marshmallow.fields.Nested(UserDigestSchema())
+    assignee = marshmallow.fields.Nested(UserDigestSchema())
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Content creation date"
+    )
+    parent = marshmallow.fields.Nested(ContentMinimalSchema())
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema())
+    status = StrippedString(
+        example="closed-deprecated",
+        validate=content_status_validator,
+        description="this slug is found in content_type available statuses",
+        default=open_status,
+    )
+
+
 class PreviewInfoSchema(marshmallow.Schema):
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     revision_id = marshmallow.fields.Int(example=12, validate=strictly_positive_int_validator)
@@ -1922,19 +1943,6 @@ class MessageCommentSchema(marshmallow.Schema):
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
-    )
-
-
-class MessageTodoSchema(marshmallow.Schema):
-    assignee_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    parent_label = String(example="This is a label")
-    status = StrippedString(
-        example="closed-deprecated",
-        validate=content_status_validator,
-        description="this slug is found in content_type available statuses",
-        default=open_status,
     )
 
 

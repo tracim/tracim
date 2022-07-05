@@ -103,6 +103,7 @@ import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
+import ToDo from './ToDo.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
@@ -797,6 +798,15 @@ export class Tracim extends React.Component {
             render={() => (
               <div className='tracim__content fullWidthFullHeight'>
                 <Favorites />
+              </div>
+            )}
+          />
+
+          <Route
+            path={PAGE.TODO}
+            render={() => (
+              <div className='tracim__content fullWidthFullHeight'>
+                <ToDo />
               </div>
             )}
           />
