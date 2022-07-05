@@ -323,7 +323,7 @@ export class Kanban extends React.Component {
             onClickChangeStatusToDo={this.handleChangeStatusToDo}
             onClickDeleteToDo={this.handleDeleteToDo}
             onClickSaveNewToDo={this.handleSaveNewToDo}
-            onClickAddNewToDo={this.handleAddNewToDo}
+            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
             user={state.loggedUser}
             toDoList={state.toDoList}
           />
@@ -461,7 +461,7 @@ export class Kanban extends React.Component {
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
   }
 
-  handleAddNewToDo = (showProgressStatus) => {
+  handleSetShowProgressbarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 
@@ -693,6 +693,7 @@ export class Kanban extends React.Component {
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             menuItemList={this.getMenuItemList()}
+            onClickNavButton={this.handleSetShowProgressbarStatus}
           />
         </PopinFixedContent>
       </PopinFixed>
