@@ -30,7 +30,11 @@ import {
 import { FETCH_CONFIG } from '../util/helper.js'
 
 const filterToDoList = (list, filterList) => {
-  return list.filter(toDo => toDo.raw_content.toUpperCase().includes(filterList.toUpperCase()))
+  return list.filter(toDo =>
+    toDo.raw_content.toUpperCase().includes(filterList.toUpperCase()) ||
+    toDo.parent.label.toUpperCase().includes(filterList.toUpperCase()) ||
+    toDo.workspace.label.toUpperCase().includes(filterList.toUpperCase())
+  )
 }
 
 const ToDo = (props) => {
