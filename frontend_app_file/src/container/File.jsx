@@ -956,7 +956,6 @@ export class File extends React.Component {
           label={props.t('Tasks')}
           toDoList={state.toDoList}
           showProgress={state.showProgress}
-          id='todo'
         >
           <ToDoManagement
             apiUrl={state.config.apiUrl}
@@ -1295,7 +1294,6 @@ export class File extends React.Component {
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             menuItemList={this.getMenuItemList()}
-            onClickNavButton={this.handleSetShowProgressbarStatus}
           />
         </PopinFixedContent>
       </PopinFixed>
