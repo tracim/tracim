@@ -59,6 +59,7 @@ class TracimContext(ABC):
         self._client_token = None  # type: typing.Optional[str]
         # Pending events: have been created but are commited to the DB
         self._pending_events = []  # type: typing.List[Event]
+        self.force_anonymous_context = False
 
     @property
     def pending_events(self) -> typing.List[Event]:
@@ -85,6 +86,8 @@ class TracimContext(ABC):
 
         None can happen with tracimcli commands (or unauthenticated endpoints).
         """
+        if self.force_anonymous_context:
+            return None
         try:
             return self.current_user
         except NotAuthenticated:
@@ -341,7 +344,6 @@ class TracimRequest(TracimContext, Request):
     def __init__(self, environ, charset=None, unicode_errors=None, decode_param_names=None, **kw):
         Request.__init__(self, environ, charset, unicode_errors, decode_param_names, **kw)
         TracimContext.__init__(self)
-
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(lambda r: r.cleanup())
 
