@@ -122,7 +122,7 @@ const ToDoManagement = (props) => {
       // Ignoring blank space before the + and between the UserName and the ToDo text
       // Example:
       // With the string: '  +mathis do this'
-      // The expression will return: match['  ', '+mathis do this', '+mathis', ' ', 'do this']
+      // The expression will return: match['+mathis do this', '  ', '+mathis', ' ', 'do this']
       // With the string: 'you have to do this'
       // The expression will return: match['you have to do this', undefined, undefined, undefined, 'you have to do this']
       const toDoGroups = line.match(/^([\s]*)([+][a-zA-Z]*)?( +)?(.*)/)
