@@ -256,7 +256,7 @@ export class Kanban extends React.Component {
         <PopinFixedRightPartContent
           label={props.t('Timeline')}
           toDoList={state.toDoList}
-          showProgress={true}
+          showProgress
           id='timeline'
         >
           <Timeline
@@ -338,7 +338,7 @@ export class Kanban extends React.Component {
         <PopinFixedRightPartContent
           label={props.t('Tags')}
           toDoList={state.toDoList}
-          showProgress={true}
+          showProgress
           id='tag'
         >
           <TagList
