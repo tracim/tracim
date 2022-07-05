@@ -306,11 +306,11 @@ export class Kanban extends React.Component {
     }
     const toDoObject = {
       id: 'todo',
-      label: props.t('To Do'),
+      label: props.t('Tasks'),
       icon: 'fas fa-check-square',
       children: (
         <PopinFixedRightPartContent
-          label={props.t('To Do')}
+          label={props.t('Tasks')}
           toDoList={state.toDoList}
           showProgress={state.showProgress}
           id='todo'
