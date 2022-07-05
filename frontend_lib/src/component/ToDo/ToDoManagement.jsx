@@ -48,7 +48,6 @@ const ToDoManagement = (props) => {
               intent='primary'
               mode='light'
               onClick={handleAddNewToDo}
-              // onClick={() => setIsNewToDo(true)}
               text={props.t('New task')}
             />
           )}
