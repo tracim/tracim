@@ -51,11 +51,11 @@ const ToDo = (props) => {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: handleToDoDeleted }
     ])
 
-    setDisplayedToDoList(filterTodoList(toDoList, toDoListFilter))
+    setDisplayedToDoList(filterToDoList(toDoList, toDoListFilter))
   }, [toDoList])
 
   useEffect(() => {
-    setDisplayedToDoList(filterTodoList(toDoList, toDoListFilter))
+    setDisplayedToDoList(filterToDoList(toDoList, toDoListFilter))
   }, [toDoListFilter])
 
   const setHeadTitleToDo = () => {
