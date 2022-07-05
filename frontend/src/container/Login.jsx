@@ -247,11 +247,11 @@ class Login extends React.Component {
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         i18n.changeLanguage(loggedUser.lang)
 
+        Cookies.set(COOKIE_FRONTEND.SHOW_USERNAME_POPUP, true, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceLists()
-        // this.loadNotificationNotRead(loggedUser.user_id)
-        // this.loadNotificationList(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
         break
       }

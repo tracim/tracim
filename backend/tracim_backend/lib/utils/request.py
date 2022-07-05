@@ -59,6 +59,7 @@ class TracimContext(ABC):
         self._client_token = None  # type: typing.Optional[str]
         # Pending events: have been created but are commited to the DB
         self._pending_events = []  # type: typing.List[Event]
+        self.force_anonymous_context = False
 
     @property
     def pending_events(self) -> typing.List[Event]:
@@ -85,6 +86,8 @@ class TracimContext(ABC):
 
         None can happen with tracimcli commands (or unauthenticated endpoints).
         """
+        if self.force_anonymous_context:
+            return None
         try:
             return self.current_user
         except NotAuthenticated:
@@ -320,6 +323,9 @@ class TracimContext(ABC):
     def _get_current_reaction_id(self) -> int:
         raise NotImplementedError()
 
+    def _get_current_todo_id(self) -> int:
+        raise NotImplementedError()
+
     def _get_candidate_user_id(self) -> int:
         raise NotImplementedError()
 
@@ -338,7 +344,6 @@ class TracimRequest(TracimContext, Request):
     def __init__(self, environ, charset=None, unicode_errors=None, decode_param_names=None, **kw):
         Request.__init__(self, environ, charset, unicode_errors, decode_param_names, **kw)
         TracimContext.__init__(self)
-
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(lambda r: r.cleanup())
 
@@ -460,6 +465,11 @@ class TracimRequest(TracimContext, Request):
         )
         exception_if_invalid_id = InvalidReactionId("comment_id is not a correct integer")
         return self._get_path_id("reaction_id", exception_if_none, exception_if_invalid_id)
+
+    def _get_current_todo_id(self) -> int:
+        exception_if_none = ReactionNotFoundInTracimRequest("No todo_id property found in request")
+        exception_if_invalid_id = InvalidReactionId("todo_id is not a correct integer")
+        return self._get_path_id("todo_id", exception_if_none, exception_if_invalid_id)
 
     def _get_candidate_user_id(self) -> int:
         exception_if_none = UserNotFoundInTracimRequest(

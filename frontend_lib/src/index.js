@@ -13,6 +13,7 @@ import {
   getCurrentContentVersionNumber,
   hasSpaces,
   BREADCRUMBS_TYPE,
+  COLLABORA_EXTENSIONS,
   ROLE,
   ROLE_LIST,
   PROFILE,
@@ -64,6 +65,7 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
+  sortContentByStatus,
   USER_CALL_STATE
 } from './helper.js'
 
@@ -133,6 +135,8 @@ import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
 import PageContent from './component/Layout/PageContent.jsx'
 
+import TimedEvent from './component/TimedEvent/TimedEvent.jsx'
+
 import Delimiter from './component/Delimiter/Delimiter.jsx'
 
 import CardPopup from './component/CardPopup/CardPopup.jsx'
@@ -179,6 +183,10 @@ import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
 import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
+import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
+import NewToDo from './component/ToDo/NewToDo.jsx'
+import ToDoItem from './component/ToDo/ToDoItem.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -189,7 +197,11 @@ import {
 
 import {
   baseFetch,
+  deleteToDo,
+  getComment,
   getContentPath,
+  getToDo,
+  getToDoListForUser,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -224,7 +236,8 @@ import {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  putToDo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -258,7 +271,7 @@ export {
 } from './localStorage.js'
 
 export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
-export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+export { default as FilenameWithBadges } from './component/FilenameWithBadges/FilenameWithBadges.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
 export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
@@ -280,6 +293,9 @@ export {
   AgendaInfo,
   appContentFactory,
   DateInput,
+  deleteToDo,
+  getToDo,
+  getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -340,6 +356,7 @@ export {
   TLM_CORE_EVENT_TYPE,
   TLM_SUB_TYPE,
   BREADCRUMBS_TYPE,
+  COLLABORA_EXTENSIONS,
   ROLE,
   ROLE_LIST,
   PROFILE,
@@ -391,6 +408,7 @@ export {
   tinymceAutoCompleteHandleSelectionChange,
   updateTLMUser,
   baseFetch,
+  getComment,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -461,5 +479,11 @@ export {
   getFileRevisionPreviewInfo,
   tinymceRemove,
   Popover,
-  getBrowserLang
+  getBrowserLang,
+  NewToDo,
+  putToDo,
+  sortContentByStatus,
+  TimedEvent,
+  ToDoItem,
+  ToDoManagement
 }

@@ -58,9 +58,10 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
+      isMemberListLoading: false,
       displayNewMemberForm: false,
       autoCompleteFormNewMemberActive: false,
       searchedKnownMemberList: [],
@@ -98,8 +99,17 @@ export class Dashboard extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  async componentDidUpdate (prevProps, prevState) {
+  async componentDidUpdate (prevProps) {
     const { props } = this
+
+    // INFO - CH - 2022 06 16 - empty string is the default value for the property currentWorkspace.defaultRole in the reducer
+    if (prevProps.currentWorkspace.defaultRole === '' && props.currentWorkspace.defaultRole !== '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
+
+    if (prevProps.currentWorkspace.defaultRole !== '' && props.currentWorkspace.defaultRole === '') {
+      this.setState(prev => ({ newMember: { ...prev.newMember, role: props.currentWorkspace.defaultRole } }))
+    }
 
     if (!prevProps.match || !props.match || prevProps.currentWorkspace.id === props.currentWorkspace.id) return
     if (prevProps.system.config.instance_name !== props.system.config.instance_name) this.setHeadTitle()
@@ -113,7 +123,7 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       }
     })
@@ -256,6 +266,8 @@ export class Dashboard extends React.Component {
       return false
     }
 
+    this.setState({ isMemberListLoading: true })
+
     const newMemberInKnownMemberList = state.searchedKnownMemberList.find(u => u.user_id === state.newMember.id)
 
     if (state.newMember.id === '' && newMemberInKnownMemberList) { // this is to force sending the id of the user to the api if he exists
@@ -275,12 +287,14 @@ export class Dashboard extends React.Component {
         avatarUrl: '',
         personalData: '',
         publicName: '',
-        role: '',
+        role: props.currentWorkspace.defaultRole,
         isEmail: false
       },
       autoCompleteFormNewMemberActive: false,
       displayNewMemberForm: false
     })
+
+    this.setState({ isMemberListLoading: false })
 
     switch (fetchWorkspaceNewMember.status) {
       case 200:
@@ -317,6 +331,8 @@ export class Dashboard extends React.Component {
   handleClickRemoveMember = async memberId => {
     const { props } = this
 
+    this.setState({ isMemberListLoading: true })
+
     const fetchWorkspaceRemoveMember = await props.dispatch(deleteWorkspaceMember(props.currentWorkspace.id, memberId))
     switch (fetchWorkspaceRemoveMember.status) {
       case 204:
@@ -324,6 +340,8 @@ export class Dashboard extends React.Component {
         break
       default: props.dispatch(newFlashMessage(props.t('Error while removing member'), 'warning')); break
     }
+
+    this.setState({ isMemberListLoading: false })
   }
 
   handleClickOpenAdvancedDashboard = () => {
@@ -381,6 +399,7 @@ export class Dashboard extends React.Component {
         .filter(app => app.slug !== 'contents/share_folder')
         .filter(app => app.slug !== 'share_content')
         .filter(app => app.slug !== 'upload_permission')
+        .filter(app => app.slug !== 'contents/todo')
         .map(app => {
           const contentType = props.contentType.find(ct => app.slug.includes(ct.slug)) || { creationLabel: '', slug: '' }
           // INFO - CH - 2019-04-03 - hard coding some agenda properties for now since some end points requires some clarifications
@@ -517,6 +536,7 @@ export class Dashboard extends React.Component {
                     autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
                     publicName={state.newMember.publicName}
                     isEmail={state.newMember.isEmail}
+                    isLoading={state.isMemberListLoading}
                     onChangePersonalData={this.handleChangePersonalData}
                     onClickKnownMember={this.handleClickKnownMember}
                     // createAccount={state.newMember.createAccount}

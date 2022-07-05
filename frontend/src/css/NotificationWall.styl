@@ -87,6 +87,10 @@
         background lightOrange
       &.isMention.itemRead
         background lightOrangeOpacity
+      &.isToDo:not(.itemRead)
+        background greenToDo
+      &.isToDo.itemRead
+        background greenToDoOpacity
       &:hover
         color inherit
   &__wallClose

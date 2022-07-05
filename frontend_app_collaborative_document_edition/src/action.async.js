@@ -1,10 +1,11 @@
 import { baseFetch } from 'tracim_frontend_lib'
 
-export const postCollaborativeDocumentFromTemplate = (apiUrl, workspaceId, folderId, contentType, filename, templateName) =>
+export const postCollaborativeDocumentFromTemplate = (apiUrl, workspaceId, folderId, contentType, filename, templateName, templateId) =>
   baseFetch('POST', `${apiUrl}/collaborative-document-edition/workspaces/${workspaceId}/files`, {
     parent_id: folderId || 0,
     template: templateName,
-    filename: filename
+    filename: filename,
+    template_id: templateId
   })
 
 export const getCollaborativeDocumentTemplates = (apiUrl, workspaceId) =>

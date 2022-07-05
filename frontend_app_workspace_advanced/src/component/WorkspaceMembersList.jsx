@@ -25,7 +25,7 @@ export const WorkspaceMembersList = props => {
             searchedKnownMemberList={props.searchedKnownMemberList}
             onClickKnownMember={props.onClickKnownMember}
             roleList={props.roleList}
-            role={props.newMemberRole}
+            role={props.role}
             onChangeRole={props.onClickNewMemberRole}
             onClickBtnValidate={props.onClickValidateNewMember}
             autoCompleteActive={props.autoCompleteFormNewMemberActive}

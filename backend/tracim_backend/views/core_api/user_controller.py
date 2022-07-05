@@ -617,13 +617,12 @@ class UserController(Controller):
         workspace = None
         if hapic_data.path.workspace_id:
             workspace = wapi.get_one(hapic_data.path.workspace_id)
-        last_actives = content_api.get_last_active(
+        read_statuses = content_api.get_read_status(
             workspace=workspace,
-            limit=None,
-            before_content=None,
+            user=request.candidate_user,
             content_ids=hapic_data.query.content_ids or None,
         )
-        return [content_api.get_content_in_context(content) for content in last_actives]
+        return read_statuses
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_CONTENT_ENDPOINTS])
     @check_right(has_personal_access)

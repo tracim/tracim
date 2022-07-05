@@ -14,11 +14,15 @@ import {
 } from '../action-creator.sync.js'
 import {
   CONTENT_NAMESPACE,
-  GROUP_NOTIFICATION_CRITERIA
+  GROUP_NOTIFICATION_CRITERIA,
+  FETCH_CONFIG
 } from '../util/helper.js'
 import {
   CONTENT_TYPE,
+  getContentPath,
   GROUP_MENTION_TRANSLATION_LIST,
+  handleFetchResult,
+  Loading,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
@@ -41,7 +45,9 @@ const NUMBER_OF_CRITERIA = {
 }
 
 const getMainContentId = (notification) => {
-  return notification.type.includes(CONTENT_TYPE.COMMENT) || notification.type.includes(TLM_ENTITY.MENTION)
+  return notification.type.includes(CONTENT_TYPE.COMMENT) ||
+    notification.type.includes(CONTENT_TYPE.TODO) ||
+    notification.type.includes(TLM_ENTITY.MENTION)
     ? notification.content.parentId
     : notification.content.id
 }
@@ -196,12 +202,15 @@ const createNotificationListWithGroupsFromFlatNotificationList = (notificationLi
   return groupedNotificationList
 }
 
-const linkToComment = (notification) => {
+const linkToParentContent = (notification) => {
   return PAGE.CONTENT(notification.content.parentId)
 }
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
+  // INFO - GB -2022-06-05 - The no set bellow is not used because folderPath is a dictionary and the manipulations are done directly
+  const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
+  const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   // NOTE - MP - 2022-05-20 - If we change the height, we need to change the
@@ -215,8 +224,20 @@ export const NotificationWall = props => {
   // NOTE - MP - 2022-05-20 - This effect is used to recreate the notification
   // list with groups and fetch more notifications if needed.
   useEffect(() => {
+    setIsFolderPathLoading(true)
+
     const newNotificationList = createNotificationListWithGroupsFromFlatNotificationList(props.notificationPage.list)
 
+    props.notificationPage.list.forEach(async notification => {
+      if (notification.type === `${TLM_ENTITY.CONTENT}.${TLM_EVENT.CREATED}.${TLM_SUB.FOLDER}`) {
+        const fetchGetContentPath = await handleFetchResult(await getContentPath(FETCH_CONFIG.apiUrl, notification.content.id))
+        if (fetchGetContentPath.apiResponse.status === 200) {
+          folderPath[notification.content.id] = fetchGetContentPath.body.items.map(content => content.content_id)
+        }
+      }
+    })
+
+    setIsFolderPathLoading(false)
     setNotificationList(newNotificationList)
   }, [props.notificationPage.list])
 
@@ -279,7 +300,9 @@ export const NotificationWall = props => {
     const escapedContentLabel = (
       notification.content
         ? escapeHtml(
-          ((contentType === TLM_SUB.COMMENT) || (entityType === TLM_ENTITY.MENTION && notification.content.type === CONTENT_TYPE.COMMENT))
+          ((contentType === TLM_SUB.COMMENT) ||
+            (contentType === TLM_SUB.TODO) ||
+            (entityType === TLM_ENTITY.MENTION && notification.content.type === CONTENT_TYPE.COMMENT))
             ? notification.content.parentLabel
             : notification.content.label
         )
@@ -293,7 +316,7 @@ export const NotificationWall = props => {
       content: `<span title='${escapedContentLabel}' class='${numberOfContents === 1
         ? 'contentTitle__highlight'
         : ''
-      }'>${escapedContentLabel}</span>`,
+        }'>${escapedContentLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
@@ -304,16 +327,33 @@ export const NotificationWall = props => {
     }
 
     const isPublication = notification.content && notification.content.contentNamespace === CONTENT_NAMESPACE.PUBLICATION
-    const contentUrl = notification.content ? PAGE.CONTENT(notification.content.id) : ''
+
+    let contentUrl = notification.content ? PAGE.CONTENT(notification.content.id) : ''
 
     if (entityType === TLM_ENTITY.CONTENT) {
       switch (eventType) {
         case TLM_EVENT.CREATED: {
+          if (contentType === TLM_SUB.FOLDER && folderPath[notification.content.id]) {
+            contentUrl = PAGE.WORKSPACE.FOLDER_OPEN(
+              notification.workspace.id,
+              folderPath[notification.content.id]
+            )
+          }
+
           if (contentType === TLM_SUB.COMMENT) {
             return {
               title: props.t('Comment_noun'),
               text: props.t('{{author}} commented on {{content}}{{workspaceInfo}}', i18nOpts),
-              url: linkToComment(notification)
+              url: linkToParentContent(notification)
+            }
+          }
+
+          if (contentType === TLM_SUB.TODO) {
+            return {
+              title: props.t('Task to do created'),
+              text: props.t('{{author}} created a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              url: linkToParentContent(notification),
+              isToDo: true
             }
           }
 
@@ -325,6 +365,15 @@ export const NotificationWall = props => {
         }
         case TLM_EVENT.MODIFIED: {
           if (notification.content.currentRevisionType === 'status-update') {
+            if (contentType === TLM_SUB.TODO) {
+              return {
+                title: props.t('Task updated'),
+                text: props.t('{{author}} updated a task on {{content}}{{workspaceInfo}}', i18nOpts),
+                url: linkToParentContent(notification),
+                isToDo: true
+              }
+            }
+
             return {
               title: props.t('Status updated'),
               text: props.t('{{author}} changed the status of {{content}}{{workspaceInfo}}', i18nOpts),
@@ -339,6 +388,15 @@ export const NotificationWall = props => {
           }
         }
         case TLM_EVENT.DELETED: {
+          if (contentType === TLM_SUB.TODO) {
+            return {
+              title: props.t('Task deleted'),
+              text: props.t('{{author}} deleted a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              url: linkToParentContent(notification),
+              isToDo: true
+            }
+          }
+
           return {
             title: isPublication ? props.t('Publication deleted') : props.t('Content deleted'),
             text: props.t('{{author}} deleted {{content}}{{workspaceInfo}}', i18nOpts),
@@ -586,58 +644,62 @@ export const NotificationWall = props => {
   }
 
   return (
-    <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
-      <PopinFixedHeader
-        customClass='notification'
-        faIcon='far fa-bell'
-        rawTitle={props.t('Notifications')}
-        componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
-        onClickCloseBtn={props.onCloseNotificationWall}
-      >
-        <IconButton
-          mode='dark'
-          onClick={handleClickMarkAllAsRead}
-          icon='far fa-envelope-open'
-          text={props.t('Mark all as read')}
-          dataCy='markAllAsReadButton'
-        />
-      </PopinFixedHeader>
+    isFolderPathLoading
+      ? <Loading />
+      : (
+        <div className={classnames('notification', { notification__wallClose: !props.isNotificationWallOpen })}>
+          <PopinFixedHeader
+            customClass='notification'
+            faIcon='far fa-bell'
+            rawTitle={props.t('Notifications')}
+            componentTitle={<span className='componentTitle'>{props.t('Notifications')}</span>}
+            onClickCloseBtn={props.onCloseNotificationWall}
+          >
+            <IconButton
+              mode='dark'
+              onClick={handleClickMarkAllAsRead}
+              icon='far fa-envelope-open'
+              text={props.t('Mark all as read')}
+              dataCy='markAllAsReadButton'
+            />
+          </PopinFixedHeader>
 
-      <div className='notification__list' onScroll={handleScroll}>
-        {notificationList.length !== 0 && notificationList.map((notification, i) => {
-          if (notification.group) {
-            return (
-              <GroupedNotificationItem
-                getNotificationDetails={getNotificationDetails}
-                groupedNotifications={notification}
-                isFirst={i === 0}
-                isLast={i === notificationList.length - 1}
-                isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
-                key={notification.id}
-                onCloseNotificationWall={props.onCloseNotificationWall}
-                read={false}
-              />
-            )
-          } else {
-            return (
-              <ListItemWrapper
-                isFirst={i === 0}
-                isLast={i === notificationList.length - 1}
-                read={false}
-                key={notification.id}
-              >
-                <NotificationItem
-                  onCloseNotificationWall={props.onCloseNotificationWall}
-                  getNotificationDetails={getNotificationDetails}
-                  notification={notification}
-                />
-              </ListItemWrapper>
-            )
-          }
-        })}
+          <div className='notification__list' onScroll={handleScroll}>
+            {notificationList.length !== 0 && notificationList.map((notification, i) => {
+              if (notification.group) {
+                return (
+                  <GroupedNotificationItem
+                    getNotificationDetails={getNotificationDetails}
+                    groupedNotifications={notification}
+                    isFirst={i === 0}
+                    isLast={i === notificationList.length - 1}
+                    isSameContent={notification.type.includes(GROUP_NOTIFICATION_CRITERIA.CONTENT)}
+                    key={notification.id}
+                    onCloseNotificationWall={props.onCloseNotificationWall}
+                    read={false}
+                  />
+                )
+              } else {
+                return (
+                  <ListItemWrapper
+                    isFirst={i === 0}
+                    isLast={i === notificationList.length - 1}
+                    read={false}
+                    key={notification.id}
+                  >
+                    <NotificationItem
+                      onCloseNotificationWall={props.onCloseNotificationWall}
+                      getNotificationDetails={getNotificationDetails}
+                      notification={notification}
+                    />
+                  </ListItemWrapper>
+                )
+              }
+            })}
 
-      </div>
-    </div>
+          </div>
+        </div>
+      )
   )
 }
 

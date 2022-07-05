@@ -18,6 +18,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import eq_
 
@@ -48,6 +49,81 @@ class TestContentApi(object):
             do_save=True,
         )
         assert isinstance(item, Content)
+
+    def test_unit__create_content_from_template__OK_nominal_case(
+        self,
+        user_api_factory,
+        workspace_api_factory,
+        role_api_factory,
+        admin_user,
+        session,
+        app_config,
+        content_type_list,
+    ):
+        uapi = user_api_factory.get()
+
+        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
+        template_workspace = workspace_api_factory.get(user).create_workspace(
+            "template_workspace", save_now=True
+        )
+        workspace = workspace_api_factory.get(admin_user).create_workspace(
+            "template_workspace", save_now=True
+        )
+        role_api_factory.get().create_one(
+            admin_user, template_workspace, WorkspaceRoles.CONTRIBUTOR.level, False
+        )
+        api = ContentApi(current_user=user, session=session, config=app_config)
+        folder = api.create(
+            content_type_slug="folder",
+            workspace=template_workspace,
+            parent=None,
+            label="template directory",
+            do_save=True,
+        )
+        template = api.create(
+            content_type_slug="html-document",
+            workspace=template_workspace,
+            parent=folder,
+            label="REPORT: ",
+            do_save=True,
+        )
+        with new_revision(session, transaction.manager, content=template):
+            api.update_content(template, "REPORT: UPDATED", new_description="Template description")
+            api.save(
+                content=template, action_description=ActionDescription.EDITION, do_notify=False
+            )
+        transaction.commit()
+        api = ContentApi(current_user=admin_user, session=session, config=app_config)
+        with session.no_autoflush:
+            new_content = api.create(
+                content_type_slug="html-document",
+                workspace=workspace,
+                template_id=template.content_id,
+                parent=None,
+                label="REPORT: OK",
+                do_save=True,
+            )
+        assert new_content
+        assert len(new_content.revisions) == 1
+        assert new_content.description == template.description
+        assert new_content.workspace_id == workspace.workspace_id
+        assert new_content.parent is None
+        assert new_content.label == "REPORT: OK"
+        assert new_content.content_id != template.content_id
+        assert new_content.properties == {
+            "allowed_content": {
+                "thread": True,
+                "file": True,
+                "html-document": True,
+                "folder": True,
+                "comment": True,
+            },
+            "origin": {"content": 2, "revision": 3},
+        }
+        assert new_content.owner == admin_user
+        assert template.owner == user
+        assert new_content.revision_type == ActionDescription.COPY
+        assert template.revision_type == ActionDescription.EDITION
 
     def test_unit__create_content__err_empty_label(
         self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
@@ -389,41 +465,6 @@ class TestContentApi(object):
             content_type_list.Folder.slug: True,
             content_type_list.File.slug: True,
         }
-
-    def test_unit__restore_content_default_allowed_content__ok__nominal_case(
-        self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
-    ):
-        uapi = user_api_factory.get()
-
-        user = uapi.create_minimal_user(email="this.is@user", profile=Profile.ADMIN, save_now=True)
-        workspace = workspace_api_factory.get(current_user=user).create_workspace(
-            "test workspace", save_now=True
-        )
-        api = ContentApi(current_user=user, session=session, config=app_config)
-        folder = api.create(
-            content_type_slug=content_type_list.Folder.slug,
-            workspace=workspace,
-            parent=None,
-            label="plop",
-            do_save=False,
-        )
-        allowed_content_type_slug_list = [
-            content_type_list.Folder.slug,
-            content_type_list.File.slug,
-        ]
-        api.set_allowed_content(
-            folder, allowed_content_type_slug_list=allowed_content_type_slug_list
-        )
-        assert "allowed_content" in folder.properties
-        assert folder.properties["allowed_content"] == {
-            content_type_list.Folder.slug: True,
-            content_type_list.File.slug: True,
-        }
-        api.restore_content_default_allowed_content(folder)
-        assert "allowed_content" in folder.properties
-        assert folder.properties[
-            "allowed_content"
-        ] == content_type_list.default_allowed_content_properties(folder.type)
 
     def test_unit__get_allowed_content_type__ok__html_document(
         self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
@@ -791,9 +832,27 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        item = api.create(content_type_list.Folder.slug, workspace, None, "parent", do_save=True)
-        item2 = api.create(content_type_list.File.slug, workspace, item, "file1", do_save=True)
-        api.create(content_type_list.File.slug, workspace, None, "file2", do_save=True)
+        item = api.create(
+            content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=None,
+            label="parent",
+            do_save=True,
+        )
+        item2 = api.create(
+            content_type_list.File.slug,
+            workspace=workspace,
+            parent=item,
+            label="file1",
+            do_save=True,
+        )
+        api.create(
+            content_type_list.File.slug,
+            workspace=workspace,
+            parent=None,
+            label="file2",
+            do_save=True,
+        )
         parent_id = item.content_id
         child_id = item2.content_id
         uid = user.user_id
@@ -824,7 +883,12 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        c = api.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
+        c = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+        )
         with new_revision(session=session, tm=transaction.manager, content=c):
             with pytest.raises(ValueError):
                 api.set_status(c, "unknown-status")
@@ -849,7 +913,12 @@ class TestContentApi(object):
         rapi = role_api_factory.get(current_user=user2)
         rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
-        c = api2.create(content_type_list.Folder.slug, workspace, None, "parent", "", True)
+        c = api2.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="parent",
+            do_save=True,
+        )
         assert c.owner_id == user2.user_id
         assert c.current_revision.owner_id == user2.user_id
         api = ContentApi(current_user=user, session=session, config=app_config)
@@ -886,10 +955,9 @@ class TestContentApi(object):
 
         api = ContentApi(current_user=user, session=session, config=app_config)
         p = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            None,
-            "this_is_a_page",
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="this_is_a_page",
             do_save=True,
             content_namespace=ContentNamespaces.UPLOAD,
         )
@@ -910,7 +978,12 @@ class TestContentApi(object):
         )
 
         api = ContentApi(current_user=user, session=session, config=app_config)
-        p = api.create(content_type_list.Page.slug, workspace, None, "this_is_a_page", do_save=True)
+        p = api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="this_is_a_page",
+            do_save=True,
+        )
         c = api.create_comment(workspace, p, "this is the comment", True)
 
         assert Content == c.__class__
@@ -948,7 +1021,12 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
         with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -962,7 +1040,12 @@ class TestContentApi(object):
         api.create_comment(
             workspace, parent=text_file, content="just a comment", do_save=True, do_notify=False
         )
-        folderb = api.create(content_type_list.Folder.slug, workspace, None, "folder b", "", True)
+        folderb = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder b",
+            do_save=True,
+        )
         comment_before_move_id = text_file.children[0].id
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
         with new_revision(content=text_file, tm=transaction.manager, session=session):
@@ -1001,7 +1084,12 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
         with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -1021,7 +1109,12 @@ class TestContentApi(object):
         workspace2 = workspace_api_factory.get(current_user=user).create_workspace(
             "test workspace2", save_now=True
         )
-        folderb = api.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
+        folderb = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="folder b",
+            do_save=True,
+        )
         with new_revision(content=text_file, tm=transaction.manager, session=session):
             api.move(
                 item=text_file,
@@ -1063,12 +1156,10 @@ class TestContentApi(object):
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
-            content_type_list.Folder.slug,
-            workspace,
-            None,
-            "folder a",
-            "",
-            True,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
             content_namespace=ContentNamespaces.CONTENT,
         )
         with session.no_autoflush:
@@ -1094,12 +1185,10 @@ class TestContentApi(object):
             "test workspace2", save_now=True
         )
         folderb = api.create(
-            content_type_list.Folder.slug,
-            workspace2,
-            None,
-            "folder b",
-            "",
-            True,
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="folder b",
+            do_save=True,
             content_namespace=ContentNamespaces.UPLOAD,
         )
         with new_revision(content=text_file, tm=transaction.manager, session=session):
@@ -1193,6 +1282,15 @@ class TestContentApi(object):
         assert text_file_copy.file_mimetype == text_file.file_mimetype
         assert text_file_copy.revision_type == ActionDescription.COPY
         assert len(text_file_copy.revisions) == len(text_file.revisions) + 1
+        # check properties
+        assert text_file.properties.get("origin") is None
+        assert text_file.properties.get("allowed_content") is None
+        assert text_file_copy.properties.get("allowed_content") is None
+        assert text_file_copy.properties.get("origin")
+        assert (
+            text_file_copy.all_properties["allowed_content"]
+            == text_file.all_properties["allowed_content"]
+        )
 
     def test_unit_copy_file_same_label_different_namespace(
         self,
@@ -1280,7 +1378,12 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
         with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -1310,7 +1413,12 @@ class TestContentApi(object):
         workspace2 = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace2", save_now=True
         )
-        folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
+        folderb = api2.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="folder b",
+            do_save=True,
+        )
 
         api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
 
@@ -1362,7 +1470,12 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
         with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -1379,7 +1492,10 @@ class TestContentApi(object):
             "test workspace2", save_now=True
         )
         folderb = api2.create(
-            content_type_list.Folder.slug, workspace2, None, "folder b", "", False
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="folder b",
+            do_save=False,
         )
         api2.set_allowed_content(folderb, [])
         api2.save(folderb)
@@ -1409,7 +1525,12 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
         with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -1425,7 +1546,12 @@ class TestContentApi(object):
         workspace2 = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace2", save_now=True
         )
-        folderb = api2.create(content_type_list.Folder.slug, workspace2, None, "folder b", "", True)
+        folderb = api2.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="folder b",
+            do_save=True,
+        )
         api2.copy(item=text_file, new_parent=folderb)
 
         transaction.commit()
@@ -1468,7 +1594,12 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
         with session.no_autoflush:
             text_file = api.create(
                 content_type_slug=content_type_list.File.slug,
@@ -1528,7 +1659,12 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
 
         with session.no_autoflush:
             text_file = api.create(
@@ -1570,9 +1706,18 @@ class TestContentApi(object):
             user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
-        foldera = api.create(content_type_list.Folder.slug, workspace, None, "folder a", "", True)
+        foldera = api.create(
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="folder a",
+            do_save=True,
+        )
         already_exist = api.create(
-            content_type_list.Folder.slug, workspace, foldera, "already_exist", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            parent=foldera,
+            label="already_exist",
+            do_save=True,
         )
         with session.no_autoflush:
             text_file = api.create(
@@ -1629,16 +1774,28 @@ class TestContentApi(object):
         # Creates page_1 & page_2 in workspace 1
         #     and page_3 & page_4 in workspace 2
         page_1 = cont_api_a.create(
-            content_type_list.Page.slug, workspace1, None, "this is a page", do_save=True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace1,
+            label="this is a page",
+            do_save=True,
         )
         page_2 = cont_api_a.create(
-            content_type_list.Page.slug, workspace1, None, "this is page1", do_save=True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace1,
+            label="this is page1",
+            do_save=True,
         )
         page_3 = cont_api_a.create(
-            content_type_list.Thread.slug, workspace2, None, "this is page2", do_save=True
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace2,
+            label="this is page2",
+            do_save=True,
         )
         page_4 = cont_api_a.create(
-            content_type_list.File.slug, workspace2, None, "this is page3", do_save=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace2,
+            label="this is page3",
+            do_save=True,
         )
 
         for rev in page_1.revisions:
@@ -1701,9 +1858,11 @@ class TestContentApi(object):
         cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
 
         page_1 = cont_api_a.create(
-            content_type_list.Page.slug, workspace, None, "this is a page", do_save=True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="this is a page",
+            do_save=True,
         )
-
         for rev in page_1.revisions:
             eq_(user_b not in rev.read_by.keys(), True)
 
@@ -1739,13 +1898,22 @@ class TestContentApi(object):
         cont_api_b = ContentApi(current_user=user_b, session=session, config=app_config)
 
         page_2 = cont_api_a.create(
-            content_type_list.Page.slug, workspace, None, "this is page1", do_save=True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="this is page1",
+            do_save=True,
         )
         page_3 = cont_api_a.create(
-            content_type_list.Thread.slug, workspace, None, "this is page2", do_save=True
+            content_type_slug=content_type_list.Thread.slug,
+            workspace=workspace,
+            label="this is page2",
+            do_save=True,
         )
         page_4 = cont_api_a.create(
-            content_type_list.File.slug, workspace, None, "this is page3", do_save=True
+            content_type_slug=content_type_list.File.slug,
+            workspace=workspace,
+            label="this is page3",
+            do_save=True,
         )
 
         for rev in page_2.revisions:
@@ -2568,7 +2736,7 @@ class TestContentApi(object):
         eq_(ActionDescription.UNDELETION, updated2.revision_type)
         eq_(u1id, updated2.owner_id)
 
-    def test_unit__get_last_active__ok__nominal_case(
+    def test_unit__get_read_status__ok__nominal_case(
         self, user_api_factory, workspace_api_factory, session, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -2585,34 +2753,46 @@ class TestContentApi(object):
 
         api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="Hepla",
+            do_save=True,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
             session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
@@ -2621,54 +2801,55 @@ class TestContentApi(object):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
-        api.create_comment(
+        comment = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
         content_workspace_2 = api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace2,
+            parent=main_folder_workspace2,
+            label="content_workspace_2",
+            do_save=True,
         )
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 9
-        # workspace_2 content
-        assert last_actives[0] == content_workspace_2
-        # comment is newest than page2
-        assert last_actives[1] == firstly_created_but_recently_commented
-        assert last_actives[2] == secondly_created_but_not_commented
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[3] == firstly_created_but_recently_updated
-        assert last_actives[4] == secondly_created_but_not_updated
-        # creation order is inverted here as last created is last active
-        assert last_actives[5] == secondly_created
-        assert last_actives[6] == firstly_created
-        # folder subcontent modification does not change folder order
-        assert last_actives[7] == main_folder
-        # folder subcontent modification does not change folder order
-        # (workspace2)
-        assert last_actives[8] == main_folder_workspace2
 
-    def test_unit__get_last_active__ok__do_no_show_deleted_archived(
+        valid_content_ids = (
+            firstly_created_but_recently_commented.content_id,
+            firstly_created_but_recently_updated.content_id,
+            secondly_created_but_not_commented.content_id,
+            secondly_created.content_id,
+            firstly_created.content_id,
+            main_folder.content_id,
+            main_folder_workspace2.content_id,
+            comment.content_id,
+            secondly_created_but_not_updated.content_id,
+            content_workspace_2.content_id,
+        )
+
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 10
+        parsed_elems = []
+        for item in read_status:
+            assert item["content_id"] in valid_content_ids
+            assert item["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(item)
+
+    def test_unit__get_read_status__ok__do_no_show_deleted_archived(
         self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -2691,16 +2872,25 @@ class TestContentApi(object):
             show_archived=False,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         archived = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "archived", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="archived",
+            do_save=True,
         )
         deleted = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "deleted", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="deleted",
+            do_save=True,
         )
-        api.create_comment(workspace, parent=archived, content="just a comment", do_save=True)
-        api.create_comment(workspace, parent=deleted, content="just a comment", do_save=True)
         with new_revision(session=session, tm=transaction.manager, content=archived):
             api.archive(archived)
             api.save(archived)
@@ -2708,40 +2898,60 @@ class TestContentApi(object):
         with new_revision(session=session, tm=transaction.manager, content=deleted):
             api.delete(deleted)
             api.save(deleted)
-        normal = api.create(content_type_list.Page.slug, workspace, main_folder, "normal", "", True)
-        api.create_comment(workspace, parent=normal, content="just a comment", do_save=True)
+        normal = api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="normal",
+            do_save=True,
+        )
 
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 2
-        assert last_actives[0].content_id == normal.content_id
-        assert last_actives[1].content_id == main_folder.content_id
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 2
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                main_folder.content_id,
+            ]
 
         api._show_deleted = True
         api._show_archived = False
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 3
-        assert last_actives[0] == normal
-        assert last_actives[1] == deleted
-        assert last_actives[2] == main_folder
+
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 3
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                deleted.content_id,
+                main_folder.content_id,
+            ]
 
         api._show_deleted = False
         api._show_archived = True
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 3
-        assert last_actives[0] == normal
-        assert last_actives[1] == archived
-        assert last_actives[2] == main_folder
+
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 3
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                archived.content_id,
+                main_folder.content_id,
+            ]
 
         api._show_deleted = True
         api._show_archived = True
-        last_actives = api.get_last_active()
-        assert len(last_actives) == 4
-        assert last_actives[0] == normal
-        assert last_actives[1] == deleted
-        assert last_actives[2] == archived
-        assert last_actives[3] == main_folder
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_full(
+        read_status = api.get_read_status(user=user)
+        assert len(read_status) == 4
+        for item in read_status:
+            assert item["content_id"] in [
+                normal.content_id,
+                archived.content_id,
+                deleted.content_id,
+                main_folder.content_id,
+            ]
+
+    def test_unit__get_read_status__ok__workspace_filter_workspace_full(
         self, user_api_factory, session, app_config, workspace_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -2755,31 +2965,40 @@ class TestContentApi(object):
 
         api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
             session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
@@ -2788,41 +3007,49 @@ class TestContentApi(object):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
-        api.create_comment(
+        comment = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
-        last_actives = api.get_last_active(workspace=workspace)
-        assert len(last_actives) == 7
-        # comment is newest than page2
-        assert last_actives[0] == firstly_created_but_recently_commented
-        assert last_actives[1] == secondly_created_but_not_commented
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[2] == firstly_created_but_recently_updated
-        assert last_actives[3] == secondly_created_but_not_updated
-        # creation order is inverted here as last created is last active
-        assert last_actives[4] == secondly_created
-        assert last_actives[5] == firstly_created
-        # folder subcontent modification does not change folder order
-        assert last_actives[6] == main_folder
+        valid_content_ids = (
+            firstly_created_but_recently_commented.content_id,
+            secondly_created_but_not_commented.content_id,
+            firstly_created_but_recently_updated.content_id,
+            secondly_created_but_not_commented.content_id,
+            secondly_created.content_id,
+            firstly_created.content_id,
+            main_folder.content_id,
+            secondly_created_but_not_updated.content_id,
+            comment.content_id,
+        )
+        read_status = api.get_read_status(user=user, workspace=workspace)
+        assert len(read_status) == 8
+        parsed_elems = []
+        for item in read_status:
+            assert item["content_id"] in valid_content_ids
+            assert item["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(item)
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_content_ids(
+        assert set(valid_content_ids) == set(
+            [parsed_elem["content_id"] for parsed_elem in parsed_elems]
+        )
+
+    def test_unit__get_read_status__ok__workspace_filter_workspace_content_ids(
         self, session, user_api_factory, workspace_api_factory, app_config, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -2836,53 +3063,59 @@ class TestContentApi(object):
 
         api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
-        secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+        api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
-        secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+        api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
             session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
         ):
             firstly_created_but_recently_updated.description = "Just an update"
         api.save(firstly_created_but_recently_updated)
-        # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
-        secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+        api.create(
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
         api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
@@ -2895,118 +3128,24 @@ class TestContentApi(object):
             main_folder,
         ]
         content_ids = [content.content_id for content in selected_contents]
-        last_actives = api.get_last_active(workspace=workspace, content_ids=content_ids)
-        assert len(last_actives) == 4
-        # comment is newest than page2
-        assert last_actives[0] == firstly_created_but_recently_commented
-        assert secondly_created_but_not_commented not in last_actives
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[1] == firstly_created_but_recently_updated
-        assert secondly_created_but_not_updated not in last_actives
-        # creation order is inverted here as last created is last active
-        assert secondly_created not in last_actives
-        assert last_actives[2] == firstly_created
-        # folder subcontent modification does not change folder order
-        assert last_actives[3] == main_folder
+        read_status = api.get_read_status(user=user, workspace=workspace, content_ids=content_ids)
+        assert len(read_status) == 4
+        parsed_elems = []
+        for elem in read_status:
+            assert elem["read_by_user"] == 1
+            assert elem["last_view_datetime"]
+            assert elem["content_id"] in (
+                firstly_created_but_recently_commented.content_id,
+                firstly_created_but_recently_updated.content_id,
+                firstly_created.content_id,
+                main_folder.content_id,
+            )
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
 
-    def test_unit__get_last_active__ok__workspace_filter_workspace_limit_2_multiples_times(
-        self, session, user_api_factory, workspace_api_factory, app_config, content_type_list
-    ):
-        uapi = user_api_factory.get()
-
-        profile = Profile.ADMIN
-
-        user = uapi.create_minimal_user(email="this.is@user", profile=profile, save_now=True)
-        workspace = workspace_api_factory.get(current_user=user).create_workspace(
-            "test workspace", save_now=True
-        )
-
-        api = ContentApi(current_user=user, session=session, config=app_config)
-        main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
-        )
-        # creation order test
-        firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
-        )
-        secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
-        )
-        # update order test
-        firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
-        )
-        secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
-        )
-        with new_revision(
-            session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
-        ):
-            firstly_created_but_recently_updated.description = "Just an update"
-        api.save(firstly_created_but_recently_updated)
-        # comment change order
-        firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
-        )
-        secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
-        )
-        api.create_comment(
-            workspace, firstly_created_but_recently_commented, "juste a super comment", True
-        )
-
-        last_actives = api.get_last_active(workspace=workspace, limit=2)
-        assert len(last_actives) == 2
-        # comment is newest than page2
-        assert last_actives[0] == firstly_created_but_recently_commented
-        assert last_actives[1] == secondly_created_but_not_commented
-
-        last_actives = api.get_last_active(
-            workspace=workspace, limit=2, before_content=last_actives[1]
-        )
-        assert len(last_actives) == 2
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert last_actives[0] == firstly_created_but_recently_updated
-        assert last_actives[1] == secondly_created_but_not_updated
-
-        last_actives = api.get_last_active(
-            workspace=workspace, limit=2, before_content=last_actives[1]
-        )
-        assert len(last_actives) == 2
-        # creation order is inverted here as last created is last active
-        assert last_actives[0] == secondly_created
-        assert last_actives[1] == firstly_created
-
-        last_actives = api.get_last_active(
-            workspace=workspace, limit=2, before_content=last_actives[1]
-        )
-        assert len(last_actives) == 1
-        # folder subcontent modification does not change folder order
-        assert last_actives[0] == main_folder
-
-    def test_unit__get_last_active__ok__workspace_filter_workspace_empty(
+    def test_unit__get_read_status__ok__workspace_filter_workspace_empty(
         self, session, workspace_api_factory, app_config, user_api_factory, content_type_list
     ):
         uapi = user_api_factory.get()
@@ -3022,31 +3161,40 @@ class TestContentApi(object):
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
             session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
@@ -3055,27 +3203,25 @@ class TestContentApi(object):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
         api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
 
-        last_actives = api.get_last_active(workspace=workspace2)
-        assert len(last_actives) == 0
+        read_status = api.get_read_status(user=user, workspace=workspace2)
+        assert len(read_status) == 0
 
     def test_unit__get_all_query__with_user(
         self,

@@ -82,11 +82,14 @@ const ActivityList = (props) => {
     }
 
     if (activity.contentAvailable && activity.contentPath.length > 0) {
+      const contentPathList = activity.contentPath.map(content => content.content_id)
       return [
         dashboardBreadcrumb,
         ...activity.contentPath.map(crumb => ({
           label: crumb.label,
-          link: PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id),
+          link: crumb.content_type === CONTENT_TYPE.FOLDER
+            ? PAGE.WORKSPACE.FOLDER_OPEN(workspace.workspace_id, contentPathList)
+            : PAGE.WORKSPACE.CONTENT(workspace.workspace_id, crumb.content_type, crumb.content_id),
           type: BREADCRUMBS_TYPE.APP_FEATURE,
           isALink: true
         }))

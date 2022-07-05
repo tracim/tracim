@@ -70,34 +70,46 @@ class TestUserReadStatusEndpoint(object):
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = content_api_factory.get()
         main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="Helpa",
+            do_save=True,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         secondly_created = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         secondly_created_but_not_updated = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
             session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
@@ -106,31 +118,28 @@ class TestUserReadStatusEndpoint(object):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         secondly_created_but_not_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
-        api.create_comment(
+        comment = api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace2,
+            parent=main_folder_workspace2,
+            label="content_workspace_2",
+            do_save=True,
         )
         session.flush()
         transaction.commit()
@@ -143,22 +152,27 @@ class TestUserReadStatusEndpoint(object):
             status=200,
         )
         res = res.json_body
-        assert len(res) == 7
+        assert len(res) == 8
+        parsed_elems = []
         for elem in res:
             assert isinstance(elem["content_id"], int)
             assert isinstance(elem["read_by_user"], bool)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        assert res[1]["content_id"] == secondly_created_but_not_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[2]["content_id"] == firstly_created_but_recently_updated.content_id
-        assert res[3]["content_id"] == secondly_created_but_not_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[4]["content_id"] == secondly_created.content_id
-        assert res[5]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[6]["content_id"] == main_folder.content_id
+            # check only valid content
+            assert elem["content_id"] in (
+                firstly_created_but_recently_commented.content_id,
+                secondly_created_but_not_commented.content_id,
+                firstly_created_but_recently_updated.content_id,
+                secondly_created_but_not_updated.content_id,
+                secondly_created.content_id,
+                firstly_created.content_id,
+                main_folder.content_id,
+                comment.content_id,
+            )
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(elem)
 
     def test_api__get_read_status__ok__200__user_itself(
         self,
@@ -191,34 +205,46 @@ class TestUserReadStatusEndpoint(object):
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = content_api_factory.get()
         main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="Helpa",
+            do_save=True,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
             session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
@@ -227,31 +253,28 @@ class TestUserReadStatusEndpoint(object):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
         api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace2,
+            parent=main_folder_workspace2,
+            label="content_workspace_2",
+            do_save=True,
         )
         session.flush()
         transaction.commit()
@@ -276,19 +299,19 @@ class TestUserReadStatusEndpoint(object):
         )
         res = web_testapp.get(url=url, status=200, params=params)
         res = res.json_body
+
         assert len(res) == 4
+        parsed_elems = []
         for elem in res:
             assert isinstance(elem["content_id"], int)
             assert isinstance(elem["read_by_user"], bool)
-        # comment is newest than page2
-        assert res[0]["content_id"] == firstly_created_but_recently_commented.content_id
-        # last updated content is newer than other one despite creation
-        # of the other is more recent
-        assert res[1]["content_id"] == firstly_created_but_recently_updated.content_id
-        # creation order is inverted here as last created is last active
-        assert res[2]["content_id"] == firstly_created.content_id
-        # folder subcontent modification does not change folder order
-        assert res[3]["content_id"] == main_folder.content_id
+            # check only valid content
+            assert elem["content_id"] in selected_contents_id
+            # check duplicate
+            assert elem["content_id"] not in [
+                parsed_elem["content_id"] for parsed_elem in parsed_elems
+            ]
+            parsed_elems.append(elem)
 
     def test_api__get_read_status__err__403__other_user(
         self,
@@ -322,34 +345,46 @@ class TestUserReadStatusEndpoint(object):
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = content_api_factory.get()
         main_folder_workspace2 = api.create(
-            content_type_list.Folder.slug, workspace2, None, "Hepla", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace2,
+            label="Helpa",
+            do_save=True,
         )
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another creation_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another creation_order_test",
+            do_save=True,
         )
         # update order test
         firstly_created_but_recently_updated = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "update_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="update_order_test",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "another update_order_test",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="another update_order_test",
+            do_save=True,
         )
         with new_revision(
             session=session, tm=transaction.manager, content=firstly_created_but_recently_updated
@@ -358,31 +393,28 @@ class TestUserReadStatusEndpoint(object):
         api.save(firstly_created_but_recently_updated)
         # comment change order
         firstly_created_but_recently_commented = api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is randomized label content",
+            do_save=True,
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace,
-            main_folder,
-            "this is another randomized label content",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="this is another randomized label content",
+            do_save=True,
         )
         api.create_comment(
             workspace, firstly_created_but_recently_commented, "juste a super comment", True
         )
         api.create(
-            content_type_list.Page.slug,
-            workspace2,
-            main_folder_workspace2,
-            "content_workspace_2",
-            "",
-            True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace2,
+            parent=main_folder_workspace2,
+            label="content_workspace_2",
+            do_save=True,
         )
         session.flush()
         transaction.commit()
@@ -449,11 +481,18 @@ class TestUserSetContentAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
@@ -462,10 +501,12 @@ class TestUserSetContentAsRead(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -476,6 +517,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -492,19 +534,11 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
-
-        res = web_testapp.get(
-            "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
-                user_id=admin_user.user_id, workspace_id=workspace.workspace_id
-            ),
-            status=200,
-        )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
 
     def test_api_set_content_as_read__ok__200__admin_workspace_do_not_exist(
         self,
@@ -537,11 +571,18 @@ class TestUserSetContentAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
@@ -591,11 +632,18 @@ class TestUserSetContentAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
@@ -645,11 +693,18 @@ class TestUserSetContentAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
@@ -658,10 +713,12 @@ class TestUserSetContentAsRead(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -680,6 +737,7 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -717,11 +775,18 @@ class TestUserSetContentAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(firstly_created)
         api2.mark_unread(firstly_created)
@@ -773,11 +838,18 @@ class TestUserSetContentAsRead(object):
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_unread(firstly_created)
@@ -787,10 +859,12 @@ class TestUserSetContentAsRead(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -800,6 +874,7 @@ class TestUserSetContentAsRead(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -817,6 +892,7 @@ class TestUserSetContentAsRead(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -826,6 +902,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -842,7 +919,6 @@ class TestUserSetContentAsRead(object):
         session,
     ):
         # init DB
-
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         uapi = user_api_factory.get()
 
@@ -861,24 +937,32 @@ class TestUserSetContentAsRead(object):
         rapi.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_unread(comments)
         session.flush()
         transaction.commit()
-
+        params = {"content_ids": firstly_created.content_id}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -889,6 +973,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -905,6 +990,7 @@ class TestUserSetContentAsRead(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -914,6 +1000,7 @@ class TestUserSetContentAsRead(object):
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -958,11 +1045,18 @@ class TestUserSetContentAsUnread(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
@@ -971,10 +1065,12 @@ class TestUserSetContentAsUnread(object):
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -984,6 +1080,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1002,6 +1099,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1011,6 +1109,7 @@ class TestUserSetContentAsUnread(object):
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=admin_user.user_id, workspace_id=workspace.workspace_id
             ),
+            params=params,
             status=200,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
@@ -1048,11 +1147,18 @@ class TestUserSetContentAsUnread(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
@@ -1102,11 +1208,18 @@ class TestUserSetContentAsUnread(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
@@ -1157,11 +1270,18 @@ class TestUserSetContentAsUnread(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
@@ -1170,11 +1290,13 @@ class TestUserSetContentAsUnread(object):
 
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         # before
+        params = {"content_ids": firstly_created.content_id}
         res = web_testapp.get(
             "/api/users/{user_id}/workspaces/{workspace_id}/contents/read_status".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1193,6 +1315,7 @@ class TestUserSetContentAsUnread(object):
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1229,11 +1352,18 @@ class TestUserSetContentAsUnread(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_read(firstly_created)
         api2.mark_read(firstly_created)
@@ -1269,22 +1399,30 @@ class TestUserSetContentAsUnread(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
         session.flush()
         transaction.commit()
-
+        params = {"content_ids": firstly_created.content_id}
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1298,6 +1436,7 @@ class TestUserSetContentAsUnread(object):
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1316,22 +1455,31 @@ class TestUserSetContentAsUnread(object):
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         api = content_api_factory.get()
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         comments = api.create_comment(workspace, firstly_created, "juste a super comment", True)
         api.mark_read(firstly_created)
         api.mark_read(comments)
         session.flush()
         transaction.commit()
+        params = {"content_ids": firstly_created.content_id}
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is True
@@ -1345,6 +1493,7 @@ class TestUserSetContentAsUnread(object):
         res = web_testapp.get(
             "/api/users/1/workspaces/{}/contents/read_status".format(workspace.workspace_id),
             status=200,
+            params=params,
         )
         assert res.json_body[0]["content_id"] == firstly_created.content_id
         assert res.json_body[0]["read_by_user"] is False
@@ -1388,11 +1537,18 @@ class TestUserSetWorkspaceAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
@@ -1408,10 +1564,10 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is False
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is False
+
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
@@ -1425,10 +1581,9 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is True
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is True
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__ok__200__user_itself(
         self,
@@ -1461,11 +1616,18 @@ class TestUserSetWorkspaceAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
@@ -1481,10 +1643,10 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is False
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is False
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is False
+
         web_testapp.put(
             "/api/users/{user_id}/workspaces/{workspace_id}/read".format(
                 workspace_id=workspace.workspace_id,
@@ -1498,10 +1660,9 @@ class TestUserSetWorkspaceAsRead(object):
             ),
             status=200,
         )
-        assert res.json_body[0]["content_id"] == firstly_created.content_id
-        assert res.json_body[0]["read_by_user"] is True
-        assert res.json_body[1]["content_id"] == main_folder.content_id
-        assert res.json_body[1]["read_by_user"] is True
+        for elem in res.json_body:
+            assert elem["content_id"] == firstly_created.content_id or main_folder.content_id
+            assert elem["read_by_user"] is True
 
     def test_api_set_content_as_read__err__403__other_user(
         self,
@@ -1535,11 +1696,18 @@ class TestUserSetWorkspaceAsRead(object):
         api = content_api_factory.get()
         api2 = content_api_factory.get(current_user=test_user)
         main_folder = api.create(
-            content_type_list.Folder.slug, workspace, None, "this is randomized folder", "", True
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=workspace,
+            label="this is randomized folder",
+            do_save=True,
         )
         # creation order test
         firstly_created = api.create(
-            content_type_list.Page.slug, workspace, main_folder, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            parent=main_folder,
+            label="creation_order_test",
+            do_save=True,
         )
         api.mark_unread(main_folder)
         api.mark_unread(firstly_created)
@@ -5618,10 +5786,16 @@ class TestAboutUserEndpoint(object):
         workspace = workspace_api.create_workspace("test workspace", save_now=True)
         content_api = content_api_factory.get()
         content_api.create(
-            content_type_list.Page.slug, workspace, None, "creation_order_test", "", True
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="creation_order_test",
+            do_save=True,
         )
         content = content_api.create(
-            content_type_list.Page.slug, workspace, None, "another creation_order_test", "", True,
+            content_type_slug=content_type_list.Page.slug,
+            workspace=workspace,
+            label="another creation_order_test",
+            do_save=True,
         )
         with new_revision(session=session, tm=transaction.manager, content=content):
             content.description = "Just an update"

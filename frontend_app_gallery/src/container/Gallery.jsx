@@ -311,7 +311,7 @@ export class Gallery extends React.Component {
     }]
     if (state.folderId) {
       breadcrumbsList.push({
-        link: `/ui/workspaces/${state.config.appConfig.workspaceId}/contents?folder_open=${state.folderId},${folderDetail.folderParentIdList.join(',')}`,
+        link: PAGE.WORKSPACE.FOLDER_OPEN(state.config.appConfig.workspaceId, [state.folderId, ...folderDetail.folderParentIdList]),
         type: BREADCRUMBS_TYPE.APP_FULLSCREEN,
         label: folderDetail.fileName,
         isALink: true

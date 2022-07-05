@@ -5,6 +5,7 @@ import { translate } from 'react-i18next'
 import {
   CardPopup,
   IconButton,
+  Loading,
   PROFILE,
   ROLE_LIST,
   serialize,
@@ -41,6 +42,7 @@ export const AdminUserSpacesConfig = (props) => {
   const [memberSpaceList, setMemberSpaceList] = useState([])
   const [displayedMemberSpaceList, setDisplayedMemberSpaceList] = useState([])
   const [spaceList, setSpaceList] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     props.registerLiveMessageHandlerList([
@@ -82,6 +84,7 @@ export const AdminUserSpacesConfig = (props) => {
   }, [memberSpaceListFilter])
 
   const getSpaceList = async () => {
+    setIsLoading(true)
     const fetchGetSpaceList = await props.dispatch(getWorkspaceList())
 
     switch (fetchGetSpaceList.status) {
@@ -91,6 +94,7 @@ export const AdminUserSpacesConfig = (props) => {
           return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
         })).then((spaceListResult) => {
           setSpaceList(sortWorkspaceList(spaceListResult))
+          setIsLoading(false)
         })
         break
       }
@@ -218,24 +222,26 @@ export const AdminUserSpacesConfig = (props) => {
               value={availableSpaceListFilter}
             />
           </div>
-          {(availableSpaceList.length
-            ? (
-              <div className='adminUserSpacesConfig__zones__table'>
-                <table className='table'>
-                  <tbody>
-                    {displayedAvailableSpaceList.map(space => {
-                      return (
-                        <AdminUserSpacesConfigItem
-                          key={`availableSpaceList_${space.id}`}
-                          onClickButton={handleAddToSpace}
-                          space={space}
-                        />
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : <div>{props.t('No other spaces available')}</div>
+          {(isLoading
+            ? <Loading />
+            : availableSpaceList.length
+              ? (
+                <div className='adminUserSpacesConfig__zones__table'>
+                  <table className='table'>
+                    <tbody>
+                      {displayedAvailableSpaceList.map(space => {
+                        return (
+                          <AdminUserSpacesConfigItem
+                            key={`availableSpaceList_${space.id}`}
+                            onClickButton={handleAddToSpace}
+                            space={space}
+                          />
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : <div>{props.t('No other spaces available')}</div>
           )}
         </div>
 
@@ -253,33 +259,36 @@ export const AdminUserSpacesConfig = (props) => {
               value={memberSpaceListFilter}
             />
           </div>
-          {(memberSpaceList.length
-            ? (
-              <div className='adminUserSpacesConfig__zones__table'>
-                <table className='table'>
-                  <tbody>
-                    {displayedMemberSpaceList.map(space => {
-                      const member = space.memberList.find(u => u.id === props.userToEditId)
-                      const memberRole = ROLE_LIST.find(r => r.slug === member.role)
+          {(isLoading
+            ? <Loading />
+            : (memberSpaceList.length
+              ? (
+                <div className='adminUserSpacesConfig__zones__table'>
+                  <table className='table'>
+                    <tbody>
+                      {displayedMemberSpaceList.map(space => {
+                        const member = space.memberList.find(u => u.id === props.userToEditId)
+                        const memberRole = ROLE_LIST.find(r => r.slug === member.role)
 
-                      return (
-                        <AdminUserSpacesConfigItem
-                          emailNotificationActivated={props.system.config.email_notification_activated}
-                          key={`memberSpaceList_${space.id}`}
-                          onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-                          onClickButton={handleLeaveSpace}
-                          onClickChangeRole={handleClickChangeRole}
-                          onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
-                          member={member}
-                          memberRole={memberRole}
-                          space={space}
-                        />
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : <div>{props.t('This user is not a member of any space yet')}</div>
+                        return (
+                          <AdminUserSpacesConfigItem
+                            emailNotificationActivated={props.system.config.email_notification_activated}
+                            key={`memberSpaceList_${space.id}`}
+                            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+                            onClickButton={handleLeaveSpace}
+                            onClickChangeRole={handleClickChangeRole}
+                            onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
+                            member={member}
+                            memberRole={memberRole}
+                            space={space}
+                          />
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : <div>{props.t('This user is not a member of any space yet')}</div>
+            )
           )}
         </div>
       </div>

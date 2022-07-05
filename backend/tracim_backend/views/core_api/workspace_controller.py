@@ -42,6 +42,7 @@ from tracim_backend.lib.utils.authorization import can_see_workspace_information
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import is_content_manager
+from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
 from tracim_backend.lib.utils.authorization import is_trusted_user
 from tracim_backend.lib.utils.request import TracimRequest
@@ -53,7 +54,6 @@ from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
-from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import WorkspaceSubscription
@@ -71,6 +71,9 @@ from tracim_backend.views.core_api.schemas import FilterContentQuerySchema
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import PaginatedContentDigestSchema
 from tracim_backend.views.core_api.schemas import RoleUpdateSchema
+from tracim_backend.views.core_api.schemas import SetContentIsTemplateSchema
+from tracim_backend.views.core_api.schemas import TemplateQuerySchema
+from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndUserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceCreationSchema
@@ -557,14 +560,20 @@ class WorkspaceController(Controller):
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(creation_data.parent_id)
                 ) from exc
+
         content = api.create(
-            label=creation_data.label,
             content_type_slug=creation_data.content_type,
+            do_save=True,
+            label=creation_data.label,
+            template_id=creation_data.template_id,
             workspace=request.current_workspace,
             parent=parent,
             content_namespace=creation_data.content_namespace,
         )
-        api.save(content, ActionDescription.CREATION)
+        if creation_data.template_id:
+            api.copy_tags(
+                destination=content, source_content_id=creation_data.template_id,
+            )
         content = api.get_content_in_context(content)
         return content
 
@@ -599,7 +608,11 @@ class WorkspaceController(Controller):
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         api = ContentApi(
-            current_user=request.current_user, session=request.dbsession, config=app_config
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
         )
         content = api.get_one(
             content_id=hapic_data.path["content_id"], content_type=content_type_list.Any_SLUG
@@ -787,6 +800,51 @@ class WorkspaceController(Controller):
             api.unarchive(content)
         return
 
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @check_right(is_contributor)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.input_body(SetContentIsTemplateSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_content_template(self, context, request: TracimRequest, hapic_data=None) -> None:
+        """
+        Set content as template
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=True,
+            show_deleted=True,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+            api.set_template(content, hapic_data.body.is_template)
+            api.save(content)
+        return
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(TemplateQuerySchema())
+    @hapic.output_body(ContentDigestSchema(many=True), default_http_code=HTTPStatus.OK)
+    def get_templates(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[ContentDigestSchema]:
+        """
+        Get all templates
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        api = ContentApi(
+            show_archived=False,
+            show_deleted=False,
+            current_user=request.current_user,
+            session=request.dbsession,
+            config=app_config,
+        )
+        return api.get_templates(
+            user_id=hapic_data.path["user_id"], template_type=hapic_data.query["type"]
+        )
+
     def bind(self, configurator: Configurator) -> None:
         """
         Create all routes and views using
@@ -902,7 +960,7 @@ class WorkspaceController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.undelete_content, route_name="undelete_content")
-        # # Archive/Unarchive Content
+        # Archive/Unarchive Content
         configurator.add_route(
             "archive_content",
             "/workspaces/{workspace_id}/contents/{content_id}/archived",
@@ -915,6 +973,20 @@ class WorkspaceController(Controller):
             request_method="PUT",
         )
         configurator.add_view(self.unarchive_content, route_name="unarchive_content")
+
+        # Mark/unmark Content as template
+        configurator.add_route(
+            "set_content_template",
+            "/workspaces/{workspace_id}/contents/{content_id}/template",
+            request_method="PUT",
+        )
+        configurator.add_view(self.set_content_template, route_name="set_content_template")
+
+        # Get every templates
+        configurator.add_route(
+            "get_templates", "/users/{user_id}/template_contents", request_method="GET"
+        )
+        configurator.add_view(self.get_templates, route_name="get_templates")
 
         # Subscriptions
         configurator.add_route(

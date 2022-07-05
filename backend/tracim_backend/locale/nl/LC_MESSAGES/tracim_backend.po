@@ -1,0 +1,370 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2022-06-15 08:19+0000\n"
+"Last-Translator: Paul de Wit <pdwonline@goatnet.nl>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/tracim/backend/nl/>"
+"\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.13-dev\n"
+
+#: tracim_backend/config.py:687
+msgid "[{website_title}] A password reset has been requested"
+msgstr "[{website_title}] Wachtwoord herstel aangevraagd"
+
+#: tracim_backend/app_models/contents.py:47
+msgid "Opened"
+msgstr "Geopend"
+
+#: tracim_backend/app_models/contents.py:55
+msgid "Validated"
+msgstr "Gecontroleerd"
+
+#: tracim_backend/app_models/contents.py:63
+msgid "Cancelled"
+msgstr "Geannuleerd"
+
+#: tracim_backend/app_models/contents.py:71
+msgid "Deprecated"
+msgstr "Verouderd"
+
+#: tracim_backend/applications/share/application.py:25
+msgid ""
+"[{website_title}] {emitter_name} shared the file \"{content_filename}\" "
+"with you"
+msgstr ""
+"[{website_title}] {emitter_name} heeft \"{content_filename}\" met jou gedeeld"
+
+#: tracim_backend/applications/share/application.py:33
+msgid ""
+"[{website_title}] You shared \"{content_filename}\" with {nb_receivers} "
+"people"
+msgstr ""
+"[{website_title}] Je hebt \"{content_filename}\" gedeeld met {nb_receivers}"
+
+#: tracim_backend/applications/upload_permissions/application.py:32
+msgid ""
+"[{website_title}] You invited {nb_receivers} people to upload files on "
+"\"{workspace_name}\""
+msgstr ""
+"[{website_title}] Je hebt {nb_receivers} mensen uitgenodigd om bestanden te "
+"uploaden naar \"{workspace_name}\""
+
+#: tracim_backend/lib/core/content.py:1906
+msgid "New folder"
+msgstr "Nieuwe Map"
+
+#: tracim_backend/lib/core/content.py:1911
+msgid "New folder {0}"
+msgstr "Nieuwe map {0}"
+
+#: tracim_backend/lib/core/workspace.py:497
+msgid "Space"
+msgstr "Omgeving"
+
+#: tracim_backend/lib/core/workspace.py:500
+msgid "Space {}"
+msgstr "Omgeving {}"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:31
+msgid ""
+"I modified the status of {content_name}. The new status is "
+"<i>{new_status}</i>"
+msgstr "Ik heb de status van {content_name} aangepast naar <i>{new_status}</i>"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:35
+msgid "I added an item entitled {content_name}."
+msgstr "Ik heb item <i>{content_name}</i> toegevoegd."
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:61
+msgid ""
+"Reply to this email directly or <a href=\"{call_to_action_url}\">view it "
+"on tracim</a>"
+msgstr ""
+"Je kunt op deze mail antwoorden of <a href=\"{call_to_action_url}\">toon het "
+"item online</a>"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:63
+msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
+msgstr "<a href=\"{call_to_action_url}\">toon het online</a>"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:66
+msgid ""
+"If you'd like to receive fewer emails, you can <a "
+"href=\"{website_title}/ui/account\">unsubscribe from notifications</a>."
+msgstr ""
+"Je kunt <a href=\"{website_title}/ui/account\">notificaties uitzetten</a> om "
+"minder emails te ontvangen."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:8
+msgid "{origin_user_name} invited you to join <i>{website_title}</i>."
+msgstr "{origin_user_name} heeft je uitgenodigd voor <i>{website_title}</i>."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:10
+msgid "Someone invited you to join <i>{website_title}</i>."
+msgstr "Iemand heeft je uitgenodigd voor <i>{website_title}</i>."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:16
+msgid "login: {email_address}"
+msgstr "login: {email_address}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:23
+msgid ""
+"note: as soon as you are connected, we strongly recommend that you change"
+" your password and delete this email."
+msgstr ""
+"Let op: Wijzig je wachtwoord als je de eerste keer bent ingelogd en "
+"verwijder dan deze email."
+
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:5
+msgid ""
+"{username} (<a href=\"{email_link}\">{email}</a>) shared one or several "
+"files with you in this space: <a "
+"href={sharedspace_url}>{sharedspace_name}</a>"
+msgstr ""
+"{username} (<a href=\"{email_link}\">{email}</a>) heeft bestanden met je "
+"gedeeld in deze omgeving: <a href={sharedspace_url}>{sharedspace_name}</a>"
+
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:12
+msgid "Message:"
+msgstr "Bericht:"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:11
+msgid "In order to reset your password, please click on following link :"
+msgstr "Klik op de volgende link om een nieuw wachtwoord in te stellen:"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:19
+msgid "The link is valid for {} minutes."
+msgstr "De link is {} minuten geldig."
+
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
+msgid "This file is protected by this password: \"{share_password}\""
+msgstr ""
+"Dit bestand is beschermd met het volgende wachtwoord: \"{share_password}\""
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:9
+msgid "I share a file with you, download it here:"
+msgstr "Ik heb een bestand met je gedeeld. Download het hier:"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:19
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:16
+msgid "Note: You can also use this link: {url}"
+msgstr "NB: je kunt ook deze link gebruiken: {url}"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:25
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:19
+msgid "{username} (through tracim)"
+msgstr "{username} (door Tracim)"
+
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
+msgid ""
+"You have invited {nb_receivers} people to upload files in this space <a "
+"href={sharedspace_url}>{sharedspace_name}</a>:"
+msgstr ""
+"Je hebt {nb_receivers} mensen uitgenodigd om bestanden te uploaden in <a "
+"href={sharedspace_url}>{sharedspace_name}</a>:"
+
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
+msgid ""
+"This upload is protected by this password: "
+"\"{upload_permission_password}\""
+msgstr ""
+"Deze upload is beveiligd met het wachtwoord: \"{upload_permission_password}\""
+
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:10
+msgid "Upload files"
+msgstr "Upload bestanden"
+
+#: tracim_backend/config.py:668
+msgid ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
+msgstr ""
+"[{website_title}] [{workspace_label}] {content_label} "
+"({content_status_label})"
+
+#: tracim_backend/config.py:677
+msgid "[{website_title}] Someone created an account for you"
+msgstr "[{website_title}] Iemand heeft een account voor je aangemaakt"
+
+#: tracim_backend/applications/upload_permissions/lib.py:280
+msgid "Message from {username}: {message}"
+msgstr "Bericht van {username}: {message}"
+
+#: tracim_backend/lib/mail_notifier/notifier.py:280
+msgid "{username} & all members of {workspace}"
+msgstr "{username} & alle leden van {workspace}"
+
+#: tracim_backend/applications/upload_permissions/application.py:24
+msgid "{emitter_name} invited you to upload files on \"{website_title}\""
+msgstr ""
+"{emitter_name} Heeft je uitgenodigd om bestanden te uploaden op \""
+"{website_title}\""
+
+#: tracim_backend/applications/upload_permissions/application.py:42
+msgid ""
+"[{website_title}] {uploader_username} shared {nb_uploaded_contents} files"
+" in \"{workspace_name}\""
+msgstr ""
+"[{website_title}] {uploader_username} heeft {nb_uploaded_contents} bestanden "
+"gedeeld op\"{workspace_name}\""
+
+#: tracim_backend/applications/upload_permissions/lib.py:258
+msgid "Files uploaded by {username} on {date} at {time}"
+msgstr "Bestanden ge-upload door {username} op {date} at {time}"
+
+#: tracim_backend/applications/upload_permissions/lib.py:284
+msgid "Uploaded by {username}."
+msgstr "Ge-upload door {username}."
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:41
+msgid "I updated {content_name}."
+msgstr "I Ik heb <i>{content_name}</i> bijgewerkt."
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:48
+msgid "Here is an overview of the changes:"
+msgstr "Hier is een overzicht van de wijzigingen:"
+
+#: tracim_backend/templates/mail/content_update_body_html.mak:65
+msgid "You're receiving this email because of your account on {website_title}."
+msgstr "Je ontvangt deze email omdat je een account hebt op {website_title}."
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:5
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:4
+#: tracim_backend/templates/mail/reset_password_body_html.mak:4
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:4
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:5
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:4
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:5
+msgid "Hello {username},"
+msgstr "Hallo {username},"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:13
+msgid "Your credentials are:"
+msgstr "Jouw inloggegevens zijn:"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:17
+msgid "password: {password}"
+msgstr "wachtwoord: {password}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:21
+msgid ""
+"Let start to discuss, share files, agenda and documentation with "
+"collaborators by logging into your space: {a_link}"
+msgstr ""
+"Je kunt beginnen met het uitwisselen van bestanden, agenda, documentatie en "
+"informatie in jouw omgeving: {a_link}"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:24
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:16
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:16
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:16
+msgid "Enjoy your day :)"
+msgstr "Veel plezier :)"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:25
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:17
+#: tracim_backend/templates/mail/reset_password_body_html.mak:21
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
+msgid "Suricat', your digital assistant"
+msgstr "Suricat', jouw digitale assistent"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:29
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
+#: tracim_backend/templates/mail/reset_password_body_html.mak:25
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
+msgid "Suricat', the bot"
+msgstr "Suricat', de robot"
+
+#: tracim_backend/templates/mail/created_account_body_html.mak:32
+#: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
+#: tracim_backend/templates/mail/reset_password_body_html.mak:28
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:24
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:32
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:24
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:26
+msgid "powered by tracim software"
+msgstr "powered door Tracim software"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:8
+msgid "If you did not perform this request, you can safely ignore this email."
+msgstr ""
+"Als je dit verzoek niet zelf hebt gemaakt, dan kun je dit bericht gewoon "
+"negeren."
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:7
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:7
+msgid "Hello,"
+msgstr "Hallo,"
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:6
+msgid ""
+"Someone has requested to reset the password for your account on "
+"<i>{website_title}</i>."
+msgstr ""
+"Iemand heeft wachtwoordherstel aangevraagd voor jouw account op "
+"<i>{website_title}</i>."
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:14
+msgid "If the link is not working, I suggest to copy/paste the full url: "
+msgstr ""
+"Als de link niet werkt, kopieer dan de gehele url naar de adresbalk van je "
+"browser: "
+
+#: tracim_backend/templates/mail/reset_password_body_html.mak:12
+msgid "Reset my password"
+msgstr "Nieuw wachtwoord"
+
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
+msgid "You shared the file <i>{content_filename}</i> with:"
+msgstr "Je hebt <i>{content_filename}</i> gedeeld met:"
+
+#: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:8
+#: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:8
+msgid ""
+"<i><a href=\"{email_link}\">{email}</a></i> at this link: <a "
+"href=\"{url}\">{url}</a>"
+msgstr ""
+"<i><a href=\"{email_link}\">{email}</a></i> via deze link: <a href=\"{url}\""
+">{url}</a>"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:11
+msgid ""
+"<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> "
+"({file_size})"
+msgstr ""
+"<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> ({file_size})"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:18
+msgid ""
+"This file is protected by a password, please contact me (<a "
+"href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
+msgstr ""
+"Dit bestand is beveiligd met een wachtwoord, Neem contact op met (<a href="
+"\"mailto:{emitter_email}\">{username}</a>) om toegang te krijgen."
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:21
+msgid "Note: You can also use this direct link: {direct_url}"
+msgstr "NB: je kunt ook deze directe link gebruiken: {direct_url}"
+
+#: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:24
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:18
+msgid "Thanks a lot"
+msgstr "Bedankt"
+
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:9
+msgid "I invited you to upload files here:"
+msgstr "Ik heb je uitgenodigd om bestanden te uploaden in:"
+
+#: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:13
+msgid ""
+"This upload is protected by a password, please contact me (<a "
+"href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
+msgstr ""
+"Deze upload is beveiligd met een wachtwoord. Neem contact op met (<a href="
+"\"mailto:{emitter_email}\">{username}</a>) voor toegang."

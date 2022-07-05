@@ -252,6 +252,7 @@ export class Timeline extends React.Component {
               workspaceId={props.workspaceId}
               wysiwyg={props.wysiwyg}
               wysiwygIdSelector={props.wysiwygIdSelector}
+              isFileCommentLoading={props.isFileCommentLoading}
             />
           </div>
         )}
@@ -302,7 +303,8 @@ Timeline.propTypes = {
   canLoadMoreTimelineItems: PropTypes.func,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
-  wysiwygIdSelector: PropTypes.string
+  wysiwygIdSelector: PropTypes.string,
+  isFileCommentLoading: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -339,5 +341,6 @@ Timeline.defaultProps = {
   canLoadMoreTimelineItems: () => false,
   contentId: 0,
   contentType: '',
-  wysiwygIdSelector: ''
+  wysiwygIdSelector: '',
+  isFileCommentLoading: false
 }
