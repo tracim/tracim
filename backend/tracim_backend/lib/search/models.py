@@ -10,6 +10,7 @@ class ContentSearchField(str, Enum):
     COMMENTS = "comments"
     DESCRIPTION = "description"
     TAGS = "tags"
+    TODOS = "todos"
 
 
 class UserSearchField(str, Enum):
@@ -51,10 +52,18 @@ class SearchedDigestContent(object):
         self.content_type = content_type
 
 
-class SearchedDigestComment(object):
+class SearchedDigestSubContent(object):
     def __init__(self, content_id: int, parent_id: int) -> None:
         self.content_id = content_id
         self.parent_id = parent_id
+
+
+class SearchedDigestComment(SearchedDigestSubContent):
+    pass
+
+
+class SearchedDigestTodo(SearchedDigestSubContent):
+    pass
 
 
 class SearchedContent(object):
@@ -76,6 +85,8 @@ class SearchedContent(object):
         path: List[SearchedDigestContent],
         comments: List[SearchedDigestComment],
         comment_count: int,
+        todos: List[SearchedDigestTodo],
+        todo_count: int,
         author: SearchedDigestUser,
         last_modifier: SearchedDigestUser,
         sub_content_types: List[str],
@@ -111,6 +122,8 @@ class SearchedContent(object):
         self.path = path
         self.comments = comments
         self.comment_count = comment_count
+        self.todos = todos
+        self.todo_count = todo_count
         self.author = author
         self.last_modifier = last_modifier
         self.sub_content_types = sub_content_types

@@ -253,7 +253,9 @@ describe('Account page', () => {
       })
     })
 
-    describe('Space management', () => {
+    // TODO - MP - 2022-07-04 - Unstable test
+    // see: https://github.com/tracim/tracim/issues/5344
+    describe.skip('Space management', () => {
       it('Allows leaving a space', () => {
         cy.get('[data-cy=menusubcomponent__list__spacesConfig]')
           .click()

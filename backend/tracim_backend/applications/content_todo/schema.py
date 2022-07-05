@@ -24,8 +24,7 @@ class SetTodoSchema(marshmallow.Schema):
         example=42,
         description="Id of the user who is assigned to the todo",
         validate=strictly_positive_int_validator,
-        allow_none=False,
-        required=True,
+        allow_none=True,
     )
 
 

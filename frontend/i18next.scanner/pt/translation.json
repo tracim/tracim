@@ -563,5 +563,12 @@
   "{{author}} updated a task on {{content}}{{workspaceInfo}}": "{{author}} actualizou uma tarefa em {{content}}{{workspaceInfo}}",
   "Task deleted": "Tarefa eliminada",
   "{{author}} deleted a task on {{content}}{{workspaceInfo}}": "{{author}} eliminou uma tarefa em {{content}}{{workspaceInfo}}",
-  "Unknown comment": "Comentário desconhecido"
+  "Unknown comment": "Comentário desconhecido",
+  "To Do": "",
+  "You are not allowed to delete this to do": "",
+  "Error while deleting to do": "",
+  "You are not allowed to change the status of this to do": "",
+  "Error while saving new to do": "",
+  "To do": "",
+  "Task": ""
 }

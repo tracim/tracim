@@ -135,6 +135,8 @@ import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
 import PageContent from './component/Layout/PageContent.jsx'
 
+import TimedEvent from './component/TimedEvent/TimedEvent.jsx'
+
 import Delimiter from './component/Delimiter/Delimiter.jsx'
 
 import CardPopup from './component/CardPopup/CardPopup.jsx'
@@ -195,9 +197,11 @@ import {
 
 import {
   baseFetch,
+  deleteToDo,
   getComment,
   getContentPath,
   getToDo,
+  getToDoListForUser,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -232,7 +236,8 @@ import {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  putToDo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -288,7 +293,9 @@ export {
   AgendaInfo,
   appContentFactory,
   DateInput,
+  deleteToDo,
   getToDo,
+  getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -474,7 +481,9 @@ export {
   Popover,
   getBrowserLang,
   NewToDo,
+  putToDo,
   sortContentByStatus,
+  TimedEvent,
   ToDoItem,
   ToDoManagement
 }
