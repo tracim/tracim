@@ -4,22 +4,23 @@
   display flex
   flex-direction column
   margin standardSpacing
+
   &__new
-    margin standardSpacing
     display flex
     flex-direction column
+    margin-bottom standardSpacing
+    margin-top standardSpacing
+
     &__toDoText
-      margin-top standardSpacing
-    &__buttons
       display flex
-      justify-content flex-end
+      flex-direction column
       margin-top standardSpacing
-      & > .iconbutton
-        margin-inline-start standardSpacing
-    & > textarea
-      border-radius standardBorderRadius
-      border borderStyle
-      padding textSpacing
+
+      & > textarea
+        border borderStyle
+        border-radius standardBorderRadius
+        padding textSpacing
+
     &Button
       align-self flex-end
       margin-bottom standardSpacing

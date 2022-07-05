@@ -1,82 +1,49 @@
-import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import Select from 'react-select'
 import { translate } from 'react-i18next'
-import IconButton from '../Button/IconButton.jsx'
+import PropTypes from 'prop-types'
 
-const NewToDo = props => {
-  const nobodyValueObject = { value: null, label: props.t('Nobody') }
-  const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
-  const [assignedUserId, setAssignedUserId] = useState(0)
-  const [newComment, setNewComment] = useState('')
-
-  useEffect(() => {
-    setMemberListOptions([
-      nobodyValueObject,
-      ...props.memberList.filter(member => member.username)
-        .map(member => ({ value: member.id, label: `${member.publicName} (${member.username})` }))])
-  }, [props.memberList])
-
-  const onChangeAssignedUser = (e) => setAssignedUserId(e.value)
-  const onChangeToDo = (e) => setNewComment(e.target.value)
-
+const NewToDo = (props) => {
   return (
     <div className='toDo__new'>
       <div className='toDo__new__assignedPerson'>
-        {props.t('Assigned person:')}
+        <span>
+          {props.t('Assigned person:')}
+        </span>
+        <Select
+          isSearchable
+          onChange={props.onChangeSelectedValue}
+          options={props.memberListOptions}
+          tabSelectsValue
+          value={props.selectedValue}
+        />
       </div>
-      <Select
-        defaultValue={memberListOptions[0]}
-        isSearchable
-        onChange={onChangeAssignedUser}
-        options={memberListOptions}
-      />
 
       <div className='toDo__new__toDoText'>
-        {props.t('Enter your To Do bellow:')}
-      </div>
-      <textarea
-        placeholder={props.placeHolder || props.t('Your message...')}
-        value={newComment}
-        onChange={onChangeToDo}
-      />
-
-      <div className='toDo__new__buttons'>
-        <IconButton
-          text={props.t('Cancel')}
-          icon='fas fa-times'
-          onClick={props.onClickCancel}
-          color={props.customColor}
-          intent='secondary'
-        />
-
-        <IconButton
-          text={props.t('Validate')}
-          icon='fas fa-check'
-          onClick={() => props.onClickSaveNewToDo(assignedUserId, newComment)}
-          disabled={!newComment}
-          color={props.customColor}
-          intent='primary'
-          mode='light'
+        <span>
+          {props.t('Enter your tasks bellow:')}
+        </span>
+        <textarea
+          placeholder={props.placeHolder || props.t('Your message...')}
+          onChange={props.onChangeValue}
+          value={props.value}
         />
       </div>
-
     </div>
   )
 }
 export default translate()(NewToDo)
 
 NewToDo.propTypes = {
-  apiUrl: PropTypes.string.isRequired,
-  onClickCancel: PropTypes.func.isRequired,
-  onClickSaveNewToDo: PropTypes.func.isRequired,
-  contentId: PropTypes.number,
-  customColor: PropTypes.string,
-  memberList: PropTypes.array
+  onChangeSelectedValue: PropTypes.func.isRequired,
+  onChangeValue: PropTypes.func.isRequired,
+  memberListOptions: PropTypes.array,
+  selectedValue: PropTypes.object,
+  value: PropTypes.string
 }
 
 NewToDo.defaultProps = {
-  contentId: 1,
-  customColor: '',
-  memberList: []
+  memberListOptions: [],
+  selectedValue: {},
+  value: ''
 }
