@@ -135,7 +135,7 @@ const tryGroupingNotification = (notificationList) => {
   return notificationListToReturn
 }
 
-// NODE - MP - 2022-05-24 - Create a notification group from a notification list
+// INFO - MP - 2022-05-24 - Create a notification group from a notification list
 const createGroupNotificationFromNotificationList = (notificationList) => {
   const groupedNotification = {
     created: notificationList[0].created,
