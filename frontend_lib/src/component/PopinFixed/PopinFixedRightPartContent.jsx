@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { STATUSES } from '../../../src/helper.js'
 
 const PopinFixedRightPartContent = props => {
   const [progressBarWidth, setProgessBarWidth] = useState('0%')
   const [progessStatus, setProgessStatus] = useState('')
   useEffect(() => {
-    const toDoArray = props.toDoList
-    let sum = 0
-    const isClosed = (el) => {
-      if (el.status === 'closed-validated') {
-        sum += 1
+    if (props.toDoList) {
+      const toDoArray = props.toDoList
+      let sum = 0
+      const isClosed = (el) => {
+        if (el.status === STATUSES.VALIDATED) {
+          sum += 1
+        }
       }
+      toDoArray.forEach(isClosed)
+      const progressBarWidth = Math.round(sum / props.toDoList.length * 100) + '%'
+      setProgessBarWidth(progressBarWidth)
+      setProgessStatus('(' + sum + '/' + props.toDoList.length + ')')
     }
-    toDoArray.forEach(isClosed)
-    const progressBarWidth = Math.round(sum / props.toDoList.length * 100) + '%'
-    setProgessBarWidth(progressBarWidth)
-    setProgessStatus('(' + sum + '/' + props.toDoList.length + ')')
   }, [props.toDoList])
 
   return (

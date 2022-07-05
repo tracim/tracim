@@ -901,7 +901,6 @@ export class File extends React.Component {
       children: state.config.apiUrl ? (
         <PopinFixedRightPartContent
           label={props.t('Timeline')}
-          toDoList={state.toDoList}
           showProgress
           id='timeline'
         >
@@ -983,7 +982,6 @@ export class File extends React.Component {
       children: (
         <PopinFixedRightPartContent
           label={props.t('Tags')}
-          toDoList={state.toDoList}
           showProgress
           id='tag'
         >
