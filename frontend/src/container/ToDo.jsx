@@ -28,6 +28,7 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../util/helper.js'
+import { STATUSES } from '../../../frontend_lib/src/helper.js'
 
 const filterToDoList = (list, filterList) => {
   return list.filter(toDo =>
@@ -162,6 +163,24 @@ const ToDo = (props) => {
     }
   }
 
+  const [progressBarWidth, setProgessBarWidth] = useState('0%')
+  const [count, setNumberOfCheckedToDos] = useState(0)
+
+  useEffect(() => {
+    let numberOfCheckedToDos = 0
+
+    toDoList.forEach((toDo) => {
+      if (toDo.status === STATUSES.VALIDATED) {
+        numberOfCheckedToDos += 1
+      }
+    })
+
+    const progressBarWidth = Math.round(numberOfCheckedToDos / toDoList.length * 100) + '%'
+
+    setProgessBarWidth(progressBarWidth)
+    setNumberOfCheckedToDos(numberOfCheckedToDos)
+  }, [toDoList])
+
   return (
     <div className='tracim__content-scrollview'>
       <PageWrapper customClass='toDo__wrapper'>
@@ -170,6 +189,16 @@ const ToDo = (props) => {
           icon='fas fa-check-square'
           breadcrumbsList={props.breadcrumbs}
         />
+        {toDoListFilter === '' &&
+          <div
+            className='toDo__progressBar_container toDo__progressBar_container_on_mytasks'
+            title={props.t('{{count}} tasks performed on {{numberOfTasks}}', {
+              count: count,
+              numberOfTasks: toDoList.length
+            })}
+          >
+            <div className='toDo__progressBar' style={{ width: `${progressBarWidth}` }} />
+          </div>}
         <TextInput
           customClass='form-control'
           onChange={e => {
@@ -180,7 +209,9 @@ const ToDo = (props) => {
           icon='search'
           value={toDoListFilter}
         />
-        <PageContent>
+        <PageContent
+          parentClass='toDo__pageContent_on_mytasks'
+        >
           <div className='toDo__item'>
             {displayedToDoList.map(toDo => {
               return (

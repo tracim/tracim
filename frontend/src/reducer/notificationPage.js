@@ -34,7 +34,6 @@ const defaultNotificationsObject = {
 // FIXME - GB - 2020-07-30 - We can't use the global serializer in this case because it doesn't handle nested object
 // See https://github.com/tracim/tracim/issues/3229
 export const serializeNotification = notification => {
-  console.log('notification -- ', notification)
   return {
     ...notification.fields,
     author: {

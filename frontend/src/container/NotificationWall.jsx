@@ -278,9 +278,6 @@ export const NotificationWall = props => {
           // INFO - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
           // after, so the hook isn't triggered too early.
           props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-
-          console.log('APPEND -- ', fetchGetNotificationWall)
-
           props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
           break
         default:
@@ -304,8 +301,6 @@ export const NotificationWall = props => {
     const [entityType, eventType, contentType] = notification.type.split('.')
     const escapedAuthor = notification.author ? escapeHtml(notification.author.publicName) : ''
     const escapedUser = notification.user ? escapeHtml(notification.user.publicName) : ''
-
-    console.log('notification', notification)
     const escapedContentLabel = (
       notification.content
         ? escapeHtml(
