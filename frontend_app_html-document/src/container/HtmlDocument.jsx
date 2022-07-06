@@ -93,7 +93,8 @@ export class HtmlDocument extends React.Component {
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
       translationTargetLanguageCode: param.loggedUser.lang,
-      toDoList: []
+      toDoList: [],
+      showProgress: true
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -710,6 +711,7 @@ export class HtmlDocument extends React.Component {
   handleSaveNewToDo = (assignedUserId, toDo) => {
     const { state, props } = this
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
   }
 
   handleDeleteToDo = (toDo) => {
@@ -720,6 +722,10 @@ export class HtmlDocument extends React.Component {
   handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+  }
+
+  handleSetShowProgressbarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickNotifyAll = async () => {
@@ -858,11 +864,13 @@ export class HtmlDocument extends React.Component {
 
     const toDoObject = {
       id: 'todo',
-      label: props.t('To Do'),
+      label: props.t('Tasks'),
       icon: 'fas fa-check-square',
       children: (
         <PopinFixedRightPartContent
-          label={props.t('To Do')}
+          label={props.t('Tasks')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
         >
           <ToDoManagement
             apiUrl={state.config.apiUrl}
@@ -872,6 +880,7 @@ export class HtmlDocument extends React.Component {
             onClickChangeStatusToDo={this.handleChangeStatusToDo}
             onClickDeleteToDo={this.handleDeleteToDo}
             onClickSaveNewToDo={this.handleSaveNewToDo}
+            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
             user={state.loggedUser}
             toDoList={state.toDoList}
           />

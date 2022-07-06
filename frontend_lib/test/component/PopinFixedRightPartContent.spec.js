@@ -1,12 +1,15 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import PopinFixedRightPartContent from '../../src/component/PopinFixed/PopinFixedRightPartContent.jsx'
+import { PopinFixedRightPartContent } from '../../src/component/PopinFixed/PopinFixedRightPartContent.jsx'
 
 describe('<PopinFixedRightPartContent />', () => {
   const props = {
     label: 'randomLabel',
-    showTitle: true
+    showTitle: true,
+    showProgress: false,
+    toDoList: [],
+    t: key => key
   }
 
   const Children = () => <div><h1>Random title</h1>I am a children of PopinFixedRightPartContent</div>

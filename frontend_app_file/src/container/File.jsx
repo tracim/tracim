@@ -114,7 +114,8 @@ export class File extends React.Component {
         page_nb: 1
       },
       isFileCommentLoading: false,
-      toDoList: []
+      toDoList: [],
+      showProgress: true
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -540,6 +541,7 @@ export class File extends React.Component {
   handleSaveNewToDo = (assignedUserId, toDo) => {
     const { state, props } = this
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
   }
 
   handleDeleteToDo = (toDo) => {
@@ -550,6 +552,10 @@ export class File extends React.Component {
   handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+  }
+
+  handleSetShowProgressbarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickEditComment = (comment) => {
@@ -943,11 +949,13 @@ export class File extends React.Component {
     }
     const toDoObject = {
       id: 'todo',
-      label: props.t('To Do'),
+      label: props.t('Tasks'),
       icon: 'fas fa-check-square',
       children: (
         <PopinFixedRightPartContent
-          label={props.t('To Do')}
+          label={props.t('Tasks')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
         >
           <ToDoManagement
             apiUrl={state.config.apiUrl}
@@ -957,6 +965,7 @@ export class File extends React.Component {
             onClickChangeStatusToDo={this.handleChangeStatusToDo}
             onClickDeleteToDo={this.handleDeleteToDo}
             onClickSaveNewToDo={this.handleSaveNewToDo}
+            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
             user={state.loggedUser}
             toDoList={state.toDoList}
           />

@@ -71,11 +71,19 @@ const ToDoManagement = (props) => {
     setNewToDoList(tmpToDoList)
   }
 
-  const handleClickCancel = () => setIsNewToDo(false)
+  const handleClickCancel = () => {
+    props.onClickAddNewToDo(true)
+    setIsNewToDo(false)
+  }
 
   const handleClickClose = () => {
     setNewToDoList(newToDoListSave)
     setIsPopUpDisplayed(false)
+  }
+
+  const handleAddNewToDo = () => {
+    props.onClickAddNewToDo(false)
+    setIsNewToDo(true)
   }
 
   const handleClickSaveToDo = () => {
@@ -224,7 +232,7 @@ const ToDoManagement = (props) => {
               icon='fas fa-plus-circle'
               intent='primary'
               mode='light'
-              onClick={() => setIsNewToDo(true)}
+              onClick={handleAddNewToDo}
               text={props.t('New task')}
             />
           )}
