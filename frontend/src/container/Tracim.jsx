@@ -728,7 +728,7 @@ export class Tracim extends React.Component {
           />
         )}
 
-        {((!props.user.username && Cookies.get(COOKIE_FRONTEND.SHOW_USERNAME_POPUP) === 'true' && props.user.config.display_username_popup !== 'false') &&
+        {((!props.user.username && props.user.logged && Cookies.get(COOKIE_FRONTEND.SHOW_USERNAME_POPUP) === 'true' && props.user.config.display_username_popup !== 'false') &&
           <CardPopupUsername />
         )}
 
