@@ -3,7 +3,7 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { STATUSES } from '../../../src/helper.js'
 
-const PopinFixedRightPartContent = props => {
+export const PopinFixedRightPartContent = props => {
   const [progressBarWidth, setProgessBarWidth] = useState('0%')
   const [progessStatus, setProgessStatus] = useState('')
   const [count, setNumberOfCheckedToDos] = useState(0)
