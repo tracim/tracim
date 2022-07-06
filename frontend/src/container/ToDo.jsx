@@ -15,6 +15,7 @@ import {
   PageWrapper,
   putToDo,
   sortContentByStatus,
+  STATUSES,
   TextInput,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -28,7 +29,6 @@ import {
   setHeadTitle
 } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../util/helper.js'
-import { STATUSES } from '../../../frontend_lib/src/helper.js'
 
 const filterToDoList = (list, filterList) => {
   return list.filter(toDo =>

@@ -66,7 +66,8 @@ import {
   tinymceRemove,
   addExternalLinksIcons,
   sortContentByStatus,
-  USER_CALL_STATE
+  USER_CALL_STATE,
+  STATUSES
 } from './helper.js'
 
 import {
@@ -485,5 +486,6 @@ export {
   sortContentByStatus,
   TimedEvent,
   ToDoItem,
-  ToDoManagement
+  ToDoManagement,
+  STATUSES
 }
