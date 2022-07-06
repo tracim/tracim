@@ -31,9 +31,10 @@ const ToDoManagement = (props) => {
 
   useEffect(() => {
     setNewToDoList([{
-      assigneeId: null,
+      assigneeId: 0,
       value: null
     }])
+    setSelectedValueList([nobodyValueObject])
   }, [isNewToDo])
 
   useEffect(() => {

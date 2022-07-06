@@ -30,9 +30,9 @@ export const PopinFixedRightPartContent = props => {
       {props.showTitle && (
         <div className='toDo__title_container'>
           <div className='wsContentGeneric__content__right__content__title'>
-            {props.label} {progessStatus}
+            {props.label} {props.showProgress && progessStatus}
           </div>
-          {props.showProgress && (
+          {(props.showProgress && (props.toDoList.length > 0)) && (
             <div
               className='toDo__progressBar_container'
               title={props.t('{{count}} tasks performed on {{numberOfTasks}}', {
