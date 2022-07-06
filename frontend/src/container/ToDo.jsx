@@ -15,6 +15,7 @@ import {
   PageWrapper,
   putToDo,
   sortContentByStatus,
+  TextInput,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
@@ -28,8 +29,18 @@ import {
 } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 
-const ToDo = props => {
+const filterToDoList = (list, filterList) => {
+  return list.filter(toDo =>
+    toDo.raw_content.toUpperCase().includes(filterList.toUpperCase()) ||
+    toDo.parent.label.toUpperCase().includes(filterList.toUpperCase()) ||
+    toDo.workspace.label.toUpperCase().includes(filterList.toUpperCase())
+  )
+}
+
+const ToDo = (props) => {
+  const [displayedToDoList, setDisplayedToDoList] = useState([])
   const [toDoList, setToDoList] = useState([])
+  const [toDoListFilter, setToDoListFilter] = useState('')
 
   useEffect(() => {
     setHeadTitleToDo()
@@ -43,7 +54,13 @@ const ToDo = props => {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: handleToDoChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: handleToDoDeleted }
     ])
+
+    setDisplayedToDoList(filterToDoList(toDoList, toDoListFilter))
   }, [toDoList])
+
+  useEffect(() => {
+    setDisplayedToDoList(filterToDoList(toDoList, toDoListFilter))
+  }, [toDoListFilter])
 
   const setHeadTitleToDo = () => {
     const headTitle = buildHeadTitle([props.t('My tasks')])
@@ -153,9 +170,19 @@ const ToDo = props => {
           icon='fas fa-check-square'
           breadcrumbsList={props.breadcrumbs}
         />
+        <TextInput
+          customClass='form-control'
+          onChange={e => {
+            const newFilter = e.target.value
+            setToDoListFilter(newFilter)
+          }}
+          placeholder={props.t('Filter my tasks')}
+          icon='search'
+          value={toDoListFilter}
+        />
         <PageContent>
           <div className='toDo__item'>
-            {toDoList.map(toDo => {
+            {displayedToDoList.map(toDo => {
               return (
                 <ToDoItem
                   isDeletable
