@@ -49,6 +49,7 @@ export const serializeNotification = notification => {
     } : null,
     content: notification.fields.content ? {
       parentLabel: notification.fields.content.parent ? notification.fields.content.parent.label : null,
+      parentId: notification.fields.content.parent ? notification.fields.content.parent.content_id : null,
       ...serialize(notification.fields.content, serializeContentProps)
     } : null,
     created: notification.created,
