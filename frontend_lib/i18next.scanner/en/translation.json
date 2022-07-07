@@ -229,7 +229,6 @@
   "Something went wrong": "Something went wrong",
   "Unknown comment": "Unknown comment",
   "Assigned person:": "Assigned person:",
-  "Enter your To Do bellow:": "Enter your To Do bellow:",
   "Uncheck": "Uncheck",
   "Check": "Check",
   "New task": "New task",
@@ -237,5 +236,12 @@
   "Error while saving new to do": "Error while saving new to do",
   "You are not allowed to delete this to do": "You are not allowed to delete this to do",
   "Error while deleting to do": "Error while deleting to do",
-  "You are not allowed to change the status of this to do": "You are not allowed to change the status of this to do"
+  "You are not allowed to change the status of this to do": "You are not allowed to change the status of this to do",
+  "by": "by",
+  "Create task from text": "Create task from text",
+  "Enter your tasks bellow:": "Enter your tasks bellow:",
+  "created": "created",
+  "Create from text": "Create from text",
+  "Item marked as template": "Item marked as template",
+  "Item unmarked as template": "Item unmarked as template"
 }

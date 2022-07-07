@@ -318,7 +318,6 @@
   "modified": "modifié",
   "deleted": "supprimé",
   "restored": "restauré",
-  "by": "par",
   "Please ask access to spaces to an administrator or space manager": "Veuillez demander l'accès aux espaces à un administrateur ou à un gestionnaire d'espace",
   "mention made": "mention créée",
   "unknown": "inconnue",
@@ -564,11 +563,12 @@
   "Task deleted": "Tâche supprimée",
   "{{author}} deleted a task on {{content}}{{workspaceInfo}}": "{{author}} a supprimé une tâche sur {{content}}{{workspaceInfo}}",
   "Unknown comment": "Commentaire inconnu",
-  "To Do": "",
   "You are not allowed to delete this to do": "",
   "Error while deleting to do": "",
   "You are not allowed to change the status of this to do": "",
   "Error while saving new to do": "",
-  "To do": "",
-  "Task": ""
+  "Tasks": "",
+  "My tasks": "",
+  "Error while loading to do list": "",
+  "Filter my tasks": ""
 }

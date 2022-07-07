@@ -229,7 +229,6 @@
   "Something went wrong": "",
   "Unknown comment": "",
   "Assigned person:": "",
-  "Enter your To Do bellow:": "",
   "Uncheck": "",
   "Check": "",
   "New task": "",
@@ -237,5 +236,12 @@
   "Error while saving new to do": "",
   "You are not allowed to delete this to do": "",
   "Error while deleting to do": "",
-  "You are not allowed to change the status of this to do": ""
+  "You are not allowed to change the status of this to do": "",
+  "by": "von",
+  "Create task from text": "",
+  "Enter your tasks bellow:": "",
+  "created": "",
+  "Create from text": "",
+  "Item marked as template": "",
+  "Item unmarked as template": ""
 }
