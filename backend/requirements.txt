@@ -111,7 +111,7 @@ jsonschema==3.2.0
     # via tracim-backend (setup.py)
 ldap3==2.9
     # via pyramid-ldap3
-lxml==4.8.0
+lxml==4.9.1
     # via
     #   caldav
     #   tracim-backend (setup.py)
