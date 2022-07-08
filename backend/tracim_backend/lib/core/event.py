@@ -72,9 +72,9 @@ from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
 from tracim_backend.views.core_api.schemas import MessageCommentSchema
 from tracim_backend.views.core_api.schemas import MessageContentSchema
-from tracim_backend.views.core_api.schemas import MessageTodoSchema
 from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import TagSchema
+from tracim_backend.views.core_api.schemas import ToDoSchema
 from tracim_backend.views.core_api.schemas import UserCallSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
@@ -97,7 +97,7 @@ class EventApi:
         FILE_TYPE: FileContentSchema(),
         FOLDER_TYPE: MessageContentSchema(),
         THREAD_TYPE: MessageContentSchema(),
-        TODO_TYPE: MessageTodoSchema(),
+        TODO_TYPE: ToDoSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()

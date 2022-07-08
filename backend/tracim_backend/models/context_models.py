@@ -1244,6 +1244,12 @@ class ContentInContext(object):
         return self.content.assignee_id
 
     @property
+    def assignee(self) -> UserInContext:
+        return UserInContext(
+            dbsession=self.dbsession, config=self.config, user=self.content.assignee
+        )
+
+    @property
     def content_id(self) -> int:
         return self.content.content_id
 
@@ -1431,12 +1437,6 @@ class ContentInContext(object):
     def author(self) -> UserInContext:
         return UserInContext(
             dbsession=self.dbsession, config=self.config, user=self.content.first_revision.owner
-        )
-
-    @property
-    def assignee(self) -> UserInContext:
-        return UserInContext(
-            dbsession=self.dbsession, config=self.config, user=self.content.assignee
         )
 
     @property

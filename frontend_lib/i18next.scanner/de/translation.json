@@ -227,5 +227,21 @@
   "Unmark template": "",
   "Mark template": "",
   "Something went wrong": "",
-  "Unknown comment": ""
+  "Unknown comment": "",
+  "Assigned person:": "",
+  "Uncheck": "",
+  "Check": "",
+  "New task": "",
+  "This content has no task to do associated. Click on \"New task\" button to create a new one.": "",
+  "Error while saving new to do": "",
+  "You are not allowed to delete this to do": "",
+  "Error while deleting to do": "",
+  "You are not allowed to change the status of this to do": "",
+  "by": "von",
+  "Create task from text": "",
+  "Enter your tasks bellow:": "",
+  "created": "",
+  "Create from text": "",
+  "Item marked as template": "",
+  "Item unmarked as template": ""
 }

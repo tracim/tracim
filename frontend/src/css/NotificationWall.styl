@@ -22,6 +22,8 @@
       font-weight normal
       background-color lightBlueOpacity
       padding standardSpacing
+      // NOTE - MP - 2022-05-20 - If we change the height, we need to change the
+      // height of NotificationWall component.
       height 60px
       align-items center
       &__text
@@ -94,14 +96,6 @@
   &__wallClose
     height 0
     top 0
-  &__footer
-    border-top borderStyle
-    padding standardSpacing
-    position sticky
-    bottom 0
-    background-color offWhite
-    justify-content center
-    display flex
   &__header
     min-height headerHeight
     &__title

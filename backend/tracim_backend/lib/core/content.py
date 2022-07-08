@@ -900,6 +900,7 @@ class ContentApi(object):
         ] = None,
         complete_path_to_id: typing.Optional[int] = None,
         user: typing.Optional[User] = None,
+        assignee_id: typing.Optional[int] = None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -911,6 +912,8 @@ class ContentApi(object):
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
+        :param user: user owner of the contents
+        :param assignee_id: assignee of the contents
         :return: Query object
         """
         order_by_properties = order_by_properties or []  # FDV
@@ -975,6 +978,9 @@ class ContentApi(object):
                 .limit(1)
             )
             query = query.filter(or_(Content.owner == user, user.user_id == author_id_query))
+
+        if assignee_id:
+            query = query.filter(Content.assignee_id == assignee_id)
 
         for _property in order_by_properties:
             query = query.order_by(_property)
@@ -1803,7 +1809,10 @@ class ContentApi(object):
                 "Can't mark this kind file as a template. Files supported: .document.html, .odt, .ods, .odp, .odg"
             )
         content.is_template = is_template
-        content.revision_type = ActionDescription.REVISION
+        if is_template:
+            content.revision_type = ActionDescription.MARK_AS_TEMPLATE
+        else:
+            content.revision_type = ActionDescription.UNMARK_AS_TEMPLATE
         return content
 
     def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:
@@ -2290,7 +2299,7 @@ class ContentApi(object):
         )
         item.raw_content = raw_content
         if assignee:
-            item.assignee_id = assignee.user_id
+            item.assignee = assignee
         self._session.add(item)
         self.save(item, ActionDescription.CREATION, do_notify=do_notify)
 

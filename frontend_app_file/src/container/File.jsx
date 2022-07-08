@@ -114,7 +114,8 @@ export class File extends React.Component {
         page_nb: 1
       },
       isFileCommentLoading: false,
-      toDoList: []
+      toDoList: [],
+      showProgress: true
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -135,7 +136,7 @@ export class File extends React.Component {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreate },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreated },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
@@ -183,14 +184,14 @@ export class File extends React.Component {
     this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
   }
 
-  handleToDoCreate = async data => {
+  handleToDoCreated = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
@@ -201,12 +202,12 @@ export class File extends React.Component {
 
   handleToDoChanged = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
@@ -217,7 +218,7 @@ export class File extends React.Component {
 
   handleToDoDeleted = data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
       toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
@@ -540,16 +541,21 @@ export class File extends React.Component {
   handleSaveNewToDo = (assignedUserId, toDo) => {
     const { state, props } = this
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
   }
 
-  handleDeleteToDo = (toDoId) => {
+  handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDoId, this.setState.bind(this))
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
   }
 
-  handleChangeStatusToDo = (toDoId, status) => {
+  handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+  }
+
+  handleSetShowProgressbarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickEditComment = (comment) => {
@@ -943,11 +949,13 @@ export class File extends React.Component {
     }
     const toDoObject = {
       id: 'todo',
-      label: props.t('To Do'),
+      label: props.t('Tasks'),
       icon: 'fas fa-check-square',
       children: (
         <PopinFixedRightPartContent
-          label={props.t('To Do')}
+          label={props.t('Tasks')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
         >
           <ToDoManagement
             apiUrl={state.config.apiUrl}
@@ -957,6 +965,7 @@ export class File extends React.Component {
             onClickChangeStatusToDo={this.handleChangeStatusToDo}
             onClickDeleteToDo={this.handleDeleteToDo}
             onClickSaveNewToDo={this.handleSaveNewToDo}
+            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
             user={state.loggedUser}
             toDoList={state.toDoList}
           />
