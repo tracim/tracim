@@ -1450,20 +1450,25 @@ class ContentApi(object):
         new_content.current_revision = cpy_rev
         self._flag_revision_as_copy(new_content, source_content)
 
-        todos = self.get_all_query(
-            parent_ids=[source_content.id],
-            content_type_slug=TODO_TYPE,
-            workspaces=[source_content.workspace],
-        ).all()
+        # INFO - MP - 2022-07-08 - We fetch every todos to duplicate them
+        try:
+            todos = self.get_all_query(
+                parent_ids=[source_content.id],
+                content_type_slug=TODO_TYPE,
+                workspaces=[source_content.workspace],
+            ).all()
 
-        for todo in todos:
-            self.copy(
-                item=todo,
-                new_parent=new_content,
-                copy_revision=False,
-                do_save=True,
-                do_notify=False,
-            )
+            for todo in todos:
+                self.copy(
+                    item=todo,
+                    new_parent=new_content,
+                    copy_revision=False,
+                    do_save=True,
+                    do_notify=False,
+                )
+        except ContentTypeNotExist:
+            # INFO - MP - 2022-07-08 - We can have an error if the todo application isn't activated
+            pass
 
         return new_content
 
