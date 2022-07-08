@@ -1,3 +1,25 @@
+# 4.3.0 / 2022-07-21
+
+### New Features
+
+- Notes can be download as PDF
+- Notes, office documents and kanban templates
+- To do feature
+- UI/UX improvements
+
+### Fixed Issues
+
+- XXXXXX: [#XXXXX](https://github.com/tracim/tracim/issues/XXXXX)
+
+### Breaking/Important change
+
+- :warning: XXXXXX. See [XXXX](https://github.com/tracim/tracim/issues/XXXXX)
+
+### Known Issues
+
+- XXXX (issue [#XXX](https://github.com/tracim/tracim/issues/XXXX))
+
+
 # 4.2.2 / 2022-05-05
 
 ### Fixed Issues
