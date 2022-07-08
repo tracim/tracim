@@ -1744,10 +1744,6 @@ class ContentApi(object):
                 "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
             )
         # INFO - MP - 2022-06-09 - Hacky way to disable to set a template that aren't supported
-        if content.file_extension not in [".document.html", ".odt", ".ods", ".odp", ".odg"]:
-            raise ContentInNotEditableState(
-                "Can't mark this kind file as a template. Files supported: .document.html, .odt, .ods, .odp, .odg"
-            )
         content.is_template = is_template
         if is_template:
             content.revision_type = ActionDescription.MARK_AS_TEMPLATE
