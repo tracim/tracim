@@ -44,12 +44,14 @@ var globalInterfaceLanguage = (function (lang) {
       return 'en_US'
     case 'ar':
       return 'ar'
+    case 'es':
+      return 'es_ES'
     default:
       return 'en_US'
   }
 })(configObj.userLang)
 
-var globalInterfaceCustomLanguages=['en_US', 'fr_FR', 'de_DE', 'ar']
+var globalInterfaceCustomLanguages=['en_US', 'fr_FR', 'de_DE', 'es_ES', 'ar']
 var globalSortAlphabet=' 0123456789'+
   'AÀÁÂÄÆÃÅĀBCÇĆČDĎEÈÉÊËĒĖĘĚFGĞHIÌÍÎİÏĪĮJKLŁĹĽMNŃÑŇOÒÓÔÖŐŒØÕŌ'+
   'PQRŔŘSŚŠȘșŞşẞTŤȚțŢţUÙÚÛÜŰŮŪVWXYÝŸZŹŻŽ'+

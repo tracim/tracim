@@ -14,7 +14,7 @@ function Popover (props) {
       placement={props.placement}
       isOpen={isPopoverOpen}
       target={props.targetId}
-      // INFO - GB - 2021-12-29 - ignoring rule react/jsx-handler-names for prop bellow because it comes from external lib
+      // INFO - GB - 2021-12-29 - ignoring rule react/jsx-handler-names for prop below because it comes from external lib
       toggle={() => setIsPopoverOpen(!isPopoverOpen)} // eslint-disable-line react/jsx-handler-names
       trigger={isMobile ? 'click' : 'hover'}
     >

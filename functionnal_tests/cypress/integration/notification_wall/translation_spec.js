@@ -23,5 +23,13 @@ describe('Notification Wall', () => {
     cy.changeLanguage('de')
     cy.get('.notificationButton').click()
     cy.contains('.notification__header__title', 'Benachrichtigungen').should('be.visible')
+
+    cy.changeLanguage('ar')
+    cy.get('.notificationButton').click()
+    cy.contains('.notification__header__title', 'إشعارات').should('be.visible')
+
+    cy.changeLanguage('es')
+    cy.get('.notificationButton').click()
+    cy.contains('.notification__header__title', 'Notificaciones').should('be.visible')
   })
 })

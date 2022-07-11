@@ -37,5 +37,13 @@ describe('Timeline', () => {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
     cy.contains('.wsContentGeneric__content__right__content__title', 'Zeitleiste')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
+    cy.contains('.wsContentGeneric__content__right__content__title', 'السِجلّ')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
+    cy.contains('.wsContentGeneric__content__right__content__title', 'Línea de tiempo')
   })
 })

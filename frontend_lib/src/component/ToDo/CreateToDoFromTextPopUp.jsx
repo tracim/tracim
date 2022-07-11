@@ -15,7 +15,7 @@ const CreateToDoFromTextPopup = (props) => {
     >
       <div className='createToDoFromTextPopup__main'>
         <span>
-          {props.t('Enter your tasks bellow:')}
+          {props.t('Enter your tasks below:')}
         </span>
         <textarea
           placeholder={props.placeHolder || props.t('Your message...')}
