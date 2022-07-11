@@ -531,6 +531,24 @@ class ContentApi(object):
         for tag in tags_values:
             tag_lib.add_tag_to_content(user=self._user, content=destination, tag_name=tag.tag_name)
 
+    def copy_todos(self, new_parent: Content, template_id: int) -> None:
+        """Create extra data for templates: todos"""
+        try:
+            todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
+
+            for todo in todos:
+                self.copy(
+                    item=todo,
+                    new_parent=new_parent,
+                    copy_revision=False,
+                    do_save=False,
+                    do_notify=False,
+                )
+
+        except ContentTypeNotExist:
+            # INFO - MP - 2022-07-08 - We can have an error if the todo application isn't activated
+            pass
+
     def create_comment(
         self,
         workspace: Workspace = None,
@@ -1449,26 +1467,6 @@ class ContentApi(object):
 
         new_content.current_revision = cpy_rev
         self._flag_revision_as_copy(new_content, source_content)
-
-        # INFO - MP - 2022-07-08 - We fetch every todos to duplicate them
-        try:
-            todos = self.get_all_query(
-                parent_ids=[source_content.id],
-                content_type_slug=TODO_TYPE,
-                workspaces=[source_content.workspace],
-            ).all()
-
-            for todo in todos:
-                self.copy(
-                    item=todo,
-                    new_parent=new_content,
-                    copy_revision=False,
-                    do_save=True,
-                    do_notify=False,
-                )
-        except ContentTypeNotExist:
-            # INFO - MP - 2022-07-08 - We can have an error if the todo application isn't activated
-            pass
 
         return new_content
 
