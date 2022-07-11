@@ -131,6 +131,7 @@ class FileController(Controller):
             workspace=request.current_workspace,
             parent=parent,
             content_namespace=hapic_data.forms.content_namespace,
+            template_id=hapic_data.forms.template_id,
         )
         api.save(content, ActionDescription.CREATION)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
