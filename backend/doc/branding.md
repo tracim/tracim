@@ -124,7 +124,12 @@ If you want to change it, choose another audio file and change it's name, or cha
 
 ## Customize Note as pdf convertion rendering
 
-Tracim convert Note as PDF using both pandoc and weasyprint tool.
+Tracim convert Note as PDF using both pandoc and Weasyprint tool is feature is activated.
+To activate the feature, you need to set this property in configuration file:
+```ini
+rich_text_preview.enabled = True
+```
+
 This process is customizable through 2 files in branding:
 - The css style : `rich_text_preview.css`.
 - The html template : `rich_text_preview.template`.
