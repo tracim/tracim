@@ -134,13 +134,15 @@ class FileController(Controller):
             template_id=hapic_data.forms.template_id,
         )
         api.save(content, ActionDescription.CREATION)
-        with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
-            api.update_file_data(
-                content,
-                new_filename=_file.filename,
-                new_mimetype=_file.type,
-                new_content=_file.file,
-            )
+
+        if not hapic_data.forms.template_id:
+            with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
+                api.update_file_data(
+                    content,
+                    new_filename=_file.filename,
+                    new_mimetype=_file.type,
+                    new_content=_file.file,
+                )
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
