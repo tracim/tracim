@@ -125,13 +125,11 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     const { state, props } = this
     const { PAGE } = this.props.data.config
 
-    let filename
+    const filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
     let templateName
     if (state.templateId) {
-      filename = state.newContentName
       templateName = `${state.templateName}${FILE_TYPES.collabora[state.selectedOption.value].ext}`
     } else {
-      filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
       templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
     }
 
