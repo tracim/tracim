@@ -439,56 +439,9 @@ class ContentApi(object):
                 new_content_namespace=content_namespace,
             )
 
-            with new_revision(session=self._session, tm=transaction.manager, content=content):
-                self.fill_content(
-                    content=content,
-                    workspace=workspace,
-                    content_type_slug=content_type_slug,
-                    filename=filename,
-                    label=label,
-                    content_type=content_type,
-                    parent=parent,
-                    is_temporary=is_temporary,
-                    content_namespace=content_namespace,
-                )
-
         else:
             content.revision_type = ActionDescription.CREATION
 
-            self.fill_content(
-                content=content,
-                workspace=workspace,
-                content_type_slug=content_type_slug,
-                filename=filename,
-                label=label,
-                content_type=content_type,
-                parent=parent,
-                is_temporary=is_temporary,
-                content_namespace=content_namespace,
-            )
-
-        if do_save:
-            self._session.add(content)
-            self.save(content, content.revision_type, do_notify=do_notify)
-
-        return content
-
-    # NOTE - MP - 2022-07-04 - This function is used as hacky way to reate/duplicate a template
-    # Actually our template are created in the created function. However it's a copy, we should
-    # remove the copy from template logic in the create function and use the copy function when
-    # we want to create from a template
-    def fill_content(
-        self,
-        content: Content,
-        workspace: Workspace,
-        content_type_slug: str,
-        filename: str,
-        label: str,
-        content_type: TracimContentType,
-        parent: Content = None,
-        is_temporary: bool = False,
-        content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
-    ) -> None:
         if label:
             file_extension = ""
             if content_type.file_extension:
@@ -523,6 +476,12 @@ class ContentApi(object):
         content.is_temporary = is_temporary
         content.content_namespace = content_namespace
 
+        if do_save:
+            self._session.add(content)
+            self.save(content, content.revision_type, do_notify=do_notify)
+
+        return content
+
     def copy_tags(self, destination: Content, source_content_id: int,) -> None:
         """Create extra data for templates: tags"""
         tag_lib = TagLib(self._session)
@@ -538,11 +497,7 @@ class ContentApi(object):
 
             for todo in todos:
                 self.copy(
-                    item=todo,
-                    new_parent=new_parent,
-                    copy_revision=False,
-                    do_save=False,
-                    do_notify=False,
+                    item=todo, new_parent=new_parent, do_save=False, do_notify=False,
                 )
 
         except ContentTypeNotExist:
@@ -1344,7 +1299,6 @@ class ContentApi(object):
         new_workspace: Workspace = None,
         new_file_extension: str = None,
         new_content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
-        copy_revision: bool = True,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> Content:
@@ -1433,20 +1387,19 @@ class ContentApi(object):
 
         copy_result = self._copy(item, content_namespace, parent)
 
-        if copy_revision:
-            copy_result = self._add_copy_revisions(
-                original_content=item,
-                new_content=copy_result.new_content,
-                original_content_children=copy_result.original_children_dict,
-                new_content_children=copy_result.new_children_dict,
-                new_parent=parent,
-                new_label=label,
-                new_workspace=workspace,
-                new_file_extension=file_extension,
-                new_content_namespace=content_namespace,
-                do_save=do_save,
-                do_notify=do_notify,
-            )
+        copy_result = self._add_copy_revisions(
+            original_content=item,
+            new_content=copy_result.new_content,
+            original_content_children=copy_result.original_children_dict,
+            new_content_children=copy_result.new_children_dict,
+            new_parent=parent,
+            new_label=label,
+            new_workspace=workspace,
+            new_file_extension=file_extension,
+            new_content_namespace=content_namespace,
+            do_save=do_save,
+            do_notify=do_notify,
+        )
         return copy_result.new_content
 
     def copy_from_template(
