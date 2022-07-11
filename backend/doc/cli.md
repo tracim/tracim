@@ -18,7 +18,7 @@ There are two way to use tracimcli, you can either type direct command:
 tracimcli help
 ```
 
-or use the interactive mode :
+or use the interactive mode:
 
 ```shell
 tracimcli
@@ -293,7 +293,7 @@ optional arguments:
 
 ### Move Space
 
-Theses commands permit to move space which technically mean change the parent space of the chosen space.
+Theses commands allows you to move a space, which technically mean change the parent space of the chosen space.
 
 ```shell
 $ tracimcli space move -h
@@ -319,7 +319,7 @@ optional arguments:
 ### Show content ###
 
 Show some content informations. This show only some metadata for privacy reason
-but information given should be enough to solve most system administrator issues.
+but information given should be enough to solve most of system administrator issues.
 
 ```shell
 $ tracimcli content show -h

@@ -387,7 +387,7 @@ class DeleteContentRevisionCommand(AppContextCommand):
         self._app_config = app_context["registry"].settings["CFG"]
 
         if parsed_args.dry_run_mode:
-            print("(!) Running in dry-run mode, not change will be applied.")
+            print("(!) Running in dry-run mode, no change will be applied.")
             app_context["request"].tm.doom()
 
         with unprotected_content_revision(self._session) as session:
@@ -447,7 +447,7 @@ class DeleteContentCommand(AppContextCommand):
         self._app_config = app_context["registry"].settings["CFG"]
 
         if parsed_args.dry_run_mode:
-            print("(!) Running in dry-run mode, not change will be applied.")
+            print("(!) Running in dry-run mode, no change will be applied.")
             app_context["request"].tm.doom()
 
         capi = ContentApi(
@@ -507,7 +507,7 @@ class DeleteSpaceCommand(AppContextCommand):
         self._app_config = app_context["registry"].settings["CFG"]
 
         if parsed_args.dry_run_mode:
-            print("(!) Running in dry-run mode, not change will be applied.")
+            print("(!) Running in dry-run mode, no change will be applied.")
             app_context["request"].tm.doom()
 
         with unprotected_content_revision(self._session) as session:
