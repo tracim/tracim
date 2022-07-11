@@ -15,8 +15,8 @@ export const CheckboxFilter = props => {
         >
           <Icon
             icon={props.showFilter
-              ? 'fa-fw fas fa-caret-down'
-              : 'fa-fw fas fa-caret-right'}
+              ? 'fas fa-caret-down'
+              : 'fas fa-caret-right'}
             title={props.showFilter
               ? props.t('Hide {{filter}}', { filter: props.label })
               : props.t('Show {{filter}}', { filter: props.label })}

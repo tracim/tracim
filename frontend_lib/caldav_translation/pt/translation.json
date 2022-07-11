@@ -2,7 +2,7 @@
     "txtResources": "Recursos",
     "txtNote": "Nota",
     "errUnableSync": "Erro: 'incapaz de sincronizar recursos': tente novamente mais tarde!",
-    "loadingResources": "Carregamento de recursos (%act% de %total%)...",
+    "loadingResources": "Carregamento de recursos (%act% de %total%)…",
     "loadingCollectionList": "Carregamento da lista de recursos",
     "txtCacheText": "Há uma atualização disponível no servidor, por favor recarregue a página!",
     "txtCacheButton": "Recarregar",

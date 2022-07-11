@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import datetime
+from datetime import timezone
 import os
 import typing
 
 from depot.io.utils import FileIntent
 from hapic.data import HapicFile
+from importlib_metadata import metadata
 from preview_generator.exception import UnsupportedMimeType
 from preview_generator.manager import PreviewManager
 from sqlakeyset import Page
 from sqlakeyset import get_page
-from sqlalchemy import desc
+from sqlalchemy import Integer
+from sqlalchemy import bindparam
 from sqlalchemy import func
 from sqlalchemy import or_
+from sqlalchemy import text
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm.attributes import QueryableAttribute
@@ -21,7 +25,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.elements import and_
 import transaction
 
+from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.app_models.contents import FOLDER_TYPE
+from tracim_backend.app_models.contents import TODO_TYPE
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
@@ -50,12 +56,15 @@ from tracim_backend.lib.core.storage import StorageLib
 from tracim_backend.lib.core.tag import TagLib
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
+from tracim_backend.lib.rich_text_preview.html_preview import RichTextPreviewLib
 from tracim_backend.lib.utils.app import TracimContentType
 from tracim_backend.lib.utils.logger import logger
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizer
 from tracim_backend.lib.utils.sanitizer import HtmlSanitizerConfig
 from tracim_backend.lib.utils.translation import Translator
+from tracim_backend.lib.utils.translation import translator_marker as _
 from tracim_backend.lib.utils.utils import current_date_for_filename
+from tracim_backend.lib.utils.utils import date_as_lang
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import AuthoredContentRevisionsInfos
 from tracim_backend.models.context_models import ContentInContext
@@ -421,6 +430,19 @@ class ContentApi(object):
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
 
+        # NOTE - MP - 2022-07-04 - We should copy the template, note try to create a copy
+        if template_id:
+            template = self.get_one(template_id)
+            content = self.copy_from_template(
+                new_content=content,
+                source_content=template,
+                new_parent=parent,
+                new_content_namespace=content_namespace,
+            )
+
+        else:
+            content.revision_type = ActionDescription.CREATION
+
         if label:
             file_extension = ""
             if content_type.file_extension:
@@ -448,48 +470,40 @@ class ContentApi(object):
                 )
         if self._user:
             content.owner = self._user
-        content.parent = parent
 
+        content.parent = parent
         content.workspace = workspace
         content.type = content_type.slug
         content.is_temporary = is_temporary
-        content.revision_type = ActionDescription.CREATION
         content.content_namespace = content_namespace
-
-        if template_id:
-            template = self.get_one(template_id)
-
-            if label:
-                content = self.copy(
-                    template,
-                    new_label=label,
-                    new_workspace=workspace,
-                    copy_revision=False,
-                    do_save=False,
-                )
-            elif filename:
-                content = self.copy(
-                    template,
-                    new_label=filename,
-                    new_workspace=workspace,
-                    copy_revision=False,
-                    do_save=False,
-                )
 
         if do_save:
             self._session.add(content)
-            self.save(content, ActionDescription.CREATION, do_notify=do_notify)
-
-            if template_id:
-                tag_lib = TagLib(self._session)
-                tags_values = tag_lib.get_all(content_id=template_id)
-
-                for tag in tags_values:
-                    tag_lib.add_tag_to_content(
-                        user=self._user, content=content, tag_name=tag.tag_name
-                    )
+            self.save(content, content.revision_type, do_notify=do_notify)
 
         return content
+
+    def copy_tags(self, destination: Content, source_content_id: int,) -> None:
+        """Create extra data for templates: tags"""
+        tag_lib = TagLib(self._session)
+        tags_values = tag_lib.get_all(content_id=source_content_id)
+
+        for tag in tags_values:
+            tag_lib.add_tag_to_content(user=self._user, content=destination, tag_name=tag.tag_name)
+
+    def copy_todos(self, new_parent: Content, template_id: int) -> None:
+        """Create extra data for templates: todos"""
+        try:
+            todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
+
+            for todo in todos:
+                self.copy(
+                    item=todo, new_parent=new_parent, do_save=False, do_notify=False,
+                )
+
+        except ContentTypeNotExist:
+            # INFO - MP - 2022-07-08 - We can have an error if the todo application isn't activated
+            pass
 
     def create_comment(
         self,
@@ -719,6 +733,73 @@ class ContentApi(object):
             force_download=force_download,
         )
 
+    def get_full_pdf_preview_from_html_raw_content(
+        self,
+        revision: ContentRevisionRO,
+        filename: str,
+        default_filename: str,
+        additional_metadata: typing.Optional[typing.Dict[str, typing.Any]] = None,
+        force_download: bool = None,
+    ):
+        if not additional_metadata:
+            additional_metadata = {}
+        content = revision.node
+        revision_in_context = self.get_revision_in_context(revision)
+        space_name = _("Space {workspace_name}").format(workspace_name=content.workspace.label)
+        tag_lib = TagLib(session=self._session)
+        tags_objs = tag_lib.get_all(
+            workspace_id=content.workspace_id, content_id=content.content_id
+        )
+        keywords = ",".join([tag_obj.tag_name for tag_obj in tags_objs])
+        generator = "Tracim {}".format(metadata("tracim_backend")["Version"])
+        current_date = date_as_lang(
+            datetime.datetime.now(),
+            locale=self._user.lang,
+            default_locale=self._config.DEFAULT_LANG,
+        )
+
+        revision_txt = _("version {} (revision {}) on {}").format(
+            revision_in_context.version_number,
+            revision_in_context.revision_id,
+            date_as_lang(
+                revision_in_context.created,
+                locale=self._user.lang,
+                default_locale=self._config.DEFAULT_LANG,
+            ),
+        )
+        content_url = "{}/ui/workspaces/{}/contents/html-document/{}".format(
+            self._config.WEBSITE__BASE_URL, content.workspace_id, content.content_id
+        )
+        preview_metadata = {
+            "title": content.label,
+            "subtitle": space_name,
+            "author": content.owner.public_name,
+            "keywords": keywords,
+            "description": content.description,
+            "generator": generator,
+            "created": content.created.astimezone(timezone.utc).isoformat(),
+            "updated": content.updated.astimezone(timezone.utc).isoformat(),
+            "date": date_as_lang(
+                content.updated, locale=self._user.lang, default_locale=self._config.DEFAULT_LANG
+            ),
+            "content_url": content_url,
+            "revision_txt": revision_txt,
+            "footer_text": _("Generated by Tracim, on {}".format(current_date)),
+            "toctitle": _("Summary"),
+            "website_url": self._config.WEBSITE__BASE_URL,
+            "logo_url": self._config.WEBSITE__BASE_URL + "/assets/branding/images/tracim-logo.png",
+        }
+        preview_metadata.update(additional_metadata)
+
+        return RichTextPreviewLib(self._config).get_full_pdf_preview(
+            content=revision.raw_content,
+            default_filename=default_filename,
+            filename=filename,
+            force_download=force_download,
+            last_modified=revision.updated,
+            metadata=preview_metadata,
+        )
+
     def get_full_pdf_preview(
         self,
         revision: ContentRevisionRO,
@@ -801,6 +882,7 @@ class ContentApi(object):
         ] = None,
         complete_path_to_id: typing.Optional[int] = None,
         user: typing.Optional[User] = None,
+        assignee_id: typing.Optional[int] = None,
     ) -> Query:
         """
         Extended filter for better "get all data" query
@@ -812,6 +894,8 @@ class ContentApi(object):
         :param order_by_properties: filter by properties can be both string of
         attribute or attribute of Model object from sqlalchemy(preferred way,
         QueryableAttribute object)
+        :param user: user owner of the contents
+        :param assignee_id: assignee of the contents
         :return: Query object
         """
         order_by_properties = order_by_properties or []  # FDV
@@ -877,6 +961,9 @@ class ContentApi(object):
             )
             query = query.filter(or_(Content.owner == user, user.user_id == author_id_query))
 
+        if assignee_id:
+            query = query.filter(Content.assignee_id == assignee_id)
+
         for _property in order_by_properties:
             query = query.order_by(_property)
 
@@ -917,92 +1004,114 @@ class ContentApi(object):
             return get_page(query, per_page=count, page=page_token or False)
         return Page(query.all())
 
-    def get_last_active(
+    def _text_filter_generator(
+        self, filters: typing.List[str], prefix: str = "where ", separator: str = " and "
+    ):
+        if not filters:
+            return ""
+        text = prefix
+        text = prefix + separator.join(filters)
+        return text
+
+    def get_read_status(
         self,
+        user: User,
         workspace: typing.Optional[Workspace] = None,
-        limit: typing.Optional[int] = None,
-        before_content: typing.Optional[Content] = None,
         content_ids: typing.Optional[typing.List[int]] = None,
-    ) -> typing.List[Content]:
+    ) -> typing.List[typing.Dict[str, typing.Any]]:
         """
-        get contents list sorted by last update
-        (last modification of content itself or one of this comment)
-        :param workspace: Workspace to check
-        :param limit: maximum number of elements to return
-        :param before_content: last_active content are only those updated
-         before this content given.
-        :param content_ids: restrict selection to some content ids and
-        related Comments
-        :return: list of content
+        Return read status for a user of a content
+        :param user: user concerned by these read status
+        :param workspace: workspace to check for read status
+        :param content_ids: list of content to check for read status
+        :return: list of read status
+
+        :warning: This method does not use standard security filter, so be careful with
+        access right.
+
+        Result is dependant of show_deleted, show_archived and show_active filters
         """
 
-        resultset = (
-            self.get_all_query(workspaces=[workspace] if workspace else None)
-            .outerjoin(
-                RevisionReadStatus,
-                and_(
-                    RevisionReadStatus.revision_id == Content.cached_revision_id,
-                    RevisionReadStatus.user_id == self._user_id,
+        optional_begin_filters = []
+        optional_end_filters = []
+        if content_ids:
+            optional_end_filters.append("root_id in :content_ids")
+
+        if workspace:
+            optional_begin_filters.append("cr.workspace_id = :workspace_id")
+
+        # NOTE - G.M - 2022-06-21: Theses SQL boolean filters use a syntax especially chosen
+        # to be compatible with both postgresql and sqlite, using some other similar syntax
+        # may failed in one or the other database software.
+        if not self._show_deleted:
+            optional_begin_filters.append("not cr.is_deleted")
+        if not self._show_archived:
+            optional_begin_filters.append("not cr.is_archived")
+        if not self._show_active:
+            optional_begin_filters.append("(cr.is_archived or cr.is_deleted)")
+
+        statement = text(
+            """
+            with recursive content_read_status as (
+                select c.id                                                      as content_id,
+                       cr.parent_id                                              as parent_id,
+                       rrs.view_datetime                                         as view_datetime,
+                       case when rrs.view_datetime is not NULL then 1 else 0 END as read
+                from content c
+                         join content_revisions cr on c.cached_revision_id = cr.revision_id
+                         left outer join revision_read_status rrs on cr.revision_id = rrs.revision_id and rrs.user_id = :user_id
+                {optional_begin_filter}
+            ), temp_read_status as
+            (
+              select
+                  crs.content_id,
+                  crs.view_datetime,
+                  crs.read,
+                  crs.content_id as root_id
+              from content_read_status crs
+              union all
+              select crs.content_id,
+                     crs.view_datetime,
+                     crs.read,
+                     trs.root_id as root_id
+              from content_read_status crs
+                inner join temp_read_status trs
+                  on crs.parent_id = trs.content_id
+            )
+            select
+                   trs.root_id as root_id,
+                   max(trs.view_datetime) as last_view_datetime,
+                   min(trs.read) as read
+            from temp_read_status trs
+            group by root_id
+            {optional_end_filter}
+            ;
+        """.format(
+                optional_begin_filter=self._text_filter_generator(optional_begin_filters),
+                optional_end_filter=self._text_filter_generator(
+                    prefix="having ", filters=optional_end_filters
                 ),
             )
-            .options(
-                contains_eager(Content.current_revision).contains_eager(
-                    ContentRevisionRO.revision_read_statuses
-                )
-            )
         )
-
         if content_ids:
-            resultset = resultset.filter(
-                or_(
-                    Content.content_id.in_(content_ids),
-                    and_(
-                        Content.parent_id.in_(content_ids),
-                        Content.type == content_type_list.Comment.slug,
-                    ),
-                )
+            statement = statement.bindparams(
+                bindparam("content_ids", expanding=True, type_=Integer())
             )
 
-        resultset = resultset.order_by(
-            desc(ContentRevisionRO.updated),
-            desc(ContentRevisionRO.revision_id),
-            desc(ContentRevisionRO.content_id),
-        )
-
-        active_contents = []
-        too_recent_content = []
-        before_content_find = False
-        for content in resultset:
-            related_active_content = None
-            if content_type_list.Comment.slug == content.type:
-                related_active_content = content.parent
-            else:
-                related_active_content = content
-
-            # INFO - G.M - 2018-08-10 - re-apply general filters here to avoid
-            # issue with comments
-            if not self._show_deleted and related_active_content.is_deleted:
-                continue
-            if not self._show_archived and related_active_content.is_archived:
-                continue
-
-            if (
-                related_active_content not in active_contents
-                and related_active_content not in too_recent_content
-            ):
-
-                if not before_content or before_content_find:
-                    active_contents.append(related_active_content)
-                else:
-                    too_recent_content.append(related_active_content)
-
-                if before_content and related_active_content == before_content:
-                    before_content_find = True
-
-            if limit and len(active_contents) >= limit:
-                break
-
-        return active_contents
+        tuples_result = self._session.execute(
+            statement,
+            {
+                "user_id": user.user_id,
+                "workspace_id": workspace.workspace_id if workspace else None,
+                "content_ids": content_ids or [],
+            },
+        ).fetchall()
+        result = []
+        for tuple in tuples_result:
+            result.append(
+                {"content_id": tuple[0], "last_view_datetime": tuple[1], "read_by_user": tuple[2]}
+            )
+        return result
 
     def _set_allowed_content(self, content: Content, allowed_content_dict: dict) -> Content:
         """
@@ -1016,9 +1125,13 @@ class ContentApi(object):
             )
         :return: content
         """
-        properties = content.properties.copy()
-        if set(properties["allowed_content"]) == set(allowed_content_dict):
+
+        if set(content.all_properties["allowed_content"]) == set(allowed_content_dict):
             raise SameValueError("Content allowed content did not change")
+        if content.properties:
+            properties = content.properties.copy()
+        else:
+            properties = {}
         properties["allowed_content"] = allowed_content_dict
         content.properties = properties
         return content
@@ -1041,17 +1154,6 @@ class ContentApi(object):
             allowed_content_dict[allowed_content_type_slug] = True
 
         return self._set_allowed_content(content, allowed_content_dict)
-
-    def restore_content_default_allowed_content(self, content: Content) -> None:
-        """
-        Return to default allowed_content_types
-        :param content: the given content instance
-        :return: nothing
-        """
-        if content._properties and "allowed_content" in content._properties:
-            properties = content.properties.copy()
-            del properties["allowed_content"]
-            content.properties = properties
 
     def set_status(self, content: Content, new_status: str):
         if new_status in content_status_list.get_all_slugs_values():
@@ -1170,9 +1272,10 @@ class ContentApi(object):
     ) -> None:
         if parent:
             assert workspace == parent.workspace
-            if parent.properties and "allowed_content" in parent.properties:
+            properties = parent.all_properties
+            if properties and "allowed_content" in properties:
                 if content_type not in self._get_allowed_content_type(
-                    parent.properties["allowed_content"]
+                    properties["allowed_content"]
                 ):
                     raise UnallowedSubContent(
                         " SubContent of type {subcontent_type}  not allowed in content {content_id}".format(
@@ -1202,7 +1305,6 @@ class ContentApi(object):
         new_workspace: Workspace = None,
         new_file_extension: str = None,
         new_content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
-        copy_revision: bool = True,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> Content:
@@ -1289,7 +1391,8 @@ class ContentApi(object):
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
 
-        copy_result = self._copy(item, content_namespace, parent, copy_revision)
+        copy_result = self._copy(item, content_namespace, parent)
+
         copy_result = self._add_copy_revisions(
             original_content=item,
             new_content=copy_result.new_content,
@@ -1305,12 +1408,32 @@ class ContentApi(object):
         )
         return copy_result.new_content
 
+    def copy_from_template(
+        self,
+        new_content: Content,
+        source_content: Content,
+        new_parent: Content,
+        new_content_namespace: ContentNamespaces = None,
+    ) -> Content:
+        cpy_rev = ContentRevisionRO.copy(
+            revision=source_content.last_revision,
+            parent=new_parent,
+            new_content_namespace=new_content_namespace,
+            copy_as_template=True,
+        )
+        cpy_rev.properties = {}
+        cpy_rev.node = new_content
+
+        new_content.current_revision = cpy_rev
+        self._flag_revision_as_copy(new_content, source_content)
+
+        return new_content
+
     def _copy(
         self,
         content: Content,
         new_content_namespace: ContentNamespaces = None,
         new_parent: Content = None,
-        copy_revisions: bool = True,
     ) -> AddCopyRevisionsResult:
         """
         Create new content for content and his children, recreate all revision in order and
@@ -1329,35 +1452,24 @@ class ContentApi(object):
         # revision related to old data. key of dict is original content id.
         original_content_children = {}  # type: typing.Dict[int,Content]
 
-        if copy_revisions:
-            for rev, is_current_rev in content.get_tree_revisions_advanced():
+        for rev, is_current_rev in content.get_tree_revisions_advanced():
 
-                if rev.content_id == content.content_id:
-                    related_content = new_content  # type: Content
-                    related_parent = new_parent
+            if rev.content_id == content.content_id:
+                related_content = new_content  # type: Content
+                related_parent = new_parent
+            else:
+                # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
+                # we create it.
+                if rev.content_id not in new_content_children:
+                    new_content_children[rev.content_id] = Content()
+                    original_content_children[rev.content_id] = rev.node
+                related_content = new_content_children[rev.content_id]
+                if rev.parent_id == content.content_id:
+                    related_parent = new_content
                 else:
-                    # INFO - G.M - 2019-04-30 - if we retrieve a revision without a new content related yet
-                    # we create it.
-                    if rev.content_id not in new_content_children:
-                        new_content_children[rev.content_id] = Content()
-                        original_content_children[rev.content_id] = rev.node
-                    related_content = new_content_children[rev.content_id]
-                    if rev.parent_id == content.content_id:
-                        related_parent = new_content
-                    else:
-                        related_parent = new_content_children[rev.parent_id]
-                # INFO - G.M - 2019-04-30 - copy of revision itself.
-                cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
-                cpy_rev.node = related_content
-                related_content.current_revision = cpy_rev
-                self._session.add(related_content)
-                self._session.flush()
-        else:
-            related_content = new_content
-            related_parent = new_parent
-            cpy_rev = ContentRevisionRO.copy(
-                content.last_revision, related_parent, new_content_namespace, not copy_revisions
-            )
+                    related_parent = new_content_children[rev.parent_id]
+            # INFO - G.M - 2019-04-30 - copy of revision itself.
+            cpy_rev = ContentRevisionRO.copy(rev, related_parent, new_content_namespace)
             cpy_rev.node = related_content
             related_content.current_revision = cpy_rev
             self._session.add(related_content)
@@ -1368,6 +1480,18 @@ class ContentApi(object):
             new_children_dict=new_content_children,
             original_children_dict=original_content_children,
         )
+
+    def _flag_revision_as_copy(
+        self, content: ContentRevisionRO, original_content: Content,
+    ):
+        properties = content.properties.copy()
+        properties["origin"] = {
+            "content": original_content.id,
+            "revision": original_content.last_revision.revision_id,
+        }
+        content.revision_type = ActionDescription.COPY
+        content.properties = properties
+        return content
 
     def _add_copy_revisions(
         self,
@@ -1406,13 +1530,7 @@ class ContentApi(object):
                 force_create_new_revision=True,
             ) as rev:
                 rev.workspace = new_workspace
-                rev.revision_type = ActionDescription.COPY
-                properties = rev.properties.copy()
-                properties["origin"] = {
-                    "content": original_child.id,
-                    "revision": original_child.last_revision.revision_id,
-                }
-                rev.properties = properties
+                self._flag_revision_as_copy(content=rev, original_content=original_child)
             self.save(new_child, ActionDescription.COPY, do_notify=False)
         with new_revision(
             session=self._session,
@@ -1427,13 +1545,7 @@ class ContentApi(object):
             rev.label = new_label
             rev.file_extension = new_file_extension
             rev.content_namespace = new_content_namespace
-            rev.revision_type = ActionDescription.COPY
-            properties = rev.properties.copy()
-            properties["origin"] = {
-                "content": original_content.id,
-                "revision": original_content.last_revision.revision_id,
-            }
-            rev.properties = properties
+            self._flag_revision_as_copy(content=rev, original_content=original_content)
         if do_save:
             self.save(new_content, ActionDescription.COPY, do_notify=do_notify)
         return AddCopyRevisionsResult(
@@ -1662,7 +1774,10 @@ class ContentApi(object):
                 "Can't mark this kind file as a template. Files supported: .document.html, .odt, .ods, .odp, .odg"
             )
         content.is_template = is_template
-        content.revision_type = ActionDescription.REVISION
+        if is_template:
+            content.revision_type = ActionDescription.MARK_AS_TEMPLATE
+        else:
+            content.revision_type = ActionDescription.UNMARK_AS_TEMPLATE
         return content
 
     def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:
@@ -1873,7 +1988,6 @@ class ContentApi(object):
 
         if do_flush:
             self.flush()
-
         return content
 
     def mark_unread(self, content: Content, do_flush=True) -> Content:
@@ -1999,10 +2113,7 @@ class ContentApi(object):
         return _("New folder {0}").format(query.count() + 1)
 
     def _allow_empty_label(self, content_type_slug: str) -> bool:
-        if (
-            content_type_list.get_one_by_slug(content_type_slug).slug
-            == content_type_list.Comment.slug
-        ):
+        if content_type_list.get_one_by_slug(content_type_slug).slug in [COMMENT_TYPE, TODO_TYPE]:
             return True
         return False
 
@@ -2142,3 +2253,19 @@ class ContentApi(object):
         ).delete()
         if do_save:
             self._session.flush()
+
+    def create_todo(
+        self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
+    ) -> Content:
+        item = self.create(
+            content_type_slug=content_type_list.Todo.slug,
+            workspace=parent.workspace,
+            parent=parent,
+        )
+        item.raw_content = raw_content
+        if assignee:
+            item.assignee = assignee
+        self._session.add(item)
+        self.save(item, ActionDescription.CREATION, do_notify=do_notify)
+
+        return item

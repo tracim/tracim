@@ -1,5 +1,6 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
@@ -15,6 +16,7 @@ import {
   addAllResourceI18n,
   handleFetchResult,
   handleInvalidMentionInComment,
+  getToDo,
   PopinFixed,
   PopinFixedContent,
   PopinFixedRightPart,
@@ -31,6 +33,7 @@ import {
   buildHeadTitle,
   tinymceRemove,
   ROLE,
+  ROLE_LIST,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
@@ -46,7 +49,9 @@ import {
   PopinFixedRightPartContent,
   sendGlobalFlashMessage,
   TagList,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  sortContentByStatus,
+  ToDoManagement
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -108,7 +113,9 @@ export class File extends React.Component {
         revision_id: param.content.current_revision_id,
         page_nb: 1
       },
-      isFileCommentLoading: false
+      isFileCommentLoading: false,
+      toDoList: [],
+      showProgress: true
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -128,7 +135,11 @@ export class File extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -162,6 +173,56 @@ export class File extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
     )
+  }
+
+  handleMemberModified = async data => {
+    const { state } = this
+    if (data.fields.user.user_id !== state.loggedUser.userId) return
+
+    const newUserRoleId = ROLE_LIST.find(r => data.fields.member.role === r.slug).id
+
+    this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
+  }
+
+  handleToDoCreated = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
+    }))
+  }
+
+  handleToDoChanged = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    }))
+  }
+
+  handleToDoDeleted = data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
+    }))
   }
 
   handleContentModified = (data) => {
@@ -303,6 +364,7 @@ export class File extends React.Component {
     }
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -474,6 +536,26 @@ export class File extends React.Component {
   handleClickRestoreArchive = async () => {
     const { props, state } = this
     props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+  }
+
+  handleSaveNewToDo = (assignedUserId, toDo) => {
+    const { state, props } = this
+    props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
+  }
+
+  handleDeleteToDo = (toDo) => {
+    const { state, props } = this
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
+  }
+
+  handleChangeStatusToDo = (toDo, status) => {
+    const { state, props } = this
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+  }
+
+  handleSetShowProgressbarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickEditComment = (comment) => {
@@ -865,7 +947,32 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const tag = {
+    const toDoObject = {
+      id: 'todo',
+      label: props.t('Tasks'),
+      icon: 'fas fa-check-square',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Tasks')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+        >
+          <ToDoManagement
+            apiUrl={state.config.apiUrl}
+            contentId={state.content.content_id}
+            customColor={state.config.hexcolor}
+            memberList={state.config.workspace.memberList}
+            onClickChangeStatusToDo={this.handleChangeStatusToDo}
+            onClickDeleteToDo={this.handleDeleteToDo}
+            onClickSaveNewToDo={this.handleSaveNewToDo}
+            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
+            user={state.loggedUser}
+            toDoList={state.toDoList}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -914,7 +1021,8 @@ export class File extends React.Component {
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
       return [
         timelineObject,
-        tag,
+        toDoObject,
+        tagObject,
         {
           id: 'share',
           label: props.t('Share'),
@@ -945,7 +1053,7 @@ export class File extends React.Component {
 
       ]
     } else {
-      return [timelineObject, tag, propertiesObject]
+      return [timelineObject, toDoObject, tagObject, propertiesObject]
     }
   }
 

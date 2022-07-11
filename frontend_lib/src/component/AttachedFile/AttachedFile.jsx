@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 export default function AttachedFile (props) {
   return (
     <span className='attachedFile'>
-      <Icon icon='fas fa-fw fa-paperclip' title='' />
+      <Icon icon='fas fa-paperclip' title='' />
       {` ${props.fileName}`}
     </span>
   )

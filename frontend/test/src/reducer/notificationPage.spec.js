@@ -14,7 +14,6 @@ import {
   readNotificationList,
   SET,
   setNextPage,
-  setNotificationList,
   UPDATE,
   updateNotification
 } from '../../../src/action-creator.sync.js'
@@ -95,17 +94,6 @@ describe('reducer notificationPage.js', () => {
       unreadNotificationCount: 0,
       unreadMentionCount: 0
     }
-
-    describe(`${SET}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage(initialState, setNotificationList([TLM], workspaceList.workspaceList))
-
-      it('should return the list of notification from the objects passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({
-          ...initialState,
-          list: [notification]
-        })
-      })
-    })
 
     describe(`${ADD}/${NOTIFICATION}`, () => {
       const listOfNotification = notificationPage(initialState, addNotification(TLM, workspaceList.workspaceList))

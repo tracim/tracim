@@ -65,7 +65,9 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
-  USER_CALL_STATE
+  sortContentByStatus,
+  USER_CALL_STATE,
+  STATUSES
 } from './helper.js'
 
 import {
@@ -134,6 +136,8 @@ import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
 import PageContent from './component/Layout/PageContent.jsx'
 
+import TimedEvent from './component/TimedEvent/TimedEvent.jsx'
+
 import Delimiter from './component/Delimiter/Delimiter.jsx'
 
 import CardPopup from './component/CardPopup/CardPopup.jsx'
@@ -180,6 +184,10 @@ import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
 import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
+import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
+import NewToDo from './component/ToDo/NewToDo.jsx'
+import ToDoItem from './component/ToDo/ToDoItem.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -190,8 +198,11 @@ import {
 
 import {
   baseFetch,
+  deleteToDo,
   getComment,
   getContentPath,
+  getToDo,
+  getToDoListForUser,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -226,7 +237,8 @@ import {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  putToDo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -282,6 +294,9 @@ export {
   AgendaInfo,
   appContentFactory,
   DateInput,
+  deleteToDo,
+  getToDo,
+  getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -465,5 +480,12 @@ export {
   getFileRevisionPreviewInfo,
   tinymceRemove,
   Popover,
-  getBrowserLang
+  getBrowserLang,
+  NewToDo,
+  putToDo,
+  sortContentByStatus,
+  TimedEvent,
+  ToDoItem,
+  ToDoManagement,
+  STATUSES
 }

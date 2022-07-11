@@ -42,7 +42,10 @@ class EmojiReactions extends React.Component {
     if (fetchGetContentReactionList.apiResponse.ok) {
       this.setState({ reactionList: fetchGetContentReactionList.body })
     } else {
-      sendGlobalFlashMessage(props.t('Error while fetching a list of reactions'))
+      // INFO - CH - removing the flash message because of an issue in the activity loading.
+      // see https://github.com/tracim/tracim/issues/4946 for details
+      // sendGlobalFlashMessage(props.t('Error while fetching a list of reactions'))
+      console.error('Error while fetching list of reaction', 'workspaceId:', props.workspaceId, 'contentId: ', props.contentId)
     }
   }
 

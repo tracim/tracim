@@ -77,14 +77,14 @@ export class DisplayFileToUpload extends React.Component {
                     {(isFileInError
                       ? (
                         <Icon
-                          icon='fas fa-fw fa-exclamation-triangle'
+                          icon='fas fa-exclamation-triangle'
                           customClass='DisplayFileToUpload__popover__item__iconFile inError'
                           title={isFileInError ? file.errorMessage : ''}
                         />
                       )
                       : (
                         <Icon
-                          icon='fas fa-fw fa-paperclip'
+                          icon='fas fa-paperclip'
                           customClass='DisplayFileToUpload__popover__item__iconFile'
                           title=''
                         />

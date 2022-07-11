@@ -57,7 +57,8 @@ export const PAGE = {
   RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`,
-  FAVORITES: '/ui/favorites'
+  FAVORITES: '/ui/favorites',
+  TODO: '/ui/todos'
 }
 
 export const DATE_FNS_LOCALE = {
@@ -194,6 +195,16 @@ export const revisionTypeList = [{
   faIcon: 'far fa-copy',
   tradKey: i18n.t('Item copied'),
   label: 'Item copied'
+}, {
+  id: 'mark-as-template',
+  faIcon: 'fas fa-clipboard',
+  tradKey: i18n.t('Item marked as template'),
+  label: 'Item marked as template'
+}, {
+  id: 'unmark-as-template',
+  faIcon: 'fas fa-paste',
+  tradKey: i18n.t('Item unmarked as template'),
+  label: 'Item unmarked as template'
 }]
 
 const WORKSPACE_MANAGER = {
@@ -505,6 +516,23 @@ export const IMG_LOAD_STATE = {
   ERROR: 'error'
 }
 
+export const STATUSES = {
+  OPEN: 'open',
+  VALIDATED: 'closed-validated',
+  CANCELLED: 'closed-unvalidated',
+  DEPRECATED: 'closed-deprecated'
+}
+
+export const sortContentByStatus = (contentList) => {
+  return contentList.sort((contantA, contentB) => {
+    if (contantA.status === STATUSES.VALIDATED && contentB.status === STATUSES.OPEN) {
+      return 1
+    } if (contantA.status === STATUSES.OPEN && contentB.status === STATUSES.VALIDATED) {
+      return -1
+    } else return 0
+  })
+}
+
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types
@@ -514,7 +542,8 @@ export const CONTENT_TYPE = {
   THREAD: 'thread',
   FOLDER: 'folder',
   COMMENT: 'comment',
-  KANBAN: 'kanban'
+  KANBAN: 'kanban',
+  TODO: 'todo'
 }
 
 // FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js

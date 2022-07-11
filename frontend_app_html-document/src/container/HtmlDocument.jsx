@@ -1,6 +1,7 @@
 import React from 'react'
 import HtmlDocumentComponent from '../component/HtmlDocument.jsx'
 import { translate } from 'react-i18next'
+import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import {
   APP_FEATURE_MODE,
@@ -15,6 +16,7 @@ import {
   getContent,
   getInvalidMentionList,
   getOrCreateSessionClientToken,
+  getToDo,
   handleFetchResult,
   handleInvalidMentionInComment,
   PAGE,
@@ -22,6 +24,7 @@ import {
   PopinFixedContent,
   PopinFixedRightPart,
   ROLE,
+  ROLE_LIST,
   Timeline,
   TagList,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -42,7 +45,9 @@ import {
   tinymceRemove,
   FAVORITE_STATE,
   addExternalLinksIcons,
-  PopinFixedRightPartContent
+  PopinFixedRightPartContent,
+  sortContentByStatus,
+  ToDoManagement
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -87,7 +92,9 @@ export class HtmlDocument extends React.Component {
       showInvalidMentionPopupInContent: false,
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      toDoList: [],
+      showProgress: true
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -106,7 +113,11 @@ export class HtmlDocument extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentRestore }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentRestore },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -182,6 +193,56 @@ export class HtmlDocument extends React.Component {
         sendGlobalFlashMessage(props.t('Unknown content'))
         break
     }
+  }
+
+  handleMemberModified = async data => {
+    const { state } = this
+    if (data.fields.user.user_id !== state.loggedUser.userId) return
+
+    const newUserRoleId = ROLE_LIST.find(r => data.fields.member.role === r.slug).id
+
+    this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
+  }
+
+  handleToDoCreated = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
+    }))
+  }
+
+  handleToDoChanged = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    }))
+  }
+
+  handleToDoDeleted = data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
+    }))
   }
 
   // Custom Event Handlers
@@ -330,8 +391,10 @@ export class HtmlDocument extends React.Component {
   }
 
   loadContent = () => {
+    const { state } = this
     this.loadHtmlDocument()
     this.props.loadTimeline(getHtmlDocRevision, this.state.content)
+    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
   }
 
   handleLoadMoreTimelineItems = async () => {
@@ -534,6 +597,15 @@ export class HtmlDocument extends React.Component {
     props.appContentDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  // INFO - CH - 2019-05-24 - last path param revision_id is to force browser to not use cache when we upload new revision
+  // see https://github.com/tracim/tracim/issues/1804
+  getDownloadPDFUrl = ({ config: { apiUrl }, content, mode }) => {
+    // FIXME - b.l - refactor urls
+    const label = content.label ? encodeURIComponent(content.label + '.pdf') : 'unknown.pdf'
+    const urlRevisionPart = mode === APP_FEATURE_MODE.REVISION ? `revisions/${content.current_revision_id}/` : ''
+    return `${apiUrl}/workspaces/${content.workspace_id}/html-documents/${content.content_id}/${urlRevisionPart}preview/pdf/full/${label}?force_download=1&revision_id=${content.current_revision_id}`
+  }
+
   handleClickRestoreDelete = async () => {
     const { props, state } = this
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
@@ -635,6 +707,26 @@ export class HtmlDocument extends React.Component {
   }
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInContent: false, showInvalidMentionPopupInComment: false })
+
+  handleSaveNewToDo = (assignedUserId, toDo) => {
+    const { state, props } = this
+    props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
+  }
+
+  handleDeleteToDo = (toDo) => {
+    const { state, props } = this
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
+  }
+
+  handleChangeStatusToDo = (toDo, status) => {
+    const { state, props } = this
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+  }
+
+  handleSetShowProgressbarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
+  }
 
   handleClickNotifyAll = async () => {
     const { state, props } = this
@@ -769,7 +861,33 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const tag = {
+
+    const toDoObject = {
+      id: 'todo',
+      label: props.t('Tasks'),
+      icon: 'fas fa-check-square',
+      children: (
+        <PopinFixedRightPartContent
+          label={props.t('Tasks')}
+          toDoList={state.toDoList}
+          showProgress={state.showProgress}
+        >
+          <ToDoManagement
+            apiUrl={state.config.apiUrl}
+            contentId={state.content.content_id}
+            customColor={state.config.hexcolor}
+            memberList={state.config.workspace.memberList}
+            onClickChangeStatusToDo={this.handleChangeStatusToDo}
+            onClickDeleteToDo={this.handleDeleteToDo}
+            onClickSaveNewToDo={this.handleSaveNewToDo}
+            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
+            user={state.loggedUser}
+            toDoList={state.toDoList}
+          />
+        </PopinFixedRightPartContent>
+      )
+    }
+    const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -787,7 +905,7 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, tag]
+    return [timelineObject, toDoObject, tagObject]
   }
 
   render () {
@@ -812,6 +930,12 @@ export class HtmlDocument extends React.Component {
         <PopinFixedContent
           actionList={[
             {
+              icon: 'far fa-file-pdf',
+              label: props.t('Download as PDF'),
+              downloadLink: this.getDownloadPDFUrl(state),
+              showAction: true,
+              dataCy: 'popinListItem__downloadAsPdf'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
@@ -867,6 +991,7 @@ export class HtmlDocument extends React.Component {
           translationState={state.translationState}
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
           translationTargetLanguageCode={state.translationTargetLanguageCode}
+          showMarkedAsTemplate
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug

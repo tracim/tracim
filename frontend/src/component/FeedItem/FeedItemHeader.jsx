@@ -13,9 +13,9 @@ import {
   COLORS,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  FilenameWithBadges
+  FilenameWithBadges,
+  TimedEvent
 } from 'tracim_frontend_lib'
-import TimedEvent from '../TimedEvent.jsx'
 
 require('./FeedItemHeader.styl')
 
@@ -76,7 +76,7 @@ export class FeedItemHeader extends React.Component {
           customClass='feedItemHeader__icon'
           color={props.isPublication ? COLORS.PUBLICATION : app.hexcolor}
           title={props.isPublication ? props.t('Publication') : app.label}
-          icon={`fa-fw ${icon}`}
+          icon={icon}
         />
         <div className='feedItemHeader__title'>
           {props.titleLink
