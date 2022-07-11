@@ -132,10 +132,11 @@ class FileController(Controller):
             parent=parent,
             content_namespace=hapic_data.forms.content_namespace,
             template_id=hapic_data.forms.template_id,
+            do_save=hapic_data.forms.template_id
         )
-        api.save(content, ActionDescription.CREATION)
 
         if not hapic_data.forms.template_id:
+            api.save(content, ActionDescription.CREATION)
             with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
                 api.update_file_data(
                     content,
