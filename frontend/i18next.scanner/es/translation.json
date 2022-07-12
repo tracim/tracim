@@ -327,7 +327,7 @@
   "You can join an existing space or create your first space": "Puedes unirse a un espacio existente o crear tu primer espacio",
   "deleted": "eliminado",
   "commented": "comentó",
-  "created": "creó",
+  "created": "creado",
   "modified": "modificado",
   "Unknown entity type": "Tipo de entidad desconocida",
   "<0><0>{{userPublicName}}</0></0>'s  role has been changed to <2>{{role}}</2>": "El rol de <0><0>{{userPublicName}}</0></0> ha sido cambiado a <2>{{role}}</2>",
@@ -563,5 +563,13 @@
   "Call in progress...": "Llamada en curso…",
   "Show discussion": "Mostrar discusión",
   "{{author}} modified their role in a space": "{{author}} modificó su papel en un espacio",
-  "{{author}} restored their account": "{{author}} restauró su cuenta"
+  "{{author}} restored their account": "{{author}} restauró su cuenta",
+  "Error while saving new to do": "Error al guardar las nuevas tareas",
+  "You are not allowed to delete this to do": "No puede eliminar esta tarea",
+  "Tasks": "Tareas",
+  "My tasks": "Mis tareas",
+  "Error while loading to do list": "Error al cargar la lista de tareas",
+  "Filter my tasks": "Filtrar mis tareas",
+  "You are not allowed to change the status of this to do": "No está permitido cambiar el estado de esta tarea",
+  "Error while deleting to do": "Error al eliminar esta tarea"
 }

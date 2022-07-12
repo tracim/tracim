@@ -44,5 +44,6 @@
   "Exit fullscreen mode": "Salir del modo de pantalla completa",
   "See less": "Ver menos",
   "You must change the status or restore this kanban board before any change": "Debe cambiar el estado o restaurar esta tabla kanban antes de cualquier cambio",
-  "To Do": "Tareas"
+  "To Do": "Tareas",
+  "Tasks": "Tareas"
 }
