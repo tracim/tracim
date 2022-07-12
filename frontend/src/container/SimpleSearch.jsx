@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import {
+  EmptyListMessage,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -33,7 +34,7 @@ import { parseSearchUrl, SEARCH_TYPE } from '../util/helper.js'
 const qs = require('query-string')
 
 export class SimpleSearch extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
     // https://github.com/tracim/tracim/issues/1973
@@ -53,13 +54,13 @@ export class SimpleSearch extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { props } = this
     const prevSearch = parseSearchUrl(qs.parse(prevProps.location.search))
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
@@ -151,7 +152,7 @@ export class SimpleSearch extends React.Component {
     )
   }
 
-  setSubtitle () {
+  setSubtitle() {
     const { props } = this
     const { simpleSearch } = props
 
@@ -163,7 +164,7 @@ export class SimpleSearch extends React.Component {
     return subtitle
   }
 
-  getSubtitle () {
+  getSubtitle() {
     let subtitle = ''
     const currentNumberSearchResults = this.props.simpleSearch.resultList.length
     if (currentNumberSearchResults > 0) {
@@ -173,7 +174,7 @@ export class SimpleSearch extends React.Component {
     return subtitle
   }
 
-  hasMoreResults () {
+  hasMoreResults() {
     const { props } = this
     const currentNumberSearchResults = this.state.totalHits
     return currentNumberSearchResults >= (props.simpleSearch.numberResultsByPage * props.simpleSearch.currentPage)
@@ -190,7 +191,7 @@ export class SimpleSearch extends React.Component {
     }]))
   }
 
-  render () {
+  render() {
     const { props, state } = this
     const currentNumberSearchResults = props.simpleSearch.resultList.length
 
@@ -214,55 +215,57 @@ export class SimpleSearch extends React.Component {
                 <PageContent parentClass='searchResult'>
                   <div>{this.getSubtitle()}</div>
 
-                  <div className='folder__content' data-cy='search__content'>
-                    {currentNumberSearchResults > 0 && (
-                      <ContentItemHeader showSearchDetails />
-                    )}
+                  {currentNumberSearchResults > 0
+                    ? (
+                      <div>
+                        <div className='folder__content' data-cy='search__content'>
+                          <ContentItemHeader showSearchDetails />
 
-                    {currentNumberSearchResults === 0 && (
-                      <div className='searchResult__content__empty'>
-                        {`${props.t('No results for the search terms:')} ${props.simpleSearch.searchString}`}
+                          {props.simpleSearch.resultList.map((searchItem, index) => (
+                            <ListItemWrapper
+                              label={searchItem.label}
+                              read
+                              contentType={props.contentType.find(ct => ct.slug === searchItem.contentType)}
+                              isLast={index === props.simpleSearch.resultList.length - 1}
+                              isFirst={index === 0}
+                              key={searchItem.contentId}
+                            >
+                              <ContentItemSearch
+                                label={searchItem.label}
+                                path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
+                                lastModificationAuthor={searchItem.lastModifier}
+                                lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
+                                lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
+                                fileExtension={searchItem.fileExtension}
+                                faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
+                                statusSlug={searchItem.status}
+                                contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
+                                urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
+                                key={searchItem.contentId}
+                              />
+                            </ListItemWrapper>
+                          ))}
+                        </div>
+                        <div className='searchResult__btnSeeMore'>
+                          {(this.hasMoreResults()
+                            ? (
+                              <IconButton
+                                onClick={this.handleClickSeeMore}
+                                icon='chevron-down'
+                                text={props.t('See more')}
+                              />
+                            )
+                            : currentNumberSearchResults > props.simpleSearch.numberResultsByPage &&
+                            props.t('No more results')
+                          )}
+                        </div>
+
                       </div>
+                    ) : (
+                      <EmptyListMessage>
+                        {`${props.t('No results for the search terms:')} ${props.simpleSearch.searchString}`}
+                      </EmptyListMessage>
                     )}
-
-                    {props.simpleSearch.resultList.map((searchItem, index) => (
-                      <ListItemWrapper
-                        label={searchItem.label}
-                        read
-                        contentType={props.contentType.find(ct => ct.slug === searchItem.contentType)}
-                        isLast={index === props.simpleSearch.resultList.length - 1}
-                        isFirst={index === 0}
-                        key={searchItem.contentId}
-                      >
-                        <ContentItemSearch
-                          label={searchItem.label}
-                          path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
-                          lastModificationAuthor={searchItem.lastModifier}
-                          lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-                          lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-                          fileExtension={searchItem.fileExtension}
-                          faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
-                          statusSlug={searchItem.status}
-                          contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                          urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
-                          key={searchItem.contentId}
-                        />
-                      </ListItemWrapper>
-                    ))}
-                  </div>
-                  <div className='searchResult__btnSeeMore'>
-                    {(this.hasMoreResults()
-                      ? (
-                        <IconButton
-                          onClick={this.handleClickSeeMore}
-                          icon='chevron-down'
-                          text={props.t('See more')}
-                        />
-                      )
-                      : currentNumberSearchResults > props.simpleSearch.numberResultsByPage &&
-                      props.t('No more results')
-                    )}
-                  </div>
                 </PageContent>
               )}
           </PageWrapper>

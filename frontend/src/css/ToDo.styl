@@ -1,17 +1,19 @@
-.toDo__wrapper
-  & .toDo__item
-    background-color offWhite
+.toDo
+  &__list
+    display flex
+    flex-direction column
+    height 100%
 
-    & .toDoItem
-      display flex
-      min-height headerHeight
-      align-items center
-      padding standardSpacing
+  &__wrapper
+    & .toDo__item
+      background-color offWhite
 
-  & .textinput__box
-    flex-grow 1
-    margin 15px pageSpacing 0 pageSpacing
-.toDo__progressBar_container_on_mytasks
-  margin pageSpacing pageSpacing 0 pageSpacing
-.toDo__pageContent_on_mytasks
-  padding-top 15px
+      & .toDoItem
+        display flex
+        min-height headerHeight
+        align-items center
+        padding standardSpacing
+
+  &__progressBar_container
+    flex 0
+    margin 15px 0 15px 0

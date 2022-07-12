@@ -10,6 +10,7 @@ import {
   CommentArea,
   CUSTOM_EVENT,
   EditCommentPopup,
+  EmptyListMessage,
   getComment,
   getContentComment,
   getFileChildContent,
@@ -613,9 +614,9 @@ export class Publications extends React.Component {
         {state.loading && <Loading />}
 
         {!state.loading && isPublicationListEmpty && (
-          <div className='publications__empty'>
+          <EmptyListMessage>
             {props.t('This space does not have any news yet, create the first news post using the area at the bottom of the page.')}
-          </div>
+          </EmptyListMessage>
         )}
 
         {!state.loading && props.publicationPage.list.map(publication =>
