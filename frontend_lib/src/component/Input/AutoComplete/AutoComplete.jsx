@@ -32,7 +32,7 @@ export const AutoComplete = props => {
             </b>
             &nbsp;-&nbsp;
             <span className='autocomplete__item__id'>
-              {autocompleteItem.mention ? `@${autocompleteItem.mention}` : `#${autocompleteItem.content_id}`}
+              {autocompleteItem.mention ? `@${props.t(autocompleteItem.mention)}` : `#${autocompleteItem.content_id}`}
             </span>
           </div>
           {i === props.delimiterIndex && i !== props.autoCompleteItemList.length - 1 && (

@@ -160,8 +160,8 @@ export const handleMentionsBeforeSave = (htmlString, loggedUsername, invalidMent
 export const getMatchingGroupMentionList = (query) => {
   const matching = []
   for (const mention of GROUP_MENTION_LIST) {
-    const translatedMention = { ...mention, mention: i18n.t(mention.mention) }
-    if (translatedMention.mention.indexOf(query.toLowerCase()) >= 0) matching.push(translatedMention)
+    const translatedMention = { ...mention, mention: mention.tradKey[0] }
+    if (translatedMention.mention.indexOf(query.toLowerCase()) >= 0) matching.push(mention)
   }
   return matching
 }
