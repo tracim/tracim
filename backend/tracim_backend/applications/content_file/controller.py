@@ -132,7 +132,7 @@ class FileController(Controller):
             parent=parent,
             content_namespace=hapic_data.forms.content_namespace,
             template_id=hapic_data.forms.template_id,
-            do_save=hapic_data.forms.template_id
+            do_save=hapic_data.forms.template_id,
         )
 
         if not hapic_data.forms.template_id:
