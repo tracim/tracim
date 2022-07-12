@@ -34,7 +34,7 @@ import { parseSearchUrl, SEARCH_TYPE } from '../util/helper.js'
 const qs = require('query-string')
 
 export class SimpleSearch extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
     // https://github.com/tracim/tracim/issues/1973
@@ -54,13 +54,13 @@ export class SimpleSearch extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate (prevProps) {
     const { props } = this
     const prevSearch = parseSearchUrl(qs.parse(prevProps.location.search))
     const currentSearch = parseSearchUrl(qs.parse(props.location.search))
@@ -152,7 +152,7 @@ export class SimpleSearch extends React.Component {
     )
   }
 
-  setSubtitle() {
+  setSubtitle () {
     const { props } = this
     const { simpleSearch } = props
 
@@ -164,7 +164,7 @@ export class SimpleSearch extends React.Component {
     return subtitle
   }
 
-  getSubtitle() {
+  getSubtitle () {
     let subtitle = ''
     const currentNumberSearchResults = this.props.simpleSearch.resultList.length
     if (currentNumberSearchResults > 0) {
@@ -174,7 +174,7 @@ export class SimpleSearch extends React.Component {
     return subtitle
   }
 
-  hasMoreResults() {
+  hasMoreResults () {
     const { props } = this
     const currentNumberSearchResults = this.state.totalHits
     return currentNumberSearchResults >= (props.simpleSearch.numberResultsByPage * props.simpleSearch.currentPage)
@@ -191,7 +191,7 @@ export class SimpleSearch extends React.Component {
     }]))
   }
 
-  render() {
+  render () {
     const { props, state } = this
     const currentNumberSearchResults = props.simpleSearch.resultList.length
 
