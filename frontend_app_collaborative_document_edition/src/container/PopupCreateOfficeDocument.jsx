@@ -125,15 +125,10 @@ export class PopupCreateCollaborativeDocument extends React.Component {
     const { state, props } = this
     const { PAGE } = this.props.data.config
 
-    let filename
-    let templateName
-    if (state.templateId) {
-      filename = state.newContentName
-      templateName = `${state.templateName}${FILE_TYPES.collabora[state.selectedOption.value].ext}`
-    } else {
-      filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
-      templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
-    }
+    const filename = state.newContentName + getExtensionFromFileType(state.software, state.selectedOption.value)
+    // NOTE - MP - 2022-07-11 - templateName is a variable that stores the name of the default
+    // template. Therefore, if we use a custom template, we won't use it.
+    const templateName = getTemplateFromFileType(state.software, state.selectedOption.value, state.availableTemplates)
 
     const request = postCollaborativeDocumentFromTemplate(
       state.config.apiUrl, state.workspaceId, state.folderId, state.selectedOption.value, filename, templateName, state.templateId
