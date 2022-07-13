@@ -968,6 +968,7 @@ export class File extends React.Component {
             onClickAddNewToDo={this.handleSetShowProgressbarStatus}
             user={state.loggedUser}
             toDoList={state.toDoList}
+            workspaceId={state.content.workspace_id}
           />
         </PopinFixedRightPartContent>
       )

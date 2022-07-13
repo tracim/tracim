@@ -336,7 +336,8 @@ export function appContentFactory (WrappedComponent) {
           ? prev.newComment
           : getLocalStorageItem(
             appSlug,
-            newContent,
+            newContent.content_id,
+            newContent.workspace_id,
             LOCAL_STORAGE_FIELD.COMMENT
           ) || ''
       }))
@@ -576,7 +577,8 @@ export function appContentFactory (WrappedComponent) {
 
           removeLocalStorageItem(
             appSlug,
-            content,
+            content.content_id,
+            content.workspace_id,
             LOCAL_STORAGE_FIELD.COMMENT
           )
           break

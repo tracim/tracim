@@ -345,7 +345,8 @@ export class HtmlDocument extends React.Component {
 
     const localStorageRawContent = getLocalStorageItem(
       state.appName,
-      resHtmlDocument.body,
+      resHtmlDocument.body.content_id,
+      resHtmlDocument.body.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
 
@@ -418,7 +419,12 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const previouslyUnsavedRawContent = getLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)
+    const previouslyUnsavedRawContent = getLocalStorageItem(
+      this.state.appName,
+      this.state.content.content_id,
+      this.state.content.workspace_id,
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
+    )
 
     this.setState(prev => ({
       content: {
@@ -443,7 +449,8 @@ export class HtmlDocument extends React.Component {
 
     removeLocalStorageItem(
       this.state.appName,
-      this.state.content,
+      this.state.content.content_id,
+      this.state.content.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
   }
@@ -498,7 +505,8 @@ export class HtmlDocument extends React.Component {
       case 200: {
         removeLocalStorageItem(
           state.appName,
-          state.content,
+          state.content.content_id,
+          state.content.workspace_id,
           LOCAL_STORAGE_FIELD.RAW_CONTENT
         )
 
@@ -883,6 +891,7 @@ export class HtmlDocument extends React.Component {
             onClickAddNewToDo={this.handleSetShowProgressbarStatus}
             user={state.loggedUser}
             toDoList={state.toDoList}
+            workspaceId={state.content.workspace_id}
           />
         </PopinFixedRightPartContent>
       )
@@ -1016,7 +1025,7 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
             // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
