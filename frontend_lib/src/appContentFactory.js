@@ -1,6 +1,7 @@
 import React from 'react'
 import i18n from './i18n.js'
 import Autolinker from 'autolinker'
+import { uniqBy } from 'lodash'
 
 import {
   handleFetchResult,
@@ -15,7 +16,8 @@ import {
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
   tinymceRemove,
-  addRevisionFromTLM
+  addRevisionFromTLM,
+  sortContentByStatus
 } from './helper.js'
 
 import {
@@ -41,22 +43,30 @@ import {
 
 import {
   deleteComment,
-  putEditContent,
-  putComment,
+  deleteToDo,
+  deleteContentFromFavoriteList,
+  getComment,
+  getCommentTranslated,
+  getContent,
+  getContentComment,
+  getFavoriteContentList,
+  getFileChildContent,
+  getMyselfKnownContents,
+  getMyselfKnownMember,
+  getTemplateList,
+  getToDoList,
+  postContentToFavoriteList,
   postNewComment,
-  putEditStatus,
+  postToDo,
+  putComment,
   putContentArchived,
   putContentDeleted,
   putContentRestoreArchive,
   putContentRestoreDelete,
-  getMyselfKnownContents,
-  getMyselfKnownMember,
-  getCommentTranslated,
-  postContentToFavoriteList,
-  getFavoriteContentList,
-  deleteContentFromFavoriteList,
-  getContentComment,
-  getFileChildContent
+  putContentTemplate,
+  putEditContent,
+  putEditStatus,
+  putToDo
 } from './action.async.js'
 
 import {
@@ -107,7 +117,7 @@ export function appContentFactory (WrappedComponent) {
 
       props.registerLiveMessageHandlerList([
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, handler: this.handleContentModified },
-        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentCreated },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.COMMENT, handler: this.handleChildContentDeleted },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
@@ -131,10 +141,83 @@ export function appContentFactory (WrappedComponent) {
 
     setApiUrl = url => { this.apiUrl = url }
 
+    getContent = async (contentId) => {
+      const fetchGetContent = await handleFetchResult(await getContent(this.apiUrl, contentId))
+
+      switch (fetchGetContent.apiResponse.status) {
+        case 200: return fetchGetContent.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown content'))
+          return {}
+      }
+    }
+
+    getTemplateList = async (setState, templateType) => {
+      const result = await getTemplateList(this.apiUrl, templateType)
+      const fetchGetTemplates = await handleFetchResult(result)
+      const templateList = []
+
+      switch (fetchGetTemplates.apiResponse.status) {
+        case 200:
+          fetchGetTemplates.body.forEach(template => {
+            templateList.push({
+              ...template,
+              value: template.content_id
+            })
+          })
+          setState({ templateList: templateList })
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          setState({ templateList: templateList })
+          break
+      }
+    }
+
+    getComment = async (workspaceId, contentId, commentId) => {
+      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, workspaceId, contentId, commentId))
+
+      switch (fetchGetComment.apiResponse.status) {
+        case 200: return fetchGetComment.body
+        default:
+          sendGlobalFlashMessage(i18n.t('Unknown comment'))
+          return {}
+      }
+    }
+
+    getToDoList = async (setState, workspaceId, contentId) => {
+      const fetchGetToDo = await handleFetchResult(await getToDoList(this.apiUrl, workspaceId, contentId))
+
+      switch (fetchGetToDo.apiResponse.status) {
+        case 200:
+          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'content_id')) })
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Something went wrong'))
+          break
+      }
+    }
+
+    handleCommentCreated = async (tlm) => {
+      const { state } = this
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+      this.handleChildContentCreated({
+        ...tlm,
+        fields: {
+          ...tlm.fields,
+          content: {
+            ...tlm.fields.content,
+            ...comment
+          }
+        }
+      })
+    }
+
     handleChildContentCreated = (tlm) => {
       const { state } = this
       // Not a child of our content
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
       const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
       this.addChildContentToTimeline(
@@ -147,7 +230,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleChildContentDeleted = (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
@@ -155,12 +238,15 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentCommentModified = (tlm) => {
+    handleContentCommentModified = async (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const wholeTimeline = this.updateCommentOnTimeline(
-          tlm.fields.content,
+          { ...tlm.fields.content, ...comment },
           prevState.wholeTimeline,
           prevState.loggedUser.username
         )
@@ -181,15 +267,23 @@ export function appContentFactory (WrappedComponent) {
       })
     }
 
-    handleContentModified = (tlm) => {
+    handleContentModified = async (tlm) => {
       const { state } = this
       // Not our content
       if (!state.content || !permissiveNumberEqual(tlm.fields.content.content_id, state.content.content_id)) return
 
+      const content = await this.getContent(tlm.fields.content.content_id)
+
       this.setState(prevState => {
         const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
         const wholeTimeline = addRevisionFromTLM(
-          tlm.fields,
+          {
+            ...tlm.fields,
+            content: {
+              ...tlm.fields.content,
+              ...content
+            }
+          },
           prevState.wholeTimeline,
           prevState.loggedUser.lang,
           isFromCurrentToken
@@ -295,6 +389,31 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
+    appContentMarkAsTemplate = async (setState, content, isTemplate = false) => {
+      setState({ disableChangeIsTemplate: true })
+      this.checkApiUrl()
+
+      if (!content) {
+        return {}
+      }
+
+      const response = await handleFetchResult(
+        await putContentTemplate(this.apiUrl, content.workspace_id, content.content_id, isTemplate)
+      )
+
+      switch (response.status) {
+        case 204:
+          setState({ isTemplate: isTemplate })
+          break
+        default:
+          sendGlobalFlashMessage('Error while marking this as a template')
+          break
+      }
+
+      setState({ disableChangeIsTemplate: false })
+      return response
+    }
+
     appContentDeleteComment = async (workspaceId, contentId, commentId, contentType = CONTENT_TYPE.COMMENT) => {
       this.checkApiUrl()
       let response
@@ -307,6 +426,47 @@ export function appContentFactory (WrappedComponent) {
 
       if (response.status !== 204) {
         sendGlobalFlashMessage(i18n.t('Error while deleting the comment'))
+      }
+
+      return response
+    }
+
+    appContentSaveNewToDo = async (workspaceId, contentId, assignedUserId, toDo, setState) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
+      if (response.apiResponse.status !== 200) sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+      return response
+    }
+
+    appContentDeleteToDo = async (workspaceId, contentId, toDoId, setState) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(await deleteToDo(this.apiUrl, workspaceId, contentId, toDoId))
+
+      switch (response.status) {
+        case 204: break
+        case 403:
+          sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Error while deleting to do'))
+          break
+      }
+
+      return response
+    }
+
+    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState) => {
+      this.checkApiUrl()
+      const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
+
+      switch (response.status) {
+        case 204: break
+        case 403:
+          sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))
+          break
+        default:
+          sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
+          break
       }
 
       return response
@@ -459,7 +619,7 @@ export function appContentFactory (WrappedComponent) {
             content_namespace: parentNamespace
           },
           httpMethod: 'POST',
-          progressEventHandler: () => {},
+          progressEventHandler: () => { },
           errorMessageList: errorMessageList,
           defaultErrorMessage: i18n.t('Error while uploading file')
         }
@@ -470,19 +630,19 @@ export function appContentFactory (WrappedComponent) {
       content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername, id = ''
     ) => {
       this.checkApiUrl()
-
       if (newComment) {
         await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id)
       }
 
       if (newCommentAsFileList && newCommentAsFileList.length > 0) {
+        setState({ isFileCommentLoading: true })
         const responseList = await Promise.all(
           newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
         )
         const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
         uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
 
-        setState({ newCommentAsFileList: uploadFailedList })
+        setState({ newCommentAsFileList: uploadFailedList, isFileCommentLoading: false })
       }
     }
 
@@ -771,9 +931,9 @@ export function appContentFactory (WrappedComponent) {
       const { state } = this
       return (
         state.wholeTimeline.length > state.timeline.length ||
-          state.hasMoreComments ||
-          state.hasMoreFiles ||
-          state.hasMoreRevisions
+        state.hasMoreComments ||
+        state.hasMoreFiles ||
+        state.hasMoreRevisions
       )
     }
 
@@ -938,6 +1098,8 @@ export function appContentFactory (WrappedComponent) {
         <WrappedComponent
           {...this.props}
           setApiUrl={this.setApiUrl}
+          addContentToFavoriteList={this.addContentToFavoriteList}
+          appContentChangeStatusToDo={this.appContentChangeStatusToDo}
           appContentCustomEventHandlerShowApp={this.appContentCustomEventHandlerShowApp}
           appContentCustomEventHandlerHideApp={this.appContentCustomEventHandlerHideApp}
           appContentCustomEventHandlerReloadAppFeatureData={this.appContentCustomEventHandlerReloadAppFeatureData}
@@ -946,7 +1108,9 @@ export function appContentFactory (WrappedComponent) {
           appContentChangeTitle={this.appContentChangeTitle}
           appContentChangeComment={this.appContentChangeComment}
           appContentDeleteComment={this.appContentDeleteComment}
+          appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
+          appContentMarkAsTemplate={this.appContentMarkAsTemplate}
           appContentSaveNewComment={this.appContentSaveNewComment}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
@@ -954,12 +1118,14 @@ export function appContentFactory (WrappedComponent) {
           appContentNotifyAll={this.appContentNotifyAll}
           appContentRestoreArchive={this.appContentRestoreArchive}
           appContentRestoreDelete={this.appContentRestoreDelete}
+          appContentSaveNewToDo={this.appContentSaveNewToDo}
           buildTimelineFromCommentAndRevision={this.buildTimelineFromCommentAndRevision}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          getTemplateList={this.getTemplateList}
+          getToDoList={this.getToDoList}
           handleTranslateComment={this.onHandleTranslateComment}
           handleRestoreComment={this.onHandleRestoreComment}
           isContentInFavoriteList={this.isContentInFavoriteList}
-          addContentToFavoriteList={this.addContentToFavoriteList}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
           removeContentFromFavoriteList={this.removeContentFromFavoriteList}
           loadFavoriteContentList={this.loadFavoriteContentList}
           buildChildContentTimelineItem={this.buildChildContentTimelineItem}

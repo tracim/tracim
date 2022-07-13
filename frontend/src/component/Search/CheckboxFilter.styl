@@ -18,6 +18,12 @@
       cursor pointer
     & > input[type='checkbox']
           margin 0px standardSpacing
+    &__input
+      margin-inline-start textSpacing
+      margin-inline-end standardSpacing
+      align-self start
+      // INFO - AJ - 2022-06-06 - Adding 2 pixels at top-margin in order to have the box aligned whether field name is single or multi-line
+      margin-top 2px
     &__label
       overflow hidden
       flex 1

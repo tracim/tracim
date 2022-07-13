@@ -33,7 +33,7 @@ export const onlyManager = (userToEditId, member, memberList) => {
     return false
   }
 
-  return (memberList.filter(m => m.id !== userToEditId && m.role === manager)).length === 1
+  return !memberList.some(m => m.user_id !== userToEditId && m.role === manager)
 }
 
 export const fillMemberList = async (space) => {
@@ -59,27 +59,23 @@ export const UserSpacesConfig = (props) => {
   }, [spaceList])
 
   useEffect(() => {
-    const entrieList = spaceList.reduce((res, space) => {
-      if (space.memberList.length > 0) {
+    const entrieList = spaceList
+      .filter(space => space.memberList.length > 0 && space.memberList.find(u => u.id === props.userToEditId))
+      .map(space => {
         const member = space.memberList.find(u => u.id === props.userToEditId)
-        if (member) {
-          res.push(
-            <UserSpacesConfigLine
-              space={space}
-              member={member}
-              key={space.id}
-              onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-              onLeaveSpace={handleLeaveSpace}
-              admin={props.admin}
-              system={props.system}
-              onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
-            />
-          )
-        }
-        return res
-      }
-    }, [])
-
+        return (
+          <UserSpacesConfigLine
+            space={space}
+            member={member}
+            key={space.id}
+            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+            onLeaveSpace={handleLeaveSpace}
+            admin={props.admin}
+            system={props.system}
+            onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
+          />
+        )
+      })
     setEntries(entrieList)
   }, [spaceList])
 
@@ -157,7 +153,7 @@ export const UserSpacesConfig = (props) => {
 
   const getUserSpaceListMemberList = async (fetchedSpaceList) => {
     Promise.all(fetchedSpaceList.map(userSpace => {
-      return props.workspaceList.find(space => space.id === userSpace.id) || fillMemberList(userSpace)
+      return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
     })).then((spaceListResult) => {
       setSpaceList(sortWorkspaceList(spaceListResult))
       setIsLoading(false)

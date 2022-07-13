@@ -30,7 +30,14 @@ const mockGetHtmlDocumentContent200 = (apiUrl, workspaceId, contentId, content) 
     .reply(200, content)
 }
 
+const mockGetContent200 = (apiUrl, contentId, content) => {
+  return nock(apiUrl)
+    .get(`/contents/${contentId}`)
+    .reply(200, content)
+}
+
 export {
+  mockGetContent200,
   mockGetHtmlDocumentContent200,
   mockGetHtmlDocumentComment200,
   mockGetHtmlDocumentRevision200,

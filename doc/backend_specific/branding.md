@@ -120,3 +120,17 @@ supported by browsers. These files it will be accessible through links.
 
 The original audio track used here for 'incoming-call.ogg' is 'data_sounds_ringtones_Solarium.ogg', it was found in Android's repository : https://android.googlesource.com/platform/frameworks/base.git which is licenced under Apache 2.0.
 If you want to change it, choose another audio file and change it's name, or change the variable.
+
+
+## Customize Note as pdf convertion rendering
+
+Tracim convert Note as PDF using both pandoc and weasyprint tool.
+This process is customizable through 2 files in branding:
+- The css style : `rich_text_preview.css`.
+- The html template : `rich_text_preview.template`.
+
+The first one(`rich_text_preview.css`) is a simple css file. You can use advanced feature for pagination file conversion
+like `@page`. Supported css features depending on weasyprint, see [here](https://doc.courtbouillon.org/weasyprint/v52.5/features.html#css).
+
+The second one (`rich_text_preview.template`) is a templating file of html for pandoc, see [here](https://pandoc.org/MANUAL.html#template-syntax)
+for specific template syntax.

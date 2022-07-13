@@ -15,7 +15,8 @@ import {
   getContentComment,
   getContentPath,
   Icon,
-  ListItemWrapper
+  ListItemWrapper,
+  Loading
 } from 'tracim_frontend_lib'
 
 import {
@@ -81,7 +82,7 @@ const UnavailableContent = translate()(props => {
         {props.label}
         <span className='unavailableContent__warning'>
           <Icon
-            icon='fa-fw fas fa-exclamation-triangle'
+            icon='fas fa-exclamation-triangle'
             title={props.t('Warning')}
           />
           &nbsp;
@@ -100,7 +101,7 @@ export class Favorites extends React.Component {
     this.state = {
       contentCommentsCountList: [],
       contentBreadcrumbsList: [],
-      hasLoadedFavoriteList: false
+      isLoading: true
     }
 
     props.registerCustomEventHandlerList([
@@ -177,7 +178,8 @@ export class Favorites extends React.Component {
     })
     const contentBreadcrumbsList = await Promise.all(contentBreadcrumbsFetchList)
 
-    this.setState({ contentCommentsCountList, contentBreadcrumbsList, hasLoadedFavoriteList: true })
+    this.setState({ contentCommentsCountList, contentBreadcrumbsList, isLoading: false })
+
     props.dispatch(setFavoriteList(favoriteList))
   }
 
@@ -256,10 +258,6 @@ export class Favorites extends React.Component {
 
   render () {
     const { props, state } = this
-    // NOTE - S.G. - 2021-04-02 - added as if a favorite list is present then one
-    // favorite content is made unavailable, the list is not sync-ed and shouldn't be used
-    // until it has been re-loaded by this component.
-    if (!state.hasLoadedFavoriteList) return null
     return (
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
@@ -268,17 +266,22 @@ export class Favorites extends React.Component {
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
           />
-          {props.favoriteList.length > 0
-            ? (
-              <PageContent>
-                <FavoritesHeader />
-                {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
-              </PageContent>
-            )
+
+          {state.isLoading
+            ? <Loading />
             : (
-              <div className='pageContentGeneric favorites__no_favorite'>
-                {props.t('You did not add any content as favorite yet.')}
-              </div>
+              props.favoriteList.length > 0
+                ? (
+                  <PageContent>
+                    <FavoritesHeader />
+                    {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
+                  </PageContent>
+                )
+                : (
+                  <div className='pageContentGeneric favorites__no_favorite'>
+                    {props.t('You did not add any content as favorite yet.')}
+                  </div>
+                )
             )}
         </PageWrapper>
       </div>

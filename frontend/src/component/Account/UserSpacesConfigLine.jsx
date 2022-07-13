@@ -33,7 +33,7 @@ class UserSpacesConfigLine extends React.Component {
         {(props.system.config.email_notification_activated &&
           <td>
             <BtnSwitch
-              checked={member.do_notify}
+              checked={member.doNotify}
               onChange={() => props.onChangeSubscriptionNotif(space.id, !member.doNotify)}
             />
           </td>

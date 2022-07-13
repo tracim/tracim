@@ -54,7 +54,7 @@ const GroupRender = props => {
       to={notificationDetails.url || '#'}
       onClick={handleClickGroupedNotification}
       className={classnames('notification__list__item',
-        { itemRead: readStatus, isMention: notificationDetails.isMention }
+        { itemRead: readStatus, isMention: notificationDetails.isMention, isToDo: notificationDetails.isToDo }
       )}
       key={groupedNotifications.id}
     >
@@ -79,7 +79,7 @@ const GroupRender = props => {
           ) : (
             <Icon
               customClass='notification__list__item__text__usersAvatar'
-              icon='fas fa-fw fa-users'
+              icon='fas fa-users'
               color='#fdfdfd' // INFO - GB - 2021-08-26 - offWhite color
               title={groupedNotifications.author.map(author => author.publicName)}
             />

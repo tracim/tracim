@@ -9,11 +9,11 @@ import {
   CONTENT_TYPE,
   Icon,
   ListItemWrapper,
-  FilenameWithExtension,
-  PAGE
+  FilenameWithBadges,
+  PAGE,
+  TimedEvent
 } from 'tracim_frontend_lib'
 import ContentType from './ContentType.jsx'
-import TimedEvent from './TimedEvent.jsx'
 import { getRevisionTypeLabel } from '../util/helper.js'
 
 require('./ContentListItem.styl')
@@ -61,7 +61,7 @@ const ContentListItem = (props) => {
       />
 
       <div className='contentListItem__name_path'>
-        <FilenameWithExtension file={content} />
+        <FilenameWithBadges file={content} />
         <Breadcrumbs
           breadcrumbsList={props.breadcrumbsList}
           keepLastBreadcrumbAsLink
@@ -82,7 +82,7 @@ const ContentListItem = (props) => {
             {commentCountTitle && (
               <span className='contentListItem__information__comments'>
                 <Icon
-                  icon='fa-fw far fa-comment'
+                  icon='far fa-comment'
                   title={commentCountTitle}
                 />
                 <span title={commentCountTitle}>{props.commentsCount}</span>
@@ -90,7 +90,7 @@ const ContentListItem = (props) => {
             )}
             <span className='contentListItem__information__status'>
               <Icon
-                icon={`fa-fw ${statusInfo.faIcon}`}
+                icon={`${statusInfo.faIcon}`}
                 title={props.t(statusInfo.label)}
                 color={statusInfo.hexcolor}
               />

@@ -590,7 +590,7 @@ class TestElasticSearch(object):
                 "this is another comment content",
             ),
             (
-                "raw_content,description",
+                "raw_content,description,todos",
                 "good practices",
                 "eureka",
                 0,
@@ -656,6 +656,104 @@ class TestElasticSearch(object):
             parent=content,
             content=second_created_comment_content,
             do_save=True,
+        )
+        api.create(
+            content_type_slug="html-document", workspace=workspace, label="report", do_save=True
+        )
+        api.create(
+            content_type_slug="thread", workspace=workspace, label="discussion", do_save=True
+        )
+        transaction.commit()
+        elasticsearch.refresh_elasticsearch()
+
+        web_testapp.authorization = ("Basic", ("test@test.test", "test@test.test"))
+        params = {"search_string": search_string, "search_fields": search_fields}
+        res = web_testapp.get("/api/advanced_search/content".format(), status=200, params=params)
+        search_result = res.json_body
+
+        assert search_result
+        assert search_result["total_hits"] == nb_content_result
+        assert search_result["is_total_hits_accurate"] is True
+        if nb_content_result:
+            assert search_result["contents"][0]["label"] == first_search_result_content_name
+
+    @pytest.mark.parametrize(
+        "search_fields, created_content_name, search_string, nb_content_result, first_search_result_content_name, first_created_todo_content, second_created_todo_content",
+        [
+            # exact syntax
+            (
+                "",
+                "good practices",
+                "eureka",
+                1,
+                "good practices",
+                "this is a todo content containing the string: eureka.",
+                "this is another todo content",
+            ),
+            (
+                "raw_content,description,comments",
+                "good practices",
+                "eureka",
+                0,
+                "good practices",
+                "this is a todo content containing the string: eureka.",
+                "this is another todo content",
+            ),
+            # autocompletion
+            (
+                "",
+                "good practices",
+                "eur",
+                1,
+                "good practices",
+                "this is a todo content containing the string: eureka.",
+                "this is another todo content containing eureka string",
+            ),
+        ],
+    )
+    def test_api___elasticsearch_search_ok__by_todo_content(
+        self,
+        search_fields,
+        user_api_factory,
+        role_api_factory,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        elasticsearch,
+        created_content_name,
+        search_string,
+        nb_content_result,
+        first_search_result_content_name,
+        first_created_todo_content,
+        second_created_todo_content,
+    ) -> None:
+
+        uapi = user_api_factory.get()
+
+        profile = Profile.TRUSTED_USER
+        user = uapi.create_user(
+            "test@test.test",
+            password="test@test.test",
+            do_save=True,
+            do_notify=False,
+            profile=profile,
+        )
+        workspace_api = workspace_api_factory.get(show_deleted=True)
+        workspace = workspace_api.create_workspace("test", save_now=True)
+        rapi = role_api_factory.get()
+        rapi.create_one(user, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, False)
+        api = content_api_factory.get(current_user=user)
+        content = api.create(
+            content_type_slug="html-document",
+            workspace=workspace,
+            label=created_content_name,
+            do_save=True,
+        )
+        api.create_todo(
+            parent=content, assignee=user, raw_content=first_created_todo_content,
+        )
+        api.create_todo(
+            assignee=user, parent=content, raw_content=second_created_todo_content,
         )
         api.create(
             content_type_slug="html-document", workspace=workspace, label="report", do_save=True
