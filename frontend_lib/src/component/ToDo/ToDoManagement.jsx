@@ -40,7 +40,7 @@ const ToDoManagement = (props) => {
       CONTENT_TYPE.TODO,
       props.contentId,
       props.workspaceId,
-      LOCAL_STORAGE_FIELD.TODO,
+      LOCAL_STORAGE_FIELD.TODO
     )
 
     if (localStorageToDoList) {
@@ -78,7 +78,6 @@ const ToDoManagement = (props) => {
         text
       )
     }
-
   }, [newToDoList])
 
   const addTodo = () => {
