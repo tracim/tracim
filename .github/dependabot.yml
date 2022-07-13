@@ -1,7 +1,7 @@
 version: 2
 updates:
   # Maintain dependencies for yarn
-  - package-ecosystem: "yarn"
+  - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
