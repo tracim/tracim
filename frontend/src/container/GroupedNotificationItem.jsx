@@ -41,9 +41,9 @@ export const GroupedNotificationItem = props => {
     let escapedToDoLabel = ''
     if (notification.group.some(notification => notification.content)) {
       if (numberOfContents > 1) {
-        const parentId = notification.group.find(notification => notification.content).content.parentId
-        const hasDifferentParent = notification.group.some(notification => notification.content.parentId !== parentId)
-        if (hasDifferentParent) {
+        const parentId = notification.group.find(notification => notification.content && notification.content.parentId)?.content.parentId
+        const hasDifferentParent = notification.group.some(notification => notification.content && notification.content.parentId !== parentId)
+        if (parentId === undefined || hasDifferentParent) {
           escapedContentLabel = props.t('{{numberOfContents}} contents', { numberOfContents: numberOfContents })
         } else {
           const parentLabel = notification.group.find(notification => notification.content).content.parentLabel
