@@ -13,7 +13,8 @@ updates:
       - "frontend"
       - "dependencies"
     ignore:
-      update-types: ["version-update:semver-major"]
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
 
   # Maintain dependencies for pip
   - package-ecosystem: "pip"
