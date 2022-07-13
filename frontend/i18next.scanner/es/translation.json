@@ -315,7 +315,7 @@
   "{{author}} deleted {{content}}{{workspaceInfo}}": "{{author}} eliminó{ {{content}}{{workspaceInfo}}",
   "{{author}} modified your role in a space": "{{author}} modificó su papel en un espacio",
   "An error has happened while removing the favorite": "Se ha producido un error al eliminar el favorito",
-  "This space does not have any news yet, create the first news post using the area at the bottom of the page.": "Este espacio no tiene todavía ninguna noticia. Cree la primera noticia utilizando el área en la parte inferior de la página.",
+  "This space does not have any news yet. Create the first news post using the area at the top of the page.": "Este espacio no tiene todavía ninguna noticia. Cree la primera noticia utilizando el área en la parte superior de la página.",
   "{{author}} modified <b>{{user}}</b>'s role in a space": "{{author}} modificó el rol de <b>{{user}}</b> en un espacio",
   "{{author}} added <b>{{user}}</b> to a space": "{{author}} añadió <b>{{user}}</b> a un espacio",
   "In order to finish your sign in, please read the following usage conditions and accept them": "Para finalizar su registro, lea las siguientes condiciones de uso y acéptelas",

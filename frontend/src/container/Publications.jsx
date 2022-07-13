@@ -615,7 +615,7 @@ export class Publications extends React.Component {
 
         {!state.loading && isPublicationListEmpty && (
           <EmptyListMessage>
-            {props.t('This space does not have any news yet, create the first news post using the area at the bottom of the page.')}
+            {props.t('This space does not have any news yet. Create the first news post using the area at the top of the page.')}
           </EmptyListMessage>
         )}
 

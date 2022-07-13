@@ -185,7 +185,7 @@
   "copied": "kopiert",
   "Download {{filename}}": "Last ned {{filename}}",
   "You have reached your storage limit, you cannot add new files": "Du har nådd lagringsgrensen, og kan ikke legge til nye filer.",
-  "This space does not have any news yet, create the first news post using the area at the bottom of the page.": "Dette rommet har ingen nyheter enda. Opprett den første nyhetsposten ved bruk av området på bunnen av siden.",
+  "This space does not have any news yet. Create the first news post using the area at the top of the page.": "",
   "Repeat new password:": "Gjenta nytt passord:",
   "Type your password:": "Skriv inn passordet ditt:",
   "Administrator's password:": "Administratorpassordet:",
