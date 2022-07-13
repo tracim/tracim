@@ -2,14 +2,19 @@
 
 ### New Features
 
+- To do feature
 - Notes can be download as PDF
 - Notes, office documents and kanban templates
-- To do feature
-- UI/UX improvements
+- UI/UX improvements (interface coherence, performance, loaders)
 
 ### Fixed Issues
 
-- XXXXXX: [#XXXXX](https://github.com/tracim/tracim/issues/XXXXX)
+- Frontend: [#4931](https://github.com/tracim/tracim/issues/4931),
+[#4935](https://github.com/tracim/tracim/issues/4935),
+[#5395](https://github.com/tracim/tracim/issues/5395),
+[#5404](https://github.com/tracim/tracim/issues/5404),
+[#5631](https://github.com/tracim/tracim/issues/5631),
+
 
 ### Breaking/Important change
 
