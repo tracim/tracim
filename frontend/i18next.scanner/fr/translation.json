@@ -563,12 +563,12 @@
   "Task deleted": "Tâche supprimée",
   "{{author}} deleted a task on {{content}}{{workspaceInfo}}": "{{author}} a supprimé une tâche sur {{content}}{{workspaceInfo}}",
   "Unknown comment": "Commentaire inconnu",
-  "You are not allowed to delete this to do": "",
-  "Error while deleting to do": "",
-  "You are not allowed to change the status of this to do": "",
-  "Error while saving new to do": "",
-  "Tasks": "",
-  "My tasks": "",
-  "Error while loading to do list": "",
-  "Filter my tasks": ""
+  "You are not allowed to delete this to do": "Vous n'êtes pas autorisé à supprimer cette tâche",
+  "Error while deleting to do": "Erreur lors de la suppression de cette tâche",
+  "You are not allowed to change the status of this to do": "Vous n'êtes pas autorisé à changer le statut de cette tâche",
+  "Error while saving new to do": "Erreur lors de la sauvegarde de la nouvelle tâche",
+  "Tasks": "Tâches",
+  "My tasks": "Mes tâches",
+  "Error while loading to do list": "Erreur lors du chargement de la liste des tâches",
+  "Filter my tasks": "Filtrer mes tâches"
 }

@@ -570,10 +570,16 @@ class WorkspaceController(Controller):
             parent=parent,
             content_namespace=creation_data.content_namespace,
         )
+
         if creation_data.template_id:
             api.copy_tags(
                 destination=content, source_content_id=creation_data.template_id,
             )
+
+            api.copy_todos(
+                new_parent=content, template_id=creation_data.template_id,
+            )
+
         content = api.get_content_in_context(content)
         return content
 
