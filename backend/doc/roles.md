@@ -84,8 +84,8 @@ On top of the [workspace roles](#workspace-roles) we add the assignee and owner 
   - assignee: the user is assigned to the todo.
   - owner: the user is the owner of the todo.
 
-|| Reader | Reader + assignee/owner | Contributor | Contributor + assignee | Contributor + owner | Content Manager | Workspace Manager |
-|-|-|-|-|-|-|-|-|
-| create todo | no | no | yes | yes | yes | yes | yes |
-| update todo (check/uncheck) | no | yes | yes | no | yes | yes | yes | yes |
-| delete todo | no | no | no | no | yes | yes | yes |
+|| Reader | Reader + assignee | Reader + owner | Contributor | Contributor + assignee | Contributor + owner | Content Manager | Workspace Manager |
+|-|-|-|-|-|-|-|-|-|
+| create todo | no | no | no | yes | yes | yes | yes | yes |
+| update todo (check/uncheck) | no | yes | no | yes | no | yes | yes | yes | yes |
+| delete todo | no | no | no | no | no | yes | yes | yes |
