@@ -211,7 +211,6 @@ export class SimpleSearch extends React.Component {
             {state.isLoading
               ? <Loading />
               : (
-
                 <PageContent parentClass='searchResult'>
                   <div>{this.getSubtitle()}</div>
 
