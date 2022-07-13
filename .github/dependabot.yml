@@ -1,0 +1,31 @@
+version: 2
+updates:
+  # Maintain dependencies for yarn
+  - package-ecosystem: "yarn"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "07:00"
+      timezone: "Europe/Paris"
+    target-branch: "develop"
+    labels:
+      - "frontend"
+      - "dependencies"
+    ignore:
+      update-types: ["version-update:semver-major"]
+
+  # Maintain dependencies for pip
+  - package-ecosystem: "pip"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "07:00"
+      timezone: "Europe/Paris"
+    target-branch: "develop"
+    labels:
+      - "backend"
+      - "dependencies"
+    ignore:
+      update-types: ["version-update:semver-major"]
