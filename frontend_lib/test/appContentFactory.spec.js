@@ -206,7 +206,7 @@ describe('appContentFactory.js', () => {
     it('should get the localStorage value', () => {
       sinon.assert.calledWith(
         global.localStorage.getItem,
-        generateLocalStorageContentId(newContent.workspace_id, newContent.content_id, appContentSlug, 'comment')
+        generateLocalStorageContentId(appContentSlug, newContent.content_id, newContent.workspace_id, 'comment')
       )
     })
 
@@ -336,7 +336,7 @@ describe('appContentFactory.js', () => {
     it('should set the localStorage value', () => {
       sinon.assert.calledWith(
         global.localStorage.setItem,
-        generateLocalStorageContentId(fakeContent.workspace_id, fakeContent.content_id, appContentSlug, 'comment')
+        generateLocalStorageContentId(appContentSlug, fakeContent.content_id, fakeContent.workspace_id, 'comment')
       )
     })
   })
@@ -386,7 +386,7 @@ describe('appContentFactory.js', () => {
       it('should remove the localStorage value', () => {
         sinon.assert.calledWith(
           global.localStorage.removeItem,
-          generateLocalStorageContentId(fakeContent.workspace_id, fakeContent.content_id, appContentSlug, 'comment')
+          generateLocalStorageContentId(appContentSlug, fakeContent.content_id, fakeContent.workspace_id, 'comment')
         )
       })
 

@@ -972,6 +972,7 @@ export class File extends React.Component {
               displayProgressBarStatus={this.handleSetShowProgressBarStatus}
               user={state.loggedUser}
               toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
             />
           </PopinFixedRightPartContent>
         )
