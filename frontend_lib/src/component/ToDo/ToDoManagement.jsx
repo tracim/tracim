@@ -254,6 +254,7 @@ const ToDoManagement = (props) => {
               />
 
               <IconButton
+                dataCy='toDoManagement__buttons__new'
                 text={props.t('Validate')}
                 icon='fas fa-check'
                 onClick={handleClickSaveToDo}
@@ -291,7 +292,11 @@ const ToDoManagement = (props) => {
                 toDo={toDo}
               />
             )
-            : <div>{props.t('This content has no task to do associated. Click on "New task" button to create a new one.')}</div>}
+            : (
+              <div data-cy='toDo__empty'>
+                {props.t('This content has no task to do associated. Click on "New task" button to create a new one.')}
+              </div>
+            )}
         </div>
       )}
 
