@@ -73,7 +73,7 @@ const ToDoManagement = (props) => {
   }
 
   const handleClickCancel = () => {
-    props.onClickAddNewToDo(true)
+    props.displayProgressBarStatus(true)
     setIsToDoCreationDisplayed(false)
   }
 
@@ -83,7 +83,7 @@ const ToDoManagement = (props) => {
   }
 
   const handleAddNewToDo = () => {
-    props.onClickAddNewToDo(false)
+    props.displayProgressBarStatus(false)
     setIsToDoCreationDisplayed(true)
   }
 

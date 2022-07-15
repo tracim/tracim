@@ -323,7 +323,7 @@ export class Kanban extends React.Component {
               onClickChangeStatusToDo={this.handleChangeStatusToDo}
               onClickDeleteToDo={this.handleDeleteToDo}
               onClickSaveNewToDo={this.handleSaveNewToDo}
-              onClickAddNewToDo={this.handleSetShowProgressbarStatus}
+              displayProgressBarStatus={this.handleSetShowProgressBarStatus}
               user={state.loggedUser}
               toDoList={state.toDoList}
             />
@@ -463,7 +463,7 @@ export class Kanban extends React.Component {
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
   }
 
-  handleSetShowProgressbarStatus = (showProgressStatus) => {
+  handleSetShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 
