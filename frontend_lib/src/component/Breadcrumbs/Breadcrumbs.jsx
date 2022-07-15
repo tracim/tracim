@@ -84,12 +84,13 @@ export const Breadcrumbs = props => {
 export default Breadcrumbs
 
 Breadcrumbs.propTypes = {
-  hidden: PropTypes.bool,
-  root: PropTypes.object,
   breadcrumbsList: PropTypes.array.isRequired,
-  keepLastBreadcrumbAsLink: PropTypes.bool
+  hidden: PropTypes.bool,
+  keepLastBreadcrumbAsLink: PropTypes.bool,
+  root: PropTypes.object
 }
 
 Breadcrumbs.defaultProps = {
+  hidden: false,
   keepLastBreadcrumbAsLink: false
 }

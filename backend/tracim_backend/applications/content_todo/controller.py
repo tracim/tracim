@@ -6,10 +6,8 @@ from pyramid.config import Configurator
 import transaction
 
 from tracim_backend.app_models.contents import content_type_list
-from tracim_backend.applications.content_todo.models_in_context import TodoInContext
 from tracim_backend.applications.content_todo.schema import SetTodoSchema
 from tracim_backend.applications.content_todo.schema import TodoPathSchema
-from tracim_backend.applications.content_todo.schema import TodoSchemaWithContent
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import ParentNotFound
 from tracim_backend.exceptions import TodoNotFound
@@ -23,12 +21,16 @@ from tracim_backend.lib.utils.authorization import can_edit_todo
 from tracim_backend.lib.utils.authorization import check_right
 from tracim_backend.lib.utils.authorization import is_contributor
 from tracim_backend.lib.utils.authorization import is_reader
+from tracim_backend.lib.utils.authorization import is_user
 from tracim_backend.lib.utils.request import TracimRequest
 from tracim_backend.lib.utils.utils import generate_documentation_swagger_tag
+from tracim_backend.models.context_models import ContentInContext
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.views.controllers import Controller
 from tracim_backend.views.core_api.schemas import NoContentSchema
 from tracim_backend.views.core_api.schemas import SetContentStatusSchema
+from tracim_backend.views.core_api.schemas import ToDoSchema
+from tracim_backend.views.core_api.schemas import UserIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceAndContentIdPathSchema
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 
@@ -40,15 +42,15 @@ SWAGGER_TAG__CONTENT_TODO_ENDPOINTS = generate_documentation_swagger_tag(
 
 class TodoController(Controller):
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
-    @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
-    @check_right(is_reader)
-    @hapic.input_path(WorkspaceAndContentIdPathSchema())
-    @hapic.output_body(TodoSchemaWithContent(many=True))
-    def get_todos(
+    @check_right(is_user)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.output_body(ToDoSchema(many=True))
+    def get_user_todos(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> typing.List[TodoInContext]:
+    ) -> typing.List[ContentInContext]:
         """
-        Get all todos related to a content in asc order (first is the oldest)
+        Get every todos related to a user
+        user_id: user is that we want to fetch the todos
         """
 
         app_config = request.registry.settings["CFG"]
@@ -57,11 +59,42 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todos = content_api.get_all_todos_for_content_id(hapic_data.path.content_id)
+        todos = content_api.get_all_query(
+            content_type_slug=content_type_list.Todo.slug, assignee_id=hapic_data.path["user_id"]
+        )
 
         todos_in_context = []
         for todo in todos:
-            todos_in_context.append(content_api.get_todo_in_context(todo))
+            todos_in_context.append(content_api.get_content_in_context(todo))
+
+        return todos_in_context
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_TODO_ENDPOINTS])
+    @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
+    @check_right(is_reader)
+    @hapic.input_path(WorkspaceAndContentIdPathSchema())
+    @hapic.output_body(ToDoSchema(many=True))
+    def get_todos(
+        self, context, request: TracimRequest, hapic_data=None
+    ) -> typing.List[ContentInContext]:
+        """
+        Get all todos related to a content in asc order (first is the oldest)
+        content_id: content id that have todos
+        """
+
+        app_config = request.registry.settings["CFG"]
+
+        content_api = ContentApi(
+            current_user=request.current_user, session=request.dbsession, config=app_config,
+        )
+
+        todos = content_api.get_all(
+            parent_ids=[hapic_data.path.content_id], content_type=content_type_list.Todo.slug
+        )
+
+        todos_in_context = []
+        for todo in todos:
+            todos_in_context.append(content_api.get_content_in_context(todo))
 
         return todos_in_context
 
@@ -69,8 +102,8 @@ class TodoController(Controller):
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_reader)
     @hapic.input_path(TodoPathSchema())
-    @hapic.output_body(TodoSchemaWithContent())
-    def get_todo(self, context, request: TracimRequest, hapic_data=None) -> TodoInContext:
+    @hapic.output_body(ToDoSchema())
+    def get_todo(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Get a todo
         """
@@ -81,8 +114,10 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todo = content_api.get_todo(hapic_data.path.todo_id)
-        todo_in_context = content_api.get_todo_in_context(todo)
+        todo = content_api.get_one(
+            content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+        )
+        todo_in_context = content_api.get_content_in_context(todo)
 
         return todo_in_context
 
@@ -91,8 +126,8 @@ class TodoController(Controller):
     @check_right(is_contributor)
     @hapic.input_path(WorkspaceAndContentIdPathSchema())
     @hapic.input_body(SetTodoSchema())
-    @hapic.output_body(TodoSchemaWithContent())
-    def create_todo(self, context, request: TracimRequest, hapic_data=None) -> TodoInContext:
+    @hapic.output_body(ToDoSchema())
+    def create_todo(self, context, request: TracimRequest, hapic_data=None) -> ContentInContext:
         """
         Create a todo
         """
@@ -117,20 +152,21 @@ class TodoController(Controller):
             ) from exc
 
         assignee = None  # type: typing.Optional['User']
-        try:
-            assignee = user_api.get_one(user_id=hapic_data.body["assignee_id"])
-        except UserDoesNotExist as exc:
-            raise UserDoesNotExist(
-                "User with user_id {} not member of workspace".format(
-                    hapic_data.body["assignee_id"]
-                )
-            ) from exc
+        if hapic_data.body["assignee_id"]:
+            try:
+                assignee = user_api.get_one(user_id=hapic_data.body["assignee_id"])
+            except UserDoesNotExist as exc:
+                raise UserDoesNotExist(
+                    "User with user_id {} not member of workspace".format(
+                        hapic_data.body["assignee_id"]
+                    )
+                ) from exc
 
         todo = content_api.create_todo(
             parent=parent, raw_content=hapic_data.body["raw_content"], assignee=assignee,
         )
 
-        todo_in_context = content_api.get_todo_in_context(todo)
+        todo_in_context = content_api.get_content_in_context(todo)
 
         return todo_in_context
 
@@ -150,8 +186,9 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todo = content_api.get_todo(hapic_data.path.todo_id)
-        todo_content = content_api.get_one(todo.content_id)
+        todo_content = content_api.get_one(
+            content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+        )
 
         with new_revision(session=request.dbsession, tm=transaction.manager, content=todo_content):
             content_api.set_status(todo_content, hapic_data.body.status)
@@ -172,10 +209,10 @@ class TodoController(Controller):
             current_user=request.current_user, session=request.dbsession, config=app_config,
         )
 
-        todo = None  # type: typing.Optional['Todo']
         try:
-            todo = content_api.get_todo(hapic_data.path.todo_id)
-            todo_content = content_api.get_one(todo.content_id)
+            todo_content = content_api.get_one(
+                content_id=hapic_data.path.todo_id, content_type=content_type_list.Todo.slug
+            )
         except ContentNotFound as exc:
             raise TodoNotFound(
                 "Todo with content_id {} not found".format(request.current_content.content_id)
@@ -185,6 +222,12 @@ class TodoController(Controller):
             content_api.delete(todo_content)
 
     def bind(self, configurator: Configurator):
+        # Get every todos of a user
+        configurator.add_route(
+            "user_todos", "/users/{user_id}/todos", request_method="GET",
+        )
+        configurator.add_view(self.get_user_todos, route_name="user_todos")
+
         # Get every todos of a content
         configurator.add_route(
             "todos", "/workspaces/{workspace_id}/contents/{content_id}/todos", request_method="GET",

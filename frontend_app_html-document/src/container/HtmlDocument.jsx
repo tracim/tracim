@@ -24,6 +24,7 @@ import {
   PopinFixedContent,
   PopinFixedRightPart,
   ROLE,
+  ROLE_LIST,
   Timeline,
   TagList,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -92,7 +93,8 @@ export class HtmlDocument extends React.Component {
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
       translationTargetLanguageCode: param.loggedUser.lang,
-      toDoList: []
+      toDoList: [],
+      showProgress: true
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -108,15 +110,14 @@ export class HtmlDocument extends React.Component {
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
-    // FIXME - GB - 2022-06-21 - The empty handlers bellow should be updated to call handleToDoCreate, handleToDoChanged and
-    // handleToDoDeleted when the backend is made. See https://github.com/tracim/tracim/issues/5699
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentRestore },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: () => { } },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: () => { } },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: () => { } }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -194,44 +195,53 @@ export class HtmlDocument extends React.Component {
     }
   }
 
-  handleToDoCreate = async data => {
+  handleMemberModified = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.user.user_id !== state.loggedUser.userId) return
+
+    const newUserRoleId = ROLE_LIST.find(r => data.fields.member.role === r.slug).id
+
+    this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
+  }
+
+  handleToDoCreated = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
-      data.fields.content.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id'))
+      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
     }))
   }
 
   handleToDoChanged = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
-      data.fields.content.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
     }))
   }
 
   handleToDoDeleted = data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
     }))
   }
 
@@ -335,7 +345,8 @@ export class HtmlDocument extends React.Component {
 
     const localStorageRawContent = getLocalStorageItem(
       state.appName,
-      resHtmlDocument.body,
+      resHtmlDocument.body.content_id,
+      resHtmlDocument.body.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
 
@@ -384,7 +395,7 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     this.loadHtmlDocument()
     this.props.loadTimeline(getHtmlDocRevision, this.state.content)
-    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
   }
 
   handleLoadMoreTimelineItems = async () => {
@@ -408,7 +419,12 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const previouslyUnsavedRawContent = getLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)
+    const previouslyUnsavedRawContent = getLocalStorageItem(
+      this.state.appName,
+      this.state.content.content_id,
+      this.state.content.workspace_id,
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
+    )
 
     this.setState(prev => ({
       content: {
@@ -433,7 +449,8 @@ export class HtmlDocument extends React.Component {
 
     removeLocalStorageItem(
       this.state.appName,
-      this.state.content,
+      this.state.content.content_id,
+      this.state.content.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
   }
@@ -488,7 +505,8 @@ export class HtmlDocument extends React.Component {
       case 200: {
         removeLocalStorageItem(
           state.appName,
-          state.content,
+          state.content.content_id,
+          state.content.workspace_id,
           LOCAL_STORAGE_FIELD.RAW_CONTENT
         )
 
@@ -701,16 +719,21 @@ export class HtmlDocument extends React.Component {
   handleSaveNewToDo = (assignedUserId, toDo) => {
     const { state, props } = this
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
   }
 
-  handleDeleteToDo = (toDoId) => {
+  handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDoId, this.setState.bind(this))
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
   }
 
-  handleChangeStatusToDo = (toDoId, status) => {
+  handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+  }
+
+  handleSetShowProgressbarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickNotifyAll = async () => {
@@ -847,28 +870,38 @@ export class HtmlDocument extends React.Component {
       ) : null
     }
 
-    const toDoObject = {
-      id: 'todo',
-      label: props.t('To Do'),
-      icon: 'fas fa-check-square',
-      children: (
-        <PopinFixedRightPartContent
-          label={props.t('To Do')}
-        >
-          <ToDoManagement
-            apiUrl={state.config.apiUrl}
-            contentId={state.content.content_id}
-            customColor={state.config.hexcolor}
-            memberList={state.config.workspace.memberList}
-            onClickChangeStatusToDo={this.handleChangeStatusToDo}
-            onClickDeleteToDo={this.handleDeleteToDo}
-            onClickSaveNewToDo={this.handleSaveNewToDo}
-            user={state.loggedUser}
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
             toDoList={state.toDoList}
-          />
-        </PopinFixedRightPartContent>
-      )
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              onClickAddNewToDo={this.handleSetShowProgressbarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
     }
+
     const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
@@ -887,7 +920,9 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, toDoObject, tagObject]
+    menuItemList.push(tagObject)
+
+    return menuItemList
   }
 
   render () {
@@ -973,6 +1008,7 @@ export class HtmlDocument extends React.Component {
           translationState={state.translationState}
           translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
           translationTargetLanguageCode={state.translationTargetLanguageCode}
+          showMarkedAsTemplate
         >
           {/*
             FIXME - GB - 2019-06-05 - we need to have a better way to check the state.config than using state.config.availableStatuses[3].slug
@@ -997,7 +1033,7 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
             // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}

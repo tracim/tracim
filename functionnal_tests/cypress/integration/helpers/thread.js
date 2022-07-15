@@ -21,6 +21,6 @@ export const create_thread = (cy, threadTitle = 'Thread 1') => {
   cy.get('[data-cy="popinFixed"].thread')
     .should('be.visible')
 
-  cy.get(`.workspace__content__fileandfolder > .content[title="${threadTitle}"]`)
+  cy.get(`.workspace__content__file_and_folder > .content[title="${threadTitle}"]`)
     .should('be.visible')
 }

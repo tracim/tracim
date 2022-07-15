@@ -17,6 +17,6 @@ describe('Sidebar', function () {
     cy.get('[data-cy="sidebar_subdropdown-contents/all"]').should('be.visible')
     cy.get('[data-cy="sidebar_subdropdown-contents/all"]').click()
     cy.url().should('include', '/workspaces/1/contents')
-    cy.get('.workspace__content__fileandfolder').should('be.visible')
+    cy.get('.workspace__content__file_and_folder').should('be.visible')
   })
 })

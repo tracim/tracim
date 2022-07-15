@@ -185,6 +185,8 @@ export class Sidebar extends React.Component {
 
     if (!this.shouldDisplaySidebar(this.props)) return null
 
+    const isToDoEnabled = props.appList.some(a => a.slug === 'contents/todo')
+
     return (
       <div className='sidebar'>
         <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
@@ -206,8 +208,9 @@ export class Sidebar extends React.Component {
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
-                {this.getSidebarItem(props.t('Recent activities'), 'far fa-fw fa-newspaper', PAGE.RECENT_ACTIVITIES)}
-                {this.getSidebarItem(props.t('Favorites'), 'far fa-fw fa-star', PAGE.FAVORITES)}
+                {this.getSidebarItem(props.t('Recent activities'), 'far fa-newspaper', PAGE.RECENT_ACTIVITIES)}
+                {isToDoEnabled && this.getSidebarItem(props.t('My tasks'), 'fas fa-check-square', PAGE.TODO)}
+                {this.getSidebarItem(props.t('Favorites'), 'far fa-star', PAGE.FAVORITES)}
                 <ul className='sidebar__content__navigation__workspace'>
                   {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
                 </ul>
@@ -255,5 +258,5 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ accessibleWorkspaceList, system, user, workspaceList }) => ({ accessibleWorkspaceList, system, user, workspaceList })
+const mapStateToProps = ({ accessibleWorkspaceList, appList, system, user, workspaceList }) => ({ accessibleWorkspaceList, appList, system, user, workspaceList })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))

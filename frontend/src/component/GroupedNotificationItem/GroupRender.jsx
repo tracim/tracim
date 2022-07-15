@@ -54,7 +54,7 @@ const GroupRender = props => {
       to={notificationDetails.url || '#'}
       onClick={handleClickGroupedNotification}
       className={classnames('notification__list__item',
-        { itemRead: readStatus, isMention: notificationDetails.isMention }
+        { itemRead: readStatus, isMention: notificationDetails.isMention, isToDo: notificationDetails.isToDo }
       )}
       key={groupedNotifications.id}
     >
