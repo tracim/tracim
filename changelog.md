@@ -4,8 +4,8 @@
 
 - To do feature
 - Notes can be download as PDF
-- Notes, office documents and kanban templates
-- Notification wall improvementd (bug fix, infinite scroll)
+- Notes, office documents and kanban can be marked and use as templates
+- Notification wall improvements (bug fix, infinite scroll)
 - UX/UI improvements (interface coherence, performance, loaders)
 
 ### Fixed Issues
@@ -27,11 +27,11 @@
 
 - :warning: The new feature of downloading as PDF requires updates to the branding folder. For more information see: [#5711](https://github.com/tracim/tracim/issues/5711)
 - :warning: With the to do feature, you will need to rebuild the index of Advanced Search (if you use it). For more information see: [#5711](https://github.com/tracim/tracim/issues/5711)
-- The to do feature is enabledon apps by default. If you have customized the parameter `app.enabled`, you should update it and add `contents/todo`.
+- The to do feature is enabledon apps by default. If you have customized the parameter `app.enabled`, you can update it and add `contents/todo`.
 
 ### Known Issues
 
-- White screen when clicking on a favorite that are not existing anymore (issue [#5704](https://github.com/tracim/tracim/issues/5704))
+- Blank page when clicking on a favorite that no longer exists (issue [#5704](https://github.com/tracim/tracim/issues/5704))
 - Popup to set username appears for a second whereas it should not (issue [#5751](https://github.com/tracim/tracim/issues/5751))
 - Automatic scroll when click on News See more button (issue [#5792](https://github.com/tracim/tracim/issues/5792))
 
