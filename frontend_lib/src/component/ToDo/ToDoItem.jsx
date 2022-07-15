@@ -14,16 +14,18 @@ import TimedEvent from '../TimedEvent/TimedEvent.jsx'
 export const isEditable = (toDo, user, userRoleId) => {
   const isAuthor = toDo.author.user_id === user.userId
   const isAssignee = toDo.assignee.user_id === user.userId
-  const isSpaceManager = userRoleId === ROLE.workspaceManager.id
   const isContentManager = userRoleId === ROLE.contentManager.id
-  return isAuthor || isAssignee || isSpaceManager || isContentManager
+  const isContributor = userRoleId === ROLE.contributor.id
+  const isSpaceManager = userRoleId === ROLE.workspaceManager.id
+  return (isContributor && isAuthor) || isAssignee || isSpaceManager || isContentManager
 }
 
 export const isDeletable = (toDo, user, userRoleId) => {
   const isAuthor = toDo.author.user_id === user.userId
-  const isSpaceManager = userRoleId === ROLE.workspaceManager.id
   const isContentManager = userRoleId === ROLE.contentManager.id
-  return isAuthor || isSpaceManager || isContentManager
+  const isContributor = userRoleId === ROLE.contributor.id
+  const isSpaceManager = userRoleId === ROLE.workspaceManager.id
+  return (isContributor && isAuthor) || isSpaceManager || isContentManager
 }
 
 const ToDoItem = props => {

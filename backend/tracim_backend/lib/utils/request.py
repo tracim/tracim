@@ -47,6 +47,8 @@ class TracimContext(ABC):
         self._current_content = None  # type: Content
         # Current comment, found in request path
         self._current_comment = None  # type: Content
+        # Current todo, found in request path
+        self._current_todo = None  # type: Content
         # Current reaction, found in request path
         self._current_reaction = None  # type: Reaction
         # Candidate user found in request body
@@ -130,6 +132,16 @@ class TracimContext(ABC):
         """
         return self._generate_if_none(
             self._current_comment, self._get_content, self._get_current_comment_id
+        )
+
+    @property
+    def current_todo(self) -> Content:
+        """
+        Current todo if exist, if you are deleting todo 8 of content 21,
+        current todo will be 8.
+        """
+        return self._generate_if_none(
+            self._current_todo, self._get_content, self._get_current_todo_id
         )
 
     @property
@@ -467,8 +479,8 @@ class TracimRequest(TracimContext, Request):
         return self._get_path_id("reaction_id", exception_if_none, exception_if_invalid_id)
 
     def _get_current_todo_id(self) -> int:
-        exception_if_none = ReactionNotFoundInTracimRequest("No todo_id property found in request")
-        exception_if_invalid_id = InvalidReactionId("todo_id is not a correct integer")
+        exception_if_none = ContentNotFoundInTracimRequest("No todo_id property found in request")
+        exception_if_invalid_id = InvalidCommentId("todo_id is not a correct integer")
         return self._get_path_id("todo_id", exception_if_none, exception_if_invalid_id)
 
     def _get_candidate_user_id(self) -> int:
