@@ -16,7 +16,7 @@ const ToDoManagement = (props) => {
   const nobodyValueObject = { value: null, label: props.t('Nobody') }
 
   const [isPopUpDisplayed, setIsPopUpDisplayed] = useState(false)
-  const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
+  const [isToDoCreationDisplayed, setIsToDoCreationDisplayed] = useState(false)
   const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
   const [newToDoList, setNewToDoList] = useState([])
   const [newToDoListAsText, setNewToDoListAsText] = useState('')
@@ -35,7 +35,7 @@ const ToDoManagement = (props) => {
       value: null
     }])
     setSelectedValueList([nobodyValueObject])
-  }, [isNewToDo])
+  }, [isToDoCreationDisplayed])
 
   useEffect(() => {
     if (!isPopUpDisplayed) {
@@ -74,7 +74,7 @@ const ToDoManagement = (props) => {
 
   const handleClickCancel = () => {
     props.onClickAddNewToDo(true)
-    setIsNewToDo(false)
+    setIsToDoCreationDisplayed(false)
   }
 
   const handleClickClose = () => {
@@ -84,7 +84,7 @@ const ToDoManagement = (props) => {
 
   const handleAddNewToDo = () => {
     props.onClickAddNewToDo(false)
-    setIsNewToDo(true)
+    setIsToDoCreationDisplayed(true)
   }
 
   const handleClickSaveToDo = () => {
@@ -98,7 +98,7 @@ const ToDoManagement = (props) => {
       }
     })
     setIsPopUpDisplayed(false)
-    setIsNewToDo(false)
+    setIsToDoCreationDisplayed(false)
   }
 
   const handleChangeSelectedValue = (e, index) => {
@@ -170,7 +170,7 @@ const ToDoManagement = (props) => {
 
   return (
     <div className='toDoManagement'>
-      {isNewToDo ? (
+      {isToDoCreationDisplayed ? (
         <div className='toDoManagement__creation'>
           <div className='toDoManagement__creation__linkButton'>
             <LinkButton
