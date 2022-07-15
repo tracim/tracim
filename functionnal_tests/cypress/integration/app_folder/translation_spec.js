@@ -36,5 +36,13 @@ describe('App Folder Advanced', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
     cy.get('.folder_advanced__content__title').contains('Erlaubte Inhaltsarten für diesen Ordner')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
+    cy.get('.folder_advanced__content__title').contains('نوع المحتوى المسموح به لهذا المجلد')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: folderId } })
+    cy.get('.folder_advanced__content__title').contains('Tipo de contenido permitido para esta carpeta')
   })
 })

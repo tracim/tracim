@@ -42,5 +42,15 @@ describe('App File', () => {
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: fileId }})
     cy.get('.FilenameWithBadges').should('be.visible')
     cy.contains('.wsContentGeneric__content__right__content__title', 'Zeitleiste')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: fileId }})
+    cy.get('.FilenameWithBadges').should('be.visible')
+    cy.contains('.wsContentGeneric__content__right__content__title', 'السِجلّ')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: fileId }})
+    cy.get('.FilenameWithBadges').should('be.visible')
+    cy.contains('.wsContentGeneric__content__right__content__title', 'Línea de tiempo')
   })
 })

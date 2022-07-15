@@ -208,7 +208,7 @@ const linkToParentContent = (notification) => {
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
-  // INFO - GB -2022-06-05 - The no set bellow is not used because folderPath is a dictionary and the manipulations are done directly
+  // INFO - GB -2022-06-05 - The no set below is not used because folderPath is a dictionary and the manipulations are done directly
   const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
   const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)

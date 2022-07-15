@@ -22,6 +22,14 @@ describe('content :: admin > workspace', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.ADMIN_WORKSPACE })
     cy.get('.adminWorkspace__description').contains('Liste aller Bereiche')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.ADMIN_WORKSPACE })
+    cy.get('.adminWorkspace__description').contains('قائمة كل الفضاءات')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.ADMIN_WORKSPACE })
+    cy.get('.adminWorkspace__description').contains('Lista de todos los espacios')
   })
 })
 
@@ -47,5 +55,13 @@ describe('content :: admin > user', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.ADMIN_USER })
     cy.get('.adminUser__description').contains('Auf dieser Seite können Sie die Benutzer Ihrer Tracim-Instanz verwalten.')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.ADMIN_USER })
+    cy.get('.adminUser__description').contains('يمكنك على هذه الصفحة إدارة مستخدمي مثيل خادم Tracim الخاص بك.')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.ADMIN_USER })
+    cy.get('.adminUser__description').contains('En esta página puede gestionar los usuarios de su instancia de Tracim.')
   })
 })

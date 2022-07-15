@@ -94,7 +94,7 @@ describe('<CollaborativeEditionFrame />', function () {
     })
 
     it('should return the proper built url without', async () => {
-      // INFO - CH - 2019-01-09 - the nock bellow should refactored with frontend_lib apiMock file once PR related to merge
+      // INFO - CH - 2019-01-09 - the nock below should refactored with frontend_lib apiMock file once PR related to merge
       // generic code of app feature is in develop
 
       nock(props.data.config.apiUrl)

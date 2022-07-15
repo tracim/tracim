@@ -32,5 +32,13 @@ describe('App HTML Document', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
     cy.contains('[data-cy="newVersionButton"]', 'Bearbeiten')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
+    cy.contains('[data-cy="newVersionButton"]', 'تعديل')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: noteId } })
+    cy.contains('[data-cy="newVersionButton"]', 'Editar')
   })
 })

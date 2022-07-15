@@ -25,5 +25,13 @@ describe('Profile', () => {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
     cy.contains('.breadcrumbs', 'Profil').should('be.visible')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
+    cy.contains('.breadcrumbs', 'الشخصي').should('be.visible')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.PROFILE, params: { userId: baseUser.user_id } })
+    cy.contains('.breadcrumbs', 'Perfil').should('be.visible')
   })
 })

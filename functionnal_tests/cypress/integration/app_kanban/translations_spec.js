@@ -41,5 +41,13 @@ describe('App Kanban', () => {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
     cy.contains(fullscreenButtonSelector, 'Vollbild')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
+    cy.contains(fullscreenButtonSelector, 'ملء الشاشة')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: kanbanId } })
+    cy.contains(fullscreenButtonSelector, 'Pantalla completa')
   })
 })
