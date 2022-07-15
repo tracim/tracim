@@ -8,6 +8,7 @@ import {
   deleteToDo,
   getToDo,
   getToDoListForUser,
+  EmptyListMessage,
   handleFetchResult,
   PAGE,
   PageContent,
@@ -39,7 +40,9 @@ const filterToDoList = (list, filterList) => {
 }
 
 const ToDo = (props) => {
+  const [count, setNumberOfCheckedToDos] = useState(0)
   const [displayedToDoList, setDisplayedToDoList] = useState([])
+  const [progressBarWidth, setProgessBarWidth] = useState('0%')
   const [toDoList, setToDoList] = useState([])
   const [toDoListFilter, setToDoListFilter] = useState('')
 
@@ -56,7 +59,19 @@ const ToDo = (props) => {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: handleToDoDeleted }
     ])
 
+    let numberOfCheckedToDos = 0
+
+    toDoList.forEach((toDo) => {
+      if (toDo.status === STATUSES.VALIDATED) {
+        numberOfCheckedToDos += 1
+      }
+    })
+
+    const progressBarWidth = Math.round(numberOfCheckedToDos / toDoList.length * 100) + '%'
+
     setDisplayedToDoList(filterToDoList(toDoList, toDoListFilter))
+    setProgessBarWidth(progressBarWidth)
+    setNumberOfCheckedToDos(numberOfCheckedToDos)
   }, [toDoList])
 
   useEffect(() => {
@@ -163,24 +178,6 @@ const ToDo = (props) => {
     }
   }
 
-  const [progressBarWidth, setProgessBarWidth] = useState('0%')
-  const [count, setNumberOfCheckedToDos] = useState(0)
-
-  useEffect(() => {
-    let numberOfCheckedToDos = 0
-
-    toDoList.forEach((toDo) => {
-      if (toDo.status === STATUSES.VALIDATED) {
-        numberOfCheckedToDos += 1
-      }
-    })
-
-    const progressBarWidth = Math.round(numberOfCheckedToDos / toDoList.length * 100) + '%'
-
-    setProgessBarWidth(progressBarWidth)
-    setNumberOfCheckedToDos(numberOfCheckedToDos)
-  }, [toDoList])
-
   return (
     <div className='tracim__content-scrollview'>
       <PageWrapper customClass='toDo__wrapper'>
@@ -189,47 +186,62 @@ const ToDo = (props) => {
           icon='fas fa-check-square'
           breadcrumbsList={props.breadcrumbs}
         />
-        {toDoListFilter === '' &&
-          <div
-            className='toDo__progressBar_container toDo__progressBar_container_on_mytasks'
-            title={props.t('{{count}} tasks performed on {{numberOfTasks}}', {
-              count: count,
-              numberOfTasks: toDoList.length
-            })}
-          >
-            <div className='toDo__progressBar' style={{ width: `${progressBarWidth}` }} />
-          </div>}
-        <TextInput
-          customClass='form-control'
-          onChange={e => {
-            const newFilter = e.target.value
-            setToDoListFilter(newFilter)
-          }}
-          placeholder={props.t('Filter my tasks')}
-          icon='search'
-          value={toDoListFilter}
-        />
+
         <PageContent
           parentClass='toDo__pageContent_on_mytasks'
         >
-          <div className='toDo__item'>
-            {displayedToDoList.map(toDo => {
-              return (
-                <ToDoItem
-                  isDeletable
-                  isEditable
-                  key={`todo_id__${toDo.content_id}`}
-                  lang={props.user.lang}
-                  onClickChangeStatusToDo={handleChangeStatusToDo}
-                  onClickDeleteToDo={handleDeleteToDo}
-                  isPersonalPage
-                  toDo={toDo}
-                  username={props.user.username}
-                />
-              )
-            }
-            )}
-          </div>
+          {toDoList.length > 0 ? (
+            <div className='toDo__list'>
+              <TextInput
+                customClass='form-control'
+                onChange={e => {
+                  const newFilter = e.target.value
+                  setToDoListFilter(newFilter)
+                }}
+                placeholder={props.t('Filter my tasks')}
+                icon='search'
+                value={toDoListFilter}
+              />
+              {toDoListFilter === '' &&
+                <div
+                  className='toDo__progressBar_container'
+                  title={props.t('{{count}} tasks performed on {{numberOfTasks}}', {
+                    count: count,
+                    numberOfTasks: toDoList.length
+                  })}
+                >
+                  <div className='toDo__progressBar' style={{ width: `${progressBarWidth}` }} />
+                </div>}
+              {displayedToDoList.length > 0 ? (
+                <div className='toDo__item'>
+                  {displayedToDoList.map(toDo => {
+                    return (
+                      <ToDoItem
+                        isDeletable
+                        isEditable
+                        key={`todo_id__${toDo.content_id}`}
+                        lang={props.user.lang}
+                        onClickChangeStatusToDo={handleChangeStatusToDo}
+                        onClickDeleteToDo={handleDeleteToDo}
+                        isPersonalPage
+                        toDo={toDo}
+                        username={props.user.username}
+                      />
+                    )
+                  }
+                  )}
+                </div>
+              ) : (
+                <EmptyListMessage>
+                  {props.t('There is no tasks that match your filter')}
+                </EmptyListMessage>
+              )}
+            </div>
+          ) : (
+            <EmptyListMessage>
+              {props.t('You don\'t have any assigned tasks')}
+            </EmptyListMessage>
+          )}
         </PageContent>
       </PageWrapper>
     </div>

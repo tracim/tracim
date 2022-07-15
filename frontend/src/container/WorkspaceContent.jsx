@@ -22,6 +22,7 @@ import TabBar from '../component/TabBar/TabBar.jsx'
 import {
   ROLE,
   ROLE_LIST,
+  EmptyListMessage,
   PageWrapper,
   PageContent,
   Loading,
@@ -613,9 +614,9 @@ export class WorkspaceContent extends React.Component {
       : props.t('This space has no content yet')
 
     return (
-      <div className='workspace__content__fileandfolder__empty'>
+      <EmptyListMessage>
         {userRoleIdInWorkspace > ROLE.reader.id ? creationAllowedMessage : creationNotAllowedMessage}
-      </div>
+      </EmptyListMessage>
     )
   }
 
@@ -674,7 +675,7 @@ export class WorkspaceContent extends React.Component {
 
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight' id='scrollableElement'>
-        <div className='WorkspaceContent'>
+        <div className='workspace__content'>
           {state.contentLoaded && (
             <OpenContentApp
               // automatically open the app for the contentId in url
@@ -735,7 +736,7 @@ export class WorkspaceContent extends React.Component {
                 )}
               </div>
 
-              <div className='workspace__content__fileandfolder folder__content active'>
+              <div className='workspace__content__file_and_folder folder__content active'>
                 <ContentItemHeader />
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (

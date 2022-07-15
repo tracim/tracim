@@ -85,7 +85,7 @@ describe('Searching keywords', () => {
     //       cy.get(searchInput).type('{enter}')
 
     //       cy.get('.content').should('have.length', 1)
-    //       // cy.get('.searchResult__content__empty').should('be.visible') // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
+    //       // cy.get('.emptyListMessage').should('be.visible') // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
     //     })
     //   })
     // })
@@ -95,7 +95,7 @@ describe('Searching keywords', () => {
     it('Should display the No results message', () => {
       cy.get(searchInput).type('DoesNotExist').type('{enter}')
 
-      cy.get('.searchResult__content__empty').should('be.visible')
+      cy.get('.emptyListMessage').should('be.visible')
     })
   })
 
