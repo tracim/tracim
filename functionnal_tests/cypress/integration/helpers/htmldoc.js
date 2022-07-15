@@ -22,7 +22,7 @@ export const create_htmldocument = (cy, htmlDocTitle = 'Html document 1') => {
     .should('be.visible')
 
   cy.waitForTinyMCELoaded().then(() => {
-    cy.get(`.workspace__content__fileandfolder > .content[title="${htmlDocTitle}"]`)
+    cy.get(`.workspace__content__file_and_folder > .content[title="${htmlDocTitle}"]`)
       .should('be.visible')
   })
 }

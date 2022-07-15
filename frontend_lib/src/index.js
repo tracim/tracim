@@ -106,6 +106,7 @@ import { defaultDebug } from './debug.js'
 
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
+import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -295,6 +296,7 @@ export {
   appContentFactory,
   DateInput,
   deleteToDo,
+  EmptyListMessage,
   getToDo,
   getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,

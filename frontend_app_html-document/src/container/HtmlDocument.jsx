@@ -395,7 +395,7 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     this.loadHtmlDocument()
     this.props.loadTimeline(getHtmlDocRevision, this.state.content)
-    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
   }
 
   handleLoadMoreTimelineItems = async () => {
@@ -870,32 +870,38 @@ export class HtmlDocument extends React.Component {
       ) : null
     }
 
-    const toDoObject = {
-      id: 'todo',
-      label: props.t('Tasks'),
-      icon: 'fas fa-check-square',
-      children: (
-        <PopinFixedRightPartContent
-          label={props.t('Tasks')}
-          toDoList={state.toDoList}
-          showProgress={state.showProgress}
-        >
-          <ToDoManagement
-            apiUrl={state.config.apiUrl}
-            contentId={state.content.content_id}
-            customColor={state.config.hexcolor}
-            memberList={state.config.workspace.memberList}
-            onClickChangeStatusToDo={this.handleChangeStatusToDo}
-            onClickDeleteToDo={this.handleDeleteToDo}
-            onClickSaveNewToDo={this.handleSaveNewToDo}
-            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
-            user={state.loggedUser}
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
             toDoList={state.toDoList}
-            workspaceId={state.content.workspace_id}
-          />
-        </PopinFixedRightPartContent>
-      )
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              onClickAddNewToDo={this.handleSetShowProgressbarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
     }
+
     const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
@@ -914,7 +920,9 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, toDoObject, tagObject]
+    menuItemList.push(tagObject)
+
+    return menuItemList
   }
 
   render () {

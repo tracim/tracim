@@ -16,6 +16,7 @@ export const GroupedNotificationItem = props => {
   const [isGrouped, setIsGrouped] = useState(true)
 
   const getGroupedNotificationDetails = (notification) => {
+    let hasToDo = false
     const numberOfContributionTypes = uniqBy(notification.group, 'type').length
     const numberOfWorkspaces = uniqBy(notification.group.map(notification => notification.workspace), 'id').length
     const numberOfContents = uniqBy(notification.group.filter(notification => notification.content)
@@ -37,9 +38,25 @@ export const GroupedNotificationItem = props => {
     }
 
     let escapedContentLabel = ''
+    let escapedToDoLabel = ''
     if (notification.group.some(notification => notification.content)) {
       if (numberOfContents > 1) {
-        escapedContentLabel = props.t('{{numberOfContents}} contents', { numberOfContents: numberOfContents })
+        const parentId = notification.group.find(notification => notification.content && notification.content.parentId)?.content.parentId
+        const hasDifferentParent = notification.group.some(notification => notification.content && notification.content.parentId !== parentId)
+        if (parentId === undefined || hasDifferentParent) {
+          escapedContentLabel = props.t('{{numberOfContents}} contents', { numberOfContents: numberOfContents })
+        } else {
+          const parentLabel = notification.group.find(notification => notification.content).content.parentLabel
+          escapedContentLabel = props.t('{{parentLabel}}', {
+            parentLabel: parentLabel,
+            interpolation: { escapeValue: false }
+          })
+          escapedToDoLabel = props.t('{{numberOfTasks}} task', {
+            numberOfTasks: numberOfContents,
+            interpolation: { escapeValue: false }
+          })
+          hasToDo = true
+        }
       } else {
         const content = notification.group.find(notification => notification.content).content
         escapedContentLabel = escapeHtml(content.type === TLM_SUB.COMMENT
@@ -83,9 +100,15 @@ export const GroupedNotificationItem = props => {
       const notificationDetails = props.getNotificationDetails({
         ...notification.group[0],
         author: { publicName: escapedAuthorList },
-        content: { ...notification.group[0].content, label: escapedContentLabel, parentLabel: escapedContentLabel },
-        numberOfWorkspaces: numberOfWorkspaces,
+        content: {
+          ...notification.group[0].content,
+          hasToDo: hasToDo,
+          label: escapedContentLabel,
+          parentLabel: escapedContentLabel,
+          toDoLabel: escapedToDoLabel
+        },
         numberOfContents: numberOfContents,
+        numberOfWorkspaces: numberOfWorkspaces,
         type: notification.group[0].type,
         user: { ...notification.group[0].user, publicName: escapedUser }
       })

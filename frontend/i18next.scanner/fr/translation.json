@@ -429,7 +429,7 @@
   "copied": "copié",
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
   "Download {{filename}}": "Télécharger {{filename}}",
-  "This space does not have any news yet, create the first news post using the area at the bottom of the page.": "Cet espace n'a pas encore d'actualités. Créez la première actualité en utilisant la zone en bas de la page.",
+  "This space does not have any news yet. Create the first news post using the area at the top of the page.": "Cet espace n'a pas encore d'actualités. Créez la première actualité en utilisant la zone en haut de la page.",
   "Open as content": "Ouvrir en tant que contenu",
   "New full name:": "Nouveau nom complet :",
   "New username:": "Nouvel identifiant :",
