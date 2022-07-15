@@ -325,7 +325,7 @@ ToDoManagement.propTypes = {
 
 ToDoManagement.defaultProps = {
   customColor: '',
-  displayProgressBarStatus: () => {},
+  displayProgressBarStatus: () => { },
   memberList: [],
   workspaceId: 0
 }
