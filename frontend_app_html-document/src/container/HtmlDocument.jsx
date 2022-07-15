@@ -950,7 +950,7 @@ export class HtmlDocument extends React.Component {
               icon: 'far fa-file-pdf',
               label: props.t('Download as PDF'),
               downloadLink: this.getDownloadPDFUrl(state),
-              showAction: true,
+              showAction: state.config.system.config.rich_text_preview__enabled,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
               icon: 'far fa-trash-alt',
