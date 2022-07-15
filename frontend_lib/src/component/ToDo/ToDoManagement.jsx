@@ -22,7 +22,7 @@ const ToDoManagement = (props) => {
   const nobodyValueObject = { value: null, label: props.t('Nobody') }
 
   const [isPopUpDisplayed, setIsPopUpDisplayed] = useState(false)
-  const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
+  const [isToDoCreationDisplayed, setIsToDoCreationDisplayed] = useState(false)
   const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
   const [newToDoList, setNewToDoList] = useState([])
   const [newToDoListAsText, setNewToDoListAsText] = useState('')
@@ -52,7 +52,7 @@ const ToDoManagement = (props) => {
       }])
       setSelectedValueList([nobodyValueObject])
     }
-  }, [isNewToDo])
+  }, [isToDoCreationDisplayed])
 
   useEffect(() => {
     if (!isPopUpDisplayed) {
@@ -97,8 +97,8 @@ const ToDoManagement = (props) => {
   }
 
   const handleClickCancel = () => {
-    props.onClickAddNewToDo(true)
-    setIsNewToDo(false)
+    props.displayProgressBarStatus(true)
+    setIsToDoCreationDisplayed(false)
     removeLocalStorageItem(
       CONTENT_TYPE.TODO,
       props.contentId,
@@ -113,8 +113,8 @@ const ToDoManagement = (props) => {
   }
 
   const handleAddNewToDo = () => {
-    props.onClickAddNewToDo(false)
-    setIsNewToDo(true)
+    props.displayProgressBarStatus(false)
+    setIsToDoCreationDisplayed(true)
   }
 
   const handleClickSaveToDo = () => {
@@ -128,7 +128,7 @@ const ToDoManagement = (props) => {
       }
     })
     setIsPopUpDisplayed(false)
-    setIsNewToDo(false)
+    setIsToDoCreationDisplayed(false)
     setNewToDoList([])
     removeLocalStorageItem(
       CONTENT_TYPE.TODO,
@@ -214,7 +214,7 @@ const ToDoManagement = (props) => {
 
   return (
     <div className='toDoManagement'>
-      {isNewToDo ? (
+      {isToDoCreationDisplayed ? (
         <div className='toDoManagement__creation'>
           <div className='toDoManagement__creation__linkButton'>
             <LinkButton
@@ -318,12 +318,14 @@ ToDoManagement.propTypes = {
   toDoList: PropTypes.array.isRequired,
   user: PropTypes.object.isRequired,
   customColor: PropTypes.string,
+  displayProgressBarStatus: PropTypes.func,
   memberList: PropTypes.array,
   workspaceId: PropTypes.number
 }
 
 ToDoManagement.defaultProps = {
   customColor: '',
+  displayProgressBarStatus: () => { },
   memberList: [],
   workspaceId: 0
 }
