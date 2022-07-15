@@ -732,7 +732,7 @@ export class HtmlDocument extends React.Component {
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
   }
 
-  handleSetShowProgressBarStatus = (showProgressStatus) => {
+  setShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 
@@ -891,7 +891,7 @@ export class HtmlDocument extends React.Component {
               onClickChangeStatusToDo={this.handleChangeStatusToDo}
               onClickDeleteToDo={this.handleDeleteToDo}
               onClickSaveNewToDo={this.handleSaveNewToDo}
-              displayProgressBarStatus={this.handleSetShowProgressBarStatus}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
               user={state.loggedUser}
               toDoList={state.toDoList}
               workspaceId={state.content.workspace_id}
