@@ -1,13 +1,13 @@
 import { PAGES as p } from '../../support/urls_commands'
 
-describe('Create to dos', () => {
+describe('Modify to dos', () => {
   let contentId
   const fileTitle = 'File'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
   const toDoText = 'Some to do text'
 
-  describe('In a content', () => {
+  describe('in a content', () => {
 
     before(() => {
       cy.resetDB()
