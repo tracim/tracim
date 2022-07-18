@@ -7,9 +7,9 @@ describe('Create to dos', () => {
   const contentType = 'image/png'
   const toDoText = 'Some to do text'
 
-  describe('in a content', () => {
+  describe('In a content', () => {
 
-    beforeEach(() => {
+    before(() => {
       cy.resetDB()
       cy.setupBaseDB()
 
@@ -21,31 +21,105 @@ describe('Create to dos', () => {
           cy.visitPage({ pageName: p.CONTENT_OPEN, params: { contentId } })
           cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
           cy.get('[data-cy=popin_right_part_todo]').click()
-          // cy.get('.toDo__newButton').click()
+          cy.get('.toDo__newButton').click()
+
+          cy.get('.toDoManagement__creation__linkButton .linkButton').click()
+          cy.get('.createToDoFromTextPopup__main textarea').type(`+johndoe ${toDoText}
+          +TheAdmin ${toDoText}`)
+          cy.get('[data-cy=createToDoFromTextPopup__buttons__create]').click()
+          cy.get('[data-cy=toDoManagement__buttons__new]').click()
         })
       })
     })
 
-    it('should be able to check and uncheck the assigned to do', () => {
-      cy.get('.toDo__new__assignedPerson > div').type('2')
-      cy.get('#react-select-2-option-2').click()
-      cy.get('.toDo__new__toDoText textarea').type(toDoText)
-      cy.get('[data-cy=toDoManagement__buttons__new]').click()
-      cy.loginAs('users')
-      cy.contains('.toDoItem', '+johndoe').get('.toDoItem__checkbox button').click()
-      cy.get('.toDoItemChecked').should('be.visible')
-      cy.contains('.toDoItem', '+johndoe').get('.toDoItem__checkbox button').click()
-      cy.get('.toDoItemChecked').should('not.be.visible')
+    describe('As space manager', () => {
+      before(() => {
+        cy.loginAs('administrators')
+        cy.visit('/ui/workspaces/1/advanced_dashboard')
+        cy.contains('.workspace_advanced__userlist__list__item', '@johndoe').within(() => {
+          cy.get('button.btn').click()
+          cy.contains('.dropdownMenuItem', 'Space manager').click()
+        })
+      })
+
+      beforeEach(() => {
+        cy.loginAs('users')
+        cy.visit('/ui/workspaces/1/contents/file/1')
+        cy.get('[data-cy=popin_right_part_todo]').click()
+      })
+
+      it('should be able to check/uncheck the assigned to do', () => {
+        cy.contains('.toDoItem', '+johndoe').within(() => {
+          cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+        })
+        cy.get('.toDoItemChecked').should('be.visible')
+        cy.contains('.toDoItem', '+johndoe').within(() => {
+          cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+        })
+        cy.get('.toDoItemChecked').should('not.be.visible')
+      })
+
+      it('should be able to check/uncheck the unassigned to do', () => {
+        cy.contains('.toDoItem', '+TheAdmin').within(() => {
+          cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+        })
+        cy.get('.toDoItemChecked').should('be.visible')
+        cy.contains('.toDoItem', '+TheAdmin').within(() => {
+          cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+        })
+        cy.get('.toDoItemChecked').should('not.be.visible')
+      })
     })
 
-    it('should not be able to check and uncheck the assigned to do', () => {
-      cy.get('.toDo__new__assignedPerson > div').type('1')
-      cy.get('#react-select-2-option-1').click()
-      cy.get('.toDo__new__toDoText textarea').type(toDoText)
-      cy.get('[data-cy=toDoManagement__buttons__new]').click()
-      cy.loginAs('users')
-      cy.contains('.toDoItem', '+TheAdmin').get('.toDoItem__checkbox button').click()
-      cy.get('.toDoItemChecked').should('not.be.visible')
+    describe('As contributor', () => {
+      before(() => {
+        cy.loginAs('administrators')
+        cy.visit('/ui/workspaces/1/advanced_dashboard')
+        cy.contains('.workspace_advanced__userlist__list__item', '@johndoe').within(() => {
+          cy.get('button.btn').click()
+          cy.contains('.dropdownMenuItem', 'Contributor').click()
+        })
+      })
+
+      beforeEach(() => {
+        cy.loginAs('users')
+        cy.visit('/ui/workspaces/1/contents/file/1')
+        cy.get('[data-cy=popin_right_part_todo]').click()
+      })
+
+      it('should be able to check/uncheck the assigned to do', () => {
+        cy.contains('.toDoItem', '+johndoe').within(() => {
+          cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+        })
+        cy.get('.toDoItemChecked').should('be.visible')
+        cy.contains('.toDoItem', '+johndoe').within(() => {
+          cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+        })
+        cy.get('.toDoItemChecked').should('not.be.visible')
+      })
+
+      it('should not be able to check/uncheck the unassigned to do', () => {
+        cy.contains('.toDoItem', '+TheAdmin').within(() => {
+          cy.get('.toDoItem__checkbox button').should('be.disabled')
+        })
+      })
+
+      describe('As owner', () => {
+        it('should be able to check/uncheck the owned to do', () => {
+          cy.get('.toDo__newButton').click()
+          cy.get('.toDo__new__toDoText textarea').type('customToDo')
+          cy.get('[data-cy=toDoManagement__buttons__new]').click()
+
+          cy.contains('.toDoItem', 'customToDo').within(() => {
+            cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+          })
+          cy.get('.toDoItemChecked').should('be.visible')
+          cy.contains('.toDoItem', 'customToDo').within(() => {
+            cy.get('.toDoItem__checkbox button').should('not.be.disabled').click()
+          })
+          cy.get('.toDoItemChecked').should('not.be.visible')
+        })
+      })
     })
   })
 })

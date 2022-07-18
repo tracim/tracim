@@ -30,14 +30,14 @@ describe('Create to dos', () => {
     })
 
     it('should create a to do for "nobody" and add to the list', () => {
-      // cy.get('.toDo__newButton').click()
+      cy.get('.toDo__newButton').click()
       cy.get('.toDo__new__toDoText textarea').type(toDoText)
       cy.get('[data-cy=toDoManagement__buttons__new]').click()
       cy.contains('.toDoItem__content__task', toDoText)
     })
 
     it('should create a to do for a user and add to the list', () => {
-      // cy.get('.toDo__newButton').click()
+      cy.get('.toDo__newButton').click()
       cy.get('.toDo__new__assignedPerson > div').type('1')
       cy.get('#react-select-2-option-1').click()
       cy.get('.toDo__new__toDoText textarea').type(toDoText)
@@ -47,7 +47,7 @@ describe('Create to dos', () => {
     })
 
     it('should create multiple to dos from text and add to the list', () => {
-      // cy.get('.toDo__newButton').click()
+      cy.get('.toDo__newButton').click()
       cy.get('.toDoManagement__creation__linkButton .linkButton').click()
       cy.get('.createToDoFromTextPopup__main textarea').type(multipleTodos)
       cy.get('[data-cy=createToDoFromTextPopup__buttons__create]').click()
