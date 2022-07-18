@@ -554,7 +554,7 @@ export class File extends React.Component {
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
   }
 
-  handleSetShowProgressbarStatus = (showProgressStatus) => {
+  setShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 
@@ -969,7 +969,7 @@ export class File extends React.Component {
               onClickChangeStatusToDo={this.handleChangeStatusToDo}
               onClickDeleteToDo={this.handleDeleteToDo}
               onClickSaveNewToDo={this.handleSaveNewToDo}
-              onClickAddNewToDo={this.handleSetShowProgressbarStatus}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
               user={state.loggedUser}
               toDoList={state.toDoList}
               workspaceId={state.content.workspace_id}
