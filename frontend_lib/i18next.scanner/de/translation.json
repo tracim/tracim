@@ -201,6 +201,8 @@
   "1 file selected": "1 Datei ausgewählt",
   "{{count}} files selected": "{{count}} ausgewählte Datei",
   "{{count}} files selected_plural": "{{count}} ausgewählte Dateien",
+  "{{count}} tasks performed on {{numberOfTasks}}": "",
+  "{{count}} tasks performed on {{numberOfTasks}}_plural": "",
   "Error while adding a tag to the content": "Fehler beim Hinzufügen einer Markierung zum Inhalt",
   "Error while fetching a list of tags": "Fehler beim Holen einer Liste von Markierungen",
   "Your tag has been added": "Ihre Markierung wurde hinzugefügt",

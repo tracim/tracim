@@ -190,6 +190,8 @@
   "See files": "Voir les fichiers",
   "{{count}} files selected": "{{count}} fichier sélectionné",
   "{{count}} files selected_plural": "{{count}} fichiers sélectionnés",
+  "{{count}} tasks performed on {{numberOfTasks}}": "{{count}} tâche effectuée sur {{numberOfTasks}}",
+  "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} tâches effectuées sur {{numberOfTasks}}",
   "1 file selected": "1 fichier sélectionné",
   "Remove file": "Supprimer le fichier",
   "A content with the same name already exists": "Un contenu avec le même nom existe déjà",

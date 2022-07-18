@@ -219,6 +219,8 @@
   "Remove tag from content": "Eliminar la etiqueta del contenido",
   "{{count}} files selected": "{{count}} archivo seleccionado",
   "{{count}} files selected_plural": "{{count}} archivos seleccionados",
+  "{{count}} tasks performed on {{numberOfTasks}}": "",
+  "{{count}} tasks performed on {{numberOfTasks}}_plural": "",
   "PB": "PB",
   "Dark Skin Tone": "Tono de piel oscuro",
   "This content has no associated tags yet.": "Este contenido aún no tiene etiquetas asociadas.",
