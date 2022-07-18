@@ -574,9 +574,9 @@
   "{{parentLabel}}": "{{parentLabel}}",
   "{{count}} task": "{{count}} tarea",
   "{{count}} task_plural": "{{count}} tareas",
-  "{{count}} tasks performed on {{numberOfTasks}}": "",
-  "{{count}} tasks performed on {{numberOfTasks}}_plural": "",
+  "{{count}} tasks performed on {{numberOfTasks}}": "{{count}} tarea realizada en {{numberOfTasks}}",
+  "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} tareas realizadas en {{numberOfTasks}}",
   "a task": "una tarea",
-  "There is no tasks that match your filter": "",
-  "You don't have any assigned tasks": ""
+  "There is no tasks that match your filter": "No hay tareas que coincidan con su filtro",
+  "You don't have any assigned tasks": "No tiene ninguna tarea asignada"
 }
