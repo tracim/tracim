@@ -70,7 +70,6 @@ export class HtmlDocument extends React.Component {
       isTemplate: false,
       isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
       externalTranslationList: [
         props.t('Note'),
@@ -82,6 +81,8 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       newContent: {},
       loadingContent: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
@@ -224,6 +225,9 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
@@ -232,7 +236,8 @@ export class HtmlDocument extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDo_id => toDo_id !== data.fields.content.content_id)
     }))
   }
 
@@ -729,7 +734,14 @@ export class HtmlDocument extends React.Component {
 
   handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
   setShowProgressBarStatus = (showProgressStatus) => {
@@ -887,6 +899,7 @@ export class HtmlDocument extends React.Component {
               apiUrl={state.config.apiUrl}
               contentId={state.content.content_id}
               customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
               memberList={state.config.workspace.memberList}
               onClickChangeStatusToDo={this.handleChangeStatusToDo}
               onClickDeleteToDo={this.handleDeleteToDo}

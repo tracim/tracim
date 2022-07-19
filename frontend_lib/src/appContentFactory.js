@@ -456,8 +456,10 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState) => {
+    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState, previousLockedToDoList) => {
       this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
       const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
 
       switch (response.status) {
@@ -469,6 +471,8 @@ export function appContentFactory (WrappedComponent) {
           sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
           break
       }
+
+      setState({ lockedToDoList: [...previousLockedToDoList] })
 
       return response
     }

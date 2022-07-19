@@ -71,7 +71,7 @@ export const DATE_FNS_LOCALE = {
   es: dateFnsEs
 }
 
-// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+// INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
 export const COLLABORA_EXTENSIONS = [
   '.odg',
   '.odp',
