@@ -380,6 +380,9 @@ class FileCreationFormSchema(marshmallow.Schema):
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
     content_type = marshmallow.fields.String(missing=FILE_TYPE, example=FILE_TYPE)
+    template_id = marshmallow.fields.Int(
+        example=2, default=0, validate=positive_int_validator, allow_none=True
+    )
 
     @post_load
     def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -1714,6 +1717,9 @@ class UserInfoContentAbstractSchema(marshmallow.Schema):
 
 
 class ContentDigestSchema(UserInfoContentAbstractSchema):
+    assignee_id = marshmallow.fields.Int(
+        example=42, allow_none=True, default=None, validate=strictly_positive_int_validator
+    )
     content_namespace = EnumField(ContentNamespaces, example="content")
     content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
     current_revision_id = marshmallow.fields.Int(example=12)
@@ -1804,6 +1810,27 @@ class ContentSchema(MessageContentSchema):
     raw_content = StrippedString(
         required=True,
         description="Content of the object, may be raw text or <b>html</b> for example",
+    )
+
+
+class ToDoSchema(marshmallow.Schema):
+    author = marshmallow.fields.Nested(UserDigestSchema())
+    assignee = marshmallow.fields.Nested(UserDigestSchema())
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    created = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Content creation date"
+    )
+    parent = marshmallow.fields.Nested(ContentMinimalSchema())
+    raw_content = StrippedString(
+        required=True,
+        description="Content of the object, may be raw text or <b>html</b> for example",
+    )
+    workspace = marshmallow.fields.Nested(WorkspaceDigestSchema())
+    status = StrippedString(
+        example="closed-deprecated",
+        validate=content_status_validator,
+        description="this slug is found in content_type available statuses",
+        default=open_status,
     )
 
 

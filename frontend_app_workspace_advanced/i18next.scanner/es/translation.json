@@ -53,11 +53,11 @@
   "News deactivated": "Noticias desactivadas",
   "Error while activating news": "Error al activar las noticias",
   "Error while deactivating news": "Error al desactivar las noticias",
-  "Please set a name, an email or a username": "Error al obtener la lista de miembros conocidos",
+  "Please set a name, an email or a username": "Por favor, ponga un nombre, un correo electrónico o un nombre de usuario",
   "Error while rejecting user": "Error al rechazar al usuario",
   "Reject request": "Rechazar la solicitud",
   "Error while saving the new version": "Error al guardar la nueva versión",
   "Error while loading members list": "Error al cargar la lista de miembros",
   "You cannot change this member role because there are no other space managers.": "No se puede modificar esta función de miembro porque no hay otros gestores de espacios.",
-  "Save successful": "Guardar con éxito"
+  "Save successful": "Guardado con éxito"
 }

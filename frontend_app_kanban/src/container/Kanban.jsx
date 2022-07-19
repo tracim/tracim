@@ -9,6 +9,7 @@ import {
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
+  FilenameWithBadges,
   handleFetchResult,
   handleInvalidMentionInComment,
   getToDo,
@@ -27,11 +28,13 @@ import {
   getOrCreateSessionClientToken,
   FAVORITE_STATE,
   ROLE,
+  ROLE_LIST,
   getFileContent,
   getFileRevision,
   tinymceRemove,
   TagList,
   putMyselfFileRead,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
@@ -52,26 +55,28 @@ export class Kanban extends React.Component {
     this.state = {
       appName: 'kanban',
       breadcrumbsList: [],
-      fullscreen: false,
-      isFileCommentLoading: false,
-      isTemplate: false,
-      isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
       currentContentRevisionId: param.content.current_revision_id,
-      loading: false,
-      newContent: {},
-      timelineWysiwyg: false,
+      editionAuthor: '',
       externalTranslationList: [
         props.t('Create a Kanban board')
       ],
-      showRefreshWarning: false,
-      editionAuthor: '',
+      fullscreen: false,
       invalidMentionList: [],
+      isFileCommentLoading: false,
+      isTemplate: false,
+      isVisible: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
+      loading: false,
+      newContent: {},
+      timelineWysiwyg: false,
       showInvalidMentionPopupInComment: false,
-      toDoList: [],
-      translationTargetLanguageCode: param.loggedUser.lang
+      showProgress: true,
+      showRefreshWarning: false,
+      translationTargetLanguageCode: param.loggedUser.lang,
+      toDoList: []
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -87,15 +92,14 @@ export class Kanban extends React.Component {
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
     ])
 
-    // FIXME - GB - 2022-06-21 - The empty handlers bellow should be updated to call handleToDoCreate, handleToDoChanged and
-    // handleToDoDeleted when the backend is made. See https://github.com/tracim/tracim/issues/5699
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: () => { } },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: () => { } },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: () => { } }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -165,44 +169,57 @@ export class Kanban extends React.Component {
     this.loadContent()
   }
 
-  handleToDoCreate = async data => {
+  handleMemberModified = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.user.user_id !== state.loggedUser.userId) return
+
+    const newUserRoleId = ROLE_LIST.find(r => data.fields.member.role === r.slug).id
+
+    this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
+  }
+
+  handleToDoCreated = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
-      data.fields.content.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'todo_id'))
+      toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id')))
     }))
   }
 
   handleToDoChanged = async data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
-      data.fields.content.workspace_id,
-      data.fields.content.parent_id,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
       data.fields.content.content_id
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.todo_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
   handleToDoDeleted = data => {
     const { state } = this
-    if (data.fields.content.parent_id !== state.content.content_id) return
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.filter(toDo => toDo.todo_id !== data.fields.content.content_id)
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
     }))
   }
 
@@ -291,28 +308,40 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const toDoObject = {
-      id: 'todo',
-      label: props.t('To Do'),
-      icon: 'fas fa-check-square',
-      children: (
-        <PopinFixedRightPartContent
-          label={props.t('To Do')}
-        >
-          <ToDoManagement
-            apiUrl={state.config.apiUrl}
-            contentId={state.content.content_id}
-            customColor={state.config.hexcolor}
-            memberList={state.config.workspace.memberList}
-            onClickChangeStatusToDo={this.handleChangeStatusToDo}
-            onClickDeleteToDo={this.handleDeleteToDo}
-            onClickSaveNewToDo={this.handleSaveNewToDo}
-            user={state.loggedUser}
+
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
             toDoList={state.toDoList}
-          />
-        </PopinFixedRightPartContent>
-      )
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
     }
+
     const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
@@ -331,7 +360,9 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, toDoObject, tagObject]
+    menuItemList.push(tagObject)
+
+    return menuItemList
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -400,7 +431,7 @@ export class Kanban extends React.Component {
     this.buildBreadcrumbs(response.body)
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -428,16 +459,28 @@ export class Kanban extends React.Component {
   handleSaveNewToDo = (assignedUserId, toDo) => {
     const { state, props } = this
     props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
   }
 
-  handleDeleteToDo = (toDoId) => {
+  handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDoId, this.setState.bind(this))
+    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
   }
 
-  handleChangeStatusToDo = (toDoId, status) => {
+  handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDoId, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
+  }
+
+  setShowProgressBarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickBtnCloseApp = () => {
@@ -627,7 +670,6 @@ export class Kanban extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
           content={state.content}
           config={state.config}
-          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
           isRefreshNeeded={state.showRefreshWarning}
@@ -640,7 +682,8 @@ export class Kanban extends React.Component {
           onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onValidateChangeTitle={this.handleSaveEditTitle}
           showReactions
-          showMarkedAsTemplate={false}
+          showMarkedAsTemplate
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
             : FAVORITE_STATE.NOT_FAVORITE}

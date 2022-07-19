@@ -65,8 +65,10 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
-  USER_CALL_STATE
+  USER_CALL_STATE,
+  STATUSES
 } from './helper.js'
 
 import {
@@ -105,6 +107,7 @@ import { defaultDebug } from './debug.js'
 
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
+import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -134,6 +137,8 @@ import AutoComplete from './component/Input/AutoComplete/AutoComplete.jsx'
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
 import PageContent from './component/Layout/PageContent.jsx'
+
+import TimedEvent from './component/TimedEvent/TimedEvent.jsx'
 
 import Delimiter from './component/Delimiter/Delimiter.jsx'
 
@@ -195,9 +200,11 @@ import {
 
 import {
   baseFetch,
+  deleteToDo,
   getComment,
   getContentPath,
   getToDo,
+  getToDoListForUser,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -209,6 +216,7 @@ import {
   getMyselfKnownMember,
   getUsernameAvailability,
   getReservedUsernames,
+  getSpaceMemberFromId,
   getWorkspaceDetail,
   getWorkspaceMemberList,
   deleteWorkspace,
@@ -232,7 +240,8 @@ import {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  putToDo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -250,6 +259,7 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
 export const arTranslation = require('../i18next.scanner/ar/translation.json')
+export const esTranslation = require('../i18next.scanner/es/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
@@ -288,7 +298,10 @@ export {
   AgendaInfo,
   appContentFactory,
   DateInput,
+  deleteToDo,
+  EmptyListMessage,
   getToDo,
+  getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -411,6 +424,7 @@ export {
   putContentRestoreArchive,
   putContentRestoreDelete,
   getMyselfKnownMember,
+  getSpaceMemberFromId,
   getUsernameAvailability,
   getReservedUsernames,
   getWorkspaceDetail,
@@ -474,7 +488,11 @@ export {
   Popover,
   getBrowserLang,
   NewToDo,
+  putToDo,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
+  TimedEvent,
   ToDoItem,
-  ToDoManagement
+  ToDoManagement,
+  STATUSES
 }

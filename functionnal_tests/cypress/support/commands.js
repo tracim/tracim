@@ -210,8 +210,8 @@ Cypress.Commands.add('changeLanguage', (langCode) => {
     const dropdown = elements[0]
     const button = dropdown.getElementsByTagName('button')[0]
     if (button && button.getAttribute('data-cy') === `${langCode}-active`) return
+    cy.get(button).click()
     cy.wrap(dropdown)
-      .click('left')
       .find(`[data-cy="${langCode}"]`)
       .click()
     cy.get('[data-cy=IconButton_PersonalData]').click()

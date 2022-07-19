@@ -5,6 +5,7 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CUSTOM_EVENT,
+  EmptyListMessage,
   PAGE,
   PageContent,
   PageTitle,
@@ -278,9 +279,9 @@ export class Favorites extends React.Component {
                   </PageContent>
                 )
                 : (
-                  <div className='pageContentGeneric favorites__no_favorite'>
+                  <EmptyListMessage>
                     {props.t('You did not add any content as favorite yet.')}
-                  </div>
+                  </EmptyListMessage>
                 )
             )}
         </PageWrapper>

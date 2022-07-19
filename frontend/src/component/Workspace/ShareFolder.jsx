@@ -51,7 +51,7 @@ class ShareFolder extends React.Component {
           onClick={() => props.onClickShareFolder()}
           title={props.t('Received files')}
         >
-          <div className='folder__header__triangleborder'>
+          <div className={classnames('folder__header__triangleborder', { open: props.isOpen && folderContentList.length > 0 })}>
             <div className='folder__header__triangleborder__triangle' />
           </div>
 
@@ -154,10 +154,19 @@ class ShareFolder extends React.Component {
 export default translate()(withRouter(ShareFolder))
 
 ShareFolder.propTypes = {
-  loading: PropTypes.bool,
-  folderData: PropTypes.object,
-  app: PropTypes.array,
-  lang: PropTypes.string,
+  isLast: PropTypes.bool.isRequired,
   onClickShareFolder: PropTypes.func.isRequired,
-  isLast: PropTypes.bool.isRequired
+  app: PropTypes.array,
+  folderData: PropTypes.object,
+  isOpen: PropTypes.bool,
+  lang: PropTypes.string,
+  loading: PropTypes.bool
+}
+
+ShareFolder.defaultProps = {
+  app: [],
+  folderData: {},
+  isOpen: false,
+  lang: '',
+  loading: false
 }

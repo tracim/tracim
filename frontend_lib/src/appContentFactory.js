@@ -17,6 +17,7 @@ import {
   getOrCreateSessionClientToken,
   tinymceRemove,
   addRevisionFromTLM,
+  sortContentByCreatedDateAndID,
   sortContentByStatus
 } from './helper.js'
 
@@ -190,7 +191,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'todo_id')) })
+          setState({ toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy(fetchGetToDo.body, 'content_id'))) })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
@@ -200,7 +201,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleCommentCreated = async (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
       this.handleChildContentCreated({
         ...tlm,
@@ -217,7 +218,7 @@ export function appContentFactory (WrappedComponent) {
     handleChildContentCreated = (tlm) => {
       const { state } = this
       // Not a child of our content
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
       const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
       this.addChildContentToTimeline(
@@ -230,7 +231,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleChildContentDeleted = (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
@@ -240,7 +241,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleContentCommentModified = async (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
       const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
 
@@ -336,7 +337,8 @@ export function appContentFactory (WrappedComponent) {
           ? prev.newComment
           : getLocalStorageItem(
             appSlug,
-            newContent,
+            newContent.content_id,
+            newContent.workspace_id,
             LOCAL_STORAGE_FIELD.COMMENT
           ) || ''
       }))
@@ -434,14 +436,7 @@ export function appContentFactory (WrappedComponent) {
     appContentSaveNewToDo = async (workspaceId, contentId, assignedUserId, toDo, setState) => {
       this.checkApiUrl()
       const response = await handleFetchResult(await postToDo(this.apiUrl, workspaceId, contentId, assignedUserId, toDo))
-      if (response.apiResponse.status === 200) {
-        setState(prev => ({
-          toDoList: sortContentByStatus(uniqBy([response.body, ...prev.toDoList], 'todo_id'))
-        }))
-      } else {
-        sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
-      }
-
+      if (response.apiResponse.status !== 200) sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
       return response
     }
 
@@ -450,9 +445,7 @@ export function appContentFactory (WrappedComponent) {
       const response = await handleFetchResult(await deleteToDo(this.apiUrl, workspaceId, contentId, toDoId))
 
       switch (response.status) {
-        case 204:
-          setState(prev => ({ toDoList: prev.toDoList.filter(toDo => toDo.todo_id !== toDoId) }))
-          break
+        case 204: break
         case 403:
           sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
           break
@@ -464,14 +457,14 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState) => {
+    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState, previousLockedToDoList) => {
       this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
       const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
 
       switch (response.status) {
-        case 204:
-          setState(prev => ({ toDoList: prev.toDoList.map(toDo => toDo.todo_id === toDoId ? { ...toDo, status } : toDo) }))
-          break
+        case 204: break
         case 403:
           sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))
           break
@@ -479,6 +472,8 @@ export function appContentFactory (WrappedComponent) {
           sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
           break
       }
+
+      setState({ lockedToDoList: [...previousLockedToDoList] })
 
       return response
     }
@@ -587,7 +582,8 @@ export function appContentFactory (WrappedComponent) {
 
           removeLocalStorageItem(
             appSlug,
-            content,
+            content.content_id,
+            content.workspace_id,
             LOCAL_STORAGE_FIELD.COMMENT
           )
           break

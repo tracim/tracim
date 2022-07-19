@@ -8,6 +8,7 @@ import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
 import dateFnsAr from 'date-fns/locale/ar-SA'
+import dateFnsEs from 'date-fns/locale/es'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -57,7 +58,8 @@ export const PAGE = {
   RECENT_ACTIVITIES: '/ui/recent-activities',
   ONLINE_EDITION: (contentId) => `/api/collaborative-document-edition/wopi/files/${contentId}`,
   PUBLIC_PROFILE: (userId = ':userid') => `/ui/users/${userId}/profile`,
-  FAVORITES: '/ui/favorites'
+  FAVORITES: '/ui/favorites',
+  TODO: '/ui/todos'
 }
 
 export const DATE_FNS_LOCALE = {
@@ -65,10 +67,11 @@ export const DATE_FNS_LOCALE = {
   en: dateFnsEn,
   pt: dateFnsPt,
   de: dateFnsDe,
-  ar: dateFnsAr
+  ar: dateFnsAr,
+  es: dateFnsEs
 }
 
-// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+// INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
 export const COLLABORA_EXTENSIONS = [
   '.odg',
   '.odp',
@@ -194,6 +197,16 @@ export const revisionTypeList = [{
   faIcon: 'far fa-copy',
   tradKey: i18n.t('Item copied'),
   label: 'Item copied'
+}, {
+  id: 'mark-as-template',
+  faIcon: 'fas fa-clipboard',
+  tradKey: i18n.t('Item marked as template'),
+  label: 'Item marked as template'
+}, {
+  id: 'unmark-as-template',
+  faIcon: 'fas fa-paste',
+  tradKey: i18n.t('Item unmarked as template'),
+  label: 'Item unmarked as template'
 }]
 
 const WORKSPACE_MANAGER = {
@@ -519,6 +532,18 @@ export const sortContentByStatus = (contentList) => {
     } if (contantA.status === STATUSES.OPEN && contentB.status === STATUSES.VALIDATED) {
       return -1
     } else return 0
+  })
+}
+
+export const sortContentByCreatedDateAndID = (arrayToSort) => {
+  return arrayToSort.sort(function (a, b) {
+    if (a.created < b.created) return 1
+    if (a.created > b.created) return -1
+    if (a.created === b.created) {
+      if (a.id < b.id) return 1
+      if (a.id > b.id) return -1
+    }
+    return 0
   })
 }
 

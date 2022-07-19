@@ -123,6 +123,8 @@ _LABELS = {
     "move": "Item moved",
     "comment": "Comment",
     "copy": "Item copied",
+    "mark-as-template": "Item marked as template",
+    "unmark-as-template": "Item unmarked as template",
 }
 
 THREAD_MESSAGE = """

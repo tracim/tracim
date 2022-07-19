@@ -308,7 +308,7 @@ PopinFixedHeader.defaultProps = {
   onClickRemoveFromFavoriteList: () => { },
   rawTitle: '',
   showChangeTitleButton: true,
-  showMarkedAsTemplate: true,
+  showMarkedAsTemplate: false,
   showReactions: false,
   userRoleIdInWorkspace: ROLE.reader.id
 }

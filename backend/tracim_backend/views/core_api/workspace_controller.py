@@ -561,15 +561,26 @@ class WorkspaceController(Controller):
                     "Parent with content_id {} not found".format(creation_data.parent_id)
                 ) from exc
 
-        content = api.create(
-            content_type_slug=creation_data.content_type,
-            do_save=True,
-            label=creation_data.label,
-            template_id=creation_data.template_id,
-            workspace=request.current_workspace,
-            parent=parent,
-            content_namespace=creation_data.content_namespace,
-        )
+        with request.dbsession.no_autoflush:
+            content = api.create(
+                content_type_slug=creation_data.content_type,
+                do_save=True,
+                label=creation_data.label,
+                template_id=creation_data.template_id,
+                workspace=request.current_workspace,
+                parent=parent,
+                content_namespace=creation_data.content_namespace,
+            )
+
+        if creation_data.template_id:
+            api.copy_tags(
+                destination=content, source_content_id=creation_data.template_id,
+            )
+
+            api.copy_todos(
+                new_parent=content, template_id=creation_data.template_id,
+            )
+
         content = api.get_content_in_context(content)
         return content
 

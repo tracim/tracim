@@ -135,7 +135,7 @@ export const COOKIE_FRONTEND = {
   LAST_CONNECTION: 'lastConnection',
   DEFAULT_LANGUAGE: 'defaultLanguage',
   DEFAULT_EXPIRE_TIME: 180,
-  HIDE_USERNAME_POPUP: 'hideUsernamePopup'
+  SHOW_USERNAME_POPUP: 'showUsernamePopup'
 }
 
 export const getUserProfile = slug => PROFILE_LIST.find(p => slug === p.slug) || {}
@@ -148,7 +148,7 @@ export const DRAG_AND_DROP = {
   CONTENT_ITEM: 'contentItem'
 }
 
-// Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
+// Côme - 2018/09/19 - the object below is a temporary hack to be able to generate translation keys that only exists in backend
 // and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
@@ -161,7 +161,7 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
   i18n.t('Deprecated')
 ]
 
-export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban'
+export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban,todo'
 
 export const compareContents = (a, b, lang) => {
   if (a.type === 'folder' && b.type !== 'folder') return -1

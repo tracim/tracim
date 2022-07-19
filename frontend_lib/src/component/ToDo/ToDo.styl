@@ -4,25 +4,38 @@
   display flex
   flex-direction column
   margin standardSpacing
+
   &__new
-    margin standardSpacing
     display flex
     flex-direction column
+    margin-bottom standardSpacing
+    margin-top standardSpacing
+
     &__toDoText
-      margin-top standardSpacing
-    &__buttons
       display flex
-      justify-content flex-end
+      flex-direction column
       margin-top standardSpacing
-      & > .iconbutton
-        margin-inline-start standardSpacing
-    & > textarea
-      border-radius standardBorderRadius
-      border borderStyle
-      padding textSpacing
+
+      & > textarea
+        border borderStyle
+        border-radius standardBorderRadius
+        padding textSpacing
+
     &Button
       align-self flex-end
       margin-bottom standardSpacing
+  &__progressBar
+    height textSpacing
+    background-color fontColor
+    transition 0.5s
+    &_container
+      background-color mediumGrey
+      flex 1
+      margin 0px pageSpacing
+  &__title
+    &_container
+      display flex
+      align-items center
   &Item
     display flex
     background-color offWhite
@@ -36,18 +49,33 @@
       border none
     &__checkbox
       font-size titleFontSize
+      margin-inline-end textSpacing
       &:focus
         outline none
     &__delete:focus
       outline none
-    &__content
+    &__timedEvent
       flex 1
+    &__content
+      flex 6
       align-items baseline
-      overflow
+      overflow hidden
       text-overflow ellipsis
+      &__navigation
+        display flex
+        justify-content space-between
+        margin-inline-end standardSpacing
+        font-weight bold
+        & > *
+          color fontColor
+          font-size metadataFontSize
+          &:hover
+            color fontColor
+            text-decoration underline
       & strong
-        margin-right textSpacing
+        margin-inline-end textSpacing
     &Checked
       color lightDarkGrey
-      & > button
+      background repeating-linear-gradient(25deg, lightGrey, lightGrey 5px, white 5px, white 10px)
+      & *
         color lightDarkGrey

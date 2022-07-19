@@ -165,7 +165,7 @@ export class Account extends React.Component {
             props.dispatch(newFlashMessage(props.t('Your name has been changed'), 'info'))
             return true
           }
-          // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
+          // else, if email also has been changed, flash msg is handled below to not display 2 flash msg
           break
         default:
           props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning'))

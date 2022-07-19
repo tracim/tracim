@@ -3,8 +3,8 @@ from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 import enum
-import json
 import os
+import typing
 from typing import Any
 from typing import List
 from typing import Optional
@@ -16,6 +16,7 @@ from depot.io.utils import FileIntent
 from sqlakeyset import Page
 from sqlakeyset import get_page
 import sqlalchemy
+from sqlalchemy import JSON
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -40,6 +41,7 @@ from sqlalchemy.types import Text
 from sqlalchemy.types import Unicode
 
 from tracim_backend.app_models.contents import ContentStatus
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_status_list
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentRevisionUpdateError
@@ -346,11 +348,7 @@ class WorkspaceSubscription(DeclarativeBase):
 
 class ActionDescription(object):
     """
-    Allowed status are:
-    - open
-    - closed-validated
-    - closed-invalidated
-    - closed-deprecated
+    Types of revisions available
     """
 
     COPY = "copy"
@@ -364,6 +362,8 @@ class ActionDescription(object):
     UNARCHIVING = "unarchiving"
     UNDELETION = "undeletion"
     MOVE = "move"
+    MARK_AS_TEMPLATE = "mark-as-template"
+    UNMARK_AS_TEMPLATE = "unmark-as-template"
 
     # TODO - G.M - 10-04-2018 - [Cleanup] Drop this
     _ICONS = {
@@ -378,6 +378,8 @@ class ActionDescription(object):
         "undeletion": "far fa-trash-alt",
         "move": "fas fa-arrows-alt",
         "copy": "far fa-copy",
+        "mark-as-template": "fas fa-clipboard",
+        "unmark-as-template": "fas fa-paste",
     }
 
     def __init__(self, id):
@@ -403,6 +405,8 @@ class ActionDescription(object):
             cls.UNDELETION,
             cls.MOVE,
             cls.COPY,
+            cls.MARK_AS_TEMPLATE,
+            cls.UNMARK_AS_TEMPLATE,
         ]
 
 
@@ -410,7 +414,7 @@ class ContentChecker(object):
     @classmethod
     def check_properties(cls, item):
         properties = item.properties
-        if "allowed_content" in properties.keys():
+        if properties and "allowed_content" in properties.keys():
             for content_slug, value in properties["allowed_content"].items():
                 if not isinstance(value, bool):
                     return False
@@ -464,7 +468,10 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     content_id = Column(Integer, ForeignKey("content.id", ondelete="CASCADE"))
     # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author" ?
     owner_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
-    owner = relationship("User", remote_side=[User.user_id])
+    owner = relationship("User", foreign_keys=[owner_id], remote_side=[User.user_id])
+
+    assignee_id = Column(Integer, ForeignKey("users.user_id"), nullable=True)
+    assignee = relationship("User", foreign_keys=[assignee_id], remote_side=[User.user_id])
 
     description = Column(Text(), unique=False, nullable=False, default="")
     raw_content = Column(Text(), unique=False, nullable=False, default="")
@@ -478,7 +485,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     # http://depot.readthedocs.io/en/latest/#attaching-files-to-models
     # http://depot.readthedocs.io/en/latest/api.html#module-depot.fields
     depot_file = Column(TracimUploadedFileField, unique=False, nullable=True)
-    properties = Column("properties", Text(), unique=False, nullable=False, default="")
+    properties = Column("properties", JSON, unique=False, nullable=False, default={})
 
     # INFO - G.M - same type are used for FavoriteContent.
     label = Column(Unicode(MAX_LABEL_LENGTH), unique=False, nullable=False)
@@ -513,6 +520,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
     """ List of column copied when make a new revision from another """
     _cloned_columns = (
         # db_column
+        "assignee_id",
         "content_id",
         "content_namespace",
         "created",
@@ -534,6 +542,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
         "updated",
         "workspace_id",
         # object
+        "assignee",
         "owner",
         "parent",
         "workspace",
@@ -712,6 +721,7 @@ class ContentRevisionRO(CreationDateMixin, UpdateDateMixin, TrashableMixin, Decl
 
 # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
 Index("idx__content_revisions__owner_id", ContentRevisionRO.owner_id)
+Index("idx__content_revisions__assignee_id", ContentRevisionRO.assignee_id)
 Index("idx__content_revisions__parent_id", ContentRevisionRO.parent_id)
 # INFO - G.M - 2020-04-02 - Theses index may have different name in mysql
 # this is due to the fact, we do not remove automatically created index by mysql
@@ -831,6 +841,18 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.owner_id
 
     @hybrid_property
+    def assignee_id(self) -> int:
+        return self.revision.assignee_id
+
+    @assignee_id.setter
+    def assignee_id(self, value: int) -> None:
+        self.revision.assignee_id = value
+
+    @assignee_id.expression
+    def assignee_id(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.assignee_id
+
+    @hybrid_property
     def label(self) -> str:
         return self.revision.label
 
@@ -905,15 +927,16 @@ class Content(DeclarativeBase):
         return ContentRevisionRO.file_mimetype
 
     @hybrid_property
-    def _properties(self) -> str:
+    def properties(self) -> str:
         return self.revision.properties
 
-    @_properties.setter
-    def _properties(self, value: str) -> None:
+    @properties.setter
+    def properties(self, value: str) -> None:
+        ContentChecker.check_properties(self)
         self.revision.properties = value
 
-    @_properties.expression
-    def _properties(cls) -> InstrumentedAttribute:
+    @properties.expression
+    def properties(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.properties
 
     @hybrid_property
@@ -1110,6 +1133,18 @@ class Content(DeclarativeBase):
     def owner(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.owner
 
+    @hybrid_property
+    def assignee(self) -> User:
+        return self.revision.assignee
+
+    @assignee.setter
+    def assignee(self, value: User) -> None:
+        self.revision.assignee = value
+
+    @assignee.expression
+    def assignee(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.assignee
+
     @property
     def children(self) -> List["Content"]:
         return (
@@ -1239,25 +1274,21 @@ class Content(DeclarativeBase):
             query = query.filter(ContentRevisionRO.type.in_(content_types))
         return query
 
-    @hybrid_property
-    def properties(self) -> dict:
-        """ return a structure decoded from json content of _properties """
-
-        if not self._properties:
+    @property
+    def all_properties(self) -> dict:
+        """
+        Return a "read-only" dictionnary based on "properties" dict
+        completed with default/generated data
+        """
+        if not self.properties:
             properties = {}
         else:
-            properties = json.loads(self._properties)
+            properties = self.properties
         if "allowed_content" not in properties:
             properties["allowed_content"] = content_type_list.default_allowed_content_properties(
                 self.type
             )
         return properties
-
-    @properties.setter
-    def properties(self, properties_struct: dict) -> None:
-        """ encode a given structure into json and store it in _properties attribute"""
-        self._properties = json.dumps(properties_struct)
-        ContentChecker.check_properties(self)
 
     def created_as_delta(self, delta_from_datetime: datetime = None) -> timedelta:
         if not delta_from_datetime:
@@ -1304,14 +1335,17 @@ class Content(DeclarativeBase):
 
         return False
 
-    def get_comments(
+    def get_subcontents(
         self,
+        content_types: typing.Optional[typing.List[ContentTypeSlug]] = None,
         page_token: Optional[str] = None,
         count: Optional[int] = None,
         sort_order: ContentSortOrder = ContentSortOrder.CREATED_ASC,
     ) -> Page:
-        """Get the comments of this Content in pages."""
-        query = self.get_valid_children(content_types=[content_type_list.Comment.slug])
+        """Get the subcontent of this Content in pages, by default, comments"""
+        if not content_types:
+            content_types = [ContentTypeSlug.COMMENT]
+        query = self.get_valid_children(content_types=content_types)
         # INFO - 2021-08-16 - S.G. : remove the sort clause as
         # get_valid_children calls children which always sorts by id.
         query = query.order_by(None)
@@ -1373,7 +1407,7 @@ class Content(DeclarativeBase):
 
     def get_first_comment(self) -> Optional["Content"]:
         try:
-            return self.get_comments()[0]
+            return self.get_subcontents([ContentTypeSlug.COMMENT])[0]
         except IndexError:
             return None
 
@@ -1381,7 +1415,7 @@ class Content(DeclarativeBase):
         # TODO - Make this more efficient
         last_comment_updated = None
         last_comment = None
-        for comment in self.get_comments():
+        for comment in self.get_subcontents([ContentTypeSlug.COMMENT]):
             if user.user_id == comment.owner.user_id:
                 if not last_comment or last_comment_updated < comment.updated:
                     # take only the latest comment !
@@ -1410,7 +1444,7 @@ class Content(DeclarativeBase):
 
     def get_allowed_content_types(self) -> List[TracimContentType]:
         types = []
-        allowed_types = self.properties["allowed_content"]
+        allowed_types = self.all_properties["allowed_content"]
         for type_label, is_allowed in allowed_types.items():
             if is_allowed:
                 try:
@@ -1433,7 +1467,7 @@ class Content(DeclarativeBase):
     # TODO - G.M - 2020-09-29 - [Cleanup] Should probably be dropped, see issue #704
     def get_history(self, drop_empty_revision=False) -> List["VirtualEvent"]:
         events = []
-        for comment in self.get_comments():
+        for comment in self.get_subcontents([ContentTypeSlug.COMMENT]):
             events.append(VirtualEvent.create_from_content(comment))
 
         revisions = sorted(self.revisions, key=lambda rev: rev.revision_id)
