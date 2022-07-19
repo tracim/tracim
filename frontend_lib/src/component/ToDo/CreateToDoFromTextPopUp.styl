@@ -1,6 +1,8 @@
 @import "../../css/Variable.styl"
 
 .createToDoFromTextPopup
+  & .cardPopup
+    top calc(50% - 250px)
   & .cardPopup__body
     display flex
     flex-direction column
@@ -11,12 +13,23 @@
 
     & textarea
       width 100%
+      border borderStyle
+      border-radius standardBorderRadius
+      padding textSpacing
 
   &__main
     width 100%
 
+    &__title
+      display flex
+      justify-content space-between
+
+      &__info
+        color grey
+
   &__buttons
     align-self flex-end
+    margin-top textSpacing
 
     & button:last-child
       margin-inline-start standardSpacing

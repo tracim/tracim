@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
+import Popover from '../Popover/Popover.jsx'
 
 const CreateToDoFromTextPopup = (props) => {
   return (
@@ -14,13 +15,36 @@ const CreateToDoFromTextPopup = (props) => {
       faIcon='fas fa-edit'
     >
       <div className='createToDoFromTextPopup__main'>
-        <span>
-          {props.t('Enter your tasks below:')}
-        </span>
+        <div className='createToDoFromTextPopup__main__title'>
+          <span>
+            {props.t('Enter your tasks below:')}
+          </span>
+          <button
+            type='button'
+            className='transparentButton createToDoFromTextPopup__main__title__info'
+            id='popoverToDoInfo'
+            title={props.t('Information')}
+          >
+            <i className='fas fa-fw fa-question-circle' />
+          </button>
+        </div>
+        <Popover
+          popoverBody={(
+            <div>
+              {props.t('To create a task, type the + character followed by the username, then the text of your task.')}
+              <br />
+              {props.t('Each new line corresponds to a new task.')}
+              <br />
+              {props.t('For the task to be assigned to a member, the username must be at the beginning of the line.')}
+            </div>
+          )}
+          targetId='popoverToDoInfo'
+        />
         <textarea
           placeholder={props.placeHolder || props.t('+username please read the document')}
           onChange={props.onChangeValue}
           value={props.value}
+          rows={10}
         />
       </div>
       <div className='createToDoFromTextPopup__buttons'>
