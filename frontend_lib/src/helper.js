@@ -535,6 +535,18 @@ export const sortContentByStatus = (contentList) => {
   })
 }
 
+export const sortContentByCreatedDateAndID = (arrayToSort) => {
+  return arrayToSort.sort(function (a, b) {
+    if (a.created < b.created) return 1
+    if (a.created > b.created) return -1
+    if (a.created === b.created) {
+      if (a.id < b.id) return 1
+      if (a.id > b.id) return -1
+    }
+    return 0
+  })
+}
+
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types

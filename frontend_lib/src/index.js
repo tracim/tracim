@@ -65,6 +65,7 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   USER_CALL_STATE,
   STATUSES
@@ -486,6 +487,7 @@ export {
   getBrowserLang,
   NewToDo,
   putToDo,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   TimedEvent,
   ToDoItem,

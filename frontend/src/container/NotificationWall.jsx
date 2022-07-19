@@ -33,6 +33,7 @@ import {
   IconButton,
   ListItemWrapper,
   PopinFixedHeader,
+  sortContentByCreatedDateAndID,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
@@ -72,18 +73,6 @@ const hasSameContent = (notificationList) => {
   })
 }
 
-const sortByCreatedDateAndID = (arrayToSort) => {
-  return arrayToSort.sort(function (a, b) {
-    if (a.created < b.created) return 1
-    if (a.created > b.created) return -1
-    if (a.created === b.created) {
-      if (a.id < b.id) return 1
-      if (a.id > b.id) return -1
-    }
-    return 0
-  })
-}
-
 // INFO - MP - 2022-05-24 - Return true if the notification list can be grouped
 const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TWO) => {
   const isSameContent = hasSameContent(notificationList)
@@ -104,7 +93,7 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
 
 // INFO - MP - 2022-05-24 - Add a notification to an existing group
 const addNotificationToGroup = (notification, notificationGroup) => {
-  notificationGroup.group = sortByCreatedDateAndID([notification, ...notificationGroup.group])
+  notificationGroup.group = sortContentByCreatedDateAndID([notification, ...notificationGroup.group])
 
   notificationGroup.created = new Date(notification.created).getTime() < new Date(notificationGroup.created).getTime()
     ? notificationGroup.created

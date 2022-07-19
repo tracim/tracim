@@ -17,6 +17,7 @@ import {
   PageWrapper,
   putToDo,
   ROLE,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   STATUSES,
   TextInput,
@@ -104,7 +105,7 @@ const ToDo = (props) => {
     setIsLoading(false)
 
     if (fetchGetToDo.apiResponse.status === 200) {
-      setToDoList(sortContentByStatus(fetchGetToDo.body))
+      setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(fetchGetToDo.body)))
     } else props.dispatch(newFlashMessage(props.t('Error while loading to do list')))
   }
 
@@ -118,7 +119,7 @@ const ToDo = (props) => {
       data.fields.content.content_id
     ))
 
-    setToDoList(sortContentByStatus(uniqBy([fecthGetToDo.body, ...toDoList], 'content_id')))
+    setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'))))
   }
 
   const handleToDoChanged = async data => {

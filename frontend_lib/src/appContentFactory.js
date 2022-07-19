@@ -17,6 +17,7 @@ import {
   getOrCreateSessionClientToken,
   tinymceRemove,
   addRevisionFromTLM,
+  sortContentByCreatedDateAndID,
   sortContentByStatus
 } from './helper.js'
 
@@ -190,7 +191,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'content_id')) })
+          setState({ toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy(fetchGetToDo.body, 'content_id'))) })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
