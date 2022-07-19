@@ -234,7 +234,6 @@
   "Uncheck": "Desmarcar",
   "Check": "Marcar",
   "New task": "Nova tarefa",
-  "This content has no task to do associated. Click on \"New task\" button to create a new one.": "Este conteúdo não tem nenhuma tarefa a fazer associada. Clique no botão \"Nova tarefa\" para criar uma.",
   "Error while saving new to do": "Erro ao guardar a nova tarefa",
   "You are not allowed to delete this to do": "Não está autorizado a eliminar esta tarefa",
   "Error while deleting to do": "Erro ao eliminar esta tarefa",
@@ -245,5 +244,12 @@
   "created": "criado",
   "Create from text": "Criar a partir de texto",
   "Item marked as template": "Item marcado como modelo",
-  "Item unmarked as template": "Item desmarcado como modelo"
+  "Item unmarked as template": "Item desmarcado como modelo",
+  "Information": "Informação",
+  "To create a task, type the + character followed by the username, then the text of your task.": "Para criar uma tarefa, escreva o carácter + seguido do identificador, depois o texto da sua tarefa.",
+  "Each new line corresponds to a new task.": "Cada nova linha corresponde a uma nova tarefa.",
+  "For the task to be assigned to a member, the username must be at the beginning of the line.": "Para que a tarefa seja atribuída a um membro, o identificador deve estar no início da linha.",
+  "+username please read the document": "+identificador por favor leia o documento",
+  "This content has no task to do associated.": "Este conteúdo não tem nenhuma tarefa a fazer associada.",
+  "Click on \"New task\" button to create a new one.": "Clique no botão \"Nova tarefa\" para criar uma."
 }
