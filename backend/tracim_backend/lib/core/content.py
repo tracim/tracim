@@ -496,8 +496,14 @@ class ContentApi(object):
             todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
 
             for todo in todos:
-                self.copy(
-                    item=todo, new_parent=new_parent, do_save=False, do_notify=False,
+                self.create(
+                    content_type_slug=TODO_TYPE,
+                    workspace=new_parent.workspace,
+                    template_id=todo.content_id,
+                    parent=new_parent,
+                    content_namespace=new_parent.content_namespace,
+                    do_save=False,
+                    do_notify=False,
                 )
 
         except ContentTypeNotExist:
@@ -1761,11 +1767,6 @@ class ContentApi(object):
         if not self.is_editable(content):
             raise ContentInNotEditableState(
                 "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
-            )
-        # INFO - MP - 2022-06-09 - Hacky way to disable to set a template that aren't supported
-        if content.file_extension not in [".document.html", ".odt", ".ods", ".odp", ".odg"]:
-            raise ContentInNotEditableState(
-                "Can't mark this kind file as a template. Files supported: .document.html, .odt, .ods, .odp, .odg"
             )
         content.is_template = is_template
         if is_template:

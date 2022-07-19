@@ -9,6 +9,7 @@ import {
   BREADCRUMBS_TYPE,
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
+  FilenameWithBadges,
   handleFetchResult,
   handleInvalidMentionInComment,
   getToDo,
@@ -669,7 +670,6 @@ export class Kanban extends React.Component {
           breadcrumbsList={state.breadcrumbsList}
           content={state.content}
           config={state.config}
-          componentTitle={<span className='componentTitle'>{state.content.label}</span>}
           customClass={`${state.config.slug}__contentpage`}
           disableChangeTitle={!state.content.is_editable}
           isRefreshNeeded={state.showRefreshWarning}
@@ -682,6 +682,8 @@ export class Kanban extends React.Component {
           onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
           onValidateChangeTitle={this.handleSaveEditTitle}
           showReactions
+          showMarkedAsTemplate
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
             : FAVORITE_STATE.NOT_FAVORITE}
