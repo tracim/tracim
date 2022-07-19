@@ -44,7 +44,7 @@ const ToDoItem = props => {
           intent='link'
           onClick={() => props.onClickChangeStatusToDo(
             props.toDo, isToDoChecked ? STATUSES.OPEN : STATUSES.VALIDATED
-            )}
+          )}
           title={props.isEditable ? (isToDoChecked ? props.t('Uncheck') : props.t('Check')) : undefined}
         />
       </div>

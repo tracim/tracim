@@ -209,7 +209,7 @@ export class Kanban extends React.Component {
 
     this.setState(prevState => ({
       toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
-      lockedToDoList: prevState.lockedToDoList.filter(toDo_id => toDo_id !== data.fields.content.content_id)
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 

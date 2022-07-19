@@ -292,10 +292,12 @@ const ToDoManagement = (props) => {
                 toDo={toDo}
               />
             )
-            : <div>
+            : (
+              <div>
                 <span>{props.t('This content has no task to do associated.')}</span>
                 {!isReader && <span> {props.t('Click on "New task" button to create a new one.')}</span>}
-              </div>}
+              </div>
+            )}
         </div>
       )}
 

@@ -48,6 +48,7 @@ const ToDo = (props) => {
   const [isLoading, setIsLoading] = useState(true)
   const [progressBarWidth, setProgessBarWidth] = useState('0%')
   const [toDoList, setToDoList] = useState([])
+  const [lockedToDoList, setLockedToDoList] = useState([])
   const [toDoListFilter, setToDoListFilter] = useState('')
 
   useEffect(() => {
@@ -125,6 +126,9 @@ const ToDo = (props) => {
   const handleToDoChanged = async data => {
     if (data.fields.content.assignee.user_id !== props.user.userId) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       FETCH_CONFIG.apiUrl,
       data.fields.workspace.workspace_id,
@@ -133,6 +137,9 @@ const ToDo = (props) => {
     ))
     setToDoList(uniqBy(
       toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    ), 'content_id')
+    setLockedToDoList(uniqBy(
+      lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     ), 'content_id')
   }
 
@@ -163,6 +170,7 @@ const ToDo = (props) => {
   }
 
   const handleChangeStatusToDo = async (toDo, status) => {
+    setLockedToDoList([...lockedToDoList, toDo.content_id])
     const response = await handleFetchResult(await putToDo(
       FETCH_CONFIG.apiUrl,
       toDo.workspace.workspace_id,
@@ -182,6 +190,7 @@ const ToDo = (props) => {
         props.dispatch(newFlashMessage(props.t('Error while saving new to do')))
         break
     }
+    setLockedToDoList([...lockedToDoList])
   }
 
   const isToDoDeletable = (toDo, user, userRole) => {
@@ -238,6 +247,7 @@ const ToDo = (props) => {
                           <ToDoItem
                             isDeletable={isToDoDeletable(toDo, props.user, currentMember.role)}
                             isEditable
+                            isLoading={lockedToDoList.includes(toDo.content_id)}
                             key={`todo_id__${toDo.content_id}`}
                             lang={props.user.lang}
                             onClickChangeStatusToDo={handleChangeStatusToDo}
