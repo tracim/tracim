@@ -1768,7 +1768,6 @@ class ContentApi(object):
             raise ContentInNotEditableState(
                 "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
             )
-        # INFO - MP - 2022-06-09 - Hacky way to disable to set a template that aren't supported
         content.is_template = is_template
         if is_template:
             content.revision_type = ActionDescription.MARK_AS_TEMPLATE
