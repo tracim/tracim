@@ -6,6 +6,7 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   deleteToDo,
+  getSpaceMemberFromId,
   getToDo,
   getToDoListForUser,
   EmptyListMessage,
@@ -50,6 +51,7 @@ const ToDo = (props) => {
   const [toDoList, setToDoList] = useState([])
   const [lockedToDoList, setLockedToDoList] = useState([])
   const [toDoListFilter, setToDoListFilter] = useState('')
+  const [spaceRoleList, setSpaceRoleList] = useState([])
 
   useEffect(() => {
     setHeadTitleToDo()
@@ -63,6 +65,8 @@ const ToDo = (props) => {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: handleToDoChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: handleToDoDeleted }
     ])
+
+    getSpaceRoleListForAnUser(props.user.userId)
 
     let numberOfCheckedToDos = 0
 
@@ -108,6 +112,28 @@ const ToDo = (props) => {
     if (fetchGetToDo.apiResponse.status === 200) {
       setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(fetchGetToDo.body)))
     } else props.dispatch(newFlashMessage(props.t('Error while loading to do list')))
+  }
+
+  const getSpaceRoleListForAnUser = async (userId) => {
+    const toDoListUniqBySpaceList = uniqBy(toDoList, 'workspace.workspace_id')
+    const spaceRoleList = []
+
+    await Promise.all(toDoListUniqBySpaceList.map(async (todo) => {
+      const fetchGetSpaceRoleList = await handleFetchResult(await getSpaceMemberFromId(
+        FETCH_CONFIG.apiUrl,
+        todo.workspace.workspace_id,
+        userId
+      ))
+
+      if (fetchGetSpaceRoleList.apiResponse.status === 200) {
+        spaceRoleList.push({
+          spaceId: todo.workspace.workspace_id,
+          role: fetchGetSpaceRoleList.body.role
+        })
+      }
+    }))
+
+    setSpaceRoleList([...spaceRoleList])
   }
 
   const handleToDoCreated = async data => {
@@ -241,11 +267,11 @@ const ToDo = (props) => {
                   {displayedToDoList.length > 0 ? (
                     <div className='toDo__item'>
                       {displayedToDoList.map(toDo => {
-                        const toDoWorkspace = props.workspaceList.find(workspace => workspace.id === toDo.workspace.workspace_id)
-                        const currentMember = toDoWorkspace.memberList.find(member => member.id === props.user.userId)
+                        const toDoSpace = spaceRoleList.find(spaceRole => spaceRole.spaceId === toDo.workspace.workspace_id)
+                        const toDoSpaceRole = toDoSpace ? toDoSpace.role : undefined
                         return (
                           <ToDoItem
-                            isDeletable={isToDoDeletable(toDo, props.user, currentMember.role)}
+                            isDeletable={toDoSpaceRole ? isToDoDeletable(toDo, props.user, toDoSpaceRole) : false}
                             isEditable
                             isLoading={lockedToDoList.includes(toDo.content_id)}
                             key={`todo_id__${toDo.content_id}`}
