@@ -302,31 +302,39 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const toDoObject = {
-      id: 'todo',
-      label: props.t('Tasks'),
-      icon: 'fas fa-check-square',
-      children: (
-        <PopinFixedRightPartContent
-          label={props.t('Tasks')}
-          toDoList={state.toDoList}
-          showProgress={state.showProgress}
-        >
-          <ToDoManagement
-            apiUrl={state.config.apiUrl}
-            contentId={state.content.content_id}
-            customColor={state.config.hexcolor}
-            memberList={state.config.workspace.memberList}
-            onClickChangeStatusToDo={this.handleChangeStatusToDo}
-            onClickDeleteToDo={this.handleDeleteToDo}
-            onClickSaveNewToDo={this.handleSaveNewToDo}
-            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
-            user={state.loggedUser}
+
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
             toDoList={state.toDoList}
-          />
-        </PopinFixedRightPartContent>
-      )
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
     }
+
     const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
@@ -345,7 +353,9 @@ export class Kanban extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, toDoObject, tagObject]
+    menuItemList.push(tagObject)
+
+    return menuItemList
   }
 
   componentDidUpdate (prevProps, prevState) {
@@ -414,7 +424,7 @@ export class Kanban extends React.Component {
     this.buildBreadcrumbs(response.body)
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -455,7 +465,7 @@ export class Kanban extends React.Component {
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
   }
 
-  handleSetShowProgressbarStatus = (showProgressStatus) => {
+  setShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 

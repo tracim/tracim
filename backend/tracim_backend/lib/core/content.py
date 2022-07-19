@@ -428,14 +428,17 @@ class ContentApi(object):
 
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
+
+        # NOTE - MP - 2022-07-04 - We should copy the template, note try to create a copy
         if template_id:
             template = self.get_one(template_id)
-            content = self.copy_as_template(
+            content = self.copy_from_template(
                 new_content=content,
                 source_content=template,
                 new_parent=parent,
                 new_content_namespace=content_namespace,
             )
+
         else:
             content.revision_type = ActionDescription.CREATION
 
@@ -486,6 +489,20 @@ class ContentApi(object):
 
         for tag in tags_values:
             tag_lib.add_tag_to_content(user=self._user, content=destination, tag_name=tag.tag_name)
+
+    def copy_todos(self, new_parent: Content, template_id: int) -> None:
+        """Create extra data for templates: todos"""
+        try:
+            todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
+
+            for todo in todos:
+                self.copy(
+                    item=todo, new_parent=new_parent, do_save=False, do_notify=False,
+                )
+
+        except ContentTypeNotExist:
+            # INFO - MP - 2022-07-08 - We can have an error if the todo application isn't activated
+            pass
 
     def create_comment(
         self,
@@ -1282,7 +1299,6 @@ class ContentApi(object):
         new_workspace: Workspace = None,
         new_file_extension: str = None,
         new_content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
-        copy_revision: bool = True,
         do_save: bool = True,
         do_notify: bool = True,
     ) -> Content:
@@ -1370,6 +1386,7 @@ class ContentApi(object):
             )
 
         copy_result = self._copy(item, content_namespace, parent)
+
         copy_result = self._add_copy_revisions(
             original_content=item,
             new_content=copy_result.new_content,
@@ -1385,7 +1402,7 @@ class ContentApi(object):
         )
         return copy_result.new_content
 
-    def copy_as_template(
+    def copy_from_template(
         self,
         new_content: Content,
         source_content: Content,
@@ -1400,8 +1417,10 @@ class ContentApi(object):
         )
         cpy_rev.properties = {}
         cpy_rev.node = new_content
+
         new_content.current_revision = cpy_rev
         self._flag_revision_as_copy(new_content, source_content)
+
         return new_content
 
     def _copy(

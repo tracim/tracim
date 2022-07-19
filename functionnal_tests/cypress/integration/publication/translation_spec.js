@@ -33,5 +33,13 @@ describe('Publications page', () => {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.PUBLICATION, params: { workspaceId }, waitForTlm: true })
     cy.contains(publishButton, 'Publizieren')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.PUBLICATION, params: { workspaceId }, waitForTlm: true })
+    cy.contains(publishButton, 'نشر')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.PUBLICATION, params: { workspaceId }, waitForTlm: true })
+    cy.contains(publishButton, 'Publicar')
   })
 })

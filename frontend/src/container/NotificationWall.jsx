@@ -208,7 +208,7 @@ const linkToParentContent = (notification) => {
 
 export const NotificationWall = props => {
   const [notificationList, setNotificationList] = useState([])
-  // INFO - GB -2022-06-05 - The no set bellow is not used because folderPath is a dictionary and the manipulations are done directly
+  // INFO - GB -2022-06-05 - The no set below is not used because folderPath is a dictionary and the manipulations are done directly
   const [folderPath, setFolderPath] = useState({}) // eslint-disable-line no-unused-vars
   const [isFolderPathLoading, setIsFolderPathLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -312,15 +312,26 @@ export const NotificationWall = props => {
         )
         : ''
     )
+    const escapedToDoLabel = (
+      notification.content
+        ? notification.content.toDoLabel
+          ? escapeHtml(notification.content.toDoLabel)
+          : props.t('a task')
+        : ''
+    )
+    const hasToDo = notification.content ? notification.content.hasToDo : false
 
     const numberOfContents = notification.numberOfContents || 1
     const i18nOpts = {
       user: `<span title='${escapedUser}'>${escapedUser}</span>`,
       author: `<span title='${escapedAuthor}'>${escapedAuthor}</span>`,
-      content: `<span title='${escapedContentLabel}' class='${numberOfContents === 1
-        ? 'contentTitle__highlight'
-        : ''
-        }'>${escapedContentLabel}</span>`,
+      content: hasToDo
+        ? `<span title='${escapedContentLabel}' class='contentTitle__highlight'>${escapedContentLabel}</span>`
+        : `<span title='${escapedContentLabel}' class='${numberOfContents === 1
+            ? 'contentTitle__highlight'
+            : ''
+          }'>${escapedContentLabel}</span>`,
+      task: `<span title='${escapedToDoLabel}'>${escapedToDoLabel}</span>`,
       interpolation: { escapeValue: false }
     }
 
@@ -355,7 +366,7 @@ export const NotificationWall = props => {
           if (contentType === TLM_SUB.TODO) {
             return {
               title: props.t('Task to do created'),
-              text: props.t('{{author}} created a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              text: props.t('{{author}} created {{task}} on {{content}}{{workspaceInfo}}', i18nOpts),
               url: linkToParentContent(notification),
               isToDo: true
             }
@@ -372,7 +383,7 @@ export const NotificationWall = props => {
             if (contentType === TLM_SUB.TODO) {
               return {
                 title: props.t('Task updated'),
-                text: props.t('{{author}} updated a task on {{content}}{{workspaceInfo}}', i18nOpts),
+                text: props.t('{{author}} updated {{task}} on {{content}}{{workspaceInfo}}', i18nOpts),
                 url: linkToParentContent(notification),
                 isToDo: true
               }
@@ -395,7 +406,7 @@ export const NotificationWall = props => {
           if (contentType === TLM_SUB.TODO) {
             return {
               title: props.t('Task deleted'),
-              text: props.t('{{author}} deleted a task on {{content}}{{workspaceInfo}}', i18nOpts),
+              text: props.t('{{author}} deleted {{task}} on {{content}}{{workspaceInfo}}', i18nOpts),
               url: linkToParentContent(notification),
               isToDo: true
             }

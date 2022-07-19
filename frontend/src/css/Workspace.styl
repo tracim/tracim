@@ -1,10 +1,15 @@
 .workspace
   &__content
+    display flex
+    flex-direction column
+    height 100%
+
     &__buttons
       display flex
       justify-content space-between
       & .dropdown
         flex 1
+
     &__button
       display flex
       justify-content flex-end
@@ -12,10 +17,11 @@
       &__btnaddworkspace
         margin-bottom 50px
         padding standardSpacing 55px
-    &__fileandfolder
-      &__empty
-        margin-top 50px
-        font-weight bold
+
+    &__file_and_folder
+      display flex
+      flex 1
+      flex-direction column
 
 // MEDIAQUERIES
 

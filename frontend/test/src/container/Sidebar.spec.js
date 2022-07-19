@@ -32,7 +32,8 @@ describe('<Sidebar />', () => {
     registerLiveMessageHandlerList: () => {},
     registerCustomEventHandlerList: () => {},
     t: tradKey => tradKey,
-    accessibleWorkspaceList: []
+    accessibleWorkspaceList: [],
+    appList: []
   }
 
   const ComponentWithHOC = withRouterMock(SidebarWithoutHOC)

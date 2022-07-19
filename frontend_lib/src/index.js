@@ -106,6 +106,7 @@ import { defaultDebug } from './debug.js'
 
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
+import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -256,6 +257,7 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
 export const arTranslation = require('../i18next.scanner/ar/translation.json')
+export const esTranslation = require('../i18next.scanner/es/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
@@ -295,6 +297,7 @@ export {
   appContentFactory,
   DateInput,
   deleteToDo,
+  EmptyListMessage,
   getToDo,
   getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,

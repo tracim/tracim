@@ -20,6 +20,14 @@ describe('content :: home_page', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.HOME })
     cy.contains('#content', 'Einen Bereich schaffen')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'إنشاء فضاء')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Crear un espacio')
   })
 
   it('should have translations', () => {
@@ -42,5 +50,13 @@ describe('content :: home_page', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.HOME })
     cy.contains('#content', 'Willkommen bei Tracim')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'مرحبا بك في Tracim')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.HOME })
+    cy.contains('#content', 'Bienvenido a Tracim')
   })
 })

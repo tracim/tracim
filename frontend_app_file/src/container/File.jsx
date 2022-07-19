@@ -364,7 +364,7 @@ export class File extends React.Component {
     }
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -554,7 +554,7 @@ export class File extends React.Component {
     props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
   }
 
-  handleSetShowProgressbarStatus = (showProgressStatus) => {
+  setShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 
@@ -947,31 +947,39 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const toDoObject = {
-      id: 'todo',
-      label: props.t('Tasks'),
-      icon: 'fas fa-check-square',
-      children: (
-        <PopinFixedRightPartContent
-          label={props.t('Tasks')}
-          toDoList={state.toDoList}
-          showProgress={state.showProgress}
-        >
-          <ToDoManagement
-            apiUrl={state.config.apiUrl}
-            contentId={state.content.content_id}
-            customColor={state.config.hexcolor}
-            memberList={state.config.workspace.memberList}
-            onClickChangeStatusToDo={this.handleChangeStatusToDo}
-            onClickDeleteToDo={this.handleDeleteToDo}
-            onClickSaveNewToDo={this.handleSaveNewToDo}
-            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
-            user={state.loggedUser}
+
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
             toDoList={state.toDoList}
-          />
-        </PopinFixedRightPartContent>
-      )
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
     }
+
     const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
@@ -990,6 +998,8 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    menuItemList.push(tagObject)
+
     const propertiesObject = {
       id: 'properties',
       label: props.t('Properties'),
@@ -1017,44 +1027,38 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    menuItemList.push(propertiesObject)
 
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
-      return [
-        timelineObject,
-        toDoObject,
-        tagObject,
-        {
-          id: 'share',
-          label: props.t('Share'),
-          icon: 'fa-share-alt',
-          children: (
-            <PopinFixedRightPartContent
-              label={props.t('Share')}
-            >
-              <ShareDownload
-                label={props.t(state.config.label)}
-                hexcolor={state.config.hexcolor}
-                shareEmails={state.shareEmails}
-                onChangeEmails={this.handleChangeEmails}
-                onKeyDownEnter={this.handleKeyDownEnter}
-                sharePassword={state.sharePassword}
-                onChangePassword={this.handleChangePassword}
-                shareLinkList={state.shareLinkList}
-                onClickDeleteShareLink={this.handleClickDeleteShareLink}
-                onClickNewShare={this.handleClickNewShare}
-                userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                emailNotifActivated={state.config.system.config.email_notification_activated}
-                key='ShareDownload'
-              />
-            </PopinFixedRightPartContent>
-          )
-        },
-        propertiesObject
-
-      ]
-    } else {
-      return [timelineObject, toDoObject, tagObject, propertiesObject]
+      const shareObject = {
+        id: 'share',
+        label: props.t('Share'),
+        icon: 'fa-share-alt',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Share')}
+          >
+            <ShareDownload
+              label={props.t(state.config.label)}
+              hexcolor={state.config.hexcolor}
+              shareEmails={state.shareEmails}
+              onChangeEmails={this.handleChangeEmails}
+              onKeyDownEnter={this.handleKeyDownEnter}
+              sharePassword={state.sharePassword}
+              onChangePassword={this.handleChangePassword}
+              shareLinkList={state.shareLinkList}
+              onClickDeleteShareLink={this.handleClickDeleteShareLink}
+              onClickNewShare={this.handleClickNewShare}
+              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+              emailNotifActivated={state.config.system.config.email_notification_activated}
+              key='ShareDownload'
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(shareObject)
     }
+    return menuItemList
   }
 
   handleCloseNotifyAllMessage = async () => {
@@ -1221,7 +1225,7 @@ export class File extends React.Component {
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
-              (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
+                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionBtn'
             }

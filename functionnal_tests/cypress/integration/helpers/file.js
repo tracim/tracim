@@ -1,4 +1,4 @@
-// INFO - CH - 2019-05-15 - The function bellow assumes you already is on a workspace's content list page
+// INFO - CH - 2019-05-15 - The function below assumes you already is on a workspace's content list page
 // it is better to use commands from support/db_commands.js (write it if not exists)
 export const create_file = (cy, fileTitle = 'newFile') => {
   cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
@@ -12,6 +12,6 @@ export const create_file = (cy, fileTitle = 'newFile') => {
   cy.get('[data-cy="popinFixed"].file')
     .should('be.visible')
 
-  cy.get(`.workspace__content__fileandfolder > .content[title="${fileTitle}"] .fas.fa-paperclip`)
+  cy.get(`.workspace__content__file_and_folder > .content[title="${fileTitle}"] .fas.fa-paperclip`)
     .should('be.visible')
 }

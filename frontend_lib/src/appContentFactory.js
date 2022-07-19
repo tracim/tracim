@@ -200,7 +200,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleCommentCreated = async (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
       this.handleChildContentCreated({
         ...tlm,
@@ -217,7 +217,7 @@ export function appContentFactory (WrappedComponent) {
     handleChildContentCreated = (tlm) => {
       const { state } = this
       // Not a child of our content
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
       const isFromCurrentToken = tlm.fields.client_token === this.sessionClientToken
       this.addChildContentToTimeline(
@@ -230,7 +230,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleChildContentDeleted = (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
       this.setState(prevState => {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
@@ -240,7 +240,7 @@ export function appContentFactory (WrappedComponent) {
 
     handleContentCommentModified = async (tlm) => {
       const { state } = this
-      if (!permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
+      if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
       const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
 
@@ -336,7 +336,8 @@ export function appContentFactory (WrappedComponent) {
           ? prev.newComment
           : getLocalStorageItem(
             appSlug,
-            newContent,
+            newContent.content_id,
+            newContent.workspace_id,
             LOCAL_STORAGE_FIELD.COMMENT
           ) || ''
       }))
@@ -576,7 +577,8 @@ export function appContentFactory (WrappedComponent) {
 
           removeLocalStorageItem(
             appSlug,
-            content,
+            content.content_id,
+            content.workspace_id,
             LOCAL_STORAGE_FIELD.COMMENT
           )
           break

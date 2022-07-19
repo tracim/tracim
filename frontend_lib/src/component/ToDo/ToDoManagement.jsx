@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+import {
+  getLocalStorageItem,
+  LOCAL_STORAGE_FIELD,
+  removeLocalStorageItem,
+  setLocalStorageItem
+} from '../../localStorage.js'
 import IconButton from '../Button/IconButton.jsx'
 import LinkButton from '../Button/LinkButton.jsx'
 import ToDoItem, {
@@ -8,7 +14,7 @@ import ToDoItem, {
   isEditable
 } from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
-import { ROLE } from '../../helper.js'
+import { CONTENT_TYPE, ROLE } from '../../helper.js'
 import CreateToDoFromTextPopUp from './CreateToDoFromTextPopUp.jsx'
 
 const ToDoManagement = (props) => {
@@ -16,7 +22,7 @@ const ToDoManagement = (props) => {
   const nobodyValueObject = { value: null, label: props.t('Nobody') }
 
   const [isPopUpDisplayed, setIsPopUpDisplayed] = useState(false)
-  const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
+  const [isToDoCreationDisplayed, setIsToDoCreationDisplayed] = useState(false)
   const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
   const [newToDoList, setNewToDoList] = useState([])
   const [newToDoListAsText, setNewToDoListAsText] = useState('')
@@ -30,12 +36,23 @@ const ToDoManagement = (props) => {
   }, [props.memberList])
 
   useEffect(() => {
-    setNewToDoList([{
-      assigneeId: 0,
-      value: null
-    }])
-    setSelectedValueList([nobodyValueObject])
-  }, [isNewToDo])
+    const localStorageToDoList = getLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO
+    )
+
+    if (localStorageToDoList) {
+      transformToDoTextListIntoArray({ target: { value: localStorageToDoList } })
+    } else {
+      setNewToDoList([{
+        assigneeId: 0,
+        value: null
+      }])
+      setSelectedValueList([nobodyValueObject])
+    }
+  }, [isToDoCreationDisplayed])
 
   useEffect(() => {
     if (!isPopUpDisplayed) {
@@ -53,6 +70,13 @@ const ToDoManagement = (props) => {
         }
       })
       setNewToDoListAsText(text)
+      setLocalStorageItem(
+        CONTENT_TYPE.TODO,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.TODO,
+        text
+      )
     }
   }, [newToDoList])
 
@@ -73,8 +97,14 @@ const ToDoManagement = (props) => {
   }
 
   const handleClickCancel = () => {
-    props.onClickAddNewToDo(true)
-    setIsNewToDo(false)
+    props.displayProgressBarStatus(true)
+    setIsToDoCreationDisplayed(false)
+    removeLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO
+    )
   }
 
   const handleClickClose = () => {
@@ -83,8 +113,8 @@ const ToDoManagement = (props) => {
   }
 
   const handleAddNewToDo = () => {
-    props.onClickAddNewToDo(false)
-    setIsNewToDo(true)
+    props.displayProgressBarStatus(false)
+    setIsToDoCreationDisplayed(true)
   }
 
   const handleClickSaveToDo = () => {
@@ -98,7 +128,14 @@ const ToDoManagement = (props) => {
       }
     })
     setIsPopUpDisplayed(false)
-    setIsNewToDo(false)
+    setIsToDoCreationDisplayed(false)
+    setNewToDoList([])
+    removeLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO
+    )
   }
 
   const handleChangeSelectedValue = (e, index) => {
@@ -118,7 +155,7 @@ const ToDoManagement = (props) => {
     setNewToDoList(tmpToDoList)
   }
 
-  const handleChangePopUpValue = (e) => {
+  const transformToDoTextListIntoArray = (e) => {
     setNewToDoListAsText(e.target.value)
 
     const lines = e.target.value.split(/\n/g)
@@ -146,7 +183,7 @@ const ToDoManagement = (props) => {
         const toDoAssignee = props.memberList.find(member => member.username && member.username === toDoAssigneeUsername)
 
         if (toDoAssignee) {
-          tmpSelectedValueList[index] = memberListOptions.find(option => option.value === toDoAssignee.id)
+          tmpSelectedValueList[index] = { value: toDoAssignee.id, label: `${toDoAssignee.publicName} (${toDoAssignee.username})` }
         } else {
           tmpSelectedValueList[index] = nobodyValueObject
         }
@@ -161,6 +198,13 @@ const ToDoManagement = (props) => {
     })
     setSelectedValueList([...tmpSelectedValueList])
     setNewToDoList([...tmpToDoList])
+    setLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO,
+      e.target.value
+    )
   }
 
   const handleOpenPopUp = () => {
@@ -170,7 +214,7 @@ const ToDoManagement = (props) => {
 
   return (
     <div className='toDoManagement'>
-      {isNewToDo ? (
+      {isToDoCreationDisplayed ? (
         <div className='toDoManagement__creation'>
           <div className='toDoManagement__creation__linkButton'>
             <LinkButton
@@ -182,13 +226,10 @@ const ToDoManagement = (props) => {
           {newToDoList.map((toDo, index) => {
             return (
               <NewToDo
-                apiUrl={props.apiUrl}
-                onChangeSelectedValue={(e) => handleChangeSelectedValue(e, index)}
-                onChangeValue={(e) => handleChangeValue(e, index)}
-                contentId={props.contentId}
-                customColor={props.customColor}
                 key={`todoList__${index}`}
                 memberListOptions={memberListOptions}
+                onChangeSelectedValue={(e) => handleChangeSelectedValue(e, index)}
+                onChangeValue={(e) => handleChangeValue(e, index)}
                 selectedValue={selectedValueList[index]}
                 value={toDo.value ? toDo.value : ''}
               />
@@ -257,7 +298,7 @@ const ToDoManagement = (props) => {
       {isPopUpDisplayed && (
         <CreateToDoFromTextPopUp
           customColor={props.customColor}
-          onChangeValue={handleChangePopUpValue}
+          onChangeValue={transformToDoTextListIntoArray}
           onClickTransform={() => setIsPopUpDisplayed(false)}
           onClickClose={handleClickClose}
           value={newToDoListAsText}
@@ -277,10 +318,14 @@ ToDoManagement.propTypes = {
   toDoList: PropTypes.array.isRequired,
   user: PropTypes.object.isRequired,
   customColor: PropTypes.string,
-  memberList: PropTypes.array
+  displayProgressBarStatus: PropTypes.func,
+  memberList: PropTypes.array,
+  workspaceId: PropTypes.number
 }
 
 ToDoManagement.defaultProps = {
   customColor: '',
-  memberList: []
+  displayProgressBarStatus: () => { },
+  memberList: [],
+  workspaceId: 0
 }
