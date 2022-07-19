@@ -577,6 +577,6 @@
   "{{count}} tasks performed on {{numberOfTasks}}": "{{count}} tarefa realizada em {{numberOfTasks}}",
   "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} tarefas realizadas em {{numberOfTasks}}",
   "a task": "uma tarefa",
-  "There is no tasks that match your filter": "",
-  "You don't have any assigned tasks": ""
+  "There is no tasks that match your filter": "Não há tarefas que correspondam ao seu filtro",
+  "You don't have any assigned tasks": "Não tem nenhuma tarefa atribuída"
 }
