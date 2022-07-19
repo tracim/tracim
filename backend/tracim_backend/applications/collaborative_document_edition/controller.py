@@ -135,6 +135,13 @@ class CollaborativeDocumentEditionController(Controller):
                 collaborative_document_edition_api.update_content_from_template(
                     content=content, template_filename=hapic_data.body.template
                 )
+        else:
+            api.copy_tags(
+                destination=content, source_content_id=hapic_data.body.template_id,
+            )
+            api.copy_todos(
+                new_parent=content, template_id=hapic_data.body.template_id,
+            )
 
         return api.get_content_in_context(content)
 

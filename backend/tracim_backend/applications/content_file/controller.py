@@ -144,6 +144,14 @@ class FileController(Controller):
                     new_mimetype=_file.type,
                     new_content=_file.file,
                 )
+        else:
+            api.copy_tags(
+                destination=content, source_content_id=hapic_data.forms.template_id,
+            )
+            api.copy_todos(
+                new_parent=content, template_id=hapic_data.forms.template_id,
+            )
+
         return api.get_content_in_context(content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_FILE_ENDPOINTS])
