@@ -71,7 +71,7 @@ export const DATE_FNS_LOCALE = {
   es: dateFnsEs
 }
 
-// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+// INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
 export const COLLABORA_EXTENSIONS = [
   '.odg',
   '.odp',
@@ -532,6 +532,18 @@ export const sortContentByStatus = (contentList) => {
     } if (contantA.status === STATUSES.OPEN && contentB.status === STATUSES.VALIDATED) {
       return -1
     } else return 0
+  })
+}
+
+export const sortContentByCreatedDateAndID = (arrayToSort) => {
+  return arrayToSort.sort(function (a, b) {
+    if (a.created < b.created) return 1
+    if (a.created > b.created) return -1
+    if (a.created === b.created) {
+      if (a.id < b.id) return 1
+      if (a.id > b.id) return -1
+    }
+    return 0
   })
 }
 

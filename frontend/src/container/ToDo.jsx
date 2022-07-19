@@ -6,15 +6,19 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   deleteToDo,
+  getSpaceMemberFromId,
   getToDo,
   getToDoListForUser,
   EmptyListMessage,
   handleFetchResult,
+  Loading,
   PAGE,
   PageContent,
   PageTitle,
   PageWrapper,
   putToDo,
+  ROLE,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   STATUSES,
   TextInput,
@@ -42,9 +46,12 @@ const filterToDoList = (list, filterList) => {
 const ToDo = (props) => {
   const [count, setNumberOfCheckedToDos] = useState(0)
   const [displayedToDoList, setDisplayedToDoList] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
   const [progressBarWidth, setProgessBarWidth] = useState('0%')
   const [toDoList, setToDoList] = useState([])
+  const [lockedToDoList, setLockedToDoList] = useState([])
   const [toDoListFilter, setToDoListFilter] = useState('')
+  const [spaceRoleList, setSpaceRoleList] = useState([])
 
   useEffect(() => {
     setHeadTitleToDo()
@@ -58,6 +65,8 @@ const ToDo = (props) => {
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: handleToDoChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: handleToDoDeleted }
     ])
+
+    getSpaceRoleListForAnUser(props.user.userId)
 
     let numberOfCheckedToDos = 0
 
@@ -98,9 +107,33 @@ const ToDo = (props) => {
       props.user.userId
     ))
 
+    setIsLoading(false)
+
     if (fetchGetToDo.apiResponse.status === 200) {
-      setToDoList(sortContentByStatus(fetchGetToDo.body))
+      setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(fetchGetToDo.body)))
     } else props.dispatch(newFlashMessage(props.t('Error while loading to do list')))
+  }
+
+  const getSpaceRoleListForAnUser = async (userId) => {
+    const toDoListUniqBySpaceList = uniqBy(toDoList, 'workspace.workspace_id')
+    const spaceRoleList = []
+
+    await Promise.all(toDoListUniqBySpaceList.map(async (todo) => {
+      const fetchGetSpaceRoleList = await handleFetchResult(await getSpaceMemberFromId(
+        FETCH_CONFIG.apiUrl,
+        todo.workspace.workspace_id,
+        userId
+      ))
+
+      if (fetchGetSpaceRoleList.apiResponse.status === 200) {
+        spaceRoleList.push({
+          spaceId: todo.workspace.workspace_id,
+          role: fetchGetSpaceRoleList.body.role
+        })
+      }
+    }))
+
+    setSpaceRoleList([...spaceRoleList])
   }
 
   const handleToDoCreated = async data => {
@@ -113,12 +146,15 @@ const ToDo = (props) => {
       data.fields.content.content_id
     ))
 
-    setToDoList(sortContentByStatus(uniqBy([fecthGetToDo.body, ...toDoList], 'content_id')))
+    setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'))))
   }
 
   const handleToDoChanged = async data => {
     if (data.fields.content.assignee.user_id !== props.user.userId) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       FETCH_CONFIG.apiUrl,
       data.fields.workspace.workspace_id,
@@ -127,6 +163,9 @@ const ToDo = (props) => {
     ))
     setToDoList(uniqBy(
       toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+    ), 'content_id')
+    setLockedToDoList(uniqBy(
+      lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     ), 'content_id')
   }
 
@@ -157,6 +196,7 @@ const ToDo = (props) => {
   }
 
   const handleChangeStatusToDo = async (toDo, status) => {
+    setLockedToDoList([...lockedToDoList, toDo.content_id])
     const response = await handleFetchResult(await putToDo(
       FETCH_CONFIG.apiUrl,
       toDo.workspace.workspace_id,
@@ -176,75 +216,92 @@ const ToDo = (props) => {
         props.dispatch(newFlashMessage(props.t('Error while saving new to do')))
         break
     }
+    setLockedToDoList([...lockedToDoList])
+  }
+
+  const isToDoDeletable = (toDo, user, userRole) => {
+    const isAuthor = toDo.author.user_id === user.userId
+    const isContentManager = userRole === ROLE.contentManager.slug
+    const isContributor = userRole === ROLE.contributor.slug
+    const isSpaceManager = userRole === ROLE.workspaceManager.slug
+    return (isContributor && isAuthor) || isSpaceManager || isContentManager
   }
 
   return (
-    <div className='tracim__content-scrollview'>
-      <PageWrapper customClass='toDo__wrapper'>
-        <PageTitle
-          title={props.t('My tasks')}
-          icon='fas fa-check-square'
-          breadcrumbsList={props.breadcrumbs}
-        />
+    isLoading
+      ? <Loading />
+      : (
+        <div className='tracim__content-scrollview'>
+          <PageWrapper customClass='toDo__wrapper'>
+            <PageTitle
+              title={props.t('My tasks')}
+              icon='fas fa-check-square'
+              breadcrumbsList={props.breadcrumbs}
+            />
 
-        <PageContent
-          parentClass='toDo__pageContent_on_mytasks'
-        >
-          {toDoList.length > 0 ? (
-            <div className='toDo__list'>
-              <TextInput
-                customClass='form-control'
-                onChange={e => {
-                  const newFilter = e.target.value
-                  setToDoListFilter(newFilter)
-                }}
-                placeholder={props.t('Filter my tasks')}
-                icon='search'
-                value={toDoListFilter}
-              />
-              {toDoListFilter === '' &&
-                <div
-                  className='toDo__progressBar_container'
-                  title={props.t('{{count}} tasks performed on {{numberOfTasks}}', {
-                    count: count,
-                    numberOfTasks: toDoList.length
-                  })}
-                >
-                  <div className='toDo__progressBar' style={{ width: `${progressBarWidth}` }} />
-                </div>}
-              {displayedToDoList.length > 0 ? (
-                <div className='toDo__item'>
-                  {displayedToDoList.map(toDo => {
-                    return (
-                      <ToDoItem
-                        isDeletable
-                        isEditable
-                        key={`todo_id__${toDo.content_id}`}
-                        lang={props.user.lang}
-                        onClickChangeStatusToDo={handleChangeStatusToDo}
-                        onClickDeleteToDo={handleDeleteToDo}
-                        isPersonalPage
-                        toDo={toDo}
-                        username={props.user.username}
-                      />
-                    )
-                  }
+            <PageContent
+              parentClass='toDo__pageContent_on_mytasks'
+            >
+              {toDoList.length > 0 ? (
+                <div className='toDo__list'>
+                  <TextInput
+                    customClass='form-control'
+                    onChange={e => {
+                      const newFilter = e.target.value
+                      setToDoListFilter(newFilter)
+                    }}
+                    placeholder={props.t('Filter my tasks')}
+                    icon='search'
+                    value={toDoListFilter}
+                  />
+                  {toDoListFilter === '' &&
+                    <div
+                      className='toDo__progressBar_container'
+                      title={props.t('{{count}} tasks performed on {{numberOfTasks}}', {
+                        count: count,
+                        numberOfTasks: toDoList.length
+                      })}
+                    >
+                      <div className='toDo__progressBar' style={{ width: `${progressBarWidth}` }} />
+                    </div>}
+                  {displayedToDoList.length > 0 ? (
+                    <div className='toDo__item'>
+                      {displayedToDoList.map(toDo => {
+                        const toDoSpace = spaceRoleList.find(spaceRole => spaceRole.spaceId === toDo.workspace.workspace_id)
+                        const toDoSpaceRole = toDoSpace ? toDoSpace.role : undefined
+                        return (
+                          <ToDoItem
+                            isDeletable={toDoSpaceRole ? isToDoDeletable(toDo, props.user, toDoSpaceRole) : false}
+                            isEditable
+                            isLoading={lockedToDoList.includes(toDo.content_id)}
+                            key={`todo_id__${toDo.content_id}`}
+                            lang={props.user.lang}
+                            onClickChangeStatusToDo={handleChangeStatusToDo}
+                            onClickDeleteToDo={handleDeleteToDo}
+                            isPersonalPage
+                            toDo={toDo}
+                            username={props.user.username}
+                          />
+                        )
+                      }
+                      )}
+                    </div>
+                  ) : (
+                    toDoListFilter !== '' &&
+                      <EmptyListMessage>
+                        {props.t('There is no tasks that match your filter')}
+                      </EmptyListMessage>
                   )}
                 </div>
               ) : (
                 <EmptyListMessage>
-                  {props.t('There is no tasks that match your filter')}
+                  {props.t('You don\'t have any assigned tasks')}
                 </EmptyListMessage>
               )}
-            </div>
-          ) : (
-            <EmptyListMessage>
-              {props.t('You don\'t have any assigned tasks')}
-            </EmptyListMessage>
-          )}
-        </PageContent>
-      </PageWrapper>
-    </div>
+            </PageContent>
+          </PageWrapper>
+        </div>
+      )
   )
 }
 

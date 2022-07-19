@@ -34,6 +34,7 @@ import {
   tinymceRemove,
   TagList,
   putMyselfFileRead,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
@@ -54,27 +55,28 @@ export class Kanban extends React.Component {
     this.state = {
       appName: 'kanban',
       breadcrumbsList: [],
-      fullscreen: false,
-      isFileCommentLoading: false,
-      isTemplate: false,
-      isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
       currentContentRevisionId: param.content.current_revision_id,
-      loading: false,
-      newContent: {},
-      timelineWysiwyg: false,
+      editionAuthor: '',
       externalTranslationList: [
         props.t('Create a Kanban board')
       ],
-      showRefreshWarning: false,
-      editionAuthor: '',
+      fullscreen: false,
       invalidMentionList: [],
+      isFileCommentLoading: false,
+      isTemplate: false,
+      isVisible: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
+      loading: false,
+      newContent: {},
+      timelineWysiwyg: false,
       showInvalidMentionPopupInComment: false,
-      toDoList: [],
+      showProgress: true,
+      showRefreshWarning: false,
       translationTargetLanguageCode: param.loggedUser.lang,
-      showProgress: true
+      toDoList: []
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
 
@@ -188,7 +190,7 @@ export class Kanban extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
+      toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id')))
     }))
   }
 
@@ -196,6 +198,9 @@ export class Kanban extends React.Component {
     const { state } = this
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
@@ -204,7 +209,8 @@ export class Kanban extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
@@ -320,6 +326,7 @@ export class Kanban extends React.Component {
               apiUrl={state.config.apiUrl}
               contentId={state.content.content_id}
               customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
               memberList={state.config.workspace.memberList}
               onClickChangeStatusToDo={this.handleChangeStatusToDo}
               onClickDeleteToDo={this.handleDeleteToDo}
@@ -462,7 +469,14 @@ export class Kanban extends React.Component {
 
   handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
   setShowProgressBarStatus = (showProgressStatus) => {

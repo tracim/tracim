@@ -50,6 +50,7 @@ import {
   sendGlobalFlashMessage,
   TagList,
   getFileRevisionPreviewInfo,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
@@ -78,7 +79,6 @@ export class File extends React.Component {
       disableChangeIsTemplate: false,
       isVisible: true,
       isTemplate: false,
-      loggedUser: param.loggedUser,
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -88,6 +88,8 @@ export class File extends React.Component {
       ],
       newContent: {},
       loadingContent: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -196,7 +198,7 @@ export class File extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
+      toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id')))
     }))
   }
 
@@ -204,6 +206,9 @@ export class File extends React.Component {
     const { state } = this
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
@@ -212,7 +217,8 @@ export class File extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
@@ -551,7 +557,14 @@ export class File extends React.Component {
 
   handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
   setShowProgressBarStatus = (showProgressStatus) => {
@@ -965,6 +978,7 @@ export class File extends React.Component {
               apiUrl={state.config.apiUrl}
               contentId={state.content.content_id}
               customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
               memberList={state.config.workspace.memberList}
               onClickChangeStatusToDo={this.handleChangeStatusToDo}
               onClickDeleteToDo={this.handleDeleteToDo}

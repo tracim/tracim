@@ -17,6 +17,7 @@ import {
   getOrCreateSessionClientToken,
   tinymceRemove,
   addRevisionFromTLM,
+  sortContentByCreatedDateAndID,
   sortContentByStatus
 } from './helper.js'
 
@@ -190,7 +191,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'content_id')) })
+          setState({ toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy(fetchGetToDo.body, 'content_id'))) })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
@@ -456,8 +457,10 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState) => {
+    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState, previousLockedToDoList) => {
       this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
       const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
 
       switch (response.status) {
@@ -469,6 +472,8 @@ export function appContentFactory (WrappedComponent) {
           sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
           break
       }
+
+      setState({ lockedToDoList: [...previousLockedToDoList] })
 
       return response
     }

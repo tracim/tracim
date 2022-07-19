@@ -284,6 +284,7 @@ const ToDoManagement = (props) => {
                 key={`toDo_${toDo.content_id}`}
                 isDeletable={isDeletable(toDo, props.user, props.user.userRoleIdInWorkspace)}
                 isEditable={isEditable(toDo, props.user, props.user.userRoleIdInWorkspace)}
+                isLoading={props.lockedToDoList.includes(toDo.content_id)}
                 memberList={props.memberList}
                 onClickChangeStatusToDo={props.onClickChangeStatusToDo}
                 onClickDeleteToDo={props.onClickDeleteToDo}
@@ -291,7 +292,12 @@ const ToDoManagement = (props) => {
                 toDo={toDo}
               />
             )
-            : <div>{props.t('This content has no task to do associated. Click on "New task" button to create a new one.')}</div>}
+            : (
+              <div>
+                <span>{props.t('This content has no task to do associated.')}</span>
+                {!isReader && <span> {props.t('Click on "New task" button to create a new one.')}</span>}
+              </div>
+            )}
         </div>
       )}
 
@@ -319,6 +325,7 @@ ToDoManagement.propTypes = {
   user: PropTypes.object.isRequired,
   customColor: PropTypes.string,
   displayProgressBarStatus: PropTypes.func,
+  lockedToDoList: PropTypes.array,
   memberList: PropTypes.array,
   workspaceId: PropTypes.number
 }
@@ -326,6 +333,7 @@ ToDoManagement.propTypes = {
 ToDoManagement.defaultProps = {
   customColor: '',
   displayProgressBarStatus: () => { },
+  lockedToDoList: [],
   memberList: [],
   workspaceId: 0
 }

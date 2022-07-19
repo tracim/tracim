@@ -2253,6 +2253,7 @@ class ContentApi(object):
         self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
     ) -> Content:
         item = self.create(
+            content_namespace=parent.content_namespace,
             content_type_slug=content_type_list.Todo.slug,
             workspace=parent.workspace,
             parent=parent,
