@@ -24,6 +24,21 @@ function logerror {
     exit 1
 }
 
+function copy_dir_content(){
+    # Helper to copy recursively missing content in directory
+    # Similar code used in common.sh in docker code /!\
+    # Update those two code synchronously
+    ORIGIN_DIR=$1
+    DEST_DIR=$2
+    for file in $(find $ORIGIN_DIR -printf "%P\n")
+    do
+      if [ ! -r $DEST_DIR/$file ]; then
+        cp -r $ORIGIN_DIR/$file $DEST_DIR/$file
+        loggood "$file added in $DEST_DIR directory"
+      fi
+    done
+}
+
 function create_dir(){
     DIR_NAME=$1
     DIR_PATH=$2
@@ -82,6 +97,8 @@ function setup_config_file {
         cp -r ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding && loggood "Successfully created default branding folder" || logerror "Failed to create default branding folder"
     else
         loggood "branding folder already exists"
+        log "Check missing branding files"
+        copy_dir_content ../frontend/dist/assets/branding.sample ../frontend/dist/assets/branding
     fi
 
     if [ -d "$DEFAULTDIR/backend/sessions_data/" ]; then
