@@ -121,14 +121,15 @@ class CollaborativeDocumentEditionController(Controller):
                     "Parent with content_id {} not found".format(hapic_data.body.parent_id)
                 ) from exc
 
-        content = api.create(
-            content_type_slug=FILE_TYPE,
-            do_save=True,
-            filename=hapic_data.body.filename,
-            template_id=hapic_data.body.template_id,
-            workspace=request.current_workspace,
-            parent=parent,
-        )
+        with request.dbsession.no_autoflush:
+            content = api.create(
+                content_type_slug=FILE_TYPE,
+                do_save=True,
+                filename=hapic_data.body.filename,
+                template_id=hapic_data.body.template_id,
+                workspace=request.current_workspace,
+                parent=parent,
+            )
 
         if not hapic_data.body.template_id:
             with new_revision(session=request.dbsession, tm=transaction.manager, content=content):

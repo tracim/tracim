@@ -125,15 +125,16 @@ class FileController(Controller):
                 raise ParentNotFound(
                     "Parent with content_id {} not found".format(parent_id)
                 ) from exc
-        content = api.create(
-            filename=_file.filename,
-            content_type_slug=hapic_data.forms.content_type,
-            workspace=request.current_workspace,
-            parent=parent,
-            content_namespace=hapic_data.forms.content_namespace,
-            template_id=hapic_data.forms.template_id,
-            do_save=hapic_data.forms.template_id,
-        )
+        with request.dbsession.no_autoflush:
+            content = api.create(
+                filename=_file.filename,
+                content_type_slug=hapic_data.forms.content_type,
+                workspace=request.current_workspace,
+                parent=parent,
+                content_namespace=hapic_data.forms.content_namespace,
+                template_id=hapic_data.forms.template_id,
+                do_save=hapic_data.forms.template_id,
+            )
 
         if not hapic_data.forms.template_id:
             api.save(content, ActionDescription.CREATION)

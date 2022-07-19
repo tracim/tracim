@@ -496,8 +496,14 @@ class ContentApi(object):
             todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
 
             for todo in todos:
-                self.copy(
-                    item=todo, new_parent=new_parent, do_save=False, do_notify=False,
+                self.create(
+                    content_type_slug=TODO_TYPE,
+                    workspace=new_parent.workspace,
+                    template_id=todo.content_id,
+                    parent=new_parent,
+                    content_namespace=new_parent.content_namespace,
+                    do_save=False,
+                    do_notify=False,
                 )
 
         except ContentTypeNotExist:
