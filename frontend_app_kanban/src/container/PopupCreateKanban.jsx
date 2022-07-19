@@ -72,10 +72,16 @@ export class PopupCreateKanban extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  handleChangeTemplate = (template) => {
-    this.setState({ templateId: template.content_id })
-    if (this.state.newContentName === '') {
-      this.setState({ newContentName: template.label })
+  handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
+    if (action !== 'clear') {
+      if (template.content_id !== -1) {
+        this.setState({ templateId: template.content_id })
+        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
+      }
+    } else {
+      this.setState({ templateId: null })
     }
   }
 
