@@ -164,17 +164,19 @@ const ToDo = (props) => {
     setToDoList(uniqBy(
       toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
     ), 'content_id')
-    setLockedToDoList(uniqBy(
-      lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
-    ), 'content_id')
+    setLockedToDoList(lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id))
   }
 
   const handleToDoDeleted = data => {
     if (data.fields.content.assignee.user_id !== props.user.userId) return
     setToDoList(toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id))
+    setLockedToDoList(lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id))
   }
 
   const handleDeleteToDo = async (toDo) => {
+    const savedLockedToDoList = [...lockedToDoList]
+    setLockedToDoList([...lockedToDoList, toDo.content_id])
+
     const response = await handleFetchResult(await deleteToDo(
       FETCH_CONFIG.apiUrl,
       toDo.workspace.workspace_id,
@@ -187,16 +189,20 @@ const ToDo = (props) => {
         setToDoList(toDoList.filter(oldToDo => oldToDo.content_id !== toDo.content_id))
         break
       case 403:
+        setLockedToDoList([...savedLockedToDoList])
         props.dispatch(newFlashMessage(props.t('You are not allowed to delete this to do')))
         break
       default:
+        setLockedToDoList([...savedLockedToDoList])
         props.dispatch(newFlashMessage(props.t('Error while deleting to do')))
         break
     }
   }
 
   const handleChangeStatusToDo = async (toDo, status) => {
+    const savedLockedToDoList = [...lockedToDoList]
     setLockedToDoList([...lockedToDoList, toDo.content_id])
+
     const response = await handleFetchResult(await putToDo(
       FETCH_CONFIG.apiUrl,
       toDo.workspace.workspace_id,
@@ -210,13 +216,14 @@ const ToDo = (props) => {
         setToDoList(toDoList.map(oldToDo => oldToDo.content_id === toDo.content_id ? { ...oldToDo, status } : oldToDo))
         break
       case 403:
+        setLockedToDoList([...savedLockedToDoList])
         props.dispatch(newFlashMessage(props.t('You are not allowed to change the status of this to do')))
         break
       default:
+        setLockedToDoList([...savedLockedToDoList])
         props.dispatch(newFlashMessage(props.t('Error while saving new to do')))
         break
     }
-    setLockedToDoList([...lockedToDoList])
   }
 
   const isToDoDeletable = (toDo, user, userRole) => {

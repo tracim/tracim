@@ -219,7 +219,8 @@ export class Kanban extends React.Component {
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
@@ -464,7 +465,13 @@ export class Kanban extends React.Component {
 
   handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
+    props.appContentDeleteToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
   handleChangeStatusToDo = (toDo, status) => {
