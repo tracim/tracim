@@ -7,6 +7,9 @@
 - Notes, office documents and kanban can be marked and use as templates
 - Notification wall improvements (bug fix, infinite scroll)
 - UX/UI improvements (interface coherence, performance, loaders)
+- The user interface is now available in Spanish
+- Opensearch compatibility for advanced search
+- The branding folder is now automatically updated when a new file is added to the sample folder
 
 ### Fixed Issues
 
@@ -25,15 +28,17 @@
 
 ### Breaking/Important change
 
-- :warning: The new feature of downloading as PDF requires updates to the branding folder. For more information see: [#5711](https://github.com/tracim/tracim/issues/5711)
 - :warning: With the to do feature, you will need to rebuild the index of Advanced Search (if you use it). For more information see: [#5711](https://github.com/tracim/tracim/issues/5711)
-- The to do feature is enabledon apps by default. If you have customized the parameter `app.enabled`, you can update it and add `contents/todo`.
+- The to do feature is enabled on apps by default. If you have customized the parameter `app.enabled`, you can update it and add `contents/todo`.
 
 ### Known Issues
 
 - Blank page when clicking on a favorite that no longer exists (issue [#5704](https://github.com/tracim/tracim/issues/5704))
 - Popup to set username appears for a second whereas it should not (issue [#5751](https://github.com/tracim/tracim/issues/5751))
 - Automatic scroll when click on News See more button (issue [#5792](https://github.com/tracim/tracim/issues/5792))
+- Mention to everyone is not always translated on Spanish (issue [#4463](https://github.com/tracim/tracim/issues/4463))
+- Task notification do not read all notification from the content (issue [#5797](https://github.com/tracim/tracim/issues/5797))
+- Arabic language is not handled on PDF export (issue [#5730](https://github.com/tracim/tracim/issues/5730))
 
 
 # 4.2.2 / 2022-05-05
