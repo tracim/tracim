@@ -473,8 +473,6 @@ export function appContentFactory (WrappedComponent) {
           break
       }
 
-      setState({ lockedToDoList: [...previousLockedToDoList] })
-
       return response
     }
 
