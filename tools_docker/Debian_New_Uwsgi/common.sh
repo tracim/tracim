@@ -13,6 +13,21 @@ function create_dir() {
         mkdir "$1" -p
     fi
 }
+
+function copy_dir_content(){
+    # Helper to copy recursively missing content in directory
+    # Similar code used in common.sh in setup_default_backend.sh script /!\
+    # Update those two code synchronously
+    ORIGIN_DIR=$1
+    DEST_DIR=$2
+    for file in $(find $ORIGIN_DIR -printf "%P\n")
+    do
+      if [ ! -r $DEST_DIR/$file ]; then
+        cp -r $ORIGIN_DIR/$file $DEST_DIR/$file
+      fi
+    done
+}
+
 # address on which tracim web is accessible within docker
 # on port 8080 as uwsgi listens here by default.
 tracim_web_internal_listen="localhost:8080"
@@ -96,7 +111,10 @@ echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 # Create and link branding directory if it does not exist
 if [ ! -d /etc/tracim/branding ]; then
     cp -r /tracim/frontend/dist/assets/branding.sample /etc/tracim/branding
+else
+    copy_dir_content /tracim/frontend/dist/assets/branding.sample /etc/tracim/branding
 fi
+
 if [ ! -L /tracim/frontend/dist/assets/branding ]; then
     ln -s /etc/tracim/branding /tracim/frontend/dist/assets/branding
 fi
