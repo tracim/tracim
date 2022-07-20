@@ -518,6 +518,7 @@ export class AdvancedSearch extends React.Component {
 
                         {!state.isFilterMenuOpen && (
                           <IconButton
+                            customClass='advancedSearch__content__detail__filter_button'
                             icon='fas fa-sliders-h'
                             onClick={this.handleClickFilterMenu}
                             text={props.t('Filter')}
