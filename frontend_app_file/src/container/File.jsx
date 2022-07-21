@@ -1,25 +1,28 @@
 import React from 'react'
 import { translate } from 'react-i18next'
+import { uniqBy } from 'lodash'
 import i18n from '../i18n.js'
 import FileComponent from '../component/FileComponent.jsx'
 import {
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
+  COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
-  TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
+  TracimComponent,
+  buildContentPathBreadcrumbs,
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
   handleInvalidMentionInComment,
+  getToDo,
   PopinFixed,
   PopinFixedContent,
   PopinFixedRightPart,
   Timeline,
   displayDistanceDate,
-  FilenameWithExtension,
+  FilenameWithBadges,
   CUSTOM_EVENT,
   ShareDownload,
   displayFileSize,
@@ -30,6 +33,7 @@ import {
   buildHeadTitle,
   tinymceRemove,
   ROLE,
+  ROLE_LIST,
   APP_FEATURE_MODE,
   computeProgressionPercentage,
   FILE_PREVIEW_STATE,
@@ -45,7 +49,10 @@ import {
   PopinFixedRightPartContent,
   sendGlobalFlashMessage,
   TagList,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  sortContentByCreatedDateAndID,
+  sortContentByStatus,
+  ToDoManagement
 } from 'tracim_frontend_lib'
 import { isVideoMimeTypeAndIsAllowed, DISALLOWED_VIDEO_MIME_TYPE_LIST } from '../helper.js'
 import {
@@ -67,10 +74,11 @@ export class File extends React.Component {
     this.state = {
       appName: 'file',
       breadcrumbsList: [],
-      isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
+      disableChangeIsTemplate: false,
+      isVisible: true,
+      isTemplate: false,
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -80,6 +88,8 @@ export class File extends React.Component {
       ],
       newContent: {},
       loadingContent: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -104,7 +114,10 @@ export class File extends React.Component {
         content_id: param.content.content_id,
         revision_id: param.content.current_revision_id,
         page_nb: 1
-      }
+      },
+      isFileCommentLoading: false,
+      toDoList: [],
+      showProgress: true
     }
     this.refContentLeftTop = React.createRef()
     this.sessionClientToken = getOrCreateSessionClientToken()
@@ -124,7 +137,11 @@ export class File extends React.Component {
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.FILE, handler: this.handleContentDeletedOrRestored },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoCreated },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoChanged },
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.TODO, handler: this.handleToDoDeleted },
+      { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleMemberModified }
     ])
   }
 
@@ -158,6 +175,61 @@ export class File extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
     )
+  }
+
+  handleMemberModified = async data => {
+    const { state } = this
+    if (data.fields.user.user_id !== state.loggedUser.userId) return
+
+    const newUserRoleId = ROLE_LIST.find(r => data.fields.member.role === r.slug).id
+
+    this.setState(prev => ({ ...prev, loggedUser: { ...prev.loggedUser, userRoleIdInWorkspace: newUserRoleId } }))
+  }
+
+  handleToDoCreated = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id')))
+    }))
+  }
+
+  handleToDoChanged = async data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
+    const fecthGetToDo = await handleFetchResult(await getToDo(
+      state.config.apiUrl,
+      data.fields.workspace.workspace_id,
+      data.fields.content.parent.content_id,
+      data.fields.content.content_id
+    ))
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
+    }))
+  }
+
+  handleToDoDeleted = data => {
+    const { state } = this
+    if (data.fields.content.parent.content_id !== state.content.content_id) return
+
+    this.setState(prevState => ({
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
+    }))
   }
 
   handleContentModified = (data) => {
@@ -283,8 +355,9 @@ export class File extends React.Component {
         )
         const filenameNoExtension = removeExtensionOfFilename(response.body.filename)
         this.setState({
-          loadingContent: false,
           content,
+          isTemplate: response.body.is_template,
+          loadingContent: false,
           mode: APP_FEATURE_MODE.VIEW,
           previewInfo: previewInfoResponse.body
         })
@@ -298,6 +371,7 @@ export class File extends React.Component {
     }
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -408,6 +482,11 @@ export class File extends React.Component {
     }
   }
 
+  handleChangeMarkedTemplate = (isTemplate) => {
+    const { props, state } = this
+    props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
+  }
+
   searchForMentionOrLinkInQuery = async (query) => {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
@@ -464,6 +543,39 @@ export class File extends React.Component {
   handleClickRestoreArchive = async () => {
     const { props, state } = this
     props.appContentRestoreArchive(state.content, this.setState.bind(this), state.config.slug)
+  }
+
+  handleSaveNewToDo = (assignedUserId, toDo) => {
+    const { state, props } = this
+    props.appContentSaveNewToDo(state.content.workspace_id, state.content.content_id, assignedUserId, toDo, this.setState.bind(this))
+    this.setState({ showProgress: true })
+  }
+
+  handleDeleteToDo = (toDo) => {
+    const { state, props } = this
+    props.appContentDeleteToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
+  }
+
+  handleChangeStatusToDo = (toDo, status) => {
+    const { state, props } = this
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
+  }
+
+  setShowProgressBarStatus = (showProgressStatus) => {
+    this.setState({ showProgress: showProgressStatus })
   }
 
   handleClickEditComment = (comment) => {
@@ -850,11 +962,46 @@ export class File extends React.Component {
             onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            isFileCommentLoading={state.isFileCommentLoading}
           />
         </PopinFixedRightPartContent>
       ) : null
     }
-    const tag = {
+
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
+            toDoList={state.toDoList}
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
+    }
+
+    const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
       icon: 'fas fa-tag',
@@ -872,6 +1019,8 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    menuItemList.push(tagObject)
+
     const propertiesObject = {
       id: 'properties',
       label: props.t('Properties'),
@@ -899,43 +1048,38 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    menuItemList.push(propertiesObject)
 
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
-      return [
-        timelineObject,
-        tag,
-        {
-          id: 'share',
-          label: props.t('Share'),
-          icon: 'fa-share-alt',
-          children: (
-            <PopinFixedRightPartContent
-              label={props.t('Share')}
-            >
-              <ShareDownload
-                label={props.t(state.config.label)}
-                hexcolor={state.config.hexcolor}
-                shareEmails={state.shareEmails}
-                onChangeEmails={this.handleChangeEmails}
-                onKeyDownEnter={this.handleKeyDownEnter}
-                sharePassword={state.sharePassword}
-                onChangePassword={this.handleChangePassword}
-                shareLinkList={state.shareLinkList}
-                onClickDeleteShareLink={this.handleClickDeleteShareLink}
-                onClickNewShare={this.handleClickNewShare}
-                userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                emailNotifActivated={state.config.system.config.email_notification_activated}
-                key='ShareDownload'
-              />
-            </PopinFixedRightPartContent>
-          )
-        },
-        propertiesObject
-
-      ]
-    } else {
-      return [timelineObject, tag, propertiesObject]
+      const shareObject = {
+        id: 'share',
+        label: props.t('Share'),
+        icon: 'fa-share-alt',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Share')}
+          >
+            <ShareDownload
+              label={props.t(state.config.label)}
+              hexcolor={state.config.hexcolor}
+              shareEmails={state.shareEmails}
+              onChangeEmails={this.handleChangeEmails}
+              onKeyDownEnter={this.handleKeyDownEnter}
+              sharePassword={state.sharePassword}
+              onChangePassword={this.handleChangePassword}
+              shareLinkList={state.shareLinkList}
+              onClickDeleteShareLink={this.handleClickDeleteShareLink}
+              onClickNewShare={this.handleClickNewShare}
+              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+              emailNotifActivated={state.config.system.config.email_notification_activated}
+              key='ShareDownload'
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(shareObject)
     }
+    return menuItemList
   }
 
   handleCloseNotifyAllMessage = async () => {
@@ -1030,40 +1174,6 @@ export class File extends React.Component {
         customColor={state.config.hexcolor}
       >
         <PopinFixedContent
-          loading={state.loadingContent}
-          appMode={state.mode}
-          availableStatuses={state.config.availableStatuses}
-          breadcrumbsList={state.breadcrumbsList}
-          componentTitle={<FilenameWithExtension file={state.content} />}
-          content={state.content}
-          config={state.config}
-          customClass={`${state.config.slug}__contentpage`}
-          disableChangeTitle={!state.content.is_editable}
-          headerButtons={[
-            {
-              icon: 'fas fa-edit',
-              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
-              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
-              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT,
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'wsContentGeneric__option__menu__addversion'
-            }, {
-              icon: 'fas fa-upload',
-              label: props.t('Upload a new version'),
-              onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
-                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
-              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'newVersionBtn'
-            }
-          ]}
-          isRefreshNeeded={state.showRefreshWarning}
-          contentVersionNumber={contentVersionNumber}
-          lastVersion={lastVersionNumber}
-          loggedUser={state.loggedUser}
-          onChangeStatus={this.handleChangeStatus}
-          onClickCloseBtn={this.handleClickBtnCloseApp}
-          onValidateChangeTitle={this.handleSaveEditTitle}
           actionList={[
             {
               icon: 'fas fa-upload',
@@ -1113,7 +1223,45 @@ export class File extends React.Component {
               dataCy: 'popinListItem__delete'
             }
           ]}
+          appMode={state.mode}
+          availableStatuses={state.config.availableStatuses}
+          breadcrumbsList={state.breadcrumbsList}
+          componentTitle={<FilenameWithBadges file={state.content} isTemplate={state.isTemplate} />}
+          content={state.content}
+          config={state.config}
+          contentVersionNumber={contentVersionNumber}
+          customClass={`${state.config.slug}__contentpage`}
+          disableChangeIsTemplate={state.disableChangeIsTemplate}
+          disableChangeTitle={!state.content.is_editable}
+          headerButtons={[
+            {
+              icon: 'fas fa-edit',
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT,
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'wsContentGeneric__option__menu__addversion'
+            }, {
+              icon: 'fas fa-upload',
+              label: props.t('Upload a new version'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
+              disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
+              dataCy: 'newVersionBtn'
+            }
+          ]}
+          isRefreshNeeded={state.showRefreshWarning}
+          isTemplate={state.isTemplate}
+          lastVersion={lastVersionNumber}
+          loading={state.loadingContent}
+          loggedUser={state.loggedUser}
+          onChangeStatus={this.handleChangeStatus}
+          onClickCloseBtn={this.handleClickBtnCloseApp}
+          onClickChangeMarkedTemplate={this.handleChangeMarkedTemplate}
+          onValidateChangeTitle={this.handleSaveEditTitle}
           showReactions
+          showMarkedAsTemplate={COLLABORA_EXTENSIONS.includes(state.content.file_extension)}
           favoriteState={props.isContentInFavoriteList(state.content, state)
             ? FAVORITE_STATE.FAVORITE
             : FAVORITE_STATE.NOT_FAVORITE}

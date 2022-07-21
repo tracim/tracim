@@ -15,11 +15,12 @@ export const putHtmlDocContent = (apiUrl, workspaceId, contentId, label, newCont
     raw_content: newContent
   })
 
-export const postHtmlDocContent = (apiUrl, workspaceId, folderId, contentType, newContentName) =>
+export const postHtmlDocContent = (apiUrl, workspaceId, folderId, contentType, newContentName, templateId = null) =>
   baseFetch('POST', `${apiUrl}/workspaces/${workspaceId}/contents`, {
-    parent_id: folderId,
     content_type: contentType,
-    label: newContentName
+    label: newContentName,
+    parent_id: folderId,
+    template_id: templateId
   })
 
 export const putHtmlDocRead = (apiUrl, user, workspaceId, contentId) =>

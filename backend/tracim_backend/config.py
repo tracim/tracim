@@ -261,6 +261,7 @@ class CFG(object):
             "contents/html-document,"
             "contents/folder,"
             "contents/kanban,"
+            "contents/todo,"
             "agenda,"
             "share_content,"
             "upload_permission,"
@@ -292,6 +293,7 @@ class CFG(object):
             "contents/html-document",
             "contents/folder",
             "contents/kanban",
+            "contents/todo",
             "agenda",
             "collaborative_document_edition",
             "share_content",
@@ -523,6 +525,19 @@ class CFG(object):
         default_color_config_file_path = os.path.join(self.branding_folder_path, "color.json")
         self.COLOR__CONFIG_FILE_PATH = self.get_raw_config(
             "color.config_file_path", default_color_config_file_path
+        )
+
+        default_rich_text_preview_css_file_path = os.path.join(
+            self.branding_folder_path, "rich_text_preview.css"
+        )
+        self.RICH_TEXT_PREVIEW__CSS_PATH = self.get_raw_config(
+            "rich_text_preview.css_path", default_rich_text_preview_css_file_path
+        )
+        default_rich_text_preview_template_file_path = os.path.join(
+            self.branding_folder_path, "rich_text_preview.template"
+        )
+        self.RICH_TEXT_PREVIEW__TEMPLATE_PATH = self.get_raw_config(
+            "rich_text_preview.template_path", default_rich_text_preview_template_file_path
         )
 
         default_plugin_folder_path = self.here_macro_replace("%(here)s/plugins")

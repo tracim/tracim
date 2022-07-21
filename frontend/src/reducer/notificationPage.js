@@ -47,7 +47,11 @@ export const serializeNotification = notification => {
       ...notification.fields.subscription,
       author: serialize(notification.fields.subscription.author, serializeUserProps)
     } : null,
-    content: notification.fields.content ? serialize(notification.fields.content, serializeContentProps) : null,
+    content: notification.fields.content ? {
+      parentLabel: notification.fields.content.parent ? notification.fields.content.parent.label : null,
+      parentId: notification.fields.content.parent ? notification.fields.content.parent.content_id : null,
+      ...serialize(notification.fields.content, serializeContentProps)
+    } : null,
     created: notification.created,
     id: notification.event_id,
     read: notification.read,
@@ -92,15 +96,6 @@ function notificationListDisplayFilter (notificationList, spaceList, unreadNotif
 
 export default function notificationPage (state = defaultNotificationsObject, action) {
   switch (action.type) {
-    case `${SET}/${NOTIFICATION_LIST}`: {
-      const notificationList = action.notificationList
-        .map(notification => serializeNotification(notification))
-      return {
-        ...state,
-        ...notificationListDisplayFilter(notificationList, action.spaceList, state.unreadNotificationCount)
-      }
-    }
-
     case `${APPEND}/${NOTIFICATION_LIST}`: {
       const notificationList = action.notificationList
         .map(notification => serializeNotification(notification))

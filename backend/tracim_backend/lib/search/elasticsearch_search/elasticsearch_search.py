@@ -7,6 +7,7 @@ from elasticsearch import NotFoundError
 from elasticsearch.client import IngestClient
 from elasticsearch_dsl import Document
 from elasticsearch_dsl import Index
+from elasticsearch_dsl import InnerDoc
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.response.aggs import Bucket
 import pluggy
@@ -16,7 +17,7 @@ from sqlalchemy.orm import Session
 
 # from tracim_backend.lib.search.models import UserSearchResponse
 from tracim_backend import CFG
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import IndexingError
 from tracim_backend.lib.core.content import ContentApi
@@ -31,6 +32,7 @@ from tracim_backend.lib.rq.worker import worker_context
 from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
+from tracim_backend.lib.search.elasticsearch_search.es_models import DigestTodo
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
@@ -228,24 +230,45 @@ class ESSearchApi(SearchApi):
             # move the alias to point to the newly created index
             self.set_alias(parameters, new_index_name)
 
+    def _index_subcontents(
+        self, content_in_context: ContentInContext
+    ) -> typing.Dict[str, typing.List[InnerDoc]]:
+        comments = [
+            DigestComments(
+                content_id=comment.content_id,
+                parent_id=comment.parent_id,
+                content_type=comment.content_type,
+                raw_content=comment.raw_content,
+            )
+            for comment in content_in_context.comments
+        ]
+        todos = [
+            DigestTodo(
+                content_id=todo.content_id,
+                parent_id=todo.parent_id,
+                content_type=todo.content_type,
+                raw_content=todo.raw_content,
+            )
+            for todo in content_in_context.todos
+        ]
+        return {"comments": comments, "todos": todos}
+
+    def _create_digest_user_from_user(self, user_in_context: UserInContext) -> DigestUser:
+        return DigestUser(
+            user_id=user_in_context.user_id,
+            public_name=user_in_context.public_name,
+            has_avatar=user_in_context.has_avatar,
+            has_cover=user_in_context.has_cover,
+        )
+
     def index_content(self, content: Content) -> None:
         """
         Index/update a content into elastic_search engine
         """
         content_in_context = ContentInContext(content, config=self._config, dbsession=self._session)
         logger.info(self, "Indexing content {}".format(content_in_context.content_id))
-        author = DigestUser(
-            user_id=content_in_context.author.user_id,
-            public_name=content_in_context.author.public_name,
-            has_avatar=content_in_context.author.has_avatar,
-            has_cover=content_in_context.author.has_cover,
-        )
-        last_modifier = DigestUser(
-            user_id=content_in_context.last_modifier.user_id,
-            public_name=content_in_context.last_modifier.public_name,
-            has_avatar=content_in_context.last_modifier.has_avatar,
-            has_cover=content_in_context.last_modifier.has_cover,
-        )
+        author = self._create_digest_user_from_user(content_in_context.author)
+        last_modifier = self._create_digest_user_from_user(content_in_context.last_modifier)
         workspace = DigestWorkspace(
             workspace_id=content_in_context.workspace.workspace_id,
             label=content_in_context.workspace.label,
@@ -259,15 +282,9 @@ class ESSearchApi(SearchApi):
             )
             for component in content_in_context.content_path
         ]
-        comments = [
-            DigestComments(
-                content_id=comment.content_id,
-                parent_id=comment.parent_id,
-                content_type=comment.content_type,
-                raw_content=comment.raw_content,
-            )
-            for comment in content_in_context.comments
-        ]
+        indexed_subcontent = self._index_subcontents(content_in_context)
+        comments = indexed_subcontent["comments"]
+        todos = indexed_subcontent["todos"]
         tags = [content_tag.tag.tag_name for content_tag in content.tags]
         indexed_content = IndexedContent(
             content_namespace=content_in_context.content_namespace,
@@ -296,6 +313,8 @@ class ESSearchApi(SearchApi):
             path=path,
             comments=comments,
             comment_count=len(comments),
+            todos=todos,
+            todo_count=len(todos),
             tags=tags,
             tag_count=len(tags),
             author=author,
@@ -531,6 +550,10 @@ class ESSearchApi(SearchApi):
         if ContentSearchField.COMMENTS in search_fields:
             es_search_fields.extend(
                 ["comments.raw_content.{}".format(EXACT_FIELD), "comments.raw_content"]
+            )
+        if ContentSearchField.TODOS in search_fields:
+            es_search_fields.extend(
+                ["todos.raw_content.{}".format(EXACT_FIELD), "todos.raw_content"]
             )
 
         if ContentSearchField.DESCRIPTION in search_fields:
@@ -918,7 +941,7 @@ class ESContentIndexer:
 
     # content types which won't be indexed directly. Instead their main content will be indexed
     # when they are created/modified.
-    EXCLUDED_CONTENT_TYPES = (content_type_list.Comment.slug,)
+    EXCLUDED_CONTENT_TYPES = (ContentTypeSlug.COMMENT, ContentTypeSlug.TODO)
 
     @hookimpl
     def on_content_created(self, content: Content, context: TracimContext) -> None:

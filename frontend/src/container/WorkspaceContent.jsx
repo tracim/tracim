@@ -22,6 +22,7 @@ import TabBar from '../component/TabBar/TabBar.jsx'
 import {
   ROLE,
   ROLE_LIST,
+  EmptyListMessage,
   PageWrapper,
   PageContent,
   Loading,
@@ -145,14 +146,14 @@ export class WorkspaceContent extends React.Component {
 
     this.setHeadTitle(this.getFilterName(qs.parse(props.location.search).type))
 
-    let wsToLoad = null
+    let spaceToLoad = null
 
     if (props.match.params.idws === undefined) {
-      if (props.workspaceList.length > 0) wsToLoad = props.workspaceList[0].id
+      if (props.workspaceList.length > 0) spaceToLoad = props.workspaceList[0].id
       else return
-    } else wsToLoad = props.match.params.idws
+    } else spaceToLoad = props.match.params.idws
 
-    this.loadAllWorkspaceContent(wsToLoad, true, true)
+    this.loadAllWorkspaceContent(spaceToLoad, true, true)
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -239,11 +240,10 @@ export class WorkspaceContent extends React.Component {
   }
 
   loadContentList = async (workspaceId, shouldLoadReadStatusList) => {
-    console.log(`%c<WorkspaceContent> loadContentList (with read status list: ${shouldLoadReadStatusList})`, 'color: #c17838')
     const { props } = this
+    console.log(`%c<WorkspaceContent> loadContentList (with read status list: ${shouldLoadReadStatusList})`, 'color: #c17838')
 
     const folderIdInUrl = [0, ...this.getFolderIdToOpenInUrl(props.location.search)] // add 0 to get workspace's root
-
     const contentIdInUrl = (props.match && props.match.params.idcts) || null
 
     if (contentIdInUrl && contentIdInUrl !== 'new' && props.match && props.match.params.type === CONTENT_TYPE.FOLDER) folderIdInUrl.push(contentIdInUrl)
@@ -614,9 +614,9 @@ export class WorkspaceContent extends React.Component {
       : props.t('This space has no content yet')
 
     return (
-      <div className='workspace__content__fileandfolder__empty'>
+      <EmptyListMessage>
         {userRoleIdInWorkspace > ROLE.reader.id ? creationAllowedMessage : creationNotAllowedMessage}
-      </div>
+      </EmptyListMessage>
     )
   }
 
@@ -630,7 +630,9 @@ export class WorkspaceContent extends React.Component {
     const htmlContentIdToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentIdToScrollTo}`
     const domElementToScrollTo = document.getElementById(htmlContentIdToScrollTo)
     if (domElementToScrollTo) {
-      domElementToScrollTo.parentNode.scrollTop = domElementToScrollTo.offsetTop
+      const headerHeight = 60 // 60px is Tracim's header height
+      const scrollableElement = document.getElementById('scrollableElement')
+      scrollableElement.scrollTop = domElementToScrollTo.offsetTop - headerHeight
     }
   }
 
@@ -658,6 +660,7 @@ export class WorkspaceContent extends React.Component {
     const createContentAvailableApp = [
       ...contentType
         .filter(ct => ct.slug !== CONTENT_TYPE.COMMENT)
+        .filter(ct => ct.slug !== CONTENT_TYPE.TODO)
         .filter(ct => userRoleIdInWorkspace === ROLE.contributor.id ? ct.slug !== CONTENT_TYPE.FOLDER : true),
 
       // FIXME - CH - 2019-09-06 - hack for content type. See https://github.com/tracim/tracim/issues/2375
@@ -671,8 +674,8 @@ export class WorkspaceContent extends React.Component {
     const isFilteredWorkspaceEmpty = rootContentList.length === 0
 
     return (
-      <div className='tracim__content-scrollview fullWidthFullHeight'>
-        <div className='WorkspaceContent'>
+      <div className='tracim__content-scrollview fullWidthFullHeight' id='scrollableElement'>
+        <div className='workspace__content'>
           {state.contentLoaded && (
             <OpenContentApp
               // automatically open the app for the contentId in url
@@ -733,7 +736,7 @@ export class WorkspaceContent extends React.Component {
                 )}
               </div>
 
-              <div className='workspace__content__fileandfolder folder__content active'>
+              <div className='workspace__content__file_and_folder folder__content active'>
                 <ContentItemHeader />
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
@@ -804,6 +807,7 @@ export class WorkspaceContent extends React.Component {
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
                         isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
+                        isTemplate={content.isTemplate}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
                         isLast={i === rootContentList.length - 1}

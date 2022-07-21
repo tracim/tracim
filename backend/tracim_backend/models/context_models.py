@@ -13,6 +13,7 @@ from sqlakeyset import Page
 from sqlalchemy.orm import Session
 
 from tracim_backend.app_models.contents import FILE_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.app_models.workspace_menu_entries import WorkspaceMenuEntry
 from tracim_backend.applications.collaborative_document_edition.models import (
@@ -217,10 +218,12 @@ class FileCreation(object):
         content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
         parent_id: int = 0,
         content_type: str = FILE_TYPE,
+        template_id: int = 0,
     ) -> None:
         self.parent_id = parent_id
         self.content_namespace = content_namespace
         self.content_type = content_type
+        self.template_id = template_id
 
 
 class SetPassword(object):
@@ -726,11 +729,13 @@ class ContentCreation(object):
         content_type: str,
         content_namespace: ContentNamespaces,
         parent_id: Optional[int] = None,
+        template_id: Optional[int] = None,
     ) -> None:
         self.label = label
         self.content_type = content_type
         self.parent_id = parent_id or None
         self.content_namespace = content_namespace
+        self.template_id = template_id
 
 
 class CommentCreation(object):
@@ -768,6 +773,15 @@ class SetContentStatus(object):
 
     def __init__(self, status: str) -> None:
         self.status = status
+
+
+class SetContentIsTemplate(object):
+    """
+    Set the is_template property of a content.
+    """
+
+    def __init__(self, is_template: bool) -> None:
+        self.is_template = is_template
 
 
 class ContentUpdate(object):
@@ -1228,6 +1242,16 @@ class ContentInContext(object):
 
     # Default
     @property
+    def assignee_id(self) -> int:
+        return self.content.assignee_id
+
+    @property
+    def assignee(self) -> UserInContext:
+        return UserInContext(
+            dbsession=self.dbsession, config=self.config, user=self.content.assignee
+        )
+
+    @property
     def content_id(self) -> int:
         return self.content.content_id
 
@@ -1301,8 +1325,15 @@ class ContentInContext(object):
 
     @property
     def comments(self) -> List["ContentInContext"]:
-        comments_in_context = []
-        for comment in self.content.get_comments():
+        return self.subcontent_in_context([ContentTypeSlug.COMMENT])
+
+    @property
+    def todos(self) -> List["ContentInContext"]:
+        return self.subcontent_in_context([ContentTypeSlug.TODO])
+
+    def subcontent_in_context(self, content_types):
+        subcontents_in_context = []
+        for subcontent in self.content.get_subcontents(content_types=content_types):
             from tracim_backend.lib.core.content import ContentApi
 
             content_api = ContentApi(
@@ -1314,9 +1345,9 @@ class ContentInContext(object):
                 show_active=True,
                 show_temporary=True,
             )
-            comment_in_context = content_api.get_content_in_context(comment)
-            comments_in_context.append(comment_in_context)
-        return comments_in_context
+            subcontent_in_context = content_api.get_content_in_context(subcontent)
+            subcontents_in_context.append(subcontent_in_context)
+        return subcontents_in_context
 
     @property
     def label(self) -> str:
@@ -1334,6 +1365,10 @@ class ContentInContext(object):
     @property
     def status(self) -> str:
         return self.content.status
+
+    @property
+    def is_template(self) -> bool:
+        return self.content.is_template
 
     @property
     def is_archived(self) -> bool:
@@ -1625,6 +1660,10 @@ class RevisionInContext(object):
 
     # Default
     @property
+    def assignee_id(self) -> int:
+        return self.revision.assignee_id
+
+    @property
     def content_id(self) -> int:
         return self.revision.content_id
 
@@ -1658,6 +1697,10 @@ class RevisionInContext(object):
     @property
     def status(self) -> str:
         return self.revision.status
+
+    @property
+    def is_template(self) -> bool:
+        return self.revision.is_template
 
     @property
     def is_archived(self) -> bool:

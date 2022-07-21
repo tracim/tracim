@@ -65,7 +65,8 @@ export class Thread extends React.Component {
       editionAuthor: '',
       invalidMentionList: [],
       showInvalidMentionPopupInComment: false,
-      translationTargetLanguageCode: param.loggedUser.lang
+      translationTargetLanguageCode: param.loggedUser.lang,
+      isFileCommentLoading: false
     }
     this.sessionClientToken = getOrCreateSessionClientToken()
     this.isLoadMoreTimelineInProgress = false
@@ -481,6 +482,7 @@ export class Thread extends React.Component {
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                 onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+                isFileCommentLoading={state.isFileCommentLoading}
               />
             ) : null}
           </div>

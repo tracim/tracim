@@ -29,6 +29,7 @@ from tracim_backend.app_models.contents import FILE_TYPE
 from tracim_backend.app_models.contents import FOLDER_TYPE
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.app_models.contents import THREAD_TYPE
+from tracim_backend.app_models.contents import TODO_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import UserDoesNotExist
@@ -66,12 +67,14 @@ from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tag import Tag
 from tracim_backend.models.tag import TagOnContent
 from tracim_backend.models.tracim_session import TracimSession
-from tracim_backend.views.core_api.schemas import CommentSchema
 from tracim_backend.views.core_api.schemas import ContentSchema
 from tracim_backend.views.core_api.schemas import EventSchema
 from tracim_backend.views.core_api.schemas import FileContentSchema
+from tracim_backend.views.core_api.schemas import MessageCommentSchema
+from tracim_backend.views.core_api.schemas import MessageContentSchema
 from tracim_backend.views.core_api.schemas import ReactionSchema
 from tracim_backend.views.core_api.schemas import TagSchema
+from tracim_backend.views.core_api.schemas import ToDoSchema
 from tracim_backend.views.core_api.schemas import UserCallSchema
 from tracim_backend.views.core_api.schemas import UserDigestSchema
 from tracim_backend.views.core_api.schemas import WorkspaceMemberDigestSchema
@@ -89,11 +92,12 @@ class EventApi:
     workspace_schema = WorkspaceSchema()
     workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
-        COMMENT_TYPE: CommentSchema(),
-        HTML_DOCUMENTS_TYPE: ContentSchema(),
+        COMMENT_TYPE: MessageCommentSchema(),
+        HTML_DOCUMENTS_TYPE: MessageContentSchema(),
         FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: ContentSchema(),
-        THREAD_TYPE: ContentSchema(),
+        FOLDER_TYPE: MessageContentSchema(),
+        THREAD_TYPE: MessageContentSchema(),
+        TODO_TYPE: ToDoSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()

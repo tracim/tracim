@@ -7,6 +7,7 @@ import { user } from '../../hocMock/redux/user/user'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
 import { appList } from '../../hocMock/redux/appList/appList'
 import { workspaceList } from '../../hocMock/redux/workspaceList/workspaceList'
+import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import configureMockStore from 'redux-mock-store'
 import { translateMock } from '../../hocMock/translate'
 import { Provider } from 'react-redux'
@@ -177,8 +178,8 @@ describe('<Tracim />', () => {
 
     describe('loadWorkspaceListMemberList', () => {
       it('setWorkspaceListMemberListCallBack should be called when loadWorkspaceListMemberList() is called', (done) => {
-        workspaceList.workspaceList.map(ws => mockGetWorkspaceMemberList200(FETCH_CONFIG.apiUrl, ws.id, ws.memberList))
-        wrapperInstance.loadWorkspaceListMemberList(workspaceList.workspaceList).then(() => {
+        mockGetWorkspaceMemberList200(FETCH_CONFIG.apiUrl, firstWorkspaceFromApi.workspace_id, [user])
+        wrapperInstance.loadWorkspaceListMemberList([firstWorkspaceFromApi]).then(() => {
           expect(setWorkspaceListMemberListCallBack.called).to.equal(true)
         }).then(done, done)
       })

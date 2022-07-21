@@ -357,7 +357,7 @@ class CustomForm extends React.Component {
   handleClickValidateNewCommentBtn = async (comment) => {
     const { props, state } = this
 
-    // @FIXME - Côme - 2018/10/31 - line bellow is a hack to force send html to api
+    // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
     // see https://github.com/tracim/tracim/issues/1101
     const newCommentForApi = state.timelineWysiwyg
       ? comment

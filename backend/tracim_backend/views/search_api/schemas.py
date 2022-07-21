@@ -206,6 +206,7 @@ class ContentSearchSchema(ContentDigestSchema, UserInfoContentAbstractSchema):
     path = marshmallow.fields.List(marshmallow.fields.Nested(ContentMinimalSchema))
     is_active = marshmallow.fields.Boolean()
     comment_count = marshmallow.fields.Integer(example=12, validate=positive_int_validator)
+    todo_count = marshmallow.fields.Integer(example=5, validate=positive_int_validator)
     content_size = marshmallow.fields.Integer(
         example=1200, description="Content size in bytes", validate=positive_int_validator
     )

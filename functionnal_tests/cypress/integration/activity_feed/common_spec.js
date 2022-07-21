@@ -117,7 +117,7 @@ for (const pageTestCase of activityPages) {
       })
 
       it('should have a title link, clicking on it opens the content', () => {
-        cy.get('[data-cy=FilenameWithExtension__label]').click()
+        cy.get('[data-cy=FilenameWithBadges__label]').click()
         cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/file/${fileId}`)
       })
 

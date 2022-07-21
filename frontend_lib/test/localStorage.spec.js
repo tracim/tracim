@@ -11,9 +11,9 @@ describe('localStorage.js', () => {
         dataType: 'randomContentType'
       }
       const localStorageContentId = generateLocalStorageContentId(
-        fixture.workspaceId,
-        fixture.contentId,
         fixture.contentType,
+        fixture.contentId,
+        fixture.workspaceId,
         fixture.dataType
       )
       expect(localStorageContentId).to.eql(`${fixture.workspaceId}/${fixture.contentId}/${fixture.contentType}_${fixture.dataType}`)

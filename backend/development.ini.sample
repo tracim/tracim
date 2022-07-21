@@ -65,7 +65,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ### Language ###
 ## default language used in backend if user do not set any language.
-# Available parameter: en, fr, pt, de, ar
+# Available parameter: en, fr, pt, de, ar, es
 ; default_lang = en
 
 ### Apps ###
@@ -75,13 +75,14 @@ basic_setup.session_secret = change_this_value_please!
 # already added to default list.
 # This parameter is a list of app slug separated by ',' char.
 # Not exhaustive list of available apps:
-# - "content/thread" -> thread/topic/discussion: allow to discuss about one
+# - contents/thread -> thread/topic/discussion: allow to discuss about one
 #   subject.
-# - content/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
-# - content/html-document -> allow to work on a standard html-based document
+# - contents/file -> allow to upload all type of file like .pdf, .odt, .jpg, etc
+# - contents/html-document -> allow to work on a standard html-based document
 #   which is editable through Tracim.
-# - content/folder -> allow to put content into folder.
-# - content/kanban -> allow to work with kanban-styled boards. It requires content/file to be enabled.
+# - contents/folder -> allow to put content into folder.
+# - contents/kanban -> allow to work with kanban-styled boards. It requires content/file to be enabled.
+# - contents/todo -> allow to use todos on contents
 # - agenda -> add caldav agenda feature (specific process need to be runned)
 # - collaborative_document_edition -> add support for collaborative document edition,
 #   add support for collaborative edition server like collabora/libreofficeOnline.
@@ -89,9 +90,9 @@ basic_setup.session_secret = change_this_value_please!
 # - upload_permission -> allow external with permission to upload some file in a space.
 # - gallery -> add gallery app in Tracim
 # default app.enabled config explicit list config:
-; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,agenda,share_content,upload_permission,gallery
+; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,share_content,upload_permission,gallery
 # With all apps (add collaborative document edition):
-# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,agenda,collaborative_document_edition,share_content,upload_permission,gallery
+# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,collaborative_document_edition,share_content,upload_permission,gallery
 
 ### Live Messages ###
 # control_uri for GRIP protocol reverse-proxy (PushPin)
@@ -475,6 +476,15 @@ website.usage_conditions =
 # example:
 # color.config_file_path = /home/user/tracim/color.json
 
+### Rich Text Preview ###
+# Template and css used for preview of notes files, by default use files from
+# the branding dir (frontend/dist/assets/branding/)
+; rich_text_preview.css_path =
+; rich_text_preview.template_path =
+# example:
+# rich_text_preview.css_path = /home/user/tracim/rich_text_preview.css
+# rich_text_preview.css_path = /home/user/tracim/rich_text_preview.template
+
 ### Webdav ###
 # webdav url for client
 # url can be extended like localhost/webdav by setting webdav.root_path parameter
@@ -767,11 +777,11 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # caldav.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event/test/description.txt
 
 ####
-# SEARCH (ElasticSearch)
+# SEARCH (ElasticSearch/OpenSearch)
 ####
 # choose search engine to use, available value are: simple, elasticsearch.
 # simple need nothing more than Tracim but features are limited,
-# elasticsearch is more effective but need an elasticsearch server.
+# elasticsearch is more effective but need an elasticsearch/opensearch server.
 ; search.engine = simple
 # elasticsearch configuration
 ; search.elasticsearch.host = localhost

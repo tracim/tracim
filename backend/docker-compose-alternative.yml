@@ -1,0 +1,47 @@
+# Alternatives services for testing/developing Tracim backend.
+# This are service which are not anymore officially supported (like mysql/mariadb)
+# or are alternatives to existing service (like opensearch)
+# Those aren't currently needed by the automated tests.
+# WARNING: This file is meant for testing only and mustn't be used as-is for production environments.
+# Production-ready docker-compose examples are available in the "tools_docker" directory of the Tracim repository.
+version: '3'
+services:
+  opensearch:
+    build: ../tools_docker/opensearch_ingest
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    environment:
+      discovery.type: single-node
+      cluster.routing.allocation.disk.threshold_enabled: "false"
+      ES_JAVA_OPTS: "-Xms4g -Xmx4g"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      DISABLE_SECURITY_PLUGIN: "true"
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_RANDOM_ROOT_PASSWORD: "true"
+    tmpfs:
+      - ${TMPFS_DIR}
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_0900_ai_ci"
+  mariadb:
+    image: mariadb/server:10.3
+    ports:
+      - "3307:3306"
+    environment:
+      MARIADB_DATABASE: ${DATABASE_NAME}
+      MARIADB_USER: user
+      MARIADB_PASSWORD: secret
+      MARIADB_RANDOM_ROOT_PASSWORD: "true"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_520_ci"
+    tmpfs:
+      - ${TMPFS_DIR}

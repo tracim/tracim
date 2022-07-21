@@ -43,10 +43,8 @@ export class TextAreaApp extends React.Component {
     this.reloadWysiwyg()
     const savedText = getLocalStorageItem(
       props.contentType,
-      {
-        content_id: props.contentId,
-        workspace_id: props.workspaceId
-      },
+      props.contentId,
+      props.workspaceId,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
     if (!!savedText && savedText !== state.text) {
@@ -167,6 +165,7 @@ export class TextAreaApp extends React.Component {
             value={state.text}
             onChange={this.handleChangeText}
             autoFocus
+            hidden
           />
 
           <div className={`${props.customClass}__button editionmode__button`}>

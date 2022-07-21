@@ -20,7 +20,7 @@ export const UserStatus = props => {
         <Icon
           color={myRole.hexcolor}
           customClass='userstatus__role__icon'
-          icon={`fa-fw ${myRole.faIcon}`}
+          icon={myRole.faIcon}
           title={props.t('Your role in the space')}
         />
         <div className='userstatus__role__text' title={props.t('Your role in the space')}>
@@ -55,7 +55,7 @@ export const UserStatus = props => {
             to={PAGE.WORKSPACE.ADVANCED_DASHBOARD(props.currentWorkspace.id)}
           >
             <Icon
-              icon='fa-fw fas fa-sign-in-alt'
+              icon='fas fa-sign-in-alt'
               title={props.t('{{newRequests}} new requests', {
                 newRequests: props.newSubscriptionRequestsNumber
               })}

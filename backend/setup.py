@@ -21,7 +21,8 @@ requires = [
     # INFO - G.M - 2019-03-21 - this is needed as there is a requirement issue
     # in hapic, apispec-marshmallow-advanced==0.3
     # and hapic==0.73 aren't compatible
-    "apispec-marshmallow-advanced>=0.4" "apispec==2.0.2",
+    "apispec-marshmallow-advanced>=0.4",
+    "apispec==2.0.2",
     "marshmallow <3.0.0a1,>=2.21.0",
     # CLI
     "cliff",
@@ -81,6 +82,9 @@ requires = [
     "webpreview @ git+https://github.com/algoo/webpreview@v1.6.0+algoo",
     # importlib
     "importlib_metadata==4.6.0",
+    # note pdf preview
+    "pypandoc",
+    "weasyprint<53",
 ]
 
 tests_require = [

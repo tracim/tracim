@@ -2,10 +2,11 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
   addAllResourceI18n,
   CardPopupCreateContent,
   handleFetchResult,
-  CUSTOM_EVENT,
   buildHeadTitle,
   appContentFactory,
   TracimComponent,
@@ -29,10 +30,12 @@ export class PopupCreateKanban extends React.Component {
     this.state = {
       appName: 'kanban', // must remain 'kanban' because it is the name of the react built app (which contains Kanban and PopupCreateKanban)
       config: param.config,
+      templateId: null,
       loggedUser: param.loggedUser,
       workspaceId: param.workspaceId,
       folderId: param.folderId,
-      newContentName: ''
+      newContentName: '',
+      templateList: []
     }
 
     // i18n has been init, add resources from frontend
@@ -46,6 +49,7 @@ export class PopupCreateKanban extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.KANBAN)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -67,6 +71,19 @@ export class PopupCreateKanban extends React.Component {
   }
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
+
+  handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
+    if (action !== 'clear') {
+      if (template.content_id !== -1) {
+        this.setState({ templateId: template.content_id })
+        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
+      }
+    } else {
+      this.setState({ templateId: null })
+    }
+  }
 
   handleClose = () => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.HIDE_POPUP_CREATE_CONTENT,
@@ -94,6 +111,7 @@ export class PopupCreateKanban extends React.Component {
       JSON.stringify(defaultKanbanBoard),
       KANBAN_MIME_TYPE,
       state.folderId,
+      state.templateId,
       state.config.slug
     )
 
@@ -140,15 +158,18 @@ export class PopupCreateKanban extends React.Component {
   render () {
     return (
       <CardPopupCreateContent
+        btnValidateLabel={this.props.t('Validate and create')}
+        contentName={this.state.newContentName}
+        customColor={this.state.config.hexcolor}
+        displayTemplateList
+        faIcon={this.state.config.faIcon}
+        inputPlaceholder={this.props.t("Board's name")}
+        label={this.props.t('New Kanban board')}
+        onChangeContentName={this.handleChangeNewContentName}
+        onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
-        label={this.props.t('New Kanban board')}
-        customColor={this.state.config.hexcolor}
-        faIcon={this.state.config.faIcon}
-        contentName={this.state.newContentName}
-        onChangeContentName={this.handleChangeNewContentName}
-        btnValidateLabel={this.props.t('Validate and create')}
-        inputPlaceholder={this.props.t("Board's name")}
+        templateList={this.state.templateList}
       />
     )
   }

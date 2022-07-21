@@ -24,10 +24,12 @@ import WorkspaceContent from './WorkspaceContent.jsx'
 import OpenWorkspaceAdvanced from '../component/Workspace/OpenWorkspaceAdvanced.jsx'
 import Home from './Home.jsx'
 import WIPcomponent from './WIPcomponent.jsx'
+import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
+  getWorkspaceMemberList,
+  handleFetchResult,
   PROFILE,
-  NUMBER_RESULTS_BY_PAGE,
   formatAbsoluteDate,
   serialize,
   CardPopup,
@@ -56,9 +58,7 @@ import {
   getAppList,
   getConfig,
   getContentTypeList,
-  getWorkspaceMemberList,
   getMyselfWorkspaceList,
-  getNotificationList,
   getUserConfiguration,
   getUserIsConnected,
   putUserLang,
@@ -74,8 +74,6 @@ import {
   setConfig,
   setAppList,
   setContentTypeList,
-  setNextPage,
-  setNotificationList,
   setUserConfiguration,
   setUserConnected,
   setWorkspaceList,
@@ -101,6 +99,7 @@ import Publications from './Publications.jsx'
 import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
+import ToDo from './ToDo.jsx'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
@@ -376,7 +375,6 @@ export class Tracim extends React.Component {
         this.loadAppConfig()
         this.loadWorkspaceLists()
         this.loadNotificationNotRead(fetchUser.user_id)
-        this.loadNotificationList(fetchUser.user_id)
         this.loadUserConfiguration(fetchUser.user_id)
 
         this.liveMessageManager.openLiveMessageConnection(fetchUser.user_id, FETCH_CONFIG.apiUrl)
@@ -465,13 +463,13 @@ export class Tracim extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
       workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
@@ -492,27 +490,6 @@ export class Tracim extends React.Component {
     switch (fetchUnreadMessageCount.status) {
       case 200: props.dispatch(setUnreadNotificationCount(fetchUnreadMessageCount.json.unread_messages_count)); break
       default: props.dispatch(newFlashMessage(props.t('Error loading unread mention number')))
-    }
-  }
-
-  loadNotificationList = async (userId) => {
-    const { props } = this
-
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      userId,
-      {
-        excludeAuthorId: userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
-      }
-    ))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-        break
     }
   }
 
@@ -751,6 +728,10 @@ export class Tracim extends React.Component {
           />
         )}
 
+        {((!props.user.username && props.user.logged && Cookies.get(COOKIE_FRONTEND.SHOW_USERNAME_POPUP) === 'true' && props.user.config.display_username_popup !== 'false') &&
+          <CardPopupUsername />
+        )}
+
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>
@@ -791,6 +772,15 @@ export class Tracim extends React.Component {
             render={() => (
               <div className='tracim__content fullWidthFullHeight'>
                 <Favorites />
+              </div>
+            )}
+          />
+
+          <Route
+            path={PAGE.TODO}
+            render={() => (
+              <div className='tracim__content fullWidthFullHeight'>
+                <ToDo />
               </div>
             )}
           />

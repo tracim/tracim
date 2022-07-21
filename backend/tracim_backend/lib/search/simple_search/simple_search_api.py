@@ -7,6 +7,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm import joinedload
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.search.models import ContentSearchResponse
@@ -28,6 +29,9 @@ class SimpleSearchApi(SearchApi):
     - allow pagination and filtering by content_type, deleted, archived
     - limited feature (no ranking, no search into content, etc)
     """
+
+    # content types which won't be returned directly. Instead their main content will be returned
+    EXCLUDED_CONTENT_TYPES = (ContentTypeSlug.COMMENT, ContentTypeSlug.TODO)
 
     def create_indices(self):
         pass
@@ -80,7 +84,7 @@ class SimpleSearchApi(SearchApi):
             if not content_api._show_archived:
                 if content_api.get_archived_parent_id(content):
                     continue
-            if content.type == content_type_list.Comment.slug:
+            if content.type in self.EXCLUDED_CONTENT_TYPES:
                 # INFO - G.M - 2019-06-13 -  filter by content_types of parent for comment
                 # if correct content_type, content is parent.
                 if not content_types or content.parent.type in content_types:

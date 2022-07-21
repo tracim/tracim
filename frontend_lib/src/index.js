@@ -13,6 +13,7 @@ import {
   getCurrentContentVersionNumber,
   hasSpaces,
   BREADCRUMBS_TYPE,
+  COLLABORA_EXTENSIONS,
   ROLE,
   ROLE_LIST,
   PROFILE,
@@ -64,7 +65,10 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
-  USER_CALL_STATE
+  sortContentByCreatedDateAndID,
+  sortContentByStatus,
+  USER_CALL_STATE,
+  STATUSES
 } from './helper.js'
 
 import {
@@ -103,6 +107,7 @@ import { defaultDebug } from './debug.js'
 
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
+import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -132,6 +137,8 @@ import AutoComplete from './component/Input/AutoComplete/AutoComplete.jsx'
 import PageWrapper from './component/Layout/PageWrapper.jsx'
 import PageTitle from './component/Layout/PageTitle.jsx'
 import PageContent from './component/Layout/PageContent.jsx'
+
+import TimedEvent from './component/TimedEvent/TimedEvent.jsx'
 
 import Delimiter from './component/Delimiter/Delimiter.jsx'
 
@@ -179,6 +186,10 @@ import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
 import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.jsx'
 
+import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
+import NewToDo from './component/ToDo/NewToDo.jsx'
+import ToDoItem from './component/ToDo/ToDoItem.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -189,7 +200,11 @@ import {
 
 import {
   baseFetch,
+  deleteToDo,
+  getComment,
   getContentPath,
+  getToDo,
+  getToDoListForUser,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -201,6 +216,7 @@ import {
   getMyselfKnownMember,
   getUsernameAvailability,
   getReservedUsernames,
+  getSpaceMemberFromId,
   getWorkspaceDetail,
   getWorkspaceMemberList,
   deleteWorkspace,
@@ -224,7 +240,8 @@ import {
   getRawFileContent,
   putRawFileContent,
   postRawFileContent,
-  getFileRevisionPreviewInfo
+  getFileRevisionPreviewInfo,
+  putToDo
 } from './action.async.js'
 
 const customEventReducer = ({ detail: { type, data } }) => {
@@ -242,6 +259,7 @@ export const frTranslation = require('../i18next.scanner/fr/translation.json')
 export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
 export const arTranslation = require('../i18next.scanner/ar/translation.json')
+export const esTranslation = require('../i18next.scanner/es/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
@@ -258,7 +276,7 @@ export {
 } from './localStorage.js'
 
 export { default as AttachedFile } from './component/AttachedFile/AttachedFile.jsx'
-export { default as FilenameWithExtension } from './component/FilenameWithExtension/FilenameWithExtension.jsx'
+export { default as FilenameWithBadges } from './component/FilenameWithBadges/FilenameWithBadges.jsx'
 export { default as EmojiReactions } from './container/EmojiReactions.jsx'
 export { default as FavoriteButton, FAVORITE_STATE } from './component/Button/FavoriteButton.jsx'
 export { default as ToolBar } from './component/ToolBar/ToolBar.jsx'
@@ -280,6 +298,10 @@ export {
   AgendaInfo,
   appContentFactory,
   DateInput,
+  deleteToDo,
+  EmptyListMessage,
+  getToDo,
+  getToDoListForUser,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -340,6 +362,7 @@ export {
   TLM_CORE_EVENT_TYPE,
   TLM_SUB_TYPE,
   BREADCRUMBS_TYPE,
+  COLLABORA_EXTENSIONS,
   ROLE,
   ROLE_LIST,
   PROFILE,
@@ -391,6 +414,7 @@ export {
   tinymceAutoCompleteHandleSelectionChange,
   updateTLMUser,
   baseFetch,
+  getComment,
   putEditContent,
   postNewEmptyContent,
   postNewComment,
@@ -400,6 +424,7 @@ export {
   putContentRestoreArchive,
   putContentRestoreDelete,
   getMyselfKnownMember,
+  getSpaceMemberFromId,
   getUsernameAvailability,
   getReservedUsernames,
   getWorkspaceDetail,
@@ -461,5 +486,13 @@ export {
   getFileRevisionPreviewInfo,
   tinymceRemove,
   Popover,
-  getBrowserLang
+  getBrowserLang,
+  NewToDo,
+  putToDo,
+  sortContentByCreatedDateAndID,
+  sortContentByStatus,
+  TimedEvent,
+  ToDoItem,
+  ToDoManagement,
+  STATUSES
 }

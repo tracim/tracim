@@ -1,1 +1,25 @@
-{}
+{
+  "Delete": "Suprimir",
+  "Cancel": "Cancelar",
+  "Gallery": "Galería",
+  "No preview available": "Vista previa no disponible",
+  "{picture}Next": "Siguiente",
+  "Previous": "Precedente",
+  "Pause": "Pausa",
+  "Play": "Jugar",
+  "Enable fullscreen": "Activar pantalla completa",
+  "Disable fullscreen": "Desactivar pantalla completa",
+  "Are you sure?": "¿Está seguro?",
+  "Error while loading folder detail": "Error al cargar el detalle de la carpeta",
+  "Error while loading content list": "Error al cargar la lista de contenidos",
+  "Error while loading file preview": "Error al cargar la vista previa del archivo",
+  "Error while loading space detail": "Error al cargar el detalle del espacio",
+  "Error while deleting document": "Error al borrar un documento",
+  "Insufficient permissions": "Derechos insuficientes",
+  "Open raw file": "Abrir el archivo original",
+  "There isn't any previewable content at that folder's root.": "No hay ningún contenido previsible en la raíz de ese espacio.",
+  "There isn't any picture to delete.": "No hay ninguna imagen que borrar.",
+  "Rotate 90° left": "Girar 90° a la izquierda",
+  "Rotate 90° right": "Girar 90° a la derecha",
+  "There isn't any previewable content at that space's root.": "No hay ningún contenido previsible en la raíz de ese espacio."
+}

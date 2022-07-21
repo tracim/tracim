@@ -5,12 +5,14 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CUSTOM_EVENT,
+  EmptyListMessage,
   IconButton,
   PAGE,
   PageContent,
   PageTitle,
   PageWrapper,
-  TracimComponent
+  TracimComponent,
+  Loading
 } from 'tracim_frontend_lib'
 import {
   appendSearchResultList,
@@ -52,7 +54,8 @@ export class AdvancedSearch extends React.Component {
     this.state = {
       totalHits: 0,
       isFilterMenuOpen: true,
-      searchType: ADVANCED_SEARCH_TYPE.CONTENT
+      searchType: ADVANCED_SEARCH_TYPE.CONTENT,
+      isLoading: true
     }
 
     props.registerCustomEventHandlerList([
@@ -193,6 +196,7 @@ export class AdvancedSearch extends React.Component {
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
         break
     }
+    this.setState({ isLoading: false })
   }
 
   handleChangeSearchFieldList = (field) => {
@@ -500,82 +504,85 @@ export class AdvancedSearch extends React.Component {
                   searchString={currentSearch.searchString}
                 />
               </div>
+              {state.isLoading
+                ? <Loading />
+                : (
+                  <div className='advancedSearch__page'>
+                    <div className='advancedSearch__content'>
+                      <div className='advancedSearch__content__detail'>
+                        {currentNumberSearchResults > 0 && (
+                          <span>
+                            {this.getDisplayDetail()}
+                          </span>
+                        )}
 
-              <div className='advancedSearch__page'>
-                <div className='advancedSearch__content'>
-                  <div className='advancedSearch__content__detail'>
-                    {currentNumberSearchResults > 0 && (
-                      <div className='advancedSearch__content__detail__count'>
-                        {this.getDisplayDetail()}
+                        {!state.isFilterMenuOpen && (
+                          <IconButton
+                            customClass='advancedSearch__content__detail__filter_button'
+                            icon='fas fa-sliders-h'
+                            onClick={this.handleClickFilterMenu}
+                            text={props.t('Filter')}
+                            title={props.t('Search filters')}
+                          />
+                        )}
                       </div>
-                    )}
 
-                    {!state.isFilterMenuOpen && (
-                      <IconButton
-                        customClass='advancedSearch__content__detail__filter'
-                        icon='fas fa-sliders-h'
-                        onClick={this.handleClickFilterMenu}
-                        text={props.t('Filter')}
-                        title={props.t('Search filters')}
+                      {currentNumberSearchResults === 0 && (
+                        <EmptyListMessage>
+                          {`${props.t('No results for the search terms:')} ${currentSearch.searchString}`}
+                        </EmptyListMessage>
+                      )}
+
+                      {state.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
+                        <AdvancedSearchContentList
+                          contentSearch={props.contentSearch}
+                          contentType={props.contentType}
+                          userLang={props.user.lang}
+                        />
+                      )}
+
+                      {state.searchType === ADVANCED_SEARCH_TYPE.USER && (
+                        <AdvancedSearchUserList
+                          apiUrl={FETCH_CONFIG.apiUrl}
+                          userSearch={props.userSearch}
+                        />
+                      )}
+
+                      {state.searchType === ADVANCED_SEARCH_TYPE.SPACE && (
+                        <AdvancedSearchSpaceList
+                          spaceSearch={props.spaceSearch}
+                          workspaceList={props.workspaceList}
+                        />
+                      )}
+
+                      <div className='advancedSearch__content__btnSeeMore'>
+                        {(this.hasMoreResults()
+                          ? (
+                            <IconButton
+                              onClick={this.handleClickSeeMore}
+                              icon='fas fa-chevron-down'
+                              text={props.t('See more')}
+                            />
+                          )
+                          : currentNumberSearchResults > currentSearch.numberResultsByPage &&
+                          props.t('No more results')
+                        )}
+                      </div>
+                    </div>
+                    {state.isFilterMenuOpen && (
+                      <SearchFilterMenu
+                        onClickCloseSearchFilterMenu={this.handleClickFilterMenu}
+                        currentSearch={currentSearch}
+                        searchType={state.searchType}
+                        onClickSearchField={this.handleChangeSearchFieldList}
+                        onChangeNewestAuthoredContentDate={this.handleChangeNewestAuthoredContentDate}
+                        onChangeCreatedDate={this.handleChangeCreatedRange}
+                        onChangeModifiedDate={this.handleChangeModifiedRange}
+                        onChangeSearchFacets={this.handleChangeSearchFacets}
                       />
                     )}
                   </div>
-
-                  {currentNumberSearchResults === 0 && (
-                    <div className='advancedSearch__content__empty'>
-                      {`${props.t('No results for the search terms:')} ${currentSearch.searchString}`}
-                    </div>
-                  )}
-
-                  {state.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (
-                    <AdvancedSearchContentList
-                      contentSearch={props.contentSearch}
-                      contentType={props.contentType}
-                      userLang={props.user.lang}
-                    />
-                  )}
-
-                  {state.searchType === ADVANCED_SEARCH_TYPE.USER && (
-                    <AdvancedSearchUserList
-                      apiUrl={FETCH_CONFIG.apiUrl}
-                      userSearch={props.userSearch}
-                    />
-                  )}
-
-                  {state.searchType === ADVANCED_SEARCH_TYPE.SPACE && (
-                    <AdvancedSearchSpaceList
-                      spaceSearch={props.spaceSearch}
-                      workspaceList={props.workspaceList}
-                    />
-                  )}
-
-                  <div className='advancedSearch__content__btnSeeMore'>
-                    {(this.hasMoreResults()
-                      ? (
-                        <IconButton
-                          onClick={this.handleClickSeeMore}
-                          icon='fas fa-chevron-down'
-                          text={props.t('See more')}
-                        />
-                      )
-                      : currentNumberSearchResults > currentSearch.numberResultsByPage &&
-                      props.t('No more results')
-                    )}
-                  </div>
-                </div>
-                {state.isFilterMenuOpen && (
-                  <SearchFilterMenu
-                    onClickCloseSearchFilterMenu={this.handleClickFilterMenu}
-                    currentSearch={currentSearch}
-                    searchType={state.searchType}
-                    onClickSearchField={this.handleChangeSearchFieldList}
-                    onChangeNewestAuthoredContentDate={this.handleChangeNewestAuthoredContentDate}
-                    onChangeCreatedDate={this.handleChangeCreatedRange}
-                    onChangeModifiedDate={this.handleChangeModifiedRange}
-                    onChangeSearchFacets={this.handleChangeSearchFacets}
-                  />
                 )}
-              </div>
             </PageContent>
           </PageWrapper>
         </div>

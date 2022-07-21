@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import {
+  EmptyListMessage,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -12,7 +13,8 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   PAGE,
-  TracimComponent
+  TracimComponent,
+  Loading
 } from 'tracim_frontend_lib'
 import ContentItemSearch from '../component/Search/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -37,7 +39,8 @@ export class SimpleSearch extends React.Component {
     // FIXME - GB - 2019-06-26 - this state is needed to know if there are still any results not sent from the backend
     // https://github.com/tracim/tracim/issues/1973
     this.state = {
-      totalHits: 0
+      totalHits: 0,
+      isLoading: true
     }
 
     props.registerCustomEventHandlerList([
@@ -122,6 +125,7 @@ export class SimpleSearch extends React.Component {
         props.dispatch(newFlashMessage(props.t('An error has happened'), 'warning'))
         break
     }
+    this.setState({ isLoading: false })
   }
 
   getPath = (path) => path.map(c => c.label).join(' / ')
@@ -188,7 +192,7 @@ export class SimpleSearch extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     const currentNumberSearchResults = props.simpleSearch.resultList.length
 
     return (
@@ -204,60 +208,65 @@ export class SimpleSearch extends React.Component {
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
             />
+            {state.isLoading
+              ? <Loading />
+              : (
+                <PageContent parentClass='searchResult'>
+                  <div>{this.getSubtitle()}</div>
 
-            <PageContent parentClass='searchResult'>
-              <div>{this.getSubtitle()}</div>
+                  {currentNumberSearchResults > 0
+                    ? (
+                      <div>
+                        <div className='folder__content' data-cy='search__content'>
+                          <ContentItemHeader showSearchDetails />
 
-              <div className='folder__content' data-cy='search__content'>
-                {currentNumberSearchResults > 0 && (
-                  <ContentItemHeader showSearchDetails />
-                )}
+                          {props.simpleSearch.resultList.map((searchItem, index) => (
+                            <ListItemWrapper
+                              label={searchItem.label}
+                              read
+                              contentType={props.contentType.find(ct => ct.slug === searchItem.contentType)}
+                              isLast={index === props.simpleSearch.resultList.length - 1}
+                              isFirst={index === 0}
+                              key={searchItem.contentId}
+                            >
+                              <ContentItemSearch
+                                label={searchItem.label}
+                                path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
+                                lastModificationAuthor={searchItem.lastModifier}
+                                lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
+                                lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
+                                fileExtension={searchItem.fileExtension}
+                                faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
+                                statusSlug={searchItem.status}
+                                contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
+                                urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
+                                key={searchItem.contentId}
+                              />
+                            </ListItemWrapper>
+                          ))}
+                        </div>
+                        <div className='searchResult__btnSeeMore'>
+                          {(this.hasMoreResults()
+                            ? (
+                              <IconButton
+                                onClick={this.handleClickSeeMore}
+                                icon='chevron-down'
+                                text={props.t('See more')}
+                              />
+                            )
+                            : currentNumberSearchResults > props.simpleSearch.numberResultsByPage &&
+                            props.t('No more results')
+                          )}
+                        </div>
 
-                {currentNumberSearchResults === 0 && (
-                  <div className='searchResult__content__empty'>
-                    {`${props.t('No results for the search terms:')} ${props.simpleSearch.searchString}`}
-                  </div>
-                )}
-
-                {props.simpleSearch.resultList.map((searchItem, index) => (
-                  <ListItemWrapper
-                    label={searchItem.label}
-                    read
-                    contentType={props.contentType.find(ct => ct.slug === searchItem.contentType)}
-                    isLast={index === props.simpleSearch.resultList.length - 1}
-                    isFirst={index === 0}
-                    key={searchItem.contentId}
-                  >
-                    <ContentItemSearch
-                      label={searchItem.label}
-                      path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
-                      lastModificationAuthor={searchItem.lastModifier}
-                      lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-                      lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
-                      fileExtension={searchItem.fileExtension}
-                      faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
-                      statusSlug={searchItem.status}
-                      contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === searchItem.contentType) : null}
-                      urlContent={`${PAGE.WORKSPACE.CONTENT(searchItem.workspaceId, searchItem.contentType, searchItem.contentId)}`}
-                      key={searchItem.contentId}
-                    />
-                  </ListItemWrapper>
-                ))}
-              </div>
-              <div className='searchResult__btnSeeMore'>
-                {(this.hasMoreResults()
-                  ? (
-                    <IconButton
-                      onClick={this.handleClickSeeMore}
-                      icon='chevron-down'
-                      text={props.t('See more')}
-                    />
-                  )
-                  : currentNumberSearchResults > props.simpleSearch.numberResultsByPage &&
-                    props.t('No more results')
-                )}
-              </div>
-            </PageContent>
+                      </div>
+                    ) : (
+                      <EmptyListMessage>
+                        {`${props.t('No results for the search terms:')} ${props.simpleSearch.searchString}`}
+                      </EmptyListMessage>
+                    )}
+                </PageContent>
+              )}
           </PageWrapper>
         </div>
       </div>

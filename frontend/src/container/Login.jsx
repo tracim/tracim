@@ -9,8 +9,8 @@ import * as Cookies from 'js-cookie'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
+  getWorkspaceMemberList,
   handleFetchResult,
-  NUMBER_RESULTS_BY_PAGE,
   checkEmailValidity,
   PAGE,
   putUserConfiguration,
@@ -32,8 +32,6 @@ import {
   setWorkspaceListMemberList,
   setUnreadMentionCount,
   setUnreadNotificationCount,
-  setNotificationList,
-  setNextPage,
   setHeadTitle,
   setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
@@ -42,11 +40,9 @@ import {
   getConfig,
   getContentTypeList,
   getMyselfWorkspaceList,
-  getNotificationList,
   getUsageConditions,
   getUserConfiguration,
   getUserMessagesSummary,
-  getWorkspaceMemberList,
   postUserLogout,
   postUserLogin,
   putUserLang,
@@ -247,11 +243,12 @@ class Login extends React.Component {
         Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, fetchPostUserLogin.json.lang, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
         i18n.changeLanguage(loggedUser.lang)
 
+        Cookies.set(COOKIE_FRONTEND.SHOW_USERNAME_POPUP, true, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
+
         this.loadAppList()
         this.loadContentTypeList()
         this.loadWorkspaceLists()
         this.loadNotificationNotRead(loggedUser.user_id)
-        this.loadNotificationList(loggedUser.user_id)
         this.loadUserConfiguration(loggedUser.user_id)
         break
       }
@@ -356,13 +353,13 @@ class Login extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await props.dispatch(getWorkspaceMemberList(ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 
     const workspaceListMemberList = fetchWorkspaceListMemberList.map(memberList => ({
       workspaceId: memberList.workspaceId,
-      memberList: memberList.fetchMemberList.status === 200 ? memberList.fetchMemberList.json : []
+      memberList: memberList.fetchMemberList.apiResponse.status === 200 ? memberList.fetchMemberList.body : []
     }))
 
     props.dispatch(setWorkspaceListMemberList(workspaceListMemberList))
@@ -415,27 +412,6 @@ class Login extends React.Component {
     switch (fetchUnreadMessageCount.status) {
       case 200: props.dispatch(setUnreadNotificationCount(fetchUnreadMessageCount.json.unread_messages_count)); break
       default: props.dispatch(newFlashMessage(props.t('Error loading unread notification number')))
-    }
-  }
-
-  loadNotificationList = async (userId) => {
-    const { props } = this
-
-    const fetchGetNotificationWall = await props.dispatch(getNotificationList(
-      userId,
-      {
-        excludeAuthorId: userId,
-        notificationsPerPage: NUMBER_RESULTS_BY_PAGE
-      }
-    ))
-    switch (fetchGetNotificationWall.status) {
-      case 200:
-        props.dispatch(setNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
-        props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-        break
-      default:
-        props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))
-        break
     }
   }
 

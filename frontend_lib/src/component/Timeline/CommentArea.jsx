@@ -20,6 +20,7 @@ import AddFileToUploadButton from './AddFileToUploadButton.jsx'
 import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
+import Loading from '../Loading/Loading.jsx'
 
 export class CommentArea extends React.Component {
   constructor (props) {
@@ -45,10 +46,8 @@ export class CommentArea extends React.Component {
     } else {
       const savedComment = getLocalStorageItem(
         props.contentType,
-        {
-          content_id: props.contentId,
-          workspace_id: props.workspaceId
-        },
+        props.contentId,
+        props.workspaceId,
         LOCAL_STORAGE_FIELD.COMMENT
       )
 
@@ -81,10 +80,8 @@ export class CommentArea extends React.Component {
     if (prevProps.contentType !== props.contentType) {
       const savedComment = getLocalStorageItem(
         props.contentType,
-        {
-          content_id: props.contentId,
-          workspace_id: props.workspaceId
-        },
+        props.contentId,
+        props.workspaceId,
         LOCAL_STORAGE_FIELD.COMMENT
       )
       if (!!savedComment && savedComment !== this.state.newComment) {
@@ -357,6 +354,7 @@ export class CommentArea extends React.Component {
               }
             }}
             data-cy='commentArea__textinput'
+            hidden={state.shouldLoadWysiwyg}
           />
         </div>
 
@@ -383,6 +381,10 @@ export class CommentArea extends React.Component {
                 />
               </div>
             </div>
+
+            {props.isFileCommentLoading && (
+              <Loading />
+            )}
 
             <div className={classnames(`${props.customClass}__texteditor__submit`, 'commentArea__submit')}>
               <div>
@@ -440,7 +442,8 @@ CommentArea.propTypes = {
   showInvalidMentionPopup: PropTypes.bool,
   workspaceId: PropTypes.number,
   wysiwyg: PropTypes.bool,
-  wysiwygIdSelector: PropTypes.string
+  wysiwygIdSelector: PropTypes.string,
+  isFileCommentLoading: PropTypes.bool
 }
 
 CommentArea.defaultProps = {
@@ -465,5 +468,6 @@ CommentArea.defaultProps = {
   showInvalidMentionPopup: false,
   workspaceId: 0,
   wysiwyg: false,
-  wysiwygIdSelector: ''
+  wysiwygIdSelector: '',
+  isFileCommentLoading: false
 }

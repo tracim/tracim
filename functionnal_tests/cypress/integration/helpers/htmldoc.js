@@ -1,6 +1,6 @@
 import { assertPopupCreateContent } from './index.js'
 
-// INFO - CH - 2019-05-15 - The function bellow assumes you already is on a workspace's content list page
+// INFO - CH - 2019-05-15 - The function below assumes you already is on a workspace's content list page
 // it is better to use commands from support/db_commands.js (write it if not exists)
 export const create_htmldocument = (cy, htmlDocTitle = 'Html document 1') => {
   cy.get('[data-cy=dropdownCreateBtn]').should('be.visible').click()
@@ -22,7 +22,7 @@ export const create_htmldocument = (cy, htmlDocTitle = 'Html document 1') => {
     .should('be.visible')
 
   cy.waitForTinyMCELoaded().then(() => {
-    cy.get(`.workspace__content__fileandfolder > .content[title="${htmlDocTitle}"]`)
+    cy.get(`.workspace__content__file_and_folder > .content[title="${htmlDocTitle}"]`)
       .should('be.visible')
   })
 }
