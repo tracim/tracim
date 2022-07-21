@@ -38,7 +38,7 @@
 - Automatic scroll when click on News See more button (issue [#5792](https://github.com/tracim/tracim/issues/5792))
 - Mention to everyone is not always translated on Spanish (issue [#4463](https://github.com/tracim/tracim/issues/4463))
 - Task notification do not read all notification from the content (issue [#5797](https://github.com/tracim/tracim/issues/5797))
-- Arabic language is not handled on PDF export (issue [#5730](https://github.com/tracim/tracim/issues/5730))
+- Notification "Someone called you" appears when the callee rejected/accepted the call (issue [#5044](https://github.com/tracim/tracim/issues/5044))
 
 
 # 4.2.2 / 2022-05-05
