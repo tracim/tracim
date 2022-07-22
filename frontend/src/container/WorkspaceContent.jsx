@@ -630,9 +630,8 @@ export class WorkspaceContent extends React.Component {
     const htmlContentIdToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentIdToScrollTo}`
     const domElementToScrollTo = document.getElementById(htmlContentIdToScrollTo)
     if (domElementToScrollTo) {
-      const headerHeight = 60 // 60px is Tracim's header height
       const scrollableElement = document.getElementById('scrollableElement')
-      scrollableElement.scrollTop = domElementToScrollTo.offsetTop - headerHeight
+      scrollableElement.scrollTop = domElementToScrollTo.offsetTop
     }
   }
 

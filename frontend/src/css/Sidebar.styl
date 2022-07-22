@@ -35,7 +35,7 @@ sidebar-animate-speed = 0.5s
       margin-inline-start auto
   &__frame
     background-color var(--sidebarColor)
-    height "calc(100vh - %s)" % headerHeight
+    height 100vh
     position relative
     transition all sidebar-animate-speed
     width sidebarWidth
@@ -185,7 +185,7 @@ body.tox-fullscreen .sidebar
   .sidebar
     &__frame
       position absolute
-      min-height "calc(100% - %s)" % headerHeight
+      min-height 100%
 
 @media (min-width: min-md) and (max-width: max-md)
   .sidebarpagecontainer
@@ -194,7 +194,7 @@ body.tox-fullscreen .sidebar
   .sidebar
     &__frame
       position absolute
-      min-height "calc(100% - %s)" % headerHeight
+      min-height 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .sidebarpagecontainer
@@ -203,7 +203,7 @@ body.tox-fullscreen .sidebar
   .sidebar
     &__frame
       position absolute
-      min-height "calc(100% - %s)" % headerHeight
+      min-height 100%
 
 @media (max-width: max-xs)
   .sidebarpagecontainer
@@ -212,7 +212,7 @@ body.tox-fullscreen .sidebar
   .sidebar
     &__frame
       position absolute
-      min-height "calc(100% - %s)" % headerHeight
+      min-height 100%
 
 // INFO - GB - 2022-01-27 - The commands below are fallbacks because border-end-end-radius and border-start-end-radius are new
 // and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.

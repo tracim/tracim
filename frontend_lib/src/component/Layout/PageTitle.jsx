@@ -35,11 +35,9 @@ export const PageTitle = (props) => {
           targetId='popoverPageTitle'
           popoverBody={props.title}
         />
-      </div>
 
-      {!props.emailNotifActivated && (
-        <li className='header__menu__rightside__emailwarning'>
-          <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
+        {!props.emailNotifActivated && (
+          <div className='pageTitleGeneric__title__emailwarning' title={props.t('Email notifications are disabled')}>
             <ComposedIcon
               mainIcon='far fa-envelope'
               smallIcon='fas fa-exclamation-triangle'
@@ -47,8 +45,8 @@ export const PageTitle = (props) => {
               smallIconCustomClass='text-danger'
             />
           </div>
-        </li>
-      )}
+        )}
+      </div>
 
       <div
         id='customToolboxHeaderBtn'

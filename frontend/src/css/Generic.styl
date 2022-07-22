@@ -30,7 +30,7 @@ a
 .iconBtn
   border-color transparent
   background-color transparent
-  padding 5px
+  padding textSpacing
   cursor pointer
   &:disabled
     cursor not-allowed
@@ -39,9 +39,8 @@ a
   min-height 150px
 
 div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
-  max-height "calc(100% - %s)" % headerHeight
+  max-height 100%
   z-index 1050
-  top headerHeight !important
 
 // NOTE - RJ - 2022-02-14 - remove some borders on TinyMCE toolbars
 .tox-toolbar
@@ -153,7 +152,7 @@ div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
     border-color inherit
 
 #appFullscreenContainer
-  height "calc(100vh - %s)" % headerHeight
+  height 100vh
   overflow hidden
   & > div[data-radium="true"]
     width 100%
