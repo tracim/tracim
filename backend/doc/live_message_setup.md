@@ -6,7 +6,7 @@
 On ubuntu/debian:
 
 ~~~bash
-apt install docker.io docker-compose
+apt install docker.io docker-compose-plugin
 ~~~
 
 :warning: do not install pushpin package as it will conflict with the docker based pushpin (`apt remove pushpin` if installed).
@@ -32,7 +32,7 @@ cd backend
 
 run pushpin docker (from tracim root dir):
 ~~~bash
-docker-compose up -d pushpin
+docker compose up -d pushpin
 ~~~
 
 then run tracim:
@@ -54,7 +54,7 @@ firefox localhost:7999
 to stop "pushpin" containers (from `backend` directory):
 
 ~~~bash
-docker-compose down
+docker compose down
 ~~~
 
 to see running container list (pushpin container will be named `backend_pushpin_1`):
