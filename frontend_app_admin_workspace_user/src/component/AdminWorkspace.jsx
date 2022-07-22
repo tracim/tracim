@@ -21,6 +21,7 @@ const AdminWorkspace = props => {
         title={props.t('Space management')}
         icon='fas fa-users'
         breadcrumbsList={props.breadcrumbsList}
+        // emailNotifActivated={props.system.config.email_notification_activated}
       />
 
       <PageContent parentClass='adminWorkspace'>

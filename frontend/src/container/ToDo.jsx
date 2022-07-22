@@ -244,6 +244,7 @@ const ToDo = (props) => {
               title={props.t('My tasks')}
               icon='fas fa-check-square'
               breadcrumbsList={props.breadcrumbs}
+              // emailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent

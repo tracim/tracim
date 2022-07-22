@@ -290,6 +290,7 @@ export class Account extends React.Component {
               title={props.t('Account Settings')}
               icon='fas fa-cogs'
               breadcrumbsList={props.breadcrumbs}
+              // emailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent parentClass='account'>

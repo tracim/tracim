@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import { BREADCRUMBS_TYPE, PAGE } from '../../helper.js'
 import Breadcrumbs from '../Breadcrumbs/Breadcrumbs.jsx'
 import Popover from '../Popover/Popover.jsx'
+import ComposedIcon from '../Icon/ComposedIcon.jsx'
 
 export const PageTitle = (props) => {
   const title = props.t('Home')
@@ -36,6 +37,24 @@ export const PageTitle = (props) => {
         />
       </div>
 
+      {!props.emailNotifActivated && (
+        <li className='header__menu__rightside__emailwarning'>
+          <div className='header__menu__system' title={props.t('Email notifications are disabled')}>
+            <ComposedIcon
+              mainIcon='far fa-envelope'
+              smallIcon='fas fa-exclamation-triangle'
+              mainIconCustomClass='slowblink'
+              smallIconCustomClass='text-danger'
+            />
+          </div>
+        </li>
+      )}
+
+      <div
+        id='customToolboxHeaderBtn'
+        className='header__menu__rightside__specificBtn'
+      />
+
       {(props.breadcrumbsList.length > 0
         ? <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />
         : <div />
@@ -63,7 +82,8 @@ PageTitle.propTypes = {
   parentClass: PropTypes.string,
   customClass: PropTypes.string,
   icon: PropTypes.string,
-  iconTooltip: PropTypes.string
+  iconTooltip: PropTypes.string,
+  emailNotifActivated: PropTypes.bool
 }
 
 PageTitle.defaultProps = {
@@ -71,5 +91,6 @@ PageTitle.defaultProps = {
   customClass: '',
   icon: '',
   subtitle: '',
-  iconTooltip: ''
+  iconTooltip: '',
+  emailNotifActivated: false
 }

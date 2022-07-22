@@ -342,6 +342,7 @@ export class Agenda extends React.Component {
           title={pageTitle}
           icon='fas fa-calendar-alt'
           breadcrumbsList={state.breadcrumbsList}
+          // emailNotifActivated={props.system.config.email_notification_activated}
         />
 
         <div className='agendaPage__warningMessage'>

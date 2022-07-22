@@ -7,13 +7,21 @@ import { isMobile } from 'react-device-detect'
 import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { addWorkspaceList } from '../action-creator.sync.js'
+import Logo from '../component/Header/Logo.jsx'
+import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
+import SearchInput from '../component/Search/SearchInput.jsx'
+import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
+import NotificationButton from '../component/Header/MenuActionListItem/NotificationButton.jsx'
 import {
+  ADVANCED_SEARCH_TYPE,
   NO_ACTIVE_SPACE_ID,
   TRACIM_APP_VERSION,
   findUserRoleIdInWorkspace,
   getUserProfile,
-  unLoggedAllowedPageList,
-  workspaceConfig
+  workspaceConfig,
+  ALL_CONTENT_TYPES,
+  SEARCH_TYPE,
+  unLoggedAllowedPageList
 } from '../util/helper.js'
 import {
   createSpaceTree,
@@ -26,12 +34,19 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   scrollIntoViewIfNeeded,
   Icon,
+  NUMBER_RESULTS_BY_PAGE,
   IconButton,
   PAGE
 } from 'tracim_frontend_lib'
+import {
+  logoutUser
+} from '../action-creator.async.js'
+
+const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
+const qs = require('query-string')
 
 export class Sidebar extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.frameRef = React.createRef()
     this.state = {
@@ -94,6 +109,26 @@ export class Sidebar extends React.Component {
     )
   }
 
+  handleClickSearch = async (searchString) => {
+    const { props } = this
+    const FIRST_PAGE = 1
+
+    // INFO - GB - 2019-06-07 - When we do a search, the parameters need to be in default mode.
+    // Respectively, we have arc for show_archived=0 (false), del for show_deleted=0 (false) and act for show_active=1 (true)
+    const newUrlSearchObject = {
+      t: ALL_CONTENT_TYPES,
+      q: searchString,
+      p: FIRST_PAGE,
+      nr: NUMBER_RESULTS_BY_PAGE,
+      arc: 0,
+      del: 0,
+      act: 1,
+      s: props.system.config.search_engine === SEARCH_TYPE.ADVANCED ? ADVANCED_SEARCH_TYPE.CONTENT : SEARCH_TYPE.SIMPLE
+    }
+
+    props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
+  }
+
   handleToggleFoldChildren = (id) => {
     const { state } = this
     if (state.foldedSpaceList.find(spaceId => spaceId === id)) {
@@ -112,7 +147,7 @@ export class Sidebar extends React.Component {
           }
         )}
         to={to}
-        onClick={isMobile ? this.handleClickToggleSidebar : () => {}}
+        onClick={isMobile ? this.handleClickToggleSidebar : () => { }}
       >
         <div
           className='sidebar__content__navigation__item__name'
@@ -169,9 +204,13 @@ export class Sidebar extends React.Component {
       type: this.state.sidebarClose
         ? CUSTOM_EVENT.SHOW_SIDEBAR
         : CUSTOM_EVENT.HIDE_SIDEBAR,
-      data: { }
+      data: {}
     })
     this.setState(previousState => ({ sidebarClose: !previousState.sidebarClose }))
+  }
+
+  handleClickLogout = () => {
+    this.props.dispatch(logoutUser(this.props.history))
   }
 
   handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
@@ -189,6 +228,7 @@ export class Sidebar extends React.Component {
 
     return (
       <div className='sidebar'>
+        <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
         <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
           {state.sidebarClose
             ? <i className={classnames('fas', 'fa-chevron-right')} title={props.t('See sidebar')} />
@@ -208,6 +248,32 @@ export class Sidebar extends React.Component {
               <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
 
               <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
+                <MenuProfil
+                  user={props.user}
+                  onClickLogout={this.handleClickLogout}
+                />
+                <SearchInput
+                  className='header__menu__rightside__search'
+                  onClickSearch={this.handleClickSearch}
+                  searchString={props.simpleSearch.searchString}
+                />
+                {props.user.profile === PROFILE.administrator.slug && (
+                  <AdminLink />
+                )}
+                <NotificationButton
+                  unreadMentionCount={props.unreadMentionCount}
+                  unreadNotificationCount={props.unreadNotificationCount}
+                  onClickNotification={props.onClickNotification}
+                />
+                {props.appList.some(a => a.slug === 'agenda') && (
+                    <Link
+                      className='btn outlineTextBtn primaryColorBorder nohover'
+                      to={PAGE.AGENDA}
+                    >
+                        <i className='fas fa-fw fa-calendar-alt' />
+                        {props.t('Agendas')}
+                    </Link>
+                )}
                 {this.getSidebarItem(props.t('Recent activities'), 'far fa-newspaper', PAGE.RECENT_ACTIVITIES)}
                 {isToDoEnabled && this.getSidebarItem(props.t('My tasks'), 'fas fa-check-square', PAGE.TODO)}
                 {this.getSidebarItem(props.t('Favorites'), 'far fa-star', PAGE.FAVORITES)}
@@ -258,5 +324,5 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ accessibleWorkspaceList, appList, system, user, workspaceList }) => ({ accessibleWorkspaceList, appList, system, user, workspaceList })
+const mapStateToProps = ({ accessibleWorkspaceList, appList, system, user, workspaceList, simpleSearch }) => ({ accessibleWorkspaceList, appList, system, user, workspaceList, simpleSearch })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))

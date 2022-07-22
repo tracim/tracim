@@ -93,6 +93,7 @@ export class PersonalRecentActivities extends React.Component {
           icon='far fa-newspaper'
           iconTooltip={props.t('Recent activities')}
           breadcrumbsList={props.breadcrumbs}
+          // emailNotifActivated={props.system.config.email_notification_activated}
         />
         <PageContent>
           <ActivityList

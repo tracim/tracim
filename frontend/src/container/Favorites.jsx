@@ -266,6 +266,7 @@ export class Favorites extends React.Component {
             title={props.t('Favorites')}
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
+            // emailNotifActivated={props.system.config.email_notification_activated}
           />
 
           {state.isLoading

@@ -19,6 +19,7 @@ export const AdvancedSearchLoader = props =>
           title={props.t('Search results')}
           icon='fas fa-search'
           breadcrumbsList={[]}
+          // emailNotifActivated={props.system.config.email_notification_activated}
         />
         <PageContent>
           <div className='advancedSearchLoader'>

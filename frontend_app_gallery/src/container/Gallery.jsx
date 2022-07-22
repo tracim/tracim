@@ -726,6 +726,7 @@ export class Gallery extends React.Component {
             icon='far fa-image'
             breadcrumbsList={state.breadcrumbsList}
             parentClass='gallery__header'
+            // emailNotifActivated={props.system.config.email_notification_activated}
           />
 
           <PageContent>
