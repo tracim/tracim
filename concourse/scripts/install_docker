@@ -3,7 +3,7 @@ set -e
 
 # Official docker instructions from https://docs.docker.com/engine/install/debian/#install-using-the-repository
 apt-get update
-apt-get install \
+apt-get install -qy \
   ca-certificates \
   curl \
   gnupg \
