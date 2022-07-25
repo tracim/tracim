@@ -3,10 +3,12 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { PAGE } from 'tracim_frontend_lib'
 
+require('./Logo.styl')
+
 const Logo = props => {
   return (
-    <Link className='header__logo navbar-brand' to={props.to}>
-      <img className='header__logo__img' src={props.logoSrc} />
+    <Link className='tracimLogo' to={props.to}>
+      <img className='tracimLogo__img' src={props.logoSrc} />
     </Link>
   )
 }

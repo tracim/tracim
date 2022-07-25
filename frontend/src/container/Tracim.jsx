@@ -731,13 +731,16 @@ export class Tracim extends React.Component {
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>
-          <Route render={() => (
-            <Sidebar
-              onClickNotification={this.handleClickNotificationButton}
-              unreadNotificationCount={props.notificationPage.unreadNotificationCount}
-              unreadMentionCount={props.notificationPage.unreadMentionCount}
-            />
-          )} />
+          <Route
+            render={() => (
+              <Sidebar
+                onClickNotification={this.handleClickNotificationButton}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                isNotificationWallOpen={state.isNotificationWallOpen}
+              />
+            )}
+          />
 
           <Route
             render={() => (

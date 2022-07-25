@@ -50,7 +50,7 @@ export const PageTitle = (props) => {
 
       <div
         id='customToolboxHeaderBtn'
-        className='header__menu__rightside__specificBtn'
+        className='pageTitleGeneric__specificBtn'
       />
 
       {(props.breadcrumbsList.length > 0

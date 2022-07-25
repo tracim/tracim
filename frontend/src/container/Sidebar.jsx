@@ -1,23 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { Link, withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
 import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { addWorkspaceList } from '../action-creator.sync.js'
-import Logo from '../component/Header/Logo.jsx'
+import Logo from '../component/Logo.jsx'
 import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
 import SearchInput from '../component/Search/SearchInput.jsx'
-import AdminLink from '../component/Header/MenuActionListItem/AdminLink.jsx'
-import NotificationButton from '../component/Header/MenuActionListItem/NotificationButton.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
   NO_ACTIVE_SPACE_ID,
   TRACIM_APP_VERSION,
   findUserRoleIdInWorkspace,
-  getUserProfile,
   workspaceConfig,
   ALL_CONTENT_TYPES,
   SEARCH_TYPE,
@@ -33,7 +29,6 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   scrollIntoViewIfNeeded,
-  Icon,
   NUMBER_RESULTS_BY_PAGE,
   IconButton,
   PAGE
@@ -41,12 +36,13 @@ import {
 import {
   logoutUser
 } from '../action-creator.async.js'
+import SidebarItem from '../component/Sidebar/SidebarItem.jsx'
 
 const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 const qs = require('query-string')
 
 export class Sidebar extends React.Component {
-  constructor(props) {
+  constructor (props) { // TODO GIULIA Passar em hooks
     super(props)
     this.frameRef = React.createRef()
     this.state = {
@@ -101,6 +97,7 @@ export class Sidebar extends React.Component {
           onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
           userRoleIdInWorkspace={[findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)]}
           workspaceId={space.id}
+          isNotificationWallOpen={props.isNotificationWallOpen}
         />
         {!state.foldedSpaceList.find(id => id === space.id) &&
           space.children.length !== 0 &&
@@ -135,33 +132,6 @@ export class Sidebar extends React.Component {
       const newFoldedSpaceList = state.foldedSpaceList.filter(spaceId => spaceId !== id)
       this.setState({ foldedSpaceList: newFoldedSpaceList })
     } else this.setState(prev => ({ foldedSpaceList: [...prev.foldedSpaceList, id] }))
-  }
-
-  getSidebarItem = (label, icon, to) => {
-    return (
-      <Link
-        className={classnames('sidebar__content__navigation__item sidebar__content__navigation__item__wrapper',
-          {
-            'sidebar__content__navigation__item__current primaryColorBorder':
-              this.props.location.pathname.endsWith(to)
-          }
-        )}
-        to={to}
-        onClick={isMobile ? this.handleClickToggleSidebar : () => { }}
-      >
-        <div
-          className='sidebar__content__navigation__item__name'
-          title={label}
-        >
-          <Icon
-            icon={icon}
-            title={label}
-            color='white'
-          />
-          &nbsp;{label}
-        </div>
-      </Link>
-    )
   }
 
   componentDidMount () {
@@ -213,109 +183,164 @@ export class Sidebar extends React.Component {
     this.props.dispatch(logoutUser(this.props.history))
   }
 
-  handleClickScrollUp = () => this.workspaceListTop.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' })
-
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
 
+  /* TODO GIULIA
+   - Talvez dividir o componente em 3+ : opçoes, espaços, footer.
+   - Fazer titulo pros espaços
+   - Mecanismo de fold/unfold.
+   - Fix titulos que estao se mexendo quando item ativo.
+   - Fix scroll.
+   - Closed sidebar
+  */
   render () {
     const { props, state } = this
 
     if (!this.shouldDisplaySidebar(this.props)) return null
 
     const isToDoEnabled = props.appList.some(a => a.slug === 'contents/todo')
+    const isAgendaEnabled = props.appList.some(a => a.slug === 'agenda')
+    const isUserAdministrator = props.user.profile === PROFILE.administrator.slug
+    const isUserManager = props.user.profile === PROFILE.manager.slug
 
     return (
-      <div className='sidebar'>
-        <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
-        <div className={classnames('sidebar__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
-          {state.sidebarClose
-            ? <i className={classnames('fas', 'fa-chevron-right')} title={props.t('See sidebar')} />
-            : <i className={classnames('fas', 'fa-chevron-left')} title={props.t('Hide sidebar')} />}
+      <div ref={this.frameRef} className={classnames('sidebar', { sidebarclose: state.sidebarClose })}>
+        <div className='sidebar__header'>
+          <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
+          <button className={classnames('transparentButton sidebar__header__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
+            {state.sidebarClose
+              ? <i className='fas fa-chevron-right' title={props.t('See sidebar')} />
+              : <i className='fas fa-chevron-left' title={props.t('Hide sidebar')} />}
+          </button>
         </div>
-        <div ref={this.frameRef} className={classnames('sidebar__frame', { sidebarclose: state.sidebarClose })}>
-          <div className='sidebar__scrollview'>
-            {/*
-            FIXME - CH - 2019-04-04 - button scroll to top removed for now
-            see https://github.com/tracim/tracim/issues/1554
-            <div className='sidebar__scrollup' onClick={this.handleClickScrollUp}>
-              <i className='fas fa-chevron-up' />
-            </div>
-            */}
 
-            <div className='sidebar__content'>
-              <div id='sidebar__content__scrolltopmarker' style={{ visibility: 'hidden' }} ref={el => { this.workspaceListTop = el }} />
+        <div
+          className={classnames('sidebar__search', {
+            'sidebar__item__current primaryColorBorder':
+              props.location.pathname === PAGE.SEARCH_RESULT && !props.isNotificationWallOpen
+          })}
+        >
+          <SearchInput
+            onClickSearch={this.handleClickSearch}
+            searchString={props.simpleSearch.searchString}
+          />
+        </div>
 
-              <nav className={classnames('sidebar__content__navigation', { sidebarclose: state.sidebarClose })}>
-                <MenuProfil
-                  user={props.user}
-                  onClickLogout={this.handleClickLogout}
-                />
-                <SearchInput
-                  className='header__menu__rightside__search'
-                  onClickSearch={this.handleClickSearch}
-                  searchString={props.simpleSearch.searchString}
-                />
-                {props.user.profile === PROFILE.administrator.slug && (
-                  <AdminLink />
-                )}
-                <NotificationButton
-                  unreadMentionCount={props.unreadMentionCount}
-                  unreadNotificationCount={props.unreadNotificationCount}
-                  onClickNotification={props.onClickNotification}
-                />
-                {props.appList.some(a => a.slug === 'agenda') && (
-                    <Link
-                      className='btn outlineTextBtn primaryColorBorder nohover'
-                      to={PAGE.AGENDA}
-                    >
-                        <i className='fas fa-fw fa-calendar-alt' />
-                        {props.t('Agendas')}
-                    </Link>
-                )}
-                {this.getSidebarItem(props.t('Recent activities'), 'far fa-newspaper', PAGE.RECENT_ACTIVITIES)}
-                {isToDoEnabled && this.getSidebarItem(props.t('My tasks'), 'fas fa-check-square', PAGE.TODO)}
-                {this.getSidebarItem(props.t('Favorites'), 'far fa-star', PAGE.FAVORITES)}
-                <ul className='sidebar__content__navigation__workspace'>
-                  {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
-                </ul>
-              </nav>
-            </div>
+        <MenuProfil
+          user={props.user}
+          onClickLogout={this.handleClickLogout}
+          isCurrentItem={props.location.pathname === PAGE.PUBLIC_PROFILE(props.user.userId) && !props.isNotificationWallOpen}
+        />
 
-            <div className='sidebar__footer'>
-              <div className='sidebar__footer__buttons'>
-                {getUserProfile(props.user.profile).id >= PROFILE.manager.id && (
-                  <IconButton
-                    onClick={this.handleClickNewWorkspace}
-                    dataCy='sidebarCreateWorkspaceBtn'
-                    icon='fas fa-plus'
-                    text={props.t('Create a space')}
-                    textMobile={props.t('Create a space')}
-                    mode='light'
-                  />
-                )}
-                {props.accessibleWorkspaceList.length > 0 && (
-                  <IconButton
-                    onClick={this.handleClickJoinWorkspace}
-                    dataCy='sidebarJoinWorkspaceBtn'
-                    icon='fas fa-users'
-                    text={props.t('Join a space')}
-                    textMobile={props.t('Join a space')}
-                    intent='primary'
-                    mode='light'
-                  />
-                )}
-              </div>
-              <div className='sidebar__footer__text'>
-                {TRACIM_APP_VERSION}
-              </div>
-              <div className='sidebar__footer__text'>
-                Copyright - 2013 - 2022
-                <div className='sidebar__footer__text__link'>
-                  <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
-                </div>
-              </div>
+        <SidebarItem
+          to={PAGE.ACCOUNT}
+          label={props.t('Account Settings')}
+          icon='fas fa-cogs'
+          isCurrentItem={props.location.pathname === PAGE.ACCOUNT && !props.isNotificationWallOpen}
+          dataCy='menuprofil__dropdown__account__link'
+        />
+
+        <SidebarItem
+          label={props.t('Log out')}
+          icon='fas fa-sign-out-alt'
+          onClickItem={this.handleClickLogout}
+          dataCy='menuprofil__dropdown__logout__link'
+        />
+
+        <SidebarItem
+          label={props.t('Notifications')}
+          icon='far fa-bell'
+          onClickItem={props.onClickNotification}
+          unreadMentionCount={props.unreadMentionCount}
+          unreadNotificationCount={props.unreadNotificationCount}
+          isCurrentItem={props.isNotificationWallOpen}
+        />
+
+        {isUserAdministrator && (
+          <SidebarItem
+            to={PAGE.ADMIN.WORKSPACE}
+            label={props.t('Space management')}
+            icon={workspaceConfig.faIcon}
+            isCurrentItem={props.location.pathname === PAGE.ADMIN.WORKSPACE && !props.isNotificationWallOpen}
+          />
+        )}
+
+        {isUserAdministrator && (
+          <SidebarItem
+            to={PAGE.ADMIN.USER}
+            label={props.t('User account management')}
+            icon='far fa-user'
+            isCurrentItem={props.location.pathname === PAGE.ADMIN.USER && !props.isNotificationWallOpen}
+          />
+        )}
+
+        {isAgendaEnabled && (
+          <SidebarItem
+            to={PAGE.AGENDA}
+            label={props.t('Agendas')}
+            icon='fas fa-calendar-alt'
+            isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
+          />
+        )}
+
+        {isToDoEnabled && (
+          <SidebarItem
+            to={PAGE.TODO}
+            label={props.t('My tasks')}
+            icon='fas fa-check-square'
+            isCurrentItem={props.location.pathname === PAGE.TODO && !props.isNotificationWallOpen}
+          />
+        )}
+
+        <SidebarItem
+          to={PAGE.FAVORITES}
+          label={props.t('Favorites')}
+          icon='far fa-star'
+          isCurrentItem={props.location.pathname === PAGE.FAVORITES && !props.isNotificationWallOpen}
+        />
+
+        <SidebarItem
+          to={PAGE.RECENT_ACTIVITIES}
+          label={props.t('Recent activities')}
+          icon='far fa-newspaper'
+          isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
+        />
+
+        {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
+
+        <div className='sidebar__footer'>
+          <div className='sidebar__footer__buttons'>
+            {(isUserManager || isUserAdministrator) && (
+              <IconButton
+                onClick={this.handleClickNewWorkspace}
+                dataCy='sidebarCreateWorkspaceBtn'
+                icon='fas fa-plus'
+                text={props.t('Create a space')}
+                textMobile={props.t('Create a space')}
+                mode='light'
+              />
+            )}
+            {props.accessibleWorkspaceList.length > 0 && (
+              <IconButton
+                onClick={this.handleClickJoinWorkspace}
+                dataCy='sidebarJoinWorkspaceBtn'
+                icon='fas fa-users'
+                text={props.t('Join a space')}
+                textMobile={props.t('Join a space')}
+                intent='primary'
+                mode='light'
+              />
+            )}
+          </div>
+          <div className='sidebar__footer__text'>
+            {TRACIM_APP_VERSION}
+          </div>
+          <div className='sidebar__footer__text'>
+            Copyright - 2013 - 2022
+            <div className='sidebar__footer__text__link'>
+              <a href='https://www.algoo.fr/fr/tracim' target='_blank' rel='noopener noreferrer'>tracim.fr</a>
             </div>
           </div>
         </div>
@@ -325,4 +350,4 @@ export class Sidebar extends React.Component {
 }
 
 const mapStateToProps = ({ accessibleWorkspaceList, appList, system, user, workspaceList, simpleSearch }) => ({ accessibleWorkspaceList, appList, system, user, workspaceList, simpleSearch })
-export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar)))))
+export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar))))

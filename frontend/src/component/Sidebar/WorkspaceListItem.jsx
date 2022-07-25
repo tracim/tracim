@@ -132,19 +132,19 @@ class WorkspaceListItem extends React.Component {
     const BASE_MARGIN = 20
 
     return (
-      <li
+      <div
         id={props.id}
         className={classnames(
-          'sidebar__content__navigation__item',
+          'sidebar__item__workspace',
           {
-            'primaryColorBorder sidebar__content__navigation__item__current':
-              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
+            'primaryColorBorder sidebar__item__current':
+              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) && !props.isNotificationWallOpen
           },
           {
-            sidebar__content__navigation__item__unread: state.unreadNotifications.length > 0
+            sidebar__item__unread: state.unreadNotifications.length > 0
           }
         )}
-        data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
+        data-cy={`sidebar__workspace__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
@@ -162,7 +162,7 @@ class WorkspaceListItem extends React.Component {
 
         {props.hasChildren && (
           <IconButton
-            customClass='transparentButton sidebar__content__navigation__item__foldChildren'
+            customClass='transparentButton sidebar__item__foldChildren'
             icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'
@@ -173,18 +173,18 @@ class WorkspaceListItem extends React.Component {
 
         <Link
           className={classnames(
-            'sidebar__content__navigation__item__wrapper',
-            { sidebar__content__navigation__item__withoutChildren: !props.hasChildren }
+            'sidebar__item',
+            { sidebar__item__withoutChildren: !props.hasChildren }
           )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
           onClick={this.handleClickSpace}
         >
           {(props.canDrop && props.isOver) && (
-            <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
+            <i className={`fas fa-fw ${this.getIcon()} sidebar__item__dragNdrop`} />
           )}
 
           <div
-            className='sidebar__content__navigation__item__name'
+            className='sidebar__item__name'
             title={props.label}
           >
             <div
@@ -199,7 +199,7 @@ class WorkspaceListItem extends React.Component {
         {state.showDropdownMenuButton && (
           <DropdownMenu
             buttonIcon='fas fa-ellipsis-v'
-            buttonCustomClass='sidebar__content__navigation__item__menu'
+            buttonCustomClass='sidebar__item__menu'
             buttonTooltip={props.t('Actions')}
             buttonClick={this.activeDropdownMenu}
           >
@@ -215,7 +215,7 @@ class WorkspaceListItem extends React.Component {
             ))}
           </DropdownMenu>
         )}
-      </li>
+      </div>
     )
   }
 }

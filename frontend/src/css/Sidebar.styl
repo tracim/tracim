@@ -1,50 +1,117 @@
 sidebar-animate-speed = 0.5s
-
-[dir=ltr]
-  .sidebar
-    &__frame
-      box-shadow -1px 2px 2px 1px var(--sidebarColor)
-    &__expand
-      left sidebarWidth
-      &.sidebarclose
-        left 0
-
-[dir=rtl]
-  .sidebar
-    &__frame
-      box-shadow 1px 2px 2px 1px var(--sidebarColor)
-    &__expand
-      right sidebarWidth
-      &.sidebarclose
-        right 0
+sidebarFontColor = offWhite
+sidebarFontColorHover = grey
 
 .sidebar
-  &__expand
-    align-items center
-    background-color var(--sidebarColor)
-    cursor pointer
-    color offWhite
+  background-color var(--sidebarColor)
+  transition all sidebar-animate-speed
+  width sidebarWidth
+  min-width sidebarWidth
+  z-index 10
+  display flex
+  flex-direction column
+  &.sidebarclose
+    width 60px
+    min-width unset
+  &__header
+    height headerHeight
     display flex
+    justify-content center
+    align-items center
+    &__expand
+      color sidebarFontColor
+      padding standardSpacing
+      transition all sidebar-animate-speed
+      &:hover
+        color sidebarFontColorHover
+    & .tracimLogo
+      flex 1
+      text-align center
+  &__search
     padding standardSpacing
-    position absolute
-    transition all sidebar-animate-speed
-    z-index 15
+    & > .search
+      padding textSpacing standardSpacing
+  &__item
+    display flex
+    align-items center
+    color sidebarFontColor
+    white-space nowrap
+    overflow hidden
+    width 100%
+    height 40px
+    padding-inline-start 5px
+    & *
+      color sidebarFontColor
+    &__unread
+      font-weight bold
     &:hover
       background-color var(--sidebarColorDarken)
-    & i
-      margin-inline-start auto
-  &__frame
-    background-color var(--sidebarColor)
-    height 100vh
-    position relative
-    transition all sidebar-animate-speed
-    width sidebarWidth
-    z-index 10
-    &.sidebarclose
-      width 0
-      overflow hidden
+      color sidebarFontColor
+    &__current
+      padding-inline-start 0
+      border-inline-start-style solid
+      border-inline-start-width 5px
+      background-color var(--sidebarColorLighten)
+      font-weight bold
+      &.sidebar__search
+        padding-inline-start textSpacing
+    &__name
+      align-items center
+      display inline-flex
+      padding standardSpacing
+      width 100%
+      & .label
+        overflow hidden
+        text-overflow ellipsis
+        unicode-bidi plaintext
+    &__workspace
+      display flex
+      & > *
+        color sidebarFontColor
+      &:hover
+        background-color var(--sidebarColorDarken)
+    &__withoutChildren
+      padding-inline-start 20px
+    &__foldChildren:hover > .iconbutton__icon
+        color sidebarFontColorHover
+    &__dragNdrop
+      margin-inline-start 5px
+    &__menu.dropdownMenuButton
+      & i
+        width auto
+        color sidebarFontColor
+      &:hover
+        color sidebarFontColorHover
+      &:focus
+        outline none
+      &::after
+        display none
+  &__footer
+    margin-top auto
+    margin-bottom standardSpacing
+    display flex
+    flex-direction column
+    &__buttons
+      margin standardSpacing
+      & > *
+        margin-top standardSpacing
+        width 100%
+    &__text
+      color sidebarFontColor
+      font-size metadataFontSize
+      margin 0 auto
+      display flex
+      &__link
+        & > a
+          color sidebarFontColor
+          font-size metadataFontSize
+          margin-inline-start textSpacing
+          &:hover
+            text-decoration underline
 
-  &__mention
+
+
+  &__mention // TODO GIULIA Test
     background-color errorRed
     border-radius 50%
     font-size metadataFontSize
@@ -53,127 +120,7 @@ sidebar-animate-speed = 0.5s
     margin-inline-start standardSpacing
     min-width sideBarCircleSize
     text-align center
-  &__scrollview
-    height 100%
-    overflow-y auto
-    display flex
-    flex-direction column
-    -ms-overflow-style none // INFO - GB - 2020-10-23 - Hide scrollbar for IE and Edge
-    scrollbar-width none // INFO - GB - 2020-10-23 - Hide scrollbar for Firefox
-    &::-webkit-scrollbar // INFO - GB - 2020-10-23 - Hide scrollbar for Chrome, Safari and Opera
-      display none
-  &__scrollup
-    position fixed
-    bottom 0
-    left sidebarWidth
-    display flex
-    justify-content center
-    align-items center
-    border 1px solid var(--sidebarColor)
-    border-start-end-radius 15px
-    padding 8px 12px
-    cursor pointer
-    color offWhite
-    transition all sidebar-animate-speed
-    background-color var(--sidebarColor)
-    ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
-      left 0
-  &__content__navigation
-    transition all sidebar-animate-speed
-    &.sidebarclose
-      width 0
-    &__workspace
-      padding-inline-start 0
-      list-style none
-    &__item
-      align-items center
-      border-bottom 1px solid var(--sidebarColorDarken)
-      display flex
-      padding-inline-start textSpacing
-      &__unread
-        font-weight bold
-      &:hover
-        background-color var(--sidebarColorDarken)
-      &__withoutChildren
-        padding-inline-start 20px
-      &__foldChildren
-        color offWhite
-        &:hover
-          color lightGrey
-        & .iconbutton__icon
-          margin 0
-      &__menu.dropdownMenuButton
-        color offWhite
-        & i
-          margin 0
-          width auto
-        &:hover
-          color lightGrey
-        &:focus
-          outline none
-        &::after
-          display none
-      &__dragNdrop
-        margin-inline-start 5px
-      &__wrapper
-        display flex
-        align-items center
-        color offWhite
-        white-space nowrap
-        overflow hidden
-        width 100%
-        &:hover
-          color offWhite
-      &__number
-        display flex
-        width 50px
-        height 50px
-        padding 12px
-        letter-spacing 2px
-        & .fas
-          font-size bigIconSize
-      &__name
-        align-items center
-        display inline-flex
-        padding standardSpacing
-        width 100%
-        & .label
-          overflow hidden
-          text-overflow ellipsis
-          unicode-bidi plaintext
-      &__current
-        padding-inline-start 0
-        border-inline-start-style solid
-        border-inline-start-width 5px
-        background-color var(--sidebarColorLighten)
-        font-weight bold
-  &__footer
-    margin-top auto
-    margin-bottom standardSpacing
-    display flex
-    flex-direction column
-    &__buttons
-      width 75%
-      margin 0 auto
-      overflow hidden
-      display flex
-      flex-direction column
-      margin-bottom standardSpacing
-      & > *
-        margin-top standardSpacing
-        width 100%
-    &__text
-      color offWhite
-      font-size metadataFontSize
-      margin 0 auto
-      display flex
-      &__link
-        & > a
-          color offWhite
-          font-size metadataFontSize
-          margin-inline-start textSpacing
-          &:hover
-            text-decoration underline
+
 
 body.tox-fullscreen .sidebar
   display none
@@ -183,46 +130,29 @@ body.tox-fullscreen .sidebar
     position relative
 
   .sidebar
-    &__frame
-      position absolute
-      min-height 100%
+    position absolute
+    min-height 100%
 
 @media (min-width: min-md) and (max-width: max-md)
   .sidebarpagecontainer
     position relative
 
   .sidebar
-    &__frame
-      position absolute
-      min-height 100%
+    position absolute
+    min-height 100%
 
 @media (min-width: min-sm) and (max-width: max-sm)
   .sidebarpagecontainer
     position relative
 
   .sidebar
-    &__frame
-      position absolute
-      min-height 100%
+    position absolute
+    min-height 100%
 
 @media (max-width: max-xs)
   .sidebarpagecontainer
     position relative
 
   .sidebar
-    &__frame
-      position absolute
-      min-height 100%
-
-// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-end-end-radius and border-start-end-radius are new
-// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
-[dir=ltr] .sidebar
-  &__expand
-    border-bottom-right-radius 15px
-  &__scrollup
-    border-top-right-radius 15px
-[dir=rtl] .sidebar
-  &__expand
-    border-bottom-left-radius 15px
-  &__scrollup
-    border-top-left-radius 15px
+    position absolute
+    min-height 100%

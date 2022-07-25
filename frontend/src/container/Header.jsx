@@ -4,16 +4,12 @@ import i18n from '../util/i18n.js'
 import appFactory from '../util/appFactory.js'
 import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
-import Logo from '../component/Header/Logo.jsx'
+import Logo from '../component/Logo.jsx'
 import DropdownLang from '../component/DropdownLang.jsx'
 import { newFlashMessage, setUserLang } from '../action-creator.sync.js'
 import { putUserLang } from '../action-creator.async.js'
 import { COOKIE_FRONTEND } from '../util/helper.js'
-import {
-  ComposedIcon,
-  CUSTOM_EVENT,
-  PAGE
-} from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
 
 const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 
@@ -57,6 +53,11 @@ export class Header extends React.Component {
     return (
       <header className='header'>
         <Logo to={PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
+
+        <div
+          id='customToolboxHeaderBtn'
+          className='header__menu__rightside__specificBtn'
+        />
 
         <DropdownLang
           langList={props.lang}
