@@ -49,7 +49,7 @@ describe('Check notification dot', () => {
             params: { contentId: threadId }
           })
         })
-        cy.contains('.menuprofil__dropdown__name', baseUser.public_name)
+        cy.contains('.menuprofile__dropdown__name', baseUser.public_name)
       })
     })
 
@@ -72,7 +72,7 @@ describe('Check notification dot', () => {
             params: { contentId: threadId }
           })
         })
-        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
+        cy.contains('.menuprofile__dropdown__name', defaultAdmin.public_name)
         cy.get('.notificationButton__notification')
           .should('be.visible')
       })
@@ -98,7 +98,7 @@ describe('Check notification dot', () => {
             params: { contentId: threadId }
           })
         })
-        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
+        cy.contains('.menuprofile__dropdown__name', defaultAdmin.public_name)
         cy.get('.notificationButton__btn')
           .should('be.visible')
         cy.get('.notificationButton__mention')

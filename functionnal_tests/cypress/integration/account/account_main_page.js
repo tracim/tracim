@@ -14,10 +14,10 @@ describe('Account page', function () {
 
   it("should be able to access the account page through header's buttons", () => {
     cy.getTag({ selectorName: s.HEADER })
-      .find('[data-cy=menuprofil__dropdown__button]')
+      .find('[data-cy=menuprofile__dropdown__button]')
       .click()
 
-    cy.get('[data-cy=menuprofil__dropdown__account__link]')
+    cy.get('[data-cy=menuprofile__dropdown__account__link]')
       .click()
 
     cy.get('.userinfo')
