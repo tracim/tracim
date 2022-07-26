@@ -10,11 +10,10 @@ sidebarFontColorHover = grey
   z-index 10
   display flex
   flex-direction column
-  &.sidebarclose
-    width 60px
-    min-width unset
+  height 100vh
   &__header
     height headerHeight
+    min-height headerHeight
     display flex
     justify-content center
     align-items center
@@ -27,10 +26,13 @@ sidebarFontColorHover = grey
     & .tracimLogo
       flex 1
       text-align center
+      filter drop-shadow(0px 0px 20px grey)
   &__search
     padding standardSpacing
     & > .search
       padding textSpacing standardSpacing
+    & > .sidebar__item
+      display none
   &__item
     display flex
     align-items center
@@ -39,7 +41,9 @@ sidebarFontColorHover = grey
     overflow hidden
     width 100%
     height 40px
-    padding-inline-start 5px
+    min-height 40px
+    padding-inline-start textSpacing
+    background-color transparent
     & *
       color sidebarFontColor
     &__unread
@@ -53,6 +57,8 @@ sidebarFontColorHover = grey
       border-inline-start-width 5px
       background-color var(--sidebarColorLighten)
       font-weight bold
+      &.sidebar__item__workspace
+        padding-inline-start 0
       &.sidebar__search
         padding-inline-start textSpacing
     &__name
@@ -64,8 +70,12 @@ sidebarFontColorHover = grey
         overflow hidden
         text-overflow ellipsis
         unicode-bidi plaintext
+      & > span
+        display flex
+        align-items center
     &__workspace
       display flex
+      padding-inline-start textSpacing
       & > *
         color sidebarFontColor
       &:hover
@@ -80,12 +90,37 @@ sidebarFontColorHover = grey
       & i
         width auto
         color sidebarFontColor
-      &:hover
-        color sidebarFontColorHover
+        &:hover
+          color sidebarFontColorHover
       &:focus
         outline none
       &::after
         display none
+  &__title
+    display flex
+    color offWhite
+    font-weight bold
+    & *
+      color offWhite
+  &__spaces
+    overflow-y auto
+  &__mention
+    background-color errorRed
+    border-radius 50%
+    font-size metadataFontSize
+    font-weight bold
+    line-height mentionCircleSize
+    margin-inline-start textSpacing
+    min-width mentionCircleSize
+    display flex
+    align-items center
+    justify-content center
+  &__notification
+    height notificationCircleSize
+    width notificationCircleSize
+    border-radius 50%
+    background-color lightBlue
+    margin-inline-start textSpacing
   &__footer
     margin-top auto
     margin-bottom standardSpacing
@@ -109,18 +144,64 @@ sidebarFontColorHover = grey
           &:hover
             text-decoration underline
 
+// INFO - GB - 2022-07-26 - Closed sidebar
+.sidebar
+  &.sidebarClose
+    width 60px
+    min-width unset
+    & .tracimLogo
+      display none
+    & .sidebar__search
+      padding 0
+      & > .search
+        display none
+      & > .sidebar__item
+        display flex
+    & .sidebar__item
+      justify-content center
+      & > span
+        display none
+      &__name
+        justify-content center
+        & > span
+          display none
+        & .sidebar__mention, .sidebar__notification
+          font-size 0
+          min-width wallCircleSize
+          height wallCircleSize
+          position absolute
+          margin-inline-start 25px
+      &__foldChildren
+        display none
+    & .sidebar__spaces
+      display none
+    & .sidebar__footer
+      & .iconbutton__label
+        display none
+      & .sidebar__footer__text
+        display none
 
-
-  &__mention // TODO GIULIA Test
-    background-color errorRed
-    border-radius 50%
-    font-size metadataFontSize
-    font-weight bold
-    line-height sideBarCircleSize
-    margin-inline-start standardSpacing
-    min-width sideBarCircleSize
-    text-align center
-
+// INFO - GB - 2022-07-26 - Icon colors
+.sidebar__search__item i
+  color grey
+.sidebar__notification__item i
+  color lightBlue
+.sidebar__activities__item i
+  color warningOrange
+.sidebar__agendas__item i
+  color #ff4b3a
+.sidebar__tasks__item i
+  color greenToDo
+.sidebar__favorites__item i
+  color #ffeb3b
+.sidebar__spaces__item i
+  color #ad3bdb
+.sidebar__users__item i
+  color #946645
+.sidebar__account__item i
+  color #00bcd4
+.sidebar__logout__item i
+  color errorRed
 
 body.tox-fullscreen .sidebar
   display none

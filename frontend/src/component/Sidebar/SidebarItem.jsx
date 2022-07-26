@@ -12,7 +12,8 @@ const SidebarItem = (props) => {
           className={classnames('sidebar__item',
             {
               'sidebar__item__current primaryColorBorder': props.isCurrentItem
-            }
+            },
+            props.customClass
           )}
           to={props.to}
           onClick={isMobile ? props.onClickToggleSidebar : () => { }}
@@ -25,9 +26,8 @@ const SidebarItem = (props) => {
             <Icon
               icon={props.icon}
               title={props.label}
-              color='#fdfdfd'
             />
-            &nbsp;{props.label}
+            <span>&nbsp;{props.label}</span>
           </div>
         </Link>
       ) : (
@@ -35,7 +35,8 @@ const SidebarItem = (props) => {
           className={classnames('transparentButton sidebar__item',
             {
               'sidebar__item__current primaryColorBorder': props.isCurrentItem
-            }
+            },
+            props.customClass
           )}
           onClick={props.onClickItem}
           data-cy={props.dataCy}
@@ -47,18 +48,15 @@ const SidebarItem = (props) => {
             <Icon
               icon={props.icon}
               title={props.label}
-              color='#fdfdfd'
             />
-            &nbsp;{props.label}
+            <span>&nbsp;{props.label}</span>
             {props.unreadMentionCount > 0 && (
-              <div
-                className='notificationButton__mention' // TODO GIULIA Nommage et test
-              >
+              <div className='sidebar__mention'>
                 {props.unreadMentionCount > 99 ? '99+' : props.unreadMentionCount}
               </div>
             )}
             {props.unreadMentionCount === 0 && props.unreadNotificationCount > 0 && (
-              <div className='notificationButton__notification' /> // TODO GIULIA Nommage et test
+              <div className='sidebar__notification' />
             )}
           </div>
         </button>

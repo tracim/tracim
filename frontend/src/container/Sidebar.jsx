@@ -7,7 +7,7 @@ import appFactory from '../util/appFactory.js'
 import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
 import { addWorkspaceList } from '../action-creator.sync.js'
 import Logo from '../component/Logo.jsx'
-import MenuProfil from '../component/Header/MenuActionListItem/MenuProfil.jsx'
+import MenuProfile from '../component/Header/MenuActionListItem/MenuProfile.jsx'
 import SearchInput from '../component/Search/SearchInput.jsx'
 import {
   ADVANCED_SEARCH_TYPE,
@@ -48,7 +48,9 @@ export class Sidebar extends React.Component {
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
       foldedSpaceList: [],
-      sidebarClose: isMobile
+      sidebarClose: isMobile,
+      showSpaceList: true,
+      showUserItems: true
     }
 
     props.registerCustomEventHandlerList([
@@ -179,6 +181,10 @@ export class Sidebar extends React.Component {
     this.setState(previousState => ({ sidebarClose: !previousState.sidebarClose }))
   }
 
+  handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
+
+  handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
+
   handleClickLogout = () => {
     this.props.dispatch(logoutUser(this.props.history))
   }
@@ -187,14 +193,8 @@ export class Sidebar extends React.Component {
 
   handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
 
-  /* TODO GIULIA
-   - Talvez dividir o componente em 3+ : opçoes, espaços, footer.
-   - Fazer titulo pros espaços
-   - Mecanismo de fold/unfold.
-   - Fix titulos que estao se mexendo quando item ativo.
-   - Fix scroll.
-   - Closed sidebar
-  */
+  // TODO GIULIA Talvez dividir o componente em 3+ : opçoes, espaços, footer
+
   render () {
     const { props, state } = this
 
@@ -206,10 +206,10 @@ export class Sidebar extends React.Component {
     const isUserManager = props.user.profile === PROFILE.manager.slug
 
     return (
-      <div ref={this.frameRef} className={classnames('sidebar', { sidebarclose: state.sidebarClose })}>
+      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.sidebarClose })}>
         <div className='sidebar__header'>
           <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
-          <button className={classnames('transparentButton sidebar__header__expand', { sidebarclose: state.sidebarClose })} onClick={this.handleClickToggleSidebar}>
+          <button className='transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
             {state.sidebarClose
               ? <i className='fas fa-chevron-right' title={props.t('See sidebar')} />
               : <i className='fas fa-chevron-left' title={props.t('Hide sidebar')} />}
@@ -226,89 +226,139 @@ export class Sidebar extends React.Component {
             onClickSearch={this.handleClickSearch}
             searchString={props.simpleSearch.searchString}
           />
+
+          <SidebarItem
+            customClass='sidebar__search__item'
+            label={props.t('Search')}
+            icon='fas fa-search'
+            onClickItem={() => this.handleClickSearch('')}
+          />
         </div>
 
-        <MenuProfil
-          user={props.user}
-          onClickLogout={this.handleClickLogout}
-          isCurrentItem={props.location.pathname === PAGE.PUBLIC_PROFILE(props.user.userId) && !props.isNotificationWallOpen}
-        />
-
         <SidebarItem
-          to={PAGE.ACCOUNT}
-          label={props.t('Account Settings')}
-          icon='fas fa-cogs'
-          isCurrentItem={props.location.pathname === PAGE.ACCOUNT && !props.isNotificationWallOpen}
-          dataCy='menuprofil__dropdown__account__link'
-        />
-
-        <SidebarItem
-          label={props.t('Log out')}
-          icon='fas fa-sign-out-alt'
-          onClickItem={this.handleClickLogout}
-          dataCy='menuprofil__dropdown__logout__link'
-        />
-
-        <SidebarItem
+          customClass='sidebar__notification__item'
           label={props.t('Notifications')}
-          icon='far fa-bell'
+          icon='fas fa-bell'
           onClickItem={props.onClickNotification}
           unreadMentionCount={props.unreadMentionCount}
           unreadNotificationCount={props.unreadNotificationCount}
           isCurrentItem={props.isNotificationWallOpen}
         />
 
-        {isUserAdministrator && (
-          <SidebarItem
-            to={PAGE.ADMIN.WORKSPACE}
-            label={props.t('Space management')}
-            icon={workspaceConfig.faIcon}
-            isCurrentItem={props.location.pathname === PAGE.ADMIN.WORKSPACE && !props.isNotificationWallOpen}
-          />
-        )}
-
-        {isUserAdministrator && (
-          <SidebarItem
-            to={PAGE.ADMIN.USER}
-            label={props.t('User account management')}
-            icon='far fa-user'
-            isCurrentItem={props.location.pathname === PAGE.ADMIN.USER && !props.isNotificationWallOpen}
-          />
-        )}
-
-        {isAgendaEnabled && (
-          <SidebarItem
-            to={PAGE.AGENDA}
-            label={props.t('Agendas')}
-            icon='fas fa-calendar-alt'
-            isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
-          />
-        )}
-
-        {isToDoEnabled && (
-          <SidebarItem
-            to={PAGE.TODO}
-            label={props.t('My tasks')}
-            icon='fas fa-check-square'
-            isCurrentItem={props.location.pathname === PAGE.TODO && !props.isNotificationWallOpen}
-          />
-        )}
-
-        <SidebarItem
-          to={PAGE.FAVORITES}
-          label={props.t('Favorites')}
-          icon='far fa-star'
-          isCurrentItem={props.location.pathname === PAGE.FAVORITES && !props.isNotificationWallOpen}
+        <MenuProfile
+          user={props.user}
+          onClickLogout={this.handleClickLogout}
+          isCurrentItem={props.location.pathname === PAGE.PUBLIC_PROFILE(props.user.userId) && !props.isNotificationWallOpen}
+          showUserItems={state.showUserItems}
+          onClickToggleUserItems={this.handleClickToggleUserItems}
         />
 
-        <SidebarItem
-          to={PAGE.RECENT_ACTIVITIES}
-          label={props.t('Recent activities')}
-          icon='far fa-newspaper'
-          isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
-        />
+        {(state.showUserItems || state.sidebarClose) && (
+          <>
+            <SidebarItem
+              customClass='sidebar__activities__item'
+              to={PAGE.RECENT_ACTIVITIES}
+              label={props.t('Recent activities')}
+              icon='fas fa-newspaper'
+              isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
+            />
 
-        {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
+            {isAgendaEnabled && (
+              <SidebarItem
+                customClass='sidebar__agendas__item'
+                to={PAGE.AGENDA}
+                label={props.t('Agendas')}
+                icon='fas fa-calendar-alt'
+                isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
+              />
+            )}
+
+            {isToDoEnabled && (
+              <SidebarItem
+                customClass='sidebar__tasks__item'
+                to={PAGE.TODO}
+                label={props.t('My tasks')}
+                icon='fas fa-check-square'
+                isCurrentItem={props.location.pathname === PAGE.TODO && !props.isNotificationWallOpen}
+              />
+            )}
+
+            <SidebarItem
+              customClass='sidebar__favorites__item'
+              to={PAGE.FAVORITES}
+              label={props.t('Favorites')}
+              icon='fas fa-star'
+              isCurrentItem={props.location.pathname === PAGE.FAVORITES && !props.isNotificationWallOpen}
+            />
+
+            {isUserAdministrator && (
+              <SidebarItem
+                customClass='sidebar__spaces__item'
+                to={PAGE.ADMIN.WORKSPACE}
+                label={props.t('Space management')}
+                icon={workspaceConfig.faIcon}
+                isCurrentItem={props.location.pathname === PAGE.ADMIN.WORKSPACE && !props.isNotificationWallOpen}
+              />
+            )}
+
+            {isUserAdministrator && (
+              <SidebarItem
+                customClass='sidebar__users__item'
+                to={PAGE.ADMIN.USER}
+                label={props.t('User account management')}
+                icon='fas fa-user-cog'
+                isCurrentItem={props.location.pathname === PAGE.ADMIN.USER && !props.isNotificationWallOpen}
+              />
+            )}
+
+            <SidebarItem
+              customClass='sidebar__account__item'
+              to={PAGE.ACCOUNT}
+              label={props.t('Account Settings')}
+              icon='fas fa-cogs'
+              isCurrentItem={props.location.pathname === PAGE.ACCOUNT && !props.isNotificationWallOpen}
+              dataCy='menuprofile__dropdown__account__link'
+            />
+
+            <SidebarItem
+              customClass='sidebar__logout__item'
+              label={props.t('Log out')}
+              icon='fas fa-sign-out-alt'
+              onClickItem={this.handleClickLogout}
+              dataCy='menuprofile__dropdown__logout__link'
+            />
+          </>
+        )}
+
+        {!state.sidebarClose && (
+          <div className='sidebar__title'>
+            <IconButton
+              customClass='sidebar__item__foldChildren'
+              icon={`fas fa-caret-${state.showSpaceList ? 'down' : 'right'}`}
+              title={state.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
+              intent='link'
+              mode='light'
+              onClick={this.handleClickToggleSpaceList}
+            />
+            <div className='sidebar__item__name'>
+              {props.t('Spaces')}
+            </div>
+          </div>
+        )}
+
+        {state.sidebarClose && (
+          <SidebarItem
+            label={props.t('Spaces')}
+            icon='fas fa-users'
+            onClickItem={this.handleClickToggleSidebar}
+          />
+        )}
+
+        {state.showSpaceList && (
+          <div className='sidebar__spaces'>
+            {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
+          </div>
+        )}
 
         <div className='sidebar__footer'>
           <div className='sidebar__footer__buttons'>
