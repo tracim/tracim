@@ -571,6 +571,7 @@ export class Publications extends React.Component {
         <TabBar
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
+          emailNotifActivated={props.system.config.email_notification_activated}
         />
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='publishAreaContainer'>
@@ -671,6 +672,7 @@ const mapStateToProps = ({
   breadcrumbs,
   currentWorkspace,
   publicationPage,
+  system,
   user
-}) => ({ breadcrumbs, currentWorkspace, publicationPage, user })
+}) => ({ breadcrumbs, currentWorkspace, publicationPage, system, user })
 export default connect(mapStateToProps)(withRouter(translate()(appContentFactory(TracimComponent(Publications)))))

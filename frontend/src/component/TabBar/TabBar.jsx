@@ -22,7 +22,7 @@ export const TabBar = props => {
         icon={spaceType.faIcon}
         breadcrumbsList={props.breadcrumbs}
         iconTooltip={spaceType.label}
-        // emailNotifActivated={props.system.config.email_notification_activated}
+        emailNotifActivated={props.emailNotifActivated}
       />
 
       <div className='tabBar__tabs'>

@@ -114,7 +114,7 @@ export class AdminUser extends React.Component {
           title={props.t('User account management')}
           icon='fas fa-users'
           breadcrumbsList={props.breadcrumbsList}
-          // emailNotifActivated={props.system.config.email_notification_activated}
+          emailNotifActivated={props.emailNotifActivated}
         />
 
         <PageContent parentClass='adminUser'>

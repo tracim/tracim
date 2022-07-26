@@ -715,6 +715,7 @@ export class WorkspaceContent extends React.Component {
             <TabBar
               currentSpace={props.currentWorkspace}
               breadcrumbs={breadcrumbs}
+              emailNotifActivated={props.system.config.email_notification_activated}
             />
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__buttons'>
@@ -855,7 +856,7 @@ export class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(WorkspaceContent)))))

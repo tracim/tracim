@@ -555,6 +555,7 @@ export class AdminWorkspaceUser extends React.Component {
             onClickNewWorkspace={this.handleClickNewSpace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
+            emailNotifActivated={state.config.system.config.email_notification_activated}
           />
         )}
 

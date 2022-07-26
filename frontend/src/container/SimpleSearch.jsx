@@ -207,7 +207,7 @@ export class SimpleSearch extends React.Component {
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
-              // emailNotifActivated={props.system.config.email_notification_activated}
+              emailNotifActivated={props.system.config.email_notification_activated}
             />
             {state.isLoading
               ? <Loading />

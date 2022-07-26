@@ -93,7 +93,7 @@ export class PersonalRecentActivities extends React.Component {
           icon='far fa-newspaper'
           iconTooltip={props.t('Recent activities')}
           breadcrumbsList={props.breadcrumbs}
-          // emailNotifActivated={props.system.config.email_notification_activated}
+          emailNotifActivated={props.system.config.email_notification_activated}
         />
         <PageContent>
           <ActivityList
@@ -120,7 +120,7 @@ PersonalRecentActivities.propTypes = {
   onEventClicked: PropTypes.func
 }
 
-const mapStateToProps = ({ lang, user, userActivity, breadcrumbs, workspaceList }) => ({ lang, user, activity: userActivity, breadcrumbs, workspaceList })
+const mapStateToProps = ({ lang, user, userActivity, breadcrumbs, system, workspaceList }) => ({ lang, user, activity: userActivity, breadcrumbs, system, workspaceList })
 const component = withActivity(
   TracimComponent(PersonalRecentActivities),
   setUserActivityList,

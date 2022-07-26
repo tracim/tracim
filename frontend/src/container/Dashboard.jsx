@@ -460,6 +460,7 @@ export class Dashboard extends React.Component {
             <TabBar
               currentSpace={props.currentWorkspace}
               breadcrumbs={props.breadcrumbs}
+              emailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent>

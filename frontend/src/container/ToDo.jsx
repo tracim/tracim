@@ -244,7 +244,7 @@ const ToDo = (props) => {
               title={props.t('My tasks')}
               icon='fas fa-check-square'
               breadcrumbsList={props.breadcrumbs}
-              // emailNotifActivated={props.system.config.email_notification_activated}
+              emailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent
@@ -313,5 +313,5 @@ const ToDo = (props) => {
   )
 }
 
-const mapStateToProps = ({ breadcrumbs, user, workspaceList }) => ({ breadcrumbs, user, workspaceList })
+const mapStateToProps = ({ breadcrumbs, system, user, workspaceList }) => ({ breadcrumbs, system, user, workspaceList })
 export default connect(mapStateToProps)(translate()(TracimComponent(ToDo)))
