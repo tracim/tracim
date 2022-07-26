@@ -325,15 +325,15 @@ First setup the needed tools and directories (only needed once):
     # - https://docs.docker.com/engine/install/
     # - https://docs.docker.com/compose/install/
     # On Debian systems the following lines are enough
-    sudo apt install docker.io docker-compose
+    sudo apt install docker.io docker-compose-plugin
     # add the current user to docker group, you'll need to use a new login shell for this change to be taken into account
     sudo usermod -a -G docker $USER
 
 Running tests can be done with:
 
-    docker-compose up -d
+    docker compose up -d
     pytest
-    docker-compose down
+    docker compose down
 
 
 By default the tests will be executed with the `sqlite` database, this can be changed using the `--database` argument of pytest:
@@ -349,7 +349,7 @@ It is possible to specify several databases or even `all`:
     # Run tests on all databases
     pytest --forked --database=all
 
-### Docker-compose test file
+### Docker compose test file
 
 The [docker-compose.yml](docker-compose.yml) file lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the [.env](.env) file next to `docker-compose.yml`.
 

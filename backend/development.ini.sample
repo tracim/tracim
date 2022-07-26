@@ -100,7 +100,7 @@ basic_setup.session_secret = change_this_value_please!
 ; live_messages.control_zmq_uri = tcp://localhost:5563
 # stats socket uri for GRIP protocol reverse-proxy (PushPin)
 # this is the base url used for listening to events related to connection to the
-# reverse-proxy. If you are running pushpin using the docker-compose, set this
+# reverse-proxy. If you are running pushpin using the docker compose, set this
 # parameter to tcp://localhost:5564
 ; live_messages.stats_zmq_uri = ipc:///var/run/pushpin/pushpin-stats
 # do tracim block until publishing is complete or not

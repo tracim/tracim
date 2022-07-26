@@ -1,7 +1,7 @@
 # Optional services for testing/developing Tracim backend.
 # Those aren't currently needed by the automated tests.
 # WARNING: This file is meant for testing only and mustn't be used as-is for production environments.
-# Production-ready docker-compose examples are available in the "tools_docker" directory of the Tracim repository.
+# Production-ready docker compose examples are available in the "tools_docker" directory of the Tracim repository.
 version: '3'
 services:
   collabora:

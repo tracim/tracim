@@ -2,7 +2,7 @@
 # Also useful for local development.
 # By default the mysql & mariadb databases will be lost when the container is exited (see TMPFS_DIR).
 # WARNING: This file is meant for testing only and mustn't be used as-is for production environments.
-# Production-ready docker-compose examples are available in the "tools_docker" directory of the Tracim repository.
+# Production-ready docker compose examples are available in the "tools_docker" directory of the Tracim repository.
 version: '3'
 services:
   pushpin:
