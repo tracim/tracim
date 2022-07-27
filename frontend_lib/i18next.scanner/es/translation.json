@@ -82,7 +82,7 @@
   "Drag and drop your file here": "Arrastre y suelte su archivo aquí",
   "Drag and drop your files here": "Arrastre y suelte sus archivos aquí",
   "You can also import your file by clicking here": "También puede importar su archivo haciendo clic aquí",
-  "You can also import your files by clicking here": "También puede importar su archivo haciendo clic aquí",
+  "You can also import your files by clicking here": "También puede importar sus archivos haciendo clic aquí",
   "Copy link": "Copiar enlace",
   "Delete link": "Borrar enlace",
   "New share": "Compartir un enlace",
@@ -246,10 +246,10 @@
   "Error while deleting to do": "Error al eliminar esta tarea",
   "You are not allowed to delete this to do": "No puede eliminar esta tarea",
   "Information": "Información",
-  "To create a task, type the + character followed by the username, then the text of your task.": "",
-  "Each new line corresponds to a new task.": "",
-  "For the task to be assigned to a member, the username must be at the beginning of the line.": "",
-  "+username please read the document": "",
+  "To create a task, type the + character followed by the username, then the text of your task.": "Para crear una tarea, escriba el carácter + seguido del nombre de usuario y luego el texto de su tarea.",
+  "Each new line corresponds to a new task.": "Cada nueva línea corresponde a una nueva tarea.",
+  "For the task to be assigned to a member, the username must be at the beginning of the line.": "Para que la tarea se asigne a un miembro, el nombre de usuario debe estar al principio de la línea.",
+  "+username please read the document": "+nombre de usuario por favor lea el documento",
   "This content has no task to do associated.": "Este contenido no tiene ninguna tarea asociada.",
   "Click on \"New task\" button to create a new one.": "Haga clic en el botón \"Nueva tarea\" para crear una nueva."
 }
