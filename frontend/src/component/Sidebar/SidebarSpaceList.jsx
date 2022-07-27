@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   createSpaceTree,
@@ -6,7 +7,10 @@ import {
   ROLE_LIST,
   sortWorkspaceList
 } from 'tracim_frontend_lib'
-import { findUserRoleIdInWorkspace } from '../../util/helper.js'
+import {
+  findUserRoleIdInWorkspace,
+  NO_ACTIVE_SPACE_ID
+} from '../../util/helper.js'
 import SidebarItem from './SidebarItem.jsx'
 import SidebarSpaceItem from './SidebarSpaceItem.jsx'
 
@@ -38,7 +42,7 @@ const SidebarSpaceList = (props) => {
 
   return (
     <>
-      {!props.sidebarClose && (
+      {!props.isSidebarClose && (
         <div className='sidebar__title'>
           <IconButton
             customClass='sidebar__item__foldChildren'
@@ -54,7 +58,7 @@ const SidebarSpaceList = (props) => {
         </div>
       )}
 
-      {props.sidebarClose && (
+      {props.isSidebarClose && (
         <SidebarItem
           label={props.t('Spaces')}
           icon='fas fa-users'
@@ -71,3 +75,30 @@ const SidebarSpaceList = (props) => {
   )
 }
 export default translate()(SidebarSpaceList)
+
+SidebarSpaceList.propTypes = {
+  userId: PropTypes.number.isRequired,
+  activeWorkspaceId: PropTypes.number,
+  foldedSpaceList: PropTypes.array,
+  isNotificationWallOpen: PropTypes.bool,
+  isSidebarClose: PropTypes.bool,
+  onClickAllContent: PropTypes.func,
+  onClickToggleSidebar: PropTypes.func,
+  onClickToggleSpaceList: PropTypes.func,
+  onToggleFoldChildren: PropTypes.func,
+  showSpaceList: PropTypes.bool,
+  spaceList: PropTypes.array
+}
+
+SidebarSpaceList.defaultProps = {
+  activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+  foldedSpaceList: [],
+  isNotificationWallOpen: false,
+  isSidebarClose: false,
+  onClickAllContent: () => { },
+  onClickToggleSidebar: () => { },
+  onClickToggleSpaceList: () => { },
+  onToggleFoldChildren: () => { },
+  showSpaceList: true,
+  spaceList: []
+}

@@ -43,9 +43,9 @@ export class Sidebar extends React.Component {
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
       foldedSpaceList: [],
+      isSidebarClose: isMobile,
       showSpaceList: true,
-      showUserItems: true,
-      sidebarClose: isMobile
+      showUserItems: true
     }
 
     props.registerCustomEventHandlerList([
@@ -134,12 +134,12 @@ export class Sidebar extends React.Component {
 
   handleClickToggleSidebar = () => {
     GLOBAL_dispatchEvent({
-      type: this.state.sidebarClose
+      type: this.state.isSidebarClose
         ? CUSTOM_EVENT.SHOW_SIDEBAR
         : CUSTOM_EVENT.HIDE_SIDEBAR,
       data: {}
     })
-    this.setState(previousState => ({ sidebarClose: !previousState.sidebarClose }))
+    this.setState(previousState => ({ isSidebarClose: !previousState.isSidebarClose }))
   }
 
   handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
@@ -163,11 +163,11 @@ export class Sidebar extends React.Component {
     const isUserManager = props.user.profile === PROFILE.manager.slug
 
     return (
-      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.sidebarClose })}>
+      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClose })}>
         <div className='sidebar__header'>
           <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
           <button className='transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
-            {state.sidebarClose
+            {state.isSidebarClose
               ? <i className='fas fa-chevron-right' title={props.t('See sidebar')} />
               : <i className='fas fa-chevron-left' title={props.t('Hide sidebar')} />}
           </button>
@@ -203,7 +203,7 @@ export class Sidebar extends React.Component {
         />
 
         <SidebarUserItemList
-          sidebarClose={state.sidebarClose}
+          isSidebarClose={state.isSidebarClose}
           isNotificationWallOpen={props.isNotificationWallOpen}
           user={props.user}
           onClickLogout={this.handleClickLogout}
@@ -216,7 +216,7 @@ export class Sidebar extends React.Component {
         />
 
         <SidebarSpaceList
-          sidebarClose={state.sidebarClose}
+          isSidebarClose={state.isSidebarClose}
           showSpaceList={state.showSpaceList}
           onClickToggleSpaceList={this.handleClickToggleSpaceList}
           onClickToggleSidebar={this.handleClickToggleSidebar}

@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { PAGE } from 'tracim_frontend_lib'
 import { workspaceConfig } from '../../util/helper.js'
@@ -15,7 +16,7 @@ const SidebarUserItemList = (props) => {
         user={props.user}
       />
 
-      {(props.showUserItems || props.sidebarClose) && (
+      {(props.showUserItems || props.isSidebarClose) && (
         <>
           <SidebarItem
             customClass='sidebar__activities__item'
@@ -95,3 +96,27 @@ const SidebarUserItemList = (props) => {
   )
 }
 export default translate()(SidebarUserItemList)
+
+SidebarUserItemList.propTypes = {
+  location: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  isAgendaEnabled: PropTypes.bool,
+  isNotificationWallOpen: PropTypes.bool,
+  isSidebarClose: PropTypes.bool,
+  isToDoEnabled: PropTypes.bool,
+  isUserAdministrator: PropTypes.bool,
+  onClickLogout: PropTypes.func,
+  onClickToggleUserItems: PropTypes.func,
+  showUserItems: PropTypes.bool
+}
+
+SidebarUserItemList.defaultProps = {
+  isAgendaEnabled: false,
+  isNotificationWallOpen: false,
+  isSidebarClose: false,
+  isToDoEnabled: false,
+  isUserAdministrator: false,
+  onClickLogout: () => { },
+  onClickToggleUserItems: () => { },
+  showUserItems: true
+}

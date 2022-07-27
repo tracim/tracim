@@ -44,9 +44,9 @@ describe('<Sidebar />', () => {
 
   describe('static design', () => {
     it('should close the sidebar with a mobile (isMobile = true)', () => {
-      wrapper.setState({ sidebarClose: true })
+      wrapper.setState({ isSidebarClose: true })
       expect(wrapper.find('.sidebar.sidebarClose').length).to.equal(1)
-      wrapper.setState({ sidebarClose: false })
+      wrapper.setState({ isSidebarClose: false })
     })
   })
 
