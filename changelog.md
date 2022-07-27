@@ -1,3 +1,11 @@
+# 4.3.1 / 2022-07-21
+
+### Fixed Issues
+
+- Frontend: [#5803](https://github.com/tracim/tracim/issues/5803)
+- Docker: [#5801](https://github.com/tracim/tracim/pull/5801)
+
+
 # 4.3.0 / 2022-07-21
 
 ### New Features
