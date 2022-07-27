@@ -106,6 +106,7 @@ export class AdminForm extends React.Component {
   }
 
   render () {
+    const { props } = this
     return (
       <PageWrapper customClass='adminUser'>
         <PageTitle
