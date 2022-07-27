@@ -22,7 +22,7 @@ export const TabBar = props => {
         icon={spaceType.faIcon}
         breadcrumbsList={props.breadcrumbs}
         iconTooltip={spaceType.label}
-        emailNotifActivated={props.emailNotifActivated}
+        isEmailNotifActivated={props.isEmailNotifActivated}
       />
 
       <div className='tabBar__tabs'>
@@ -54,5 +54,10 @@ export default translate()(TabBar)
 
 TabBar.propTypes = {
   currentSpace: PropTypes.object.isRequired,
-  breadcrumbs: PropTypes.array.isRequired
+  breadcrumbs: PropTypes.array.isRequired,
+  isEmailNotifActivated: PropTypes.bool
+}
+
+TabBar.defaultProps = {
+  isEmailNotifActivated: false
 }

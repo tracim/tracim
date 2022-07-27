@@ -114,7 +114,7 @@ export class AdminUser extends React.Component {
           title={props.t('User account management')}
           icon='fas fa-users'
           breadcrumbsList={props.breadcrumbsList}
-          emailNotifActivated={props.emailNotifActivated}
+          isEmailNotifActivated={props.isEmailNotifActivated}
         />
 
         <PageContent parentClass='adminUser'>
@@ -133,7 +133,7 @@ export class AdminUser extends React.Component {
             />
 
             <div className='adminUser__adduser__emailstate'>
-              {!props.emailNotifActivated && (
+              {!props.isEmailNotifActivated && (
                 <div>
                   <ComposedIcon
                     mainIcon='far fa-envelope'
@@ -153,7 +153,7 @@ export class AdminUser extends React.Component {
               onClickAddUser={this.handleClickAddUser}
               onClickCreateUserAndAddToSpaces={props.onClickCreateUserAndAddToSpaces}
               onChangeUsername={props.onChangeUsername}
-              emailNotifActivated={props.emailNotifActivated}
+              isEmailNotifActivated={props.isEmailNotifActivated}
               isUsernameValid={props.isUsernameValid}
               usernameInvalidMsg={props.usernameInvalidMsg}
               isEmailRequired={props.isEmailRequired}

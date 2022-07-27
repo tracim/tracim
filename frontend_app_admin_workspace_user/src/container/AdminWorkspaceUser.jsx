@@ -555,7 +555,7 @@ export class AdminWorkspaceUser extends React.Component {
             onClickNewWorkspace={this.handleClickNewSpace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
-            emailNotifActivated={state.config.system.config.email_notification_activated}
+            isEmailNotifActivated={state.config.system.config.email_notification_activated}
           />
         )}
 
@@ -564,7 +564,7 @@ export class AdminWorkspaceUser extends React.Component {
             loaded={state.loaded}
             userList={state.content.userList}
             loggedUserId={state.loggedUser.userId}
-            emailNotifActivated={state.config.system.config.email_notification_activated}
+            isEmailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}
             onChangeProfile={this.handleUpdateProfile}
             onClickAddUser={this.handleClickAddUser}

@@ -115,7 +115,7 @@ export const NewMemberForm = props => {
           )}
 
           {(props.canSendInviteNewUser && props.userRoleIdInWorkspace >= ROLE.workspaceManager.id) && (
-            props.emailNotifActivated
+            props.isEmailNotifActivated
               ? (
                 <div className='name__adminmsg'>
                   <i className='name__adminmsg__icon far fa-fw fa-lightbulb-o' />
@@ -173,7 +173,7 @@ NewMemberForm.propTypes = {
   onClickAutoComplete: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.number,
   canSendInviteNewUser: PropTypes.bool,
-  emailNotifActivated: PropTypes.bool,
+  isEmailNotifActivated: PropTypes.bool,
   roleList: PropTypes.arrayOf(PropTypes.object),
   autoCompleteClicked: PropTypes.bool,
   onClickBtnValidate: PropTypes.func,
@@ -190,7 +190,7 @@ NewMemberForm.defaultProps = {
   isEmail: false,
   userRoleIdInWorkspace: 0,
   canSendInviteNewUser: false,
-  emailNotifActivated: false,
+  isEmailNotifActivated: false,
   roleList: [],
   autoCompleteClicked: false,
   autoCompleteActive: false,

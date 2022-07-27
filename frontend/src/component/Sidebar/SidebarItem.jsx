@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Link, withRouter } from 'react-router-dom'
 import classnames from 'classnames'
 import { isMobile } from 'react-device-detect'
@@ -64,3 +65,27 @@ const SidebarItem = (props) => {
   )
 }
 export default withRouter(SidebarItem)
+
+SidebarItem.propTypes = {
+  icon: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  customClass: PropTypes.string,
+  dataCy: PropTypes.string,
+  isCurrentItem: PropTypes.bool,
+  onClickItem: PropTypes.func,
+  onClickToggleSidebar: PropTypes.func,
+  to: PropTypes.string,
+  unreadMentionCount: PropTypes.number,
+  unreadNotificationCount: PropTypes.number
+}
+
+SidebarItem.defaultProps = {
+  customClass: '',
+  dataCy: '',
+  onClickItem: () => { },
+  onClickToggleSidebar: () => { },
+  isCurrentItem: false,
+  to: '',
+  unreadMentionCount: 0,
+  unreadNotificationCount: 0
+}

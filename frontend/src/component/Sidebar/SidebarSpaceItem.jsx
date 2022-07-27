@@ -1,27 +1,19 @@
 import React from 'react'
+import classnames from 'classnames'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter, Link } from 'react-router-dom'
-import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import {
-  DRAG_AND_DROP,
-  NO_ACTIVE_SPACE_ID
-} from '../../util/helper.js'
-import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
-import {
-  putNotificationAsRead
-} from '../../action-creator.async.js'
-import {
-  newFlashMessage,
-  readNotification
-} from '../../action-creator.sync.js'
+import { DropdownMenu, IconButton, PAGE, ROLE } from 'tracim_frontend_lib'
+import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
+import { putNotificationAsRead } from '../../action-creator.async.js'
+import { newFlashMessage, readNotification } from '../../action-creator.sync.js'
 
 const qs = require('query-string')
 
-class WorkspaceListItem extends React.Component {
+class SidebarSpaceItem extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -235,28 +227,30 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
 })
 
 const mapStateToProps = ({ notificationPage, user }) => ({ notificationPage, user })
-export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(WorkspaceListItem))))
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(SidebarSpaceItem))))
 
-WorkspaceListItem.propTypes = {
+SidebarSpaceItem.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  workspaceId: PropTypes.number.isRequired,
   activeWorkspaceId: PropTypes.number,
   allowedAppList: PropTypes.array,
   foldChildren: PropTypes.bool,
   hasChildren: PropTypes.bool,
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
+  isNotificationWallOpen: PropTypes.bool,
   level: PropTypes.number,
   onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
-  userRoleIdInWorkspace: PropTypes.array,
-  workspaceId: PropTypes.number.isRequired
+  userRoleIdInWorkspace: PropTypes.array
 }
 
-WorkspaceListItem.defaultProps = {
+SidebarSpaceItem.defaultProps = {
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   allowedAppList: [],
   foldChildren: false,
   hasChildren: false,
+  isNotificationWallOpen: false,
   level: 0,
   onClickAllContent: () => { },
   onClickToggleSidebar: () => {},

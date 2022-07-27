@@ -112,7 +112,7 @@ export class AdminForm extends React.Component {
           parentClass='adminUser'
           title='Formulaires manager'
           icon='users'
-          emailNotifActivated={props.emailNotifActivated}
+          isEmailNotifActivated={props.isEmailNotifActivated}
         />
 
         <PageContent parentClass='adminUser'>

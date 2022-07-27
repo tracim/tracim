@@ -5,7 +5,7 @@ import { AddUserForm } from '../../src/component/AddUserForm.jsx'
 
 describe('<AddUserForm />', () => {
   const props = {
-    emailNotifActivated: true,
+    isEmailNotifActivated: true,
     isEmailRequired: true,
     isUsernameValid: true
   }
@@ -41,7 +41,7 @@ describe('<AddUserForm />', () => {
 
       it('should return true if the email notification are deactivated and the password are empty', () => {
         wrapper.setState({ newUserPassword: '' })
-        wrapper.setProps({ emailNotifActivated: false })
+        wrapper.setProps({ isEmailNotifActivated: false })
         expect(wrapper.instance().isValidateButtonDisabled()).to.equal(true)
       })
 

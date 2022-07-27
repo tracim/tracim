@@ -157,7 +157,7 @@ export class NewUpload extends React.Component {
           </button>
         </div>
 
-        {!props.emailNotifActivated && (
+        {!props.isEmailNotifActivated && (
           <div className='newUpload__emailWarning'>
             <ComposedIcon
               mainIcon='far fa-envelope'

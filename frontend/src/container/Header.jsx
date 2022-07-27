@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import i18n from '../util/i18n.js'
-import appFactory from '../util/appFactory.js'
 import { translate } from 'react-i18next'
 import * as Cookies from 'js-cookie'
+import i18n from '../util/i18n.js'
+import appFactory from '../util/appFactory.js'
 import Logo from '../component/Logo.jsx'
 import DropdownLang from '../component/DropdownLang.jsx'
 import { newFlashMessage, setUserLang } from '../action-creator.sync.js'
@@ -13,19 +13,16 @@ import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
 
 const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 
-export class Header extends React.Component {
-  componentDidMount () {
-    this.props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', { lang: this.props.user.lang })
-    i18n.changeLanguage(this.props.user.lang)
-  }
+export const Header = (props) => {
+  useEffect(() => {
+    props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', { lang: props.user.lang })
+  }, [])
 
-  componentDidUpdate (prevProps) {
-    if (prevProps.user.lang !== this.props.user.lang) i18n.changeLanguage(this.props.user.lang)
-  }
+  useEffect(() => {
+    i18n.changeLanguage(props.user.lang)
+  }, [props.user.lang])
 
-  handleChangeLang = async langId => {
-    const { props } = this
-
+  const handleChangeLang = async langId => {
     if (props.user.userId === -1) {
       Cookies.set(COOKIE_FRONTEND.DEFAULT_LANGUAGE, langId, { expires: COOKIE_FRONTEND.DEFAULT_EXPIRE_TIME })
       i18n.changeLanguage(langId)
@@ -45,28 +42,26 @@ export class Header extends React.Component {
     }
   }
 
-  render () {
-    const { props } = this
+  return (
+    props.user.logged
+      ? null
+      : (
+        <header className='header'>
+          <Logo to={PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
 
-    if (props.user.logged) return null
+          <div
+            id='customToolboxHeaderBtn'
+            className='header__menu__rightside__specificBtn'
+          />
 
-    return (
-      <header className='header'>
-        <Logo to={PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
-
-        <div
-          id='customToolboxHeaderBtn'
-          className='header__menu__rightside__specificBtn'
-        />
-
-        <DropdownLang
-          langList={props.lang}
-          langActiveId={props.user.lang}
-          onChangeLang={this.handleChangeLang}
-        />
-      </header>
-    )
-  }
+          <DropdownLang
+            langList={props.lang}
+            langActiveId={props.user.lang}
+            onChangeLang={handleChangeLang}
+          />
+        </header>
+      )
+  )
 }
 
 const mapStateToProps = ({ lang, user, system }) => ({ lang, user, system })

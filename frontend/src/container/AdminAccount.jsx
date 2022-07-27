@@ -372,7 +372,7 @@ export class Account extends React.Component {
               title={this.setTitle()}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
-              emailNotifActivated={props.system.config.email_notification_activated}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent parentClass='account'>

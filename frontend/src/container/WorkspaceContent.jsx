@@ -715,7 +715,7 @@ export class WorkspaceContent extends React.Component {
             <TabBar
               currentSpace={props.currentWorkspace}
               breadcrumbs={breadcrumbs}
-              emailNotifActivated={props.system.config.email_notification_activated}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__buttons'>

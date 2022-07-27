@@ -460,7 +460,7 @@ export class Dashboard extends React.Component {
             <TabBar
               currentSpace={props.currentWorkspace}
               breadcrumbs={props.breadcrumbs}
-              emailNotifActivated={props.system.config.email_notification_activated}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent>
@@ -551,7 +551,7 @@ export class Dashboard extends React.Component {
                     onClickRemoveMember={this.handleClickRemoveMember}
                     userRoleIdInWorkspace={userRoleIdInWorkspace}
                     canSendInviteNewUser={[PROFILE.administrator.slug, PROFILE.manager.slug].includes(props.user.profile)}
-                    emailNotifActivated={props.system.config.email_notification_activated}
+                    isEmailNotifActivated={props.system.config.email_notification_activated}
                     autoCompleteClicked={state.autoCompleteClicked}
                     onClickAutoComplete={this.handleClickAutoComplete}
                     t={props.t}

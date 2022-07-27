@@ -16,10 +16,9 @@ export default Logo
 
 Logo.propTypes = {
   logoSrc: PropTypes.string.isRequired,
-  to: PropTypes.string.isRequired
+  to: PropTypes.string
 }
 
 Logo.defaultProps = {
-  logoSrc: '',
   to: PAGE.LOGIN
 }

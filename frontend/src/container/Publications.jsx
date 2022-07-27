@@ -571,7 +571,7 @@ export class Publications extends React.Component {
         <TabBar
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
-          emailNotifActivated={props.system.config.email_notification_activated}
+          isEmailNotifActivated={props.system.config.email_notification_activated}
         />
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='publishAreaContainer'>

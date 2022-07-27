@@ -1,70 +1,60 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
-import appFactory from '../util/appFactory.js'
-import WorkspaceListItem from '../component/Sidebar/WorkspaceListItem.jsx'
-import { addWorkspaceList } from '../action-creator.sync.js'
-import Logo from '../component/Logo.jsx'
-import MenuProfile from '../component/Header/MenuActionListItem/MenuProfile.jsx'
-import SearchInput from '../component/Search/SearchInput.jsx'
 import {
-  ADVANCED_SEARCH_TYPE,
-  NO_ACTIVE_SPACE_ID,
-  TRACIM_APP_VERSION,
-  findUserRoleIdInWorkspace,
-  workspaceConfig,
-  ALL_CONTENT_TYPES,
-  SEARCH_TYPE,
-  unLoggedAllowedPageList
-} from '../util/helper.js'
-import {
-  createSpaceTree,
   CUSTOM_EVENT,
-  ROLE_LIST,
-  sortWorkspaceList,
+  IconButton,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
   PROFILE,
-  TracimComponent,
+  scrollIntoViewIfNeeded,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  scrollIntoViewIfNeeded,
-  NUMBER_RESULTS_BY_PAGE,
-  IconButton,
-  PAGE
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
-  logoutUser
-} from '../action-creator.async.js'
+  ADVANCED_SEARCH_TYPE,
+  ALL_CONTENT_TYPES,
+  NO_ACTIVE_SPACE_ID,
+  SEARCH_TYPE,
+  TRACIM_APP_VERSION,
+  unLoggedAllowedPageList,
+  workspaceConfig
+} from '../util/helper.js'
+import { addWorkspaceList } from '../action-creator.sync.js'
+import { logoutUser } from '../action-creator.async.js'
+import appFactory from '../util/appFactory.js'
+import Logo from '../component/Logo.jsx'
+import SearchInput from '../component/Search/SearchInput.jsx'
 import SidebarItem from '../component/Sidebar/SidebarItem.jsx'
+import SidebarSpaceList from '../component/Sidebar/SidebarSpaceList.jsx'
+import SidebarUserItemList from '../component/Sidebar/SidebarUserItemList.jsx'
 
 const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 const qs = require('query-string')
 
 export class Sidebar extends React.Component {
-  constructor (props) { // TODO GIULIA Passar em hooks
+  constructor (props) {
     super(props)
     this.frameRef = React.createRef()
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
       foldedSpaceList: [],
-      sidebarClose: isMobile,
       showSpaceList: true,
-      showUserItems: true
+      showUserItems: true,
+      sidebarClose: isMobile
     }
 
     props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleShowCreateWorkspacePopup }
+      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleClickNewWorkspace }
     ])
 
     props.registerLiveMessageHandlerList([
       { entityType: TLM_ET.SHAREDSPACE_MEMBER, coreEntityType: TLM_CET.CREATED, handler: this.handleTlmMemberCreated }
     ])
-  }
-
-  // Custom Event Handler
-  handleShowCreateWorkspacePopup = () => {
-    this.handleClickNewWorkspace()
   }
 
   handleTlmMemberCreated = tlmFieldObject => {
@@ -77,35 +67,6 @@ export class Sidebar extends React.Component {
     if (loggedUserId === tlmUser.user_id) {
       props.dispatch(addWorkspaceList([tlmWorkspace]))
     }
-  }
-
-  spaceItemId = (id) => `sidebar-space-item-${id}`
-
-  displaySpace = (spaceLevel, spaceList) => {
-    const { props, state } = this
-
-    return spaceList.map(space =>
-      <React.Fragment key={space.id}>
-        <WorkspaceListItem
-          activeWorkspaceId={state.activeWorkspaceId}
-          allowedAppList={space.sidebarEntryList}
-          foldChildren={!!state.foldedSpaceList.find(id => id === space.id)}
-          hasChildren={space.children.length > 0}
-          id={this.spaceItemId(space.id)}
-          label={space.label}
-          level={spaceLevel}
-          onClickAllContent={this.handleClickAllContent}
-          onClickToggleSidebar={this.handleClickToggleSidebar}
-          onToggleFoldChildren={() => this.handleToggleFoldChildren(space.id)}
-          userRoleIdInWorkspace={[findUserRoleIdInWorkspace(props.user.userId, space.memberList, ROLE_LIST)]}
-          workspaceId={space.id}
-          isNotificationWallOpen={props.isNotificationWallOpen}
-        />
-        {!state.foldedSpaceList.find(id => id === space.id) &&
-          space.children.length !== 0 &&
-          this.displaySpace(spaceLevel + 1, space.children)}
-      </React.Fragment>
-    )
   }
 
   handleClickSearch = async (searchString) => {
@@ -151,8 +112,9 @@ export class Sidebar extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (prevProps.currentWorkspace.id !== this.props.currentWorkspace.id) {
-      const spaceListItem = document.getElementById(this.spaceItemId(this.props.currentWorkspace.id))
+    const { props } = this
+    if (prevProps.currentWorkspace.id !== props.currentWorkspace.id) {
+      const spaceListItem = document.getElementById(`sidebar-space-item-${props.currentWorkspace.id}`)
       scrollIntoViewIfNeeded(spaceListItem, this.frameRef.current)
     }
   }
@@ -161,12 +123,11 @@ export class Sidebar extends React.Component {
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
-  shouldDisplaySidebar = props => { // pass props to allow to pass nextProps in shouldComponentUpdate
-    return ![
-      ...unLoggedAllowedPageList,
-      ...props.workspaceList.length > 0 ? [] : [PAGE.HOME, '/ui/'] // @fixme - Côme - 2018/11/13 - have a better way than hardcoding '/ui/'
-    ]
-      .some(url => props.location.pathname.startsWith(url))
+  // INFO - CH - 2018-10-19 - pass props to allow to pass nextProps in shouldComponentUpdate
+  shouldDisplaySidebar = props => {
+    const isUnLoggedAllowedPageList = unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
+    const isUserASpaceMember = props.workspaceList.length > 0
+    return !isUnLoggedAllowedPageList && isUserASpaceMember
   }
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
@@ -185,20 +146,16 @@ export class Sidebar extends React.Component {
 
   handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
 
-  handleClickLogout = () => {
-    this.props.dispatch(logoutUser(this.props.history))
-  }
+  handleClickLogout = () => this.props.dispatch(logoutUser(this.props.history))
 
   handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
-  handleClickJoinWorkspace = () => { this.props.history.push(PAGE.JOIN_WORKSPACE) }
-
-  // TODO GIULIA Talvez dividir o componente em 3+ : opçoes, espaços, footer
+  handleClickJoinWorkspace = () => this.props.history.push(PAGE.JOIN_WORKSPACE)
 
   render () {
     const { props, state } = this
 
-    if (!this.shouldDisplaySidebar(this.props)) return null
+    if (!this.shouldDisplaySidebar(props)) return null
 
     const isToDoEnabled = props.appList.some(a => a.slug === 'contents/todo')
     const isAgendaEnabled = props.appList.some(a => a.slug === 'agenda')
@@ -245,120 +202,32 @@ export class Sidebar extends React.Component {
           isCurrentItem={props.isNotificationWallOpen}
         />
 
-        <MenuProfile
+        <SidebarUserItemList
+          sidebarClose={state.sidebarClose}
+          isNotificationWallOpen={props.isNotificationWallOpen}
           user={props.user}
           onClickLogout={this.handleClickLogout}
-          isCurrentItem={props.location.pathname === PAGE.PUBLIC_PROFILE(props.user.userId) && !props.isNotificationWallOpen}
+          location={props.location}
           showUserItems={state.showUserItems}
           onClickToggleUserItems={this.handleClickToggleUserItems}
+          isToDoEnabled={isToDoEnabled}
+          isAgendaEnabled={isAgendaEnabled}
+          isUserAdministrator={isUserAdministrator}
         />
 
-        {(state.showUserItems || state.sidebarClose) && (
-          <>
-            <SidebarItem
-              customClass='sidebar__activities__item'
-              to={PAGE.RECENT_ACTIVITIES}
-              label={props.t('Recent activities')}
-              icon='fas fa-newspaper'
-              isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
-            />
-
-            {isAgendaEnabled && (
-              <SidebarItem
-                customClass='sidebar__agendas__item'
-                to={PAGE.AGENDA}
-                label={props.t('Agendas')}
-                icon='fas fa-calendar-alt'
-                isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
-              />
-            )}
-
-            {isToDoEnabled && (
-              <SidebarItem
-                customClass='sidebar__tasks__item'
-                to={PAGE.TODO}
-                label={props.t('My tasks')}
-                icon='fas fa-check-square'
-                isCurrentItem={props.location.pathname === PAGE.TODO && !props.isNotificationWallOpen}
-              />
-            )}
-
-            <SidebarItem
-              customClass='sidebar__favorites__item'
-              to={PAGE.FAVORITES}
-              label={props.t('Favorites')}
-              icon='fas fa-star'
-              isCurrentItem={props.location.pathname === PAGE.FAVORITES && !props.isNotificationWallOpen}
-            />
-
-            {isUserAdministrator && (
-              <SidebarItem
-                customClass='sidebar__spaces__item'
-                to={PAGE.ADMIN.WORKSPACE}
-                label={props.t('Space management')}
-                icon={workspaceConfig.faIcon}
-                isCurrentItem={props.location.pathname === PAGE.ADMIN.WORKSPACE && !props.isNotificationWallOpen}
-              />
-            )}
-
-            {isUserAdministrator && (
-              <SidebarItem
-                customClass='sidebar__users__item'
-                to={PAGE.ADMIN.USER}
-                label={props.t('User account management')}
-                icon='fas fa-user-cog'
-                isCurrentItem={props.location.pathname === PAGE.ADMIN.USER && !props.isNotificationWallOpen}
-              />
-            )}
-
-            <SidebarItem
-              customClass='sidebar__account__item'
-              to={PAGE.ACCOUNT}
-              label={props.t('Account Settings')}
-              icon='fas fa-cogs'
-              isCurrentItem={props.location.pathname === PAGE.ACCOUNT && !props.isNotificationWallOpen}
-              dataCy='menuprofile__dropdown__account__link'
-            />
-
-            <SidebarItem
-              customClass='sidebar__logout__item'
-              label={props.t('Log out')}
-              icon='fas fa-sign-out-alt'
-              onClickItem={this.handleClickLogout}
-              dataCy='menuprofile__dropdown__logout__link'
-            />
-          </>
-        )}
-
-        {!state.sidebarClose && (
-          <div className='sidebar__title'>
-            <IconButton
-              customClass='sidebar__item__foldChildren'
-              icon={`fas fa-caret-${state.showSpaceList ? 'down' : 'right'}`}
-              title={state.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
-              intent='link'
-              mode='light'
-              onClick={this.handleClickToggleSpaceList}
-            />
-            <div className='sidebar__item__name'>
-              {props.t('Spaces')}
-            </div>
-          </div>
-        )}
-
-        {state.sidebarClose && (
-          <SidebarItem
-            label={props.t('Spaces')}
-            icon='fas fa-users'
-            onClickItem={this.handleClickToggleSidebar}
-          />
-        )}
-
-        {state.showSpaceList && (
-          <div className='sidebar__spaces'>
-            {this.displaySpace(0, createSpaceTree(sortWorkspaceList(props.workspaceList)))}
-          </div>
-        )}
+        <SidebarSpaceList
+          sidebarClose={state.sidebarClose}
+          showSpaceList={state.showSpaceList}
+          onClickToggleSpaceList={this.handleClickToggleSpaceList}
+          onClickToggleSidebar={this.handleClickToggleSidebar}
+          spaceList={props.workspaceList}
+          userId={props.user.userId}
+          isNotificationWallOpen={props.isNotificationWallOpen}
+          activeWorkspaceId={state.activeWorkspaceId}
+          foldedSpaceList={state.foldedSpaceList}
+          onClickAllContent={this.handleClickAllContent}
+          onToggleFoldChildren={this.handleToggleFoldChildren}
+        />
 
         <div className='sidebar__footer'>
           <div className='sidebar__footer__buttons'>
@@ -399,5 +268,33 @@ export class Sidebar extends React.Component {
   }
 }
 
-const mapStateToProps = ({ accessibleWorkspaceList, appList, system, user, workspaceList, simpleSearch }) => ({ accessibleWorkspaceList, appList, system, user, workspaceList, simpleSearch })
+const mapStateToProps = ({
+  accessibleWorkspaceList,
+  appList,
+  system,
+  simpleSearch,
+  user,
+  workspaceList
+}) => ({
+  accessibleWorkspaceList,
+  appList,
+  simpleSearch,
+  system,
+  user,
+  workspaceList
+})
 export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar))))
+
+Sidebar.propTypes = {
+  isNotificationWallOpen: PropTypes.bool,
+  onClickNotification: PropTypes.func,
+  unreadMentionCount: PropTypes.number,
+  unreadNotificationCount: PropTypes.number
+}
+
+Sidebar.defaultProps = {
+  isNotificationWallOpen: false,
+  onClickNotification: () => { },
+  unreadMentionCount: 0,
+  unreadNotificationCount: 0
+}

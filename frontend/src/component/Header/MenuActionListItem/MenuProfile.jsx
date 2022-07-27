@@ -1,6 +1,6 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import { FETCH_CONFIG } from '../../../util/helper.js'
 import { Avatar, AVATAR_SIZE, IconButton, PAGE } from 'tracim_frontend_lib'
@@ -43,5 +43,13 @@ export default translate()(MenuProfile)
 
 MenuProfile.propTypes = {
   user: PropTypes.object.isRequired,
-  onClickLogout: PropTypes.func.isRequired
+  isCurrentItem: PropTypes.bool,
+  onClickToggleUserItems: PropTypes.func,
+  showUserItems: PropTypes.bool
+}
+
+MenuProfile.defaultProps = {
+  isCurrentItem: false,
+  onClickToggleUserItems: () => { },
+  showUserItems: true
 }

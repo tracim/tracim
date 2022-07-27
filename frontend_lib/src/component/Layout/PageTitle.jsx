@@ -36,7 +36,7 @@ export const PageTitle = (props) => {
           popoverBody={props.title}
         />
 
-        {!props.emailNotifActivated && (
+        {!props.isEmailNotifActivated && (
           <div className='pageTitleGeneric__title__emailwarning' title={props.t('Email notifications are disabled')}>
             <ComposedIcon
               mainIcon='far fa-envelope'
@@ -81,7 +81,7 @@ PageTitle.propTypes = {
   customClass: PropTypes.string,
   icon: PropTypes.string,
   iconTooltip: PropTypes.string,
-  emailNotifActivated: PropTypes.bool
+  isEmailNotifActivated: PropTypes.bool
 }
 
 PageTitle.defaultProps = {
@@ -90,5 +90,5 @@ PageTitle.defaultProps = {
   icon: '',
   subtitle: '',
   iconTooltip: '',
-  emailNotifActivated: false
+  isEmailNotifActivated: false
 }
