@@ -25,5 +25,5 @@ RUN \
     ./install_frontend_dependencies.sh root && \
     # cypress
     ./setup_functionnal_tests.sh root && \
-    # docker & docker-compose
+    # docker & docker compose
     ./concourse/scripts/install_docker

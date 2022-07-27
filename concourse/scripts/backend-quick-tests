@@ -20,5 +20,5 @@ start_docker "" "$docker_registry"
 cd backend
 pip install -r requirements.txt -r requirements-test.txt
 python setup.py develop
-docker-compose up -d redis
+docker compose up -d redis
 pytest --ignore "tracim_backend/tests/functional" --ignore "tracim_backend/tests/commands"
