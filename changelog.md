@@ -6,7 +6,7 @@
 - Docker: [#5801](https://github.com/tracim/tracim/pull/5801)
 
 ### Breaking/Important change
-- We have updated our documentation and our scripts in order to follow  the changes in docker compose v2.
+- We have updated our documentation and our scripts in order to follow [the changes in docker compose v2](https://docs.docker.com/compose/#compose-v2-and-the-new-docker-compose-command).
 
 
 # 4.3.0 / 2022-07-21
