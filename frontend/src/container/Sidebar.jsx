@@ -125,9 +125,7 @@ export class Sidebar extends React.Component {
 
   // INFO - CH - 2018-10-19 - pass props to allow to pass nextProps in shouldComponentUpdate
   shouldDisplaySidebar = props => {
-    const isUnLoggedAllowedPageList = unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
-    const isUserASpaceMember = props.workspaceList.length > 0
-    return !isUnLoggedAllowedPageList && isUserASpaceMember
+    return !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
   }
 
   handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))

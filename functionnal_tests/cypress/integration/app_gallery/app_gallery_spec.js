@@ -133,7 +133,7 @@ describe('App Gallery', function () {
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
-      cy.get('.sidebar__expand')
+      cy.get('.sidebar__header__expand')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .find('.carousel__arrow.arrowprev')
@@ -159,7 +159,7 @@ describe('App Gallery', function () {
         pageName: PAGES.GALLERY,
         params: { workspaceId }
       })
-      cy.get('.sidebar__expand')
+      cy.get('.sidebar__header__expand')
         .click()
       cy.getTag({ selectorName: s.GALLERY_FRAME })
         .get('[data-cy=gallery__action__button__auto__play]')

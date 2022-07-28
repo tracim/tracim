@@ -16,7 +16,7 @@ describe('Notification wall', () => {
     cy.logout()
     cy.loginAs('users')
     cy.visitPage({ pageName: PAGES.HOME })
-    cy.get('.notificationButton').click()
+    cy.get('.sidebar__notification__item').click()
   })
 
   it('should close when clicked at the X', () => {

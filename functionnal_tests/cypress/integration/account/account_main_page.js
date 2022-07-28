@@ -1,5 +1,4 @@
 import { PAGES } from '../../support/urls_commands.js'
-import { SELECTORS as s } from '../../support/generic_selector_commands.js'
 
 describe('Account page', function () {
   before(() => {
@@ -13,8 +12,7 @@ describe('Account page', function () {
   })
 
   it("should be able to access the account page through header's buttons", () => {
-    cy.getTag({ selectorName: s.HEADER })
-      .find('[data-cy=menuprofile__dropdown__button]')
+    cy.get('[data-cy=menuprofile__sidebar]')
       .click()
 
     cy.get('[data-cy=menuprofile__dropdown__account__link]')

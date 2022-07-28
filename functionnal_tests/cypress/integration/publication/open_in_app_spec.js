@@ -37,11 +37,11 @@ describe.skip('Open publications in the thread app', () => {
         cy.get('.wsContentGeneric.thread .wsContentGeneric__header__close').should('be.visible').click()
     }
 
-    cy.get('.notificationButton__btn').should('be.visible').click()
+    cy.get('.sidebar__notification__item').should('be.visible').click()
     cy.get('.notification__list__item.isMention').should('be.visible').click()
     checkAndCloseThreadApp()
 
-    cy.get('.notificationButton__btn').should('be.visible').click()
+    cy.get('.sidebar__notification__item').should('be.visible').click()
     cy.get('.notification__list__item:not(.isMention)').contains('commented on').should('be.visible').click()
     checkAndCloseThreadApp()
 

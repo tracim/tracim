@@ -21,6 +21,7 @@ describe('Sidebar', function () {
       .should('be.visible')
       .get('.fa-caret-down')
       .should('be.visible')
+      .last()
       .click()
       .get('.fa-caret-right')
       .should('be.visible')

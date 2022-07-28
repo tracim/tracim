@@ -26,13 +26,13 @@ export const MenuProfile = props => {
       <Link
         className='sidebar__item'
         to={PAGE.PUBLIC_PROFILE(props.user.userId)}
-        data-cy='menuprofile__dropdown__profile__link'
+        data-cy='menuprofile__sidebar'
       >
         <Avatar
           size={AVATAR_SIZE.SMALL}
           user={props.user}
           apiUrl={FETCH_CONFIG.apiUrl}
-          key='menuprofile__dropdown__avatar'
+          key='menuprofile__sidebar__avatar'
         />
         <span>&nbsp;{props.user.publicName}</span>
       </Link>

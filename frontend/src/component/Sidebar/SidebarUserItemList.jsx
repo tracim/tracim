@@ -71,6 +71,7 @@ const SidebarUserItemList = (props) => {
               label={props.t('User account management')}
               icon='fas fa-user-cog'
               isCurrentItem={props.location.pathname === PAGE.ADMIN.USER && !props.isNotificationWallOpen}
+              dataCy='sidebar__admin__user'
             />
           )}
 
@@ -88,7 +89,7 @@ const SidebarUserItemList = (props) => {
             label={props.t('Log out')}
             icon='fas fa-sign-out-alt'
             onClickItem={props.onClickLogout}
-            dataCy='menuprofile__dropdown__logout__link'
+            dataCy='sidebar__logout'
           />
         </>
       )}
