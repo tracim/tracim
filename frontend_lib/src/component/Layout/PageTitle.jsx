@@ -46,12 +46,12 @@ export const PageTitle = (props) => {
             />
           </div>
         )}
-      </div>
 
-      <div
-        id='customToolboxHeaderBtn'
-        className='pageTitleGeneric__specificBtn'
-      />
+        <div
+          id='customToolboxHeaderBtn'
+          className='pageTitleGeneric__specificBtn'
+        />
+      </div>
 
       {(props.breadcrumbsList.length > 0
         ? <Breadcrumbs root={breadcrumbsRoot} breadcrumbsList={props.breadcrumbsList} />

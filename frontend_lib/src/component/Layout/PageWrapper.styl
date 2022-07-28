@@ -10,7 +10,6 @@
   display flex
   flex-direction column
   height 100%
-
   &__header
     display flex
   &__content
@@ -40,8 +39,10 @@
     &__emailwarning
       font-size standardFontSize
       margin-inline-start standardSpacing
-  &__specificBtn:empty
-    display none
+  &__specificBtn
+    margin-inline-start standardSpacing
+    &:empty
+      display none
   &__subtitle
     margin-top 15px
 
