@@ -1,5 +1,11 @@
 @import "../../css/Variable.styl"
 
+.slowblink
+  animation blink-animation 2.5s steps(100, start) 2
+@keyframes blink-animation
+  to
+    opacity 0
+
 .pageWrapperGeneric
   display flex
   flex-direction column
@@ -31,6 +37,11 @@
       overflow hidden
       text-overflow ellipsis
       white-space nowrap
+    &__emailwarning
+      font-size standardFontSize
+      margin-inline-start standardSpacing
+  &__specificBtn:empty
+    display none
   &__subtitle
     margin-top 15px
 

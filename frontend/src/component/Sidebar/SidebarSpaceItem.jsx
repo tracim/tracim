@@ -1,27 +1,19 @@
 import React from 'react'
+import classnames from 'classnames'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter, Link } from 'react-router-dom'
-import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import {
-  DRAG_AND_DROP,
-  NO_ACTIVE_SPACE_ID
-} from '../../util/helper.js'
-import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
-import {
-  putNotificationAsRead
-} from '../../action-creator.async.js'
-import {
-  newFlashMessage,
-  readNotification
-} from '../../action-creator.sync.js'
+import { DropdownMenu, IconButton, PAGE, ROLE } from 'tracim_frontend_lib'
+import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
+import { putNotificationAsRead } from '../../action-creator.async.js'
+import { newFlashMessage, readNotification } from '../../action-creator.sync.js'
 
 const qs = require('query-string')
 
-class WorkspaceListItem extends React.Component {
+class SidebarSpaceItem extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -132,19 +124,19 @@ class WorkspaceListItem extends React.Component {
     const BASE_MARGIN = 20
 
     return (
-      <li
+      <div
         id={props.id}
         className={classnames(
-          'sidebar__content__navigation__item',
+          'sidebar__item__space',
           {
-            'primaryColorBorder sidebar__content__navigation__item__current':
-              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
+            'primaryColorBorder sidebar__item__current':
+              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) && !props.isNotificationWallOpen
           },
           {
-            sidebar__content__navigation__item__unread: state.unreadNotifications.length > 0
+            sidebar__item__unread: state.unreadNotifications.length > 0
           }
         )}
-        data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
+        data-cy={`sidebar__space__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
@@ -162,7 +154,7 @@ class WorkspaceListItem extends React.Component {
 
         {props.hasChildren && (
           <IconButton
-            customClass='transparentButton sidebar__content__navigation__item__foldChildren'
+            customClass='transparentButton sidebar__item__foldChildren'
             icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'
@@ -173,18 +165,18 @@ class WorkspaceListItem extends React.Component {
 
         <Link
           className={classnames(
-            'sidebar__content__navigation__item__wrapper',
-            { sidebar__content__navigation__item__withoutChildren: !props.hasChildren }
+            'sidebar__item',
+            { sidebar__item__withoutChildren: !props.hasChildren }
           )}
           to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
           onClick={this.handleClickSpace}
         >
           {(props.canDrop && props.isOver) && (
-            <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
+            <i className={`fas fa-fw ${this.getIcon()} sidebar__item__dragNdrop`} />
           )}
 
           <div
-            className='sidebar__content__navigation__item__name'
+            className='sidebar__item__name'
             title={props.label}
           >
             <div
@@ -199,7 +191,7 @@ class WorkspaceListItem extends React.Component {
         {state.showDropdownMenuButton && (
           <DropdownMenu
             buttonIcon='fas fa-ellipsis-v'
-            buttonCustomClass='sidebar__content__navigation__item__menu'
+            buttonCustomClass='sidebar__item__menu'
             buttonTooltip={props.t('Actions')}
             buttonClick={this.activeDropdownMenu}
           >
@@ -215,7 +207,7 @@ class WorkspaceListItem extends React.Component {
             ))}
           </DropdownMenu>
         )}
-      </li>
+      </div>
     )
   }
 }
@@ -235,28 +227,30 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
 })
 
 const mapStateToProps = ({ notificationPage, user }) => ({ notificationPage, user })
-export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(WorkspaceListItem))))
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(SidebarSpaceItem))))
 
-WorkspaceListItem.propTypes = {
+SidebarSpaceItem.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  workspaceId: PropTypes.number.isRequired,
   activeWorkspaceId: PropTypes.number,
   allowedAppList: PropTypes.array,
   foldChildren: PropTypes.bool,
   hasChildren: PropTypes.bool,
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
+  isNotificationWallOpen: PropTypes.bool,
   level: PropTypes.number,
   onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
-  userRoleIdInWorkspace: PropTypes.array,
-  workspaceId: PropTypes.number.isRequired
+  userRoleIdInWorkspace: PropTypes.array
 }
 
-WorkspaceListItem.defaultProps = {
+SidebarSpaceItem.defaultProps = {
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   allowedAppList: [],
   foldChildren: false,
   hasChildren: false,
+  isNotificationWallOpen: false,
   level: 0,
   onClickAllContent: () => { },
   onClickToggleSidebar: () => {},

@@ -1,59 +1,12 @@
-.slowblink
-  animation blink-animation 2.5s steps(100, start) 2
-@keyframes blink-animation
-  to
-    opacity 0
-
 .header
-  width 100%
-  & .navbar
-    padding standardSpacing
-    z-index 30 // INFO - CH - 2019-04-18 - higher than .wsContentGeneric and lower than caldavzap fullscreen
-    border-bottom borderStyle
-    height headerHeight
-    background-color lightGrey
-  &__logo
-    cursor pointer
-    &__img
-      max-width 150px
-      max-height 50px
+  display flex
+  justify-content space-between
+  height headerHeight
+  align-items center
+  padding-inline-start standardSpacing
+  padding-inline-end standardSpacing
+  background-color lightGrey
   &__menu
-    justify-content flex-end
-    &__system
-      display flex
-      justify-content flex-end
-      align-items center
-      height 100%
-      &__text
-        margin-inline-end textSpacing
-        font-size metadataFontSize
     &__rightside
-      display flex
-      justify-content flex-end
-      margin auto 0
-      list-style none
-      align-items center
-      & li:not(:last-child)
-        margin-inline-end standardSpacing
-      & .btn .fa-fw
-        margin-inline-end textSpacing
-      &__agenda .btn
-        color fontColor
       &__specificBtn:empty
         display none
-
-@media (max-width: max-md)
-  .header__menu
-    &.navbar-collapse
-      position fixed
-      left 0
-      top "calc(%s - 1px)" % headerHeight
-      width 100%
-      background-color lightGrey
-      border-bottom borderStyle
-    &__rightside
-      flex-wrap wrap
-      padding-inline-start 0
-      & li
-        margin-inline-end standardSpacing
-        margin-bottom standardSpacing

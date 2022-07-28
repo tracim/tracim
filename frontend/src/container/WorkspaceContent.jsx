@@ -630,9 +630,8 @@ export class WorkspaceContent extends React.Component {
     const htmlContentIdToScrollTo = `${ANCHOR_NAMESPACE.workspaceItem}:${contentIdToScrollTo}`
     const domElementToScrollTo = document.getElementById(htmlContentIdToScrollTo)
     if (domElementToScrollTo) {
-      const headerHeight = 60 // 60px is Tracim's header height
       const scrollableElement = document.getElementById('scrollableElement')
-      scrollableElement.scrollTop = domElementToScrollTo.offsetTop - headerHeight
+      scrollableElement.scrollTop = domElementToScrollTo.offsetTop
     }
   }
 
@@ -716,6 +715,7 @@ export class WorkspaceContent extends React.Component {
             <TabBar
               currentSpace={props.currentWorkspace}
               breadcrumbs={breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
             <PageContent parentClass='workspace__content'>
               <div className='workspace__content__buttons'>
@@ -856,7 +856,7 @@ export class WorkspaceContent extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList }) => ({
-  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, workspaceList, contentType, appList
+const mapStateToProps = ({ breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList }) => ({
+  breadcrumbs, user, currentWorkspace, workspaceContentList, workspaceShareFolderContentList, system, workspaceList, contentType, appList
 })
 export default withRouter(connect(mapStateToProps)(appFactory(translate()(TracimComponent(WorkspaceContent)))))

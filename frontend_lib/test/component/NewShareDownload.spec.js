@@ -22,7 +22,7 @@ describe('<NewShareDownload />', () => {
     onChangePassword: onChangePasswordCallBack,
     onClickCancelButton: onClickCancelButtonCallBack,
     onClickNewShare: onClickNewShareCallBack,
-    emailNotifActivated: false
+    isEmailNotifActivated: false
   }
 
   const NewShareDownloadWithHoc = translateMock()(NewShareDownloadWithoutHOC)

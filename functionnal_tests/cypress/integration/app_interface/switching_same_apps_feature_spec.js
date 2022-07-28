@@ -74,7 +74,7 @@ describe('Hot switching between the same app', () => {
 
         cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(fileTitle)
 
-        cy.get('.notificationButton__btn')
+        cy.get('.sidebar__notification__item')
           .click('left')
 
         cy.get('.notification__list__item').first().click()
@@ -94,7 +94,7 @@ describe('Hot switching between the same app', () => {
 
         cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(htmlDocTitle)
 
-        cy.get('.notificationButton__btn')
+        cy.get('.sidebar__notification__item')
           .click('left')
 
         cy.get('.notification__list__item').first().click()
@@ -114,7 +114,7 @@ describe('Hot switching between the same app', () => {
 
         cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(threadTitle)
 
-        cy.get('.notificationButton__btn')
+        cy.get('.sidebar__notification__item')
           .click('left')
 
         cy.get('.notification__list__item').first().click()
@@ -134,7 +134,7 @@ describe('Hot switching between the same app', () => {
 
         cy.getTag({ selectorName: s.CONTENT_FRAME }).contains(kanbantitle)
 
-        cy.get('.notificationButton__btn')
+        cy.get('.sidebar__notification__item')
           .click('left')
 
         cy.get('.notification__list__item').first().click()

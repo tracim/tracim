@@ -13,12 +13,11 @@ cardWidth = 280px
       display flex
       flex-direction column
       // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
-      height "calc(100% - %s)" % (headerHeight + 28px)
+      height "calc(100% - %s)" % 28px
       &.fullscreen
         position fixed
-        top headerHeight
         width 100%
-        height "calc(100% - %s)" % headerHeight
+        height 100%
         z-index 1
         background offWhite
 
@@ -162,12 +161,12 @@ cardWidth = 280px
           width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
         label
           padding-inline-end textSpacing
-        
+
         & .form-control
           color unset
           font-size standardFontSize
           padding-inline-start textSpacing
-          
+
       &_buttons
         margin-bottom 0
         padding-bottom 0
@@ -236,13 +235,13 @@ cardWidth = 280px
 @media (max-width: max-xs)
   .kanban__KanbanPopup
     top 10%
-    max-height "calc(100% - %s)" % (headerHeight + standardSpacing)
+    max-height "calc(100% - %s)" % standardSpacing
 
     & .cardPopup__container
       min-width 100%
       max-height 100%
       overflow auto
       & .cardPopup__body
-        height "calc(100% - %s)" % headerHeight
+        height 100%
         & .kanban__KanbanPopup__form
           height "calc(100% - %s)" % standardSpacing

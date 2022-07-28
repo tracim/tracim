@@ -22,14 +22,14 @@ describe('Notification button at header', () => {
   })
 
   it('should open the notification wall when clicked one time', () => {
-    cy.get('.notificationButton').click()
+    cy.get('.sidebar__notification__item').click()
     cy.get('.notification__header__title').contains('Notifications').should('be.visible')
   })
 
   it('should close the notification wall when clicked two times', () => {
-    cy.get('.notificationButton').click()
+    cy.get('.sidebar__notification__item').click()
     cy.get('.notification__header__title').contains('Notifications')
-    cy.get('.notificationButton').click()
+    cy.get('.sidebar__notification__item').click()
     cy.get('.notification__header__title').contains('Notifications').should('not.be.visible')
   })
 })
@@ -49,7 +49,7 @@ describe('Check notification dot', () => {
             params: { contentId: threadId }
           })
         })
-        cy.contains('.menuprofil__dropdown__name', baseUser.public_name)
+        cy.contains('[data-cy=menuprofile__sidebar]', baseUser.public_name)
       })
     })
 
@@ -72,8 +72,8 @@ describe('Check notification dot', () => {
             params: { contentId: threadId }
           })
         })
-        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
-        cy.get('.notificationButton__notification')
+        cy.contains('[data-cy=menuprofile__sidebar]', defaultAdmin.public_name)
+        cy.get('.sidebar__notification__item')
           .should('be.visible')
       })
 
@@ -98,10 +98,10 @@ describe('Check notification dot', () => {
             params: { contentId: threadId }
           })
         })
-        cy.contains('.menuprofil__dropdown__name', defaultAdmin.public_name)
-        cy.get('.notificationButton__btn')
+        cy.contains('[data-cy=menuprofile__sidebar]', defaultAdmin.public_name)
+        cy.get('.sidebar__notification__item')
           .should('be.visible')
-        cy.get('.notificationButton__mention')
+        cy.get('.sidebar__mention')
           .should('be.visible')
       })
     })

@@ -266,6 +266,7 @@ export class Favorites extends React.Component {
             title={props.t('Favorites')}
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
+            isEmailNotifActivated={props.system.config.email_notification_activated}
           />
 
           {state.isLoading
@@ -290,11 +291,12 @@ export class Favorites extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, favoriteList, contentType, workspaceList }) => ({
+const mapStateToProps = ({ breadcrumbs, user, favoriteList, contentType, system, workspaceList }) => ({
   breadcrumbs,
   user,
   favoriteList,
   contentType,
+  system,
   workspaceList
 })
 export default connect(mapStateToProps)(translate()(TracimComponent(Favorites)))

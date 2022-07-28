@@ -34,7 +34,7 @@ export class SearchInput extends React.Component {
     const { props } = this
 
     return (
-      <div className='search primaryColorBorder'>
+      <div className='search'>
         <input
           className='search__text'
           data-cy='search__text'
