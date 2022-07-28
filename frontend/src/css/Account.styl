@@ -5,8 +5,10 @@
   background-color lightGrey
 
 .account
+  &.pageContentGeneric
+    height unset
   &__delimiter
-    margin auto
+    margin standardSpacing auto
   &__userpreference
     display flex
     padding-top standardSpacing
@@ -16,8 +18,10 @@
       width 80%
       min-height 500px
       background-color offWhite
+      flex 1
       .spaceconfig
         &__table
+          overflow auto
           &__role
             display flex
             align-items center

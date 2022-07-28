@@ -15,9 +15,9 @@ describe('Sidebar', function () {
   })
 
   it('should be able to fold child space', function () {
-    cy.get('[data-cy="sidebar__workspace__item_2"]')
+    cy.get('[data-cy="sidebar__space__item_2"]')
       .should('be.visible')
-    cy.get('[data-cy="sidebar__workspace__item_1"]')
+    cy.get('[data-cy="sidebar__space__item_1"]')
       .should('be.visible')
       .get('.fa-caret-down')
       .should('be.visible')
@@ -25,7 +25,7 @@ describe('Sidebar', function () {
       .click()
       .get('.fa-caret-right')
       .should('be.visible')
-    cy.get('[data-cy="sidebar__workspace__item_2"]')
+    cy.get('[data-cy="sidebar__space__item_2"]')
       .should('not.be.visible')
   })
 })

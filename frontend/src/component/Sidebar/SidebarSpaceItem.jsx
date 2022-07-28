@@ -127,7 +127,7 @@ class SidebarSpaceItem extends React.Component {
       <div
         id={props.id}
         className={classnames(
-          'sidebar__item__workspace',
+          'sidebar__item__space',
           {
             'primaryColorBorder sidebar__item__current':
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) && !props.isNotificationWallOpen
@@ -136,7 +136,7 @@ class SidebarSpaceItem extends React.Component {
             sidebar__item__unread: state.unreadNotifications.length > 0
           }
         )}
-        data-cy={`sidebar__workspace__item_${props.workspaceId}`}
+        data-cy={`sidebar__space__item_${props.workspaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}

@@ -22,7 +22,7 @@ describe('Sidebar buttons', () => {
     describe(`With only a ${testCase.workspaceFixture} space`, () => {
       before(() => prepareTest(testCase.workspaceFixture))
       it(`the join space button should ${testCase.should}`, () => {
-        cy.get('[data-cy=sidebarJoinWorkspaceBtn]').should(testCase.should)
+        cy.get('[data-cy=sidebarJoinSpaceBtn]').should(testCase.should)
       })
     })
   })
@@ -30,7 +30,7 @@ describe('Sidebar buttons', () => {
   describe('Clicking on the join space button', () => {
     before(() => prepareTest('openWorkspace'))
     it('should redirect to the join space page', () => {
-      cy.get('[data-cy=sidebarJoinWorkspaceBtn]').click()
+      cy.get('[data-cy=sidebarJoinSpaceBtn]').click()
       cy.location('pathname').should('eq', '/ui/join-workspace')
     })
   })

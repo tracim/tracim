@@ -60,7 +60,7 @@ describe('Workspace', () => {
     it.skip('should scroll to the new workspace in the sidebar', () => {
       cy.visitPage({ pageName: p.HOME })
       cy.get('.sidebar__scrollview').scrollTo('bottom')
-      cy.get('[data-cy=sidebarCreateWorkspaceBtn]').should('be.visible').click()
+      cy.get('[data-cy=sidebarCreateSpaceBtn]').should('be.visible').click()
       createOneSpace(cy, newSpaceName)
       getWorkspaceItemByName(cy, newSpaceName).should('be.visible')
     })

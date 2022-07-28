@@ -16,7 +16,7 @@ const SidebarUserItemList = (props) => {
         user={props.user}
       />
 
-      {(props.showUserItems || props.isSidebarClose) && (
+      {(props.showUserItems || props.isSidebarClosed) && (
         <>
           <SidebarItem
             customClass='sidebar__activities__item'
@@ -103,7 +103,7 @@ SidebarUserItemList.propTypes = {
   user: PropTypes.object.isRequired,
   isAgendaEnabled: PropTypes.bool,
   isNotificationWallOpen: PropTypes.bool,
-  isSidebarClose: PropTypes.bool,
+  isSidebarClosed: PropTypes.bool,
   isToDoEnabled: PropTypes.bool,
   isUserAdministrator: PropTypes.bool,
   onClickLogout: PropTypes.func,
@@ -114,7 +114,7 @@ SidebarUserItemList.propTypes = {
 SidebarUserItemList.defaultProps = {
   isAgendaEnabled: false,
   isNotificationWallOpen: false,
-  isSidebarClose: false,
+  isSidebarClosed: false,
   isToDoEnabled: false,
   isUserAdministrator: false,
   onClickLogout: () => { },

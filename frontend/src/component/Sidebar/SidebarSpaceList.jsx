@@ -42,7 +42,7 @@ const SidebarSpaceList = (props) => {
 
   return (
     <>
-      {!props.isSidebarClose && (
+      {!props.isSidebarClosed && (
         <div className='sidebar__title'>
           <IconButton
             customClass='sidebar__item__foldChildren'
@@ -58,7 +58,7 @@ const SidebarSpaceList = (props) => {
         </div>
       )}
 
-      {props.isSidebarClose && (
+      {props.isSidebarClosed && (
         <SidebarItem
           label={props.t('Spaces')}
           icon='fas fa-users'
@@ -81,7 +81,7 @@ SidebarSpaceList.propTypes = {
   activeWorkspaceId: PropTypes.number,
   foldedSpaceList: PropTypes.array,
   isNotificationWallOpen: PropTypes.bool,
-  isSidebarClose: PropTypes.bool,
+  isSidebarClosed: PropTypes.bool,
   onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onClickToggleSpaceList: PropTypes.func,
@@ -94,7 +94,7 @@ SidebarSpaceList.defaultProps = {
   activeWorkspaceId: NO_ACTIVE_SPACE_ID,
   foldedSpaceList: [],
   isNotificationWallOpen: false,
-  isSidebarClose: false,
+  isSidebarClosed: false,
   onClickAllContent: () => { },
   onClickToggleSidebar: () => { },
   onClickToggleSpaceList: () => { },

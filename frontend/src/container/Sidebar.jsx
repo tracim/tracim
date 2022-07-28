@@ -43,13 +43,13 @@ export class Sidebar extends React.Component {
     this.state = {
       activeWorkspaceId: NO_ACTIVE_SPACE_ID,
       foldedSpaceList: [],
-      isSidebarClose: isMobile,
+      isSidebarClosed: isMobile,
       showSpaceList: true,
       showUserItems: true
     }
 
     props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleClickNewWorkspace }
+      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleClickNewSpace }
     ])
 
     props.registerLiveMessageHandlerList([
@@ -132,12 +132,12 @@ export class Sidebar extends React.Component {
 
   handleClickToggleSidebar = () => {
     GLOBAL_dispatchEvent({
-      type: this.state.isSidebarClose
+      type: this.state.isSidebarClosed
         ? CUSTOM_EVENT.SHOW_SIDEBAR
         : CUSTOM_EVENT.HIDE_SIDEBAR,
       data: {}
     })
-    this.setState(previousState => ({ isSidebarClose: !previousState.isSidebarClose }))
+    this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
   }
 
   handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
@@ -146,7 +146,7 @@ export class Sidebar extends React.Component {
 
   handleClickLogout = () => this.props.dispatch(logoutUser(this.props.history))
 
-  handleClickNewWorkspace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
+  handleClickNewSpace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   handleClickJoinWorkspace = () => this.props.history.push(PAGE.JOIN_WORKSPACE)
 
@@ -161,11 +161,11 @@ export class Sidebar extends React.Component {
     const isUserManager = props.user.profile === PROFILE.manager.slug
 
     return (
-      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClose })}>
+      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })}>
         <div className='sidebar__header'>
           <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
           <button className='transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
-            {state.isSidebarClose
+            {state.isSidebarClosed
               ? <i className='fas fa-chevron-right' title={props.t('See sidebar')} />
               : <i className='fas fa-chevron-left' title={props.t('Hide sidebar')} />}
           </button>
@@ -201,7 +201,7 @@ export class Sidebar extends React.Component {
         />
 
         <SidebarUserItemList
-          isSidebarClose={state.isSidebarClose}
+          isSidebarClosed={state.isSidebarClosed}
           isNotificationWallOpen={props.isNotificationWallOpen}
           user={props.user}
           onClickLogout={this.handleClickLogout}
@@ -214,7 +214,7 @@ export class Sidebar extends React.Component {
         />
 
         <SidebarSpaceList
-          isSidebarClose={state.isSidebarClose}
+          isSidebarClosed={state.isSidebarClosed}
           showSpaceList={state.showSpaceList}
           onClickToggleSpaceList={this.handleClickToggleSpaceList}
           onClickToggleSidebar={this.handleClickToggleSidebar}
@@ -231,8 +231,8 @@ export class Sidebar extends React.Component {
           <div className='sidebar__footer__buttons'>
             {(isUserManager || isUserAdministrator) && (
               <IconButton
-                onClick={this.handleClickNewWorkspace}
-                dataCy='sidebarCreateWorkspaceBtn'
+                onClick={this.handleClickNewSpace}
+                dataCy='sidebarCreateSpaceBtn'
                 icon='fas fa-plus'
                 text={props.t('Create a space')}
                 textMobile={props.t('Create a space')}
@@ -242,7 +242,7 @@ export class Sidebar extends React.Component {
             {props.accessibleWorkspaceList.length > 0 && (
               <IconButton
                 onClick={this.handleClickJoinWorkspace}
-                dataCy='sidebarJoinWorkspaceBtn'
+                dataCy='sidebarJoinSpaceBtn'
                 icon='fas fa-users'
                 text={props.t('Join a space')}
                 textMobile={props.t('Join a space')}

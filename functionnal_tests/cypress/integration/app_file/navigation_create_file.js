@@ -7,7 +7,7 @@ describe('navigate :: workspace > create_new > file', function () {
   beforeEach(function () {
     cy.loginAs('users')
     cy.visit('/')
-    cy.get('[data-cy=sidebar__workspace__item_1]').click()
+    cy.get('[data-cy=sidebar__space__item_1]').click()
   })
 
   it('dashboard > button', function () {
