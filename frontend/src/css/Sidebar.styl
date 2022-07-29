@@ -174,6 +174,7 @@ borderWhenActive= 5px
         & .sidebar__mention, .sidebar__notification
           font-size 0
           min-width wallCircleSize
+          width wallCircleSize
           height wallCircleSize
           position absolute
           margin-inline-start 25px
@@ -182,7 +183,7 @@ borderWhenActive= 5px
     & .sidebar__spaces
       display none
     & .sidebar__footer
-      & .iconbutton__label
+      & .iconbutton__label, .iconbutton__label-mobile
         display none
       & .sidebar__footer__text
         display none
@@ -212,34 +213,12 @@ borderWhenActive= 5px
 body.tox-fullscreen .sidebar
   display none
 
-@media (min-width: min-lg) and (max-width: max-lg)
-  .sidebarpagecontainer
+@media (max-width: max-xs) and (max-width: max-lg)
+  .siebarpagecontainer
     position relative
 
   .sidebar
     position absolute
     min-height 100%
-
-@media (min-width: min-md) and (max-width: max-md)
-  .sidebarpagecontainer
-    position relative
-
-  .sidebar
-    position absolute
-    min-height 100%
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .sidebarpagecontainer
-    position relative
-
-  .sidebar
-    position absolute
-    min-height 100%
-
-@media (max-width: max-xs)
-  .sidebarpagecontainer
-    position relative
-
-  .sidebar
-    position absolute
-    min-height 100%
+    &.sidebarClose
+      position static
