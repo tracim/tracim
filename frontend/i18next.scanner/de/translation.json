@@ -331,7 +331,7 @@
   "Last Modification": "Letzte Modifikation",
   "Favorite": "Favorit",
   "content is not available": "Inhalt ist nicht verfügbar",
-  "Favorites": "Favoriten",
+  "My favorites": "Meine Favoriten",
   "An error has happened while fetching favorites": "Beim Holen der Favoriten ist ein Fehler aufgetreten",
   "An error has happened while removing the favorite": "Beim Entfernen des Favoriten ist ein Fehler aufgetreten",
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} wurde aus Ihren Favoriten entfernt.",

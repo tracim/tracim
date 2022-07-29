@@ -94,7 +94,7 @@
   "Last Modification": "آخر تعديل",
   "Favorite": "مفضّل",
   "content is not available": "المحتوى غير متوفر",
-  "Favorites": "المفضّلات",
+  "My favorites": "المفضّلات",
   "An error has happened while fetching favorites": "لقد حدث خطأ أثناء محاولة الحصول على المفضّلات",
   "An error has happened while removing the favorite": "لقد حدث خطأ أثناء حذف المفضّلات",
   "{{contentLabel}} has been removed from your favorites.": "تم حذف {{contentLabel}} من مفضّلاتك.",

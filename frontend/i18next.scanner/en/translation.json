@@ -418,7 +418,7 @@
   "Password:": "Password:",
   "Favorite": "Favourite",
   "content is not available": "content is not available",
-  "Favorites": "Favourites",
+  "My favorites": "My favourites",
   "An error has happened while fetching favorites": "An error has happened while fetching favourites",
   "An error has happened while removing the favorite": "An error has happened while removing the favourite",
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} has been removed from your favourites.",

@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { PAGE } from 'tracim_frontend_lib'
-import { workspaceConfig } from '../../util/helper.js'
 import SidebarItem from './SidebarItem.jsx'
 import MenuProfile from '../Header/MenuActionListItem/MenuProfile.jsx'
 
@@ -41,7 +40,7 @@ const SidebarUserItemList = (props) => {
               customClass='sidebar__spaces__item'
               to={PAGE.ADMIN.WORKSPACE}
               label={props.t('Space management')}
-              icon={workspaceConfig.faIcon}
+              icon='fas fa-users-cog'
               isCurrentItem={props.location.pathname === PAGE.ADMIN.WORKSPACE && !props.isNotificationWallOpen}
             />
           )}

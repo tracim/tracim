@@ -62,6 +62,8 @@ borderWhenActive= 5px
         padding-inline-start 0
       &.sidebar__search
         padding-inline-start textSpacing
+    &__profile
+      font-weight bold
     &__name
       align-items center
       display inline-flex
@@ -105,8 +107,8 @@ borderWhenActive= 5px
     color offWhite
     font-weight bold
     padding-inline-start borderWhenActive
-    & *
-      color offWhite
+    & .sidebar__item__name
+      padding-inline-start 0
   &__spaces
     overflow-y auto
     flex 1
@@ -187,6 +189,8 @@ borderWhenActive= 5px
         display none
       & .sidebar__footer__text
         display none
+    & .sidebar__title .sidebar__item__name
+        padding-inline-start standardSpacing
 
 // INFO - GB - 2022-07-26 - Icon colors
 .sidebar__search__item i

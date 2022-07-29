@@ -420,7 +420,7 @@
   "Password:": "Mot de passe :",
   "Favorite": "Favori",
   "content is not available": "le contenu n'est pas disponible",
-  "Favorites": "Favoris",
+  "My favorites": "Mes favoris",
   "An error has happened while fetching favorites": "Une erreur est survenue pendant la récupération des favoris",
   "An error has happened while removing the favorite": "Une erreur est survenue pendant la suppression du favori",
   "{{contentLabel}} has been removed from your favorites.": "{{contentLabel}} a été supprimé de vos favoris.",

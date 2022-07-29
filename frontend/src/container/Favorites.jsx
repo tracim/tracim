@@ -117,7 +117,7 @@ export class Favorites extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    const headTitle = buildHeadTitle([props.t('Favorites')])
+    const headTitle = buildHeadTitle([props.t('My favorites')])
     props.dispatch(setHeadTitle(headTitle))
   }
 
@@ -127,7 +127,7 @@ export class Favorites extends React.Component {
     props.dispatch(setBreadcrumbs([{
       link: PAGE.FAVORITES,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Favorites'),
+      label: props.t('My favorites'),
       isALink: true
     }]))
   }

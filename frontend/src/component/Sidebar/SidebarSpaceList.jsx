@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
   createSpaceTree,
-  IconButton,
   ROLE_LIST,
   sortWorkspaceList
 } from 'tracim_frontend_lib'
@@ -42,29 +41,12 @@ const SidebarSpaceList = (props) => {
 
   return (
     <>
-      {!props.isSidebarClosed && (
-        <div className='sidebar__title'>
-          <IconButton
-            customClass='sidebar__item__foldChildren'
-            icon={`fas fa-caret-${props.showSpaceList ? 'down' : 'right'}`}
-            title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
-            intent='link'
-            mode='light'
-            onClick={props.onClickToggleSpaceList}
-          />
-          <div className='sidebar__item__name'>
-            {props.t('Spaces')}
-          </div>
-        </div>
-      )}
-
-      {props.isSidebarClosed && (
-        <SidebarItem
-          label={props.t('Spaces')}
-          icon='fas fa-users'
-          onClickItem={props.onClickToggleSidebar}
-        />
-      )}
+      <SidebarItem
+        customClass='sidebar__title'
+        label={props.t('Spaces')}
+        icon={props.isSidebarClosed ? 'fas fa-users' : `fas fa-caret-${props.showSpaceList ? 'down' : 'right'}`}
+        onClickItem={props.isSidebarClosed ? props.onClickToggleSidebar : props.onClickToggleSpaceList}
+      />
 
       {props.showSpaceList && (
         <div className='sidebar__spaces'>
