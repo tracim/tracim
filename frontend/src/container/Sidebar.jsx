@@ -45,7 +45,7 @@ export class Sidebar extends React.Component {
       foldedSpaceList: [],
       isSidebarClosed: isMobile,
       showSpaceList: true,
-      showUserItems: true
+      showUserItems: false
     }
 
     props.registerCustomEventHandlerList([
@@ -190,16 +190,6 @@ export class Sidebar extends React.Component {
           />
         </div>
 
-        <SidebarItem
-          customClass='sidebar__notification__item'
-          label={props.t('Notifications')}
-          icon='fas fa-bell'
-          onClickItem={props.onClickNotification}
-          unreadMentionCount={props.unreadMentionCount}
-          unreadNotificationCount={props.unreadNotificationCount}
-          isCurrentItem={props.isNotificationWallOpen}
-        />
-
         <SidebarUserItemList
           isSidebarClosed={state.isSidebarClosed}
           isNotificationWallOpen={props.isNotificationWallOpen}
@@ -212,6 +202,34 @@ export class Sidebar extends React.Component {
           isAgendaEnabled={isAgendaEnabled}
           isUserAdministrator={isUserAdministrator}
         />
+
+        <SidebarItem
+          customClass='sidebar__activities__item'
+          to={PAGE.RECENT_ACTIVITIES}
+          label={props.t('Recent activities')}
+          icon='fas fa-newspaper'
+          isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
+        />
+
+        <SidebarItem
+          customClass='sidebar__notification__item'
+          label={props.t('Notifications')}
+          icon='fas fa-bell'
+          onClickItem={props.onClickNotification}
+          unreadMentionCount={props.unreadMentionCount}
+          unreadNotificationCount={props.unreadNotificationCount}
+          isCurrentItem={props.isNotificationWallOpen}
+        />
+
+        {props.isAgendaEnabled && (
+          <SidebarItem
+            customClass='sidebar__agendas__item'
+            to={PAGE.AGENDA}
+            label={props.t('Agendas')}
+            icon='fas fa-calendar-alt'
+            isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
+          />
+        )}
 
         <SidebarSpaceList
           isSidebarClosed={state.isSidebarClosed}

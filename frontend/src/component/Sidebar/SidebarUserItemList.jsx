@@ -18,24 +18,6 @@ const SidebarUserItemList = (props) => {
 
       {(props.showUserItems || props.isSidebarClosed) && (
         <>
-          <SidebarItem
-            customClass='sidebar__activities__item'
-            to={PAGE.RECENT_ACTIVITIES}
-            label={props.t('Recent activities')}
-            icon='fas fa-newspaper'
-            isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
-          />
-
-          {props.isAgendaEnabled && (
-            <SidebarItem
-              customClass='sidebar__agendas__item'
-              to={PAGE.AGENDA}
-              label={props.t('Agendas')}
-              icon='fas fa-calendar-alt'
-              isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
-            />
-          )}
-
           {props.isToDoEnabled && (
             <SidebarItem
               customClass='sidebar__tasks__item'
@@ -49,7 +31,7 @@ const SidebarUserItemList = (props) => {
           <SidebarItem
             customClass='sidebar__favorites__item'
             to={PAGE.FAVORITES}
-            label={props.t('Favorites')}
+            label={props.t('My favorites')}
             icon='fas fa-star'
             isCurrentItem={props.location.pathname === PAGE.FAVORITES && !props.isNotificationWallOpen}
           />

@@ -263,7 +263,7 @@ export class Favorites extends React.Component {
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
           <PageTitle
-            title={props.t('Favorites')}
+            title={props.t('My favorites')}
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
             isEmailNotifActivated={props.system.config.email_notification_activated}

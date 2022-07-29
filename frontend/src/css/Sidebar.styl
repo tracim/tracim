@@ -1,6 +1,7 @@
 sidebar-animate-speed = 0.5s
 sidebarFontColor = offWhite
 sidebarFontColorHover = grey
+borderWhenActive= 5px
 
 .sidebar
   background-color var(--sidebarColor)
@@ -42,7 +43,7 @@ sidebarFontColorHover = grey
     width 100%
     height 40px
     min-height 40px
-    padding-inline-start textSpacing
+    padding-inline-start borderWhenActive
     background-color transparent
     & *
       color sidebarFontColor
@@ -54,7 +55,7 @@ sidebarFontColorHover = grey
     &__current
       padding-inline-start 0
       border-inline-start-style solid
-      border-inline-start-width 5px
+      border-inline-start-width borderWhenActive
       background-color var(--sidebarColorLighten)
       font-weight bold
       &.sidebar__item__space
@@ -75,17 +76,20 @@ sidebarFontColorHover = grey
         align-items center
     &__space
       display flex
-      padding-inline-start textSpacing
+      padding-inline-start borderWhenActive
+      align-items center
       & > *
         color sidebarFontColor
       &:hover
         background-color var(--sidebarColorDarken)
     &__withoutChildren
       padding-inline-start 20px
-    &__foldChildren:hover > .iconbutton__icon
+    &__foldChildren
+      height 100%
+      &:hover > .iconbutton__icon
         color sidebarFontColorHover
     &__dragNdrop
-      margin-inline-start 5px
+      margin-inline-start textSpacing
     &__menu.dropdownMenuButton
       & i
         width auto
@@ -100,6 +104,7 @@ sidebarFontColorHover = grey
     display flex
     color offWhite
     font-weight bold
+    padding-inline-start borderWhenActive
     & *
       color offWhite
   &__spaces
