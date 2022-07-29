@@ -199,7 +199,6 @@ export class Sidebar extends React.Component {
           showUserItems={state.showUserItems}
           onClickToggleUserItems={this.handleClickToggleUserItems}
           isToDoEnabled={isToDoEnabled}
-          isAgendaEnabled={isAgendaEnabled}
           isUserAdministrator={isUserAdministrator}
         />
 
@@ -221,7 +220,7 @@ export class Sidebar extends React.Component {
           isCurrentItem={props.isNotificationWallOpen}
         />
 
-        {props.isAgendaEnabled && (
+        {isAgendaEnabled && (
           <SidebarItem
             customClass='sidebar__agendas__item'
             to={PAGE.AGENDA}
