@@ -1778,6 +1778,8 @@ class ContentApi(object):
     def get_templates(self, user: User, template_type: str) -> typing.List[Content]:
         space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
         space_list = space_api.get_all_for_user(user)
+        if not space_list:
+            return []
         content_list = (
             self._base_query(space_list)
             .filter(Content.is_template.is_(True), Content.type == template_type,)
