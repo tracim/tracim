@@ -114,8 +114,8 @@ def init_plugin_manager(app_config: CFG) -> pluggy.PluginManager:
     from tracim_backend.lib.core.event import EventBuilder
     from tracim_backend.lib.core.event import EventPublisher
     from tracim_backend.lib.core.event import MessageHooks
-    from tracim_backend.lib.search.search_factory import SearchFactory
     import tracim_backend.lib.core.mention as mention
+    from tracim_backend.lib.search.search_factory import SearchFactory
 
     plugin_manager.register(EventBuilder(app_config))
     plugin_manager.register(EventPublisher(app_config))

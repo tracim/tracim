@@ -394,4 +394,3 @@ msgid ""
 msgstr ""
 "Deze upload is beveiligd met een wachtwoord. Neem contact op met (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) voor toegang."
-

@@ -12,12 +12,12 @@ import string
 import sys
 import types
 import typing
-from typing import TYPE_CHECKING
 from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 from urllib.parse import urljoin
 import uuid

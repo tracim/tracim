@@ -8,8 +8,9 @@ from pyramid.config import Configurator
 from tracim_backend.models.roles import WorkspaceRoles
 
 if typing.TYPE_CHECKING:
+    from tracim_backend.app_models.contents import ContentStatus  # noqa:F401
+    from tracim_backend.app_models.contents import content_status_list  # noqa:F401
     from tracim_backend.config import CFG  # noqa:F401
-    from tracim_backend.app_models.contents import ContentStatus, content_status_list  # noqa:F401
 
 
 class TracimContentType(object):

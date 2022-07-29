@@ -11,10 +11,10 @@ from tracim_backend.lib.utils.app import TracimApplication
 from tracim_backend.lib.utils.app import TracimContentType
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.models.data import Workspace
-    from tracim_backend.config import CFG
     from tracim_backend.app_models.applications import TracimApplicationInContext  # noqa:F401
     from tracim_backend.app_models.contents import ContentTypeInContext  # noqa: F401
+    from tracim_backend.config import CFG
+    from tracim_backend.models.data import Workspace
 
 
 class ApplicationApi(object):

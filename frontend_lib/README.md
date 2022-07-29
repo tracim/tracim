@@ -28,7 +28,7 @@ The build and its functions can be used by accessing the global variable `tracim
 - `tracim_frontend_vendors` and `tracim_frontend_lib` are included using the `<script>` tag before the app is loaded.
   - In this configuration, `tracim_frontend_lib` expects the global object `tracim_frontend_vendors` to be available.
   - This can be done by using the `externals.json` file built when bundling `tracim_frontend_vendors`.
-  
+
 Note: All the above is already configured for Tracim's `optimized` bundles.
 
 Run:

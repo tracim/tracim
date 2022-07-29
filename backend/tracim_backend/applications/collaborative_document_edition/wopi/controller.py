@@ -20,21 +20,21 @@ from tracim_backend.applications.collaborative_document_edition.data import (
     SWAGGER_TAG__COLLABORATIVE_DOCUMENT_EDITION_ENDPOINTS,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.lib import WopiLib
-from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.applications.collaborative_document_edition.wopi.models import (
     WopiLastModifiedTime,
 )
+from tracim_backend.applications.collaborative_document_edition.wopi.models import WopiCheckFileInfo
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WOPICheckFileInfoSchema,
+)
+from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
+    WOPITokenQuerySchema,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutHeadersSchema,
 )
 from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
     WopiPutResponseSchema,
-)
-from tracim_backend.applications.collaborative_document_edition.wopi.schema import (
-    WOPITokenQuerySchema,
 )
 from tracim_backend.exceptions import CannotGetDepotFileDepotCorrupted
 from tracim_backend.exceptions import TracimFileNotFound

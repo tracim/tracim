@@ -9,9 +9,9 @@ from copy import deepcopy
 
 # revision identifiers, used by Alembic.
 from alembic import op
-from sqlalchemy import JSON
 from sqlalchemy import Column
 from sqlalchemy import Integer
+from sqlalchemy import JSON
 from sqlalchemy import MetaData
 from sqlalchemy import Sequence
 from sqlalchemy.ext.declarative import declarative_base

@@ -2,8 +2,8 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import backref
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import JSON
 from sqlalchemy.types import Integer
+from sqlalchemy.types import JSON
 
 from tracim_backend.models.auth import User
 from tracim_backend.models.meta import DeclarativeBase

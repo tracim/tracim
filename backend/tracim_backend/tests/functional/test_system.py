@@ -9,7 +9,6 @@ from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_timezones_list
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
-
 """
 Tests for /api/system subpath endpoints.
 """

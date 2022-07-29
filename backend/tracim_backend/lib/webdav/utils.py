@@ -4,8 +4,8 @@ import tempfile
 from sqlalchemy.orm import Session
 import transaction
 from wsgidav import util
-from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import DAVError
+from wsgidav.dav_error import HTTP_FORBIDDEN
 
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import TracimException

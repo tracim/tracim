@@ -5,7 +5,7 @@ This folder is a fullscreen app loaded by Tracim.
 
 The app wrap Caldavzap which is a full js implementation of the protocol caldav.
 
-It allows to create events and to connect to it through any tool that implements caldav protocol (eg. thunderbird) 
+It allows to create events and to connect to it through any tool that implements caldav protocol (eg. thunderbird)
 
 ### Build the app
 

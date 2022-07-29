@@ -16,11 +16,11 @@ from depot.io.utils import FileIntent
 from sqlakeyset import Page
 from sqlakeyset import get_page
 import sqlalchemy
-from sqlalchemy import JSON
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Index
+from sqlalchemy import JSON
 from sqlalchemy import Sequence
 from sqlalchemy import inspect
 from sqlalchemy import text

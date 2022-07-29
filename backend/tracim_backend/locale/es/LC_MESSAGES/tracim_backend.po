@@ -393,4 +393,3 @@ msgstr ""
 "Esta carga está protegida por una contraseña, por favor, póngase en "
 "contacto conmigo (<a href=\"mailto:{emitter_email}\">{username}</a>) para"
 " obtener la contraseña."
-

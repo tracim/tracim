@@ -57,16 +57,16 @@ After migration, the file can be found in `/<your>/<migration>/<folder>/<path>/e
 Copy folder `collection-root/agenda/` in `radicale_storage/`:
 
     cp -r export/collection-root /<your>/<tracimv2>/<path>/backend/radicale_storage/
-    
+
 Make sure that file `.Radicale.props` does not exist in the following folders (otherwise delete them):
-  
+
 - `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/user/`
 - `/<your>/<tracimv2>/<path>/backend/radicale_storage/collection-root/agenda/workspace/`
 
 After starting the CalDAV server, you need to synchronize Tracim with radicale:
 
     tracimcli caldav sync
-    
+
 Now all of your agendas are visible in Tracim.
 
 ## Parameter changed from v2.1 to v2.2
@@ -134,7 +134,7 @@ One easy way to migrate from Tracim v1 to Tracim v2 with shell script is :
  - running shell automatic install with default sqlite database
  - active virtual environment (in `/backend` folder) `source env/bin/activate`
  - check that Tracim v2 is running correctly by launching `pserve development.ini`
- - do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your 
+ - do `pip install -e .[mysql]` or `pip install -e .[postgresql] `to install proper package for your
 SGDB.
  - modify default config file (`development.ini` name here but you can change it) with `basic_setup.sqlalchemy_url` linking to your own database with Tracim v1 data and `basic_setup.depot_storage_dir` with path giving access to your old Tracim v1 depot dir content.
  - force migration of database with `alembic -c developement.ini upgrade head` (see also [here](migration.md) for more info)

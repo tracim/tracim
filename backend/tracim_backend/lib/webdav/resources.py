@@ -13,9 +13,9 @@ from typing import List
 
 import transaction
 from wsgidav import compat
+from wsgidav.dav_error import DAVError
 from wsgidav.dav_error import HTTP_FORBIDDEN
 from wsgidav.dav_error import HTTP_REQUEST_ENTITY_TOO_LARGE
-from wsgidav.dav_error import DAVError
 from wsgidav.dav_provider import DAVCollection
 from wsgidav.dav_provider import DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
@@ -51,8 +51,8 @@ from tracim_backend.models.revision_protection import new_revision
 logger = logging.getLogger()
 
 if typing.TYPE_CHECKING:
-    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
     from tracim_backend.lib.webdav.dav_provider import TracimDavProvider
+    from tracim_backend.lib.webdav.dav_provider import WebdavTracimContext
 
 
 def webdav_check_right(authorization_checker: AuthorizationChecker):

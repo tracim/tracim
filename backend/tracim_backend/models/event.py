@@ -12,10 +12,10 @@ from sqlalchemy import Index
 from sqlalchemy import Sequence
 from sqlalchemy.ext.indexable import index_property
 from sqlalchemy.orm import relationship
-from sqlalchemy.types import JSON
 from sqlalchemy.types import DateTime
 from sqlalchemy.types import Enum
 from sqlalchemy.types import Integer
+from sqlalchemy.types import JSON
 from sqlalchemy.types import String
 
 from tracim_backend.models.auth import User

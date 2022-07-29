@@ -29,12 +29,12 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.rq import RqQueueName
 from tracim_backend.lib.rq import get_rq_queue2
 from tracim_backend.lib.rq.worker import worker_context
-from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestComments
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestTodo
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestUser
 from tracim_backend.lib.search.elasticsearch_search.es_models import DigestWorkspace
+from tracim_backend.lib.search.elasticsearch_search.es_models import EXACT_FIELD
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedContent
 from tracim_backend.lib.search.elasticsearch_search.es_models import IndexedWorkspace
 from tracim_backend.lib.search.elasticsearch_search.es_models import create_indexed_user_class

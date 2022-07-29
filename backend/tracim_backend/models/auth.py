@@ -39,8 +39,8 @@ from tracim_backend.models.mixins import TrashableMixin
 from tracim_backend.models.types import TracimUploadedFileField
 
 if TYPE_CHECKING:
-    from tracim_backend.models.data import Workspace
     from tracim_backend.models.data import UserRoleInWorkspace
+    from tracim_backend.models.data import Workspace
 __all__ = ["User"]
 
 

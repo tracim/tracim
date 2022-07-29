@@ -34,8 +34,8 @@ from tracim_backend.exceptions import UserCantDeleteHimself
 from tracim_backend.exceptions import UserCantDisableHimself
 from tracim_backend.exceptions import UserFollowAlreadyDefined
 from tracim_backend.exceptions import UserImageNotFound
-from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import UserSelfRegistrationDisabledException
+from tracim_backend.exceptions import UsernameAlreadyExists
 from tracim_backend.exceptions import WorkspaceNotFound
 from tracim_backend.exceptions import WrongUserPassword
 from tracim_backend.extensions import hapic
@@ -89,8 +89,8 @@ from tracim_backend.views.core_api.schemas import SetEmailSchema
 from tracim_backend.views.core_api.schemas import SetPasswordSchema
 from tracim_backend.views.core_api.schemas import SetUserAllowedSpaceSchema
 from tracim_backend.views.core_api.schemas import SetUserInfoSchema
-from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SetUserProfileSchema
+from tracim_backend.views.core_api.schemas import SetUsernameSchema
 from tracim_backend.views.core_api.schemas import SimpleFileSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventHeaderSchema
 from tracim_backend.views.core_api.schemas import TracimLiveEventQuerySchema
@@ -112,13 +112,13 @@ from tracim_backend.views.core_api.schemas import UserWorkspaceIdPathSchema
 from tracim_backend.views.core_api.schemas import WorkspaceIdSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSchema
 from tracim_backend.views.core_api.schemas import WorkspaceSubscriptionSchema
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
+from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__CONTENT_ENDPOINTS
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__ENABLE_AND_DISABLE_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__NOTIFICATION_SECTION
 from tracim_backend.views.swagger_generic_section import SWAGGER_TAG__TRASH_AND_RESTORE_SECTION
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_EVENT_ENDPOINTS
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_CONFIG_ENDPOINTS
-from tracim_backend.views.swagger_generic_section import SWAGGER_TAG_USER_SUBSCRIPTIONS_SECTION
 
 SWAGGER_TAG__USER_ENDPOINTS = "Users"
 

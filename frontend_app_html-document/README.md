@@ -21,7 +21,7 @@ see [frontend/doc/app_building#Development](../frontend/doc/app_building.md#deve
 - In `src/debug.js`, change:
   - `content.content_id` to the id of the content you just created
   - `content.workspace_id` to the id of the space you just created the content in
-  
+
 ___
 
 ### Other available yarn scripts

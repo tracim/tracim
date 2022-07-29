@@ -11,8 +11,8 @@ from tracim_backend.config import CFG
 from tracim_backend.extensions import app_list
 from tracim_backend.lib.core.application import ApplicationApi
 from tracim_backend.lib.utils.request import TracimRequest
-from tracim_backend.lib.utils.utils import FRONTEND_UI_SUBPATH
 from tracim_backend.lib.utils.utils import ExtendedColor
+from tracim_backend.lib.utils.utils import FRONTEND_UI_SUBPATH
 from tracim_backend.views.controllers import Controller
 
 INDEX_PAGE_NAME = "index.mak"
