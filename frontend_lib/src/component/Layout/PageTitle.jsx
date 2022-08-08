@@ -46,11 +46,6 @@ export const PageTitle = (props) => {
             />
           </div>
         )}
-
-        <div
-          id='customToolboxHeaderBtn'
-          className='pageTitleGeneric__specificBtn'
-        />
       </div>
 
       {(props.breadcrumbsList.length > 0

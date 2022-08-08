@@ -3,6 +3,7 @@
 cardWidth = 280px
 
 .kanban
+  z-index 11
   &__contentpage
     &__content
       &__left
@@ -13,12 +14,12 @@ cardWidth = 280px
       display flex
       flex-direction column
       // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
-      height "calc(100% - %s)" % 28px
+      height "calc(100% - %s)" % (headerHeight + 28px)
       &.fullscreen
         position fixed
         width 100%
         height 100%
-        z-index 1
+        z-index 2
         background offWhite
 
       &__options
