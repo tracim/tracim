@@ -1775,22 +1775,14 @@ class ContentApi(object):
             content.revision_type = ActionDescription.UNMARK_AS_TEMPLATE
         return content
 
-    def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:
-        user = self._session.query(User).get(user_id)
-
+    def get_templates(self, user: User, template_type: str) -> typing.List[Content]:
         space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
-        space_ids = [space.workspace_id for space in space_api.get_all_for_user(user)]
-
+        space_list = space_api.get_all_for_user(user)
+        if not space_list:
+            return []
         content_list = (
-            self._session.query(Content)
-            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
-            .filter(
-                Content.workspace_id.in_(space_ids),
-                Content.is_template.is_(True),
-                Content.type == template_type,
-                Content.is_deleted.is_(False),
-                Content.is_archived.is_(False),
-            )
+            self._base_query(space_list)
+            .filter(Content.is_template.is_(True), Content.type == template_type,)
             .all()
         )
 
