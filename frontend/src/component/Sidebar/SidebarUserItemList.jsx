@@ -62,7 +62,7 @@ const SidebarUserItemList = (props) => {
             label={props.t('Account Settings')}
             icon='fas fa-cogs'
             isCurrentItem={props.location.pathname === PAGE.ACCOUNT && !props.isNotificationWallOpen}
-            dataCy='menuprofile__dropdown__account__link'
+            dataCy='sidebar__account__settings'
           />
 
           <SidebarItem
