@@ -172,6 +172,11 @@ export class Sidebar extends React.Component {
         </div>
 
         <div
+          id='customToolboxHeaderBtn'
+          className='header__menu__rightside__specificBtn'
+        />
+
+        <div
           className={classnames('sidebar__search', {
             'sidebar__item__current primaryColorBorder':
               props.location.pathname === PAGE.SEARCH_RESULT && !props.isNotificationWallOpen

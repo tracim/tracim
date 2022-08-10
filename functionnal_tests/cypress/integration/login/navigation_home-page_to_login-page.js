@@ -39,6 +39,9 @@ describe('Login page', function () {
       .find('.loginpage__main__form__btnsubmit')
       .click()
 
+    cy.get('.sidebar__item__profile .sidebar__item__foldChildren')
+      .click()
+
     cy.get('[data-cy="sidebar__logout"]')
       .click()
   })
@@ -68,6 +71,9 @@ describe('Login page', function () {
 
     cy.getTag({ selectorName: s.LOGIN_PAGE_MAIN })
       .find('.loginpage__main__form__btnsubmit')
+      .click()
+
+    cy.get('.sidebar__item__profile .sidebar__item__foldChildren')
       .click()
 
     cy.get('[data-cy="sidebar__logout"]')

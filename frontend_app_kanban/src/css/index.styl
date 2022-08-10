@@ -3,6 +3,8 @@
 cardWidth = 280px
 
 .kanban
+  // INFO - GB - 2022-08-09 - .kanban has z-index 11 to be above of sidebar and allow the fullscreen mode
+  z-index 11
   &__contentpage
     &__content
       &__left
@@ -13,12 +15,14 @@ cardWidth = 280px
       display flex
       flex-direction column
       // INFO - GB - 2021-12-20 - 28px is the wsContentGeneric__content__left__top height
-      height "calc(100% - %s)" % 28px
+      height "calc(100% - %s)" % (headerHeight + 28px)
       &.fullscreen
         position fixed
         width 100%
         height 100%
-        z-index 1
+        // INFO - GB - 2022-08-09 - .kanban.fullscreen has z-index 2 to be above TinyMCE (.tox .tox-editor-header)
+        // In case advanced edition is enabled at the moment the user goes into fullscreen mode.
+        z-index 2
         background offWhite
 
       &__options

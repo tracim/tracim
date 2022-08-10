@@ -11,11 +11,10 @@ describe('Account page', function () {
     cy.visitPage({ pageName: PAGES.HOME })
   })
 
-  it("should be able to access the account page through header's buttons", () => {
-    cy.get('[data-cy=menuprofile__sidebar]')
-      .click()
+  it("should be able to access the account page through sidebar's buttons", () => {
+    cy.get('.sidebar__item__profile .sidebar__item__foldChildren').click()
 
-    cy.get('[data-cy=menuprofile__dropdown__account__link]')
+    cy.get('[data-cy=sidebar__account__settings]')
       .click()
 
     cy.get('.userinfo')
