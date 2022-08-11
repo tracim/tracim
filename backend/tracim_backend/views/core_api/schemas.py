@@ -2040,7 +2040,9 @@ class SetContentIsTemplateSchema(marshmallow.Schema):
 
 
 class TemplateQuerySchema(marshmallow.Schema):
-    type = StrippedString(example="html-document", validate=all_content_types_validator)
+    type = StrippedString(
+        example="html-document", validate=all_content_types_validator, required=True
+    )
 
 
 class TargetLanguageSchema(marshmallow.Schema):

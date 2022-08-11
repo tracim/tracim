@@ -39,6 +39,9 @@ describe('Login after a disconnection ', function () {
     cy.get('.pageTitleGeneric__title__label')
       .should('be.visible')
 
+    cy.get('.sidebar__item__profile .sidebar__item__foldChildren')
+      .click()
+
     cy.get('[data-cy=sidebar__admin__user]')
       .should('be.visible')
       .click()

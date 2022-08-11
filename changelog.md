@@ -1,3 +1,10 @@
+# 4.3.2 / 2022-08-09
+
+### Fixed Issue
+
+- Backend: [#5813](https://github.com/tracim/tracim/issues/5813)
+
+
 # 4.3.1 / 2022-07-27
 
 ### Fixed Issues

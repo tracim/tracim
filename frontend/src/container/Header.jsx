@@ -49,16 +49,18 @@ export const Header = (props) => {
         <header className='header'>
           <Logo to={PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
 
-          <div
-            id='customToolboxHeaderBtn'
-            className='header__menu__rightside__specificBtn'
-          />
+          <div>
+            <div
+              id='customToolboxHeaderBtn'
+              className='header__menu__rightside__specificBtn'
+            />
 
-          <DropdownLang
-            langList={props.lang}
-            langActiveId={props.user.lang}
-            onChangeLang={handleChangeLang}
-          />
+            <DropdownLang
+              langList={props.lang}
+              langActiveId={props.user.lang}
+              onChangeLang={handleChangeLang}
+            />
+          </div>
         </header>
       )
   )
