@@ -49,7 +49,7 @@ export const Header = (props) => {
         <header className='header'>
           <Logo to={PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
 
-          <div>
+          <div className='header__menu__rightside'>
             <div
               id='customToolboxHeaderBtn'
               className='header__menu__rightside__specificBtn'
