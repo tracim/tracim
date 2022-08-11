@@ -11,7 +11,7 @@ export const MenuProfile = props => {
 
   return (
     <div
-      className={classnames('sidebar__item sidebar__item__profile',
+      className={classnames('sidebar__item sidebar__title',
         { 'sidebar__item__current primaryColorBorder primaryColorBgOpacity': props.isCurrentItem }
       )}
     >

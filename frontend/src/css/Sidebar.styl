@@ -60,8 +60,6 @@ borderWhenActive= 5px
         padding-inline-start 0
       &.sidebar__search
         padding-inline-start textSpacing
-    &__profile
-      font-weight bold
     &__name
       align-items center
       display inline-flex
@@ -78,6 +76,8 @@ borderWhenActive= 5px
       display flex
       padding-inline-start borderWhenActive
       align-items center
+      &__type
+        padding-inline-start textSpacing
       & > *
         color sidebarFontColor
       &:hover
@@ -101,23 +101,26 @@ borderWhenActive= 5px
       &::after
         display none
   &__title
-    display flex
-    color offWhite
     font-weight bold
-    padding-inline-start 0
-    align-items center
-    flex 1
-    height 100%
-    & > span
-      padding-inline-start standardSpacing
-    &__create
-      padding-inline-start textSpacing
-      padding-inline-end textSpacing
+    background-color var(--sidebarColorLighten)
+    &__spaces
+      display flex
+      color offWhite
+      font-weight bold
+      padding-inline-start 0
+      align-items center
+      flex 1
       height 100%
-    &__join
-      padding-inline-start textSpacing
-      padding-inline-end textSpacing
-      height 100%
+      & > span
+        padding-inline-start standardSpacing
+      &__create
+        padding-inline-start textSpacing
+        padding-inline-end textSpacing
+        height 100%
+      &__join
+        padding-inline-start textSpacing
+        padding-inline-end textSpacing
+        height 100%
   &__spaces
     overflow-y auto
     flex 1
@@ -196,7 +199,7 @@ borderWhenActive= 5px
         display none
       & .sidebar__footer__text
         display none
-    & .sidebar__title
+    & .sidebar__title__spaces
       padding-inline-start borderWhenActive
       justify-content center
       & > span

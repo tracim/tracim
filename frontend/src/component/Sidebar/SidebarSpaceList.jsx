@@ -19,19 +19,20 @@ const SidebarSpaceList = (props) => {
     return spaceList.map(space =>
       <React.Fragment key={space.id}>
         <SidebarSpaceItem
-          activeWorkspaceId={props.activeWorkspaceId}
+          activeSpaceId={props.activeSpaceId}
           allowedAppList={space.sidebarEntryList}
           foldChildren={!!props.foldedSpaceList.find(id => id === space.id)}
           hasChildren={space.children.length > 0}
           id={`sidebar-space-item-${space.id}`}
+          isNotificationWallOpen={props.isNotificationWallOpen}
           label={space.label}
           level={spaceLevel}
           onClickAllContent={props.onClickAllContent}
           onClickToggleSidebar={props.onClickToggleSidebar}
           onToggleFoldChildren={() => props.onToggleFoldChildren(space.id)}
+          spaceId={space.id}
+          spaceType={space.accessType}
           userRoleIdInWorkspace={[findUserRoleIdInWorkspace(props.userId, space.memberList, ROLE_LIST)]}
-          workspaceId={space.id}
-          isNotificationWallOpen={props.isNotificationWallOpen}
         />
         {!props.foldedSpaceList.find(id => id === space.id) &&
           space.children.length !== 0 &&
@@ -63,9 +64,9 @@ const SidebarSpaceList = (props) => {
 
   return (
     <>
-      <div className='sidebar__item'>
+      <div className='sidebar__item sidebar__title'>
         <button
-          className='transparentButton sidebar__title'
+          className='transparentButton sidebar__title__spaces'
           title={props.t('Open space list')}
           onClick={handleClickTitle}
         >
@@ -77,7 +78,7 @@ const SidebarSpaceList = (props) => {
         </button>
         {props.accessibleWorkspaceList.length > 0 && (
           <IconButton
-            customClass='sidebar__title__join'
+            customClass='sidebar__title__spaces__join'
             onClick={props.onClickJoinWorkspace}
             dataCy='sidebarJoinSpaceBtn'
             icon='fas fa-users'
@@ -89,7 +90,7 @@ const SidebarSpaceList = (props) => {
 
         {(props.isUserManager || props.isUserAdministrator) && (
           <IconButton
-            customClass='sidebar__title__create'
+            customClass='sidebar__title__spaces__create'
             onClick={props.onClickNewSpace}
             dataCy='sidebarCreateSpaceBtn'
             icon='fas fa-plus'
@@ -118,7 +119,7 @@ export default translate()(SidebarSpaceList)
 
 SidebarSpaceList.propTypes = {
   userId: PropTypes.number.isRequired,
-  activeWorkspaceId: PropTypes.number,
+  activeSpaceId: PropTypes.number,
   foldedSpaceList: PropTypes.array,
   isNotificationWallOpen: PropTypes.bool,
   isSidebarClosed: PropTypes.bool,
@@ -131,7 +132,7 @@ SidebarSpaceList.propTypes = {
 }
 
 SidebarSpaceList.defaultProps = {
-  activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+  activeSpaceId: NO_ACTIVE_SPACE_ID,
   foldedSpaceList: [],
   isNotificationWallOpen: false,
   isSidebarClosed: false,

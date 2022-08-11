@@ -40,7 +40,7 @@ export class Sidebar extends React.Component {
     super(props)
     this.frameRef = React.createRef()
     this.state = {
-      activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+      activeSpaceId: NO_ACTIVE_SPACE_ID,
       foldedSpaceList: [],
       isSidebarClosed: isMobile,
       showSpaceList: true,
@@ -105,7 +105,7 @@ export class Sidebar extends React.Component {
       const spaceIdInUrl = parseInt(urlElements[urlElements.indexOf('workspaces') + 1])
 
       if (props.workspaceList.find(space => space.id === spaceIdInUrl) !== undefined) {
-        this.setState({ activeWorkspaceId: spaceIdInUrl })
+        this.setState({ activeSpaceId: spaceIdInUrl })
       }
     }
   }
@@ -244,7 +244,7 @@ export class Sidebar extends React.Component {
 
         <SidebarSpaceList
           accessibleWorkspaceList={props.accessibleWorkspaceList}
-          activeWorkspaceId={state.activeWorkspaceId}
+          activeSpaceId={state.activeSpaceId}
           foldedSpaceList={state.foldedSpaceList}
           isNotificationWallOpen={props.isNotificationWallOpen}
           isSidebarClosed={state.isSidebarClosed}
