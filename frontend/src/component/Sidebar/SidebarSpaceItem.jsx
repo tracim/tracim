@@ -129,7 +129,7 @@ class SidebarSpaceItem extends React.Component {
         className={classnames(
           'sidebar__item__space',
           {
-            'primaryColorBorder sidebar__item__current':
+            'primaryColorBorder primaryColorBgOpacity sidebar__item__current':
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`) && !props.isNotificationWallOpen
           },
           {

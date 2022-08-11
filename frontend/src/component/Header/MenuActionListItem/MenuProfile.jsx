@@ -12,7 +12,7 @@ export const MenuProfile = props => {
   return (
     <div
       className={classnames('sidebar__item sidebar__item__profile',
-        { 'sidebar__item__current primaryColorBorder': props.isCurrentItem }
+        { 'sidebar__item__current primaryColorBorder primaryColorBgOpacity': props.isCurrentItem }
       )}
     >
       <IconButton
