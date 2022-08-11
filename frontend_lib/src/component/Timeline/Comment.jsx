@@ -37,7 +37,7 @@ const Comment = props => {
   const createdDistance = displayDistanceDate(props.created, props.loggedUser.lang)
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
-  const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type)  === CONTENT_TYPE.FILE
+  const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
 
   return (
