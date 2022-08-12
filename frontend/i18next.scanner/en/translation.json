@@ -151,7 +151,6 @@
   "Server unreachable": "Server unreachable",
   "Unknown user": "Unknown user",
   "Email notifications": "E-mail notifications",
-  "Email notifications are disabled": "E-mail notifications are disabled",
   "Please enter a login and a password": "Please enter a login and a password",
   "This account is deactivated": "This account is deactivated",
   "Error while adding the member to the space": "Error while adding the member to the space",
@@ -187,7 +186,6 @@
   "Use this link to integrate Tracim in your file explorer": "Use this link to integrate Tracim in your file explorer",
   "CalDAV compatible software": "CalDAV compatible software",
   "(protocole WebDAV)": "(WebDAV protocol)",
-  "Administration": "Administration",
   "Agendas": "Agendas",
   "See sidebar": "See sidebar",
   "Hide sidebar": "Hide sidebar",
@@ -344,7 +342,6 @@
   "{{user}}'s profile": "{{user}}'s profile",
   "Profile": "Profile",
   "Loading": "Loading",
-  "My profile": "My profile",
   "Error while saving public profile": "Error while saving public profile",
   "Personal Page": "Personal Page",
   "Recommended dimensions: {{dimensions}} px": "Recommended dimensions: {{dimensions}} px",
@@ -578,5 +575,11 @@
   "{{author}} updated {{task}} on {{content}}{{workspaceInfo}}": "{{author}} updated {{task}} on {{content}}{{workspaceInfo}}",
   "{{author}} deleted {{task}} on {{content}}{{workspaceInfo}}": "{{author}} deleted {{task}} on {{content}}{{workspaceInfo}}",
   "There is no tasks that match your filter": "There is no tasks that match your filter",
-  "You don't have any assigned tasks": "You don't have any assigned tasks"
+  "You don't have any assigned tasks": "You don't have any assigned tasks",
+  "Confidential space": "Confidential space",
+  "Hide space list": "Hide space list",
+  "Show space list": "Show space list",
+  "Space management": "Space management",
+  "Hide user menu": "Hide user menu",
+  "Show user menu": "Show user menu"
 }

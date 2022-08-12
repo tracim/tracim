@@ -12,7 +12,7 @@ describe('Account page', function () {
   })
 
   it("should be able to access the account page through sidebar's buttons", () => {
-    cy.get('.sidebar__item__profile .sidebar__item__foldChildren').click()
+    cy.get('.sidebar__title .sidebar__item__foldChildren').click()
 
     cy.get('[data-cy=sidebar__account__settings]')
       .click()

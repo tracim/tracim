@@ -6,7 +6,6 @@ import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
 import {
   CUSTOM_EVENT,
-  IconButton,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
@@ -41,7 +40,7 @@ export class Sidebar extends React.Component {
     super(props)
     this.frameRef = React.createRef()
     this.state = {
-      activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+      activeSpaceId: NO_ACTIVE_SPACE_ID,
       foldedSpaceList: [],
       isSidebarClosed: isMobile,
       showSpaceList: true,
@@ -106,7 +105,7 @@ export class Sidebar extends React.Component {
       const spaceIdInUrl = parseInt(urlElements[urlElements.indexOf('workspaces') + 1])
 
       if (props.workspaceList.find(space => space.id === spaceIdInUrl) !== undefined) {
-        this.setState({ activeWorkspaceId: spaceIdInUrl })
+        this.setState({ activeSpaceId: spaceIdInUrl })
       }
     }
   }
@@ -139,6 +138,8 @@ export class Sidebar extends React.Component {
     })
     this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
   }
+
+  handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
 
   handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
 
@@ -178,7 +179,7 @@ export class Sidebar extends React.Component {
 
         <div
           className={classnames('sidebar__search', {
-            'sidebar__item__current primaryColorBorder':
+            'sidebar__item__current primaryColorBorder primaryColorBgOpacity':
               props.location.pathname === PAGE.SEARCH_RESULT && !props.isNotificationWallOpen
           })}
         >
@@ -236,43 +237,26 @@ export class Sidebar extends React.Component {
         )}
 
         <SidebarSpaceList
+          accessibleWorkspaceList={props.accessibleWorkspaceList}
+          activeSpaceId={state.activeSpaceId}
+          foldedSpaceList={state.foldedSpaceList}
+          isNotificationWallOpen={props.isNotificationWallOpen}
           isSidebarClosed={state.isSidebarClosed}
-          showSpaceList={state.showSpaceList}
-          onClickToggleSpaceList={this.handleClickToggleSpaceList}
+          isUserAdministrator={isUserAdministrator}
+          isUserManager={isUserManager}
+          onClickAllContent={this.handleClickAllContent}
+          onClickJoinWorkspace={this.handleClickJoinWorkspace}
+          onClickNewSpace={this.handleClickNewSpace}
+          onClickOpenSpaceList={this.handleClickOpenSpaceList}
           onClickToggleSidebar={this.handleClickToggleSidebar}
+          onClickToggleSpaceList={this.handleClickToggleSpaceList}
+          onToggleFoldChildren={this.handleToggleFoldChildren}
+          showSpaceList={state.showSpaceList}
           spaceList={props.workspaceList}
           userId={props.user.userId}
-          isNotificationWallOpen={props.isNotificationWallOpen}
-          activeWorkspaceId={state.activeWorkspaceId}
-          foldedSpaceList={state.foldedSpaceList}
-          onClickAllContent={this.handleClickAllContent}
-          onToggleFoldChildren={this.handleToggleFoldChildren}
         />
 
         <div className='sidebar__footer'>
-          <div className='sidebar__footer__buttons'>
-            {(isUserManager || isUserAdministrator) && (
-              <IconButton
-                onClick={this.handleClickNewSpace}
-                dataCy='sidebarCreateSpaceBtn'
-                icon='fas fa-plus'
-                text={props.t('Create a space')}
-                textMobile={props.t('Create a space')}
-                mode='light'
-              />
-            )}
-            {props.accessibleWorkspaceList.length > 0 && (
-              <IconButton
-                onClick={this.handleClickJoinWorkspace}
-                dataCy='sidebarJoinSpaceBtn'
-                icon='fas fa-users'
-                text={props.t('Join a space')}
-                textMobile={props.t('Join a space')}
-                intent='primary'
-                mode='light'
-              />
-            )}
-          </div>
           <div className='sidebar__footer__text'>
             {TRACIM_APP_VERSION}
           </div>

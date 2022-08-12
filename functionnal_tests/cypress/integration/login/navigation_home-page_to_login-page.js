@@ -39,7 +39,7 @@ describe('Login page', function () {
       .find('.loginpage__main__form__btnsubmit')
       .click()
 
-    cy.get('.sidebar__item__profile .sidebar__item__foldChildren')
+    cy.get('.sidebar__title .sidebar__item__foldChildren')
       .click()
 
     cy.get('[data-cy="sidebar__logout"]')
@@ -73,7 +73,7 @@ describe('Login page', function () {
       .find('.loginpage__main__form__btnsubmit')
       .click()
 
-    cy.get('.sidebar__item__profile .sidebar__item__foldChildren')
+    cy.get('.sidebar__title .sidebar__item__foldChildren')
       .click()
 
     cy.get('[data-cy="sidebar__logout"]')

@@ -11,14 +11,14 @@ export const MenuProfile = props => {
 
   return (
     <div
-      className={classnames('sidebar__item sidebar__item__profile',
-        { 'sidebar__item__current primaryColorBorder': props.isCurrentItem }
+      className={classnames('sidebar__item sidebar__title',
+        { 'sidebar__item__current primaryColorBorder primaryColorBgOpacity': props.isCurrentItem }
       )}
     >
       <IconButton
         customClass='sidebar__item__foldChildren'
         icon={`fas fa-caret-${props.showUserItems ? 'down' : 'right'}`}
-        title={props.showUserItems ? props.t('Hide user items') : props.t('Show user items')}
+        title={props.showUserItems ? props.t('Hide user menu') : props.t('Show user menu')}
         intent='link'
         mode='light'
         onClick={props.onClickToggleUserItems}

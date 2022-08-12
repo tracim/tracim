@@ -148,7 +148,6 @@
   "Thank you, your upload is finished!": "شكرا لك، لقد انتهى التحميل الخاص بك!",
   "Your interlocutor has been notified of your upload. You can close this window.": "الشخص الذي تتواصل معه تم إعلامه بعملية التحميل التي قمت بها، بإمكانك غلق هذه النافذة.",
   "Error while saving new lang": "خطأ أثناء حفظ لغة جديدة",
-  "Email notifications are disabled": "إشعارات البريد الإلكتروني معطلة",
   "Agendas": "مفكرات",
   "Home": "صفحة الاستقبال",
   "Your username has been set": "لقد تم تحديد اسم المستخدم الخاص بك",
@@ -480,8 +479,6 @@
   "Create in folder": "إنشاء مجلد",
   "Received files": "الملفات المستلمة",
   "Manage": "إشراف",
-  "Administration": "إدارة",
-  "My profile": "ملفي الشخصي",
   "Create": "إنشاء",
   "Unexpected error, please inform an administrator": "خطأ غير متوقع، أعلم مديرا من فضلك",
   "Server unreachable": "خادم غير متوفر",
@@ -618,5 +615,11 @@
   "{{count}} tasks performed on {{numberOfTasks}}_5": "",
   "a task": "مهمة",
   "There is no tasks that match your filter": "",
-  "You don't have any assigned tasks": ""
+  "You don't have any assigned tasks": "",
+  "Confidential space": "",
+  "Hide space list": "",
+  "Show space list": "",
+  "Space management": "إدارة الفضاءات",
+  "Hide user menu": "",
+  "Show user menu": ""
 }

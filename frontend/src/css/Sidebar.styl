@@ -44,7 +44,6 @@ borderWhenActive= 5px
     height 40px
     min-height 40px
     padding-inline-start borderWhenActive
-    background-color transparent
     & *
       color sidebarFontColor
     &__unread
@@ -56,14 +55,11 @@ borderWhenActive= 5px
       padding-inline-start 0
       border-inline-start-style solid
       border-inline-start-width borderWhenActive
-      background-color var(--sidebarColorLighten)
       font-weight bold
       &.sidebar__item__space
         padding-inline-start 0
       &.sidebar__search
         padding-inline-start textSpacing
-    &__profile
-      font-weight bold
     &__name
       align-items center
       display inline-flex
@@ -80,6 +76,8 @@ borderWhenActive= 5px
       display flex
       padding-inline-start borderWhenActive
       align-items center
+      &__type
+        padding-inline-start textSpacing
       & > *
         color sidebarFontColor
       &:hover
@@ -103,15 +101,32 @@ borderWhenActive= 5px
       &::after
         display none
   &__title
-    display flex
-    color offWhite
     font-weight bold
-    padding-inline-start borderWhenActive
-    & .sidebar__item__name
+    background-color var(--sidebarColorLighten)
+    &__spaces
+      display flex
+      color offWhite
+      font-weight bold
       padding-inline-start 0
+      align-items center
+      flex 1
+      height 100%
+      & > span
+        padding-inline-start standardSpacing
+      &__create
+        padding-inline-start textSpacing
+        padding-inline-end textSpacing
+        height 100%
+      &__join
+        padding-inline-start textSpacing
+        padding-inline-end textSpacing
+        height 100%
   &__spaces
     overflow-y auto
     flex 1
+    &__empty
+      color mediumDarkGrey
+      text-align center
   &__mention
     background-color errorRed
     border-radius 50%
@@ -134,11 +149,6 @@ borderWhenActive= 5px
     margin-bottom standardSpacing
     display flex
     flex-direction column
-    &__buttons
-      margin standardSpacing
-      & > *
-        margin-top standardSpacing
-        width 100%
     &__text
       color sidebarFontColor
       font-size metadataFontSize
@@ -189,8 +199,15 @@ borderWhenActive= 5px
         display none
       & .sidebar__footer__text
         display none
-    & .sidebar__title .sidebar__item__name
-        padding-inline-start standardSpacing
+    & .sidebar__title__spaces
+      padding-inline-start borderWhenActive
+      justify-content center
+      & > span
+        display none
+      &__create
+        display none
+      &__join
+        display none
 
 // INFO - GB - 2022-07-26 - Icon colors
 .sidebar__search__item i

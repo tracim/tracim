@@ -156,7 +156,6 @@
   "Server unreachable": "Serveur indisponible",
   "Unknown user": "Utilisateur inconnu",
   "Email notifications": "Notifications par email",
-  "Email notifications are disabled": "Les notifications par email sont désactivées",
   "Please enter a login and a password": "Veuillez entrer un nom d'utilisateur et un mot de passe",
   "This account is deactivated": "Ce compte est désactivé",
   "Error while adding the member to the space": "Erreur lors de l'ajout du membre à l'espace",
@@ -192,7 +191,6 @@
   "Use this link to integrate Tracim in your file explorer": "Utiliser ce lien pour intégrer Tracim à votre explorateur de fichiers",
   "CalDAV compatible software": "logiciel compatible CalDAV",
   "(protocole WebDAV)": "(protocole WebDAV)",
-  "Administration": "Administration",
   "Agendas": "Agendas",
   "See sidebar": "Voir la barre latérale",
   "Hide sidebar": "Masquer la barre latérale",
@@ -349,7 +347,6 @@
   "{{user}}'s profile": "Profil de {{user}}",
   "Loading": "Chargement",
   "Profile": "Profil",
-  "My profile": "Mon profil",
   "Error while saving public profile": "Erreur lors de la sauvegarde du profil",
   "Personal Page": "Page personnelle",
   "Recommended dimensions: {{dimensions}} px": "Dimensions recommandées : {{dimensions}} px",
@@ -578,5 +575,11 @@
   "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} tâches effectuées sur {{numberOfTasks}}",
   "a task": "une tâche",
   "There is no tasks that match your filter": "Il n'y a pas de tâches qui correspondent à votre filtre",
-  "You don't have any assigned tasks": "Vous n'avez pas de tâches assignées"
+  "You don't have any assigned tasks": "Vous n'avez pas de tâches assignées",
+  "Confidential space": "Espace confidentiel",
+  "Hide space list": "Masquer la liste des espaces",
+  "Show space list": "Afficher la liste des espaces",
+  "Space management": "Gestion des espaces",
+  "Hide user menu": "Masquer le menu de l'utilisateur",
+  "Show user menu": "Afficher le menu de l'utilisateur"
 }

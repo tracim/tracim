@@ -12,7 +12,7 @@ const SidebarItem = (props) => {
         <Link
           className={classnames('sidebar__item',
             {
-              'sidebar__item__current primaryColorBorder': props.isCurrentItem
+              'sidebar__item__current primaryColorBorder primaryColorBgOpacity': props.isCurrentItem
             },
             props.customClass
           )}
@@ -35,7 +35,7 @@ const SidebarItem = (props) => {
         <button
           className={classnames('transparentButton sidebar__item',
             {
-              'sidebar__item__current primaryColorBorder': props.isCurrentItem
+              'sidebar__item__current primaryColorBorder primaryColorBgOpacity': props.isCurrentItem
             },
             props.customClass
           )}

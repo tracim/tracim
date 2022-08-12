@@ -58,7 +58,7 @@ describe("An admin seeing a user's profile", () => {
       cy.getTag({ selectorName: s.TRACIM_CONTENT })
         .find('.personaldata__form__button')
         .click()
-      cy.get('.sidebar__item__profile .sidebar__item__foldChildren').click()
+      cy.get('.sidebar__title .sidebar__item__foldChildren').click()
       cy.get('[data-cy=sidebar__admin__user]').click()
       cy.get('th').last().contains('Administrator')
     })
