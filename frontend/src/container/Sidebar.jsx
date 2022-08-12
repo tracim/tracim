@@ -139,13 +139,7 @@ export class Sidebar extends React.Component {
     this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
   }
 
-  handleClickOpenSidebar = () => {
-    GLOBAL_dispatchEvent({
-      type: CUSTOM_EVENT.SHOW_SIDEBAR,
-      data: {}
-    })
-    this.setState({ isSidebarClosed: true })
-  }
+  handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
 
   handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
 
@@ -253,7 +247,7 @@ export class Sidebar extends React.Component {
           onClickAllContent={this.handleClickAllContent}
           onClickJoinWorkspace={this.handleClickJoinWorkspace}
           onClickNewSpace={this.handleClickNewSpace}
-          onClickOpenSidebar={this.handleClickOpenSidebar}
+          onClickOpenSpaceList={this.handleClickOpenSpaceList}
           onClickToggleSidebar={this.handleClickToggleSidebar}
           onClickToggleSpaceList={this.handleClickToggleSpaceList}
           onToggleFoldChildren={this.handleToggleFoldChildren}

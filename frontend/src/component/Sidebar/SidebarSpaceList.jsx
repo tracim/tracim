@@ -50,7 +50,7 @@ const SidebarSpaceList = (props) => {
 
   const handleClickTitle = () => {
     if (props.isSidebarClosed) {
-      props.onClickOpenSidebar()
+      props.onClickOpenSpaceList()
       props.onClickToggleSidebar()
     } else {
       if (props.spaceList.length === 0) {
