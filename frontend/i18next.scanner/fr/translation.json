@@ -578,8 +578,8 @@
   "You don't have any assigned tasks": "Vous n'avez pas de tâches assignées",
   "Confidential space": "Espace confidentiel",
   "Hide space list": "Masquer la liste des espaces",
-  "Show space list": "Voir la liste des espaces",
+  "Show space list": "Afficher la liste des espaces",
   "Space management": "Gestion des espaces",
-  "Hide my items": "Masquer mes items",
-  "Show my items": "Voir mes items"
+  "Hide user menu": "Masquer le menu de l'utilisateur",
+  "Show user menu": "Afficher le menu de l'utilisateur"
 }

@@ -18,7 +18,7 @@ export const MenuProfile = props => {
       <IconButton
         customClass='sidebar__item__foldChildren'
         icon={`fas fa-caret-${props.showUserItems ? 'down' : 'right'}`}
-        title={props.showUserItems ? props.t('Hide my items') : props.t('Show my items')}
+        title={props.showUserItems ? props.t('Hide user menu') : props.t('Show user menu')}
         intent='link'
         mode='light'
         onClick={props.onClickToggleUserItems}
