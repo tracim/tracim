@@ -171,7 +171,6 @@
   "Type": "Tipo",
   "Confirm password": "Confirmar la contraseña",
   "Email notifications": "Notificaciones por correo electrónico",
-  "Email notifications are disabled": "Notificaciones por correo electrónico desactivadas",
   "This account is deactivated": "Esta cuenta está desactivada",
   "Server unreachable": "Servidor no disponible",
   "Information are missing, please use the link in the email your should have received to reset your password": "Falta información. Por favor, utilice el enlace en el correo electrónico que debería haber recibido para restablecer su contraseña",
@@ -196,7 +195,6 @@
   "Use this link to integrate Tracim in your file explorer": "Utilice este enlace para integrar Tracim en su explorador de archivos",
   "CalDAV compatible software": "Software compatible con CalDAV",
   "(protocole WebDAV)": "(protocolo WebDAV)",
-  "Administration": "Administración",
   "Agendas": "Agendas",
   "Search result": "Resultado de la búsqueda",
   "best result for": "mejor resultado para",
@@ -338,7 +336,6 @@
   "Personal Page": "Página personal",
   "Profile": "Perfil",
   "Loading": "Cargando",
-  "My profile": "Mi perfil",
   "in {{ count }} space": "en {{ count }} espacio",
   "in {{ count }} space_plural": "en {{ count }} espacios",
   "Change avatar": "Cambiar el avatar",
@@ -578,5 +575,11 @@
   "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} tareas realizadas en {{numberOfTasks}}",
   "a task": "una tarea",
   "There is no tasks that match your filter": "No hay tareas que coincidan con su filtro",
-  "You don't have any assigned tasks": "No tiene ninguna tarea asignada"
+  "You don't have any assigned tasks": "No tiene ninguna tarea asignada",
+  "Confidential space": "",
+  "Hide space list": "",
+  "Show space list": "",
+  "Space management": "Gestión de espacios",
+  "Hide my items": "",
+  "Show my items": ""
 }

@@ -67,12 +67,12 @@ const SidebarSpaceList = (props) => {
       <div className='sidebar__item sidebar__title'>
         <button
           className='transparentButton sidebar__title__spaces'
-          title={props.t('Open space list')}
+          title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           onClick={handleClickTitle}
         >
           <Icon
             icon={getTitleIcon()}
-            title={props.t('Open space list')}
+            title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           />
           <span>&nbsp;{props.t('Spaces')}</span>
         </button>

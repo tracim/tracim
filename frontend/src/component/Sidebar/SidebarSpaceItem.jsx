@@ -129,7 +129,7 @@ class SidebarSpaceItem extends React.Component {
     const { props, state } = this
     const INDENT_WIDTH = 20
     const BASE_MARGIN = 20
-    console.log('SPACE TYPE', props.spaceType)
+
     return (
       <div
         id={props.id}
