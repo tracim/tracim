@@ -3,9 +3,11 @@ import { PAGES } from '../../support/urls_commands.js'
 
 const createSpace = (type) => {
   cy.get('[data-cy=sidebarCreateSpaceBtn]').click()
-  cy.get('.newSpace__input').type(`${type} space`)
+  cy.contains('.newSpace__label', "Space's type:")
   cy.get(`li[title="${type}"] .singleChoiceList__item`).click()
+  cy.get('.newSpace__input').type(`${type} space`)
   cy.get('.newSpace__button .btn').should('be.enabled').click()
+  cy.contains('.newSpace__label', 'Default role')
   cy.get('.singleChoiceList__item__radioButton').first().click()
   cy.get('.newSpace__icon__right').click()
 }
