@@ -304,15 +304,7 @@ export class FeedItemWithPreview extends React.Component {
     const shouldShowComment = props.content.type === CONTENT_TYPE.THREAD
     const commentToShow = (
       shouldShowComment
-        ? (
-          props.isPublication
-            ? (
-              props.content.type === CONTENT_TYPE.FILE
-                ? props.content
-                : this.getFirstComment()
-            )
-            : this.getFirstComment()
-        )
+        ? this.getFirstComment()
         : null
     )
 
@@ -364,7 +356,7 @@ export class FeedItemWithPreview extends React.Component {
                   workspaceId={Number(props.workspaceId)}
                   author={commentToShow.author}
                   loggedUser={loggedUser}
-                  created={commentToShow.created || commentToShow.created_raw || commentToShow.createdRaw}
+                  created={commentToShow.created_raw || commentToShow.createdRaw || commentToShow.created}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent

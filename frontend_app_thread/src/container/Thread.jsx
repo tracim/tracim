@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'

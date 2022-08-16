@@ -36,6 +36,8 @@ const Comment = props => {
   const createdFormated = formatAbsoluteDate(props.created, props.loggedUser.lang)
   const createdDistance = displayDistanceDate(props.created, props.loggedUser.lang)
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
+  const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
+  const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
 
   return (
@@ -135,15 +137,14 @@ const Comment = props => {
                   className={classnames(`${props.customClass}__body__content__text`, 'comment__body__content__text')}
                   data-cy='comment__body__content__text'
                 >
-                  {(isFile
+                  {(isFile || (isThread && isFirstCommentFile)
                     ? (
                       <CommentFilePreview
                         apiUrl={props.apiUrl}
-                        apiContent={props.apiContent}
+                        apiContent={isFile ? props.apiContent : props.apiContent.firstComment}
                         isPublication={props.isPublication}
                       />
-                    )
-                    : (
+                    ) : (
                       <HTMLContent isTranslated={props.translationState === TRANSLATION_STATE.TRANSLATED}>
                         {addExternalLinksIcons(props.text)}
                       </HTMLContent>
