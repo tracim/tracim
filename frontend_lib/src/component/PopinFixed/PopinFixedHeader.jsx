@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
@@ -188,19 +189,41 @@ export const PopinFixedHeader = (props) => {
         />
       )}
 
-      {!props.loading && filteredHeaderButtons.map((action) =>
-        <IconButton
-          disabled={action.disabled}
-          icon={action.icon}
-          text={action.label}
-          label={action.label}
-          key={action.label}
-          onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
-          customClass='transparentButton headerBtn'
-          showAction={action.showAction}
-          dataCy={action.dataCy}
-        />
-      )}
+      {!props.loading && filteredHeaderButtons.map((action) => {
+        return action.isLink
+          ? (
+            <Link
+              aria-disabled={action.disabled}
+              className={classnames(
+                'iconbutton-secondary iconbutton headerBtn headerBtn__link',
+                { headerBtn__link__disabled: action.disabled }
+              )}
+              data-cy={action.dataCy}
+              key={action.label}
+              onClick={action.disabled ? () => { } : action.onClick}
+              title={action.label}
+              to={{
+                pathname: action.link,
+                search: `?${action.mode}`
+              }}
+            >
+              <i className={`fa-fw ${action.icon} iconbutton__icon`} />
+              <span className='iconbutton__text_with_icon iconbutton__label'>{action.label}</span>
+            </Link>
+          ) : (
+            <IconButton
+              disabled={action.disabled}
+              icon={action.icon}
+              text={action.label}
+              label={action.label}
+              key={action.label}
+              onClick={action.onClick} // eslint-disable-line react/jsx-handler-names
+              customClass='transparentButton headerBtn'
+              showAction={action.showAction}
+              dataCy={action.dataCy}
+            />
+          )
+      })}
 
       {!props.loading && props.children}
 
