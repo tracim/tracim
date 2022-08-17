@@ -249,7 +249,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
 
     isAttachedFileOnPublication = (activity) => activity.content
       ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
-      : true
+      : false
 
     activityDisplayFilter = (activity) => {
       const { props } = this

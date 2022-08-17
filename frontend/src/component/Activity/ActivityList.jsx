@@ -140,7 +140,7 @@ const ActivityList = (props) => {
 
   const isAttachedFileOnPublication = (activity) => activity.content
     ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
-    : true
+    : false
 
   const activityDisplayFilter = (activity) => {
     return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) && !isAttachedFileOnPublication(activity) &&
