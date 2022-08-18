@@ -155,7 +155,7 @@ export class NewShareDownload extends React.Component {
           </button>
         </div>
 
-        {!props.emailNotifActivated && (
+        {!props.isEmailNotifActivated && (
           <div className='shareDownload__emailWarning'>
             <ComposedIcon
               mainIcon='far fa-envelope'

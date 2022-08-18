@@ -5,6 +5,7 @@ import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
   CUSTOM_EVENT,
+  EmptyListMessage,
   IconButton,
   PAGE,
   PageContent,
@@ -462,6 +463,7 @@ export class AdvancedSearch extends React.Component {
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>
@@ -510,14 +512,14 @@ export class AdvancedSearch extends React.Component {
                     <div className='advancedSearch__content'>
                       <div className='advancedSearch__content__detail'>
                         {currentNumberSearchResults > 0 && (
-                          <div className='advancedSearch__content__detail__count'>
+                          <span>
                             {this.getDisplayDetail()}
-                          </div>
+                          </span>
                         )}
 
                         {!state.isFilterMenuOpen && (
                           <IconButton
-                            customClass='advancedSearch__content__detail__filter'
+                            customClass='advancedSearch__content__detail__filter_button'
                             icon='fas fa-sliders-h'
                             onClick={this.handleClickFilterMenu}
                             text={props.t('Filter')}
@@ -527,9 +529,9 @@ export class AdvancedSearch extends React.Component {
                       </div>
 
                       {currentNumberSearchResults === 0 && (
-                        <div className='advancedSearch__content__empty'>
+                        <EmptyListMessage>
                           {`${props.t('No results for the search terms:')} ${currentSearch.searchString}`}
-                        </div>
+                        </EmptyListMessage>
                       )}
 
                       {state.searchType === ADVANCED_SEARCH_TYPE.CONTENT && (

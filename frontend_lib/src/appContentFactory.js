@@ -17,6 +17,7 @@ import {
   getOrCreateSessionClientToken,
   tinymceRemove,
   addRevisionFromTLM,
+  sortContentByCreatedDateAndID,
   sortContentByStatus
 } from './helper.js'
 
@@ -190,7 +191,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: sortContentByStatus(uniqBy(fetchGetToDo.body, 'content_id')) })
+          setState({ toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy(fetchGetToDo.body, 'content_id'))) })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
@@ -439,16 +440,20 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentDeleteToDo = async (workspaceId, contentId, toDoId, setState) => {
+    appContentDeleteToDo = async (workspaceId, contentId, toDoId, setState, previousLockedToDoList) => {
       this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
       const response = await handleFetchResult(await deleteToDo(this.apiUrl, workspaceId, contentId, toDoId))
 
       switch (response.status) {
         case 204: break
         case 403:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
           break
         default:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('Error while deleting to do'))
           break
       }
@@ -456,16 +461,20 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState) => {
+    appContentChangeStatusToDo = async (workspaceId, contentId, toDoId, status, setState, previousLockedToDoList) => {
       this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
       const response = await handleFetchResult(await putToDo(this.apiUrl, workspaceId, contentId, toDoId, status))
 
       switch (response.status) {
         case 204: break
         case 403:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))
           break
         default:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
           break
       }

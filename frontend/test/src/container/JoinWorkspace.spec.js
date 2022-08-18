@@ -8,12 +8,17 @@ import { user } from '../../hocMock/redux/user/user.js'
 
 const wrapJoinWorkspaceComponent = (props) => {
   const wrapper = shallow(<JoinWorkspaceWithoutHOC {...props} />)
-  wrapper.instance().loadSubscriptionList = () => {}
+  wrapper.instance().loadSubscriptionList = () => { }
   return wrapper
 }
 
 describe('<JoinWorkspace />', () => {
   const props = {
+    system: {
+      config: {
+        email_notification_activated: false
+      }
+    },
     user: user,
     history: {
       location: {
@@ -21,7 +26,7 @@ describe('<JoinWorkspace />', () => {
           fromSearch: false
         }
       },
-      push: () => {}
+      push: () => { }
     },
     t: key => key,
     registerCustomEventHandlerList: () => { },

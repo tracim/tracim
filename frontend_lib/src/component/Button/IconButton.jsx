@@ -11,7 +11,8 @@ const IconButton = props => {
     `iconbutton-${props.intent}-${props.mode}`,
     `iconbutton-${props.intent}`,
     `iconbutton-${props.mode}`,
-    'iconbutton'
+    'iconbutton',
+    'btn'
   ]
   const className = classnames(classes, { [props.customClass]: props.customClass })
 

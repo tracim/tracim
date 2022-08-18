@@ -3,6 +3,8 @@
 cardWidth = 280px
 
 .kanban
+  // INFO - GB - 2022-08-09 - .kanban has z-index 11 to be above of sidebar and allow the fullscreen mode
+  z-index 11
   &__contentpage
     &__content
       &__left
@@ -16,10 +18,11 @@ cardWidth = 280px
       height "calc(100% - %s)" % (headerHeight + 28px)
       &.fullscreen
         position fixed
-        top headerHeight
         width 100%
-        height "calc(100% - %s)" % headerHeight
-        z-index 1
+        height 100%
+        // INFO - GB - 2022-08-09 - .kanban.fullscreen has z-index 2 to be above TinyMCE (.tox .tox-editor-header)
+        // In case advanced edition is enabled at the moment the user goes into fullscreen mode.
+        z-index 2
         background offWhite
 
       &__options
@@ -162,12 +165,12 @@ cardWidth = 280px
           width calc(100% - 2px) // NOTE - RJ - 19-01-2022 - TinyMCE borders make the form overflow if we don't remove these 2px here
         label
           padding-inline-end textSpacing
-        
+
         & .form-control
           color unset
           font-size standardFontSize
           padding-inline-start textSpacing
-          
+
       &_buttons
         margin-bottom 0
         padding-bottom 0
@@ -236,13 +239,13 @@ cardWidth = 280px
 @media (max-width: max-xs)
   .kanban__KanbanPopup
     top 10%
-    max-height "calc(100% - %s)" % (headerHeight + standardSpacing)
+    max-height "calc(100% - %s)" % standardSpacing
 
     & .cardPopup__container
       min-width 100%
       max-height 100%
       overflow auto
       & .cardPopup__body
-        height "calc(100% - %s)" % headerHeight
+        height 100%
         & .kanban__KanbanPopup__form
           height "calc(100% - %s)" % standardSpacing

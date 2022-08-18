@@ -39,11 +39,10 @@ describe('Login page', function () {
       .find('.loginpage__main__form__btnsubmit')
       .click()
 
-    cy.get('.menuprofil__dropdown__name.btn')
+    cy.get('.sidebar__title .sidebar__item__foldChildren')
       .click()
 
-    cy.getTag({ selectorName: s.HEADER })
-      .find('[data-cy="menuprofil__dropdown__logout__link"]')
+    cy.get('[data-cy="sidebar__logout"]')
       .click()
   })
 
@@ -74,11 +73,10 @@ describe('Login page', function () {
       .find('.loginpage__main__form__btnsubmit')
       .click()
 
-    cy.get('.menuprofil__dropdown__name.btn')
+    cy.get('.sidebar__title .sidebar__item__foldChildren')
       .click()
 
-    cy.getTag({ selectorName: s.HEADER })
-    .find('[data-cy="menuprofil__dropdown__logout__link"]')
+    cy.get('[data-cy="sidebar__logout"]')
       .click()
   })
 })

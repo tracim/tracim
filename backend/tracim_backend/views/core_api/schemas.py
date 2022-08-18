@@ -380,6 +380,9 @@ class FileCreationFormSchema(marshmallow.Schema):
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
     content_type = marshmallow.fields.String(missing=FILE_TYPE, example=FILE_TYPE)
+    template_id = marshmallow.fields.Int(
+        example=2, default=0, validate=positive_int_validator, allow_none=True
+    )
 
     @post_load
     def file_creation_object(self, data: typing.Dict[str, typing.Any]) -> object:
@@ -2037,7 +2040,9 @@ class SetContentIsTemplateSchema(marshmallow.Schema):
 
 
 class TemplateQuerySchema(marshmallow.Schema):
-    type = StrippedString(example="html-document", validate=all_content_types_validator)
+    type = StrippedString(
+        example="html-document", validate=all_content_types_validator, required=True
+    )
 
 
 class TargetLanguageSchema(marshmallow.Schema):

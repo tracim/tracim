@@ -1,27 +1,26 @@
 import React from 'react'
+import classnames from 'classnames'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter, Link } from 'react-router-dom'
-import classnames from 'classnames'
 import { translate } from 'react-i18next'
-import PropTypes from 'prop-types'
 import { DropTarget } from 'react-dnd'
-import {
-  DRAG_AND_DROP,
-  NO_ACTIVE_SPACE_ID
-} from '../../util/helper.js'
-import { IconButton, ROLE, DropdownMenu, PAGE } from 'tracim_frontend_lib'
 import { isMobile } from 'react-device-detect'
 import {
-  putNotificationAsRead
-} from '../../action-creator.async.js'
-import {
-  newFlashMessage,
-  readNotification
-} from '../../action-creator.sync.js'
+  DropdownMenu,
+  Icon,
+  IconButton,
+  PAGE,
+  ROLE,
+  SPACE_TYPE
+} from 'tracim_frontend_lib'
+import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
+import { putNotificationAsRead } from '../../action-creator.async.js'
+import { newFlashMessage, readNotification } from '../../action-creator.sync.js'
 
 const qs = require('query-string')
 
-class WorkspaceListItem extends React.Component {
+class SidebarSpaceItem extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
@@ -38,10 +37,10 @@ class WorkspaceListItem extends React.Component {
 
   componentDidUpdate () {
     const unreadNotifications = this.props.notificationPage.list.filter(
-      n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
+      n => !n.mention && !n.read && n.space && (n.space.id === this.props.spaceId)
     )
     const unreadMentionCount = this.props.notificationPage.list.filter(
-      n => n.mention && !n.read && n.workspace && (n.workspace.id === this.props.workspaceId)
+      n => n.mention && !n.read && n.space && (n.space.id === this.props.spaceId)
     ).length
 
     if (this.state.unreadNotifications.length !== unreadNotifications.length || this.state.unreadMentionCount !== unreadMentionCount) {
@@ -56,8 +55,8 @@ class WorkspaceListItem extends React.Component {
     document.removeEventListener('mousedown', this.handleClickOutsideDropdownMenu)
   }
 
-  buildLink = (route, search, workspaceId, activeWorkspaceId) => {
-    if (workspaceId !== activeWorkspaceId) return route
+  buildLink = (route, search, spaceId, activeSpaceId) => {
+    if (spaceId !== activeSpaceId) return route
 
     if (search === '') return route
 
@@ -74,9 +73,9 @@ class WorkspaceListItem extends React.Component {
     const { props } = this
 
     const isDropAllowed = props.userRoleIdInWorkspace >= ROLE.contentManager.id
-    const isDropAllowedOnWorkspaceRoot = props.draggedItem && (props.draggedItem.workspaceId !== props.workspaceId || props.draggedItem.parentId !== 0)
+    const isDropAllowedOnspaceRoot = props.draggedItem && (props.draggedItem.spaceId !== props.spaceId || props.draggedItem.parentId !== 0)
 
-    if (isDropAllowed && isDropAllowedOnWorkspaceRoot) return 'fa-arrow-circle-down'
+    if (isDropAllowed && isDropAllowedOnspaceRoot) return 'fa-arrow-circle-down'
     return 'fa-times-circle'
   }
 
@@ -132,19 +131,19 @@ class WorkspaceListItem extends React.Component {
     const BASE_MARGIN = 20
 
     return (
-      <li
+      <div
         id={props.id}
         className={classnames(
-          'sidebar__content__navigation__item',
+          'sidebar__item__space',
           {
-            'primaryColorBorder sidebar__content__navigation__item__current':
-              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.workspaceId}/`)
+            'primaryColorBorder primaryColorBgOpacity sidebar__item__current':
+              props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.spaceId}/`) && !props.isNotificationWallOpen
           },
           {
-            sidebar__content__navigation__item__unread: state.unreadNotifications.length > 0
+            sidebar__item__unread: state.unreadNotifications.length > 0
           }
         )}
-        data-cy={`sidebar__content__navigation__workspace__item_${props.workspaceId}`}
+        data-cy={`sidebar__space__item_${props.spaceId}`}
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
@@ -162,7 +161,7 @@ class WorkspaceListItem extends React.Component {
 
         {props.hasChildren && (
           <IconButton
-            customClass='transparentButton sidebar__content__navigation__item__foldChildren'
+            customClass='transparentButton sidebar__item__foldChildren'
             icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'
@@ -173,18 +172,18 @@ class WorkspaceListItem extends React.Component {
 
         <Link
           className={classnames(
-            'sidebar__content__navigation__item__wrapper',
-            { sidebar__content__navigation__item__withoutChildren: !props.hasChildren }
+            'sidebar__item',
+            { sidebar__item__withoutChildren: !props.hasChildren }
           )}
-          to={PAGE.WORKSPACE.DASHBOARD(props.workspaceId)}
+          to={PAGE.WORKSPACE.DASHBOARD(props.spaceId)}
           onClick={this.handleClickSpace}
         >
           {(props.canDrop && props.isOver) && (
-            <i className={`fas fa-fw ${this.getIcon()} sidebar__content__navigation__item__dragNdrop`} />
+            <i className={`fas fa-fw ${this.getIcon()} sidebar__item__dragNdrop`} />
           )}
 
           <div
-            className='sidebar__content__navigation__item__name'
+            className='sidebar__item__name'
             title={props.label}
           >
             <div
@@ -193,19 +192,29 @@ class WorkspaceListItem extends React.Component {
               {props.label}
             </div>
             {state.unreadMentionCount > 0 && <div className='sidebar__mention'>{state.unreadMentionCount}</div>}
+
+            {props.spaceType === SPACE_TYPE.confidential.slug && (
+              <Icon
+                customClass='sidebar__item__space__type'
+                color={SPACE_TYPE.confidential.hexcolor}
+                icon={SPACE_TYPE.confidential.faIcon}
+                title={props.t('Confidential space')}
+              />
+            )}
           </div>
+
         </Link>
 
         {state.showDropdownMenuButton && (
           <DropdownMenu
             buttonIcon='fas fa-ellipsis-v'
-            buttonCustomClass='sidebar__content__navigation__item__menu'
+            buttonCustomClass='sidebar__item__menu'
             buttonTooltip={props.t('Actions')}
             buttonClick={this.activeDropdownMenu}
           >
             {props.allowedAppList.map(allowedApp => (
               <Link
-                to={this.buildLink(allowedApp.route, props.location.search, props.workspaceId, props.activeWorkspaceId)}
+                to={this.buildLink(allowedApp.route, props.location.search, props.spaceId, props.activeSpaceId)}
                 data-cy={`sidebar_subdropdown-${allowedApp.slug}`}
                 key={allowedApp.slug}
               >
@@ -215,14 +224,14 @@ class WorkspaceListItem extends React.Component {
             ))}
           </DropdownMenu>
         )}
-      </li>
+      </div>
     )
   }
 }
 
 const dragAndDropTarget = {
   drop: props => ({
-    workspaceId: props.workspaceId,
+    workspaceId: props.spaceId,
     parentId: 0 // INFO - CH - 2019-06-05 - moving content to a different workspace is always at the root of it
   })
 }
@@ -235,31 +244,34 @@ const dragAndDropTargetCollect = (connect, monitor) => ({
 })
 
 const mapStateToProps = ({ notificationPage, user }) => ({ notificationPage, user })
-export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(WorkspaceListItem))))
+export default DropTarget(DRAG_AND_DROP.CONTENT_ITEM, dragAndDropTarget, dragAndDropTargetCollect)(connect(mapStateToProps)(withRouter(translate()(SidebarSpaceItem))))
 
-WorkspaceListItem.propTypes = {
-  activeWorkspaceId: PropTypes.number,
+SidebarSpaceItem.propTypes = {
+  id: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  spaceId: PropTypes.number.isRequired,
+  spaceType: PropTypes.number.isRequired,
+  activeSpaceId: PropTypes.number,
   allowedAppList: PropTypes.array,
   foldChildren: PropTypes.bool,
   hasChildren: PropTypes.bool,
-  id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
+  isNotificationWallOpen: PropTypes.bool,
   level: PropTypes.number,
   onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
-  userRoleIdInWorkspace: PropTypes.array,
-  workspaceId: PropTypes.number.isRequired
+  userRoleIdInWorkspace: PropTypes.array
 }
 
-WorkspaceListItem.defaultProps = {
-  activeWorkspaceId: NO_ACTIVE_SPACE_ID,
+SidebarSpaceItem.defaultProps = {
+  activeSpaceId: NO_ACTIVE_SPACE_ID,
   allowedAppList: [],
   foldChildren: false,
   hasChildren: false,
+  isNotificationWallOpen: false,
   level: 0,
   onClickAllContent: () => { },
-  onClickToggleSidebar: () => {},
-  onToggleFoldChildren: () => {},
+  onClickToggleSidebar: () => { },
+  onToggleFoldChildren: () => { },
   userRoleIdInWorkspace: ROLE.reader.id
 }

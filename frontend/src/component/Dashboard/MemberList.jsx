@@ -39,7 +39,7 @@ export const MemberList = (props) => {
                   role={props.role}
                   onChangeRole={props.onChangeRole}
                   onClickBtnValidate={props.onClickValidateNewMember}
-                  emailNotifActivated={props.emailNotifActivated}
+                  isEmailNotifActivated={props.isEmailNotifActivated}
                   canSendInviteNewUser={props.canSendInviteNewUser}
                   userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   autoCompleteClicked={props.autoCompleteClicked}

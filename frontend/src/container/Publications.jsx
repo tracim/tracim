@@ -30,7 +30,6 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   TRANSLATION_STATE,
-  isFileUploadInErrorState,
   CONTENT_TYPE,
   getFileDownloadUrl,
   NUMBER_RESULTS_BY_PAGE,
@@ -45,8 +44,7 @@ import {
 } from '../util/helper.js'
 import {
   getPublicationPage,
-  postThreadPublication,
-  postPublicationFile
+  postThreadPublication
 } from '../action-creator.async.js'
 import {
   appendPublication,
@@ -431,7 +429,7 @@ export class Publications extends React.Component {
     })
   }
 
-  saveThreadPublication = async (publication) => {
+  saveThreadPublication = async (publication, publicationAsFileList) => {
     const { props, state } = this
 
     const workspaceId = props.currentWorkspace.id
@@ -449,7 +447,7 @@ export class Publications extends React.Component {
         fetchPostPublication.json,
         state.publicationWysiwyg,
         publication,
-        [],
+        publicationAsFileList,
         this.setState.bind(this),
         '',
         props.user.username,
@@ -460,43 +458,6 @@ export class Publications extends React.Component {
     }
   }
 
-  processSaveFilePublication = async (publication, publicationAsFileList) => {
-    const { props, state } = this
-
-    const workspaceId = props.currentWorkspace.id
-    const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
-
-    if (publicationAsFileList.length !== 1) return
-
-    const fileToUpload = publicationAsFileList[0]
-    const fetchPostPublicationFile = await props.dispatch(postPublicationFile(workspaceId, fileToUpload, publicationName))
-
-    const isUploadInError = isFileUploadInErrorState(fetchPostPublicationFile)
-    if (isUploadInError) {
-      props.dispatch(newFlashMessage(fetchPostPublicationFile.errorMessage, 'warning'))
-      return
-    }
-
-    if (publication !== '') {
-      try {
-        await props.appContentSaveNewComment(
-          fetchPostPublicationFile.responseJson,
-          state.publicationWysiwyg,
-          publication,
-          [],
-          this.setState.bind(this),
-          fetchPostPublicationFile.responseJson.slug,
-          props.user.username,
-          'Publication'
-        )
-      } catch (e) {
-        props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
-      }
-    }
-
-    if (state.publicationWysiwyg) globalThis.tinymce.get(wysiwygId).setContent('')
-  }
-
   handleClickValidateAnyway = async (publication, publicationAsFileList = []) => {
     const { state, props } = this
 
@@ -505,13 +466,7 @@ export class Publications extends React.Component {
       return
     }
 
-    if (publication !== '' && publicationAsFileList.length === 0) {
-      this.saveThreadPublication(publication)
-    }
-
-    if (publicationAsFileList.length > 0) {
-      this.processSaveFilePublication(publication, publicationAsFileList)
-    }
+    this.saveThreadPublication(publication, publicationAsFileList)
 
     setLocalStorageItem(
       CONTENT_TYPE.THREAD,
@@ -571,6 +526,7 @@ export class Publications extends React.Component {
         <TabBar
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
+          isEmailNotifActivated={props.system.config.email_notification_activated}
         />
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='publishAreaContainer'>
@@ -586,7 +542,7 @@ export class Publications extends React.Component {
               id={wysiwygId}
               invalidMentionList={state.invalidMentionList}
               lang={props.user.lang}
-              multipleFiles={false}
+              multipleFiles
               onClickCancelSave={this.handleCancelSave}
               onClickSaveAnyway={this.handleClickValidateAnyway}
               onClickValidateNewCommentBtn={this.handleClickPublish}
@@ -671,6 +627,7 @@ const mapStateToProps = ({
   breadcrumbs,
   currentWorkspace,
   publicationPage,
+  system,
   user
-}) => ({ breadcrumbs, currentWorkspace, publicationPage, user })
+}) => ({ breadcrumbs, currentWorkspace, publicationPage, system, user })
 export default connect(mapStateToProps)(withRouter(translate()(appContentFactory(TracimComponent(Publications)))))

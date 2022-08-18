@@ -9,6 +9,8 @@ import { withRouterMock } from '../../hocMock/withRouter'
 
 describe('<Sidebar />', () => {
   const dispatchCallBack = sinon.stub()
+  const onClickNotificationSpy = sinon.spy()
+  const onClickLogoutCallBack = sinon.spy()
 
   const props = {
     currentWorkspace: { id: 1 },
@@ -33,7 +35,13 @@ describe('<Sidebar />', () => {
     registerCustomEventHandlerList: () => {},
     t: tradKey => tradKey,
     accessibleWorkspaceList: [],
-    appList: []
+    appList: [],
+    unreadMentionCount: 5,
+    onClickNotification: onClickNotificationSpy,
+    onClickLogout: onClickLogoutCallBack,
+    simpleSearch: {
+      searchString: 'Test'
+    }
   }
 
   const ComponentWithHOC = withRouterMock(SidebarWithoutHOC)
@@ -44,31 +52,9 @@ describe('<Sidebar />', () => {
 
   describe('static design', () => {
     it('should close the sidebar with a mobile (isMobile = true)', () => {
-      wrapper.setState({ sidebarClose: true })
-      expect(wrapper.find('.sidebar__frame.sidebarclose').length).to.equal(1)
-      wrapper.setState({ sidebarClose: false })
-    })
-  })
-
-  describe('it internal functions', () => {
-    describe('displaySpace', () => {
-      it('should return an empty array if spaceList is empty', () => {
-        expect(wrapper.instance().displaySpace(0, [])).to.deep.equal([])
-      })
-    })
-
-    describe('handleToggleFoldChildren', () => {
-      it('should add the id to the foldedSpaceList state if it is not on the list', () => {
-        wrapper.setState({ foldedSpaceList: [] })
-        wrapper.instance().handleToggleFoldChildren(10)
-        expect(wrapper.state('foldedSpaceList')).to.deep.equal([10])
-      })
-
-      it('should remove the id to the foldedSpaceList state if it is not on the list', () => {
-        wrapper.setState({ foldedSpaceList: [10, 5] })
-        wrapper.instance().handleToggleFoldChildren(10)
-        expect(wrapper.state('foldedSpaceList')).to.deep.equal([5])
-      })
+      wrapper.setState({ isSidebarClosed: true })
+      expect(wrapper.find('.sidebar.sidebarClose').length).to.equal(1)
+      wrapper.setState({ isSidebarClosed: false })
     })
   })
 })

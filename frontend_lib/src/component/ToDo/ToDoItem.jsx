@@ -39,19 +39,19 @@ const ToDoItem = props => {
       <div className='toDoItem__checkbox'>
         <IconButton
           customClass='toDoItem__checkbox'
+          disabled={!props.isEditable || props.isLoading}
           icon={`far ${isToDoChecked ? 'fa-check-square' : 'fa-square'}`}
-          title={isToDoChecked ? props.t('Uncheck') : props.t('Check')}
+          intent='link'
           onClick={() => props.onClickChangeStatusToDo(
             props.toDo, isToDoChecked ? STATUSES.OPEN : STATUSES.VALIDATED
           )}
-          disabled={!props.isEditable}
-          intent='link'
+          title={props.isEditable ? (isToDoChecked ? props.t('Uncheck') : props.t('Check')) : undefined}
         />
       </div>
       <div className='toDoItem__content'>
         <div className='toDoItem__content__task'>
           {username && !props.isPersonalPage && (
-            <strong>+{username}</strong>
+            <span><strong>+{username}</strong>&nbsp;</span>
           )}
           {props.toDo.raw_content}
         </div>
@@ -83,6 +83,7 @@ const ToDoItem = props => {
       {props.isDeletable && (
         <IconButton
           customClass='toDoItem__delete'
+          disabled={props.isLoading}
           icon='far fa-trash-alt'
           intent='link'
           onClick={() => props.onClickDeleteToDo(props.toDo)}
@@ -101,6 +102,7 @@ ToDoItem.propTypes = {
   toDo: PropTypes.object.isRequired,
   isDeletable: PropTypes.bool,
   isEditable: PropTypes.bool,
+  isLoading: PropTypes.bool,
   isPersonalPage: PropTypes.bool,
   lang: PropTypes.string,
   memberList: PropTypes.array,
@@ -110,6 +112,7 @@ ToDoItem.propTypes = {
 ToDoItem.defaultProps = {
   isDeletable: false,
   isEditable: true,
+  isLoading: false,
   isPersonalPage: false,
   lang: 'en',
   memberList: [],

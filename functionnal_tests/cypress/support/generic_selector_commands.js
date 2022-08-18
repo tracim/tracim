@@ -30,10 +30,10 @@ const TAGS = {
   [SELECTORS.HEADER]: () => '.header',
   [SELECTORS.LOGIN_PAGE_MAIN]: () => '.loginpage__main',
   [SELECTORS.TRACIM_CONTENT]: () => '.tracim__content-scrollview',
-  [SELECTORS.SIDEBAR_ARROW]: () => '.sidebar__expand > i',
+  [SELECTORS.SIDEBAR_ARROW]: () => '.sidebar__header__expand > i',
   [SELECTORS.WORKSPACE_ADVANCED_USER_DELETE]: () => '[data-cy="userlist_delete"]',
   [SELECTORS.WORKSPACE_DASHBOARD]: () => '.dashboard.pageWrapperGeneric',
-  [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__content__navigation__workspace__item_${workspaceId}]`,
+  [SELECTORS.WORKSPACE_MENU]: ({ workspaceId }) => `[data-cy=sidebar__space__item_${workspaceId}]`,
 }
 
 /**

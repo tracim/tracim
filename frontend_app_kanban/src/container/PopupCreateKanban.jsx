@@ -2,6 +2,7 @@ import React from 'react'
 import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_TYPE,
   CUSTOM_EVENT,
   addAllResourceI18n,
   CardPopupCreateContent,
@@ -29,6 +30,7 @@ export class PopupCreateKanban extends React.Component {
     this.state = {
       appName: 'kanban', // must remain 'kanban' because it is the name of the react built app (which contains Kanban and PopupCreateKanban)
       config: param.config,
+      templateId: null,
       loggedUser: param.loggedUser,
       workspaceId: param.workspaceId,
       folderId: param.folderId,
@@ -47,6 +49,7 @@ export class PopupCreateKanban extends React.Component {
 
   componentDidMount () {
     this.setHeadTitle()
+    this.props.getTemplateList(this.setState.bind(this), CONTENT_TYPE.KANBAN)
   }
 
   handleAllAppChangeLanguage = data => {
@@ -69,10 +72,16 @@ export class PopupCreateKanban extends React.Component {
 
   handleChangeNewContentName = e => this.setState({ newContentName: e.target.value })
 
-  handleChangeTemplate = (template) => {
-    this.setState({ templateId: template.content_id })
-    if (this.state.newContentName === '') {
-      this.setState({ newContentName: template.label })
+  handleChangeTemplate = (template, { action }) => {
+    // NOTE - MP - 2022-06-07 - Clear is an action type of react-select
+    // see https://react-select.com/props#prop-types
+    if (action !== 'clear') {
+      if (template.content_id !== -1) {
+        this.setState({ templateId: template.content_id })
+        this.setState({ newContentName: `${template.label} ${this.state.newContentName}` })
+      }
+    } else {
+      this.setState({ templateId: null })
     }
   }
 
@@ -152,6 +161,7 @@ export class PopupCreateKanban extends React.Component {
         btnValidateLabel={this.props.t('Validate and create')}
         contentName={this.state.newContentName}
         customColor={this.state.config.hexcolor}
+        displayTemplateList
         faIcon={this.state.config.faIcon}
         inputPlaceholder={this.props.t("Board's name")}
         label={this.props.t('New Kanban board')}
@@ -159,6 +169,7 @@ export class PopupCreateKanban extends React.Component {
         onChangeTemplate={this.handleChangeTemplate}
         onClose={this.handleClose}
         onValidate={this.handleValidate}
+        templateList={this.state.templateList}
       />
     )
   }

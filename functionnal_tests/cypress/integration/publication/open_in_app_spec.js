@@ -37,19 +37,19 @@ describe.skip('Open publications in the thread app', () => {
         cy.get('.wsContentGeneric.thread .wsContentGeneric__header__close').should('be.visible').click()
     }
 
-    cy.get('.notificationButton__btn').should('be.visible').click()
+    cy.get('.sidebar__notification__item').should('be.visible').click()
     cy.get('.notification__list__item.isMention').should('be.visible').click()
     checkAndCloseThreadApp()
 
-    cy.get('.notificationButton__btn').should('be.visible').click()
+    cy.get('.sidebar__notification__item').should('be.visible').click()
     cy.get('.notification__list__item:not(.isMention)').contains('commented on').should('be.visible').click()
     checkAndCloseThreadApp()
 
-    cy.get('.sidebar__content__navigation__item').first().should('be.visible').click() // recent activities
+    cy.get('.sidebar__item').first().should('be.visible').click() // recent activities
     cy.get('.feedItemHeader__title a').contains('News').should('be.visible').click()
     checkAndCloseThreadApp()
 
-    cy.get('.sidebar__content__navigation__item[href="/ui/recent-activities"]').first().should('be.visible').click() // recent activities
+    cy.get('.sidebar__item[href="/ui/recent-activities"]').first().should('be.visible').click() // recent activities
     cy.get('.feedItemHeader__title a').contains('News').should('be.visible').click()
     checkAndCloseThreadApp()
   })

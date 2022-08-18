@@ -25,7 +25,7 @@
   "Title:": "Título:",
   "Tags": "Etiquetas",
   "This content is deleted": "Este contenido es eliminado",
-  "Timeline": "Línea de tiempo",
+  "Timeline": "Revisiones",
   "Description:": "Descripción:",
   "Color:": "Color:",
   "Deadline:": "Plazo:",
@@ -44,6 +44,5 @@
   "Exit fullscreen mode": "Salir del modo de pantalla completa",
   "See less": "Ver menos",
   "You must change the status or restore this kanban board before any change": "Debe cambiar el estado o restaurar esta tabla kanban antes de cualquier cambio",
-  "To Do": "Tareas",
   "Tasks": "Tareas"
 }

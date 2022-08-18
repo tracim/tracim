@@ -30,7 +30,7 @@ describe('<NewMemberForm />', () => {
     onClickAutoComplete: onClickAutoCompleteCallBack,
     userRoleIdInWorkspace: ROLE.workspaceManager.id,
     canSendInviteNewUser: true,
-    emailNotifActivated: true,
+    isEmailNotifActivated: true,
     roleList: [{ slug: 'random' }, { slug: 'Role' }],
     autoCompleteClicked: true,
     onClickBtnValidate: onClickBtnValidateCallBack,

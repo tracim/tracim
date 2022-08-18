@@ -247,11 +247,15 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       return currentWorkspace.publicationEnabled
     }
 
+    isActivityAnAttachedFileOnPublication = (activity) => activity.content
+      ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
+      : false
+
     activityDisplayFilter = (activity) => {
       const { props } = this
       const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION, TLM_ET.SHAREDSPACE]
 
-      return entityType.includes(activity.entityType) &&
+      return entityType.includes(activity.entityType) && !this.isActivityAnAttachedFileOnPublication(activity) &&
         (
           (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
           (this.isSubscriptionRequestOrRejection(activity) && this.isLoggedUserMember(activity)) ||

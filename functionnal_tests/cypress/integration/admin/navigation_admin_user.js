@@ -9,7 +9,7 @@ describe('navigation :: admin > user', function () {
     cy.visit('/ui')
   })
   it('', function () {
-    cy.get('.header__menu__rightside__adminlink').should('be.visible').click()
+    cy.get('.sidebar__title .sidebar__item__foldChildren').click()
     cy.get('[href="/ui/admin/user"]').should('be.visible').click()
     cy.url().should('include', '/admin/user')
     cy.get('.adminUser__description').should('be.visible')

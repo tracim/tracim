@@ -397,7 +397,7 @@
   "Comment_noun": "Kommentar",
   "Account deleted": "Konto slettet",
   "Content deleted": "Innhold slettet",
-  "Favorites": "Favoritter",
+  "My favorites": "Mine favoritter",
   "Open as content": "Åpne som innhold",
   "Account restored": "Konto gjenopprettet",
   "New access": "Ny tilgang",
@@ -560,5 +560,9 @@
   "Share a news...": "Del nyheter …",
   "{{author}} made {{count}} contributions": "{{author}} gjorde {{count}} bidrag",
   "{{author}} made {{count}} contributions_plural": "{{author}} gjorde {{count}} bidrag",
+  "{{count}} tasks performed on {{numberOfTasks}}": "",
+  "{{count}} tasks performed on {{numberOfTasks}}_plural": "",
+  "{{count}} task": "",
+  "{{count}} task_plural": "",
   " on {{content}}": " i {{content}}"
 }

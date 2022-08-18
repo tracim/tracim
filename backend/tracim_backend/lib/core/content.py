@@ -496,8 +496,14 @@ class ContentApi(object):
             todos = self.get_all_query(parent_ids=[template_id], content_type_slug=TODO_TYPE,).all()
 
             for todo in todos:
-                self.copy(
-                    item=todo, new_parent=new_parent, do_save=False, do_notify=False,
+                self.create(
+                    content_type_slug=TODO_TYPE,
+                    workspace=new_parent.workspace,
+                    template_id=todo.content_id,
+                    parent=new_parent,
+                    content_namespace=new_parent.content_namespace,
+                    do_save=False,
+                    do_notify=False,
                 )
 
         except ContentTypeNotExist:
@@ -1762,11 +1768,6 @@ class ContentApi(object):
             raise ContentInNotEditableState(
                 "Can't mark not editable file, you need to change his status or state (deleted/archived) before any change."
             )
-        # INFO - MP - 2022-06-09 - Hacky way to disable to set a template that aren't supported
-        if content.file_extension not in [".document.html", ".odt", ".ods", ".odp", ".odg"]:
-            raise ContentInNotEditableState(
-                "Can't mark this kind file as a template. Files supported: .document.html, .odt, .ods, .odp, .odg"
-            )
         content.is_template = is_template
         if is_template:
             content.revision_type = ActionDescription.MARK_AS_TEMPLATE
@@ -1774,22 +1775,14 @@ class ContentApi(object):
             content.revision_type = ActionDescription.UNMARK_AS_TEMPLATE
         return content
 
-    def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:
-        user = self._session.query(User).get(user_id)
-
+    def get_templates(self, user: User, template_type: str) -> typing.List[Content]:
         space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
-        space_ids = [space.workspace_id for space in space_api.get_all_for_user(user)]
-
+        space_list = space_api.get_all_for_user(user)
+        if not space_list:
+            return []
         content_list = (
-            self._session.query(Content)
-            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
-            .filter(
-                Content.workspace_id.in_(space_ids),
-                Content.is_template.is_(True),
-                Content.type == template_type,
-                Content.is_deleted.is_(False),
-                Content.is_archived.is_(False),
-            )
+            self._base_query(space_list)
+            .filter(Content.is_template.is_(True), Content.type == template_type,)
             .all()
         )
 
@@ -2252,6 +2245,7 @@ class ContentApi(object):
         self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
     ) -> Content:
         item = self.create(
+            content_namespace=parent.content_namespace,
             content_type_slug=content_type_list.Todo.slug,
             workspace=parent.workspace,
             parent=parent,
