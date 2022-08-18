@@ -5,7 +5,7 @@ import fr from '../i18next.scanner/fr/translation.json'
 import pt from '../i18next.scanner/pt/translation.json'
 import de from '../i18next.scanner/de/translation.json'
 import ar from '../i18next.scanner/ar/translation.json'
-import es from '../i18next.scanner/ar/translation.json'
+import es from '../i18next.scanner/es/translation.json'
 
 export const getBrowserLang = () => {
   const browserLang = navigator.language
