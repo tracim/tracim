@@ -576,10 +576,10 @@
   "a task": "una tarea",
   "There is no tasks that match your filter": "No hay tareas que coincidan con su filtro",
   "You don't have any assigned tasks": "No tiene ninguna tarea asignada",
-  "Confidential space": "",
-  "Hide space list": "",
-  "Show space list": "",
-  "Space management": "Gestión de espacios",
-  "Hide user menu": "",
-  "Show user menu": ""
+  "Confidential space": "Espacio confidencial",
+  "Hide space list": "Ocultar la lista de espacios",
+  "Show space list": "Mostrar la lista de espacios",
+  "Space management": "Gestión de los espacios",
+  "Hide user menu": "Ocultar el menú de usuario",
+  "Show user menu": "Mostrar el menú de usuario"
 }
