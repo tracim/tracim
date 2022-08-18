@@ -3,7 +3,13 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import { FETCH_CONFIG } from '../../../util/helper.js'
-import { Avatar, AVATAR_SIZE, IconButton, PAGE } from 'tracim_frontend_lib'
+import {
+  Avatar,
+  AVATAR_SIZE,
+  DropdownMenu,
+  IconButton,
+  PAGE
+} from 'tracim_frontend_lib'
 import classnames from 'classnames'
 
 export const MenuProfile = props => {
@@ -17,7 +23,7 @@ export const MenuProfile = props => {
     >
       <IconButton
         customClass='sidebar__item__foldChildren'
-        icon={`fas fa-caret-${props.showUserItems ? 'down' : 'right'}`}
+        icon={`fas fa-chevron-${props.showUserItems ? 'down' : 'right'}`}
         title={props.showUserItems ? props.t('Hide user menu') : props.t('Show user menu')}
         intent='link'
         mode='light'
@@ -36,6 +42,22 @@ export const MenuProfile = props => {
         />
         <span>&nbsp;{props.user.publicName}</span>
       </Link>
+
+      <DropdownMenu
+        buttonCustomClass='sidebar__item__menu'
+        buttonIcon='fas fa-ellipsis-v'
+        buttonTooltip={props.t('Actions')}
+      >
+        <IconButton
+          customClass='sidebar__item__menu__logout'
+          dataCy='sidebar__logout'
+          icon='fas fa-sign-out-alt'
+          intent='link'
+          onClick={props.onClickLogout}
+          text={props.t('Log out')}
+          textMobile={props.t('Log out')}
+        />
+      </DropdownMenu>
     </div>
   )
 }
