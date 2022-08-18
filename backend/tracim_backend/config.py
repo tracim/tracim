@@ -923,7 +923,7 @@ class CFG(object):
         self.TRANSLATION_SERVICE__SYSTRAN__API_KEY = self.get_raw_config(
             "{}.systran.api_key".format(prefix)
         )
-        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch,ar:العربية"
+        default_target_languages = "fr:Français,en:English,pt:Português,de:Deutsch,ar:العربية,es:Español"
         target_language_pairs = string_to_unique_item_list(
             self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),
             separator=",",
