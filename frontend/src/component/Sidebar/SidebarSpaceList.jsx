@@ -74,7 +74,7 @@ const SidebarSpaceList = (props) => {
             icon={getTitleIcon()}
             title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           />
-          <span>&nbsp;{props.t('Spaces')}</span>
+          <span>{props.t('Spaces')}</span>
         </button>
         {props.accessibleWorkspaceList.length > 0 && (
           <IconButton
