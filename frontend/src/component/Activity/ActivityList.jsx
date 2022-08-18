@@ -138,12 +138,12 @@ const ActivityList = (props) => {
 
   const isLoggedUserMember = (activity) => props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
 
-  const isAttachedFileOnPublication = (activity) => activity.content
+  const isActivityAnAttachedFileOnPublication = (activity) => activity.content
     ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
     : false
 
   const activityDisplayFilter = (activity) => {
-    return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) && !isAttachedFileOnPublication(activity) &&
+    return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) && !isActivityAnAttachedFileOnPublication(activity) &&
       (
         (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
         (isSubscriptionRequestOrRejection(activity) && isLoggedUserMember(activity)) ||
