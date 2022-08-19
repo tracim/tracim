@@ -557,6 +557,7 @@ export class HtmlDocument extends React.Component {
         sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
+    window.history.replaceState(null, '', PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.content.content_type, state.content.content_id))
   }
 
   searchForMentionOrLinkInQuery = async (query) => {
@@ -994,13 +995,13 @@ export class HtmlDocument extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
-              icon: 'fas fa-edit',
-              label: props.t('Edit'),
-              key: props.t('Edit'),
-              onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              dataCy: 'newVersionButton',
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'newVersionButton'
+              icon: 'fas fa-edit',
+              key: props.t('Edit'),
+              label: props.t('Edit'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
             }
           ]}
           isTemplate={state.isTemplate}

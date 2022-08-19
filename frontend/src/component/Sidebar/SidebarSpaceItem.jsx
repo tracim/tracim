@@ -250,7 +250,7 @@ SidebarSpaceItem.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   spaceId: PropTypes.number.isRequired,
-  spaceType: PropTypes.number.isRequired,
+  spaceType: PropTypes.string.isRequired,
   activeSpaceId: PropTypes.number,
   allowedAppList: PropTypes.array,
   foldChildren: PropTypes.bool,
