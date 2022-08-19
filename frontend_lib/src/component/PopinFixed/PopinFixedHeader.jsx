@@ -200,7 +200,6 @@ export const PopinFixedHeader = (props) => {
               )}
               data-cy={action.dataCy}
               key={action.label}
-              onClick={action.disabled ? () => { } : action.onClick}
               title={action.label}
               to={{
                 pathname: action.link,

@@ -369,7 +369,7 @@ export class HtmlDocument extends React.Component {
       resHtmlDocument.body.current_revision_type === 'creation' && // if content has only one revision
       state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && // if user has EDIT authorization
       resHtmlDocument.body.raw_content === '' // has content been created with raw_content (means it's from webdav or import db)
-    ) || (state.config.history.location.search && state.config.history.location.search.includes(APP_FEATURE_MODE.EDIT))
+    )
       ? APP_FEATURE_MODE.EDIT
       : APP_FEATURE_MODE.VIEW
 
@@ -444,7 +444,6 @@ export class HtmlDocument extends React.Component {
   }
 
   handleCloseNewVersion = () => {
-    const { state } = this
     tinymceRemove('#wysiwygNewVersion')
 
     this.setState(prev => ({
@@ -456,13 +455,11 @@ export class HtmlDocument extends React.Component {
     }))
 
     removeLocalStorageItem(
-      state.appName,
-      state.content.content_id,
-      state.content.workspace_id,
+      this.state.appName,
+      this.state.content.content_id,
+      this.state.content.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
-
-    window.history.replaceState(null, '', PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.content.content_type, state.content.content_id))
   }
 
   handleClickSaveDocument = async () => {
@@ -1001,12 +998,8 @@ export class HtmlDocument extends React.Component {
               dataCy: 'newVersionButton',
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               icon: 'fas fa-edit',
-              isLink: true,
               key: props.t('Edit'),
               label: props.t('Edit'),
-              link: PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.content.content_type, state.content.content_id),
-              mode: APP_FEATURE_MODE.EDIT,
-
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
             }
