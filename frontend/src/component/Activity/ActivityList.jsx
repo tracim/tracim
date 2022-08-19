@@ -45,7 +45,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
         <FeedItemWithPreview
           breadcrumbsList={breadcrumbsList}
           contentAvailable={activity.contentAvailable}
-          commentList={activity.commentList}
+          commentList={activity.commentList.map(comment => ({ ...comment, timelineType: comment.content_type }))}
           content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
           isPublication={isPublication}
@@ -61,6 +61,8 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           workspaceId={activity.newestMessage.fields.workspace.workspace_id}
           titleLink={titleLink}
           previewLink={previewLink}
+          showCommentRedirection
+          showTimeline={activity.commentList && activity.commentList.length > 0}
         />
       )
   }],

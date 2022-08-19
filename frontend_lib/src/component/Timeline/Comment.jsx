@@ -202,6 +202,7 @@ Comment.propTypes = {
   apiContent: PropTypes.object.isRequired,
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
+  customColor: PropTypes.string,
   text: PropTypes.string,
   created: PropTypes.string.isRequired,
   fromMe: PropTypes.bool,
@@ -221,6 +222,7 @@ Comment.propTypes = {
 
 Comment.defaultProps = {
   customClass: '',
+  customColor: 'transparent',
   text: '',
   fromMe: false,
   translationState: TRANSLATION_STATE.DISABLED,

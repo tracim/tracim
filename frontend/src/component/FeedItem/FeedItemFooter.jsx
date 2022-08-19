@@ -59,7 +59,7 @@ export class FeedItemFooter extends React.Component {
             contentId={content.id}
             workspaceId={workspaceId}
           />
-          {props.isPublication && props.showTimeline && (
+          {props.showTimeline && (
             <IconButton
               text={props.discussionToggleButtonLabel}
               textMobile={props.discussionToggleButtonLabelMobile}

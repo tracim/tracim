@@ -581,7 +581,6 @@ export class Publications extends React.Component {
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
             commentList={publication.commentList}
             content={publication}
-            customColor={COLORS.PUBLICATION}
             key={`publication_${publication.id}`}
             ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
             memberList={props.currentWorkspace.memberList}

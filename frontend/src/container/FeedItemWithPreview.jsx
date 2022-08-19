@@ -12,6 +12,7 @@ import {
 } from '../util/helper.js'
 import {
   appContentFactory,
+  COLORS,
   Comment,
   CONTENT_TYPE,
   CUSTOM_EVENT,
@@ -323,13 +324,21 @@ export class FeedItemWithPreview extends React.Component {
 
     const isContentDeleted = props.lastModificationEntityType === TLM_ET.CONTENT && props.lastModificationType === TLM_CET.DELETED
 
+    const contentType = props.isPublication
+      ? { label: props.t('Publication'), faIcon: 'fas fa-stream', hexcolor: COLORS.PUBLICATION }
+      : (
+        props.appList.find(app => app.slug === `contents/${props.content.type}`) ||
+        { label: props.t(`No App for content-type ${props.content.type}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
+      )
+
     return (
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           allowEdition={props.allowEdition}
           breadcrumbsList={props.breadcrumbsList}
-          contentAvailable={props.contentAvailable}
           content={props.content}
+          contentAvailable={props.contentAvailable}
+          contentType={contentType}
           isPublication={props.isPublication}
           eventList={props.eventList}
           lastModificationType={props.lastModificationType}
@@ -411,7 +420,7 @@ export class FeedItemWithPreview extends React.Component {
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
                 customClass='feedItem__timeline'
-                customColor={props.customColor}
+                customColor={contentType.hexcolor}
                 id={props.content.id}
                 contentId={props.content.id}
                 contentType={props.content.type}
@@ -448,6 +457,7 @@ export class FeedItemWithPreview extends React.Component {
                 translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                showCommentRedirection={props.showCommentRedirection}
               />
             )}
           </>
@@ -457,7 +467,13 @@ export class FeedItemWithPreview extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system, user, currentWorkspace, workspaceList }) => ({ system, user, currentWorkspace, workspaceList })
+const mapStateToProps = ({
+  appList,
+  system,
+  user,
+  currentWorkspace,
+  workspaceList
+}) => ({ appList, system, user, currentWorkspace, workspaceList })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
@@ -489,7 +505,8 @@ FeedItemWithPreview.propTypes = {
   showTimeline: PropTypes.bool,
   titleLink: PropTypes.string,
   previewLink: PropTypes.string,
-  previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE))
+  previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
+  showCommentRedirection: PropTypes.bool
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -509,5 +526,6 @@ FeedItemWithPreview.defaultProps = {
   showTimeline: false,
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
   titleLink: null,
-  previewLink: null
+  previewLink: null,
+  showCommentRedirection: false
 }
