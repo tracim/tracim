@@ -42,6 +42,7 @@ describe('Login page', function () {
     cy.get('.sidebar__title .sidebar__item__foldChildren')
       .click()
 
+    cy.get('.sidebar__item__menu').first().should('be.visible').click()
     cy.get('[data-cy="sidebar__logout"]')
       .click()
   })
@@ -76,6 +77,7 @@ describe('Login page', function () {
     cy.get('.sidebar__title .sidebar__item__foldChildren')
       .click()
 
+    cy.get('.sidebar__item__menu').first().should('be.visible').click()
     cy.get('[data-cy="sidebar__logout"]')
       .click()
   })

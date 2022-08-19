@@ -12,7 +12,7 @@ describe('navigate :: workspace > create_new > file', function () {
 
   it('dashboard > button', function () {
     cy.get('.sidebar__item__name').should('be.visible')
-    cy.get('.sidebar__item__menu').click()
+    cy.get('.sidebar__item__menu').last().click()
     cy.get('[data-cy=sidebar_subdropdown-dashboard]').should('be.visible').click()
     cy.get('.dashboard__workspace__rightMenu__contents .fa-paperclip').should('be.visible').click()
     cy.get('.cardPopup__container').should('be.visible')
