@@ -44,8 +44,8 @@ const SidebarSpaceList = (props) => {
   const getTitleIcon = () => {
     if (props.isSidebarClosed) return 'fas fa-users'
     if (props.spaceList.length === 0) return ''
-    if (props.showSpaceList) return 'fas fa-caret-down'
-    return 'fas fa-caret-right'
+    if (props.showSpaceList) return 'fas fa-chevron-down'
+    return 'fas fa-chevron-right'
   }
 
   const handleClickTitle = () => {
@@ -66,7 +66,7 @@ const SidebarSpaceList = (props) => {
     <>
       <div className='sidebar__item sidebar__title'>
         <button
-          className='transparentButton sidebar__title__spaces'
+          className='transparentButton btn sidebar__title__spaces'
           title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           onClick={handleClickTitle}
         >
@@ -74,7 +74,7 @@ const SidebarSpaceList = (props) => {
             icon={getTitleIcon()}
             title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           />
-          <span>&nbsp;{props.t('Spaces')}</span>
+          <span>{props.t('Spaces')}</span>
         </button>
         {props.accessibleWorkspaceList.length > 0 && (
           <IconButton

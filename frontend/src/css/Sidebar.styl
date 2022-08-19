@@ -90,19 +90,23 @@ borderWhenActive= 5px
         color sidebarFontColorHover
     &__dragNdrop
       margin-inline-start textSpacing
-    &__menu.dropdownMenuButton
-      & i
-        width auto
-        color sidebarFontColor
-        &:hover
-          color sidebarFontColorHover
-      &:focus
-        outline none
-      &::after
-        display none
+    &__menu
+      &__logout > *
+        color fontColor
+      &.dropdownMenuButton
+        & i
+          width auto
+          color sidebarFontColor
+          &:hover
+            color sidebarFontColorHover
+        &:focus
+          outline none
+        &::after
+          display none
   &__title
     font-weight bold
     background-color var(--sidebarColorLighten)
+    overflow visible
     &__spaces
       display flex
       color offWhite
@@ -114,12 +118,12 @@ borderWhenActive= 5px
       & > span
         padding-inline-start standardSpacing
       &__create
-        padding-inline-start textSpacing
-        padding-inline-end textSpacing
+        padding-inline-start standardSpacing
+        padding-inline-end standardSpacing
         height 100%
       &__join
-        padding-inline-start textSpacing
-        padding-inline-end textSpacing
+        padding-inline-start standardSpacing
+        padding-inline-end standardSpacing
         height 100%
   &__spaces
     overflow-y auto
@@ -191,6 +195,8 @@ borderWhenActive= 5px
           position absolute
           margin-inline-start 25px
       &__foldChildren
+        display none
+      &__menu
         display none
     & .sidebar__spaces
       display none

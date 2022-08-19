@@ -330,6 +330,7 @@ class TestConfigEndpoint(object):
             {"code": "pt", "display": "Português"},
             {"code": "de", "display": "Deutsch"},
             {"code": "ar", "display": "العربية"},
+            {"code": "es", "display": "Español"},
         ]
         assert res.json_body["user__self_registration__enabled"] is False
         assert res.json_body["ui__spaces__creation__parent_space_choice__visible"] is True

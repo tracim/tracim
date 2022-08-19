@@ -13,6 +13,7 @@ const SidebarUserItemList = (props) => {
         onClickToggleUserItems={props.onClickToggleUserItems}
         showUserItems={props.showUserItems}
         user={props.user}
+        onClickLogout={props.onClickLogout}
       />
 
       {(props.showUserItems || props.isSidebarClosed) && (
@@ -63,14 +64,6 @@ const SidebarUserItemList = (props) => {
             icon='fas fa-cogs'
             isCurrentItem={props.location.pathname === PAGE.ACCOUNT && !props.isNotificationWallOpen}
             dataCy='sidebar__account__settings'
-          />
-
-          <SidebarItem
-            customClass='sidebar__logout__item'
-            label={props.t('Log out')}
-            icon='fas fa-sign-out-alt'
-            onClickItem={props.onClickLogout}
-            dataCy='sidebar__logout'
           />
         </>
       )}
