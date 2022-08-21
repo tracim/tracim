@@ -5,8 +5,8 @@ describe('Create to dos', () => {
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
   const toDoText = 'Some to do text'
-  const multipleTodos = `${toDoText}
-  +TheAdmin ${toDoText}`
+  const multipleTodos = `${toDoText}s
+  +TheAdmin ${toDoText}n`
 
   describe('in a content', () => {
     beforeEach(() => {
@@ -25,7 +25,6 @@ describe('Create to dos', () => {
     })
 
     it('should show a message if content do not have the to dos', () => {
-      cy.get('.toDoManagement__buttons__new .iconbutton-secondary').click()
       cy.get('[data-cy=toDo__empty]').should('be.visible')
     })
 
@@ -53,9 +52,9 @@ describe('Create to dos', () => {
       cy.get('[data-cy=createToDoFromTextPopup__buttons__create]').click()
       cy.get('[data-cy=toDoManagement__buttons__new]').click()
       cy.get('.toDoItem__content__task').should('have.length', 2)
-      cy.get('.toDoItem__content__task').first().contains(toDoText)
-      cy.get('.toDoItem__content__task').last().contains('+TheAdmin')
-      cy.get('.toDoItem__content__task').last().contains(toDoText)
+      cy.contains('.toDoItem__content__task', `${toDoText}s`).should('be.visible')
+      cy.contains('.toDoItem__content__task', '+TheAdmin').should('be.visible')
+      cy.contains('.toDoItem__content__task', `${toDoText}n`).should('be.visible')
     })
   })
 })
