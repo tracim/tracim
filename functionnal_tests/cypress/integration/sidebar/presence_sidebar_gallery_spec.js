@@ -12,7 +12,7 @@ describe('Sidebar', function () {
     cy.get('[data-cy=sidebar__space__item_1]').should('be.visible').click()
   })
   it('should have a link to Gallery in the hidden menu', function () {
-    cy.get('.sidebar__item__menu').should('be.visible').click()
+    cy.get('.sidebar__item__menu').last().should('be.visible').click()
     cy.get('[data-cy="sidebar_subdropdown-gallery"]').should('be.visible').click()
     cy.url().should('include', '/gallery')
     cy.get('.gallery__header__title').should('be.visible')
