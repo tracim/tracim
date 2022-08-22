@@ -177,7 +177,7 @@ const Comment = props => {
             workspaceId={props.workspaceId}
           />
 
-          {props.isPublication && props.showTimeline && (
+          {props.isPublication && props.showCommentList && (
             <IconButton
               text={props.discussionToggleButtonLabel}
               textMobile={props.threadLength > 0 ? props.threadLength.toString() : ''}

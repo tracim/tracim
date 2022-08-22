@@ -588,7 +588,7 @@ export class Publications extends React.Component {
             isPublication
             inRecentActivities={false}
             onClickEdit={() => this.handleClickEdit(publication)}
-            showTimeline
+            showCommentList
             workspaceId={Number(publication.workspaceId)}
             user={props.user}
             {...this.getPreviewLinkParameters(publication)}

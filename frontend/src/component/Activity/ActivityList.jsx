@@ -61,8 +61,8 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           workspaceId={activity.newestMessage.fields.workspace.workspace_id}
           titleLink={titleLink}
           previewLink={previewLink}
-          showCommentRedirection
-          showTimeline={activity.commentList && activity.commentList.length > 0}
+          showParticipateButton
+          showCommentList={activity.commentList}
         />
       )
   }],

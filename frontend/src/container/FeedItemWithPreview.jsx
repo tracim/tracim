@@ -78,14 +78,14 @@ export class FeedItemWithPreview extends React.Component {
       }
     }
 
-    if (props.showTimeline && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
+    if (props.showCommentList && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
       tinymceRemove(this.getWysiwygId(props.content.id))
     }
   }
 
   componentWillUnmount () {
     const { props } = this
-    if (props.showTimeline) tinymceRemove(this.getWysiwygId(props.content.id))
+    if (props.showCommentList) tinymceRemove(this.getWysiwygId(props.content.id))
   }
 
   handleAllAppChangeLanguage = (data) => {
@@ -283,9 +283,11 @@ export class FeedItemWithPreview extends React.Component {
         ? props.t('Hide discussion')
         : `${props.t('Show discussion')} (${commentList.length})`
     } else {
-      return state.isDiscussionDisplayed
-        ? props.t('Hide comment area')
-        : props.t('Comment', { context: 'verb' })
+      if (props.isPublication) {
+        return state.isDiscussionDisplayed
+          ? props.t('Hide comment area')
+          : props.t('Comment', { context: 'verb' })
+      } else return props.t('Participate')
     }
   }
 
@@ -387,7 +389,7 @@ export class FeedItemWithPreview extends React.Component {
                   onClickToggleCommentList={this.handleClickToggleComments}
                   discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel(commentList)}
                   threadLength={commentList.length}
-                  showTimeline={props.showTimeline}
+                  showCommentList={props.showCommentList}
                 />
               )
               : (
@@ -413,13 +415,15 @@ export class FeedItemWithPreview extends React.Component {
                     onClickToggleCommentList={this.handleClickToggleComments}
                     discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel(commentList)}
                     discussionToggleButtonLabelMobile={commentList.length > 0 ? commentList.length.toString() : ''}
-                    showTimeline={props.showTimeline}
+                    showCommentList={props.showCommentList}
                     isPublication={props.isPublication}
+                    isCommentListEmpty={commentList.length === 0}
+                    customColor={contentType.hexcolor}
                   />
                 </div>
               )
             )}
-            {props.showTimeline && state.isDiscussionDisplayed && (
+            {props.showCommentList && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
                 contentId={props.content.id}
@@ -459,7 +463,7 @@ export class FeedItemWithPreview extends React.Component {
                 translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-                showCommentRedirection={props.showCommentRedirection}
+                showParticipateButton={props.showParticipateButton}
                 wysiwygIdSelector={this.getWysiwygId(props.content.id)}
               />
             )}
@@ -505,11 +509,11 @@ FeedItemWithPreview.propTypes = {
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
   reactionList: PropTypes.array,
-  showTimeline: PropTypes.bool,
+  showCommentList: PropTypes.bool,
   titleLink: PropTypes.string,
   previewLink: PropTypes.string,
   previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
-  showCommentRedirection: PropTypes.bool
+  showParticipateButton: PropTypes.bool
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -526,9 +530,9 @@ FeedItemWithPreview.defaultProps = {
   modifiedDate: '',
   onClickEdit: () => { },
   reactionList: [],
-  showTimeline: false,
+  showCommentList: false,
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
   titleLink: null,
   previewLink: null,
-  showCommentRedirection: false
+  showParticipateButton: false
 }

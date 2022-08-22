@@ -237,7 +237,7 @@ export class Timeline extends React.Component {
           />
         )}
 
-        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showCommentRedirection && (
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
@@ -265,16 +265,16 @@ export class Timeline extends React.Component {
           </div>
         )}
 
-        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && props.showCommentRedirection && (
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && props.showParticipateButton && (
           <Link
             style={{
               '--primaryColor': props.customColor,
               '--primaryDarkColor': darkenColor(props.customColor)
             }}
-            className='timeline__commentRedirection'
+            className='timeline__participate'
             to={PAGE.CONTENT(props.contentId)}
           >
-            <i className='fa-fw fas fa-comment' />
+            <i className='fa-fw fas fa-bullhorn' />
             {props.t('Participate')}
           </Link>
         )}
@@ -327,7 +327,7 @@ Timeline.propTypes = {
   contentType: PropTypes.string,
   wysiwygIdSelector: PropTypes.string,
   isFileCommentLoading: PropTypes.bool,
-  showCommentRedirection: PropTypes.bool
+  showParticipateButton: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -366,5 +366,5 @@ Timeline.defaultProps = {
   contentType: '',
   wysiwygIdSelector: '',
   isFileCommentLoading: false,
-  showCommentRedirection: false
+  showParticipateButton: false
 }
