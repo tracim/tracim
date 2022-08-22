@@ -17,15 +17,13 @@ from tracim_backend.lib.search.elasticsearch_search.default_analyzers import edg
 from tracim_backend.lib.search.elasticsearch_search.default_analyzers import folding
 from tracim_backend.lib.search.elasticsearch_search.default_analyzers import html_exact_folding
 from tracim_backend.lib.search.elasticsearch_search.default_analyzers import html_folding
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es import tracim_spanish_analyzer
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.ar import tracim_arabic_analyzer
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.de import tracim_german_analyzer
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.en import tracim_english_analyzer
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.fr import tracim_french_analyzer
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.pt import (
     tracim_portuguese_analyzer,
-)
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es import (
-    tracim_spanish_analyzer,
 )
 
 EXACT_FIELD = "exact"
