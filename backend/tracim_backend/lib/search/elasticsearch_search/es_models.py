@@ -21,9 +21,8 @@ from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.ar import tra
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.de import tracim_german_analyzer
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.en import tracim_english_analyzer
 from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.fr import tracim_french_analyzer
-from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.pt import (
-    tracim_portuguese_analyzer,
-)
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.pt import tracim_portuguese_analyzer
+from tracim_backend.lib.search.elasticsearch_search.lang_analyzers.es import tracim_spanish_analyzer
 
 EXACT_FIELD = "exact"
 
@@ -118,6 +117,7 @@ class FileData(InnerDoc):
     content_fr = Text(analyzer=tracim_french_analyzer)
     content_pt = Text(analyzer=tracim_portuguese_analyzer)
     content_ar = Text(analyzer=tracim_arabic_analyzer)
+    content_es = Text(analyzer=tracim_spanish_analyzer)
     title = Text()
     name = Text()
     author = Text()
