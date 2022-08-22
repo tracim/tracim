@@ -87,8 +87,7 @@ FeedItemFooter.propTypes = {
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   discussionToggleButtonLabel: PropTypes.string.isRequired,
   discussionToggleButtonLabelMobile: PropTypes.string,
-  onClickToggleCommentList: PropTypes.func,
-  isPublication: PropTypes.bool.isRequired
+  onClickToggleCommentList: PropTypes.func
 }
 
 FeedItemFooter.defaultProps = {

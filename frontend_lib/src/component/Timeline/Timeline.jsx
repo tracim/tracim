@@ -275,7 +275,7 @@ export class Timeline extends React.Component {
             to={PAGE.CONTENT(props.contentId)}
           >
             <i className='fa-fw fas fa-comment' />
-            {props.t('Comment_verb')}
+            {props.t('Participate')}
           </Link>
         )}
       </div>

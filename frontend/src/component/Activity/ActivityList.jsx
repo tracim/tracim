@@ -45,7 +45,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
         <FeedItemWithPreview
           breadcrumbsList={breadcrumbsList}
           contentAvailable={activity.contentAvailable}
-          commentList={activity.commentList.map(comment => ({ ...comment, timelineType: comment.content_type }))}
+          commentList={activity.commentList}
           content={serialize(activity.content, serializeContentProps)}
           eventList={activity.eventList}
           isPublication={isPublication}

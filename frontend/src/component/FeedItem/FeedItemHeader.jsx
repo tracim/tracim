@@ -64,10 +64,10 @@ export class FeedItemHeader extends React.Component {
     return (
       <div className='feedItemHeader'>
         <Icon
-          customClass='feedItemHeader__icon'
           color={props.contentType.hexcolor}
-          title={props.contentType.label}
+          customClass='feedItemHeader__icon'
           icon={props.contentType.faIcon}
+          title={props.contentType.label}
         />
         <div className='feedItemHeader__title'>
           {props.titleLink
@@ -159,7 +159,6 @@ FeedItemHeader.propTypes = {
   contentAvailable: PropTypes.bool,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  isPublication: PropTypes.bool.isRequired,
   allowEdition: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
   eventList: PropTypes.array,
@@ -177,7 +176,6 @@ FeedItemHeader.defaultProps = {
   allowEdition: false,
   breadcrumbsList: [],
   eventList: [],
-  isPublication: false,
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
   lastModificationType: '',
