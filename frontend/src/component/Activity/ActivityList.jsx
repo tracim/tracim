@@ -62,7 +62,7 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           titleLink={titleLink}
           previewLink={previewLink}
           showParticipateButton
-          showCommentList={activity.commentList}
+          showCommentList={!!activity.commentList}
         />
       )
   }],

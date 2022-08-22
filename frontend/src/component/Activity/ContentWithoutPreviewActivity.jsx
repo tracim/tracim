@@ -1,9 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
+import { connect } from 'react-redux'
 import FeedItemHeader from '../FeedItem/FeedItemHeader.jsx'
 
 export const ContentWithoutPreviewActivity = props => {
+  const contentType = props.appList.find(app => app.slug === `contents/${props.content.type}`) ||
+        { label: props.t(`No App for content-type ${props.content.type}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
+
   return (
     <div className='feedItem'>
       <FeedItemHeader
@@ -19,12 +22,14 @@ export const ContentWithoutPreviewActivity = props => {
         onClickCopyLink={props.onClickCopyLink}
         onEventClicked={props.onEventClicked}
         workspaceId={props.activity.newestMessage.fields.workspace.workspace_id}
+        contentType={contentType}
       />
     </div>
   )
 }
 
-export default ContentWithoutPreviewActivity
+const mapStateToProps = ({ appList }) => ({ appList })
+export default connect(mapStateToProps)(ContentWithoutPreviewActivity)
 
 ContentWithoutPreviewActivity.propTypes = {
   activity: PropTypes.object.isRequired,

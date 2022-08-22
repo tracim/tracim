@@ -161,6 +161,7 @@ FeedItemHeader.propTypes = {
   workspaceId: PropTypes.number.isRequired,
   allowEdition: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
+  contentType: PropTypes.object,
   eventList: PropTypes.array,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
@@ -175,6 +176,11 @@ FeedItemHeader.propTypes = {
 FeedItemHeader.defaultProps = {
   allowEdition: false,
   breadcrumbsList: [],
+  contentType: {
+    label: '',
+    faIcon: '',
+    hexcolor: ''
+  },
   eventList: [],
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
