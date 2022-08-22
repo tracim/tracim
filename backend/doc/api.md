@@ -19,7 +19,7 @@ Each one is best suited for a specific usage:
 - `Api-Key` if you are administrator and you want to create daemon, gateways between applications... note that you will get full access to Tracim data: be careful!
 - `Cookie` if you work with a frontend (ui/) and don't want to store credentials for security reasons (use `/api/auth/login` to log in).
 
-Majority of examples will be given based on the use of [httpie](https://httpie.org/) and Basic-Auth will be given with curl too.
+Majority of examples will be given based on the use of [httpie](https://httpie.org/) and Basic-Auth will be given with [curl](https://curl.se/) too.
 
 ## Who am I?
 
