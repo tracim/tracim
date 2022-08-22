@@ -58,7 +58,7 @@ Set-Cookie:  session_key=22fd293b6d850faabc8e3f167bcfc804d8713deed03bc15e5029434
 
 #### With CURL
 ```
-curl -i -u admin@admin.admin:admin@admin.admin http://127.0.0.1:6543/api/auth/whoami
+$ curl -i -u admin@admin.admin:admin@admin.admin http://127.0.0.1:6543/api/auth/whoami
 HTTP/1.1 200 OK
 Date: Mon, 22 Aug 2022 09:16:23 GMT
 Server: Apache
