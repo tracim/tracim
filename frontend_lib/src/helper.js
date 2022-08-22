@@ -715,6 +715,15 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
 
 export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
 
+export const readableDateFormat = (rawDate, lang) => {
+  const options = {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  }
+  const date = new Date(rawDate).toLocaleDateString(lang, options)
+  const time = new Date(rawDate).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })
+  return `${date} ${time}`
+}
+
 // Equality test done as numbers with the following rules:
 // - strings are converted to numbers before comparing
 // - undefined and null are converted to 0 before comparing

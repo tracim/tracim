@@ -48,8 +48,9 @@ export class Thread extends React.Component {
       breadcrumbsList: [],
       isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
+      customTimeline: [],
+      loggedUser: param.loggedUser,
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
@@ -83,6 +84,7 @@ export class Thread extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged }
