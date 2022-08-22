@@ -1235,12 +1235,14 @@ export class File extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
-              icon: 'fas fa-edit',
-              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
-              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
-              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT,
+              dataCy: 'wsContentGeneric__option__menu__addversion',
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'wsContentGeneric__option__menu__addversion'
+              icon: 'fas fa-edit',
+              isLink: true,
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              link: PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, state.content.content_id),
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT
             }, {
               icon: 'fas fa-upload',
               label: props.t('Upload a new version'),

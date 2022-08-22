@@ -19,7 +19,7 @@ describe('Sidebar', function () {
     cy.get('[data-cy=sidebar__space__item_1]').click()
   })
   it('should have a link to Dashboard in the hidden menu', function () {
-    cy.get('.sidebar__item__menu').should('be.visible').click()
+    cy.get('.sidebar__item__menu').last().should('be.visible').click()
     cy.get('[data-cy="sidebar_subdropdown-dashboard"]')
       .should('have.attr', 'href', `/ui/workspaces/${workspaceId}/dashboard`)
       .should('be.visible')
