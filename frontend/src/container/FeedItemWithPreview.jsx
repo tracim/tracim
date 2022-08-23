@@ -263,6 +263,7 @@ export class FeedItemWithPreview extends React.Component {
         }
       }
     )
+    // INFO - G.B. - 2022-08-23 - For threads, we remove the first element because it's already shown in the preview
     return props.content.type === CONTENT_TYPE.THREAD ? commentList.slice(1) : commentList
   }
 
