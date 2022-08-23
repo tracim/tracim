@@ -1167,6 +1167,7 @@ export class File extends React.Component {
           1080
         )
       )
+    const isVideo= isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)
 
     return (
       <PopinFixed
@@ -1180,15 +1181,9 @@ export class File extends React.Component {
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
-                (onlineEditionAction && onlineEditionAction.action === ACTION_EDIT),
+                ((onlineEditionAction && onlineEditionAction.action === ACTION_EDIT) || isVideo),
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionBtn'
-            }, {
-              icon: 'fas fa-play',
-              label: props.t('Play video'),
-              onClick: () => this.setState({ previewVideo: true }),
-              showAction: isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST),
-              dataCy: 'popinListItem__playVideo'
             }, {
               icon: 'fas fa-edit',
               label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
@@ -1235,6 +1230,12 @@ export class File extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
+              icon: 'fas fa-play',
+              label: props.t('Play video'),
+              onClick: () => this.setState({ previewVideo: true }),
+              showAction: isVideo,
+              dataCy: 'popinListItem__playVideo'
+            }, {
               dataCy: 'wsContentGeneric__option__menu__addversion',
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               icon: 'fas fa-edit',
@@ -1248,7 +1249,8 @@ export class File extends React.Component {
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
-                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
+                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)) &&
+                (!isVideo),
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionBtn'
             }
