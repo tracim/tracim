@@ -48,18 +48,22 @@ describe('At the space recent activities page', () => {
     })
 
     it('should show the associated comments', () => {
-      cy.createComment(workspaceId, contentId, commentContent)
-      cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle)
-      cy.get('.buttonComments').click()
-      cy.contains('[data-cy=comment__body__content__text]', commentContent)
+      cy.createComment(workspaceId, contentId, commentContent).then(() => {
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
+        cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle)
+        cy.get('.buttonComments').click()
+        cy.contains('[data-cy=comment__body__content__text]', commentContent)
+      })
     })
 
     it('should show a participate button that redirects to app', () => {
-      cy.createComment(workspaceId, contentId, commentContent)
-      cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle)
-      cy.get('.buttonComments').click()
-      cy.get('.timeline__participate').click()
-      cy.contains('.html-document__contentpage__edition__header__title', noteTitle)
+      cy.createComment(workspaceId, contentId, commentContent).then(() => {
+        cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
+        cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle)
+        cy.get('.buttonComments').click()
+        cy.get('.timeline__participate').click()
+        cy.contains('.html-document__contentpage__edition__header__title', noteTitle)
+      })
     })
   })
 })
