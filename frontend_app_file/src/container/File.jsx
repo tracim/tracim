@@ -1279,6 +1279,7 @@ export class File extends React.Component {
           <FileComponent
             editionAuthor={state.editionAuthor}
             isRefreshNeeded={state.showRefreshWarning}
+            isVideo={isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)}
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
@@ -1308,7 +1309,7 @@ export class File extends React.Component {
             progressUpload={state.progressUpload}
             previewVideo={state.previewVideo}
             workspaceId={state.content.workspace_id}
-            onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
+            onTogglePreviewVideo={() => this.setState(prev => ({ previewVideo: !prev.previewVideo }))}
             ref={this.refContentLeftTop}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}

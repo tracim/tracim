@@ -82,13 +82,24 @@ export class PreviewComponent extends React.Component {
   //   }
   // }
 
+  handleClickPreview = () => {
+    const { props, state } = this
+    if (props.isVideo) {
+      this.props.onTogglePreviewVideo()
+    } else {
+      if (state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable) {
+        this.handleClickShowImageRaw()
+      }
+    }
+  }
+
   render () {
     const { props, state } = this
 
     return (
       <div className='previewcomponent'>
         <div className='previewcomponent__filepreview'>
-          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
+          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && !props.isVideo && (
             <button
               type='button'
               className='previewcomponent__navigationButton btn iconBtn'
@@ -107,7 +118,7 @@ export class PreviewComponent extends React.Component {
               'previewcomponent__fileimg',
               { previewAvailable: state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable }
             )}
-            onClick={state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable ? this.handleClickShowImageRaw : () => {}}
+            onClick={this.handleClickPreview}
           >
             {(props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
               ? (
@@ -150,7 +161,7 @@ export class PreviewComponent extends React.Component {
             )}
           </div>
 
-          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
+          {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && !props.isVideo && (
             <button
               type='button'
               className='previewcomponent__navigationButton btn transparentButton'
@@ -164,7 +175,7 @@ export class PreviewComponent extends React.Component {
             </button>
           )}
         </div>
-        {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && (
+        {state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.filePageNb > 1 && !props.isVideo && (
           <div className='previewcomponent__pagecount'>
             {props.fileCurrentPage}{props.t(' of ')}{props.filePageNb}
           </div>
@@ -181,12 +192,14 @@ PreviewComponent.propTypes = {
   fileCurrentPage: PropTypes.number,
   isJpegAvailable: PropTypes.bool,
   isPdfAvailable: PropTypes.bool,
+  isVideo: PropTypes.bool,
   previewUrl: PropTypes.string,
   downloadPdfPageUrl: PropTypes.string,
   color: PropTypes.string,
   onClickPreviousPage: PropTypes.func,
   onClickNextPage: PropTypes.func,
-  lightboxUrlList: PropTypes.array
+  lightboxUrlList: PropTypes.array,
+  onTogglePreviewVideo: PropTypes.func
 
 }
 
@@ -195,10 +208,12 @@ PreviewComponent.defaultProps = {
   fileCurrentPage: 0,
   isJpegAvailable: false,
   isPdfAvailable: true,
+  isVideo: false,
   previewUrl: '',
   downloadPdfPageUrl: '',
   color: '',
-  onClickPreviousPage: () => {},
-  onClickNextPage: () => {},
-  lightboxUrlList: []
+  onClickPreviousPage: () => { },
+  onClickNextPage: () => { },
+  lightboxUrlList: [],
+  onTogglePreviewVideo: () => { }
 }
