@@ -28,12 +28,13 @@ export class CollaborativeEditionFrame extends React.Component {
       formId: props.formId ? props.formId : FORM_ID,
       iframeId: props.frameId ? props.frameId : IFRAME_ID,
       iframeStyle: {
-        width: '100%',
+        width: 'calc(100% - 60px)',
         height: '100%',
         left: 0,
         position: 'fixed',
-        zIndex: 25,
+        zIndex: 9, // INFO - GB - 2022-08-09 - z-index 9 is just below the sidebar
         border: 'none',
+        marginInlineStart: '60px',
         ...props.iframeStyle
       },
       accessToken: '',

@@ -69,6 +69,7 @@ borderWhenActive= 5px
         overflow hidden
         text-overflow ellipsis
         unicode-bidi plaintext
+        flex 1
       & > span
         display flex
         align-items center
@@ -91,7 +92,7 @@ borderWhenActive= 5px
     &__dragNdrop
       margin-inline-start textSpacing
     &__menu
-      &__logout > *
+      &__element *
         color fontColor
       &.dropdownMenuButton
         & i
@@ -117,6 +118,8 @@ borderWhenActive= 5px
       height 100%
       & > span
         padding-inline-start standardSpacing
+        display flex
+        align-items center
       &__create
         padding-inline-start standardSpacing
         padding-inline-end standardSpacing
@@ -228,17 +231,6 @@ borderWhenActive= 5px
   color greenToDo
 .sidebar__favorites__item i
   color #ffeb3b
-.sidebar__spaces__item i
-  color #ad3bdb
-.sidebar__users__item i
-  color #946645
-.sidebar__account__item i
-  color #00bcd4
-.sidebar__logout__item i
-  color errorRed
-
-body.tox-fullscreen .sidebar
-  display none
 
 @media (max-width: max-xs) and (max-width: max-lg)
   .siebarpagecontainer
