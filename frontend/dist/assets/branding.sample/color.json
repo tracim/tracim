@@ -1,6 +1,7 @@
 {
   "primary": "#2f7d30",
-  "sidebar": "#333",
+  "sidebar": "#f0f0f0",
+  "sidebar/font": "#252525",
   "contents/html-document": "#00CC00",
   "contents/thread": "#428BCA",
   "contents/file": "#ffa500",

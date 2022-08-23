@@ -77,11 +77,13 @@
 
       <%
         sidebar = colors["sidebar"]
+        sidebarFont = colors["sidebar/font"]
       %>
       :root {
-          --sidebarColor: ${sidebar.web};
-          --sidebarColorDarken: ${sidebar.darken.web};
-          --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarColor: ${sidebar.web};
+        --sidebarColorDarken: ${sidebar.darken.web};
+        --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarFontColor: ${sidebarFont.web};
       }
     </style>
 
