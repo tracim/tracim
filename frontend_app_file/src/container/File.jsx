@@ -1167,7 +1167,7 @@ export class File extends React.Component {
           1080
         )
       )
-    const isVideo= isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)
+    const isVideo = isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)
 
     return (
       <PopinFixed
