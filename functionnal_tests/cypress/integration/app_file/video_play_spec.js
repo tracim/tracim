@@ -4,6 +4,9 @@ const fileTitle = 'FileTitle'
 const fullFilename = 'video.mp4'
 const contentType = 'video/mp4'
 
+const pageWidth = Cypress.config().viewportWidth
+const pageHeight = Cypress.config().viewportHeight
+
 let workspaceId, contentId
 
 describe('Paly a video file', () => {
@@ -29,7 +32,7 @@ describe('Paly a video file', () => {
     cy.cancelXHR()
   })
 
-  it('should display the full video in fullscreen', () => {
+  it('should display the video', () => {
     cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
     cy.get('[data-cy=dropdownContentButton]').click()
     cy.get('[data-cy=popinListItem__playVideo').click()
@@ -41,5 +44,19 @@ describe('Paly a video file', () => {
     cy.get('[data-cy=dropdownContentButton]').click()
     cy.get('[data-cy=popinListItem__playVideo').click()
     cy.get('#videoWrapperDiv .file__previewVideo__error').should('be.visible')
+  })
+
+  it('should display the full video in fullscreen', () => {
+    cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle)
+    cy.get('[data-cy=dropdownContentButton]').click()
+    cy.get('[data-cy=popinListItem__playVideo').click()
+    cy.get('#videoWrapperDiv > video')
+      .should('be.visible')
+      .invoke('outerWidth')
+      .should('be.lte', pageWidth)
+    cy.get('#videoWrapperDiv > video')
+      .should('be.visible')
+      .invoke('height')
+      .should('be.lte', pageHeight)
   })
 })
