@@ -268,8 +268,8 @@ export class Timeline extends React.Component {
         {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && props.showParticipateButton && (
           <Link
             style={{
-              '--primaryColor': props.customColor,
-              '--primaryDarkColor': darkenColor(props.customColor)
+              '--appTypeColor': props.customColor,
+              '--appTypeDarkColor': darkenColor(props.customColor)
             }}
             className='timeline__participate'
             to={PAGE.CONTENT(props.contentId)}

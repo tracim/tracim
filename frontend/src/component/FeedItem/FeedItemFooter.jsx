@@ -103,5 +103,6 @@ FeedItemFooter.propTypes = {
 
 FeedItemFooter.defaultProps = {
   discussionToggleButtonLabelMobile: '',
-  isCommentListEmpty: true
+  isCommentListEmpty: true,
+  onClickToggleCommentList: () => { }
 }
