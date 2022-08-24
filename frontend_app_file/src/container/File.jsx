@@ -1281,7 +1281,7 @@ export class File extends React.Component {
           <FileComponent
             editionAuthor={state.editionAuthor}
             isRefreshNeeded={state.showRefreshWarning}
-            isVideo={isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)}
+            isVideo={isVideo}
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}

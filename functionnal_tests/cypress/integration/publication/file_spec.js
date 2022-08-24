@@ -28,6 +28,7 @@ describe('Publications', () => {
           params: { workspaceId: workspace.workspace_id },
           waitForTlm: true
         })
+        cy.get('.emptyListMessage__text').should('be.visible')
         cy.get(addFileButton).click()
         cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
         cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
@@ -66,6 +67,7 @@ describe('Publications', () => {
           params: { workspaceId: workspace.workspace_id },
           waitForTlm: true
         })
+        cy.get('.emptyListMessage__text').should('be.visible')
         cy.get(addFileButton).click()
         cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
         cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
@@ -116,6 +118,7 @@ describe('Publications', () => {
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
+      cy.get('.emptyListMessage__text').should('be.visible')
       cy.get(addFileButton).click()
       cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
