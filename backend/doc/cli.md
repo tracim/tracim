@@ -12,7 +12,7 @@ and active the Tracim virtualenv:
     user@host:~/tracim_backend$ source env/bin/activate
     (env) user@host:~/tracim_backend$
 
-There are two way to use tracimcli, you can either type direct command:
+There are two ways to use tracimcli, you can either type direct command:
 
 ```shell
 tracimcli help
