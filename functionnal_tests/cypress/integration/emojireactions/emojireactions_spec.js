@@ -131,7 +131,7 @@ describe('Reactions', function () {
       cy.logout()
       cy.loginAs('users')
       cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
-      cy.contains('[data-cy=menuprofile__sidebar]', 'John Doe')
+      cy.contains('.sidebar__title__button', 'John Doe')
 
       cy.contains(`${container} ${emojiValueClassName}`, '😀')
       cy.contains(`${container} ${emojiCounterClassName}`, '1')

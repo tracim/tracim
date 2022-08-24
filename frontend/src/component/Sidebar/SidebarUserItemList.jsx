@@ -44,7 +44,7 @@ const SidebarUserItemList = (props) => {
             <SidebarItem
               customClass='sidebar__agendas__item'
               to={PAGE.AGENDA}
-              label={props.t('Mes gendas')}
+              label={props.t('My agendas')}
               icon='fas fa-calendar-alt'
               isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
             />

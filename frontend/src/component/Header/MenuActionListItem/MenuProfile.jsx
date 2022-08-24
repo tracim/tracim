@@ -31,12 +31,12 @@ export const MenuProfile = props => {
               size={AVATAR_SIZE.SMALL}
               user={props.user}
               apiUrl={FETCH_CONFIG.apiUrl}
-              key='menuprofile__sidebar__avatar'
+              key='sidebar__profile__item__avatar'
             />
           </button>
         ) : (
           <button
-            className='sidebar__item transparentButton btn sidebar__title__spaces'
+            className='sidebar__item transparentButton btn sidebar__title__button'
             onClick={props.onClickToggleUserItems}
             title={props.showUserItems ? props.t('Hide user menu') : props.t('Show user menu')}
           >
@@ -46,7 +46,7 @@ export const MenuProfile = props => {
                 size={AVATAR_SIZE.SMALL}
                 user={props.user}
                 apiUrl={FETCH_CONFIG.apiUrl}
-                key='menuprofile__sidebar__avatar'
+                key='sidebar__profile__item__avatar'
               />
               &nbsp;{props.user.publicName}
             </span>
@@ -60,7 +60,7 @@ export const MenuProfile = props => {
         itemCustomClass='sidebar__item__menu__element'
       >
         <Link
-          data-cy='menuprofile__sidebar'
+          data-cy='sidebar__profile__item'
           key='sidebar__profile__item'
           to={PAGE.PUBLIC_PROFILE(props.user.userId)}
         >
@@ -69,7 +69,7 @@ export const MenuProfile = props => {
         </Link>
 
         <Link
-          data-cy='sidebar__account__settings'
+          data-cy='sidebar__account__item'
           key='sidebar__account__item'
           to={PAGE.ACCOUNT}
         >
@@ -85,7 +85,11 @@ export const MenuProfile = props => {
         )}
 
         {props.isUserAdministrator && (
-          <Link to={PAGE.ADMIN.USER} key='sidebar__users__item'>
+          <Link
+            data-cy='sidebar__users__item'
+            key='sidebar__users__item'
+            to={PAGE.ADMIN.USER}
+          >
             <i className='fa-fw fas fa-user-cog' />
             {props.t('User account management')}
           </Link>
@@ -93,8 +97,8 @@ export const MenuProfile = props => {
 
         <IconButton
           customClass='sidebar__item__menu__logout'
-          key='sidebar__logout'
-          dataCy='sidebar__logout'
+          key='sidebar__logout__item'
+          dataCy='sidebar__logout__item'
           icon='fas fa-sign-out-alt'
           intent='link'
           onClick={props.onClickLogout}
