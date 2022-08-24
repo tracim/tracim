@@ -86,10 +86,8 @@ export class PreviewComponent extends React.Component {
     const { props, state } = this
     if (props.isVideo) {
       this.props.onTogglePreviewVideo()
-    } else {
-      if (state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable) {
-        this.handleClickShowImageRaw()
-      }
+    } else if (state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable) {
+      this.handleClickShowImageRaw()
     }
   }
 

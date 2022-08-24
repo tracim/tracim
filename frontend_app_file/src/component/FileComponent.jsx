@@ -35,7 +35,7 @@ export class FileComponent extends React.Component {
     const videoWrapper = document.createElement('div')
     videoWrapper.id = 'videoWrapperDiv'
     videoWrapper.className = 'file__previewVideo open'
-    videoWrapper.onclick = () => this.props.onTogglePreviewVideo()
+    videoWrapper.onclick = this.props.onTogglePreviewVideo
 
     videoWrapper.appendChild(video)
 
