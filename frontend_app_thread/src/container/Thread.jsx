@@ -121,6 +121,10 @@ export class Thread extends React.Component {
     )
   }
 
+  handleCommentChanged = (data) => {
+    this.props.markAsModified(data.fields.content.content_id)
+  }
+
   handleContentChanged = data => {
     const { state } = this
     if (data.fields.content.content_id !== state.content.content_id) return
@@ -157,6 +161,8 @@ export class Thread extends React.Component {
 
     if (!prevState.content || !state.content) return
 
+    // INFO - MP - 24-08-2022 - We update the timeline when there is a new content added to the
+    // thread or a content removed from the thread
     if (prevState.content.content_id !== state.content.content_id) {
       this.updateTimelineAndContent()
     }

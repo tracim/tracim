@@ -168,7 +168,8 @@ export class Timeline extends React.Component {
                     workspaceId={Number(props.workspaceId)}
                     author={content.author}
                     loggedUser={props.loggedUser}
-                    created={content.created_raw || content.created}
+                    createdDate={content.created_raw || content.created}
+                    modifiedDate={content.modified}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}

@@ -954,6 +954,17 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
+    markAsModified = (content_id) => {
+      this.setState(prev => ({
+        timeline: prev.timeline.map(
+          item => item.content_id === content_id ? { ...item, modified: true } : item
+        ),
+        wholeTimeline: prev.wholeTimeline.map(
+          item => item.content_id === content_id ? { ...item, modified: true } : item
+        )
+      }))
+    }
+
     searchForMentionOrLinkInQuery = async (query, workspaceId) => {
       function matchingContentIdsFirst (contentA, contentB) {
         const aContentId = contentA.content_id.toString()
@@ -1144,6 +1155,7 @@ export function appContentFactory (WrappedComponent) {
           timeline={this.state.timeline}
           loadTimeline={this.loadTimeline}
           loadMoreTimelineItems={this.loadMoreTimelineItems}
+          markAsModified={this.markAsModified}
           resetTimeline={this.resetTimeline}
           canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
           isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}

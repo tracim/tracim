@@ -356,7 +356,7 @@ export class FeedItemWithPreview extends React.Component {
                   workspaceId={Number(props.workspaceId)}
                   author={commentToShow.author}
                   loggedUser={loggedUser}
-                  created={commentToShow.created_raw || commentToShow.createdRaw || commentToShow.created}
+                  createdDate={commentToShow.created_raw || commentToShow.createdRaw || commentToShow.created}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent

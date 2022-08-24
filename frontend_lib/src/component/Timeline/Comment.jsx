@@ -36,13 +36,13 @@ const Comment = (props) => {
   }
 
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
-  const createdFormated = readableDateFormat(props.created, props.loggedUser.lang)
-  const createdDistance = displayDistanceDate(props.created, props.loggedUser.lang)
-  const isModified = props.apiContent.modified !== props.created
+  const readableCreatedDate = readableDateFormat(props.createdDate, props.loggedUser.lang)
+  const createdDistance = displayDistanceDate(props.createdDate, props.loggedUser.lang)
+  const isModified = props.modifiedDate ? props.modifiedDate !== props.createdDate : false
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
   const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
-  const modifiedDate = isModified ? readableDateFormat(props.apiContent.modified, props.loggedUser.lang) : null
+  const readableModifiedDate = isModified ? readableDateFormat(props.modifiedDate, props.loggedUser.lang) : null
 
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
@@ -83,7 +83,7 @@ const Comment = (props) => {
                     </span>
                     <Popover
                       targetId={`createdDistance_${props.apiContent.content_id}`}
-                      popoverBody={createdFormated}
+                      popoverBody={readableCreatedDate}
                     />
                     {isModified && (
                       // Doesn't displayed by TLM; require a refresh to be displayed
@@ -91,7 +91,7 @@ const Comment = (props) => {
                          - <span id={`modifiedDate_${props.apiContent.content_id}`}>{props.t('modified')}</span>
                         <Popover
                           targetId={`modifiedDate_${props.apiContent.content_id}`}
-                          popoverBody={modifiedDate}
+                          popoverBody={readableModifiedDate}
                         />
                       </>
                     )}
@@ -213,38 +213,41 @@ const Comment = (props) => {
 export default translate()(Comment)
 
 Comment.propTypes = {
+  apiContent: PropTypes.object.isRequired,
   author: PropTypes.object.isRequired,
+  contentId: PropTypes.number.isRequired,
+  discussionToggleButtonLabel: PropTypes.string.isRequired,
   isPublication: PropTypes.bool.isRequired,
   loggedUser: PropTypes.object.isRequired,
-  contentId: PropTypes.number.isRequired,
-  apiContent: PropTypes.object.isRequired,
-  workspaceId: PropTypes.number.isRequired,
-  customClass: PropTypes.string,
-  text: PropTypes.string,
-  created: PropTypes.string.isRequired,
-  fromMe: PropTypes.bool,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
-  onClickEditComment: PropTypes.func,
-  onClickDeleteComment: PropTypes.func,
-  onClickOpenFileComment: PropTypes.func,
-  onClickTranslate: PropTypes.func.isRequired,
-  onClickRestore: PropTypes.func.isRequired,
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  workspaceId: PropTypes.number.isRequired,
+  customClass: PropTypes.string,
+  createdDate: PropTypes.string,
+  fromMe: PropTypes.bool,
+  modifiedDate: PropTypes.string,
+  onClickEditComment: PropTypes.func,
+  onClickDeleteComment: PropTypes.func,
+  onClickOpenFileComment: PropTypes.func,
+  onClickRestore: PropTypes.func.isRequired,
   onClickToggleCommentList: PropTypes.func,
-  discussionToggleButtonLabel: PropTypes.string.isRequired,
-  threadLength: PropTypes.number
+  onClickTranslate: PropTypes.func.isRequired,
+  text: PropTypes.string,
+  threadLength: PropTypes.number,
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }
 
 Comment.defaultProps = {
-  customClass: '',
-  text: '',
-  fromMe: false,
-  translationState: TRANSLATION_STATE.DISABLED,
   discussionToggleButtonLabel: 'Comment',
-  threadLength: 0,
+  fromMe: false,
+  createdDate: '',
+  customClass: '',
+  modifiedDate: '',
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
-  onClickDeleteComment: () => {}
+  onClickDeleteComment: () => {},
+  text: '',
+  threadLength: 0,
+  translationState: TRANSLATION_STATE.DISABLED
 }
