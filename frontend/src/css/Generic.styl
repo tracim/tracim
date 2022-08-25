@@ -40,6 +40,8 @@ a
 
 div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
   z-index 1050
+  margin-inline-start closedSidebarWidth
+  width "calc(100% - %s)" % closedSidebarWidth !important // INFO - GB - 2022-08-23 - override TinyMCE calculated width
 
 // NOTE - RJ - 2022-02-14 - remove some borders on TinyMCE toolbars
 .tox-toolbar

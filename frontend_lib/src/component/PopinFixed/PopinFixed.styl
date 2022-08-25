@@ -10,7 +10,7 @@
   background-color lightGrey
   height 100%
   position fixed
-  width calc(100% - 60px)
+  width "calc(100% - %s)" % closedSidebarWidth
   z-index 9
   &.sidebarVisible
     max-width "calc(100% - %s)" % sidebarWidth

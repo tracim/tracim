@@ -141,6 +141,8 @@ export class Sidebar extends React.Component {
 
   handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
 
+  handleClickOpenUserItems = () => this.setState({ showUserItems: true })
+
   handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
 
   handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
@@ -196,18 +198,6 @@ export class Sidebar extends React.Component {
           />
         </div>
 
-        <SidebarUserItemList
-          isSidebarClosed={state.isSidebarClosed}
-          isNotificationWallOpen={props.isNotificationWallOpen}
-          user={props.user}
-          onClickLogout={this.handleClickLogout}
-          location={props.location}
-          showUserItems={state.showUserItems}
-          onClickToggleUserItems={this.handleClickToggleUserItems}
-          isToDoEnabled={isToDoEnabled}
-          isUserAdministrator={isUserAdministrator}
-        />
-
         <SidebarItem
           customClass='sidebar__activities__item'
           to={PAGE.RECENT_ACTIVITIES}
@@ -226,15 +216,20 @@ export class Sidebar extends React.Component {
           isCurrentItem={props.isNotificationWallOpen}
         />
 
-        {isAgendaEnabled && (
-          <SidebarItem
-            customClass='sidebar__agendas__item'
-            to={PAGE.AGENDA}
-            label={props.t('Agendas')}
-            icon='fas fa-calendar-alt'
-            isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
-          />
-        )}
+        <SidebarUserItemList
+          isAgendaEnabled={isAgendaEnabled}
+          isNotificationWallOpen={props.isNotificationWallOpen}
+          isSidebarClosed={state.isSidebarClosed}
+          isToDoEnabled={isToDoEnabled}
+          isUserAdministrator={isUserAdministrator}
+          location={props.location}
+          onClickLogout={this.handleClickLogout}
+          onClickOpenUserItems={this.handleClickOpenUserItems}
+          onClickToggleSidebar={this.handleClickToggleSidebar}
+          onClickToggleUserItems={this.handleClickToggleUserItems}
+          showUserItems={state.showUserItems}
+          user={props.user}
+        />
 
         <SidebarSpaceList
           accessibleWorkspaceList={props.accessibleWorkspaceList}

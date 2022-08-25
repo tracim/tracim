@@ -9,7 +9,7 @@ describe('navigation :: admin > workspace', function () {
     cy.visit('/ui')
   })
   it('', function () {
-    cy.get('.sidebar__title .sidebar__item__foldChildren').click()
+    cy.get('.sidebar__item__menu').click()
     cy.get('a[href="/ui/admin/workspace"]').click()
     cy.url().should('include', '/ui/admin/workspace')
     cy.get('.adminWorkspace__description').should('be.visible')

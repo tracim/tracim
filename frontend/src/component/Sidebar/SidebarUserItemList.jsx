@@ -10,10 +10,14 @@ const SidebarUserItemList = (props) => {
     <>
       <MenuProfile
         isCurrentItem={props.location.pathname === PAGE.PUBLIC_PROFILE(props.user.userId) && !props.isNotificationWallOpen}
+        isSidebarClosed={props.isSidebarClosed}
+        isUserAdministrator={props.isUserAdministrator}
+        onClickLogout={props.onClickLogout}
+        onClickOpenUserItems={props.onClickOpenUserItems}
+        onClickToggleSidebar={props.onClickToggleSidebar}
         onClickToggleUserItems={props.onClickToggleUserItems}
         showUserItems={props.showUserItems}
         user={props.user}
-        onClickLogout={props.onClickLogout}
       />
 
       {(props.showUserItems || props.isSidebarClosed) && (
@@ -36,35 +40,15 @@ const SidebarUserItemList = (props) => {
             isCurrentItem={props.location.pathname === PAGE.FAVORITES && !props.isNotificationWallOpen}
           />
 
-          {props.isUserAdministrator && (
+          {props.isAgendaEnabled && (
             <SidebarItem
-              customClass='sidebar__spaces__item'
-              to={PAGE.ADMIN.WORKSPACE}
-              label={props.t('Space management')}
-              icon='fas fa-users-cog'
-              isCurrentItem={props.location.pathname === PAGE.ADMIN.WORKSPACE && !props.isNotificationWallOpen}
+              customClass='sidebar__agendas__item'
+              to={PAGE.AGENDA}
+              label={props.t('My agendas')}
+              icon='fas fa-calendar-alt'
+              isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
             />
           )}
-
-          {props.isUserAdministrator && (
-            <SidebarItem
-              customClass='sidebar__users__item'
-              to={PAGE.ADMIN.USER}
-              label={props.t('User account management')}
-              icon='fas fa-user-cog'
-              isCurrentItem={props.location.pathname === PAGE.ADMIN.USER && !props.isNotificationWallOpen}
-              dataCy='sidebar__admin__user'
-            />
-          )}
-
-          <SidebarItem
-            customClass='sidebar__account__item'
-            to={PAGE.ACCOUNT}
-            label={props.t('Account Settings')}
-            icon='fas fa-cogs'
-            isCurrentItem={props.location.pathname === PAGE.ACCOUNT && !props.isNotificationWallOpen}
-            dataCy='sidebar__account__settings'
-          />
         </>
       )}
     </>
@@ -81,6 +65,8 @@ SidebarUserItemList.propTypes = {
   isToDoEnabled: PropTypes.bool,
   isUserAdministrator: PropTypes.bool,
   onClickLogout: PropTypes.func,
+  onClickOpenUserItems: PropTypes.func,
+  onClickToggleSidebar: PropTypes.func,
   onClickToggleUserItems: PropTypes.func,
   showUserItems: PropTypes.bool
 }
@@ -92,6 +78,8 @@ SidebarUserItemList.defaultProps = {
   isToDoEnabled: false,
   isUserAdministrator: false,
   onClickLogout: () => { },
+  onClickOpenUserItems: () => { },
+  onClickToggleSidebar: () => { },
   onClickToggleUserItems: () => { },
   showUserItems: true
 }
