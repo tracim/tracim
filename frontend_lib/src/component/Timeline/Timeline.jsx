@@ -2,11 +2,19 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Radium from 'radium'
+import i18n from '../../i18n.js'
+import { Link } from 'react-router-dom'
+import { translate } from 'react-i18next'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
-import { translate } from 'react-i18next'
-import i18n from '../../i18n.js'
-import { ROLE, formatAbsoluteDate, displayDistanceDate, TIMELINE_TYPE } from '../../helper.js'
+import {
+  darkenColor,
+  displayDistanceDate,
+  formatAbsoluteDate,
+  PAGE,
+  ROLE,
+  TIMELINE_TYPE
+} from '../../helper.js'
 import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
@@ -229,7 +237,7 @@ export class Timeline extends React.Component {
           />
         )}
 
-        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
@@ -255,6 +263,20 @@ export class Timeline extends React.Component {
               isFileCommentLoading={props.isFileCommentLoading}
             />
           </div>
+        )}
+
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && props.showParticipateButton && (
+          <Link
+            style={{
+              '--appTypeColor': props.customColor,
+              '--appTypeDarkColor': darkenColor(props.customColor)
+            }}
+            className='timeline__participate'
+            to={PAGE.CONTENT(props.contentId)}
+          >
+            <i className='fa-fw fas fa-bullhorn' />
+            {props.t('Participate')}
+          </Link>
         )}
       </div>
     )
@@ -304,7 +326,8 @@ Timeline.propTypes = {
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   wysiwygIdSelector: PropTypes.string,
-  isFileCommentLoading: PropTypes.bool
+  isFileCommentLoading: PropTypes.bool,
+  showParticipateButton: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -342,5 +365,6 @@ Timeline.defaultProps = {
   contentId: 0,
   contentType: '',
   wysiwygIdSelector: '',
-  isFileCommentLoading: false
+  isFileCommentLoading: false,
+  showParticipateButton: false
 }

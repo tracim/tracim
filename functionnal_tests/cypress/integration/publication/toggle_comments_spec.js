@@ -21,10 +21,13 @@ describe('Publications page', () => {
   it("should change button's label according to its state", () => {
     cy.get('#wysiwygTimelineCommentPublication').type(text)
     cy.contains(publishButton, 'Publier').click()
+    cy.contains('[data-cy=comment__body__content__text]', text)
     cy.contains('.buttonComments', 'Commenter').should('be.visible').click()
-    cy.get('#wysiwygTimelineComment1').type(text)
-    cy.contains('.feedItem__timeline__texteditor__submit__btn', 'Envoyer').should('be.visible').click()
-    cy.contains('.buttonComments', 'Masquer la discussion').should('be.visible').click()
-    cy.contains('.buttonComments', 'Afficher la discussion (1)').should('be.visible').click()
+    cy.get('#wysiwygTimelineComment1').type(text).then(() => {
+      cy.contains('.feedItem__timeline__texteditor__submit__btn', 'Envoyer').should('be.visible').click()
+      cy.contains('.feedItem__timeline__comment__body__content .feedItem__timeline__comment__body__content__text', text)
+      cy.contains('.buttonComments', 'Masquer la discussion').should('be.visible').click()
+      cy.contains('.buttonComments', 'Afficher la discussion (1)').should('be.visible').click()
+    })
   })
 })

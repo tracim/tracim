@@ -177,7 +177,7 @@ const Comment = props => {
             workspaceId={props.workspaceId}
           />
 
-          {props.isPublication && props.showTimeline && (
+          {props.isPublication && props.showCommentList && (
             <IconButton
               text={props.discussionToggleButtonLabel}
               textMobile={props.threadLength > 0 ? props.threadLength.toString() : ''}
@@ -202,6 +202,7 @@ Comment.propTypes = {
   apiContent: PropTypes.object.isRequired,
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
+  customColor: PropTypes.string,
   text: PropTypes.string,
   created: PropTypes.string.isRequired,
   fromMe: PropTypes.bool,
@@ -221,6 +222,7 @@ Comment.propTypes = {
 
 Comment.defaultProps = {
   customClass: '',
+  customColor: 'transparent',
   text: '',
   fromMe: false,
   translationState: TRANSLATION_STATE.DISABLED,
