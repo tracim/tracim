@@ -992,7 +992,7 @@ class WorkspaceController(Controller):
         )
         configurator.add_view(self.set_content_template, route_name="set_content_template")
 
-        # Get every templates
+        # Get every template
         configurator.add_route(
             "get_templates", "/users/{user_id}/template_contents", request_method="GET"
         )

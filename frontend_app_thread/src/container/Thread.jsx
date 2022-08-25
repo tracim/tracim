@@ -49,7 +49,6 @@ export class Thread extends React.Component {
       isVisible: true,
       config: param.config,
       content: param.content,
-      customTimeline: [],
       loggedUser: param.loggedUser,
       loading: false,
       newContent: {},
@@ -122,7 +121,7 @@ export class Thread extends React.Component {
   }
 
   handleCommentChanged = (data) => {
-    this.props.markAsModified(data.fields.content.content_id)
+    this.props.updateModified(data.fields.content.content_id, data.fields.content.modified)
   }
 
   handleContentChanged = data => {

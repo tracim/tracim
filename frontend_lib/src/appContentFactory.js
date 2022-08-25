@@ -954,13 +954,13 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    markAsModified = (content_id) => {
+    updateModified = (contentId, modifiedDate) => {
       this.setState(prev => ({
         timeline: prev.timeline.map(
-          item => item.content_id === content_id ? { ...item, modified: true } : item
+          item => item.content_id === contentId ? { ...item, modified: modifiedDate } : item
         ),
         wholeTimeline: prev.wholeTimeline.map(
-          item => item.content_id === content_id ? { ...item, modified: true } : item
+          item => item.content_id === contentId ? { ...item, modified: modifiedDate } : item
         )
       }))
     }
@@ -1155,7 +1155,7 @@ export function appContentFactory (WrappedComponent) {
           timeline={this.state.timeline}
           loadTimeline={this.loadTimeline}
           loadMoreTimelineItems={this.loadMoreTimelineItems}
-          markAsModified={this.markAsModified}
+          updateModified={this.updateModified}
           resetTimeline={this.resetTimeline}
           canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
           isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}

@@ -36,13 +36,13 @@ const Comment = (props) => {
   }
 
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
-  const readableCreatedDate = readableDateFormat(props.createdDate, props.loggedUser.lang)
-  const createdDistance = displayDistanceDate(props.createdDate, props.loggedUser.lang)
-  const isModified = props.modifiedDate ? props.modifiedDate !== props.createdDate : false
+  const readableCreationDate = readableDateFormat(props.creationDate, props.loggedUser.lang)
+  const createdDistance = displayDistanceDate(props.creationDate, props.loggedUser.lang)
+  const isModified = props.modificationDate ? props.modificationDate !== props.creationDate : false
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
   const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
-  const readableModifiedDate = isModified ? readableDateFormat(props.modifiedDate, props.loggedUser.lang) : null
+  const readableModificationDate = isModified ? readableDateFormat(props.modificationDate, props.loggedUser.lang) : null
 
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
@@ -83,15 +83,14 @@ const Comment = (props) => {
                     </span>
                     <Popover
                       targetId={`createdDistance_${props.apiContent.content_id}`}
-                      popoverBody={readableCreatedDate}
+                      popoverBody={readableCreationDate}
                     />
                     {isModified && (
-                      // Doesn't displayed by TLM; require a refresh to be displayed
                       <>
-                         - <span id={`modifiedDate_${props.apiContent.content_id}`}>{props.t('modified')}</span>
+                         - <span id={`modificationDate_${props.apiContent.content_id}`}>{props.t('modified')}</span>
                         <Popover
-                          targetId={`modifiedDate_${props.apiContent.content_id}`}
-                          popoverBody={readableModifiedDate}
+                          targetId={`modificationDate_${props.apiContent.content_id}`}
+                          popoverBody={readableModificationDate}
                         />
                       </>
                     )}
@@ -224,9 +223,9 @@ Comment.propTypes = {
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
   customClass: PropTypes.string,
-  createdDate: PropTypes.string,
+  creationDate: PropTypes.string,
   fromMe: PropTypes.bool,
-  modifiedDate: PropTypes.string,
+  modificationDate: PropTypes.string,
   onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
@@ -241,9 +240,9 @@ Comment.propTypes = {
 Comment.defaultProps = {
   discussionToggleButtonLabel: 'Comment',
   fromMe: false,
-  createdDate: '',
+  creationDate: '',
   customClass: '',
-  modifiedDate: '',
+  modificationDate: '',
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
   onClickDeleteComment: () => {},

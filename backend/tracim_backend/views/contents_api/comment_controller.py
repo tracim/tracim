@@ -102,7 +102,7 @@ class CommentController(Controller):
     @hapic.output_body(CommentsPageSchema())
     def content_comments(self, context, request: TracimRequest, hapic_data=None):
         """
-        Get every comments related to a content in asc order (first is the oldest)
+        Get every comment related to a content in asc order (first is the oldest)
         """
 
         app_config = request.registry.settings["CFG"]  # type: CFG
