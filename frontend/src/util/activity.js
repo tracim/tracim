@@ -1,4 +1,5 @@
 import {
+  CONTENT_TYPE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
@@ -60,7 +61,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   else if (content.assignee) parentContentType = content.parent.content_type
   else if (content.parent_id) {
     const parentType = await getParentType(content.parent_id, apiUrl)
-    if (parentType !== 'folder') parentContentType = parentType
+    if (parentType !== CONTENT_TYPE.FOLDER) parentContentType = parentType
   }
 
   let fetchGetWorkspaceContent
@@ -127,7 +128,7 @@ const getActivityParams = async (message, apiUrl) => {
       else if (subEntityType === TLM_ST.TODO) id = message.fields.content.parent.content_id
       else if (message.fields.content.parent_id) {
         const parentType = await getParentType(message.fields.content.parent_id, apiUrl)
-        if (parentType === 'folder') id = message.fields.content.content_id
+        if (parentType === CONTENT_TYPE.FOLDER) id = message.fields.content.content_id
         else id = message.fields.content.parent_id
       } else id = message.fields.content.content_id
 
