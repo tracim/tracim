@@ -16,7 +16,7 @@ cardWidth = 280px
       height "calc(100% - %s)" % (headerHeight + 28px)
       &.fullscreen
         position fixed
-        width 100%
+        width "calc(100% - %s)" % closedSidebarWidth
         height 100%
         // INFO - GB - 2022-08-09 - .kanban.fullscreen has z-index 2 to be above TinyMCE (.tox .tox-editor-header)
         // In case advanced edition is enabled at the moment the user goes into fullscreen mode.
