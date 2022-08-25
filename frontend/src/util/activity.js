@@ -64,27 +64,17 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
     if (parentType !== CONTENT_TYPE.FOLDER) parentContentType = parentType
   }
 
-  let fetchGetWorkspaceContent
-  if (parentContentType) {
-    // INFO - SG - 2021-04-16
-    // We have to get the parent content as comments shall produce an activity
-    // for it and not for the comment.
-    const parentId = content.parent_id || content.parent.content_id
-    if (!(parentContentType && parentId)) return null
-    fetchGetWorkspaceContent = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      parentContentType,
-      parentId
-    ))
-  } else {
-    fetchGetWorkspaceContent = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      content.content_type,
-      content.content_id
-    ))
-  }
+  const parentId = content.parent_id || content.parent.content_id
+
+  // INFO - SG - 2021-04-16
+  // We have to get the parent content as comments shall produce an activity
+  // for it and not for the comment.
+  const fetchGetWorkspaceContent = await handleFetchResult(await getWorkspaceContent(
+    apiUrl,
+    newestMessage.fields.workspace.workspace_id,
+    parentContentType || content.content_type,
+    parentContentType ? parentId : content.content_id
+  ))
 
   if (!fetchGetWorkspaceContent.apiResponse.ok) return null
   content = { ...content, ...fetchGetWorkspaceContent.body }
