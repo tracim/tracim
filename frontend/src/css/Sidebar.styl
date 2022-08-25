@@ -11,6 +11,7 @@ borderWhenActive= 5px
   display flex
   flex-direction column
   height 100vh
+  overflow-x auto
   &__header
     height headerHeight
     min-height headerHeight
@@ -55,7 +56,8 @@ borderWhenActive= 5px
       &.sidebar__item__space
         padding-inline-start 0
       & .sidebar__item__space__type
-        color rgb(182, 22, 22) // update
+        // INFO - G.B. - The color below should be coherent with SPACE_TYPE.confidential.hexcolor at frontend_lib/src/helper.js
+        color #B61616
       &.sidebar__search
         padding-inline-start textSpacing
     &__name
@@ -67,7 +69,6 @@ borderWhenActive= 5px
         overflow hidden
         text-overflow ellipsis
         unicode-bidi plaintext
-        flex 1
       & > span
         display flex
         align-items center
@@ -78,6 +79,8 @@ borderWhenActive= 5px
       &__type
         padding-inline-start textSpacing
         color grey
+        flex 1
+        text-align end
       & > *
         color var(--sidebarFontColor)
       &:hover
@@ -115,6 +118,8 @@ borderWhenActive= 5px
       align-items center
       flex 1
       height 100%
+      & > i:hover
+        color sidebarFontColorHover
       & > span
         padding-inline-start standardSpacing
         display flex
@@ -220,16 +225,14 @@ borderWhenActive= 5px
 // INFO - GB - 2022-07-26 - Icon colors
 .sidebar__search__item i
   color grey
-.sidebar__notification__item i
-  color lightBlue
 .sidebar__activities__item i
   color #17B4D4
+.sidebar__notification__item i
+  color lightBlue
 .sidebar__tasks__item i
   color #7DA944
 .sidebar__favorites__item i
   color #F2CA53
-.sidebar__agendas__item i
-  color #07549D // update
 
 @media (max-width: max-xs) and (max-width: max-lg)
   .siebarpagecontainer

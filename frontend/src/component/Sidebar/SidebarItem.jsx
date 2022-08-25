@@ -27,6 +27,7 @@ const SidebarItem = (props) => {
             <Icon
               icon={props.icon}
               title={props.label}
+              color={props.customColor}
             />
             <span>&nbsp;{props.label}</span>
           </div>
@@ -49,6 +50,7 @@ const SidebarItem = (props) => {
             <Icon
               icon={props.icon}
               title={props.label}
+              color={props.customColor}
             />
             <span>&nbsp;{props.label}</span>
             {props.unreadMentionCount > 0 && (
@@ -69,6 +71,7 @@ export default withRouter(SidebarItem)
 SidebarItem.propTypes = {
   icon: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
+  customColor: PropTypes.string,
   customClass: PropTypes.string,
   dataCy: PropTypes.string,
   isCurrentItem: PropTypes.bool,
@@ -80,6 +83,7 @@ SidebarItem.propTypes = {
 }
 
 SidebarItem.defaultProps = {
+  customColor: '',
   customClass: '',
   dataCy: '',
   onClickItem: () => { },

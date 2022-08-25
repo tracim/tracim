@@ -32,7 +32,7 @@ export const sidebarEntryList = [
   }, {
     slug: 'agenda',
     route: '/ui/workspaces/6/agenda',
-    hexcolor: '#07549D',
+    hexcolor: '#0b166a',
     fa_icon: 'fas fa-calendar-alt',
     label: 'Agenda'
   }, {
