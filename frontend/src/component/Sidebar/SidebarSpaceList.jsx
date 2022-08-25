@@ -66,7 +66,7 @@ const SidebarSpaceList = (props) => {
     <>
       <div className='sidebar__item sidebar__title'>
         <button
-          className='transparentButton btn sidebar__title__spaces'
+          className='transparentButton btn sidebar__title__button'
           title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           onClick={handleClickTitle}
         >
@@ -78,7 +78,7 @@ const SidebarSpaceList = (props) => {
         </button>
         {props.accessibleWorkspaceList.length > 0 && (
           <IconButton
-            customClass='sidebar__title__spaces__join'
+            customClass='sidebar__title__button__join'
             onClick={props.onClickJoinWorkspace}
             dataCy='sidebarJoinSpaceBtn'
             icon='fas fa-users'
@@ -90,7 +90,7 @@ const SidebarSpaceList = (props) => {
 
         {(props.isUserManager || props.isUserAdministrator) && (
           <IconButton
-            customClass='sidebar__title__spaces__create'
+            customClass='sidebar__title__button__create'
             onClick={props.onClickNewSpace}
             dataCy='sidebarCreateSpaceBtn'
             icon='fas fa-plus'

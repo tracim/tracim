@@ -40,6 +40,20 @@
     position relative
     flex 0 1 auto
     margin standardSpacing
+  &__participate
+    background-color var(--appTypeColor)
+    color offWhite
+    width fit-content
+    width -moz-fit-content
+    padding standardSpacing
+    border-radius standardBorderRadius
+    align-self flex-end
+    margin-top textSpacing
+    & > i
+      margin-inline-end textSpacing
+    &:hover
+      background-color var(--appTypeDarkColor)
+      color offWhite
 
 .tox-btn-group:not(:first-child)
   border-inline-start none!important //remove the left borders of the wysiwyg for a better aesthetic result

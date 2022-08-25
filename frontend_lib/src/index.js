@@ -68,7 +68,8 @@ import {
   sortContentByCreatedDateAndID,
   sortContentByStatus,
   USER_CALL_STATE,
-  STATUSES
+  STATUSES,
+  TIMELINE_TYPE
 } from './helper.js'
 
 import {
@@ -494,5 +495,6 @@ export {
   TimedEvent,
   ToDoItem,
   ToDoManagement,
-  STATUSES
+  STATUSES,
+  TIMELINE_TYPE
 }

@@ -91,7 +91,7 @@ borderWhenActive= 5px
     &__dragNdrop
       margin-inline-start textSpacing
     &__menu
-      &__logout > *
+      &__element *
         color fontColor
       &.dropdownMenuButton
         & i
@@ -107,7 +107,7 @@ borderWhenActive= 5px
     font-weight bold
     background-color var(--sidebarColorDarken)
     overflow visible
-    &__spaces
+    &__button
       display flex
       color var(--sidebarFontColor)
       font-weight bold
@@ -117,6 +117,8 @@ borderWhenActive= 5px
       height 100%
       & > span
         padding-inline-start standardSpacing
+        display flex
+        align-items center
       &__create, &__join
         padding-inline-start standardSpacing
         padding-inline-end standardSpacing
@@ -205,7 +207,7 @@ borderWhenActive= 5px
         display none
       & .sidebar__footer__text
         display none
-    & .sidebar__title__spaces
+    & .sidebar__title__button
       padding-inline-start borderWhenActive
       justify-content center
       & > span
@@ -228,9 +230,6 @@ borderWhenActive= 5px
   color #F2CA53
 .sidebar__agendas__item i
   color #07549D // update
-
-body.tox-fullscreen .sidebar
-  display none
 
 @media (max-width: max-xs) and (max-width: max-lg)
   .siebarpagecontainer

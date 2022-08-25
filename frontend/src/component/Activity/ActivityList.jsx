@@ -61,6 +61,10 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           workspaceId={activity.newestMessage.fields.workspace.workspace_id}
           titleLink={titleLink}
           previewLink={previewLink}
+          showParticipateButton
+          // INFO - GB - 2022-08-23 - The line bellow call Object.prototype to not trigger the no-prototype-builtins linting error
+          // See https://ourcodeworld.com/articles/read/1425/how-to-fix-eslint-error-do-not-access-objectprototype-method-hasownproperty-from-target-object-no-prototype-builtins
+          showCommentList={Object.prototype.hasOwnProperty.call(activity, 'commentList')}
         />
       )
   }],

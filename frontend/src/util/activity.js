@@ -3,9 +3,12 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   getContentComment,
+  getFileChildContent,
   handleFetchResult,
   getWorkspaceContent,
-  getContentPath
+  getContentPath,
+  sortTimelineByDate,
+  TIMELINE_TYPE
 } from 'tracim_frontend_lib'
 
 const createActivityEvent = (message) => {
@@ -31,8 +34,19 @@ const createSingleMessageActivity = (activityParams, messageList) => {
 }
 
 const getCommentList = async (content, apiUrl) => {
-  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
-  return response.apiResponse.status === 200 ? response.body.items : []
+  const [resComment, resCommentAsFile] = await Promise.all([
+    handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id)),
+    handleFetchResult(await getFileChildContent(apiUrl, content.workspace_id, content.content_id))
+  ])
+
+  if (resComment.apiResponse.status !== 200 || resCommentAsFile.apiResponse.status !== 200) return []
+
+  const commentList = sortTimelineByDate([
+    ...resComment.body.items.map(comment => ({ ...comment, timelineType: TIMELINE_TYPE.COMMENT })),
+    ...resCommentAsFile.body.items.map(comment => ({ ...comment, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE }))
+  ])
+
+  return commentList
 }
 
 /**
