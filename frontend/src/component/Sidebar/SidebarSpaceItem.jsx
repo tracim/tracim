@@ -196,7 +196,7 @@ class SidebarSpaceItem extends React.Component {
             {props.spaceType === SPACE_TYPE.confidential.slug && (
               <Icon
                 customClass='sidebar__item__space__type'
-                color={SPACE_TYPE.confidential.hexcolor}
+                // color={SPACE_TYPE.confidential.hexcolor} update
                 icon={SPACE_TYPE.confidential.faIcon}
                 title={props.t('Confidential space')}
               />

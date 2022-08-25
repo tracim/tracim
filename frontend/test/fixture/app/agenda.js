@@ -3,7 +3,7 @@ export const agenda = {
   slug: 'agenda',
   isActive: true,
   faIcon: 'fas fa-calendar-alt',
-  hexcolor: '#ff4b3a',
+  hexcolor: '#07549D',
   config: {},
   creationLabel: 'Create a agenda'
 }

@@ -54,6 +54,8 @@ borderWhenActive= 5px
       font-weight bold
       &.sidebar__item__space
         padding-inline-start 0
+      & .sidebar__item__space__type
+        color rgb(182, 22, 22) // update
       &.sidebar__search
         padding-inline-start textSpacing
     &__name
@@ -65,6 +67,7 @@ borderWhenActive= 5px
         overflow hidden
         text-overflow ellipsis
         unicode-bidi plaintext
+        flex 1
       & > span
         display flex
         align-items center
@@ -74,6 +77,7 @@ borderWhenActive= 5px
       align-items center
       &__type
         padding-inline-start textSpacing
+        color grey
       & > *
         color var(--sidebarFontColor)
       &:hover
@@ -101,7 +105,7 @@ borderWhenActive= 5px
           display none
   &__title
     font-weight bold
-    background-color var(--sidebarColorLighten)
+    background-color var(--sidebarColorDarken)
     overflow visible
     &__spaces
       display flex
@@ -113,15 +117,13 @@ borderWhenActive= 5px
       height 100%
       & > span
         padding-inline-start standardSpacing
-      &__create
+      &__create, &__join
         padding-inline-start standardSpacing
         padding-inline-end standardSpacing
         color var(--sidebarFontColor)
         height 100%
-      &__join
-        padding-inline-start standardSpacing
-        padding-inline-end standardSpacing
-        height 100%
+        &:hover
+          color sidebarFontColorHover
   &__spaces
     overflow-y auto
     flex 1
@@ -139,6 +141,7 @@ borderWhenActive= 5px
     display flex
     align-items center
     justify-content center
+    color offWhite
   &__notification
     height notificationCircleSize
     width notificationCircleSize
@@ -218,21 +221,13 @@ borderWhenActive= 5px
 .sidebar__notification__item i
   color lightBlue
 .sidebar__activities__item i
-  color #597985
-.sidebar__agendas__item i
-  color #ff4b3a
+  color #17B4D4
 .sidebar__tasks__item i
-  color greenToDo
+  color #7DA944
 .sidebar__favorites__item i
-  color #ffeb3b
-.sidebar__spaces__item i
-  color #ad3bdb
-.sidebar__users__item i
-  color #946645
-.sidebar__account__item i
-  color #00bcd4
-.sidebar__logout__item i
-  color errorRed
+  color #F2CA53
+.sidebar__agendas__item i
+  color #07549D // update
 
 body.tox-fullscreen .sidebar
   display none
