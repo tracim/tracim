@@ -665,7 +665,8 @@ export class Kanban extends React.Component {
               icon: 'fas fa-link',
               label: props.t('Copy content link'),
               onClick: this.handleClickCopyLink,
-              showAction: true
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
             }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
