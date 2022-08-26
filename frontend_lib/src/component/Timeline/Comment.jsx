@@ -15,7 +15,6 @@ import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigati
 import {
   ROLE,
   CONTENT_TYPE,
-  formatAbsoluteDate,
   readableDateFormat,
   displayDistanceDate,
   addExternalLinksIcons
