@@ -15,6 +15,7 @@ import {
   getContentComment,
   getFileChildContent,
   getOrCreateSessionClientToken,
+  handleClickCopyLink,
   handleFetchResult,
   handleInvalidMentionInComment,
   tinymceRemove,
@@ -39,8 +40,7 @@ import {
 import {
   CONTENT_NAMESPACE,
   FETCH_CONFIG,
-  findUserRoleIdInWorkspace,
-  handleClickCopyLink
+  findUserRoleIdInWorkspace
 } from '../util/helper.js'
 import {
   getPublicationPage,
@@ -476,7 +476,7 @@ export class Publications extends React.Component {
 
   handleClickCopyLink = content => {
     const { props } = this
-    handleClickCopyLink(content)
+    handleClickCopyLink(content.id)
     props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
   }
 
