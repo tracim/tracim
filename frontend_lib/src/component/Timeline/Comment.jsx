@@ -238,12 +238,10 @@ Comment.propTypes = {
 }
 
 Comment.defaultProps = {
-  customClass: '',
-  discussionToggleButtonLabel: 'Comment',
-  fromMe: false,
   creationDate: '',
   customClass: '',
   customColor: 'transparent',
+  fromMe: false,
   modificationDate: '',
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
