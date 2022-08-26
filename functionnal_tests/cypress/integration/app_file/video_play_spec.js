@@ -9,7 +9,7 @@ const pageHeight = Cypress.config().viewportHeight
 
 let workspaceId, contentId
 
-describe('Paly a video file', () => {
+describe('Play a video file', () => {
   before(function () {
     cy.resetDB()
     cy.setupBaseDB()
