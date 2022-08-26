@@ -43,6 +43,8 @@ const Comment = (props) => {
   const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
   const readableModificationDate = isModified ? readableDateFormat(props.modificationDate, props.loggedUser.lang) : null
 
+  console.log('contentId', props.contentId)
+
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
       <div
@@ -226,8 +228,8 @@ Comment.propTypes = {
   discussionToggleButtonLabel: PropTypes.string,
   fromMe: PropTypes.bool,
   modificationDate: PropTypes.string,
-  onClickEditComment: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
+  onClickEditComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
   onClickRestore: PropTypes.func.isRequired,
   onClickToggleCommentList: PropTypes.func,
@@ -244,9 +246,9 @@ Comment.defaultProps = {
   discussionToggleButtonLabel: 'Comment',
   fromMe: false,
   modificationDate: '',
+  onClickDeleteComment: () => {},
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
-  onClickDeleteComment: () => {},
   text: '',
   threadLength: 0,
   translationState: TRANSLATION_STATE.DISABLED

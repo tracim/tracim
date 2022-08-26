@@ -27,7 +27,9 @@ describe('<NewShareDownload />', () => {
 
   const NewShareDownloadWithHoc = translateMock()(NewShareDownloadWithoutHOC)
 
-  // INFO - G.B. - 2019-09-03 - The lines below are needed because the reactstrap code looks in the document for the target and if the target is mounted outside of the document it cannot find it.
+  // INFO - G.B. - 2019-09-03 - The lines below are needed because the reactstrap code looks in the document for the target
+  // and if the target is mounted outside of the document it cannot find it.
+  // See: https://github.com/reactstrap/reactstrap/issues/773#issuecomment-373451256
   const div = document.createElement('div')
   document.body.appendChild(div)
 

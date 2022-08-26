@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { mount } from 'enzyme'
 import Comment from '../../src/component/Timeline/Comment.jsx'
 import { TRANSLATION_STATE } from '../../src/translation.js'
+import { reactstrapPopoverHack } from '../testHelper.js'
 
 const nock = require('nock')
 
@@ -42,10 +43,16 @@ describe('<Comment />', () => {
     nock(props.apiUrl).get(`/workspaces/${props.workspaceId}/contents/${props.contentId}/reactions`).reply(200, [])
   }
 
+  reactstrapPopoverHack(document, `createdDistance_${props.contentId}`)
+  reactstrapPopoverHack(document, `modificationDate_${props.contentId}`)
+
   const CommentWithHOC = withRouterMock(Comment)
+  const wrapper = mount(
+    <CommentWithHOC {...props} />,
+    { wrappingComponent: RouterMock }
+  )
 
   mockReactions()
-  const wrapper = mount(<CommentWithHOC {...props} />, { wrappingComponent: RouterMock })
 
   describe('Static design', () => {
     it(`should have the class '${props.customClass}__messagelist__item'`, () => {
