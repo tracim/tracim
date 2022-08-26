@@ -193,7 +193,7 @@ const Comment = (props) => {
             workspaceId={props.workspaceId}
           />
 
-          {props.isPublication && props.showTimeline && (
+          {props.isPublication && props.showCommentList && (
             <IconButton
               text={props.discussionToggleButtonLabel}
               textMobile={props.threadLength > 0 ? props.threadLength.toString() : ''}
@@ -221,8 +221,9 @@ Comment.propTypes = {
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
-  customClass: PropTypes.string,
   creationDate: PropTypes.string,
+  customClass: PropTypes.string,
+  customColor: PropTypes.string,
   fromMe: PropTypes.bool,
   modificationDate: PropTypes.string,
   onClickEditComment: PropTypes.func,
@@ -237,10 +238,12 @@ Comment.propTypes = {
 }
 
 Comment.defaultProps = {
+  customClass: '',
   discussionToggleButtonLabel: 'Comment',
   fromMe: false,
   creationDate: '',
   customClass: '',
+  customColor: 'transparent',
   modificationDate: '',
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
