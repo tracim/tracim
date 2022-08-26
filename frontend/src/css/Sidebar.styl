@@ -18,6 +18,7 @@ borderWhenActive= 5px
     display flex
     justify-content center
     align-items center
+    background-color var(--sidebarLogoColor)
     &__expand
       color var(--sidebarFontColor)
       padding standardSpacing
@@ -31,6 +32,7 @@ borderWhenActive= 5px
     padding standardSpacing
     & > .search
       padding textSpacing standardSpacing
+      box-shadow 0px 0px 20px 0px var(--sidebarColorDarken)
     & > .sidebar__item
       display none
   &__item
@@ -55,9 +57,6 @@ borderWhenActive= 5px
       font-weight bold
       &.sidebar__item__space
         padding-inline-start 0
-      & .sidebar__item__space__type
-        // INFO - G.B. - The color below should be coherent with SPACE_TYPE.confidential.hexcolor at frontend_lib/src/helper.js
-        color #B61616
       &.sidebar__search
         padding-inline-start textSpacing
     &__name
@@ -118,7 +117,7 @@ borderWhenActive= 5px
       align-items center
       flex 1
       height 100%
-      & > i:hover
+      &:hover > i
         color sidebarFontColorHover
       & > span
         padding-inline-start standardSpacing

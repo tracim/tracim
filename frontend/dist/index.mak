@@ -77,12 +77,14 @@
 
       <%
         sidebar = colors["sidebar"]
+        sidebarLogo = colors["sidebar/logo"]
         sidebarFont = colors["sidebar/font"]
       %>
       :root {
         --sidebarColor: ${sidebar.web};
         --sidebarColorDarken: ${sidebar.darken.web};
         --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarLogoColor: ${sidebarLogo.web};
         --sidebarFontColor: ${sidebarFont.web};
       }
     </style>
