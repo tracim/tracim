@@ -77,18 +77,18 @@ const Comment = (props) => {
                   <div
                     className={classnames(`${props.customClass}__body__content__header__meta__date`, 'comment__body__content__header__meta__date')}
                   >
-                    <span id={`createdDistance_${props.apiContent.content_id}`}>
+                    <span id={`createdDistance_${props.contentId}`}>
                       {createdDistance}
                     </span>
                     <Popover
-                      targetId={`createdDistance_${props.apiContent.content_id}`}
+                      targetId={`createdDistance_${props.contentId}`}
                       popoverBody={readableCreationDate}
                     />
                     {isModified && (
                       <>
-                         - <span id={`modificationDate_${props.apiContent.content_id}`}>{props.t('modified')}</span>
+                         - <span id={`modificationDate_${props.contentId}`}>{props.t('modified')}</span>
                         <Popover
-                          targetId={`modificationDate_${props.apiContent.content_id}`}
+                          targetId={`modificationDate_${props.contentId}`}
                           popoverBody={readableModificationDate}
                         />
                       </>

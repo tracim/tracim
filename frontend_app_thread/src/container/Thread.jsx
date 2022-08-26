@@ -120,7 +120,6 @@ export class Thread extends React.Component {
     )
   }
 
-
   // TLM Handlers
 
   handleCommentChanged = (data) => {
