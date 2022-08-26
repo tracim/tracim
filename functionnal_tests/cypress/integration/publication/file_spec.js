@@ -38,6 +38,10 @@ describe('Publications', () => {
       })
     })
 
+    afterEach(() => {
+      cy.cancelXHR()
+    })
+
     it('should show image as preview', () => {
       cy.get('.CommentFilePreview img').should('be.visible')
     })
@@ -51,7 +55,9 @@ describe('Publications', () => {
       cy.get('.feedItemHeader__actionMenu__item[title="Open as content"]').click()
 
       cy.url().should('include', '/contents')
-
+      cy.contains('.wsContentGeneric__header__title', 'News')
+      cy.get('.thread__contentpage__comment').should('be.visible')
+      cy.get('.CommentFilePreview').should('be.visible')
       cy.contains('.attachedFile', fileName)
       cy.get('.CommentFilePreview > img').should('be.visible')
 
@@ -76,6 +82,10 @@ describe('Publications', () => {
         cy.get(publicationInput).type(exampleText)
         cy.contains(publishButton, 'Publish').click()
       })
+    })
+
+    afterEach(() => {
+      cy.cancelXHR()
     })
 
     it('should show text as preview', () => {
