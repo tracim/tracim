@@ -17,6 +17,7 @@ import {
   getInvalidMentionList,
   getOrCreateSessionClientToken,
   getToDo,
+  handleClickCopyLink,
   handleFetchResult,
   handleInvalidMentionInComment,
   PAGE,
@@ -764,6 +765,12 @@ export class HtmlDocument extends React.Component {
     this.handleCloseNotifyAllMessage()
   }
 
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+  }
+
   shouldDisplayNotifyAllMessage = () => {
     const { state } = this
 
@@ -974,6 +981,12 @@ export class HtmlDocument extends React.Component {
               downloadLink: this.getDownloadPDFUrl(state),
               showAction: true,
               dataCy: 'popinListItem__downloadAsPdf'
+            }, {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
             }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),

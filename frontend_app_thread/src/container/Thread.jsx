@@ -8,6 +8,7 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
+  handleClickCopyLink,
   handleFetchResult,
   handleInvalidMentionInComment,
   PAGE,
@@ -315,6 +316,12 @@ export class Thread extends React.Component {
     props.appContentRestoreDelete(state.content, this.setState.bind(this), state.config.slug)
   }
 
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+  }
+
   handleClickEditComment = (comment) => {
     const { props, state } = this
     props.appContentEditComment(
@@ -388,6 +395,12 @@ export class Thread extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           actionList={[
             {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,

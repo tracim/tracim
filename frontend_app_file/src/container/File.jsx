@@ -7,6 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
+  handleClickCopyLink,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
@@ -472,6 +473,12 @@ export class File extends React.Component {
   handleChangeNewComment = e => {
     const { props, state } = this
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
+  }
+
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -1209,6 +1216,12 @@ export class File extends React.Component {
               downloadLink: this.getDownloadRawUrl(state),
               showAction: true,
               dataCy: 'popinListItem__downloadFile'
+            }, {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
             }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),

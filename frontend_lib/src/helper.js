@@ -947,3 +947,17 @@ export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
 
   return { textBegin, textEnd }
 }
+
+export const handleClickCopyLink = (contentId) => {
+  // INFO - G.B. - 2022-08-26 - document.execCommand() is deprecated, but the alternative navigator.clipboard is
+  // not compatible with all browsers versions at this time, so a fallback was made to the old algorithm
+  const link = `${window.location.origin}${PAGE.CONTENT(contentId)}`
+  if (!navigator.clipboard) {
+    const tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = link
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+  } else navigator.clipboard.writeText(link)
+}
