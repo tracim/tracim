@@ -120,6 +120,9 @@ export class Thread extends React.Component {
     )
   }
 
+
+  // TLM Handlers
+
   handleCommentChanged = (data) => {
     this.props.updateModified(data.fields.content.content_id, data.fields.content.modified)
   }
