@@ -27,6 +27,7 @@ import {
   tinymceRemove,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   TRANSLATION_STATE
 } from 'tracim_frontend_lib'
@@ -38,6 +39,10 @@ export class FeedItemWithPreview extends React.Component {
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentChanged }
     ])
 
     this.state = {
@@ -95,6 +100,12 @@ export class FeedItemWithPreview extends React.Component {
       tinymceRemove(wysiwygId)
       globalThis.wysiwyg(wysiwygId, data, this.handleChangeNewComment)
     }
+  }
+
+  // TLM Handlers
+
+  handleCommentChanged = (data) => {
+    this.props.updateModified(data.fields.content.content_id, data.fields.content.modified)
   }
 
   getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`
@@ -372,6 +383,7 @@ export class FeedItemWithPreview extends React.Component {
                   author={commentToShow.author}
                   loggedUser={loggedUser}
                   creationDate={commentToShow.created_raw || commentToShow.createdRaw || commentToShow.created}
+                  modificationDate={commentToShow.modified}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent
