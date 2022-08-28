@@ -9,6 +9,7 @@ import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
 import dateFnsAr from 'date-fns/locale/ar-SA'
 import dateFnsEs from 'date-fns/locale/es'
+import dateFnsNbNO from 'date-fns/locale/nb'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -68,7 +69,8 @@ export const DATE_FNS_LOCALE = {
   pt: dateFnsPt,
   de: dateFnsDe,
   ar: dateFnsAr,
-  es: dateFnsEs
+  es: dateFnsEs,
+  nb_NO: dateFnsNbNO
 }
 
 // INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
