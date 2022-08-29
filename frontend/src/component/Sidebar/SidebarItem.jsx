@@ -6,6 +6,11 @@ import { isMobile } from 'react-device-detect'
 import { Icon } from 'tracim_frontend_lib'
 
 const SidebarItem = (props) => {
+  const handleClickOnSidebarItemButton = () => {
+    if (isMobile && !props.isSidebarClosed) props.onClickToggleSidebar()
+    props.onClickItem()
+  }
+
   return (
     props.to
       ? (
@@ -17,7 +22,7 @@ const SidebarItem = (props) => {
             props.customClass
           )}
           to={props.to}
-          onClick={isMobile ? props.onClickToggleSidebar : () => { }}
+          onClick={(isMobile && !props.isSidebarClosed) ? props.onClickToggleSidebar : () => { }}
           data-cy={props.dataCy}
         >
           <div
@@ -40,7 +45,7 @@ const SidebarItem = (props) => {
             },
             props.customClass
           )}
-          onClick={props.onClickItem}
+          onClick={handleClickOnSidebarItemButton}
           data-cy={props.dataCy}
         >
           <div
@@ -75,6 +80,7 @@ SidebarItem.propTypes = {
   customClass: PropTypes.string,
   dataCy: PropTypes.string,
   isCurrentItem: PropTypes.bool,
+  isSidebarClosed: PropTypes.bool,
   onClickItem: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   to: PropTypes.string,
@@ -86,9 +92,10 @@ SidebarItem.defaultProps = {
   customColor: '',
   customClass: '',
   dataCy: '',
+  isCurrentItem: false,
+  isSidebarClosed: false,
   onClickItem: () => { },
   onClickToggleSidebar: () => { },
-  isCurrentItem: false,
   to: '',
   unreadMentionCount: 0,
   unreadNotificationCount: 0

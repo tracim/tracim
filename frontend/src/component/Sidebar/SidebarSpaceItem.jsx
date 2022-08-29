@@ -256,7 +256,6 @@ SidebarSpaceItem.propTypes = {
   hasChildren: PropTypes.bool,
   isNotificationWallOpen: PropTypes.bool,
   level: PropTypes.number,
-  onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.array
@@ -269,7 +268,6 @@ SidebarSpaceItem.defaultProps = {
   hasChildren: false,
   isNotificationWallOpen: false,
   level: 0,
-  onClickAllContent: () => { },
   onClickToggleSidebar: () => { },
   onToggleFoldChildren: () => { },
   userRoleIdInWorkspace: ROLE.reader.id

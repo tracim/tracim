@@ -30,6 +30,8 @@ const SidebarUserItemList = (props) => {
               label={props.t('My tasks')}
               icon='fas fa-check-square'
               isCurrentItem={props.location.pathname === PAGE.TODO && !props.isNotificationWallOpen}
+              isSidebarClosed={props.isSidebarClosed}
+              onClickToggleSidebar={props.onClickToggleSidebar}
             />
           )}
 
@@ -39,6 +41,8 @@ const SidebarUserItemList = (props) => {
             label={props.t('My favorites')}
             icon='fas fa-star'
             isCurrentItem={props.location.pathname === PAGE.FAVORITES && !props.isNotificationWallOpen}
+            isSidebarClosed={props.isSidebarClosed}
+            onClickToggleSidebar={props.onClickToggleSidebar}
           />
 
           {props.isAgendaEnabled && (
@@ -49,6 +53,8 @@ const SidebarUserItemList = (props) => {
               label={props.t('My agendas')}
               icon='fas fa-calendar-alt'
               isCurrentItem={props.location.pathname === PAGE.AGENDA && !props.isNotificationWallOpen}
+              isSidebarClosed={props.isSidebarClosed}
+              onClickToggleSidebar={props.onClickToggleSidebar}
             />
           )}
         </>

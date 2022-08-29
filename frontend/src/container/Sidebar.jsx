@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
 import {
   CUSTOM_EVENT,
+  Icon,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
@@ -32,7 +33,6 @@ import SidebarItem from '../component/Sidebar/SidebarItem.jsx'
 import SidebarSpaceList from '../component/Sidebar/SidebarSpaceList.jsx'
 import SidebarUserItemList from '../component/Sidebar/SidebarUserItemList.jsx'
 
-const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 const qs = require('query-string')
 
 export class Sidebar extends React.Component {
@@ -70,6 +70,7 @@ export class Sidebar extends React.Component {
 
   handleClickSearch = async (searchString) => {
     const { props } = this
+    if (isMobile && !this.state.isSidebarClosed) this.handleClickToggleSidebar()
     const FIRST_PAGE = 1
 
     // INFO - GB - 2019-06-07 - When we do a search, the parameters need to be in default mode.
@@ -127,8 +128,6 @@ export class Sidebar extends React.Component {
     return !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
   }
 
-  handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
-
   handleClickToggleSidebar = () => {
     GLOBAL_dispatchEvent({
       type: this.state.isSidebarClosed
@@ -166,11 +165,17 @@ export class Sidebar extends React.Component {
     return (
       <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })}>
         <div className='sidebar__header'>
-          <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
-          <button className='transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
-            {state.isSidebarClosed
-              ? <i className='fas fa-chevron-right' title={props.t('See sidebar')} />
-              : <i className='fas fa-chevron-left' title={props.t('Hide sidebar')} />}
+          <button
+            className='btn transparentButton sidebar__header__logo'
+            onClick={() => { if (isMobile && !state.isSidebarClosed) this.handleClickToggleSidebar() }}
+          >
+            <Logo to={PAGE.HOME} />
+          </button>
+          <button className='btn transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
+            <Icon
+              icon='fas fa-bars'
+              title={state.isSidebarClosed ? props.t('See sidebar') : props.t('Hide sidebar')}
+            />
           </button>
         </div>
 
@@ -204,16 +209,20 @@ export class Sidebar extends React.Component {
           label={props.t('Recent activities')}
           icon='fas fa-newspaper'
           isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
+          isSidebarClosed={state.isSidebarClosed}
+          onClickToggleSidebar={this.handleClickToggleSidebar}
         />
 
         <SidebarItem
           customClass='sidebar__notification__item'
           label={props.t('Notifications')}
           icon='fas fa-bell'
+          isCurrentItem={props.isNotificationWallOpen}
+          isSidebarClosed={state.isSidebarClosed}
           onClickItem={props.onClickNotification}
+          onClickToggleSidebar={this.handleClickToggleSidebar}
           unreadMentionCount={props.unreadMentionCount}
           unreadNotificationCount={props.unreadNotificationCount}
-          isCurrentItem={props.isNotificationWallOpen}
         />
 
         <SidebarUserItemList
@@ -239,7 +248,6 @@ export class Sidebar extends React.Component {
           isSidebarClosed={state.isSidebarClosed}
           isUserAdministrator={isUserAdministrator}
           isUserManager={isUserManager}
-          onClickAllContent={this.handleClickAllContent}
           onClickJoinWorkspace={this.handleClickJoinWorkspace}
           onClickNewSpace={this.handleClickNewSpace}
           onClickOpenSpaceList={this.handleClickOpenSpaceList}
@@ -250,6 +258,8 @@ export class Sidebar extends React.Component {
           spaceList={props.workspaceList}
           userId={props.user.userId}
         />
+
+        <div className='sidebar__emptyZone' onClick={this.handleClickToggleSidebar} />
 
         <div className='sidebar__footer'>
           <div className='sidebar__footer__text'>

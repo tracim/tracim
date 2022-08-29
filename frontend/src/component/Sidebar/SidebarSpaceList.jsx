@@ -27,7 +27,6 @@ const SidebarSpaceList = (props) => {
           isNotificationWallOpen={props.isNotificationWallOpen}
           label={space.label}
           level={spaceLevel}
-          onClickAllContent={props.onClickAllContent}
           onClickToggleSidebar={props.onClickToggleSidebar}
           onToggleFoldChildren={() => props.onToggleFoldChildren(space.id)}
           spaceId={space.id}
@@ -123,7 +122,6 @@ SidebarSpaceList.propTypes = {
   foldedSpaceList: PropTypes.array,
   isNotificationWallOpen: PropTypes.bool,
   isSidebarClosed: PropTypes.bool,
-  onClickAllContent: PropTypes.func,
   onClickToggleSidebar: PropTypes.func,
   onClickToggleSpaceList: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
@@ -136,7 +134,6 @@ SidebarSpaceList.defaultProps = {
   foldedSpaceList: [],
   isNotificationWallOpen: false,
   isSidebarClosed: false,
-  onClickAllContent: () => { },
   onClickToggleSidebar: () => { },
   onClickToggleSpaceList: () => { },
   onToggleFoldChildren: () => { },
