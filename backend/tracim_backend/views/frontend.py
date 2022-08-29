@@ -124,6 +124,8 @@ class FrontendController(Controller):
                 "colors": {
                     "primary": ExtendedColor(app_config.APPS_COLORS["primary"]),
                     "sidebar": ExtendedColor(app_config.APPS_COLORS["sidebar"]),
+                    "sidebar/logo": ExtendedColor(app_config.APPS_COLORS["sidebar/logo"]),
+                    "sidebar/font": ExtendedColor(app_config.APPS_COLORS["sidebar/font"]),
                 },
                 "applications": frontend_apps,
                 "website_title": app_config.WEBSITE__TITLE,

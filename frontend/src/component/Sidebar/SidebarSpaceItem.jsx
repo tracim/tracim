@@ -37,10 +37,10 @@ class SidebarSpaceItem extends React.Component {
 
   componentDidUpdate () {
     const unreadNotifications = this.props.notificationPage.list.filter(
-      n => !n.mention && !n.read && n.space && (n.space.id === this.props.spaceId)
+      n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.spaceId)
     )
     const unreadMentionCount = this.props.notificationPage.list.filter(
-      n => n.mention && !n.read && n.space && (n.space.id === this.props.spaceId)
+      n => n.mention && !n.read && n.workspace && (n.workspace.id === this.props.spaceId)
     ).length
 
     if (this.state.unreadNotifications.length !== unreadNotifications.length || this.state.unreadMentionCount !== unreadMentionCount) {
@@ -196,7 +196,6 @@ class SidebarSpaceItem extends React.Component {
             {props.spaceType === SPACE_TYPE.confidential.slug && (
               <Icon
                 customClass='sidebar__item__space__type'
-                color={SPACE_TYPE.confidential.hexcolor}
                 icon={SPACE_TYPE.confidential.faIcon}
                 title={props.t('Confidential space')}
               />
