@@ -1,5 +1,7 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
+playButtonSize = 40px
+
 .ril__caption
   display flex
   flex-direction row-reverse
@@ -17,6 +19,14 @@
     flex-direction column
     justify-content center
     width 100%
+    &__play
+      position absolute
+      left "calc(50% - %s)" % (playButtonSize / 2)
+      font-size playButtonSize
+      opacity 0.7
+    &:hover
+      & .previewcomponent__fileimg__play
+        opacity 1
     &__img
       margin auto
       max-height 100%
