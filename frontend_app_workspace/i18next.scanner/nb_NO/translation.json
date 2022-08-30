@@ -1,1 +1,10 @@
-{}
+{
+  "Back": "Tilbake",
+  "Create": "Opprett",
+  "Default role:": "Forvalgt rolle:",
+  "Space's name": "Rommets navn",
+  "A space with that name already exists": "Et rom med det navnet finnes allerede",
+  "None": "Ingen",
+  "Next": "Neste",
+  "Some input are invalid": "Noe av inndataen er ugyldig"
+}
