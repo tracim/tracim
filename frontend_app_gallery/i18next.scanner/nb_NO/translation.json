@@ -13,5 +13,10 @@
   "Gallery": "Galleri",
   "Error while loading file preview": "Kunne ikke forhåndsvise fil",
   "Error while loading content list": "Kunne ikke laste inn innholdsliste",
-  "Error while deleting document": "Kunne ikke slette dokumentet"
+  "Error while deleting document": "Kunne ikke slette dokumentet",
+  "Enable fullscreen": "Fullskjermsvisning",
+  "Error while loading folder detail": "Kunne ikke laste inn mappedetalj",
+  "No preview available": "Ingen forhåndsvisning tilgjengelig",
+  "Error while loading space detail": "Kunne ikke laste inn detalj om rom",
+  "There isn't any picture to delete.": "Ingen bilder å slette."
 }
