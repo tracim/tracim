@@ -15,5 +15,19 @@
   "Download as PDF": "Last ned som PDF",
   "Error while saving the comment": "Kunne ikke lagre kommentaren",
   "Error while saving the new version": "Kunne ikke lagre den nye versjonen",
-  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}"
+  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
+  "Write a note": "Skriv et notat",
+  "Notes": "Notater",
+  "Error while creating note": "Kunne ikke opprettet notat",
+  "You have a pending draft": "Du har en ventende kladd",
+  "This content is deprecated": "Innholdet er foreldet",
+  "Note": "Notat",
+  "notes": "notater",
+  "New note": "Nytt notat",
+  "Unknown content": "Ukjent innhold",
+  "Last version": "Nyeste versjon",
+  "You must change the status or restore this note before any change": "Du må endre statusen eller gjenopprette dette notatet før endringer gjøres",
+  "Error while saving the user configuration": "Kunne ikke lagre brukeroppsettet",
+  "Your text contains mentions that do not match any member of this space:": "Teksten din nevner medlemmer som ikke finnes i dette rommet.",
+  "You are trying to mention an invalid user": "Du prøver å nevne en ugyldig bruker"
 }
