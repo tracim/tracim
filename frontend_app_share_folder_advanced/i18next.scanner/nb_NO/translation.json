@@ -1,1 +1,13 @@
-{}
+{
+  "Cancel": "Avbryt",
+  "New": "Ny",
+  "Generate random password": "Generer et tilfeldig passord",
+  "Show password": "Vis passord",
+  "Error in the URL": "Feil i nettadressen",
+  "Protect by password": "Beskytt med passord",
+  "Error while loading Tracim's content type list": " \n",
+  "Validate": "Bekreft",
+  "Received files": "Mottatte filer",
+  "Password": "Passord",
+  "Recipient's email addresses": "Mottagers e-postadresser"
+}
