@@ -12,5 +12,6 @@
   "This folder is deleted": "Denne mappen er slettet",
   "Error while loading Tracim's content type list": " \n",
   "Delete": "Slett",
-  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}"
+  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
+  "Error while saving new available apps list": "Kunne ikke lagre liste over nye tilgjengelige programmer"
 }
