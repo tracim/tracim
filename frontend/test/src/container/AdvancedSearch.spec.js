@@ -142,27 +142,5 @@ describe('In <AdvancedSearch />', () => {
         )
       })
     })
-
-    describe('Filter button', () => {
-      const testCases = [
-        {
-          props: props,
-          description: 'with results'
-        },
-        {
-          props: { ...props, contentSearch: { ...emptySearchResult, appliedFilters: {} } },
-          description: 'without results'
-        }
-      ]
-      for (const testCase of testCases) {
-        const wrapper = mount(<Provider store={store}><MemoryRouter><AdvancedSearchWithHOC {...testCase.props} /></MemoryRouter></Provider>)
-        it(`should always exist (${testCase.description})`, () => {
-          expect(
-            wrapper.find('.advancedSearch__content__detail__filter').length +
-            wrapper.find('.advancedSearch__openMenu').length
-          ).to.equal(1)
-        })
-      }
-    })
   })
 })

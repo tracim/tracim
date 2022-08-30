@@ -5,7 +5,7 @@ import Logo from '../../../src/component/Logo.jsx'
 
 describe('<Logo />', () => {
   const props = {
-    logoSrc: 'randomLogoSrc',
+    logoSrc: '/assets/branding/images/tracim-logo.png',
     to: 'randomTo'
   }
 
