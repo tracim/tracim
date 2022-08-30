@@ -49,7 +49,7 @@ const SidebarSpaceList = (props) => {
   const handleClickTitle = (e) => {
     if (props.isSidebarClosed) {
       props.onClickOpenSpaceList()
-      props.onClickToggleSidebar()
+      props.onClickToggleSidebar(e)
     } else {
       if (props.spaceList.length === 0) {
         if (props.accessibleWorkspaceList.length > 0) props.onClickJoinWorkspace()

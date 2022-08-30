@@ -14,9 +14,9 @@ import {
 export const MenuProfile = props => {
   if (!props.user.logged) return null
 
-  const handleClickAvatarWhenSidebarIsClosed = () => {
+  const handleClickAvatarWhenSidebarIsClosed = (e) => {
     props.onClickOpenUserItems()
-    props.onClickToggleSidebar()
+    props.onClickToggleSidebar(e)
   }
 
   return (
