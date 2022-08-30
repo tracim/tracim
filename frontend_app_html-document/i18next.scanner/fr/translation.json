@@ -32,5 +32,7 @@
   "Delete": "Supprimer",
   "Unknown content": "Contenu inconnu",
   "Download as PDF": "Télécharger en PDF",
-  "Tasks": "Tâches"
+  "Tasks": "Tâches",
+  "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
+  "Copy content link": "Copier le lien du contenu"
 }

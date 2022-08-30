@@ -31,5 +31,7 @@
   "A content with the same name already exists": "Innhold med samme navn finnes allerede",
   "This content is deleted": "Dette innholdet er slettet",
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
-  "Value:": "Verdi:"
+  "Value:": "Verdi:",
+  "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
+  "Copy content link": "Kopier innholdslenke"
 }

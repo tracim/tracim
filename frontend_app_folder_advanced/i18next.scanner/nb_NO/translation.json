@@ -12,5 +12,7 @@
   "This folder is deleted": "Denne mappen er slettet",
   "Error while loading Tracim's content type list": " \n",
   "Delete": "Slett",
-  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}"
+  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
+  "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
+  "Copy content link": "Kopier innholdslenke"
 }

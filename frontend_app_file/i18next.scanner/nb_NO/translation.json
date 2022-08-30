@@ -38,5 +38,7 @@
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
   "Error while creating new share link": "Kunne ikke opprette ny delingslenke",
   "Error while deleting share link": "Kunne ikke slette delingslenke",
-  "New file": "Ny fil"
+  "New file": "Ny fil",
+  "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
+  "Copy content link": "Kopier innholdslenke"
 }

@@ -15,5 +15,7 @@
   "Download as PDF": "Last ned som PDF",
   "Error while saving the comment": "Kunne ikke lagre kommentaren",
   "Error while saving the new version": "Kunne ikke lagre den nye versjonen",
-  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}"
+  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
+  "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
+  "Copy content link": "Kopier innholdslenke"
 }

@@ -191,7 +191,6 @@
   "Use this link to integrate Tracim in your file explorer": "Utilize este link para incluir Tracim no seu navegador de ficheiro",
   "CalDAV compatible software": "Software compatível com CalDAV",
   "(protocole WebDAV)": "(Protocolo WebDAV)",
-  "Agendas": "Agendas",
   "See sidebar": "Ver barra lateral",
   "Hide sidebar": "Ocultar barra lateral",
   "Hello, you don't have a username yet!": "Olá, você ainda não tem um identificador!",
@@ -581,5 +580,8 @@
   "Show space list": "Ver a lista de espaços",
   "Space management": "Gestão dos espaços",
   "Hide user menu": "Ocultar menu do utilizador",
-  "Show user menu": "Ver menu do utilizador"
+  "Show user menu": "Ver menu do utilizador",
+  "Participate": "Participar",
+  "My agendas": "Minhas agendas",
+  "My profile": "Meu perfil"
 }
