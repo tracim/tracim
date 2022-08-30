@@ -31,5 +31,15 @@
   "A content with the same name already exists": "Innhold med samme navn finnes allerede",
   "This content is deleted": "Dette innholdet er slettet",
   "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
-  "Value:": "Verdi:"
+  "Value:": "Verdi:",
+  "Create a Kanban board": "Opprett en kanban-tavle",
+  "You must change the status or restore this kanban board before any change": "Endre status eller gjenopprett denne kanban-tavlen før du gjør endringer",
+  "Error while loading the board.": "Kunne ikke laste inn tavlen.",
+  "Editing Card": "Redigering av tavle",
+  "New Kanban board": "Ny kanban-tavle",
+  "See more": "Vis mer",
+  "You have reached your storage limit, you cannot add new files": "",
+  "Last version": "Nyeste versjon",
+  "Error while creating kanban": "Kunne ikke opprette kanban-tavle",
+  "Board's name": "Tavlenavn"
 }
