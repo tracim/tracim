@@ -70,7 +70,6 @@ export class Sidebar extends React.Component {
 
   handleClickSearch = async (searchString) => {
     const { props } = this
-    if (isMobile && !this.state.isSidebarClosed) this.handleClickToggleSidebar()
     const FIRST_PAGE = 1
 
     // INFO - GB - 2019-06-07 - When we do a search, the parameters need to be in default mode.
@@ -89,8 +88,9 @@ export class Sidebar extends React.Component {
     props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
   }
 
-  handleToggleFoldChildren = (id) => {
+  handleToggleFoldChildren = (id, e) => {
     const { state } = this
+    e.stopPropagation()
     if (state.foldedSpaceList.find(spaceId => spaceId === id)) {
       const newFoldedSpaceList = state.foldedSpaceList.filter(spaceId => spaceId !== id)
       this.setState({ foldedSpaceList: newFoldedSpaceList })
@@ -128,7 +128,8 @@ export class Sidebar extends React.Component {
     return !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
   }
 
-  handleClickToggleSidebar = () => {
+  handleClickToggleSidebar = (e) => {
+    e.stopPropagation()
     GLOBAL_dispatchEvent({
       type: this.state.isSidebarClosed
         ? CUSTOM_EVENT.SHOW_SIDEBAR
@@ -142,15 +143,25 @@ export class Sidebar extends React.Component {
 
   handleClickOpenUserItems = () => this.setState({ showUserItems: true })
 
-  handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
+  handleClickToggleSpaceList = (e) => {
+    e.stopPropagation()
+    this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
+  }
 
-  handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
+  handleClickToggleUserItems = (e) => {
+    e.stopPropagation()
+    this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
+  }
 
   handleClickLogout = () => this.props.dispatch(logoutUser(this.props.history))
 
   handleClickNewSpace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   handleClickJoinWorkspace = () => this.props.history.push(PAGE.JOIN_WORKSPACE)
+
+  handleClickSidebarWhenOpenOnMobile = (e) => {
+    if (isMobile && !this.state.isSidebarClosed) this.handleClickToggleSidebar(e)
+  }
 
   render () {
     const { props, state } = this
@@ -163,14 +174,9 @@ export class Sidebar extends React.Component {
     const isUserManager = props.user.profile === PROFILE.manager.slug
 
     return (
-      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })}>
+      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })} onClick={this.handleClickSidebarWhenOpenOnMobile}>
         <div className='sidebar__header'>
-          <button
-            className='btn transparentButton sidebar__header__logo'
-            onClick={() => { if (isMobile && !state.isSidebarClosed) this.handleClickToggleSidebar() }}
-          >
-            <Logo to={PAGE.HOME} />
-          </button>
+          <Logo to={PAGE.HOME} />
           <button className='btn transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
             <Icon
               icon='fas fa-bars'
@@ -192,6 +198,7 @@ export class Sidebar extends React.Component {
         >
           <SearchInput
             onClickSearch={this.handleClickSearch}
+            onClickToggleSidebar={this.handleClickToggleSidebar}
             searchString={props.simpleSearch.searchString}
           />
 
@@ -209,8 +216,6 @@ export class Sidebar extends React.Component {
           label={props.t('Recent activities')}
           icon='fas fa-newspaper'
           isCurrentItem={props.location.pathname === PAGE.RECENT_ACTIVITIES && !props.isNotificationWallOpen}
-          isSidebarClosed={state.isSidebarClosed}
-          onClickToggleSidebar={this.handleClickToggleSidebar}
         />
 
         <SidebarItem
@@ -218,9 +223,7 @@ export class Sidebar extends React.Component {
           label={props.t('Notifications')}
           icon='fas fa-bell'
           isCurrentItem={props.isNotificationWallOpen}
-          isSidebarClosed={state.isSidebarClosed}
           onClickItem={props.onClickNotification}
-          onClickToggleSidebar={this.handleClickToggleSidebar}
           unreadMentionCount={props.unreadMentionCount}
           unreadNotificationCount={props.unreadNotificationCount}
         />

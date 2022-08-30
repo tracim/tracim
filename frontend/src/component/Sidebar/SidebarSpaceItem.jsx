@@ -93,10 +93,6 @@ class SidebarSpaceItem extends React.Component {
 
   handleClickSpace = () => {
     this.handleReadSpaceNotifications()
-
-    if (isMobile) {
-      this.props.onClickToggleSidebar()
-    }
   }
 
   handleMouseEnterItem = () => this.setState({ showDropdownMenuButton: true })
@@ -256,7 +252,6 @@ SidebarSpaceItem.propTypes = {
   hasChildren: PropTypes.bool,
   isNotificationWallOpen: PropTypes.bool,
   level: PropTypes.number,
-  onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.array
 }
@@ -268,7 +263,6 @@ SidebarSpaceItem.defaultProps = {
   hasChildren: false,
   isNotificationWallOpen: false,
   level: 0,
-  onClickToggleSidebar: () => { },
   onToggleFoldChildren: () => { },
   userRoleIdInWorkspace: ROLE.reader.id
 }

@@ -27,8 +27,7 @@ const SidebarSpaceList = (props) => {
           isNotificationWallOpen={props.isNotificationWallOpen}
           label={space.label}
           level={spaceLevel}
-          onClickToggleSidebar={props.onClickToggleSidebar}
-          onToggleFoldChildren={() => props.onToggleFoldChildren(space.id)}
+          onToggleFoldChildren={(e) => props.onToggleFoldChildren(space.id, e)}
           spaceId={space.id}
           spaceType={space.accessType}
           userRoleIdInWorkspace={[findUserRoleIdInWorkspace(props.userId, space.memberList, ROLE_LIST)]}
@@ -47,7 +46,7 @@ const SidebarSpaceList = (props) => {
     return 'fas fa-chevron-right'
   }
 
-  const handleClickTitle = () => {
+  const handleClickTitle = (e) => {
     if (props.isSidebarClosed) {
       props.onClickOpenSpaceList()
       props.onClickToggleSidebar()
@@ -57,7 +56,7 @@ const SidebarSpaceList = (props) => {
         else {
           if (props.isUserManager || props.isUserAdministrator) props.onClickNewSpace()
         }
-      } else props.onClickToggleSpaceList()
+      } else props.onClickToggleSpaceList(e)
     }
   }
 
