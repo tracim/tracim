@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { isMobile } from 'react-device-detect'
+import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
 
 require('./SearchInput.styl')
 
@@ -25,7 +26,7 @@ export const SearchInput = (props) => {
   return (
     <div className='search'>
       <input
-        className='search__text lockToggleSidebarWhenOpenedOnMobile'
+        className={`search__text ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
         data-cy='search__text'
         type='text'
         placeholder={props.t('Search')}

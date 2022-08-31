@@ -17,6 +17,7 @@ import {
 import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
 import { putNotificationAsRead } from '../../action-creator.async.js'
 import { newFlashMessage, readNotification } from '../../action-creator.sync.js'
+import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
 
 const qs = require('query-string')
 
@@ -157,7 +158,7 @@ class SidebarSpaceItem extends React.Component {
 
         {props.hasChildren && (
           <IconButton
-            customClass='transparentButton sidebar__item__foldChildren lockToggleSidebarWhenOpenedOnMobile'
+            customClass={`transparentButton sidebar__item__foldChildren ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
             icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'

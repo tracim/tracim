@@ -12,6 +12,7 @@ import {
   findUserRoleIdInWorkspace,
   NO_ACTIVE_SPACE_ID
 } from '../../util/helper.js'
+import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
 import SidebarSpaceItem from './SidebarSpaceItem.jsx'
 
 const SidebarSpaceList = (props) => {
@@ -63,7 +64,7 @@ const SidebarSpaceList = (props) => {
     <>
       <div className='sidebar__item sidebar__title'>
         <button
-          className='transparentButton btn sidebar__title__button lockToggleSidebarWhenOpenedOnMobile'
+          className={`transparentButton btn sidebar__title__button ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
           title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           onClick={handleClickTitle}
         >

@@ -10,6 +10,7 @@ import {
   IconButton,
   PAGE
 } from 'tracim_frontend_lib'
+import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../../container/Sidebar.jsx'
 
 export const MenuProfile = props => {
   if (!props.user.logged) return null
@@ -19,7 +20,7 @@ export const MenuProfile = props => {
       {props.isSidebarClosed
         ? (
           <button
-            className='transparentButton btn lockToggleSidebarWhenOpenedOnMobile'
+            className={`transparentButton btn ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
             onClick={props.onClickOpenUserItems}
           >
             <Avatar
@@ -31,7 +32,7 @@ export const MenuProfile = props => {
           </button>
         ) : (
           <button
-            className='sidebar__item transparentButton btn sidebar__title__button lockToggleSidebarWhenOpenedOnMobile'
+            className={`sidebar__item transparentButton btn sidebar__title__button ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
             onClick={props.onClickToggleUserItems}
             title={props.showUserItems ? props.t('Hide user menu') : props.t('Show user menu')}
           >

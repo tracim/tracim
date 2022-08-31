@@ -34,6 +34,7 @@ import SidebarSpaceList from '../component/Sidebar/SidebarSpaceList.jsx'
 import SidebarUserItemList from '../component/Sidebar/SidebarUserItemList.jsx'
 
 const qs = require('query-string')
+export const LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE = 'lockToggleSidebarWhenOpenedOnMobile'
 
 export class Sidebar extends React.Component {
   constructor (props) {
@@ -127,17 +128,21 @@ export class Sidebar extends React.Component {
     return !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
   }
 
-  hasClass = (element, className) => {
+  // INFO - G.B. - 2022-08-31 - Since the e.target is the last node of the clicked location, the desired class may not be in it, but in
+  // its parent, or even in the parent of its parent... So the function looks recursively through all parents until it reaches the sidebar,
+  // if the class is not found, it means that it doesn't exist in the location clicked.
+  hasClassOnTargetOrItsParents = (element, className) => {
     const hasOriginalClass = element.classList.contains(className)
     const hasStopClass = element.classList.contains('sidebar')
     if (hasStopClass) return false
-    else return hasOriginalClass || this.hasClass(element.parentNode, className)
+    else return hasOriginalClass || this.hasClassOnTargetOrItsParents(element.parentNode, className)
   }
 
   handleClickToggleSidebar = (e) => {
     const { state } = this
-    const isExpandOrEmptyZone = this.hasClass(e.target, 'sidebar__header__expand') || this.hasClass(e.target, 'sidebar__emptyZone')
-    const hasLockClass = this.hasClass(e.target, 'lockToggleSidebarWhenOpenedOnMobile')
+    const isExpandOrEmptyZone = this.hasClassOnTargetOrItsParents(e.target, 'sidebar__header__expand') ||
+      this.hasClassOnTargetOrItsParents(e.target, 'sidebar__emptyZone')
+    const hasLockClass = this.hasClassOnTargetOrItsParents(e.target, LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE)
 
     if (
       isExpandOrEmptyZone ||
