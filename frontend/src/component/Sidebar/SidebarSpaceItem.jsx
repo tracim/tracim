@@ -157,12 +157,12 @@ class SidebarSpaceItem extends React.Component {
 
         {props.hasChildren && (
           <IconButton
-            customClass='transparentButton sidebar__item__foldChildren'
+            customClass='transparentButton sidebar__item__foldChildren lockToggleSidebarWhenOpenedOnMobile'
             icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'
             mode='light'
-            onClick={props.onToggleFoldChildren}
+            onClick={() => props.onToggleFoldChildren(props.spaceId)}
           />
         )}
 

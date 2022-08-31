@@ -88,9 +88,8 @@ export class Sidebar extends React.Component {
     props.history.push(PAGE.SEARCH_RESULT + '?' + qs.stringify(newUrlSearchObject, { encode: true }))
   }
 
-  handleToggleFoldChildren = (id, e) => {
+  handleToggleFoldChildren = (id) => {
     const { state } = this
-    e.stopPropagation()
     if (state.foldedSpaceList.find(spaceId => spaceId === id)) {
       const newFoldedSpaceList = state.foldedSpaceList.filter(spaceId => spaceId !== id)
       this.setState({ foldedSpaceList: newFoldedSpaceList })
@@ -128,40 +127,46 @@ export class Sidebar extends React.Component {
     return !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
   }
 
+  hasClass = (element, className) => {
+    const hasOriginalClass = element.classList.contains(className)
+    const hasStopClass = element.classList.contains('sidebar')
+    if (hasStopClass) return false
+    else return hasOriginalClass || this.hasClass(element.parentNode, className)
+  }
+
   handleClickToggleSidebar = (e) => {
-    e.stopPropagation()
-    GLOBAL_dispatchEvent({
-      type: this.state.isSidebarClosed
-        ? CUSTOM_EVENT.SHOW_SIDEBAR
-        : CUSTOM_EVENT.HIDE_SIDEBAR,
-      data: {}
-    })
-    this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
+    const { state } = this
+    const isExpandOrEmptyZone = this.hasClass(e.target, 'sidebar__header__expand') || this.hasClass(e.target, 'sidebar__emptyZone')
+    const hasLockClass = this.hasClass(e.target, 'lockToggleSidebarWhenOpenedOnMobile')
+
+    if (
+      isExpandOrEmptyZone ||
+      (state.isSidebarClosed && hasLockClass) ||
+      (isMobile && !state.isSidebarClosed && !hasLockClass)
+    ) {
+      GLOBAL_dispatchEvent({
+        type: this.state.isSidebarClosed
+          ? CUSTOM_EVENT.SHOW_SIDEBAR
+          : CUSTOM_EVENT.HIDE_SIDEBAR,
+        data: {}
+      })
+      this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
+    }
   }
 
   handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
 
   handleClickOpenUserItems = () => this.setState({ showUserItems: true })
 
-  handleClickToggleSpaceList = (e) => {
-    e.stopPropagation()
-    this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
-  }
+  handleClickToggleSpaceList = () => this.setState(previousState => ({ showSpaceList: !previousState.showSpaceList }))
 
-  handleClickToggleUserItems = (e) => {
-    e.stopPropagation()
-    this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
-  }
+  handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
 
   handleClickLogout = () => this.props.dispatch(logoutUser(this.props.history))
 
   handleClickNewSpace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
   handleClickJoinWorkspace = () => this.props.history.push(PAGE.JOIN_WORKSPACE)
-
-  handleClickSidebarWhenOpenOnMobile = (e) => {
-    if (isMobile && !this.state.isSidebarClosed) this.handleClickToggleSidebar(e)
-  }
 
   render () {
     const { props, state } = this
@@ -174,10 +179,10 @@ export class Sidebar extends React.Component {
     const isUserManager = props.user.profile === PROFILE.manager.slug
 
     return (
-      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })} onClick={this.handleClickSidebarWhenOpenOnMobile}>
+      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })} onClick={this.handleClickToggleSidebar}>
         <div className='sidebar__header'>
           <Logo to={PAGE.HOME} />
-          <button className='btn transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
+          <button className='btn transparentButton sidebar__header__expand'>
             <Icon
               icon='fas fa-bars'
               title={state.isSidebarClosed ? props.t('See sidebar') : props.t('Hide sidebar')}
@@ -198,7 +203,6 @@ export class Sidebar extends React.Component {
         >
           <SearchInput
             onClickSearch={this.handleClickSearch}
-            onClickToggleSidebar={this.handleClickToggleSidebar}
             searchString={props.simpleSearch.searchString}
           />
 
@@ -237,7 +241,6 @@ export class Sidebar extends React.Component {
           location={props.location}
           onClickLogout={this.handleClickLogout}
           onClickOpenUserItems={this.handleClickOpenUserItems}
-          onClickToggleSidebar={this.handleClickToggleSidebar}
           onClickToggleUserItems={this.handleClickToggleUserItems}
           showUserItems={state.showUserItems}
           user={props.user}
@@ -254,7 +257,6 @@ export class Sidebar extends React.Component {
           onClickJoinWorkspace={this.handleClickJoinWorkspace}
           onClickNewSpace={this.handleClickNewSpace}
           onClickOpenSpaceList={this.handleClickOpenSpaceList}
-          onClickToggleSidebar={this.handleClickToggleSidebar}
           onClickToggleSpaceList={this.handleClickToggleSpaceList}
           onToggleFoldChildren={this.handleToggleFoldChildren}
           showSpaceList={state.showSpaceList}
@@ -262,7 +264,7 @@ export class Sidebar extends React.Component {
           userId={props.user.userId}
         />
 
-        <div className='sidebar__emptyZone' onClick={this.handleClickToggleSidebar} />
+        <div className='sidebar__emptyZone' />
 
         <div className='sidebar__footer'>
           <div className='sidebar__footer__text'>

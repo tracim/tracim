@@ -19,22 +19,19 @@ export const SearchInput = (props) => {
   const handleKeyDown = e => {
     if (e.key === 'Enter') {
       handleClickSearch()
-      if (isMobile) props.onClickToggleSidebar(e)
     }
   }
 
   return (
     <div className='search'>
       <input
-        className='search__text'
+        className='search__text lockToggleSidebarWhenOpenedOnMobile'
         data-cy='search__text'
         type='text'
         placeholder={props.t('Search')}
         onChange={handleNewSearch}
         onKeyDown={handleKeyDown}
         value={searchString}
-        // INFO - G.B. - 2022-08-30 - The stop propagation below allows to type on sidebar without toogle on mobile
-        onClick={(e) => e.stopPropagation()}
       />
       <button
         className='search__btn'
@@ -53,12 +50,10 @@ export default translate()(SearchInput)
 
 SearchInput.propTypes = {
   onClickSearch: PropTypes.func,
-  onClickToggleSidebar: PropTypes.func,
   searchString: PropTypes.string
 }
 
 SearchInput.defaultProps = {
   onClickSearch: () => { },
-  onClickToggleSidebar: () => { },
   searchString: ''
 }

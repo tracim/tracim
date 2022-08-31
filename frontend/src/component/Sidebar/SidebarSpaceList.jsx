@@ -27,7 +27,7 @@ const SidebarSpaceList = (props) => {
           isNotificationWallOpen={props.isNotificationWallOpen}
           label={space.label}
           level={spaceLevel}
-          onToggleFoldChildren={(e) => props.onToggleFoldChildren(space.id, e)}
+          onToggleFoldChildren={props.onToggleFoldChildren}
           spaceId={space.id}
           spaceType={space.accessType}
           userRoleIdInWorkspace={[findUserRoleIdInWorkspace(props.userId, space.memberList, ROLE_LIST)]}
@@ -46,17 +46,16 @@ const SidebarSpaceList = (props) => {
     return 'fas fa-chevron-right'
   }
 
-  const handleClickTitle = (e) => {
+  const handleClickTitle = () => {
     if (props.isSidebarClosed) {
       props.onClickOpenSpaceList()
-      props.onClickToggleSidebar(e)
     } else {
       if (props.spaceList.length === 0) {
         if (props.accessibleWorkspaceList.length > 0) props.onClickJoinWorkspace()
         else {
           if (props.isUserManager || props.isUserAdministrator) props.onClickNewSpace()
         }
-      } else props.onClickToggleSpaceList(e)
+      } else props.onClickToggleSpaceList()
     }
   }
 
@@ -64,7 +63,7 @@ const SidebarSpaceList = (props) => {
     <>
       <div className='sidebar__item sidebar__title'>
         <button
-          className='transparentButton btn sidebar__title__button'
+          className='transparentButton btn sidebar__title__button lockToggleSidebarWhenOpenedOnMobile'
           title={props.showSpaceList ? props.t('Hide space list') : props.t('Show space list')}
           onClick={handleClickTitle}
         >
@@ -121,7 +120,6 @@ SidebarSpaceList.propTypes = {
   foldedSpaceList: PropTypes.array,
   isNotificationWallOpen: PropTypes.bool,
   isSidebarClosed: PropTypes.bool,
-  onClickToggleSidebar: PropTypes.func,
   onClickToggleSpaceList: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   showSpaceList: PropTypes.bool,
@@ -133,7 +131,6 @@ SidebarSpaceList.defaultProps = {
   foldedSpaceList: [],
   isNotificationWallOpen: false,
   isSidebarClosed: false,
-  onClickToggleSidebar: () => { },
   onClickToggleSpaceList: () => { },
   onToggleFoldChildren: () => { },
   showSpaceList: true,
