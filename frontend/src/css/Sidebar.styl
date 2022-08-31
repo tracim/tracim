@@ -132,7 +132,7 @@ borderWhenActive= 5px
           color sidebarFontColorHover
   &__spaces
     overflow-y auto
-    flex 1
+    min-height 225px // INFO - G.B. - 2022-08-30 - Min height to show full dropdown menu
     &__empty
       color mediumDarkGrey
       text-align center
@@ -171,14 +171,17 @@ borderWhenActive= 5px
           margin-inline-start textSpacing
           &:hover
             text-decoration underline
+  &__emptyZone
+    flex 1
 
 // INFO - GB - 2022-07-26 - Closed sidebar
 .sidebar
   &.sidebarClose
     width closedSidebarWidth
-    min-width unset
-    & .tracimLogo
-      display none
+    min-width closedSidebarWidth
+    & .sidebar__header
+      & .tracimLogo
+        display none
     & .sidebar__search
       padding 0
       & > .search
@@ -237,12 +240,10 @@ borderWhenActive= 5px
 .sidebar__favorites__item i
   color #F2CA53
 
-@media (max-width: max-xs) and (max-width: max-lg)
-  .siebarpagecontainer
-    position relative
-
+@media (max-width: max-lg)
   .sidebar
-    position absolute
     min-height 100%
-    &.sidebarClose
-      position static
+
+@media (max-width: max-sm)
+  .sidebar
+    min-width 100%

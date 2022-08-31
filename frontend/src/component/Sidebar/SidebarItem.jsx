@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link, withRouter } from 'react-router-dom'
 import classnames from 'classnames'
-import { isMobile } from 'react-device-detect'
 import { Icon } from 'tracim_frontend_lib'
 
 const SidebarItem = (props) => {
@@ -17,7 +16,6 @@ const SidebarItem = (props) => {
             props.customClass
           )}
           to={props.to}
-          onClick={isMobile ? props.onClickToggleSidebar : () => { }}
           data-cy={props.dataCy}
         >
           <div
@@ -76,7 +74,6 @@ SidebarItem.propTypes = {
   dataCy: PropTypes.string,
   isCurrentItem: PropTypes.bool,
   onClickItem: PropTypes.func,
-  onClickToggleSidebar: PropTypes.func,
   to: PropTypes.string,
   unreadMentionCount: PropTypes.number,
   unreadNotificationCount: PropTypes.number
@@ -86,9 +83,8 @@ SidebarItem.defaultProps = {
   customColor: '',
   customClass: '',
   dataCy: '',
-  onClickItem: () => { },
-  onClickToggleSidebar: () => { },
   isCurrentItem: false,
+  onClickItem: () => { },
   to: '',
   unreadMentionCount: 0,
   unreadNotificationCount: 0

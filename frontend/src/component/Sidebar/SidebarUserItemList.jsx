@@ -15,7 +15,6 @@ const SidebarUserItemList = (props) => {
         isUserAdministrator={props.isUserAdministrator}
         onClickLogout={props.onClickLogout}
         onClickOpenUserItems={props.onClickOpenUserItems}
-        onClickToggleSidebar={props.onClickToggleSidebar}
         onClickToggleUserItems={props.onClickToggleUserItems}
         showUserItems={props.showUserItems}
         user={props.user}
@@ -69,7 +68,6 @@ SidebarUserItemList.propTypes = {
   isUserAdministrator: PropTypes.bool,
   onClickLogout: PropTypes.func,
   onClickOpenUserItems: PropTypes.func,
-  onClickToggleSidebar: PropTypes.func,
   onClickToggleUserItems: PropTypes.func,
   showUserItems: PropTypes.bool
 }
@@ -82,7 +80,6 @@ SidebarUserItemList.defaultProps = {
   isUserAdministrator: false,
   onClickLogout: () => { },
   onClickOpenUserItems: () => { },
-  onClickToggleSidebar: () => { },
   onClickToggleUserItems: () => { },
   showUserItems: true
 }

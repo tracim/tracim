@@ -6,6 +6,7 @@ import { translate } from 'react-i18next'
 import { isMobile } from 'react-device-detect'
 import {
   CUSTOM_EVENT,
+  Icon,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   PROFILE,
@@ -32,8 +33,8 @@ import SidebarItem from '../component/Sidebar/SidebarItem.jsx'
 import SidebarSpaceList from '../component/Sidebar/SidebarSpaceList.jsx'
 import SidebarUserItemList from '../component/Sidebar/SidebarUserItemList.jsx'
 
-const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 const qs = require('query-string')
+export const LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE = 'lockToggleSidebarWhenOpenedOnMobile'
 
 export class Sidebar extends React.Component {
   constructor (props) {
@@ -127,16 +128,35 @@ export class Sidebar extends React.Component {
     return !unLoggedAllowedPageList.some(url => props.location.pathname.startsWith(url))
   }
 
-  handleClickAllContent = idWs => this.props.history.push(PAGE.WORKSPACE.CONTENT_LIST(idWs))
+  // INFO - G.B. - 2022-08-31 - Since the e.target is the last node of the clicked location, the desired class may not be in it, but in
+  // its parent, or even in the parent of its parent... So the function looks recursively through all parents until it reaches the sidebar,
+  // if the class is not found, it means that it doesn't exist in the location clicked.
+  hasClassOnTargetOrItsParents = (element, className) => {
+    const hasOriginalClass = element.classList.contains(className)
+    const hasStopClass = element.classList.contains('sidebar')
+    if (hasStopClass) return false
+    else return hasOriginalClass || this.hasClassOnTargetOrItsParents(element.parentNode, className)
+  }
 
-  handleClickToggleSidebar = () => {
-    GLOBAL_dispatchEvent({
-      type: this.state.isSidebarClosed
-        ? CUSTOM_EVENT.SHOW_SIDEBAR
-        : CUSTOM_EVENT.HIDE_SIDEBAR,
-      data: {}
-    })
-    this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
+  handleClickToggleSidebar = (e) => {
+    const { state } = this
+    const isExpandOrEmptyZone = this.hasClassOnTargetOrItsParents(e.target, 'sidebar__header__expand') ||
+      this.hasClassOnTargetOrItsParents(e.target, 'sidebar__emptyZone')
+    const hasLockClass = this.hasClassOnTargetOrItsParents(e.target, LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE)
+
+    if (
+      isExpandOrEmptyZone ||
+      (state.isSidebarClosed && hasLockClass) ||
+      (isMobile && !state.isSidebarClosed && !hasLockClass)
+    ) {
+      GLOBAL_dispatchEvent({
+        type: this.state.isSidebarClosed
+          ? CUSTOM_EVENT.SHOW_SIDEBAR
+          : CUSTOM_EVENT.HIDE_SIDEBAR,
+        data: {}
+      })
+      this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
+    }
   }
 
   handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
@@ -164,13 +184,14 @@ export class Sidebar extends React.Component {
     const isUserManager = props.user.profile === PROFILE.manager.slug
 
     return (
-      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })}>
+      <div ref={this.frameRef} className={classnames('sidebar', { sidebarClose: state.isSidebarClosed })} onClick={this.handleClickToggleSidebar}>
         <div className='sidebar__header'>
-          <Logo to={PAGE.HOME} logoSrc={TRACIM_LOGO_PATH} />
-          <button className='transparentButton sidebar__header__expand' onClick={this.handleClickToggleSidebar}>
-            {state.isSidebarClosed
-              ? <i className='fas fa-chevron-right' title={props.t('See sidebar')} />
-              : <i className='fas fa-chevron-left' title={props.t('Hide sidebar')} />}
+          <Logo to={PAGE.HOME} />
+          <button className='btn transparentButton sidebar__header__expand'>
+            <Icon
+              icon='fas fa-bars'
+              title={state.isSidebarClosed ? props.t('See sidebar') : props.t('Hide sidebar')}
+            />
           </button>
         </div>
 
@@ -210,10 +231,10 @@ export class Sidebar extends React.Component {
           customClass='sidebar__notification__item'
           label={props.t('Notifications')}
           icon='fas fa-bell'
+          isCurrentItem={props.isNotificationWallOpen}
           onClickItem={props.onClickNotification}
           unreadMentionCount={props.unreadMentionCount}
           unreadNotificationCount={props.unreadNotificationCount}
-          isCurrentItem={props.isNotificationWallOpen}
         />
 
         <SidebarUserItemList
@@ -225,7 +246,6 @@ export class Sidebar extends React.Component {
           location={props.location}
           onClickLogout={this.handleClickLogout}
           onClickOpenUserItems={this.handleClickOpenUserItems}
-          onClickToggleSidebar={this.handleClickToggleSidebar}
           onClickToggleUserItems={this.handleClickToggleUserItems}
           showUserItems={state.showUserItems}
           user={props.user}
@@ -239,17 +259,17 @@ export class Sidebar extends React.Component {
           isSidebarClosed={state.isSidebarClosed}
           isUserAdministrator={isUserAdministrator}
           isUserManager={isUserManager}
-          onClickAllContent={this.handleClickAllContent}
           onClickJoinWorkspace={this.handleClickJoinWorkspace}
           onClickNewSpace={this.handleClickNewSpace}
           onClickOpenSpaceList={this.handleClickOpenSpaceList}
-          onClickToggleSidebar={this.handleClickToggleSidebar}
           onClickToggleSpaceList={this.handleClickToggleSpaceList}
           onToggleFoldChildren={this.handleToggleFoldChildren}
           showSpaceList={state.showSpaceList}
           spaceList={props.workspaceList}
           userId={props.user.userId}
         />
+
+        <div className='sidebar__emptyZone' />
 
         <div className='sidebar__footer'>
           <div className='sidebar__footer__text'>
