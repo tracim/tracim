@@ -32,5 +32,7 @@
   "You are trying to mention an invalid user": "Está intentando mencionar un usuario no válido",
   "Validate anyway": "Validar de todos modos",
   "Tasks": "Tareas",
-  "Download as PDF": "Descargar como PDF"
+  "Download as PDF": "Descargar como PDF",
+  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "Copy content link": "Copiar enlace al contenido"
 }

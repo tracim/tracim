@@ -44,5 +44,7 @@
   "The file is larger than the maximum file size allowed": "The file is larger than the maximum file size allowed",
   "Error, the space exceed its maximum size": "Error, the space exceed its maximum size",
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
-  "Tasks": "Tasks"
+  "Tasks": "Tasks",
+  "The link has been copied to clipboard": "The link has been copied to clipboard",
+  "Copy content link": "Copy content link"
 }

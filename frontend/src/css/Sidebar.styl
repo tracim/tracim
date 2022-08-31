@@ -190,6 +190,7 @@ borderWhenActive= 5px
         display flex
     & .sidebar__item
       justify-content center
+      padding-inline-end borderWhenActive
       & > span
         display none
       &__name
@@ -223,6 +224,9 @@ borderWhenActive= 5px
         display none
       &__join
         display none
+
+[dir=rtl] .sidebar.sidebarClose .sidebar__notification
+  right 15px
 
 // INFO - GB - 2022-07-26 - Icon colors
 .sidebar__search__item i

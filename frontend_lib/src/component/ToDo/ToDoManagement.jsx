@@ -17,6 +17,56 @@ import NewToDo from './NewToDo.jsx'
 import { CONTENT_TYPE, ROLE } from '../../helper.js'
 import CreateToDoFromTextPopUp from './CreateToDoFromTextPopUp.jsx'
 
+// INFO - MP - 2022-07-18 - Transform a list of a to do in text form to a list of to do
+// Parameters:
+//  - toDosAsLineList: list of to do
+//  - memberList: the list of members
+//  - selectedValueList: the existing list of selected user on to dos
+//  - defaultObject: the default object that will be used to create a new to do
+// return an object that contains the list of to dos and the list of selected values
+export function transformToDoTextListIntoArrayHelper (toDosAsLineList, memberList, selectedValueList, defaultObject) {
+  const lines = toDosAsLineList
+  const tmpToDoList = []
+  const tmpSelectedValueList = [...selectedValueList]
+
+  lines.forEach((line, index) => {
+    // INFO - MP - 2022-07-04 - This regex will:
+    // Look for a +<UserName> followed by the ToDo text
+    // Ignoring blank space before the + and between the UserName and the ToDo text
+    // Example:
+    // With the string: '  +mathis do this'
+    // The expression will return: match['+mathis do this', '  ', '+mathis', ' ', 'do this']
+    // With the string: 'you have to do this'
+    // The expression will return: match['you have to do this', undefined, undefined, undefined, 'you have to do this']
+    const toDoGroups = line.match(/^([\s]*)([+][a-zA-Z]*)?( +)?(.*)/)
+
+    if (toDoGroups) {
+      let toDoAssigneeUsername
+
+      if (toDoGroups[2] && toDoGroups[2].startsWith('+')) {
+        toDoAssigneeUsername = toDoGroups[2].substring(1)
+      }
+
+      const toDoAssignee = memberList.find(member => member.username && member.username === toDoAssigneeUsername)
+
+      if (toDoAssignee) {
+        tmpSelectedValueList[index] = { value: toDoAssignee.id, label: `${toDoAssignee.publicName} (${toDoAssignee.username})` }
+      } else {
+        tmpSelectedValueList[index] = defaultObject
+      }
+
+      tmpToDoList.push(
+        {
+          assigneeId: tmpSelectedValueList[index] ? tmpSelectedValueList[index].value : null,
+          value: toDoGroups[4]
+        }
+      )
+    }
+  })
+
+  return { tmpToDoList, tmpSelectedValueList }
+}
+
 const ToDoManagement = (props) => {
   const isReader = props.user.userRoleIdInWorkspace === ROLE.reader.id
   const nobodyValueObject = { value: null, label: props.t('Nobody') }
@@ -159,45 +209,10 @@ const ToDoManagement = (props) => {
     setNewToDoListAsText(e.target.value)
 
     const lines = e.target.value.split(/\n/g)
-    const tmpToDoList = []
-    const tmpSelectedValueList = [...selectedValueList]
+    const { tmpToDoList, tmpSelectedValueList } = transformToDoTextListIntoArrayHelper(lines, props.memberList, selectedValueList, nobodyValueObject)
 
-    lines.forEach((line, index) => {
-      // INFO - MP - 2022-07-04 - This regex will:
-      // Look for a +<UserName> followed by the ToDo text
-      // Ignoring blank space before the + and between the UserName and the ToDo text
-      // Example:
-      // With the string: '  +mathis do this'
-      // The expression will return: match['+mathis do this', '  ', '+mathis', ' ', 'do this']
-      // With the string: 'you have to do this'
-      // The expression will return: match['you have to do this', undefined, undefined, undefined, 'you have to do this']
-      const toDoGroups = line.match(/^([\s]*)([+][a-zA-Z]*)?( +)?(.*)/)
-
-      if (toDoGroups) {
-        let toDoAssigneeUsername
-
-        if (toDoGroups[2] && toDoGroups[2].startsWith('+')) {
-          toDoAssigneeUsername = toDoGroups[2].substring(1)
-        }
-
-        const toDoAssignee = props.memberList.find(member => member.username && member.username === toDoAssigneeUsername)
-
-        if (toDoAssignee) {
-          tmpSelectedValueList[index] = { value: toDoAssignee.id, label: `${toDoAssignee.publicName} (${toDoAssignee.username})` }
-        } else {
-          tmpSelectedValueList[index] = nobodyValueObject
-        }
-
-        tmpToDoList.push(
-          {
-            assigneeId: tmpSelectedValueList[index] ? tmpSelectedValueList[index].value : null,
-            value: toDoGroups[4]
-          }
-        )
-      }
-    })
-    setSelectedValueList([...tmpSelectedValueList])
     setNewToDoList([...tmpToDoList])
+    setSelectedValueList([...tmpSelectedValueList])
     setLocalStorageItem(
       CONTENT_TYPE.TODO,
       props.contentId,
@@ -254,6 +269,7 @@ const ToDoManagement = (props) => {
               />
 
               <IconButton
+                dataCy='toDoManagement__buttons__new'
                 text={props.t('Validate')}
                 icon='fas fa-check'
                 onClick={handleClickSaveToDo}
@@ -293,7 +309,7 @@ const ToDoManagement = (props) => {
               />
             )
             : (
-              <div>
+              <div data-cy='toDo__empty'>
                 <span>{props.t('This content has no task to do associated.')}</span>
                 {!isReader && <span> {props.t('Click on "New task" button to create a new one.')}</span>}
               </div>
