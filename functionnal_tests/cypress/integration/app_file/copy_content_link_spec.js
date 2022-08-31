@@ -29,7 +29,7 @@ describe('The app file', function () {
       cy.contains('[data-cy=FilenameWithBadges__label]', filenameWithoutExtension)
       cy.get('.wsContentGeneric__header__actions').click()
       cy.get('[data-cy=popinListItem__copyLink]').click()
-      cy.contains('.flashmessage__container__content__text__paragraph', 'Link copied to clipboard')
+      cy.get('.flashmessage__container .bg-info').should('be.visible')
     })
   })
 })
