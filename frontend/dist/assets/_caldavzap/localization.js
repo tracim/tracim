@@ -5063,6 +5063,324 @@ localizationCalDAV['zh_CN']=	/* thanks Fandy */
 	CalDAVerrTodoHttp410: '待办已经服务器上。'
 };
 
+// pt_PT - Portuguese
+
+localization['pt_PT']=
+{
+	txtResources: 'Recursos',
+	txtNote: 'Nota',
+
+	errUnableSync: 'Erro: \'incapaz de sincronizar recursos\': tente novamente mais tarde!',
+
+	loadingResources: 'Carregamento de recursos (%act% de %total%)…',
+	loadingCollectionList: 'Carregamento da lista de recursos',
+
+	txtCacheText: 'Há uma atualização disponível no servidor, por favor recarregue a página!',
+	txtCacheButton: 'Recarregar',
+
+	fullscreenBtn: 'Ecrã inteiro'
+};
+
+localizationShared['pt_PT']=
+{
+	_name_: 'Português',
+	_default_datepicker_format_: 'dd/mm/yy',
+	_default_AMPM_format_: false,
+
+	altLogo: 'Logo',
+	altLogout: 'Terminar sessão',
+	buttonLogin: 'Iniciar sessão',
+	pholderUsername: 'Identificador',
+	pholderPassword: 'Palavra-passe',
+	txtSearch: 'Pesquisar',
+	txtError: 'Erro',
+	txtRefresh: 'Actualizar',
+
+	buttonEdit: 'Editar',
+	buttonSave: 'Guardar',
+	buttonReset: 'Reverter',
+	buttonCancel: 'Anular',
+	buttonDelete: 'Eliminar',
+
+	errCollectionLoad: 'Erro: \'incapaz de guardar definições\'!',
+	errHttpCommon: 'código de erro %%',
+	errHttp401: 'não autorizado',
+	errHttp403: 'proibido',
+	errHttp405: 'método não permitido',
+	errHttp408: 'expiração do prazo para a solicitação',
+	errHttp412: 'outra pessoa já o alterou no servidor',
+	errHttp500: 'erro interno do servidor',
+	errHttp501: 'não implementado',
+
+	unsupportedBrowser: 'Nota: seu navegador não é suportado!',
+	updateNotification: '%name% %new_ver% está disponível (você está atualmente na versão %curr_ver%) - %url%'
+};
+
+localizationSharedCalDAV['pt_PT']=
+{
+	txtCalendars: 'Calendários',
+	txtTodos: 'Tarefas',
+	localTime: 'Hora local',
+	fullCalendarMonth: 'mês',
+	fullCalendarMultiWeek: 'multisem',
+	fullCalendarAgendaWeek: 'semana',
+	fullCalendarAgendaDay: 'dia',
+
+	monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+	'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+	monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun',
+	'Jul','Ago','Set','Out','Nov','Dez'],
+	dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+	dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+	dayNamesMin: ['Do','Seg','Te','Qua','Qui','Sex','Sá']
+};
+
+localizationCalDAV['pt_PT']=
+{
+	_default_title_format_month_: 'MMM yyyy',
+	_default_title_format_week_: 'd[ MMM][ yyyy]{ \'–\' d MMM yyyy}',
+	_default_title_format_day_: 'ddd, d MMM yyyy',
+	_default_title_format_table_: 'ddd, MMM yyyy',
+	_default_column_format_agenda_: 'ddd, d MMM',
+
+	txtCalendar: 'Calendário',
+	txtEnabledCalendars: 'Calendários ativados',
+	txtTodo: 'Tarefa',
+	txtTodoList: 'Lista de tarefas',
+	txtTodoLists: 'Listas de tarefas',
+	txtEnabledTodoLists: 'Listas de tarefas ativadas',
+	txtSubscribed: 'Assinaturas',
+	fullCalendarTable: 'tabela',
+	fullCalendarTodayButton: 'hoje',
+	fullCalendarAllDay: 'o dia todo',
+	CalDAVsearch: 'Pesquisa',
+	resourceEnable: 'Habilitar todos os calendários deste recurso',
+	resourceDisable: 'Desactivar todos os calendários deste recurso',
+	allEnable: 'Activar todos os calendários',
+	allDisable: 'Desactivar todos os calendários',
+	timezone: 'Fuso horário',
+	txtTimezonePicker: 'Fuso horário:',
+	loadingRList: 'Carregando lista de recursos…',
+	renderingE: 'Renderizando calendários…',
+	timezoneChange: 'Aplicando mudança de fuso horário…',
+	customTimezone: 'Personalizado (Hora Local)',
+	customRepeat: 'Outros (modificação não suportada)',
+	loadPrevMonth: 'Carregar mês anterior',
+	loadNextMonth: 'Carregar próximo mês',
+	repeatBoxButton: 'Recorrência',
+	repeatBoxContent: 'é um acontecimento que se repete.',
+	repeatBoxQuestion: 'Com que eventos gostaria de trabalhar?',
+	allEvsButton: 'Todos os eventos',
+	allFutureButton: 'Este e todos os eventos futuros',
+	eventOnlyButton: 'Este evento apenas',
+	repeatBoxContentTODO: 'é uma tarefa que se repete.',
+	repeatBoxQuestionTODO: 'Com quais tarefas gostaria de trabalhar?',
+	allEvsButtonTODO: 'Todas tarefas',
+	allFutureButtonTODO: 'Esta e todas as tarefas futuras',
+	eventOnlyButtonTODO: 'Esta tarefa apenas',
+	txtStatus: 'Status',
+	eventAvailability : 'Disponibilidade',
+	eventAvailabilityBusy : 'Ocupado',
+	eventAvailabilityFree : 'Livre',
+	eventType: 'Privacidade',
+	eventTypePublic: 'Público',
+	eventTypePrivate: 'Particular',
+	eventTypeConfidential: 'Confidencial',
+	txtPriority: 'Prioridade',
+	txtPriorityNone: 'Nenhuma',
+	txtPriorityLow: 'Baixa',
+	txtPriorityMedium: 'Média',
+	txtPriorityHigh: 'Alta',
+	eventURL : 'URL',
+	repeatInterval: 'cada',
+	repeatDays: 'dias',
+	repeatWeeks: 'semanas',
+	repeatMonths: 'meses',
+	repeatYears: 'anos',
+	repeatChangeTxt: 'foi alterado no servidor!',
+	repeatChangeTxtClose: 'Fechar o formulário e abrir novamente o evento',
+	repeatTodoChangeTxtClose: 'Fechar o formulário e abrir novamente a tarefa',
+	calendarLoader: 'Recarregando…',
+	resizeLoader: 'Redimensionando…',
+
+	// TODOS
+	pholderNameTODO: 'Nome',
+	pholderNewTODO: 'Nova tarefa',
+	txtTypeTODO: 'Tipo',
+	txtTypeTODONone: 'Simples',
+	txtTypeTODOStart: 'Com data de início',
+	txtTypeTODODue: 'Com o devido tempo',
+	txtTypeTODOBoth: 'Tanto com tempo de início como com tempo devido',
+	txtDateFromTODO: 'De',
+	txtDateToTODO: 'A',
+	txtCompletedOn: 'Concluído em',
+
+	pholderDateFromTODO: 'Data de',
+	pholderTimeFromTODO: 'Hora de',
+	pholderDateToTODO: 'Data a',
+	pholderTimeToTODO: 'Hora a',
+	pholderCompletedOnDate: 'Data',
+	pholderCompletedOnTime: 'Hora',
+
+	txtStatusFiltersHeaderTODO: 'Filtros',
+	txtStatusFiltersFooterTODO: '* completado em ou após %date%',
+	txtStatusNeedsActionTODO: 'Precisa de ação',
+	txtStatusCompletedTODO: 'Concluído',
+	txtStatusInProcessTODO: 'Em curso',
+	txtStatusCancelledTODO: 'Cancelado',
+	txtPercentCompletedTODO: 'Concluído',
+
+	txtCalendarTODO: 'Calendário',
+	txtSelectCalendarTODO: 'Seleccione um calendário',
+	txtAlertTODO: 'Alerta',
+	txtAlertNoneTODO: 'Nenhum',
+	txtAlertMessageTODO: 'Mensagem',
+	txtAlertOnDateTODO: 'Na data',
+	txtAlertWeeksBeforeTODO: 'Semanas antes',
+	txtAlertDaysBeforeTODO: 'Dias antes',
+	txtAlertHoursBeforeTODO: 'Horas antes',
+	txtAlertMinutesBeforeTODO: 'Minutos antes',
+	txtAlertSecondsBeforeTODO: 'Segundos antes',
+	txtAlertWeeksAfterTODO: 'Semanas depois',
+	txtAlertDaysAfterTODO: 'Dias depois',
+	txtAlertHoursAfterTODO: 'Horas depois',
+	txtAlertMinutesAfterTODO: 'Minutos depois',
+	txtAlertSecondsAfterTODO: 'Segundos depois',
+
+	pholderAfterBeforeValTODO: 'Valor',
+	pholderAlarmDateTODO: 'Data do alarme',
+	pholderAlarmTimeTODO: 'Hora do alarme',
+
+	pholderNoteTODO: 'Nota',
+	txtNoteTODO: 'Nota',
+
+	todoPrevNav: 'Mostrar instância anterior',
+	todoNextNav: 'Mostrar a próxima instância',
+	todoUncompletedPrevNav: 'Mostrar instância anterior não terminada',
+	todoUncompletedNextNav: 'Mostrar a próxima instância não terminada',
+
+	buttonSaveTODO: 'Guardar',
+	buttonEditTODO: 'Editar',
+	buttonDuplicateTODO: 'Duplicar',
+	buttonResetTODO: 'Reverter',
+	buttonCloseTODO: 'Fechar',
+	buttonDeleteTODO: 'Eliminar',
+
+	// EVENTS
+	pholderName: 'Nome',
+	pholderNewEvent: 'Novo Evento',
+	txtLocation: 'Localização',
+	pholderLocation: 'Localização',
+
+	txtAllDay: 'O dia todo',
+	from: 'De',
+	to: 'A',
+
+	pholderDateFrom: 'Data de',
+	pholderTimeFrom: 'Hora de',
+	pholderDateTo: 'Data a',
+	pholderTimeTo: 'Hora a',
+
+	txtStatusNone: 'Não especificado',
+	txtStatusTentative: 'Tentativa',
+	txtStatusConfirmed: 'Confirmado',
+	txtStatusCancelled: 'Cancelado',
+
+	txtRepeat: 'Repetir',
+	txtNoRepeat: 'Sem repetição',
+	txtRepeatDay: 'Diariamente',
+	txtRepeatWeek: 'Semanalmente',
+	txtRepeatWeekend: 'Todos os fins-de-semana',
+	txtRepeatMonth: 'Mensalmente',
+	txtRepeatTwoWeek: 'Bi-semanal',
+	txtRepeatYear: 'Anualmente',
+	txtRepeatCustomWeek: 'Semanalmente personalizado',
+	txtRepeatCustomMonth: 'Mensalmente personalizado',
+	txtRepeatCustomYear: 'Anualmente personalizado',
+	txtRepeatWork: 'Todos os dias úteis',
+	txtRepeatOnDate: 'Na data',
+	txtRepeatAfter: 'Ocorrências',
+	txtRepeatNever: 'Nunca',
+	pholderUntilDate: 'Data até',
+	pholderRepeatCount: 'Número de repetições',
+	txtRepeatCustomWeekLabel: 'em',
+	txtRepeatCustomMonthLabel: 'em dias',
+	txtRepeatCustomMonthEvery: 'Cada',
+	txtRepeatCustomMonthFirst: 'Primeiro',
+	txtRepeatCustomMonthSecond: 'Segundo',
+	txtRepeatCustomMonthThird: 'Terceiro',
+	txtRepeatCustomMonthFourth: 'Quarto',
+	txtRepeatCustomMonthFifth: 'Quinto',
+	txtRepeatCustomMonthLast: 'Último',
+	txtRepeatCustomMonthCustom: 'Personalizado',
+	txtRepeatCustomMonthMonth: 'Dia do mês',
+	txtRepeatCustomYearLabel1: 'cada',
+	txtRepeatCustomYearLabel2: 'de',
+
+	txtRepeatEnd: 'fim',
+	txtEventCalendar: 'Calendário',
+	txtSelectCalendar: 'Seleccione um calendário',
+	txtAlert: 'Alerta',
+	txtAlertNone: 'Nenhum',
+	txtAlertMessage: 'Mensagem',
+	txtAlertOnDate: 'Na data',
+	txtAlertWeeksBefore: 'Semanas antes',
+	txtAlertDaysBefore: 'Dias antes',
+	txtAlertHoursBefore: 'Horas antes',
+	txtAlertMinutesBefore: 'Minutos antes',
+	txtAlertSecondsBefore: 'Segundos antes',
+	txtAlertWeeksAfter: 'Semanas depois',
+	txtAlertDaysAfter: 'Dias depois',
+	txtAlertHoursAfter: 'Horas depois',
+	txtAlertMinutesAfter: 'Minutos depois',
+	txtAlertSecondsAfter: 'Segundos depois',
+
+	pholderAfterBeforeVal: 'Valor',
+	pholderAlarmDate: 'Data do alarme',
+	pholderAlarmTime: 'Hora do alarme',
+
+	pholderNote: 'Nota',
+
+	eventPrevNav: 'Mostrar instância anterior',
+	eventNextNav: 'Mostrar a próxima instância',
+
+	buttonClose: 'Fechar',
+	buttonDuplicate: 'Duplicar',
+
+	txtAllSavedTodo: 'Sucesso: Tarefa salva!',
+	txtAllSaved: 'Sucesso: Evento salvo!',
+
+	txtAllDeletedTodo: 'Sucesso: Tarefa apagada!',
+	txtAllDeleted: 'Sucesso: Evento excluído!',
+
+	txtNotChooseTodo: 'Erro: Tem de escolher o calendário!',
+	txtNotChoose: 'Erro: Tem de escolher o calendário!',
+
+	txtErorInputTodo: 'Não é possível salvar: corrija valores inválidos!',
+	txtDateTimeErrorTodo: 'Têm de escolher data e hora!',
+
+	txtErrorDates: 'Erro: A data de início deve preceder a data final!',
+	txtErrorDatesTodo: 'Erro: A data de início deve preceder a data final!',
+
+	txtErorInput: 'Erro: \'incapaz de salvar\': corrigir os valores inválidos destacados!',
+
+	txtAlertsH: 'Alertas',
+	buttonAlert: 'Limpar alertas',
+
+	altAddEvent: 'Adicionar evento',
+	altAddTodo: 'Adicionar tarefa',
+
+	loadingCalendars: 'Carregamento dos calendários (%act% de %total%)…',
+	unloadingCalendars: 'Descarregando calendários…',
+
+	errUnableSaveBeginCalDAV: 'Erro: \'não foi possível salvar o evento\': %%!',
+	errUnableDeleteBeginCalDAV: 'Erro: \'incapaz de eliminar o evento\': %%!',
+	CalDAVerrHttp410: 'O evento não está mais disponível no servidor',
+	errUnableSaveTodoBeginCalDAV: 'Erro: \'não foi possível salvar a tarefa\': %%!',
+	errUnableDeleteTodoBeginCalDAV: 'Erro: \'incapaz de eliminar a tarefa\': %%!',
+	CalDAVerrTodoHttp410: 'Tarefa já não está disponível no servidor'
+};
+
 // nb_NO - Norwegian Bokmål
 
 localization['nb_NO']=
@@ -5076,7 +5394,9 @@ localization['nb_NO']=
 	loadingCollectionList: 'Laster inn ressursliste',
 
 	txtCacheText: 'En oppdatering er tilgjengelig på tjeneren. Last inn siden igjen.',
-	txtCacheButton: 'Last inn igjen'
+	txtCacheButton: 'Last inn igjen',
+
+	fullscreenBtn: 'Fullskjermsvisning'
 };
 
 localizationShared['nb_NO']=
@@ -5114,7 +5434,7 @@ localizationShared['nb_NO']=
 	updateNotification: '%name% %new_ver% tilgjengelig (du har %curr_ver%) - %url%'
 };
 
-localizationSharedCalDAV['nb_NO']=	/* Jan Mate <jan.mate@inf-it.com> */
+localizationSharedCalDAV['nb_NO']=
 {
 	txtCalendars: 'Kalendere',
 	txtTodos: 'Gjøremålslister',
