@@ -10,22 +10,18 @@ import {
   IconButton,
   PAGE
 } from 'tracim_frontend_lib'
+import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../../container/Sidebar.jsx'
 
 export const MenuProfile = props => {
   if (!props.user.logged) return null
-
-  const handleClickAvatarWhenSidebarIsClosed = () => {
-    props.onClickOpenUserItems()
-    props.onClickToggleSidebar()
-  }
 
   return (
     <div className='sidebar__item sidebar__title'>
       {props.isSidebarClosed
         ? (
           <button
-            className='transparentButton btn'
-            onClick={handleClickAvatarWhenSidebarIsClosed}
+            className={`transparentButton btn ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
+            onClick={props.onClickOpenUserItems}
           >
             <Avatar
               size={AVATAR_SIZE.SMALL}
@@ -36,7 +32,7 @@ export const MenuProfile = props => {
           </button>
         ) : (
           <button
-            className='sidebar__item transparentButton btn sidebar__title__button'
+            className={`sidebar__item transparentButton btn sidebar__title__button ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
             onClick={props.onClickToggleUserItems}
             title={props.showUserItems ? props.t('Hide user menu') : props.t('Show user menu')}
           >
@@ -117,7 +113,6 @@ MenuProfile.propTypes = {
   isSidebarClosed: PropTypes.bool,
   isUserAdministrator: PropTypes.bool,
   onClickOpenUserItems: PropTypes.func,
-  onClickToggleSidebar: PropTypes.func,
   onClickToggleUserItems: PropTypes.func,
   showUserItems: PropTypes.bool
 }
@@ -127,7 +122,6 @@ MenuProfile.defaultProps = {
   isSidebarClosed: false,
   isUserAdministrator: false,
   onClickOpenUserItems: () => { },
-  onClickToggleSidebar: () => { },
   onClickToggleUserItems: () => { },
   showUserItems: true
 }

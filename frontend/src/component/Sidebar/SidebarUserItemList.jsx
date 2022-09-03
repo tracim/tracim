@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import { PAGE } from 'tracim_frontend_lib'
 import SidebarItem from './SidebarItem.jsx'
@@ -14,7 +15,6 @@ const SidebarUserItemList = (props) => {
         isUserAdministrator={props.isUserAdministrator}
         onClickLogout={props.onClickLogout}
         onClickOpenUserItems={props.onClickOpenUserItems}
-        onClickToggleSidebar={props.onClickToggleSidebar}
         onClickToggleUserItems={props.onClickToggleUserItems}
         showUserItems={props.showUserItems}
         user={props.user}
@@ -42,6 +42,7 @@ const SidebarUserItemList = (props) => {
 
           {props.isAgendaEnabled && (
             <SidebarItem
+              customColor={props.appList.find(app => app.slug === 'agenda').hexcolor}
               customClass='sidebar__agendas__item'
               to={PAGE.AGENDA}
               label={props.t('My agendas')}
@@ -54,7 +55,8 @@ const SidebarUserItemList = (props) => {
     </>
   )
 }
-export default translate()(SidebarUserItemList)
+const mapStateToProps = ({ appList }) => ({ appList })
+export default connect(mapStateToProps)(translate()(SidebarUserItemList))
 
 SidebarUserItemList.propTypes = {
   location: PropTypes.object.isRequired,
@@ -66,7 +68,6 @@ SidebarUserItemList.propTypes = {
   isUserAdministrator: PropTypes.bool,
   onClickLogout: PropTypes.func,
   onClickOpenUserItems: PropTypes.func,
-  onClickToggleSidebar: PropTypes.func,
   onClickToggleUserItems: PropTypes.func,
   showUserItems: PropTypes.bool
 }
@@ -79,7 +80,6 @@ SidebarUserItemList.defaultProps = {
   isUserAdministrator: false,
   onClickLogout: () => { },
   onClickOpenUserItems: () => { },
-  onClickToggleSidebar: () => { },
   onClickToggleUserItems: () => { },
   showUserItems: true
 }

@@ -63,5 +63,7 @@
   "Error while saving the user configuration": "Error while saving the user configuration",
   "Tags": "Tags",
   "Delete": "Delete",
-  "Tasks": "Tasks"
+  "Tasks": "Tasks",
+  "The link has been copied to clipboard": "The link has been copied to clipboard",
+  "Copy content link": "Copy content link"
 }

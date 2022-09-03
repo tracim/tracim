@@ -1,1 +1,24 @@
-{}
+{
+  "Cancel": "Avbryt",
+  "New": "Ny",
+  "Generate random password": "Generer et tilfeldig passord",
+  "Show password": "Vis passord",
+  "Error in the URL": "Feil i nettadressen",
+  "Protect by password": "Beskytt med passord",
+  "Error while loading Tracim's content type list": " \n",
+  "Validate": "Bekreft",
+  "Received files": "Mottatte filer",
+  "Password": "Passord",
+  "Recipient's email addresses": "Mottagers e-postadresser",
+  "No upload link has been created yet": "Det har ikke blitt laget en opplastingslenke enda",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "",
+  "Email notification are disabled, please manually share the link": "E-postmerknader er avskrudd. Del lenken manuelt.",
+  "Cancel protection by password": "Avbryt beskyttelse med passord",
+  "Public upload links": "Offentlige opplastingslenker",
+  "Public upload link has been created. Don't forget to share the password to the recipients.": "Offentlig opplastingslenke opprettet. Ikke glem å dele passordet med mottagerne.",
+  "Public upload link has been created.": "Offentlig opplastingslenke opprettet.",
+  "New public upload link": "Ny offentlig opplastingslenke",
+  "Error while creating new public upload link": "Kunne ikke opprette ny offentlig opplastingslenke",
+  "Error while deleting public upload link": "Kunne ikke slette offentlig opplastingslenke",
+  "Error, these emails are invalid: ": "Disse e-postadressene er ugyldige: "
+}

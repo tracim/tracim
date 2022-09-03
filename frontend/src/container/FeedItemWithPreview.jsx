@@ -258,6 +258,7 @@ export class FeedItemWithPreview extends React.Component {
         const commentTranslationState = state.translationStateByCommentId[comment.content_id] || {}
         return {
           ...comment,
+          timelineType: comment.timelineType || comment.content_type,
           translationState: commentTranslationState.translationState || defaultTranslationState,
           translatedRawContent: commentTranslationState.translatedRawContent
         }

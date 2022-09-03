@@ -13,5 +13,7 @@
   "This folder is deleted": "Esta carpeta ha sido eliminada",
   "Error while loading Tracim's content type list": "Error al cargar la lista de tipos de contenido de Tracim",
   "Restore": "Restaurar",
-  "Create a folder": "Crear una carpeta"
+  "Create a folder": "Crear una carpeta",
+  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "Copy content link": "Copiar enlace al contenido"
 }

@@ -1,1 +1,22 @@
-{}
+{
+  "{picture}Next": "Neste",
+  "Previous": "Forrige",
+  "Play": "Spill av",
+  "Cancel": "Avbryt",
+  "Delete": "Slett",
+  "Disable fullscreen": "Skru av fullskjermsvisning",
+  "Are you sure?": "Er du sikker?",
+  "Insufficient permissions": "Utilstrekkelige tilganger",
+  "Open raw file": "Åpne rå-fil",
+  "Rotate 90° left": "Roter 90° til venstre",
+  "Rotate 90° right": "Roter 90° til høyre",
+  "Gallery": "Galleri",
+  "Error while loading file preview": "Kunne ikke forhåndsvise fil",
+  "Error while loading content list": "Kunne ikke laste inn innholdsliste",
+  "Error while deleting document": "Kunne ikke slette dokumentet",
+  "Enable fullscreen": "Fullskjermsvisning",
+  "Error while loading folder detail": "Kunne ikke laste inn mappedetalj",
+  "No preview available": "Ingen forhåndsvisning tilgjengelig",
+  "Error while loading space detail": "Kunne ikke laste inn detalj om rom",
+  "There isn't any picture to delete.": "Ingen bilder å slette."
+}

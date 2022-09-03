@@ -1,1 +1,17 @@
-{}
+{
+  "Back": "Tilbake",
+  "Create": "Opprett",
+  "Default role:": "Forvalgt rolle:",
+  "Space's name": "Rommets navn",
+  "A space with that name already exists": "Et rom med det navnet finnes allerede",
+  "None": "Ingen",
+  "Next": "Neste",
+  "Some input are invalid": "Noe av inndataen er ugyldig",
+  "Error while getting user spaces": "Kunne ikke hente brukerrom",
+  "New space": "Nytt rom",
+  "Error while saving new space": "Kunne ikke lagre nytt rom",
+  "Parent space:": "Ovennevnt rom:",
+  "Space's name:": "Rommets navn:",
+  "Space's type:": "Romtype:",
+  "You cannot create anymore space": "Du kan ikke opprette mer rom"
+}

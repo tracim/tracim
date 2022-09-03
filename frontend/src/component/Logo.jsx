@@ -5,17 +5,17 @@ import { PAGE } from 'tracim_frontend_lib'
 
 require('./Logo.styl')
 
+const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
 const Logo = props => {
   return (
     <Link className='tracimLogo' to={props.to}>
-      <img className='tracimLogo__img' src={props.logoSrc} />
+      <img className='tracimLogo__img' src={TRACIM_LOGO_PATH} />
     </Link>
   )
 }
 export default Logo
 
 Logo.propTypes = {
-  logoSrc: PropTypes.string.isRequired,
   to: PropTypes.string
 }
 

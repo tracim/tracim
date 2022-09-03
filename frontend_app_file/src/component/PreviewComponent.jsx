@@ -5,7 +5,7 @@ import Radium from 'radium'
 import PropTypes from 'prop-types'
 import Lightbox from 'react-image-lightbox'
 import 'react-image-lightbox/style.css'
-import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
+import { Icon, IMG_LOAD_STATE } from 'tracim_frontend_lib'
 
 require('./PreviewComponent.styl')
 
@@ -120,7 +120,18 @@ export class PreviewComponent extends React.Component {
           >
             {(props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
               ? (
-                <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img' />
+                <>
+                  <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img' />
+
+                  {props.isVideo && (
+                    <div className='previewcomponent__fileimg__play'>
+                      <Icon
+                        icon='far fa-play-circle'
+                        title={props.t('Play video')}
+                      />
+                    </div>
+                  )}
+                </>
               )
               : (
                 <div className='previewcomponent__fileimg__text'>

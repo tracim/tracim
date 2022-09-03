@@ -1037,7 +1037,7 @@ class CFG(object):
             "COLOR__CONFIG_FILE_PATH", self.COLOR__CONFIG_FILE_PATH,
         )
 
-        for required_color in ("primary", "sidebar"):
+        for required_color in ("primary", "sidebar", "sidebar/font"):
             try:
                 self.APPS_COLORS[required_color]
             except KeyError as e:
