@@ -1028,6 +1028,7 @@ export class File extends React.Component {
     }
     menuItemList.push(tagObject)
 
+    const locale = props.i18n.language ? props.i18n.language.replaceAll('_', '-') : undefined
     const propertiesObject = {
       id: 'properties',
       label: props.t('Properties'),
@@ -1042,10 +1043,10 @@ export class File extends React.Component {
             fileSize={displayFileSize(state.content.size)}
             filePageNb={state.previewInfo.page_nb}
             activesShares={state.content.actives_shares}
-            creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
-            creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
+            creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric' })}
+            creationDateFormatted={(new Date(state.content.created)).toLocaleString(locale)}
             lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-            lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
+            lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(locale)}
             description={state.content.description}
             displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
             disableChangeDescription={!state.content.is_editable}

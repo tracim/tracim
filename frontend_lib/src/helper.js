@@ -715,7 +715,10 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
+export const formatAbsoluteDate = (rawDate, lang, options = {}) => {
+  const locale = lang ? lang.replaceAll('_', '-') : undefined
+  return new Date(rawDate).toLocaleString(locale, options)
+}
 
 // Equality test done as numbers with the following rules:
 // - strings are converted to numbers before comparing
@@ -753,7 +756,8 @@ export const naturalCompareLabels = (itemA, itemB, lang) => {
 
 export const naturalCompare = (itemA, itemB, lang, field) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
+  const locale = lang ? lang.replaceAll('_', '-') : undefined
+  return itemA[field].localeCompare(itemB[field], locale, { numeric: true })
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {

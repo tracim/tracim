@@ -2008,4 +2008,3 @@ function setAgendaFullscreen () {
   }
   isIframeCaldavzapInFullscreen = !isIframeCaldavzapInFullscreen
 }
-

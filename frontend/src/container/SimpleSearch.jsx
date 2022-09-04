@@ -194,6 +194,7 @@ export class SimpleSearch extends React.Component {
   render () {
     const { props, state } = this
     const currentNumberSearchResults = props.simpleSearch.resultList.length
+    const locale = props.user.lang ? props.user.lang.replaceAll('_', '-') : undefined
 
     return (
       <div className='tracim__content fullWidthFullHeight'>
@@ -235,7 +236,7 @@ export class SimpleSearch extends React.Component {
                                 path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
                                 lastModificationAuthor={searchItem.lastModifier}
                                 lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-                                lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
+                                lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(locale)}
                                 fileExtension={searchItem.fileExtension}
                                 faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
                                 statusSlug={searchItem.status}

@@ -6,7 +6,7 @@ import pt from '../i18next.scanner/pt/translation.json'
 import de from '../i18next.scanner/de/translation.json'
 import ar from '../i18next.scanner/ar/translation.json'
 import es from '../i18next.scanner/es/translation.json'
-import nb_NO from '../i18next.scanner/nb_NO/translation.json'
+import nb_NO from '../i18next.scanner/nb_NO/translation.json' // eslint-disable-line camelcase
 
 export const getBrowserLang = () => {
   const browserLang = navigator.language
