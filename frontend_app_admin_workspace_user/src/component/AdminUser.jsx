@@ -179,7 +179,7 @@ export class AdminUser extends React.Component {
               </thead>
 
               <tbody>
-                {props.loaded && props.userList.sort(sortMemberList).map(u => {
+                {props.loaded && props.userList.map(u => {
                   const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
