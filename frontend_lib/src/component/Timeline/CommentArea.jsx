@@ -123,6 +123,7 @@ export class CommentArea extends React.Component {
 
     switch (e.key) {
       case ' ': this.setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] }); break
+      case 'Tab':
       case 'Enter': {
         this.handleClickAutoCompleteItem(state.autoCompleteItemList[state.autoCompleteCursorPosition])
         e.preventDefault()
