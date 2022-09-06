@@ -25,7 +25,7 @@ describe('App Kanban', () => {
     })
   })
 
-  it('should have translations', () => {
+  it('should close sidebar on fullscreen', () => {
     cy.get('.sidebar').should('be.visible')
     cy.get('.sidebarClose').should('not.exist')
     cy.get(fullscreenButtonSelector).should('be.visible').click()
