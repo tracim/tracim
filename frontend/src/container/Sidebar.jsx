@@ -49,7 +49,8 @@ export class Sidebar extends React.Component {
     }
 
     props.registerCustomEventHandlerList([
-      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleClickNewSpace }
+      { name: CUSTOM_EVENT.SHOW_CREATE_WORKSPACE_POPUP, handler: this.handleClickNewSpace },
+      { name: CUSTOM_EVENT.HIDE_SIDEBAR, handler: this.handleCloseSidebar }
     ])
 
     props.registerLiveMessageHandlerList([
@@ -158,6 +159,8 @@ export class Sidebar extends React.Component {
       this.setState(previousState => ({ isSidebarClosed: !previousState.isSidebarClosed }))
     }
   }
+
+  handleCloseSidebar = () => this.setState({ isSidebarClosed: true })
 
   handleClickOpenSpaceList = () => this.setState({ showSpaceList: true })
 
