@@ -15,7 +15,8 @@ import {
   CUSTOM_EVENT,
   PROFILE,
   PROFILE_LIST,
-  ProfileNavigation
+  ProfileNavigation,
+  sortMemberList
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -178,7 +179,7 @@ export class AdminUser extends React.Component {
               </thead>
 
               <tbody>
-                {props.loaded && props.userList.map(u => {
+                {props.loaded && props.userList.sort(sortMemberList).map(u => {
                   const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
