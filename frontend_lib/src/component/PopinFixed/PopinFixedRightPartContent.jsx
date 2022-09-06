@@ -28,7 +28,7 @@ export const PopinFixedRightPartContent = props => {
   return (
     <div className='wsContentGeneric__content__right__content'>
       {props.showTitle && (
-        <div className='toDo__title_container'>
+        <div className='toDo__title_container'  style={{ minWidth: '130px'}} >
           <div className='wsContentGeneric__content__right__content__title'>
             {props.label} {props.showProgress && progessStatus}
           </div>
