@@ -15,8 +15,7 @@ import {
   CUSTOM_EVENT,
   PROFILE,
   PROFILE_LIST,
-  ProfileNavigation,
-  sortMemberList
+  ProfileNavigation
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
