@@ -7,6 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
+  handleClickCopyLink,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
@@ -479,6 +480,12 @@ export class File extends React.Component {
   handleChangeNewComment = e => {
     const { props, state } = this
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
+  }
+
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
 
   handleSaveEditTitle = async newTitle => {
@@ -1217,6 +1224,12 @@ export class File extends React.Component {
               showAction: true,
               dataCy: 'popinListItem__downloadFile'
             }, {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
@@ -1288,6 +1301,7 @@ export class File extends React.Component {
           <FileComponent
             editionAuthor={state.editionAuthor}
             isRefreshNeeded={state.showRefreshWarning}
+            isVideo={isVideo}
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
@@ -1317,7 +1331,7 @@ export class File extends React.Component {
             progressUpload={state.progressUpload}
             previewVideo={state.previewVideo}
             workspaceId={state.content.workspace_id}
-            onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
+            onTogglePreviewVideo={() => this.setState(prev => ({ previewVideo: !prev.previewVideo }))}
             ref={this.refContentLeftTop}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}

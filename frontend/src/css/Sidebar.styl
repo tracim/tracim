@@ -1,5 +1,4 @@
 sidebar-animate-speed = 0.5s
-sidebarFontColor = offWhite
 sidebarFontColorHover = grey
 borderWhenActive= 5px
 
@@ -12,14 +11,16 @@ borderWhenActive= 5px
   display flex
   flex-direction column
   height 100vh
+  overflow-x auto
   &__header
     height headerHeight
     min-height headerHeight
     display flex
     justify-content center
     align-items center
+    background-color var(--sidebarLogoColor)
     &__expand
-      color sidebarFontColor
+      color var(--sidebarFontColor)
       padding standardSpacing
       transition all sidebar-animate-speed
       &:hover
@@ -27,30 +28,28 @@ borderWhenActive= 5px
     & .tracimLogo
       flex 1
       text-align center
-      filter drop-shadow(0px 0px 20px grey)
   &__search
     padding standardSpacing
     & > .search
       padding textSpacing standardSpacing
+      box-shadow 0px 0px 20px 0px var(--sidebarColorDarken)
     & > .sidebar__item
       display none
   &__item
     display flex
     align-items center
-    color sidebarFontColor
+    color var(--sidebarFontColor)
     white-space nowrap
     overflow hidden
     width 100%
     height 40px
     min-height 40px
     padding-inline-start borderWhenActive
-    & *
-      color sidebarFontColor
     &__unread
       font-weight bold
     &:hover
       background-color var(--sidebarColorDarken)
-      color sidebarFontColor
+      color var(--sidebarFontColor)
     &__current
       padding-inline-start 0
       border-inline-start-style solid
@@ -69,7 +68,6 @@ borderWhenActive= 5px
         overflow hidden
         text-overflow ellipsis
         unicode-bidi plaintext
-        flex 1
       & > span
         display flex
         align-items center
@@ -79,8 +77,11 @@ borderWhenActive= 5px
       align-items center
       &__type
         padding-inline-start textSpacing
+        color grey
+        flex 1
+        text-align end
       & > *
-        color sidebarFontColor
+        color var(--sidebarFontColor)
       &:hover
         background-color var(--sidebarColorDarken)
     &__withoutChildren
@@ -97,7 +98,7 @@ borderWhenActive= 5px
       &.dropdownMenuButton
         & i
           width auto
-          color sidebarFontColor
+          color var(--sidebarFontColor)
           &:hover
             color sidebarFontColorHover
         &:focus
@@ -106,31 +107,32 @@ borderWhenActive= 5px
           display none
   &__title
     font-weight bold
-    background-color var(--sidebarColorLighten)
+    background-color var(--sidebarColorDarken)
     overflow visible
     &__button
       display flex
-      color offWhite
+      color var(--sidebarFontColor)
       font-weight bold
       padding-inline-start 0
       align-items center
       flex 1
       height 100%
+      &:hover > i
+        color sidebarFontColorHover
       & > span
         padding-inline-start standardSpacing
         display flex
         align-items center
-      &__create
+      &__create, &__join
         padding-inline-start standardSpacing
         padding-inline-end standardSpacing
+        color var(--sidebarFontColor)
         height 100%
-      &__join
-        padding-inline-start standardSpacing
-        padding-inline-end standardSpacing
-        height 100%
+        &:hover
+          color sidebarFontColorHover
   &__spaces
     overflow-y auto
-    flex 1
+    min-height 225px // INFO - G.B. - 2022-08-30 - Min height to show full dropdown menu
     &__empty
       color mediumDarkGrey
       text-align center
@@ -145,6 +147,7 @@ borderWhenActive= 5px
     display flex
     align-items center
     justify-content center
+    color offWhite
   &__notification
     height notificationCircleSize
     width notificationCircleSize
@@ -157,25 +160,28 @@ borderWhenActive= 5px
     display flex
     flex-direction column
     &__text
-      color sidebarFontColor
+      color sidebarFontColorHover
       font-size metadataFontSize
       margin 0 auto
       display flex
       &__link
         & > a
-          color sidebarFontColor
+          color sidebarFontColorHover
           font-size metadataFontSize
           margin-inline-start textSpacing
           &:hover
             text-decoration underline
+  &__emptyZone
+    flex 1
 
 // INFO - GB - 2022-07-26 - Closed sidebar
 .sidebar
   &.sidebarClose
     width closedSidebarWidth
-    min-width unset
-    & .tracimLogo
-      display none
+    min-width closedSidebarWidth
+    & .sidebar__header
+      & .tracimLogo
+        display none
     & .sidebar__search
       padding 0
       & > .search
@@ -184,6 +190,7 @@ borderWhenActive= 5px
         display flex
     & .sidebar__item
       justify-content center
+      padding-inline-end borderWhenActive
       & > span
         display none
       &__name
@@ -218,26 +225,25 @@ borderWhenActive= 5px
       &__join
         display none
 
+[dir=rtl] .sidebar.sidebarClose .sidebar__notification
+  right 15px
+
 // INFO - GB - 2022-07-26 - Icon colors
 .sidebar__search__item i
   color grey
+.sidebar__activities__item i
+  color #17B4D4
 .sidebar__notification__item i
   color lightBlue
-.sidebar__activities__item i
-  color warningOrange
-.sidebar__agendas__item i
-  color #ff4b3a
 .sidebar__tasks__item i
-  color greenToDo
+  color #7DA944
 .sidebar__favorites__item i
-  color #ffeb3b
+  color #F2CA53
 
-@media (max-width: max-xs) and (max-width: max-lg)
-  .siebarpagecontainer
-    position relative
-
+@media (max-width: max-lg)
   .sidebar
-    position absolute
     min-height 100%
-    &.sidebarClose
-      position static
+
+@media (max-width: max-sm)
+  .sidebar
+    min-width 100%

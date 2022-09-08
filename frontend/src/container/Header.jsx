@@ -11,8 +11,6 @@ import { putUserLang } from '../action-creator.async.js'
 import { COOKIE_FRONTEND } from '../util/helper.js'
 import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
 
-const TRACIM_LOGO_PATH = '/assets/branding/images/tracim-logo.png'
-
 export const Header = (props) => {
   useEffect(() => {
     props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', { lang: props.user.lang })
@@ -47,7 +45,7 @@ export const Header = (props) => {
       ? null
       : (
         <header className='header'>
-          <Logo to={PAGE.LOGIN} logoSrc={TRACIM_LOGO_PATH} />
+          <Logo to={PAGE.LOGIN} />
 
           <div className='header__menu__rightside'>
             <div

@@ -17,6 +17,7 @@ import {
 import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
 import { putNotificationAsRead } from '../../action-creator.async.js'
 import { newFlashMessage, readNotification } from '../../action-creator.sync.js'
+import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
 
 const qs = require('query-string')
 
@@ -37,10 +38,10 @@ class SidebarSpaceItem extends React.Component {
 
   componentDidUpdate () {
     const unreadNotifications = this.props.notificationPage.list.filter(
-      n => !n.mention && !n.read && n.space && (n.space.id === this.props.spaceId)
+      n => !n.mention && !n.read && n.workspace && (n.workspace.id === this.props.spaceId)
     )
     const unreadMentionCount = this.props.notificationPage.list.filter(
-      n => n.mention && !n.read && n.space && (n.space.id === this.props.spaceId)
+      n => n.mention && !n.read && n.workspace && (n.workspace.id === this.props.spaceId)
     ).length
 
     if (this.state.unreadNotifications.length !== unreadNotifications.length || this.state.unreadMentionCount !== unreadMentionCount) {
@@ -93,10 +94,6 @@ class SidebarSpaceItem extends React.Component {
 
   handleClickSpace = () => {
     this.handleReadSpaceNotifications()
-
-    if (isMobile) {
-      this.props.onClickToggleSidebar()
-    }
   }
 
   handleMouseEnterItem = () => this.setState({ showDropdownMenuButton: true })
@@ -161,12 +158,12 @@ class SidebarSpaceItem extends React.Component {
 
         {props.hasChildren && (
           <IconButton
-            customClass='transparentButton sidebar__item__foldChildren'
+            customClass={`transparentButton sidebar__item__foldChildren ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
             icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             intent='link'
             mode='light'
-            onClick={props.onToggleFoldChildren}
+            onClick={() => props.onToggleFoldChildren(props.spaceId)}
           />
         )}
 
@@ -196,7 +193,6 @@ class SidebarSpaceItem extends React.Component {
             {props.spaceType === SPACE_TYPE.confidential.slug && (
               <Icon
                 customClass='sidebar__item__space__type'
-                color={SPACE_TYPE.confidential.hexcolor}
                 icon={SPACE_TYPE.confidential.faIcon}
                 title={props.t('Confidential space')}
               />
@@ -257,8 +253,6 @@ SidebarSpaceItem.propTypes = {
   hasChildren: PropTypes.bool,
   isNotificationWallOpen: PropTypes.bool,
   level: PropTypes.number,
-  onClickAllContent: PropTypes.func,
-  onClickToggleSidebar: PropTypes.func,
   onToggleFoldChildren: PropTypes.func,
   userRoleIdInWorkspace: PropTypes.array
 }
@@ -270,8 +264,6 @@ SidebarSpaceItem.defaultProps = {
   hasChildren: false,
   isNotificationWallOpen: false,
   level: 0,
-  onClickAllContent: () => { },
-  onClickToggleSidebar: () => { },
   onToggleFoldChildren: () => { },
   userRoleIdInWorkspace: ROLE.reader.id
 }

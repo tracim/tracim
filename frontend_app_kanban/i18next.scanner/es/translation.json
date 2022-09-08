@@ -44,5 +44,7 @@
   "Exit fullscreen mode": "Salir del modo de pantalla completa",
   "See less": "Ver menos",
   "You must change the status or restore this kanban board before any change": "Debe cambiar el estado o restaurar esta tabla kanban antes de cualquier cambio",
-  "Tasks": "Tareas"
+  "Tasks": "Tareas",
+  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "Copy content link": "Copiar enlace al contenido"
 }

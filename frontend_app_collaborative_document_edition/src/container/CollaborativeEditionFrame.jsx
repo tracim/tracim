@@ -48,10 +48,10 @@ export class CollaborativeEditionFrame extends React.Component {
   }
 
   async componentDidMount () {
-    // console.log('%c<CollaboraFrame> did mount', `color: ${props.data.config.hexcolor}`, props)
     // INFO - B.L - 2019/09/03 Collabora fire the event from window we need to listen window.
     window.addEventListener('message', this.handleIframeIsClosing)
     try {
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: { } })
       await this.loadContent()
     } catch (error) {
       console.log(error.message)

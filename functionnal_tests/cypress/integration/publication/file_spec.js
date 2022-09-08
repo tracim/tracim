@@ -28,6 +28,7 @@ describe('Publications', () => {
           params: { workspaceId: workspace.workspace_id },
           waitForTlm: true
         })
+        cy.get('.emptyListMessage__text').should('be.visible')
         cy.get(addFileButton).click()
         cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
         cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
@@ -35,6 +36,10 @@ describe('Publications', () => {
           .click()
         cy.contains(publishButton, 'Publish').click()
       })
+    })
+
+    afterEach(() => {
+      cy.cancelXHR()
     })
 
     it('should show image as preview', () => {
@@ -50,7 +55,9 @@ describe('Publications', () => {
       cy.get('.feedItemHeader__actionMenu__item[title="Open as content"]').click()
 
       cy.url().should('include', '/contents')
-
+      cy.contains('.wsContentGeneric__header__title', 'News')
+      cy.get('.thread__contentpage__comment').should('be.visible')
+      cy.get('.CommentFilePreview').should('be.visible')
       cy.contains('.attachedFile', fileName)
       cy.get('.CommentFilePreview > img').should('be.visible')
 
@@ -66,6 +73,7 @@ describe('Publications', () => {
           params: { workspaceId: workspace.workspace_id },
           waitForTlm: true
         })
+        cy.get('.emptyListMessage__text').should('be.visible')
         cy.get(addFileButton).click()
         cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
         cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })
@@ -74,6 +82,10 @@ describe('Publications', () => {
         cy.get(publicationInput).type(exampleText)
         cy.contains(publishButton, 'Publish').click()
       })
+    })
+
+    afterEach(() => {
+      cy.cancelXHR()
     })
 
     it('should show text as preview', () => {
@@ -116,6 +128,7 @@ describe('Publications', () => {
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
+      cy.get('.emptyListMessage__text').should('be.visible')
       cy.get(addFileButton).click()
       cy.dropFixtureInDropZone(pngFile, 'image/png', '.filecontent__form', `${fileName}.png`)
       cy.getTag({ selectorName: SELECTORS.CARD_POPUP_BODY })

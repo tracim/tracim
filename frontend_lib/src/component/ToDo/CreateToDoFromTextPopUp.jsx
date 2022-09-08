@@ -58,6 +58,7 @@ const CreateToDoFromTextPopup = (props) => {
         />
         <IconButton
           color={props.customColor}
+          dataCy='createToDoFromTextPopup__buttons__create'
           disabled={false}
           icon='far fa-paper-plane'
           intent='primary'

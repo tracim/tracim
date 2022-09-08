@@ -11,5 +11,7 @@
   "thread": "discussão",
   "threads": "discussões",
   "The content has been modified by {{author}}": "O conteúdo foi modificado por {{author}}",
-  "Delete": "Eliminar"
+  "Delete": "Eliminar",
+  "The link has been copied to clipboard": "Ligação copiada para a área de transferência",
+  "Copy content link": "Copiar ligação do conteúdo"
 }
