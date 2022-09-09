@@ -1,5 +1,5 @@
 import i18n from './i18n.js'
-import { tinymceRemove } from 'tracim_frontend_lib'
+import { tinymceRemove, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import { v4 as uniqueId } from 'uuid'
 
 (function () {
@@ -214,6 +214,10 @@ import { v4 as uniqueId } from 'uuid'
               active: !customFullscreen.active,
               originalHeight: customFullscreen.originalHeight,
               newHeight: customFullscreen.active ? customFullscreen.originalHeight : currentHeightInt - headerHeight
+            }
+
+            if (customFullscreen.active) {
+              GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: { } })
             }
 
             iframeElement.frameElement.style.height = customFullscreen.newHeight + 'px'
