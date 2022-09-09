@@ -360,9 +360,9 @@ class TestUserApi(object):
         api = UserApi(current_user=None, session=session, config=app_config)
         u = api.create_minimal_user("bob@bob")
         with pytest.raises(TracimValidationFailed):
-            lang = "n" * 4
+            lang = "n" * 7
             u = api.update(user=u, lang=lang)
-        lang = "n" * 3
+        lang = "n" * 6
         api.update(user=u, lang=lang)
 
     # timezone
