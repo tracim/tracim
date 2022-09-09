@@ -221,17 +221,24 @@ def tracim_webserver(
     process = subprocess.Popen(
         [
             "pserve",
-            str(config_filepath),
             "-n",
             "tracim_webserver",
             "--server-name",
             "tracim_webserver",
+            str(config_filepath),
             "http_listen={}".format(listen),
         ],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=penv,
     )
+    try:
+        (stdout, stderr) = process.communicate(timeout=0.5)
+        if process.returncode:
+            raise Exception("Error while starting pserve: {}".format(stderr))
+    except subprocess.TimeoutExpired:
+        # pserve did start successfully
+        pass
     wait_for_url("http://{}".format(listen))
     yield process
     quit_process(process, "tracim webserver")
