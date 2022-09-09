@@ -42,7 +42,7 @@ export class FeedItemWithPreview extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
-      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentChanged }
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentModified }
     ])
 
     this.state = {
@@ -104,8 +104,8 @@ export class FeedItemWithPreview extends React.Component {
 
   // TLM Handlers
 
-  handleCommentChanged = (data) => {
-    this.props.updateModified(data.fields.content.content_id, data.fields.content.modified)
+  handleCommentModified = (data) => {
+    this.props.updateComment(data)
   }
 
   getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`

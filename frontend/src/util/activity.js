@@ -214,6 +214,7 @@ export const sortActivityList = (activityList) => {
 }
 
 const updateActivity = (message, activity) => {
+  // console.log('updateActivity', message, activity)
   const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
   const isContentAChild = activity.content && (
     (message.fields.content && message.fields.content.parent_id === activity.content.content_id) ||

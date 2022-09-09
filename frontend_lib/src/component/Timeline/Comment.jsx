@@ -43,8 +43,6 @@ const Comment = (props) => {
   const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
   const readableModificationDate = isModified ? readableDateFormat(props.modificationDate, props.loggedUser.lang) : null
 
-  console.log('contentId', props.contentId)
-
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
       <div

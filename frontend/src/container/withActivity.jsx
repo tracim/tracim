@@ -2,6 +2,7 @@ import React from 'react'
 
 import {
   CONTENT_TYPE,
+  // getComment,
   getContent,
   handleClickCopyLink,
   handleFetchResult,
@@ -119,8 +120,35 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       }
     }
 
+    /**
+     * Get a complete comment
+     *
+     * This function exists also in appContentFactory
+     * @param {int} spaceId
+     * @param {int} contentId
+     * @param {int} commentId
+     * @returns {Promise<JSON>}
+     */
+    // getComment = async (spaceId, contentId, commentId) => {
+    //   const { props } = this
+    //   const fetchGetContent = await handleFetchResult(await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId))
+    //   switch (fetchGetContent.apiResponse.status) {
+    //     case 200: return fetchGetContent.body
+    //     default:
+    //       props.dispatch(newFlashMessage(props.t('Unknown comment')))
+    //       return {}
+    //   }
+    // }
+
+    /**
+     * Update the activity list according to the TLM
+     * Every operation on ActivityList from TLM should be in this function
+     * @param {TLM} data
+     * @returns
+     */
     updateActivityListFromTlm = async (data) => {
       const { props } = this
+      // console.log("withActivity updateActivityListFromTlm:", data)
       if (
         data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${TLM_SUB.COMMENT}` ||
         data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.DELETED}.${TLM_SUB.COMMENT}`
@@ -145,6 +173,28 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           }
         }
       }
+      // else if (
+      //   data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.CREATED}.${TLM_SUB.COMMENT}` ||
+      //   data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${TLM_SUB.COMMENT}` ||
+      //   data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.DELETED}.${TLM_SUB.COMMENT}`
+      // ) {
+      //   // console.log("This is fine")
+      //   activity = {
+      //     ...data,
+      //     fields: {
+      //       ...data.fields,
+      //       content: {
+      //         ...data.fields.content,
+      //         ...await this.getComment(
+      //           data.fields.workspace.workspace_id,
+      //           data.fields.content.parent_id,
+      //           data.fields.content.content_id
+      //         )
+      //       }
+      //     }
+      //   }
+      //   // console.log("New activity:", activity)
+      // }
       const updatedActivityList = await addMessageToActivityList(activity, props.activity.list, FETCH_CONFIG.apiUrl)
       props.dispatch(setActivityList(updatedActivityList))
       const showRefresh = (
