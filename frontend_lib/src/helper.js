@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { formatDistance, isAfter } from 'date-fns'
+import { format, formatDistance, isAfter } from 'date-fns'
 import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
@@ -715,9 +715,10 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang, options = {}) => {
-  const locale = lang ? lang.replaceAll('_', '-') : undefined
-  return new Date(rawDate).toLocaleString(locale, options)
+// INFO - G.B. - 2022-09-10 - To see the different format time: https://date-fns.org/v2.29.2/docs/format
+export const formatAbsoluteDate = (rawDate, lang = 'en', formatTime) => {
+  if (!rawDate) return
+  return format(new Date(rawDate), formatTime || 'Pp', { locale: DATE_FNS_LOCALE[lang] })
 }
 
 // Equality test done as numbers with the following rules:
