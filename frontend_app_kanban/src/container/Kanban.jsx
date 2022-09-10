@@ -583,6 +583,9 @@ export class Kanban extends React.Component {
   }
 
   handleClickFullscreen = () => {
+    if (!this.state.fullscreen) {
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: { } })
+    }
     this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
   }
 
