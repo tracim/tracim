@@ -10,7 +10,7 @@ On Debian Bullseye (11) with sudo:
 
 ```shell
 sudo apt update
-xargs sudo apt-get install < system_packages/debian/build_backend_packages.list
+xargs sudo apt install < system_packages/debian/build_backend_packages.list
 xargs sudo apt install < system_packages/debian/run_backend_packages.list
 ```
 
