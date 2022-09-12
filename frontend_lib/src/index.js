@@ -70,7 +70,8 @@ import {
   sortContentByStatus,
   USER_CALL_STATE,
   STATUSES,
-  TIMELINE_TYPE
+  TIMELINE_TYPE,
+  sortMemberList
 } from './helper.js'
 
 import {
@@ -498,5 +499,6 @@ export {
   ToDoItem,
   ToDoManagement,
   STATUSES,
-  TIMELINE_TYPE
+  TIMELINE_TYPE,
+  sortMemberList
 }
