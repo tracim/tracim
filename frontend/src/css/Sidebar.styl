@@ -1,228 +1,249 @@
 sidebar-animate-speed = 0.5s
-
-[dir=ltr]
-  .sidebar
-    &__frame
-      box-shadow -1px 2px 2px 1px var(--sidebarColor)
-    &__expand
-      left sidebarWidth
-      &.sidebarclose
-        left 0
-
-[dir=rtl]
-  .sidebar
-    &__frame
-      box-shadow 1px 2px 2px 1px var(--sidebarColor)
-    &__expand
-      right sidebarWidth
-      &.sidebarclose
-        right 0
+sidebarFontColorHover = grey
+borderWhenActive= 5px
 
 .sidebar
-  &__expand
-    align-items center
-    background-color var(--sidebarColor)
-    cursor pointer
-    color offWhite
+  background-color var(--sidebarColor)
+  transition all sidebar-animate-speed
+  width sidebarWidth
+  min-width sidebarWidth
+  z-index 10
+  display flex
+  flex-direction column
+  height 100vh
+  overflow-x auto
+  &__header
+    height headerHeight
+    min-height headerHeight
     display flex
+    justify-content center
+    align-items center
+    background-color var(--sidebarLogoColor)
+    &__expand
+      color var(--sidebarFontColor)
+      padding standardSpacing
+      transition all sidebar-animate-speed
+      &:hover
+        color sidebarFontColorHover
+    & .tracimLogo
+      flex 1
+      text-align center
+  &__search
     padding standardSpacing
-    position absolute
-    transition all sidebar-animate-speed
-    z-index 15
+    & > .search
+      padding textSpacing standardSpacing
+      box-shadow 0px 0px 20px 0px var(--sidebarColorDarken)
+    & > .sidebar__item
+      display none
+  &__item
+    display flex
+    align-items center
+    color var(--sidebarFontColor)
+    white-space nowrap
+    overflow hidden
+    width 100%
+    height 40px
+    min-height 40px
+    padding-inline-start borderWhenActive
+    &__unread
+      font-weight bold
     &:hover
       background-color var(--sidebarColorDarken)
-    & i
-      margin-inline-start auto
-  &__frame
-    background-color var(--sidebarColor)
-    height "calc(100vh - %s)" % headerHeight
-    position relative
-    transition all sidebar-animate-speed
-    width sidebarWidth
-    z-index 10
-    &.sidebarclose
-      width 0
-      overflow hidden
-
+      color var(--sidebarFontColor)
+    &__current
+      padding-inline-start 0
+      border-inline-start-style solid
+      border-inline-start-width borderWhenActive
+      font-weight bold
+      &.sidebar__item__space
+        padding-inline-start 0
+      &.sidebar__search
+        padding-inline-start textSpacing
+    &__name
+      align-items center
+      display inline-flex
+      padding standardSpacing
+      width 100%
+      & .label
+        overflow hidden
+        text-overflow ellipsis
+        unicode-bidi plaintext
+      & > span
+        display flex
+        align-items center
+    &__space
+      display flex
+      padding-inline-start borderWhenActive
+      align-items center
+      &__type
+        padding-inline-start textSpacing
+        color grey
+        flex 1
+        text-align end
+      & > *
+        color var(--sidebarFontColor)
+      &:hover
+        background-color var(--sidebarColorDarken)
+    &__withoutChildren
+      padding-inline-start 20px
+    &__foldChildren
+      height 100%
+      &:hover > .iconbutton__icon
+        color sidebarFontColorHover
+    &__dragNdrop
+      margin-inline-start textSpacing
+    &__menu
+      &__element *
+        color fontColor
+      &.dropdownMenuButton
+        & i
+          width auto
+          color var(--sidebarFontColor)
+          &:hover
+            color sidebarFontColorHover
+        &:focus
+          outline none
+        &::after
+          display none
+  &__title
+    font-weight bold
+    background-color var(--sidebarColorDarken)
+    overflow visible
+    &__button
+      display flex
+      color var(--sidebarFontColor)
+      font-weight bold
+      padding-inline-start 0
+      align-items center
+      flex 1
+      height 100%
+      &:hover > i
+        color sidebarFontColorHover
+      & > span
+        padding-inline-start standardSpacing
+        display flex
+        align-items center
+      &__create, &__join
+        padding-inline-start standardSpacing
+        padding-inline-end standardSpacing
+        color var(--sidebarFontColor)
+        height 100%
+        &:hover
+          color sidebarFontColorHover
+  &__spaces
+    overflow-y auto
+    min-height 225px // INFO - G.B. - 2022-08-30 - Min height to show full dropdown menu
+    &__empty
+      color mediumDarkGrey
+      text-align center
   &__mention
     background-color errorRed
     border-radius 50%
     font-size metadataFontSize
     font-weight bold
-    line-height sideBarCircleSize
-    margin-inline-start standardSpacing
-    min-width sideBarCircleSize
-    text-align center
-  &__scrollview
-    height 100%
-    overflow-y auto
+    line-height mentionCircleSize
+    margin-inline-start textSpacing
+    min-width mentionCircleSize
     display flex
-    flex-direction column
-    -ms-overflow-style none // INFO - GB - 2020-10-23 - Hide scrollbar for IE and Edge
-    scrollbar-width none // INFO - GB - 2020-10-23 - Hide scrollbar for Firefox
-    &::-webkit-scrollbar // INFO - GB - 2020-10-23 - Hide scrollbar for Chrome, Safari and Opera
-      display none
-  &__scrollup
-    position fixed
-    bottom 0
-    left sidebarWidth
-    display flex
-    justify-content center
     align-items center
-    border 1px solid var(--sidebarColor)
-    border-start-end-radius 15px
-    padding 8px 12px
-    cursor pointer
+    justify-content center
     color offWhite
-    transition all sidebar-animate-speed
-    background-color var(--sidebarColor)
-    ^[0].sidebarclose ^[1] // renders .sidebar.sidebarclose .sidebar__scrollup
-      left 0
-  &__content__navigation
-    transition all sidebar-animate-speed
-    &.sidebarclose
-      width 0
-    &__workspace
-      padding-inline-start 0
-      list-style none
-    &__item
-      align-items center
-      border-bottom 1px solid var(--sidebarColorDarken)
-      display flex
-      padding-inline-start textSpacing
-      &__unread
-        font-weight bold
-      &:hover
-        background-color var(--sidebarColorDarken)
-      &__withoutChildren
-        padding-inline-start 20px
-      &__foldChildren
-        color offWhite
-        &:hover
-          color lightGrey
-        & .iconbutton__icon
-          margin 0
-      &__menu.dropdownMenuButton
-        color offWhite
-        & i
-          margin 0
-          width auto
-        &:hover
-          color lightGrey
-        &:focus
-          outline none
-        &::after
-          display none
-      &__dragNdrop
-        margin-inline-start 5px
-      &__wrapper
-        display flex
-        align-items center
-        color offWhite
-        white-space nowrap
-        overflow hidden
-        width 100%
-        &:hover
-          color offWhite
-      &__number
-        display flex
-        width 50px
-        height 50px
-        padding 12px
-        letter-spacing 2px
-        & .fas
-          font-size bigIconSize
-      &__name
-        align-items center
-        display inline-flex
-        padding standardSpacing
-        width 100%
-        & .label
-          overflow hidden
-          text-overflow ellipsis
-          unicode-bidi plaintext
-      &__current
-        padding-inline-start 0
-        border-inline-start-style solid
-        border-inline-start-width 5px
-        background-color var(--sidebarColorLighten)
-        font-weight bold
+  &__notification
+    height notificationCircleSize
+    width notificationCircleSize
+    border-radius 50%
+    background-color lightBlue
+    margin-inline-start textSpacing
   &__footer
     margin-top auto
     margin-bottom standardSpacing
     display flex
     flex-direction column
-    &__buttons
-      width 75%
-      margin 0 auto
-      overflow hidden
-      display flex
-      flex-direction column
-      margin-bottom standardSpacing
-      & > *
-        margin-top standardSpacing
-        width 100%
     &__text
-      color offWhite
+      color sidebarFontColorHover
       font-size metadataFontSize
       margin 0 auto
       display flex
       &__link
         & > a
-          color offWhite
+          color sidebarFontColorHover
           font-size metadataFontSize
           margin-inline-start textSpacing
           &:hover
             text-decoration underline
+  &__emptyZone
+    flex 1
 
-body.tox-fullscreen .sidebar
-  display none
+// INFO - GB - 2022-07-26 - Closed sidebar
+.sidebar
+  &.sidebarClose
+    width closedSidebarWidth
+    min-width closedSidebarWidth
+    & .sidebar__header
+      & .tracimLogo
+        display none
+    & .sidebar__search
+      padding 0
+      & > .search
+        display none
+      & > .sidebar__item
+        display flex
+    & .sidebar__item
+      justify-content center
+      padding-inline-end borderWhenActive
+      & > span
+        display none
+      &__name
+        justify-content center
+        & > span
+          display none
+        & .sidebar__mention, .sidebar__notification
+          font-size 0
+          min-width wallCircleSize
+          width wallCircleSize
+          height wallCircleSize
+          position absolute
+          margin-inline-start 25px
+      &__foldChildren
+        display none
+      &__menu
+        display none
+    & .sidebar__spaces
+      display none
+    & .sidebar__footer
+      & .iconbutton__label, .iconbutton__label-mobile
+        display none
+      & .sidebar__footer__text
+        display none
+    & .sidebar__title__button
+      padding-inline-start borderWhenActive
+      justify-content center
+      & > span
+        display none
+      &__create
+        display none
+      &__join
+        display none
 
-@media (min-width: min-lg) and (max-width: max-lg)
-  .sidebarpagecontainer
-    position relative
+[dir=rtl] .sidebar.sidebarClose .sidebar__notification
+  right 15px
 
+// INFO - GB - 2022-07-26 - Icon colors
+.sidebar__search__item i
+  color grey
+.sidebar__activities__item i
+  color #17B4D4
+.sidebar__notification__item i
+  color lightBlue
+.sidebar__tasks__item i
+  color #7DA944
+.sidebar__favorites__item i
+  color #F2CA53
+
+@media (max-width: max-lg)
   .sidebar
-    &__frame
-      position absolute
-      min-height "calc(100% - %s)" % headerHeight
+    min-height 100%
 
-@media (min-width: min-md) and (max-width: max-md)
-  .sidebarpagecontainer
-    position relative
-
+@media (max-width: max-sm)
   .sidebar
-    &__frame
-      position absolute
-      min-height "calc(100% - %s)" % headerHeight
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .sidebarpagecontainer
-    position relative
-
-  .sidebar
-    &__frame
-      position absolute
-      min-height "calc(100% - %s)" % headerHeight
-
-@media (max-width: max-xs)
-  .sidebarpagecontainer
-    position relative
-
-  .sidebar
-    &__frame
-      position absolute
-      min-height "calc(100% - %s)" % headerHeight
-
-// INFO - GB - 2022-01-27 - The commands below are fallbacks because border-end-end-radius and border-start-end-radius are new
-// and have a global usage below 90% according to https://caniuse.com/. When the global usage is higher, we can delete the fallbacks.
-[dir=ltr] .sidebar
-  &__expand
-    border-bottom-right-radius 15px
-  &__scrollup
-    border-top-right-radius 15px
-[dir=rtl] .sidebar
-  &__expand
-    border-bottom-left-radius 15px
-  &__scrollup
-    border-top-left-radius 15px
+    min-width 100%

@@ -568,11 +568,7 @@ export class Tracim extends React.Component {
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
-        <Header
-          onClickNotification={this.handleClickNotificationButton}
-          unreadNotificationCount={props.notificationPage.unreadNotificationCount}
-          unreadMentionCount={props.notificationPage.unreadMentionCount}
-        />
+        <Header />
         {state.displayConnectionError && (
           <FlashMessage
             className='connection_error'
@@ -735,7 +731,16 @@ export class Tracim extends React.Component {
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>
-          <Route render={() => <Sidebar />} />
+          <Route
+            render={() => (
+              <Sidebar
+                onClickNotification={this.handleClickNotificationButton}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                isNotificationWallOpen={state.isNotificationWallOpen}
+              />
+            )}
+          />
 
           <Route
             render={() => (

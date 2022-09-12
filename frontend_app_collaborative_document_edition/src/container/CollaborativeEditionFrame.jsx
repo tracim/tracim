@@ -28,13 +28,13 @@ export class CollaborativeEditionFrame extends React.Component {
       formId: props.formId ? props.formId : FORM_ID,
       iframeId: props.frameId ? props.frameId : IFRAME_ID,
       iframeStyle: {
-        width: '100%',
-        height: 'calc(100% - 60px)',
-        top: 60,
+        width: 'calc(100% - 60px)',
+        height: '100%',
         left: 0,
         position: 'fixed',
-        zIndex: 25,
+        zIndex: 9, // INFO - GB - 2022-08-09 - z-index 9 is just below the sidebar
         border: 'none',
+        marginInlineStart: '60px',
         ...props.iframeStyle
       },
       accessToken: '',
@@ -48,10 +48,10 @@ export class CollaborativeEditionFrame extends React.Component {
   }
 
   async componentDidMount () {
-    // console.log('%c<CollaboraFrame> did mount', `color: ${props.data.config.hexcolor}`, props)
     // INFO - B.L - 2019/09/03 Collabora fire the event from window we need to listen window.
     window.addEventListener('message', this.handleIframeIsClosing)
     try {
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: { } })
       await this.loadContent()
     } catch (error) {
       console.log(error.message)

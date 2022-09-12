@@ -17,6 +17,7 @@ import {
   getInvalidMentionList,
   getOrCreateSessionClientToken,
   getToDo,
+  handleClickCopyLink,
   handleFetchResult,
   handleInvalidMentionInComment,
   PAGE,
@@ -46,6 +47,7 @@ import {
   FAVORITE_STATE,
   addExternalLinksIcons,
   PopinFixedRightPartContent,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
@@ -70,7 +72,6 @@ export class HtmlDocument extends React.Component {
       isTemplate: false,
       isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
       externalTranslationList: [
         props.t('Note'),
@@ -82,6 +83,8 @@ export class HtmlDocument extends React.Component {
       rawContentBeforeEdit: '',
       newContent: {},
       loadingContent: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
       timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
@@ -216,7 +219,7 @@ export class HtmlDocument extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
+      toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id')))
     }))
   }
 
@@ -224,6 +227,9 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
@@ -232,7 +238,8 @@ export class HtmlDocument extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
@@ -241,7 +248,8 @@ export class HtmlDocument extends React.Component {
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
@@ -345,7 +353,8 @@ export class HtmlDocument extends React.Component {
 
     const localStorageRawContent = getLocalStorageItem(
       state.appName,
-      resHtmlDocument.body,
+      resHtmlDocument.body.content_id,
+      resHtmlDocument.body.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
 
@@ -394,7 +403,7 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     this.loadHtmlDocument()
     this.props.loadTimeline(getHtmlDocRevision, this.state.content)
-    this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) this.props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
   }
 
   handleLoadMoreTimelineItems = async () => {
@@ -418,7 +427,12 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
-    const previouslyUnsavedRawContent = getLocalStorageItem(this.state.appName, this.state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)
+    const previouslyUnsavedRawContent = getLocalStorageItem(
+      this.state.appName,
+      this.state.content.content_id,
+      this.state.content.workspace_id,
+      LOCAL_STORAGE_FIELD.RAW_CONTENT
+    )
 
     this.setState(prev => ({
       content: {
@@ -443,7 +457,8 @@ export class HtmlDocument extends React.Component {
 
     removeLocalStorageItem(
       this.state.appName,
-      this.state.content,
+      this.state.content.content_id,
+      this.state.content.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
     )
   }
@@ -498,7 +513,8 @@ export class HtmlDocument extends React.Component {
       case 200: {
         removeLocalStorageItem(
           state.appName,
-          state.content,
+          state.content.content_id,
+          state.content.workspace_id,
           LOCAL_STORAGE_FIELD.RAW_CONTENT
         )
 
@@ -542,6 +558,7 @@ export class HtmlDocument extends React.Component {
         sendGlobalFlashMessage(props.t('Error while saving the new version'))
         break
     }
+    window.history.replaceState(null, '', PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.content.content_type, state.content.content_id))
   }
 
   searchForMentionOrLinkInQuery = async (query) => {
@@ -716,15 +733,28 @@ export class HtmlDocument extends React.Component {
 
   handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
+    props.appContentDeleteToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
   handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
-  handleSetShowProgressbarStatus = (showProgressStatus) => {
+  setShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 
@@ -733,6 +763,12 @@ export class HtmlDocument extends React.Component {
 
     props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
     this.handleCloseNotifyAllMessage()
+  }
+
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
 
   shouldDisplayNotifyAllMessage = () => {
@@ -862,31 +898,39 @@ export class HtmlDocument extends React.Component {
       ) : null
     }
 
-    const toDoObject = {
-      id: 'todo',
-      label: props.t('Tasks'),
-      icon: 'fas fa-check-square',
-      children: (
-        <PopinFixedRightPartContent
-          label={props.t('Tasks')}
-          toDoList={state.toDoList}
-          showProgress={state.showProgress}
-        >
-          <ToDoManagement
-            apiUrl={state.config.apiUrl}
-            contentId={state.content.content_id}
-            customColor={state.config.hexcolor}
-            memberList={state.config.workspace.memberList}
-            onClickChangeStatusToDo={this.handleChangeStatusToDo}
-            onClickDeleteToDo={this.handleDeleteToDo}
-            onClickSaveNewToDo={this.handleSaveNewToDo}
-            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
-            user={state.loggedUser}
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
             toDoList={state.toDoList}
-          />
-        </PopinFixedRightPartContent>
-      )
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
     }
+
     const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
@@ -905,7 +949,9 @@ export class HtmlDocument extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
-    return [timelineObject, toDoObject, tagObject]
+    menuItemList.push(tagObject)
+
+    return menuItemList
   }
 
   render () {
@@ -936,6 +982,12 @@ export class HtmlDocument extends React.Component {
               showAction: true,
               dataCy: 'popinListItem__downloadAsPdf'
             }, {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
@@ -956,13 +1008,13 @@ export class HtmlDocument extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
-              icon: 'fas fa-edit',
-              label: props.t('Edit'),
-              key: props.t('Edit'),
-              onClick: this.handleClickNewVersion,
-              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id,
+              dataCy: 'newVersionButton',
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'newVersionButton'
+              icon: 'fas fa-edit',
+              key: props.t('Edit'),
+              label: props.t('Edit'),
+              onClick: this.handleClickNewVersion,
+              showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
             }
           ]}
           isTemplate={state.isTemplate}
@@ -1016,7 +1068,7 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
+            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
             // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}

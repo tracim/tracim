@@ -61,6 +61,10 @@ const ENTITY_TYPE_COMPONENT_CONSTRUCTOR = new Map([
           workspaceId={activity.newestMessage.fields.workspace.workspace_id}
           titleLink={titleLink}
           previewLink={previewLink}
+          showParticipateButton
+          // INFO - GB - 2022-08-23 - The line bellow call Object.prototype to not trigger the no-prototype-builtins linting error
+          // See https://ourcodeworld.com/articles/read/1425/how-to-fix-eslint-error-do-not-access-objectprototype-method-hasownproperty-from-target-object-no-prototype-builtins
+          showCommentList={Object.prototype.hasOwnProperty.call(activity, 'commentList')}
         />
       )
   }],
@@ -130,7 +134,7 @@ const ActivityList = (props) => {
 
   const isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
     if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-        !activity.newestMessage.fields.workspace) return true
+      !activity.newestMessage.fields.workspace) return true
     const activityWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
     if (!activityWorkspace) return true
     return activityWorkspace.publicationEnabled
@@ -138,14 +142,18 @@ const ActivityList = (props) => {
 
   const isLoggedUserMember = (activity) => props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
 
+  const isActivityAnAttachedFileOnPublication = (activity) => activity.content
+    ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
+    : false
+
   const activityDisplayFilter = (activity) => {
-    return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) &&
-    (
-      (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-      (isSubscriptionRequestOrRejection(activity) && isLoggedUserMember(activity)) ||
-      (isMemberCreatedOrModified(activity) && isLoggedUserMember(activity)) ||
-      (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.userId)
-    )
+    return ENTITY_TYPE_COMPONENT_CONSTRUCTOR.has(activity.entityType) && !isActivityAnAttachedFileOnPublication(activity) &&
+      (
+        (activity.entityType === TLM_ET.CONTENT && isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
+        (isSubscriptionRequestOrRejection(activity) && isLoggedUserMember(activity)) ||
+        (isMemberCreatedOrModified(activity) && isLoggedUserMember(activity)) ||
+        (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.userId)
+      )
   }
 
   const activityList = props.activity.list.filter(activityDisplayFilter).map(renderActivityComponent)

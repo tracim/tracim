@@ -52,6 +52,16 @@ describe('Tags', () => {
       cy.get('[data-cy=popin_right_part_tag]').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Markierungen')
 
+      cy.changeLanguage('ar')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
+      cy.get('[data-cy=popin_right_part_tag]').click()
+      cy.contains('.wsContentGeneric__content__right__content__title', 'إشارات')
+
+      cy.changeLanguage('es')
+      cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } })
+      cy.get('[data-cy=popin_right_part_tag]').click()
+      cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')
+
       cy.changeLanguage('en')
     })
   })
@@ -77,6 +87,16 @@ describe('Tags', () => {
       cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
       cy.get('[data-cy=popin_right_part_tag').click()
       cy.contains('.wsContentGeneric__content__right__content__title', 'Markierungen')
+
+      cy.changeLanguage('ar')
+      cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+      cy.get('[data-cy=popin_right_part_tag').click()
+      cy.contains('.wsContentGeneric__content__right__content__title', 'إشارات')
+
+      cy.changeLanguage('es')
+      cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+      cy.get('[data-cy=popin_right_part_tag').click()
+      cy.contains('.wsContentGeneric__content__right__content__title', 'Etiquetas')
     })
   })
 })

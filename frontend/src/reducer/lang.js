@@ -15,6 +15,9 @@ const defaultLang = [{
 }, {
   id: 'ar',
   label: 'العربية'
+}, {
+  id: 'es',
+  label: 'Español'
 }]
 
 export function lang (state = defaultLang, action) {

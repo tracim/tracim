@@ -35,9 +35,7 @@ export class FileComponent extends React.Component {
     const videoWrapper = document.createElement('div')
     videoWrapper.id = 'videoWrapperDiv'
     videoWrapper.className = 'file__previewVideo open'
-    videoWrapper.onclick = (e) => {
-      this.props.onClickClosePreviewVideo(e)
-    }
+    videoWrapper.onclick = this.props.onTogglePreviewVideo
 
     videoWrapper.appendChild(video)
 
@@ -148,6 +146,7 @@ export class FileComponent extends React.Component {
             downloadRawUrl={props.downloadRawUrl}
             isPdfAvailable={props.isPdfAvailable}
             isJpegAvailable={props.isJpegAvailable}
+            isVideo={props.isVideo}
             downloadPdfPageUrl={props.downloadPdfPageUrl}
             downloadPdfFullUrl={props.downloadPdfFullUrl}
             previewUrl={props.previewUrl}
@@ -156,6 +155,7 @@ export class FileComponent extends React.Component {
             lightboxUrlList={props.lightboxUrlList}
             onClickPreviousPage={props.onClickPreviousPage}
             onClickNextPage={props.onClickNextPage}
+            onTogglePreviewVideo={props.onTogglePreviewVideo}
           />
         )}
 
@@ -214,16 +214,20 @@ FileComponent.propTypes = {
   customColor: PropTypes.string,
   editionAuthor: PropTypes.string,
   isRefreshNeeded: PropTypes.bool,
+  isVideo: PropTypes.bool,
   mode: PropTypes.string,
   onClickLastVersion: PropTypes.func,
-  onClickRefresh: PropTypes.func
+  onClickRefresh: PropTypes.func,
+  onTogglePreviewVideo: PropTypes.func
 }
 
 FileComponent.defaultProps = {
   customColor: '#252525',
   editionAuthor: '',
   isRefreshNeeded: false,
+  isVideo: false,
   mode: APP_FEATURE_MODE.VIEW,
   onClickLastVersion: () => { },
-  onClickRefresh: () => { }
+  onClickRefresh: () => { },
+  onTogglePreviewVideo: () => { }
 }

@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+import {
+  getLocalStorageItem,
+  LOCAL_STORAGE_FIELD,
+  removeLocalStorageItem,
+  setLocalStorageItem
+} from '../../localStorage.js'
 import IconButton from '../Button/IconButton.jsx'
 import LinkButton from '../Button/LinkButton.jsx'
 import ToDoItem, {
@@ -8,15 +14,65 @@ import ToDoItem, {
   isEditable
 } from './ToDoItem.jsx'
 import NewToDo from './NewToDo.jsx'
-import { ROLE } from '../../helper.js'
+import { CONTENT_TYPE, ROLE } from '../../helper.js'
 import CreateToDoFromTextPopUp from './CreateToDoFromTextPopUp.jsx'
+
+// INFO - MP - 2022-07-18 - Transform a list of a to do in text form to a list of to do
+// Parameters:
+//  - toDosAsLineList: list of to do
+//  - memberList: the list of members
+//  - selectedValueList: the existing list of selected user on to dos
+//  - defaultObject: the default object that will be used to create a new to do
+// return an object that contains the list of to dos and the list of selected values
+export function transformToDoTextListIntoArrayHelper (toDosAsLineList, memberList, selectedValueList, defaultObject) {
+  const lines = toDosAsLineList
+  const tmpToDoList = []
+  const tmpSelectedValueList = [...selectedValueList]
+
+  lines.forEach((line, index) => {
+    // INFO - MP - 2022-07-04 - This regex will:
+    // Look for a +<UserName> followed by the ToDo text
+    // Ignoring blank space before the + and between the UserName and the ToDo text
+    // Example:
+    // With the string: '  +mathis do this'
+    // The expression will return: match['+mathis do this', '  ', '+mathis', ' ', 'do this']
+    // With the string: 'you have to do this'
+    // The expression will return: match['you have to do this', undefined, undefined, undefined, 'you have to do this']
+    const toDoGroups = line.match(/^([\s]*)([+][a-zA-Z]*)?( +)?(.*)/)
+
+    if (toDoGroups) {
+      let toDoAssigneeUsername
+
+      if (toDoGroups[2] && toDoGroups[2].startsWith('+')) {
+        toDoAssigneeUsername = toDoGroups[2].substring(1)
+      }
+
+      const toDoAssignee = memberList.find(member => member.username && member.username === toDoAssigneeUsername)
+
+      if (toDoAssignee) {
+        tmpSelectedValueList[index] = { value: toDoAssignee.id, label: `${toDoAssignee.publicName} (${toDoAssignee.username})` }
+      } else {
+        tmpSelectedValueList[index] = defaultObject
+      }
+
+      tmpToDoList.push(
+        {
+          assigneeId: tmpSelectedValueList[index] ? tmpSelectedValueList[index].value : null,
+          value: toDoGroups[4]
+        }
+      )
+    }
+  })
+
+  return { tmpToDoList, tmpSelectedValueList }
+}
 
 const ToDoManagement = (props) => {
   const isReader = props.user.userRoleIdInWorkspace === ROLE.reader.id
   const nobodyValueObject = { value: null, label: props.t('Nobody') }
 
   const [isPopUpDisplayed, setIsPopUpDisplayed] = useState(false)
-  const [isNewToDo, setIsNewToDo] = useState(props.toDoList.length === 0 && !isReader)
+  const [isToDoCreationDisplayed, setIsToDoCreationDisplayed] = useState(false)
   const [memberListOptions, setMemberListOptions] = useState([nobodyValueObject])
   const [newToDoList, setNewToDoList] = useState([])
   const [newToDoListAsText, setNewToDoListAsText] = useState('')
@@ -30,12 +86,23 @@ const ToDoManagement = (props) => {
   }, [props.memberList])
 
   useEffect(() => {
-    setNewToDoList([{
-      assigneeId: 0,
-      value: null
-    }])
-    setSelectedValueList([nobodyValueObject])
-  }, [isNewToDo])
+    const localStorageToDoList = getLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO
+    )
+
+    if (localStorageToDoList) {
+      transformToDoTextListIntoArray({ target: { value: localStorageToDoList } })
+    } else {
+      setNewToDoList([{
+        assigneeId: 0,
+        value: null
+      }])
+      setSelectedValueList([nobodyValueObject])
+    }
+  }, [isToDoCreationDisplayed])
 
   useEffect(() => {
     if (!isPopUpDisplayed) {
@@ -53,6 +120,13 @@ const ToDoManagement = (props) => {
         }
       })
       setNewToDoListAsText(text)
+      setLocalStorageItem(
+        CONTENT_TYPE.TODO,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.TODO,
+        text
+      )
     }
   }, [newToDoList])
 
@@ -73,8 +147,14 @@ const ToDoManagement = (props) => {
   }
 
   const handleClickCancel = () => {
-    props.onClickAddNewToDo(true)
-    setIsNewToDo(false)
+    props.displayProgressBarStatus(true)
+    setIsToDoCreationDisplayed(false)
+    removeLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO
+    )
   }
 
   const handleClickClose = () => {
@@ -83,8 +163,8 @@ const ToDoManagement = (props) => {
   }
 
   const handleAddNewToDo = () => {
-    props.onClickAddNewToDo(false)
-    setIsNewToDo(true)
+    props.displayProgressBarStatus(false)
+    setIsToDoCreationDisplayed(true)
   }
 
   const handleClickSaveToDo = () => {
@@ -98,7 +178,14 @@ const ToDoManagement = (props) => {
       }
     })
     setIsPopUpDisplayed(false)
-    setIsNewToDo(false)
+    setIsToDoCreationDisplayed(false)
+    setNewToDoList([])
+    removeLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO
+    )
   }
 
   const handleChangeSelectedValue = (e, index) => {
@@ -118,49 +205,21 @@ const ToDoManagement = (props) => {
     setNewToDoList(tmpToDoList)
   }
 
-  const handleChangePopUpValue = (e) => {
+  const transformToDoTextListIntoArray = (e) => {
     setNewToDoListAsText(e.target.value)
 
     const lines = e.target.value.split(/\n/g)
-    const tmpToDoList = []
-    const tmpSelectedValueList = [...selectedValueList]
+    const { tmpToDoList, tmpSelectedValueList } = transformToDoTextListIntoArrayHelper(lines, props.memberList, selectedValueList, nobodyValueObject)
 
-    lines.forEach((line, index) => {
-      // INFO - MP - 2022-07-04 - This regex will:
-      // Look for a +<UserName> followed by the ToDo text
-      // Ignoring blank space before the + and between the UserName and the ToDo text
-      // Example:
-      // With the string: '  +mathis do this'
-      // The expression will return: match['+mathis do this', '  ', '+mathis', ' ', 'do this']
-      // With the string: 'you have to do this'
-      // The expression will return: match['you have to do this', undefined, undefined, undefined, 'you have to do this']
-      const toDoGroups = line.match(/^([\s]*)([+][a-zA-Z]*)?( +)?(.*)/)
-
-      if (toDoGroups) {
-        let toDoAssigneeUsername
-
-        if (toDoGroups[2] && toDoGroups[2].startsWith('+')) {
-          toDoAssigneeUsername = toDoGroups[2].substring(1)
-        }
-
-        const toDoAssignee = props.memberList.find(member => member.username && member.username === toDoAssigneeUsername)
-
-        if (toDoAssignee) {
-          tmpSelectedValueList[index] = memberListOptions.find(option => option.value === toDoAssignee.id)
-        } else {
-          tmpSelectedValueList[index] = nobodyValueObject
-        }
-
-        tmpToDoList.push(
-          {
-            assigneeId: tmpSelectedValueList[index] ? tmpSelectedValueList[index].value : null,
-            value: toDoGroups[4]
-          }
-        )
-      }
-    })
-    setSelectedValueList([...tmpSelectedValueList])
     setNewToDoList([...tmpToDoList])
+    setSelectedValueList([...tmpSelectedValueList])
+    setLocalStorageItem(
+      CONTENT_TYPE.TODO,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.TODO,
+      e.target.value
+    )
   }
 
   const handleOpenPopUp = () => {
@@ -170,7 +229,7 @@ const ToDoManagement = (props) => {
 
   return (
     <div className='toDoManagement'>
-      {isNewToDo ? (
+      {isToDoCreationDisplayed ? (
         <div className='toDoManagement__creation'>
           <div className='toDoManagement__creation__linkButton'>
             <LinkButton
@@ -182,13 +241,10 @@ const ToDoManagement = (props) => {
           {newToDoList.map((toDo, index) => {
             return (
               <NewToDo
-                apiUrl={props.apiUrl}
-                onChangeSelectedValue={(e) => handleChangeSelectedValue(e, index)}
-                onChangeValue={(e) => handleChangeValue(e, index)}
-                contentId={props.contentId}
-                customColor={props.customColor}
                 key={`todoList__${index}`}
                 memberListOptions={memberListOptions}
+                onChangeSelectedValue={(e) => handleChangeSelectedValue(e, index)}
+                onChangeValue={(e) => handleChangeValue(e, index)}
                 selectedValue={selectedValueList[index]}
                 value={toDo.value ? toDo.value : ''}
               />
@@ -213,6 +269,7 @@ const ToDoManagement = (props) => {
               />
 
               <IconButton
+                dataCy='toDoManagement__buttons__new'
                 text={props.t('Validate')}
                 icon='fas fa-check'
                 onClick={handleClickSaveToDo}
@@ -243,6 +300,7 @@ const ToDoManagement = (props) => {
                 key={`toDo_${toDo.content_id}`}
                 isDeletable={isDeletable(toDo, props.user, props.user.userRoleIdInWorkspace)}
                 isEditable={isEditable(toDo, props.user, props.user.userRoleIdInWorkspace)}
+                isLoading={props.lockedToDoList.includes(toDo.content_id)}
                 memberList={props.memberList}
                 onClickChangeStatusToDo={props.onClickChangeStatusToDo}
                 onClickDeleteToDo={props.onClickDeleteToDo}
@@ -250,14 +308,19 @@ const ToDoManagement = (props) => {
                 toDo={toDo}
               />
             )
-            : <div>{props.t('This content has no task to do associated. Click on "New task" button to create a new one.')}</div>}
+            : (
+              <div data-cy='toDo__empty'>
+                <span>{props.t('This content has no task to do associated.')}</span>
+                {!isReader && <span> {props.t('Click on "New task" button to create a new one.')}</span>}
+              </div>
+            )}
         </div>
       )}
 
       {isPopUpDisplayed && (
         <CreateToDoFromTextPopUp
           customColor={props.customColor}
-          onChangeValue={handleChangePopUpValue}
+          onChangeValue={transformToDoTextListIntoArray}
           onClickTransform={() => setIsPopUpDisplayed(false)}
           onClickClose={handleClickClose}
           value={newToDoListAsText}
@@ -277,10 +340,16 @@ ToDoManagement.propTypes = {
   toDoList: PropTypes.array.isRequired,
   user: PropTypes.object.isRequired,
   customColor: PropTypes.string,
-  memberList: PropTypes.array
+  displayProgressBarStatus: PropTypes.func,
+  lockedToDoList: PropTypes.array,
+  memberList: PropTypes.array,
+  workspaceId: PropTypes.number
 }
 
 ToDoManagement.defaultProps = {
   customColor: '',
-  memberList: []
+  displayProgressBarStatus: () => { },
+  lockedToDoList: [],
+  memberList: [],
+  workspaceId: 0
 }

@@ -7,6 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
+  handleClickCopyLink,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
@@ -50,6 +51,7 @@ import {
   sendGlobalFlashMessage,
   TagList,
   getFileRevisionPreviewInfo,
+  sortContentByCreatedDateAndID,
   sortContentByStatus,
   ToDoManagement
 } from 'tracim_frontend_lib'
@@ -78,7 +80,6 @@ export class File extends React.Component {
       disableChangeIsTemplate: false,
       isVisible: true,
       isTemplate: false,
-      loggedUser: param.loggedUser,
       externalTranslationList: [
         props.t('File'),
         props.t('Files'),
@@ -88,6 +89,8 @@ export class File extends React.Component {
       ],
       newContent: {},
       loadingContent: true,
+      lockedToDoList: [],
+      loggedUser: param.loggedUser,
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
@@ -196,7 +199,7 @@ export class File extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'))
+      toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id')))
     }))
   }
 
@@ -204,6 +207,9 @@ export class File extends React.Component {
     const { state } = this
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
+    // INFO - MP - 2022-07-19 - We fetch the to do data because we don't trust Redux
+    // therefore we only update the to do when we fetch a TLM. Gives the impression
+    // of lags
     const fecthGetToDo = await handleFetchResult(await getToDo(
       state.config.apiUrl,
       data.fields.workspace.workspace_id,
@@ -212,7 +218,8 @@ export class File extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo)
+      toDoList: prevState.toDoList.map(toDo => toDo.content_id === data.fields.content.content_id ? fecthGetToDo.body : toDo),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
@@ -221,7 +228,8 @@ export class File extends React.Component {
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
   }
 
@@ -364,7 +372,7 @@ export class File extends React.Component {
     }
 
     await putMyselfFileRead(state.config.apiUrl, state.content.workspace_id, state.content.content_id)
-    props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
+    if (state.config.toDoEnabled) props.getToDoList(this.setState.bind(this), state.content.workspace_id, state.content.content_id)
     GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.REFRESH_CONTENT_LIST, data: {} })
   }
 
@@ -467,6 +475,12 @@ export class File extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+  }
+
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
     const response = await props.appContentChangeTitle(state.content, newTitle, state.config.slug)
@@ -546,15 +560,28 @@ export class File extends React.Component {
 
   handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
+    props.appContentDeleteToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
   handleChangeStatusToDo = (toDo, status) => {
     const { state, props } = this
-    props.appContentChangeStatusToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, status, this.setState.bind(this))
+    props.appContentChangeStatusToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      status,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
-  handleSetShowProgressbarStatus = (showProgressStatus) => {
+  setShowProgressBarStatus = (showProgressStatus) => {
     this.setState({ showProgress: showProgressStatus })
   }
 
@@ -947,31 +974,40 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       ) : null
     }
-    const toDoObject = {
-      id: 'todo',
-      label: props.t('Tasks'),
-      icon: 'fas fa-check-square',
-      children: (
-        <PopinFixedRightPartContent
-          label={props.t('Tasks')}
-          toDoList={state.toDoList}
-          showProgress={state.showProgress}
-        >
-          <ToDoManagement
-            apiUrl={state.config.apiUrl}
-            contentId={state.content.content_id}
-            customColor={state.config.hexcolor}
-            memberList={state.config.workspace.memberList}
-            onClickChangeStatusToDo={this.handleChangeStatusToDo}
-            onClickDeleteToDo={this.handleDeleteToDo}
-            onClickSaveNewToDo={this.handleSaveNewToDo}
-            onClickAddNewToDo={this.handleSetShowProgressbarStatus}
-            user={state.loggedUser}
+
+    const menuItemList = [timelineObject]
+
+    if (state.config.toDoEnabled) {
+      const toDoObject = {
+        id: 'todo',
+        label: props.t('Tasks'),
+        icon: 'fas fa-check-square',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Tasks')}
             toDoList={state.toDoList}
-          />
-        </PopinFixedRightPartContent>
-      )
+            showProgress={state.showProgress}
+          >
+            <ToDoManagement
+              apiUrl={state.config.apiUrl}
+              contentId={state.content.content_id}
+              customColor={state.config.hexcolor}
+              lockedToDoList={state.lockedToDoList}
+              memberList={state.config.workspace.memberList}
+              onClickChangeStatusToDo={this.handleChangeStatusToDo}
+              onClickDeleteToDo={this.handleDeleteToDo}
+              onClickSaveNewToDo={this.handleSaveNewToDo}
+              displayProgressBarStatus={this.setShowProgressBarStatus}
+              user={state.loggedUser}
+              toDoList={state.toDoList}
+              workspaceId={state.content.workspace_id}
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(toDoObject)
     }
+
     const tagObject = {
       id: 'tag',
       label: props.t('Tags'),
@@ -990,6 +1026,8 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    menuItemList.push(tagObject)
+
     const propertiesObject = {
       id: 'properties',
       label: props.t('Properties'),
@@ -1017,44 +1055,38 @@ export class File extends React.Component {
         </PopinFixedRightPartContent>
       )
     }
+    menuItemList.push(propertiesObject)
 
     if (state.config.workspace.downloadEnabled && state.loggedUser.userRoleIdInWorkspace >= ROLE.contentManager.id) {
-      return [
-        timelineObject,
-        toDoObject,
-        tagObject,
-        {
-          id: 'share',
-          label: props.t('Share'),
-          icon: 'fa-share-alt',
-          children: (
-            <PopinFixedRightPartContent
-              label={props.t('Share')}
-            >
-              <ShareDownload
-                label={props.t(state.config.label)}
-                hexcolor={state.config.hexcolor}
-                shareEmails={state.shareEmails}
-                onChangeEmails={this.handleChangeEmails}
-                onKeyDownEnter={this.handleKeyDownEnter}
-                sharePassword={state.sharePassword}
-                onChangePassword={this.handleChangePassword}
-                shareLinkList={state.shareLinkList}
-                onClickDeleteShareLink={this.handleClickDeleteShareLink}
-                onClickNewShare={this.handleClickNewShare}
-                userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
-                emailNotifActivated={state.config.system.config.email_notification_activated}
-                key='ShareDownload'
-              />
-            </PopinFixedRightPartContent>
-          )
-        },
-        propertiesObject
-
-      ]
-    } else {
-      return [timelineObject, toDoObject, tagObject, propertiesObject]
+      const shareObject = {
+        id: 'share',
+        label: props.t('Share'),
+        icon: 'fa-share-alt',
+        children: (
+          <PopinFixedRightPartContent
+            label={props.t('Share')}
+          >
+            <ShareDownload
+              label={props.t(state.config.label)}
+              hexcolor={state.config.hexcolor}
+              shareEmails={state.shareEmails}
+              onChangeEmails={this.handleChangeEmails}
+              onKeyDownEnter={this.handleKeyDownEnter}
+              sharePassword={state.sharePassword}
+              onChangePassword={this.handleChangePassword}
+              shareLinkList={state.shareLinkList}
+              onClickDeleteShareLink={this.handleClickDeleteShareLink}
+              onClickNewShare={this.handleClickNewShare}
+              userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
+              isEmailNotifActivated={state.config.system.config.email_notification_activated}
+              key='ShareDownload'
+            />
+          </PopinFixedRightPartContent>
+        )
+      }
+      menuItemList.push(shareObject)
     }
+    return menuItemList
   }
 
   handleCloseNotifyAllMessage = async () => {
@@ -1142,6 +1174,7 @@ export class File extends React.Component {
           1080
         )
       )
+    const isVideo = isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST)
 
     return (
       <PopinFixed
@@ -1155,15 +1188,9 @@ export class File extends React.Component {
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
-                (onlineEditionAction && onlineEditionAction.action === ACTION_EDIT),
+                ((onlineEditionAction && onlineEditionAction.action === ACTION_EDIT) || isVideo),
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionBtn'
-            }, {
-              icon: 'fas fa-play',
-              label: props.t('Play video'),
-              onClick: () => this.setState({ previewVideo: true }),
-              showAction: isVideoMimeTypeAndIsAllowed(state.content.mimetype, DISALLOWED_VIDEO_MIME_TYPE_LIST),
-              dataCy: 'popinListItem__playVideo'
             }, {
               icon: 'fas fa-edit',
               label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
@@ -1190,6 +1217,12 @@ export class File extends React.Component {
               showAction: true,
               dataCy: 'popinListItem__downloadFile'
             }, {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,
@@ -1210,18 +1243,27 @@ export class File extends React.Component {
           disableChangeTitle={!state.content.is_editable}
           headerButtons={[
             {
-              icon: 'fas fa-edit',
-              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
-              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
-              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT,
+              icon: 'fas fa-play',
+              label: props.t('Play video'),
+              onClick: () => this.setState({ previewVideo: true }),
+              showAction: isVideo,
+              dataCy: 'popinListItem__playVideo'
+            }, {
+              dataCy: 'wsContentGeneric__option__menu__addversion',
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
-              dataCy: 'wsContentGeneric__option__menu__addversion'
+              icon: 'fas fa-edit',
+              isLink: true,
+              label: onlineEditionAction ? props.t(onlineEditionAction.label) : '',
+              link: PAGE.WORKSPACE.CONTENT_EDITION(state.content.workspace_id, state.content.content_id),
+              onClick: onlineEditionAction ? onlineEditionAction.handleClick : undefined,
+              showAction: onlineEditionAction && onlineEditionAction.action === ACTION_EDIT
             }, {
               icon: 'fas fa-upload',
               label: props.t('Upload a new version'),
               onClick: this.handleClickNewVersion,
               showAction: state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
-              (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)),
+                (!onlineEditionAction || (onlineEditionAction && onlineEditionAction.action !== ACTION_EDIT)) &&
+                (!isVideo),
               disabled: state.mode !== APP_FEATURE_MODE.VIEW || !state.content.is_editable,
               dataCy: 'newVersionBtn'
             }
@@ -1252,6 +1294,7 @@ export class File extends React.Component {
           <FileComponent
             editionAuthor={state.editionAuthor}
             isRefreshNeeded={state.showRefreshWarning}
+            isVideo={isVideo}
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
@@ -1281,7 +1324,7 @@ export class File extends React.Component {
             progressUpload={state.progressUpload}
             previewVideo={state.previewVideo}
             workspaceId={state.content.workspace_id}
-            onClickClosePreviewVideo={() => this.setState({ previewVideo: false })}
+            onTogglePreviewVideo={() => this.setState(prev => ({ previewVideo: !prev.previewVideo }))}
             ref={this.refContentLeftTop}
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}

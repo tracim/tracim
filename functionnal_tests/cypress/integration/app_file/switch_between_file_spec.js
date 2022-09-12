@@ -67,9 +67,6 @@ describe('App File', () => {
         cy.get('[data-cy="appFileLastVersionBtn"]')
           .should('be.not.visible')
 
-        cy.get(formatTag({ selectorName: s.SIDEBAR_ARROW }))
-          .click()
-
         cy.contains('.FilenameWithBadges__label', fileTitle_1)
 
         cy.get('.file__contentpage__header ul > li.breadcrumbs__item')

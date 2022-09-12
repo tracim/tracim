@@ -10,7 +10,6 @@ import {
   Icon,
   IconButton,
   PAGE,
-  COLORS,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   FilenameWithBadges,
@@ -53,7 +52,6 @@ export class FeedItemHeader extends React.Component {
   render () {
     const { props } = this
     const contentId = props.content.id
-    const contentType = props.content.type
     const showLastModification = (
       props.contentAvailable &&
       props.lastModificationType &&
@@ -63,20 +61,13 @@ export class FeedItemHeader extends React.Component {
       props.lastModifier
     )
 
-    const app = (
-      props.appList.find(a => a.slug === `contents/${contentType}`) ||
-      { label: props.t(`No App for content-type ${contentType}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
-    )
-
-    const icon = (props.isPublication && contentType === CONTENT_TYPE.THREAD) ? 'fas fa-stream' : app.faIcon
-
     return (
       <div className='feedItemHeader'>
         <Icon
+          color={props.contentType.hexcolor}
           customClass='feedItemHeader__icon'
-          color={props.isPublication ? COLORS.PUBLICATION : app.hexcolor}
-          title={props.isPublication ? props.t('Publication') : app.label}
-          icon={icon}
+          icon={props.contentType.faIcon}
+          title={props.contentType.label}
         />
         <div className='feedItemHeader__title'>
           {props.titleLink
@@ -147,10 +138,10 @@ export class FeedItemHeader extends React.Component {
             <Link
               className='feedItemHeader__actionMenu__item'
               title={props.t('Open as content')}
-              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, contentType, contentId)}
+              to={PAGE.WORKSPACE.CONTENT(props.workspaceId, props.content.type, contentId)}
               key={`open-${contentId}`}
             >
-              <i className={`fa-fw ${app.faIcon}`} />
+              <i className={`fa-fw ${props.contentType.faIcon}`} />
               {props.t('Open as content')}
             </Link>
           </DropdownMenu>
@@ -160,7 +151,7 @@ export class FeedItemHeader extends React.Component {
   }
 }
 
-const mapStateToProps = ({ user, appList }) => ({ user, appList })
+const mapStateToProps = ({ user }) => ({ user })
 export default connect(mapStateToProps)(translate()(FeedItemHeader))
 
 FeedItemHeader.propTypes = {
@@ -168,9 +159,9 @@ FeedItemHeader.propTypes = {
   contentAvailable: PropTypes.bool,
   onClickCopyLink: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  isPublication: PropTypes.bool.isRequired,
   allowEdition: PropTypes.bool,
   breadcrumbsList: PropTypes.array,
+  contentType: PropTypes.object,
   eventList: PropTypes.array,
   lastModificationEntityType: PropTypes.string,
   lastModificationSubEntityType: PropTypes.string,
@@ -185,8 +176,12 @@ FeedItemHeader.propTypes = {
 FeedItemHeader.defaultProps = {
   allowEdition: false,
   breadcrumbsList: [],
+  contentType: {
+    label: '',
+    faIcon: '',
+    hexcolor: ''
+  },
   eventList: [],
-  isPublication: false,
   lastModificationEntityType: '',
   lastModificationSubEntityType: '',
   lastModificationType: '',

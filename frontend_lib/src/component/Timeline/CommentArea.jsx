@@ -46,10 +46,8 @@ export class CommentArea extends React.Component {
     } else {
       const savedComment = getLocalStorageItem(
         props.contentType,
-        {
-          content_id: props.contentId,
-          workspace_id: props.workspaceId
-        },
+        props.contentId,
+        props.workspaceId,
         LOCAL_STORAGE_FIELD.COMMENT
       )
 
@@ -82,10 +80,8 @@ export class CommentArea extends React.Component {
     if (prevProps.contentType !== props.contentType) {
       const savedComment = getLocalStorageItem(
         props.contentType,
-        {
-          content_id: props.contentId,
-          workspace_id: props.workspaceId
-        },
+        props.contentId,
+        props.workspaceId,
         LOCAL_STORAGE_FIELD.COMMENT
       )
       if (!!savedComment && savedComment !== this.state.newComment) {
@@ -127,6 +123,7 @@ export class CommentArea extends React.Component {
 
     switch (e.key) {
       case ' ': this.setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] }); break
+      case 'Tab':
       case 'Enter': {
         this.handleClickAutoCompleteItem(state.autoCompleteItemList[state.autoCompleteCursorPosition])
         e.preventDefault()

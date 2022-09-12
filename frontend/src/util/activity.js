@@ -1,11 +1,16 @@
 import {
+  CONTENT_TYPE,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
+  getContent,
   getContentComment,
+  getFileChildContent,
   handleFetchResult,
   getWorkspaceContent,
-  getContentPath
+  getContentPath,
+  sortTimelineByDate,
+  TIMELINE_TYPE
 } from 'tracim_frontend_lib'
 
 const createActivityEvent = (message) => {
@@ -31,8 +36,19 @@ const createSingleMessageActivity = (activityParams, messageList) => {
 }
 
 const getCommentList = async (content, apiUrl) => {
-  const response = await handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id))
-  return response.apiResponse.status === 200 ? response.body.items : []
+  const [resComment, resCommentAsFile] = await Promise.all([
+    handleFetchResult(await getContentComment(apiUrl, content.workspace_id, content.content_id)),
+    handleFetchResult(await getFileChildContent(apiUrl, content.workspace_id, content.content_id))
+  ])
+
+  if (resComment.apiResponse.status !== 200 || resCommentAsFile.apiResponse.status !== 200) return []
+
+  const commentList = sortTimelineByDate([
+    ...resComment.body.items.map(comment => ({ ...comment, timelineType: TIMELINE_TYPE.COMMENT })),
+    ...resCommentAsFile.body.items.map(comment => ({ ...comment, timelineType: TIMELINE_TYPE.COMMENT_AS_FILE }))
+  ])
+
+  return commentList
 }
 
 /**
@@ -51,34 +67,31 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
 
   let content = newestMessage.fields.content
 
-  if (content.content_type === TLM_ST.COMMENT ||
-    content.content_type === TLM_ST.MENTION ||
-    content.content_type === TLM_ST.TODO) {
-    // INFO - SG - 2021-04-16
-    // We have to get the parent content as comments shall produce an activity
-    // for it and not for the comment.
-    const parentContentType = content.parent_content_type
-    const parentId = content.parent_id
-    if (!(parentContentType && parentId)) return null
+  const isMentionOrComment = content.content_type === TLM_ST.COMMENT ||
+    content.content_type === TLM_ET.MENTION
 
-    const response = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      parentContentType,
-      parentId
-    ))
-    if (!response.apiResponse.ok) return null
-    content = { ...content, ...response.body }
-  } else {
-    const response = await handleFetchResult(await getWorkspaceContent(
-      apiUrl,
-      newestMessage.fields.workspace.workspace_id,
-      content.content_type,
-      content.content_id
-    ))
-    if (!response.apiResponse.ok) return null
-    content = { ...content, ...response.body }
+  let parentContentType
+  if (isMentionOrComment) parentContentType = content.parent_content_type
+  else if (content.assignee) parentContentType = content.parent.content_type
+  else if (content.parent_id) {
+    const parentType = await getParentType(content.parent_id, apiUrl)
+    if (parentType !== CONTENT_TYPE.FOLDER) parentContentType = parentType
   }
+
+  // INFO - SG - 2021-04-16
+  // We have to get the parent content as comments shall produce an activity
+  // for it and not for the comment.
+  const fetchGetWorkspaceContent = await handleFetchResult(await getWorkspaceContent(
+    apiUrl,
+    newestMessage.fields.workspace.workspace_id,
+    parentContentType || content.content_type,
+    parentContentType
+      ? content.parent_id || content.parent.content_id
+      : content.content_id
+  ))
+
+  if (!fetchGetWorkspaceContent.apiResponse.ok) return null
+  content = { ...content, ...fetchGetWorkspaceContent.body }
 
   const fetchGetContentPath = await handleFetchResult(
     await getContentPath(apiUrl, content.content_id)
@@ -99,14 +112,30 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   }
 }
 
-const getActivityParams = (message) => {
+const getParentType = async (parentId, apiUrl) => {
+  const fetchGetContent = await handleFetchResult(
+    await getContent(apiUrl, parentId)
+  )
+  return fetchGetContent.apiResponse.status === 200
+    ? fetchGetContent.body.content_type
+    : null
+}
+
+const getActivityParams = async (message, apiUrl) => {
   const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
   switch (entityType) {
     case TLM_ET.CONTENT: {
       if (subEntityType === TLM_ST.COMMENT && coreEventType !== TLM_CET.CREATED) return null
-      const id = (subEntityType === TLM_ST.COMMENT)
-        ? message.fields.content.parent_id
-        : message.fields.content.content_id
+
+      let id
+      if (subEntityType === TLM_ST.COMMENT) id = message.fields.content.parent_id
+      else if (subEntityType === TLM_ST.TODO) id = message.fields.content.parent.content_id
+      else if (message.fields.content.parent_id) {
+        const parentType = await getParentType(message.fields.content.parent_id, apiUrl)
+        if (parentType === CONTENT_TYPE.FOLDER) id = message.fields.content.content_id
+        else id = message.fields.content.parent_id
+      } else id = message.fields.content.content_id
+
       return { id: `${entityType}-${id}`, entityType: entityType }
     }
     case TLM_ET.MENTION: {
@@ -135,10 +164,10 @@ const createActivity = async (activityParams, activityMessageList, apiUrl) => {
   }
 }
 
-const groupMessageListByActivityId = (messageList) => {
+const groupMessageListByActivityId = async (messageList, apiUrl) => {
   const activityMap = new Map()
   for (const message of messageList) {
-    const activityParams = getActivityParams(message)
+    const activityParams = await getActivityParams(message, apiUrl)
     if (activityParams !== null) {
       const activityParamsAndMessageList = activityMap.get(activityParams.id) || { list: [] }
       activityMap.set(activityParams.id, { params: activityParams, list: [...activityParamsAndMessageList.list, message] })
@@ -164,7 +193,7 @@ const createActivityListFromActivityMap = async (activityMap, apiUrl) => {
  * INFO - SG - 2020-11-12 - this function assumes that the message list is already ordered from newest to oldest.
  */
 export const mergeWithActivityList = async (messageList, activityList, apiUrl) => {
-  const activityMap = groupMessageListByActivityId(messageList)
+  const activityMap = await groupMessageListByActivityId(messageList, apiUrl)
 
   for (const activity of activityList) {
     if (activityMap.has(activity.id)) {
@@ -186,10 +215,11 @@ export const sortActivityList = (activityList) => {
 
 const updateActivity = (message, activity) => {
   const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
-  const isMentionOnComment = (
-    message.event_type.startsWith(`${TLM_ET.MENTION}.`) &&
-    message.fields.content.content_type === TLM_ST.COMMENT
+  const isContentAChild = activity.content && (
+    (message.fields.content && message.fields.content.parent_id === activity.content.content_id) ||
+    (message.fields.content.parent && message.fields.content.parent.content_id === activity.content.content_id)
   )
+
   // NOTE SG 2020-11-12: keep the existing content
   // if the message is a comment as a comment cannot change anything
   // on its parent
@@ -204,7 +234,7 @@ const updateActivity = (message, activity) => {
       ? [...activity.commentList, message.fields.content]
       : activity.commentList,
     newestMessage: message,
-    content: isComment || isMentionOnComment ? activity.content : message.fields.content
+    content: isContentAChild ? activity.content : message.fields.content
   }
 }
 
@@ -218,7 +248,7 @@ const updateActivity = (message, activity) => {
  * @param {*} activityList
  */
 export const addMessageToActivityList = async (message, activityList, apiUrl) => {
-  const activityParams = getActivityParams(message)
+  const activityParams = await getActivityParams(message, apiUrl)
   if (!activityParams) return activityList
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {

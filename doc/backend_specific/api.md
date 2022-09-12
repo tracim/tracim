@@ -19,7 +19,7 @@ Each one is best suited for a specific usage:
 - `Api-Key` if you are administrator and you want to create daemon, gateways between applications... note that you will get full access to Tracim data: be careful!
 - `Cookie` if you work with a frontend (ui/) and don't want to store credentials for security reasons (use `/api/auth/login` to log in).
 
-Examples will be given based on the use of [httpie](https://httpie.org/).
+Majority of examples will be given based on the use of [httpie](https://httpie.org/) and Basic-Auth will be given with [curl](https://curl.se/) too.
 
 ## Who am I?
 
@@ -31,6 +31,7 @@ You need to use your username/password like in standard basic auth. See [rfc7616
 
 As a resume, the standard is to base64-encode username and password in `Authorization` header.
 
+#### With httpie
 ```
 $ http -a admin@admin.admin:admin@admin.admin GET http://127.0.0.1:6543/api/auth/whoami
 HTTP/1.1 200 OK
@@ -55,6 +56,31 @@ Set-Cookie:  session_key=22fd293b6d850faabc8e3f167bcfc804d8713deed03bc15e5029434
 }
 ```
 
+#### With CURL
+```
+$ curl -i -u admin@admin.admin:admin@admin.admin http://127.0.0.1:6543/api/auth/whoami
+HTTP/1.1 200 OK
+Date: Mon, 22 Aug 2022 09:16:23 GMT
+Server: Apache
+Strict-Transport-Security: max-age=31536000; preload
+Content-Type: application/json
+Cache-Control: no-store
+Transfer-Encoding: chunked
+
+{
+    "auth_type": "internal",
+    "avatar_url": null,
+    "created": "2019-01-18T13:07:02Z",
+    "email": "admin@admin.admin",
+    "is_active": true,
+    "is_deleted": false,
+    "lang": null,
+    "profile": "administrators",
+    "public_name": "Global manager",
+    "timezone": "",
+    "user_id": 1
+}
+```
 ### Api-Key
 
 You need to set 2 custom headers: `Tracim-Api-Key` with a correct API key and `Tracim-Api-Login` with a valid user login.

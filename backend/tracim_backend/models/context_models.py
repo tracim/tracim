@@ -218,10 +218,12 @@ class FileCreation(object):
         content_namespace: ContentNamespaces = ContentNamespaces.CONTENT,
         parent_id: int = 0,
         content_type: str = FILE_TYPE,
+        template_id: int = 0,
     ) -> None:
         self.parent_id = parent_id
         self.content_namespace = content_namespace
         self.content_type = content_type
+        self.template_id = template_id
 
 
 class SetPassword(object):

@@ -231,7 +231,7 @@ export class Account extends React.Component {
             props.dispatch(newFlashMessage(props.t('Name has been changed'), 'info'))
             return true
           }
-          // else, if email also has been changed, flash msg is handled bellow to not display 2 flash msg
+          // else, if email also has been changed, flash msg is handled below to not display 2 flash msg
           break
         default: props.dispatch(newFlashMessage(props.t('Error while changing name'), 'warning')); break
       }
@@ -372,6 +372,7 @@ export class Account extends React.Component {
               title={this.setTitle()}
               icon='user-o'
               breadcrumbsList={props.breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent parentClass='account'>

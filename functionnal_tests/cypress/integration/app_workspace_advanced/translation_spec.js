@@ -28,5 +28,13 @@ describe('App Workspace Advanced', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
     cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'Standard-Rolle:')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+    cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'الدور الإفتراضي:')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId } })
+    cy.contains('.workspace_advanced__defaultRole .formBlock__title', 'Rol por defecto:')
   })
 })

@@ -3,6 +3,7 @@ import React from 'react'
 import {
   CONTENT_TYPE,
   getContent,
+  handleClickCopyLink,
   handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -18,8 +19,7 @@ import {
 } from '../util/activity.js'
 import {
   FETCH_CONFIG,
-  CONTENT_NAMESPACE,
-  handleClickCopyLink
+  CONTENT_NAMESPACE
 } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -87,16 +87,8 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     handleClickCopyLink = content => {
       const { props } = this
       handleClickCopyLink(content.content_type === CONTENT_TYPE.COMMENT
-        ? {
-          id: content.parent_id,
-          workspaceId: props.workspaceId,
-          type: content.parent_content_type
-        }
-        : {
-          id: content.content_id,
-          workspaceId: content.workspace_id,
-          type: content.content_type
-        }
+        ? content.parent_id
+        : content.content_id
       )
       props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
     }
@@ -247,11 +239,15 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       return currentWorkspace.publicationEnabled
     }
 
+    isActivityAnAttachedFileOnPublication = (activity) => activity.content
+      ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
+      : false
+
     activityDisplayFilter = (activity) => {
       const { props } = this
       const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION, TLM_ET.SHAREDSPACE]
 
-      return entityType.includes(activity.entityType) &&
+      return entityType.includes(activity.entityType) && !this.isActivityAnAttachedFileOnPublication(activity) &&
         (
           (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
           (this.isSubscriptionRequestOrRejection(activity) && this.isLoggedUserMember(activity)) ||

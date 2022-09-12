@@ -62,6 +62,7 @@ export class OpenContentApp extends React.Component {
 
     const contentInformation = {
       ...typeObj,
+      toDoEnabled: appList.some(a => a.slug === 'contents/todo'),
       workspace: {
         label: currentWorkspace.label,
         downloadEnabled: currentWorkspace.downloadEnabled && appList.some(a => a.slug === 'share_content'),

@@ -22,7 +22,7 @@ class SetTodoSchema(marshmallow.Schema):
     )
     assignee_id = marshmallow.fields.Integer(
         example=42,
-        description="Id of the user who is assigned to the todo",
+        description="Id of the user who is assigned to the todo, null if no user assigned",
         validate=strictly_positive_int_validator,
         allow_none=True,
     )

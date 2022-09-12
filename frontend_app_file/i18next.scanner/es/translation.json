@@ -24,12 +24,11 @@
   "This content is deleted": "Este contenido es eliminado",
   "This content is deprecated": "Este contenido está obsoleto",
   "Description:": "Descripción:",
-  "Timeline": "Línea de tiempo",
+  "Timeline": "Revisiones",
   "To notify all members of the space of your modification": "Para notificar a todos los miembros del espacio su modificación",
   "Tags": "Etiquetas",
   "click here!": "¡ haga clic aquí !",
   "Last version": "Última versión",
-  "To Do": "Tareas",
   "Download as PDF": "Descargar como PDF",
   "Change description": "Cambiar la descripción",
   "Files": "Archivos",
@@ -64,5 +63,7 @@
   "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Para descargar el vídeo, salga del modo de pantalla completa y haga clic en el botón de descarga {{icon}}.",
   " of ": " sobre ",
   "of": "sobre",
-  "Tasks": "Tareas"
+  "Tasks": "Tareas",
+  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "Copy content link": "Copiar enlace al contenido"
 }

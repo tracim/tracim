@@ -65,7 +65,7 @@ basic_setup.session_secret = change_this_value_please!
 
 ### Language ###
 ## default language used in backend if user do not set any language.
-# Available parameter: en, fr, pt, de, ar
+# Available parameter: en, fr, pt, de, ar, es
 ; default_lang = en
 
 ### Apps ###
@@ -100,7 +100,7 @@ basic_setup.session_secret = change_this_value_please!
 ; live_messages.control_zmq_uri = tcp://localhost:5563
 # stats socket uri for GRIP protocol reverse-proxy (PushPin)
 # this is the base url used for listening to events related to connection to the
-# reverse-proxy. If you are running pushpin using the docker-compose, set this
+# reverse-proxy. If you are running pushpin using the docker compose, set this
 # parameter to tcp://localhost:5564
 ; live_messages.stats_zmq_uri = ipc:///var/run/pushpin/pushpin-stats
 # do tracim block until publishing is complete or not
@@ -777,11 +777,11 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 # caldav.pre_filled_event.description_file_path = %(here)s/tracim_backend/templates/pre-filled_agenda_event/test/description.txt
 
 ####
-# SEARCH (ElasticSearch)
+# SEARCH (ElasticSearch/OpenSearch)
 ####
 # choose search engine to use, available value are: simple, elasticsearch.
 # simple need nothing more than Tracim but features are limited,
-# elasticsearch is more effective but need an elasticsearch server.
+# elasticsearch is more effective but need an elasticsearch/opensearch server.
 ; search.engine = simple
 # elasticsearch configuration
 ; search.elasticsearch.host = localhost
@@ -861,7 +861,7 @@ caldav.radicale.headers.Access-Control-Expose-Headers = Etag
 ## Translation service target languages that will be proposed in Tracim's interface
 # It is a comma-separated list of <ISO-639-1 language code>:<Language string to display> pairs.
 # The string can use any UTF-8 character.
-; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch,ar:العربية
+; translation_service.target_languages = en:English,fr:Français,pt:Português,de:Deutsch,ar:العربية,es:Español
 # example:
 # translation_service.target_languages = fr:Français,ar:العربية,ja:日本語
 

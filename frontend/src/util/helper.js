@@ -148,7 +148,7 @@ export const DRAG_AND_DROP = {
   CONTENT_ITEM: 'contentItem'
 }
 
-// Côme - 2018/09/19 - the object bellow is a temporary hack to be able to generate translation keys that only exists in backend
+// Côme - 2018/09/19 - the object below is a temporary hack to be able to generate translation keys that only exists in backend
 // and are returned through api.
 // We will later implement a better solution
 // this const isn't exported since it's only purpose is to generate key trads through i18n.scanner
@@ -243,21 +243,6 @@ export const parseSearchUrl = (parsedQuery) => {
   searchObject.searchType = parsedQuery.s
 
   return searchObject
-}
-
-export const handleClickCopyLink = (content) => {
-  // INFO - GB - 2020-11-20 - Algorithm based on
-  // https://stackoverflow.com/questions/55190650/copy-link-on-button-click-into-clipboard-not-working
-  const tmp = document.createElement('textarea')
-  document.body.appendChild(tmp)
-  tmp.value = `${window.location.origin}${PAGE.WORKSPACE.CONTENT(
-    content.workspaceId || content.workspace_id,
-    content.content_type || content.type,
-    content.id || content.content_id
-  )}`
-  tmp.select()
-  document.execCommand('copy')
-  document.body.removeChild(tmp)
 }
 
 export const getRevisionTypeLabel = (revisionType, t) => {

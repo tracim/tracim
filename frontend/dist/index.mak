@@ -50,6 +50,10 @@
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
+      <% html_class = ".primaryColorBg{state}Opacity"%>
+      ${html_class.replace("{state}", "")} { ${param}: ${primary}33; }
+      ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}33; }
+      ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}33; }
       <% html_class = ".primaryColorBg{state}Hover:hover"%>
       ${html_class.replace("{state}", "")} { ${param}: ${primary}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
@@ -73,11 +77,15 @@
 
       <%
         sidebar = colors["sidebar"]
+        sidebarLogo = colors["sidebar/logo"]
+        sidebarFont = colors["sidebar/font"]
       %>
       :root {
-          --sidebarColor: ${sidebar.web};
-          --sidebarColorDarken: ${sidebar.darken.web};
-          --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarColor: ${sidebar.web};
+        --sidebarColorDarken: ${sidebar.darken.web};
+        --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarLogoColor: ${sidebarLogo.web};
+        --sidebarFontColor: ${sidebarFont.web};
       }
     </style>
 

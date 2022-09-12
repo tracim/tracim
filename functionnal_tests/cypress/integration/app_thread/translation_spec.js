@@ -28,5 +28,13 @@ describe('navigate :: workspace > create_new > thread', function () {
     cy.changeLanguage('de')
     cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: threadId } })
     cy.get('.thread__contentpage__texteditor__submit__btn').contains('Senden')
+
+    cy.changeLanguage('ar')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: threadId } })
+    cy.get('.thread__contentpage__texteditor__submit__btn').contains('إرسال')
+
+    cy.changeLanguage('es')
+    cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId: threadId } })
+    cy.get('.thread__contentpage__texteditor__submit__btn').contains('Enviar')
   })
 })

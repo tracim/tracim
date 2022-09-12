@@ -8,6 +8,7 @@ import dateFnsEn from 'date-fns/locale/en-US'
 import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
 import dateFnsAr from 'date-fns/locale/ar-SA'
+import dateFnsEs from 'date-fns/locale/es'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -66,10 +67,11 @@ export const DATE_FNS_LOCALE = {
   en: dateFnsEn,
   pt: dateFnsPt,
   de: dateFnsDe,
-  ar: dateFnsAr
+  ar: dateFnsAr,
+  es: dateFnsEs
 }
 
-// INFO - MP - 2022-06-09 - This oarray must stay synchronized with the supported extensions
+// INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
 export const COLLABORA_EXTENSIONS = [
   '.odg',
   '.odp',
@@ -533,6 +535,18 @@ export const sortContentByStatus = (contentList) => {
   })
 }
 
+export const sortContentByCreatedDateAndID = (arrayToSort) => {
+  return arrayToSort.sort(function (a, b) {
+    if (a.created < b.created) return 1
+    if (a.created > b.created) return -1
+    if (a.created === b.created) {
+      if (a.id < b.id) return 1
+      if (a.id > b.id) return -1
+    }
+    return 0
+  })
+}
+
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types
@@ -933,3 +947,19 @@ export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
 
   return { textBegin, textEnd }
 }
+
+export const handleClickCopyLink = (contentId) => {
+  // INFO - G.B. - 2022-08-26 - document.execCommand() is deprecated, but the alternative navigator.clipboard is
+  // not compatible with all browsers versions at this time, so a fallback was made to the old algorithm
+  const link = `${window.location.origin}${PAGE.CONTENT(contentId)}`
+  if (!navigator.clipboard) {
+    const tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = link
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+  } else navigator.clipboard.writeText(link)
+}
+
+export const sortMemberList = (a, b) => a.publicName.localeCompare(b.publicName)

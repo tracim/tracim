@@ -19,5 +19,11 @@ describe('Login page', function () {
 
     cy.changeLanguageUnloggedPages('de')
     cy.contains('.loginpage__main__form__btnsubmit', 'Verbindung')
+
+    cy.changeLanguageUnloggedPages('ar')
+    cy.contains('.loginpage__main__form__btnsubmit', 'تسجيل الدخول')
+
+    cy.changeLanguageUnloggedPages('es')
+    cy.contains('.loginpage__main__form__btnsubmit', 'Conexión')
   })
 })

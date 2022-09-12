@@ -63,5 +63,7 @@
   "Error while saving the user configuration": "Erreur lors de la sauvegarde de la configuration de l'utilisateur",
   "Tags": "Étiquettes",
   "Delete": "Supprimer",
-  "Tasks": "Tâches"
+  "Tasks": "Tâches",
+  "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
+  "Copy content link": "Copier le lien du contenu"
 }

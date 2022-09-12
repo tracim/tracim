@@ -8,10 +8,9 @@
 
 .wsContentGeneric
   background-color lightGrey
-  height "calc(100% - %s)" % headerHeight
+  height 100%
   position fixed
-  top headerHeight
-  width 100%
+  width "calc(100% - %s)" % closedSidebarWidth
   z-index 9
   &.sidebarVisible
     max-width "calc(100% - %s)" % sidebarWidth
@@ -173,6 +172,13 @@
             flex 1
   & .headerBtn
     margin-inline-end 0
+    &__link
+      color fontColor
+      &__disabled
+        cursor not-allowed
+        opacity 0.5
+      &:hover
+        color fontColor
 
 .rightPartClose
   .wsContentGeneric__content
@@ -257,9 +263,6 @@ responsiveColumnStyle()
     & span
       display none
   .wsContentGeneric
-    width 100%
-    max-width 100%
-    top headerHeight
     &__content
       overflow-Y auto
       width 100%
@@ -279,9 +282,6 @@ responsiveColumnStyle()
     & span
       display none
   .wsContentGeneric
-    width 100%
-    max-width 100%
-    top headerHeight
     &.sidebarVisible
       max-width 100%
     &__option

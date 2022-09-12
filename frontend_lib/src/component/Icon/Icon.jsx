@@ -19,8 +19,8 @@ Icon.propTypes = {
 }
 
 Icon.defaultProps = {
-  customClass: '',
-  color: '#252525' // INFO - G.B. - 20210211 - Default font color
+  color: '',
+  customClass: ''
 }
 
 export default Icon
