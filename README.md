@@ -50,6 +50,7 @@ There are several ways to contribute to Tracim, here are some tips:
 For more information about contributing to Tracim, see the [Contributing to Tracim](./CONTRIBUTING.md) page.
 
 ## Translation status
+We are adding to Tracim every translations that once reached 50%.
 
 ![Translation status](https://hosted.weblate.org/widgets/tracim/en/multi-auto.svg)
 
