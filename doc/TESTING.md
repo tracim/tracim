@@ -8,7 +8,7 @@ See [how to build](./BUILD.md).
     1. [Prerequisites](#prerequisites)
     2. [Tests](#tests-with-pytest)
     3. [Configuration test](#configuration-test)
-    4. [Docker-compose test](#docker-compose-test-file)
+    4. [Docker compose test](#docker-compose-test-file)
 2. [Frontend](#fronted)
     1. [Prerequisites](#prerequisites-1)
     1. [Unit tests](#unit-tests)
@@ -25,10 +25,10 @@ You need to setup tools and directories (only needed once):
     python3 ./setup_dev_env.py
     ./create_test_storage_dir.sh
 
-You will need docker-compose to run the backend tests.
+You will need docker compose to run the backend tests.
 For Debian-based systems, you can install it with:
 
-    sudo apt install docker.io docker-compose
+    sudo apt install docker.io docker-compose-plugin
 
 See [installation instructions](https://docs.docker.com/compose/install/) if you are not using Debian-based systems.
 
@@ -42,7 +42,7 @@ To test every databases, you will need the pytest-forked plugin.
 
 ### Configuration test
 
-To run backend tests, you need a configuration:
+To run backend tests, you need several configurations:
 - A specific configuration for specific tests is
 available in `TEST_CONFIG_FILE_PATH` (by default: `./tests_configs.ini` in backend folder).
 - For a more general configuration, pytest rely on dotenv `.env` file (by default `.test.env` in backend folder)
@@ -63,9 +63,9 @@ Order of usage is (from less to more important, last is used if set):
 
 Run tests with the following commands:
 
-    docker-compose up -d
+    docker compose up -d
     pytest
-    docker-compose down
+    docker compose down
 
 
 By default the tests will be executed with the `sqlite` database, this can be changed using the `--database` argument of pytest:
@@ -81,7 +81,7 @@ Run tests on all databases.
 
     pytest --forked --database=all
 
-### Docker-compose test file
+### Docker compose test file
 
 The [docker-compose.yml](../backend/docker-compose.yml) file lists the services needed for testing the Tracim backend.
 <!-- Default environment variables used by the containers are written in the [.env](../backend/.env) file next to `docker-compose.yml`. -->
