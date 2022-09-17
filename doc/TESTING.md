@@ -4,6 +4,7 @@ To test [Tracim](https://www.algoo.fr/fr/tracim), you first need to be able to b
 See [how to build](./BUILD.md).
 
 ## Table of contents
+
 1. [Backend](#backend)
     1. [Prerequisites](#prerequisites)
     2. [Tests](#tests-with-pytest)
