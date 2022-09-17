@@ -1043,8 +1043,8 @@ export class File extends React.Component {
             fileSize={displayFileSize(state.content.size)}
             filePageNb={state.previewInfo.page_nb}
             activesShares={state.content.actives_shares}
-            creationDateFormattedWithTime={formatAbsoluteDate(state.content.created, props.i18n.language, 'P')}
-            creationDateFormatted={formatAbsoluteDate(state.content.created, props.i18n.language)}
+            creationDateFormattedWithTime={formatAbsoluteDate(state.content.created_raw, props.i18n.language, 'P')}
+            creationDateFormatted={formatAbsoluteDate(state.content.created_raw, props.i18n.language)}
             lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
             lastModificationFormatted={formatAbsoluteDate(state.content.modified, props.i18n.language)}
             description={state.content.description}
