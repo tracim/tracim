@@ -8,6 +8,7 @@ It's officially supported in Arabic, English, French, German and Portuguese.
 
 Any questions, remarks? Reach us on [Tracim Community](https://community.tracim.fr).<br>
 More informations on our [website](https://www.algoo.fr/fr/tracim).
+
 ## Quick start (using Docker)
 
 An easy way to start using Tracim is to use the [Docker image](https://hub.docker.com/r/algoo/tracim/).
