@@ -20,6 +20,7 @@ OS compatibility (tested with Python >= 3.6.14):
 Older versions of Debian (8, 9) and Ubuntu (16.04) should work as long as a python version >= 3.6 is used.
 
 ## Backend
+
 To install the backend, you have two options:
 
 ### Option 1: Automated script
