@@ -33,6 +33,7 @@ For advanced docker-based usage, look at the full [Tracim Docker documentation](
 See [Building Tracim from source](./doc/BUILD.md)
 
 ## Testing Tracim
+
 See [Testing Tracim](./doc/TESTING.md)
 
 ## Run Tracim for production
