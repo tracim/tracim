@@ -8,6 +8,7 @@
 4. [Run development server](#run-development-server)
 
 ## Compatibility
+
 OS compatibility (tested with Python >= 3.6.14):
 
 - Debian:
