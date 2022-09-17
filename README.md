@@ -59,6 +59,7 @@ We are adding to Tracim every translations that once reached 50%.
 ![Translation status](https://hosted.weblate.org/widgets/tracim/en/multi-auto.svg)
 
 ## Licence
+
 See [LICENCE.md](./LICENCE.md)
 
 ## Support
