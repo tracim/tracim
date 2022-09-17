@@ -968,3 +968,5 @@ export const handleClickCopyLink = (contentId) => {
     document.body.removeChild(tmp)
   } else navigator.clipboard.writeText(link)
 }
+
+export const sortMemberList = (a, b) => a.publicName.localeCompare(b.publicName)
