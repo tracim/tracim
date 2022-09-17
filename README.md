@@ -29,6 +29,7 @@ The credentials to access the application are:
 For advanced docker-based usage, look at the full [Tracim Docker documentation](./tools_docker/)
 
 ## Build Tracim from source
+
 See [Building Tracim from source](./doc/BUILD.md)
 
 ## Testing Tracim
