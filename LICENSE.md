@@ -9,4 +9,4 @@ Tracim is distributed under the terms of 4 distinct licenses:
     - [welcome-simple-bg-rocks](./frontend/dist/assets/branding.sample/welcome-simple-bg-rocks.jpg)
     - [welcome-simple-bg-wheat](./frontend/dist/assets/branding.sample/welcome-simple-bg-wheat.jpg)
 
-You can find every licences in the [licences folder](./doc/licences/)
+You can find every licences in the [licences folder](./doc/licences/).
