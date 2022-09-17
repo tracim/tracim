@@ -6,7 +6,7 @@
 [Tracim](https://www.algoo.fr/fr/tracim) is a tool designed to help you and your team to a better collaboration.
 It's officially supported in Arabic, English, French, German and Portuguese.
 
-Any questions, remarks? Reach us on [Tracim Community](https://community.tracim.fr).
+Any questions, remarks? Reach us on [Tracim Community](https://public-community.tracim.fr).<br>
 More informations on our [website](https://www.algoo.fr/fr/tracim).
 
 ## Quick start (using Docker)
@@ -54,7 +54,7 @@ For more information about contributing to Tracim, see the [Contributing to Trac
 
 ## Translation status
 
-We are adding to Tracim every translations that once reached 50%.
+We are adding to Tracim interface every translations that once reached 50%.
 
 ![Translation status](https://hosted.weblate.org/widgets/tracim/en/multi-auto.svg)
 

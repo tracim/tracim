@@ -1,6 +1,6 @@
 # Tests
 
-To test [Tracim](https://www.algoo.fr/fr/tracim), you first need to be able to build the backend and the frontend.
+To test [Tracim](https://www.algoo.fr/fr/tracim), you first need to be able to build the backend and the frontend.<br>
 See [how to build](./BUILD.md).
 
 ## Table of contents
