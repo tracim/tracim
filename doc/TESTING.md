@@ -1,6 +1,6 @@
 # Tests
 
-To test [Tracim](https://www.algoo.fr/fr/tracim), you first need to be able to build the backend and the frontend.<br>
+To test [Tracim](https://www.algoo.fr/fr/tracim), you first need to be able to build the backend and the frontend.
 See [how to build](./BUILD.md).
 
 ## Table of contents
@@ -102,7 +102,6 @@ Alternatively, under root:
     ./setup_functionnal_tests.sh root
 
 If you need to run Cypress with an external server of Tracim, modify "baseurl" in cypress.json ([more details here](https://docs.cypress.io/guides/references/configuration.html#Options)).
-
 
 ### Unit tests
 
