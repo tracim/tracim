@@ -169,6 +169,7 @@ On top of that you have an option to build the frontend in development mode:
 This allow to faster builds and better debugging.
 
 ## Run development server
+
 To run the development server, accessible at [localhost:7999](http://localhost:7999), you have to run the script:
 
     ./run_development_server.sh
