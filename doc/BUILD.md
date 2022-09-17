@@ -1,5 +1,7 @@
 # Build Tracim from Source
+
 ## Table of contents
+
 1. [Compatibility](#compatibility)
 2. [Backend](#backend)
     1. [Automatically](#option-1-automatically)
