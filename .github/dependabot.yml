@@ -22,8 +22,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "07:00"
-      timezone: "Europe/Paris"
+      time: "05:00"
+      timezone: "UTC"
     target-branch: "develop"
     labels:
       - "backend"
