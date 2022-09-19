@@ -7,6 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
+  formatAbsoluteDate,
   handleClickCopyLink,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -1042,10 +1043,10 @@ export class File extends React.Component {
             fileSize={displayFileSize(state.content.size)}
             filePageNb={state.previewInfo.page_nb}
             activesShares={state.content.actives_shares}
-            creationDateFormattedWithTime={(new Date(state.content.created)).toLocaleString(props.i18n.language, { day: '2-digit', month: '2-digit', year: 'numeric' })}
-            creationDateFormatted={(new Date(state.content.created)).toLocaleString(props.i18n.language)}
+            creationDateFormattedWithTime={formatAbsoluteDate(state.content.created_raw, props.i18n.language, 'P')}
+            creationDateFormatted={formatAbsoluteDate(state.content.created_raw, props.i18n.language)}
             lastModification={displayDistanceDate(state.content.modified, state.loggedUser.lang)}
-            lastModificationFormatted={(new Date(state.content.modified)).toLocaleString(props.i18n.language)}
+            lastModificationFormatted={formatAbsoluteDate(state.content.modified, props.i18n.language)}
             description={state.content.description}
             displayChangeDescriptionBtn={state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id}
             disableChangeDescription={!state.content.is_editable}

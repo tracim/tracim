@@ -15,7 +15,7 @@ export class AddFileToUploadButton extends React.Component {
 
   filenameWithDate (filename) {
     const { basename, extension } = splitFilenameExtension(filename)
-    const date = formatAbsoluteDate(new Date(), this.props.i18n.language)
+    const date = formatAbsoluteDate(new Date(), this.props.i18n.language, 'PPpp')
     return `${basename} (${date})${extension}`
   }
 

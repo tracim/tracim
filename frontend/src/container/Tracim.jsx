@@ -535,7 +535,7 @@ export class Tracim extends React.Component {
   // INFO - MP - 2021-11-10 - Helper function
   // Return the current time HH:mm
   getHoursAndMinutes = () => {
-    return formatAbsoluteDate(new Date(), this.props.user.lang, { hour: '2-digit', minute: '2-digit' })
+    return formatAbsoluteDate(new Date(), this.props.user.lang, 'p')
   }
 
   render () {

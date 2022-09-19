@@ -421,7 +421,7 @@ export class Publications extends React.Component {
 
     return props.t('News of {{author}} on {{date}}', {
       author: authorName,
-      date: formatAbsoluteDate(new Date(), userLang),
+      date: formatAbsoluteDate(new Date(), userLang, 'PPpp'),
       interpolation: { escapeValue: false }
     })
   }
