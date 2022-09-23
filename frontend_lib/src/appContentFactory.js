@@ -249,7 +249,6 @@ export function appContentFactory (WrappedComponent) {
     }
 
     handleContentCommentModified = async (tlm) => {
-      // console.log("I DO NOT UNDERSTAND WHEN THIS FUNCTION IS TRIGGERED", tlm)
       const { state } = this
       if (!state.content || !permissiveNumberEqual(tlm.fields.content.parent_id, state.content.content_id)) return
 
@@ -969,9 +968,7 @@ export function appContentFactory (WrappedComponent) {
      * @param {TLM} tlm TLM received that contains the new comment information
      */
     updateComment = async (tlm) => {
-      // console.log('TLM', tlm)
       const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
-      // console.log('COMMENT', comment)
       this.setState(prev => ({
         timeline: prev.timeline.map(
           item => item.content_id === comment.content_id ? { ...item, ...comment } : item

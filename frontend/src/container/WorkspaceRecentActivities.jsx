@@ -55,7 +55,6 @@ export class WorkspaceRecentActivities extends React.Component {
    */
   handleTlm = async (data) => {
     const { props } = this
-    // console.log("WorkspaceRecentActivities handleTlm:", data)
     let tlm = data
     if (!data.fields.workspace ||
       !permissiveNumberEqual(data.fields.workspace.workspace_id, props.workspaceId)) return
@@ -67,7 +66,6 @@ export class WorkspaceRecentActivities extends React.Component {
       const comment = await handleFetchResult(
         await getComment(FETCH_CONFIG.apiUrl, data.fields.workspace.workspace_id, data.fields.content.parent_id, data.fields.content.content_id)
       )
-      // console.log('Comment', comment)
       tlm = { ...data, fields: { ...data.fields, content: { ...data.fields.content, ...comment.body } } }
     } else if (data.event_type.includes(TLM_ET.CONTENT)) {
       const content = await handleFetchResult(
