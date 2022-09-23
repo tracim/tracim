@@ -50,7 +50,6 @@ export class PersonalRecentActivities extends React.Component {
    */
   handleTlm = async (data) => {
     const { props } = this
-    // console.log("PresonalRecentActivities handleTlm:", data)
     if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
       const space = props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id) || { memberList: [] }
       const member = space.memberList.find(user => user.id === data.fields.user.user_id)

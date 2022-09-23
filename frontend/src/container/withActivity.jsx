@@ -2,7 +2,7 @@ import React from 'react'
 
 import {
   CONTENT_TYPE,
-  // getComment,
+  getComment,
   getContent,
   handleClickCopyLink,
   handleFetchResult,
@@ -129,16 +129,16 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * @param {int} commentId
      * @returns {Promise<JSON>}
      */
-    // getComment = async (spaceId, contentId, commentId) => {
-    //   const { props } = this
-    //   const fetchGetContent = await handleFetchResult(await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId))
-    //   switch (fetchGetContent.apiResponse.status) {
-    //     case 200: return fetchGetContent.body
-    //     default:
-    //       props.dispatch(newFlashMessage(props.t('Unknown comment')))
-    //       return {}
-    //   }
-    // }
+    getComment = async (spaceId, contentId, commentId) => {
+      const { props } = this
+      const fetchGetComment = await handleFetchResult(await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId))
+      switch (fetchGetComment.apiResponse.status) {
+        case 200: return fetchGetComment.body
+        default:
+          props.dispatch(newFlashMessage(props.t('Unknown comment')))
+          return {}
+      }
+    }
 
     /**
      * Update the activity list according to the TLM
@@ -148,53 +148,41 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      */
     updateActivityListFromTlm = async (data) => {
       const { props } = this
-      // console.log("withActivity updateActivityListFromTlm:", data)
-      if (
-        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${TLM_SUB.COMMENT}` ||
-        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.DELETED}.${TLM_SUB.COMMENT}`
-      ) return
       await this.waitForNoChange()
       this.changingActivityList = true
       let activity = data
-      if (
-        (data.event_type.includes(TLM_ET.CONTENT) && !(
-          data.event_type.includes(TLM_SUB.COMMENT) || data.event_type.includes(TLM_SUB.TODO)
-        )) ||
-        (data.event_type.includes(TLM_ET.MENTION) && data.fields.content.content_type !== TLM_SUB.COMMENT)
-      ) {
+      if (data.event_type.includes(TLM_SUB.COMMENT)) {
         activity = {
           ...data,
           fields: {
             ...data.fields,
             content: {
               ...data.fields.content,
-              ...await this.getContent(data.fields.content.content_id)
+              ...await this.getComment(
+                data.fields.workspace.workspace_id,
+                data.fields.content.parent_id,
+                data.fields.content.content_id
+              )
+            }
+          }
+        }
+      } else {
+        if (
+          (data.event_type.includes(TLM_ET.CONTENT) && !data.event_type.includes(TLM_SUB.TODO)) ||
+          data.event_type.includes(TLM_ET.MENTION)
+        ) {
+          activity = {
+            ...data,
+            fields: {
+              ...data.fields,
+              content: {
+                ...data.fields.content,
+                ...await this.getContent(data.fields.content.content_id)
+              }
             }
           }
         }
       }
-      // else if (
-      //   data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.CREATED}.${TLM_SUB.COMMENT}` ||
-      //   data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${TLM_SUB.COMMENT}` ||
-      //   data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.DELETED}.${TLM_SUB.COMMENT}`
-      // ) {
-      //   // console.log("This is fine")
-      //   activity = {
-      //     ...data,
-      //     fields: {
-      //       ...data.fields,
-      //       content: {
-      //         ...data.fields.content,
-      //         ...await this.getComment(
-      //           data.fields.workspace.workspace_id,
-      //           data.fields.content.parent_id,
-      //           data.fields.content.content_id
-      //         )
-      //       }
-      //     }
-      //   }
-      //   // console.log("New activity:", activity)
-      // }
       const updatedActivityList = await addMessageToActivityList(activity, props.activity.list, FETCH_CONFIG.apiUrl)
       props.dispatch(setActivityList(updatedActivityList))
       const showRefresh = (
@@ -315,7 +303,6 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * @param {string} nextPageToken token to get the next page of messages
      * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
      */
-
     loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
       const { props } = this
       const initialActivityListLength = activityList.length
