@@ -929,7 +929,8 @@ class CFG(object):
             pt:Português,
             de:Deutsch,
             ar:العربية,
-            es:Español
+            es:Español,
+            nb_NO:Norsk
         """
         target_language_pairs = string_to_unique_item_list(
             self.get_raw_config("{}.target_languages".format(prefix), default_target_languages),

@@ -46,7 +46,7 @@ localization['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 
 	errUnableSync: 'Chyba: \'nepodařilo se synchronizovat prostředek\': zkuste to později!',
 
-	loadingResources: 'Načítání prostředků (%act% z %total%) ...',
+	loadingResources: 'Načítání prostředků (%act% z %total%) …',
 	loadingCollectionList: 'Načítání zoznamu prostředků',
 
 	txtCacheText: 'Na serveru byla nalezena aktualizace, prosím znovu načtěte stránku!',
@@ -60,7 +60,7 @@ localization['da_DK']=	/* thanks Niels Bo Andersen and Michael Rasmussen */
 
 	errUnableSync: 'Fejl: \'kunne ikke synkronisere ressource\': prøv igen senere!',
 
-	loadingResources: 'Henter ressourcer (%act% af %total%) ...',
+	loadingResources: 'Henter ressourcer (%act% af %total%) …',
 	loadingCollectionList: 'Indlæser ressource listen',
 
 	txtCacheText: 'En opdatering er klar på serveren, genindlæs derfor siden!',
@@ -88,7 +88,7 @@ localization['en_US']=	/* Jan Mate <jan.mate@inf-it.com> */
 
 	errUnableSync: 'Error: \'unable to sync resource\': try again later!',
 
-	loadingResources: 'Loading resources (%act% of %total%) ...',
+	loadingResources: 'Loading resources (%act% of %total%)…',
 	loadingCollectionList: 'Loading resource list',
 
 	txtCacheText: 'There is an update available on the server, please reload the page!',
@@ -102,13 +102,15 @@ localization['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 	txtResources: 'Recursos',
 	txtNote: 'Nota',
 
-	errUnableSync: 'Error: \'imposible sincronizar con el recurso\': inténtelo más tarde!',
+	errUnableSync: 'Error: \'no se puede sincronizar el recurso\': ¡inténtalo más tarde!',
 
-	loadingResources: 'Cargando recursos (%act% de %total%) ...',
-	loadingCollectionList: 'Cargando la lista de recursos',
+	loadingResources: 'Cargando recursos (%act% de %total%)…',
+	loadingCollectionList: 'Carga de la lista de recursos',
 
-	txtCacheText: 'Hay una actualización disponible en el servidor, por favor, recarga la página!',
-	txtCacheButton: 'Recargar'
+	txtCacheText: '¡Hay una actualización disponible en el servidor, por favor recargue la página!',
+	txtCacheButton: 'Recargar',
+
+	fullscreenBtn: 'Pantalla completa'
 };
 
 localization['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
@@ -116,15 +118,47 @@ localization['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	txtResources: 'Ressources',
 	txtNote: 'Note',
 
-	errUnableSync: 'Erreur : \'impossible de synchroniser la ressource\' : réessayez plus tard !',
+	errUnableSync: 'Erreur : \'impossible de synchroniser la ressource\' : réessayez plus tard !',
 
-	loadingResources: 'Chargement des ressources (%act% sur %total%)...',
+	loadingResources: 'Chargement des ressources (%act% sur %total%)…',
 	loadingCollectionList: 'Chargement de la liste des ressources',
 
 	txtCacheText: 'Il y a une mise à jour disponible sur le serveur, veuillez recharger la page s\'il vous plaît !',
 	txtCacheButton: 'Recharger',
 
 	fullscreenBtn: 'Plein écran'
+};
+
+localization['pt_PT']=
+{
+	txtResources: 'Recursos',
+	txtNote: 'Nota',
+
+	errUnableSync: 'Erro: \'incapaz de sincronizar recursos\': tente novamente mais tarde!',
+
+	loadingResources: 'Carregamento de recursos (%act% de %total%)…',
+	loadingCollectionList: 'Carregamento da lista de recursos',
+
+	txtCacheText: 'Há uma atualização disponível no servidor, por favor recarregue a página!',
+	txtCacheButton: 'Recarregar',
+
+	fullscreenBtn: 'Ecrã inteiro'
+};
+
+localization['nb_NO']=
+{
+	txtResources: 'Ressurser',
+	txtNote: 'Notis',
+
+	errUnableSync: 'Feil: «Kunne ikke synkronisere ressurs»: Prøv igjen senere.',
+
+	loadingResources: 'Laster inn ressurser (%act% av %total%) …',
+	loadingCollectionList: 'Laster inn ressursliste',
+
+	txtCacheText: 'En oppdatering er tilgjengelig på tjeneren. Last inn siden igjen.',
+	txtCacheButton: 'Last inn igjen',
+
+	fullscreenBtn: 'Fullskjermsvisning'
 };
 
 localization['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
@@ -134,7 +168,7 @@ localization['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
 
 	errUnableSync: 'Hiba: \'nem sikerült a forrás szinkronizálása\': próbálkozzon később!',
 
-	loadingResources: 'Források betöltése (%act%/%total%) ...',
+	loadingResources: 'Források betöltése (%act%/%total%) …',
 	loadingCollectionList: 'Forrás lista betöltése',
 
 	txtCacheText: 'Frissítés elérhető a szerveren, kérjük töltse be újra az oldalt!',
@@ -148,7 +182,7 @@ localization['it_IT']=	/* thanks Luca Ferrario */
 
 	errUnableSync: 'Errore: \'impossibile sincronizzare la risorsa\': riprovare!',
 
-	loadingResources: 'Caricamento risorse (%act% di %total%) ...',
+	loadingResources: 'Caricamento risorse (%act% di %total%) …',
 	loadingCollectionList: 'Caricamento della lista delle risorse',
 
 	txtCacheText: 'La voce è stata aggiornata sul server, per favore ricarica la pagina!',
@@ -162,7 +196,7 @@ localization['ja_JP']=	/* Muimu Nakayama */
 
 	errUnableSync: 'エラー: \'リソースと同期できません\': 後で再度試してみてください!',
 
-	loadingResources: 'リソースを読み込み中 (%total% 個中 %act% 個) ...',
+	loadingResources: 'リソースを読み込み中 (%total% 個中 %act% 個) …',
 	loadingCollectionList: 'リソースリストを読み込み中',
 
 	txtCacheText: 'サーバ上で更新があります。ページを再読み込みしてください!',
@@ -176,8 +210,8 @@ localization['nl_NL']=	/* thanks Johan Vromans */
 
 	errUnableSync: 'Fout: Synchronisatie mislukt, probeer later nog eens!',
 
-	loadingResources: 'Laden (%act% van %total%) ...',
-	loadingCollectionList: 'Laden (Bronnenlijst) ...',
+	loadingResources: 'Laden (%act% van %total%) …',
+	loadingCollectionList: 'Laden (Bronnenlijst) …',
 
 	txtCacheText: 'Er zijn updates beschikbaar op de server. Gelieve deze pagina te verversen.',
 	txtCacheButton: 'Verversen'
@@ -190,7 +224,7 @@ localization['sk_SK']=	/* Jan Mate <jan.mate@inf-it.com> */
 
 	errUnableSync: 'Chyba: \'nepodarilo sa synchronizovať prostriedok\': skúste to neskôr!',
 
-	loadingResources: 'Načítavanie prostriedkov (%act% z %total%) ...',
+	loadingResources: 'Načítavanie prostriedkov (%act% z %total%) …',
 	loadingCollectionList: 'Načítavanie prostriedkov',
 
 	txtCacheText: 'Na servery bola nájdená aktualizácia, prosím znova načítajte stránku!',
@@ -204,7 +238,7 @@ localization['tr_TR']=	/* thanks Selcuk Pultar */
 
 	errUnableSync: 'Hata: \'kaynak eşlenememiştir\': sonra yeniden deneyin!',
 
-	loadingResources: 'Kaynaklar yükleniyor (%total% taneden %act%) ...',
+	loadingResources: 'Kaynaklar yükleniyor (%total% taneden %act%) …',
 	loadingCollectionList: 'Kaynak listesi yükleniyor',
 
 	txtCacheText: 'Sunucuda bir güncelleme mevcut, lütfen sayfayı yeniden yükleyin!',
@@ -218,7 +252,7 @@ localization['ru_RU']=	/* thanks Александр Симонов */
 
 	errUnableSync: 'Ошибка: \'невозможно синхронизировать ресурс\': попробуйте позже!',
 
-	loadingResources: 'Загрузка ресурсов (%act% из %total%)...',
+	loadingResources: 'Загрузка ресурсов (%act% из %total%)…',
 	loadingCollectionList: 'Загрузка списка ресурсов',
 
 	txtCacheText: 'На сервере доступно обновление. Перезагрузите страницу!',
@@ -232,7 +266,7 @@ localization['uk_UA']=	/* Serge Yakimchuck <yakim@yakim.org.ua> */
 
 	errUnableSync: 'Помилка: \'неможливо синхронізувати ресурс\': спробуйте пізніше!',
 
-	loadingResources: 'завантаження ресурсів (%act% з %total%) ...',
+	loadingResources: 'завантаження ресурсів (%act% з %total%) …',
 	loadingCollectionList: 'Завантаження списку ресурсів',
 
 	txtCacheText: 'на сервері доступне оновлення, перезавантажте, будь ласка, сторінку!',
@@ -246,7 +280,7 @@ localization['zh_CN']=	/* thanks Fandy */
 
 	errUnableSync: '错误: \'不能同步信息\': 请稍后重试!',
 
-	loadingResources: '加载中，请稍等 (%act% of %total%) ...',
+	loadingResources: '加载中，请稍等 (%act% of %total%) …',
 	loadingCollectionList: '加载中',
 
 	txtCacheText: '服务器有更新, 请重新加载页面!',
@@ -436,13 +470,13 @@ localizationShared['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 	_default_AMPM_format_: false,
 
 	altLogo: 'Logo',
-	altLogout: 'Desconectar',
+	altLogout: 'Cerrar sesión',
 	buttonLogin: 'Iniciar sesión',
-	pholderUsername: 'Usuario',
+	pholderUsername: 'Nombre de usuario',
 	pholderPassword: 'Contraseña',
-	txtSearch: 'Buscar',
+	txtSearch: 'Búsqueda',
 	txtError: 'Error',
-	txtRefresh: 'Refrescar',
+	txtRefresh: 'Actualizar',
 
 	buttonEdit: 'Editar',
 	buttonSave: 'Guardar',
@@ -450,18 +484,18 @@ localizationShared['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 	buttonCancel: 'Cancelar',
 	buttonDelete: 'Borrar',
 
-	errCollectionLoad: 'Error: \'imposible guardar las configuraciones\'!',
+	errCollectionLoad: 'Error: \'no se puede guardar la configuración\'!',
 	errHttpCommon: 'código de error %%',
 	errHttp401: 'no autorizado',
 	errHttp403: 'prohibido',
 	errHttp405: 'método no permitido',
-	errHttp408: 'petición caducada',
-	errHttp412: 'alguien lo ha cambiado ya en el servidor',
+	errHttp408: 'expiración del tiempo de solicitud',
+	errHttp412: 'alguien ya lo ha cambiado en el servidor',
 	errHttp500: 'error interno de servidor',
 	errHttp501: 'no implementado',
 
-	unsupportedBrowser: 'Nota: ¡tu navegador no está soportado!',
-	updateNotification: '%name% %new_ver% disponible (tu versión es %curr_ver%) - %url%'
+	unsupportedBrowser: 'Nota: ¡su navegador no es compatible!',
+	updateNotification: '%name% %new_ver% disponible (tiene %curr_ver%) - %url%'
 };
 
 localizationShared['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
@@ -485,7 +519,7 @@ localizationShared['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	buttonCancel: 'Annuler',
 	buttonDelete: 'Supprimer',
 
-	errCollectionLoad: 'Impossible de sauvegarder les paramètres !',
+	errCollectionLoad: 'Erreur : « Impossible d\'enregistrer les paramètres » !',
 	errHttpCommon: 'code d\'erreur %%',
 	errHttp401: 'non autorisé',
 	errHttp403: 'interdit',
@@ -497,6 +531,76 @@ localizationShared['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 
 	unsupportedBrowser: 'Note : votre navigateur n\'est pas supporté !',
 	updateNotification: '%name% %new_ver% est disponible (vous êtes actuellement en version %curr_ver%) - %url%'
+};
+
+localizationShared['pt_PT']=
+{
+	_name_: 'Português',
+	_default_datepicker_format_: 'dd/mm/yy',
+	_default_AMPM_format_: false,
+
+	altLogo: 'Logo',
+	altLogout: 'Terminar sessão',
+	buttonLogin: 'Iniciar sessão',
+	pholderUsername: 'Identificador',
+	pholderPassword: 'Palavra-passe',
+	txtSearch: 'Pesquisar',
+	txtError: 'Erro',
+	txtRefresh: 'Actualizar',
+
+	buttonEdit: 'Editar',
+	buttonSave: 'Guardar',
+	buttonReset: 'Reverter',
+	buttonCancel: 'Anular',
+	buttonDelete: 'Eliminar',
+
+	errCollectionLoad: 'Erro: \'incapaz de guardar definições\'!',
+	errHttpCommon: 'código de erro %%',
+	errHttp401: 'não autorizado',
+	errHttp403: 'proibido',
+	errHttp405: 'método não permitido',
+	errHttp408: 'expiração do prazo para a solicitação',
+	errHttp412: 'outra pessoa já o alterou no servidor',
+	errHttp500: 'erro interno do servidor',
+	errHttp501: 'não implementado',
+
+	unsupportedBrowser: 'Nota: seu navegador não é suportado!',
+	updateNotification: '%name% %new_ver% está disponível (você está atualmente na versão %curr_ver%) - %url%'
+};
+
+localizationShared['nb_NO']=
+{
+	_name_: 'Norsk bokmål',
+	_default_datepicker_format_: 'dd.mm.yy',
+	_default_AMPM_format_: false,
+
+	altLogo: 'Logo',
+	altLogout: 'Logg ut',
+	buttonLogin: 'Logg inn',
+	pholderUsername: 'Brukernavn',
+	pholderPassword: 'Passord',
+	txtSearch: 'Søk',
+	txtError: 'Feil',
+	txtRefresh: 'Gjenoppfrisk',
+
+	buttonEdit: 'Rediger',
+	buttonSave: 'Lagre',
+	buttonReset: 'Tilbakefør',
+	buttonCancel: 'Avbryt',
+	buttonDelete: 'Slett',
+
+	errCollectionLoad: 'Feil: «Kunne ikke lagre innstillingene».',
+	errHttpCommon: 'feilkode %%',
+	errHttp401: 'mangler identietsbekreftelse',
+	errHttp403: 'forbudt',
+	errHttp405: 'metoden tillates ikke',
+	errHttp408: 'forespørselstidsavbrudd',
+	errHttp412: 'noen andre har allerede endret det på tjeneren',
+	errHttp500: 'intern tjenerfeil',
+	errHttp501: 'ikke implementert',
+
+	unsupportedBrowser: 'Merk: Nettleseren din støttes ikke.',
+	updateNotification: '%name% %new_ver% tilgjengelig (du har %curr_ver%) - %url%'
 };
 
 localizationShared['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
@@ -916,9 +1020,9 @@ localizationSharedCalDAV['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 {
 	txtCalendars: 'Calendarios',
 	txtTodos: 'Tareas',
-	localTime: 'Tiempo local',
+	localTime: 'Hora local',
 	fullCalendarMonth: 'mes',
-	fullCalendarMultiWeek: 'msemana',
+	fullCalendarMultiWeek: 'multisem.',
 	fullCalendarAgendaWeek: 'semana',
 	fullCalendarAgendaDay: 'día',
 
@@ -928,7 +1032,7 @@ localizationSharedCalDAV['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 	'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
 	dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
 	dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sáb'],
-	dayNamesMin: ['D','L','M','X','J','V','S']
+	dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sa']
 };
 
 localizationSharedCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
@@ -948,6 +1052,44 @@ localizationSharedCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Ba
 	dayNames: ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'],
 	dayNamesShort: ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'],
 	dayNamesMin: ['di','lu','ma','me','je','ve','sa']
+};
+
+localizationSharedCalDAV['pt_PT']=
+{
+	txtCalendars: 'Calendários',
+	txtTodos: 'Tarefas',
+	localTime: 'Hora local',
+	fullCalendarMonth: 'mês',
+	fullCalendarMultiWeek: 'multisem',
+	fullCalendarAgendaWeek: 'semana',
+	fullCalendarAgendaDay: 'dia',
+
+	monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+	'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+	monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun',
+	'Jul','Ago','Set','Out','Nov','Dez'],
+	dayNames: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+	dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
+	dayNamesMin: ['Do','Seg','Te','Qua','Qui','Sex','Sá']
+};
+
+localizationSharedCalDAV['nb_NO']=
+{
+	txtCalendars: 'Kalendere',
+	txtTodos: 'Gjøremålslister',
+	localTime: 'Lokal tid',
+	fullCalendarMonth: 'måned',
+	fullCalendarMultiWeek: 'fleruker',
+	fullCalendarAgendaWeek: 'uke',
+	fullCalendarAgendaDay: 'dag',
+
+	monthNames: ['Januar','Februar','Mars','April','Mai','Juni',
+	'Juli','August','September','Oktober','November','Desember'],
+	monthNamesShort: ['Jan','Feb','Mar','Apr','Mai','Jun',
+	'Jul','Aug','Sep','Okt','Nov','Des'],
+	dayNames: ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
+	dayNamesShort: ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'],
+	dayNamesMin: ['Sø','Ma','Ti','On','To','Fr','Lø']
 };
 
 localizationSharedCalDAV['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
@@ -1190,8 +1332,8 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	repeatChangeTxt: 'تم تغييره على الخادم!',
 	repeatChangeTxtClose: 'غلق الاستمارة و إعادة فتح هذه الفعاليّة',
 	repeatTodoChangeTxtClose: 'غلق مربع الحوار و إعادة فتح المهمة',
-	calendarLoader: 'إعادة تحميل...',
-	resizeLoader: 'إعادة تحجيم...',
+	calendarLoader: 'إعادة تحميل…',
+	resizeLoader: 'إعادة تحجيم…',
 
 	// TODOS
 	pholderNameTODO: 'الاسم',
@@ -1361,7 +1503,7 @@ localizationCalDAV['ar']=	/* thanks Myriam Rabhi */
 	altAddTodo: 'اضافة مهمة',
 
 	loadingCalendars: 'تحميل التقويمات (%act% من %total%) …',
-	unloadingCalendars: 'إلغاء تحميل التقويمات...',
+	unloadingCalendars: 'إلغاء تحميل التقويمات…',
 
 	errUnableSaveBeginCalDAV: 'خطأ: \'تسجيل الفعالية غير ممكن\' : %%!',
 	errUnableDeleteBeginCalDAV: 'خطأ: \'حذف الفعالية غير ممكن\' : %%!',
@@ -1396,9 +1538,9 @@ localizationCalDAV['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 	allDisable: 'Schovat všechny kalendáře',
 	timezone: 'Časové pásmo',
 	txtTimezonePicker: 'Pásmo:',
-	loadingRList: 'Načítaní zoznamu prostředků ...',
-	renderingE: 'Vykreslování kalendářů ...',
-	timezoneChange: 'Aplikování změny časového pásma ...',
+	loadingRList: 'Načítaní zoznamu prostředků …',
+	renderingE: 'Vykreslování kalendářů …',
+	timezoneChange: 'Aplikování změny časového pásma …',
 	customTimezone: 'Vlastní (Lokální čas)',
 	customRepeat: 'Jiní (změna není podporována)',
 	loadPrevMonth: 'Načíst předchádzející měsíc',
@@ -1436,8 +1578,8 @@ localizationCalDAV['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 	repeatChangeTxt: 'byl změnen na serveru!',
 	repeatChangeTxtClose: 'Zavřete formulář a otevřte událost znovu',
 	repeatTodoChangeTxtClose: 'Zavřete formulář a otevřte připomínku znovu.',
-	calendarLoader: 'Znovunačítání ...',
-	resizeLoader: 'Přepočítávání velikosti ...',
+	calendarLoader: 'Znovunačítání …',
+	resizeLoader: 'Přepočítávání velikosti …',
 
 	// TODOS
 	pholderNameTODO: 'Název',
@@ -1606,8 +1748,8 @@ localizationCalDAV['cs_CZ']=	/* Jan Mate <jan.mate@inf-it.com> */
 	altAddEvent: 'Přidat událost',
 	altAddTodo: 'Přidat připomínku',
 
-	loadingCalendars: 'Načítavání kalendářů (%act% z %total%) ...',
-	unloadingCalendars: 'Odčítavání kalendářů ...',
+	loadingCalendars: 'Načítavání kalendářů (%act% z %total%) …',
+	unloadingCalendars: 'Odčítavání kalendářů …',
 
 	errUnableSaveBeginCalDAV: 'Chyba: \'nepodařilo sa uložit událost\': %%!',
 	errUnableDeleteBeginCalDAV: 'Chyba: \'nepodařilo sa vymazat událost\': %%!',
@@ -1642,9 +1784,9 @@ localizationCalDAV['da_DK']=	/* thanks Niels Bo Andersen and Michael Rasmussen *
 	allDisable: 'Deaktiver alle kalendere',
 	timezone: 'Tidszone',
 	txtTimezonePicker: 'Tidszone:',
-	loadingRList: 'Henter ressourceliste ...',
-	renderingE: 'Klargør kalendere ...',
-	timezoneChange: 'Udfører tidszoneskift ...',
+	loadingRList: 'Henter ressourceliste …',
+	renderingE: 'Klargør kalendere …',
+	timezoneChange: 'Udfører tidszoneskift …',
 	customTimezone: 'Brugerdefineret (Lokal tid)',
 	customRepeat: 'Andet (kan ikke redigeres)',
 	loadPrevMonth: 'Hent forrige måned',
@@ -1682,8 +1824,8 @@ localizationCalDAV['da_DK']=	/* thanks Niels Bo Andersen and Michael Rasmussen *
 	repeatChangeTxt: 'blev ændret på serveren!',
 	repeatChangeTxtClose: 'Luk formularen og åbn begivenheden igen',
 	repeatTodoChangeTxtClose: 'Close the form and open the todo again',
-	calendarLoader: 'Genindlæser ...',
-	resizeLoader: 'Tilpasser størrelse ...',
+	calendarLoader: 'Genindlæser …',
+	resizeLoader: 'Tilpasser størrelse …',
 
 	// TODOS
 	pholderNameTODO: 'Emne',
@@ -1852,8 +1994,8 @@ localizationCalDAV['da_DK']=	/* thanks Niels Bo Andersen and Michael Rasmussen *
 	altAddEvent: 'Tilføj begivenhed',
 	altAddTodo: 'Tilføj opgave',
 
-	loadingCalendars: 'Indlæser kalendere (%act% af %total%) ...',
-	unloadingCalendars: 'Gemmer kalendere ...',
+	loadingCalendars: 'Indlæser kalendere (%act% af %total%) …',
+	unloadingCalendars: 'Gemmer kalendere …',
 
 	errUnableSaveBeginCalDAV: 'Fejl: \'kunne ikke gemme begivenheden\': %%!',
 	errUnableDeleteBeginCalDAV: 'Fejl: \'kunne ikke slette begivenheden\': %%!',
@@ -1888,9 +2030,9 @@ localizationCalDAV['de_DE']=	/* thanks Marten Gajda and Thomas Scheel */
 	allDisable: 'Deaktiviere alle Kalender',
 	timezone: 'Zeitzone',
 	txtTimezonePicker: 'Zeitzone:',
-	loadingRList: 'Lade Ressourcenliste ...',
-	renderingE: 'Bereite Ansicht vor ...',
-	timezoneChange: 'Anwenden der Zeitzonenänderung ...',
+	loadingRList: 'Lade Ressourcenliste …',
+	renderingE: 'Bereite Ansicht vor …',
+	timezoneChange: 'Anwenden der Zeitzonenänderung …',
 	customTimezone: 'Unbekannt (lokale Zeit)',
 	customRepeat: 'Sonstige (nicht änderbar)',
 	loadPrevMonth: 'Zeige vorherigen Monat',
@@ -1928,8 +2070,8 @@ localizationCalDAV['de_DE']=	/* thanks Marten Gajda and Thomas Scheel */
 	repeatChangeTxt: 'wurde auf dem Server geändert!',
 	repeatChangeTxtClose: 'Fenster schließen und Termin erneut öffnen',
 	repeatTodoChangeTxtClose: 'Fenster schließen und Aufgabe erneut öffnen',
-	calendarLoader: 'Lade ...',
-	resizeLoader: 'Größe anpassen ...',
+	calendarLoader: 'Lade …',
+	resizeLoader: 'Größe anpassen …',
 
 	// TODOS
 	pholderNameTODO: 'Titel',
@@ -2098,8 +2240,8 @@ localizationCalDAV['de_DE']=	/* thanks Marten Gajda and Thomas Scheel */
 	altAddEvent: 'Termin hinzufügen',
 	altAddTodo: 'Aufgabe hinzufügen',
 
-	loadingCalendars: 'Lade Kalender (%act% von %total%) ...',
-	unloadingCalendars: 'Entlade Kalender ...',
+	loadingCalendars: 'Lade Kalender (%act% von %total%) …',
+	unloadingCalendars: 'Entlade Kalender …',
 
 	errUnableSaveBeginCalDAV: 'Fehler: \'Termin konnte nicht gespeichert werden\': %%!',
 	errUnableDeleteBeginCalDAV: 'Fehler: \'Termin konnte nicht gelöscht werden\': %%!',
@@ -2134,9 +2276,9 @@ localizationCalDAV['en_US']=	/* Jan Mate <jan.mate@inf-it.com> */
 	allDisable: 'Disable all calendars',
 	timezone: 'Timezone',
 	txtTimezonePicker: 'Timezone:',
-	loadingRList: 'Loading resource list ...',
-	renderingE: 'Rendering calendars ...',
-	timezoneChange: 'Applying timezone change ...',
+	loadingRList: 'Loading resource list…',
+	renderingE: 'Rendering calendars…',
+	timezoneChange: 'Applying timezone change…',
 	customTimezone: 'Custom (Local Time)',
 	customRepeat: 'Other (modification not supported)',
 	loadPrevMonth: 'Load previous month',
@@ -2174,8 +2316,8 @@ localizationCalDAV['en_US']=	/* Jan Mate <jan.mate@inf-it.com> */
 	repeatChangeTxt: 'was changed on the server!',
 	repeatChangeTxtClose: 'Close the form and open the event again',
 	repeatTodoChangeTxtClose: 'Close the form and open the todo again',
-	calendarLoader: 'Reloading ...',
-	resizeLoader: 'Resizing ...',
+	calendarLoader: 'Reloading…',
+	resizeLoader: 'Resizing…',
 
 	// TODOS
 	pholderNameTODO: 'Name',
@@ -2344,8 +2486,8 @@ localizationCalDAV['en_US']=	/* Jan Mate <jan.mate@inf-it.com> */
 	altAddEvent: 'Add Event',
 	altAddTodo: 'Add Todo',
 
-	loadingCalendars: 'Loading calendars (%act% of %total%) ...',
-	unloadingCalendars: 'Unloading calendars ...',
+	loadingCalendars: 'Loading calendars (%act% of %total%)…',
+	unloadingCalendars: 'Unloading calendars…',
 
 	errUnableSaveBeginCalDAV: 'Error: \'unable to save the event\': %%!',
 	errUnableDeleteBeginCalDAV: 'Error: \'unable to delete the event\': %%!',
@@ -2365,41 +2507,41 @@ localizationCalDAV['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 
 	txtCalendar: 'Calendario',
 	txtEnabledCalendars: 'Calendars habilitados',
-	txtTodo: 'Tarea',
+	txtTodo: 'A hacer',
 	txtTodoList: 'Lista de tareas',
 	txtTodoLists: 'Listas de tareas',
-	txtEnabledTodoLists: 'Listas de tareas habilitadas',
+	txtEnabledTodoLists: 'Listas de tareas activadas',
 	txtSubscribed: 'Suscripciones',
 	fullCalendarTable: 'tabla',
 	fullCalendarTodayButton: 'hoy',
 	fullCalendarAllDay: 'todo el día',
 	CalDAVsearch: 'Buscar',
-	resourceEnable: 'Habilitar todos los calendarios para este recurso',
-	resourceDisable: 'Deshabilitar todos los calendarios para este recurso',
-	allEnable: 'Habilitar todos los calendarios',
-	allDisable: 'Deshabilitar todos los calendarios',
+	resourceEnable: 'Activar todos los calendarios para este recurso',
+	resourceDisable: 'Desactivar todos los calendarios para este recurso',
+	allEnable: 'Activar todos los calendarios',
+	allDisable: 'Desactivar todos los calendarios',
 	timezone: 'Zona horaria',
-	txtTimezonePicker: 'Z. horaria:',
-	loadingRList: 'Cargando lista de recursos ...',
-	renderingE: 'Generando calendarios ...',
-	timezoneChange: 'Aplicando cambios de zona horaria ...',
-	customTimezone: 'Personalizado (Tiempo local)',
-	customRepeat: 'Otra (modificación no soportada)',
-	loadPrevMonth: 'Cargar mes anterior',
-	loadNextMonth: 'Cargar mes siguiente',
+	txtTimezonePicker: 'Zona horaria:',
+	loadingRList: 'Cargando lista de recursos…',
+	renderingE: 'Vista previa de los calendarios …',
+	timezoneChange: 'Cambio de zona horaria…',
+	customTimezone: 'Personalizado (hora local)',
+	customRepeat: 'Otros (modificación no admitida)',
+	loadPrevMonth: 'Cargar el mes anterior',
+	loadNextMonth: 'Cargar el próximo mes',
 	repeatBoxButton: 'Recurrencia',
-	repeatBoxContent: 'es un evento repetitivo.',
-	repeatBoxQuestion: '¿Con cuáles eventos quieres trabajar?',
+	repeatBoxContent: 'es un evento que se repite.',
+	repeatBoxQuestion: '¿Con qué eventos le gustaría trabajar?',
 	allEvsButton: 'Todos los eventos',
-	allFutureButton: 'Este y los eventos siguientes',
-	eventOnlyButton: 'Solo este evento',
-	repeatBoxContentTODO: 'es una tarea repetitiva.',
-	repeatBoxQuestionTODO: '¿Con qué tareas quieres trabajar?',
+	allFutureButton: 'Este y los eventos futuros',
+	eventOnlyButton: 'Este evento sólo',
+	repeatBoxContentTODO: 'es una tarea que se repite.',
+	repeatBoxQuestionTODO: '¿Con qué tareas le gustaría trabajar?',
 	allEvsButtonTODO: 'Todas las tareas',
-	allFutureButtonTODO: 'Esta y las futuras tareas',
-	eventOnlyButtonTODO: 'Solo esta tarea',
+	allFutureButtonTODO: 'Este y todos los próximas tareas',
+	eventOnlyButtonTODO: 'Esta tarea sólo',
 	txtStatus: 'Estado',
-	eventAvailability : 'Disponible',
+	eventAvailability : 'Disponibilidad',
 	eventAvailabilityBusy : 'Ocupado',
 	eventAvailabilityFree : 'Libre',
 	eventType: 'Privacidad',
@@ -2417,41 +2559,41 @@ localizationCalDAV['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 	repeatWeeks: 'semanas',
 	repeatMonths: 'meses',
 	repeatYears: 'años',
-	repeatChangeTxt: 'ha sido cambiado en el servidor!',
-	repeatChangeTxtClose: 'Cierra el formulario y vuelve a abrir el evento',
-	repeatTodoChangeTxtClose: 'Cierra el formulario y vuelve a abrir la tarea',
-	calendarLoader: 'Recargando ...',
-	resizeLoader: 'Redimensionando ...',
+	repeatChangeTxt: '¡fue cambiado en el servidor!',
+	repeatChangeTxtClose: 'Cierre el formulario y abra de nuevo el evento',
+	repeatTodoChangeTxtClose: 'Cierra el formulario y abre de nuevo la tarea',
+	calendarLoader: 'Recargando…',
+	resizeLoader: 'Redimensionamiento…',
 
 	// TODOS
 	pholderNameTODO: 'Nombre',
 	pholderNewTODO: 'Nueva tarea',
 	txtTypeTODO: 'Tipo',
 	txtTypeTODONone: 'Simple',
-	txtTypeTODOStart: 'Con hora de inicio',
-	txtTypeTODODue: 'Con hora de fin',
-	txtTypeTODOBoth: 'Con hora de inicio y fin',
-	txtDateFromTODO: 'Desde',
-	txtDateToTODO: 'Hasta',
-	txtCompletedOn: 'Completado en',
+	txtTypeTODOStart: 'Con fecha de inicio',
+	txtTypeTODODue: 'Con fecha límite',
+	txtTypeTODOBoth: 'Con las fecha de inicio y fecha limite',
+	txtDateFromTODO: 'De',
+	txtDateToTODO: 'A',
+	txtCompletedOn: 'Completado el',
 
 	pholderDateFromTODO: 'Fecha desde',
-	pholderTimeFromTODO: 'Hora desde',
+	pholderTimeFromTODO: 'Tiempo desde',
 	pholderDateToTODO: 'Fecha hasta',
-	pholderTimeToTODO: 'Hora hasta',
+	pholderTimeToTODO: 'Hora de',
 	pholderCompletedOnDate: 'Fecha',
 	pholderCompletedOnTime: 'Hora',
 
 	txtStatusFiltersHeaderTODO: 'Filtros',
 	txtStatusFiltersFooterTODO: '* completado en o después de %date%',
-	txtStatusNeedsActionTODO: 'Necesita atención',
-	txtStatusCompletedTODO: 'Completado',
-	txtStatusInProcessTODO: 'En progreso',
-	txtStatusCancelledTODO: 'Cancelado',
-	txtPercentCompletedTODO: 'Completado',
+	txtStatusNeedsActionTODO: 'Necesita acción',
+	txtStatusCompletedTODO: 'Finalizada',
+	txtStatusInProcessTODO: 'proceso',
+	txtStatusCancelledTODO: 'Cancelada',
+	txtPercentCompletedTODO: 'Completada',
 
 	txtCalendarTODO: 'Calendario',
-	txtSelectCalendarTODO: 'Selecciona un calendario',
+	txtSelectCalendarTODO: 'Seleccione un calendario',
 	txtAlertTODO: 'Alerta',
 	txtAlertNoneTODO: 'Ninguno',
 	txtAlertMessageTODO: 'Mensaje',
@@ -2468,38 +2610,38 @@ localizationCalDAV['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 	txtAlertSecondsAfterTODO: 'Segundos después',
 
 	pholderAfterBeforeValTODO: 'Valor',
-	pholderAlarmDateTODO: 'Fecha de alarma',
-	pholderAlarmTimeTODO: 'Hora de alarma',
+	pholderAlarmDateTODO: 'Fecha de la alarma',
+	pholderAlarmTimeTODO: 'Hora de la alarma',
 
 	pholderNoteTODO: 'Nota',
 	txtNoteTODO: 'Nota',
 
-	todoPrevNav: 'Mostrar instancia previa',
-	todoNextNav: 'Mostrar siguiente instancia',
-	todoUncompletedPrevNav: 'Mostrar instancia previa incompleta',
-	todoUncompletedNextNav: 'Mostrar siguiente instancia incompleta',
+	todoPrevNav: 'Mostrar la instancia anterior',
+	todoNextNav: 'Mostrar la siguiente instancia',
+	todoUncompletedPrevNav: 'Mostrar la instancia anterior no completada',
+	todoUncompletedNextNav: 'Mostrar la siguiente instancia no completada',
 
 	buttonSaveTODO: 'Guardar',
 	buttonEditTODO: 'Editar',
 	buttonDuplicateTODO: 'Duplicar',
-	buttonResetTODO: 'Revertir',
+	buttonResetTODO: 'Volver a',
 	buttonCloseTODO: 'Cerrar',
 	buttonDeleteTODO: 'Borrar',
 
 	// EVENTS
 	pholderName: 'Nombre',
 	pholderNewEvent: 'Nuevo evento',
-	txtLocation: 'Lugar',
-	pholderLocation: 'Lugar',
+	txtLocation: 'Ubicación',
+	pholderLocation: 'Ubicación',
 
 	txtAllDay: 'Todo el día',
 	from: 'Desde',
-	to: 'Hasta',
+	to: 'A',
 
 	pholderDateFrom: 'Fecha desde',
 	pholderTimeFrom: 'Hora desde',
-	pholderDateTo: 'Fecha hasta',
-	pholderTimeTo: 'Hora hasta',
+	pholderDateTo: 'Fecha a',
+	pholderTimeTo: 'Hora a',
 
 	txtStatusNone: 'No especificado',
 	txtStatusTentative: 'Tentativo',
@@ -2508,40 +2650,40 @@ localizationCalDAV['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 
 	txtRepeat: 'Repetir',
 	txtNoRepeat: 'No repetir',
-	txtRepeatDay: 'Diariamente',
-	txtRepeatWeek: 'Semanalmente',
-	txtRepeatWeekend: 'Cada fin de semana',
-	txtRepeatMonth: 'Mensualmente',
-	txtRepeatTwoWeek: 'Bi-semanalmente',
-	txtRepeatYear: 'Anualmente',
-	txtRepeatCustomWeek: 'Semanalmente personalizado',
-	txtRepeatCustomMonth: 'Mensualmente personalizado',
-	txtRepeatCustomYear: 'Anualmente personalizado',
-	txtRepeatWork: 'En días de semana',
+	txtRepeatDay: 'Diario',
+	txtRepeatWeek: 'Semanal',
+	txtRepeatWeekend: 'Todos los fines de semana',
+	txtRepeatMonth: 'Mensual',
+	txtRepeatTwoWeek: 'Cada dos semanas',
+	txtRepeatYear: 'Anual',
+	txtRepeatCustomWeek: 'Semanal personalizado',
+	txtRepeatCustomMonth: 'Mensual personalizado',
+	txtRepeatCustomYear: 'Anual personalizado',
+	txtRepeatWork: 'Todos los días laborables',
 	txtRepeatOnDate: 'En la fecha',
 	txtRepeatAfter: 'Ocurrencias',
 	txtRepeatNever: 'Nunca',
 	pholderUntilDate: 'Fecha hasta',
-	pholderRepeatCount: 'Repetir la cuenta',
-	txtRepeatCustomWeekLabel: 'en',
-	txtRepeatCustomMonthLabel: 'en los días',
-	txtRepeatCustomMonthEvery: 'Cada',
-	txtRepeatCustomMonthFirst: 'Primer',
+	pholderRepeatCount: 'número de repeticiones',
+	txtRepeatCustomWeekLabel: 'El',
+	txtRepeatCustomMonthLabel: 'Los días',
+	txtRepeatCustomMonthEvery: 'Todos',
+	txtRepeatCustomMonthFirst: 'Primero',
 	txtRepeatCustomMonthSecond: 'Segundo',
-	txtRepeatCustomMonthThird: 'Tercer',
+	txtRepeatCustomMonthThird: 'Tercero',
 	txtRepeatCustomMonthFourth: 'Cuarto',
 	txtRepeatCustomMonthFifth: 'Quinto',
 	txtRepeatCustomMonthLast: 'Último',
 	txtRepeatCustomMonthCustom: 'Personalizado',
 	txtRepeatCustomMonthMonth: 'Día del mes',
-	txtRepeatCustomYearLabel1: 'cada',
-	txtRepeatCustomYearLabel2: 'de',
+	txtRepeatCustomYearLabel1: 'todos los',
+	txtRepeatCustomYearLabel2: 'De',
 
-	txtRepeatEnd: 'fin',
+	txtRepeatEnd: 'Fin',
 	txtEventCalendar: 'Calendario',
-	txtSelectCalendar: 'Selecciona un calendario',
+	txtSelectCalendar: 'Seleccionar un calendario',
 	txtAlert: 'Alerta',
-	txtAlertNone: 'Ninguno',
+	txtAlertNone: 'Vacío',
 	txtAlertMessage: 'Mensaje',
 	txtAlertOnDate: 'En la fecha',
 	txtAlertWeeksBefore: 'Semanas antes',
@@ -2556,48 +2698,48 @@ localizationCalDAV['es_ES']=	/* Damian Vila <damianvila@gmail.com> */
 	txtAlertSecondsAfter: 'Segundos después',
 
 	pholderAfterBeforeVal: 'Valor',
-	pholderAlarmDate: 'Fecha de alarm',
-	pholderAlarmTime: 'Hora de alarma',
+	pholderAlarmDate: 'Fecha de la alarma',
+	pholderAlarmTime: 'Hora de la alarma',
 
 	pholderNote: 'Nota',
 
-	eventPrevNav: 'Mostrar instancia previa',
+	eventPrevNav: 'Mostrar instancia anterior',
 	eventNextNav: 'Mostrar siguiente instancia',
 
 	buttonClose: 'Cerrar',
 	buttonDuplicate: 'Duplicar',
 
-	txtAllSavedTodo: 'Éxito: Tarea guardada!',
-	txtAllSaved: 'Éxito: Evento guardado!',
+	txtAllSavedTodo: 'Éxito: ¡Tarea registrada!',
+	txtAllSaved: 'Éxito: ¡Evento registrado!',
 
-	txtAllDeletedTodo: 'Éxito: Tarea borrada!',
-	txtAllDeleted: 'Éxito: Evento borrado!',
+	txtAllDeletedTodo: 'Éxito: ¡Tarea eliminada!',
+	txtAllDeleted: 'Éxito: ¡Evento eliminado!',
 
-	txtNotChooseTodo: 'Error: Tienes que elegir un calendario!',
-	txtNotChoose: 'Error: Tienes que elegir un calendario!',
+	txtNotChooseTodo: 'Error: ¡hay que elegir un calendario!',
+	txtNotChoose: 'Error: ¡hay que elegir un calendario!',
 
-	txtErrorDates: 'Error: La fecha de comienzo debe ser anterior a la de fin!',
-	txtErrorDatesTodo: 'Error: La fecha de comienzo debe ser anterior a la de fin!',
+	txtErrorDates: 'Error: ¡La fecha de inicio debe ser anterior a la fecha de finalización!',
+	txtErrorDatesTodo: 'Error: ¡La fecha de inicio debe ser anterior a la fecha de finalización!',
 
-	txtErorInputTodo: 'Imposible guardar: corrige los valores inválidos!',
-	txtDateTimeErrorTodo: 'Debes elegir una fecha y hora!',
+	txtErorInputTodo: 'No se puede guardar: ¡corregir valores no válidos!',
+	txtDateTimeErrorTodo: '¡Hay que elegir la fecha y la hora!',
 
-	txtErorInput: 'Error: \'imposible guardar\': corrige los valores marcados!',
+	txtErorInput: 'Error: \'no se puede guardar\': ¡corrige los valores no válidos resaltados!',
 
 	txtAlertsH: 'Alertas',
-	buttonAlert: 'Limpiar alertas',
+	buttonAlert: 'Borrar alertas',
 
-	altAddEvent: 'Agregar evento',
-	altAddTodo: 'Agregar tarea',
+	altAddEvent: 'Añadir evento',
+	altAddTodo: 'Añadir una tarea',
 
-	loadingCalendars: 'Cargando calendarios (%act% de %total%) ...',
-	unloadingCalendars: 'Quitando calendarios ...',
+	loadingCalendars: 'Cargando calendarios (%act% de %total%)…',
+	unloadingCalendars: 'Descarga de calendarios…',
 
-	errUnableSaveBeginCalDAV: 'Error: \'imposible guardar el evento\': %%!',
-	errUnableDeleteBeginCalDAV: 'Error: \'imposible borrar el evento\': %%!',
+	errUnableSaveBeginCalDAV: '¡Error: \'imposibilidad de guardar el evento\': %%!',
+	errUnableDeleteBeginCalDAV: '¡Error: \'no se puede borrar el evento\': %%!',
 	CalDAVerrHttp410: 'El evento ya no está disponible en el servidor',
-	errUnableSaveTodoBeginCalDAV: 'Error: \'imposible guardar la tarea\': %%!',
-	errUnableDeleteTodoBeginCalDAV: 'Error: \'imposible borrar la tarea\': %%!',
+	errUnableSaveTodoBeginCalDAV: '¡Error: \'imposibilidad de guardar la tarea\': %%!',
+	errUnableDeleteTodoBeginCalDAV: '¡Error: \'imposibilidad de eliminar una tarea\': %%!',
 	CalDAVerrTodoHttp410: 'La tarea ya no está disponible en el servidor'
 };
 
@@ -2626,9 +2768,9 @@ localizationCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	allDisable: 'Désactiver tous les calendriers',
 	timezone: 'Fuseau horaire',
 	txtTimezonePicker: 'Fuseau horaire : ',
-	loadingRList: 'Chargement de la liste des ressources...',
-	renderingE: 'Prévisualisation des calendriers ...',
-	timezoneChange: 'Changement de fuseau horaire...',
+	loadingRList: 'Chargement de la liste des ressources…',
+	renderingE: 'Prévisualisation des calendriers…',
+	timezoneChange: 'Changement de fuseau horaire…',
 	customTimezone: 'Personnalisé (heure locale)',
 	customRepeat: 'Autre (changement n\'est pas supporté)',
 	loadPrevMonth: 'Charger le mois précédent',
@@ -2637,14 +2779,14 @@ localizationCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	repeatBoxContent: 'est un évènement récurrent.',
 	repeatBoxQuestion: 'Avec quels évènements voulez-vous travailler ?',
 	allEvsButton: 'Tous les évènements',
-	allFutureButton: 'Tous les évènements à venir',
-	eventOnlyButton: 'Cet évènement seulement',
+	allFutureButton: 'Cet évènement et tous les évènements futurs',
+	eventOnlyButton: 'Cet évènement uniquement',
 	repeatBoxContentTODO: 'est une tâche récurrente.',
 	repeatBoxQuestionTODO: 'Quelles tâches désirez-vous associer ?',
 	allEvsButtonTODO: 'Toutes les tâches',
 	allFutureButtonTODO: 'Toutes les tâches futures à faire',
 	eventOnlyButtonTODO: 'Cette tâche seulement',
-	txtStatus: 'État',
+	txtStatus: 'Statut',
 	eventAvailability : 'Disponibilité',
 	eventAvailabilityBusy : 'Occupé',
 	eventAvailabilityFree : 'Disponible',
@@ -2666,8 +2808,8 @@ localizationCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	repeatChangeTxt: 'a été modifié sur le serveur !',
 	repeatChangeTxtClose: 'Fermer ce formulaire et rouvrir cet évènement',
 	repeatTodoChangeTxtClose: 'Fermer la boîte de dialogue et ouvrir à nouveau la tâche',
-	calendarLoader: 'Rechargement...',
-	resizeLoader: 'Redimensionnement...',
+	calendarLoader: 'Rechargement…',
+	resizeLoader: 'Redimensionnement…',
 
 	// TODOS
 	pholderNameTODO: 'Nom',
@@ -2813,22 +2955,22 @@ localizationCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	buttonClose: 'Fermer',
 	buttonDuplicate: 'Dupliquer',
 
-	txtAllSavedTodo: 'Succès : Tâche enregistrée !',
-	txtAllSaved: 'Succès : Évènement enregistré !',
+	txtAllSavedTodo: 'Succès : Tâche enregistrée !',
+	txtAllSaved: 'Succès : Évènement enregistré !',
 
-	txtAllDeletedTodo: 'Succès : Tâche effacée !',
-	txtAllDeleted: 'Succès : Évènement effacé !',
+	txtAllDeletedTodo: 'Succès : Tâche effacée !',
+	txtAllDeleted: 'Succès : Évènement effacé !',
 
-	txtNotChooseTodo: 'Erreur : il faut choisir un calendrier !',
-	txtNotChoose: 'Erreur : il faut choisir un calendrier !',
+	txtNotChooseTodo: 'Erreur : il faut choisir un calendrier !',
+	txtNotChoose: 'Erreur : il faut choisir un calendrier !',
 
-	txtErrorDates: 'Erreur : La date de début doit précéder la date de fin !',
-	txtErrorDatesTodo: 'Erreur : La date de début doit précéder la date de fin !',
+	txtErrorDates: 'Erreur : La date de début doit précéder la date de fin !',
+	txtErrorDatesTodo: 'Erreur : La date de début doit précéder la date de fin !',
 
-	txtErorInputTodo: 'Impossible d\'enregistrer : corrigez les valeurs non valides !',
-	txtDateTimeErrorTodo: 'Il faut choisir une date et une heure !',
+	txtErorInputTodo: 'Impossible d\'enregistrer : corrigez les valeurs non valides !',
+	txtDateTimeErrorTodo: 'Il faut choisir une date et une heure !',
 
-	txtErorInput: 'Erreur : \'Impossible d\'enregistrer\' : corrigez les valeurs surlignées !',
+	txtErorInput: 'Erreur : \'Impossible d\'enregistrer\' : corrigez les valeurs surlignées !',
 
 	txtAlertsH: 'Alertes',
 	buttonAlert: 'Vider les Alertes',
@@ -2836,15 +2978,507 @@ localizationCalDAV['fr_FR']=	/* thanks John Fischer and Jean-Christophe Bach */
 	altAddEvent: 'Ajouter un évènement',
 	altAddTodo: 'Ajouter une tâche',
 
-	loadingCalendars: 'Chargement des calendriers (%act% sur %total%) ...',
-	unloadingCalendars: 'Déchargement des calendriers ...',
+	loadingCalendars: 'Chargement des calendriers (%act% sur %total%)…',
+	unloadingCalendars: 'Déchargement des calendriers…',
 
-	errUnableSaveBeginCalDAV: 'Erreur : \'impossible d\'enregistrer l\'évènement\' : %% !',
-	errUnableDeleteBeginCalDAV: 'Erreur : \'impossible d\'effacer l\'évènement\' : %% !',
+	errUnableSaveBeginCalDAV: 'Erreur : \'impossible d\'enregistrer l\'évènement\' : %% !',
+	errUnableDeleteBeginCalDAV: 'Erreur : \'impossible d\'effacer l\'évènement\' : %% !',
 	CalDAVerrHttp410: 'Évènement non présent sur le serveur',
-	errUnableSaveTodoBeginCalDAV: 'Erreur : \'impossible de sauvegarder la tâche\' : %% !',
-	errUnableDeleteTodoBeginCalDAV: 'Erreur : \'impossible de supprimer la tâche\' : %% !',
+	errUnableSaveTodoBeginCalDAV: 'Erreur : \'impossible de sauvegarder la tâche\' : %% !',
+	errUnableDeleteTodoBeginCalDAV: 'Erreur : \'impossible de supprimer la tâche\' : %% !',
 	CalDAVerrTodoHttp410: 'La tâche n\'est plus disponible sur le serveur'
+};
+
+localizationCalDAV['pt_PT']=
+{
+	_default_title_format_month_: 'MMM yyyy',
+	_default_title_format_week_: 'd[ MMM][ yyyy]{ \'–\' d MMM yyyy}',
+	_default_title_format_day_: 'ddd, d MMM yyyy',
+	_default_title_format_table_: 'ddd, MMM yyyy',
+	_default_column_format_agenda_: 'ddd, d MMM',
+
+	txtCalendar: 'Calendário',
+	txtEnabledCalendars: 'Calendários ativados',
+	txtTodo: 'Tarefa',
+	txtTodoList: 'Lista de tarefas',
+	txtTodoLists: 'Listas de tarefas',
+	txtEnabledTodoLists: 'Listas de tarefas ativadas',
+	txtSubscribed: 'Assinaturas',
+	fullCalendarTable: 'tabela',
+	fullCalendarTodayButton: 'hoje',
+	fullCalendarAllDay: 'o dia todo',
+	CalDAVsearch: 'Pesquisa',
+	resourceEnable: 'Habilitar todos os calendários deste recurso',
+	resourceDisable: 'Desactivar todos os calendários deste recurso',
+	allEnable: 'Activar todos os calendários',
+	allDisable: 'Desactivar todos os calendários',
+	timezone: 'Fuso horário',
+	txtTimezonePicker: 'Fuso horário:',
+	loadingRList: 'Carregando lista de recursos…',
+	renderingE: 'Renderizando calendários…',
+	timezoneChange: 'Aplicando mudança de fuso horário…',
+	customTimezone: 'Personalizado (Hora Local)',
+	customRepeat: 'Outros (modificação não suportada)',
+	loadPrevMonth: 'Carregar mês anterior',
+	loadNextMonth: 'Carregar próximo mês',
+	repeatBoxButton: 'Recorrência',
+	repeatBoxContent: 'é um acontecimento que se repete.',
+	repeatBoxQuestion: 'Com que eventos gostaria de trabalhar?',
+	allEvsButton: 'Todos os eventos',
+	allFutureButton: 'Este e todos os eventos futuros',
+	eventOnlyButton: 'Este evento apenas',
+	repeatBoxContentTODO: 'é uma tarefa que se repete.',
+	repeatBoxQuestionTODO: 'Com quais tarefas gostaria de trabalhar?',
+	allEvsButtonTODO: 'Todas tarefas',
+	allFutureButtonTODO: 'Esta e todas as tarefas futuras',
+	eventOnlyButtonTODO: 'Esta tarefa apenas',
+	txtStatus: 'Status',
+	eventAvailability : 'Disponibilidade',
+	eventAvailabilityBusy : 'Ocupado',
+	eventAvailabilityFree : 'Livre',
+	eventType: 'Privacidade',
+	eventTypePublic: 'Público',
+	eventTypePrivate: 'Particular',
+	eventTypeConfidential: 'Confidencial',
+	txtPriority: 'Prioridade',
+	txtPriorityNone: 'Nenhuma',
+	txtPriorityLow: 'Baixa',
+	txtPriorityMedium: 'Média',
+	txtPriorityHigh: 'Alta',
+	eventURL : 'URL',
+	repeatInterval: 'cada',
+	repeatDays: 'dias',
+	repeatWeeks: 'semanas',
+	repeatMonths: 'meses',
+	repeatYears: 'anos',
+	repeatChangeTxt: 'foi alterado no servidor!',
+	repeatChangeTxtClose: 'Fechar o formulário e abrir novamente o evento',
+	repeatTodoChangeTxtClose: 'Fechar o formulário e abrir novamente a tarefa',
+	calendarLoader: 'Recarregando…',
+	resizeLoader: 'Redimensionando…',
+
+	// TODOS
+	pholderNameTODO: 'Nome',
+	pholderNewTODO: 'Nova tarefa',
+	txtTypeTODO: 'Tipo',
+	txtTypeTODONone: 'Simples',
+	txtTypeTODOStart: 'Com data de início',
+	txtTypeTODODue: 'Com o devido tempo',
+	txtTypeTODOBoth: 'Tanto com tempo de início como com tempo devido',
+	txtDateFromTODO: 'De',
+	txtDateToTODO: 'A',
+	txtCompletedOn: 'Concluído em',
+
+	pholderDateFromTODO: 'Data de',
+	pholderTimeFromTODO: 'Hora de',
+	pholderDateToTODO: 'Data a',
+	pholderTimeToTODO: 'Hora a',
+	pholderCompletedOnDate: 'Data',
+	pholderCompletedOnTime: 'Hora',
+
+	txtStatusFiltersHeaderTODO: 'Filtros',
+	txtStatusFiltersFooterTODO: '* completado em ou após %date%',
+	txtStatusNeedsActionTODO: 'Precisa de ação',
+	txtStatusCompletedTODO: 'Concluído',
+	txtStatusInProcessTODO: 'Em curso',
+	txtStatusCancelledTODO: 'Cancelado',
+	txtPercentCompletedTODO: 'Concluído',
+
+	txtCalendarTODO: 'Calendário',
+	txtSelectCalendarTODO: 'Seleccione um calendário',
+	txtAlertTODO: 'Alerta',
+	txtAlertNoneTODO: 'Nenhum',
+	txtAlertMessageTODO: 'Mensagem',
+	txtAlertOnDateTODO: 'Na data',
+	txtAlertWeeksBeforeTODO: 'Semanas antes',
+	txtAlertDaysBeforeTODO: 'Dias antes',
+	txtAlertHoursBeforeTODO: 'Horas antes',
+	txtAlertMinutesBeforeTODO: 'Minutos antes',
+	txtAlertSecondsBeforeTODO: 'Segundos antes',
+	txtAlertWeeksAfterTODO: 'Semanas depois',
+	txtAlertDaysAfterTODO: 'Dias depois',
+	txtAlertHoursAfterTODO: 'Horas depois',
+	txtAlertMinutesAfterTODO: 'Minutos depois',
+	txtAlertSecondsAfterTODO: 'Segundos depois',
+
+	pholderAfterBeforeValTODO: 'Valor',
+	pholderAlarmDateTODO: 'Data do alarme',
+	pholderAlarmTimeTODO: 'Hora do alarme',
+
+	pholderNoteTODO: 'Nota',
+	txtNoteTODO: 'Nota',
+
+	todoPrevNav: 'Mostrar instância anterior',
+	todoNextNav: 'Mostrar a próxima instância',
+	todoUncompletedPrevNav: 'Mostrar instância anterior não terminada',
+	todoUncompletedNextNav: 'Mostrar a próxima instância não terminada',
+
+	buttonSaveTODO: 'Guardar',
+	buttonEditTODO: 'Editar',
+	buttonDuplicateTODO: 'Duplicar',
+	buttonResetTODO: 'Reverter',
+	buttonCloseTODO: 'Fechar',
+	buttonDeleteTODO: 'Eliminar',
+
+	// EVENTS
+	pholderName: 'Nome',
+	pholderNewEvent: 'Novo Evento',
+	txtLocation: 'Localização',
+	pholderLocation: 'Localização',
+
+	txtAllDay: 'O dia todo',
+	from: 'De',
+	to: 'A',
+
+	pholderDateFrom: 'Data de',
+	pholderTimeFrom: 'Hora de',
+	pholderDateTo: 'Data a',
+	pholderTimeTo: 'Hora a',
+
+	txtStatusNone: 'Não especificado',
+	txtStatusTentative: 'Tentativa',
+	txtStatusConfirmed: 'Confirmado',
+	txtStatusCancelled: 'Cancelado',
+
+	txtRepeat: 'Repetir',
+	txtNoRepeat: 'Sem repetição',
+	txtRepeatDay: 'Diariamente',
+	txtRepeatWeek: 'Semanalmente',
+	txtRepeatWeekend: 'Todos os fins-de-semana',
+	txtRepeatMonth: 'Mensalmente',
+	txtRepeatTwoWeek: 'Bi-semanal',
+	txtRepeatYear: 'Anualmente',
+	txtRepeatCustomWeek: 'Semanalmente personalizado',
+	txtRepeatCustomMonth: 'Mensalmente personalizado',
+	txtRepeatCustomYear: 'Anualmente personalizado',
+	txtRepeatWork: 'Todos os dias úteis',
+	txtRepeatOnDate: 'Na data',
+	txtRepeatAfter: 'Ocorrências',
+	txtRepeatNever: 'Nunca',
+	pholderUntilDate: 'Data até',
+	pholderRepeatCount: 'Número de repetições',
+	txtRepeatCustomWeekLabel: 'em',
+	txtRepeatCustomMonthLabel: 'em dias',
+	txtRepeatCustomMonthEvery: 'Cada',
+	txtRepeatCustomMonthFirst: 'Primeiro',
+	txtRepeatCustomMonthSecond: 'Segundo',
+	txtRepeatCustomMonthThird: 'Terceiro',
+	txtRepeatCustomMonthFourth: 'Quarto',
+	txtRepeatCustomMonthFifth: 'Quinto',
+	txtRepeatCustomMonthLast: 'Último',
+	txtRepeatCustomMonthCustom: 'Personalizado',
+	txtRepeatCustomMonthMonth: 'Dia do mês',
+	txtRepeatCustomYearLabel1: 'cada',
+	txtRepeatCustomYearLabel2: 'de',
+
+	txtRepeatEnd: 'fim',
+	txtEventCalendar: 'Calendário',
+	txtSelectCalendar: 'Seleccione um calendário',
+	txtAlert: 'Alerta',
+	txtAlertNone: 'Nenhum',
+	txtAlertMessage: 'Mensagem',
+	txtAlertOnDate: 'Na data',
+	txtAlertWeeksBefore: 'Semanas antes',
+	txtAlertDaysBefore: 'Dias antes',
+	txtAlertHoursBefore: 'Horas antes',
+	txtAlertMinutesBefore: 'Minutos antes',
+	txtAlertSecondsBefore: 'Segundos antes',
+	txtAlertWeeksAfter: 'Semanas depois',
+	txtAlertDaysAfter: 'Dias depois',
+	txtAlertHoursAfter: 'Horas depois',
+	txtAlertMinutesAfter: 'Minutos depois',
+	txtAlertSecondsAfter: 'Segundos depois',
+
+	pholderAfterBeforeVal: 'Valor',
+	pholderAlarmDate: 'Data do alarme',
+	pholderAlarmTime: 'Hora do alarme',
+
+	pholderNote: 'Nota',
+
+	eventPrevNav: 'Mostrar instância anterior',
+	eventNextNav: 'Mostrar a próxima instância',
+
+	buttonClose: 'Fechar',
+	buttonDuplicate: 'Duplicar',
+
+	txtAllSavedTodo: 'Sucesso: Tarefa salva!',
+	txtAllSaved: 'Sucesso: Evento salvo!',
+
+	txtAllDeletedTodo: 'Sucesso: Tarefa apagada!',
+	txtAllDeleted: 'Sucesso: Evento excluído!',
+
+	txtNotChooseTodo: 'Erro: Tem de escolher o calendário!',
+	txtNotChoose: 'Erro: Tem de escolher o calendário!',
+
+	txtErorInputTodo: 'Não é possível salvar: corrija valores inválidos!',
+	txtDateTimeErrorTodo: 'Têm de escolher data e hora!',
+
+	txtErrorDates: 'Erro: A data de início deve preceder a data final!',
+	txtErrorDatesTodo: 'Erro: A data de início deve preceder a data final!',
+
+	txtErorInput: 'Erro: \'incapaz de salvar\': corrigir os valores inválidos destacados!',
+
+	txtAlertsH: 'Alertas',
+	buttonAlert: 'Limpar alertas',
+
+	altAddEvent: 'Adicionar evento',
+	altAddTodo: 'Adicionar tarefa',
+
+	loadingCalendars: 'Carregamento dos calendários (%act% de %total%)…',
+	unloadingCalendars: 'Descarregando calendários…',
+
+	errUnableSaveBeginCalDAV: 'Erro: \'não foi possível salvar o evento\': %%!',
+	errUnableDeleteBeginCalDAV: 'Erro: \'incapaz de eliminar o evento\': %%!',
+	CalDAVerrHttp410: 'O evento não está mais disponível no servidor',
+	errUnableSaveTodoBeginCalDAV: 'Erro: \'não foi possível salvar a tarefa\': %%!',
+	errUnableDeleteTodoBeginCalDAV: 'Erro: \'incapaz de eliminar a tarefa\': %%!',
+	CalDAVerrTodoHttp410: 'Tarefa já não está disponível no servidor'
+};
+
+localizationCalDAV['nb_NO']=
+{
+	_default_title_format_month_: 'MMM yyyy',
+	_default_title_format_week_: 'd[ MMM][ yyyy]{ \'–\' d MMM yyyy}',
+	_default_title_format_day_: 'ddd, d MMM yyyy',
+	_default_title_format_table_: 'ddd, MMM yyyy',
+	_default_column_format_agenda_: 'ddd, d MMM',
+
+	txtCalendar: 'Kalender',
+	txtEnabledCalendars: 'Påskrudde kalendere',
+	txtTodo: 'Gjøremål',
+	txtTodoList: 'Gjøremålsliste',
+	txtTodoLists: 'Gjøremålslister',
+	txtEnabledTodoLists: 'Påskrudde gjøremålslister',
+	txtSubscribed: 'Abonnementer',
+	fullCalendarTable: 'liste',
+	fullCalendarTodayButton: 'i dag',
+	fullCalendarAllDay: 'hele dagen',
+	CalDAVsearch: 'Søk',
+	resourceEnable: 'Skru på alle kalendere i denne ressursen',
+	resourceDisable: 'Skru av alle kalendere i denne ressursen',
+	allEnable: 'Skru på alle kalendere',
+	allDisable: 'Skru av alle kalendere',
+	timezone: 'Tidssone',
+	txtTimezonePicker: 'Tidssone:',
+	loadingRList: 'Laster inn ressursiste …',
+	renderingE: 'Tegner opp kalendere …',
+	timezoneChange: 'Utfører tidssoneendring …',
+	customTimezone: 'Egendefinert (lokal tid)',
+	customRepeat: 'Annet (endringer støttes ikke)',
+	loadPrevMonth: 'Last inn forrige måned',
+	loadNextMonth: 'Last inn neste måned',
+	repeatBoxButton: 'Gjentagelse',
+	repeatBoxContent: 'er en gjentagende begivenhet.',
+	repeatBoxQuestion: 'Hvilke begivenheter ønsker du å jobbe med?',
+	allEvsButton: 'Alle begivenheter',
+	allFutureButton: 'Denne og alle framtidige begivenheter',
+	eventOnlyButton: 'Kun denne begivenheten',
+	repeatBoxContentTODO: 'er et gjentagende gjøremål.',
+	repeatBoxQuestionTODO: 'Hvilke gjøremål vil du jobbe med?',
+	allEvsButtonTODO: 'Alle gjøremål',
+	allFutureButtonTODO: 'Denne og alle fremtidige gjøremål',
+	eventOnlyButtonTODO: 'Kun dette gjøremålet',
+	txtStatus: 'Status',
+	eventAvailability : 'Tilgjengelighet',
+	eventAvailabilityBusy : 'Opptatt',
+	eventAvailabilityFree : 'Ledig',
+	eventType: 'Personvern',
+	eventTypePublic: 'Offentlig',
+	eventTypePrivate: 'Privat',
+	eventTypeConfidential: 'Konfidensiell',
+	txtPriority: 'Prioritet',
+	txtPriorityNone: 'Ingen',
+	txtPriorityLow: 'Lav',
+	txtPriorityMedium: 'Middels',
+	txtPriorityHigh: 'Høy',
+	eventURL : 'Nettadresse',
+	repeatInterval: 'hver',
+	repeatDays: 'dag',
+	repeatWeeks: 'týdnů',
+	repeatMonths: 'måned',
+	repeatYears: 'år',
+	repeatChangeTxt: 'ble endret på tjeneren.',
+	repeatChangeTxtClose: 'Lukk skjemaet og åpne begivenheten igjen',
+	repeatTodoChangeTxtClose: 'Lukk dette skjemaet og åpne begivenheten igjen',
+	calendarLoader: 'Laster inn igjen …',
+	resizeLoader: 'Endrer størrelse …',
+
+	// TODOS
+	pholderNameTODO: 'Navn',
+	pholderNewTODO: 'Nytt gjøremål',
+	txtTypeTODO: 'Type',
+	txtTypeTODONone: 'Enkel',
+	txtTypeTODOStart: 'Med starttid',
+	txtTypeTODODue: 'Med frist',
+	txtTypeTODOBoth: 'Med både starttid og frist',
+	txtDateFromTODO: 'Fra',
+	txtDateToTODO: 'Til',
+	txtCompletedOn: 'Fullført',
+
+	pholderDateFromTODO: 'Startdato',
+	pholderTimeFromTODO: 'Starttidspunkt',
+	pholderDateToTODO: 'Sluttdato',
+	pholderTimeToTODO: 'Slutt-tidspunkt',
+	pholderCompletedOnDate: 'Dato',
+	pholderCompletedOnTime: 'Tid',
+
+	txtStatusFiltersHeaderTODO: 'Filter',
+	txtStatusFiltersFooterTODO: '* fullført på eller etter %date%',
+	txtStatusNeedsActionTODO: 'Åpen',
+	txtStatusCompletedTODO: 'Fullført',
+	txtStatusInProcessTODO: 'Underveis',
+	txtStatusCancelledTODO: 'Avbrutt',
+	txtPercentCompletedTODO: 'Fullført',
+
+	txtCalendarTODO: 'Kalender',
+	txtSelectCalendarTODO: 'Velg en kalender',
+	txtAlertTODO: 'Alarm',
+	txtAlertNoneTODO: 'Ingen',
+	txtAlertMessageTODO: 'Melding',
+	txtAlertOnDateTODO: 'Ved dato',
+	txtAlertWeeksBeforeTODO: 'Uker før',
+	txtAlertDaysBeforeTODO: 'Dager før',
+	txtAlertHoursBeforeTODO: 'Timer før',
+	txtAlertMinutesBeforeTODO: 'Minutter før',
+	txtAlertSecondsBeforeTODO: 'Sekunder før',
+	txtAlertWeeksAfterTODO: 'Uker etter',
+	txtAlertDaysAfterTODO: 'Dager etter',
+	txtAlertHoursAfterTODO: 'Timer etter',
+	txtAlertMinutesAfterTODO: 'Minutter etter',
+	txtAlertSecondsAfterTODO: 'Sekunder etter',
+
+	pholderAfterBeforeValTODO: 'Verdi',
+	pholderAlarmDateTODO: 'Alarmdato',
+	pholderAlarmTimeTODO: 'Alarmtid',
+
+	pholderNoteTODO: 'Notis',
+	txtNoteTODO: 'Notis',
+
+	todoPrevNav: 'Vis forrige instans',
+	todoNextNav: 'Vis neste instans',
+	todoUncompletedPrevNav: 'Vis forrige ufullførte instans',
+	todoUncompletedNextNav: 'Vis neste ufullførte instans',
+
+	buttonSaveTODO: 'Lagre',
+	buttonEditTODO: 'Rediger',
+	buttonDuplicateTODO: 'Dupliser',
+	buttonResetTODO: 'Tilbakefør',
+	buttonCloseTODO: 'Lukk',
+	buttonDeleteTODO: 'Slett',
+
+	// EVENTS
+	pholderName: 'Navn',
+	pholderNewEvent: 'Ny begivenhet',
+	txtLocation: 'Sted',
+	pholderLocation: 'Sted',
+
+	txtAllDay: 'Hele dagen',
+	from: 'Fra',
+	to: 'Til',
+
+	pholderDateFrom: 'Startdato',
+	pholderTimeFrom: 'Starttidspunkt',
+	pholderDateTo: 'Dato til',
+	pholderTimeTo: 'Slutt-tidspunkt',
+
+	txtStatusNone: 'Ikke angitt',
+	txtStatusTentative: 'Foreløpig',
+	txtStatusConfirmed: 'Bekreftet',
+	txtStatusCancelled: 'Kansellert',
+
+	txtRepeat: 'Gjentagelse',
+	txtNoRepeat: 'Ingen gjentagelse',
+	txtRepeatDay: 'Daglig',
+	txtRepeatWeek: 'Ukentlig',
+	txtRepeatWeekend: 'Hver helg',
+	txtRepeatMonth: 'Månedlig',
+	txtRepeatTwoWeek: 'Hver andre uke',
+	txtRepeatYear: 'Årlig',
+	txtRepeatCustomWeek: 'Egendefinert ukentlig',
+	txtRepeatCustomMonth: 'Egendefinert månedlig',
+	txtRepeatCustomYear: 'Egendefinert årlig',
+	txtRepeatWork: 'Hver forretningsdag',
+	txtRepeatOnDate: 'den',
+	txtRepeatAfter: 'Inntreffer',
+	txtRepeatNever: 'Aldri',
+	pholderUntilDate: 'til datoen',
+	pholderRepeatCount: 'Gjentagelser',
+	txtRepeatCustomWeekLabel: 'på',
+	txtRepeatCustomMonthLabel: 'ved dager',
+	txtRepeatCustomMonthEvery: 'Hver',
+	txtRepeatCustomMonthFirst: 'første',
+	txtRepeatCustomMonthSecond: 'andre',
+	txtRepeatCustomMonthThird: 'tredje',
+	txtRepeatCustomMonthFourth: 'fjerde',
+	txtRepeatCustomMonthFifth: 'femte',
+	txtRepeatCustomMonthLast: 'siste',
+	txtRepeatCustomMonthCustom: 'egendefinert',
+	txtRepeatCustomMonthMonth: 'Dag i måneden',
+	txtRepeatCustomYearLabel1: 'hver',
+	txtRepeatCustomYearLabel2: 'av',
+
+	txtRepeatEnd: 'slutt',
+	txtEventCalendar: 'Kalender',
+	txtSelectCalendar: 'Velg en kalender',
+	txtAlert: 'Alarm',
+	txtAlertNone: 'Ingen',
+	txtAlertMessage: 'Melding',
+	txtAlertOnDate: 'Ved dato',
+	txtAlertWeeksBefore: 'Uker før',
+	txtAlertDaysBefore: 'Dager før',
+	txtAlertHoursBefore: 'Timer før',
+	txtAlertMinutesBefore: 'Minutter før',
+	txtAlertSecondsBefore: 'Sekunder før',
+	txtAlertWeeksAfter: 'Uker etter',
+	txtAlertDaysAfter: 'Dager etter',
+	txtAlertHoursAfter: 'Timer etter',
+	txtAlertMinutesAfter: 'Minutter etter',
+	txtAlertSecondsAfter: 'Sekunder etter',
+
+	pholderAfterBeforeVal: 'Verdi',
+	pholderAlarmDate: 'Alarmdato',
+	pholderAlarmTime: 'Alarmtid',
+
+	pholderNote: 'Ingen',
+
+	eventPrevNav: 'Vis forrige instans',
+	eventNextNav: 'Vis neste instans',
+
+	buttonClose: 'Lukk',
+	buttonDuplicate: 'Dupliser',
+
+	txtAllSavedTodo: 'Vellykket: Gjøremål lagret.',
+	txtAllSaved: 'Vellykket: Begivenhet lagret.',
+
+	txtAllDeletedTodo: 'Vellykket: Gjøremål slettet.',
+	txtAllDeleted: 'Vellykket: Begivenhet slettet.',
+
+	txtNotChooseTodo: 'Feil: En kalender må velges.',
+	txtNotChoose: 'Feil: En kalender må velges.',
+
+	txtErorInputTodo: 'Kunne ikke lagre: Korriger de ugyldige verdiene.',
+	txtDateTimeErrorTodo: 'Dato og tid må velges.',
+
+	txtErrorDates: 'Feil: Startdato må være før slutt-dato.',
+	txtErrorDatesTodo: 'Feil: Startdato må være før slutt-dato.',
+
+	txtErorInput: 'Feil: «Kunne ikke lagre»: Fiks de framhevede ugyldige verdiene.',
+
+	txtAlertsH: 'Varsler',
+	buttonAlert: 'Tøm varsler',
+
+	altAddEvent: 'Legg til begivenhet',
+	altAddTodo: 'Legg til gjøremål',
+
+	loadingCalendars: 'Laster inn kalendere (%act% av %total%) …',
+	unloadingCalendars: 'Angrer innlasting av kalendere …',
+
+	errUnableSaveBeginCalDAV: 'Feil: «Kunne ikke lagre begivenheten»: %%.',
+	errUnableDeleteBeginCalDAV: 'Feil: «Kunne ikke slette begivenheten»: %%.',
+	CalDAVerrHttp410: 'Begivenheten er ikke lenger tilgjengelig på tjeneren',
+	errUnableSaveTodoBeginCalDAV: 'Feil: «Kunne ikke lagre gjøremålet»: %%.',
+	errUnableDeleteTodoBeginCalDAV: 'Feil: «Klarte ikke å slette gjøremål»: %%.',
+	CalDAVerrTodoHttp410: 'Gjøremålet er ikke lenger tilgjengelig på tjeneren'
 };
 
 localizationCalDAV['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
@@ -2872,9 +3506,9 @@ localizationCalDAV['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
 	allDisable: 'Minden naptár elrejtése',
 	timezone: 'Időzóna',
 	txtTimezonePicker: 'Időzóna:',
-	loadingRList: 'Forrás lista betöltése ...',
-	renderingE: 'Naptárak megjelenítése ...',
-	timezoneChange: 'Időzónaváltás alkalmazása ...',
+	loadingRList: 'Forrás lista betöltése …',
+	renderingE: 'Naptárak megjelenítése …',
+	timezoneChange: 'Időzónaváltás alkalmazása …',
 	customTimezone: 'Egyéni (Helyi idő)',
 	customRepeat: 'Egyéb (módosítás nem támogatott)',
 	loadPrevMonth: 'Előző hónap betöltése',
@@ -2912,8 +3546,8 @@ localizationCalDAV['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
 	repeatChangeTxt: 'megváltozott a szerveren!',
 	repeatChangeTxtClose: 'Zárja be az űrlapot, és nyissa meg az eseményt újra',
 	repeatTodoChangeTxtClose: 'Zárja be az űrlapot, és nyissa meg a feladatot újra',
-	calendarLoader: 'Újratöltés ...',
-	resizeLoader: 'Átméretezés ...',
+	calendarLoader: 'Újratöltés …',
+	resizeLoader: 'Átméretezés …',
 
 	// TODOS
 	pholderNameTODO: 'Cím',
@@ -3082,8 +3716,8 @@ localizationCalDAV['hu_HU']=	/* Jan Mate <jan.mate@inf-it.com> */
 	altAddEvent: 'Új esemény',
 	altAddTodo: 'Új feladat',
 
-	loadingCalendars: 'Naptárak betöltése (%act%/%total%) ...',
-	unloadingCalendars: 'Naptárak eltávolítása ...', // better translation?
+	loadingCalendars: 'Naptárak betöltése (%act%/%total%) …',
+	unloadingCalendars: 'Naptárak eltávolítása …', // better translation?
 
 	errUnableSaveBeginCalDAV: 'Hiba: \'nem sikerült az esemény elmentése\': %%!',
 	errUnableDeleteBeginCalDAV: 'Hiba: \'nem sikerült az esemény törlése\': %%!',
@@ -3118,9 +3752,9 @@ localizationCalDAV['it_IT']=	/* thanks Luca Ferrario */
 	allDisable: 'Disabilita tutti i calendari',
 	timezone: 'Fuso orario',
 	txtTimezonePicker: 'Fuso orario:',
-	loadingRList: 'Caricamento delle risorse in corso ...',
-	renderingE: 'Elaborazione dei calendari in corso ...',
-	timezoneChange: 'Applicazione nuovo fuso orario ...',
+	loadingRList: 'Caricamento delle risorse in corso …',
+	renderingE: 'Elaborazione dei calendari in corso …',
+	timezoneChange: 'Applicazione nuovo fuso orario …',
 	customTimezone: 'Personalizzato (Ora Locale)',
 	customRepeat: 'Altro (modifica non supportata)',
 	loadPrevMonth: 'Carica mese precedente',
@@ -3158,8 +3792,8 @@ localizationCalDAV['it_IT']=	/* thanks Luca Ferrario */
 	repeatChangeTxt: 'è stato modificato sul server!',
 	repeatChangeTxtClose: 'Chiudi il form e apri nuovamente l\'evento',
 	repeatTodoChangeTxtClose: 'Chiudi e riapri l\'attività',
-	calendarLoader: 'Aggiornamento ...',
-	resizeLoader: 'Ridimensionamento ...',
+	calendarLoader: 'Aggiornamento …',
+	resizeLoader: 'Ridimensionamento …',
 
 	// TODOS
 	pholderNameTODO: 'Nome',
@@ -3328,8 +3962,8 @@ localizationCalDAV['it_IT']=	/* thanks Luca Ferrario */
 	altAddEvent: 'Aggiungi Evento',
 	altAddTodo: 'Aggiungi Attività',
 
-	loadingCalendars: 'Caricamento calendari in corso (%act% di %total%) ...',
-	unloadingCalendars: 'Chiusura calendari...',
+	loadingCalendars: 'Caricamento calendari in corso (%act% di %total%) …',
+	unloadingCalendars: 'Chiusura calendari…',
 
 	errUnableSaveBeginCalDAV: 'Errore: \'impossibile salvare l\'evento\': %%!',
 	errUnableDeleteBeginCalDAV: 'Error: \'impossibile eliminare l\'evento\': %%!',
@@ -3364,9 +3998,9 @@ localizationCalDAV['ja_JP']=	/* Muimu Nakayama */
 	allDisable: '全てのカレンダーを無効にする',
 	timezone: 'タイムゾーン',
 	txtTimezonePicker: 'タイムゾーン:',
-	loadingRList: 'リソースのリストを読み込み中 ...',
-	renderingE: 'カレンダーを表示中 ...',
-	timezoneChange: 'タイムゾーンの変更を適用中 ...',
+	loadingRList: 'リソースのリストを読み込み中 …',
+	renderingE: 'カレンダーを表示中 …',
+	timezoneChange: 'タイムゾーンの変更を適用中 …',
 	customTimezone: 'カスタム (ローカルタイム)',
 	customRepeat: 'その他（修正はサポートされません）',
 	loadPrevMonth: '前月を読み込み',
@@ -3404,8 +4038,8 @@ localizationCalDAV['ja_JP']=	/* Muimu Nakayama */
 	repeatChangeTxt: 'はサーバ上で変更されました!',
 	repeatChangeTxtClose: 'フォームを閉じて，イベントを開き直してください',
 	repeatTodoChangeTxtClose: 'フォームを閉じて，ToDoを開き直してください',
-	calendarLoader: '再読み込み中 ...',
-	resizeLoader: 'サイズ変更中 ...',
+	calendarLoader: '再読み込み中 …',
+	resizeLoader: 'サイズ変更中 …',
 
 	// TODOS
 	pholderNameTODO: '名前',
@@ -3574,8 +4208,8 @@ localizationCalDAV['ja_JP']=	/* Muimu Nakayama */
 	altAddEvent: 'イベントを追加',
 	altAddTodo: 'ToDoを追加',
 
-	loadingCalendars: 'カレンダーを読み込み中 (%total% 個中 %act% 個) ...',
-	unloadingCalendars: 'カレンダーの読み込みを解除中 ...',
+	loadingCalendars: 'カレンダーを読み込み中 (%total% 個中 %act% 個) …',
+	unloadingCalendars: 'カレンダーの読み込みを解除中 …',
 
 	errUnableSaveBeginCalDAV: 'エラー: \'イベントを保存できません\': %%!',
 	errUnableDeleteBeginCalDAV: 'エラー: \'イベントを削除できません\': %%!',
@@ -3610,9 +4244,9 @@ localizationCalDAV['nl_NL']=	/* thanks Johan Vromans */
 	allDisable: 'Alle agenda’s deaktiveren',
 	timezone: 'Tijdzone',
 	txtTimezonePicker: 'Tijdzone:',
-	loadingRList: 'Agenda\'s opmaken ...',
-	renderingE: 'Kalenders opmaken ...',
-	timezoneChange: 'Tijdzonewijziging uitvoeren ...',
+	loadingRList: 'Agenda\'s opmaken …',
+	renderingE: 'Kalenders opmaken …',
+	timezoneChange: 'Tijdzonewijziging uitvoeren …',
 	customTimezone: 'Speciaal (Plaatselijke tijd)',
 	customRepeat: 'Anders (kan niet worden gewijzigd)',
 	loadPrevMonth: 'Vorige maand',
@@ -3650,8 +4284,8 @@ localizationCalDAV['nl_NL']=	/* thanks Johan Vromans */
 	repeatChangeTxt: 'is gewijzigd op de server!',
 	repeatChangeTxtClose: 'Sluit dit formulier en open het opnieuw',
 	repeatTodoChangeTxtClose: 'Sluit het formulier en heropen de taak',
-	calendarLoader: 'Opnieuw laden ...',
-	resizeLoader: 'Aanpassen ...',	// ???
+	calendarLoader: 'Opnieuw laden …',
+	resizeLoader: 'Aanpassen …',	// ???
 
 	// TODOS
 	pholderNameTODO: 'Naam',
@@ -3820,8 +4454,8 @@ localizationCalDAV['nl_NL']=	/* thanks Johan Vromans */
 	altAddEvent: 'Afspraak aanmaken',
 	altAddTodo: 'Taak aanmaken',
 
-	loadingCalendars: 'Agenda\'s worden geladen (%act% van %total%) ...',
-	unloadingCalendars: 'Agenda\'s worden ontladen ...',
+	loadingCalendars: 'Agenda\'s worden geladen (%act% van %total%) …',
+	unloadingCalendars: 'Agenda\'s worden ontladen …',
 
 	errUnableSaveBeginCalDAV: 'Fout: de afspraak kon niet worden opgeslagen: %%',
 	errUnableDeleteBeginCalDAV: 'Fout: de afspraak kon niet worden verwijderd: %%',
@@ -3856,9 +4490,9 @@ localizationCalDAV['sk_SK']=	/* Jan Mate <jan.mate@inf-it.com> */
 	allDisable: 'Schovať všetky kalendáre',
 	timezone: 'Časové pásmo',
 	txtTimezonePicker: 'Pásmo:',
-	loadingRList: 'Načítavanie zoznamu prostriedkov ...',
-	renderingE: 'Vykreslovanie kalendárov ...',
-	timezoneChange: 'Aplikovanie zmeny časového pásma ...',
+	loadingRList: 'Načítavanie zoznamu prostriedkov …',
+	renderingE: 'Vykreslovanie kalendárov …',
+	timezoneChange: 'Aplikovanie zmeny časového pásma …',
 	customTimezone: 'Vlastná (Lokálny čas)',
 	customRepeat: 'Iné (zmena nie je podporovaná)',
 	loadPrevMonth: 'Načítať predchádzajúci mesiac',
@@ -3896,8 +4530,8 @@ localizationCalDAV['sk_SK']=	/* Jan Mate <jan.mate@inf-it.com> */
 	repeatChangeTxt: 'bol zmenený na serveri!',
 	repeatChangeTxtClose: 'Zatvorte formulár a znova otvorte udalosť',
 	repeatTodoChangeTxtClose: 'Zatvorte formulár a znova otvorte pripomienku.',
-	calendarLoader: 'Znovunačítanie ...',
-	resizeLoader: 'Prepočítavanie veľkosti ...',
+	calendarLoader: 'Znovunačítanie …',
+	resizeLoader: 'Prepočítavanie veľkosti …',
 
 	// TODOS
 	pholderNameTODO: 'Názov',
@@ -4066,8 +4700,8 @@ localizationCalDAV['sk_SK']=	/* Jan Mate <jan.mate@inf-it.com> */
 	altAddEvent: 'Pridať udalosť',
 	altAddTodo: 'Pridať pripomienku',
 
-	loadingCalendars: 'Načítavanie kalendárov (%act% z %total%) ...',
-	unloadingCalendars: 'Odčítavanie kalendárov ...',
+	loadingCalendars: 'Načítavanie kalendárov (%act% z %total%) …',
+	unloadingCalendars: 'Odčítavanie kalendárov …',
 
 	errUnableSaveBeginCalDAV: 'Chyba: \'nepodarilo sa uložiť udalosť\': %%!',
 	errUnableDeleteBeginCalDAV: 'Chyba: \'nepodarilo sa vymazať udalosť\': %%!',
@@ -4102,9 +4736,9 @@ localizationCalDAV['tr_TR']=	/* thanks Selcuk Pultar */
 	allDisable: 'Tüm takvimleri etkisizleştir',
 	timezone: 'Saat dilimi',
 	txtTimezonePicker: 'Saat dilimi:',
-	loadingRList: 'Kaynak listesi yükleniyor ...',
-	renderingE: 'Takvimler oluşturuluyor ...',
-	timezoneChange: 'Saat dilimi değişikliği uygulanıyor ...',
+	loadingRList: 'Kaynak listesi yükleniyor …',
+	renderingE: 'Takvimler oluşturuluyor …',
+	timezoneChange: 'Saat dilimi değişikliği uygulanıyor …',
 	customTimezone: 'Özel (Yerel Saat)',
 	customRepeat: 'Diğer (değişiklik desteklenmez)',
 	loadPrevMonth: 'Önceki ayı yükle',
@@ -4142,8 +4776,8 @@ localizationCalDAV['tr_TR']=	/* thanks Selcuk Pultar */
 	repeatChangeTxt: 'sunucuda değiştirilmiş!',
 	repeatChangeTxtClose: 'Formu kapatıp etkinliği yeniden açın',
 	repeatTodoChangeTxtClose: 'Formu kapatıp yapılacağı yeniden açın',
-	calendarLoader: 'Yeniden yükleniyor ...',
-	resizeLoader: 'Yeniden boyutlandırılıyor ...',
+	calendarLoader: 'Yeniden yükleniyor …',
+	resizeLoader: 'Yeniden boyutlandırılıyor …',
 
 	// TODOS
 	pholderNameTODO: 'İsim',
@@ -4312,8 +4946,8 @@ localizationCalDAV['tr_TR']=	/* thanks Selcuk Pultar */
 	altAddEvent: 'Etkinlik ekle',
 	altAddTodo: 'Yapılacak ekle',
 
-	loadingCalendars: 'Takvimler yükleniyor (%total% taneden %act%) ...',
-	unloadingCalendars: 'Takvimler kaldırılıyor ...',
+	loadingCalendars: 'Takvimler yükleniyor (%total% taneden %act%) …',
+	unloadingCalendars: 'Takvimler kaldırılıyor …',
 
 	errUnableSaveBeginCalDAV: 'Hata: \'etkinlik kaydedilemedi\': %%!',
 	errUnableDeleteBeginCalDAV: 'Hata: \'etkinlik silinemedi\': %%!',
@@ -4348,9 +4982,9 @@ localizationCalDAV['ru_RU']=	/* thanks Александр Симонов */
 	allDisable: 'Скрыть все календари',
 	timezone: 'Врем. зона',
 	txtTimezonePicker: 'Вр. зона:',
-	loadingRList: 'Загрузка списка ресурсов...',
-	renderingE: 'Отображение календарей...',
-	timezoneChange: 'Применение временной зоны ...',
+	loadingRList: 'Загрузка списка ресурсов…',
+	renderingE: 'Отображение календарей…',
+	timezoneChange: 'Применение временной зоны …',
 	customTimezone: 'Заказная (местное время)',
 	customRepeat: 'Другое (без возможности изменения)',
 	loadPrevMonth: 'Загрузить предыдущий месяц',
@@ -4388,8 +5022,8 @@ localizationCalDAV['ru_RU']=	/* thanks Александр Симонов */
 	repeatChangeTxt: 'было изменено на сервере!',
 	repeatChangeTxtClose: 'Закройте и откройте событие заново',
 	repeatTodoChangeTxtClose: 'Закройте и откройте задачу заново',
-	calendarLoader: 'Перезагрузка...',
-	resizeLoader: 'Изменение размера...',
+	calendarLoader: 'Перезагрузка…',
+	resizeLoader: 'Изменение размера…',
 
 	// TODOS
 	pholderNameTODO: 'Название',
@@ -4558,8 +5192,8 @@ localizationCalDAV['ru_RU']=	/* thanks Александр Симонов */
 	altAddEvent: 'Добавить событие',
 	altAddTodo: 'Добавить задачу',
 
-	loadingCalendars: 'Загрузка календарей (%act% из %total%) ...',
-	unloadingCalendars: 'Выгружаю календари ...',
+	loadingCalendars: 'Загрузка календарей (%act% из %total%) …',
+	unloadingCalendars: 'Выгружаю календари …',
 
 	errUnableSaveBeginCalDAV: 'Ошибка: \'не могу сохранить событие\': %%!',
 	errUnableDeleteBeginCalDAV: 'Ошибка: \'не могу удалить событие\': %%!',
@@ -4594,9 +5228,9 @@ localizationCalDAV['uk_UA']=	/* Sergey Yakimchuck <yakim@yakim.org.ua> */
 	allDisable: 'Вимкнути всі календарі',
 	timezone: 'Часова зона',
 	txtTimezonePicker: 'Часова зона:',
-	loadingRList: 'Завантаження списку ресурсів ...',
-	renderingE: 'Надання календарів ...',
-	timezoneChange: 'Прийняття змін часової зони ...',
+	loadingRList: 'Завантаження списку ресурсів …',
+	renderingE: 'Надання календарів …',
+	timezoneChange: 'Прийняття змін часової зони …',
 	customTimezone: 'Налаштований (локальний час)',
 	customRepeat: 'Інше (Зміни не підтримуються)',
 	loadPrevMonth: 'Завантаження попереднього місяця',
@@ -4634,8 +5268,8 @@ localizationCalDAV['uk_UA']=	/* Sergey Yakimchuck <yakim@yakim.org.ua> */
 	repeatChangeTxt: 'було змінено на сервері!',
 	repeatChangeTxtClose: 'Закрийте форму та відкрийте подію знову',
 	repeatTodoChangeTxtClose: 'Закрийте форму та відкрийте завдання знову',
-	calendarLoader: 'перезавантаження ...',
-	resizeLoader: 'зміна розміру ...',
+	calendarLoader: 'перезавантаження …',
+	resizeLoader: 'зміна розміру …',
 
 	// TODOS
 	pholderNameTODO: 'Назва',
@@ -4804,8 +5438,8 @@ localizationCalDAV['uk_UA']=	/* Sergey Yakimchuck <yakim@yakim.org.ua> */
 	altAddEvent: 'Додати подію',
 	altAddTodo: 'Додати завдання',
 
-	loadingCalendars: 'Завантаження календарів (%act% з %total%) ...',
-	unloadingCalendars: 'Розвантаження календарі ...',
+	loadingCalendars: 'Завантаження календарів (%act% з %total%) …',
+	unloadingCalendars: 'Розвантаження календарі …',
 
 	errUnableSaveBeginCalDAV: 'Помилка: \'неможливо зберегти подію\': %%!',
 	errUnableDeleteBeginCalDAV: 'Помилка: \'неможливо видалити подію\': %%!',
@@ -4840,9 +5474,9 @@ localizationCalDAV['zh_CN']=	/* thanks Fandy */
 	allDisable: '关闭所有日历',
 	timezone: '时区',
 	txtTimezonePicker: '时区:',
-	loadingRList: '加载资源列表 ...',
-	renderingE: '加载日程 ...',
-	timezoneChange: '应用更改时区 ...',
+	loadingRList: '加载资源列表 …',
+	renderingE: '加载日程 …',
+	timezoneChange: '应用更改时区 …',
 	customTimezone: '自定义 (本地时区)',
 	customRepeat: '其它 (不支持修改)',
 	loadPrevMonth: '加载上个月',
@@ -4880,8 +5514,8 @@ localizationCalDAV['zh_CN']=	/* thanks Fandy */
 	repeatChangeTxt: '在服务器上发生了改变！',
 	repeatChangeTxtClose: '关闭窗体，重新打开活动',
 	repeatTodoChangeTxtClose: '关闭窗体，重新打开待办',
-	calendarLoader: '重新加载中 ...',
-	resizeLoader: '调整大小...',
+	calendarLoader: '重新加载中 …',
+	resizeLoader: '调整大小…',
 
 	// TODOS
 	pholderNameTODO: '待办事宜',
@@ -5050,8 +5684,8 @@ localizationCalDAV['zh_CN']=	/* thanks Fandy */
 	altAddEvent: '新建日程',
 	altAddTodo: '新建待办',
 
-	loadingCalendars: '日程加载中 (第%act% 个/共%total%个) ...',
-	unloadingCalendars: '卸载日程...',
+	loadingCalendars: '日程加载中 (第%act% 个/共%total%个) …',
+	unloadingCalendars: '卸载日程…',
 
 	errUnableSaveBeginCalDAV: '错误: \'活动不能保存\': %%!',
 	errUnableDeleteBeginCalDAV: '错误: \'活动不能删除\': %%!',
