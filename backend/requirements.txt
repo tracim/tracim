@@ -115,7 +115,7 @@ lxml==4.9.1
     # via
     #   caldav
     #   tracim-backend (setup.py)
-mako==1.1.4
+mako==1.2.2
     # via
     #   alembic
     #   pyramid-mako
