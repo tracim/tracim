@@ -91,6 +91,7 @@ export const tinymceAutoCompleteHandleKeyDown = (event, setState, isAutoComplete
       setState({ isAutoCompleteActivated: false, autoCompleteItemList: [] })
       break
     }
+    case 'Tab':
     case 'Enter': {
       tinymceAutoCompleteHandleClickItem(autoCompleteItemList[autoCompleteCursorPosition], setState)
       event.preventDefault()

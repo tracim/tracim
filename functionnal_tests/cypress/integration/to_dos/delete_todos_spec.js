@@ -1,8 +1,11 @@
+import { PAGES } from '../../support/urls_commands'
+
 describe('Delete to dos', () => {
   const fileTitle = 'File'
   const fullFilename = 'Linux-Free-PNG.png'
   const contentType = 'image/png'
   const toDoText = 'Some to do text'
+  let workspaceId, contentId
 
   describe('in a content', () => {
 
@@ -13,36 +16,42 @@ describe('Delete to dos', () => {
       cy.loginAs('administrators')
 
       cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-        cy.createFile(fullFilename, contentType, fileTitle, workspace.workspace_id)
+        workspaceId = workspace.workspace_id
+        cy.createFile(fullFilename, contentType, fileTitle, workspaceId).then(content => {
+          contentId = content.content_id
+        })
       })
     })
 
     describe('As space manager', () => {
       before(() => {
         cy.loginAs('administrators')
+        cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } }).then(() => {
+          cy.contains('.FilenameWithBadges__label', fileTitle)
 
-        cy.visit('/ui/workspaces/1/contents/file/1')
-
-        cy.get('[data-cy=popin_right_part_todo]').click()
-        cy.get('.toDo__newButton').click()
-        cy.get('.toDoManagement__creation__linkButton .linkButton').click()
-        cy.get('.createToDoFromTextPopup__main textarea').type(`+johndoe ${toDoText}
+          cy.get('[data-cy=popin_right_part_todo]').click()
+          cy.get('.toDo__newButton').click()
+          cy.get('.toDoManagement__creation__linkButton .linkButton').click()
+          cy.get('.createToDoFromTextPopup__main textarea').type(`+johndoe ${toDoText}
         +TheAdmin ${toDoText}`)
-        cy.get('[data-cy=createToDoFromTextPopup__buttons__create]').click()
-        cy.get('[data-cy=toDoManagement__buttons__new]').click()
+          cy.get('[data-cy=createToDoFromTextPopup__buttons__create]').click()
+          cy.get('[data-cy=toDoManagement__buttons__new]').click()
 
-        cy.visit('/ui/workspaces/1/advanced_dashboard')
-        cy.contains('.workspace_advanced__userlist__list__item', '@johndoe').within(() => {
-          cy.get('button.btn').click()
-          cy.contains('.dropdownMenuItem', 'Space manager').click()
+          cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId: workspaceId } })
+          cy.contains('.workspace_advanced__userlist__list__item', '@johndoe').within(() => {
+            cy.get('button.btn').click()
+            cy.contains('.dropdownMenuItem', 'Space manager').click()
+          })
         })
       })
 
       beforeEach(() => {
         cy.logout()
         cy.loginAs('users')
-        cy.visit('/ui/workspaces/1/contents/file/1')
-        cy.get('[data-cy=popin_right_part_todo]').click()
+        cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } }).then(() => {
+          cy.contains('.FilenameWithBadges__label', fileTitle)
+          cy.get('[data-cy=popin_right_part_todo]').click()
+        })
       })
 
       it('should be able to delete the assigned to do', () => {
@@ -62,28 +71,31 @@ describe('Delete to dos', () => {
       before(() => {
         cy.loginAs('administrators')
 
-        cy.visit('/ui/workspaces/1/advanced_dashboard')
+        cy.visitPage({ pageName: PAGES.ADVANCED_DASHBOARD, params: { workspaceId: workspaceId } })
         cy.contains('.workspace_advanced__userlist__list__item', '@johndoe').within(() => {
           cy.get('button.btn').click()
           cy.contains('.dropdownMenuItem', 'Contributor').click()
         })
+        cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } }).then(() => {
+          cy.contains('.FilenameWithBadges__label', fileTitle)
 
-        cy.visit('/ui/workspaces/1/contents/file/1')
-
-        cy.get('[data-cy=popin_right_part_todo]').click()
-        cy.get('.toDo__newButton').click()
-        cy.get('.toDoManagement__creation__linkButton .linkButton').click()
-        cy.get('.createToDoFromTextPopup__main textarea').type(`+johndoe ${toDoText}
+          cy.get('[data-cy=popin_right_part_todo]').click()
+          cy.get('.toDo__newButton').click()
+          cy.get('.toDoManagement__creation__linkButton .linkButton').click()
+          cy.get('.createToDoFromTextPopup__main textarea').type(`+johndoe ${toDoText}
         +TheAdmin ${toDoText}`)
-        cy.get('[data-cy=createToDoFromTextPopup__buttons__create]').click()
-        cy.get('[data-cy=toDoManagement__buttons__new]').click()
+          cy.get('[data-cy=createToDoFromTextPopup__buttons__create]').click()
+          cy.get('[data-cy=toDoManagement__buttons__new]').click()
+        })
       })
 
       beforeEach(() => {
         cy.logout()
         cy.loginAs('users')
-        cy.visit('/ui/workspaces/1/contents/file/1')
-        cy.get('[data-cy=popin_right_part_todo]').click()
+        cy.visitPage({ pageName: PAGES.CONTENT_OPEN, params: { contentId } }).then(() => {
+          cy.contains('.FilenameWithBadges__label', fileTitle)
+          cy.get('[data-cy=popin_right_part_todo]').click()
+        })
       })
 
       it('should not be able to delete any to dos', () => {
@@ -98,11 +110,12 @@ describe('Delete to dos', () => {
       describe('As owner', () => {
         it('should be able to delete the owned to do', () => {
           cy.get('.toDo__newButton').click()
-          cy.get('.toDo__new__toDoText textarea').type('customToDo')
-          cy.get('[data-cy=toDoManagement__buttons__new]').click()
-
-          cy.contains('.toDoItem', 'customToDo').within(() => {
-            cy.get('.toDoItem__delete').should('be.visible').click().should('not.exist')
+          cy.get('.toDo__new__toDoText textarea').type('customToDo').then(() => {
+            cy.get('[data-cy=toDoManagement__buttons__new]').click()
+            cy.get('.wsContentGeneric__content__right__content__title').should('be.visible')
+            cy.contains('.toDoItem', 'customToDo').within(() => {
+              cy.get('.toDoItem__delete').should('be.visible').click().should('not.exist')
+            })
           })
         })
       })

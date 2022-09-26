@@ -46,7 +46,7 @@ import TabBar from '../component/TabBar/TabBar.jsx'
 import WorkspaceRecentActivities from './WorkspaceRecentActivities.jsx'
 import { HACK_COLLABORA_CONTENT_TYPE } from './WorkspaceContent.jsx'
 
-const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda']
+const ALWAYS_ALLOWED_BUTTON_SLUGS = ['contents/all', 'agenda', 'gallery']
 
 export class Dashboard extends React.Component {
   constructor (props) {
@@ -392,6 +392,7 @@ export class Dashboard extends React.Component {
       })
     }
 
+    // INFO - MP - 06-09-2022 - Build the application list buttons
     contentTypeButtonList = contentTypeButtonList.concat(props.contentType.length > 0 // INFO - CH - 2019-04-03 - wait for content type api to have responded
       ? props.appList
         .filter(app => userRoleIdInWorkspace === ROLE.contributor.id ? app.slug !== 'contents/folder' : true)
