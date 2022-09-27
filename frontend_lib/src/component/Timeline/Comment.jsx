@@ -17,7 +17,7 @@ import {
   ROLE,
   addExternalLinksIcons,
   displayDistanceDate,
-  formatAbsoluteDate,
+  formatAbsoluteDate
 } from '../../helper.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'

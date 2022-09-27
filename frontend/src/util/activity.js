@@ -1,7 +1,6 @@
 import {
   CONTENT_TYPE,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   getContent,
   getContentComment,
@@ -122,7 +121,7 @@ const getParentType = async (parentId, apiUrl) => {
 }
 
 const getActivityParams = async (message, apiUrl) => {
-  const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
+  const [entityType, , subEntityType] = message.event_type.split('.')
   switch (entityType) {
     case TLM_ET.CONTENT: {
       let id
@@ -218,7 +217,6 @@ export const sortActivityList = (activityList) => {
  * @returns The new activity list
  */
 const updateActivity = (message, activity) => {
-  const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
   const isContentAChild = activity.content && (
     (message.fields.content && message.fields.content.parent_id === activity.content.content_id) ||
     (message.fields.content.parent && message.fields.content.parent.content_id === activity.content.content_id)
