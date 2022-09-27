@@ -13,11 +13,11 @@ import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 import {
-  ROLE,
   CONTENT_TYPE,
-  readableDateFormat,
+  ROLE,
+  addExternalLinksIcons,
   displayDistanceDate,
-  addExternalLinksIcons
+  formatAbsoluteDate,
 } from '../../helper.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'
@@ -35,13 +35,13 @@ const Comment = (props) => {
   }
 
   const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
-  const readableCreationDate = readableDateFormat(props.creationDate, props.loggedUser.lang)
+  const readableCreationDate = formatAbsoluteDate(props.creationDate, props.loggedUser.lang, 'PPPPp')
   const createdDistance = displayDistanceDate(props.creationDate, props.loggedUser.lang)
   const isModified = props.modificationDate ? props.modificationDate !== props.creationDate : false
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
   const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
-  const readableModificationDate = isModified ? readableDateFormat(props.modificationDate, props.loggedUser.lang) : null
+  const readableModificationDate = isModified ? formatAbsoluteDate(props.modificationDate, props.loggedUser.lang, 'PPPPp') : null
 
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>

@@ -715,19 +715,16 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-// INFO - G.B. - 2022-09-10 - To see the different format time: https://date-fns.org/v2.29.2/docs/format
+/**
+ * INFO - G.B. - 2022-09-10
+ * @param {*} rawDate Date to format
+ * @param {*} lang Locale lang
+ * @param {*} formatTime To see the different format time: https://date-fns.org/v2.29.2/docs/format
+ * @returns
+ */
 export const formatAbsoluteDate = (rawDate, lang = 'en', formatTime) => {
   if (!rawDate) return
   return format(new Date(rawDate), formatTime || 'Pp', { locale: DATE_FNS_LOCALE[lang] })
-}
-
-export const readableDateFormat = (rawDate, lang) => {
-  const options = {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-  }
-  const date = new Date(rawDate).toLocaleDateString(lang, options)
-  const time = new Date(rawDate).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' })
-  return `${date} ${time}`
 }
 
 /**
