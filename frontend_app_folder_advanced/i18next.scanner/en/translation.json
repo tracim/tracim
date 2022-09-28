@@ -14,6 +14,6 @@
   "Error while loading Tracim's content type list": "Error while loading Tracim's content type list",
   "The content has been modified by {{author}}": "The content has been modified by {{author}}",
   "Delete": "Delete",
-  "The link has been copied to clipboard": "The link has been copied to clipboard",
+  "The link has been copied to clipboard": "Link copied to clipboard",
   "Copy content link": "Copy content link"
 }
