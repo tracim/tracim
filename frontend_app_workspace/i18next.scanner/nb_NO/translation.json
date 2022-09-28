@@ -13,5 +13,7 @@
   "Parent space:": "Ovennevnt rom:",
   "Space's name:": "Rommets navn:",
   "Space's type:": "Romtype:",
-  "You cannot create anymore space": "Du kan ikke opprette mer rom"
+  "You cannot create anymore space": "Du kan ikke opprette mer rom",
+  "Be careful, we do not recommend creating more than two levels of spaces because it makes the information much less accessible.": "Det anbefales å ikke lage rom i mer enn to nivåer fordi det gjør infoen mye mindre tilgjengelig.",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Rollen medlemmer vil ha som forvalg når det tar del i rommet ditt (dvs. for åpne og forespørselsrom)."
 }

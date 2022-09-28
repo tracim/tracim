@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-07-18 13:54+0200\n"
-"PO-Revision-Date: 2022-08-30 15:03+0000\n"
+"PO-Revision-Date: 2022-09-01 15:01+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/tracim/"
 "backend/nb_NO/>\n"
@@ -93,8 +93,9 @@ msgid "Uploaded by {username}."
 msgstr "Lastet opp av {username}."
 
 #: tracim_backend/lib/core/content.py:742
+#, fuzzy
 msgid "Space {workspace_name}"
-msgstr ""
+msgstr "{workspace_name}-rommet"
 
 #: tracim_backend/lib/core/content.py:755
 #, fuzzy
@@ -122,8 +123,9 @@ msgid "Space"
 msgstr "Rom"
 
 #: tracim_backend/lib/core/workspace.py:500
+#, fuzzy
 msgid "Space {}"
-msgstr ""
+msgstr "{}-rommet"
 
 #: tracim_backend/lib/mail_notifier/notifier.py:281
 #, fuzzy
@@ -139,7 +141,7 @@ msgstr "Jeg endret status for {content_name}. Ny status er  <i>{new_status}</i>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:35
 msgid "I added an item entitled {content_name}."
-msgstr ""
+msgstr "Jeg la til et element som heter {content_name}."
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:41
 msgid "I updated {content_name}."
@@ -195,28 +197,34 @@ msgid "Someone invited you to join <i>{website_title}</i>."
 msgstr "Noen inviterte deg til å ta del i  <i>{website_title}</i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:13
+#, fuzzy
 msgid "Your credentials are:"
-msgstr ""
+msgstr "Brukernavnet og passordet ditt er:"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:16
 msgid "login: {email_address}"
-msgstr ""
+msgstr "innlogging: {email_address}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:17
 msgid "password: {password}"
 msgstr "passord: {password}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:21
+#, fuzzy
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your space: {a_link}"
 msgstr ""
+"Begynn diskusjonen, fildelingen, agenda og dokumentasjon med bidragsytere "
+"ved å logge inn i rommet: {a_link}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:23
 msgid ""
 "note: as soon as you are connected, we strongly recommend that you change"
 " your password and delete this email."
 msgstr ""
+"Merk: Så snart du er tilkoblet anbefales det sterkt at du endrer passordet "
+"og sletter denne e-posten."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:24
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:16
@@ -230,16 +238,18 @@ msgstr "Nyt dagen :)"
 #: tracim_backend/templates/mail/reset_password_body_html.mak:21
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:17
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:17
+#, fuzzy
 msgid "Suricat', your digital assistant"
-msgstr ""
+msgstr "Suricat', din digitale assistent"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:29
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:21
 #: tracim_backend/templates/mail/reset_password_body_html.mak:25
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:21
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:21
+#, fuzzy
 msgid "Suricat', the bot"
-msgstr ""
+msgstr "Suricat', bott-en"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:32
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:24
@@ -258,6 +268,8 @@ msgid ""
 "files with you in this space: <a "
 "href={sharedspace_url}>{sharedspace_name}</a>"
 msgstr ""
+"{username} (<a href=\"{email_link}\">{email}</a>) delte én eller flere filer "
+"med deg i dette rommet: <a href={sharedspace_url}>{sharedspace_name}</a>"
 
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:12
 msgid "Message:"
@@ -268,22 +280,26 @@ msgid ""
 "Someone has requested to reset the password for your account on "
 "<i>{website_title}</i>."
 msgstr ""
+"Noen har forespurt tilbakestilling av passordet for din konto på "
+"<i>{website_title}</i>."
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:8
 msgid "If you did not perform this request, you can safely ignore this email."
-msgstr ""
+msgstr "Hvis du ikke har bedt om dette kan du se bort fra denne e-posten."
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:11
+#, fuzzy
 msgid "In order to reset your password, please click on following link :"
-msgstr ""
+msgstr "For å tilbakestille passordet ditt kan du klikke på følgende lenke:"
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:12
 msgid "Reset my password"
 msgstr "Tilbakestill passordet mitt"
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:14
+#, fuzzy
 msgid "If the link is not working, I suggest to copy/paste the full url: "
-msgstr ""
+msgstr "Hvis lenken ikke fungere kan du kopiere og lime inn hele nettadressen: "
 
 #: tracim_backend/templates/mail/reset_password_body_html.mak:19
 msgid "The link is valid for {} minutes."
@@ -291,7 +307,7 @@ msgstr "Lenken er gyldig i {} minutter."
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:5
 msgid "You shared the file <i>{content_filename}</i> with:"
-msgstr ""
+msgstr "Du delte filen <i>{content_filename}</i> med:"
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:8
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:8
@@ -299,6 +315,8 @@ msgid ""
 "<i><a href=\"{email_link}\">{email}</a></i> at this link: <a "
 "href=\"{url}\">{url}</a>"
 msgstr ""
+"<i><a href=\"{email_link}\">{email}</a></i> på denne lenken: <a href=\"{url}"
+"\">{url}</a>"
 
 #: tracim_backend/templates/mail/shared_content_to_emitter_body_html.mak:13
 #, fuzzy
@@ -320,12 +338,16 @@ msgid ""
 "<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> "
 "({file_size})"
 msgstr ""
+"<a href=\"{url}\" id=\"call-to-action-button\">{filename}</a> ({file_size})"
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:18
+#, fuzzy
 msgid ""
 "This file is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
+"Kontakt brukeren min (<a href=\"mailto:{emitter_email}\">{username}</a>) for "
+"å få passordet som beskytter filen."
 
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:19
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:16
@@ -352,6 +374,8 @@ msgid ""
 "You have invited {nb_receivers} people to upload files in this space <a "
 "href={sharedspace_url}>{sharedspace_name}</a>:"
 msgstr ""
+"Du har invitert {nb_receivers} folk til å laste opp filer i dette rommet <a "
+"href={sharedspace_url}>{sharedspace_name}</a>:"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:13
 msgid ""
@@ -370,7 +394,10 @@ msgid "Upload files"
 msgstr "Last opp filer"
 
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:13
+#, fuzzy
 msgid ""
 "This upload is protected by a password, please contact me (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) to get the password."
 msgstr ""
+"Kontakt brukeren min (<a href=\"mailto:{emitter_email}\">{username}</a>) for "
+"å få passordet som beskytter denne opplastingen."

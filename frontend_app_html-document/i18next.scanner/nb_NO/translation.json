@@ -31,5 +31,8 @@
   "You must change the status or restore this note before any change": "Du må endre statusen eller gjenopprette dette notatet før endringer gjøres",
   "Error while saving the user configuration": "Kunne ikke lagre brukeroppsettet",
   "Your text contains mentions that do not match any member of this space:": "Teksten din nevner medlemmer som ikke finnes i dette rommet.",
-  "You are trying to mention an invalid user": "Du prøver å nevne en ugyldig bruker"
+  "You are trying to mention an invalid user": "Du prøver å nevne en ugyldig bruker",
+  "To notify all members of the space of your modification": "For å varsle alle medlemmene av rommet om din endring",
+  "note": "notat",
+  "Note's title": "Notatnavn"
 }

@@ -12,5 +12,9 @@
   "Validate and create": "Bekreft og opprett",
   "Content not found": "Fant ikke innholdet",
   "Draw": "Tegn",
-  "Space not found": "Fant ikke rommet"
+  "Space not found": "Fant ikke rommet",
+  "Office Document's title": "Kontordokumentets navn",
+  "New Office Document": "Nytt kontor-dokument",
+  "Create an office document": "Opprett et kontordokument",
+  "New Office document": "Nytt kontordokument"
 }
