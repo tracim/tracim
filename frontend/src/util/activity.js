@@ -235,7 +235,7 @@ const updateActivity = (message, activity) => {
     } else return comment
   })
 
-  if (!found) {
+  if (!found && message.event_type.includes(TLM_ST.COMMENT)) {
     commentList.push(message.fields.content)
   }
 
