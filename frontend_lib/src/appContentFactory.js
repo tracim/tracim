@@ -175,8 +175,17 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    getComment = async (workspaceId, contentId, commentId) => {
-      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, workspaceId, contentId, commentId))
+    /**
+     * Get a complete comment
+     * This function exists also in withActivity.jsx
+     * @async
+     * @param {int} spaceId
+     * @param {int} contentId
+     * @param {int} commentId
+     * @returns {Promise<JSON>}
+     */
+    getComment = async (spaceId, contentId, commentId) => {
+      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, spaceId, contentId, commentId))
 
       switch (fetchGetComment.apiResponse.status) {
         case 200: return fetchGetComment.body
@@ -954,6 +963,22 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
+    /**
+     * Update both timeline and wholeTimeline with the new comment from the TLM
+     * @param {TLM} tlm TLM received that contains the new comment information
+     */
+    updateComment = async (tlm) => {
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+      this.setState(prev => ({
+        timeline: prev.timeline.map(
+          item => item.content_id === comment.content_id ? { ...item, ...comment } : item
+        ),
+        wholeTimeline: prev.wholeTimeline.map(
+          item => item.content_id === comment.content_id ? { ...item, ...comment } : item
+        )
+      }))
+    }
+
     searchForMentionOrLinkInQuery = async (query, workspaceId) => {
       function matchingContentIdsFirst (contentA, contentB) {
         const aContentId = contentA.content_id.toString()
@@ -1144,6 +1169,7 @@ export function appContentFactory (WrappedComponent) {
           timeline={this.state.timeline}
           loadTimeline={this.loadTimeline}
           loadMoreTimelineItems={this.loadMoreTimelineItems}
+          updateComment={this.updateComment}
           resetTimeline={this.resetTimeline}
           canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
           isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}

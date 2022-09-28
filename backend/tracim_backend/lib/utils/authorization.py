@@ -245,10 +245,10 @@ class CommentOwnerChecker(AuthorizationChecker):
 
     def check(self, tracim_context: TracimContext) -> bool:
 
-        if tracim_context.current_comment.owner.user_id == tracim_context.current_user.user_id:
+        if tracim_context.current_comment.author.user_id == tracim_context.current_user.user_id:
             return True
         raise UserIsNotContentOwner(
-            "user {} is not owner of comment {}".format(
+            "user {} is not the original owner of the comment {}".format(
                 tracim_context.current_user.user_id, tracim_context.current_comment.content_id,
             )
         )
@@ -419,7 +419,7 @@ can_create_content = ContentTypeCreationChecker(content_type_list)
 # comments
 is_comment_owner = CommentOwnerChecker()
 can_edit_comment = OrAuthorizationChecker(
-    AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager
+    AndAuthorizationChecker(is_contributor, is_comment_owner), is_workspace_manager,
 )
 # todos
 is_todo_owner = TodoOwnerChecker()

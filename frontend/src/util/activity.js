@@ -1,7 +1,6 @@
 import {
   CONTENT_TYPE,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   getContent,
   getContentComment,
@@ -60,8 +59,8 @@ const getCommentList = async (content, apiUrl) => {
  */
 const createContentActivity = async (activityParams, messageList, apiUrl) => {
   // INFO - RJ - 2021-08-23
-  // Beware, a content may have been moved to another workspace or deleted, so
-  // the workspace field of the messages might be outdated or the content
+  // Beware, a content may have been moved to another space or deleted, so
+  // the space field of the messages might be outdated or the content
   // inaccessible. This should be kept in mind while working on this code
   const newestMessage = messageList[0]
 
@@ -81,7 +80,7 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   // INFO - SG - 2021-04-16
   // We have to get the parent content as comments shall produce an activity
   // for it and not for the comment.
-  const fetchGetWorkspaceContent = await handleFetchResult(await getWorkspaceContent(
+  const fetchGetSpaceContent = await handleFetchResult(await getWorkspaceContent(
     apiUrl,
     newestMessage.fields.workspace.workspace_id,
     parentContentType || content.content_type,
@@ -90,8 +89,8 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
       : content.content_id
   ))
 
-  if (!fetchGetWorkspaceContent.apiResponse.ok) return null
-  content = { ...content, ...fetchGetWorkspaceContent.body }
+  if (!fetchGetSpaceContent.apiResponse.ok) return null
+  content = { ...content, ...fetchGetSpaceContent.body }
 
   const fetchGetContentPath = await handleFetchResult(
     await getContentPath(apiUrl, content.content_id)
@@ -122,11 +121,9 @@ const getParentType = async (parentId, apiUrl) => {
 }
 
 const getActivityParams = async (message, apiUrl) => {
-  const [entityType, coreEventType, subEntityType] = message.event_type.split('.')
+  const [entityType, , subEntityType] = message.event_type.split('.')
   switch (entityType) {
     case TLM_ET.CONTENT: {
-      if (subEntityType === TLM_ST.COMMENT && coreEventType !== TLM_CET.CREATED) return null
-
       let id
       if (subEntityType === TLM_ST.COMMENT) id = message.fields.content.parent_id
       else if (subEntityType === TLM_ST.TODO) id = message.fields.content.parent.content_id
@@ -213,12 +210,34 @@ export const sortActivityList = (activityList) => {
   return [...activityList].sort((a, b) => b.newestMessage.event_id - a.newestMessage.event_id)
 }
 
+/**
+ * Update an activity list with a new event
+ * @param {*} message New event to add to the activity list
+ * @param {*} activity The activity list
+ * @returns The new activity list
+ */
 const updateActivity = (message, activity) => {
-  const isComment = message.event_type.endsWith(`.${TLM_ST.COMMENT}`)
   const isContentAChild = activity.content && (
     (message.fields.content && message.fields.content.parent_id === activity.content.content_id) ||
     (message.fields.content.parent && message.fields.content.parent.content_id === activity.content.content_id)
   )
+
+  // NOTE - MP - 2022-09-23 - This piece of code deals with commentary
+  // If the message is an existing commentary, it will update the existing commentary
+  // (the tlm processed is a commentary update)
+  // If the message is a new commentary, it will append the commentary to the list
+  // (the tlm processed is a new commentary)
+  let found = false
+  const commentList = activity.commentList.map((comment) => {
+    if (comment.content_id === message.fields.content.content_id) {
+      found = true
+      return message.fields.content
+    } else return comment
+  })
+
+  if (!found && message.event_type.includes(TLM_ST.COMMENT)) {
+    commentList.push(message.fields.content)
+  }
 
   // NOTE SG 2020-11-12: keep the existing content
   // if the message is a comment as a comment cannot change anything
@@ -230,9 +249,7 @@ const updateActivity = (message, activity) => {
       createActivityEvent(message),
       ...activity.eventList
     ],
-    commentList: isComment
-      ? [...activity.commentList, message.fields.content]
-      : activity.commentList,
+    commentList: commentList,
     newestMessage: message,
     content: isContentAChild ? activity.content : message.fields.content
   }
@@ -250,11 +267,13 @@ const updateActivity = (message, activity) => {
 export const addMessageToActivityList = async (message, activityList, apiUrl) => {
   const activityParams = await getActivityParams(message, apiUrl)
   if (!activityParams) return activityList
+
   const activityIndex = activityList.findIndex(a => a.id === activityParams.id)
   if (activityIndex === -1) {
     const activity = await createActivity(activityParams, [message], apiUrl)
     return activity ? [activity, ...activityList] : activityList
   }
+
   const oldActivity = activityList[activityIndex]
   const updatedActivity = updateActivity(message, oldActivity)
   const updatedActivityList = [...activityList]

@@ -49,8 +49,8 @@ export class Thread extends React.Component {
       breadcrumbsList: [],
       isVisible: true,
       config: param.config,
-      loggedUser: param.loggedUser,
       content: param.content,
+      loggedUser: param.loggedUser,
       loading: false,
       newContent: {},
       timelineWysiwyg: false,
@@ -84,6 +84,7 @@ export class Thread extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.THREAD, handler: this.handleContentChanged }
@@ -118,6 +119,12 @@ export class Thread extends React.Component {
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
+  }
+
+  // TLM Handlers
+
+  handleCommentModified = (data) => {
+    this.props.updateComment(data)
   }
 
   handleContentChanged = data => {
@@ -156,6 +163,8 @@ export class Thread extends React.Component {
 
     if (!prevState.content || !state.content) return
 
+    // INFO - MP - 24-08-2022 - We update the timeline when there is a new content added to the
+    // thread or a content removed from the thread
     if (prevState.content.content_id !== state.content.content_id) {
       this.updateTimelineAndContent()
     }

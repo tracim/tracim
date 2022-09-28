@@ -8,15 +8,16 @@ import { TRANSLATION_STATE } from '../../translation.js'
 import TranslateButton from '../Button/TranslateButton.jsx'
 import EmojiReactions from '../../container/EmojiReactions.jsx'
 import DropdownMenu from '../DropdownMenu/DropdownMenu.jsx'
+import Popover from '../Popover/Popover.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import LinkPreview from '../LinkPreview/LinkPreview.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 import {
-  ROLE,
   CONTENT_TYPE,
-  formatAbsoluteDate,
+  ROLE,
+  addExternalLinksIcons,
   displayDistanceDate,
-  addExternalLinksIcons
+  formatAbsoluteDate
 } from '../../helper.js'
 
 import CommentFilePreview from './CommentFilePreview.jsx'
@@ -28,17 +29,19 @@ function areCommentActionsAllowed (loggedUser, commentAuthorId) {
   )
 }
 
-const Comment = props => {
+const Comment = (props) => {
   const styleSent = {
     borderColor: props.customColor
   }
 
-  const createdFormated = formatAbsoluteDate(props.created, props.loggedUser.lang)
-  const createdDistance = displayDistanceDate(props.created, props.loggedUser.lang)
+  const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
+  const readableCreationDate = formatAbsoluteDate(props.creationDate, props.loggedUser.lang, 'PPPPp')
+  const createdDistance = displayDistanceDate(props.creationDate, props.loggedUser.lang)
+  const isModified = props.modificationDate ? props.modificationDate !== props.creationDate : false
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
   const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
-  const actionsAllowed = areCommentActionsAllowed(props.loggedUser, props.author.user_id)
+  const readableModificationDate = isModified ? formatAbsoluteDate(props.modificationDate, props.loggedUser.lang, 'PPPPp') : null
 
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
@@ -71,12 +74,25 @@ const Comment = props => {
                       {props.author.public_name}
                     </span>
                   </ProfileNavigation>
-
                   <div
                     className={classnames(`${props.customClass}__body__content__header__meta__date`, 'comment__body__content__header__meta__date')}
-                    title={createdFormated}
                   >
-                    {createdDistance}
+                    <span id={`createdDistance_${props.contentId}`}>
+                      {createdDistance}
+                    </span>
+                    <Popover
+                      targetId={`createdDistance_${props.contentId}`}
+                      popoverBody={readableCreationDate}
+                    />
+                    {isModified && (
+                      <>
+                         - <span id={`modificationDate_${props.contentId}`}>{props.t('modified')}</span>
+                        <Popover
+                          targetId={`modificationDate_${props.contentId}`}
+                          popoverBody={readableModificationDate}
+                        />
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -195,40 +211,43 @@ const Comment = props => {
 export default translate()(Comment)
 
 Comment.propTypes = {
+  apiContent: PropTypes.object.isRequired,
   author: PropTypes.object.isRequired,
+  contentId: PropTypes.number.isRequired,
   isPublication: PropTypes.bool.isRequired,
   loggedUser: PropTypes.object.isRequired,
-  contentId: PropTypes.number.isRequired,
-  apiContent: PropTypes.object.isRequired,
-  workspaceId: PropTypes.number.isRequired,
-  customClass: PropTypes.string,
-  customColor: PropTypes.string,
-  text: PropTypes.string,
-  created: PropTypes.string.isRequired,
-  fromMe: PropTypes.bool,
-  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE)),
-  onClickEditComment: PropTypes.func,
-  onClickDeleteComment: PropTypes.func,
-  onClickOpenFileComment: PropTypes.func,
-  onClickTranslate: PropTypes.func.isRequired,
-  onClickRestore: PropTypes.func.isRequired,
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  workspaceId: PropTypes.number.isRequired,
+  creationDate: PropTypes.string,
+  customClass: PropTypes.string,
+  customColor: PropTypes.string,
+  discussionToggleButtonLabel: PropTypes.string,
+  fromMe: PropTypes.bool,
+  modificationDate: PropTypes.string,
+  onClickDeleteComment: PropTypes.func,
+  onClickEditComment: PropTypes.func,
+  onClickOpenFileComment: PropTypes.func,
+  onClickRestore: PropTypes.func.isRequired,
   onClickToggleCommentList: PropTypes.func,
-  discussionToggleButtonLabel: PropTypes.string.isRequired,
-  threadLength: PropTypes.number
+  onClickTranslate: PropTypes.func.isRequired,
+  text: PropTypes.string,
+  threadLength: PropTypes.number,
+  translationState: PropTypes.oneOf(Object.values(TRANSLATION_STATE))
 }
 
 Comment.defaultProps = {
+  creationDate: '',
   customClass: '',
   customColor: 'transparent',
-  text: '',
-  fromMe: false,
-  translationState: TRANSLATION_STATE.DISABLED,
   discussionToggleButtonLabel: 'Comment',
-  threadLength: 0,
+  fromMe: false,
+  modificationDate: '',
+  onClickDeleteComment: () => {},
   onClickEditComment: () => {},
   onClickOpenFileComment: () => {},
-  onClickDeleteComment: () => {}
+  text: '',
+  threadLength: 0,
+  translationState: TRANSLATION_STATE.DISABLED
 }

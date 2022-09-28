@@ -1119,8 +1119,20 @@ class Content(DeclarativeBase):
     def node(cls) -> InstrumentedAttribute:
         return ContentRevisionRO.node
 
-    # TODO - G.M - 2018-06-177 - [author] Owner should be renamed "author"
-    # and should be author of first revision.
+    # Author is the author of the original revision
+    @hybrid_property
+    def author(self) -> User:
+        return self.revisions[0].owner
+
+    @author.setter
+    def author(self, value: User) -> None:
+        self.revisions[0].owner = value
+
+    @author.expression
+    def author(cls) -> InstrumentedAttribute:
+        return ContentRevisionRO.owner
+
+    # Owner is the owner of the last revision.
     @hybrid_property
     def owner(self) -> User:
         return self.revision.owner

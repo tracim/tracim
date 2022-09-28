@@ -94,6 +94,7 @@ export class Kanban extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
@@ -223,6 +224,12 @@ export class Kanban extends React.Component {
       toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id),
       lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
+  }
+
+  // TLM Handlers
+
+  handleCommentModified = (data) => {
+    this.props.updateComment(data)
   }
 
   handleContentChanged = data => {
