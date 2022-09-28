@@ -102,11 +102,13 @@ import { v4 as uniqueId } from 'uuid'
       resize: false,
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks',
+      plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks codesample',
       toolbar: [
         'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap ',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen'
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen',
+        'codesample'
       ],
+      codesample_global_prismjs: true,
       insertdatetime_element: true,
       content_style: 'div {height: 100%;}',
       paste_data_images: true,
