@@ -50,5 +50,14 @@
   "CalDAV compatible software": "CalDAV-kompatibel programvare",
   "Note, only administrators can send invitational email": "Merk, kun administratorer kan sende e-poster med invitasjoner.",
   "News deactivated": "Nyheter avslått",
-  "Error while adding the member to the space": "Kunne ikke legge til medlemmet i rommet"
+  "Error while adding the member to the space": "Kunne ikke legge til medlemmet i rommet",
+  "Download activated": "Nedlasting påskrudd",
+  "Error while deactivating download": "Kunne ikke skru av nedlasting",
+  "Error while activating upload": "Kunne ikke aktivere opplasting",
+  "Upload activated": "Opplasting påskrudd",
+  "Upload deactivated": "Opplasting avskrudd",
+  "You cannot change this member role because there are no other space managers.": "Du kan ikke endre dette medlemmets rolle, siden det ikke finnes noen andre rom-håndterere.",
+  "Error while deactivating agenda": "Kunne ikke skru av agendaen",
+  "Error while activating agenda": "Kunne ikke slå på agendaen",
+  "This is the role that members will have by default when they join your space (for open and on request spaces only).": "Rollen medlemmer vil ha som forvalg når det tar del i rommet ditt (dvs. for åpne og forespørselsrom)."
 }

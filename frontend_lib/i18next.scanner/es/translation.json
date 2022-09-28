@@ -123,7 +123,7 @@
   "Error while changing status": "Error al cambiar de estado",
   "Error while restoring content": "Error al restaurar el contenido",
   "Only one file is allowed": "Sólo se permite un archivo",
-  "The type of this file is not allowed": "El tipo de este archivo no está permitido",
+  "The type of this file is not allowed": "No se permite este tipo de archivo",
   "The file is too big": "El archivo es demasiado grande",
   "Error while uploading file(s)": "Error al cargar los archivos",
   "Please wait until the upload ends": "Por favor, espere hasta que termine la carga",
@@ -253,5 +253,5 @@
   "This content has no task to do associated.": "Este contenido no tiene ninguna tarea asociada.",
   "Click on \"New task\" button to create a new one.": "Haga clic en el botón \"Nueva tarea\" para crear una nueva.",
   "Email notifications are disabled": "Notificaciones por correo electrónico desactivadas",
-  "Participate": ""
+  "Participate": "Participar"
 }

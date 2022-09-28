@@ -18,5 +18,8 @@
   "Error while loading folder detail": "Kunne ikke laste inn mappedetalj",
   "No preview available": "Ingen forhåndsvisning tilgjengelig",
   "Error while loading space detail": "Kunne ikke laste inn detalj om rom",
-  "There isn't any picture to delete.": "Ingen bilder å slette."
+  "There isn't any picture to delete.": "Ingen bilder å slette.",
+  "Pause": "Pause",
+  "There isn't any previewable content at that folder's root.": "Det er ikke noe forhåndsvisbart innhold på mappens rot-nivå.",
+  "There isn't any previewable content at that space's root.": "Det er ikke noe forhåndsvisbart innhold på rommets rot-nivå."
 }

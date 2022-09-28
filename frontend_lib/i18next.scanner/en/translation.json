@@ -140,7 +140,7 @@
   "Home": "Home",
   "Only one file is allowed": "Only one file is allowed",
   "Files already added:": "Files already added:",
-  "The type of this file is not allowed": "The type of this file is not allowed",
+  "The type of this file is not allowed": "This filetype is not allowed",
   "The file is too big": "The file is too big",
   "Error while uploading file": "Error while uploading file",
   "Error while uploading file(s)": "Error while uploading file(s)",
