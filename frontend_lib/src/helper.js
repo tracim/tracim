@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { formatDistance, isAfter } from 'date-fns'
+import { format, formatDistance, isAfter } from 'date-fns'
 import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
@@ -9,6 +9,7 @@ import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
 import dateFnsAr from 'date-fns/locale/ar-SA'
 import dateFnsEs from 'date-fns/locale/es'
+import dateFnsNbNO from 'date-fns/locale/nb'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -68,7 +69,8 @@ export const DATE_FNS_LOCALE = {
   pt: dateFnsPt,
   de: dateFnsDe,
   ar: dateFnsAr,
-  es: dateFnsEs
+  es: dateFnsEs,
+  nb_NO: dateFnsNbNO
 }
 
 // INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
@@ -713,7 +715,11 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
+// INFO - G.B. - 2022-09-10 - To see the different format time: https://date-fns.org/v2.29.2/docs/format
+export const formatAbsoluteDate = (rawDate, lang = 'en', formatTime) => {
+  if (!rawDate) return
+  return format(new Date(rawDate), formatTime || 'Pp', { locale: DATE_FNS_LOCALE[lang] })
+}
 
 // Equality test done as numbers with the following rules:
 // - strings are converted to numbers before comparing
@@ -751,7 +757,8 @@ export const naturalCompareLabels = (itemA, itemB, lang) => {
 
 export const naturalCompare = (itemA, itemB, lang, field) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
+  const locale = lang ? lang.replaceAll('_', '-') : undefined
+  return itemA[field].localeCompare(itemB[field], locale, { numeric: true })
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {

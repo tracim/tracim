@@ -76,14 +76,17 @@ See the [Backend README](../backend/README.md).
 
 To install the backend, you need to install the following dependencies:
 
-    sudo apt install system_packages/debian/build_backend_packages.list
-    sudo apt install system_packages/debian/run_backend_packages.list
-
+```shell
+sudo apt update
+xargs sudo apt install < system_packages/debian/build_backend_packages.list
+xargs sudo apt install < system_packages/debian/run_backend_packages.list
+```
 
 Additionally, you can install the preview dependencies for a better preview support (LibreOffice, Inkscape, FFmpeg,...):
 
-    sudo apt install system_packages/debian/optional_preview_packages.list
-
+```shell
+sudo apt install system_packages/debian/optional_preview_packages.list
+```
 
 ### VirtualEnv
 

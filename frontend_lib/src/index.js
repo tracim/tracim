@@ -263,6 +263,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
 export const arTranslation = require('../i18next.scanner/ar/translation.json')
 export const esTranslation = require('../i18next.scanner/es/translation.json')
+export const nbNOTranslation = require('../i18next.scanner/nb_NO/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'

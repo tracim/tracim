@@ -46,12 +46,16 @@ var globalInterfaceLanguage = (function (lang) {
       return 'ar'
     case 'es':
       return 'es_ES'
+    case 'pt':
+      return 'pt_PT'
+    case 'nb_NO':
+      return 'nb_NO'
     default:
       return 'en_US'
   }
 })(configObj.userLang)
 
-var globalInterfaceCustomLanguages=['en_US', 'fr_FR', 'de_DE', 'es_ES', 'ar']
+var globalInterfaceCustomLanguages=['en_US', 'fr_FR', 'de_DE', 'es_ES', 'ar', 'pt_PT', 'nb_NO']
 var globalSortAlphabet=' 0123456789'+
   'AÀÁÂÄÆÃÅĀBCÇĆČDĎEÈÉÊËĒĖĘĚFGĞHIÌÍÎİÏĪĮJKLŁĹĽMNŃÑŇOÒÓÔÖŐŒØÕŌ'+
   'PQRŔŘSŚŠȘșŞşẞTŤȚțŢţUÙÚÛÜŰŮŪVWXYÝŸZŹŻŽ'+
