@@ -375,7 +375,7 @@
   "Download {{filename}}": "Descargar {{filename}}",
   "Your reset password link has expired, you can regenerate one by following <1>this link</1>.": "El enlace para restablecer tu contraseña ha caducado. Crea una nueva siguiendo <1>este enlace</1>.",
   "Unknown content": "Contenido desconocido",
-  "{{author}} mentioned you in {{content}}": "{{author}} mencionó a todos en {{content}}",
+  "{{author}} mentioned you in {{content}}": "{{author}} lo mencionó en {{content}}",
   "{{author}} added you to a space": "{{author}} le agregó a un espacio",
   "{{author}} mentioned everyone in {{content}}": "{{author}} mencionó a todos en {{content}}",
   "{{author}} modified a space": "{{author}} modificó un espacio",
@@ -535,7 +535,7 @@
   "Sunday": "Domingo",
   "Comment_verb": "Comentario",
   "MM/dd/yyyy": "dd/MM/yyyy",
-  "{{username}} has received your call. If accepted, the call will open automatically.": "{{username}} ha recibido su llamada. Si se acepta, la llamada se abrirá automáticamente.{{username}} has received your call. If accepted, the call will open automatically.",
+  "{{username}} has received your call. If accepted, the call will open automatically.": "{{username}} ha recibido su llamada. Si se acepta, la llamada se abrirá automáticamente.",
   "{{author}} modified their account": "{{author}} modificó su cuenta",
   "{{author}} requested access to a space": "{{author}} solicitó acceso a un espacio",
   "Hide discussion": "Ocultar discusión",
@@ -581,7 +581,7 @@
   "Space management": "Gestión de los espacios",
   "Hide user menu": "Ocultar el menú de usuario",
   "Show user menu": "Mostrar el menú de usuario",
-  "Participate": "",
+  "Participate": "Participar",
   "My agendas": "Mis agendas",
   "My profile": "Mi perfil"
 }
