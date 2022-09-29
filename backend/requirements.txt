@@ -16,7 +16,7 @@ apispec-marshmallow-advanced==0.4
     # via
     #   hapic
     #   tracim-backend (setup.py)
-attrs==21.2.0
+attrs==21.4.0
     # via
     #   cmd2
     #   jsonschema
