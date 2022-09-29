@@ -4,96 +4,22 @@ Backend source code of Tracim, using Pyramid Framework.
 
 ## Installation
 
-### Distribution dependencies
-
-On Debian Bullseye (11) with sudo:
-
-```shell
-sudo apt update
-xargs sudo apt install < system_packages/debian/build_backend_packages.list
-xargs sudo apt install < system_packages/debian/run_backend_packages.list
-```
-
-
-(Optional) Add optional preview dependencies for better preview support (LibreOffice, Inkscape, FFmpeg,...):
-
-```shell
-sudo apt install system_packages/debian/optional_preview_packages.list
-```
-
-
 ### Supported database engines
 
+<!-- Remove the one that we don't support -->
 - SQLite 3.22(2018-01-22)+ with JSON1 extension
 - PostgreSQL 9.6+
 - MySQL 8.0.1+
 - MariaDB 10.3+
 
-### Get the source
-
-get source from github:
-
-    git clone https://github.com/tracim/tracim.git
-
-go to *backend* subdirectory:
-
-    cd backend
-
-### Setup Python Virtualenv
-
-Create a Python virtual environment:
-
-    python3 -m venv env
-
-Activate it in your terminal session (**all Tracim command execution must be executed under this virtual environment**):
-
-    source env/bin/activate
-
-Install packaging tools:
-
-    pip install -r requirements-build.txt
-
-(Optional) Install strict supported version of dependencies with requirement.txt:
-
-    pip install -r requirements.txt
-
-(Optional) Install all preview builders to be able to generate preview for most file formats:
-
-    pip install -r requirements-full-preview-generator.txt
-
-Install the project in editable mode with its develop requirements:
-
-    pip install -r requirements-test.txt
-    pip install -e "."
-
-If you want to use PostgreSQL, MySQL or MariaDB database engine instead of
-the default one (SQLite bundled with python), you need to install the python driver for those databases
-that are supported by SQLAlchemy.
-
-For PostgreSQL and MariaDB/MySQL, those are shortcuts to install Tracim with test and
-specific driver.
-
-For PostgreSQL:
-
-    pip install -r requirements-db-postgres.txt
-
-For MySQL/MariaDB:
-
-    pip install -r requirements-db-mysql.txt
-
-If you want to store files on s3, you need to install the S3 driver:
-
-    pip install -r requirements-storage-s3.txt
-
-
 ## Configuration
 
-Create [configuration file](doc/setting.md) for a development environment:
+Create configuration file for a development environment:
 
     cp development.ini.sample development.ini
 
 The provided default configuration is suitable for local-test. If you need to run Tracim
-over network, see [configuration file documentation](doc/setting.md).
+over network, see [configuration file documentation](../doc/backend_specific/setting.md).
 
 You need to create the branding folder containing customizable ui elements. Starting with the provided sample is a good way:
 
@@ -103,7 +29,7 @@ You should also create requested folder for running Tracim:
 
     mkdir sessions_data sessions_lock depot previews radicale_storage
 
-Initialize the database using [tracimcli](doc/cli.md) tool
+Initialize the database using [tracimcli](../doc/backend_specific/cli.md) tool
 
     tracimcli db init
 
@@ -297,12 +223,6 @@ Run with (supervisord.conf should be provided, see [supervisord.conf default_pat
     supervisord
 
 
-## Running Pushpin Service
-
-For a working Tracim instance, you need to setup pushpin as proxy for tracim web service.
-
-See [main readme](../README.md)  section _Install and run pushpin for UI updates_
-
 ## Lint the code
 
 Install the required tool, `flake8` and its dependencies:
@@ -312,66 +232,6 @@ Install the required tool, `flake8` and its dependencies:
 Then run flake8:
 
     flake8
-
-## Run Tests
-
-First setup the needed tools and directories (only needed once):
-
-    # from backend directory
-    python3 ./setup_dev_env.py
-    ./create_test_storage_dir.sh
-    # several external services (mail/databases/…) are started through a docker compose file
-    # please install it by following their instructions:
-    # - https://docs.docker.com/engine/install/
-    # - https://docs.docker.com/compose/install/
-    # On Debian systems the following lines are enough
-    sudo apt install docker.io docker-compose-plugin
-    # add the current user to docker group, you'll need to use a new login shell for this change to be taken into account
-    sudo usermod -a -G docker $USER
-
-Running tests can be done with:
-
-    docker compose up -d
-    pytest
-    docker compose down
-
-
-By default the tests will be executed with the `sqlite` database, this can be changed using the `--database` argument of pytest:
-
-    pytest --database=postgresql
-
-Possible databases are `sqlite`, `postgresql`, `mysql` and `mariadb`.
-It is possible to specify several databases or even `all`:
-
-    # Needs the pytest-forked plugin (pip install pytest-forked)
-    # as some test fixtures do modify static variables.
-    pytest --forked --database=sqlite --database=postgresql
-    # Run tests on all databases
-    pytest --forked --database=all
-
-### Docker compose test file
-
-The [docker-compose.yml](docker-compose.yml) file lists the services needed for testing the Tracim backend. Default environment variables used by the containers are written in the [.env](.env) file next to `docker-compose.yml`.
-
-### About Pytest Tests Config
-
-For running tests, Tracim tests need config to be set:
-- specific config for specific tests is
-available in TEST_CONFIG_FILE_PATH (by default: "./tests_configs.ini" in backend folder).
-- For more general config, pytest rely on dotenv .env file (by default ".test.env" in backend folder)
-- If you want to change general config like paths used or database, you should better use env var
-instead of modifying "TEST_CONFIG_FILE_PATH" file or ".test.env".
-
-for example, if you want to use another database, you can do this:
-
-    export TRACIM_SQLALCHEMY__URL=sqlite:////tmp/mydatabase
-    python3 ./setup_dev_env.py
-    pytest
-
-Order of usage is (from less to more important, last is used if set):
-- specific TEST_CONFIG_FILE_PATH config (different for each test)
-- default env var setting in .test.env
-- env var set by user
 
 ## The Tracim API
 
@@ -389,13 +249,9 @@ For example, with the default configuration:
 ## Roles, Profile and Access Rights
 
 In Tracim, only some users can access to some information, this is also true in
-the Tracim REST API. you can check the [roles documentation](doc/roles.md) to check
+the Tracim REST API. you can check the [roles documentation](../doc/backend_specific/roles.md) to check
 what a specific user can do.
-
-## Known Issues
-
-see [here](doc/known_issues.md)
 
 ## Other Documentation
 
-Detailed documentation on several topics is available in the [doc](doc) directory.
+Detailed documentation on several topics is available in the [doc/backend_specific](../doc/backend_specific/) directory.
