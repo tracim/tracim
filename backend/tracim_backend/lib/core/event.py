@@ -149,7 +149,7 @@ class EventApi:
     def _base_query(
         self,
         read_status: ReadStatus = ReadStatus.ALL,
-        event_id: Optional[int] = None,
+        event_ids: Optional[List[int]] = None,
         user_id: Optional[int] = None,
         include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
@@ -182,8 +182,8 @@ class EventApi:
 
         if not include_not_sent:
             query = query.filter(Message.sent != None)  # noqa: E711
-        if event_id:
-            query = query.filter(Message.event_id == event_id)
+        if event_ids:
+            query = query.filter(Message.event_id.in_(event_ids))
         if user_id:
             query = query.filter(Message.receiver_id == user_id)
         if read_status == ReadStatus.READ:
@@ -215,7 +215,7 @@ class EventApi:
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
         try:
-            return self._base_query(event_id=event_id, user_id=user_id).one()
+            return self._base_query(event_ids=[event_id], user_id=user_id).one()
         except NoResultFound as exc:
             raise MessageDoesNotExist(
                 'Message for user {} with event id "{}" not found in database'.format(
@@ -223,6 +223,7 @@ class EventApi:
                 )
             ) from exc
 
+    # DEPRECATED - MP - 2022-09-29
     def mark_user_message_as_read(self, event_id: int, user_id: int) -> Message:
         message = self.get_one_message(event_id, user_id)
         message.read = datetime.utcnow()
@@ -230,6 +231,7 @@ class EventApi:
         self._session.flush()
         return message
 
+    # DEPRECATED - MP - 2022-09-29
     def mark_user_message_as_unread(self, event_id: int, user_id: int) -> Message:
         message = self.get_one_message(event_id, user_id)
         message.read = None
@@ -237,14 +239,46 @@ class EventApi:
         self._session.flush()
         return message
 
-    def mark_user_messages_as_read(
+    def mark_user_messages_as_unread(
         self,
         user_id: int,
+        event_ids: typing.Optional[List[int]] = None,
         parent_ids: typing.Optional[List[int]] = None,
         content_ids: typing.Optional[List[int]] = None,
     ) -> List[Message]:
+        """Mark messages as unread for a user.
+
+        Returns:
+            List[Message]: every message marked as unread
+        """
+        read_messages = self._base_query(
+            read_status=ReadStatus.READ,
+            event_ids=event_ids,
+            user_id=user_id,
+            parent_ids=parent_ids,
+            content_ids=content_ids,
+        ).all()
+        for message in read_messages:
+            message.read = None
+            self._session.add(message)
+        self._session.flush()
+        return read_messages
+
+    def mark_user_messages_as_read(
+        self,
+        user_id: int,
+        event_ids: typing.Optional[List[int]] = None,
+        parent_ids: typing.Optional[List[int]] = None,
+        content_ids: typing.Optional[List[int]] = None,
+    ) -> List[Message]:
+        """Mark messages as read for a user.
+
+        Returns:
+            List[Message]: every message marked as read
+        """
         unread_messages = self._base_query(
             read_status=ReadStatus.UNREAD,
+            event_ids=event_ids,
             user_id=user_id,
             parent_ids=parent_ids,
             content_ids=content_ids,

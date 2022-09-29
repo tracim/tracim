@@ -704,6 +704,15 @@ class UserIdPathSchema(marshmallow.Schema):
     )
 
 
+class EventIdListSchema(marshmallow.Schema):
+    event_id_list = marshmallow.fields.List(
+        marshmallow.fields.Int(
+            example=3, description="id of a valid event", validate=strictly_positive_int_validator,
+        ),
+        required=False,
+    )
+
+
 class EventIdPathSchema(marshmallow.Schema):
     event_id = marshmallow.fields.Int(
         example=5,

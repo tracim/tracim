@@ -73,6 +73,7 @@ from tracim_backend.views.core_api.schemas import AboutUserSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
+from tracim_backend.views.core_api.schemas import EventIdListSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
@@ -788,22 +789,47 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserMessagesMarkAsReadQuerySchema())
+    @hapic.input_body(EventIdListSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_user_messages_as_read(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
-        Read all unread message for user
+        Read every unread messages for a user
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
         event_api.mark_user_messages_as_read(
             request.candidate_user.user_id,
+            event_ids=hapic_data.body.get("event_id_list", None),
             content_ids=hapic_data.query.content_ids,
             parent_ids=hapic_data.query.parent_ids,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    @check_right(has_personal_access)
+    @hapic.input_path(UserIdPathSchema())
+    @hapic.input_query(UserMessagesMarkAsReadQuerySchema())
+    @hapic.input_body(EventIdListSchema())
+    @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
+    def set_user_messages_as_unread(
+        self, context, request: TracimRequest, hapic_data: HapicData
+    ) -> None:
+        """
+        Unread every messages for a user
+        """
+        app_config = request.registry.settings["CFG"]  # type: CFG
+        event_api = EventApi(request.current_user, request.dbsession, app_config)
+
+        event_api.mark_user_messages_as_unread(
+            request.candidate_user.user_id,
+            event_ids=hapic_data.body.get("event_id_list", None),
+            content_ids=hapic_data.query.content_ids,
+            parent_ids=hapic_data.query.parent_ids,
+        )
+
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    # @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
@@ -819,13 +845,14 @@ class UserController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
+    # @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_message_as_unread(self, context, request: TracimRequest, hapic_data: HapicData) -> None:
         """
-        unread one message
+        Unread one message
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
@@ -1528,7 +1555,7 @@ class UserController(Controller):
         )
         configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
 
-        # read all unread messages for user
+        # read every unread messages for user
         configurator.add_route(
             "read_messages",
             "/users/{user_id:\d+}/messages/read",
@@ -1536,7 +1563,16 @@ class UserController(Controller):
         )
         configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
 
+        # unread every messages for user
+        configurator.add_route(
+            "unread_messages",
+            "/users/{user_id:\d+}/messages/unread",
+            request_method="PUT",  # noqa: W605
+        )
+        configurator.add_view(self.set_user_messages_as_unread, route_name="unread_messages")
+
         # read all unread messages for user
+        # DEPRECATED - MP - 29-09-2022
         configurator.add_route(
             "read_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
@@ -1545,6 +1581,7 @@ class UserController(Controller):
         configurator.add_view(self.set_message_as_read, route_name="read_message")
 
         # read all unread messages for user
+        # DEPRECATED - MP - 29-09-2022
         configurator.add_route(
             "unread_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",

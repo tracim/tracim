@@ -21,6 +21,11 @@ def create_events_and_messages(
         # remove messages created by the base fixture
         if remove_existing_events:
             session.query(tracim_event.Message).delete()
+
+        read_datetime = datetime.datetime.utcnow()
+        if unread:
+            read_datetime = None
+
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.CREATED,
@@ -28,9 +33,6 @@ def create_events_and_messages(
             author_id=1,
         )
         session.add(event)
-        read_datetime = datetime.datetime.utcnow()
-        if unread:
-            read_datetime = None
         messages.append(
             tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
         )
@@ -42,7 +44,9 @@ def create_events_and_messages(
             author_id=2,
         )
         session.add(event)
-        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+        messages.append(
+            tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
+        )
 
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
@@ -51,7 +55,9 @@ def create_events_and_messages(
             author_id=None,
         )
         session.add(event)
-        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+        messages.append(
+            tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
+        )
 
         session.add_all(messages)
         session.flush()
@@ -559,6 +565,7 @@ class TestMessages(object):
         assert message_dicts["code"] == 2001
         assert message_dicts["message"] == "Validation error of input data"
 
+    # TODO: Update
     def test_api__read_all_messages__ok_204__nominal_case(self, session, web_testapp) -> None:
         """
         Read all unread messages
@@ -599,6 +606,40 @@ class TestMessages(object):
             "/api/users/1/messages?read_status=read", status=200,
         ).json_body.get("items")
         assert len(message_dicts) == 3
+
+    @pytest.mark.parametrize("api_end_url, is_unread", [("unread", True), ("read", False)])
+    def test_api__read_unread_messages__ok_204__nominal_case(
+        self, session, web_testapp, api_end_url, is_unread
+    ) -> None:
+        """
+        Read two messages
+        """
+        messages = create_events_and_messages(
+            session, unread=is_unread, sent_date=datetime.datetime.utcnow()
+        )
+
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+
+        events_to_modify = [messages[0].event_id, messages[2].event_id]
+        web_testapp.put_json(
+            f"/api/users/1/messages/{api_end_url}",
+            params={"event_id_list": events_to_modify},
+            status=204,
+        )
+
+        transaction.commit()
+
+        modified_event = (
+            session.query(tracim_event.Message)
+            .filter(tracim_event.Message.event_id.in_(events_to_modify))
+            .all()
+        )
+        assert len(modified_event) == 2
+        for event in modified_event:
+            if not is_unread:
+                assert event.read
+            else:
+                assert event.read is None
 
     def test_api__read_content_related_messages__ok_204__nominal_case(
         self, session, web_testapp
@@ -648,6 +689,7 @@ class TestMessages(object):
         result = web_testapp.put("/api/users/1/messages/{}/read".format("1000"), status=400)
         assert result.json_body["code"] == 1009
 
+    # TODO: Update
     def test_api__unread_message__err_400__message_does_not_exist(
         self, session, web_testapp
     ) -> None:
@@ -659,44 +701,47 @@ class TestMessages(object):
         result = web_testapp.put("/api/users/1/messages/{}/unread".format("1000"), status=400)
         assert result.json_body["code"] == 1009
 
-    def test_api__read_message__ok_204__nominal_case(self, session, web_testapp) -> None:
+    @pytest.mark.parametrize("api_end_url, is_unread", [("unread", False), ("read", True)])
+    def test_api__read_unread_message__ok_204__nominal_case(
+        self, session, web_testapp, api_end_url, is_unread
+    ) -> None:
         """
         Read one unread message
         """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        messages = create_events_and_messages(
+            session, unread=is_unread, sent_date=datetime.datetime.utcnow()
+        )
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(messages) == len(message_dicts) == 3
-
-        unread_event_id = None
-        for message, message_dict in zip(messages, message_dicts):
-            if not message_dict.get("read"):
-                unread_event_id = message.event_id
-
-        assert unread_event_id
-        message_dicts = web_testapp.put(
-            "/api/users/1/messages/{}/read".format(unread_event_id), status=204,
+        web_testapp.put(
+            f"/api/users/1/messages/{messages[0].event_id}/{api_end_url}", status=204,
         )
 
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(message_dicts) == 3
+        transaction.commit()
 
-        for message, message_dict in zip(messages, message_dicts):
-            if message_dict["event_id"] == unread_event_id:
-                assert message_dict["read"]
+        modified_event = (
+            session.query(tracim_event.Message)
+            .filter(tracim_event.Message.event_id == messages[0].event_id)
+            .one()
+        )
+        if is_unread:
+            assert modified_event.read
+        else:
+            assert modified_event.read is None
 
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 1
+        other_events = (
+            session.query(tracim_event.Message)
+            .filter(tracim_event.Message.event_id != messages[0].event_id)
+            .all()
+        )
+        for event in other_events:
+            if is_unread:
+                assert event.read is None
+            else:
+                assert event.read
 
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=read", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 2
-
+    # TODO: Update
     def test_api__read_message__ok_204__read_only_one_message(self, session, web_testapp) -> None:
         """
         Read one unread message, check if only one message as been read
@@ -723,54 +768,18 @@ class TestMessages(object):
         assert len(message_dicts) == 1
         assert message_dicts[0]["event_id"] == 2
 
-    def test_api__unread_message__ok_204__nominal_case(self, session, web_testapp) -> None:
-        """
-        Read one unread message
-        """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(messages) == len(message_dicts) == 3
-
-        read_event_id = None
-        for message, message_dict in zip(messages, message_dicts):
-            if message_dict.get("read"):
-                read_event_id = message.event_id
-
-        assert read_event_id
-        message_dicts = web_testapp.put(
-            "/api/users/1/messages/{}/unread".format(read_event_id), status=204,
-        )
-
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(message_dicts) == 3
-        for message, message_dict in zip(messages, message_dicts):
-            assert not message_dict["read"]
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 3
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=read", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 0
-
     def test_api__messages_summary__ok_200__nominal_case(self, session, web_testapp) -> None:
         """
         check summary of messages
         """
-        create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        create_events_and_messages(session, unread=True, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         message_dicts = web_testapp.get("/api/users/1/messages/summary", status=200,).json_body
         assert message_dicts["user_id"] == 1
-        assert message_dicts["unread_messages_count"] == 2
-        assert message_dicts["read_messages_count"] == 1
+        assert message_dicts["unread_messages_count"] == 3
+        assert message_dicts["read_messages_count"] == 0
         assert message_dicts["messages_count"] == 3
         assert message_dicts["user"]["user_id"] == 1
         assert message_dicts["user"]["username"] == "TheAdmin"
@@ -778,12 +787,12 @@ class TestMessages(object):
     @pytest.mark.parametrize(
         "include_exclude,event_types,read_messages_count,unread_messages_count",
         [
-            ("include", ["user.created", "user.modified"], 1, 2),
-            ("include", ["user.created"], 1, 0),
+            ("include", ["user.created", "user.modified"], 0, 3),
+            ("include", ["user.created"], 0, 1),
             ("include", ["user.modified"], 0, 2),
             ("exclude", ["user.created", "user.modified"], 0, 0),
             ("exclude", ["user.created"], 0, 2),
-            ("exclude", ["user.modified"], 1, 0),
+            ("exclude", ["user.modified"], 0, 1),
         ],
     )
     def test_api__messages_summary__ok_200__filter_event_types_all(
@@ -798,7 +807,7 @@ class TestMessages(object):
         """
         check summary of messages
         """
-        create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        create_events_and_messages(session, unread=True, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         event_type_filter = ",".join(event_types)

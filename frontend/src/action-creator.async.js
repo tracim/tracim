@@ -946,6 +946,35 @@ export const getNotificationList = (
   return fetchGetNotificationWall
 }
 
+/**
+ * Put a list of notifications as read
+ * @param {String} userId
+ * @param {int[]} notificationIdList
+ * @returns
+ */
+export const putNotificationListAsRead = (userId, notificationIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT',
+      body: JSON.stringify({
+        event_id_list: notificationIdList
+      })
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+/**
+ * @deprecated
+ * Put a notification as read
+ * @param {String} userId user that read the notification
+ * @param {String} eventId id of the notification to read
+ * @returns
+ */
 export const putNotificationAsRead = (userId, eventId) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,

@@ -11,7 +11,7 @@ import {
   READ,
   readContentNotification,
   readNotification,
-  readNotificationList,
+  readEveryNotifications,
   SET,
   setNextPage,
   UPDATE,
@@ -158,7 +158,7 @@ describe('reducer notificationPage.js', () => {
     })
 
     describe(`${READ}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotificationList())
+      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readEveryNotifications())
 
       it('should return the list of objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
