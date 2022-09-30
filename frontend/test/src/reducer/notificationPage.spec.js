@@ -10,7 +10,7 @@ import {
   NOTIFICATION_LIST,
   READ,
   readContentNotification,
-  readNotification,
+  readNotificationList,
   readEveryNotifications,
   SET,
   setNextPage,
@@ -132,7 +132,7 @@ describe('reducer notificationPage.js', () => {
     describe(`${READ}/${NOTIFICATION}`, () => {
       it('should read a notification in a flat list', () => {
         const initState = { ...initialState, list: [notification], unreadNotificationCount: 1 }
-        const listOfNotification = notificationPage(initState, readNotification(notification.id))
+        const listOfNotification = notificationPage(initState, readNotificationList([notification.id]))
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [{ ...notification, read: true }],

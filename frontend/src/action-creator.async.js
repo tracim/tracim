@@ -968,26 +968,6 @@ export const putNotificationListAsRead = (userId, notificationIdList) => dispatc
   })
 }
 
-/**
- * @deprecated
- * Put a notification as read
- * @param {String} userId user that read the notification
- * @param {String} eventId id of the notification to read
- * @returns
- */
-export const putNotificationAsRead = (userId, eventId) => dispatch => {
-  return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
-    param: {
-      credentials: 'include',
-      headers: FETCH_CONFIG.headers,
-      method: 'PUT'
-    },
-    actionName: NOTIFICATION,
-    dispatch
-  })
-}
-
 export const putContentNotificationAsRead = (userId, contentId, parentId = null) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read?content_ids=${contentId}${parentId ? `&parent_ids=${parentId}` : ''}`,

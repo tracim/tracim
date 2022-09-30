@@ -129,24 +129,6 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    // Deprecated
-    case `${READ}/${NOTIFICATION}`: {
-      const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
-
-      if (!notification) return state
-
-      const replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
-      const newUnreadMentionCount = replaceList.filter(n => !n.read && n.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`).length
-      const newUnreadNotificationCount = replaceList.filter(n => !n.read).length
-
-      return {
-        ...state,
-        list: replaceList,
-        unreadMentionCount: newUnreadMentionCount,
-        unreadNotificationCount: newUnreadNotificationCount
-      }
-    }
-
     case `${READ}/${NOTIFICATION_LIST}`: {
       const notificationList = state.list.filter(n => !n.read && action.notificationIdList.includes(n.id))
 

@@ -15,8 +15,8 @@ import {
   SPACE_TYPE
 } from 'tracim_frontend_lib'
 import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
-import { putNotificationAsRead } from '../../action-creator.async.js'
-import { newFlashMessage, readNotification } from '../../action-creator.sync.js'
+import { putNotificationListAsRead } from '../../action-creator.async.js'
+import { newFlashMessage, readNotificationList } from '../../action-creator.sync.js'
 import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
 
 const qs = require('query-string')
@@ -104,21 +104,17 @@ class SidebarSpaceItem extends React.Component {
     const { props } = this
 
     if (this.state.unreadNotifications.length > 0) {
-      await Promise.all(
-        this.state.unreadNotifications
-          .map(n => n.id)
-          .map(async (notificationId) => {
-            const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
-            switch (fetchPutNotificationAsRead.status) {
-              case 204: {
-                props.dispatch(readNotification(notificationId))
-                break
-              }
-              default:
-                props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-            }
-          })
+      const notificationList = this.state.unreadNotifications.map(n => n.id)
+      const fetchPutNotificationListAsRead = await props.dispatch(
+        putNotificationListAsRead(props.user.userId, notificationList)
       )
+      switch (fetchPutNotificationListAsRead.status) {
+        case 204:
+          props.dispatch(readNotificationList(notificationList))
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while marking notifications as read'), 'warning'))
+      }
     }
   }
 
