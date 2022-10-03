@@ -21,7 +21,7 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-image-lightbox": "^5.1.0",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^5.3.3",
     "reactstrap": "^8.9.0",
     "regenerator-runtime": "^0.13.2",
     "webpack": "^5.72.0",
