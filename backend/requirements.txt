@@ -54,7 +54,7 @@ cliff==3.8.0
     # via tracim-backend (setup.py)
 cmd2==2.1.1
     # via cliff
-colorama==0.4.4
+colorama==0.4.5
     # via cmd2
 colorlog==5.0.1
     # via tracim-backend (setup.py)
