@@ -129,7 +129,7 @@ marshmallow==2.21.0
     #   apispec-marshmallow-advanced
     #   hapic
     #   tracim-backend (setup.py)
-multidict==5.1.0
+multidict==5.2.0
     # via hapic
 packaging==20.9
     # via sqlakeyset
