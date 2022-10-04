@@ -101,7 +101,7 @@ hupper==1.10.3
     # via pyramid
 idna==2.10
     # via requests
-imapclient==2.2.0
+imapclient==2.3.1
     # via tracim-backend (setup.py)
 importlib-metadata==4.6.0
     # via tracim-backend (setup.py)
