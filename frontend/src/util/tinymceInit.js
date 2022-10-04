@@ -104,9 +104,8 @@ import { v4 as uniqueId } from 'uuid'
       remove_script_host: false,
       plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks codesample',
       toolbar: [
-        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap ',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen',
-        'codesample'
+        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap ' | 'codesample',
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen'
       ],
       codesample_global_prismjs: true,
       insertdatetime_element: true,

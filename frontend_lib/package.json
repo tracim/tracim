@@ -34,6 +34,7 @@
     "emoji-mart": "^3.0.1",
     "glob": "^7.1.6",
     "i18next": "10.5.0",
+    "prismjs": "^1.29.0",
     "prop-types": "^15.7.2",
     "radium": "^0.25.2",
     "react-device-detect": "^1.7.5",
