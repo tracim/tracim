@@ -13,8 +13,6 @@ import 'prismjs/components/prism-java'
 /*
   INFO - G.B. - 2022-09-28 - Apparently to add a plugin, you just import it, the rest is done automatically by the Prism.highlightAll() command.
   The same is true for the support of new languages.
-  Also, a new css file has been added in frontend/dist/assets/prism.css.
-  This file is generated on the Prism website according to the options chosen. See https://prismjs.com/download.html
 */
 
 function onClick (e) {
