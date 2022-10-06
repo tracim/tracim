@@ -79,6 +79,7 @@ resources:
 jobs:
 - name: reconfigure-self
   plan:
+  - timeout: 5m
   - get: pull-request
     trigger: true
     params:
@@ -96,12 +97,11 @@ jobs:
       docker-registry: ((docker-registry))
     instance_vars:
       number: ((number))
-   - timeout: 5m
 
 - name: backend-tests
   <<: *status_notifications
   plan:
-
+  - timeout: 2h30m
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
@@ -161,13 +161,11 @@ jobs:
           - ((.:database))
           - ((docker-registry))
 
-  - timeout: 2h30m
-
 - name: frontend-tests
   <<: *status_notifications
 
   plan:
-
+  - timeout: 15m
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
@@ -188,11 +186,10 @@ jobs:
         dir: pull-request
         path: concourse/scripts/frontend-unit-tests
 
-  - timeout: 15m
-
 - name: end-to-end-tests
   <<: *status_notifications
   plan:
+  - timeout: 1h40m
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
@@ -218,5 +215,3 @@ jobs:
         args:
           - *main_python_version
           - ((docker-registry))
-  - timeout: 1h40m
-
