@@ -173,7 +173,7 @@ pyjwt==2.4.0
     # via
     #   gripcontrol
     #   pubcontrol
-pypandoc==1.8.1
+pypandoc==1.9
     # via tracim-backend (setup.py)
 pyparsing==2.4.7
     # via
