@@ -29,7 +29,7 @@
     "broadcast-channel": "^4.17.0",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
-    "core-js": "^3.6.4",
+    "core-js": "^3.25.5",
     "date-fns": "^2.19.0",
     "emoji-mart": "^3.0.1",
     "glob": "^7.2.3",
