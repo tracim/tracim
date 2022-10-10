@@ -15,6 +15,7 @@ import {
 } from '../../helper.js'
 import IconButton from '../Button/IconButton.jsx'
 import { isMobile } from 'react-device-detect'
+import onClickOutside from "react-onclickoutside";
 
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -36,19 +37,10 @@ export class NewTagForm extends React.Component {
     this.setState({ tagName: '', autoCompleteActive: false })
   }
 
-  componentDidMount () {
-    document.addEventListener('click', this.handleClickEvent, true)
-  }
+  handleClickOutside = () => {
+    const inputField = document.getElementById('addTag')
 
-  componentWillUnmount () {
-    document.removeEventListener('click', this.handleClickEvent, true)
-  }
-
-  handleClickEvent = (event) => {
-    const { state } = this
-    const inputField = document.getElementById('addTagFullInput')
-
-    this.setState({ autoCompleteActive: inputField.contains(event.target) && state.tagName })
+    this.setState({ autoCompleteActive: inputField.contains(event.target)})
   }
 
   handleClickBtnValidateContent = async () => {
@@ -180,13 +172,14 @@ export class NewTagForm extends React.Component {
         {props.contentId
           ? props.t('Add a tag to your content. To see the list of tags available in this space, go to space settings.')
           : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')}
-        <div id='addTagFullInput' className='tagList__form__tag'>
+        <div className='tagList__form__tag'>
           <input
             autoFocus={!isMobile}
             type='text'
             className='name__input form-control'
             id='addTag'
             placeholder={props.t('Add a tag here...')}
+            onFocus={() => this.setState({ autoCompleteActive: true })}
             data-cy='add_tag'
             value={state.tagName}
             onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}
@@ -228,7 +221,7 @@ export class NewTagForm extends React.Component {
   }
 }
 
-export default translate()(NewTagForm)
+export default translate()(onClickOutside(NewTagForm))
 
 NewTagForm.propTypes = {
   apiUrl: PropTypes.string.isRequired,
