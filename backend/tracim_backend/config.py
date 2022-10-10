@@ -561,6 +561,80 @@ class CFG(object):
             self.get_raw_config("ui.spaces.creation.parent_space_choice.visible", "True")
         )
 
+        default_code_sample_languages = """
+            markup:Markup,
+            css:CSS,
+            clike:C-like,
+            javascript:JavaScript,
+            apacheconf:Apache Configuration,
+            arduino:Arduino,
+            aspnet:ASP.NET,
+            bash:Bash,
+            batch:Batch,
+            bbcode:BBcode,
+            c:C,
+            csharp:C#,
+            cpp:C++,
+            cobol:COBOL,
+            css-extras:CSS Extras,
+            csv:CSV,
+            diff:Diff,
+            django:Django/Jinja2,
+            docker:Docker,
+            erlang:Erlang,
+            excel-formula:Excel Formula,
+            fortran:Fortran,
+            git:Git,
+            haskell:Haskell,
+            ignore:.ignore,
+            ini:Ini,
+            java:Java,
+            jq:JQ,
+            json:JSON,
+            json5:JSON5,
+            jsonp:JSONP,
+            latex:LaTeX,
+            lisp:Lisp,
+            lua:Lua,
+            makefile:Makefile,
+            markdown:Markdown,
+            matlab:MATLAB,
+            nginx:nginx,
+            objectivec:Objective-C,
+            ocaml:OCaml,
+            pascal:Pascal,
+            perl:Perl,
+            php:PHP,
+            phpdoc:PHPDoc,
+            php-extras:PHP Extras,
+            powershell:PowerShell,
+            properties:.properties,
+            python:Python,
+            r:R,
+            jsx:React JSX,
+            tsx:React TSX,
+            regex:Regex,
+            ruby:Ruby,
+            rust:Rust,
+            sql:SQL,
+            vbnet:VB.Net,
+            vim:vim,
+            visual-basic:Visual Basic,
+            yaml:YAML,
+            wiki:Wiki markup
+        """
+        code_sample_languages = string_to_unique_item_list(
+            self.get_raw_config("ui.notes.code_sample_languages", default_code_sample_languages),
+            separator=",",
+            cast_func=create_target_langage,
+        )
+        try:
+            self.UI__NOTES__CODE_SAMPLE_LANGUAGES = [
+                {"code": code, "display": display} for code, display in code_sample_languages
+            ]
+        except ValueError:
+            raise ConfigurationError("The value of ui.notes.code_sample_languages is malformed")
+
     def __load_uploaded_files_config(self) -> None:
         default_depot_storage_path = self.here_macro_replace("%(here)s/depot")
         self.DEPOT_STORAGE_DIR = self.get_raw_config(
