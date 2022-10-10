@@ -1,6 +1,8 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { getUserProfile, FETCH_CONFIG } from '../../util/helper.js'
+import { IconButton } from 'tracim_frontend_lib/src'
+import { Link } from 'react-router-dom'
 import {
   Avatar,
   AVATAR_SIZE,
@@ -64,6 +66,9 @@ export const UserInfo = (props) => {
           {props.t(getUserProfile(props.user.profile).label)}
         </div>
       </div>
+      <Link className='userinfo__profile_button' to={`/ui/users/${props.user.userId}/profile`}>
+        <IconButton text={props.t('My profile')} type='button' icon='fa fa-user' />
+      </Link>
     </div>
   )
 }
