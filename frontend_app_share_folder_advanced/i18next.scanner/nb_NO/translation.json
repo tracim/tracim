@@ -11,7 +11,7 @@
   "Password": "Passord",
   "Recipient's email addresses": "Mottagers e-postadresser",
   "No upload link has been created yet": "Det har ikke blitt laget en opplastingslenke enda",
-  "The password length must be between 6 and 512 characters and the email(s) must be valid": "",
+  "The password length must be between 6 and 512 characters and the email(s) must be valid": "Passordets lengde må være 6 til 512 tegn, og e-postadressen(e) må være gyldige.",
   "Email notification are disabled, please manually share the link": "E-postmerknader er avskrudd. Del lenken manuelt.",
   "Cancel protection by password": "Avbryt beskyttelse med passord",
   "Public upload links": "Offentlige opplastingslenker",
@@ -20,5 +20,7 @@
   "New public upload link": "Ny offentlig opplastingslenke",
   "Error while creating new public upload link": "Kunne ikke opprette ny offentlig opplastingslenke",
   "Error while deleting public upload link": "Kunne ikke slette offentlig opplastingslenke",
-  "Error, these emails are invalid: ": "Disse e-postadressene er ugyldige: "
+  "Error, these emails are invalid: ": "Disse e-postadressene er ugyldige: ",
+  "To add multiple recipients, separate the email addresses with a comma, a semicolon or a line break.": "For å legge til flere mottagere kan du dele inn e-postadressene med komma, semikolon, eller et linjeskift.",
+  "Error while loading list of public upload links": "Kunne ikke laste inn liste over offentlige opplastingslenker"
 }

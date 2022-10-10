@@ -40,8 +40,11 @@
   "Editing Card": "Redigering av tavle",
   "New Kanban board": "Ny kanban-tavle",
   "See more": "Vis mer",
-  "You have reached your storage limit, you cannot add new files": "",
+  "You have reached your storage limit, you cannot add new files": "Du har nådd lagringsgrensen din, og kan ikke legge til nye filer.",
   "Last version": "Nyeste versjon",
   "Error while creating kanban": "Kunne ikke opprette kanban-tavle",
-  "Board's name": "Tavlenavn"
+  "Board's name": "Tavlenavn",
+  "The file is larger than the maximum file size allowed": "Filen er større enn det som er tillatt",
+  "Error, the space exceed its maximum size": "Rommet er nå større enn det som tillates",
+  "Title:": "Navn:"
 }

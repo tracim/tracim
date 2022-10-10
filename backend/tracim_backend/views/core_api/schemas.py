@@ -1934,23 +1934,35 @@ class TagSchema(marshmallow.Schema):
 
 
 class MessageCommentSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
-    parent_content_type = String(example="html-document", validate=all_content_types_validator)
-    parent_content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
-    )
-    parent_label = String(example="This is a label")
-    description = StrippedString(example="This is a description")
+    """
+    Schema for comments without raw_content
+    """
+
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
     )
+    modified = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Comment last edition date"
+    )
+    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    description = StrippedString(example="This is a description")
+    parent_content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
+    parent_content_type = String(example="html-document", validate=all_content_types_validator)
+    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
+    parent_label = String(example="This is a label")
 
 
 class CommentSchema(MessageCommentSchema):
-    raw_content = StrippedString(example="<p>This is just an html comment !</p>")
+    """
+    Schema for comments with raw_content
+    """
+
+    raw_content = StrippedString(example="<p>This is just an html comment!</p>")
 
 
 class SetCommentSchema(marshmallow.Schema):

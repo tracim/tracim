@@ -39,9 +39,11 @@ export function TracimComponent (WrappedComponent) {
       })
     }
 
-    // NOTE - S.G. - 2020/11/05
-    // Register a handler that will be called for any tlm type
-    // the handler will be called with the tlm as argument.
+    /**
+     * NOTE - S.G. - 2020/11/05
+     * Register a handler that will be called for any tlm type
+     * @param {*} handler handler that will be called with the TLM as argument
+     */
     registerGlobalLiveMessageHandler = (handler) => {
       this.globalLiveMessageHandlerList.push(handler)
     }

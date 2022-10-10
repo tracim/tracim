@@ -114,6 +114,7 @@ export class HtmlDocument extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentDeleted },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.HTML_DOCUMENT, handler: this.handleContentRestore },
@@ -125,6 +126,11 @@ export class HtmlDocument extends React.Component {
   }
 
   // TLM Handlers
+
+  handleCommentModified = (data) => {
+    this.props.updateComment(data)
+  }
+
   handleContentModified = async data => {
     const { props, state } = this
     if (data.fields.content.content_id !== state.content.content_id) return

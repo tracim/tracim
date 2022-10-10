@@ -23,7 +23,6 @@ const CreateToDoFromTextPopup = (props) => {
             type='button'
             className='transparentButton createToDoFromTextPopup__main__title__info'
             id='popoverToDoInfo'
-            title={props.t('Information')}
           >
             <i className='fas fa-fw fa-question-circle' />
           </button>

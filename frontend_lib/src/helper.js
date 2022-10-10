@@ -715,15 +715,26 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-// INFO - G.B. - 2022-09-10 - To see the different format time: https://date-fns.org/v2.29.2/docs/format
+/**
+ * INFO - G.B. - 2022-09-10
+ * @param {*} rawDate Date to format
+ * @param {*} lang Locale lang
+ * @param {*} formatTime To see the different format time: https://date-fns.org/v2.29.2/docs/format
+ * @returns
+ */
 export const formatAbsoluteDate = (rawDate, lang = 'en', formatTime) => {
   if (!rawDate) return
   return format(new Date(rawDate), formatTime || 'Pp', { locale: DATE_FNS_LOCALE[lang] })
 }
 
-// Equality test done as numbers with the following rules:
-// - strings are converted to numbers before comparing
-// - undefined and null are converted to 0 before comparing
+/**
+ * Equality test done as numbers with the following rules:
+ * - strings are converted to numbers before comparing
+ * - undefined and null are converted to 0 before comparing
+ * @param {*} var1 number 1 to test
+ * @param {*} var2 number 2 to test
+ * @returns
+ */
 export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }

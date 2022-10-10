@@ -2,6 +2,7 @@ import React from 'react'
 
 import {
   CONTENT_TYPE,
+  getComment,
   getContent,
   handleClickCopyLink,
   handleFetchResult,
@@ -119,20 +120,39 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       }
     }
 
+    /**
+     * Get a complete comment
+     *
+     * This function exists also in appContentFactory
+     * @param {int} spaceId
+     * @param {int} contentId
+     * @param {int} commentId
+     * @returns {Promise<JSON>}
+     */
+    getComment = async (spaceId, contentId, commentId) => {
+      const { props } = this
+      const fetchGetComment = await handleFetchResult(await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId))
+      switch (fetchGetComment.apiResponse.status) {
+        case 200: return fetchGetComment.body
+        default:
+          props.dispatch(newFlashMessage(props.t('Unknown comment')))
+          return {}
+      }
+    }
+
+    /**
+     * Update the activity list according to the TLM
+     * Every operation on ActivityList from TLM should be in this function
+     * @param {TLM} data
+     * @returns
+     */
     updateActivityListFromTlm = async (data) => {
       const { props } = this
-      if (
-        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.MODIFIED}.${TLM_SUB.COMMENT}` ||
-        data.event_type === `${TLM_ET.CONTENT}.${TLM_CET.DELETED}.${TLM_SUB.COMMENT}`
-      ) return
       await this.waitForNoChange()
       this.changingActivityList = true
       let activity = data
-      if (
-        (data.event_type.includes(TLM_ET.CONTENT) && !(
-          data.event_type.includes(TLM_SUB.COMMENT) || data.event_type.includes(TLM_SUB.TODO)
-        )) ||
-        (data.event_type.includes(TLM_ET.MENTION) && data.fields.content.content_type !== TLM_SUB.COMMENT)
+      if (data.event_type.includes(TLM_SUB.COMMENT) ||
+        (data.event_type.includes(TLM_ET.MENTION) && data.fields.content.content_type === TLM_SUB.COMMENT)
       ) {
         activity = {
           ...data,
@@ -140,7 +160,27 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
             ...data.fields,
             content: {
               ...data.fields.content,
-              ...await this.getContent(data.fields.content.content_id)
+              ...await this.getComment(
+                data.fields.workspace.workspace_id,
+                data.fields.content.parent_id,
+                data.fields.content.content_id
+              )
+            }
+          }
+        }
+      } else {
+        if (
+          (data.event_type.includes(TLM_ET.CONTENT) && !data.event_type.includes(TLM_SUB.TODO)) ||
+          data.event_type.includes(TLM_ET.MENTION)
+        ) {
+          activity = {
+            ...data,
+            fields: {
+              ...data.fields,
+              content: {
+                ...data.fields.content,
+                ...await this.getContent(data.fields.content.content_id)
+              }
             }
           }
         }
@@ -265,7 +305,6 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * @param {string} nextPageToken token to get the next page of messages
      * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
      */
-
     loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
       const { props } = this
       const initialActivityListLength = activityList.length

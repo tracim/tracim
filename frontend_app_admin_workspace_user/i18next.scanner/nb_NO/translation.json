@@ -43,5 +43,10 @@
   "Error while loading spaces list": "Kunne ikke laste inn romliste",
   "You can't remove yourself from Administrator": "Du kan ikke fjerne deg selv som administrator",
   "Your username is incorrect, the allowed characters are {{allowedCharactersUsername}}": "Brukernavnet ditt er feil. Tegnene {{allowedCharactersUsername}} tillates.",
-  "Error while deleting space": "Kunne ikke slette rom"
+  "Error while deleting space": "Kunne ikke slette rom",
+  "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "Brukernavnet må være mellom {{minimumCharactersUsername}} og {{maximumCharactersUsername}} tegn langt.",
+  "Full name must be at least {{minimumCharactersPublicName}} characters": "Fullstendig navn nå være minst {{minimumCharactersPublicName}} tegn",
+  "Linking an email address is required for the user to be able to reset the password.": "Å sammenlenke en e-postadresse kreves for at brukeren skal kunne tilbakestille passordet.",
+  "If you do not link an email to this new user, please notify manually the username and password.": "Hvis du ikke lenker denne e-postadressen til en ny bruker må du merke deg brukernavnet og passordet og passordet manuelt.",
+  "Email notification are disabled, please manually notify users of any change": "E-postmerknader er avskrudd. Gi brukere beskjed om endringer manuelt."
 }

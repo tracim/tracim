@@ -40,6 +40,14 @@ export class PersonalRecentActivities extends React.Component {
     this.buildBreadcrumbs()
   }
 
+  /**
+   * Function to handle TLM which will be triggered on every global TLM
+   *
+   * See also WorspaceRecentActivities.handleTlm
+   * @async
+   * @param {TLM} data
+   * @returns
+   */
   handleTlm = async (data) => {
     const { props } = this
     if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
