@@ -627,6 +627,7 @@ class CFG(object):
             self.get_raw_config("ui.notes.code_sample_languages", default_code_sample_languages),
             separator=",",
             cast_func=create_target_langage,
+            do_strip=True,
         )
         try:
             self.UI__NOTES__CODE_SAMPLE_LANGUAGES = [

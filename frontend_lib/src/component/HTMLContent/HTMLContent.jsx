@@ -1,18 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 
 import Prism from 'prismjs'
 
-import 'prismjs/plugins/line-numbers/prism-line-numbers.js'
-import 'prismjs/plugins/toolbar/prism-toolbar.js'
-import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.js'
-
-import 'prismjs/components/prism-java'
-
 /*
-  INFO - G.B. - 2022-09-28 - Apparently to add a plugin, you just import it, the rest is done automatically by the Prism.highlightAll() command.
-  The same is true for the support of new languages.
+  INFO - G.B. - 2022-10-10 - To add a plugin, change babel.plugins.prismjs.plugins at frontend_lib/package.json
+  The rest is done automatically by the Prism.highlightAll() command.
+  For some plugins it is necessary to add extra things like line-numbers class name, to know all the
+  details, click on the plugin name at https://prismjs.com/#plugins
 */
 
 function onClick (e) {
@@ -24,7 +20,10 @@ function onClick (e) {
 }
 
 const HTMLContent = (props) => {
-  Prism.highlightAll()
+  useEffect(() => {
+    Prism.highlightAll()
+  }, [])
+
   return (
     <article
       onClick={onClick}
