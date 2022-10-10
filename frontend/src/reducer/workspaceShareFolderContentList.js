@@ -13,9 +13,9 @@ import {
   WORKSPACE_CONTENT,
   CONTENT
 } from '../action-creator.sync.js'
-import { serialize, CONTENT_TYPE } from 'tracim_frontend_lib'
+import { serialize, CONTENT_TYPE, CONTENT_NAMESPACE } from 'tracim_frontend_lib'
 import { serializeContentProps } from './workspaceContentList'
-import { CONTENT_NAMESPACE, SHARE_FOLDER_ID } from '../util/helper'
+import { SHARE_FOLDER_ID } from '../util/helper'
 
 const defaultWorkspaceShareFolderContentList = {
   workspaceId: 0,

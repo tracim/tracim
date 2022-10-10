@@ -13,11 +13,11 @@ import {
   setNextPage
 } from '../action-creator.sync.js'
 import {
-  CONTENT_NAMESPACE,
   GROUP_NOTIFICATION_CRITERIA,
   FETCH_CONFIG
 } from '../util/helper.js'
 import {
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
   getContentPath,
   GROUP_MENTION_TRANSLATION_LIST,

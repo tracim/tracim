@@ -18,8 +18,7 @@ import {
 import { contentFromApi } from '../../fixture/content/content.js'
 import { serializeContentProps } from '../../../src/reducer/workspaceContentList.js'
 import workspaceShareFolderContentList from '../../../src/reducer/workspaceShareFolderContentList.js'
-import { serialize, CONTENT_TYPE } from 'tracim_frontend_lib'
-import { CONTENT_NAMESPACE } from '../../../src/util/helper'
+import { serialize, CONTENT_TYPE, CONTENT_NAMESPACE } from 'tracim_frontend_lib'
 
 describe('reducer workspaceShareFolderContentList.js', () => {
   describe('actions', () => {
