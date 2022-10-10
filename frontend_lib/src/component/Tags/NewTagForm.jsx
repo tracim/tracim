@@ -36,6 +36,22 @@ export class NewTagForm extends React.Component {
     this.setState({ tagName: '', autoCompleteActive: false })
   }
 
+  componentDidMount() {
+    document.addEventListener('click', this.handleClickEvent, true)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.handleClickEvent, true)
+  }
+
+  handleClickEvent = (event) => {
+    const { state } = this
+    const inputField = document.getElementById('addTagFullInput')
+
+    // Hide when clicking outside related area, if clicking inside and has content, show
+    this.setState({ autoCompleteActive: inputField.contains(event.target) && state.tagName })
+  }
+
   handleClickBtnValidateContent = async () => {
     const { props, state } = this
 
@@ -165,7 +181,7 @@ export class NewTagForm extends React.Component {
         {props.contentId
           ? props.t('Add a tag to your content. To see the list of tags available in this space, go to space settings.')
           : props.t('Create a tag for your space. It can be added to any content that belongs to this space.')}
-        <div className='tagList__form__tag'>
+        <div id="addTagFullInput" className='tagList__form__tag'>
           <input
             autoFocus={!isMobile}
             type='text'
