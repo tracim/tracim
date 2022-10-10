@@ -276,6 +276,12 @@ describe('Account page', () => {
         cy.contains('.account__userpreference__setting__spacename', 'You are not a member of any space yet')
       })
     })
+    describe('Profile link button', () => {
+      it('should redirect to user\'s public profile', () => {
+        cy.get('.userinfo__profile_button').click()
+        cy.url().should('include', `/ui/users/${baseUser.user_id}/profile`);
+      })
+    })
 
   })
 })
