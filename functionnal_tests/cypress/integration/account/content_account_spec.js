@@ -1,4 +1,4 @@
-import { PAGES } from '../../support/urls_commands'
+import { PAGES, URLS } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
 
@@ -279,7 +279,7 @@ describe('Account page', () => {
     describe('Profile link button', () => {
       it('should redirect to user\'s public profile', () => {
         cy.get('.userinfo__profile_button').click()
-      cy.url().should('include', PAGES.PROFILE);
+        cy.url().should('include', URLS[PAGES.PROFILE]({ userId: baseUser.user_id }));
       })
     })
 
