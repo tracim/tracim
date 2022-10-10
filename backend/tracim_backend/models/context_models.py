@@ -104,9 +104,7 @@ class ConfigModel(object):
         self.ui__spaces__creation__parent_space_choice__visible = (
             ui__spaces__creation__parent_space_choice__visible
         )
-        self.ui__notes__code_sample_languages = (
-            ui__notes__code_sample_languages
-        )
+        self.ui__notes__code_sample_languages = ui__notes__code_sample_languages
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
         self.call__enabled = call__enabled
         self.call__unanswered_timeout = call__unanswered_timeout

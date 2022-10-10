@@ -395,7 +395,7 @@ class TestConfigEndpoint(object):
             {"code": "vim", "display": "vim"},
             {"code": "visual-basic", "display": "Visual Basic"},
             {"code": "yaml", "display": "YAML"},
-            {"code": "wiki", "display": "Wiki markup"}
+            {"code": "wiki", "display": "Wiki markup"},
         ]
         assert res.json_body["limitation__maximum_online_users_message"] == ""
         assert res.json_body["call__enabled"] is False
