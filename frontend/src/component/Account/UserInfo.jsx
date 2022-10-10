@@ -68,7 +68,7 @@ export const UserInfo = (props) => {
         </div>
       </div>
       <Link className='userinfo__profile_button' to={PAGE.PUBLIC_PROFILE(props.user.userId)}>
-        <IconButton text={props.t('My profile')} type='button' icon='fa fa-user' />
+        <IconButton text={props.t('My profile')} type='button' icon='fas fa-user' />
       </Link>
     </div>
   )
