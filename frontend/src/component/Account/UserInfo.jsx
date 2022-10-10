@@ -3,6 +3,7 @@ import { translate } from 'react-i18next'
 import { getUserProfile, FETCH_CONFIG } from '../../util/helper.js'
 import { Link } from 'react-router-dom'
 import {
+  PAGE,
   IconButton,
   Avatar,
   AVATAR_SIZE,
@@ -66,7 +67,7 @@ export const UserInfo = (props) => {
           {props.t(getUserProfile(props.user.profile).label)}
         </div>
       </div>
-      <Link className='userinfo__profile_button' to={`/ui/users/${props.user.userId}/profile`}>
+      <Link className='userinfo__profile_button' to={PAGE.PUBLIC_PROFILE(props.user.userId)}>
         <IconButton text={props.t('My profile')} type='button' icon='fa fa-user' />
       </Link>
     </div>

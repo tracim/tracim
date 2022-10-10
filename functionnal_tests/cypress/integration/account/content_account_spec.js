@@ -279,7 +279,7 @@ describe('Account page', () => {
     describe('Profile link button', () => {
       it('should redirect to user\'s public profile', () => {
         cy.get('.userinfo__profile_button').click()
-        cy.url().should('include', `/ui/users/${baseUser.user_id}/profile`);
+      cy.url().should('include', PAGES.PROFILE);
       })
     })
 
