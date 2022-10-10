@@ -48,7 +48,6 @@ export class NewTagForm extends React.Component {
     const { state } = this
     const inputField = document.getElementById('addTagFullInput')
 
-    // Hide when clicking outside related area, if clicking inside and has content, show
     this.setState({ autoCompleteActive: inputField.contains(event.target) && state.tagName })
   }
 
