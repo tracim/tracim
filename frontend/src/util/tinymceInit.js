@@ -1,6 +1,7 @@
 import i18n from './i18n.js'
 import { tinymceRemove, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import { v4 as uniqueId } from 'uuid'
+import { store } from '../store.js'
 
 (function () {
   // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
@@ -41,7 +42,6 @@ import { v4 as uniqueId } from 'uuid'
   globalThis.wysiwyg = function (
     selector,
     lang,
-    codeSampleLangList,
     handleOnChange,
     handleTinyMceInput,
     handleTinyMceKeyDown,
@@ -96,6 +96,8 @@ import { v4 as uniqueId } from 'uuid'
     // WARNING when upgrading TinyMCE, you should check that the direction of TinyMCE's UI is still correct.
     globalThis.tinymce.util.I18n.setCode(language)
 
+    const reduxStore = store.getState()
+
     globalThis.tinymce.init({
       selector: selector,
       language,
@@ -109,7 +111,7 @@ import { v4 as uniqueId } from 'uuid'
         'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code codesample | insert | customFullscreen'
       ],
       codesample_global_prismjs: true,
-      codesample_languages: codeSampleLangList,
+      codesample_languages: reduxStore.system.config.ui__notes__code_sample_languages,
       insertdatetime_element: true,
       content_style: 'div {height: 100%;}',
       paste_data_images: true,

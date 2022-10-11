@@ -136,7 +136,6 @@ export const HtmlDocument = props => {
         {(props.mode === APP_FEATURE_MODE.EDIT &&
           <TextAreaApp
             apiUrl={props.apiUrl}
-            codeSampleLanguageList={props.codeSampleLanguageList}
             contentId={props.contentId}
             contentType={props.contentType}
             customClass='html-document__editionmode'
@@ -165,7 +164,6 @@ HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   wysiwygNewVersion: PropTypes.string.isRequired,
-  codeSampleLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customColor: PropTypes.string,
@@ -200,7 +198,6 @@ HtmlDocument.propTypes = {
 }
 
 HtmlDocument.defaultProps = {
-  codeSampleLanguageList: [],
   contentId: 0,
   contentType: CONTENT_TYPE.HTML_DOCUMENT,
   customColor: '#252525',

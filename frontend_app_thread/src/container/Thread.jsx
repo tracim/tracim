@@ -118,7 +118,6 @@ export class Thread extends React.Component {
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     props.appContentCustomEventHandlerAllAppChangeLanguage(
       data,
-      this.state.config.system.config.ui__notes__code_sample_languages,
       this.setState.bind(this),
       i18n,
       this.state.timelineWysiwyg,
@@ -463,7 +462,6 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
-                codeSampleLanguageList={state.config.system.config.ui__notes__code_sample_languages}
                 contentId={state.content.content_id}
                 contentType={state.content.content_type}
                 loading={props.loadingTimeline}

@@ -31,7 +31,6 @@ export class TextareaRich extends React.Component {
     globalThis.wysiwyg(
       this.editorIdAsSelector,
       initializationLanguage,
-      this.props.system.config.ui__notes__code_sample_languages,
       this.customOnChange
     )
   }

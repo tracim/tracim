@@ -77,7 +77,6 @@ export class TextAreaApp extends React.Component {
     globalThis.wysiwyg(
       `#${props.elementId}`,
       props.lang,
-      props.codeSampleLanguageList,
       this.handleChangeText,
       this.handleTinyMceInput,
       this.handleTinyMceKeyDown,
@@ -207,7 +206,6 @@ TextAreaApp.propTypes = {
   onClickValidateBtn: PropTypes.func.isRequired,
   workspaceId: PropTypes.number.isRequired,
   apiUrl: PropTypes.string,
-  codeSampleLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customClass: PropTypes.string,
@@ -223,7 +221,6 @@ TextAreaApp.propTypes = {
 
 TextAreaApp.defaultProps = {
   apiUrl: '/',
-  codeSampleLanguageList: [],
   contentId: 0,
   contentType: CONTENT_TYPE.HTML_DOCUMENT,
   customClass: '',

@@ -287,13 +287,7 @@ export class HtmlDocument extends React.Component {
   handleAllAppChangeLanguage = data => {
     console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
-    this.props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data,
-      this.state.config.system.config.ui__notes__code_sample_languages,
-      this.setState.bind(this),
-      i18n,
-      false
-    )
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
   }
 
   componentDidMount () {
@@ -865,7 +859,6 @@ export class HtmlDocument extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
-            codeSampleLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
             loading={props.loadingTimeline}
@@ -1064,7 +1057,6 @@ export class HtmlDocument extends React.Component {
           */}
           <HtmlDocumentComponent
             apiUrl={state.config.apiUrl}
-            codeSampleLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             customColor={state.config.hexcolor}
             contentId={state.content.content_id}
             contentType={CONTENT_TYPE.HTML_DOCUMENT}

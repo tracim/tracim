@@ -360,10 +360,10 @@ export function appContentFactory (WrappedComponent) {
     }
 
     // INFO - 2019-01-09 - if param isTimelineWysiwyg is false, param changeNewCommentHandler isn't required
-    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, codeSampleLanguageList, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
+    appContentCustomEventHandlerAllAppChangeLanguage = (newLang, setState, i18n, isTimelineWysiwyg, changeNewCommentHandler = null) => {
       if (isTimelineWysiwyg) {
         tinymceRemove('#wysiwygTimelineComment')
-        globalThis.wysiwyg('#wysiwygTimelineComment', newLang, codeSampleLanguageList, changeNewCommentHandler)
+        globalThis.wysiwyg('#wysiwygTimelineComment', newLang, changeNewCommentHandler)
       }
 
       setState(prev => ({

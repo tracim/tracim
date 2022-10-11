@@ -157,7 +157,6 @@ export class Publications extends React.Component {
       globalThis.wysiwyg(
         `#${wysiwygId}`,
         data,
-        this.props.system.config.ui__notes__code_sample_languages,
         this.handleChangeNewPublication
       )
     }
@@ -536,7 +535,6 @@ export class Publications extends React.Component {
               apiUrl={FETCH_CONFIG.apiUrl}
               bottomAutocomplete
               buttonLabel={props.t('Publish')}
-              codeSampleLanguageList={props.system.config.ui__notes__code_sample_languages}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
               customColor={COLORS.PUBLICATION}
@@ -601,7 +599,6 @@ export class Publications extends React.Component {
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
-            codeSampleLanguageList={props.system.config.ui__notes__code_sample_languages}
             comment={state.commentToEdit.raw_content}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}

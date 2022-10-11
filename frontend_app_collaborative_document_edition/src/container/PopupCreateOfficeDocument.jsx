@@ -65,7 +65,7 @@ export class PopupCreateCollaborativeDocument extends React.Component {
   handleAllAppChangeLanguage = data => {
     console.log('%c<PopupCreateOfficeDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
-    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, [], this.setState.bind(this), i18n, false)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
     this.setHeadTitle()
   }
 
