@@ -176,11 +176,7 @@ export class File extends React.Component {
     console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
     props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data,
-      this.setState.bind(this),
-      i18n,
-      state.timelineWysiwyg,
-      this.handleChangeNewComment
+      data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
     )
   }
 

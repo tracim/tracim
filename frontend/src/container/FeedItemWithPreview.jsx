@@ -98,11 +98,7 @@ export class FeedItemWithPreview extends React.Component {
     if (state.timelineWysiwyg) {
       const wysiwygId = this.getWysiwygId(props.content.id)
       tinymceRemove(wysiwygId)
-      globalThis.wysiwyg(
-        wysiwygId,
-        data,
-        this.handleChangeNewComment
-      )
+      globalThis.wysiwyg(wysiwygId, data, this.handleChangeNewComment)
     }
   }
 

@@ -117,11 +117,7 @@ export class Thread extends React.Component {
     const { props } = this
     console.log('%c<Thread> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data,
-      this.setState.bind(this),
-      i18n,
-      this.state.timelineWysiwyg,
-      this.handleChangeNewComment
+      data, this.setState.bind(this), i18n, this.state.timelineWysiwyg, this.handleChangeNewComment
     )
   }
 

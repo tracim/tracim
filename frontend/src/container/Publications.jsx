@@ -154,11 +154,7 @@ export class Publications extends React.Component {
   handleAllAppChangeLanguage = (data) => {
     if (this.state.publicationWysiwyg) {
       tinymceRemove(`#${wysiwygId}`)
-      globalThis.wysiwyg(
-        `#${wysiwygId}`,
-        data,
-        this.handleChangeNewPublication
-      )
+      globalThis.wysiwyg(`#${wysiwygId}`, data, this.handleChangeNewPublication)
     }
     this.buildBreadcrumbs()
     this.setHeadTitle()
