@@ -32,10 +32,10 @@ describe('Content list', function () {
           assert.isNotOk(true, 'Page reload when clicking and it should not')
         })
 
-        cy.get(`.content[title="${TITLE}"] .dropdown`)
+        cy.get(`.contentItem[title="${TITLE}"] .dropdown`)
           .click()
 
-        cy.get(`.content[title="${TITLE}"] .dropdown`)
+        cy.get(`.contentItem[title="${TITLE}"] .dropdown`)
           .contains(EDIT_LABEL)
           .click()
 
@@ -47,13 +47,13 @@ describe('Content list', function () {
           assert.isNotOk(true, 'Page reload when clicking and it should not')
         })
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .contains(DELETE_LABEL).click()
         cy
-          .get(`.content[title="${TITLE}"]`)
+          .get(`.contentItem[title="${TITLE}"]`)
           .should('not.exist')
       })
 
@@ -63,13 +63,13 @@ describe('Content list', function () {
       //     assert.isNotOk(true, 'Page reload when clicking and it should not')
       //   })
       //   cy
-      //     .get(`.content[title="${TITLE}"] .dropdown`)
+      //     .get(`.contentItem[title="${TITLE}"] .dropdown`)
       //     .click()
       //   cy
-      //     .get(`.content[title="${TITLE}"] .dropdown`)
+      //     .get(`.contentItem[title="${TITLE}"] .dropdown`)
       //     .contains(ARCHIVE_LABEL).click()
       //   cy
-      //     .get(`.content[title="${TITLE}"]`)
+      //     .get(`.contentItem[title="${TITLE}"]`)
       //     .should('not.exist')
       // })
     })
@@ -90,29 +90,29 @@ describe('Content list', function () {
           assert.isNotOk(true, 'Page reload when clicking and it should not')
         })
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .contains(EDIT_LABEL).click()
         cy.get('[data-cy=popinFixed]')
       })
 
       it('button delete should not exists', function () {
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .contains(DELETE_LABEL).should('not.exist')
       })
 
       it('button archive should not exists', function () {
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .click()
         cy
-          .get(`.content[title="${TITLE}"] .dropdown`)
+          .get(`.contentItem[title="${TITLE}"] .dropdown`)
           .contains(ARCHIVE_LABEL).should('not.exist')
       })
     })
