@@ -550,7 +550,7 @@ export const sortContentByCreatedDateAndID = (arrayToSort) => {
 }
 
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
-RE
+
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types
 export const CONTENT_TYPE = {
   HTML_DOCUMENT: 'html-document',
