@@ -2063,8 +2063,8 @@ class TargetLanguageSchema(marshmallow.Schema):
 
 
 class CodeSampleLanguageSchema(marshmallow.Schema):
-    code = marshmallow.fields.String(required=True, example="markup")
-    display = marshmallow.fields.String(required=True, example="Markup")
+    value = marshmallow.fields.String(required=True, example="markup")
+    text = marshmallow.fields.String(required=True, example="Markup")
 
 
 class ConfigSchema(marshmallow.Schema):

@@ -72,6 +72,11 @@ def create_target_langage(value: str) -> typing.Tuple[str, str]:
     return (code, display)
 
 
+def create_code_sample_langage(language: str) -> typing.Tuple[str, str]:
+    value, text = language.split(":")
+    return (value, text)
+
+
 class ConfigParam(object):
     def __init__(
         self,
@@ -626,12 +631,12 @@ class CFG(object):
         code_sample_languages = string_to_unique_item_list(
             self.get_raw_config("ui.notes.code_sample_languages", default_code_sample_languages),
             separator=",",
-            cast_func=create_target_langage,
+            cast_func=create_code_sample_langage,
             do_strip=True,
         )
         try:
             self.UI__NOTES__CODE_SAMPLE_LANGUAGES = [
-                {"code": code, "display": display} for code, display in code_sample_languages
+                {"value": value, "text": text} for value, text in code_sample_languages
             ]
         except ValueError:
             raise ConfigurationError("The value of ui.notes.code_sample_languages is malformed")
