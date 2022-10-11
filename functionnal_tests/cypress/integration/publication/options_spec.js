@@ -39,7 +39,7 @@ describe('Publications page', () => {
     cy.contains(sendButton, 'Send')
       .should('be.enabled')
       .click()
-    cy.contains('.feedItem__publication__messagelist__item .comment__body__content__text', text)
+    cy.contains('.feedItem__publication__messagelist__item .timeline__comment__body__content__text', text)
   })
 
   describe('in the action menu', () => {

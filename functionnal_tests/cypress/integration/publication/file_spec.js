@@ -93,7 +93,7 @@ describe('Publications', () => {
     })
 
     it('should show text as preview', () => {
-      cy.contains('.comment__body__content__text', exampleText).should('be.visible')
+      cy.contains('.timeline__comment__body__content__text', exampleText).should('be.visible')
     })
 
     it('should show image as comment', () => {

@@ -282,7 +282,7 @@ describe('appContentFactory.js', () => {
       })
 
       it('should call the tinymce constructor', () => {
-        sinon.assert.calledWith(fakeWysiwygConstructor, '#wysiwygTimelineComment', newLang, dummyChangeNewCommentHandler)
+        sinon.assert.calledWith(fakeWysiwygConstructor, '#wysiwygTimelineComment', newLang, [{ text: 'C', value: 'C' }], dummyChangeNewCommentHandler)
       })
     })
   })
