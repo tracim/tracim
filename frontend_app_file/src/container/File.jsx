@@ -176,7 +176,12 @@ export class File extends React.Component {
     console.log('%c<File> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
 
     props.appContentCustomEventHandlerAllAppChangeLanguage(
-      data, this.setState.bind(this), i18n, state.timelineWysiwyg, this.handleChangeNewComment
+      data,
+      state.config.system.config.ui__notes__code_sample_languages,
+      this.setState.bind(this),
+      i18n,
+      state.timelineWysiwyg,
+      this.handleChangeNewComment
     )
   }
 
@@ -938,6 +943,7 @@ export class File extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            codeSampleLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
             loading={props.loadingTimeline}

@@ -218,6 +218,7 @@ export class Timeline extends React.Component {
         {state.showEditCommentPopup && (
           <EditCommentPopup
             apiUrl={props.apiUrl}
+            codeSampleLanguageList={props.codeSampleLanguageList}
             comment={state.newComment.raw_content}
             commentId={state.newComment.content_id}
             customColor={props.customColor}
@@ -243,6 +244,7 @@ export class Timeline extends React.Component {
             <CommentArea
               apiUrl={props.apiUrl}
               buttonLabel={props.t('Send')}
+              codeSampleLanguageList={props.codeSampleLanguageList}
               contentId={props.contentId}
               contentType={props.contentType}
               customClass={props.customClass}
@@ -298,6 +300,7 @@ Timeline.propTypes = {
   allowClickOnRevision: PropTypes.bool,
   availableStatusList: PropTypes.array,
   canLoadMoreTimelineItems: PropTypes.func,
+  codeSampleLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customClass: PropTypes.string,
@@ -335,6 +338,7 @@ Timeline.defaultProps = {
   allowClickOnRevision: true,
   availableStatusList: [],
   canLoadMoreTimelineItems: () => false,
+  codeSampleLanguageList: [],
   contentId: 0,
   contentType: '',
   customClass: '',

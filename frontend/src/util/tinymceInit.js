@@ -41,6 +41,7 @@ import { v4 as uniqueId } from 'uuid'
   globalThis.wysiwyg = function (
     selector,
     lang,
+    codeSampleLangList,
     handleOnChange,
     handleTinyMceInput,
     handleTinyMceKeyDown,
@@ -104,10 +105,11 @@ import { v4 as uniqueId } from 'uuid'
       remove_script_host: false,
       plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks codesample',
       toolbar: [
-        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap | codesample',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen'
+        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap',
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code codesample | insert | customFullscreen'
       ],
       codesample_global_prismjs: true,
+      codesample_languages: codeSampleLangList,
       insertdatetime_element: true,
       content_style: 'div {height: 100%;}',
       paste_data_images: true,

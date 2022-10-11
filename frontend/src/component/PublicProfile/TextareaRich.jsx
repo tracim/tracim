@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { TracimComponent, CUSTOM_EVENT, tinymceRemove } from 'tracim_frontend_lib'
 
 export class TextareaRich extends React.Component {
@@ -27,7 +28,12 @@ export class TextareaRich extends React.Component {
   }
 
   initTextRich = initializationLanguage => {
-    globalThis.wysiwyg(this.editorIdAsSelector, initializationLanguage, this.customOnChange)
+    globalThis.wysiwyg(
+      this.editorIdAsSelector,
+      initializationLanguage,
+      this.props.system.config.ui__notes__code_sample_languages,
+      this.customOnChange
+    )
   }
 
   removeTextRich = () => {
@@ -52,7 +58,8 @@ export class TextareaRich extends React.Component {
   }
 }
 
-export default TracimComponent(TextareaRich)
+const mapStateToProps = ({ system }) => ({ system })
+export default connect(mapStateToProps)(TracimComponent(TextareaRich))
 
 TextareaRich.propTypes = {
   id: PropTypes.string,

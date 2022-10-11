@@ -33,7 +33,13 @@ export class EditCommentPopup extends React.Component {
   }
 
   handleAllAppChangeLanguage = (data) => {
-    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, true)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(
+      data,
+      this.props.codeSampleLanguageList,
+      this.setState.bind(this),
+      i18n,
+      true
+    )
   }
 
   searchForMentionOrLinkInQuery = async (query) => {
@@ -53,6 +59,7 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
+          codeSampleLanguageList={props.codeSampleLanguageList}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
           customClass='editCommentPopup'
@@ -98,6 +105,7 @@ EditCommentPopup.propTypes = {
   onClickClose: PropTypes.func.isRequired,
   onClickValidate: PropTypes.func.isRequired,
   apiUrl: PropTypes.string,
+  codeSampleLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   loggedUserLanguage: PropTypes.string,
   workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -106,6 +114,7 @@ EditCommentPopup.propTypes = {
 
 EditCommentPopup.defaultProps = {
   apiUrl: '',
+  codeSampleLanguageList: [],
   customColor: undefined,
   loggedUserLanguage: 'en',
   workspaceId: undefined,

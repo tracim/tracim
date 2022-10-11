@@ -98,7 +98,12 @@ export class FeedItemWithPreview extends React.Component {
     if (state.timelineWysiwyg) {
       const wysiwygId = this.getWysiwygId(props.content.id)
       tinymceRemove(wysiwygId)
-      globalThis.wysiwyg(wysiwygId, data, this.handleChangeNewComment)
+      globalThis.wysiwyg(
+        wysiwygId,
+        data,
+        props.system.config.ui__notes__code_sample_languages,
+        this.handleChangeNewComment
+      )
     }
   }
 
@@ -440,6 +445,7 @@ export class FeedItemWithPreview extends React.Component {
             {props.showCommentList && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
+                codeSampleLanguageList={props.system.config.ui__notes__code_sample_languages}
                 contentId={props.content.id}
                 contentType={props.content.type}
                 customClass='feedItem__timeline'

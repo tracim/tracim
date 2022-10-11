@@ -245,7 +245,7 @@ describe('appContentFactory.js', () => {
     before(() => {
       global.tinymce.remove = fakeTinymceRemove
       global.wysiwyg = fakeWysiwygConstructor
-      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, false)
+      wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, [{ text: 'C', value: 'C' }], fakeSetState, fakeI18n, false)
     })
 
     after(() => {
@@ -267,7 +267,7 @@ describe('appContentFactory.js', () => {
       before(() => {
         global.tinymce.remove = fakeTinymceRemove
         global.wysiwyg = fakeWysiwygConstructor
-        wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, fakeSetState, fakeI18n, true, dummyChangeNewCommentHandler)
+        wrapper.instance().appContentCustomEventHandlerAllAppChangeLanguage(newLang, [{ text: 'C', value: 'C' }], fakeSetState, fakeI18n, true, dummyChangeNewCommentHandler)
       })
 
       after(() => {

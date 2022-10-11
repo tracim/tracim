@@ -25,6 +25,7 @@ function KanbanCardEditor (props) {
     globalThis.wysiwyg(
       descriptionEditionSelector,
       props.i18n.language,
+      props.codeSampleLanguageList,
       setDescription,
       props.onTinyMceInput,
       props.onTinyMceKeyDown,
@@ -150,6 +151,7 @@ KanbanCardEditor.propTypes = {
   apiUrl: PropTypes.string,
   autoCompleteCursorPosition: PropTypes.number,
   autoCompleteItemList: PropTypes.array,
+  codeSampleLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   focusOnDescription: PropTypes.bool,
   i18n: PropTypes.object,
@@ -165,6 +167,7 @@ KanbanCardEditor.defaultProps = {
   apiUrl: '',
   autoCompleteCursorPosition: 0,
   autoCompleteItemList: [],
+  codeSampleLanguageList: [],
   customColor: '',
   focusOnDescription: false,
   i18n: {

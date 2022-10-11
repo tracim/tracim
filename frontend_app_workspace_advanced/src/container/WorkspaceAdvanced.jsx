@@ -133,7 +133,13 @@ export class WorkspaceAdvanced extends React.Component {
 
   handleAllAppChangeLanguage = data => {
     console.log('%c<WorkspaceAdvanced> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(
+      data,
+      this.state.config.system.config.ui__notes__code_sample_languages,
+      this.setState.bind(this),
+      i18n,
+      false
+    )
   }
 
   // TLM Handlers
@@ -874,6 +880,7 @@ export class WorkspaceAdvanced extends React.Component {
           <WorkspaceAdvancedConfiguration
             agendaUrl={state.content.agendaUrl}
             apiUrl={state.config.apiUrl}
+            codeSampleLanguageList={state.config.system.config.ui__notes__code_sample_languages}
             lang={state.loggedUser.lang}
             isReadOnlyMode={
               state.loggedUser.userRoleIdInWorkspace < ROLE.workspaceManager.id &&

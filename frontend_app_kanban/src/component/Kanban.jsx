@@ -436,6 +436,7 @@ export class Kanban extends React.Component {
               <KanbanCardEditor
                 apiUrl={props.config.apiUrl}
                 card={state.editedCardInfos.card}
+                codeSampleLanguageList={props.codeSampleLanguageList}
                 customColor={props.config.hexcolor}
                 focusOnDescription={state.editedCardInfos.focusOnDescription}
                 onValidate={this.handleCardEdited}
@@ -474,10 +475,12 @@ export class Kanban extends React.Component {
 Kanban.propTypes = {
   config: PropTypes.object.isRequired,
   content: PropTypes.object.isRequired,
+  codeSampleLanguageList: PropTypes.array,
   readOnly: PropTypes.bool
 }
 
 Kanban.defaultProps = {
+  codeSampleLanguageList: [],
   readOnly: false
 }
 

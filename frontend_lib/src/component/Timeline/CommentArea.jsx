@@ -243,6 +243,7 @@ export class CommentArea extends React.Component {
     globalThis.wysiwyg(
       this.props.wysiwygIdSelector,
       this.props.lang,
+      this.props.codeSampleLanguageList,
       this.handleChangeNewComment,
       handleTinyMceInput,
       handleTinyMceKeyDown,
@@ -423,6 +424,7 @@ export default translate()(CommentArea)
 CommentArea.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   buttonLabel: PropTypes.string,
+  codeSampleLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customClass: PropTypes.string,
@@ -449,6 +451,7 @@ CommentArea.propTypes = {
 
 CommentArea.defaultProps = {
   buttonLabel: '',
+  codeSampleLanguageList: [],
   contentId: 0,
   contentType: '',
   customClass: '',

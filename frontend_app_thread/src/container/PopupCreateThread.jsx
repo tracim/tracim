@@ -46,7 +46,7 @@ class PopupCreateThread extends React.Component {
   handleAllAppChangeLanguage = data => {
     console.log('%c<PopupCreateThread> Custom event', 'color: #28a745', CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, data)
 
-    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
+    this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, [], this.setState.bind(this), i18n, false)
     this.setHeadTitle()
   }
 

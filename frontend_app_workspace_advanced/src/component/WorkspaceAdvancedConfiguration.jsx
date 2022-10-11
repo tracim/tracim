@@ -24,6 +24,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
       globalThis.wysiwyg(
         `#${props.textareaId}`,
         props.lang,
+        props.codeSampleLanguageList,
         props.onChangeDescription,
         props.onTinyMceInput,
         props.onTinyMceKeyDown,
@@ -211,6 +212,7 @@ export default translate()(Radium(WorkspaceAdvancedConfiguration))
 
 WorkspaceAdvancedConfiguration.propTypes = {
   agendaUrl: PropTypes.string,
+  codeSampleLanguageList: PropTypes.array,
   description: PropTypes.string,
   lang: PropTypes.string,
   isReadOnlyMode: PropTypes.bool,
@@ -220,6 +222,7 @@ WorkspaceAdvancedConfiguration.propTypes = {
 
 WorkspaceAdvancedConfiguration.defaultProps = {
   agendaUrl: '',
+  codeSampleLanguageList: [],
   description: '',
   lang: '',
   isReadOnlyMode: true,
