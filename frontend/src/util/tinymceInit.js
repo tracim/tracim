@@ -96,7 +96,12 @@ import { store } from '../store.js'
     // WARNING when upgrading TinyMCE, you should check that the direction of TinyMCE's UI is still correct.
     globalThis.tinymce.util.I18n.setCode(language)
 
-    const reduxStore = store.getState()
+    let reduxStore = store.getState()
+    
+    if (!reduxStore.system || !reduxStore.system.config) {
+      console.error('The redux system variable is not initialized. See #5890 GitHub issue for details.')
+      reduxStore = { system: { config: { ui__notes__code_sample_languages: [] } } }
+    }
 
     globalThis.tinymce.init({
       selector: selector,
