@@ -1,4 +1,4 @@
-import { PAGES as p } from "../../support/urls_commands";
+import { PAGES as p, URLS } from '../../support/urls_commands';
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 
 const pngFile = 'artikodin.png'
@@ -36,9 +36,7 @@ describe('In a workspace', function () {
       .get('.previewcomponent').should('have.length', 1)
     cy.getTag({ selectorName: s.CONTENT_FRAME })
       .get('.selectStatus').contains('Opened')
-    cy.url().should('include', `/ui/workspaces/${workspaceId}/contents/file/`)
-
-    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceId } })
+    cy.url().should('include', URLS[p.FILE]({workspaceId, fileId: '1'}))
   })
 
   it('should display an error popup containing a descriptive error when uploading a single file', function () {
@@ -56,7 +54,7 @@ describe('In a workspace', function () {
     cy.get('.flashmessage__container__content__text__paragraph')
       .should('exist')
     cy.get('.flashmessage__container__content__text__paragraph')
-      .should('include.text', "already exists")
+      .should('include.text', 'already exists')
   })
 
   it('should display an error popup containing a descriptive error when uploading multiple files', function () {
@@ -78,7 +76,7 @@ describe('In a workspace', function () {
     cy.get('.flashmessage__container__content__text__paragraph')
       .should('exist')
     cy.get('.flashmessage__container__content__text__paragraph')
-      .should('include.text', "already exists")
+      .should('include.text', 'already exists')
   })
 
   it('should display an error popup containing a generic error when uploading multiple erroneous files', function () {
@@ -100,6 +98,6 @@ describe('In a workspace', function () {
     cy.get('.flashmessage__container__content__text__paragraph')
       .should('exist')
     cy.get('.flashmessage__container__content__text__paragraph')
-      .should('include.text', "Error while uploading file(s)")
+      .should('include.text', 'Error while uploading file(s)')
   })
 })
