@@ -98,7 +98,7 @@ import { store } from '../store.js'
 
     let reduxStore = store.getState()
     
-    if (!reduxStore.system || !reduxStore.system.config) {
+    if (Object.keys(reduxStore.system.config).length === 0) {
       console.error('The redux system variable is not initialized. See #5890 GitHub issue for details.')
       reduxStore = { system: { config: { ui__notes__code_sample_languages: [] } } }
     }
