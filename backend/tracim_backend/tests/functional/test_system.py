@@ -336,10 +336,6 @@ class TestConfigEndpoint(object):
         assert res.json_body["user__self_registration__enabled"] is False
         assert res.json_body["ui__spaces__creation__parent_space_choice__visible"] is True
         assert res.json_body["ui__notes__code_sample_languages"] == [
-            {"value": "markup", "text": "Markup"},
-            {"value": "css", "text": "CSS"},
-            {"value": "clike", "text": "C-like"},
-            {"value": "javascript", "text": "JavaScript"},
             {"value": "apacheconf", "text": "Apache Configuration"},
             {"value": "arduino", "text": "Arduino"},
             {"value": "aspnet", "text": "ASP.NET"},
@@ -347,9 +343,11 @@ class TestConfigEndpoint(object):
             {"value": "batch", "text": "Batch"},
             {"value": "bbcode", "text": "BBcode"},
             {"value": "c", "text": "C"},
+            {"value": "clike", "text": "C-like"},
             {"value": "csharp", "text": "C#"},
             {"value": "cpp", "text": "C++"},
             {"value": "cobol", "text": "COBOL"},
+            {"value": "css", "text": "CSS"},
             {"value": "css-extras", "text": "CSS Extras"},
             {"value": "csv", "text": "CSV"},
             {"value": "diff", "text": "Diff"},
@@ -363,6 +361,7 @@ class TestConfigEndpoint(object):
             {"value": "ignore", "text": ".ignore"},
             {"value": "ini", "text": "Ini"},
             {"value": "java", "text": "Java"},
+            {"value": "javascript", "text": "JavaScript"},
             {"value": "jq", "text": "JQ"},
             {"value": "json", "text": "JSON"},
             {"value": "json5", "text": "JSON5"},
@@ -372,6 +371,7 @@ class TestConfigEndpoint(object):
             {"value": "lua", "text": "Lua"},
             {"value": "makefile", "text": "Makefile"},
             {"value": "markdown", "text": "Markdown"},
+            {"value": "markup", "text": "Markup"},
             {"value": "matlab", "text": "MATLAB"},
             {"value": "nginx", "text": "nginx"},
             {"value": "objectivec", "text": "Objective-C"},

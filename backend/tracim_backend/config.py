@@ -567,10 +567,6 @@ class CFG(object):
         )
 
         default_code_sample_languages = """
-            markup:Markup,
-            css:CSS,
-            clike:C-like,
-            javascript:JavaScript,
             apacheconf:Apache Configuration,
             arduino:Arduino,
             aspnet:ASP.NET,
@@ -578,9 +574,11 @@ class CFG(object):
             batch:Batch,
             bbcode:BBcode,
             c:C,
+            clike:C-like,
             csharp:C#,
             cpp:C++,
             cobol:COBOL,
+            css:CSS,
             css-extras:CSS Extras,
             csv:CSV,
             diff:Diff,
@@ -594,6 +592,7 @@ class CFG(object):
             ignore:.ignore,
             ini:Ini,
             java:Java,
+            javascript:JavaScript,
             jq:JQ,
             json:JSON,
             json5:JSON5,
@@ -603,6 +602,7 @@ class CFG(object):
             lua:Lua,
             makefile:Makefile,
             markdown:Markdown,
+            markup:Markup,
             matlab:MATLAB,
             nginx:nginx,
             objectivec:Objective-C,
