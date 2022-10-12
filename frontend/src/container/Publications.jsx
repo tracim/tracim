@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_NAMESPACE,
   formatAbsoluteDate,
   appContentFactory,
   BREADCRUMBS_TYPE,
@@ -38,7 +39,6 @@ import {
   setLocalStorageItem
 } from 'tracim_frontend_lib'
 import {
-  CONTENT_NAMESPACE,
   FETCH_CONFIG,
   findUserRoleIdInWorkspace
 } from '../util/helper.js'
