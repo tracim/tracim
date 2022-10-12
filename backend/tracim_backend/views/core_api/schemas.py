@@ -2062,6 +2062,11 @@ class TargetLanguageSchema(marshmallow.Schema):
     display = marshmallow.fields.String(required=True, example="Français")
 
 
+class CodeSampleLanguageSchema(marshmallow.Schema):
+    value = marshmallow.fields.String(required=True, example="markup")
+    text = marshmallow.fields.String(required=True, example="Markup")
+
+
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
@@ -2082,6 +2087,9 @@ class ConfigSchema(marshmallow.Schema):
     )
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
+    ui__notes__code_sample_languages = marshmallow.fields.items = marshmallow.fields.Nested(
+        CodeSampleLanguageSchema, many=True
+    )
     limitation__maximum_online_users_message = marshmallow.fields.String()
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()

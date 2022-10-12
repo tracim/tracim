@@ -46,13 +46,13 @@ const Comment = (props) => {
   return (
     <div className={classnames(`${props.customClass}__messagelist__item`, 'timeline__messagelist__item')}>
       <div
-        className={classnames(`${props.customClass}`, 'comment', {
+        className={classnames(`${props.customClass}`, 'timeline__comment', {
           sent: props.fromMe,
           received: !props.fromMe
         })}
         style={props.fromMe ? styleSent : {}}
       >
-        <div className={classnames(`${props.customClass}__body`, 'comment__body')}>
+        <div className={classnames(`${props.customClass}__body`, 'timeline__comment__body')}>
           {!props.isPublication && (
             <Avatar
               size={AVATAR_SIZE.MEDIUM}
@@ -60,22 +60,22 @@ const Comment = (props) => {
               apiUrl={props.apiUrl}
             />
           )}
-          <div className={classnames(`${props.customClass}__body__content`, 'comment__body__content')}>
+          <div className={classnames(`${props.customClass}__body__content`, 'timeline__comment__body__content')}>
             {!props.isPublication && (
-              <div className={classnames(`${props.customClass}__body__content__header`, 'comment__body__content__header')}>
-                <div className={classnames(`${props.customClass}__body__content__header__meta`, 'comment__body__content__header__meta')}>
+              <div className={classnames(`${props.customClass}__body__content__header`, 'timeline__comment__body__content__header')}>
+                <div className={classnames(`${props.customClass}__body__content__header__meta`, 'timeline__comment__body__content__header__meta')}>
                   <ProfileNavigation
                     user={{
                       userId: props.author.user_id,
                       publicName: props.author.public_name
                     }}
                   >
-                    <span className={classnames(`${props.customClass}__body__content__header__meta__author`, 'comment__body__content__header__meta__author')}>
+                    <span className={classnames(`${props.customClass}__body__content__header__meta__author`, 'timeline__comment__body__content__header__meta__author')}>
                       {props.author.public_name}
                     </span>
                   </ProfileNavigation>
                   <div
-                    className={classnames(`${props.customClass}__body__content__header__meta__date`, 'comment__body__content__header__meta__date')}
+                    className={classnames(`${props.customClass}__body__content__header__meta__date`, 'timeline__comment__body__content__header__meta__date')}
                   >
                     <span id={`createdDistance_${props.contentId}`}>
                       {createdDistance}
@@ -98,7 +98,7 @@ const Comment = (props) => {
 
                 {(isFile || actionsAllowed) && (
                   <DropdownMenu
-                    buttonCustomClass='comment__body__content__header__actions'
+                    buttonCustomClass='timeline__comment__body__content__header__actions'
                     buttonIcon='fas fa-ellipsis-v'
                     buttonTooltip={props.t('Actions')}
                   >
@@ -145,13 +145,13 @@ const Comment = (props) => {
               </div>
             )}
 
-            <div className='comment__body__content__textAndPreview'>
+            <div className='timeline__comment__body__content__textAndPreview'>
               <div
-                className='comment__body__content__text'
+                className='timeline__comment__body__content__text'
               >
                 <div
-                  className={classnames(`${props.customClass}__body__content__text`, 'comment__body__content__text')}
-                  data-cy='comment__body__content__text'
+                  className={classnames(`${props.customClass}__body__content__text`, 'timeline__comment__body__content__text')}
+                  data-cy='timeline__comment__body__content__text'
                 >
                   {(isFile || (isThread && isFirstCommentFile)
                     ? (
@@ -173,7 +173,7 @@ const Comment = (props) => {
           </div>
         </div>
         <div
-          className={classnames(`${props.customClass}__footer`, 'comment__footer')}
+          className={classnames(`${props.customClass}__footer`, 'timeline__comment__footer')}
         >
           {!isFile && (
             <TranslateButton

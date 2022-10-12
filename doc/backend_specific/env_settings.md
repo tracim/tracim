@@ -58,6 +58,7 @@ Note that you need to activate all applications (`app.enabled` setting) for this
 | TRACIM_URL_PREVIEW__FETCH_TIMEOUT                                         | url_preview.fetch_timeout                                      | URL_PREVIEW__FETCH_TIMEOUT                                         |
 | TRACIM_URL_PREVIEW__MAX_CONTENT_LENGTH                                    | url_preview.max_content_length                                 | URL_PREVIEW__MAX_CONTENT_LENGTH                                    |
 | TRACIM_UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 | ui.spaces.creation.parent_space_choice.visible                 | UI__SPACES__CREATION__PARENT_SPACE_CHOICE__VISIBLE                 |
+| TRACIM_UI__NOTES__CODE_SAMPLE_LANGUAGES                                   | ui.notes.code_sample_languages                                 | UI__NOTES__CODE_SAMPLE_LANGUAGES                                   |
 | TRACIM_DEPOT_STORAGE_DIR                                                  | depot_storage_dir                                              | DEPOT_STORAGE_DIR                                                  |
 | TRACIM_DEPOT_STORAGE_NAME                                                 | depot_storage_name                                             | DEPOT_STORAGE_NAME                                                 |
 | TRACIM_UPLOADED_FILES__STORAGE__STORAGE_NAME                              | uploaded_files.storage.storage_name                            | UPLOADED_FILES__STORAGE__STORAGE_NAME                              |

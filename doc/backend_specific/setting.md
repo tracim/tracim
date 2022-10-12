@@ -645,6 +645,12 @@ ui.spaces.creation.parent_space_choice.visible = False
 
 By default, this parameter is set to `True`.
 
+You can also defines the list of languages available to create code samples in the notes.
+
+```
+ui.notes.code_sample_languages = apacheconf:Apache Configuration,arduino:Arduino,aspnet:ASP.NET,bash:Bash,batch:Batch,bbcode:BBcode,c:C,clike:C-like,csharp:C#,cpp:C++,cobol:COBOL,css:CSS,css-extras:CSS Extras,csv:CSV,diff:Diff,django:Django/Jinja2,docker:Docker,erlang:Erlang,excel-formula:Excel Formula,fortran:Fortran,git:Git,haskell:Haskell,ignore:.ignore,ini:Ini,java:Java,javascript:JavaScript,jq:JQ,json:JSON,json5:JSON5,jsonp:JSONP,latex:LaTeX,lisp:Lisp,lua:Lua,makefile:Makefile,markdown:Markdown,markup:Markup,matlab:MATLAB,nginx:nginx,objectivec:Objective-C,ocaml:OCaml,pascal:Pascal,perl:Perl,php:PHP,phpdoc:PHPDoc,php-extras:PHP Extras,powershell:PowerShell,properties:.properties,python:Python,r:R,jsx:React JSX,tsx:React TSX,regex:Regex,ruby:Ruby,rust:Rust,sql:SQL,vbnet:VB.Net,vim:vim,visual-basic:Visual Basic,yaml:YAML,wiki:Wiki markup
+```
+
 ## User online status and limitation
 
 You may limit the number of online users on your instance. If the maximum is

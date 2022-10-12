@@ -65,10 +65,10 @@ describe('Reactions', function () {
       })
     })
 
-    const container = '.comment__footer'
+    const container = '.timeline__comment__footer'
 
     it('should allow creating and deleting reactions in a comment', () => {
-      cy.get(`.comment__footer ${emojiButtonClassName}`)
+      cy.get(`.timeline__comment__footer ${emojiButtonClassName}`)
         .should('not.exist')
 
       addEmojiReaction(container, 'grinning', '😀')

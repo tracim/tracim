@@ -21,7 +21,7 @@ const TAGS = {
   [SELECTORS.ADMIN_USER_PAGE]: () => '.adminUser.pageContentGeneric',
   [SELECTORS.CARD_POPUP_BODY]: () => '.cardPopup__body',
   [SELECTORS.CONTENT_FRAME]: () => '[data-cy="popinFixed"]',
-  [SELECTORS.CONTENT_IN_LIST]: ({ read }) => `.workspace__content__file_and_folder > .content${read ? '.read' : ''}`,
+  [SELECTORS.CONTENT_IN_LIST]: ({ read }) => `.workspace__content__file_and_folder > .contentItem${read ? '.read' : ''}`,
   [SELECTORS.CONTENT_IN_SEARCH]: () => '.FilenameWithBadges',
   [SELECTORS.FLASH_MESSAGE]: () => '[data-cy="flashmessage"]',
   [SELECTORS.FLASH_TYPE]: () => `.flashmessage__container__header`,

@@ -52,7 +52,7 @@ describe('At the space recent activities page', () => {
         cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
         cy.contains('[data-cy=FilenameWithBadges__label]', noteTitle)
         cy.get('.buttonComments').click()
-        cy.contains('[data-cy=comment__body__content__text]', commentContent)
+        cy.contains('[data-cy=timeline__comment__body__content__text]', commentContent)
       })
     })
 

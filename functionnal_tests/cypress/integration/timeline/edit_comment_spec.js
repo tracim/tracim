@@ -24,14 +24,14 @@ describe('Timeline', () => {
   describe('edit a comment', () => {
     it.skip('should show new comment', () => {
       // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
-      cy.get('.comment__body__content__header__actions').click()
-      cy.contains('.comment__body__content__textAndPreview', text)
+      cy.get('.timeline__comment__body__content__header__actions').click()
+      cy.contains('.timeline__comment__body__content__textAndPreview', text)
       cy.get('.iconbutton[title="Edit comment"]').click()
       cy.get('.cardPopup__header__title').should('be.visible')
       cy.waitForTinyMCELoaded()
         .then(() => cy.typeInTinyMCE(`${text}!`))
       cy.contains('.editCommentPopup__buttons .iconbutton__text_with_icon', 'Send').click()
-      cy.contains('.comment__body__content__textAndPreview', `${text}!`)
+      cy.contains('.timeline__comment__body__content__textAndPreview', `${text}!`)
     })
   })
 })

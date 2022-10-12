@@ -49,12 +49,12 @@ describe('In a comment', () => {
 
   describe('send a comment with a link', () => {
     it('should have the text and the a tag with the title', () => {
-      cy.contains('.comment__body__content__text', commentDisplayedText)
-      cy.contains('.comment__body__content__text a', noteTitle)
+      cy.contains('.timeline__comment__body__content__text', commentDisplayedText)
+      cy.contains('.timeline__comment__body__content__text a', noteTitle)
     })
 
     it('should redirect to content if clicked', () => {
-      cy.get('.comment__body__content__text a')
+      cy.get('.timeline__comment__body__content__text a')
         .click()
       cy.url().should('include', noteId)
     })

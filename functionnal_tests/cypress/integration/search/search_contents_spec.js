@@ -84,7 +84,7 @@ describe('Searching keywords', () => {
     //       cy.get('[data-cy=promptMessage]')
     //       cy.get(searchInput).type('{enter}')
 
-    //       cy.get('.content').should('have.length', 1)
+    //       cy.get('.contentItem').should('have.length', 1)
     //       // cy.get('.emptyListMessage').should('be.visible') // INFO - G.B. - 2019-09-06 - For now, we decide to hide the archive function - https://github.com/tracim/tracim/issues/2347
     //     })
     //   })

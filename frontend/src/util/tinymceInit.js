@@ -1,6 +1,7 @@
 import i18n from './i18n.js'
 import { tinymceRemove, CUSTOM_EVENT } from 'tracim_frontend_lib'
 import { v4 as uniqueId } from 'uuid'
+import { store } from '../store.js'
 
 (function () {
   // NOTE - 2022-01-25 - SG - some tinyMCE languages have both language + variation
@@ -95,6 +96,13 @@ import { v4 as uniqueId } from 'uuid'
     // WARNING when upgrading TinyMCE, you should check that the direction of TinyMCE's UI is still correct.
     globalThis.tinymce.util.I18n.setCode(language)
 
+    let reduxStore = store.getState()
+
+    if (Object.keys(reduxStore.system.config).length === 0) {
+      console.error('The redux system variable is not initialized. See #5890 GitHub issue for details.')
+      reduxStore = { system: { config: { ui__notes__code_sample_languages: [] } } }
+    }
+
     globalThis.tinymce.init({
       selector: selector,
       language,
@@ -102,11 +110,13 @@ import { v4 as uniqueId } from 'uuid'
       resize: false,
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks',
+      plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks codesample',
       toolbar: [
-        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap ',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code | insert | customFullscreen'
+        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap',
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code codesample | insert | customFullscreen'
       ],
+      codesample_global_prismjs: true,
+      codesample_languages: reduxStore.system.config.ui__notes__code_sample_languages,
       insertdatetime_element: true,
       content_style: 'div {height: 100%;}',
       paste_data_images: true,
