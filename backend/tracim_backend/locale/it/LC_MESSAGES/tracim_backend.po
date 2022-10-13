@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-07-18 13:54+0200\n"
-"PO-Revision-Date: 2022-09-28 10:05+0000\n"
+"PO-Revision-Date: 2022-09-30 07:51+0000\n"
 "Last-Translator: Perrier Mathis <mathis.perrier73@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/tracim/backend/"
 "it/>\n"
@@ -195,14 +195,18 @@ msgid "<a href=\"{call_to_action_url}\">view it on tracim</a>"
 msgstr "<a href=\"{call_to_action_url}\">vedere su Tracim</a>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:65
+#, fuzzy
 msgid "You're receiving this email because of your account on {website_title}."
-msgstr ""
+msgstr "Ricevi questo messaggio in quanto sei iscritto al sito {website_title}."
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:66
+#, fuzzy
 msgid ""
 "If you'd like to receive fewer emails, you can <a "
 "href=\"{website_title}/ui/account\">unsubscribe from notifications</a>."
 msgstr ""
+"Se vuoi ricevere meno email, puoi <a href=\"{website_title}/ui/account\""
+">dimenticare le notifiche</a>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:5
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:4
@@ -211,40 +215,50 @@ msgstr ""
 #: tracim_backend/templates/mail/shared_content_to_receiver_body_html.mak:5
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:4
 #: tracim_backend/templates/mail/upload_permission_to_receiver_body_html.mak:5
+#, fuzzy
 msgid "Hello {username},"
-msgstr ""
+msgstr "Ciao {username},"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:8
+#, fuzzy
 msgid "{origin_user_name} invited you to join <i>{website_title}</i>."
-msgstr ""
+msgstr "{origin_user_name} ti ha invitato a unirevi a <i>{website_title}</i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:10
+#, fuzzy
 msgid "Someone invited you to join <i>{website_title}</i>."
-msgstr ""
+msgstr "Qualcuno ti ha invitato a unirevi a <i>{website_title}</i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:13
+#, fuzzy
 msgid "Your credentials are:"
-msgstr ""
+msgstr "I tuoi dati di accesso sono :"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:16
 msgid "login: {email_address}"
-msgstr ""
+msgstr "login: {email_address}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:17
 msgid "password: {password}"
-msgstr ""
+msgstr "password: {password}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:21
+#, fuzzy
 msgid ""
 "Let start to discuss, share files, agenda and documentation with "
 "collaborators by logging into your space: {a_link}"
 msgstr ""
+"Inizia a discutere, condividere file, agenda e documentazione con i tuoi "
+"collaboratori accedendo al tuo spazio: {a_link}"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:23
+#, fuzzy
 msgid ""
 "note: as soon as you are connected, we strongly recommend that you change"
 " your password and delete this email."
 msgstr ""
+"nota: una volta connesso, vi consigliamo vivamente di cambiare la password e "
+"di cancellare questo messaggio."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:24
 #: tracim_backend/templates/mail/new_upload_event_body_html.mak:16

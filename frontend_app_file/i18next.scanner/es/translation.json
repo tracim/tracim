@@ -8,7 +8,7 @@
   "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
   "Error in the URL": "Error en la URL",
   "Upload files": "Cargar archivos",
-  "The file is larger than the maximum file size allowed": "El archivo es mayor que el tamaño máximo permitido",
+  "The file is larger than the maximum file size allowed": "El archivo supera el tamaño máximo permitido",
   "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo",
   "No preview available": "Vista previa no disponible",
   "Validate and create": "Validar y crear",
