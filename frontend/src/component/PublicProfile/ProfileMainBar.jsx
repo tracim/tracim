@@ -69,7 +69,12 @@ export const ProfileMainBar = props => {
             </div>
             <div className='profile__mainBar__btnGrp'>
               {props.changeAvatarEnabled && (
-                <Link className='profile__mainBar__btnGrp__btn' to={PAGE.ACCOUNT}>
+                <Link
+                  className='profile__mainBar__btnGrp__btn'
+                  to={props.user.userId === props.displayedUser.userId
+                    ? PAGE.ACCOUNT
+                    : PAGE.ADMIN.USER_EDIT(props.displayedUser.userId)}
+                >
                   <IconButton text={props.t('Account Settings')} type='button' icon='fas fa-cogs' />
                 </Link>
               )}
