@@ -40,9 +40,13 @@
     padding-inline-start pageSpacing
     background-color offWhite
     display flex
-    &__callBtn
-      align-self start
-      margin standardSpacing pageSpacing standardSpacing
+    &__btnGrp
+      display flex
+      flex-direction row
+      margin standardSpacing pageSpacing
+      &__btn
+        align-self start
+        margin 0 standardSpacing
     &__avatar
       position relative
       &__medium
