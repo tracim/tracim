@@ -1,8 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
-import { CONTENT_NAMESPACE } from '../../util/helper.js'
 import {
+  CONTENT_NAMESPACE,
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   IconButton,

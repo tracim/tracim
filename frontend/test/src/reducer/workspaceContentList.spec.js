@@ -17,8 +17,7 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { contentFromApi } from '../../fixture/content/content.js'
 import workspaceContentList, { serializeContentProps } from '../../../src/reducer/workspaceContentList.js'
-import { serialize, CONTENT_TYPE } from 'tracim_frontend_lib'
-import { CONTENT_NAMESPACE } from '../../../src/util/helper'
+import { serialize, CONTENT_TYPE, CONTENT_NAMESPACE } from 'tracim_frontend_lib'
 
 describe('reducer workspaceContentList.js', () => {
   describe('actions', () => {

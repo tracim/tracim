@@ -169,12 +169,6 @@ export const compareContents = (a, b, lang) => {
   return naturalCompareLabels(a, b, lang)
 }
 
-export const CONTENT_NAMESPACE = {
-  CONTENT: 'content',
-  UPLOAD: 'upload',
-  PUBLICATION: 'publication'
-}
-
 export const sortContentList = (workspaceContents, lang) => {
   return workspaceContents.sort((a, b) => compareContents(a, b, lang))
 }

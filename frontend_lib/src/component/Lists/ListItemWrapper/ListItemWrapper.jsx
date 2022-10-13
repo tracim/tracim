@@ -9,7 +9,7 @@ const ListItemWrapper = props => {
     <div
       className={
         classnames(
-          'content',
+          'contentItem',
           {
             'item-last': props.isLast,
             'item-first': props.isFirst,

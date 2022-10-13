@@ -10,6 +10,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_SUB,
+  CONTENT_NAMESPACE,
   SUBSCRIPTION_TYPE
 } from 'tracim_frontend_lib'
 
@@ -18,10 +19,7 @@ import {
   addMessageToActivityList,
   sortActivityList
 } from '../util/activity.js'
-import {
-  FETCH_CONFIG,
-  CONTENT_NAMESPACE
-} from '../util/helper.js'
+import { FETCH_CONFIG } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 

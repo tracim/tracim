@@ -1,12 +1,12 @@
 import React from 'react'
 import {
   ADVANCED_SEARCH_TYPE,
-  CONTENT_NAMESPACE,
   FETCH_CONFIG,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
+
 import { parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
@@ -66,6 +66,7 @@ import {
   UNREAD_NOTIFICATION_COUNT
 } from './action-creator.sync.js'
 import {
+  CONTENT_NAMESPACE,
   ErrorFlashMessageTemplateHtml,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,

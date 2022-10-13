@@ -562,8 +562,6 @@ export const CONTENT_TYPE = {
   TODO: 'todo'
 }
 
-// FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
-// see https://github.com/tracim/tracim/issues/4340
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
   UPLOAD: 'upload',

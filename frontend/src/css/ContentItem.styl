@@ -1,4 +1,4 @@
-.content
+.contentItem
   position relative
   border borderStyle
   background-color offWhite
@@ -7,6 +7,12 @@
     margin-bottom standardSpacing
   &.item-first
     border-bottom 0
+  & .dragHandle
+    display none
+  &:hover > .dragHandle
+    display block
+
+.content
   &__item
     padding standardSpacing 0
   &__type
@@ -34,10 +40,6 @@
     align-items center
     &__icon
       font-size bigIconSize
-  & .dragHandle
-    display none
-  &:hover > .dragHandle
-    display block
 
 @media (max-width: max-xs)
   .content

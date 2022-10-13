@@ -8,8 +8,8 @@ const veryLongComment = 'this_is_a_very_long_comment lorem_ipsum_dolor_sit_amet_
 
 const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attrs: { title: htmlDocTitle } })
 
-const commentArea = '.comment__body'
-const commentText = '.comment__body__content__text'
+const commentArea = '.timeline__comment__body'
+const commentText = '.timeline__comment__body__content__text'
 const cancelDocBtn = '.html-document__editionmode__cancel'
 const submitBtn = '.commentArea__submit__btn'
 const commentField = '#wysiwygTimelineComment'
@@ -39,18 +39,18 @@ describe('Add a new comment', () => {
     cy.get(cancelDocBtn).click()
 
     cy.createComment(workspaceId, 1, [
-      '<p data-cy="comment-first-paragraph">Hello1</p>',
-      '<p data-cy="comment-middle-paragraph">Between</p>',
-      '<p data-cy="comment-last-paragraph">Hello2</p>'
+      '<p data-cy="timeline__comment-first-paragraph">Hello1</p>',
+      '<p data-cy="timeline__comment-middle-paragraph">Between</p>',
+      '<p data-cy="timeline__comment-last-paragraph">Hello2</p>'
     ].join(''))
 
-    cy.get('[data-cy=comment-first-paragraph]').invoke('css', 'marginTop').should('be.equal', '0px')
-    cy.get('[data-cy=comment-first-paragraph]').invoke('css', 'paddingTop').should('be.equal', '0px')
-    cy.get('[data-cy=comment-last-paragraph]').invoke('css', 'marginBottom').should('be.equal', '0px')
-    cy.get('[data-cy=comment-last-paragraph]').invoke('css', 'paddingBottom').should('be.equal', '0px')
+    cy.get('[data-cy=timeline__comment-first-paragraph]').invoke('css', 'marginTop').should('be.equal', '0px')
+    cy.get('[data-cy=timeline__comment-first-paragraph]').invoke('css', 'paddingTop').should('be.equal', '0px')
+    cy.get('[data-cy=timeline__comment-last-paragraph]').invoke('css', 'marginBottom').should('be.equal', '0px')
+    cy.get('[data-cy=timeline__comment-last-paragraph]').invoke('css', 'paddingBottom').should('be.equal', '0px')
 
-    cy.get('[data-cy=comment-first-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
-    cy.get('[data-cy=comment-middle-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
+    cy.get('[data-cy=timeline__comment-first-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
+    cy.get('[data-cy=timeline__comment-middle-paragraph]').invoke('css', 'marginBottom').should('not.be.equal', '0px')
   })
 
   it('Should not change the comment area size', function () {

@@ -1,4 +1,4 @@
-import { PAGES } from '../../support/urls_commands'
+import { PAGES, URLS } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
 
@@ -274,6 +274,12 @@ describe('Account page', () => {
         cy.get('.confirm_popup').should('be.visible')
         cy.get('[data-cy=confirm_popup__button_confirm]').click()
         cy.contains('.account__userpreference__setting__spacename', 'You are not a member of any space yet')
+      })
+    })
+    describe('Profile link button', () => {
+      it('should redirect to user\'s public profile', () => {
+        cy.get('.userinfo__profile_button').click()
+        cy.url().should('include', URLS[PAGES.PROFILE]({ userId: baseUser.user_id }));
       })
     })
 

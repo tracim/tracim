@@ -4,6 +4,7 @@ import Enzyme from 'enzyme'
 import chaiEnzyme from 'chai-enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import sinon from 'sinon'
+import Prism from 'prismjs'
 
 process.env.NODE_ENV = 'test'
 
@@ -11,7 +12,7 @@ process.env.NODE_ENV = 'test'
 if (!global.window && !global.document) {
   const { window } = new JSDOM('<!doctype html><html><body></body></html>', {
     beforeParse (win) {
-      win.scrollTo = () => {}
+      win.scrollTo = () => { }
     },
     pretendToBeVisual: false,
     userAgent: 'mocha',
@@ -21,18 +22,20 @@ if (!global.window && !global.document) {
   global.self = global
   global.window = window
   global.document = window.document
+  global.Element = window.Element
   global.navigator = window.navigator
   global.FormData = window.FormData
-  global.GLOBAL_dispatchEvent = () => {}
+  global.GLOBAL_dispatchEvent = () => { }
   global.GLOBAL_primaryColor = '#aaaaaa'
+  global.Prism = Prism
   global.localStorage = {
-    getItem: () => {}
+    getItem: () => { }
   }
   global.globalThis = {
     tinymce: {
-      remove: () => {}
+      remove: () => { }
     },
-    wysiwyg: () => {}
+    wysiwyg: () => { }
   }
   const nodeCrypto = require('crypto')
   global.crypto = {

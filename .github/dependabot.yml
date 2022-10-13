@@ -6,15 +6,18 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "07:00"
-      timezone: "Europe/Paris"
+      time: "05:00"
+      timezone: "UTC"
     target-branch: "develop"
+    reviewers:
+      - "haskaris"
     labels:
       - "frontend"
       - "dependencies"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 0
 
   # Maintain dependencies for pip
   - package-ecosystem: "pip"
@@ -25,9 +28,12 @@ updates:
       time: "05:00"
       timezone: "UTC"
     target-branch: "develop"
+    reviewers:
+      - "haskaris"
     labels:
       - "backend"
       - "dependencies"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+    open-pull-requests-limit: 0

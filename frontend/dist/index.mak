@@ -12,6 +12,8 @@
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/branding/images/favicon/tracim-16x16.png?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="manifest" href="/assets/branding/manifest.json?token=${cache_token}" nonce="${csp_nonce}">
 
+    <link rel="stylesheet" type="text/css" href="/assets/prism/prism.min.css?token=${cache_token}" nonce="${csp_nonce}">
+
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/all.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
 

@@ -23,7 +23,7 @@
   "Error while uploading file": "Error al cargar el archivo",
   "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
   "Actions": "Acciones",
-  "The file is larger than the maximum file size allowed": "El archivo es mayor que el tamaño máximo permitido",
+  "The file is larger than the maximum file size allowed": "El archivo supera el tamaño máximo permitido",
   "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo",
   "{{user}}'s profile": "Perfil de {{user}}",
   "Open as content": "Abrir como contenido",
@@ -253,5 +253,6 @@
   "This content has no task to do associated.": "Este contenido no tiene ninguna tarea asociada.",
   "Click on \"New task\" button to create a new one.": "Haga clic en el botón \"Nueva tarea\" para crear una nueva.",
   "Email notifications are disabled": "Notificaciones por correo electrónico desactivadas",
-  "Participate": "Participar"
+  "Participate": "Participar",
+  "modified": "modificado"
 }

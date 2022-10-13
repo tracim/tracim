@@ -26,6 +26,7 @@ if (!global.window && !global.document) {
 
   global.window = window
   global.document = window.document
+  global.Element = window.Element
   global.navigator = window.navigator
   global.GLOBAL_primaryColor = GLOBAL_primaryColor.hex
   global.self = global

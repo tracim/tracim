@@ -15,6 +15,7 @@ import {
 } from '../../helper.js'
 import IconButton from '../Button/IconButton.jsx'
 import { isMobile } from 'react-device-detect'
+import onClickOutside from 'react-onclickoutside'
 
 // require('./NewTagForm.styl') // see https://github.com/tracim/tracim/issues/1156
 
@@ -34,6 +35,12 @@ export class NewTagForm extends React.Component {
       ? await this.handleClickBtnValidateContent()
       : await this.handleClickBtnValidateSpace()
     this.setState({ tagName: '', autoCompleteActive: false })
+  }
+
+  handleClickOutside = (event) => {
+    const inputField = document.getElementById('addTag')
+
+    this.setState({ autoCompleteActive: inputField.contains(event.target) })
   }
 
   handleClickBtnValidateContent = async () => {
@@ -172,6 +179,7 @@ export class NewTagForm extends React.Component {
             className='name__input form-control'
             id='addTag'
             placeholder={props.t('Add a tag here...')}
+            onFocus={() => this.setState({ autoCompleteActive: true })}
             data-cy='add_tag'
             value={state.tagName}
             onChange={(e) => this.setState({ tagName: e.target.value, autoCompleteActive: true })}
@@ -213,7 +221,7 @@ export class NewTagForm extends React.Component {
   }
 }
 
-export default translate()(NewTagForm)
+export default translate()(onClickOutside(NewTagForm))
 
 NewTagForm.propTypes = {
   apiUrl: PropTypes.string.isRequired,
