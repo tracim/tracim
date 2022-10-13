@@ -20,7 +20,7 @@ const options = {
       // Check out https://github.com/acornjs/acorn/tree/master/acorn#interface for additional options
     }
   },
-  lngs: ['en', 'fr', 'pt', 'de', 'ar', 'es'],
+  lngs: ['en', 'fr', 'pt', 'de', 'ar', 'es', 'nb_NO'],
   defaultLng: 'en',
   keySeparator: false, // false means "keyBasedFallback"
   nsSeparator: false, // false means "keyBasedFallback"
