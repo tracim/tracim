@@ -704,15 +704,6 @@ class UserIdPathSchema(marshmallow.Schema):
     )
 
 
-class EventIdListSchema(marshmallow.Schema):
-    event_id_list = marshmallow.fields.List(
-        marshmallow.fields.Int(
-            example=3, description="id of a valid event", validate=strictly_positive_int_validator,
-        ),
-        required=False,
-    )
-
-
 class EventIdPathSchema(marshmallow.Schema):
     event_id = marshmallow.fields.Int(
         example=5,
@@ -2235,13 +2226,26 @@ class PathSuffixSchema(marshmallow.Schema):
 class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of content_ids to check for marking event as read",
+        example="1,4",
+        description="Comma separated list of content ids. Every event related to these contents\
+            will be marked as read.",
+    )
+    notification_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,5",
+        description="Comma separated list of event ids. Every event ids will be marked as read.",
     )
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of parent_ids to check for marking event as read",
+        example="2,6",
+        description="Comma separated list of parent content ids. Every event related to theses\
+            parents will be marked as read.",
+    )
+    space_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="7",
+        description="Comma separated list of space ids. Every event related to theses space\
+            will be marked as read.",
     )
 
     @post_load

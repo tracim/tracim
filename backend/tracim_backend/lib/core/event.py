@@ -239,52 +239,47 @@ class EventApi:
         self._session.flush()
         return message
 
-    def mark_user_messages_as_unread(
+    def mark_user_messages_as_read_or_unread(
         self,
         user_id: int,
+        content_ids: typing.Optional[List[int]] = None,
         event_ids: typing.Optional[List[int]] = None,
         parent_ids: typing.Optional[List[int]] = None,
-        content_ids: typing.Optional[List[int]] = None,
+        space_ids: typing.Optional[List[int]] = None,
+        is_read: bool = True,
     ) -> List[Message]:
-        """Mark messages as unread for a user.
+        """Mark messages as read or unread for a user. Will read/unread every messages if there is\
+            no filter.
+
+        Args:
+            user_id (int): ID of the user to read/unread messages
+            content_ids (List[int]], optional): Content id list to mark as read/unread.\
+                Defaults to None.
+            event_ids (List[int]], optional): Event id list to mark as read/unread.\
+                Defaults to None.
+            parent_ids ([List[int]], optional): Parent content id list to mark as read/unread.\
+                Defaults to None.
+            space_ids (List[int]], optional): Space id list to mark as read/unread.\
+                Defaults to None.
+            is_read (bool, optional): If true, will mark as read. Unread overwise. Defaults to True.
 
         Returns:
-            List[Message]: every message marked as unread
+            List[Message]: Every message marked as read
         """
-        read_messages = self._base_query(
-            read_status=ReadStatus.READ,
-            event_ids=event_ids,
-            user_id=user_id,
-            parent_ids=parent_ids,
-            content_ids=content_ids,
-        ).all()
-        for message in read_messages:
-            message.read = None
-            self._session.add(message)
-        self._session.flush()
-        return read_messages
 
-    def mark_user_messages_as_read(
-        self,
-        user_id: int,
-        event_ids: typing.Optional[List[int]] = None,
-        parent_ids: typing.Optional[List[int]] = None,
-        content_ids: typing.Optional[List[int]] = None,
-    ) -> List[Message]:
-        """Mark messages as read for a user.
+        new_status = ReadStatus.READ if is_read else ReadStatus.UNREAD
+        read = datetime.utcnow() if is_read else None
 
-        Returns:
-            List[Message]: every message marked as read
-        """
         unread_messages = self._base_query(
-            read_status=ReadStatus.UNREAD,
-            event_ids=event_ids,
-            user_id=user_id,
-            parent_ids=parent_ids,
             content_ids=content_ids,
+            event_ids=event_ids,
+            parent_ids=parent_ids,
+            read_status=new_status,
+            user_id=user_id,
+            workspace_ids=space_ids,
         ).all()
         for message in unread_messages:
-            message.read = datetime.utcnow()
+            message.read = read
             self._session.add(message)
         self._session.flush()
         return unread_messages

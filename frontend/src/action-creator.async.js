@@ -955,14 +955,31 @@ export const getNotificationList = (
  */
 export const putNotificationListAsRead = (userId, notificationIdList) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read` +
+      `?notification_ids=${notificationIdList.join(',')}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,
-      method: 'PUT',
-      body: JSON.stringify({
-        event_id_list: notificationIdList
-      })
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+/**
+ * Put a list of space notifications as read
+ * @param {String} userId
+ * @param {int[]} spaceIdList
+ * @returns
+ */
+export const putSpaceListAsRead = (userId, spaceIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read?space_ids=${spaceIdList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
     },
     actionName: NOTIFICATION_LIST,
     dispatch

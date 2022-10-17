@@ -73,7 +73,6 @@ from tracim_backend.views.core_api.schemas import AboutUserSchema
 from tracim_backend.views.core_api.schemas import ContentDigestSchema
 from tracim_backend.views.core_api.schemas import ContentIdsQuerySchema
 from tracim_backend.views.core_api.schemas import DeleteFollowedUserPathSchema
-from tracim_backend.views.core_api.schemas import EventIdListSchema
 from tracim_backend.views.core_api.schemas import FileQuerySchema
 from tracim_backend.views.core_api.schemas import FollowedUsersSchemaPage
 from tracim_backend.views.core_api.schemas import GetLiveMessageQuerySchema
@@ -789,45 +788,59 @@ class UserController(Controller):
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserMessagesMarkAsReadQuerySchema())
-    @hapic.input_body(EventIdListSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_user_messages_as_read(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
-        Read a list of messages for a user. If there is no list provided, the
-        function will read every messages for a user.
+        Read every message that will match the parameters (parameters works as an AND not an OR).
+        If there is no parameters provided, the function will read every messages of the user\
+            specified.
+
+        notification_ids=1,2
+        content_ids=3
+
+        Will read event id 1 and 2 that are related to content id 3.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
-        event_api.mark_user_messages_as_read(
+        event_api.mark_user_messages_as_read_or_unread(
             request.candidate_user.user_id,
-            event_ids=hapic_data.body.get("event_id_list", None),
             content_ids=hapic_data.query.content_ids,
+            event_ids=hapic_data.query.notification_ids,
             parent_ids=hapic_data.query.parent_ids,
+            space_ids=hapic_data.query.space_ids,
+            is_read=True,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
     @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(UserMessagesMarkAsReadQuerySchema())
-    @hapic.input_body(EventIdListSchema())
     @hapic.output_body(NoContentSchema(), default_http_code=HTTPStatus.NO_CONTENT)
     def set_user_messages_as_unread(
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
-        Unread a list of messages for a user. If there is no list provided, the
-        function will unread every messages for a user.
+        Unread every message that will match the parameters (parameters works as an AND not an OR).
+        If there is no parameters provided, the function will unread every messages of the user\
+            specified.
+
+        notification_ids=1,2
+        content_ids=3
+
+        Will unread event id 1 and 2 that are related to content id 3 and 4.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
 
-        event_api.mark_user_messages_as_unread(
+        event_api.mark_user_messages_as_read_or_unread(
             request.candidate_user.user_id,
-            event_ids=hapic_data.body.get("event_id_list", None),
-            content_ids=hapic_data.query.content_ids,
-            parent_ids=hapic_data.query.parent_ids,
+            content_ids=hapic_data.query.get("content_ids", None),
+            event_ids=hapic_data.query.get("notification_ids", None),
+            parent_ids=hapic_data.query.get("parent_ids", None),
+            space_ids=hapic_data.query.get("space_ids", None),
+            is_read=False,
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
