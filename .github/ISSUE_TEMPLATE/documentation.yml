@@ -7,7 +7,6 @@ body:
     attributes:
       value: |
         * Please check that there is not an existing open [issue](https://github.com/tracim/tracim/labels/documentation) before you create a new one.
-        * Read the [writing guidelines](https://github.com/scaleway/docs-content/blob/main/docs/CONTRIBUTING.md#writing-guidelines) before you continue.
   - type: input
     attributes:
       label: What content on github.com/tracim/tracim] is affected?
