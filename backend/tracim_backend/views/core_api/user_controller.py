@@ -795,7 +795,8 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
-        Read every unread messages for a user
+        Read a list of messages for a user. If there is no list provided, the
+        function will read every messages for a user.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
@@ -816,7 +817,8 @@ class UserController(Controller):
         self, context, request: TracimRequest, hapic_data: HapicData
     ) -> None:
         """
-        Unread every messages for a user
+        Unread a list of messages for a user. If there is no list provided, the
+        function will unread every messages for a user.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
         event_api = EventApi(request.current_user, request.dbsession, app_config)
@@ -828,8 +830,7 @@ class UserController(Controller):
             parent_ids=hapic_data.query.parent_ids,
         )
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
-    # @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
@@ -844,8 +845,7 @@ class UserController(Controller):
             event_id=hapic_data.path.event_id, user_id=request.candidate_user.user_id
         )
 
-    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS])
-    # @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
+    @hapic.with_api_doc(tags=[SWAGGER_TAG__USER_EVENT_ENDPOINTS], deprecated=True)
     @hapic.handle_exception(MessageDoesNotExist, http_code=HTTPStatus.BAD_REQUEST)
     @check_right(has_personal_access)
     @hapic.input_path(MessageIdsPathSchema())
@@ -1555,7 +1555,7 @@ class UserController(Controller):
         )
         configurator.add_view(self.get_user_messages_summary, route_name="messages_summary")
 
-        # read every unread messages for user
+        # read a list of messages or every messages for a user
         configurator.add_route(
             "read_messages",
             "/users/{user_id:\d+}/messages/read",
@@ -1563,7 +1563,7 @@ class UserController(Controller):
         )
         configurator.add_view(self.set_user_messages_as_read, route_name="read_messages")
 
-        # unread every messages for user
+        # unread a list of messages or every messages for a user
         configurator.add_route(
             "unread_messages",
             "/users/{user_id:\d+}/messages/unread",
@@ -1571,8 +1571,8 @@ class UserController(Controller):
         )
         configurator.add_view(self.set_user_messages_as_unread, route_name="unread_messages")
 
-        # read all unread messages for user
-        # DEPRECATED - MP - 29-09-2022
+        # read one messages for user
+        # DEPRECATED - MP - 2022-09-22
         configurator.add_route(
             "read_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
@@ -1580,8 +1580,8 @@ class UserController(Controller):
         )
         configurator.add_view(self.set_message_as_read, route_name="read_message")
 
-        # read all unread messages for user
-        # DEPRECATED - MP - 29-09-2022
+        # unread one messages for user
+        # DEPRECATED - MP - 2022-09-22
         configurator.add_route(
             "unread_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",
