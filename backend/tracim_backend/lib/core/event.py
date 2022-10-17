@@ -223,7 +223,7 @@ class EventApi:
                 )
             ) from exc
 
-    # DEPRECATED - MP - 2022-09-29
+    # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
     def mark_user_message_as_read(self, event_id: int, user_id: int) -> Message:
         message = self.get_one_message(event_id, user_id)
         message.read = datetime.utcnow()
@@ -231,7 +231,7 @@ class EventApi:
         self._session.flush()
         return message
 
-    # DEPRECATED - MP - 2022-09-29
+    # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
     def mark_user_message_as_unread(self, event_id: int, user_id: int) -> Message:
         message = self.get_one_message(event_id, user_id)
         message.read = None

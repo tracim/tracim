@@ -565,7 +565,6 @@ class TestMessages(object):
         assert message_dicts["code"] == 2001
         assert message_dicts["message"] == "Validation error of input data"
 
-    # TODO: Update
     def test_api__read_all_messages__ok_204__nominal_case(self, session, web_testapp) -> None:
         """
         Read all unread messages
@@ -689,7 +688,6 @@ class TestMessages(object):
         result = web_testapp.put("/api/users/1/messages/{}/read".format("1000"), status=400)
         assert result.json_body["code"] == 1009
 
-    # TODO: Update
     def test_api__unread_message__err_400__message_does_not_exist(
         self, session, web_testapp
     ) -> None:
@@ -741,7 +739,6 @@ class TestMessages(object):
             else:
                 assert event.read
 
-    # TODO: Update
     def test_api__read_message__ok_204__read_only_one_message(self, session, web_testapp) -> None:
         """
         Read one unread message, check if only one message as been read

@@ -1572,7 +1572,7 @@ class UserController(Controller):
         configurator.add_view(self.set_user_messages_as_unread, route_name="unread_messages")
 
         # read one messages for user
-        # DEPRECATED - MP - 2022-09-22
+        # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "read_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/read",
@@ -1581,7 +1581,7 @@ class UserController(Controller):
         configurator.add_view(self.set_message_as_read, route_name="read_message")
 
         # unread one messages for user
-        # DEPRECATED - MP - 2022-09-22
+        # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
         configurator.add_route(
             "unread_message",
             "/users/{user_id:\d+}/messages/{event_id:\d+}/unread",
