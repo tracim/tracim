@@ -47,7 +47,9 @@ const GroupRender = props => {
         break
       }
       default:
-        props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
+        props.dispatch(
+          newFlashMessage(props.t('Error while marking the notification group as read'), 'warning')
+        )
     }
   }
 
