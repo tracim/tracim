@@ -1,0 +1,37 @@
+name: Documentation bug
+description: Raise an issue related to content.
+title: "🐞 Documentation Bug or documentation feature: "
+labels: "documentation, to sort"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        * Please check that there is not an existing open [issue](https://github.com/tracim/tracim/labels/documentation) before you create a new one.
+        * Read the [writing guidelines](https://github.com/scaleway/docs-content/blob/main/docs/CONTRIBUTING.md#writing-guidelines) before you continue.
+  - type: input
+    attributes:
+      label: What content on [github.com/tracim/tracim](https://github.com/tracim/tracim/) is affected?
+      placeholder: "github.com/tracim/tracim"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: What part(s) of the content would you like to see updated?
+      description: |
+        - Give as much detail as you can to help us understand the change you want to see. 
+        - Why should the docs be changed? What use cases does it support? 
+        - What is the expected outcome?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional context
+      placeholder: "Add any other context or screenshots about the feature request here."
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Related PR(s)
+      placeholder: "Let us know if this is related to an open pull request"
+    validations:
+      required: false
