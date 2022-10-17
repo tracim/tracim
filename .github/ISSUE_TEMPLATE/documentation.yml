@@ -10,7 +10,7 @@ body:
         * Read the [writing guidelines](https://github.com/scaleway/docs-content/blob/main/docs/CONTRIBUTING.md#writing-guidelines) before you continue.
   - type: input
     attributes:
-      label: What content on [http://github.com/tracim/tracim](https://github.com/tracim/tracim/) is affected?
+      label: What content on github.com/tracim/tracim] is affected?
       placeholder: "github.com/tracim/tracim"
     validations:
       required: true
