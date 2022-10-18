@@ -20,7 +20,8 @@ import {
   CONTENT_TYPE,
   serialize,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
 
 const defaultNotificationsObject = {
@@ -48,8 +49,12 @@ export const serializeNotification = notification => {
       author: serialize(notification.fields.subscription.author, serializeUserProps)
     } : null,
     content: notification.fields.content ? {
-      parentLabel: notification.fields.content.parent ? notification.fields.content.parent.label : null,
-      parentId: notification.fields.content.parent ? notification.fields.content.parent.content_id : null,
+      parentLabel: notification.fields.content.parent ?
+        notification.fields.content.parent.label : null,
+      parentId: notification.fields.content.parent ?
+        notification.fields.content.parent.content_id : null,
+      assignee: notification.fields.content.assignee ?
+        serialize(notification.fields.content.assignee, serializeUserProps) : null,
       ...serialize(notification.fields.content, serializeContentProps)
     } : null,
     created: notification.created,
@@ -74,16 +79,47 @@ function getMainContentId (notification) {
     : notification.content.id
 }
 
-// FIXME - GB - 2022-04-21 - this code is very similar to activityDisplayFilter
-// in withActivity and ActivityList, and can be refactor
-// See https://github.com/tracim/tracim/issues/4677
-function notificationListDisplayFilter (notificationList, spaceList, unreadNotificationCount) {
+/**
+ * FIXME - GB - 2022-04-21 - This code is very similar to activityDisplayFilter
+ * in withActivity and ActivityList, and can be refactor
+ * See https://github.com/tracim/tracim/issues/4677
+ * FIXME - MP - 2022-10-18 - This function allows us to filter when loading more notifications.
+ * Therefore there is a similar loginc in ReduxTlmDispatcher.js
+ * We should filter in backend instead.
+ * https://github.com/tracim/tracim/issues/5946
+ *
+ * Filter the notification list
+ * @param {int} userId
+ * @param {*} notificationList
+ * @param {*} spaceList
+ * @param {*} unreadNotificationCount
+ * @returns Notification list filtered and the unread notification count
+ */
+function notificationListDisplayFilter (
+  userId, notificationList, spaceList, unreadNotificationCount
+) {
   let newUnreadNotificationCount = unreadNotificationCount
   const newNotificationList = notificationList.map((notification) => {
-    const [entityType] = notification.type.split('.')
+    const [entityType, , subTpe] = notification.type.split('.')
+
+    // NOTE - MP - 2022-10-18 - Since we are filtering twice, the -1 verification is if we are
+    // doing this function in the `addNotification` case, which in this case is already filtered
+    if (userId !== -1) {
+      if (entityType === TLM_ET.CONTENT && subTpe === TLM_ST.TODO) {
+        if (notification.content.assignee.username) {
+          if (notification.content.assignee.userId !== userId) {
+            if (!notification.read) newUnreadNotificationCount--
+            return null
+          }
+        }
+      }
+    }
 
     if (
-      (entityType === TLM_ET.SHAREDSPACE_MEMBER || entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION) &&
+      (
+        entityType === TLM_ET.SHAREDSPACE_MEMBER ||
+        entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION
+      ) &&
       !(spaceList.find(space => space.id === notification.workspace.id))
     ) {
       if (!notification.read) newUnreadNotificationCount--
@@ -101,7 +137,12 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         .map(notification => serializeNotification(notification))
       return {
         ...state,
-        ...notificationListDisplayFilter([...state.list, ...notificationList], action.spaceList, state.unreadNotificationCount)
+        ...notificationListDisplayFilter(
+          action.userId,
+          [...state.list, ...notificationList],
+          action.spaceList,
+          state.unreadNotificationCount
+        )
       }
     }
 
@@ -111,7 +152,15 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       return {
         ...state,
         unreadMentionCount: newUnreadMentionCount,
-        ...notificationListDisplayFilter(sortByCreatedDate([...state.list, notification]), action.spaceList, state.unreadNotificationCount + 1)
+        // FIXME - MP - 2022-10-18 - Remove the function here to keep the logic in
+        // ReduxTlmDispatcher or in the backend
+        // https://github.com/tracim/tracim/issues/5946
+        ...notificationListDisplayFilter(
+          -1,
+          sortByCreatedDate([...state.list, notification]),
+          action.spaceList,
+          state.unreadNotificationCount + 1
+        )
       }
     }
 

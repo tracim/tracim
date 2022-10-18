@@ -109,11 +109,12 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleNotification = data => {
+    const { props } = this
     if (
-      this.props.user.userId !== data.fields.author.user_id &&
+      props.user.userId !== data.fields.author.user_id &&
       !EXCLUDED_NOTIFICATION_TYPE_PREFIXES.some(type => data.event_type.startsWith(type))
     ) {
-      this.props.dispatch(addNotification(data, this.props.workspaceList))
+      props.dispatch(addNotification(data, props.workspaceList))
     }
   }
 
@@ -143,7 +144,15 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceChanged = this.handleNotification
 
-  handleToDo = this.handleNotification
+  handleToDo = data => {
+    if (data.fields.content.assignee.username) {
+      if (data.fields.content.assignee.user_id === this.props.user.userId) {
+        this.handleNotification(data)
+      }
+    } else {
+      this.handleNotification(data)
+    }
+  }
 
   handleMemberCreated = data => {
     const { props } = this
@@ -323,7 +332,9 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleUserChanged = data => {
-    this.props.dispatch(addNotification(data, this.props.workspaceList))
+    const { props } = this
+
+    this.props.dispatch(addNotification(data, props.workspaceList))
   }
 
   handleWorkspaceSubscriptionCreated = data => {
