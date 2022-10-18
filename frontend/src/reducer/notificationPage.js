@@ -3,7 +3,7 @@ import {
   ADD,
   APPEND,
   CONTENT,
-  EVERY_NOTIFICATIONS,
+  EVERY_NOTIFICATION,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
@@ -146,7 +146,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    case `${READ}/${EVERY_NOTIFICATIONS}`: {
+    case `${READ}/${EVERY_NOTIFICATION}`: {
       const notificationList = state.list.map(notification => ({ ...notification, read: true }))
       return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
     }
