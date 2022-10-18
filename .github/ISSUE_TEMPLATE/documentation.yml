@@ -1,6 +1,6 @@
-name: Documentation bug
+name: Documentation request
 description: Raise an issue related to content.
-title: "📝 Documentation Bug or documentation feature: "
+title: "📝 Doc : request :"
 labels: "documentation, to sort"
 body:
   - type: markdown
