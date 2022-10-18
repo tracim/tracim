@@ -1,6 +1,6 @@
 name: Documentation bug
 description: Raise an issue related to content.
-title: "🐞 Documentation Bug or documentation feature: "
+title: "📝 Documentation Bug or documentation feature: "
 labels: "documentation, to sort"
 body:
   - type: markdown
@@ -9,7 +9,7 @@ body:
         * Please check that there is not an existing open [issue](https://github.com/tracim/tracim/labels/documentation) before you create a new one.
   - type: input
     attributes:
-      label: What content on github.com/tracim/tracim] is affected?
+      label: What content on github.com/tracim/tracim is affected?
       placeholder: "github.com/tracim/tracim"
     validations:
       required: true
