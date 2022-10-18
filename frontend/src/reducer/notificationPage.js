@@ -84,8 +84,7 @@ function getMainContentId (notification) {
  * in withActivity and ActivityList, and can be refactor
  * See https://github.com/tracim/tracim/issues/4677
  * FIXME - MP - 2022-10-18 - This function allows us to filter when loading more notifications.
- * Therefore there is a similar loginc in ReduxTlmDispatcher.js
- * We should filter in backend instead.
+ * However there is a similar loginc in ReduxTlmDispatcher.js when we receive a TLM.
  * https://github.com/tracim/tracim/issues/5946
  *
  * Filter the notification list
@@ -153,7 +152,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         ...state,
         unreadMentionCount: newUnreadMentionCount,
         // FIXME - MP - 2022-10-18 - Remove the function here to keep the logic in
-        // ReduxTlmDispatcher or in the backend
+        // ReduxTlmDispatcher.jsx
         // https://github.com/tracim/tracim/issues/5946
         ...notificationListDisplayFilter(
           -1,
