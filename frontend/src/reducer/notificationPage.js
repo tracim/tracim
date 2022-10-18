@@ -49,12 +49,12 @@ export const serializeNotification = notification => {
       author: serialize(notification.fields.subscription.author, serializeUserProps)
     } : null,
     content: notification.fields.content ? {
-      parentLabel: notification.fields.content.parent ?
-        notification.fields.content.parent.label : null,
-      parentId: notification.fields.content.parent ?
-        notification.fields.content.parent.content_id : null,
-      assignee: notification.fields.content.assignee ?
-        serialize(notification.fields.content.assignee, serializeUserProps) : null,
+      parentLabel: notification.fields.content.parent
+        ? notification.fields.content.parent.label : null,
+      parentId: notification.fields.content.parent
+        ? notification.fields.content.parent.content_id : null,
+      assignee: notification.fields.content.assignee
+        ? serialize(notification.fields.content.assignee, serializeUserProps) : null,
       ...serialize(notification.fields.content, serializeContentProps)
     } : null,
     created: notification.created,
