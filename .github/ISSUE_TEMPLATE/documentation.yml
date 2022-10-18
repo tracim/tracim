@@ -1,6 +1,6 @@
 name: Documentation request
 description: Raise an issue related to content.
-title: "📝 Doc : request :"
+title: "📝 Doc:"
 labels: "documentation, to sort"
 body:
   - type: markdown
