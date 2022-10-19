@@ -101,7 +101,7 @@ function notificationListDisplayFilter (
   const newNotificationList = notificationList.map((notification) => {
     const [entityType, , subType] = notification.type.split('.')
 
-    // NOTE - MP - 2022-10-18 - Since we are filtering twice, the -1 verification is if we are
+    // INFO - MP - 2022-10-18 - Since we are filtering twice, the -1 verification is if we are
     // doing this function in the `addNotification` case, which in this case is already filtered
     if (userId !== -1) {
       if (entityType === TLM_ET.CONTENT && subType === TLM_ST.TODO) {
