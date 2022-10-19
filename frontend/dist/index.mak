@@ -93,17 +93,17 @@
 
     <style nonce="${csp_nonce}">
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Regular.ttf");
+        font-family: "Raleway";
+        src: url("/assets/font/Raleway/Raleway-Regular.ttf");
       }
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Bold.ttf");
+        font-family: "Raleway";
+        src: url("/assets/font/Raleway/Raleway-Bold.ttf");
         font-weight: bold;
       }
 
       body {
-        font-family: Quicksand;
+        font-family: Raleway;
       }
     </style>
 
