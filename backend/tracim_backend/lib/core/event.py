@@ -161,6 +161,29 @@ class EventApi:
         content_ids: Optional[List[int]] = None,
         parent_ids: Optional[List[int]] = None,
     ) -> Query:
+        """
+        Generate base query to get events
+
+        Args:
+            read_status (ReadStatus, optional): What read status should the event have. Defaults to ReadStatus.ALL.
+            event_ids (Optional[List[int]], optional): What ID should the event have. It will return every event that have one ID in the list. Defaults to None.
+            user_id (Optional[int], optional): What user ID should the event have. Defaults to None.
+            after_event_id (int, optional): _description_. Defaults to 0.
+            workspace_ids (Optional[List[int]], optional): _description_. Defaults to None.
+            related_to_content_ids (Optional[List[int]], optional): Every events that have a content or a parent in the list.\
+                Overwrite `content_ids` and `parent_ids`. Defaults to None.
+            include_not_sent (bool, optional): _description_. Defaults to False.
+            content_ids (Optional[List[int]], optional): Every events that have a content in the list.\
+                Ignored if `related_to_content_ids` is set. Defaults to None.
+            parent_ids (Optional[List[int]], optional): Every events that have a parent in the list.\
+                Ignored if `related_to_content_ids` is set. Defaults to None.
+
+        Note:
+        - If `related_to_content_ids` is set, `content_ids` and `parent_ids` are ignored.
+
+        Returns:
+            Query: A query that will fetch the events corresponding to the parameters
+        """
         query = self._session.query(Message).join(Event)
         if workspace_ids:
             query = query.filter(Event.workspace_id.in_(workspace_ids))
@@ -267,7 +290,7 @@ class EventApi:
             List[Message]: Every message marked as read
         """
 
-        new_status = ReadStatus.READ if is_read else ReadStatus.UNREAD
+        new_status = ReadStatus.UNREAD if is_read else ReadStatus.READ
         read = datetime.utcnow() if is_read else None
 
         unread_messages = self._base_query(

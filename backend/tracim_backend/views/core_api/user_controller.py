@@ -836,10 +836,10 @@ class UserController(Controller):
 
         event_api.mark_user_messages_as_read_or_unread(
             request.candidate_user.user_id,
-            content_ids=hapic_data.query.get("content_ids", None),
-            event_ids=hapic_data.query.get("notification_ids", None),
-            parent_ids=hapic_data.query.get("parent_ids", None),
-            space_ids=hapic_data.query.get("space_ids", None),
+            content_ids=hapic_data.query.content_ids,
+            event_ids=hapic_data.query.notification_ids,
+            parent_ids=hapic_data.query.parent_ids,
+            space_ids=hapic_data.query.space_ids,
             is_read=False,
         )
 
