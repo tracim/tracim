@@ -99,12 +99,12 @@ function notificationListDisplayFilter (
 ) {
   let newUnreadNotificationCount = unreadNotificationCount
   const newNotificationList = notificationList.map((notification) => {
-    const [entityType, , subTpe] = notification.type.split('.')
+    const [entityType, , subType] = notification.type.split('.')
 
     // NOTE - MP - 2022-10-18 - Since we are filtering twice, the -1 verification is if we are
     // doing this function in the `addNotification` case, which in this case is already filtered
     if (userId !== -1) {
-      if (entityType === TLM_ET.CONTENT && subTpe === TLM_ST.TODO) {
+      if (entityType === TLM_ET.CONTENT && subType === TLM_ST.TODO) {
         if (notification.content.assignee.username) {
           if (notification.content.assignee.userId !== userId) {
             if (!notification.read) newUnreadNotificationCount--
