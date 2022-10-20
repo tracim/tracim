@@ -9,17 +9,11 @@ import DropdownLang from '../component/DropdownLang.jsx'
 import { newFlashMessage, setUserLang } from '../action-creator.sync.js'
 import { putUserLang } from '../action-creator.async.js'
 import { COOKIE_FRONTEND } from '../util/helper.js'
-import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
+import { CUSTOM_EVENT, PAGE, usePublishLifecycle } from 'tracim_frontend_lib'
 import CustomToolboxContainer from '../component/CustomToolboxContainer.jsx'
 
 export const Header = (props) => {
-  useEffect(() => {
-    props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_MOUNTED('HEADER'), { lang: props.user.lang })
-
-    return () => {
-      props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_UNMOUNTED('HEADER'), { lang: props.user.lang })
-    }
-  }, [])
+  usePublishLifecycle('HEADER', { lang: props.user.lang }, props.dispatchCustomEvent)
 
   useEffect(() => {
     i18n.changeLanguage(props.user.lang)
