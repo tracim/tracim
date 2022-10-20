@@ -2230,7 +2230,7 @@ class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
         description="Comma separated list of content ids. Every event related to these contents\
             will be marked as read.",
     )
-    notification_ids = StrippedString(
+    event_ids = StrippedString(
         validate=regex_string_as_list_of_int,
         example="3,5",
         description="Comma separated list of event ids. Every event ids will be marked as read.",

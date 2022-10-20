@@ -956,7 +956,7 @@ export const getNotificationList = (
 export const putNotificationListAsRead = (userId, notificationIdList) => dispatch => {
   return fetchWrapper({
     url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read` +
-      `?notification_ids=${notificationIdList.join(',')}`,
+      `?event_ids=${notificationIdList.join(',')}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,

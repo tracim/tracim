@@ -610,11 +610,9 @@ class TestMessages(object):
         "api_end_url, user_id, params, ids, expected_code, expected_length",
         [
             pytest.param("read", 1, [], [[]], 204, 10, id="read_all"),
-            pytest.param(
-                "read", 1, ["notification_ids"], [[0]], 204, 0, id="read_non_accessible_event",
-            ),
-            pytest.param("read", 1, ["notification_ids"], [[2]], 204, 1, id="read_one_event"),
-            pytest.param("read", 1, ["notification_ids"], [[2, 4]], 204, 2, id="read_some_events"),
+            pytest.param("read", 1, ["event_ids"], [[0]], 204, 0, id="read_non_accessible_event",),
+            pytest.param("read", 1, ["event_ids"], [[2]], 204, 1, id="read_one_event"),
+            pytest.param("read", 1, ["event_ids"], [[2, 4]], 204, 2, id="read_some_events"),
             pytest.param("read", 1, ["content_ids"], [[1]], 204, 1, id="read_one_content"),
             pytest.param("read", 1, ["content_ids"], [[1, 2]], 204, 2, id="read_some_contents"),
             pytest.param("read", 1, ["space_ids"], [[1]], 204, 1, id="read_one_space"),
@@ -686,9 +684,9 @@ class TestMessages(object):
             base_message_query = base_message_query.filter(
                 tracim_event.Event.content_id.in_(ids[params.index("content_ids")])
             )
-        if "notification_ids" in params:
+        if "event_ids" in params:
             base_message_query = base_message_query.filter(
-                tracim_event.Message.event_id.in_(ids[params.index("notification_ids")])
+                tracim_event.Message.event_id.in_(ids[params.index("event_ids")])
             )
         if "parent_ids" in params:
             base_message_query = base_message_query.filter(
