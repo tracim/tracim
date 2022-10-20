@@ -158,8 +158,14 @@ Then, you can build the frontend:
 ### Development build
 
 You may want to build only an application and not the whole frontend.<br>
-To do so, you will have to build the application by moving into the application folder.<br>
-For example:
+To do so, you will have to build the application by moving into the application folder.
+
+If you want to build `frontend`:
+
+    cd frontend
+    ./build_frontend.sh
+
+If you want to build `frontend_app_<any_app>`
 
     cd frontend_app_agenda
     ./build_app.sh
@@ -167,9 +173,9 @@ For example:
 If you want to build `frontend_lib`:
 
     cd frontend_lib
-    ./build_lib.sh
+    ./build_frontend_lib.sh
 
-On top of that you have an option to build the frontend in development mode:
+On top of that there is an option `-d` to build the frontend in development mode:
 
     ./build_full_frontend.sh -d
 
@@ -179,4 +185,4 @@ This allow to faster builds and better debugging.
 
 To run the development server, accessible at [localhost:7999](http://localhost:7999), you have to run the script:
 
-    ./run_development_server.sh
+    ./run_dev_backend.sh
