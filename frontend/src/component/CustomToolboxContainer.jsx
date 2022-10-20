@@ -1,23 +1,14 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import appFactory from '../util/appFactory'
 import PropTypes from 'prop-types'
-import { CUSTOM_EVENT } from 'tracim_frontend_lib/src'
+import { usePublishLifecycle } from 'tracim_frontend_lib'
 
 const CustomToolboxContainer = (props) => {
-  useEffect(() => {
-    props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_MOUNTED('TOOLBOX'), {
-      lang: props.user.lang,
-      parentName: props.parentName
-    })
-
-    return () => {
-      props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_UNMOUNTED('TOOLBOX'), {
-        lang: props.user.lang,
-        parentName: props.parentName
-      })
-    }
-  }, [])
+  usePublishLifecycle('TOOLBOX', {
+    lang: props.user.lang,
+    parentName: props.parentName
+  }, props.dispatchCustomEvent)
 
   return (
     <div id={`customToolbox__${props.parentName}`}>
