@@ -32,6 +32,7 @@ import SearchInput from '../component/Search/SearchInput.jsx'
 import SidebarItem from '../component/Sidebar/SidebarItem.jsx'
 import SidebarSpaceList from '../component/Sidebar/SidebarSpaceList.jsx'
 import SidebarUserItemList from '../component/Sidebar/SidebarUserItemList.jsx'
+import CustomToolboxContainer from '../component/CustomToolboxContainer.jsx'
 
 const qs = require('query-string')
 export const LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE = 'lockToggleSidebarWhenOpenedOnMobile'
@@ -200,10 +201,7 @@ export class Sidebar extends React.Component {
           </button>
         </div>
 
-        <div
-          id='customToolboxHeaderBtn'
-          className='header__menu__rightside__specificBtn'
-        />
+        <CustomToolboxContainer parentName='sidebar' />
 
         <div
           className={classnames('sidebar__search', {

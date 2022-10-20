@@ -10,6 +10,7 @@ import { newFlashMessage, setUserLang } from '../action-creator.sync.js'
 import { putUserLang } from '../action-creator.async.js'
 import { COOKIE_FRONTEND } from '../util/helper.js'
 import { CUSTOM_EVENT, PAGE } from 'tracim_frontend_lib'
+import CustomToolboxContainer from '../component/CustomToolboxContainer.jsx'
 
 export const Header = (props) => {
   useEffect(() => {
@@ -48,10 +49,7 @@ export const Header = (props) => {
           <Logo to={PAGE.LOGIN} />
 
           <div className='header__menu__rightside'>
-            <div
-              id='customToolboxHeaderBtn'
-              className='header__menu__rightside__specificBtn'
-            />
+            <CustomToolboxContainer parentName='header' />
 
             <DropdownLang
               langList={props.lang}
