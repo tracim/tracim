@@ -17,7 +17,6 @@ import Card from '../component/common/Card/Card.jsx'
 import CardHeader from '../component/common/Card/CardHeader.jsx'
 import CardBody from '../component/common/Card/CardBody.jsx'
 import HomeNoWorkspace from '../component/Home/HomeNoWorkspace.jsx'
-import HomeHasWorkspace from '../component/Home/HomeHasWorkspace.jsx'
 
 export class Home extends React.Component {
   constructor (props) {
@@ -74,19 +73,12 @@ export class Home extends React.Component {
               <CardHeader displayHeader={false} />
 
               <CardBody formClass='homepagecard__body'>
-                {(props.workspaceList.length > 0
-                  ? (
-                    <HomeHasWorkspace user={props.user} />
-                  )
-                  : (
-                    <HomeNoWorkspace
-                      canCreateWorkspace={props.canCreateWorkspace}
-                      canJoinWorkspace={props.accessibleWorkspaceList.length > 0}
-                      onClickCreateWorkspace={this.handleClickCreateWorkspace}
-                      onClickJoinWorkspace={this.handleClickJoinWorkspace}
-                    />
-                  )
-                )}
+                <HomeNoWorkspace
+                  canCreateWorkspace={props.canCreateWorkspace}
+                  canJoinWorkspace={props.accessibleWorkspaceList.length > 0}
+                  onClickCreateWorkspace={this.handleClickCreateWorkspace}
+                  onClickJoinWorkspace={this.handleClickJoinWorkspace}
+                />
               </CardBody>
             </Card>
           </section>
