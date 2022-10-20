@@ -13,7 +13,8 @@ import {
   scrollIntoViewIfNeeded,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent
+  TracimComponent,
+  withUsePublishLifecycle
 } from 'tracim_frontend_lib'
 import {
   ADVANCED_SEARCH_TYPE,
@@ -103,7 +104,6 @@ export class Sidebar extends React.Component {
   componentDidMount () {
     const { props } = this
     if (!this.shouldDisplaySidebar(props)) return
-    props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_MOUNTED('SIDEBAR'), { lang: props.user.lang })
 
     if (props.location.pathname.includes(PAGE.WORKSPACE.ROOT)) {
       const urlElements = props.location.pathname.split('/')
@@ -124,8 +124,6 @@ export class Sidebar extends React.Component {
   }
 
   componentWillUnmount () {
-    const { props } = this
-    props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_UNMOUNTED('SIDEBAR'), { lang: props.user.lang })
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
@@ -308,7 +306,8 @@ const mapStateToProps = ({
   user,
   workspaceList
 })
-export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar))))
+const SidebarWithHooks = withUsePublishLifecycle(Sidebar, 'SIDEBAR')
+export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(SidebarWithHooks))))
 
 Sidebar.propTypes = {
   isNotificationWallOpen: PropTypes.bool,
