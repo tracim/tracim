@@ -207,7 +207,7 @@ export const appendNotificationList = (notificationList, spaceList) => ({ type: 
 export const addNotification = (notification, spaceList) => ({ type: `${ADD}/${NOTIFICATION}`, notification, spaceList })
 export const updateNotification = (notificationId, notificationList) => ({ type: `${UPDATE}/${NOTIFICATION}`, notificationId, notificationList })
 export const readNotificationList = notificationIdList => ({ type: `${READ}/${NOTIFICATION_LIST}`, notificationIdList })
-export const readEveryNotifications = () => ({ type: `${READ}/${EVERY_NOTIFICATION}` })
+export const readEveryNotification = () => ({ type: `${READ}/${EVERY_NOTIFICATION}` })
 export const readContentNotification = contentId => ({ type: `${READ}/${CONTENT}/${NOTIFICATION}`, contentId })
 export const setNextPage = (hasNextPage, nextPageToken) => ({ type: `${SET}/${NEXT_PAGE}`, hasNextPage, nextPageToken })
 export const setUnreadMentionCount = (count) => ({ type: `${SET}/${UNREAD_MENTION_COUNT}`, count })
