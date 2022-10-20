@@ -179,4 +179,4 @@ This allow to faster builds and better debugging.
 
 To run the development server, accessible at [localhost:7999](http://localhost:7999), you have to run the script:
 
-    ./run_development_server.sh
+    ./run_dev_backend.sh
