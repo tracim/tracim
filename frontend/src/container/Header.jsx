@@ -14,7 +14,11 @@ import CustomToolboxContainer from '../component/CustomToolboxContainer.jsx'
 
 export const Header = (props) => {
   useEffect(() => {
-    props.dispatchCustomEvent('TRACIM_HEADER_MOUNTED', { lang: props.user.lang })
+    props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_MOUNTED('HEADER'), { lang: props.user.lang })
+
+    return () => {
+      props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_UNMOUNTED('HEADER'), { lang: props.user.lang })
+    }
   }, [])
 
   useEffect(() => {

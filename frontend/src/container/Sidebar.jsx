@@ -103,6 +103,7 @@ export class Sidebar extends React.Component {
   componentDidMount () {
     const { props } = this
     if (!this.shouldDisplaySidebar(props)) return
+    props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_MOUNTED('SIDEBAR'), { lang: props.user.lang })
 
     if (props.location.pathname.includes(PAGE.WORKSPACE.ROOT)) {
       const urlElements = props.location.pathname.split('/')
@@ -123,6 +124,8 @@ export class Sidebar extends React.Component {
   }
 
   componentWillUnmount () {
+    const { props } = this
+    props.dispatchCustomEvent(CUSTOM_EVENT.TRACIM_COMP_UNMOUNTED('SIDEBAR'), { lang: props.user.lang })
     document.removeEventListener(CUSTOM_EVENT.APP_CUSTOM_EVENT_LISTENER, this.customEventReducer)
   }
 
