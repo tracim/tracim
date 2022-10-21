@@ -32,6 +32,8 @@ const defaultNotificationsObject = {
   unreadNotificationCount: 0
 }
 
+const userIdIfFiltered = -1
+
 // FIXME - GB - 2020-07-30 - We can't use the global serializer in this case because it doesn't handle nested object
 // See https://github.com/tracim/tracim/issues/3229
 export const serializeNotification = notification => {
@@ -87,31 +89,34 @@ function getMainContentId (notification) {
  * However there is a similar loginc in ReduxTlmDispatcher.js when we receive a TLM.
  * https://github.com/tracim/tracim/issues/5946
  *
- * Filter the notification list
- * @param {int} userId
- * @param {*} notificationList
- * @param {*} spaceList
- * @param {*} unreadNotificationCount
- * @returns Notification list filtered and the unread notification count
+ * Filter the notification list according to theses filters:
+ * - userId for todo notifications
+ * - spaceList for access request notifications
+ * @param {int} userId Filter the notification list to not display todos notifications if we are not
+ *  assigned to the todo. `userIdIfFiltered` if the list is already filtered
+ * @param {Object[]} notificationList Notification list to filter
+ * @param {Object[]} spaceList Filter the notification to not display access request to spaces that
+ *  are not in the list
+ * @param {int} unreadNotificationCount The current unread notification count
+ * @returns {Object} An object that contains the new notification list filtered and the new unread
+ * notification count
  */
-function notificationListDisplayFilter (
+function notificationListFilter (
   userId, notificationList, spaceList, unreadNotificationCount
 ) {
   let newUnreadNotificationCount = unreadNotificationCount
   const newNotificationList = notificationList.map((notification) => {
-    const [entityType, , subType] = notification.type.split('.')
+    const [entityType, coreType, subType] = notification.type.split('.') // eslint-disable-line no-unused-vars
 
-    // INFO - MP - 2022-10-18 - Since we are filtering twice, the -1 verification is if we are
+    // INFO - MP - 2022-10-18 - Since we are filtering twice, the userId verification is if we are
     // doing this function in the `addNotification` case, which in this case is already filtered
-    if (userId !== -1) {
-      if (entityType === TLM_ET.CONTENT && subType === TLM_ST.TODO) {
-        if (notification.content.assignee.username) {
-          if (notification.content.assignee.userId !== userId) {
-            if (!notification.read) newUnreadNotificationCount--
-            return null
-          }
-        }
-      }
+    if (
+      userId !== userIdIfFiltered &&
+      entityType === TLM_ET.CONTENT && subType === TLM_ST.TODO &&
+      notification.content.assignee.userId !== userId
+    ) {
+      if (!notification.read) newUnreadNotificationCount--
+      return null
     }
 
     if (
@@ -126,6 +131,7 @@ function notificationListDisplayFilter (
     }
     return notification
   })
+
   return { list: newNotificationList.filter(notification => !!notification), unreadNotificationCount: newUnreadNotificationCount }
 }
 
@@ -136,7 +142,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         .map(notification => serializeNotification(notification))
       return {
         ...state,
-        ...notificationListDisplayFilter(
+        ...notificationListFilter(
           action.userId,
           [...state.list, ...notificationList],
           action.spaceList,
@@ -154,8 +160,8 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         // FIXME - MP - 2022-10-18 - Remove the function here to keep the logic in
         // ReduxTlmDispatcher.jsx
         // https://github.com/tracim/tracim/issues/5946
-        ...notificationListDisplayFilter(
-          -1,
+        ...notificationListFilter(
+          userIdIfFiltered,
           sortByCreatedDate([...state.list, notification]),
           action.spaceList,
           state.unreadNotificationCount + 1
