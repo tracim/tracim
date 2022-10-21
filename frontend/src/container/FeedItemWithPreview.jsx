@@ -324,6 +324,9 @@ export class FeedItemWithPreview extends React.Component {
         ? this.getFirstComment()
         : null
     )
+    if (shouldShowComment && props.inRecentActivities) {
+      props.content.firstComment = commentToShow
+    }
 
     const commentList = this.getTimelineData()
 

@@ -10,6 +10,7 @@ describe('<Home />', () => {
   const renderAppPopupCreationCallBack = sinon.spy()
 
   const props = {
+    accessibleWorkspaceList: [],
     user: user,
     workspaceList: workspaceList.workspaceList,
     system: {

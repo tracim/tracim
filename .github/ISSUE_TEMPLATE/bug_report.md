@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report a bug you detected using tracim
-title: "Bug:"
+title: "🐛 Bug:"
 labels: to sort
 assignees: ""
 ---

@@ -2047,12 +2047,12 @@ class ContentApi(object):
         if do_notify:
             self.do_notify(content)
 
-    def do_notify(self, content: Content):
+    def do_notify(self, content: Content) -> None:
         """
-        Allow to force notification for a given content. By default, it is
-        called during the .save() operation
-        :param content:
-        :return:
+        Create a notification -mail- and notify the current user
+
+        Args:
+            content (Content): Content that the notification will be about
         """
         NotifierFactory.create(
             config=self._config, current_user=self._user, session=self._session
@@ -2242,8 +2242,20 @@ class ContentApi(object):
             self._session.flush()
 
     def create_todo(
-        self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
+        self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True
     ) -> Content:
+        """Create a todo in the database.
+
+        Args:
+            parent (Content): Parent content of the Todo. By our definition, a Todo can only exist \
+                if it got a parent.
+            assignee (User): User assigned to the Todo. Can be `None` if the Todo has no assignee.
+            raw_content (str): Text of the Todo.
+            do_notify (bool, optional): Notify everyone. Defaults to False.
+
+        Returns:
+            Content: The created Todo.
+        """
         item = self.create(
             content_namespace=parent.content_namespace,
             content_type_slug=content_type_list.Todo.slug,
