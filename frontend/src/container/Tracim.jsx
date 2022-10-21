@@ -280,6 +280,10 @@ export class Tracim extends React.Component {
   handleClickLogout = async () => {
     await this.props.dispatch(logoutUser(this.props.history))
     this.setState({ tooManyUsers: false })
+
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('logout')
+    }
   }
 
   handleRedirect = data => {
@@ -354,11 +358,6 @@ export class Tracim extends React.Component {
   async componentDidMount () {
     // console.log('<Tracim> did Mount')
     const { props } = this
-
-    if (isMobile) {
-      console.log('aaaaaaaaaa', navigator.userAgent)
-      window.ReactNativeWebView.postMessage('test')
-    }
 
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
