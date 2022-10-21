@@ -144,14 +144,21 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceChanged = this.handleNotification
 
+  /**
+   * Handle function for todos
+   * If the todo has an assigned user that is not the current user, we do nothing
+   * @param {*} data TLM
+   * @returns {void}
+   */
   handleToDo = data => {
-    if (data.fields.content.assignee.username) {
-      if (data.fields.content.assignee.user_id === this.props.user.userId) {
-        this.handleNotification(data)
-      }
-    } else {
-      this.handleNotification(data)
-    }
+    // INFO - MP - 2022-10-21 - If the username is undefined then the todo notification will be
+    // displayed to everyone.
+    if (
+      data.fields.content.assignee.username &&
+      data.fields.content.assignee.user_id !== this.props.user.userId
+    ) return
+
+    this.handleNotification(data)
   }
 
   handleMemberCreated = data => {
