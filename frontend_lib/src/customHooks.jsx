@@ -13,14 +13,14 @@ const useLifecycle = ({ mountedEvent, unmountedEvent }) => {
   }, [])
 }
 
-export const usePublishLifecycle = (name, data, dispatchEvent) => {
+export const usePublishLifecycle = (componentName, data, dispatchEvent) => {
   useLifecycle({
-    mountedEvent: () => dispatchEvent(CUSTOM_EVENT.TRACIM_COMP_MOUNTED(name), data),
-    unmountedEvent: () => dispatchEvent(CUSTOM_EVENT.TRACIM_COMP_UNMOUNTED(name), data)
+    mountedEvent: () => dispatchEvent(CUSTOM_EVENT.TRACIM_COMP_MOUNTED(componentName), data),
+    unmountedEvent: () => dispatchEvent(CUSTOM_EVENT.TRACIM_COMP_UNMOUNTED(componentName), data)
   })
 }
 
-export const withUsePublishLifecycle = (WrappedComponent, name) => {
+export const withUsePublishLifecycle = (WrappedComponent, componentName) => {
   return (props) => {
     if (props.dispatchCustomEvent === undefined) {
       console.error(`withUsePublishLifecycle error:
@@ -32,7 +32,7 @@ export const withUsePublishLifecycle = (WrappedComponent, name) => {
       user is invalid, got: ${props.user}`)
     }
 
-    usePublishLifecycle(name, { lang: props.user.lang }, props.dispatchCustomEvent)
+    usePublishLifecycle(componentName, { lang: props.user.lang }, props.dispatchCustomEvent)
     return (
       <WrappedComponent {...props} />
     )
