@@ -270,13 +270,13 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
 
     isLoggedUserMember = (activity) => this.props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
 
-    isActuality = (activity) => {
-      const isActuality = activity.content?.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+    isNews = (activity) => {
+      const isNews = activity.content?.content_namespace === CONTENT_NAMESPACE.PUBLICATION
       const hasSpace = activity.newestMessage.fields.workspace
-      return isActuality || hasSpace
+      return isNews && hasSpace
     }
 
-    isInSpaceWithActualities = (activity) => {
+    isInSpaceWithNews = (activity) => {
       const space = this.props.workspaceList.find(
         s => s.id === activity.newestMessage.fields.workspace.workspace_id
       )
@@ -291,7 +291,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * @param {*} activity the activity to check
      * @returns true if the activity is an attached file on a publication
      */
-    isActivityAnAttachedFileOnPublication = (activity) => activity.content
+    isActivityAnAttachedFileOnNews = (activity) => activity.content
       ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
       : false
 
@@ -303,19 +303,19 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         TLM_ET.SHAREDSPACE_SUBSCRIPTION,
         TLM_ET.SHAREDSPACE
       ]
-      const hasAttachedFile = this.isActivityAnAttachedFileOnPublication(activity)
+      const hasAttachedFile = this.isActivityAnAttachedFileOnNews(activity)
 
       const isContent = activity.entityType === TLM_ET.CONTENT
       const isSharedSpace = activity.entityType === TLM_ET.SHAREDSPACE
-      const isActuality = this.isActuality(activity)
-      const isInSpaceWithActualities = this.isInSpaceWithActualities(activity)
+      const isNews = this.isNews(activity)
+      const isInSpaceWithNews = this.isInSpaceWithNews(activity)
       const isSubscription = this.isSubscriptionRequestOrRejection(activity)
       const isMember = this.isMemberCreatedOrModified(activity)
       const isLoggedUser = this.isLoggedUserMember(activity)
 
       return entityType.includes(activity.entityType) && !hasAttachedFile &&
         (
-          (isContent && (!isActuality || isInSpaceWithActualities)) ||
+          (isContent && (!isNews || isInSpaceWithNews)) ||
           (isSubscription && isLoggedUser) ||
           (isMember && isLoggedUser) ||
           (isSharedSpace && activity.newestMessage.fields.author.user_id !== props.user.userId)
