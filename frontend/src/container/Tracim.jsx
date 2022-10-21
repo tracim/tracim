@@ -105,7 +105,7 @@ const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 export class Tracim extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
@@ -354,6 +354,11 @@ export class Tracim extends React.Component {
   async componentDidMount () {
     // console.log('<Tracim> did Mount')
     const { props } = this
+
+    if (isMobile) {
+      console.log('aaaaaaaaaa', navigator.userAgent)
+      window.ReactNativeWebView.postMessage('test')
+    }
 
     const fetchGetUserIsConnected = await props.dispatch(getUserIsConnected())
     switch (fetchGetUserIsConnected.status) {
