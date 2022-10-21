@@ -151,7 +151,12 @@ export class ReduxTlmDispatcher extends React.Component {
    * @returns {void}
    */
   handleToDo = data => {
-    if (data.fields.content.assignee.user_id !== this.props.user.userId) return
+    // INFO - MP - 2022-10-21 - If the username is undefined then the todo notification will be
+    // displayed to everyone.
+    if (
+      data.fields.content.assignee.username &&
+      data.fields.content.assignee.user_id !== this.props.user.userId
+    ) return
 
     this.handleNotification(data)
   }
