@@ -116,7 +116,9 @@ class PopupUploadFile extends React.Component {
       this.setState({
         fileUploadList: failedFileUploadList
       })
-      sendGlobalFlashMessage(props.t('Error while uploading file(s)'))
+      let message = props.t('Error while uploading file(s)')
+      if (failedFileUploadList.length === 1) message = failedFileUploadList[0].errorMessage
+      sendGlobalFlashMessage(message)
       props.onFailure(failedFileUploadList)
     } else props.onSuccess(successfulFileUploadList)
     this.setState({ uploadStarted: false })

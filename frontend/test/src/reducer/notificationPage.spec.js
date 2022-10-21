@@ -168,12 +168,16 @@ describe('reducer notificationPage.js', () => {
     describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
       const listOfNotification = notificationPage(
         { ...initialState, list: [notification] },
-        appendNotificationList([{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
+        appendNotificationList(-1, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
       )
 
-      it('should return the list of notifications appended with the list passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, { ...notification, id: 999 }] })
-      })
+      it('should return the list of notifications appended with the list passed as parameter',
+        () => {
+          expect(listOfNotification).to.deep.equal(
+            { ...initialState, list: [notification, { ...notification, id: 999 }] }
+          )
+        }
+      )
     })
 
     describe(`${SET}/${NEXT_PAGE}`, () => {

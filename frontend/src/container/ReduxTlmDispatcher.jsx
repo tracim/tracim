@@ -109,11 +109,12 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleNotification = data => {
+    const { props } = this
     if (
-      this.props.user.userId !== data.fields.author.user_id &&
+      props.user.userId !== data.fields.author.user_id &&
       !EXCLUDED_NOTIFICATION_TYPE_PREFIXES.some(type => data.event_type.startsWith(type))
     ) {
-      this.props.dispatch(addNotification(data, this.props.workspaceList))
+      props.dispatch(addNotification(data, props.workspaceList))
     }
   }
 
@@ -143,7 +144,22 @@ export class ReduxTlmDispatcher extends React.Component {
 
   handleWorkspaceChanged = this.handleNotification
 
-  handleToDo = this.handleNotification
+  /**
+   * Handle function for todos
+   * If the todo has an assigned user that is not the current user, we do nothing
+   * @param {*} data TLM
+   * @returns {void}
+   */
+  handleToDo = data => {
+    // INFO - MP - 2022-10-21 - If the username is undefined then the todo notification will be
+    // displayed to everyone.
+    if (
+      data.fields.content.assignee.username &&
+      data.fields.content.assignee.user_id !== this.props.user.userId
+    ) return
+
+    this.handleNotification(data)
+  }
 
   handleMemberCreated = data => {
     const { props } = this
@@ -323,7 +339,9 @@ export class ReduxTlmDispatcher extends React.Component {
   }
 
   handleUserChanged = data => {
-    this.props.dispatch(addNotification(data, this.props.workspaceList))
+    const { props } = this
+
+    this.props.dispatch(addNotification(data, props.workspaceList))
   }
 
   handleWorkspaceSubscriptionCreated = data => {

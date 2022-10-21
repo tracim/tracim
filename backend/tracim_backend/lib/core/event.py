@@ -957,7 +957,8 @@ def _get_members_and_administrators_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> Set[int]:
     """
-    Return administrators + members of the event's workspace + user subject of the action if there is one
+    Return administrators + members of the event's workspace + user subject of the action if there\
+        is one
     """
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
@@ -1010,7 +1011,15 @@ def _get_workspace_subscription_event_receiver_ids(
 
 def _get_content_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     """
-    Content event are returned to workspace members only
+    Content event are returned to workspace members only.
+
+    Args:
+        event (Event): Event that will be sent
+        session (TracimSession): Current session
+        config (CFG): Config file
+
+    Returns:
+        Set[int]: List of user id that will receive the event
     """
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
@@ -1033,15 +1042,15 @@ class BaseLiveMessageBuilder(abc.ABC):
     _event_schema = EventSchema()
 
     _get_receiver_ids_callables = {
-        EntityType.USER: _get_user_event_receiver_ids,
-        EntityType.WORKSPACE: _get_workspace_event_receiver_ids,
-        EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
+        EntityType.CONTENT_TAG: _get_content_event_receiver_ids,
         EntityType.CONTENT: _get_content_event_receiver_ids,
-        EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
         EntityType.REACTION: _get_content_event_receiver_ids,
         EntityType.TAG: _get_workspace_event_receiver_ids,
-        EntityType.CONTENT_TAG: _get_content_event_receiver_ids,
         EntityType.USER_CALL: _get_user_call_event_receiver_ids,
+        EntityType.USER: _get_user_event_receiver_ids,
+        EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
+        EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
+        EntityType.WORKSPACE: _get_workspace_event_receiver_ids,
     }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:
@@ -1077,7 +1086,7 @@ class BaseLiveMessageBuilder(abc.ABC):
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
             receiver_ids = self.get_receiver_ids(event, session, self._config)
-            logger.debug(self, "Sending messages for event {} to {}".format(event, receiver_ids))
+            logger.debug(self, "Sending eventid: {} to users: {}".format(event_id, receiver_ids))
             messages = [
                 Message(
                     receiver_id=receiver_id,
