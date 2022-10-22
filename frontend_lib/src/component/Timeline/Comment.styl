@@ -1,15 +1,14 @@
 @import '../../css/Variable.styl'
 
 .buttonComments
-  border 1px solid transparent
-  color lightDarkGrey
+  background-color transparent
+  color darkGrey2
   &:hover
     color fontColor
 
 .timeline__comment
   padding standardSpacing
   border-radius standardBorderRadius
-  border borderStyle
   background-color offWhite
   display flex
   flex-direction column
@@ -31,7 +30,7 @@
         img
           max-width 100%
           height auto
-          box-shadow 0px 0px 10px mediumDarkGrey
+          box-shadow 0px 0px 10px darkGrey1
         & a:not(.linkPreview)
           color bootstrapLinkColor
           &:hover

@@ -77,7 +77,6 @@ function EmojiReactionButton (props) {
       disabled={props.readOnly}
       className={classnames(
         'EmojiReactionButton__button', {
-          primaryColorBorder: highlighted,
           highlighted
         }
       )}

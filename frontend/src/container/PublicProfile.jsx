@@ -515,7 +515,7 @@ export class PublicProfile extends React.Component {
                 ? (
                   <CustomFormManager
                     title={props.t('Personal Page')}
-                    submitButtonClass='profile__customForm__submit primaryColorBorder'
+                    submitButtonClass='profile__customForm__submit'
                     schemaObject={state.personalPageSchemaObject}
                     uiSchemaObject={state.uiSchemaObject}
                     dataSchemaObject={state.personalPageDataSchema}

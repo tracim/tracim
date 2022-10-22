@@ -3,9 +3,8 @@ import { translate } from 'react-i18next'
 import Radium from 'radium'
 import { generateRandomPassword } from '../../helper.js'
 import ComposedIcon from '../Icon/ComposedIcon.jsx'
+import IconButton from '../Button/IconButton.jsx'
 import Popover from '../Popover/Popover.jsx'
-
-const color = require('color')
 
 export class NewShareDownload extends React.Component {
   constructor (props) {
@@ -125,34 +124,26 @@ export class NewShareDownload extends React.Component {
           )}
 
         <div className='shareDownload__buttons'>
-          <button
-            className='shareDownload__buttons__cancel btn outlineTextBtn'
+          <IconButton
+            customClass='shareDownload__buttons__cancel'
+            color={props.hexcolor}
+            icon='fas fa-times'
             key='cancelNewShare'
             onClick={props.onClickCancelButton}
-            style={{
-              borderColor: props.hexcolor,
-              ':hover': {
-                backgroundColor: props.hexcolor
-              }
-            }}
-          >
-            {props.t('Cancel')}
-          </button>
+            text={props.t('Cancel')}
+          />
 
-          <button
-            className='shareDownload__buttons__newBtn btn highlightBtn'
-            key='newShareDownload'
-            onClick={() => props.onClickNewShare(state.isPasswordActive)}
+          <IconButton
+            customClass='shareDownload__buttons__newBtn'
+            color={props.hexcolor}
             disabled={props.shareEmails === '' || (state.isPasswordActive && props.sharePassword === '')}
-            style={{
-              backgroundColor: props.hexcolor,
-              ':hover': {
-                backgroundColor: color(props.hexcolor).darken(0.15).hex()
-              }
-            }}
-          >
-            {props.t('Validate')}
-          </button>
+            icon='fas fa-check'
+            intent='primary'
+            key='newShareDownload'
+            mode='light'
+            onClick={() => props.onClickNewShare(state.isPasswordActive)}
+            text={props.t('Validate')}
+          />
         </div>
 
         {!props.isEmailNotifActivated && (

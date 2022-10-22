@@ -129,7 +129,7 @@ export class NewUpload extends React.Component {
 
         <div className='d-flex'>
           <button
-            className='newUpload__btnCancel btn outlineTextBtn'
+            className='newUpload__btnCancel btn'
             key='deleteAllShares'
             style={{
               borderColor: customColor,

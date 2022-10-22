@@ -1,4 +1,4 @@
-@import "../../css/Variable.styl"
+@import '../../css/Variable.styl'
 
 .EmojiPickerPopover .popover
   max-width unset
@@ -19,8 +19,7 @@
     cursor pointer
 
 .EmojiReactionButton__button
-  border-width 1px
-  border-style solid
+  border none
   font-size metadataFontSize
   margin-inline-end textSpacing
   padding 3px
@@ -52,6 +51,8 @@
 .EmojiReactionButton__button:hover:not(.highlighted):not(:disabled), .EmojiReactionButton__buttonpicker:hover:not(.active):not(:disabled)
   color fontColor
 
+.emoji-mart
+  border none
 .emoji-mart button, .emoji-mart-category button.emoji-mart-emoji span
   // INFO - RJ - 2021-03-18 - This class is intentionally specific to overwrite emoji-mart's own CSS rule
   cursor pointer
