@@ -3,6 +3,7 @@ import {
   ADD,
   APPEND,
   CONTENT,
+  EVERY_NOTIFICATION,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
@@ -182,15 +183,14 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    case `${READ}/${NOTIFICATION}`: {
-      const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
+    case `${READ}/${NOTIFICATION_LIST}`: {
+      const notificationList = state.list.filter(n => !n.read && action.notificationIdList.includes(n.id))
 
-      if (!notification) return state
+      if (notificationList.length === 0) return state
 
-      const newUnreadMentionCount = (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) ? state.unreadMentionCount - 1 : state.unreadMentionCount
-      const replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
-
-      const newUnreadNotificationCount = state.unreadNotificationCount - 1
+      const replaceList = state.list.map(n => action.notificationIdList.includes(n.id) ? { ...n, read: true } : n)
+      const newUnreadMentionCount = replaceList.filter(n => !n.read && n.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`).length
+      const newUnreadNotificationCount = replaceList.filter(n => !n.read).length
 
       return {
         ...state,
@@ -200,7 +200,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    case `${READ}/${NOTIFICATION_LIST}`: {
+    case `${READ}/${EVERY_NOTIFICATION}`: {
       const notificationList = state.list.map(notification => ({ ...notification, read: true }))
       return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
     }
