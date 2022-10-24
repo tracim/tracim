@@ -118,6 +118,13 @@ export class Publications extends React.Component {
     }
   }
 
+  //getSnapshotBeforeUpdate () {
+  //  const publicationPage = document.getElementsByClassName('publications')
+  //  console.log('DEV_PUBLICATION SNAPSHOT')
+  //  if (publicationPage.length <= 0) return { scrollTop: null }
+  //  return { scrollTop: publicationPage[0].scrollTop }
+  //}
+
   gotToCurrentPublication () {
     if (!this.props.match.params.idcts) return
 
@@ -131,6 +138,7 @@ export class Publications extends React.Component {
 
   async componentDidUpdate (prevProps, prevState) {
     const { props, state } = this
+    console.log('DEV_PUBLICATION UPDATE')
     if (prevProps.currentWorkspace.id !== props.currentWorkspace.id) {
       this.setHeadTitle()
       this.buildBreadcrumbs()
@@ -144,6 +152,15 @@ export class Publications extends React.Component {
 
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
       this.gotToCurrentPublication()
+    }
+
+    if (this.state.scrollTop !== undefined) {
+      console.log('DEV_PUBLICATION GOT SCROLL')
+      const publicationPage = document.getElementsByClassName('publications')
+      if (publicationPage !== null && publicationPage.length > 0) {
+        console.log('DEV_PUBLICATION SCROLLING', this.state.scrollTop)
+        publicationPage[0].scrollTop = this.state.scrollTop
+      }
     }
   }
 
@@ -331,7 +348,16 @@ export class Publications extends React.Component {
 
   getPublicationPage = async (pageToken = '') => {
     const { props } = this
-    this.setState({ loading: true })
+
+    console.log('DEV_PUBLICATION GOT PUB_PAGE')
+    let scrollTop
+    const publicationPage = document.getElementsByClassName('publications')
+    if (publicationPage !== null && publicationPage.length > 0) {
+      console.log('DEV_PUBLICATION PUB_PAGE EDIT')
+      scrollTop = publicationPage[0].scrollTop
+    }
+
+    this.setState({ loading: true})
     const workspaceId = props.currentWorkspace.id
     const fetchGetPublicationList = await props.dispatch(getPublicationPage(workspaceId, PUBLICATION_ITEM_COUNT_PER_PAGE, pageToken))
     switch (fetchGetPublicationList.status) {
@@ -347,6 +373,7 @@ export class Publications extends React.Component {
         break
     }
     this.setState({ loading: false })
+    this.setState({ scrollTop: scrollTop })
   }
 
   getCommentList = async (publicationId, publicationContentType) => {
