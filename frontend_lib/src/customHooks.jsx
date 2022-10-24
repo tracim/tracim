@@ -20,6 +20,11 @@ export const usePublishLifecycle = (componentName, data, dispatchEvent) => {
   })
 }
 
+/* NOTE - ML - 2022-10-24 This is a HOC to allow the use of hooks inside a class component.
+  * This one particularly adds the usePublishLifecycle custom hook in a class component.
+  * It needs to be inside appFactory and to be connected to the 'user' state.
+  * See frontend/src/container/Sidebar.jsx for a concrete example
+*/
 export const withUsePublishLifecycle = (WrappedComponent, componentName) => {
   return (props) => {
     if (props.dispatchCustomEvent === undefined) {
