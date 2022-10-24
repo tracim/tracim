@@ -30,6 +30,7 @@ function areCommentActionsAllowed (loggedUser, commentAuthorId) {
 }
 
 const Comment = (props) => {
+  const firstComment = props.firstComment || props.apiContent.firstComment
   const styleSent = {
     borderColor: props.customColor
   }
@@ -40,7 +41,7 @@ const Comment = (props) => {
   const isModified = props.modificationDate ? props.modificationDate !== props.creationDate : false
   const isFile = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.FILE
   const isThread = (props.apiContent.content_type || props.apiContent.type) === CONTENT_TYPE.THREAD
-  const isFirstCommentFile = props.apiContent.firstComment && (props.apiContent.firstComment.content_type || props.apiContent.firstComment.type) === CONTENT_TYPE.FILE
+  const isFirstCommentFile = firstComment && (firstComment.content_type || firstComment.type) === CONTENT_TYPE.FILE
   const readableModificationDate = isModified ? formatAbsoluteDate(props.modificationDate, props.loggedUser.lang, 'PPPPp') : null
 
   return (
@@ -157,7 +158,7 @@ const Comment = (props) => {
                     ? (
                       <CommentFilePreview
                         apiUrl={props.apiUrl}
-                        apiContent={isFile ? props.apiContent : props.apiContent.firstComment}
+                        apiContent={isFile ? props.apiContent : firstComment}
                         isPublication={props.isPublication}
                       />
                     ) : (
@@ -212,6 +213,7 @@ export default translate()(Comment)
 
 Comment.propTypes = {
   apiContent: PropTypes.object.isRequired,
+  firstComment: PropTypes.object,
   author: PropTypes.object.isRequired,
   contentId: PropTypes.number.isRequired,
   isPublication: PropTypes.bool.isRequired,
