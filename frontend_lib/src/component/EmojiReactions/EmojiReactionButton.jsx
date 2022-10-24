@@ -7,16 +7,6 @@ import { getEmojiDataFromNative } from 'emoji-mart'
 import emojiData from 'emoji-mart/data/all.json'
 import Radium from 'radium'
 
-const color = require('color')
-
-const primaryColor = GLOBAL_primaryColor // eslint-disable-line camelcase
-const HIGHLIGHTED_BUTTON_STYLE = {
-  backgroundColor: color(primaryColor).lighten(1.85).hex(),
-  ':hover:not(:disabled)': {
-    backgroundColor: color(primaryColor).lighten(1.5).hex()
-  }
-}
-
 function getEmojiReactionButtonTitle (reactionList, userReactionId, t) {
   // INFO - RJ - 2021-03-18 - this function builds a title like:
   //  - X, Y, Z and W reacted with joy
@@ -75,12 +65,9 @@ function EmojiReactionButton (props) {
       onClick={highlighted ? props.onRemoveReaction : props.onAddReaction}
       title={title}
       disabled={props.readOnly}
-      className={classnames(
-        'EmojiReactionButton__button', {
-          highlighted
-        }
+      className={classnames({ primaryColorBgOpacity: highlighted },
+        'EmojiReactionButton__button'
       )}
-      style={highlighted ? HIGHLIGHTED_BUTTON_STYLE : {}}
     >
       <span className='EmojiReactionButton__button__value'>{reactionList[0].value}</span>
       <span className='EmojiReactionButton__button__count'>{reactionList.length}</span>

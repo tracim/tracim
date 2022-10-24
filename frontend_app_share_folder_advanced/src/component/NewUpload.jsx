@@ -4,11 +4,11 @@ import Radium from 'radium'
 import {
   ComposedIcon,
   generateRandomPassword,
+  IconButton,
   Popover
 } from 'tracim_frontend_lib'
 import PropTypes from 'prop-types'
 
-const color = require('color')
 
 export class NewUpload extends React.Component {
   constructor (props) {
@@ -128,33 +128,26 @@ export class NewUpload extends React.Component {
         )}
 
         <div className='d-flex'>
-          <button
-            className='newUpload__btnCancel btn'
+          <IconButton
+            customClass='newUpload__btnCancel'
+            color={customColor}
             key='deleteAllShares'
-            style={{
-              borderColor: customColor,
-              ':hover': {
-                backgroundColor: customColor
-              }
-            }}
+            icon='fas fa-times'
             onClick={props.onClickCancelNewUpload}
-          >
-            {props.t('Cancel')}
-          </button>
-          <button
-            className='newUpload__newBtn btn highlightBtn'
-            key='newShareFile'
-            style={{
-              backgroundColor: customColor,
-              ':hover': {
-                backgroundColor: color(customColor).darken(0.15).hex()
-              }
-            }}
-            onClick={() => props.onClickNewUpload(state.isPasswordActive)}
+            text={props.t('Cancel')}
+          />
+
+          <IconButton
+            customClass='newUpload__newBtn'
+            color={customColor}
             disabled={props.uploadEmails === '' || (state.isPasswordActive && props.uploadPassword === '')}
-          >
-            {props.t('Validate')}
-          </button>
+            key='newShareFile'
+            icon='fas fa-check'
+            intent='primary'
+            mode='light'
+            onClick={() => props.onClickNewUpload(state.isPasswordActive)}
+            text={props.t('Validate')}
+          />
         </div>
 
         {!props.isEmailNotifActivated && (
