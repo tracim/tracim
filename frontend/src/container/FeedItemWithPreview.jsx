@@ -324,8 +324,10 @@ export class FeedItemWithPreview extends React.Component {
         ? this.getFirstComment()
         : null
     )
+
+    const previewContent = props.content
     if (shouldShowComment && props.inRecentActivities) {
-      props.content.firstComment = commentToShow
+      previewContent.firstComment = commentToShow
     }
 
     const commentList = this.getTimelineData()
@@ -382,7 +384,7 @@ export class FeedItemWithPreview extends React.Component {
                   customClass='feedItem__publication'
                   apiUrl={FETCH_CONFIG.apiUrl}
                   contentId={Number(props.content.id)}
-                  apiContent={props.content}
+                  apiContent={previewContent}
                   workspaceId={Number(props.workspaceId)}
                   author={commentToShow.author}
                   loggedUser={loggedUser}
