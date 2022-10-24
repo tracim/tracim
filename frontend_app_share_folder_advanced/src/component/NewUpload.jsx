@@ -9,7 +9,6 @@ import {
 } from 'tracim_frontend_lib'
 import PropTypes from 'prop-types'
 
-
 export class NewUpload extends React.Component {
   constructor (props) {
     super(props)
