@@ -105,7 +105,7 @@ const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
 
 export class Tracim extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.connectionErrorDisplayTimeoutId = 0
     this.state = {
