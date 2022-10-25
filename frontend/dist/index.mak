@@ -93,17 +93,17 @@
 
     <style nonce="${csp_nonce}">
       @font-face {
-        font-family: "Raleway";
-        src: url("/assets/font/Raleway/Raleway-Regular.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-Regular.ttf");
       }
       @font-face {
-        font-family: "Raleway";
-        src: url("/assets/font/Raleway/Raleway-SemiBold.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-SemiBold.ttf");
         font-weight: bold;
       }
 
       body {
-        font-family: Raleway;
+        font-family: Nunito;
       }
     </style>
 
