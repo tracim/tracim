@@ -4,7 +4,7 @@
 
 - Featuring a new borderless design
 - Modified comments are now easily identifiable
-- Code preview on advanced search
+- Code preview available (through advanced edition)   
 - The user interface is now available in Norwegian 
 - Video player for video previews
 - Improved pertinence of notifications about tasks
