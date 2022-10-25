@@ -27,11 +27,12 @@ export const SpaceSubscriptionsRequests = props => {
               {request.state === 'pending' && (
                 <DropdownMenu
                   buttonLabel={props.t('Manage request')}
-                  buttonCustomClass='outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover workspace_advanced__subscriptionRequests__button'
+                  buttonCustomClass='primaryColorBgHover workspace_advanced__subscriptionRequests__button'
                   isButton
                 >
                   <button
                     className='transparentButton'
+                    key='acceptRequest'
                     onClick={() => props.onClickAcceptRequest(request.author.user_id)}
                   >
                     <i className='fas fa-fw fa-check' />
@@ -40,6 +41,7 @@ export const SpaceSubscriptionsRequests = props => {
 
                   <button
                     className='transparentButton'
+                    key='rejectRequest'
                     onClick={() => props.onClickRejectRequest(request.author.user_id)}
                   >
                     <i className='fas fa-fw fa-times' />

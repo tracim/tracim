@@ -26,11 +26,11 @@ export const AgendaInfo = props => (
       </div>
 
       <div className='agendaInfo__content__link'>
-        <div className='agendaInfo__content__link__icon primaryColorBorder'>
+        <div className='agendaInfo__content__link__icon'>
           <i className='fas fa-calendar-alt' />
         </div>
 
-        <div className='agendaInfo__content__link__url primaryColorBorder'>
+        <div className='agendaInfo__content__link__url'>
           {props.agendaUrl}
         </div>
       </div>

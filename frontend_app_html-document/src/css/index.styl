@@ -1,4 +1,4 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .html-document
   &__header
@@ -75,13 +75,13 @@
         border-inline-start-width 2px
         border-inline-start-style solid
         padding-inline-start textSpacing
-        color lightDarkGrey
+        color darkGrey2
     &__messagelist
       min-height 70px
       padding 0 20px standardSpacing
       &__item
         &__content
-          color darkGrey
+          color offBlack
       &__version
       // MB - 2021-05-21 - FIXME (#4671 - https://github.com/tracim/tracim/issues/4671)
       // This bit of code doesn't seem to be used anywhere
@@ -93,7 +93,7 @@
           font-size standardFontSize
           & > i
             margin-inline-end standardSpacing
-            color darkGrey
+            color offBlack
             font-size titleFontSize
         &__date
           color fontColor
@@ -103,10 +103,6 @@
   .timeline__messagelist
     flex 0
     min-height 0
-
-.received
-  .timeline__messagelist__item__content
-    background-color htmlColor
 
 .buttonLink
   border none

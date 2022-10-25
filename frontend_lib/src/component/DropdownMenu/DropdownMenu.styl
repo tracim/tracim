@@ -31,19 +31,21 @@
   & i
     margin-inline-end textSpacing
   &:hover:not(:active)
-    background-color grey-hover
+    background-color lightGrey1
   & .collapseNavbar
     height 100%
     width 100%
     text-align start
 
-.dropdownMenuButton.btn
-  display flex
-  align-items center
-  padding standardSpacing
-  height 100%
-  & i
-    margin-inline-end textSpacing
-  &::after
-    margin-inline-end textSpacing
-    margin-inline-start textSpacing
+.dropdownMenuButton
+  cursor pointer
+  &.btn
+    display flex
+    align-items center
+    padding standardSpacing
+    height 100%
+    & i
+      margin-inline-end textSpacing
+    &::after
+      margin-inline-end textSpacing
+      margin-inline-start textSpacing

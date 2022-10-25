@@ -1,4 +1,4 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .memberlist
   margin-top standardSpacing
@@ -8,7 +8,6 @@
 
   &__wrapper
     position relative
-    border borderStyle
     background-color offWhite
   &__list
     margin 0
@@ -16,11 +15,10 @@
     list-style none
     &__item
       display flex
-      border-bottom borderStyle
       padding standardSpacing
       align-items center
       &:hover
-        background-color grey-hover
+        background-color lightGrey1
       &__avatar
         margin-inline-end textSpacing
         & > img
@@ -40,14 +38,14 @@
             text-overflow ellipsis
             overflow hidden
           &__username
-            color mediumDarkGrey
+            color darkGrey1
             font-size metadataFontSize
             overflow hidden
             text-overflow ellipsis
             unicode-bidi plaintext
         &__role
           font-size metadataFontSize
-          color mediumDarkGrey
+          color darkGrey1
           margin-inline-start textSpacing
       &__delete
         font-size standardFontSize
@@ -56,7 +54,6 @@
       &__last
         border none
   &__btnadd
-    border-bottom borderStyle
     padding standardSpacing
     height 60px
     display flex
@@ -83,7 +80,6 @@
         cursor pointer
 
 @media (min-width: min-md) and (max-width: max-md)
-
   .memberlist
     width 100%
 
@@ -101,7 +97,3 @@
     &__list
       height auto
       overflow-Y visible
-      &__item:nth-last-child(1)
-        border-bottom borderStyle
-    &__btnadd
-      border-top 0
