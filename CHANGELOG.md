@@ -38,13 +38,10 @@ For technical users:
 
 ### Breaking/Important change
 
-For more details see: [#5860](https://github.com/tracim/tracim/issues/5860)
-- :warning: Two new colors (`sidebar/font` and `sidebar/logo`) were added in `branding/color.json`: this requires all existing instances to update their `frontend/dist/assets/branding/color.json` files to add these new colors. Otherwise the backend won't start at all. You can see an example at `frontend/dist/assets/branding.sample/color.json`.
+- :warning: Two new colors (`sidebar/font` and `sidebar/logo`) were added in `branding/color.json`: this requires all existing instances to update their `frontend/dist/assets/branding/color.json` files to add these new colors. Otherwise the backend won't start at all. For more details see: [#5860](https://github.com/tracim/tracim/issues/5860).
 - Norwegian has been added as a possible interface language. If you have Custom Properties specific to your instance, you will need to make specific translations as well. See the documentation at `backend/doc/user_custom_properties.md`
-- Configuration: A new variable was added `ui.notes.code_sample_languages` (`TRACIM_UI__NOTES__CODE_SAMPLE_LANGUAGES`) that defines the list of languages available to create code samples in the notes. By default, its value is
-```
-ui.notes.code_sample_languages = markup:Markup,css:CSS,clike:C-like,javascript:JavaScript,apacheconf:Apache Configuration,arduino:Arduino,aspnet:ASP.NET,bash:Bash,batch:Batch,bbcode:BBcode,c:C,csharp:C#,cpp:C++,cobol:COBOL,css-extras:CSS Extras,csv:CSV,diff:Diff,django:Django/Jinja2,docker:Docker,erlang:Erlang,excel-formula:Excel Formula,fortran:Fortran,git:Git,haskell:Haskell,ignore:.ignore,ini:Ini,java:Java,jq:JQ,json:JSON,json5:JSON5,jsonp:JSONP,latex:LaTeX,lisp:Lisp,lua:Lua,makefile:Makefile,markdown:Markdown,matlab:MATLAB,nginx:nginx,objectivec:Objective-C,ocaml:OCaml,pascal:Pascal,perl:Perl,php:PHP,phpdoc:PHPDoc,php-extras:PHP Extras,powershell:PowerShell,properties:.properties,python:Python,r:R,jsx:React JSX,tsx:React TSX,regex:Regex,ruby:Ruby,rust:Rust,sql:SQL,vbnet:VB.Net,vim:vim,visual-basic:Visual Basic,yaml:YAML,wiki:Wiki markup
-```
+- A new variable was added `ui.notes.code_sample_languages` (`TRACIM_UI__NOTES__CODE_SAMPLE_LANGUAGES`) that defines the list of languages available to create code samples in the notes.
+- Some API URLs are deprecated. See [#5860](https://github.com/tracim/tracim/issues/5860) for more details.
 
 ### Known Issues
 
