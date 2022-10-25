@@ -586,5 +586,9 @@
   "My profile": "Mon profil",
   "My Spaces": "Mes espaces",
   "My Password": "Mon mot de passe",
-  "My Configuration links": "Mes liens de configuration"
+  "My Configuration links": "Mes liens de configuration",
+  "Their Account": "Son compte",
+  "Their Spaces": "Ses espaces",
+  "Their Password": "Son mot de passe",
+  "Their Agenda": "Son agenda"
 }

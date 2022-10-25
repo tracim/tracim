@@ -38,5 +38,9 @@
   "Error while saving new role for member": "Fout bij het opslaan van de rol",
   "My Spaces": "",
   "My Password": "",
-  "My Configuration links": ""
+  "My Configuration links": "",
+  "Their Account": "",
+  "Their Spaces": "",
+  "Their Password": "",
+  "Their Agenda": ""
 }
