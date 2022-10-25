@@ -1,3 +1,58 @@
+# 4.4.0 / 2022-10-25
+
+### New Features
+
+- Added Spanish on the welcome page
+- Added Norwegian to the supported languages
+- Updated translations : Spanish, French, English, Portuguese
+- UX / UI improvements (sidebar, header, news)
+- UX / UI improvements on small screens
+- Updated sidebar colors
+- Video player for video previews
+- Modified comments are now easily identifiable
+- Featuring a new borderless design
+- Added code blocks to TinyMCE
+- Improved pertinence of notifications about tasks
+
+For technical users:
+- Added curl example on api documentation
+- Improved documentation
+
+### Fixed Issues
+
+- Frontend: [#5882](https://github.com/tracim/tracim/issues/5822),
+  [#5747](https://github.com/tracim/tracim/issues/5747),
+  [#5858](https://github.com/tracim/tracim/issues/5858),
+  [#4600](https://github.com/tracim/tracim/issues/4600),
+  [#5625](https://github.com/tracim/tracim/issues/5625),
+  [#5951](https://github.com/tracim/tracim/issues/5951),
+  [#5510](https://github.com/tracim/tracim/issues/5510),
+  [#5748](https://github.com/tracim/tracim/issues/5748),
+  [#5939](https://github.com/tracim/tracim/issues/5939),
+  [#5526](https://github.com/tracim/tracim/issues/5526),
+  [#5960](https://github.com/tracim/tracim/issues/5960),
+  [#5760](https://github.com/tracim/tracim/issues/5760)
+- Backend: [#5844](https://github.com/tracim/tracim/issues/5844),
+  [#5878](https://github.com/tracim/tracim/issues/5878),
+  [#5526](https://github.com/tracim/tracim/issues/5526)
+
+### Breaking/Important change
+
+For more details see: [#5860](https://github.com/tracim/tracim/issues/5860)
+- :warning: Two new colors (`sidebar/font` and `sidebar/logo`) were added in `branding/color.json`: this requires all existing instances to update their `frontend/dist/assets/branding/color.json` files to add these new colors. Otherwise the backend won't start at all. You can see an example at `frontend/dist/assets/branding.sample/color.json`.
+- Norwegian has been added as a possible interface language. If you have Custom Properties specific to your instance, you will need to make specific translations as well. See the documentation at `backend/doc/user_custom_properties.md`
+- Configuration: A new variable was added `ui.notes.code_sample_languages` (`TRACIM_UI__NOTES__CODE_SAMPLE_LANGUAGES`) that defines the list of languages available to create code samples in the notes. By default, its value is
+```
+ui.notes.code_sample_languages = markup:Markup,css:CSS,clike:C-like,javascript:JavaScript,apacheconf:Apache Configuration,arduino:Arduino,aspnet:ASP.NET,bash:Bash,batch:Batch,bbcode:BBcode,c:C,csharp:C#,cpp:C++,cobol:COBOL,css-extras:CSS Extras,csv:CSV,diff:Diff,django:Django/Jinja2,docker:Docker,erlang:Erlang,excel-formula:Excel Formula,fortran:Fortran,git:Git,haskell:Haskell,ignore:.ignore,ini:Ini,java:Java,jq:JQ,json:JSON,json5:JSON5,jsonp:JSONP,latex:LaTeX,lisp:Lisp,lua:Lua,makefile:Makefile,markdown:Markdown,matlab:MATLAB,nginx:nginx,objectivec:Objective-C,ocaml:OCaml,pascal:Pascal,perl:Perl,php:PHP,phpdoc:PHPDoc,php-extras:PHP Extras,powershell:PowerShell,properties:.properties,python:Python,r:R,jsx:React JSX,tsx:React TSX,regex:Regex,ruby:Ruby,rust:Rust,sql:SQL,vbnet:VB.Net,vim:vim,visual-basic:Visual Basic,yaml:YAML,wiki:Wiki markup
+```
+
+### Known Issues
+
+- The positioning of the notification wall is to be improved (issue [#5965](https://github.com/tracim/tracim/issues/5965))
+- The "My profile" button does not change its name when viewing as an admin on another user's profile (issue [#5975](https://github.com/tracim/tracim/issues/5975))
+- The file app menu shows in two lines on mobile (issue [#5976](https://github.com/tracim/tracim/issues/5976))
+
+
 # 4.3.2 / 2022-08-09
 
 ### Fixed Issue
