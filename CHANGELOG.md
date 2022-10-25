@@ -1,5 +1,7 @@
 # 4.4.0 / 2022-10-25
 
+### New Features
+
 - Featuring a new borderless design
 - Modified comments are now easily identifiable
 - Code preview on advanced search
@@ -7,6 +9,7 @@
 - Video player for video previews
 - Improved pertinence of notifications about tasks
 - UX / UI improvements (sidebar, header, news, mobile)
+
 ### Fixed Issues
 
 - Frontend: [#4600](https://github.com/tracim/tracim/issues/4600),
