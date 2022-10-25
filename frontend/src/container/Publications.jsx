@@ -145,13 +145,6 @@ export class Publications extends React.Component {
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
       this.gotToCurrentPublication()
     }
-
-    if (this.state.scrollTop !== undefined && this.state.scrollTop !== prevState.scrollTop) {
-      const publicationPage = document.getElementsByClassName('publications')
-      if (publicationPage !== null && publicationPage.length > 0) {
-        publicationPage[0].scrollTop = this.state.scrollTop
-      }
-    }
   }
 
   componentWillUnmount () {
@@ -338,14 +331,9 @@ export class Publications extends React.Component {
 
   getPublicationPage = async (pageToken = '') => {
     const { props } = this
-
-    let scrollTop
-    const publicationPage = document.getElementsByClassName('publications')
-    if (publicationPage !== null && publicationPage.length > 0) {
-      scrollTop = publicationPage[0].scrollTop
+    if (pageToken === '') {
+      this.setState({ loading: true })
     }
-
-    this.setState({ loading: true })
     const workspaceId = props.currentWorkspace.id
     const fetchGetPublicationList = await props.dispatch(getPublicationPage(workspaceId, PUBLICATION_ITEM_COUNT_PER_PAGE, pageToken))
     switch (fetchGetPublicationList.status) {
@@ -360,8 +348,9 @@ export class Publications extends React.Component {
         props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning'))
         break
     }
-    this.setState({ loading: false })
-    this.setState({ scrollTop: scrollTop })
+    if (pageToken === '') {
+      this.setState({ loading: false })
+    }
   }
 
   getCommentList = async (publicationId, publicationContentType) => {
