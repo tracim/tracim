@@ -1,23 +1,12 @@
 # 4.4.0 / 2022-10-25
 
-### New Features
-
-- Added Spanish on the welcome page
-- Added Norwegian to the supported languages
-- Updated translations : Spanish, French, English, Portuguese
-- UX / UI improvements (sidebar, header, news)
-- UX / UI improvements on small screens
-- Updated sidebar colors
-- Video player for video previews
-- Modified comments are now easily identifiable
 - Featuring a new borderless design
-- Added code blocks to TinyMCE
+- Modified comments are now easily identifiable
+- Code preview on advanced search
+- The user interface is now available in Norwegian 
+- Video player for video previews
 - Improved pertinence of notifications about tasks
-
-For technical users:
-- Added curl example on api documentation
-- Improved documentation
-
+- UX / UI improvements (sidebar, header, news, mobile)
 ### Fixed Issues
 
 - Frontend: [#5882](https://github.com/tracim/tracim/issues/5822),
