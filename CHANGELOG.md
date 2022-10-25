@@ -9,21 +9,17 @@
 - UX / UI improvements (sidebar, header, news, mobile)
 ### Fixed Issues
 
-- Frontend: [#5882](https://github.com/tracim/tracim/issues/5822),
-  [#5747](https://github.com/tracim/tracim/issues/5747),
-  [#5858](https://github.com/tracim/tracim/issues/5858),
-  [#4600](https://github.com/tracim/tracim/issues/4600),
-  [#5625](https://github.com/tracim/tracim/issues/5625),
-  [#5951](https://github.com/tracim/tracim/issues/5951),
+- Frontend: [#4600](https://github.com/tracim/tracim/issues/4600),
   [#5510](https://github.com/tracim/tracim/issues/5510),
-  [#5748](https://github.com/tracim/tracim/issues/5748),
-  [#5939](https://github.com/tracim/tracim/issues/5939),
   [#5526](https://github.com/tracim/tracim/issues/5526),
-  [#5960](https://github.com/tracim/tracim/issues/5960),
-  [#5760](https://github.com/tracim/tracim/issues/5760)
-- Backend: [#5844](https://github.com/tracim/tracim/issues/5844),
-  [#5878](https://github.com/tracim/tracim/issues/5878),
-  [#5526](https://github.com/tracim/tracim/issues/5526)
+  [#5625](https://github.com/tracim/tracim/issues/5625),
+  [#5747](https://github.com/tracim/tracim/issues/5747),
+  [#5748](https://github.com/tracim/tracim/issues/5748),
+  [#5760](https://github.com/tracim/tracim/issues/5760),
+  [#5858](https://github.com/tracim/tracim/issues/5858)
+- Backend: [#5526](https://github.com/tracim/tracim/issues/5526),
+  [#5844](https://github.com/tracim/tracim/issues/5844),
+  [#5878](https://github.com/tracim/tracim/issues/5878)
 
 ### Breaking/Important change
 
