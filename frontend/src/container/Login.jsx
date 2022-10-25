@@ -133,6 +133,10 @@ class Login extends React.Component {
     }
 
     await this.loadConfig()
+
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('login')
+    }
   }
 
   setHeadTitle = () => {

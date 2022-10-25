@@ -174,7 +174,12 @@ export class Sidebar extends React.Component {
 
   handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
 
-  handleClickLogout = () => this.props.dispatch(logoutUser(this.props.history))
+  handleClickLogout = () => {
+    this.props.dispatch(logoutUser(this.props.history))
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('logout')
+    }
+  }
 
   handleClickNewSpace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
