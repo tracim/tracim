@@ -280,6 +280,10 @@ export class Tracim extends React.Component {
   handleClickLogout = async () => {
     await this.props.dispatch(logoutUser(this.props.history))
     this.setState({ tooManyUsers: false })
+
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('logout')
+    }
   }
 
   handleRedirect = data => {

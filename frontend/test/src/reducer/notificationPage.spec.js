@@ -10,8 +10,8 @@ import {
   NOTIFICATION_LIST,
   READ,
   readContentNotification,
-  readNotification,
   readNotificationList,
+  readEveryNotification,
   SET,
   setNextPage,
   UPDATE,
@@ -132,7 +132,7 @@ describe('reducer notificationPage.js', () => {
     describe(`${READ}/${NOTIFICATION}`, () => {
       it('should read a notification in a flat list', () => {
         const initState = { ...initialState, list: [notification], unreadNotificationCount: 1 }
-        const listOfNotification = notificationPage(initState, readNotification(notification.id))
+        const listOfNotification = notificationPage(initState, readNotificationList([notification.id]))
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [{ ...notification, read: true }],
@@ -158,7 +158,7 @@ describe('reducer notificationPage.js', () => {
     })
 
     describe(`${READ}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotificationList())
+      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readEveryNotification())
 
       it('should return the list of objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })

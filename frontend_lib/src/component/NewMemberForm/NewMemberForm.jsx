@@ -42,7 +42,7 @@ export const NewMemberForm = props => {
 
           {props.autoCompleteActive && props.publicName.length >= 2 && (
             // Côme - 2018/10/18 - see https://github.com/tracim/tracim/issues/1021 for details about theses tests
-            <div className='autocomplete primaryColorBorder'>
+            <div className='autocomplete'>
               {props.searchedKnownMemberList.length > 0
                 ? props.searchedKnownMemberList.filter((u, i) => i < 5).map(u => // only displays the first 5
                   <div

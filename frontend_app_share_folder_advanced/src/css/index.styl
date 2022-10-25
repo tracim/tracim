@@ -1,17 +1,15 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .share_folder_advanced
   &__content
     width 100%
-    padding standardSpacing 0
+    padding pageSpacing
     overflow auto
     &__title
       display flex
       justify-content space-between
       align-items center
-      margin standardSpacing 20px
       padding-bottom standardSpacing
-      border-bottom borderStyle
       font-size titleFontSize
     &__btnupload
       margin auto 0
@@ -41,7 +39,7 @@
       border none
       cursor pointer
       margin auto
-      color mediumDarkGrey
+      color darkGrey1
       &:focus
         box-shadow 0 0 0 0
         border 0 none

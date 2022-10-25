@@ -13,7 +13,8 @@ import {
   scrollIntoViewIfNeeded,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
-  TracimComponent
+  TracimComponent,
+  withUsePublishLifecycle
 } from 'tracim_frontend_lib'
 import {
   ADVANCED_SEARCH_TYPE,
@@ -32,6 +33,7 @@ import SearchInput from '../component/Search/SearchInput.jsx'
 import SidebarItem from '../component/Sidebar/SidebarItem.jsx'
 import SidebarSpaceList from '../component/Sidebar/SidebarSpaceList.jsx'
 import SidebarUserItemList from '../component/Sidebar/SidebarUserItemList.jsx'
+import CustomToolboxContainer from '../component/CustomToolboxContainer.jsx'
 
 const qs = require('query-string')
 export const LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE = 'lockToggleSidebarWhenOpenedOnMobile'
@@ -172,7 +174,12 @@ export class Sidebar extends React.Component {
 
   handleClickToggleUserItems = () => this.setState(previousState => ({ showUserItems: !previousState.showUserItems }))
 
-  handleClickLogout = () => this.props.dispatch(logoutUser(this.props.history))
+  handleClickLogout = () => {
+    this.props.dispatch(logoutUser(this.props.history))
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('logout')
+    }
+  }
 
   handleClickNewSpace = () => this.props.renderAppPopupCreation(workspaceConfig, this.props.user, null, null)
 
@@ -200,10 +207,7 @@ export class Sidebar extends React.Component {
           </button>
         </div>
 
-        <div
-          id='customToolboxHeaderBtn'
-          className='header__menu__rightside__specificBtn'
-        />
+        <CustomToolboxContainer parentName='sidebar' />
 
         <div
           className={classnames('sidebar__search', {
@@ -307,7 +311,8 @@ const mapStateToProps = ({
   user,
   workspaceList
 })
-export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(Sidebar))))
+const SidebarWithHooks = withUsePublishLifecycle(Sidebar, 'SIDEBAR')
+export default connect(mapStateToProps)(appFactory(translate()(TracimComponent(SidebarWithHooks))))
 
 Sidebar.propTypes = {
   isNotificationWallOpen: PropTypes.bool,

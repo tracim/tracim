@@ -1,11 +1,10 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .formBlock
   margin-bottom standardSpacing
   border-radius standardBorderRadius
   &__title
     padding standardSpacing
-    border-bottom borderStyle
     font-size titleFontSize
   &__field
     padding standardSpacing
@@ -23,12 +22,11 @@
       background-color offWhite
       overflow auto
   &__description
+    padding standardSpacing
     &__text
-      padding standardSpacing
-      position relative
-      height 200px
+      height 300px
       &__textarea
-        height 200px
+        height 300px
         width 100%
     &__bottom
       display flex
@@ -48,9 +46,8 @@
       &__btn
         margin-inline-start auto
   &__agenda
+    padding standardSpacing
     .agendaInfo__header
-      padding standardSpacing
-      border-bottom borderStyle
       font-size titleFontSize
   &__userlist
     &__list
@@ -61,7 +58,6 @@
         display flex
         justify-content space-between
         align-items center
-        border-bottom borderStyle
         padding 0 standardSpacing
         height 60px
         &__avatar
@@ -108,7 +104,6 @@
           font-size titleFontSize
           cursor pointer
     &__adduser
-      border-bottom borderStyle
       padding standardSpacing
       &__button
         display flex

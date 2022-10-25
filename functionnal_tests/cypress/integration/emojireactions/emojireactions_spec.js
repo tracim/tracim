@@ -25,7 +25,7 @@ function addEmojiReaction (container, title, emoji) {
     .click()
   cy.get(EMOJI_MART_SELECTOR)
     .should('not.exist')
-  cy.get(`${container} ${emojiButtonClassName}.highlighted`)
+  cy.get(`${container} ${emojiButtonClassName}.primaryColorBgOpacity`)
     .should('be.visible')
   cy.contains(`${container} ${emojiValueClassName}`, emoji)
 }
