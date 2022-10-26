@@ -13,7 +13,7 @@ const CardPopup = props => {
       className={classnames(props.customClass, 'cardPopup')}
       style={props.customStyle}
     >
-      <div className='cardPopup__container' style={{ overflow: props.overflow }}>
+      <div className='cardPopup__container'>
         <div className={classnames(props.customHeaderClass, 'cardPopup__border')} style={{ backgroundColor: props.customColor }} />
 
         <div className='cardPopup__header'>
@@ -70,8 +70,7 @@ CardPopup.propTypes = {
   onClose: PropTypes.func,
   displayCrossButton: PropTypes.bool,
   displayCloseButton: PropTypes.bool,
-  customStyle: PropTypes.object,
-  overflow: PropTypes.string
+  customStyle: PropTypes.object
 }
 
 CardPopup.defaultProps = {
@@ -82,6 +81,5 @@ CardPopup.defaultProps = {
   onClose: () => { },
   displayCrossButton: true,
   displayCloseButton: false,
-  customStyle: {},
-  overflow: 'visible'
+  customStyle: {}
 }

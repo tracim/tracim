@@ -427,7 +427,6 @@ export class Kanban extends React.Component {
           </div>
           {state.editedCardInfos && (
             <CardPopup
-              overflow='auto'
               customClass={classnames('kanban__KanbanPopup', { hidden: state.boardState !== BOARD_STATE.LOADED })}
               customColor={props.config.hexcolor}
               faIcon='far fa-id-card'
