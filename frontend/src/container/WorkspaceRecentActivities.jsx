@@ -45,6 +45,14 @@ export class WorkspaceRecentActivities extends React.Component {
     this.props.loadActivities(ACTIVITY_COUNT_PER_PAGE, true, this.props.workspaceId)
   }
 
+  /**
+   * Function to handle TLM which will be triggered on every global TLM
+   *
+   * See also PersonalRecentActivities.handleTlm
+   * @async
+   * @param {TLM} data
+   * @returns
+   */
   handleTlm = async (data) => {
     const { props } = this
     let tlm = data

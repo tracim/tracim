@@ -117,7 +117,7 @@ export class Favorites extends React.Component {
 
   setHeadTitle = () => {
     const { props } = this
-    const headTitle = buildHeadTitle([props.t('Favorites')])
+    const headTitle = buildHeadTitle([props.t('My favorites')])
     props.dispatch(setHeadTitle(headTitle))
   }
 
@@ -127,7 +127,7 @@ export class Favorites extends React.Component {
     props.dispatch(setBreadcrumbs([{
       link: PAGE.FAVORITES,
       type: BREADCRUMBS_TYPE.CORE,
-      label: props.t('Favorites'),
+      label: props.t('My favorites'),
       isALink: true
     }]))
   }
@@ -263,9 +263,10 @@ export class Favorites extends React.Component {
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
           <PageTitle
-            title={props.t('Favorites')}
+            title={props.t('My favorites')}
             icon='far fa-star'
             breadcrumbsList={props.breadcrumbs}
+            isEmailNotifActivated={props.system.config.email_notification_activated}
           />
 
           {state.isLoading
@@ -290,11 +291,12 @@ export class Favorites extends React.Component {
   }
 }
 
-const mapStateToProps = ({ breadcrumbs, user, favoriteList, contentType, workspaceList }) => ({
+const mapStateToProps = ({ breadcrumbs, user, favoriteList, contentType, system, workspaceList }) => ({
   breadcrumbs,
   user,
   favoriteList,
   contentType,
+  system,
   workspaceList
 })
 export default connect(mapStateToProps)(translate()(TracimComponent(Favorites)))

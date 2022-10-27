@@ -39,10 +39,9 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { firstWorkspaceFromApi } from '../../fixture/workspace/firstWorkspace.js'
 import { globalManagerAsMember, globalManagerAsMemberFromApi } from '../../fixture/user/globalManagerAsMember.js'
-import { ROLE, serialize } from 'tracim_frontend_lib'
+import { ROLE, serialize, CONTENT_NAMESPACE } from 'tracim_frontend_lib'
 import { globalManagerFromApi } from '../../fixture/user/globalManagerFromApi.js'
 import { contentFromApi } from '../../fixture/content/content.js'
-import { CONTENT_NAMESPACE } from '../../../src/util/helper'
 import { serializeContentProps } from '../../../src/reducer/workspaceContentList'
 
 describe('reducer currentWorkspace.js', () => {

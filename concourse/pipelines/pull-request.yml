@@ -80,6 +80,7 @@ jobs:
 - name: reconfigure-self
   plan:
   - get: pull-request
+    timeout: 5m
     trigger: true
     params:
         list_changed_files: true
@@ -100,7 +101,6 @@ jobs:
 - name: backend-tests
   <<: *status_notifications
   plan:
-
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
@@ -112,6 +112,7 @@ jobs:
   - *pending_status_notification
 
   - task: backend-lint
+    timeout: 5m
     image: test-image
     config:
       platform: linux
@@ -126,6 +127,7 @@ jobs:
       values: *python_versions
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
+    timeout: 30m
     image: test-image
     # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?
     privileged: true
@@ -145,6 +147,7 @@ jobs:
       values: *databases
       max_in_flight: all
     task: backend-full-tests_((.:database))
+    timeout: 1h30m
     image: test-image
     # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?
     privileged: true
@@ -164,7 +167,6 @@ jobs:
   <<: *status_notifications
 
   plan:
-
   - in_parallel:
     - get: pull-request
       passed: [reconfigure-self]
@@ -176,6 +178,7 @@ jobs:
   - *pending_status_notification
 
   - task: frontend-unit-tests
+    timeout: 15m
     image: test-image
     config:
       platform: linux
@@ -199,6 +202,7 @@ jobs:
   - *pending_status_notification
 
   - task: end-to-end-cypress-tests
+    timeout: 1h40m
     image: test-image
     # needed for docker during tests
     # TODO - 2021-08-04 - SG - is there a less intrusive way to allow docker-in-docker?

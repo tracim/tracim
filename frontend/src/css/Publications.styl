@@ -20,13 +20,14 @@
     margin 0 pageSpacing
     padding-bottom pageSpacing
     & textarea
-      border borderStyle
       border-radius standardBorderRadius
       padding textSpacing
       width 100%
       order 2
       &:focus
         outline-color publicationColor
+      &:disabled
+        border borderStyle
     & .tox-container
       order 2
     & .autocomplete

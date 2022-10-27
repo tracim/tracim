@@ -1,16 +1,4 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
-
-// -----------------------------------------------------
-// border management for Workspace container
-
-.folder__header
-  border borderStyle
-.folder + .content, .content + .content
-  border-bottom 0
-.folder__content > .content, .folder__content > .folder
-  border-bottom 0
-.folder:not(.active).item-last
-  border-bottom borderStyle
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 folderclose()
   height 0
@@ -19,6 +7,7 @@ folderclose()
 
 folderopen()
   height fit-content
+  height -moz-fit-content
   opacity 1
   visibility visible
   transition opacity 0.3s
@@ -34,7 +23,7 @@ folderopen()
   .folder__header
     folderopen()
     &:hover
-      background-color grey-hover
+      background-color lightGrey2
   > .folder__content
     folderclose()
     & > .file, > .folder
@@ -51,23 +40,22 @@ folderopen()
     margin-inline-start -20px
     border-bottom 0
     padding standardSpacing 0
-    background-color lightGrey
+    background-color offWhite
     cursor pointer
     &:hover
       .folder__header__triangleborder
-        border-top-color inherit
         &__triangle
           // INFO - CH - 2019-08-07 - In the HTML, the .folder__header__triangleborder__triangle class also has .primaryColorFontLighten
           // So it always has it's font in the primary color but only uses it as border color on mousehover through "currentColor"
           border-top-color currentColor
-          color grey-hover
+          color lightGrey2
     &__triangleborder
       display none
       position absolute
       bottom -16px
       border-style solid
       border-width 16px 21px 0 21px
-      border-color grey transparent transparent transparent
+      border-color transparent
       z-index 1
       &__triangle
         display none
@@ -76,7 +64,7 @@ folderopen()
         left -20px
         border-style solid
         border-width 15px 20px 0 20px
-        border-color lightGrey transparent transparent transparent
+        border-color offWhite transparent transparent transparent
       &.open
         display block
         .folder__header__triangleborder__triangle
@@ -98,7 +86,7 @@ folderopen()
       flex-grow 0
       padding 0 standardSpacing
       font-size bigIconSize
-      color darkGrey
+      color offBlack
       text-align center
     &__name
       display flex
@@ -112,7 +100,7 @@ folderopen()
         overflow hidden
       i
         margin-inline-end 1ex
-      color darkGrey
+      color offBlack
       font-weight bold
       ^[0].read > div > ^[1] &, ^[0].read > ^[1] & // renders .folder.read > .folder__header .folder__header__name
         font-weight normal

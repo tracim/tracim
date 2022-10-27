@@ -13,8 +13,7 @@ import {
   RESTORE,
   CONTENT
 } from '../action-creator.sync.js'
-import { serialize } from 'tracim_frontend_lib'
-import { CONTENT_NAMESPACE } from '../util/helper'
+import { serialize, CONTENT_NAMESPACE } from 'tracim_frontend_lib'
 
 export const serializeContentProps = {
   actives_shares: 'activedShares',

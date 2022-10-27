@@ -12,6 +12,8 @@
     <link class="tracim__favicon" rel="icon" type="image/png" sizes="16x16" href="/assets/branding/images/favicon/tracim-16x16.png?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="manifest" href="/assets/branding/manifest.json?token=${cache_token}" nonce="${csp_nonce}">
 
+    <link rel="stylesheet" type="text/css" href="/assets/prism/prism.min.css?token=${cache_token}" nonce="${csp_nonce}">
+
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/all.css?token=${cache_token}" nonce="${csp_nonce}">
     <link rel="stylesheet" type="text/css" href="/assets/font/fontawesome-free-5.15.2-web/css/regular.css?token=${cache_token}" nonce="${csp_nonce}">
 
@@ -50,6 +52,10 @@
       ${html_class.replace("{state}", "")} { ${param}: ${primary_color_str}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
+      <% html_class = ".primaryColorBg{state}Opacity"%>
+      ${html_class.replace("{state}", "")} { ${param}: ${primary}26; }
+      ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}26; }
+      ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}26; }
       <% html_class = ".primaryColorBg{state}Hover:hover"%>
       ${html_class.replace("{state}", "")} { ${param}: ${primary}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
@@ -73,27 +79,31 @@
 
       <%
         sidebar = colors["sidebar"]
+        sidebarLogo = colors["sidebar/logo"]
+        sidebarFont = colors["sidebar/font"]
       %>
       :root {
-          --sidebarColor: ${sidebar.web};
-          --sidebarColorDarken: ${sidebar.darken.web};
-          --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarColor: ${sidebar.web};
+        --sidebarColorDarken: ${sidebar.darken.web};
+        --sidebarColorLighten: ${sidebar.lighten.web};
+        --sidebarLogoColor: ${sidebarLogo.web};
+        --sidebarFontColor: ${sidebarFont.web};
       }
     </style>
 
     <style nonce="${csp_nonce}">
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Regular.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-Regular.ttf");
       }
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Bold.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-Bold.ttf");
         font-weight: bold;
       }
 
       body {
-        font-family: Quicksand;
+        font-family: Nunito;
       }
     </style>
 

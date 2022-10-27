@@ -1,13 +1,13 @@
 @import "~tracim_frontend_lib/src/css/Variable.styl"
 
 .thread
-  .comment
+  .timeline__comment
     &.received
-      .comment__header__text
+      .timeline__comment__header__text
         padding-inline-start calc(5% + 4px)
         padding-inline-end 0
     &.sent
-      .comment__header__text
+      .timeline__comment__header__text
         padding-inline-end calc(5% + 4px)
         padding-inline-start 0
   &__header
@@ -43,6 +43,6 @@
 
 @media (max-width: max-xs)
   .thread .timeline
-    height "calc(100vh - %s)" % (headerHeight * 2 + 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
+    height "calc(100vh - %s)" % (headerHeight + 25px) // INFO - 2021-08-08 - GB - 25px is the thread__contentpage__top height
   .thread .thread__contentpage .timeline__texteditor
     padding-bottom 60px // INFO - 2022-02-10 - MB - This is a workaround, not a fix

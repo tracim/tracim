@@ -149,7 +149,7 @@ class EventApi:
     def _base_query(
         self,
         read_status: ReadStatus = ReadStatus.ALL,
-        event_id: Optional[int] = None,
+        event_ids: Optional[List[int]] = None,
         user_id: Optional[int] = None,
         include_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
         exclude_event_types: Optional[List[EventTypeDatabaseParameters]] = None,
@@ -161,6 +161,29 @@ class EventApi:
         content_ids: Optional[List[int]] = None,
         parent_ids: Optional[List[int]] = None,
     ) -> Query:
+        """
+        Generate base query to get events
+
+        Args:
+            read_status (ReadStatus, optional): What read status should the event have. Defaults to ReadStatus.ALL.
+            event_ids (Optional[List[int]], optional): What ID should the event have. It will return every event that have one ID in the list. Defaults to None.
+            user_id (Optional[int], optional): What user ID should the event have. Defaults to None.
+            after_event_id (int, optional): _description_. Defaults to 0.
+            workspace_ids (Optional[List[int]], optional): _description_. Defaults to None.
+            related_to_content_ids (Optional[List[int]], optional): Every events that have a content or a parent in the list.\
+                Overwrite `content_ids` and `parent_ids`. Defaults to None.
+            include_not_sent (bool, optional): _description_. Defaults to False.
+            content_ids (Optional[List[int]], optional): Every events that have a content in the list.\
+                Ignored if `related_to_content_ids` is set. Defaults to None.
+            parent_ids (Optional[List[int]], optional): Every events that have a parent in the list.\
+                Ignored if `related_to_content_ids` is set. Defaults to None.
+
+        Note:
+        - If `related_to_content_ids` is set, `content_ids` and `parent_ids` are ignored.
+
+        Returns:
+            Query: A query that will fetch the events corresponding to the parameters
+        """
         query = self._session.query(Message).join(Event)
         if workspace_ids:
             query = query.filter(Event.workspace_id.in_(workspace_ids))
@@ -182,8 +205,8 @@ class EventApi:
 
         if not include_not_sent:
             query = query.filter(Message.sent != None)  # noqa: E711
-        if event_id:
-            query = query.filter(Message.event_id == event_id)
+        if event_ids:
+            query = query.filter(Message.event_id.in_(event_ids))
         if user_id:
             query = query.filter(Message.receiver_id == user_id)
         if read_status == ReadStatus.READ:
@@ -215,7 +238,7 @@ class EventApi:
 
     def get_one_message(self, event_id: int, user_id: int) -> Message:
         try:
-            return self._base_query(event_id=event_id, user_id=user_id).one()
+            return self._base_query(event_ids=[event_id], user_id=user_id).one()
         except NoResultFound as exc:
             raise MessageDoesNotExist(
                 'Message for user {} with event id "{}" not found in database'.format(
@@ -223,6 +246,7 @@ class EventApi:
                 )
             ) from exc
 
+    # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
     def mark_user_message_as_read(self, event_id: int, user_id: int) -> Message:
         message = self.get_one_message(event_id, user_id)
         message.read = datetime.utcnow()
@@ -230,6 +254,7 @@ class EventApi:
         self._session.flush()
         return message
 
+    # DEPRECATED - MP - 2022-09-22 - https://github.com/tracim/tracim/issues/5941
     def mark_user_message_as_unread(self, event_id: int, user_id: int) -> Message:
         message = self.get_one_message(event_id, user_id)
         message.read = None
@@ -237,20 +262,47 @@ class EventApi:
         self._session.flush()
         return message
 
-    def mark_user_messages_as_read(
+    def mark_user_messages_as_read_or_unread(
         self,
         user_id: int,
-        parent_ids: typing.Optional[List[int]] = None,
         content_ids: typing.Optional[List[int]] = None,
+        event_ids: typing.Optional[List[int]] = None,
+        parent_ids: typing.Optional[List[int]] = None,
+        space_ids: typing.Optional[List[int]] = None,
+        is_read: bool = True,
     ) -> List[Message]:
+        """Mark messages as read or unread for a user. Will read/unread every messages if there is\
+            no filter.
+
+        Args:
+            user_id (int): ID of the user to read/unread messages
+            content_ids (List[int]], optional): Content id list to mark as read/unread.\
+                Defaults to None.
+            event_ids (List[int]], optional): Event id list to mark as read/unread.\
+                Defaults to None.
+            parent_ids ([List[int]], optional): Parent content id list to mark as read/unread.\
+                Defaults to None.
+            space_ids (List[int]], optional): Space id list to mark as read/unread.\
+                Defaults to None.
+            is_read (bool, optional): If true, will mark as read. Unread overwise. Defaults to True.
+
+        Returns:
+            List[Message]: Every message marked as read
+        """
+
+        new_status = ReadStatus.UNREAD if is_read else ReadStatus.READ
+        read = datetime.utcnow() if is_read else None
+
         unread_messages = self._base_query(
-            read_status=ReadStatus.UNREAD,
-            user_id=user_id,
-            parent_ids=parent_ids,
             content_ids=content_ids,
+            event_ids=event_ids,
+            parent_ids=parent_ids,
+            read_status=new_status,
+            user_id=user_id,
+            workspace_ids=space_ids,
         ).all()
         for message in unread_messages:
-            message.read = datetime.utcnow()
+            message.read = read
             self._session.add(message)
         self._session.flush()
         return unread_messages
@@ -905,7 +957,8 @@ def _get_members_and_administrators_ids(
     event: Event, session: TracimSession, config: CFG
 ) -> Set[int]:
     """
-    Return administrators + members of the event's workspace + user subject of the action if there is one
+    Return administrators + members of the event's workspace + user subject of the action if there\
+        is one
     """
     user_api = UserApi(current_user=None, session=session, config=config)
     administrators = user_api.get_user_ids_from_profile(Profile.ADMIN)
@@ -958,7 +1011,15 @@ def _get_workspace_subscription_event_receiver_ids(
 
 def _get_content_event_receiver_ids(event: Event, session: TracimSession, config: CFG) -> Set[int]:
     """
-    Content event are returned to workspace members only
+    Content event are returned to workspace members only.
+
+    Args:
+        event (Event): Event that will be sent
+        session (TracimSession): Current session
+        config (CFG): Config file
+
+    Returns:
+        Set[int]: List of user id that will receive the event
     """
     role_api = RoleApi(current_user=None, session=session, config=config)
     workspace_members = role_api.get_workspace_member_ids(event.workspace_id)
@@ -981,15 +1042,15 @@ class BaseLiveMessageBuilder(abc.ABC):
     _event_schema = EventSchema()
 
     _get_receiver_ids_callables = {
-        EntityType.USER: _get_user_event_receiver_ids,
-        EntityType.WORKSPACE: _get_workspace_event_receiver_ids,
-        EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
+        EntityType.CONTENT_TAG: _get_content_event_receiver_ids,
         EntityType.CONTENT: _get_content_event_receiver_ids,
-        EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
         EntityType.REACTION: _get_content_event_receiver_ids,
         EntityType.TAG: _get_workspace_event_receiver_ids,
-        EntityType.CONTENT_TAG: _get_content_event_receiver_ids,
         EntityType.USER_CALL: _get_user_call_event_receiver_ids,
+        EntityType.USER: _get_user_event_receiver_ids,
+        EntityType.WORKSPACE_MEMBER: _get_members_and_administrators_ids,
+        EntityType.WORKSPACE_SUBSCRIPTION: _get_workspace_subscription_event_receiver_ids,
+        EntityType.WORKSPACE: _get_workspace_event_receiver_ids,
     }  # type: Dict[str, GetReceiverIdsCallable]
 
     def __init__(self, config: CFG) -> None:
@@ -1025,7 +1086,7 @@ class BaseLiveMessageBuilder(abc.ABC):
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
             receiver_ids = self.get_receiver_ids(event, session, self._config)
-            logger.debug(self, "Sending messages for event {} to {}".format(event, receiver_ids))
+            logger.debug(self, "Sending eventid: {} to users: {}".format(event_id, receiver_ids))
             messages = [
                 Message(
                     receiver_id=receiver_id,

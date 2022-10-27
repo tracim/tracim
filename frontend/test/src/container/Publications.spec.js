@@ -81,6 +81,11 @@ describe('<Publications />', () => {
         idws: 1
       }
     },
+    system: {
+      config: {
+        email_notification_activated: false
+      }
+    },
     t: tradKey => tradKey,
     user
   }

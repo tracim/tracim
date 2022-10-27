@@ -74,7 +74,7 @@ class ShareFolder extends React.Component {
               {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <DropdownMenu
                   buttonIcon='fas fa-ellipsis-h'
-                  buttonCustomClass='extandedaction outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
+                  buttonCustomClass='extandedaction primaryColorBgHover'
                   buttonDataCy='extended_action'
                   isButton
                 >

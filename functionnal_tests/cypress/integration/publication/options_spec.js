@@ -39,7 +39,7 @@ describe('Publications page', () => {
     cy.contains(sendButton, 'Send')
       .should('be.enabled')
       .click()
-    cy.contains('.feedItem__publication__messagelist__item .comment__body__content__text', text)
+    cy.contains('.feedItem__publication__messagelist__item .timeline__comment__body__content__text', text)
   })
 
   describe('in the action menu', () => {
@@ -49,7 +49,7 @@ describe('Publications page', () => {
 
     it('should be able to copy content link', () => {
       cy.get('.feedItemHeader__actionMenu__item[title="Copy content link"]').click()
-      cy.contains('.flashmessage__container__content__text__paragraph', 'Link copied to clipboard')
+      cy.get('.flashmessage__container .bg-info').should('be.visible')
     })
 
     it.skip('should be able to edit publication', () => {

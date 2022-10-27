@@ -53,7 +53,7 @@ export class AdvancedSearch extends React.Component {
     super(props)
     this.state = {
       totalHits: 0,
-      isFilterMenuOpen: true,
+      isFilterMenuOpen: false,
       searchType: ADVANCED_SEARCH_TYPE.CONTENT,
       isLoading: true
     }
@@ -463,6 +463,7 @@ export class AdvancedSearch extends React.Component {
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent parentClass={classnames('advancedSearch', { advancedSearch__openMenu: state.isFilterMenuOpen })}>

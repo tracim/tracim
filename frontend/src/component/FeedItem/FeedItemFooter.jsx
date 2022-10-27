@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { connect } from 'react-redux'
@@ -59,7 +59,7 @@ export class FeedItemFooter extends React.Component {
             contentId={content.id}
             workspaceId={workspaceId}
           />
-          {props.isPublication && props.showTimeline && (
+          {props.showCommentList && !props.isCommentListEmpty && (
             <IconButton
               text={props.discussionToggleButtonLabel}
               textMobile={props.discussionToggleButtonLabelMobile}
@@ -67,6 +67,16 @@ export class FeedItemFooter extends React.Component {
               onClick={props.onClickToggleCommentList}
               customClass='buttonComments'
             />
+          )}
+
+          {props.showCommentList && props.isCommentListEmpty && (
+            <Link
+              className='feedItemFooter__right__participate'
+              to={PAGE.CONTENT(props.content.id)}
+            >
+              <i className='fa-fw fas fa-bullhorn' />
+              <span>{props.t('Participate')}</span>
+            </Link>
           )}
         </div>
       </div>
@@ -87,10 +97,12 @@ FeedItemFooter.propTypes = {
   onChangeTranslationTargetLanguageCode: PropTypes.func.isRequired,
   discussionToggleButtonLabel: PropTypes.string.isRequired,
   discussionToggleButtonLabelMobile: PropTypes.string,
-  onClickToggleCommentList: PropTypes.func,
-  isPublication: PropTypes.bool.isRequired
+  isCommentListEmpty: PropTypes.bool,
+  onClickToggleCommentList: PropTypes.func
 }
 
 FeedItemFooter.defaultProps = {
-  discussionToggleButtonLabelMobile: ''
+  discussionToggleButtonLabelMobile: '',
+  isCommentListEmpty: true,
+  onClickToggleCommentList: () => { }
 }

@@ -183,6 +183,7 @@ export class JoinWorkspace extends React.Component {
               title={props.t('Join a space')}
               icon='fas fa-users'
               breadcrumbsList={props.breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
 
             <PageContent parentClass={`${className}__content`}>
@@ -227,10 +228,11 @@ export class JoinWorkspace extends React.Component {
   }
 }
 
-const mapStateToProps = ({ accessibleWorkspaceList, breadcrumbs, spaceSearch, user, workspaceSubscriptionList }) => ({
+const mapStateToProps = ({ accessibleWorkspaceList, breadcrumbs, spaceSearch, system, user, workspaceSubscriptionList }) => ({
   accessibleWorkspaceList,
   breadcrumbs,
   spaceSearch,
+  system,
   user,
   workspaceSubscriptionList
 })

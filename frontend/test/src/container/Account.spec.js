@@ -1,7 +1,7 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import configureMockStore from 'redux-mock-store'
-import { withRouterMock } from '../../hocMock/withRouter'
+import { RouterMock, withRouterMock } from '../../hocMock/withRouter'
 import { translateMock } from '../../hocMock/translate.js'
 import { expect } from 'chai'
 import { Account as AccountWithoutHOC } from '../../../src/container/Account.jsx'
@@ -100,8 +100,9 @@ describe('In <Account />', () => {
 
   const AccountWithHOC1 = withRouterMock(translateMock()(AccountWithoutHOC))
   const AccountWithHOC2 = () => <Provider store={store}><AccountWithHOC1 {...props} /></Provider>
+  const AccountWithHOC3 = () => <RouterMock> <AccountWithHOC2 /> </RouterMock>
 
-  const wrapper = mount(<AccountWithHOC2 {...props} />)
+  const wrapper = mount(<AccountWithHOC3 {...props} />)
   const accountWrapper = wrapper.find(AccountWithoutHOC)
   const accountInstance = accountWrapper.instance()
 

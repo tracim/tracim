@@ -40,6 +40,7 @@ from tracim_backend.lib.utils.authorization import can_modify_workspace
 from tracim_backend.lib.utils.authorization import can_move_content
 from tracim_backend.lib.utils.authorization import can_see_workspace_information
 from tracim_backend.lib.utils.authorization import check_right
+from tracim_backend.lib.utils.authorization import has_personal_access
 from tracim_backend.lib.utils.authorization import is_administrator
 from tracim_backend.lib.utils.authorization import is_content_manager
 from tracim_backend.lib.utils.authorization import is_contributor
@@ -831,12 +832,13 @@ class WorkspaceController(Controller):
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ENDPOINTS])
+    @check_right(has_personal_access)
     @hapic.input_path(UserIdPathSchema())
     @hapic.input_query(TemplateQuerySchema())
     @hapic.output_body(ContentDigestSchema(many=True), default_http_code=HTTPStatus.OK)
     def get_templates(
         self, context, request: TracimRequest, hapic_data=None
-    ) -> typing.List[ContentDigestSchema]:
+    ) -> typing.List[Content]:
         """
         Get all templates
         """
@@ -848,9 +850,10 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        return api.get_templates(
-            user_id=hapic_data.path["user_id"], template_type=hapic_data.query["type"]
+        user = UserApi(current_user=None, session=request.dbsession, config=app_config).get_one(
+            hapic_data.path["user_id"]
         )
+        return api.get_templates(user=user, template_type=hapic_data.query["type"])
 
     def bind(self, configurator: Configurator) -> None:
         """
@@ -989,7 +992,7 @@ class WorkspaceController(Controller):
         )
         configurator.add_view(self.set_content_template, route_name="set_content_template")
 
-        # Get every templates
+        # Get every template
         configurator.add_route(
             "get_templates", "/users/{user_id}/template_contents", request_method="GET"
         )

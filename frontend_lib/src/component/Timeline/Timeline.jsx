@@ -2,11 +2,19 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import Radium from 'radium'
+import i18n from '../../i18n.js'
+import { Link } from 'react-router-dom'
+import { translate } from 'react-i18next'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
-import { translate } from 'react-i18next'
-import i18n from '../../i18n.js'
-import { ROLE, formatAbsoluteDate, displayDistanceDate, TIMELINE_TYPE } from '../../helper.js'
+import {
+  darkenColor,
+  displayDistanceDate,
+  formatAbsoluteDate,
+  PAGE,
+  ROLE,
+  TIMELINE_TYPE
+} from '../../helper.js'
 import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
@@ -168,7 +176,8 @@ export class Timeline extends React.Component {
                     workspaceId={Number(props.workspaceId)}
                     author={content.author}
                     loggedUser={props.loggedUser}
-                    created={content.created_raw || content.created}
+                    creationDate={content.created_raw || content.created}
+                    modificationDate={content.modified}
                     text={content.translationState === TRANSLATION_STATE.TRANSLATED ? content.translatedRawContent : content.raw_content}
                     fromMe={props.loggedUser.userId === content.author.user_id}
                     key={`comment_${content.content_id}`}
@@ -229,7 +238,7 @@ export class Timeline extends React.Component {
           />
         )}
 
-        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && (
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && !props.showParticipateButton && (
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
@@ -256,6 +265,20 @@ export class Timeline extends React.Component {
             />
           </div>
         )}
+
+        {props.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && props.showParticipateButton && (
+          <Link
+            style={{
+              '--appTypeColor': props.customColor,
+              '--appTypeDarkColor': darkenColor(props.customColor)
+            }}
+            className='timeline__participate'
+            to={PAGE.CONTENT(props.contentId)}
+          >
+            <i className='fa-fw fas fa-bullhorn' />
+            {props.t('Participate')}
+          </Link>
+        )}
       </div>
     )
   }
@@ -264,83 +287,86 @@ export class Timeline extends React.Component {
 export default translate()(Radium(TracimComponent(Timeline)))
 
 Timeline.propTypes = {
-  timelineData: PropTypes.array.isRequired,
   apiUrl: PropTypes.string.isRequired,
-  workspaceId: PropTypes.number.isRequired,
-  onClickValidateNewCommentBtn: PropTypes.func.isRequired,
-  availableStatusList: PropTypes.array,
-  deprecatedStatus: PropTypes.object,
-  disableComment: PropTypes.bool,
-  customClass: PropTypes.string,
-  customColor: PropTypes.string,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  isDeprecated: PropTypes.bool,
   loggedUser: PropTypes.object.isRequired,
-  memberList: PropTypes.array,
-  wysiwyg: PropTypes.bool,
-  onClickWysiwygBtn: PropTypes.func,
-  onClickRevisionBtn: PropTypes.func,
-  allowClickOnRevision: PropTypes.bool,
-  invalidMentionList: PropTypes.array,
-  shouldScrollToBottom: PropTypes.bool,
-  isLastTimelineItemCurrentToken: PropTypes.bool,
-  isArchived: PropTypes.bool,
-  onClickRestoreArchived: PropTypes.func,
-  isDeleted: PropTypes.bool,
-  onClickCancelSave: PropTypes.func,
-  onClickRestoreDeleted: PropTypes.func,
-  onClickSaveAnyway: PropTypes.func,
-  searchForMentionOrLinkInQuery: PropTypes.func,
-  showInvalidMentionPopup: PropTypes.bool,
-  onClickEditComment: PropTypes.func,
-  onClickDeleteComment: PropTypes.func,
-  onClickOpenFileComment: PropTypes.func,
-  onClickTranslateComment: PropTypes.func.isRequired,
   onClickRestoreComment: PropTypes.func.isRequired,
-  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onClickTranslateComment: PropTypes.func.isRequired,
+  timelineData: PropTypes.array.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,
-  onClickShowMoreTimelineItems: PropTypes.func,
+  translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
+  workspaceId: PropTypes.number.isRequired,
+  allowClickOnRevision: PropTypes.bool,
+  availableStatusList: PropTypes.array,
   canLoadMoreTimelineItems: PropTypes.func,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
-  wysiwygIdSelector: PropTypes.string,
-  isFileCommentLoading: PropTypes.bool
+  customClass: PropTypes.string,
+  customColor: PropTypes.string,
+  deprecatedStatus: PropTypes.object,
+  disableComment: PropTypes.bool,
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  invalidMentionList: PropTypes.array,
+  isArchived: PropTypes.bool,
+  isDeleted: PropTypes.bool,
+  isDeprecated: PropTypes.bool,
+  isFileCommentLoading: PropTypes.bool,
+  isLastTimelineItemCurrentToken: PropTypes.bool,
+  memberList: PropTypes.array,
+  onClickCancelSave: PropTypes.func,
+  onClickDeleteComment: PropTypes.func,
+  onClickEditComment: PropTypes.func,
+  onClickOpenFileComment: PropTypes.func,
+  onClickRestoreArchived: PropTypes.func,
+  onClickRestoreDeleted: PropTypes.func,
+  onClickRevisionBtn: PropTypes.func,
+  onClickSaveAnyway: PropTypes.func,
+  onClickShowMoreTimelineItems: PropTypes.func,
+  onClickValidateNewCommentBtn: PropTypes.func,
+  onClickWysiwygBtn: PropTypes.func,
+  searchForMentionOrLinkInQuery: PropTypes.func,
+  shouldScrollToBottom: PropTypes.bool,
+  showInvalidMentionPopup: PropTypes.bool,
+  showParticipateButton: PropTypes.bool,
+  wysiwyg: PropTypes.bool,
+  wysiwygIdSelector: PropTypes.string
 }
 
 Timeline.defaultProps = {
+  allowClickOnRevision: true,
   availableStatusList: [],
+  canLoadMoreTimelineItems: () => false,
+  contentId: 0,
+  contentType: '',
+  customClass: '',
+  customColor: '',
   deprecatedStatus: {
     faIcon: ''
   },
   disableComment: false,
-  customClass: '',
-  customColor: '',
   id: '',
-  isDeprecated: false,
-  memberList: [],
-  timelineData: [],
-  wysiwyg: false,
-  onClickWysiwygBtn: () => { },
-  onClickRevisionBtn: () => { },
-  allowClickOnRevision: true,
   invalidMentionList: [],
-  shouldScrollToBottom: true,
-  isLastTimelineItemCurrentToken: false,
   isArchived: false,
   isDeleted: false,
+  isDeprecated: false,
+  isFileCommentLoading: false,
+  isLastTimelineItemCurrentToken: false,
+  memberList: [],
   onClickCancelSave: () => { },
-  onClickSaveAnyway: () => { },
-  searchForMentionOrLinkInQuery: () => { },
-  showInvalidMentionPopup: false,
-  onClickTranslateComment: content => { },
   onClickDeleteComment: () => { },
-  onClickRestoreComment: content => { },
   onClickEditComment: () => { },
   onClickOpenFileComment: () => { },
+  onClickRestoreComment: content => { },
+  onClickRevisionBtn: () => { },
+  onClickSaveAnyway: () => { },
   onClickShowMoreTimelineItems: () => { },
-  canLoadMoreTimelineItems: () => false,
-  contentId: 0,
-  contentType: '',
-  wysiwygIdSelector: '',
-  isFileCommentLoading: false
+  onClickTranslateComment: content => { },
+  onClickValidateNewCommentBtn: () => { },
+  onClickWysiwygBtn: () => { },
+  searchForMentionOrLinkInQuery: () => { },
+  shouldScrollToBottom: true,
+  showInvalidMentionPopup: false,
+  showParticipateButton: false,
+  timelineData: [],
+  wysiwyg: false,
+  wysiwygIdSelector: ''
 }

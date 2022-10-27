@@ -9,15 +9,15 @@ import {
 import {
   appendNotificationList,
   newFlashMessage,
-  readNotificationList,
+  readEveryNotification,
   setNextPage
 } from '../action-creator.sync.js'
 import {
-  CONTENT_NAMESPACE,
   GROUP_NOTIFICATION_CRITERIA,
   FETCH_CONFIG
 } from '../util/helper.js'
 import {
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
   getContentPath,
   GROUP_MENTION_TRANSLATION_LIST,
@@ -245,7 +245,7 @@ export const NotificationWall = props => {
     const fetchAllPutNotificationAsRead = await props.dispatch(putAllNotificationAsRead(props.user.userId))
     switch (fetchAllPutNotificationAsRead.status) {
       case 204:
-        props.dispatch(readNotificationList())
+        props.dispatch(readEveryNotification())
         break
       default:
         props.dispatch(newFlashMessage(props.t('An error has happened while setting "mark all as read"'), 'warning'))
@@ -267,7 +267,13 @@ export const NotificationWall = props => {
           // INFO - MP - 2022-05-23 - We need to set the next page first and update the list of notifications
           // after, so the hook isn't triggered too early.
           props.dispatch(setNextPage(fetchGetNotificationWall.json.has_next, fetchGetNotificationWall.json.next_page_token))
-          props.dispatch(appendNotificationList(fetchGetNotificationWall.json.items, props.workspaceList))
+          props.dispatch(
+            appendNotificationList(
+              props.user.userId,
+              fetchGetNotificationWall.json.items,
+              props.workspaceList
+            )
+          )
           break
         default:
           props.dispatch(newFlashMessage(props.t('Error while loading the notification list'), 'warning'))

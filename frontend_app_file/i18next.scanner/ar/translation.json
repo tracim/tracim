@@ -63,5 +63,7 @@
   "New file": "ملف جديد",
   "Error while creating file": "خطأ أثناء إنشاء الملف",
   "Validate and create": "اعتماد و إنشاء",
-  "Tasks": ""
+  "Tasks": "",
+  "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
+  "Copy content link": "نسخ رابط المحتوى"
 }

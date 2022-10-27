@@ -368,9 +368,7 @@ describe('helper.js', () => {
 
     it('Should return only time using options', () => {
       expect(
-        formatAbsoluteDate(
-          new Date(), 'en', { hour: '2-digit', minute: '2-digit' }
-        )
+        formatAbsoluteDate(new Date(), 'en', 'p')
       ).to.be.equal = new Date().toLocaleString('en', { hour: '2-digit', minute: '2-digit' })
     })
   })

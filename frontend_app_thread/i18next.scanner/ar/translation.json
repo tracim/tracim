@@ -11,5 +11,7 @@
   "Start a topic": "الشروع في محادثة",
   "Error while saving the comment": "خطأ أثناء حفظ التعليق",
   "Delete": "حذف",
-  "The content has been modified by {{author}}": "تم تعديل المحتوى بواسطة {{author}}"
+  "The content has been modified by {{author}}": "تم تعديل المحتوى بواسطة {{author}}",
+  "The link has been copied to clipboard": "تم نسخ الرابط إلى الحافظة",
+  "Copy content link": "نسخ رابط المحتوى"
 }
