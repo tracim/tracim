@@ -8,7 +8,7 @@
 - The user interface is now available in Norwegian 
 - Video player for video previews
 - Improved pertinence of notifications about tasks
-- UX / UI improvements (sidebar, header, news, mobile)
+- UX / UI improvements (sidebar, header, activities, news, mobile)
 
 ### Fixed Issues
 
