@@ -39,9 +39,10 @@
 
 ### Known Issues
 
+- The popups are hidden by the sidebar on mobile (issue [#5989](https://github.com/tracim/tracim/issues/5989))
 - The positioning of the notification wall is to be improved (issue [#5965](https://github.com/tracim/tracim/issues/5965))
-- The "My profile" button does not change its name when using admin rights to check the profile of an other user. (issue [#5975](https://github.com/tracim/tracim/issues/5975))
 - The file app menu shows in two lines on mobile (issue [#5976](https://github.com/tracim/tracim/issues/5976))
+- The "My profile" button does not change its name when using admin rights to check the profile of another user. (issue [#5975](https://github.com/tracim/tracim/issues/5975))
 
 
 # 4.3.2 / 2022-08-09
