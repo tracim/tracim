@@ -12,7 +12,8 @@
 
 ### Fixed Issues
 
-- Frontend: [#4600](https://github.com/tracim/tracim/issues/4600),
+- Frontend: [#3497](https://github.com/tracim/tracim/issues/3497),
+  [#4600](https://github.com/tracim/tracim/issues/4600),
   [#5510](https://github.com/tracim/tracim/issues/5510),
   [#5526](https://github.com/tracim/tracim/issues/5526),
   [#5625](https://github.com/tracim/tracim/issues/5625),
