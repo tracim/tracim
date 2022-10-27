@@ -206,6 +206,10 @@ class ContentTypeList(object):
         return self.get_one_by_slug(ContentTypeSlug.FOLDER.value)
 
     @property
+    def Kanban(self) -> TracimContentType:
+        return self.get_one_by_slug(ContentTypeSlug.KANBAN.value)
+
+    @property
     def File(self) -> TracimContentType:
         return self.get_one_by_slug(ContentTypeSlug.FILE.value)
 
