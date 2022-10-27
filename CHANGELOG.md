@@ -2,7 +2,7 @@
 
 ### New Features
 
-- Featuring a new borderless design
+- Featuring a new font and borderless design
 - Modified comments are now easily identifiable
 - Code preview available (through advanced edition)   
 - The user interface is now available in Norwegian 
