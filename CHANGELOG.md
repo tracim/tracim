@@ -22,7 +22,8 @@
   [#5858](https://github.com/tracim/tracim/issues/5858)
 - Backend: [#5526](https://github.com/tracim/tracim/issues/5526),
   [#5844](https://github.com/tracim/tracim/issues/5844),
-  [#5878](https://github.com/tracim/tracim/issues/5878)
+  [#5878](https://github.com/tracim/tracim/issues/5878),
+  [#5917](https://github.com/tracim/tracim/issues/5917)
 
 ### Breaking/Important change
 
