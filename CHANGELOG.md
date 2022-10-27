@@ -20,7 +20,9 @@
   [#5747](https://github.com/tracim/tracim/issues/5747),
   [#5748](https://github.com/tracim/tracim/issues/5748),
   [#5760](https://github.com/tracim/tracim/issues/5760),
-  [#5858](https://github.com/tracim/tracim/issues/5858)
+  [#5858](https://github.com/tracim/tracim/issues/5858),
+  [#5792](https://github.com/tracim/tracim/issues/5792),
+  [#5802](https://github.com/tracim/tracim/issues/5802)
 - Backend: [#5526](https://github.com/tracim/tracim/issues/5526),
   [#5844](https://github.com/tracim/tracim/issues/5844),
   [#5878](https://github.com/tracim/tracim/issues/5878),
