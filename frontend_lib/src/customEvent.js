@@ -3,6 +3,8 @@ export const CUSTOM_EVENT = {
   TRACIM_LIVE_MESSAGE_ERROR: 'TracimLiveMessageError',
   TRACIM_LIVE_MESSAGE_STATUS_CHANGED: 'TracimLiveMessageStatusChanged',
   TRACIM_LIVE_MESSAGE: 'TracimLiveMessage',
+  TRACIM_COMP_MOUNTED: component => `TRACIM_${component}_MOUNTED`,
+  TRACIM_COMP_UNMOUNTED: component => `TRACIM_${component}_UNMOUNTED`,
   ADD_FLASH_MSG: 'addFlashMsg',
   ALL_APP_CHANGE_LANGUAGE: 'allApp_changeLanguage',
   APPEND_BREADCRUMBS: 'appendBreadcrumbs',

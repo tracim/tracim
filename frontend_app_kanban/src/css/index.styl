@@ -64,7 +64,7 @@ cardWidth = 280px
               &::after
                 display none
           & button:hover
-            background-color grey-hover
+            background-color lightGrey1
           &.buttonHidden
             .dropdown, .kanban_addCard
               display none
@@ -87,7 +87,7 @@ cardWidth = 280px
         & .iconbutton
           background-color offWhite
           &:hover
-            background-color veryLightGrey
+            background-color lightGrey2
         &:empty
           display none
 
@@ -103,7 +103,7 @@ cardWidth = 280px
 
       & .react-kanban-column
         padding standardSpacing
-        background-color lightGrey
+        background-color lightGrey2
         border-radius standardBorderRadius
         margin 0 textSpacing
         min-width 315px
@@ -131,6 +131,7 @@ cardWidth = 280px
       min-width 550px
       display flex
       flex-direction column
+      overflow auto
 
     & [type=checkbox]
       margin textSpacing
@@ -168,6 +169,7 @@ cardWidth = 280px
           color unset
           font-size standardFontSize
           padding-inline-start textSpacing
+          border none
 
       &_buttons
         margin-bottom 0
@@ -184,7 +186,7 @@ cardWidth = 280px
         margin-inline-start standardSpacing
 
   &__columnAdder
-    border 1px mediumGrey dashed
+    border 1px lightGrey1 dashed
     min-width cardWidth
     max-height 70px
     margin 0 textSpacing
@@ -198,7 +200,7 @@ cardWidth = 280px
       opacity 0.5
 
     &:hover
-      background-color veryLightGrey
+      background-color lightGrey2
     & > *
       margin auto
 

@@ -10,8 +10,8 @@ import {
   NOTIFICATION_LIST,
   READ,
   readContentNotification,
-  readNotification,
   readNotificationList,
+  readEveryNotification,
   SET,
   setNextPage,
   UPDATE,
@@ -132,7 +132,7 @@ describe('reducer notificationPage.js', () => {
     describe(`${READ}/${NOTIFICATION}`, () => {
       it('should read a notification in a flat list', () => {
         const initState = { ...initialState, list: [notification], unreadNotificationCount: 1 }
-        const listOfNotification = notificationPage(initState, readNotification(notification.id))
+        const listOfNotification = notificationPage(initState, readNotificationList([notification.id]))
         expect(listOfNotification).to.deep.equal({
           ...initialState,
           list: [{ ...notification, read: true }],
@@ -158,7 +158,7 @@ describe('reducer notificationPage.js', () => {
     })
 
     describe(`${READ}/${NOTIFICATION_LIST}`, () => {
-      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readNotificationList())
+      const listOfNotification = notificationPage({ ...initialState, list: [notification], unreadNotificationCount: 1 }, readEveryNotification())
 
       it('should return the list of objects passed as parameter', () => {
         expect(listOfNotification).to.deep.equal({ ...initialState, list: [{ ...notification, read: true }], unreadNotificationCount: 0 })
@@ -168,12 +168,16 @@ describe('reducer notificationPage.js', () => {
     describe(`${APPEND}/${NOTIFICATION_LIST}`, () => {
       const listOfNotification = notificationPage(
         { ...initialState, list: [notification] },
-        appendNotificationList([{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
+        appendNotificationList(-1, [{ ...TLM, event_id: 999 }], workspaceList.workspaceList)
       )
 
-      it('should return the list of notifications appended with the list passed as parameter', () => {
-        expect(listOfNotification).to.deep.equal({ ...initialState, list: [notification, { ...notification, id: 999 }] })
-      })
+      it('should return the list of notifications appended with the list passed as parameter',
+        () => {
+          expect(listOfNotification).to.deep.equal(
+            { ...initialState, list: [notification, { ...notification, id: 999 }] }
+          )
+        }
+      )
     })
 
     describe(`${SET}/${NEXT_PAGE}`, () => {

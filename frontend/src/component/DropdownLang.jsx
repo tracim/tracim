@@ -11,7 +11,7 @@ const DropdownLang = props => {
         buttonIcon='fas fa-globe'
         buttonLabel={activeLang.label}
         buttonDataCy={`${activeLang.id}-active`}
-        buttonCustomClass='dropdownlang__dropdown__btnlanguage outlineTextBtn nohover'
+        buttonCustomClass='dropdownlang__dropdown__btnlanguage'
         menuCustomClass='dropdownlang__dropdown__subdropdown'
         isButton
       >

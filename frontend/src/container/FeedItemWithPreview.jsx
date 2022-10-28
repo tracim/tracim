@@ -324,6 +324,9 @@ export class FeedItemWithPreview extends React.Component {
         ? this.getFirstComment()
         : null
     )
+    if (shouldShowComment && props.inRecentActivities) {
+      props.content.firstComment = commentToShow
+    }
 
     const commentList = this.getTimelineData()
 
@@ -380,6 +383,7 @@ export class FeedItemWithPreview extends React.Component {
                   apiUrl={FETCH_CONFIG.apiUrl}
                   contentId={Number(props.content.id)}
                   apiContent={props.content}
+                  firstComment={commentToShow}
                   workspaceId={Number(props.workspaceId)}
                   author={commentToShow.author}
                   loggedUser={loggedUser}

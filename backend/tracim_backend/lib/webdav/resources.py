@@ -136,7 +136,7 @@ class WebdavContainer(ABC):
         pass
 
     @abstractmethod
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         """Get list of all sub-resources of the current resource"""
         pass
 
@@ -406,7 +406,7 @@ class ContentOnlyContainer(WebdavContainer):
             workspace=self.workspace,
         )
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         """
         Access to the list of content names for current workspace/folder
         """
@@ -424,7 +424,7 @@ class ContentOnlyContainer(WebdavContainer):
             "%s/%s" % (self.path, webdav_convert_file_name_to_display(label)), self.environ
         )
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         """
         Access to the list of content of current workspace/folder
         """
@@ -485,7 +485,7 @@ class WorkspaceAndContentContainer(WebdavContainer):
     def createCollection(self, label: str) -> "FolderResource":
         return self.content_container.createCollection(label=label)
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         # INFO - G.M - 2020-14-10 - Unclear if this method is really used by wsgidav
         workspace_names = self.workspace_container.getMemberNames()
         content_names = self.content_container.getMemberNames()
@@ -502,7 +502,7 @@ class WorkspaceAndContentContainer(WebdavContainer):
         if not member:
             member = self.content_container.getMember(label=label)
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         workspace_names = self.workspace_container.getMemberNames()
         workspaces = self.workspace_container.getMemberList()
         content_resources = self.content_container.getMemberList()
@@ -636,13 +636,13 @@ class WorkspaceResource(DAVCollection):
             HTTP_FORBIDDEN, contextinfo="Not allowed to rename or move workspace through webdav"
         )
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         return self.container.getMemberNames()
 
     def getMember(self, label: str) -> _DAVResource:
         return self.container.getMember(label=label)
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         return self.container.getMemberList()
 
     @webdav_check_right(is_contributor)
@@ -803,13 +803,13 @@ class FolderResource(DAVCollection):
     def createCollection(self, label: str) -> "FolderResource":
         return self.content_container.createCollection(label=label)
 
-    def getMemberNames(self) -> [str]:
+    def getMemberNames(self) -> typing.List[str]:
         return self.content_container.getMemberNames()
 
     def getMember(self, label: str) -> _DAVResource:
         return self.content_container.getMember(label=label)
 
-    def getMemberList(self) -> [_DAVResource]:
+    def getMemberList(self) -> typing.List[_DAVResource]:
         return self.content_container.getMemberList()
 
 
@@ -1110,3 +1110,4 @@ class OtherFileResource(FileResource):
                 self.content_revision,
                 self.content_api.get_all([self.content.content_id], content_type_list.Comment.slug),
             )
+        raise NotImplementedError()

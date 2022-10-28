@@ -6,7 +6,7 @@ import {
   getContentComment,
   getFileChildContent,
   handleFetchResult,
-  getWorkspaceContent,
+  getSpaceContent,
   getContentPath,
   sortTimelineByDate,
   TIMELINE_TYPE
@@ -65,25 +65,31 @@ const createContentActivity = async (activityParams, messageList, apiUrl) => {
   const newestMessage = messageList[0]
 
   let content = newestMessage.fields.content
-
-  const isMentionOrComment = content.content_type === TLM_ST.COMMENT ||
-    content.content_type === TLM_ET.MENTION
-
+  let contentType
   let parentContentType
-  if (isMentionOrComment) parentContentType = content.parent_content_type
+
+  const isMention = content.content_type === TLM_ET.MENTION
+  const isComment = content.content_type === TLM_ST.COMMENT
+
+  if (isMention || isComment) parentContentType = content.parent_content_type
   else if (content.assignee) parentContentType = content.parent.content_type
   else if (content.parent_id) {
     const parentType = await getParentType(content.parent_id, apiUrl)
     if (parentType !== CONTENT_TYPE.FOLDER) parentContentType = parentType
   }
 
+  contentType = parentContentType || content.content_type
+
+  // INFO - MP - 2022-10-21 - Override the kanban type since kanban are files
+  if (contentType === CONTENT_TYPE.KANBAN) contentType = CONTENT_TYPE.FILE
+
   // INFO - SG - 2021-04-16
   // We have to get the parent content as comments shall produce an activity
   // for it and not for the comment.
-  const fetchGetSpaceContent = await handleFetchResult(await getWorkspaceContent(
+  const fetchGetSpaceContent = await handleFetchResult(await getSpaceContent(
     apiUrl,
     newestMessage.fields.workspace.workspace_id,
-    parentContentType || content.content_type,
+    contentType,
     parentContentType
       ? content.parent_id || content.parent.content_id
       : content.content_id

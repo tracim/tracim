@@ -171,7 +171,7 @@ describe('<NotificationWall />', () => {
   })
 
   describe('handleClickMarkAllAsRead', () => {
-    it('should call readNotificationList()', (done) => {
+    it('should call readEveryNotification()', (done) => {
       mockPutAllNotificationAsRead204(FETCH_CONFIG.apiUrl, props.user.userId, 1)
       NotificationWallInstance.handleClickMarkAllAsRead().then(() => {
         expect(readNotificationListCallBack.called).to.equal(true)

@@ -17,7 +17,7 @@ export class DateInput extends React.Component {
       <input
         autoFocus={props.autoFocus}
         type='date'
-        className='dateInput form-control primaryColorBorder'
+        className='dateInput form-control'
         onChange={props.onChange}
         disabled={props.disabled}
         placeholder={props.placeholder}
