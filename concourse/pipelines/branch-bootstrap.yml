@@ -49,12 +49,12 @@ resources:
     repository: algooci/tracim
 
 # resource to update github's commit status
-#- name: github-status-update
-#  type: cogito
-#  source:
- #   repo: tracim/tracim
- #   owner: meerkat-bot
- #   access_token: ((github-access-token))
+- name: github-status-update
+  type: cogito
+  source:
+    repo: tracim/tracim
+    owner: meerkat-bot
+    access_token: ((github-access-token))
 
 # timer used to trigger a build
 - name: periodic-build
