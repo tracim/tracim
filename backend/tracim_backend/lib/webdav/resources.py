@@ -100,11 +100,12 @@ def get_content_resource(
             content=content,
             tracim_context=tracim_context,
         )
-    elif content.type == content_type_list.File.slug:
+    elif content.depot_file:
         return FileResource(
             path=path, environ=environ, content=content, tracim_context=tracim_context,
         )
     else:
+        # Content is assumed to be in raw_content
         return OtherFileResource(
             path=path, environ=environ, content=content, tracim_context=tracim_context
         )
