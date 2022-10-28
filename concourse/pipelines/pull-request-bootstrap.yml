@@ -68,6 +68,7 @@ jobs:
     - in_parallel:
       - get: tracim-source
         trigger: true
+        timeout: 5m
       - get: test-image
 
     - task: build-pipeline

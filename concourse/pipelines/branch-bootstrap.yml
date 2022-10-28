@@ -76,6 +76,7 @@ jobs:
   plan:
     - in_parallel:
       - get: tracim-source
+        timeout: 5m
       - get: test-image
       - get: periodic-build
         trigger: true

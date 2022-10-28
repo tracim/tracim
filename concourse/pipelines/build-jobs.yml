@@ -8,6 +8,13 @@
 #    - "pending_status_notification" job.
 # 4. a "reconfigure-self" job which takes care of updating the full pipeline
 
+
+## YAML definitions re-used in plans
+definitions:
+  main_python_version: &main_python_version "3.9.6"
+  python_versions: &python_versions ["3.7.11", "3.8.11", "3.9.6"]
+  databases: &databases ["sqlite", "postgresql"]
+
 # Pipeline jobs:
 # - run backend (lint -> quick tests -> full tests) checks
 # - run frontend (lint + unit tests) checks
@@ -27,6 +34,7 @@
 
   - task: backend-lint
     image: test-image
+    timeout: 5m
     config:
       platform: linux
       inputs:
@@ -37,10 +45,11 @@
 
   - across:
     - var: python_version
-      values: ["3.5.10" , "3.6.14", "3.7.11"]
+      values: *python_versions
       max_in_flight: all
     task: backend-quick-tests_((.:python_version))
     image: test-image
+    timeout: 30m
     # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
     privileged: true
     config:
@@ -55,10 +64,11 @@
 
   - across:
     - var: database
-      values: ["sqlite", "postgresql", "mysql", "mariadb"]
+      values: *databases
       max_in_flight: all
     task: backend-full-tests_((.:database))
     image: test-image
+    timeout: 1h30m
     # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
     privileged: true
     config:
@@ -69,7 +79,7 @@
         dir: tracim-source
         path: concourse/scripts/backend-full-tests
         args:
-          - "3.7.11"
+          - *main_python_version
           - ((.:database))
 
 - name: frontend-tests
@@ -87,6 +97,7 @@
 
   - task: frontend-unit-tests
     image: test-image
+    timeout: 15m
     config:
       platform: linux
       inputs:
@@ -108,6 +119,7 @@
 
   - task: end-to-end-cypress-tests
     image: test-image
+    timeout: 1h40m
     # needed for docker during tests
     # TODO - S.G. - 2021-08-04: is there a less instrusive way to allow docker-in-docker ?
     privileged: true
