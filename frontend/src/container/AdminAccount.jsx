@@ -56,22 +56,22 @@ export class Account extends React.Component {
     const builtSubComponentMenu = [{
       name: 'personalData',
       active: true,
-      label: props.t('Their Account'),
+      label: props.t('Account'),
       display: true
     }, {
       name: 'spacesConfig',
       active: false,
-      label: props.t('Their Spaces'),
+      label: props.t('Spaces'),
       display: true
     }, {
       name: 'password',
       active: false,
-      label: props.t('Their Password'),
+      label: props.t('Password'),
       display: true
     }, {
       name: 'agenda',
       active: false,
-      label: props.t('Their Agenda'),
+      label: props.t('Agenda'),
       display: props.appList.some(a => a.slug === 'agenda')
     }].filter(menu => menu.display)
 
