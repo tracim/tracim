@@ -2,6 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import { getUserProfile, FETCH_CONFIG } from '../../util/helper.js'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 import {
   PAGE,
   IconButton,
@@ -68,10 +69,16 @@ export const UserInfo = (props) => {
         </div>
       </div>
       <Link className='userinfo__profile_button' to={PAGE.PUBLIC_PROFILE(props.user.userId)}>
-        <IconButton text={props.t('My profile')} type='button' icon='fas fa-user' />
+        <IconButton
+          text={props.currentUser.userId === props.user.userId
+            ? props.t('My profile')
+            : props.t('Profile')}
+          type='button' icon='fas fa-user'
+        />
       </Link>
     </div>
   )
 }
 
-export default translate()(UserInfo)
+const mapStateToProps = ({ user }) => ({ currentUser: user })
+export default connect(mapStateToProps)(translate()(UserInfo))
