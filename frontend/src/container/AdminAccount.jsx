@@ -376,7 +376,7 @@ export class Account extends React.Component {
             />
 
             <PageContent parentClass='account'>
-              <UserInfo user={state.userToEdit} />
+              <UserInfo user={state.userToEdit} currentUser={props.user} />
 
               <Delimiter customClass='account__delimiter' />
 

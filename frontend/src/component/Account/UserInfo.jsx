@@ -2,7 +2,6 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import { getUserProfile, FETCH_CONFIG } from '../../util/helper.js'
 import { Link } from 'react-router-dom'
-import { connect } from 'react-redux'
 import {
   PAGE,
   IconButton,
@@ -80,5 +79,4 @@ export const UserInfo = (props) => {
   )
 }
 
-const mapStateToProps = ({ user }) => ({ currentUser: user })
-export default connect(mapStateToProps)(translate()(UserInfo))
+export default translate()(UserInfo)
