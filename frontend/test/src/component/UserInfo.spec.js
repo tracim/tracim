@@ -7,9 +7,6 @@ import { withRouterMock } from '../../hocMock/withRouter'
 
 describe('<UserInfo />', () => {
   const props = {
-    currentUser: {
-      userId: 1
-    },
     user: {
       userId: 1,
       publicName: 'randomPublicName',

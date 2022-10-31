@@ -292,16 +292,20 @@ describe('Account page', () => {
       cy.url().should('include', URLS[PAGES.PROFILE]({ userId: baseUser.user_id }));
     })
 
-    it('label should be "My profile" when viewing as yourself', () => {
+    it('label should be "Profile" when viewing as yourself', () => {
+      cy.resetDB()
+      cy.setupBaseDB()
       cy.loginAs('administrators')
       cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: defaultAdmin.user_id }  })
-      cy.get('.userinfo__profile_button').should('include.text', 'My profile')
+      cy.get('.userinfo__profile_button').contains('Profile')
     })
 
-    it('label should be "My profile" when viewing another profile', () => {
+    it('label should be "Profile" when viewing another profile', () => {
+      cy.resetDB()
+      cy.setupBaseDB()
       cy.loginAs('administrators')
       cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: baseUser.user_id }  })
-      cy.get('.userinfo__profile_button').should('include.text', 'Profile')
+      cy.get('.userinfo__profile_button').contains('Profile')
     })
   })
 })
