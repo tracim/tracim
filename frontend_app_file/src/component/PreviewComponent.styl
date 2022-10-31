@@ -16,9 +16,8 @@ playButtonSize = 40px
   flex 1
   &__fileimg
     display flex
-    flex-direction column
-    justify-content center
-    width 100%
+    max-width 100%
+    max-height 100%
     &__play
       position absolute
       left "calc(50% - %s)" % (playButtonSize / 2)
@@ -28,6 +27,7 @@ playButtonSize = 40px
       & .previewcomponent__fileimg__play
         opacity 1
     &__img
+      object-fit contain
       margin auto
       max-height 100%
       max-width 100%
@@ -56,6 +56,9 @@ playButtonSize = 40px
   &__filepreview
     display flex
     flex 1
+    max-height: 90%;
+    width: 80%;
+    justify-content: center;
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .previewcomponent

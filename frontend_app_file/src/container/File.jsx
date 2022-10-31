@@ -1165,8 +1165,8 @@ export class File extends React.Component {
       state.content.current_revision_id,
       filenameWithoutExtension,
       state.fileCurrentPage,
-      500,
-      500
+      1024,
+      1024
     )
     const lightboxUrlList = (new Array(state.previewInfo.page_nb))
       .fill(null)
