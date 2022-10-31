@@ -278,34 +278,29 @@ describe('Account page', () => {
       })
     })
   })
+})
 
-  describe('Profile link button', () => {
-    beforeEach(() => {
-      cy.resetDB()
-      cy.setupBaseDB()
-    })
+describe('Profile link button', () => {
+  beforeEach(() => {
+    cy.cancelXHR()
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('administrators')
+  })
 
-    it('should redirect to user\'s public profile', () => {
-      cy.loginAs('users')
-      cy.visitPage({ pageName: PAGES.ACCOUNT })
-      cy.get('.userinfo__profile_button').click()
-      cy.url().should('include', URLS[PAGES.PROFILE]({ userId: baseUser.user_id }));
-    })
+  it("should redirect to user's public profile", () => {
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.get('.userinfo__profile_button').click()
+    cy.url().should('include', URLS[PAGES.PROFILE]({ userId: defaultAdmin.user_id }));
+  })
 
-    it('label should be "Profile" when viewing as yourself', () => {
-      cy.resetDB()
-      cy.setupBaseDB()
-      cy.loginAs('administrators')
-      cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: defaultAdmin.user_id }  })
-      cy.get('.userinfo__profile_button').contains('Profile')
-    })
+  it('label should be "My Profile" when viewing from account page', () => {
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.get('.userinfo__profile_button').contains('My profile')
+  })
 
-    it('label should be "Profile" when viewing another profile', () => {
-      cy.resetDB()
-      cy.setupBaseDB()
-      cy.loginAs('administrators')
-      cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: baseUser.user_id }  })
-      cy.get('.userinfo__profile_button').contains('Profile')
-    })
+  it('label should be "Profile" when viewing from admin page', () => {
+    cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: baseUser.user_id }  })
+    cy.get('.userinfo__profile_button').contains('Profile')
   })
 })
