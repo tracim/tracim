@@ -4,6 +4,7 @@ from urllib.parse import quote
 import pytest
 import transaction
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.data import UserRoleInWorkspace
@@ -427,13 +428,20 @@ class TestFunctionalWebdavGet(object):
         webdav_testapp.get("/parent.space/children.space", status=404)
 
     @pytest.mark.parametrize(
-        "workspace_label, webdav_workspace_label, content_filename, webdav_content_filename",
+        "workspace_label, webdav_workspace_label, content_type_slug, content_filename, webdav_content_filename",
         [
             # workspace_label, webdav_workspace_label,
             # content_filename, webdav_content_filename
-            ("myworkspace", "myworkspace", "myfile.txt", "myfile.txt"),
-            ("/?\\#*", "⧸ʔ⧹#∗", "/?\\#*.txt", "⧸ʔ⧹#∗.txt"),
-            ("Project Z", "Project Z", "report product 47.txt", "report product 47.txt"),
+            ("myworkspace", "myworkspace", ContentTypeSlug.FILE, "myfile.txt", "myfile.txt"),
+            ("/?\\#*", "⧸ʔ⧹#∗", ContentTypeSlug.FILE, "/?\\#*.txt", "⧸ʔ⧹#∗.txt"),
+            (
+                "Project Z",
+                "Project Z",
+                ContentTypeSlug.FILE,
+                "report product 47.txt",
+                "report product 47.txt",
+            ),
+            ("myworkspace", "myworkspace", ContentTypeSlug.KANBAN, "foo.kanban", "foo.kanban"),
         ],
     )
     def test_functional__webdav_access_to_content__ok__nominal_case(
@@ -441,11 +449,11 @@ class TestFunctionalWebdavGet(object):
         session,
         workspace_label,
         webdav_workspace_label,
+        content_type_slug,
         content_filename,
         webdav_content_filename,
         workspace_api_factory,
         content_api_factory,
-        content_type_list,
         admin_user,
         webdav_testapp,
     ) -> None:
@@ -455,7 +463,7 @@ class TestFunctionalWebdavGet(object):
         api = content_api_factory.get()
         with session.no_autoflush:
             file = api.create(
-                content_type_slug=content_type_list.File.slug,
+                content_type_slug=content_type_slug,
                 workspace=workspace,
                 filename=content_filename,
                 do_save=False,
