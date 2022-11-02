@@ -116,12 +116,13 @@ export class PreviewComponent extends React.Component {
               'previewcomponent__fileimg',
               { previewAvailable: state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable }
             )}
-            onClick={this.handleClickPreview}
           >
             {(props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
               ? (
                 <>
-                  <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img' />
+                  <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img'
+                       onClick={this.handleClickPreview}
+                  />
 
                   {props.isVideo && (
                     <div className='previewcomponent__fileimg__play'>
