@@ -7,7 +7,7 @@ import AttachedFile from '../AttachedFile/AttachedFile.jsx'
 import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
-  getFileDownloadUrl, 
+  getFileDownloadUrl,
   handleFetchResult
 } from '../../helper.js'
 import { getFileRevisionPreviewInfo } from '../../action.async.js'
@@ -103,7 +103,7 @@ export class CommentFilePreview extends React.Component {
 
     const lightboxUrlList = (new Array(state.previewInfo.page_nb))
       .fill(null)
-      .map((n, index) => // create an array [1..revision.page_nb]
+      .map((n, index) =>
         buildFilePreviewUrl(
           props.apiUrl,
           props.apiContent.workspace_id,
