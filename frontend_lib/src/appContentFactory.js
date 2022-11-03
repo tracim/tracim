@@ -1027,7 +1027,7 @@ export function appContentFactory (WrappedComponent) {
             ...fetchSpaceMemberList.body
               .filter(m => m.user.username)
               .filter(m => m.user.username.toLowerCase().includes(keyword.toLowerCase()))
-              .map(m => ({ mention: m.user.username, detail: m.user.public_name, ...m }))
+              .map(m => ({ mention: m.user.username, detail: m.user.public_name, ...m.user }))
           ]
           default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list')); break
         }
