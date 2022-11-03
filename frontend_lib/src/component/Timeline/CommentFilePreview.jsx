@@ -7,9 +7,10 @@ import AttachedFile from '../AttachedFile/AttachedFile.jsx'
 import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
-  getFileDownloadUrl, handleFetchResult
+  getFileDownloadUrl, 
+  handleFetchResult
 } from '../../helper.js'
-import { getFileRevisionPreviewInfo } from '../../action.async'
+import { getFileRevisionPreviewInfo } from '../../action.async.js'
 
 export class CommentFilePreview extends React.Component {
   constructor (props) {
@@ -144,7 +145,7 @@ export class CommentFilePreview extends React.Component {
           download
         >
           <AttachedFile fileName={filename} />
-          {(!this.state.fallbackPreview &&
+          {(!state.fallbackPreview &&
             <img
               className={classnames(`${props.customClass}__body__text__asFile`, 'comment__body__text__asFile')}
               src={previewUrl}
