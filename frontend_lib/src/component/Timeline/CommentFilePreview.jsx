@@ -31,9 +31,7 @@ export class CommentFilePreview extends React.Component {
   componentDidUpdate = async () => {
     const { props, state } = this
 
-    console.log("Update")
     if (state.previewLoaded) return
-    console.log("Loading")
 
     const previewInfoResponse = await handleFetchResult(
       await getFileRevisionPreviewInfo(
