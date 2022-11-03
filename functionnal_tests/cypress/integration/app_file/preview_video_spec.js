@@ -38,7 +38,8 @@ describe('A video file', () => {
   it('should display the video player when clicking on preview', () => {
     cy.contains('[data-cy=FilenameWithBadges__label]', fileTitle).then(() => {
       cy.get('.previewcomponent__fileimg__text').should('be.not.visible')
-      cy.get('.previewcomponent__fileimg').should('be.visible').click()
+      cy.get('.previewcomponent__fileimg').should('be.visible')
+      cy.get('.previewcomponent__fileimg__play').click()
       cy.get('#videoWrapperDiv > video').should('be.visible')
     })
   })
