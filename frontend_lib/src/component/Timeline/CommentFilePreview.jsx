@@ -7,16 +7,46 @@ import AttachedFile from '../AttachedFile/AttachedFile.jsx'
 import {
   buildFilePreviewUrl,
   removeExtensionOfFilename,
-  getFileDownloadUrl
+  getFileDownloadUrl, handleFetchResult
 } from '../../helper.js'
+import { getFileRevisionPreviewInfo } from '../../action.async'
 
 export class CommentFilePreview extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
+      fileCurrentPage: 1,
+      previewInfo: {
+        content_id: props.apiContent.content_id,
+        revision_id: props.apiContent.current_revision_id,
+        page_nb: 1,
+        has_jpeg_preview: false
+      },
+      previewLoaded: false,
       fallbackPreview: false,
       displayLightbox: false
     }
+  }
+
+  componentDidUpdate = async () => {
+    const { props, state } = this
+
+    console.log("Update")
+    if (state.previewLoaded) return
+    console.log("Loading")
+
+    const previewInfoResponse = await handleFetchResult(
+      await getFileRevisionPreviewInfo(
+        props.apiUrl,
+        props.apiContent.workspace_id,
+        props.apiContent.content_id,
+        props.apiContent.current_revision_id
+      )
+    )
+    this.setState({
+      previewInfo: previewInfoResponse.body,
+      previewLoaded: true
+    })
   }
 
   handleError = () => {
@@ -36,6 +66,30 @@ export class CommentFilePreview extends React.Component {
     this.setState({ displayLightbox: false })
   }
 
+  handleClickPreviousPage = () => {
+    const { state } = this
+    let page = state.fileCurrentPage
+
+    if (state.previewInfo.page_nb > 0) page--
+
+    this.setState({
+      fileCurrentPage: page,
+      previewLoaded: false
+    })
+  }
+
+  handleClickNextPage = () => {
+    const { state } = this
+    let page = state.fileCurrentPage
+
+    if (state.previewInfo.page_nb > state.fileCurrentPage) page++
+
+    this.setState({
+      fileCurrentPage: page,
+      previewLoaded: false
+    })
+  }
+
   render () {
     const { state, props } = this
 
@@ -45,18 +99,20 @@ export class CommentFilePreview extends React.Component {
     const currentRevisionId = props.apiContent.revision_id || props.apiContent.currentRevisionId
     const filenameWithoutExtension = removeExtensionOfFilename(props.apiContent.filename)
 
-    const lightboxUrlList = [
-      buildFilePreviewUrl(
-        props.apiUrl,
-        props.apiContent.workspace_id,
-        props.apiContent.content_id,
-        props.apiContent.current_revision_id,
-        filenameWithoutExtension,
-        1,
-        1920,
-        1080
+    const lightboxUrlList = (new Array(state.previewInfo.page_nb))
+      .fill(null)
+      .map((n, index) => // create an array [1..revision.page_nb]
+        buildFilePreviewUrl(
+          props.apiUrl,
+          props.apiContent.workspace_id,
+          props.apiContent.content_id,
+          props.apiContent.current_revision_id,
+          filenameWithoutExtension,
+          index + 1,
+          1280,
+          720
+        )
       )
-    ]
 
     const previewUrl = buildFilePreviewUrl(
       props.apiUrl,
@@ -96,16 +152,16 @@ export class CommentFilePreview extends React.Component {
             />
           )}
         </a>
-        {(state.displayLightbox
+        {(state.displayLightbox && state.previewInfo.has_jpeg_preview
           ? (
             <Lightbox
-              prevSrc={lightboxUrlList[1 - 2]}
-              mainSrc={lightboxUrlList[1 - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-              nextSrc={lightboxUrlList[1]}
+              prevSrc={lightboxUrlList[state.fileCurrentPage - 2]}
+              mainSrc={lightboxUrlList[state.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+              nextSrc={lightboxUrlList[state.fileCurrentPage]}
               onCloseRequest={this.handleClickHideImageRaw}
-              onMovePrevRequest={props.onClickPreviousPage}
-              onMoveNextRequest={props.onClickNextPage}
-              imageCaption={`${1} ${props.t('of')} ${1}`}
+              onMovePrevRequest={this.handleClickPreviousPage}
+              onMoveNextRequest={this.handleClickNextPage}
+              imageCaption={`${state.fileCurrentPage} ${props.t('of')} ${state.previewInfo.page_nb}`}
               imagePadding={55}
             />
           )
