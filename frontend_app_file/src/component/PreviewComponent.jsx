@@ -127,7 +127,10 @@ export class PreviewComponent extends React.Component {
                   />
 
                   {props.isVideo && (
-                    <div className='previewcomponent__fileimg__play'>
+                    <div
+                      className='previewcomponent__fileimg__play'
+                      onClick={this.handleClickPreview}
+                    >
                       <Icon
                         icon='far fa-play-circle'
                         title={props.t('Play video')}
