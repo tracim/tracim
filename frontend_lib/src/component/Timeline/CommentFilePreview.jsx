@@ -2,7 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import Lightbox from 'tracim_app_gallery/src/Lightbox.js'
+import Lightbox from 'react-image-lightbox'
 import AttachedFile from '../AttachedFile/AttachedFile.jsx'
 import {
   buildFilePreviewUrl,
@@ -52,6 +52,9 @@ export class CommentFilePreview extends React.Component {
   }
 
   handleClickPreview = (e) => {
+    const { state } = this
+
+    if (state.previewLoaded && !state.previewInfo.has_jpeg_preview) return
     e.preventDefault()
     this.handleClickShowImageRaw()
   }
@@ -138,7 +141,7 @@ export class CommentFilePreview extends React.Component {
           title={title}
           onClick={this.handleClickPreview}
           href={fileDownloadUrl}
-          // download
+          download
         >
           <AttachedFile fileName={filename} />
           {(!this.state.fallbackPreview &&
