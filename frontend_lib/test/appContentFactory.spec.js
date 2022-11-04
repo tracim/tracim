@@ -7,12 +7,13 @@ import { status } from './fixture/status.js'
 import { commentList } from './fixture/contentCommentList.js'
 import { commentTlm } from './fixture/tracimLiveMessage/commentTlm.js'
 import { user } from './fixture/user.js'
+import { member } from './fixture/member.js'
 import { revisionList as fixtureRevisionList } from './fixture/contentRevisionList.js'
 import { content } from './fixture/content.js'
 import { defaultDebug } from '../src/debug.js'
 import { baseFetch } from '../src/action.async.js'
 import {
-  mockGetMyselfKnownMember200,
+  mockGetSpaceMemberList200,
   mockPutContent200,
   mockPostContentComment200,
   mockPutContentStatus204,
@@ -56,7 +57,7 @@ describe('appContentFactory.js', () => {
 
   const fakeApiUrl = 'http://fake.url/api'
 
-  mockGetMyselfKnownMember200(fakeApiUrl, fakeContent.workspace_id, ['@user1'])
+  mockGetSpaceMemberList200(fakeApiUrl, fakeContent.workspace_id, [member])
 
   describe('The wrapped component', () => {
     it('should have all the new props', () => {
