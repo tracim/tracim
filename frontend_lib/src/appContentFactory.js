@@ -123,6 +123,7 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentModified },
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
 
@@ -246,6 +247,23 @@ export function appContentFactory (WrappedComponent) {
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
         return { timeline, wholeTimeline }
       })
+    }
+
+    handleChildContentModified = (tlm) => {
+      const { state, props } = this
+
+      if (
+        props.data === undefined ||
+        tlm.fields.content.workspace_id !== props.data.content.workspace_id ||
+        tlm.fields.content.parent_id !== props.data.content.content_id
+      ) return
+
+      const wholeTimeline = [...state.wholeTimeline]
+      const index = wholeTimeline.findIndex(element => element.content_id === tlm.fields.content.content_id)
+      if (index < 0) return
+
+      wholeTimeline[index].current_revision_id = tlm.fields.content.current_revision_id
+      this.setState({ wholeTimeline })
     }
 
     handleContentCommentModified = async (tlm) => {

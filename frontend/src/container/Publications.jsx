@@ -217,13 +217,28 @@ export class Publications extends React.Component {
   }
 
   handleContentCreatedOrRestored = (data) => {
+    const { props } = this
+
     if (
       data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-      data.fields.content.parent_id !== null ||
-      data.fields.content.workspace_id !== this.props.currentWorkspace.id
+      data.fields.content.workspace_id !== props.currentWorkspace.id
     ) return
+
+    if (data.fields.content.parent_id !== null) {
+      const parent = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
+      if (parent === undefined) return
+
+      const newCommentList = [...parent.commentList]
+      const index = newCommentList.findIndex(comment => comment.content_id === data.fields.content.content_id)
+      if (index < 0) return
+
+      newCommentList[index].current_revision_id = data.fields.content.current_revision_id
+      props.dispatch(setCommentListToPublication(parent.id, newCommentList))
+      return
+    }
+
     this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
-    this.props.dispatch(appendPublication(data.fields.content))
+    props.dispatch(appendPublication(data.fields.content))
   }
 
   handleCommentCreated = async (data) => {
