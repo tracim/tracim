@@ -271,7 +271,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
     isLoggedUserMember = (activity) => this.props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
 
     isNews = (activity) => {
-      const isNews = activity.content?.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+      const isNews = activity.content && (activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION)
       const hasSpace = activity.newestMessage.fields.workspace
       return isNews && hasSpace
     }
