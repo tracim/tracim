@@ -1,3 +1,9 @@
+# 4.4.2 / 2022-11-04
+
+### Fixed Issues
+
+- Frontend: [#4926](https://github.com/tracim/tracim/issues/4926)
+
 # 4.4.1 / 2022-10-28
 
 ### Fixed Issues
@@ -10,8 +16,8 @@
 
 - Featuring a new font and borderless design
 - Modified comments are now easily identifiable
-- Code preview available (through advanced edition)   
-- The user interface is now available in Norwegian 
+- Code preview available (through advanced edition)
+- The user interface is now available in Norwegian
 - Video player for video previews
 - Improved pertinence of notifications about tasks
 - UX / UI improvements (sidebar, header, activities, news, mobile)
