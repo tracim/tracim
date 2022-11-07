@@ -150,7 +150,7 @@ export class FileComponent extends React.Component {
             downloadPdfPageUrl={props.downloadPdfPageUrl}
             downloadPdfFullUrl={props.downloadPdfFullUrl}
             previewUrls={props.previewUrls}
-            previewUrl={previewUrl}
+            previewUrl={props.previewUrl}
             filePageNb={props.filePageNb}
             fileCurrentPage={props.fileCurrentPage}
             lightboxUrlList={props.lightboxUrlList}

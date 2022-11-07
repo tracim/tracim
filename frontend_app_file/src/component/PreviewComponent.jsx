@@ -94,13 +94,10 @@ export class PreviewComponent extends React.Component {
   render () {
     const { props, state } = this
 
-    let srcSet = ""
+    let srcSet = ''
     props.previewUrls.map((entry, index, arr) => {
       srcSet = srcSet + `${entry.url} ${entry.size}${index === arr.length - 1 ? '' : ', '}`
     })
-
-    console.log("--- srcSet ---")
-    console.log(srcSet)
 
     return (
       <div className='previewcomponent'>
@@ -127,57 +124,58 @@ export class PreviewComponent extends React.Component {
             onClick={this.handleClickPreview}
           >
             {(props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
-                ? (
-                  <>
-                    <img src={props.previewUrl.url}
-                         srcSet={srcSet}
-                         alt={props.previewUrl.name}
-                         className='img-thumbnail previewcomponent__fileimg__img' />
+              ? (
+                <>
+                  <img
+                    src={props.previewUrl.url}
+                    srcSet={srcSet} alt={props.previewUrl.name}
+                    className='img-thumbnail previewcomponent__fileimg__img'
+                  />
 
-                    {props.isVideo && (
-                      <div className='previewcomponent__fileimg__play'>
-                        <Icon
-                          icon='far fa-play-circle'
-                          title={props.t('Play video')}
-                        />
+                  {props.isVideo && (
+                    <div className='previewcomponent__fileimg__play'>
+                      <Icon
+                        icon='far fa-play-circle'
+                        title={props.t('Play video')}
+                      />
+                    </div>
+                  )}
+                </>
+              )
+              : (
+                <div className='previewcomponent__fileimg__text'>
+                  {props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADING
+                    ? (
+                      <div className='previewcomponent__fileimg__text-msg'>
+                        {props.t('Preview loading...')}
                       </div>
-                    )}
-                  </>
-                )
-                : (
-                  <div className='previewcomponent__fileimg__text'>
-                    {props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADING
-                      ? (
+                    )
+                    : (
+                      <>
+                        <i className='previewcomponent__fileimg__text-icon far fa-eye-slash' style={{ color: props.color }} />
                         <div className='previewcomponent__fileimg__text-msg'>
-                          {props.t('Preview loading...')}
+                          {props.t('No preview available')}
                         </div>
-                      )
-                      : (
-                        <>
-                          <i className='previewcomponent__fileimg__text-icon far fa-eye-slash' style={{ color: props.color }} />
-                          <div className='previewcomponent__fileimg__text-msg'>
-                            {props.t('No preview available')}
-                          </div>
-                        </>
-                      )}
-                  </div>
-                )
+                      </>
+                    )}
+                </div>
+              )
             )}
 
             {(state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED && props.isJpegAvailable && state.displayLightbox
-                ? (
-                  <Lightbox
-                    prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
-                    mainSrc={props.lightboxUrlList[props.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
-                    nextSrc={props.lightboxUrlList[props.fileCurrentPage]}
-                    onCloseRequest={this.handleClickHideImageRaw}
-                    onMovePrevRequest={props.onClickPreviousPage}
-                    onMoveNextRequest={props.onClickNextPage}
-                    imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
-                    imagePadding={55}
-                  />
-                )
-                : null
+              ? (
+                <Lightbox
+                  prevSrc={props.lightboxUrlList[props.fileCurrentPage - 2]}
+                  mainSrc={props.lightboxUrlList[props.fileCurrentPage - 1]} // INFO - CH - 2019-07-09 - fileCurrentPage starts at 1
+                  nextSrc={props.lightboxUrlList[props.fileCurrentPage]}
+                  onCloseRequest={this.handleClickHideImageRaw}
+                  onMovePrevRequest={props.onClickPreviousPage}
+                  onMoveNextRequest={props.onClickNextPage}
+                  imageCaption={`${props.fileCurrentPage} ${props.t('of')} ${props.filePageNb}`}
+                  imagePadding={55}
+                />
+              )
+              : null
             )}
           </div>
 

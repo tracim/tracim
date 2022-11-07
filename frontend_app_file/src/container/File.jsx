@@ -1150,7 +1150,7 @@ export class File extends React.Component {
 
   buildFilePreviewSizeUrl = (state, filenameWithoutExtension, width, height) => {
     return {
-      url: buildFilePreviewUrl (
+      url: buildFilePreviewUrl(
         state.config.apiUrl,
         state.content.workspace_id,
         state.content.content_id,
@@ -1184,7 +1184,7 @@ export class File extends React.Component {
       )
     })
 
-    let previewUrl = previewUrls[0]
+    const previewUrl = previewUrls[0]
     previewUrl.name = filenameWithoutExtension
 
     const lightboxUrlList = (new Array(state.previewInfo.page_nb))
