@@ -29,7 +29,7 @@ export class PreviewComponent extends React.Component {
   componentDidUpdate (prevProps) {
     const { props, state } = this
 
-    if (prevProps.previewUrl !== props.previewUrl && state.displayLightbox === false) {
+    if (prevProps.previewUrls[0].url !== props.previewUrls[0].url && state.displayLightbox === false) {
       this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADING })
       this.isjpegPreviewLoadingState()
     }
@@ -56,7 +56,7 @@ export class PreviewComponent extends React.Component {
 
     if (props.isJpegAvailable) {
       const img = document.createElement('img')
-      img.src = props.previewUrl
+      img.src = props.previewUrls[0].url
       img.onerror = () => this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.ERROR })
       img.onload = () => this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADED })
     }
@@ -94,6 +94,14 @@ export class PreviewComponent extends React.Component {
   render () {
     const { props, state } = this
 
+    let srcSet = ""
+    props.previewUrls.map((entry, index, arr) => {
+      srcSet = srcSet + `${entry.url} ${entry.size}${index === arr.length - 1 ? '' : ', '}`
+    })
+
+    console.log("--- srcSet ---")
+    console.log(srcSet)
+
     return (
       <div className='previewcomponent'>
         <div className='previewcomponent__filepreview'>
@@ -121,7 +129,9 @@ export class PreviewComponent extends React.Component {
             {(props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
                 ? (
                   <>
-                    <img src={props.previewUrl} className='img-thumbnail previewcomponent__fileimg__img' />
+                    <img src={props.previewUrls[0].url}
+                         srcSet={srcSet}
+                         className='img-thumbnail previewcomponent__fileimg__img' />
 
                     {props.isVideo && (
                       <div className='previewcomponent__fileimg__play'>
@@ -202,7 +212,7 @@ PreviewComponent.propTypes = {
   isJpegAvailable: PropTypes.bool,
   isPdfAvailable: PropTypes.bool,
   isVideo: PropTypes.bool,
-  previewUrl: PropTypes.string,
+  previewUrls: PropTypes.array,
   downloadPdfPageUrl: PropTypes.string,
   color: PropTypes.string,
   onClickPreviousPage: PropTypes.func,
@@ -218,7 +228,7 @@ PreviewComponent.defaultProps = {
   isJpegAvailable: false,
   isPdfAvailable: true,
   isVideo: false,
-  previewUrl: '',
+  previewUrls: [],
   downloadPdfPageUrl: '',
   color: '',
   onClickPreviousPage: () => { },

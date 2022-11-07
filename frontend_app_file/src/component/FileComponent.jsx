@@ -149,7 +149,7 @@ export class FileComponent extends React.Component {
             isVideo={props.isVideo}
             downloadPdfPageUrl={props.downloadPdfPageUrl}
             downloadPdfFullUrl={props.downloadPdfFullUrl}
-            previewUrl={props.previewUrl}
+            previewUrls={props.previewUrls}
             filePageNb={props.filePageNb}
             fileCurrentPage={props.fileCurrentPage}
             lightboxUrlList={props.lightboxUrlList}
