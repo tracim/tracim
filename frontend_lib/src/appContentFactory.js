@@ -262,8 +262,13 @@ export function appContentFactory (WrappedComponent) {
       const index = wholeTimeline.findIndex(element => element.content_id === tlm.fields.content.content_id)
       if (index < 0) return
 
-      wholeTimeline[index].current_revision_id = tlm.fields.content.current_revision_id
-      this.setState({ wholeTimeline })
+      wholeTimeline[index] = this.buildTimelineItemCommentAsFile(tlm.fields.content, state.loggedUser)
+      const timeline = this.getTimeline(wholeTimeline, state.timeline.length)
+
+      this.setState({
+        wholeTimeline,
+        timeline
+      })
     }
 
     handleContentCommentModified = async (tlm) => {
