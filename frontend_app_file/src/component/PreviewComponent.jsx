@@ -131,6 +131,7 @@ export class PreviewComponent extends React.Component {
                   <>
                     <img src={props.previewUrl.url}
                          srcSet={srcSet}
+                         alt={props.previewUrl.name}
                          className='img-thumbnail previewcomponent__fileimg__img' />
 
                     {props.isVideo && (
