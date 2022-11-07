@@ -110,10 +110,10 @@ import { store } from '../store.js'
       resize: false,
       relative_urls: false,
       remove_script_host: false,
-      plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks codesample',
+      plugins: 'advlist anchor autolink charmap code fullscreen help image insertdatetime link lists media paste preview print searchreplace table textcolor visualblocks codesample emoticons',
       toolbar: [
-        'formatselect | bold italic underline strikethrough | forecolor backcolor | link | customInsertImage | charmap',
-        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code codesample | insert | customFullscreen'
+        'formatselect | bold italic underline strikethrough | forecolor backcolor | customInsertImage emoticons link charmap insert',
+        'alignleft aligncenter alignright alignjustify | numlist bullist outdent indent | table | code codesample | customFullscreen'
       ],
       codesample_global_prismjs: true,
       codesample_languages: reduxStore.system.config.ui__notes__code_sample_languages,
@@ -151,6 +151,10 @@ import { store } from '../store.js'
 
           const event = new globalThis.CustomEvent('tinymceLoaded', { detail: {}, editor: this })
           document.dispatchEvent(event)
+        })
+
+        $editor.addShortcut('ctrl+e', i18n.t('Open emoticons menu'), () => {
+          $editor.execCommand('mceEmoticons')
         })
 
         const getPosition = (e) => {
