@@ -36,7 +36,9 @@ import {
   getFileDownloadUrl,
   NUMBER_RESULTS_BY_PAGE,
   LOCAL_STORAGE_FIELD,
-  setLocalStorageItem
+  setLocalStorageItem,
+  displayDistanceDate,
+  TIMELINE_TYPE
 } from 'tracim_frontend_lib'
 import {
   FETCH_CONFIG,
@@ -160,6 +162,13 @@ export class Publications extends React.Component {
     this.setHeadTitle()
   }
 
+  buildCommentAsFile = (content, loggedUser) => ({
+    ...content,
+    timelineType: TIMELINE_TYPE.COMMENT_AS_FILE,
+    created_raw: content.created,
+    created: displayDistanceDate(content.created, loggedUser.lang)
+  })
+
   handleContentCommentModified = async (data) => {
     const { props } = this
     const parentPublication = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
@@ -232,7 +241,7 @@ export class Publications extends React.Component {
       const index = newCommentList.findIndex(comment => comment.content_id === data.fields.content.content_id)
       if (index < 0) return
 
-      newCommentList[index].current_revision_id = data.fields.content.current_revision_id
+      newCommentList[index] = this.buildCommentAsFile(data.fields.content, props.user)
       props.dispatch(setCommentListToPublication(parent.id, newCommentList))
       return
     }
