@@ -1184,8 +1184,8 @@ export class File extends React.Component {
       )
     })
 
-    console.log("--- previewUrls ---")
-    console.log(previewUrls)
+    let previewUrl = previewUrls[0]
+    previewUrl.name = filenameWithoutExtension
 
     const lightboxUrlList = (new Array(state.previewInfo.page_nb))
       .fill(null)
@@ -1326,6 +1326,7 @@ export class File extends React.Component {
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
             previewUrls={previewUrls}
+            previewUrl={previewUrl}
             isJpegAvailable={state.previewInfo.has_jpeg_preview}
             filePageNb={state.previewInfo.page_nb}
             fileCurrentPage={state.fileCurrentPage}

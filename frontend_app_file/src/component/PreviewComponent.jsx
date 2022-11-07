@@ -29,7 +29,7 @@ export class PreviewComponent extends React.Component {
   componentDidUpdate (prevProps) {
     const { props, state } = this
 
-    if (prevProps.previewUrls[0].url !== props.previewUrls[0].url && state.displayLightbox === false) {
+    if (prevProps.previewUrl.url !== props.previewUrl.url && state.displayLightbox === false) {
       this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADING })
       this.isjpegPreviewLoadingState()
     }
@@ -56,7 +56,7 @@ export class PreviewComponent extends React.Component {
 
     if (props.isJpegAvailable) {
       const img = document.createElement('img')
-      img.src = props.previewUrls[0].url
+      img.src = props.previewUrl.url
       img.onerror = () => this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.ERROR })
       img.onload = () => this.setState({ jpegPreviewLoadingState: IMG_LOAD_STATE.LOADED })
     }
@@ -129,7 +129,7 @@ export class PreviewComponent extends React.Component {
             {(props.isJpegAvailable && state.jpegPreviewLoadingState === IMG_LOAD_STATE.LOADED
                 ? (
                   <>
-                    <img src={props.previewUrls[0].url}
+                    <img src={props.previewUrl.url}
                          srcSet={srcSet}
                          className='img-thumbnail previewcomponent__fileimg__img' />
 
@@ -213,6 +213,7 @@ PreviewComponent.propTypes = {
   isPdfAvailable: PropTypes.bool,
   isVideo: PropTypes.bool,
   previewUrls: PropTypes.array,
+  previewUrl: PropTypes.object,
   downloadPdfPageUrl: PropTypes.string,
   color: PropTypes.string,
   onClickPreviousPage: PropTypes.func,
