@@ -1176,16 +1176,16 @@ export class File extends React.Component {
     const filenameWithoutExtension = state.loadingContent ? '' : removeExtensionOfFilename(state.content.filename)
 
     const previewSizes = [256, 512, 1024]
-    const previewUrls = []
+    const previewList = []
 
     previewSizes.map(size => {
-      previewUrls.push(
+      previewList.push(
         this.buildFilePreviewSizeUrl(state, filenameWithoutExtension, size, size)
       )
     })
 
-    const previewUrl = previewUrls[0]
-    previewUrl.name = filenameWithoutExtension
+    const preview = previewList[0]
+    preview.name = filenameWithoutExtension
 
     const lightboxUrlList = (new Array(state.previewInfo.page_nb))
       .fill(null)
@@ -1325,8 +1325,8 @@ export class File extends React.Component {
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
-            previewUrls={previewUrls}
-            previewUrl={previewUrl}
+            previewList={previewList}
+            preview={preview}
             isJpegAvailable={state.previewInfo.has_jpeg_preview}
             filePageNb={state.previewInfo.page_nb}
             fileCurrentPage={state.fileCurrentPage}

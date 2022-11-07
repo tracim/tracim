@@ -18,8 +18,8 @@ describe('<PreviewComponent />', () => {
     fileCurrentPage: 0,
     isJpegAvailable: true,
     isPdfAvailable: true,
-    previewUrl: preview,
-    previewUrls: [preview],
+    preview: preview,
+    previewList: [preview],
     downloadPdfPageUrl: 'randomDownloadPdfPageUrl',
     color: 'randomColor',
     downloadRawUrl: 'randomDownloadRawUrl',
@@ -57,7 +57,7 @@ describe('<PreviewComponent />', () => {
       )
 
       it('should display the preview in `img` html tag', () =>
-        expect(wrapper.find('img.previewcomponent__fileimg__img').prop('src')).to.equal(props.previewUrl.url)
+        expect(wrapper.find('img.previewcomponent__fileimg__img').prop('src')).to.equal(props.preview.url)
       )
 
       it('should display the page counter and 2 navigations buttons if the file has more than 1 page', () => {
