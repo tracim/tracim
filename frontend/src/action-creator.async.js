@@ -120,10 +120,16 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
       }
       if (status >= 400 && status <= 499) return fetchResult.json()
       if (status >= 500 && status <= 599) {
-        dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger', 8000))
+        const errorData = await fetchResult.json()
+        let errorDetails = ''
+        if (errorData && errorData.code && errorData.message) {
+          errorDetails = `${errorData.code}: ${errorData.message}`
+        }
+        dispatch(newFlashMessage(
+          <ErrorFlashMessageTemplateHtml errorMsg={errorDetails} />, 'danger', 8000
+        ))
         return
       }
-
       dispatch(newFlashMessage(
         <ErrorFlashMessageTemplateHtml errorMsg={`Unknown http status ${fetchResult.status}`} />, 'danger', 300000
       ))
