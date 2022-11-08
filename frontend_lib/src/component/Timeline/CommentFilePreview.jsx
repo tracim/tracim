@@ -165,6 +165,16 @@ export class CommentFilePreview extends React.Component {
               onMoveNextRequest={this.handleClickNextPage}
               imageCaption={`${state.fileCurrentPage} ${props.t('of')} ${state.previewInfo.page_nb}`}
               imagePadding={55}
+              toolbarButtons={[(
+                <a
+                  className='btn gallery__action__button__lightbox__openRawContent'
+                  title={props.t('Download')}
+                  href={fileDownloadUrl}
+                  download
+                >
+                  <i className='fa-fw fas fa-download' />
+                </a>
+              )]}
             />
           )
           : null
