@@ -1148,6 +1148,22 @@ export class File extends React.Component {
     this.setState({ translationTargetLanguageCode })
   }
 
+  buildFilePreviewSizeUrl = (state, filenameWithoutExtension, width, height) => {
+    return {
+      url: buildFilePreviewUrl(
+        state.config.apiUrl,
+        state.content.workspace_id,
+        state.content.content_id,
+        state.content.current_revision_id,
+        filenameWithoutExtension,
+        state.fileCurrentPage,
+        width,
+        height
+      ),
+      size: `${width}w`
+    }
+  }
+
   render () {
     const { props, state } = this
     const onlineEditionAction = this.getOnlineEditionAction()
@@ -1158,16 +1174,19 @@ export class File extends React.Component {
     const contentVersionNumber = (revisionList.find(t => t.revision_id === state.content.current_revision_id) || { version_number: 1 }).version_number
     const lastVersionNumber = (revisionList[revisionList.length - 1] || { version_number: 1 }).version_number
     const filenameWithoutExtension = state.loadingContent ? '' : removeExtensionOfFilename(state.content.filename)
-    const previewUrl = buildFilePreviewUrl(
-      state.config.apiUrl,
-      state.content.workspace_id,
-      state.content.content_id,
-      state.content.current_revision_id,
-      filenameWithoutExtension,
-      state.fileCurrentPage,
-      500,
-      500
-    )
+
+    const previewSizes = [256, 512, 1024]
+    const previewList = []
+
+    previewSizes.map(size => {
+      previewList.push(
+        this.buildFilePreviewSizeUrl(state, filenameWithoutExtension, size, size)
+      )
+    })
+
+    const preview = previewList[0]
+    preview.name = filenameWithoutExtension
+
     const lightboxUrlList = (new Array(state.previewInfo.page_nb))
       .fill(null)
       .map((n, index) => // create an array [1..revision.page_nb]
@@ -1306,7 +1325,8 @@ export class File extends React.Component {
             mode={state.mode}
             customColor={state.config.hexcolor}
             loggedUser={state.loggedUser}
-            previewUrl={previewUrl}
+            previewList={previewList}
+            preview={preview}
             isJpegAvailable={state.previewInfo.has_jpeg_preview}
             filePageNb={state.previewInfo.page_nb}
             fileCurrentPage={state.fileCurrentPage}
