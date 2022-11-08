@@ -123,12 +123,11 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
         const errorData = await fetchResult.json()
         let errorDetails = ''
         if (errorData && errorData.code && errorData.message) {
-          errorDetails = `(${errorData.code}: ${errorData.message})`
+          errorDetails = `${errorData.code}: ${errorData.message}`
         }
         dispatch(newFlashMessage(
-          `${i18n.t('Unexpected error, please inform an administrator')} ${errorDetails}`,
-          'danger',
-          8000))
+          <ErrorFlashMessageTemplateHtml errorMsg={errorDetails} />, 'danger', 8000
+        ))
         return
       }
       dispatch(newFlashMessage(
