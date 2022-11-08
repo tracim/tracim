@@ -168,9 +168,10 @@ export class CommentFilePreview extends React.Component {
               toolbarButtons={[(
                 <a
                   className='btn gallery__action__button__lightbox__openRawContent'
-                  title={props.t('Download')}
-                  href={fileDownloadUrl}
                   download
+                  href={fileDownloadUrl}
+                  key='CommentFilePreview__download'
+                  title={props.t('Download')}
                 >
                   <i className='fa-fw fas fa-download' />
                 </a>
