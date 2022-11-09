@@ -5,17 +5,20 @@
   white-space nowrap
   display flex
   flex-direction column
-  &__top.btn
-    padding 0
-    margin 0
-    font-size metadataFontSize
-    &::after
-      display none
-    &:hover
-      text-decoration underline
+  &__top
+    &.btn
+      padding 0
+      margin 0
+      font-size metadataFontSize
+      &::after
+        display none
+      &:hover
+        text-decoration underline
     &Contents
       text-overflow ellipsis
       overflow hidden
+      & > span
+        color fontColor
   &__bottom
     overflow hidden
     display flex
