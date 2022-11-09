@@ -70,26 +70,20 @@ export class CommentFilePreview extends React.Component {
 
   handleClickPreviousPage = () => {
     const { state } = this
-    let page = state.fileCurrentPage
-
-    if (state.previewInfo.page_nb > 0) page--
-
-    this.setState({
-      fileCurrentPage: page,
+    if (state.previewInfo.page_nb <= 0) return
+    this.setState(previousState => ({
+      fileCurrentPage: previousState.fileCurrentPage - 1,
       previewLoaded: false
-    })
+    }))
   }
 
   handleClickNextPage = () => {
     const { state } = this
-    let page = state.fileCurrentPage
-
-    if (state.previewInfo.page_nb > state.fileCurrentPage) page++
-
-    this.setState({
-      fileCurrentPage: page,
+    if (state.previewInfo.page_nb <= state.fileCurrentPage) return
+    this.setState(previousState => ({
+      fileCurrentPage: previousState.fileCurrentPage + 1,
       previewLoaded: false
-    })
+    }))
   }
 
   render () {
