@@ -151,6 +151,10 @@
     <script type="text/javascript" src="/${plugin}?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
 
+    ## INFO - CH - 20221108 - hardcode the emoji library script because otherwise, it is loaded on the fly by the emoticons plugin
+    ## but doesn't include the cache_token and the csp_nonce. The script would then be blocked by browsers
+    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/plugins/emoticons/js/emojis.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
+
     % for lang in glob("assets/tinymce-5.10.3/js/tinymce/langs/*.js"):
     <script type="text/javascript" src="/${lang}?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
