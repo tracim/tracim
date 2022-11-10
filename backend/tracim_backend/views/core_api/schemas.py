@@ -1934,23 +1934,35 @@ class TagSchema(marshmallow.Schema):
 
 
 class MessageCommentSchema(marshmallow.Schema):
-    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
-    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
-    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
-    parent_content_type = String(example="html-document", validate=all_content_types_validator)
-    parent_content_namespace = EnumField(
-        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
-    )
-    parent_label = String(example="This is a label")
-    description = StrippedString(example="This is a description")
+    """
+    Schema for comments without raw_content
+    """
+
     author = marshmallow.fields.Nested(UserDigestSchema)
     created = marshmallow.fields.DateTime(
         format=DATETIME_FORMAT, description="comment creation date"
     )
+    modified = marshmallow.fields.DateTime(
+        format=DATETIME_FORMAT, description="Comment last edition date"
+    )
+    last_modifier = marshmallow.fields.Nested(UserDigestSchema)
+    content_id = marshmallow.fields.Int(example=6, validate=strictly_positive_int_validator)
+    content_type = StrippedString(example="html-document", validate=all_content_types_validator)
+    description = StrippedString(example="This is a description")
+    parent_content_namespace = EnumField(
+        ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
+    )
+    parent_content_type = String(example="html-document", validate=all_content_types_validator)
+    parent_id = marshmallow.fields.Int(example=34, validate=positive_int_validator)
+    parent_label = String(example="This is a label")
 
 
 class CommentSchema(MessageCommentSchema):
-    raw_content = StrippedString(example="<p>This is just an html comment !</p>")
+    """
+    Schema for comments with raw_content
+    """
+
+    raw_content = StrippedString(example="<p>This is just an html comment!</p>")
 
 
 class SetCommentSchema(marshmallow.Schema):
@@ -2040,12 +2052,19 @@ class SetContentIsTemplateSchema(marshmallow.Schema):
 
 
 class TemplateQuerySchema(marshmallow.Schema):
-    type = StrippedString(example="html-document", validate=all_content_types_validator)
+    type = StrippedString(
+        example="html-document", validate=all_content_types_validator, required=True
+    )
 
 
 class TargetLanguageSchema(marshmallow.Schema):
     code = marshmallow.fields.String(required=True, example="fr")
     display = marshmallow.fields.String(required=True, example="Français")
+
+
+class CodeSampleLanguageSchema(marshmallow.Schema):
+    value = marshmallow.fields.String(required=True, example="markup")
+    text = marshmallow.fields.String(required=True, example="Markup")
 
 
 class ConfigSchema(marshmallow.Schema):
@@ -2068,6 +2087,9 @@ class ConfigSchema(marshmallow.Schema):
     )
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
+    ui__notes__code_sample_languages = marshmallow.fields.items = marshmallow.fields.Nested(
+        CodeSampleLanguageSchema, many=True
+    )
     limitation__maximum_online_users_message = marshmallow.fields.String()
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
@@ -2204,13 +2226,26 @@ class PathSuffixSchema(marshmallow.Schema):
 class UserMessagesMarkAsReadQuerySchema(marshmallow.Schema):
     content_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of content_ids to check for marking event as read",
+        example="1,4",
+        description="Comma separated list of content ids. Every event related to these contents\
+            will be marked as read.",
+    )
+    event_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="3,5",
+        description="Comma separated list of event ids. Every event ids will be marked as read.",
     )
     parent_ids = StrippedString(
         validate=regex_string_as_list_of_int,
-        example="3,4",
-        description="comma separated list of parent_ids to check for marking event as read",
+        example="2,6",
+        description="Comma separated list of parent content ids. Every event related to theses\
+            parents will be marked as read.",
+    )
+    space_ids = StrippedString(
+        validate=regex_string_as_list_of_int,
+        example="7",
+        description="Comma separated list of space ids. Every event related to theses space\
+            will be marked as read.",
     )
 
     @post_load

@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 import {
   EmptyListMessage,
+  formatAbsoluteDate,
   PageWrapper,
   PageTitle,
   PageContent,
@@ -207,6 +208,7 @@ export class SimpleSearch extends React.Component {
               )}
               icon='fas fa-search'
               breadcrumbsList={props.breadcrumbs}
+              isEmailNotifActivated={props.system.config.email_notification_activated}
             />
             {state.isLoading
               ? <Loading />
@@ -234,7 +236,7 @@ export class SimpleSearch extends React.Component {
                                 path={`${searchItem.workspace.label} > ${this.getPath(searchItem.path)}`}
                                 lastModificationAuthor={searchItem.lastModifier}
                                 lastModificationTime={displayDistanceDate(searchItem.modified, props.user.lang)}
-                                lastModificationFormated={(new Date(searchItem.modified)).toLocaleString(props.user.lang)}
+                                lastModificationFormated={formatAbsoluteDate(searchItem.modified, props.user.lang)}
                                 fileExtension={searchItem.fileExtension}
                                 faIcon={props.contentType.length ? (props.contentType.find(ct => ct.slug === searchItem.contentType)).faIcon : null}
                                 statusSlug={searchItem.status}

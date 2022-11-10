@@ -31,6 +31,7 @@
     padding-inline-end standardSpacing
   &__actionMenu
     &.dropdownMenuButton
+      color fontColor
       padding 0 (standardSpacing * 2)
       & i
         width auto
@@ -39,11 +40,12 @@
       display none
     &__item
       padding standardSpacing
-      border none
+      background-color transparent
+      border-radius 0
       & .iconbutton__text
         padding 0
   & .profileNavigation
-    max-width 100px
+    max-width 110px
   & .breadcrumbs
     position relative
     top 0

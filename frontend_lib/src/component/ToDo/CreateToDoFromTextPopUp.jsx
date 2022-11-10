@@ -23,7 +23,6 @@ const CreateToDoFromTextPopup = (props) => {
             type='button'
             className='transparentButton createToDoFromTextPopup__main__title__info'
             id='popoverToDoInfo'
-            title={props.t('Information')}
           >
             <i className='fas fa-fw fa-question-circle' />
           </button>
@@ -59,6 +58,7 @@ const CreateToDoFromTextPopup = (props) => {
         />
         <IconButton
           color={props.customColor}
+          dataCy='createToDoFromTextPopup__buttons__create'
           disabled={false}
           icon='far fa-paper-plane'
           intent='primary'

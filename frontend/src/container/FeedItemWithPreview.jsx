@@ -12,6 +12,7 @@ import {
 } from '../util/helper.js'
 import {
   appContentFactory,
+  COLORS,
   Comment,
   CONTENT_TYPE,
   CUSTOM_EVENT,
@@ -26,6 +27,7 @@ import {
   tinymceRemove,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   TRANSLATION_STATE
 } from 'tracim_frontend_lib'
@@ -37,6 +39,10 @@ export class FeedItemWithPreview extends React.Component {
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
+    ])
+
+    props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentModified }
     ])
 
     this.state = {
@@ -77,14 +83,14 @@ export class FeedItemWithPreview extends React.Component {
       }
     }
 
-    if (props.showTimeline && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
+    if (props.showCommentList && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
       tinymceRemove(this.getWysiwygId(props.content.id))
     }
   }
 
   componentWillUnmount () {
     const { props } = this
-    if (props.showTimeline) tinymceRemove(this.getWysiwygId(props.content.id))
+    if (props.showCommentList) tinymceRemove(this.getWysiwygId(props.content.id))
   }
 
   handleAllAppChangeLanguage = (data) => {
@@ -94,6 +100,12 @@ export class FeedItemWithPreview extends React.Component {
       tinymceRemove(wysiwygId)
       globalThis.wysiwyg(wysiwygId, data, this.handleChangeNewComment)
     }
+  }
+
+  // TLM Handlers
+
+  handleCommentModified = (data) => {
+    this.props.updateComment(data)
   }
 
   getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`
@@ -252,16 +264,19 @@ export class FeedItemWithPreview extends React.Component {
   getTimelineData () {
     const { props, state } = this
     const defaultTranslationState = getDefaultTranslationState(props.system.config)
-    return props.commentList.map(
+    const commentList = props.commentList.map(
       comment => {
         const commentTranslationState = state.translationStateByCommentId[comment.content_id] || {}
         return {
           ...comment,
+          timelineType: comment.timelineType || comment.content_type,
           translationState: commentTranslationState.translationState || defaultTranslationState,
           translatedRawContent: commentTranslationState.translatedRawContent
         }
       }
     )
+    // INFO - G.B. - 2022-08-23 - For threads, we remove the first element because it's already shown in the preview
+    return props.content.type === CONTENT_TYPE.THREAD ? commentList.slice(1) : commentList
   }
 
   handleChangeTranslationTargetLanguageCode = (translationTargetLanguageCode) => {
@@ -274,16 +289,18 @@ export class FeedItemWithPreview extends React.Component {
     }))
   }
 
-  getDiscussionToggleButtonLabel = () => {
+  getDiscussionToggleButtonLabel = (commentList) => {
     const { props, state } = this
-    if (props.commentList.length > 0) {
+    if (commentList.length > 0) {
       return state.isDiscussionDisplayed
         ? props.t('Hide discussion')
-        : `${props.t('Show discussion')} (${props.commentList.length})`
+        : `${props.t('Show discussion')} (${commentList.length})`
     } else {
-      return state.isDiscussionDisplayed
-        ? props.t('Hide comment area')
-        : props.t('Comment', { context: 'verb' })
+      if (props.isPublication) {
+        return state.isDiscussionDisplayed
+          ? props.t('Hide comment area')
+          : props.t('Comment', { context: 'verb' })
+      } else return props.t('Participate')
     }
   }
 
@@ -304,17 +321,14 @@ export class FeedItemWithPreview extends React.Component {
     const shouldShowComment = props.content.type === CONTENT_TYPE.THREAD
     const commentToShow = (
       shouldShowComment
-        ? (
-          props.isPublication
-            ? (
-              props.content.type === CONTENT_TYPE.FILE
-                ? props.content
-                : this.getFirstComment()
-            )
-            : this.getFirstComment()
-        )
+        ? this.getFirstComment()
         : null
     )
+    if (shouldShowComment && props.inRecentActivities) {
+      props.content.firstComment = commentToShow
+    }
+
+    const commentList = this.getTimelineData()
 
     const spaceMemberList = (props.workspaceList.find(workspace => workspace.id === props.content.workspaceId) || { memberList: [] }).memberList
 
@@ -331,13 +345,21 @@ export class FeedItemWithPreview extends React.Component {
 
     const isContentDeleted = props.lastModificationEntityType === TLM_ET.CONTENT && props.lastModificationType === TLM_CET.DELETED
 
+    const contentType = props.isPublication
+      ? { label: props.t('Publication'), faIcon: 'fas fa-stream', hexcolor: COLORS.PUBLICATION }
+      : (
+        props.appList.find(app => app.slug === `contents/${props.content.type}`) ||
+        { label: props.t(`No App for content-type ${props.content.type}`), faIcon: 'fas fa-question', hexcolor: '#000000' }
+      )
+
     return (
       <div className='feedItem' ref={props.innerRef}>
         <FeedItemHeader
           allowEdition={props.allowEdition}
           breadcrumbsList={props.breadcrumbsList}
-          contentAvailable={props.contentAvailable}
           content={props.content}
+          contentAvailable={props.contentAvailable}
+          contentType={contentType}
           isPublication={props.isPublication}
           eventList={props.eventList}
           lastModificationType={props.lastModificationType}
@@ -361,10 +383,12 @@ export class FeedItemWithPreview extends React.Component {
                   apiUrl={FETCH_CONFIG.apiUrl}
                   contentId={Number(props.content.id)}
                   apiContent={props.content}
+                  firstComment={commentToShow}
                   workspaceId={Number(props.workspaceId)}
                   author={commentToShow.author}
                   loggedUser={loggedUser}
-                  created={commentToShow.created || commentToShow.created_raw || commentToShow.createdRaw}
+                  creationDate={commentToShow.created_raw || commentToShow.createdRaw || commentToShow.created}
+                  modificationDate={commentToShow.modified}
                   text={
                     state.contentTranslationState === TRANSLATION_STATE.TRANSLATED
                       ? state.translatedRawContent
@@ -381,9 +405,9 @@ export class FeedItemWithPreview extends React.Component {
                     this.handleTranslateComment(languageCode)
                   }}
                   onClickToggleCommentList={this.handleClickToggleComments}
-                  discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
-                  threadLength={props.commentList.length}
-                  showTimeline={props.showTimeline}
+                  discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel(commentList)}
+                  threadLength={commentList.length}
+                  showCommentList={props.showCommentList}
                 />
               )
               : (
@@ -407,22 +431,24 @@ export class FeedItemWithPreview extends React.Component {
                     onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
                     content={props.content}
                     onClickToggleCommentList={this.handleClickToggleComments}
-                    discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel()}
-                    discussionToggleButtonLabelMobile={props.commentList.length > 0 ? props.commentList.length.toString() : ''}
-                    showTimeline={props.showTimeline}
+                    discussionToggleButtonLabel={this.getDiscussionToggleButtonLabel(commentList)}
+                    discussionToggleButtonLabelMobile={commentList.length > 0 ? commentList.length.toString() : ''}
+                    showCommentList={props.showCommentList}
                     isPublication={props.isPublication}
+                    isCommentListEmpty={commentList.length === 0}
+                    customColor={contentType.hexcolor}
                   />
                 </div>
               )
             )}
-            {props.showTimeline && state.isDiscussionDisplayed && (
+            {props.showCommentList && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
-                customClass='feedItem__timeline'
-                customColor={props.customColor}
-                id={props.content.id}
                 contentId={props.content.id}
                 contentType={props.content.type}
+                customClass='feedItem__timeline'
+                customColor={contentType.hexcolor}
+                id={props.content.id}
                 invalidMentionList={state.invalidMentionList}
                 loggedUser={loggedUser}
                 memberList={props.memberList}
@@ -431,10 +457,9 @@ export class FeedItemWithPreview extends React.Component {
                 onClickEditComment={this.handleClickEditComment}
                 onClickValidateNewCommentBtn={this.handleClickSend}
                 onClickWysiwygBtn={this.handleToggleWysiwyg}
-                wysiwygIdSelector={this.getWysiwygId(props.content.id)}
                 shouldScrollToBottom={false}
                 showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-                timelineData={this.getTimelineData()}
+                timelineData={commentList}
                 wysiwyg={state.timelineWysiwyg}
                 onClickCancelSave={this.handleCancelSave}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
@@ -456,6 +481,8 @@ export class FeedItemWithPreview extends React.Component {
                 translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                showParticipateButton={props.showParticipateButton}
+                wysiwygIdSelector={this.getWysiwygId(props.content.id)}
               />
             )}
           </>
@@ -465,7 +492,13 @@ export class FeedItemWithPreview extends React.Component {
   }
 }
 
-const mapStateToProps = ({ system, user, currentWorkspace, workspaceList }) => ({ system, user, currentWorkspace, workspaceList })
+const mapStateToProps = ({
+  appList,
+  system,
+  user,
+  currentWorkspace,
+  workspaceList
+}) => ({ appList, system, user, currentWorkspace, workspaceList })
 const FeedItemWithPreviewWithoutRef = translate()(appContentFactory(withRouter(TracimComponent(connect(mapStateToProps)(FeedItemWithPreview)))))
 const FeedItemWithPreviewWithRef = React.forwardRef((props, ref) => {
   return <FeedItemWithPreviewWithoutRef innerRef={ref} {...props} />
@@ -494,10 +527,11 @@ FeedItemWithPreview.propTypes = {
   onEventClicked: PropTypes.func,
   onClickEdit: PropTypes.func,
   reactionList: PropTypes.array,
-  showTimeline: PropTypes.bool,
+  showCommentList: PropTypes.bool,
   titleLink: PropTypes.string,
   previewLink: PropTypes.string,
-  previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE))
+  previewLinkType: PropTypes.oneOf(Object.values(LINK_TYPE)),
+  showParticipateButton: PropTypes.bool
 }
 
 FeedItemWithPreview.defaultProps = {
@@ -514,8 +548,9 @@ FeedItemWithPreview.defaultProps = {
   modifiedDate: '',
   onClickEdit: () => { },
   reactionList: [],
-  showTimeline: false,
+  showCommentList: false,
   previewLinkType: LINK_TYPE.OPEN_IN_APP,
   titleLink: null,
-  previewLink: null
+  previewLink: null,
+  showParticipateButton: false
 }

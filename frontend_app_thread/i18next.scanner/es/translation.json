@@ -11,5 +11,7 @@
   "Thread": "Discusión",
   "thread": "Discusión",
   "threads": "Discusiones",
-  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}"
+  "The content has been modified by {{author}}": "El contenido fue modificado por {{author}}",
+  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "Copy content link": "Copiar enlace al contenido"
 }

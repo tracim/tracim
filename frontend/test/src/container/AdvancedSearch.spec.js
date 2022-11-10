@@ -1,14 +1,11 @@
 import React from 'react'
-import { Provider } from 'react-redux'
-import configureMockStore from 'redux-mock-store'
-import { MemoryRouter } from 'react-router-dom'
 import { withRouterMock } from '../../hocMock/withRouter'
 import { expect } from 'chai'
 import { AdvancedSearch as AdvancedSearchWithoutHOC } from '../../../src/container/AdvancedSearch.jsx'
 import sinon from 'sinon'
 import { user } from '../../hocMock/redux/user/user.js'
 import { contentType } from '../../hocMock/redux/contentType/contentType.js'
-import { emptySearchResult, searchResult } from '../../hocMock/redux/searchResult/searchResult.js'
+import { searchResult } from '../../hocMock/redux/searchResult/searchResult.js'
 import {
   APPLIED_FILTER,
   BREADCRUMBS,
@@ -17,14 +14,12 @@ import {
 } from '../../../src/action-creator.sync.js'
 import { ADVANCED_SEARCH_FILTER, ADVANCED_SEARCH_TYPE } from '../../../src/util/helper.js'
 import { isFunction } from '../../hocMock/helper'
-import { mount, shallow } from 'enzyme'
+import { shallow } from 'enzyme'
 
 describe('In <AdvancedSearch />', () => {
   const setBreadcrumbsCallBack = sinon.spy()
   const setHeadTitleCallBack = sinon.spy()
   const setAppliedFilterCallBack = sinon.spy()
-  const mockStore = configureMockStore()
-  const store = mockStore({})
 
   const dispatchMock = (params) => {
     if (isFunction(params)) return params(dispatchMock)
@@ -141,28 +136,6 @@ describe('In <AdvancedSearch />', () => {
           'Showing {{displayedResults}} of {{count}} results'
         )
       })
-    })
-
-    describe('Filter button', () => {
-      const testCases = [
-        {
-          props: props,
-          description: 'with results'
-        },
-        {
-          props: { ...props, contentSearch: { ...emptySearchResult, appliedFilters: {} } },
-          description: 'without results'
-        }
-      ]
-      for (const testCase of testCases) {
-        const wrapper = mount(<Provider store={store}><MemoryRouter><AdvancedSearchWithHOC {...testCase.props} /></MemoryRouter></Provider>)
-        it(`should always exist (${testCase.description})`, () => {
-          expect(
-            wrapper.find('.advancedSearch__content__detail__filter').length +
-            wrapper.find('.advancedSearch__openMenu').length
-          ).to.equal(1)
-        })
-      }
     })
   })
 })

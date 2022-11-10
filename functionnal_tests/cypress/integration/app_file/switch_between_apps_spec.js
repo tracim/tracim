@@ -1,4 +1,4 @@
-import { SELECTORS as s, formatTag } from '../../support/generic_selector_commands'
+import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands.js'
 
 describe('App File', () => {
@@ -8,7 +8,7 @@ describe('App File', () => {
   const fullFilename_2 = 'artikodin.png'
   const fullFilename_3 = 'newname'
   const contentType = 'image/png'
-  const comment = "This is a comment"
+  const comment = 'This is a comment'
   let workspaceId
   let secondContentId
 
@@ -70,7 +70,7 @@ describe('App File', () => {
         cy.contains('.breadcrumbs__item', fullFilename_3)
         cy.get('[data-cy="revision_data_1"]').should('be.visible')
         cy.get('[data-cy="revision_data_4"]').should('be.visible')
-        cy.get('.comment__body__content__text').contains(comment)
+        cy.get('.timeline__comment__body__content__text').contains(comment)
       })
     })
   })

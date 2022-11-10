@@ -4,6 +4,7 @@ import {
   addRevisionFromTLM,
   buildContentPathBreadcrumbs,
   createSpaceTree,
+  handleClickCopyLink,
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
@@ -68,7 +69,9 @@ import {
   sortContentByCreatedDateAndID,
   sortContentByStatus,
   USER_CALL_STATE,
-  STATUSES
+  STATUSES,
+  TIMELINE_TYPE,
+  sortMemberList
 } from './helper.js'
 
 import {
@@ -233,7 +236,7 @@ import {
   getContentComment,
   getFileChildContent,
   getContent,
-  getWorkspaceContent,
+  getSpaceContent,
   getHtmlDocTranslated,
   getCommentTranslated,
   getGenericWorkspaceContent,
@@ -243,6 +246,11 @@ import {
   getFileRevisionPreviewInfo,
   putToDo
 } from './action.async.js'
+
+export {
+  usePublishLifecycle,
+  withUsePublishLifecycle
+} from './customHooks.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -260,6 +268,7 @@ export const ptTranslation = require('../i18next.scanner/pt/translation.json')
 export const deTranslation = require('../i18next.scanner/de/translation.json')
 export const arTranslation = require('../i18next.scanner/ar/translation.json')
 export const esTranslation = require('../i18next.scanner/es/translation.json')
+export const nbNOTranslation = require('../i18next.scanner/nb_NO/translation.json')
 
 export { default as ConfirmPopup } from './component/ConfirmPopup/ConfirmPopup.jsx'
 export { default as HTMLContent } from './component/HTMLContent/HTMLContent.jsx'
@@ -302,6 +311,7 @@ export {
   EmptyListMessage,
   getToDo,
   getToDoListForUser,
+  handleClickCopyLink,
   TIMELINE_ITEM_COUNT_PER_PAGE,
   addRevisionFromTLM,
   AVATAR_SIZE,
@@ -462,7 +472,7 @@ export {
   getContent,
   DistanceDate,
   Icon,
-  getWorkspaceContent,
+  getSpaceContent,
   PAGE,
   PopupUploadFile,
   PopupProgressUpload,
@@ -494,5 +504,7 @@ export {
   TimedEvent,
   ToDoItem,
   ToDoManagement,
-  STATUSES
+  STATUSES,
+  TIMELINE_TYPE,
+  sortMemberList
 }

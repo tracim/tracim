@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
+  CONTENT_NAMESPACE,
   formatAbsoluteDate,
   appContentFactory,
   BREADCRUMBS_TYPE,
@@ -15,6 +16,7 @@ import {
   getContentComment,
   getFileChildContent,
   getOrCreateSessionClientToken,
+  handleClickCopyLink,
   handleFetchResult,
   handleInvalidMentionInComment,
   tinymceRemove,
@@ -30,23 +32,21 @@ import {
   TLM_SUB_TYPE as TLM_ST,
   TracimComponent,
   TRANSLATION_STATE,
-  isFileUploadInErrorState,
   CONTENT_TYPE,
   getFileDownloadUrl,
   NUMBER_RESULTS_BY_PAGE,
   LOCAL_STORAGE_FIELD,
-  setLocalStorageItem
+  setLocalStorageItem,
+  displayDistanceDate,
+  TIMELINE_TYPE
 } from 'tracim_frontend_lib'
 import {
-  CONTENT_NAMESPACE,
   FETCH_CONFIG,
-  findUserRoleIdInWorkspace,
-  handleClickCopyLink
+  findUserRoleIdInWorkspace
 } from '../util/helper.js'
 import {
   getPublicationPage,
-  postThreadPublication,
-  postPublicationFile
+  postThreadPublication
 } from '../action-creator.async.js'
 import {
   appendPublication,
@@ -162,6 +162,13 @@ export class Publications extends React.Component {
     this.setHeadTitle()
   }
 
+  buildCommentAsFile = (content, loggedUser) => ({
+    ...content,
+    timelineType: TIMELINE_TYPE.COMMENT_AS_FILE,
+    created_raw: content.created,
+    created: displayDistanceDate(content.created, loggedUser.lang)
+  })
+
   handleContentCommentModified = async (data) => {
     const { props } = this
     const parentPublication = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
@@ -219,13 +226,28 @@ export class Publications extends React.Component {
   }
 
   handleContentCreatedOrRestored = (data) => {
+    const { props } = this
+
     if (
       data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-      data.fields.content.parent_id !== null ||
-      data.fields.content.workspace_id !== this.props.currentWorkspace.id
+      data.fields.content.workspace_id !== props.currentWorkspace.id
     ) return
+
+    if (data.fields.content.parent_id !== null) {
+      const parent = props.publicationPage.list.find(publication => publication.id === data.fields.content.parent_id)
+      if (parent === undefined) return
+
+      const newCommentList = [...parent.commentList]
+      const index = newCommentList.findIndex(comment => comment.content_id === data.fields.content.content_id)
+      if (index < 0) return
+
+      newCommentList[index] = this.buildCommentAsFile(data.fields.content, props.user)
+      props.dispatch(setCommentListToPublication(parent.id, newCommentList))
+      return
+    }
+
     this.setState({ isLastItemAddedFromCurrentToken: data.fields.client_token === getOrCreateSessionClientToken() })
-    this.props.dispatch(appendPublication(data.fields.content))
+    props.dispatch(appendPublication(data.fields.content))
   }
 
   handleCommentCreated = async (data) => {
@@ -333,7 +355,9 @@ export class Publications extends React.Component {
 
   getPublicationPage = async (pageToken = '') => {
     const { props } = this
-    this.setState({ loading: true })
+    if (pageToken === '') {
+      this.setState({ loading: true })
+    }
     const workspaceId = props.currentWorkspace.id
     const fetchGetPublicationList = await props.dispatch(getPublicationPage(workspaceId, PUBLICATION_ITEM_COUNT_PER_PAGE, pageToken))
     switch (fetchGetPublicationList.status) {
@@ -348,7 +372,9 @@ export class Publications extends React.Component {
         props.dispatch(newFlashMessage(`${props.t('An error has happened while getting')} ${props.t('publication list')}`, 'warning'))
         break
     }
-    this.setState({ loading: false })
+    if (pageToken === '') {
+      this.setState({ loading: false })
+    }
   }
 
   getCommentList = async (publicationId, publicationContentType) => {
@@ -373,10 +399,7 @@ export class Publications extends React.Component {
       TRANSLATION_STATE.DISABLED
     )
 
-    // INFO - G.B. - 2021-03-19 - For threads, we remove the first element because it's already shown in the preview
-    const finalCommentList = publicationContentType === CONTENT_TYPE.FILE ? commentList : commentList.slice(1)
-
-    props.dispatch(setCommentListToPublication(publicationId, finalCommentList))
+    props.dispatch(setCommentListToPublication(publicationId, commentList))
     if (publicationContentType === CONTENT_TYPE.THREAD) {
       props.dispatch(setFirstComment(publicationId, commentList[0]))
     }
@@ -426,12 +449,12 @@ export class Publications extends React.Component {
 
     return props.t('News of {{author}} on {{date}}', {
       author: authorName,
-      date: formatAbsoluteDate(new Date(), userLang),
+      date: formatAbsoluteDate(new Date(), userLang, 'PPpp'),
       interpolation: { escapeValue: false }
     })
   }
 
-  saveThreadPublication = async (publication) => {
+  saveThreadPublication = async (publication, publicationAsFileList) => {
     const { props, state } = this
 
     const workspaceId = props.currentWorkspace.id
@@ -449,7 +472,7 @@ export class Publications extends React.Component {
         fetchPostPublication.json,
         state.publicationWysiwyg,
         publication,
-        [],
+        publicationAsFileList,
         this.setState.bind(this),
         '',
         props.user.username,
@@ -460,43 +483,6 @@ export class Publications extends React.Component {
     }
   }
 
-  processSaveFilePublication = async (publication, publicationAsFileList) => {
-    const { props, state } = this
-
-    const workspaceId = props.currentWorkspace.id
-    const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
-
-    if (publicationAsFileList.length !== 1) return
-
-    const fileToUpload = publicationAsFileList[0]
-    const fetchPostPublicationFile = await props.dispatch(postPublicationFile(workspaceId, fileToUpload, publicationName))
-
-    const isUploadInError = isFileUploadInErrorState(fetchPostPublicationFile)
-    if (isUploadInError) {
-      props.dispatch(newFlashMessage(fetchPostPublicationFile.errorMessage, 'warning'))
-      return
-    }
-
-    if (publication !== '') {
-      try {
-        await props.appContentSaveNewComment(
-          fetchPostPublicationFile.responseJson,
-          state.publicationWysiwyg,
-          publication,
-          [],
-          this.setState.bind(this),
-          fetchPostPublicationFile.responseJson.slug,
-          props.user.username,
-          'Publication'
-        )
-      } catch (e) {
-        props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
-      }
-    }
-
-    if (state.publicationWysiwyg) globalThis.tinymce.get(wysiwygId).setContent('')
-  }
-
   handleClickValidateAnyway = async (publication, publicationAsFileList = []) => {
     const { state, props } = this
 
@@ -505,13 +491,7 @@ export class Publications extends React.Component {
       return
     }
 
-    if (publication !== '' && publicationAsFileList.length === 0) {
-      this.saveThreadPublication(publication)
-    }
-
-    if (publicationAsFileList.length > 0) {
-      this.processSaveFilePublication(publication, publicationAsFileList)
-    }
+    this.saveThreadPublication(publication, publicationAsFileList)
 
     setLocalStorageItem(
       CONTENT_TYPE.THREAD,
@@ -524,7 +504,7 @@ export class Publications extends React.Component {
 
   handleClickCopyLink = content => {
     const { props } = this
-    handleClickCopyLink(content)
+    handleClickCopyLink(content.id)
     props.dispatch(newFlashMessage(props.t('The link has been copied to clipboard'), 'info'))
   }
 
@@ -571,6 +551,7 @@ export class Publications extends React.Component {
         <TabBar
           currentSpace={props.currentWorkspace}
           breadcrumbs={props.breadcrumbs}
+          isEmailNotifActivated={props.system.config.email_notification_activated}
         />
         {userRoleIdInWorkspace >= ROLE.contributor.id && (
           <div className='publishAreaContainer'>
@@ -586,7 +567,7 @@ export class Publications extends React.Component {
               id={wysiwygId}
               invalidMentionList={state.invalidMentionList}
               lang={props.user.lang}
-              multipleFiles={false}
+              multipleFiles
               onClickCancelSave={this.handleCancelSave}
               onClickSaveAnyway={this.handleClickValidateAnyway}
               onClickValidateNewCommentBtn={this.handleClickPublish}
@@ -625,7 +606,6 @@ export class Publications extends React.Component {
             allowEdition={this.isEditionAllowed(publication, userRoleIdInWorkspace)}
             commentList={publication.commentList}
             content={publication}
-            customColor={COLORS.PUBLICATION}
             key={`publication_${publication.id}`}
             ref={publication.id === currentPublicationId ? this.currentPublicationRef : undefined}
             memberList={props.currentWorkspace.memberList}
@@ -633,7 +613,7 @@ export class Publications extends React.Component {
             isPublication
             inRecentActivities={false}
             onClickEdit={() => this.handleClickEdit(publication)}
-            showTimeline
+            showCommentList
             workspaceId={Number(publication.workspaceId)}
             user={props.user}
             {...this.getPreviewLinkParameters(publication)}
@@ -671,6 +651,7 @@ const mapStateToProps = ({
   breadcrumbs,
   currentWorkspace,
   publicationPage,
+  system,
   user
-}) => ({ breadcrumbs, currentWorkspace, publicationPage, user })
+}) => ({ breadcrumbs, currentWorkspace, publicationPage, system, user })
 export default connect(mapStateToProps)(withRouter(translate()(appContentFactory(TracimComponent(Publications)))))

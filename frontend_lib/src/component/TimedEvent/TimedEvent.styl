@@ -1,21 +1,24 @@
-@import "../../css/Variable.styl"
+@import '../../css/Variable.styl'
 
 .timedEvent
   font-size metadataFontSize
   white-space nowrap
   display flex
   flex-direction column
-  &__top.btn
-    padding 0
-    margin 0
-    font-size metadataFontSize
-    &::after
-      display none
-    &:hover
-      text-decoration underline
+  &__top
+    &.btn
+      padding 0
+      margin 0
+      font-size metadataFontSize
+      &::after
+        display none
+      &:hover
+        text-decoration underline
     &Contents
       text-overflow ellipsis
       overflow hidden
+      & > span
+        color fontColor
   &__bottom
     overflow hidden
     display flex
@@ -27,7 +30,7 @@
     text-overflow ellipsis
   & .dropdownMenuItem
     cursor auto
-    border-bottom 1px solid mediumGrey
+    border-bottom 1px solid lightGrey1
     align-items flex-end
     & .timedEvent
       margin 0

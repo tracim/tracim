@@ -44,5 +44,7 @@
   "The file is larger than the maximum file size allowed": "Le fichier dépasse la taille maximale autorisée",
   "Error, the space exceed its maximum size": "Erreur, l'espace dépasse sa taille maximale",
   "You have reached your storage limit, you cannot add new files": "Vous avez atteint votre limite de stockage, vous ne pouvez pas ajouter de nouveaux fichiers",
-  "Tasks": "Tâches"
+  "Tasks": "Tâches",
+  "The link has been copied to clipboard": "Lien copié dans le presse-papiers",
+  "Copy content link": "Copier le lien du contenu"
 }

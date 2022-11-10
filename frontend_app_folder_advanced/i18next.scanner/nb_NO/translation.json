@@ -1,1 +1,19 @@
-{}
+{
+  "New folder": "Ny mappe",
+  "Validate and create": "Bekreft og opprett",
+  "Folder's name": "Mappenavn",
+  "Error while saving new folder": "Kunne ikke lagre den nye mappen",
+  "Allowed content type for this folder": "Tillatt innholdstype i denne mappen",
+  "Error while loading folder details": "Kunne ikke laste inn mappedetaljer",
+  "Create a folder": "Opprett en mappe",
+  "Folder": "Mappe",
+  "Restore": "Gjenopprett",
+  "This folder is archived": "Denne mappen er arkivert",
+  "This folder is deleted": "Denne mappen er slettet",
+  "Error while loading Tracim's content type list": " \n",
+  "Delete": "Slett",
+  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
+  "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
+  "Copy content link": "Kopier innholdslenke",
+  "Error while saving new available apps list": "Kunne ikke lagre liste over nye tilgjengelige programmer"
+}

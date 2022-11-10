@@ -8,7 +8,7 @@
   "A content with the same name already exists": "Ya existe un contenido con el mismo nombre",
   "Error in the URL": "Error en la URL",
   "Upload files": "Cargar archivos",
-  "The file is larger than the maximum file size allowed": "El archivo es mayor que el tamaño máximo permitido",
+  "The file is larger than the maximum file size allowed": "El archivo supera el tamaño máximo permitido",
   "Error, the space exceed its maximum size": "Error, el espacio excede su tamaño máximo",
   "No preview available": "Vista previa no disponible",
   "Validate and create": "Validar y crear",
@@ -63,5 +63,7 @@
   "To download the video, leave the fullscreen mode and click on download button {{icon}}.": "Para descargar el vídeo, salga del modo de pantalla completa y haga clic en el botón de descarga {{icon}}.",
   " of ": " sobre ",
   "of": "sobre",
-  "Tasks": "Tareas"
+  "Tasks": "Tareas",
+  "The link has been copied to clipboard": "Enlace copiado en el portapapeles",
+  "Copy content link": "Copiar enlace al contenido"
 }

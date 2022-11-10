@@ -1,12 +1,12 @@
 import React from 'react'
 import {
   ADVANCED_SEARCH_TYPE,
-  CONTENT_NAMESPACE,
   FETCH_CONFIG,
   COOKIE_FRONTEND,
   unLoggedAllowedPageList,
   history
 } from './util/helper.js'
+
 import { parseISO } from 'date-fns'
 import i18n from './util/i18n.js'
 import * as Cookies from 'js-cookie'
@@ -66,6 +66,7 @@ import {
   UNREAD_NOTIFICATION_COUNT
 } from './action-creator.sync.js'
 import {
+  CONTENT_NAMESPACE,
   ErrorFlashMessageTemplateHtml,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
@@ -119,10 +120,16 @@ const fetchWrapper = async ({ url, param, actionName, dispatch }) => {
       }
       if (status >= 400 && status <= 499) return fetchResult.json()
       if (status >= 500 && status <= 599) {
-        dispatch(newFlashMessage(i18n.t('Unexpected error, please inform an administrator'), 'danger', 8000))
+        const errorData = await fetchResult.json()
+        let errorDetails = ''
+        if (errorData && errorData.code && errorData.message) {
+          errorDetails = `${errorData.code}: ${errorData.message}`
+        }
+        dispatch(newFlashMessage(
+          <ErrorFlashMessageTemplateHtml errorMsg={errorDetails} />, 'danger', 8000
+        ))
         return
       }
-
       dispatch(newFlashMessage(
         <ErrorFlashMessageTemplateHtml errorMsg={`Unknown http status ${fetchResult.status}`} />, 'danger', 300000
       ))
@@ -946,15 +953,41 @@ export const getNotificationList = (
   return fetchGetNotificationWall
 }
 
-export const putNotificationAsRead = (userId, eventId) => dispatch => {
+/**
+ * Put a list of notifications as read
+ * @param {String} userId
+ * @param {int[]} notificationIdList
+ * @returns
+ */
+export const putNotificationListAsRead = (userId, notificationIdList) => dispatch => {
   return fetchWrapper({
-    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/${eventId}/read`,
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read` +
+      `?event_ids=${notificationIdList.join(',')}`,
     param: {
       credentials: 'include',
       headers: FETCH_CONFIG.headers,
       method: 'PUT'
     },
-    actionName: NOTIFICATION,
+    actionName: NOTIFICATION_LIST,
+    dispatch
+  })
+}
+
+/**
+ * Put a list of space notifications as read
+ * @param {String} userId
+ * @param {int[]} spaceIdList
+ * @returns
+ */
+export const putSpaceListAsRead = (userId, spaceIdList) => dispatch => {
+  return fetchWrapper({
+    url: `${FETCH_CONFIG.apiUrl}/users/${userId}/messages/read?space_ids=${spaceIdList.join(',')}`,
+    param: {
+      credentials: 'include',
+      headers: FETCH_CONFIG.headers,
+      method: 'PUT'
+    },
+    actionName: NOTIFICATION_LIST,
     dispatch
   })
 }

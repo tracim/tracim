@@ -14,6 +14,13 @@ import {
   Icon,
   formatAbsoluteDate
 } from 'tracim_frontend_lib'
+import {
+  putNotificationListAsRead
+} from '../../action-creator.async.js'
+import {
+  newFlashMessage,
+  readNotificationList
+} from '../../action-creator.sync.js'
 import { escape as escapeHtml, uniqBy } from 'lodash'
 
 const GroupRender = props => {
@@ -29,24 +36,21 @@ const GroupRender = props => {
   const numberOfWorkspaces = uniqBy(groupedNotifications.group.map(notification => notification.workspace), 'id').length
   const readStatus = groupedNotifications.group.map(notification => notification.read).reduce((acc, current) => acc && current)
 
-  // FIXME - MP - 14-03-2022 - Function removed so I can safely push
-  // However this is a regression, we can't put a group notification as read
-  // Issue : https://github.com/tracim/tracim/issues/5526
-  const handleReadGroupNotification = async (groupNotification) => {
-    //   // TODO - MP - 14-03-2022
-    //   // Create a props.dispatch(putGroupNotificationsAsRead(props.user.userId, groupNotification.group))
-    //   // Where it will read every notification in groupNotification.group
-    //   // related to https://github.com/tracim/tracim/issues/5526
-    //
-    //   const fetchPutNotificationAsRead = { status = 404 }
-    //   switch (fetchPutNotificationAsRead.status) {
-    //     case 204: {
-    //       props.dispatch(readGroupNotification(notificationId))
-    //       break
-    //     }
-    //     default:
-    //       props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-    //   }
+  const handleReadNotificationGroup = async (groupNotification) => {
+    const notificationIdList = groupNotification.group.map(notification => notification.id)
+    const fetchPutNotificationGroupAsRead = await props.dispatch(
+      putNotificationListAsRead(props.user.userId, notificationIdList)
+    )
+    switch (fetchPutNotificationGroupAsRead.status) {
+      case 204: {
+        props.dispatch(readNotificationList(notificationIdList))
+        break
+      }
+      default:
+        props.dispatch(
+          newFlashMessage(props.t('Error while marking the notification group as read'), 'warning')
+        )
+    }
   }
 
   return (
@@ -111,7 +115,11 @@ const GroupRender = props => {
         {!readStatus &&
           <i
             className='notification__list__item__circle fas fa-circle'
-            onClick={() => handleReadGroupNotification(groupedNotifications)}
+            onClick={(e) => {
+              handleReadNotificationGroup(groupedNotifications)
+              e.preventDefault()
+              e.stopPropagation()
+            }}
           />}
       </div>
     </Link>

@@ -3,13 +3,14 @@ import Radium from 'radium'
 import PropTypes from 'prop-types'
 import {
   AgendaInfo,
-  tinymceRemove,
   AutoComplete,
   BtnSwitch,
   ConfirmPopup,
+  IconButton,
   Popover,
   ROLE_LIST,
-  SingleChoiceList
+  SingleChoiceList,
+  tinymceRemove
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
 
@@ -119,13 +120,12 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
             </div>
 
             <div className='workspace_advanced__defaultRole__bottom'>
-              <button
-                type='button'
-                className='workspace_advanced__defaultRole__bottom__btn btn outlineTextBtn primaryColorFont primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+              <IconButton
+                customClass='workspace_advanced__defaultRole__bottom__btn'
+                icon='fas fa-check'
                 onClick={props.onClickValidateNewDefaultRole}
-              >
-                {props.t('Confirm')}
-              </button>
+                text={props.t('Confirm')}
+              />
             </div>
           </div>
         )}
@@ -147,13 +147,12 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
               </div>
 
               <div className='formBlock__field workspace_advanced__delete__content'>
-                <button
-                  className='btn outlineTextBtn primaryColorBorder primaryColorFontDarkenHover primaryColorFont nohover'
+                <IconButton
+                  icon='far fa-trash-alt'
                   onClick={props.onClickDeleteWorkspaceBtn}
-                >
-                  {props.t('Delete')}
-                </button>
-
+                  text={props.t('Delete')}
+                  textMobile={props.t('Delete')}
+                />
                 <div className='workspace_advanced__delete__content__warning' />
               </div>
 

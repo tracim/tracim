@@ -1,11 +1,10 @@
-@import "~tracim_frontend_lib/src/css/Variable.styl"
+@import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .formBlock
   margin-bottom standardSpacing
   border-radius standardBorderRadius
   &__title
     padding standardSpacing
-    border-bottom borderStyle
     font-size titleFontSize
   &__field
     padding standardSpacing
@@ -23,12 +22,11 @@
       background-color offWhite
       overflow auto
   &__description
+    padding standardSpacing
     &__text
-      padding standardSpacing
-      position relative
-      height 200px
+      height 300px
       &__textarea
-        height 200px
+        height 300px
         width 100%
     &__bottom
       display flex
@@ -48,9 +46,8 @@
       &__btn
         margin-inline-start auto
   &__agenda
+    padding standardSpacing
     .agendaInfo__header
-      padding standardSpacing
-      border-bottom borderStyle
       font-size titleFontSize
   &__userlist
     &__list
@@ -61,7 +58,6 @@
         display flex
         justify-content space-between
         align-items center
-        border-bottom borderStyle
         padding 0 standardSpacing
         height 60px
         &__avatar
@@ -108,7 +104,6 @@
           font-size titleFontSize
           cursor pointer
     &__adduser
-      border-bottom borderStyle
       padding standardSpacing
       &__button
         display flex
@@ -162,9 +157,8 @@
   .workspace_advanced__userlist__list__item__avatar
     display none
 
-@media (min-width: min-lg) and (max-width: max-lg)
+@media (max-width: max-xs) and (max-width: max-lg)
   .workspace_advanced
-    height "calc(100% - %s)" % headerHeight
     &-content
       width 100%
     &__contentpage__content
@@ -172,35 +166,6 @@
     &__userlist
       width 100%
 
-@media (min-width: min-md) and (max-width: max-md)
+@media (max-width: max-xs) and (max-width: max-md)
   .workspace_advanced
-    height "calc(100% - %s)" % headerHeight
     width 100%
-    &-content
-      width 100%
-    &__userlist
-      width 100%
-    &__contentpage__content
-      height auto
-
-@media (min-width: min-sm) and (max-width: max-sm)
-  .workspace_advanced
-    height "calc(100% - %s)" % headerHeight
-    width 100%
-    &-content
-      width 100%
-    &__userlist
-      width 100%
-    &__contentpage__content
-      height auto
-
-@media (max-width: max-xs)
-  .workspace_advanced
-    height "calc(100% - %s)" % headerHeight
-    width 100%
-    &-content
-      width 100%
-    &__userlist
-      width 100%
-    &__contentpage__content
-      height auto

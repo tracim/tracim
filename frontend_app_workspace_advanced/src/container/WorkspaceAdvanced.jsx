@@ -755,7 +755,7 @@ export class WorkspaceAdvanced extends React.Component {
                   onClickNewMemberRole={this.handleClickNewMemberRole}
                   onClickValidateNewMember={this.handleClickValidateNewMember}
                   autoCompleteFormNewMemberActive={state.autoCompleteFormNewMemberActive}
-                  emailNotifActivated={state.config.system.config.email_notification_activated}
+                  isEmailNotifActivated={state.config.system.config.email_notification_activated}
                   canSendInviteNewUser={
                     [state.config.profileObject.administrator.slug, state.config.profileObject.manager.slug].includes(state.loggedUser.profile)
                   }

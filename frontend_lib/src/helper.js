@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { formatDistance, isAfter } from 'date-fns'
+import { format, formatDistance, isAfter } from 'date-fns'
 import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
@@ -9,6 +9,7 @@ import dateFnsPt from 'date-fns/locale/pt'
 import dateFnsDe from 'date-fns/locale/de'
 import dateFnsAr from 'date-fns/locale/ar-SA'
 import dateFnsEs from 'date-fns/locale/es'
+import dateFnsNbNO from 'date-fns/locale/nb'
 
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
@@ -68,7 +69,8 @@ export const DATE_FNS_LOCALE = {
   pt: dateFnsPt,
   de: dateFnsDe,
   ar: dateFnsAr,
-  es: dateFnsEs
+  es: dateFnsEs,
+  nb_NO: dateFnsNbNO
 }
 
 // INFO - MP - 2022-06-09 - This array must stay synchronized with the supported extensions
@@ -560,8 +562,6 @@ export const CONTENT_TYPE = {
   TODO: 'todo'
 }
 
-// FIXME - CH - 20210324 - this constant is a duplicate from frontend/src/util/helper.js
-// see https://github.com/tracim/tracim/issues/4340
 export const CONTENT_NAMESPACE = {
   CONTENT: 'content',
   UPLOAD: 'upload',
@@ -713,11 +713,26 @@ export const checkUsernameValidity = async (apiUrl, username, props) => {
   }
 }
 
-export const formatAbsoluteDate = (rawDate, lang, options = {}) => new Date(rawDate).toLocaleString(lang, options)
+/**
+ * INFO - G.B. - 2022-09-10
+ * @param {*} rawDate Date to format
+ * @param {*} lang Locale lang
+ * @param {*} formatTime To see the different format time: https://date-fns.org/v2.29.2/docs/format
+ * @returns
+ */
+export const formatAbsoluteDate = (rawDate, lang = 'en', formatTime) => {
+  if (!rawDate) return
+  return format(new Date(rawDate), formatTime || 'Pp', { locale: DATE_FNS_LOCALE[lang] })
+}
 
-// Equality test done as numbers with the following rules:
-// - strings are converted to numbers before comparing
-// - undefined and null are converted to 0 before comparing
+/**
+ * Equality test done as numbers with the following rules:
+ * - strings are converted to numbers before comparing
+ * - undefined and null are converted to 0 before comparing
+ * @param {*} var1 number 1 to test
+ * @param {*} var2 number 2 to test
+ * @returns
+ */
 export const permissiveNumberEqual = (var1, var2) => {
   return Number(var1 || 0) === Number(var2 || 0)
 }
@@ -751,7 +766,8 @@ export const naturalCompareLabels = (itemA, itemB, lang) => {
 
 export const naturalCompare = (itemA, itemB, lang, field) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return itemA[field].localeCompare(itemB[field], lang, { numeric: true })
+  const locale = lang ? lang.replaceAll('_', '-') : undefined
+  return itemA[field].localeCompare(itemB[field], locale, { numeric: true })
 }
 
 export const sortWorkspaceList = (workspaceList, lang) => {
@@ -947,3 +963,19 @@ export const autoCompleteItem = (text, item, cursorPos, endCharacter) => {
 
   return { textBegin, textEnd }
 }
+
+export const handleClickCopyLink = (contentId) => {
+  // INFO - G.B. - 2022-08-26 - document.execCommand() is deprecated, but the alternative navigator.clipboard is
+  // not compatible with all browsers versions at this time, so a fallback was made to the old algorithm
+  const link = `${window.location.origin}${PAGE.CONTENT(contentId)}`
+  if (!navigator.clipboard) {
+    const tmp = document.createElement('textarea')
+    document.body.appendChild(tmp)
+    tmp.value = link
+    tmp.select()
+    document.execCommand('copy')
+    document.body.removeChild(tmp)
+  } else navigator.clipboard.writeText(link)
+}
+
+export const sortMemberList = (a, b) => a.publicName.localeCompare(b.publicName)

@@ -1,1 +1,17 @@
-{}
+{
+  "Validate and create": "Bekreft og opprett",
+  "Topic's subject": "Dagens emne",
+  "New Thread": "Ny tråd",
+  "Threads": "Tråder",
+  "Start a topic": "Start et emne",
+  "A content with the same name already exists": "Innhold med samme navn finnes allerede",
+  "Error while creating thread": "Kunne ikke opprette tråd",
+  "Thread": "Tråd",
+  "thread": "tråd",
+  "threads": "tråder",
+  "Delete": "Slett",
+  "Error while saving the comment": "Kunne ikke lagre kommentaren",
+  "The content has been modified by {{author}}": "Innholdet har blitt endret av {{author}}",
+  "The link has been copied to clipboard": "Lenke kopiert til utklippstavle",
+  "Copy content link": "Kopier innholdslenke"
+}

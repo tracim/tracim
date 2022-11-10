@@ -106,13 +106,14 @@ export class AdminForm extends React.Component {
   }
 
   render () {
+    const { props } = this
     return (
       <PageWrapper customClass='adminUser'>
         <PageTitle
           parentClass='adminUser'
           title='Formulaires manager'
           icon='users'
-
+          isEmailNotifActivated={props.isEmailNotifActivated}
         />
 
         <PageContent parentClass='adminUser'>

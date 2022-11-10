@@ -280,6 +280,10 @@ export class Tracim extends React.Component {
   handleClickLogout = async () => {
     await this.props.dispatch(logoutUser(this.props.history))
     this.setState({ tooManyUsers: false })
+
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage('logout')
+    }
   }
 
   handleRedirect = data => {
@@ -535,7 +539,7 @@ export class Tracim extends React.Component {
   // INFO - MP - 2021-11-10 - Helper function
   // Return the current time HH:mm
   getHoursAndMinutes = () => {
-    return formatAbsoluteDate(new Date(), this.props.user.lang, { hour: '2-digit', minute: '2-digit' })
+    return formatAbsoluteDate(new Date(), this.props.user.lang, 'p')
   }
 
   render () {
@@ -568,11 +572,7 @@ export class Tracim extends React.Component {
 
     return (
       <div className='tracim fullWidthFullHeight' dir={i18next.dir()}>
-        <Header
-          onClickNotification={this.handleClickNotificationButton}
-          unreadNotificationCount={props.notificationPage.unreadNotificationCount}
-          unreadMentionCount={props.notificationPage.unreadMentionCount}
-        />
+        <Header />
         {state.displayConnectionError && (
           <FlashMessage
             className='connection_error'
@@ -735,7 +735,16 @@ export class Tracim extends React.Component {
         <ReduxTlmDispatcher />
 
         <div className='sidebarpagecontainer'>
-          <Route render={() => <Sidebar />} />
+          <Route
+            render={() => (
+              <Sidebar
+                onClickNotification={this.handleClickNotificationButton}
+                unreadNotificationCount={props.notificationPage.unreadNotificationCount}
+                unreadMentionCount={props.notificationPage.unreadMentionCount}
+                isNotificationWallOpen={state.isNotificationWallOpen}
+              />
+            )}
+          />
 
           <Route
             render={() => (

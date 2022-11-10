@@ -123,6 +123,7 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentModified },
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
 
@@ -175,8 +176,17 @@ export function appContentFactory (WrappedComponent) {
       }
     }
 
-    getComment = async (workspaceId, contentId, commentId) => {
-      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, workspaceId, contentId, commentId))
+    /**
+     * Get a complete comment
+     * This function exists also in withActivity.jsx
+     * @async
+     * @param {int} spaceId
+     * @param {int} contentId
+     * @param {int} commentId
+     * @returns {Promise<JSON>}
+     */
+    getComment = async (spaceId, contentId, commentId) => {
+      const fetchGetComment = await handleFetchResult(await getComment(this.apiUrl, spaceId, contentId, commentId))
 
       switch (fetchGetComment.apiResponse.status) {
         case 200: return fetchGetComment.body
@@ -236,6 +246,28 @@ export function appContentFactory (WrappedComponent) {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
         return { timeline, wholeTimeline }
+      })
+    }
+
+    handleChildContentModified = (tlm) => {
+      const { state, props } = this
+
+      if (
+        props.data === undefined ||
+        tlm.fields.content.workspace_id !== props.data.content.workspace_id ||
+        tlm.fields.content.parent_id !== props.data.content.content_id
+      ) return
+
+      const wholeTimeline = [...state.wholeTimeline]
+      const index = wholeTimeline.findIndex(element => element.content_id === tlm.fields.content.content_id)
+      if (index < 0) return
+
+      wholeTimeline[index] = this.buildTimelineItemCommentAsFile(tlm.fields.content, state.loggedUser)
+      const timeline = this.getTimeline(wholeTimeline, state.timeline.length)
+
+      this.setState({
+        wholeTimeline,
+        timeline
       })
     }
 
@@ -440,16 +472,20 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentDeleteToDo = async (workspaceId, contentId, toDoId, setState) => {
+    appContentDeleteToDo = async (workspaceId, contentId, toDoId, setState, previousLockedToDoList) => {
       this.checkApiUrl()
+      setState({ lockedToDoList: [...previousLockedToDoList, toDoId] })
+
       const response = await handleFetchResult(await deleteToDo(this.apiUrl, workspaceId, contentId, toDoId))
 
       switch (response.status) {
         case 204: break
         case 403:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('You are not allowed to delete this to do'))
           break
         default:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('Error while deleting to do'))
           break
       }
@@ -466,14 +502,14 @@ export function appContentFactory (WrappedComponent) {
       switch (response.status) {
         case 204: break
         case 403:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('You are not allowed to change the status of this to do'))
           break
         default:
+          setState({ lockedToDoList: [...previousLockedToDoList] })
           sendGlobalFlashMessage(i18n.t('Error while saving new to do'))
           break
       }
-
-      setState({ lockedToDoList: [...previousLockedToDoList] })
 
       return response
     }
@@ -950,6 +986,22 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
+    /**
+     * Update both timeline and wholeTimeline with the new comment from the TLM
+     * @param {TLM} tlm TLM received that contains the new comment information
+     */
+    updateComment = async (tlm) => {
+      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
+      this.setState(prev => ({
+        timeline: prev.timeline.map(
+          item => item.content_id === comment.content_id ? { ...item, ...comment } : item
+        ),
+        wholeTimeline: prev.wholeTimeline.map(
+          item => item.content_id === comment.content_id ? { ...item, ...comment } : item
+        )
+      }))
+    }
+
     searchForMentionOrLinkInQuery = async (query, workspaceId) => {
       function matchingContentIdsFirst (contentA, contentB) {
         const aContentId = contentA.content_id.toString()
@@ -1140,6 +1192,7 @@ export function appContentFactory (WrappedComponent) {
           timeline={this.state.timeline}
           loadTimeline={this.loadTimeline}
           loadMoreTimelineItems={this.loadMoreTimelineItems}
+          updateComment={this.updateComment}
           resetTimeline={this.resetTimeline}
           canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
           isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}

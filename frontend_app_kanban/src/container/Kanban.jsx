@@ -10,6 +10,7 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_TYPE,
   FilenameWithBadges,
+  handleClickCopyLink,
   handleFetchResult,
   handleInvalidMentionInComment,
   getToDo,
@@ -93,6 +94,7 @@ export class Kanban extends React.Component {
     ])
 
     props.registerLiveMessageHandlerList([
+      { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleCommentModified },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
       { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.UNDELETED, optionalSubType: TLM_ST.KANBAN, handler: this.handleContentChanged },
@@ -219,8 +221,15 @@ export class Kanban extends React.Component {
     if (data.fields.content.parent.content_id !== state.content.content_id) return
 
     this.setState(prevState => ({
-      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id)
+      toDoList: prevState.toDoList.filter(toDo => toDo.content_id !== data.fields.content.content_id),
+      lockedToDoList: prevState.lockedToDoList.filter(toDoId => toDoId !== data.fields.content.content_id)
     }))
+  }
+
+  // TLM Handlers
+
+  handleCommentModified = (data) => {
+    this.props.updateComment(data)
   }
 
   handleContentChanged = data => {
@@ -391,11 +400,11 @@ export class Kanban extends React.Component {
     tinymceRemove('#wysiwygTimelineComment')
   }
 
-  sendGlobalFlashMessage = msg => GLOBAL_dispatchEvent({
+  sendGlobalFlashMessage = (msg, type = 'warning') => GLOBAL_dispatchEvent({
     type: CUSTOM_EVENT.ADD_FLASH_MSG,
     data: {
       msg: msg,
-      type: 'warning',
+      type: type,
       delay: undefined
     }
   })
@@ -464,7 +473,13 @@ export class Kanban extends React.Component {
 
   handleDeleteToDo = (toDo) => {
     const { state, props } = this
-    props.appContentDeleteToDo(state.content.workspace_id, state.content.content_id, toDo.content_id, this.setState.bind(this))
+    props.appContentDeleteToDo(
+      state.content.workspace_id,
+      state.content.content_id,
+      toDo.content_id,
+      this.setState.bind(this),
+      state.lockedToDoList
+    )
   }
 
   handleChangeStatusToDo = (toDo, status) => {
@@ -539,6 +554,12 @@ export class Kanban extends React.Component {
     }
   }
 
+  handleClickCopyLink = () => {
+    const { props, state } = this
+    handleClickCopyLink(state.content.content_id)
+    this.sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+  }
+
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
@@ -569,6 +590,9 @@ export class Kanban extends React.Component {
   }
 
   handleClickFullscreen = () => {
+    if (!this.state.fullscreen) {
+      GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: { } })
+    }
     this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
   }
 
@@ -648,6 +672,12 @@ export class Kanban extends React.Component {
         <PopinFixedContent
           actionList={[
             {
+              icon: 'fas fa-link',
+              label: props.t('Copy content link'),
+              onClick: this.handleClickCopyLink,
+              showAction: true,
+              dataCy: 'popinListItem__copyLink'
+            }, {
               icon: 'far fa-trash-alt',
               label: props.t('Delete'),
               onClick: this.handleClickDelete,

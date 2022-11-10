@@ -1,7 +1,7 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import configureMockStore from 'redux-mock-store'
-import { withRouterMock } from '../../hocMock/withRouter'
+import { RouterMock, withRouterMock } from '../../hocMock/withRouter'
 import { translateMock } from '../../hocMock/translate.js'
 import { expect } from 'chai'
 import { Account as AdminAccountWithoutHOC } from '../../../src/container/AdminAccount.jsx'
@@ -88,8 +88,9 @@ describe('In <Account /> at AdminAccount.jsx', () => {
 
   const AdminAccountWithHOC1 = withRouterMock(translateMock()(AdminAccountWithoutHOC))
   const AdminAccountWithHOC2 = () => <Provider store={store}><AdminAccountWithHOC1 {...props} /></Provider>
+  const AdminAccountWithHOC3 = () => <RouterMock> <AdminAccountWithHOC2 /> </RouterMock>
 
-  const wrapper = mount(<AdminAccountWithHOC2 {...props} />)
+  const wrapper = mount(<AdminAccountWithHOC3 {...props} />)
   const adminAccountWrapper = wrapper.find(AdminAccountWithoutHOC)
   const adminAccountInstance = adminAccountWrapper.instance()
 

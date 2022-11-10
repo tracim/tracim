@@ -161,7 +161,7 @@ def password_generator(
     return "".join(random.choice(chars) for char_number in range(length))
 
 
-COLOR_DARKEN_SCALE_FACTOR = 0.85
+COLOR_DARKEN_SCALE_FACTOR = 0.9
 COLOR_LIGHTEN_SCALE_FACTOR = 1.15
 
 

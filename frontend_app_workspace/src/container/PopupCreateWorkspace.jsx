@@ -173,7 +173,7 @@ export class PopupCreateWorkspace extends React.Component {
 
   render () {
     const { props, state } = this
-    const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBorder primaryColorBgDarkenHover primaryColorBorderDarkenHover'
+    const buttonStyleCallToAction = 'btn highlightBtn primaryColorBg primaryColorBgDarkenHover'
     const areParentSpacesVisible = state.config.system.config.ui__spaces__creation__parent_space_choice__visible
 
     return (
@@ -267,7 +267,7 @@ export class PopupCreateWorkspace extends React.Component {
 
                 <div className='newSpace__button'>
                   <button
-                    className='btn primaryColorBorder outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover newSpace__button__back'
+                    className='btn primaryColorBgHover newSpace__button__back'
                     disabled={!state.newName || state.newName.length === 0 || !state.newType || state.newType.length === 0}
                     onClick={this.handleClickNextOrBack}
                     title={props.t('Back')}

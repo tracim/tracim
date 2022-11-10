@@ -57,7 +57,7 @@ describe('Publications', () => {
     it('should show the first message as preview for simple edition', function () {
       cy.get(publicationInput).type(exampleText)
       cy.contains(publishButton, 'Publish').click()
-      cy.contains('.comment__body__content__textAndPreview', exampleText).should('be.visible')
+      cy.contains('.timeline__comment__body__content__textAndPreview', exampleText).should('be.visible')
     })
 
     it.skip('should show the first message as preview for advanced edition', function () {
@@ -67,7 +67,7 @@ describe('Publications', () => {
       cy.waitForTinyMCELoaded().then(() => {
         cy.typeInTinyMCE(exampleText)
         cy.contains(publishButton, 'Publish').click()
-        cy.contains('.comment__body__content__textAndPreview', exampleText).should('be.visible')
+        cy.contains('.timeline__comment__body__content__textAndPreview', exampleText).should('be.visible')
       })
     })
 

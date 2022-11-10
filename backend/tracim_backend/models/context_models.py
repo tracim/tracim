@@ -82,6 +82,7 @@ class ConfigModel(object):
         translation_service__target_languages: List[Dict[str, str]],
         user__self_registration__enabled: bool,
         ui__spaces__creation__parent_space_choice__visible: bool,
+        ui__notes__code_sample_languages: List[Dict[str, str]],
         limitation__maximum_online_users_message: str,
         call__enabled: bool,
         call__unanswered_timeout: int,
@@ -103,6 +104,7 @@ class ConfigModel(object):
         self.ui__spaces__creation__parent_space_choice__visible = (
             ui__spaces__creation__parent_space_choice__visible
         )
+        self.ui__notes__code_sample_languages = ui__notes__code_sample_languages
         self.limitation__maximum_online_users_message = limitation__maximum_online_users_message
         self.call__enabled = call__enabled
         self.call__unanswered_timeout = call__unanswered_timeout
@@ -848,10 +850,12 @@ class LiveMessageQuery(BasePaginatedQuery):
 
 class UserMessagesMarkAsReadQuery(object):
     def __init__(
-        self, content_ids: str = "", parent_ids: str = "",
+        self, content_ids: str = "", event_ids: str = "", parent_ids: str = "", space_ids: str = "",
     ):
         self.content_ids = string_to_list(content_ids, ",", int)
+        self.event_ids = string_to_list(event_ids, ",", int)
         self.parent_ids = string_to_list(parent_ids, ",", int)
+        self.space_ids = string_to_list(space_ids, ",", int)
 
 
 class UserMessagesSummaryQuery(object):

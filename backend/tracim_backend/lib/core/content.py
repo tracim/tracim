@@ -1775,22 +1775,14 @@ class ContentApi(object):
             content.revision_type = ActionDescription.UNMARK_AS_TEMPLATE
         return content
 
-    def get_templates(self, user_id: int, template_type: str) -> typing.List[Content]:
-        user = self._session.query(User).get(user_id)
-
+    def get_templates(self, user: User, template_type: str) -> typing.List[Content]:
         space_api = WorkspaceApi(current_user=None, session=self._session, config=self._config)
-        space_ids = [space.workspace_id for space in space_api.get_all_for_user(user)]
-
+        space_list = space_api.get_all_for_user(user)
+        if not space_list:
+            return []
         content_list = (
-            self._session.query(Content)
-            .join(ContentRevisionRO, Content.cached_revision_id == ContentRevisionRO.revision_id)
-            .filter(
-                Content.workspace_id.in_(space_ids),
-                Content.is_template.is_(True),
-                Content.type == template_type,
-                Content.is_deleted.is_(False),
-                Content.is_archived.is_(False),
-            )
+            self._base_query(space_list)
+            .filter(Content.is_template.is_(True), Content.type == template_type,)
             .all()
         )
 
@@ -2055,12 +2047,12 @@ class ContentApi(object):
         if do_notify:
             self.do_notify(content)
 
-    def do_notify(self, content: Content):
+    def do_notify(self, content: Content) -> None:
         """
-        Allow to force notification for a given content. By default, it is
-        called during the .save() operation
-        :param content:
-        :return:
+        Create a notification -mail- and notify the current user
+
+        Args:
+            content (Content): Content that the notification will be about
         """
         NotifierFactory.create(
             config=self._config, current_user=self._user, session=self._session
@@ -2250,8 +2242,20 @@ class ContentApi(object):
             self._session.flush()
 
     def create_todo(
-        self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True,
+        self, parent: Content, assignee: User, raw_content: str, do_notify: bool = True
     ) -> Content:
+        """Create a todo in the database.
+
+        Args:
+            parent (Content): Parent content of the Todo. By our definition, a Todo can only exist \
+                if it got a parent.
+            assignee (User): User assigned to the Todo. Can be `None` if the Todo has no assignee.
+            raw_content (str): Text of the Todo.
+            do_notify (bool, optional): Notify everyone. Defaults to False.
+
+        Returns:
+            Content: The created Todo.
+        """
         item = self.create(
             content_namespace=parent.content_namespace,
             content_type_slug=content_type_list.Todo.slug,

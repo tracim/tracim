@@ -1,6 +1,7 @@
-import { PAGES } from '../../support/urls_commands'
+import { PAGES, URLS } from '../../support/urls_commands'
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import baseUser from '../../fixtures/baseUser.json'
+import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 
 
@@ -276,6 +277,30 @@ describe('Account page', () => {
         cy.contains('.account__userpreference__setting__spacename', 'You are not a member of any space yet')
       })
     })
+  })
+})
 
+describe('Profile link button', () => {
+  beforeEach(() => {
+    cy.cancelXHR()
+    cy.resetDB()
+    cy.setupBaseDB()
+    cy.loginAs('administrators')
+  })
+
+  it("should redirect to user's public profile", () => {
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.get('.userinfo__profile_button').click()
+    cy.url().should('include', URLS[PAGES.PROFILE]({ userId: defaultAdmin.user_id }));
+  })
+
+  it('label should be "My Profile" when viewing from account page', () => {
+    cy.visitPage({ pageName: PAGES.ACCOUNT })
+    cy.get('.userinfo__profile_button').contains('My profile')
+  })
+
+  it('label should be "Profile" when viewing from admin page', () => {
+    cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: baseUser.user_id }  })
+    cy.get('.userinfo__profile_button').contains('Profile')
   })
 })

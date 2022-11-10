@@ -8,12 +8,17 @@ describe('<SearchInput />', () => {
   const onClickSearchCallBack = sinon.spy()
 
   const props = {
-    onClickSearch: onClickSearchCallBack
+    onClickSearch: onClickSearchCallBack,
+    onClickToggleSidebar: () => {},
+    searchString: 'randomValue'
   }
 
   const wrapper = shallow(<SearchWithoutHOC {...props} t={key => key} />)
 
-  describe('intern functions', () => {
+  // FIXME - G.B. - When it was a class component, the tests called the functions of the component from its instance,
+  // now it's a functional component, this can't be done.
+  // See https://github.com/tracim/tracim/issues/5223#issuecomment-1091805956
+  describe.skip('intern functions', () => {
     it('handleNewSearch should change his state', () => {
       const randomValue = 'randomValue'
       wrapper.instance().handleNewSearch({ target: { value: randomValue } })

@@ -2,9 +2,7 @@ import React from 'react'
 import { translate } from 'react-i18next'
 import Radium from 'radium'
 import PropTypes from 'prop-types'
-import { ShareLink } from 'tracim_frontend_lib'
-
-const color = require('color')
+import { IconButton, ShareLink } from 'tracim_frontend_lib'
 
 const UploadFilesManagement = props => {
   const customColor = props.customColor
@@ -13,21 +11,17 @@ const UploadFilesManagement = props => {
       <div className='share_folder_advanced__content__title'>
         {props.t('Public upload links')}
 
-        <button
-          className='share_folder_advanced__content__btnupload btn highlightBtn'
+        <IconButton
+          customClass='share_folder_advanced__content__btnupload'
+          color={customColor}
+          dataCy='share_folder_advanced__content__btnupload'
           key='newUpload'
-          style={{
-            backgroundColor: customColor,
-            ':hover': {
-              backgroundColor: color(customColor).darken(0.15).hex()
-            }
-          }}
+          icon='fas fa-plus-circle'
+          intent='primary'
+          mode='light'
           onClick={props.onClickNewUploadComponent}
-          data-cy='share_folder_advanced__content__btnupload'
-        >
-          {props.t('New')}
-          <i className='fas fa-fw fa-plus-circle' />
-        </button>
+          text={props.t('New')}
+        />
       </div>
 
       {(props.uploadLinkList.length > 0
@@ -61,6 +55,6 @@ UploadFilesManagement.propTypes = {
 }
 
 UploadFilesManagement.defaultProps = {
-  onClickDeleteShareLink: () => {},
+  onClickDeleteShareLink: () => { },
   customColor: ''
 }

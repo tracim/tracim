@@ -51,7 +51,7 @@ const ToDoItem = props => {
       <div className='toDoItem__content'>
         <div className='toDoItem__content__task'>
           {username && !props.isPersonalPage && (
-            <strong>+{username}</strong>
+            <span><strong>+{username}</strong>&nbsp;</span>
           )}
           {props.toDo.raw_content}
         </div>

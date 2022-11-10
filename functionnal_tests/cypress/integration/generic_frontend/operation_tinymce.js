@@ -29,6 +29,23 @@ describe('TinyMce text editor', function () {
     })
   })
 
+
+  describe('Button to add a emoji to the created html document', function () {
+    const fileName = 'testEmoji'
+    before(() => {
+      cy.loginAs('users')
+      cy.createHtmlDocument(fileName, 1)
+      cy.visitPage({ pageName: p.CONTENTS, params: { workspaceId: 1 } })
+    })
+
+    it('Should be visible and enabled', function () {
+      cy.getTag({ selectorName: s.CONTENT_IN_LIST, attrs: { title: fileName } }).click()
+      cy.waitForTinyMCELoaded()
+      cy.get('[title="Emoticons"]').should('be.visible').should('be.enabled')
+    })
+  })
+
+
   describe.skip('Mention autoCompletion', function () {
     describe('Insert a new mention', function () {
       beforeEach(() => {

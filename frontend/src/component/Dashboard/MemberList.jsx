@@ -7,7 +7,8 @@ import {
   Avatar,
   Loading,
   NewMemberForm,
-  ProfileNavigation
+  ProfileNavigation,
+  sortMemberList
 } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
@@ -39,7 +40,7 @@ export const MemberList = (props) => {
                   role={props.role}
                   onChangeRole={props.onChangeRole}
                   onClickBtnValidate={props.onClickValidateNewMember}
-                  emailNotifActivated={props.emailNotifActivated}
+                  isEmailNotifActivated={props.isEmailNotifActivated}
                   canSendInviteNewUser={props.canSendInviteNewUser}
                   userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   autoCompleteClicked={props.autoCompleteClicked}
@@ -65,7 +66,7 @@ export const MemberList = (props) => {
                   )}
 
                   <ul className={classnames('memberlist__list', { withAddBtn: props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
-                    {props.memberList.map((m, index) =>
+                    {props.memberList.sort(sortMemberList).map((m, index) =>
                       <li
                         className={classnames(
                           'memberlist__list__item',

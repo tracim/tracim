@@ -3,6 +3,6 @@ export const agenda = {
   slug: 'agenda',
   isActive: true,
   faIcon: 'fas fa-calendar-alt',
-  hexcolor: '#ff4b3a',
+  hexcolor: '#0b166a',
   config: {}
 }

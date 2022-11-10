@@ -3,6 +3,7 @@ import {
   ADD,
   APPEND,
   CONTENT,
+  EVERY_NOTIFICATION,
   NEXT_PAGE,
   NOTIFICATION,
   NOTIFICATION_LIST,
@@ -20,7 +21,8 @@ import {
   CONTENT_TYPE,
   serialize,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST
 } from 'tracim_frontend_lib'
 
 const defaultNotificationsObject = {
@@ -30,6 +32,8 @@ const defaultNotificationsObject = {
   unreadMentionCount: 0,
   unreadNotificationCount: 0
 }
+
+const userIdIfFiltered = -1
 
 // FIXME - GB - 2020-07-30 - We can't use the global serializer in this case because it doesn't handle nested object
 // See https://github.com/tracim/tracim/issues/3229
@@ -48,8 +52,12 @@ export const serializeNotification = notification => {
       author: serialize(notification.fields.subscription.author, serializeUserProps)
     } : null,
     content: notification.fields.content ? {
-      parentLabel: notification.fields.content.parent ? notification.fields.content.parent.label : null,
-      parentId: notification.fields.content.parent ? notification.fields.content.parent.content_id : null,
+      parentLabel: notification.fields.content.parent
+        ? notification.fields.content.parent.label : null,
+      parentId: notification.fields.content.parent
+        ? notification.fields.content.parent.content_id : null,
+      assignee: notification.fields.content.assignee
+        ? serialize(notification.fields.content.assignee, serializeUserProps) : null,
       ...serialize(notification.fields.content, serializeContentProps)
     } : null,
     created: notification.created,
@@ -74,16 +82,49 @@ function getMainContentId (notification) {
     : notification.content.id
 }
 
-// FIXME - GB - 2022-04-21 - this code is very similar to activityDisplayFilter
-// in withActivity and ActivityList, and can be refactor
-// See https://github.com/tracim/tracim/issues/4677
-function notificationListDisplayFilter (notificationList, spaceList, unreadNotificationCount) {
+/**
+ * FIXME - GB - 2022-04-21 - This code is very similar to activityDisplayFilter
+ * in withActivity and ActivityList, and can be refactor
+ * See https://github.com/tracim/tracim/issues/4677
+ * FIXME - MP - 2022-10-18 - This function allows us to filter when loading more notifications.
+ * However there is a similar loginc in ReduxTlmDispatcher.js when we receive a TLM.
+ * https://github.com/tracim/tracim/issues/5946
+ *
+ * Filter the notification list according to theses filters:
+ * - userId for todo notifications
+ * - spaceList for access request notifications
+ * @param {int} userId Filter the notification list to not display todos notifications if we are not
+ *  assigned to the todo. `userIdIfFiltered` if the list is already filtered
+ * @param {Object[]} notificationList Notification list to filter
+ * @param {Object[]} spaceList Filter the notification to not display access request to spaces that
+ *  are not in the list
+ * @param {int} unreadNotificationCount The current unread notification count
+ * @returns {Object} An object that contains the new notification list filtered and the new unread
+ * notification count
+ */
+function notificationListFilter (
+  userId, notificationList, spaceList, unreadNotificationCount
+) {
   let newUnreadNotificationCount = unreadNotificationCount
   const newNotificationList = notificationList.map((notification) => {
-    const [entityType] = notification.type.split('.')
+    const [entityType, coreType, subType] = notification.type.split('.') // eslint-disable-line no-unused-vars
+
+    // INFO - MP - 2022-10-18 - Since we are filtering twice, the userId verification is if we are
+    // doing this function in the `addNotification` case, which in this case is already filtered
+    if (
+      userId !== userIdIfFiltered &&
+      entityType === TLM_ET.CONTENT && subType === TLM_ST.TODO &&
+      notification.content.assignee.userId !== userId
+    ) {
+      if (!notification.read) newUnreadNotificationCount--
+      return null
+    }
 
     if (
-      (entityType === TLM_ET.SHAREDSPACE_MEMBER || entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION) &&
+      (
+        entityType === TLM_ET.SHAREDSPACE_MEMBER ||
+        entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION
+      ) &&
       !(spaceList.find(space => space.id === notification.workspace.id))
     ) {
       if (!notification.read) newUnreadNotificationCount--
@@ -91,6 +132,7 @@ function notificationListDisplayFilter (notificationList, spaceList, unreadNotif
     }
     return notification
   })
+
   return { list: newNotificationList.filter(notification => !!notification), unreadNotificationCount: newUnreadNotificationCount }
 }
 
@@ -101,7 +143,12 @@ export default function notificationPage (state = defaultNotificationsObject, ac
         .map(notification => serializeNotification(notification))
       return {
         ...state,
-        ...notificationListDisplayFilter([...state.list, ...notificationList], action.spaceList, state.unreadNotificationCount)
+        ...notificationListFilter(
+          action.userId,
+          [...state.list, ...notificationList],
+          action.spaceList,
+          state.unreadNotificationCount
+        )
       }
     }
 
@@ -111,7 +158,15 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       return {
         ...state,
         unreadMentionCount: newUnreadMentionCount,
-        ...notificationListDisplayFilter(sortByCreatedDate([...state.list, notification]), action.spaceList, state.unreadNotificationCount + 1)
+        // FIXME - MP - 2022-10-18 - Remove the function here to keep the logic in
+        // ReduxTlmDispatcher.jsx
+        // https://github.com/tracim/tracim/issues/5946
+        ...notificationListFilter(
+          userIdIfFiltered,
+          sortByCreatedDate([...state.list, notification]),
+          action.spaceList,
+          state.unreadNotificationCount + 1
+        )
       }
     }
 
@@ -128,15 +183,14 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    case `${READ}/${NOTIFICATION}`: {
-      const notification = state.list.find(notification => notification.id === action.notificationId && !notification.read)
+    case `${READ}/${NOTIFICATION_LIST}`: {
+      const notificationList = state.list.filter(n => !n.read && action.notificationIdList.includes(n.id))
 
-      if (!notification) return state
+      if (notificationList.length === 0) return state
 
-      const newUnreadMentionCount = (notification.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`) ? state.unreadMentionCount - 1 : state.unreadMentionCount
-      const replaceList = state.list.map(no => no.id === action.notificationId ? { ...notification, read: true } : no)
-
-      const newUnreadNotificationCount = state.unreadNotificationCount - 1
+      const replaceList = state.list.map(n => action.notificationIdList.includes(n.id) ? { ...n, read: true } : n)
+      const newUnreadMentionCount = replaceList.filter(n => !n.read && n.type === `${TLM_ET.MENTION}.${TLM_CET.CREATED}`).length
+      const newUnreadNotificationCount = replaceList.filter(n => !n.read).length
 
       return {
         ...state,
@@ -146,7 +200,7 @@ export default function notificationPage (state = defaultNotificationsObject, ac
       }
     }
 
-    case `${READ}/${NOTIFICATION_LIST}`: {
+    case `${READ}/${EVERY_NOTIFICATION}`: {
       const notificationList = state.list.map(notification => ({ ...notification, read: true }))
       return { ...state, list: uniqBy(notificationList, 'id'), unreadMentionCount: 0, unreadNotificationCount: 0 }
     }

@@ -1,10 +1,15 @@
 @import "../../css/Variable.styl"
 
+.slowblink
+  animation blink-animation 2.5s steps(100, start) 2
+@keyframes blink-animation
+  to
+    opacity 0
+
 .pageWrapperGeneric
   display flex
   flex-direction column
   height 100%
-
   &__header
     display flex
   &__content
@@ -16,7 +21,6 @@
   padding-inline-end pageSpacing
   width 100%
   background-color offWhite
-  border-bottom borderStyle
   min-height headerHeight
   display flex
   flex-direction column
@@ -31,6 +35,13 @@
       overflow hidden
       text-overflow ellipsis
       white-space nowrap
+    &__emailwarning
+      font-size standardFontSize
+      margin-inline-start standardSpacing
+  &__specificBtn
+    margin-inline-start standardSpacing
+    &:empty
+      display none
   &__subtitle
     margin-top 15px
 
@@ -66,9 +77,6 @@
 @media (max-width: max-xs)
   .pageWrapperGeneric
     display block
-    &__header
-      display block
-      margin-top 60px
     &__content
       margin 0
   .pageContentGeneric

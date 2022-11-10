@@ -1,5 +1,4 @@
 import { PAGES } from '../../support/urls_commands'
-import { SELECTORS } from '../../support/generic_selector_commands'
 
 describe('Create tags', () => {
   const fileTitle = 'FileForTags'

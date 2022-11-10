@@ -34,6 +34,11 @@ describe('<Gallery />', () => {
             search: `?folder_ids=${folderId}`
           }
         },
+        system: {
+          config: {
+            email_notification_activated: false
+          }
+        },
         translation: ''
       },
       loggedUser: {

@@ -40,6 +40,14 @@ export class PersonalRecentActivities extends React.Component {
     this.buildBreadcrumbs()
   }
 
+  /**
+   * Function to handle TLM which will be triggered on every global TLM
+   *
+   * See also WorspaceRecentActivities.handleTlm
+   * @async
+   * @param {TLM} data
+   * @returns
+   */
   handleTlm = async (data) => {
     const { props } = this
     if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
@@ -93,6 +101,7 @@ export class PersonalRecentActivities extends React.Component {
           icon='far fa-newspaper'
           iconTooltip={props.t('Recent activities')}
           breadcrumbsList={props.breadcrumbs}
+          isEmailNotifActivated={props.system.config.email_notification_activated}
         />
         <PageContent>
           <ActivityList
@@ -119,7 +128,7 @@ PersonalRecentActivities.propTypes = {
   onEventClicked: PropTypes.func
 }
 
-const mapStateToProps = ({ lang, user, userActivity, breadcrumbs, workspaceList }) => ({ lang, user, activity: userActivity, breadcrumbs, workspaceList })
+const mapStateToProps = ({ lang, user, userActivity, breadcrumbs, system, workspaceList }) => ({ lang, user, activity: userActivity, breadcrumbs, system, workspaceList })
 const component = withActivity(
   TracimComponent(PersonalRecentActivities),
   setUserActivityList,

@@ -1,18 +1,18 @@
-
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-07-18 13:54+0200\n"
-"PO-Revision-Date: 2022-06-15 08:19+0000\n"
-"Last-Translator: Paul de Wit <pdwonline@goatnet.nl>\n"
+"PO-Revision-Date: 2022-08-31 08:22+0000\n"
+"Last-Translator: gbonaspetti <gbonaspetti@hotmail.com>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/tracim/backend/nl/>"
+"\n"
 "Language: nl\n"
-"Language-Team: Dutch "
-"<https://hosted.weblate.org/projects/tracim/backend/nl/>\n"
-"Plural-Forms: nplurals=2; plural=n != 1\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.14.1-dev\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:688
@@ -103,7 +103,7 @@ msgstr ""
 
 #: tracim_backend/lib/core/content.py:755
 msgid "version {} (revision {}) on {}"
-msgstr ""
+msgstr "versie {} (revision {}) on {}"
 
 #: tracim_backend/lib/core/content.py:781
 #, fuzzy
@@ -113,7 +113,7 @@ msgstr "powered door Tracim software"
 
 #: tracim_backend/lib/core/content.py:782
 msgid "Summary"
-msgstr ""
+msgstr "Samenvatting"
 
 #: tracim_backend/lib/core/content.py:2102
 msgid "New folder"
@@ -394,4 +394,3 @@ msgid ""
 msgstr ""
 "Deze upload is beveiligd met een wachtwoord. Neem contact op met (<a "
 "href=\"mailto:{emitter_email}\">{username}</a>) voor toegang."
-
