@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   PAGE,
   PROFILE,
@@ -37,7 +37,7 @@ export const onlyManager = (userToEditId, member, memberList) => {
 }
 
 export const fillMemberList = async (space) => {
-  const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.id))
+  const fetchMemberList = await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, space.id))
   return {
     ...space,
     memberList: fetchMemberList.body.map(member => serializeMember(member)) || []

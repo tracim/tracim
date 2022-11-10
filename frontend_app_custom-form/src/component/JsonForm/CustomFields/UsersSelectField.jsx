@@ -3,7 +3,7 @@ import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
 import {
   handleFetchResult,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   sendGlobalFlashMessage
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
@@ -28,7 +28,7 @@ export class UsersSelectField extends React.Component {
   fetchUsers = async () => {
     const formContext = this.props.formContext
     if (formContext.apiUrl === undefined && formContext.workspaceId === undefined) return
-    const fetchUsersResponse = await handleFetchResult(await getWorkspaceMemberList(formContext.apiUrl, formContext.workspaceId))
+    const fetchUsersResponse = await handleFetchResult(await getSpaceMemberList(formContext.apiUrl, formContext.workspaceId))
     switch (fetchUsersResponse.apiResponse.status) {
       case 200 :
         this.setState({
