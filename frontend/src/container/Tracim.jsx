@@ -27,7 +27,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   PROFILE,
   formatAbsoluteDate,
@@ -467,7 +467,7 @@ export class Tracim extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 
