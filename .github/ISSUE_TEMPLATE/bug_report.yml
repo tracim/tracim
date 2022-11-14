@@ -14,7 +14,7 @@ body:
       label: Tracim version
       description: >
         Specify the version of Tracim you are using.
-        You can find the version of Tracim you are using in the footer of any Tracim page.
+        You can find the version of Tracim used, at the bottom of the sidebar.
       placeholder: 4.4.0, 4.4.0_build_098
     validations:
       required: true
@@ -61,6 +61,7 @@ body:
         - Microsoft Edge
         - Opera
         - Safari
+        - Other
   - type: dropdown
     id: devices
     attributes:
@@ -69,13 +70,15 @@ body:
       options:
         - Desktop
         - Smartphone
+        - Tablet
+        - Other
   - type: textarea
     id: related-pr
     attributes:
       label: Related PR
       description: |
         Let us know if this is related to an open pull request.
-        Leave empty if there is no related PR.
+        Leave empty if there is no related PR or if you don't know.
       placeholder: PR #0000
     validations:
       required: false
