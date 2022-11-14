@@ -12,6 +12,11 @@
     padding standardSpacing
     width 140px
     text-align center
+  &__modif
+    flex-grow 2
+    padding 10px
+  &__actions
+    padding 10px
   &__search
     display flex
     flex-grow 5
@@ -26,3 +31,13 @@
   .content__header__status
     width 70px
     text-align end
+
+@media (max-width: max-sm)
+  .content__header
+    &__actions
+      display none
+
+@media (max-width: max-md)
+  .content__header
+      &__modif
+        display none

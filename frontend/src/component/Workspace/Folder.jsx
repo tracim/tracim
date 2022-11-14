@@ -99,20 +99,15 @@ class Folder extends React.Component {
               </div>
             </div>
 
+            <div className='folder__header__lastModification' title={props.lastModificationFormated}>
+              {props.lastModificationTime}
+            </div>
+
             <div className='folder__header__button'>
               <div className='folder__header__button__addbtn'>
                 {props.userRoleIdInWorkspace >= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
                   <DropdownMenu
-                    buttonOpts={
-                      <span>
-                        <span className='folder__header__button__addbtn__text-desktop'>
-                          {props.t('Create in folder')}
-                        </span>
-                        <span className='folder__header__button__addbtn__text-responsive'>
-                          <i className='folder__header__button__addbtn__text-responsive__iconplus fas fa-plus' />
-                        </span>
-                      </span>
-                    }
+                    buttonIcon='fas fa-plus'
                     buttonTooltip={props.t('Create in folder')}
                     buttonCustomClass='folder__header__button__addbtn__text primaryColorBgHover'
                     isButton
@@ -300,7 +295,9 @@ Folder.propTypes = {
   folderData: PropTypes.object,
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,
-  isLast: PropTypes.bool.isRequired
+  isLast: PropTypes.bool.isRequired,
+  lastModificationFormated: PropTypes.string,
+  lastModificationTime: PropTypes.string
 }
 
 Folder.defaultProps = {

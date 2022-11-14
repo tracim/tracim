@@ -75,8 +75,12 @@ class ContentItem extends React.Component {
             <FilenameWithBadges file={props} isTemplate={props.isTemplate} customClass='content__name' />
           </div>
 
+          <div className='content__lastModification' title={props.lastModificationFormated}>
+            {props.lastModificationTime}
+          </div>
+
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (
-            <div className='d-none d-md-block' title={props.t('Actions')}>
+            <div className='d-none d-md-block content__actions' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
@@ -163,7 +167,9 @@ ContentItem.propTypes = {
   read: PropTypes.bool,
   statusSlug: PropTypes.string.isRequired,
   urlContent: PropTypes.string,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  lastModificationFormated: PropTypes.string,
+  lastModificationTime: PropTypes.string
 }
 
 ContentItem.defaultProps = {

@@ -82,6 +82,14 @@ folderopen()
       align-items center
       flex 1
       width 0 // INFO - CH - 2019-06-06 - this allows the text-overflow ellipsis
+    &__lastModification
+      flex 1
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+      margin-inline-end standardSpacing
+      color fontColor
+      padding textSpacing
     &__icon
       flex-grow 0
       padding 0 standardSpacing
@@ -120,12 +128,6 @@ folderopen()
           margin-inline-end standardSpacing
           &::after
             margin-inline-start 20px
-          &-desktop
-            display inline
-          &-responsive
-            display none
-            &__iconplus.fas.fa-plus
-              margin 0
       .addbtn__subdropdown
         padding 0
     &__status
@@ -144,14 +146,14 @@ folderopen()
 @media (max-width: max-xs)
   .folder
     &__header
-      &__button__addbtn__text
-        margin-inline-end standardSpacing
       &__status
         display none
       &__button__addbtn__text
-        &-desktop
-          display none
-        &-responsive
-          display inline
+        margin-inline-end standardSpacing
         &::after
           display none // hide the dropdown triangle
+
+@media (max-width: max-md)
+  .folder__header
+    &__lastModification
+      display none

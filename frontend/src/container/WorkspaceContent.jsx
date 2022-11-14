@@ -33,7 +33,9 @@ import {
   PAGE,
   TracimComponent,
   IconButton,
-  sendGlobalFlashMessage
+  sendGlobalFlashMessage,
+  displayDistanceDate,
+  formatAbsoluteDate
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -737,7 +739,7 @@ export class WorkspaceContent extends React.Component {
               </div>
 
               <div className='workspace__content__file_and_folder folder__content active'>
-                <ContentItemHeader />
+                <ContentItemHeader showLastEdit />
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
                   <ShareFolder
@@ -777,6 +779,8 @@ export class WorkspaceContent extends React.Component {
                         availableApp={createContentAvailableApp}
                         folderData={content}
                         lang={props.user.lang}
+                        lastModificationTime={displayDistanceDate(content.modified, props.user.lang)}
+                        lastModificationFormated={formatAbsoluteDate(content.modified, props.user.lang)}
                         workspaceContentList={filteredWorkspaceContentList}
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
@@ -804,6 +808,8 @@ export class WorkspaceContent extends React.Component {
                         parentId={content.parentId}
                         label={content.label}
                         fileName={content.fileName}
+                        lastModificationTime={displayDistanceDate(content.modified, props.user.lang)}
+                        lastModificationFormated={formatAbsoluteDate(content.modified, props.user.lang)}
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
                         isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
