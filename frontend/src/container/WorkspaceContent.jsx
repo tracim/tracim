@@ -737,7 +737,7 @@ export class WorkspaceContent extends React.Component {
               </div>
 
               <div className='workspace__content__file_and_folder folder__content active'>
-                <ContentItemHeader showLastEdit />
+                <ContentItemHeader showLastModification />
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
                   <ShareFolder
