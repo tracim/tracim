@@ -1,3 +1,9 @@
+/*  HACK - ML - 2022-15-11 - This is the width of the createInFolderButton. This is used to align folder's and content's
+  * lastModification column. This will be removed in a content listings refactor
+  * https://github.com/tracim/tracim/issues/6034
+  */
+createInFolderButtonWidth = 74px
+
 .contentItem
   position relative
   background-color offWhite
@@ -37,7 +43,7 @@
     &__icon
       font-size bigIconSize
   &__actions
-    margin-inline-start 74px
+    margin-inline-start createInFolderButtonWidth
 
 @media (max-width: max-xs)
   .content
