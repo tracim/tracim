@@ -6,7 +6,7 @@ import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
-import { DropdownMenu, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
+import { displayDistanceDate, DropdownMenu, formatAbsoluteDate, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
   sortContentList,
@@ -198,6 +198,8 @@ class Folder extends React.Component {
                 type={content.type}
                 fileName={content.fileName}
                 fileExtension={content.fileExtension}
+                lastModificationTime={displayDistanceDate(content.modified, props.lang)}
+                lastModificationFormated={formatAbsoluteDate(content.modified, props.lang)}
                 faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
                 isShared={content.activedShares !== 0}
                 isTemplate={content.isTemplate}
@@ -297,7 +299,8 @@ Folder.propTypes = {
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired,
   lastModificationFormated: PropTypes.string,
-  lastModificationTime: PropTypes.string
+  lastModificationTime: PropTypes.string,
+  lang: PropTypes.string
 }
 
 Folder.defaultProps = {
