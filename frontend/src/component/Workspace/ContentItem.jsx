@@ -177,10 +177,10 @@ ContentItem.propTypes = {
   statusSlug: PropTypes.string.isRequired,
   urlContent: PropTypes.string,
   userRoleIdInWorkspace: PropTypes.number,
-  modified: PropTypes.string,
-  lang: PropTypes.string,
-  currentRevisionType: PropTypes.string,
-  lastModifier: PropTypes.object
+  modified: PropTypes.string.isRequired,
+  lang: PropTypes.string.isRequired,
+  currentRevisionType: PropTypes.string.isRequired,
+  lastModifier: PropTypes.object.isRequired
 }
 
 ContentItem.defaultProps = {

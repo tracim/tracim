@@ -314,10 +314,10 @@ Folder.propTypes = {
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired,
-  modified: PropTypes.string,
-  lang: PropTypes.string,
-  currentRevisionType: PropTypes.string,
-  lastModifier: PropTypes.object
+  modified: PropTypes.string.isRequired,
+  lang: PropTypes.string.isRequired,
+  currentRevisionType: PropTypes.string.isRequired,
+  lastModifier: PropTypes.object.isRequired
 }
 
 Folder.defaultProps = {
