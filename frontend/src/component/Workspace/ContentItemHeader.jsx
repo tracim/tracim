@@ -21,10 +21,10 @@ export const FileItemHeader = props => {
           </div>
         </div>
       )}
-      /*  INFO - ML - 2022-15-11 - 'Last Modification' appears twice in the code because depending
-        * on the context it has a different positioning and class
-        */
       {props.showLastEdit && !props.showSearchDetails && (
+        /*  INFO - ML - 2022-15-11 - 'Last Modification' appears twice in the code because depending
+          * on the context it has a different positioning and class
+          */
         <div className='content__header__modif'>
           {props.t('Last Modification')}
         </div>
