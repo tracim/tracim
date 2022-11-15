@@ -6,12 +6,19 @@ import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
-import { displayDistanceDate, DropdownMenu, formatAbsoluteDate, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
+import {
+  DropdownMenu,
+  Icon,
+  PAGE,
+  ROLE,
+  TimedEvent
+} from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
   sortContentList,
   SHARE_FOLDER_ID,
-  ANCHOR_NAMESPACE
+  ANCHOR_NAMESPACE,
+  getRevisionTypeLabel
 } from '../../util/helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
@@ -99,9 +106,16 @@ class Folder extends React.Component {
               </div>
             </div>
 
-            <div className='folder__header__lastModification' title={props.lastModificationFormated}>
-              {props.lastModificationTime}
-            </div>
+            <TimedEvent
+              customClass='content__lastModification'
+              operation={getRevisionTypeLabel(props.currentRevisionType, props.t)}
+              date={props.modified}
+              lang={props.lang}
+              author={{
+                publicName: props.lastModifier.public_name,
+                userId: props.lastModifier.user_id
+              }}
+            />
 
             <div className='folder__header__button'>
               <div className='folder__header__button__addbtn'>
@@ -198,8 +212,10 @@ class Folder extends React.Component {
                 type={content.type}
                 fileName={content.fileName}
                 fileExtension={content.fileExtension}
-                lastModificationTime={displayDistanceDate(content.modified, props.lang)}
-                lastModificationFormated={formatAbsoluteDate(content.modified, props.lang)}
+                modified={content.modified}
+                lang={props.lang}
+                currentRevisionType={content.currentRevisionType}
+                lastModifier={content.lastModifier}
                 faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
                 isShared={content.activedShares !== 0}
                 isTemplate={content.isTemplate}
@@ -298,9 +314,10 @@ Folder.propTypes = {
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired,
-  lastModificationFormated: PropTypes.string,
-  lastModificationTime: PropTypes.string,
-  lang: PropTypes.string
+  modified: PropTypes.string,
+  lang: PropTypes.string,
+  currentRevisionType: PropTypes.string,
+  lastModifier: PropTypes.object
 }
 
 Folder.defaultProps = {
