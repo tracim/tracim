@@ -16,16 +16,16 @@ export const FileItemHeader = props => {
           <div className='content__header__search__path'>
             {props.t('Path')}
           </div>
-          <div className='content__header__search__modif'>
+          <div className='content__header__search__modification'>
             {props.t('Last Modification')}
           </div>
         </div>
       )}
-      {props.showLastEdit && !props.showSearchDetails && (
+      {props.showLastModification && !props.showSearchDetails && (
         /*  INFO - ML - 2022-15-11 - 'Last Modification' appears twice in the code because depending
           * on the context it has a different positioning and class
           */
-        <div className='content__header__modif'>
+        <div className='content__header__modification'>
           {props.t('Last Modification')}
         </div>
       )}
@@ -45,10 +45,10 @@ export default translate()(FileItemHeader)
 
 FileItemHeader.propTypes = {
   showSearchDetails: PropTypes.bool,
-  showLastEdit: PropTypes.bool
+  showLastModification: PropTypes.bool
 }
 
 FileItemHeader.defaultProps = {
   showSearchDetails: false,
-  showLastEdit: false
+  showLastModification: false
 }
