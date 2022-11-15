@@ -194,6 +194,10 @@ class Folder extends React.Component {
                 onClickFolder={props.onClickFolder}
                 onClickCreateContent={props.onClickCreateContent}
                 onDropMoveContentItem={props.onDropMoveContentItem}
+                modified={content.modified}
+                lang={props.lang}
+                currentRevisionType={content.currentRevisionType}
+                lastModifier={content.lastModifier}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
                 onSetFolderRead={props.onSetFolderRead}
