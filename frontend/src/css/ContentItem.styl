@@ -33,6 +33,14 @@ createInFolderButtonWidth = 74px
     overflow hidden
     text-overflow ellipsis
     color fontColor
+  &__lastModification
+    flex 1
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    margin-inline-end standardSpacing
+    color fontColor
+    padding textSpacing
   &__status
     flex-grow 0
     width 140px
@@ -44,6 +52,11 @@ createInFolderButtonWidth = 74px
       font-size bigIconSize
   &__actions
     margin-inline-start createInFolderButtonWidth
+
+@media (max-width: max-md)
+  .content
+    &__lastModification
+      display none
 
 @media (max-width: max-xs)
   .content

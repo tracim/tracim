@@ -30,7 +30,7 @@ export const ContentItemSearch = props => {
         {props.path}
       </div>
 
-      <div className='content__lastModification' title={props.lastModificationFormated}>
+      <div className='content__search__lastModification' title={props.lastModificationFormated}>
         <Avatar
           size={AVATAR_SIZE.SMALL}
           user={props.lastModificationAuthor}
