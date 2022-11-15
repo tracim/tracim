@@ -107,7 +107,7 @@ class Folder extends React.Component {
             </div>
 
             <TimedEvent
-              customClass='folder__lastModification'
+              customClass='folder__header__lastModification'
               operation={getRevisionTypeLabel(props.currentRevisionType, props.t)}
               date={props.modified}
               lang={props.lang}
