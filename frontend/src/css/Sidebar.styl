@@ -61,9 +61,9 @@ spacingInsideMenu = 40px
       border-inline-start-width borderWhenActive
       font-weight bold
       &.sidebar__item__inside_menu
-        padding-inline-start spacingInsideMenu - 5px
+        padding-inline-start spacingInsideMenu - borderWhenActive
       &.sidebar__item__space
-        padding-inline-start spacingInsideMenu + 5px
+        padding-inline-start spacingInsideMenu + standardSpacing - borderWhenActive
       &.sidebar__search
         padding-inline-start textSpacing
     &__name
@@ -81,7 +81,7 @@ spacingInsideMenu = 40px
         padding-inline-start standardSpacing
     &__space
       display flex
-      padding-inline-start spacingInsideMenu + 10px
+      padding-inline-start spacingInsideMenu + standardSpacing
       align-items center
       &__type
         padding-inline-start textSpacing
@@ -93,7 +93,7 @@ spacingInsideMenu = 40px
       &:hover
         background-color var(--sidebarColorDarken)
     &__withoutChildren
-      padding-inline-start 20px
+      padding-inline-start 20px + standardSpacing
     &__foldChildren
       height 100%
       padding-inline-end 0
@@ -231,7 +231,6 @@ spacingInsideMenu = 40px
       & .sidebar__footer__text
         display none
     & .sidebar__title__button
-      padding-inline-start borderWhenActive
       justify-content center
       & > span
         display none

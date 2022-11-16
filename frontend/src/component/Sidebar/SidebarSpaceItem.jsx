@@ -161,6 +161,7 @@ class SidebarSpaceItem extends React.Component {
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
             onClick={(e) => {
               e.preventDefault()
+              e.stopPropagation()
               props.onToggleFoldChildren(props.spaceId)
             }}
           />
