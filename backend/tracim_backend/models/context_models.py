@@ -850,10 +850,12 @@ class LiveMessageQuery(BasePaginatedQuery):
 
 class UserMessagesMarkAsReadQuery(object):
     def __init__(
-        self, content_ids: str = "", parent_ids: str = "",
+        self, content_ids: str = "", event_ids: str = "", parent_ids: str = "", space_ids: str = "",
     ):
         self.content_ids = string_to_list(content_ids, ",", int)
+        self.event_ids = string_to_list(event_ids, ",", int)
         self.parent_ids = string_to_list(parent_ids, ",", int)
+        self.space_ids = string_to_list(space_ids, ",", int)
 
 
 class UserMessagesSummaryQuery(object):

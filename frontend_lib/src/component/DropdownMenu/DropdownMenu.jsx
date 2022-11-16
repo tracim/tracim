@@ -12,7 +12,7 @@ const DropdownMenu = props => {
         className={classnames(
           'btn dropdown-toggle',
           'dropdownMenuButton',
-          props.isButton ? 'primaryColorBorder' : 'transparentButton',
+          { transparentButton: !props.isButton },
           props.buttonCustomClass
         )}
         data-cy={props.buttonDataCy}

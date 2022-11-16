@@ -29,11 +29,7 @@
         font-size metadataFontSize
       .autocomplete
         position absolute
-        width 300px
-        background-color offWhite
-        border-radius standardBorderRadius
-        border-width 1px
-        border-style solid
+        min-width 300px
         z-index 1
         &__item
           display flex
@@ -41,7 +37,7 @@
           cursor pointer
           padding 5px 8px
           &:hover
-            background-color: grey-hover
+            background-color lightGrey1
           &:first-child
             border-start-start-radius 10px
             border-start-end-radius 10px
@@ -71,7 +67,6 @@
                 color grey
                 font-size metadataFontSize
     .name__input
-      border borderStyle
       border-radius standardBorderRadius
       padding standardSpacing
       width 100%

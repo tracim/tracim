@@ -147,7 +147,6 @@
   "You aren't member of any space yet": "Todavía no es miembro de un espacio",
   "Forgot password": "Contraseña olvidada",
   "Have a good day!": "¡ Que tenga un buen día !",
-  "Please select a space in the left sidebar by clicking on it": "Por favor seleccionar un espacio en la barra lateral izquierda haciendo clic en él",
   "Did you forget your password?": "¿Olvidó su contraseña?",
   "Confirm": "Confirmar",
   "We are going to send you an email containing a link to reset your password": "Recibirá un correo electrónico con un enlace para restablecer su contraseña",
@@ -467,7 +466,6 @@
   "The file is too big": "El archivo es demasiado grande",
   "You cannot change this member role because there are no other space managers.": "No se puede modificar esta función de miembro porque no hay otros gestores de espacios.",
   "You can also import your file by clicking here": "También puede importar su archivo haciendo clic aquí",
-  "Configuration links": "Enlaces de configuración",
   "Unknown comment": "Comentario desconocido",
   "{{author}} deleted {{task}} on {{content}}{{workspaceInfo}}": "{{author}} borró {{task}} en {{content}}{{workspaceInfo}}",
   "Task deleted": "Tarea eliminada",
@@ -583,5 +581,11 @@
   "Show user menu": "Mostrar el menú de usuario",
   "Participate": "Participar",
   "My agendas": "Mis agendas",
-  "My profile": "Mi perfil"
+  "My profile": "Mi perfil",
+  "My Spaces": "Mis espacios",
+  "My Password": "Mi contraseña",
+  "My Configuration links": "Mis enlaces de configuración",
+  "Error while marking the notification group as read": "",
+  "Error while marking notifications as read": "",
+  "Open emoticons menu": ""
 }

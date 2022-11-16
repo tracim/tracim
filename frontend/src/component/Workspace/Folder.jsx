@@ -106,7 +106,7 @@ class Folder extends React.Component {
                     buttonOpts={
                       <span>
                         <span className='folder__header__button__addbtn__text-desktop'>
-                          {`${props.t('Create in folder')}...`}
+                          {props.t('Create in folder')}
                         </span>
                         <span className='folder__header__button__addbtn__text-responsive'>
                           <i className='folder__header__button__addbtn__text-responsive__iconplus fas fa-plus' />
@@ -114,7 +114,7 @@ class Folder extends React.Component {
                       </span>
                     }
                     buttonTooltip={props.t('Create in folder')}
-                    buttonCustomClass='folder__header__button__addbtn__text outlineTextBtn primaryColorBgHover primaryColorBorderDarkenHover'
+                    buttonCustomClass='folder__header__button__addbtn__text primaryColorBgHover'
                     isButton
                   >
                     {folderAvailableApp.map(app =>

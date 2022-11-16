@@ -12,7 +12,7 @@ export const ExtandedAction = props => {
     <DropdownMenu
       buttonIcon='fas fa-ellipsis-h'
       buttonTooltip={props.t('Actions')}
-      buttonCustomClass='extandedaction outlineTextBtn primaryColorBorder primaryColorBgHover primaryColorBorderDarkenHover'
+      buttonCustomClass='extandedaction primaryColorBgHover'
       buttonDataCy='extended_action'
       isButton
     >

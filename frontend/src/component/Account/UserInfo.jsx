@@ -9,6 +9,7 @@ import {
   AVATAR_SIZE,
   Popover
 } from 'tracim_frontend_lib'
+import PropTypes from 'prop-types'
 
 require('./UserInfo.styl')
 
@@ -68,10 +69,22 @@ export const UserInfo = (props) => {
         </div>
       </div>
       <Link className='userinfo__profile_button' to={PAGE.PUBLIC_PROFILE(props.user.userId)}>
-        <IconButton text={props.t('My profile')} type='button' icon='fas fa-user' />
+        <IconButton
+          text={props.profileButtonText}
+          type='button' icon='fas fa-user'
+        />
       </Link>
     </div>
   )
+}
+
+UserInfo.propTypes = {
+  user: PropTypes.object.isRequired,
+  profileButtonText: PropTypes.string
+}
+
+UserInfo.defaultProps = {
+  profileButtonText: 'Profile'
 }
 
 export default translate()(UserInfo)

@@ -221,7 +221,7 @@ import {
   getReservedUsernames,
   getSpaceMemberFromId,
   getWorkspaceDetail,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   deleteWorkspace,
   getContentTypeList,
   putUserConfiguration,
@@ -236,7 +236,7 @@ import {
   getContentComment,
   getFileChildContent,
   getContent,
-  getWorkspaceContent,
+  getSpaceContent,
   getHtmlDocTranslated,
   getCommentTranslated,
   getGenericWorkspaceContent,
@@ -246,6 +246,11 @@ import {
   getFileRevisionPreviewInfo,
   putToDo
 } from './action.async.js'
+
+export {
+  usePublishLifecycle,
+  withUsePublishLifecycle
+} from './customHooks.jsx'
 
 const customEventReducer = ({ detail: { type, data } }) => {
   switch (type) {
@@ -433,7 +438,7 @@ export {
   getUsernameAvailability,
   getReservedUsernames,
   getWorkspaceDetail,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   deleteWorkspace,
   getContentTypeList,
   putUserConfiguration,
@@ -467,7 +472,7 @@ export {
   getContent,
   DistanceDate,
   Icon,
-  getWorkspaceContent,
+  getSpaceContent,
   PAGE,
   PopupUploadFile,
   PopupProgressUpload,

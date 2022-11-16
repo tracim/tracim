@@ -9,7 +9,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   appContentFactory,
   addAllResourceI18n,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   PopinFixed,
   PopinFixedContent,
@@ -270,7 +270,7 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
-    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, state.content.workspace_id, false))
+    const fetchWorkspaceMember = handleFetchResult(await getSpaceMemberList(state.config.apiUrl, state.content.workspace_id, false))
     const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])

@@ -22,7 +22,7 @@ function onClick (e) {
 const HTMLContent = (props) => {
   useEffect(() => {
     Prism.highlightAll()
-  }, [])
+  })
 
   return (
     <article

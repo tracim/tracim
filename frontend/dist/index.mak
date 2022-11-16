@@ -53,9 +53,9 @@
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
       ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}; }
       <% html_class = ".primaryColorBg{state}Opacity"%>
-      ${html_class.replace("{state}", "")} { ${param}: ${primary}33; }
-      ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}33; }
-      ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}33; }
+      ${html_class.replace("{state}", "")} { ${param}: ${primary}26; }
+      ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}26; }
+      ${html_class.replace("{state}", "Lighten")} { ${param}: ${primary_color_lighten_str}26; }
       <% html_class = ".primaryColorBg{state}Hover:hover"%>
       ${html_class.replace("{state}", "")} { ${param}: ${primary}; }
       ${html_class.replace("{state}", "Darken")} { ${param}: ${primary_color_darken_str}; }
@@ -93,17 +93,17 @@
 
     <style nonce="${csp_nonce}">
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Regular.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-Regular.ttf");
       }
       @font-face {
-        font-family: "Quicksand";
-        src: url("/assets/font/Quicksand/Quicksand-Bold.ttf");
+        font-family: "Nunito";
+        src: url("/assets/font/Nunito/Nunito-Bold.ttf");
         font-weight: bold;
       }
 
       body {
-        font-family: Quicksand;
+        font-family: Nunito;
       }
     </style>
 
@@ -150,6 +150,10 @@
     % for plugin in glob("assets/tinymce-5.10.3/js/tinymce/plugins/*/plugin.min.js"):
     <script type="text/javascript" src="/${plugin}?token=${cache_token}" nonce="${csp_nonce}"></script>
     %endfor
+
+    ## INFO - CH - 20221108 - hardcode the emoji library script because otherwise, it is loaded on the fly by the emoticons plugin
+    ## but doesn't include the cache_token and the csp_nonce. The script would then be blocked by browsers
+    <script type="text/javascript" src="/assets/tinymce-5.10.3/js/tinymce/plugins/emoticons/js/emojis.min.js?token=${cache_token}" nonce="${csp_nonce}"></script>
 
     % for lang in glob("assets/tinymce-5.10.3/js/tinymce/langs/*.js"):
     <script type="text/javascript" src="/${lang}?token=${cache_token}" nonce="${csp_nonce}"></script>

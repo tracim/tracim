@@ -1,7 +1,6 @@
 @import '../../css/Variable.styl'
 
 .DisplayFileToUpload
-  // color mediumDarkGrey
   width max-content
   &:hover
     color fontColor
@@ -18,15 +17,11 @@
     & > &__iconFile, & > &__listIcon
       font-size standardFontSize
     &__listIcon
-      color mediumDarkGrey
+      color darkGrey1
   &__popover__item
     display flex
     align-items center
-    padding-top 8px
-    padding-bottom 8px
-    padding-inline 12px
-    &:not(:last-child)
-      border-bottom borderStyle
+    padding-top standardSpacing
     & > &__iconFile, & > &__text
       margin-inline-end 5px
     &__iconFile.inError
