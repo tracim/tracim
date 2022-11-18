@@ -29,13 +29,14 @@ import {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
+  IconButton,
   PAGE,
+  putFoldersAtListBeginning,
+  sendGlobalFlashMessage,
   SORT_BY,
   SORT_ORDER,
   sortListBy,
-  TracimComponent,
-  IconButton,
-  sendGlobalFlashMessage
+  TracimComponent
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -463,7 +464,7 @@ export class WorkspaceContent extends React.Component {
       props.user.lang
     )
 
-    this.setState({ displayContentList: sortedList })
+    this.setState({ displayContentList: putFoldersAtListBeginning(sortedList) })
   }
 
   handleClickTitleToSort = (criteria) => {
@@ -472,7 +473,7 @@ export class WorkspaceContent extends React.Component {
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayContentList: sortListBy(prev.displayContentList, criteria, sortOrder, this.props.user.lang),
+        displayContentList: putFoldersAtListBeginning(sortListBy(prev.displayContentList, criteria, sortOrder, this.props.user.lang)),
         selectedSortCriteria: criteria,
         sortOrder: sortOrder
       }
@@ -836,6 +837,8 @@ export class WorkspaceContent extends React.Component {
                         onSetFolderRead={this.handleSetFolderRead}
                         isLast={i === state.displayContentList.length - 1}
                         key={content.id}
+                        selectedSortCriteria={state.selectedSortCriteria}
+                        sortOrder={state.sortOrder}
                         t={t}
                       />
                     )

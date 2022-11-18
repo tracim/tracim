@@ -12,7 +12,7 @@ const TitleListHeader = props =>
     <span>{props.title}</span>
     {props.isSelected && (
       <Icon
-        icon={props.isOrderAscending ? 'fas fa-sort-alpha-down' : 'fas fa-sort-alpha-up'}
+        icon={props.isOrderAscending ? 'fas fa-sort-down' : 'fas fa-sort-up'}
         customClass='titleListHeader__icon'
       />
     )}

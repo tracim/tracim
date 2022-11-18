@@ -6,10 +6,16 @@ import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
-import { DropdownMenu, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
+import {
+  DropdownMenu,
+  Icon,
+  PAGE,
+  putFoldersAtListBeginning,
+  ROLE,
+  sortListBy
+} from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
-  sortContentList,
   SHARE_FOLDER_ID,
   ANCHOR_NAMESPACE
 } from '../../util/helper.js'
@@ -173,68 +179,71 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {sortContentList(folderContentList, props.lang).map((content, i) => content.type === 'folder'
-            ? (
-              <FolderContainer
-                availableApp={props.availableApp}
-                folderData={content}
-                workspaceContentList={props.workspaceContentList}
-                getContentParentList={props.getContentParentList}
-                userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                onClickExtendedAction={props.onClickExtendedAction}
-                onClickFolder={props.onClickFolder}
-                onClickCreateContent={props.onClickCreateContent}
-                onDropMoveContentItem={props.onDropMoveContentItem}
-                contentType={props.contentType}
-                readStatusList={props.readStatusList}
-                onSetFolderRead={props.onSetFolderRead}
-                isLast={props.isLast && i === folderContentList.length - 1}
-                key={content.id}
-                t={props.t}
-                location={props.location}
-              />
-            )
-            : (
-              <ContentItem
-                contentId={content.id}
-                workspaceId={content.workspaceId}
-                parentId={content.parentId}
-                label={content.label}
-                type={content.type}
-                fileName={content.fileName}
-                fileExtension={content.fileExtension}
-                faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
-                isShared={content.activedShares !== 0}
-                isTemplate={content.isTemplate}
-                statusSlug={content.statusSlug}
-                read={props.readStatusList.includes(content.id)}
-                contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
-                urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${props.location.search}`}
-                userRoleIdInWorkspace={props.userRoleIdInWorkspace}
-                onClickExtendedAction={{
-                  edit: {
-                    callback: e => props.onClickExtendedAction.edit(e, content),
-                    label: props.t('Edit')
-                  },
-                  download: {
-                    callback: e => props.onClickExtendedAction.download(e, content),
-                    label: props.t('Download')
-                  },
-                  archive: {
-                    callback: e => props.onClickExtendedAction.archive(e, content),
-                    label: props.t('Archive')
-                  },
-                  delete: {
-                    callback: e => props.onClickExtendedAction.delete(e, content),
-                    label: props.t('Delete')
-                  }
-                }}
-                onDropMoveContentItem={props.onDropMoveContentItem}
-                isLast={props.isLast && i === folderContentList.length - 1}
-                key={content.id}
-              />
-            )
-          )}
+          {putFoldersAtListBeginning(sortListBy(folderContentList, props.selectedSortCriteria, props.sortOrder, props.lang))
+            .map((content, i) => content.type === 'folder'
+              ? (
+                <FolderContainer
+                  availableApp={props.availableApp}
+                  folderData={content}
+                  workspaceContentList={props.workspaceContentList}
+                  getContentParentList={props.getContentParentList}
+                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+                  onClickExtendedAction={props.onClickExtendedAction}
+                  onClickFolder={props.onClickFolder}
+                  onClickCreateContent={props.onClickCreateContent}
+                  onDropMoveContentItem={props.onDropMoveContentItem}
+                  contentType={props.contentType}
+                  readStatusList={props.readStatusList}
+                  onSetFolderRead={props.onSetFolderRead}
+                  isLast={props.isLast && i === folderContentList.length - 1}
+                  key={content.id}
+                  t={props.t}
+                  location={props.location}
+                  selectedSortCriteria={props.selectedSortCriteria}
+                  sortOrder={props.sortOrder}
+                />
+              )
+              : (
+                <ContentItem
+                  contentId={content.id}
+                  workspaceId={content.workspaceId}
+                  parentId={content.parentId}
+                  label={content.label}
+                  type={content.type}
+                  fileName={content.fileName}
+                  fileExtension={content.fileExtension}
+                  faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
+                  isShared={content.activedShares !== 0}
+                  isTemplate={content.isTemplate}
+                  statusSlug={content.statusSlug}
+                  read={props.readStatusList.includes(content.id)}
+                  contentType={props.contentType.length ? props.contentType.find(ct => ct.slug === content.type) : null}
+                  urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${props.location.search}`}
+                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
+                  onClickExtendedAction={{
+                    edit: {
+                      callback: e => props.onClickExtendedAction.edit(e, content),
+                      label: props.t('Edit')
+                    },
+                    download: {
+                      callback: e => props.onClickExtendedAction.download(e, content),
+                      label: props.t('Download')
+                    },
+                    archive: {
+                      callback: e => props.onClickExtendedAction.archive(e, content),
+                      label: props.t('Archive')
+                    },
+                    delete: {
+                      callback: e => props.onClickExtendedAction.delete(e, content),
+                      label: props.t('Delete')
+                    }
+                  }}
+                  onDropMoveContentItem={props.onDropMoveContentItem}
+                  isLast={props.isLast && i === folderContentList.length - 1}
+                  key={content.id}
+                />
+              )
+            )}
         </div>
       </div>
     )

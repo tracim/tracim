@@ -8,7 +8,6 @@ import {
   handleFetchResult,
   displayDistanceDate,
   convertBackslashNToBr,
-  naturalCompareLabels,
   revisionTypeList,
   generateRandomPassword,
   getCurrentContentVersionNumber,
@@ -70,6 +69,7 @@ import {
 } from './helper.js'
 
 import {
+  putFoldersAtListBeginning,
   sortListBy,
   sortListByMultipleCriterias,
   SORT_BY,
@@ -330,7 +330,6 @@ export {
   getContentPath,
   handleInvalidMentionInComment,
   handleLinksBeforeSave,
-  naturalCompareLabels,
   ScrollToBottomWrapper,
   sortWorkspaceList,
   TracimComponent,
@@ -503,6 +502,7 @@ export {
   Popover,
   getBrowserLang,
   NewToDo,
+  putFoldersAtListBeginning,
   putToDo,
   sortListBy,
   sortListByMultipleCriterias,

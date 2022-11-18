@@ -1,5 +1,7 @@
-import { STATUSES, naturalCompareLabels, CONTENT_TYPE } from './helper.js'
+import { STATUSES, naturalCompare, CONTENT_TYPE } from './helper.js'
 import { isAfter } from 'date-fns'
+
+// GIULIA do unit tests
 
 // GIULIA need documentation
 export const SORT_BY = {
@@ -79,10 +81,6 @@ const sortByContentType = (list, lang) => {
 
     if (aContentTypeIndex !== -1 && bContentTypeIndex !== -1) return aContentTypeIndex - bContentTypeIndex
     else return compareStrings(aContentType, bContentType, lang)
-
-    // if (bContentType === CONTENT_TYPE.FOLDER && aContentType !== CONTENT_TYPE.FOLDER) return 1
-    // if (aContentType === CONTENT_TYPE.FOLDER && bContentType !== CONTENT_TYPE.FOLDER) return -1
-    // return compareStrings(aContentType, bContentType, lang)
   })
 }
 
@@ -140,8 +138,20 @@ const compareStrings = (a, b, lang) => {
   return stringA.localeCompare(stringB, locale, { numeric: true })
 }
 
-// GIULIA to do
+export const putFoldersAtListBeginning = (list) => {
+  return list.sort((a, b) => {
+    if (a.type === CONTENT_TYPE.FOLDER && b.type !== CONTENT_TYPE.FOLDER) return -1
+    if (b.type === CONTENT_TYPE.FOLDER && a.type !== CONTENT_TYPE.FOLDER) return 1
+    return 0
+  })
+}
+
+// GIULIA replace these functions
 const getSpaceId = (space) => space.workspace_id || space.id
+const naturalCompareLabels = (itemA, itemB, lang) => {
+  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
+  return naturalCompare(itemA, itemB, lang, 'label')
+}
 export const sortWorkspaceList = (workspaceList, lang) => {
   return workspaceList.sort((a, b) => {
     let res = naturalCompareLabels(a, b, lang)
