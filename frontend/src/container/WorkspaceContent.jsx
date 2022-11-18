@@ -776,7 +776,7 @@ export class WorkspaceContent extends React.Component {
                   />
                 </div>
 
-                <ContentItemHeader />
+                <ContentItemHeader showLastModification />
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
                   <ShareFolder
@@ -815,7 +815,10 @@ export class WorkspaceContent extends React.Component {
                         loading={state[this.getLoadingFolderKey(content.id)]}
                         availableApp={createContentAvailableApp}
                         folderData={content}
+                        modified={content.modified}
                         lang={props.user.lang}
+                        currentRevisionType={content.currentRevisionType}
+                        lastModifier={content.lastModifier}
                         workspaceContentList={filteredWorkspaceContentList}
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
@@ -843,6 +846,10 @@ export class WorkspaceContent extends React.Component {
                         parentId={content.parentId}
                         label={content.label}
                         fileName={content.fileName}
+                        modified={content.modified}
+                        lang={props.user.lang}
+                        currentRevisionType={content.currentRevisionType}
+                        lastModifier={content.lastModifier}
                         fileExtension={content.fileExtension}
                         faIcon={contentType.length ? contentType.find(a => a.slug === content.type).faIcon : ''}
                         isShared={content.activedShares !== 0 && currentWorkspace.downloadEnabled}
