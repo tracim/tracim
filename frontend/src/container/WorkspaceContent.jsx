@@ -33,7 +33,8 @@ import {
   PAGE,
   TracimComponent,
   IconButton,
-  sendGlobalFlashMessage
+  sendGlobalFlashMessage,
+  TextInput
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -79,6 +80,7 @@ export class WorkspaceContent extends React.Component {
     this.state = {
       appOpenedType: false,
       contentLoaded: false,
+      userFilter: '',
       loadingShareFolder: true,
       shareFolder: {
         isOpen: (qs.parse(props.location.search).share_folder || '') === '1'
@@ -598,9 +600,14 @@ export class WorkspaceContent extends React.Component {
     props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
   }
 
-  filterWorkspaceContent = (contentList, filter) => filter.length === 0
-    ? contentList
-    : contentList.filter(c => c.type === CONTENT_TYPE.FOLDER || filter.includes(c.type)) // keep unfiltered files and folders
+  filterWorkspaceContent = (contentList, filter, userFilter) => {
+    const userFilteredList = userFilter === ''
+      ? contentList
+      : contentList.filter(c => c.label.toUpperCase().includes(userFilter.toUpperCase()))
+    return filter.length === 0
+      ? userFilteredList
+      : userFilteredList.filter(c => c.type === CONTENT_TYPE.FOLDER || filter.includes(c.type))
+  } // keep unfiltered files and folders
 
   displayWorkspaceEmptyMessage = (userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty) => {
     const { props } = this
@@ -646,7 +653,7 @@ export class WorkspaceContent extends React.Component {
     const urlFilter = qs.parse(location.search).type
 
     const filteredWorkspaceContentList = workspaceContentList.length > 0
-      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
+      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [], state.userFilter)
       : []
 
     const rootContentList = sortContentList(
@@ -737,6 +744,19 @@ export class WorkspaceContent extends React.Component {
               </div>
 
               <div className='workspace__content__file_and_folder folder__content active'>
+                <div className='search__searchBar'>
+                  <TextInput
+                    customClass='form-control'
+                    onChange={e => {
+                      const newFilter = e.target.value
+                      this.setState({ userFilter: newFilter })
+                    }}
+                    placeholder={props.t('Filter contents')}
+                    icon='search'
+                    value={state.userFilter}
+                  />
+                </div>
+
                 <ContentItemHeader />
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
