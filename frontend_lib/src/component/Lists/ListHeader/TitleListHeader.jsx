@@ -14,6 +14,7 @@ const TitleListHeader = props =>
       <Icon
         icon={props.isOrderAscending ? 'fas fa-sort-down' : 'fas fa-sort-up'}
         customClass='titleListHeader__icon'
+        title={props.tootltip}
       />
     )}
   </button>

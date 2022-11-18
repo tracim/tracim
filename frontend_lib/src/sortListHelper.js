@@ -9,7 +9,9 @@ export const SORT_BY = {
   CREATION_DATE: 'created',
   ID: 'id',
   LABEL: 'label',
+  MODIFICATION_DATE: 'modified',
   PUBLIC_NAME: 'publicName',
+  SEARCH_ORDER: 'searchOrder',
   STATUS: 'status'
 }
 
@@ -39,11 +41,16 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
     case SORT_BY.LABEL:
       sortedList = sortByLabel(list, lang)
       break
+    case SORT_BY.MODIFICATION_DATE:
+      sortedList = sortByModificationDate(list)
+      break
     case SORT_BY.PUBLIC_NAME:
       sortedList = sortByPublicName(list, lang) // GIULIA frontend/src/component/Dashboard/MemberList.jsx
       break
     case SORT_BY.STATUS:
       sortedList = sortByStatus(list, lang)
+      break
+    default:
       break
   }
   return order === SORT_ORDER.ASCENDING
@@ -62,7 +69,7 @@ export const sortListByMultipleCriterias = (listToSort, criteriaList, order = SO
   )
 }
 
-// GIULIA need documentation, verify "contentType" and folders
+// GIULIA need documentation, verify "contentType"
 const sortByContentType = (list, lang) => {
   return list.sort((a, b) => {
     const aContentType = a.contentType || a.type || a.content_type
@@ -104,6 +111,14 @@ const sortById = (list) => {
 
 const sortByLabel = (list, lang) => {
   return list.sort((a, b) => compareStrings(a.label, b.label, lang))
+}
+
+const sortByModificationDate = (list) => {
+  return list.sort((a, b) => {
+    if (a.modified < b.modified) return 1
+    if (a.modified > b.modified) return -1
+    else return 0
+  })
 }
 
 const sortByPublicName = (list, lang) => {
