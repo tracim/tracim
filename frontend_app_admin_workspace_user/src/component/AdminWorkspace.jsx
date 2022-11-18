@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { translate } from 'react-i18next'
 import {
   Delimiter,
@@ -9,11 +9,24 @@ import {
   Icon,
   Loading,
   SPACE_TYPE_LIST,
-  htmlToText
+  htmlToText, EmptyListMessage, TextInput
 } from 'tracim_frontend_lib'
 
 const AdminWorkspace = props => {
   const parser = new DOMParser()
+  const [userFilter, setUserFilter] = useState('')
+
+  const filterWorkspaceList = () => {
+    return userFilter === ''
+      ? props.workspaceList
+      : props.workspaceList.filter(wksp =>
+        wksp.label.toUpperCase().includes(userFilter.toUpperCase()) ||
+        wksp.description.toUpperCase().includes(userFilter.toUpperCase())
+      )
+  }
+
+  const filteredWorkspaceList = filterWorkspaceList()
+
   return (
     <PageWrapper customClass='adminWorkspace'>
       <PageTitle
@@ -41,6 +54,19 @@ const AdminWorkspace = props => {
 
         <Delimiter customClass='adminWorkspace__delimiter' />
 
+        <div className='adminWorkspace__searchBar'>
+          <TextInput
+            customClass='form-control'
+            onChange={e => {
+              const newFilter = e.target.value
+              setUserFilter(newFilter)
+            }}
+            placeholder={props.t('Filter users')}
+            icon='search'
+            value={userFilter}
+          />
+        </div>
+
         <div className='adminWorkspace__workspaceTable'>
           <table className='table'>
             <thead>
@@ -55,7 +81,7 @@ const AdminWorkspace = props => {
             </thead>
 
             <tbody>
-              {(props.workspaceList.length > 0 ? props.workspaceList.map(ws => {
+              {(props.workspaceList.length > 0 ? filteredWorkspaceList.map(ws => {
                 const spaceType = SPACE_TYPE_LIST.find(type => type.slug === ws.access_type) || { hexcolor: '', label: '', faIcon: '' }
                 const descriptionText = htmlToText(parser, ws.description)
                 return (
@@ -107,6 +133,11 @@ const AdminWorkspace = props => {
               )}
             </tbody>
           </table>
+          {filteredWorkspaceList.length <= 0 && (
+            <EmptyListMessage>
+              {props.t('There are no users that matches you filter')}
+            </EmptyListMessage>
+          )}
         </div>
       </PageContent>
     </PageWrapper>

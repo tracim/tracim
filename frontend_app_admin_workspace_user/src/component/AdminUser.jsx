@@ -15,7 +15,8 @@ import {
   CUSTOM_EVENT,
   PROFILE,
   PROFILE_LIST,
-  ProfileNavigation
+  ProfileNavigation,
+  TextInput, EmptyListMessage
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -25,7 +26,8 @@ export class AdminUser extends React.Component {
     super(props)
 
     this.state = {
-      displayAddUser: false
+      displayAddUser: false,
+      userFilter: ''
     }
   }
 
@@ -104,8 +106,20 @@ export class AdminUser extends React.Component {
     if (resultSuccess > 0) this.handleToggleAddUser()
   }
 
+  filterUserList = () => {
+    const { props, state } = this
+    return state.userFilter === ''
+      ? props.userList
+      : props.userList.filter(usr =>
+        usr.public_name.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+        usr.email.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+        usr.username.toUpperCase().includes(state.userFilter.toUpperCase())
+      )
+  }
+
   render () {
     const { props, state } = this
+    const filteredUserList = this.filterUserList()
 
     return (
       <PageWrapper customClass='adminUser'>
@@ -162,6 +176,19 @@ export class AdminUser extends React.Component {
 
           <Delimiter customClass='adminUser__delimiter' />
 
+          <div className='adminUser__searchBar'>
+            <TextInput
+              customClass='form-control'
+              onChange={e => {
+                const newFilter = e.target.value
+                this.setState({ userFilter: newFilter })
+              }}
+              placeholder={props.t('Filter users')}
+              icon='search'
+              value={state.userFilter}
+            />
+          </div>
+
           <div className='adminUser__table'>
             <table className='table'>
               <thead>
@@ -178,7 +205,7 @@ export class AdminUser extends React.Component {
               </thead>
 
               <tbody>
-                {props.loaded && props.userList.map(u => {
+                {props.loaded && filteredUserList.length > 0 && filteredUserList.map(u => {
                   const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
@@ -292,6 +319,11 @@ export class AdminUser extends React.Component {
                 )}
               </tbody>
             </table>
+            {filteredUserList.length <= 0 && (
+              <EmptyListMessage>
+                {props.t('There are no users that matches you filter')}
+              </EmptyListMessage>
+            )}
           </div>
 
         </PageContent>
