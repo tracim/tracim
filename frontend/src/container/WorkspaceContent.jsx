@@ -6,7 +6,6 @@ import i18n from '../util/i18n.js'
 import { translate } from 'react-i18next'
 import {
   findUserRoleIdInWorkspace,
-  sortContentList,
   SHARE_FOLDER_ID,
   ANCHOR_NAMESPACE
 } from '../util/helper.js'
@@ -31,6 +30,9 @@ import {
   CUSTOM_EVENT,
   buildHeadTitle,
   PAGE,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy,
   TracimComponent,
   IconButton,
   sendGlobalFlashMessage
@@ -79,10 +81,13 @@ export class WorkspaceContent extends React.Component {
     this.state = {
       appOpenedType: false,
       contentLoaded: false,
+      displayContentList: [],
       loadingShareFolder: true,
+      selectedSortCriteria: SORT_BY.LABEL,
       shareFolder: {
         isOpen: (qs.parse(props.location.search).share_folder || '') === '1'
-      }
+      },
+      sortOrder: SORT_ORDER.ASCENDING
     }
 
     props.registerCustomEventHandlerList([
@@ -154,6 +159,7 @@ export class WorkspaceContent extends React.Component {
     } else spaceToLoad = props.match.params.idws
 
     this.loadAllWorkspaceContent(spaceToLoad, true, true)
+    this.setDisplayContentList()
   }
 
   // Côme - 2018/11/26 - refactor idea: do not rebuild folder_open when on direct link of an app (without folder_open)
@@ -190,6 +196,8 @@ export class WorkspaceContent extends React.Component {
       this.setState({ contentLoaded: false })
       this.loadAllWorkspaceContent(workspaceId, false)
     } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
+
+    if (props.workspaceContentList !== prevProps.workspaceContentList) this.setDisplayContentList()
   }
 
   componentWillUnmount () {
@@ -436,6 +444,41 @@ export class WorkspaceContent extends React.Component {
     )
   }
 
+  setDisplayContentList = () => {
+    const { props, state } = this
+    const workspaceContentList = props.workspaceContentList && props.workspaceContentList.contentList
+      ? props.workspaceContentList.contentList
+      : []
+
+    const urlFilter = qs.parse(props.location.search).type
+
+    const filteredWorkspaceContentList = workspaceContentList.length > 0
+      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
+      : []
+
+    const sortedList = sortListBy(
+      filteredWorkspaceContentList.filter(c => c.parentId === null),
+      state.selectedSortCriteria,
+      state.sortOrder,
+      props.user.lang
+    )
+
+    this.setState({ displayContentList: sortedList })
+  }
+
+  handleClickTitleToSort = (criteria) => {
+    this.setState(prev => {
+      const sortOrder = prev.selectedSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+        ? SORT_ORDER.DESCENDING
+        : SORT_ORDER.ASCENDING
+      return {
+        displayContentList: sortListBy(prev.displayContentList, criteria, sortOrder, this.props.user.lang),
+        selectedSortCriteria: criteria,
+        sortOrder: sortOrder
+      }
+    })
+  }
+
   getLoadingFolderKey = folderId => `loadingFolder${folderId}`
 
   handleToggleFolderOpen = async folderId => {
@@ -649,11 +692,6 @@ export class WorkspaceContent extends React.Component {
       ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
       : []
 
-    const rootContentList = sortContentList(
-      filteredWorkspaceContentList.filter(c => c.parentId === null),
-      props.user.lang
-    )
-
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST)
 
     const createContentAvailableApp = [
@@ -670,7 +708,7 @@ export class WorkspaceContent extends React.Component {
     ]
 
     const isWorkspaceEmpty = workspaceContentList.length === 0
-    const isFilteredWorkspaceEmpty = rootContentList.length === 0
+    const isFilteredWorkspaceEmpty = state.displayContentList.length === 0
 
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight' id='scrollableElement'>
@@ -737,7 +775,11 @@ export class WorkspaceContent extends React.Component {
               </div>
 
               <div className='workspace__content__file_and_folder folder__content active'>
-                <ContentItemHeader />
+                <ContentItemHeader
+                  onClickTitle={this.handleClickTitleToSort}
+                  isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+                  selectedSortCriteria={state.selectedSortCriteria}
+                />
 
                 {currentWorkspace.uploadEnabled && appList.some(a => a.slug === 'upload_permission') && (
                   <ShareFolder
@@ -762,7 +804,7 @@ export class WorkspaceContent extends React.Component {
                     onClickShareFolder={this.handleClickShareFolder}
                     contentType={contentType}
                     readStatusList={currentWorkspace.contentReadStatusList}
-                    rootContentList={rootContentList}
+                    rootContentList={state.displayContentList}
                     isLast={!state.contentLoaded || isWorkspaceEmpty || isFilteredWorkspaceEmpty}
                     t={t}
                   />
@@ -770,7 +812,7 @@ export class WorkspaceContent extends React.Component {
 
                 {state.contentLoaded && ((isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
-                  : rootContentList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
+                  : state.displayContentList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
                     ? (
                       <Folder
                         loading={state[this.getLoadingFolderKey(content.id)]}
@@ -792,7 +834,7 @@ export class WorkspaceContent extends React.Component {
                         contentType={contentType}
                         readStatusList={currentWorkspace.contentReadStatusList}
                         onSetFolderRead={this.handleSetFolderRead}
-                        isLast={i === rootContentList.length - 1}
+                        isLast={i === state.displayContentList.length - 1}
                         key={content.id}
                         t={t}
                       />
@@ -810,7 +852,7 @@ export class WorkspaceContent extends React.Component {
                         isTemplate={content.isTemplate}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                        isLast={i === rootContentList.length - 1}
+                        isLast={i === state.displayContentList.length - 1}
                         urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${location.search}`}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         read={currentWorkspace.contentReadStatusList.includes(content.id)}

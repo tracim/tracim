@@ -39,7 +39,6 @@ import {
   CONTENT_TYPE,
   CONTENT_NAMESPACE,
   buildTracimLiveMessageEventType,
-  sortTimelineByDate,
   removeAtInUsername,
   setupCommonRequestHeaders,
   serialize,
@@ -52,7 +51,6 @@ import {
   checkUsernameValidity,
   formatAbsoluteDate,
   permissiveNumberEqual,
-  sortWorkspaceList,
   updateTLMUser,
   scrollIntoViewIfNeeded,
   darkenColor,
@@ -66,13 +64,19 @@ import {
   htmlToText,
   tinymceRemove,
   addExternalLinksIcons,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus,
   USER_CALL_STATE,
   STATUSES,
-  TIMELINE_TYPE,
-  sortMemberList
+  TIMELINE_TYPE
 } from './helper.js'
+
+import {
+  sortListBy,
+  sortListByMultipleCriterias,
+  SORT_BY,
+  sortWorkspaceList,
+  SORT_ORDER,
+  sortTimelineByDate
+} from './sortListHelper.js'
 
 import {
   GROUP_MENTION_TRANSLATION_LIST,
@@ -111,6 +115,7 @@ import { defaultDebug } from './debug.js'
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
+import TitleListHeader from './component/Lists/ListHeader/TitleListHeader.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -499,12 +504,14 @@ export {
   getBrowserLang,
   NewToDo,
   putToDo,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus,
+  sortListBy,
+  sortListByMultipleCriterias,
+  SORT_BY,
+  SORT_ORDER,
   TimedEvent,
+  TitleListHeader,
   ToDoItem,
   ToDoManagement,
   STATUSES,
-  TIMELINE_TYPE,
-  sortMemberList
+  TIMELINE_TYPE
 }

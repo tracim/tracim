@@ -169,6 +169,7 @@ export const compareContents = (a, b, lang) => {
   return naturalCompareLabels(a, b, lang)
 }
 
+// GIULIA use sortListBy
 export const sortContentList = (workspaceContents, lang) => {
   return workspaceContents.sort((a, b) => compareContents(a, b, lang))
 }

@@ -8,7 +8,8 @@ import {
   Loading,
   NewMemberForm,
   ProfileNavigation,
-  sortMemberList
+  sortListBy,
+  SORT_BY
 } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
@@ -66,7 +67,7 @@ export const MemberList = (props) => {
                   )}
 
                   <ul className={classnames('memberlist__list', { withAddBtn: props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
-                    {props.memberList.sort(sortMemberList).map((m, index) =>
+                    {sortListBy(props.memberList, SORT_BY.PUBLIC_NAME).map((m, index) =>
                       <li
                         className={classnames(
                           'memberlist__list__item',

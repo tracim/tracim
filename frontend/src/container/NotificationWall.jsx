@@ -33,7 +33,8 @@ import {
   IconButton,
   ListItemWrapper,
   PopinFixedHeader,
-  sortContentByCreatedDateAndID,
+  sortListByMultipleCriterias,
+  SORT_BY,
   TracimComponent
 } from 'tracim_frontend_lib'
 import { escape as escapeHtml, uniqBy } from 'lodash'
@@ -93,7 +94,7 @@ const canBeGrouped = (notificationList, numberOfCriteria = NUMBER_OF_CRITERIA.TW
 
 // INFO - MP - 2022-05-24 - Add a notification to an existing group
 const addNotificationToGroup = (notification, notificationGroup) => {
-  notificationGroup.group = sortContentByCreatedDateAndID([notification, ...notificationGroup.group])
+  notificationGroup.group = sortListByMultipleCriterias([notification, ...notificationGroup.group], [SORT_BY.CREATION_DATE, SORT_BY.ID])
 
   notificationGroup.created = new Date(notification.created).getTime() < new Date(notificationGroup.created).getTime()
     ? notificationGroup.created
