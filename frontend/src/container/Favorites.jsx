@@ -265,6 +265,7 @@ export class Favorites extends React.Component {
       ? props.favoriteList
       : props.favoriteList.filter((fav, index) =>
         fav.content.label.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+        fav.content.lastModifier.publicName.toUpperCase().includes(state.userFilter.toUpperCase()) ||
         state.contentBreadcrumbsList[index].some(item => item.label.toUpperCase().includes(state.userFilter.toUpperCase()))
       )
   }
