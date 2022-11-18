@@ -20,7 +20,6 @@ const TitleListHeader = props =>
   </button>
 export default TitleListHeader
 
-
 TitleListHeader.propTypes = {
   title: PropTypes.string.isRequired,
   customClass: PropTypes.string,
@@ -37,4 +36,3 @@ TitleListHeader.defaultProps = {
   onClickTitle: () => { },
   tootltip: ''
 }
-

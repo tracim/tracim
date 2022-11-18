@@ -60,20 +60,23 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
 
 // GIULIA need documentation
 export const sortListByMultipleCriterias = (listToSort, criteriaList, order = SORT_ORDER.ASCENDING, lang = 'en') => {
-  if (criteriaList.length === 1) return sortListBy(listToSort, criteriaList[0], order, lang)
-  else return sortListByMultipleCriterias(
-    sortListBy(listToSort, criteriaList[criteriaList.length - 1], order),
-    criteriaList.slice(0, -1),
-    order,
-    lang
-  )
+  if (criteriaList.length === 1) {
+    return sortListBy(listToSort, criteriaList[0], order, lang)
+  } else {
+    return sortListByMultipleCriterias(
+      sortListBy(listToSort, criteriaList[criteriaList.length - 1], order),
+      criteriaList.slice(0, -1),
+      order,
+      lang
+    )
+  }
 }
 
-// GIULIA need documentation, verify "contentType"
+// GIULIA need documentation
 const sortByContentType = (list, lang) => {
   return list.sort((a, b) => {
-    const aContentType = a.contentType || a.type || a.content_type
-    const bContentType = b.contentType || b.type || b.content_type
+    const aContentType = a.contentType || a.type || a.content_type || a.originalType
+    const bContentType = b.contentType || b.type || b.content_type || b.originalType
 
     const contentTypeOrder = [
       CONTENT_TYPE.FOLDER,
@@ -110,13 +113,21 @@ const sortById = (list) => {
 }
 
 const sortByLabel = (list, lang) => {
-  return list.sort((a, b) => compareStrings(a.label, b.label, lang))
+  return list.sort((a, b) => {
+    const aLabel = a.label || a.originalLabel
+    const bLabel = b.label || b.originalLabel
+
+    return compareStrings(aLabel, bLabel, lang)
+  })
 }
 
 const sortByModificationDate = (list) => {
   return list.sort((a, b) => {
-    if (a.modified < b.modified) return 1
-    if (a.modified > b.modified) return -1
+    const aModificationDate = a.modified || a.content.modified
+    const bModificationDate = b.modified || b.content.modified
+
+    if (aModificationDate < bModificationDate) return 1
+    if (aModificationDate > bModificationDate) return -1
     else return 0
   })
 }
@@ -133,8 +144,8 @@ const sortByPublicName = (list, lang) => {
 // GIULIA need documentation
 const sortByStatus = (list, lang) => {
   return list.sort((a, b) => {
-    const aStatus = a.status || a.statusSlug
-    const bStatus = b.status || b.statusSlug
+    const aStatus = a.status || a.statusSlug || a.content.statusSlug
+    const bStatus = b.status || b.statusSlug || b.content.statusSlug
 
     const statusOrder = [STATUSES.OPEN, STATUSES.VALIDATED, STATUSES.CANCELLED, STATUSES.DEPRECATED]
 
