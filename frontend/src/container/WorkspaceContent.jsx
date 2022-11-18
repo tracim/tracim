@@ -605,6 +605,7 @@ export class WorkspaceContent extends React.Component {
       ? contentList
       : contentList.filter(c =>
         c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
+        c.lastModifier.public_name.toUpperCase().includes(userFilter.toUpperCase()) ||
         c.type === CONTENT_TYPE.FOLDER
       )
 
@@ -615,6 +616,7 @@ export class WorkspaceContent extends React.Component {
       ? userFilteredList
       : userFilteredList.filter(c => {
         return c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
+          c.lastModifier.public_name.toUpperCase().includes(userFilter.toUpperCase()) ||
           (c.type === CONTENT_TYPE.FOLDER && folderSet.has(c.id))
       })
   }
