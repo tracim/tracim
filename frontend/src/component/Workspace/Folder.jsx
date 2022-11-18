@@ -6,12 +6,19 @@ import classnames from 'classnames'
 import { DragSource, DropTarget } from 'react-dnd'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import ContentItem from './ContentItem.jsx'
-import { DropdownMenu, Icon, PAGE, ROLE } from 'tracim_frontend_lib'
+import {
+  DropdownMenu,
+  Icon,
+  PAGE,
+  ROLE,
+  TimedEvent
+} from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
   sortContentList,
   SHARE_FOLDER_ID,
-  ANCHOR_NAMESPACE
+  ANCHOR_NAMESPACE,
+  getRevisionTypeLabel
 } from '../../util/helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 
@@ -99,20 +106,22 @@ class Folder extends React.Component {
               </div>
             </div>
 
+            <TimedEvent
+              customClass='folder__header__lastModification'
+              operation={getRevisionTypeLabel(props.currentRevisionType, props.t)}
+              date={props.modified}
+              lang={props.lang}
+              author={{
+                publicName: props.lastModifier.public_name,
+                userId: props.lastModifier.user_id
+              }}
+            />
+
             <div className='folder__header__button'>
               <div className='folder__header__button__addbtn'>
                 {props.userRoleIdInWorkspace >= ROLE.contributor.id && props.showCreateContentButton && folderAvailableApp.length > 0 && (
                   <DropdownMenu
-                    buttonOpts={
-                      <span>
-                        <span className='folder__header__button__addbtn__text-desktop'>
-                          {props.t('Create in folder')}
-                        </span>
-                        <span className='folder__header__button__addbtn__text-responsive'>
-                          <i className='folder__header__button__addbtn__text-responsive__iconplus fas fa-plus' />
-                        </span>
-                      </span>
-                    }
+                    buttonIcon='fas fa-plus'
                     buttonTooltip={props.t('Create in folder')}
                     buttonCustomClass='folder__header__button__addbtn__text primaryColorBgHover'
                     isButton
@@ -185,6 +194,10 @@ class Folder extends React.Component {
                 onClickFolder={props.onClickFolder}
                 onClickCreateContent={props.onClickCreateContent}
                 onDropMoveContentItem={props.onDropMoveContentItem}
+                modified={content.modified}
+                lang={props.lang}
+                currentRevisionType={content.currentRevisionType}
+                lastModifier={content.lastModifier}
                 contentType={props.contentType}
                 readStatusList={props.readStatusList}
                 onSetFolderRead={props.onSetFolderRead}
@@ -203,6 +216,10 @@ class Folder extends React.Component {
                 type={content.type}
                 fileName={content.fileName}
                 fileExtension={content.fileExtension}
+                modified={content.modified}
+                lang={props.lang}
+                currentRevisionType={content.currentRevisionType}
+                lastModifier={content.lastModifier}
                 faIcon={props.contentType.length ? props.contentType.find(a => a.slug === content.type).faIcon : ''}
                 isShared={content.activedShares !== 0}
                 isTemplate={content.isTemplate}
@@ -300,7 +317,11 @@ Folder.propTypes = {
   folderData: PropTypes.object,
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,
-  isLast: PropTypes.bool.isRequired
+  isLast: PropTypes.bool.isRequired,
+  modified: PropTypes.string.isRequired,
+  lang: PropTypes.string.isRequired,
+  currentRevisionType: PropTypes.string.isRequired,
+  lastModifier: PropTypes.object.isRequired
 }
 
 Folder.defaultProps = {

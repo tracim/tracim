@@ -12,12 +12,18 @@
     margin-inline-end standardSpacing
     color fontColor
     padding 5px
-  &__lastModification
-    flex 1
-    white-space nowrap
-    overflow hidden
-    text-overflow ellipsis
-    margin-inline-end standardSpacing
-    color fontColor
-    padding textSpacing
+  &__search
+    &__lastModification
+      flex 1
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+      margin-inline-end standardSpacing
+      color fontColor
+      padding textSpacing
 
+@media (max-width: max-md)
+  .content
+    &__search
+      &__lastModification
+        display none
