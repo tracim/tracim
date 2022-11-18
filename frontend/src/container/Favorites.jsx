@@ -17,7 +17,8 @@ import {
   getContentPath,
   Icon,
   ListItemWrapper,
-  Loading
+  Loading,
+  TextInput
 } from 'tracim_frontend_lib'
 
 import {
@@ -102,6 +103,7 @@ export class Favorites extends React.Component {
     this.state = {
       contentCommentsCountList: [],
       contentBreadcrumbsList: [],
+      userFilter: '',
       isLoading: true
     }
 
@@ -257,8 +259,20 @@ export class Favorites extends React.Component {
     )
   }
 
+  filterFavoriteList = () => {
+    const { props, state } = this
+    return state.userFilter === ''
+      ? props.favoriteList
+      : props.favoriteList.filter((fav, index) =>
+        fav.content.label.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+        state.contentBreadcrumbsList[index].some(item => item.label.toUpperCase().includes(state.userFilter.toUpperCase()))
+      )
+  }
+
   render () {
     const { props, state } = this
+    const filteredFavoriteList = this.filterFavoriteList()
+
     return (
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
@@ -272,18 +286,35 @@ export class Favorites extends React.Component {
           {state.isLoading
             ? <Loading />
             : (
-              props.favoriteList.length > 0
-                ? (
-                  <PageContent>
-                    <FavoritesHeader />
-                    {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
-                  </PageContent>
-                )
-                : (
-                  <EmptyListMessage>
-                    {props.t('You did not add any content as favorite yet.')}
-                  </EmptyListMessage>
-                )
+              <PageContent>
+                <div className='search__searchBar'>
+                  <TextInput
+                    customClass='form-control'
+                    onChange={e => {
+                      const newFilter = e.target.value
+                      this.setState({ userFilter: newFilter })
+                    }}
+                    placeholder={props.t('Filter my favorites')}
+                    icon='search'
+                    value={state.userFilter}
+                  />
+                </div>
+
+                {filteredFavoriteList.length > 0
+                  ? (
+                    <>
+                      <FavoritesHeader />
+                      {filteredFavoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
+                    </>
+                  )
+                  : (
+                    <EmptyListMessage>
+                      {props.favoriteList.length <= 0
+                        ? props.t('You did not add any content as favorite yet.')
+                        : props.t('There are no favorites that matches you filter')}
+                    </EmptyListMessage>
+                  )}
+              </PageContent>
             )}
         </PageWrapper>
       </div>
