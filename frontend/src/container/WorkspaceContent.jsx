@@ -601,12 +601,27 @@ export class WorkspaceContent extends React.Component {
   }
 
   filterWorkspaceContent = (contentList, filter, userFilter) => {
-    const userFilteredList = userFilter === ''
+    let userFilteredList = userFilter === ''
       ? contentList
-      : contentList.filter(c => c.label.toUpperCase().includes(userFilter.toUpperCase()))
+      : contentList.filter(c =>
+        c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
+        c.type === CONTENT_TYPE.FOLDER
+      )
+
+    const folderSet = new Set()
+    userFilteredList.map(c => { if (c.parentId !== null) folderSet.add(c.parentId) })
+
+    userFilteredList = userFilter === ''
+      ? userFilteredList
+      : userFilteredList.filter(c => {
+        return c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
+        (c.type === CONTENT_TYPE.FOLDER && folderSet.has(c.id))
+      })
+
     return filter.length === 0
       ? userFilteredList
-      : userFilteredList.filter(c => c.type === CONTENT_TYPE.FOLDER || filter.includes(c.type))
+      : userFilteredList.filter(c => c.type === CONTENT_TYPE.FOLDER ||
+        filter.includes(c.type))
   } // keep unfiltered files and folders
 
   displayWorkspaceEmptyMessage = (userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty) => {
