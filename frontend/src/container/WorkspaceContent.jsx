@@ -600,8 +600,8 @@ export class WorkspaceContent extends React.Component {
     props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
   }
 
-  filterWorkspaceContent = (contentList, filter, userFilter) => {
-    let userFilteredList = userFilter === ''
+  filterWorkspaceContentByUserInput = (contentList, userFilter) => {
+    const userFilteredList = userFilter === ''
       ? contentList
       : contentList.filter(c =>
         c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
@@ -611,12 +611,16 @@ export class WorkspaceContent extends React.Component {
     const folderSet = new Set()
     userFilteredList.map(c => { if (c.parentId !== null) folderSet.add(c.parentId) })
 
-    userFilteredList = userFilter === ''
+    return userFilter === ''
       ? userFilteredList
       : userFilteredList.filter(c => {
         return c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
-        (c.type === CONTENT_TYPE.FOLDER && folderSet.has(c.id))
+          (c.type === CONTENT_TYPE.FOLDER && folderSet.has(c.id))
       })
+  }
+
+  filterWorkspaceContent = (contentList, filter, userFilter) => {
+    const userFilteredList = this.filterWorkspaceContentByUserInput(contentList, userFilter)
 
     return filter.length === 0
       ? userFilteredList
