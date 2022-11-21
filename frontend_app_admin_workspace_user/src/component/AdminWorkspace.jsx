@@ -133,7 +133,7 @@ const AdminWorkspace = props => {
           </table>
           {filteredWorkspaceList.length <= 0 && (
             <EmptyListMessage>
-              {props.t('There are no users that matches you filter')}
+              {props.t('There are no spaces that matches you filter')}
             </EmptyListMessage>
           )}
         </div>
