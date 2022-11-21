@@ -1,7 +1,6 @@
 import {
   CONTENT_TYPE,
   naturalCompare,
-  SPACE_TYPE,
   STATUSES
 } from './helper.js'
 import { isAfter } from 'date-fns'
@@ -12,9 +11,11 @@ import { isAfter } from 'date-fns'
 export const SORT_BY = {
   CONTENT_TYPE: 'contentType',
   CREATION_DATE: 'created',
+  DESCRIPTION: 'description',
   ID: 'id',
   LABEL: 'label',
   MODIFICATION_DATE: 'modified',
+  NUMBER_OF_MEMBERS: 'numberOfMembers',
   PUBLIC_NAME: 'publicName',
   SPACE_TYPE: 'spaceType',
   STATUS: 'status'
@@ -40,6 +41,9 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
     case SORT_BY.CREATION_DATE:
       sortedList = sortByCreationDate(list)
       break
+    case SORT_BY.DESCRIPTION:
+      sortedList = sortByDescription(list, lang)
+      break
     case SORT_BY.ID:
       sortedList = sortById(list)
       break
@@ -48,6 +52,9 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
       break
     case SORT_BY.MODIFICATION_DATE:
       sortedList = sortByModificationDate(list)
+      break
+    case SORT_BY.NUMBER_OF_MEMBERS:
+      sortedList = sortByNumberOfMembers(list)
       break
     case SORT_BY.PUBLIC_NAME:
       sortedList = sortByPublicName(list, lang) // GIULIA frontend/src/component/Dashboard/MemberList.jsx
@@ -100,10 +107,17 @@ const sortByCreationDate = (list) => {
   })
 }
 
+const sortByDescription = (list, lang) => {
+  return list.sort((a, b) => compareStrings(a.description, b.description, lang))
+}
+
 const sortById = (list) => {
   return list.sort((a, b) => {
-    if (a.id < b.id) return 1
-    if (a.id > b.id) return -1
+    const aId = a.id || a.content_id || a.workspace_id
+    const bId = b.id || b.content_id || b.workspace_id
+
+    if (aId > bId) return 1
+    if (aId < bId) return -1
     else return 0
   })
 }
@@ -124,6 +138,14 @@ const sortByModificationDate = (list) => {
 
     if (aModificationDate < bModificationDate) return 1
     if (aModificationDate > bModificationDate) return -1
+    else return 0
+  })
+}
+
+const sortByNumberOfMembers = (list) => {
+  return list.sort((a, b) => {
+    if (a.number_of_members > b.number_of_members) return 1
+    if (a.number_of_members < b.number_of_members) return -1
     else return 0
   })
 }

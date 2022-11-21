@@ -19,7 +19,10 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   CHECK_USERNAME_DEBOUNCE_WAIT,
-  PAGE
+  PAGE,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy
 } from 'tracim_frontend_lib'
 import {
   debug,
@@ -48,6 +51,8 @@ export class AdminWorkspaceUser extends React.Component {
 
     this.state = {
       appName: 'admin_workspace_user',
+      breadcrumbsList: [],
+      displayedSpaceList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -58,7 +63,8 @@ export class AdminWorkspaceUser extends React.Component {
       workspaceToDelete: null,
       workspaceIdOpened: null,
       loaded: false,
-      breadcrumbsList: []
+      selectedSortCriteria: SORT_BY.ID,
+      sortOrder: SORT_ORDER.ASCENDING
     }
 
     // i18n has been init, add resources from frontend
@@ -141,6 +147,7 @@ export class AdminWorkspaceUser extends React.Component {
   async componentDidMount () {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
     await this.refreshAll()
+    this.setDisplayedSpaceList()
   }
 
   componentWillUnmount () {
@@ -154,6 +161,33 @@ export class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       await this.refreshAll()
     }
+    if (state.content.workspaceList !== prevState.content.workspaceList) this.setDisplayedSpaceList()
+  }
+
+  setDisplayedSpaceList = () => {
+    const { state } = this
+
+    const sortedList = sortListBy(
+      state.content.workspaceList,
+      state.selectedSortCriteria,
+      state.sortOrder,
+      state.loggedUser.lang
+    )
+
+    this.setState({ displayedSpaceList: sortedList })
+  }
+
+  handleClickTitleToSort = (criteria) => {
+    this.setState(prev => {
+      const sortOrder = prev.selectedSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+        ? SORT_ORDER.DESCENDING
+        : SORT_ORDER.ASCENDING
+      return {
+        displayedSpaceList: sortListBy(prev.displayedSpaceList, criteria, sortOrder, prev.loggedUser.lang),
+        selectedSortCriteria: criteria,
+        sortOrder: sortOrder
+      }
+    })
   }
 
   setHeadTitle = (title) => {
@@ -550,12 +584,15 @@ export class AdminWorkspaceUser extends React.Component {
         {state.config.type === 'workspace' && (
           <AdminWorkspace
             loaded={state.loaded}
-            workspaceList={state.content.workspaceList}
+            workspaceList={state.displayedSpaceList}
             onClickWorkspace={this.handleClickSpace}
             onClickNewWorkspace={this.handleClickNewSpace}
             onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
             isEmailNotifActivated={state.config.system.config.email_notification_activated}
+            onClickTitle={this.handleClickTitleToSort}
+            isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+            selectedSortCriteria={state.selectedSortCriteria}
           />
         )}
 
