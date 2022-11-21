@@ -15,7 +15,11 @@ import {
   IconButton,
   PAGE,
   TextInput,
-  htmlToText
+  htmlToText,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy,
+  TitleListHeader
 } from 'tracim_frontend_lib'
 
 import {
@@ -30,7 +34,12 @@ export class JoinWorkspace extends React.Component {
   constructor (props) {
     super(props)
 
-    this.state = { filter: '' }
+    this.state = {
+      displayedFavoritesList: [],
+      filter: '',
+      selectedSortCriteria: SORT_BY.LABEL,
+      sortOrder: SORT_ORDER.ASCENDING
+    }
 
     props.registerCustomEventHandlerList([
       { name: CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, handler: this.handleAllAppChangeLanguage }
@@ -44,6 +53,39 @@ export class JoinWorkspace extends React.Component {
     if (props.history.location.state && props.history.location.state.fromSearch) {
       this.setState({ filter: props.spaceSearch.searchString })
     }
+    this.setDisplayedFavoritesList()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.accessibleWorkspaceList !== prevProps.accessibleWorkspaceList) {
+      this.setDisplayedFavoritesList()
+    }
+  }
+
+  setDisplayedFavoritesList = () => {
+    const { props, state } = this
+
+    const sortedList = sortListBy(
+      props.accessibleWorkspaceList,
+      state.selectedSortCriteria,
+      state.sortOrder,
+      props.user.lang
+    )
+
+    this.setState({ displayedFavoritesList: sortedList })
+  }
+
+  handleClickTitleToSort = (criteria) => {
+    this.setState(prev => {
+      const sortOrder = prev.selectedSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+        ? SORT_ORDER.DESCENDING
+        : SORT_ORDER.ASCENDING
+      return {
+        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criteria, sortOrder, this.props.user.lang),
+        selectedSortCriteria: criteria,
+        sortOrder: sortOrder
+      }
+    })
   }
 
   async loadWorkspaceSubscriptions () {
@@ -171,7 +213,7 @@ export class JoinWorkspace extends React.Component {
   }
 
   render () {
-    const { props } = this
+    const { props, state } = this
     const className = 'joinWorkspace'
     const parser = new DOMParser()
     return (
@@ -192,16 +234,27 @@ export class JoinWorkspace extends React.Component {
                 onChange={e => this.handleWorkspaceFilter(e.target.value)}
                 placeholder={props.t('Filter spaces')}
                 icon='search'
-                value={this.state.filter}
+                value={state.filter}
               />
               <div className={`${className}__content__workspaceList`} data-cy='joinWorkspaceWorkspaceList'>
                 <div className={`${className}__content__workspaceList__item`}>
-                  <b>{props.t('Type')}</b>
-                  <b>{props.t('Title and description')}</b>
-                  <b>{props.t('Access request')}</b>
+                  <TitleListHeader
+                    title={props.t('Type')}
+                    onClickTitle={() => this.handleClickTitleToSort(SORT_BY.SPACE_TYPE)}
+                    isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+                    isSelected={state.selectedSortCriteria === SORT_BY.SPACE_TYPE}
+                    tootltip={props.t('Sort by type')}
+                  />
+                  <TitleListHeader
+                    title={props.t('Title and description')}
+                    onClickTitle={() => this.handleClickTitleToSort(SORT_BY.LABEL)}
+                    isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+                    isSelected={state.selectedSortCriteria === SORT_BY.LABEL}
+                    tootltip={props.t('Sort by title')}
+                  />
                 </div>
 
-                {props.accessibleWorkspaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) => {
+                {state.displayedFavoritesList.filter(this.filterWorkspaces.bind(this)).map((workspace) => {
                   const descriptionText = htmlToText(parser, workspace.description)
                   return (
                     <div key={workspace.id} className={`${className}__content__workspaceList__item`}>

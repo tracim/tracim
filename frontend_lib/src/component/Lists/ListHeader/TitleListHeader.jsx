@@ -12,7 +12,7 @@ const TitleListHeader = props =>
     <span>{props.title}</span>
     {props.isSelected && (
       <Icon
-        icon={props.isOrderAscending ? 'fas fa-sort-down' : 'fas fa-sort-up'}
+        icon={props.isOrderAscending ? 'fas fa-sort-amount-down-alt' : 'fas fa-sort-amount-up-alt'}
         customClass='titleListHeader__icon'
         title={props.tootltip}
       /> // GIULIA fix css, title without icon

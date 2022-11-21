@@ -80,25 +80,13 @@ export const sortListByMultipleCriterias = (listToSort, criteriaList, order = SO
   }
 }
 
-// GIULIA need documentation
+// GIULIA need documentation ?
 const sortByContentType = (list, lang) => {
   return list.sort((a, b) => {
     const aContentType = a.contentType || a.type || a.content_type || a.originalType
     const bContentType = b.contentType || b.type || b.content_type || b.originalType
 
-    const contentTypeOrder = [
-      CONTENT_TYPE.FOLDER,
-      CONTENT_TYPE.HTML_DOCUMENT,
-      CONTENT_TYPE.FILE,
-      CONTENT_TYPE.KANBAN,
-      CONTENT_TYPE.THREAD
-    ]
-
-    const aContentTypeIndex = contentTypeOrder.indexOf(aContentType)
-    const bContentTypeIndex = contentTypeOrder.indexOf(bContentType)
-
-    if (aContentTypeIndex !== -1 && bContentTypeIndex !== -1) return aContentTypeIndex - bContentTypeIndex
-    else return compareStrings(aContentType, bContentType, lang)
+    return compareStrings(aContentType, bContentType, lang)
   })
 }
 
@@ -155,17 +143,7 @@ const sortBySpaceType = (list, lang) => {
     const aSpaceType = a.accessType || a.access_type
     const bSpaceType = b.accessType || b.access_type
 
-    const spaceTypeOrder = [
-      SPACE_TYPE.open.slug,
-      SPACE_TYPE.onRequest.slug,
-      SPACE_TYPE.confidential.slug
-    ]
-
-    const aSpaceTypeIndex = spaceTypeOrder.indexOf(aSpaceType)
-    const bSpaceTypeIndex = spaceTypeOrder.indexOf(bSpaceType)
-
-    if (aSpaceTypeIndex !== -1 && bSpaceTypeIndex !== -1) return aSpaceTypeIndex - bSpaceTypeIndex
-    else return compareStrings(aSpaceType, bSpaceType, lang)
+    return compareStrings(aSpaceType, bSpaceType, lang)
   })
 }
 
