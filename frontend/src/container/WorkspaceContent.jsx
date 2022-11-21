@@ -601,11 +601,24 @@ export class WorkspaceContent extends React.Component {
   }
 
   filterWorkspaceContentByUserInput = (contentList, userFilter) => {
+    const { props } = this
+
+    const matchesUserInput = (content) => {
+      const contentTypeInfo = props.contentType.find(info => info.slug === content.type)
+      const statusInfo = contentTypeInfo.availableStatuses.find(
+        s => s.slug === content.statusSlug
+      )
+
+      return content.label.toUpperCase().includes(userFilter.toUpperCase()) ||
+        content.lastModifier.public_name.toUpperCase().includes(userFilter.toUpperCase()) ||
+        props.t(contentTypeInfo.label).toUpperCase().includes(userFilter.toUpperCase()) ||
+        props.t(statusInfo.label).toUpperCase().includes(userFilter.toUpperCase())
+    }
+
     const userFilteredList = userFilter === ''
       ? contentList
       : contentList.filter(c =>
-        c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
-        c.lastModifier.public_name.toUpperCase().includes(userFilter.toUpperCase()) ||
+        matchesUserInput(c) ||
         c.type === CONTENT_TYPE.FOLDER
       )
 
@@ -614,11 +627,11 @@ export class WorkspaceContent extends React.Component {
 
     return userFilter === ''
       ? userFilteredList
-      : userFilteredList.filter(c => {
-        return c.label.toUpperCase().includes(userFilter.toUpperCase()) ||
-          c.lastModifier.public_name.toUpperCase().includes(userFilter.toUpperCase()) ||
-          (c.type === CONTENT_TYPE.FOLDER && folderSet.has(c.id))
-      })
+      : userFilteredList.filter(c =>
+        c.type !== CONTENT_TYPE.FOLDER ||
+          (c.type === CONTENT_TYPE.FOLDER &&
+          (folderSet.has(c.id) || matchesUserInput(c)))
+      )
   }
 
   filterWorkspaceContent = (contentList, filter, userFilter) => {
