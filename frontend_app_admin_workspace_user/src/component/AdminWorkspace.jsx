@@ -22,14 +22,13 @@ const AdminWorkspace = props => {
     return userFilter === ''
       ? props.workspaceList
       : props.workspaceList.filter(space => {
-        const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type) || { label: ''}
+        const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type) || { label: '' }
 
         return space.label.toUpperCase().includes(userFilter.toUpperCase()) ||
           space.description.toUpperCase().includes(userFilter.toUpperCase()) ||
           props.t(spaceType.label).toUpperCase().includes(userFilter.toUpperCase()) ||
           space.workspace_id.toString().includes(userFilter)
-        }
-      )
+      })
   }
 
   const filteredWorkspaceList = filterWorkspaceList()
