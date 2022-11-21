@@ -250,6 +250,7 @@ export const AdminUserSpacesConfig = (props) => {
             <b>{props.t('Spaces membership')}</b>&nbsp;({memberSpaceList.length})
 
             <FilterBar
+              customClass='adminUserSpacesConfig__zones__filterBar'
               onChange={e => {
                 const newFilter = e.target.value
                 setMemberSpaceListFilter(newFilter)

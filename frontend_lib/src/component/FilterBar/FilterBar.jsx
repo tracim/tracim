@@ -6,7 +6,7 @@ require('./FilterBar.styl')
 
 const FilterBar = (props) => {
   return (
-    <div className='filterBar'>
+    <div className={`filterBar ${props.customClass}`}>
       <TextInput
         customClass='form-control'
         {...props}
@@ -18,11 +18,13 @@ const FilterBar = (props) => {
 FilterBar.propsType = {
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
+  customClass: PropTypes.string,
   placeholder: PropTypes.string,
   icon: PropTypes.string
 }
 
 FilterBar.defaultProps = {
+  customClass: '',
   placeholder: 'Filter this list',
   icon: 'filter'
 }
