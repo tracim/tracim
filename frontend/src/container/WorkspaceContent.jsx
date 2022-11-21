@@ -34,7 +34,7 @@ import {
   TracimComponent,
   IconButton,
   sendGlobalFlashMessage,
-  TextInput
+  FilterBar
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -765,18 +765,14 @@ export class WorkspaceContent extends React.Component {
               </div>
 
               <div className='workspace__content__file_and_folder folder__content active'>
-                <div className='search__searchBar'>
-                  <TextInput
-                    customClass='form-control'
-                    onChange={e => {
-                      const newFilter = e.target.value
-                      this.setState({ userFilter: newFilter })
-                    }}
-                    placeholder={props.t('Filter contents')}
-                    icon='search'
-                    value={state.userFilter}
-                  />
-                </div>
+                <FilterBar
+                  onChange={e => {
+                    const newFilter = e.target.value
+                    this.setState({ userFilter: newFilter })
+                  }}
+                  value={state.userFilter}
+                  placeholder={props.t('Filter visible contents')}
+                />
 
                 <ContentItemHeader showLastModification />
 

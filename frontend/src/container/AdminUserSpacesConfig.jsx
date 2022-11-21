@@ -10,10 +10,10 @@ import {
   ROLE_LIST,
   serialize,
   sortWorkspaceList,
-  TextInput,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TracimComponent
+  TracimComponent,
+  FilterBar
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -211,16 +211,16 @@ export const AdminUserSpacesConfig = (props) => {
         <div className='adminUserSpacesConfig__zones__availableSpaces'>
           <div className='adminUserSpacesConfig__zones__title'>
             <b>{props.t('Available spaces')}</b>
-            <TextInput
-              customClass='form-control'
+
+            <FilterBar
               onChange={e => {
                 const newFilter = e.target.value
                 setAvailableSpaceListFilter(newFilter)
               }}
-              placeholder={props.t('Filter spaces')}
-              icon='search'
               value={availableSpaceListFilter}
+              placeholder={props.t('Filter spaces')}
             />
+
           </div>
           {(isLoading
             ? <Loading />
@@ -248,16 +248,16 @@ export const AdminUserSpacesConfig = (props) => {
         <div className='adminUserSpacesConfig__zones__spacesMembership'>
           <div className='adminUserSpacesConfig__zones__title'>
             <b>{props.t('Spaces membership')}</b>&nbsp;({memberSpaceList.length})
-            <TextInput
-              customClass='form-control'
+
+            <FilterBar
               onChange={e => {
                 const newFilter = e.target.value
                 setMemberSpaceListFilter(newFilter)
               }}
               placeholder={props.t('Filter spaces')}
-              icon='search'
               value={memberSpaceListFilter}
             />
+
           </div>
           {(isLoading
             ? <Loading />

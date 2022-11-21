@@ -9,7 +9,9 @@ import {
   Icon,
   Loading,
   SPACE_TYPE_LIST,
-  htmlToText, EmptyListMessage, TextInput
+  htmlToText,
+  EmptyListMessage,
+  FilterBar
 } from 'tracim_frontend_lib'
 
 const AdminWorkspace = props => {
@@ -54,18 +56,14 @@ const AdminWorkspace = props => {
 
         <Delimiter customClass='adminWorkspace__delimiter' />
 
-        <div className='adminWorkspace__searchBar'>
-          <TextInput
-            customClass='form-control'
-            onChange={e => {
-              const newFilter = e.target.value
-              setUserFilter(newFilter)
-            }}
-            placeholder={props.t('Filter users')}
-            icon='search'
-            value={userFilter}
-          />
-        </div>
+        <FilterBar
+          onChange={e => {
+            const newFilter = e.target.value
+            setUserFilter(newFilter)
+          }}
+          value={userFilter}
+          placeholder={props.t('Filter spaces')}
+        />
 
         <div className='adminWorkspace__workspaceTable'>
           <table className='table'>

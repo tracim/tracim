@@ -14,8 +14,8 @@ import {
   SUBSCRIPTION_TYPE,
   IconButton,
   PAGE,
-  TextInput,
-  htmlToText
+  htmlToText,
+  FilterBar
 } from 'tracim_frontend_lib'
 
 import {
@@ -187,13 +187,13 @@ export class JoinWorkspace extends React.Component {
             />
 
             <PageContent parentClass={`${className}__content`}>
-              <TextInput
-                customClass={`${className}__content__filter form-control`}
+
+              <FilterBar
                 onChange={e => this.handleWorkspaceFilter(e.target.value)}
-                placeholder={props.t('Filter spaces')}
-                icon='search'
                 value={this.state.filter}
+                placeholder={props.t('Filter spaces')}
               />
+
               <div className={`${className}__content__workspaceList`} data-cy='joinWorkspaceWorkspaceList'>
                 <div className={`${className}__content__workspaceList__item`}>
                   <b>{props.t('Type')}</b>

@@ -18,7 +18,7 @@ import {
   Icon,
   ListItemWrapper,
   Loading,
-  TextInput
+  FilterBar
 } from 'tracim_frontend_lib'
 
 import {
@@ -288,18 +288,15 @@ export class Favorites extends React.Component {
             ? <Loading />
             : (
               <PageContent>
-                <div className='search__searchBar'>
-                  <TextInput
-                    customClass='form-control'
-                    onChange={e => {
-                      const newFilter = e.target.value
-                      this.setState({ userFilter: newFilter })
-                    }}
-                    placeholder={props.t('Filter my favorites')}
-                    icon='search'
-                    value={state.userFilter}
-                  />
-                </div>
+
+                <FilterBar
+                  onChange={e => {
+                    const newFilter = e.target.value
+                    this.setState({ userFilter: newFilter })
+                  }}
+                  value={state.userFilter}
+                  placeholder={props.t('Filter my favorites')}
+                />
 
                 {filteredFavoriteList.length > 0
                   ? (

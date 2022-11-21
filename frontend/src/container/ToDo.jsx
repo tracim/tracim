@@ -21,12 +21,12 @@ import {
   sortContentByCreatedDateAndID,
   sortContentByStatus,
   STATUSES,
-  TextInput,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   ToDoItem,
-  TracimComponent
+  TracimComponent,
+  FilterBar
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -252,16 +252,16 @@ const ToDo = (props) => {
             >
               {toDoList.length > 0 ? (
                 <div className='toDo__list'>
-                  <TextInput
-                    customClass='form-control'
+
+                  <FilterBar
                     onChange={e => {
                       const newFilter = e.target.value
                       setToDoListFilter(newFilter)
                     }}
-                    placeholder={props.t('Filter my tasks')}
-                    icon='search'
                     value={toDoListFilter}
+                    placeholder={props.t('Filter my tasks')}
                   />
+
                   {toDoListFilter === '' &&
                     <div
                       className='toDo__progressBar_container'

@@ -16,7 +16,8 @@ import {
   PROFILE,
   PROFILE_LIST,
   ProfileNavigation,
-  TextInput, EmptyListMessage
+  EmptyListMessage,
+  FilterBar
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -176,18 +177,14 @@ export class AdminUser extends React.Component {
 
           <Delimiter customClass='adminUser__delimiter' />
 
-          <div className='adminUser__searchBar'>
-            <TextInput
-              customClass='form-control'
-              onChange={e => {
-                const newFilter = e.target.value
-                this.setState({ userFilter: newFilter })
-              }}
-              placeholder={props.t('Filter users')}
-              icon='search'
-              value={state.userFilter}
-            />
-          </div>
+          <FilterBar
+            onChange={e => {
+              const newFilter = e.target.value
+              this.setState({ userFilter: newFilter })
+            }}
+            value={state.userFilter}
+            placeholder={props.t('Filter users')}
+          />
 
           <div className='adminUser__table'>
             <table className='table'>
