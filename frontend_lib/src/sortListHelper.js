@@ -1,4 +1,9 @@
-import { STATUSES, naturalCompare, CONTENT_TYPE } from './helper.js'
+import {
+  CONTENT_TYPE,
+  naturalCompare,
+  SPACE_TYPE,
+  STATUSES
+} from './helper.js'
 import { isAfter } from 'date-fns'
 
 // GIULIA do unit tests
@@ -11,6 +16,7 @@ export const SORT_BY = {
   LABEL: 'label',
   MODIFICATION_DATE: 'modified',
   PUBLIC_NAME: 'publicName',
+  SPACE_TYPE: 'spaceType',
   STATUS: 'status'
 }
 
@@ -45,6 +51,9 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
       break
     case SORT_BY.PUBLIC_NAME:
       sortedList = sortByPublicName(list, lang) // GIULIA frontend/src/component/Dashboard/MemberList.jsx
+      break
+    case SORT_BY.SPACE_TYPE:
+      sortedList = sortBySpaceType(list, lang)
       break
     case SORT_BY.STATUS:
       sortedList = sortByStatus(list, lang)
@@ -137,6 +146,26 @@ const sortByPublicName = (list, lang) => {
     const bPublicName = b.publicName || b.public_name
 
     return compareStrings(aPublicName, bPublicName, lang)
+  })
+}
+
+// GIULIA need documentation
+const sortBySpaceType = (list, lang) => {
+  return list.sort((a, b) => {
+    const aSpaceType = a.accessType || a.access_type
+    const bSpaceType = b.accessType || b.access_type
+
+    const spaceTypeOrder = [
+      SPACE_TYPE.open.slug,
+      SPACE_TYPE.onRequest.slug,
+      SPACE_TYPE.confidential.slug
+    ]
+
+    const aSpaceTypeIndex = spaceTypeOrder.indexOf(aSpaceType)
+    const bSpaceTypeIndex = spaceTypeOrder.indexOf(bSpaceType)
+
+    if (aSpaceTypeIndex !== -1 && bSpaceTypeIndex !== -1) return aSpaceTypeIndex - bSpaceTypeIndex
+    else return compareStrings(aSpaceType, bSpaceType, lang)
   })
 }
 

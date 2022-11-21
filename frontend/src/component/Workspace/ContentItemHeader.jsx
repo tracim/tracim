@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { SORT_BY, TitleListHeader } from 'tracim_frontend_lib'
-import PropTypes from 'prop-types'
 
 export const ContentItemHeader = props => {
   return (
