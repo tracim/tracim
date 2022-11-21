@@ -31,7 +31,9 @@ import {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
   TagList,
-  Loading
+  Loading,
+  FilterBar,
+  ROLE_LIST
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -88,7 +90,8 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
       displayPopupValidateDeleteWorkspace: false,
-      subscriptionRequestList: []
+      subscriptionRequestList: [],
+      userFilter: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -724,6 +727,17 @@ export class WorkspaceAdvanced extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
+
+    const filteredMemberList = state.userFilter === ''
+      ? state.content.memberList
+      : state.content.memberList.filter(member => {
+        const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
+
+        return member.user.public_name.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+          member.user.username.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+          props.t(userRole.label).toUpperCase().includes(state.userFilter.toUpperCase())
+      })
+
     const memberlistObject = {
       id: 'members_list',
       label: props.t('Members List'),
@@ -733,13 +747,23 @@ export class WorkspaceAdvanced extends React.Component {
           label={props.t('Members List')}
           showTitle={!state.displayFormNewMember}
         >
+          <FilterBar
+            customClass='workspace_advanced__filterBar'
+            onChange={e => {
+              const newFilter = e.target.value
+              this.setState({ userFilter: newFilter })
+            }}
+            value={state.userFilter}
+            placeholder={props.t('Filter users')}
+          />
+
           {
             state.isLoadingMembers
               ? <Loading />
               : (
                 <WorkspaceMembersList
                   displayFormNewMember={state.displayFormNewMember}
-                  memberList={state.content.memberList}
+                  memberList={filteredMemberList}
                   roleList={state.config.roleList}
                   apiUrl={props.data.config.apiUrl}
                   onClickNewRole={this.handleClickNewRole}
