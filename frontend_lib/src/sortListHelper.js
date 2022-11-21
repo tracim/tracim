@@ -11,7 +11,6 @@ export const SORT_BY = {
   LABEL: 'label',
   MODIFICATION_DATE: 'modified',
   PUBLIC_NAME: 'publicName',
-  SEARCH_ORDER: 'searchOrder',
   STATUS: 'status'
 }
 

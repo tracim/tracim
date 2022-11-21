@@ -30,14 +30,9 @@ export const ContentItemHeader = props => {
             {props.t('Path')}
           </div>
 
-          <TitleListHeader
-            title={props.t('Last Modification')}
-            onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
-            customClass='content__header__search__modif'
-            isOrderAscending={props.isOrderAscending}
-            isSelected={props.selectedSortCriteria === SORT_BY.MODIFICATION_DATE}
-            tootltip={props.t('Sort by last Modification')}
-          />
+          <div className='content__header__search__modif'>
+            {props.t('Last Modification')}
+          </div>
         </div>
       )}
 
@@ -65,6 +60,6 @@ ContentItemHeader.propTypes = {
 ContentItemHeader.defaultProps = {
   isOrderAscending: true,
   onClickTitle: () => { },
-  selectedSortCriteria: SORT_BY.LABEL,
+  selectedSortCriteria: '',
   showSearchDetails: false
 }

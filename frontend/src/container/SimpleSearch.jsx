@@ -13,12 +13,9 @@ import {
   BREADCRUMBS_TYPE,
   CUSTOM_EVENT,
   buildHeadTitle,
-  Loading,
   PAGE,
-  SORT_BY,
-  SORT_ORDER,
-  sortListBy,
-  TracimComponent
+  TracimComponent,
+  Loading
 } from 'tracim_frontend_lib'
 import ContentItemSearch from '../component/Search/ContentItemSearch.jsx'
 import ContentItemHeader from '../component/Workspace/ContentItemHeader.jsx'
@@ -44,10 +41,7 @@ export class SimpleSearch extends React.Component {
     // https://github.com/tracim/tracim/issues/1973
     this.state = {
       totalHits: 0,
-      isLoading: true,
-      displayedSearchList: [],
-      selectedSortCriteria: SORT_BY.SEARCH_ORDER,
-      sortOrder: SORT_ORDER.ASCENDING
+      isLoading: true
     }
 
     props.registerCustomEventHandlerList([
@@ -61,35 +55,10 @@ export class SimpleSearch extends React.Component {
     this.buildBreadcrumbs()
   }
 
-  handleClickTitleToSort = (criteria) => {
-    const { props } = this
-    this.setState(prev => {
-      let newSortOrder = SORT_ORDER.ASCENDING
-      let newCriteria = criteria
-      let listToSort = prev.displayedSearchList
-
-      if (prev.selectedSortCriteria === criteria) {
-        if (prev.sortOrder === SORT_ORDER.ASCENDING) {
-          newSortOrder = SORT_ORDER.DESCENDING
-        } else {
-          newCriteria = SORT_BY.SEARCH_ORDER
-          listToSort = props.simpleSearch.resultList // GIULIA Not working
-        }
-      }
-
-      return {
-        displayedSearchList: sortListBy(listToSort, newCriteria, newSortOrder, props.user.lang),
-        selectedSortCriteria: newCriteria,
-        sortOrder: newSortOrder
-      }
-    })
-  }
-
   componentDidMount () {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadSearchUrl()
-    this.setDisplayedSearchList()
   }
 
   componentDidUpdate (prevProps) {
@@ -109,7 +78,6 @@ export class SimpleSearch extends React.Component {
     ) {
       this.setHeadTitle()
     }
-    if (props.simpleSearch.resultList !== prevProps.simpleSearch.resultList) this.setDisplayedSearchList()
   }
 
   setHeadTitle = () => {
@@ -159,18 +127,6 @@ export class SimpleSearch extends React.Component {
         break
     }
     this.setState({ isLoading: false })
-  }
-
-  setDisplayedSearchList = () => {
-    const { props, state } = this
-    const sortedList = sortListBy(
-      props.simpleSearch.resultList,
-      state.selectedSortCriteria,
-      state.sortOrder,
-      props.user.lang
-    )
-
-    this.setState({ displayedSearchList: sortedList })
   }
 
   getPath = (path) => path.map(c => c.label).join(' / ')
@@ -264,14 +220,9 @@ export class SimpleSearch extends React.Component {
                     ? (
                       <div>
                         <div className='folder__content' data-cy='search__content'>
-                          <ContentItemHeader
-                            onClickTitle={this.handleClickTitleToSort}
-                            isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-                            selectedSortCriteria={state.selectedSortCriteria}
-                            showSearchDetails
-                          />
+                          <ContentItemHeader showSearchDetails />
 
-                          {state.displayedSearchList.map((searchItem, index) => (
+                          {props.simpleSearch.resultList.map((searchItem, index) => (
                             <ListItemWrapper
                               label={searchItem.label}
                               read
