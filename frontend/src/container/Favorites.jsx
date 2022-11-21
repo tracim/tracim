@@ -261,12 +261,21 @@ export class Favorites extends React.Component {
 
   filterFavoriteList = () => {
     const { props, state } = this
+
     return state.userFilter === ''
       ? props.favoriteList
-      : props.favoriteList.filter((fav, index) =>
-        fav.content.label.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-        fav.content.lastModifier.publicName.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-        state.contentBreadcrumbsList[index].some(item => item.label.toUpperCase().includes(state.userFilter.toUpperCase()))
+      : props.favoriteList.filter((fav, index) => {
+          const contentTypeInfo = props.contentType.find(info => info.slug === fav.content.type)
+          const statusInfo = contentTypeInfo.availableStatuses.find(
+            s => s.slug === fav.content.statusSlug
+          )
+
+          return fav.content.label.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+            fav.content.lastModifier.publicName.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+            state.contentBreadcrumbsList[index].some(item => item.label.toUpperCase().includes(state.userFilter.toUpperCase())) ||
+            props.t(contentTypeInfo.label).toUpperCase().includes(state.userFilter.toUpperCase()) ||
+            props.t(statusInfo.label).toUpperCase().includes(state.userFilter.toUpperCase())
+        }
       )
   }
 
