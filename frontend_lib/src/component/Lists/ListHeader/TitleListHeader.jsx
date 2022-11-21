@@ -15,7 +15,7 @@ const TitleListHeader = props =>
         icon={props.isOrderAscending ? 'fas fa-sort-down' : 'fas fa-sort-up'}
         customClass='titleListHeader__icon'
         title={props.tootltip}
-      />
+      /> // GIULIA fix css, title without icon
     )}
   </button>
 export default TitleListHeader

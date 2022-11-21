@@ -24,7 +24,7 @@ export const ContentItemHeader = props => {
         tootltip={props.t('Sort by title')}
       />
 
-      {props.showSearchDetails && ( // GIULIA use TitleListHeader
+      {props.showSearchDetails && (
         <div className='content__header__search'>
           <div className='content__header__search__path'>
             {props.t('Path')}
@@ -36,12 +36,18 @@ export const ContentItemHeader = props => {
       )}
 
       {props.showLastModification && !props.showSearchDetails && (
-        //  INFO - ML - 2022-15-11 - 'Last Modification' appears twice in the code because depending
-        //  on the context it has a different positioning and class
-        <div className='content__header__modification'>
-          {props.t('Last Modification')}
-        </div>
+        // INFO - ML - 2022-15-11 - 'Last Modification' appears twice in the code because depending
+        // on the context it has a different positioning and class
+        <TitleListHeader
+          title={props.t('Last Modification')}
+          onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
+          customClass='content__header__modification'
+          isOrderAscending={props.isOrderAscending}
+          isSelected={props.selectedSortCriteria === SORT_BY.MODIFICATION_DATE}
+          tootltip={props.t('Sort by last modification')}
+        />
       )}
+
       {!props.showSearchDetails && (
         <div className='content__header__actions'>
           {props.t('Actions')}
