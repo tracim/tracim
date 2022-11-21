@@ -72,7 +72,7 @@ export const AdminUserSpacesConfig = (props) => {
     setAvailableSpaceList(availableSpaces)
     setDisplayedAvailableSpaceList(filterSpaceList(availableSpaces, availableSpaceListFilter))
     setMemberSpaceList(memberSpaces)
-    setDisplayedMemberSpaceList(filterSpaceList(memberSpaces, memberSpaceListFilter))
+    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaces, memberSpaceListFilter))
   }, [spaceList])
 
   useEffect(() => {
@@ -80,8 +80,19 @@ export const AdminUserSpacesConfig = (props) => {
   }, [availableSpaceListFilter])
 
   useEffect(() => {
-    setDisplayedMemberSpaceList(filterSpaceList(memberSpaceList, memberSpaceListFilter))
+    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaceList, memberSpaceListFilter))
   }, [memberSpaceListFilter])
+
+  const filterSpaceListWithUserRole = (list, filterList) => {
+    return list.filter(space => {
+      const member = space.memberList.find(u => u.id === props.userToEditId)
+      const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
+
+      return props.t(userRole.label).toUpperCase().includes(filterList.toUpperCase()) ||
+        space.label.toUpperCase().includes(filterList.toUpperCase()) ||
+        space.id === Number(filterList)
+    })
+  }
 
   const getSpaceList = async () => {
     setIsLoading(true)
