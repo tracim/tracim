@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import { SORT_BY, TitleListHeader } from 'tracim_frontend_lib'
+import PropTypes from 'prop-types'
 
 export const ContentItemHeader = props => {
   return (
@@ -29,10 +30,22 @@ export const ContentItemHeader = props => {
           <div className='content__header__search__path'>
             {props.t('Path')}
           </div>
-
-          <div className='content__header__search__modif'>
+          <div className='content__header__search__modification'>
             {props.t('Last Modification')}
           </div>
+        </div>
+      )}
+
+      {props.showLastModification && !props.showSearchDetails && (
+        //  INFO - ML - 2022-15-11 - 'Last Modification' appears twice in the code because depending
+        //  on the context it has a different positioning and class
+        <div className='content__header__modification'>
+          {props.t('Last Modification')}
+        </div>
+      )}
+      {!props.showSearchDetails && (
+        <div className='content__header__actions'>
+          {props.t('Actions')}
         </div>
       )}
 
@@ -54,12 +67,14 @@ ContentItemHeader.propTypes = {
   isOrderAscending: PropTypes.bool,
   onClickTitle: PropTypes.func,
   selectedSortCriteria: PropTypes.string,
-  showSearchDetails: PropTypes.bool
+  showSearchDetails: PropTypes.bool,
+  showLastModification: PropTypes.bool
 }
 
 ContentItemHeader.defaultProps = {
   isOrderAscending: true,
   onClickTitle: () => { },
   selectedSortCriteria: '',
-  showSearchDetails: false
+  showSearchDetails: false,
+  showLastModification: false
 }
