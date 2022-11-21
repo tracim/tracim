@@ -114,7 +114,9 @@ export class AdminUser extends React.Component {
       : props.userList.filter(usr =>
         usr.public_name.toUpperCase().includes(state.userFilter.toUpperCase()) ||
         usr.email.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-        usr.username.toUpperCase().includes(state.userFilter.toUpperCase())
+        usr.username.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+        (props.t('Active').toUpperCase().includes(state.userFilter.toUpperCase()) && usr.is_active) ||
+        (props.t('Inactive').toUpperCase().includes(state.userFilter.toUpperCase()) && !usr.is_active)
       )
   }
 
