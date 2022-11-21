@@ -16,7 +16,7 @@ import {
   SORT_BY,
   SORT_ORDER,
   sortListBy,
-  sortWorkspaceList,
+  sortListByMultipleCriterias,
   TitleListHeader,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -152,7 +152,7 @@ export const UserSpacesConfig = (props) => {
       }))
     } else {
       const space = await fillMemberList(data.fields.workspace)
-      setSpaceList(sortWorkspaceList([...spaceList, space]))
+      setSpaceList(sortListByMultipleCriterias([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
 
@@ -173,7 +173,7 @@ export const UserSpacesConfig = (props) => {
     Promise.all(fetchedSpaceList.map(userSpace => {
       return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
     })).then((spaceListResult) => {
-      setSpaceList(sortWorkspaceList(spaceListResult))
+      setSpaceList(sortListByMultipleCriterias(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
       setIsLoading(false)
     })
   }

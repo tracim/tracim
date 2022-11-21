@@ -73,7 +73,6 @@ import {
   sortListBy,
   sortListByMultipleCriterias,
   SORT_BY,
-  sortWorkspaceList,
   SORT_ORDER,
   sortTimelineByDate
 } from './sortListHelper.js'
@@ -331,7 +330,6 @@ export {
   handleInvalidMentionInComment,
   handleLinksBeforeSave,
   ScrollToBottomWrapper,
-  sortWorkspaceList,
   TracimComponent,
   addAllResourceI18n,
   handleFetchResult,

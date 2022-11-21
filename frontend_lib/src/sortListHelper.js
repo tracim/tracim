@@ -1,6 +1,5 @@
 import {
   CONTENT_TYPE,
-  naturalCompare,
   STATUSES
 } from './helper.js'
 import { isAfter } from 'date-fns'
@@ -36,6 +35,10 @@ export const SORT_ORDER = {
 
 // GIULIA need documentation
 export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 'en') => {
+  return sortListByOneCriteria(sortById(list), criteria, order, lang)
+}
+
+const sortListByOneCriteria = (list, criteria, order, lang) => {
   let sortedList = list
   switch (criteria) {
     case SORT_BY.CONTENT_TYPE:
@@ -63,7 +66,7 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
       sortedList = sortByNumberOfMembers(list)
       break
     case SORT_BY.PUBLIC_NAME:
-      sortedList = sortByPublicName(list, lang) // GIULIA frontend/src/component/Dashboard/MemberList.jsx
+      sortedList = sortByPublicName(list, lang)
       break
     case SORT_BY.ROLE:
       sortedList = sortByRole(list, lang)
@@ -88,10 +91,10 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
 // GIULIA need documentation
 export const sortListByMultipleCriterias = (listToSort, criteriaList, order = SORT_ORDER.ASCENDING, lang = 'en') => {
   if (criteriaList.length === 1) {
-    return sortListBy(listToSort, criteriaList[0], order, lang)
+    return sortListByOneCriteria(listToSort, criteriaList[0], order, lang)
   } else {
     return sortListByMultipleCriterias(
-      sortListBy(listToSort, criteriaList[criteriaList.length - 1], order),
+      sortListByOneCriteria(listToSort, criteriaList[criteriaList.length - 1], order),
       criteriaList.slice(0, -1),
       order,
       lang
@@ -129,8 +132,8 @@ const sortByEmail = (list, lang) => {
 
 const sortById = (list) => {
   return list.sort((a, b) => {
-    const aId = a.id || a.content_id || a.workspace_id
-    const bId = b.id || b.content_id || b.workspace_id
+    const aId = a.id || a.content_id || a.contentId || a.workspace_id || a.user_id
+    const bId = b.id || b.content_id || b.contentId || b.workspace_id || b.user_id
 
     if (aId > bId) return 1
     if (aId < bId) return -1
@@ -221,22 +224,6 @@ export const putFoldersAtListBeginning = (list) => {
     if (a.type === CONTENT_TYPE.FOLDER && b.type !== CONTENT_TYPE.FOLDER) return -1
     if (b.type === CONTENT_TYPE.FOLDER && a.type !== CONTENT_TYPE.FOLDER) return 1
     return 0
-  })
-}
-
-// GIULIA replace these functions
-const getSpaceId = (space) => space.workspace_id || space.id
-const naturalCompareLabels = (itemA, itemB, lang) => {
-  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return naturalCompare(itemA, itemB, lang, 'label')
-}
-export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort((a, b) => {
-    let res = naturalCompareLabels(a, b, lang)
-    if (!res) {
-      res = getSpaceId(a) - getSpaceId(b)
-    }
-    return res
   })
 }
 

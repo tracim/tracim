@@ -67,7 +67,7 @@ export const MemberList = (props) => {
                   )}
 
                   <ul className={classnames('memberlist__list', { withAddBtn: props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
-                    {sortListBy(props.memberList, SORT_BY.PUBLIC_NAME).map((m, index) =>
+                    {sortListBy(props.memberList, SORT_BY.PUBLIC_NAME, props.loggedUser.lang).map((m, index) =>
                       <li
                         className={classnames(
                           'memberlist__list__item',
