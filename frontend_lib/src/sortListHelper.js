@@ -18,6 +18,7 @@ export const SORT_BY = {
   MODIFICATION_DATE: 'modified',
   NUMBER_OF_MEMBERS: 'numberOfMembers',
   PUBLIC_NAME: 'publicName',
+  ROLE: 'role',
   SPACE_TYPE: 'spaceType',
   STATUS: 'status',
   USERNAME: 'username'
@@ -63,6 +64,9 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
       break
     case SORT_BY.PUBLIC_NAME:
       sortedList = sortByPublicName(list, lang) // GIULIA frontend/src/component/Dashboard/MemberList.jsx
+      break
+    case SORT_BY.ROLE:
+      sortedList = sortByRole(list, lang)
       break
     case SORT_BY.SPACE_TYPE:
       sortedList = sortBySpaceType(list, lang)
@@ -169,6 +173,10 @@ const sortByPublicName = (list, lang) => {
 
     return compareStrings(aPublicName, bPublicName, lang)
   })
+}
+
+const sortByRole = (list, lang) => {
+  return list.sort((a, b) => compareStrings(a.member.role, b.member.role, lang))
 }
 
 // GIULIA need documentation

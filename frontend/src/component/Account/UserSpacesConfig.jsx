@@ -13,7 +13,11 @@ import {
   ConfirmPopup,
   IconButton,
   Loading,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy,
   sortWorkspaceList,
+  TitleListHeader,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET
@@ -49,6 +53,8 @@ export const UserSpacesConfig = (props) => {
   const [spaceBeingDeleted, setSpaceBeingDeleted] = useState(null)
   const [entries, setEntries] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedSortCriteria, setSelectedSortCriteria] = useState(SORT_BY.LABEL)
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
 
   useEffect(() => {
     props.registerLiveMessageHandlerList([
@@ -59,25 +65,37 @@ export const UserSpacesConfig = (props) => {
   }, [spaceList])
 
   useEffect(() => {
-    const entrieList = spaceList
-      .filter(space => space.memberList.length > 0 && space.memberList.find(u => u.id === props.userToEditId))
-      .map(space => {
-        const member = space.memberList.find(u => u.id === props.userToEditId)
-        return (
-          <UserSpacesConfigLine
-            space={space}
-            member={member}
-            key={space.id}
-            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-            onLeaveSpace={handleLeaveSpace}
-            admin={props.admin}
-            system={props.system}
-            onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
-          />
-        )
-      })
+    const filteredListWithMember = []
+
+    spaceList.forEach(space => {
+      const member = space.memberList.find(u => u.id === props.userToEditId)
+      if (space.memberList.length > 0 && member) {
+        filteredListWithMember.push({ ...space, member })
+      }
+    })
+
+    const sortedList = sortListBy(
+      filteredListWithMember,
+      selectedSortCriteria,
+      sortOrder,
+      props.user.lang
+    )
+
+    const entrieList = sortedList.map(space => {
+      return (
+        <UserSpacesConfigLine
+          space={space}
+          key={space.id}
+          onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+          onLeaveSpace={handleLeaveSpace}
+          admin={props.admin}
+          system={props.system}
+          onlyManager={onlyManager(props.userToEditId, space.member, space.memberList)}
+        />
+      )
+    })
     setEntries(entrieList)
-  }, [spaceList])
+  }, [spaceList, sortOrder, selectedSortCriteria])
 
   useEffect(() => {
     if (props.userToEditId === props.user.userId && props.workspaceList) {
@@ -176,6 +194,14 @@ export const UserSpacesConfig = (props) => {
     setSpaceBeingDeleted(spaceBeingDeleted)
   }
 
+  const handleClickTitleToSort = (criteria) => {
+    const newSortOrder = selectedSortCriteria === criteria && sortOrder === SORT_ORDER.ASCENDING
+      ? SORT_ORDER.DESCENDING
+      : SORT_ORDER.ASCENDING
+    setSelectedSortCriteria(criteria)
+    setSortOrder(newSortOrder)
+  }
+
   return (
     isLoading
       ? <Loading />
@@ -212,8 +238,24 @@ export const UserSpacesConfig = (props) => {
                 <table className='table'>
                   <thead>
                     <tr>
-                      <th>{props.t('Space')}</th>
-                      <th>{props.t('Role')}</th>
+                      <th>
+                        <TitleListHeader
+                          title={props.t('Space')}
+                          onClickTitle={() => handleClickTitleToSort(SORT_BY.LABEL)}
+                          isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
+                          isSelected={selectedSortCriteria === SORT_BY.LABEL}
+                          tootltip={props.t('Sort by title')}
+                        />
+                      </th>
+                      <th>
+                        <TitleListHeader
+                          title={props.t('Role')}
+                          onClickTitle={() => handleClickTitleToSort(SORT_BY.ROLE)}
+                          isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
+                          isSelected={selectedSortCriteria === SORT_BY.ROLE}
+                          tootltip={props.t('Sort by role')}
+                        />
+                      </th>
                       {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
                       <th />
                     </tr>
