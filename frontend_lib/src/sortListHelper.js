@@ -12,13 +12,15 @@ export const SORT_BY = {
   CONTENT_TYPE: 'contentType',
   CREATION_DATE: 'created',
   DESCRIPTION: 'description',
+  EMAIL: 'email',
   ID: 'id',
   LABEL: 'label',
   MODIFICATION_DATE: 'modified',
   NUMBER_OF_MEMBERS: 'numberOfMembers',
   PUBLIC_NAME: 'publicName',
   SPACE_TYPE: 'spaceType',
-  STATUS: 'status'
+  STATUS: 'status',
+  USERNAME: 'username'
 }
 
 /*
@@ -44,6 +46,9 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
     case SORT_BY.DESCRIPTION:
       sortedList = sortByDescription(list, lang)
       break
+    case SORT_BY.EMAIL:
+      sortedList = sortByEmail(list, lang)
+      break
     case SORT_BY.ID:
       sortedList = sortById(list)
       break
@@ -64,6 +69,9 @@ export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 
       break
     case SORT_BY.STATUS:
       sortedList = sortByStatus(list, lang)
+      break
+    case SORT_BY.USERNAME:
+      sortedList = sortByUsername(list, lang)
       break
     default:
       break
@@ -109,6 +117,10 @@ const sortByCreationDate = (list) => {
 
 const sortByDescription = (list, lang) => {
   return list.sort((a, b) => compareStrings(a.description, b.description, lang))
+}
+
+const sortByEmail = (list, lang) => {
+  return list.sort((a, b) => compareStrings(a.email, b.email, lang))
 }
 
 const sortById = (list) => {
@@ -183,6 +195,10 @@ const sortByStatus = (list, lang) => {
     if (aStatusIndex !== -1 && bStatusIndex !== -1) return (aStatusIndex - bStatusIndex)
     else return compareStrings(aStatus, bStatus, lang)
   })
+}
+
+const sortByUsername = (list, lang) => {
+  return list.sort((a, b) => compareStrings(a.username, b.username, lang))
 }
 
 const compareStrings = (a, b, lang) => {

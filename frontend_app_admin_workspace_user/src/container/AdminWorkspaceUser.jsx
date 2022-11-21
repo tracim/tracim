@@ -53,6 +53,7 @@ export class AdminWorkspaceUser extends React.Component {
       appName: 'admin_workspace_user',
       breadcrumbsList: [],
       displayedSpaceList: [],
+      displayedUserList: [],
       isVisible: true,
       config: param.config,
       loggedUser: param.loggedUser,
@@ -63,7 +64,8 @@ export class AdminWorkspaceUser extends React.Component {
       workspaceToDelete: null,
       workspaceIdOpened: null,
       loaded: false,
-      selectedSortCriteria: SORT_BY.ID,
+      selectedSpaceSortCriteria: SORT_BY.ID,
+      selectedUserSortCriteria: SORT_BY.PUBLIC_NAME,
       sortOrder: SORT_ORDER.ASCENDING
     }
 
@@ -148,6 +150,7 @@ export class AdminWorkspaceUser extends React.Component {
     console.log('%c<AdminWorkspaceUser> did mount', `color: ${this.state.config.hexcolor}`)
     await this.refreshAll()
     this.setDisplayedSpaceList()
+    this.setDisplayedUserList()
   }
 
   componentWillUnmount () {
@@ -162,6 +165,7 @@ export class AdminWorkspaceUser extends React.Component {
       await this.refreshAll()
     }
     if (state.content.workspaceList !== prevState.content.workspaceList) this.setDisplayedSpaceList()
+    if (state.content.userList !== prevState.content.userList) this.setDisplayedUserList()
   }
 
   setDisplayedSpaceList = () => {
@@ -169,7 +173,7 @@ export class AdminWorkspaceUser extends React.Component {
 
     const sortedList = sortListBy(
       state.content.workspaceList,
-      state.selectedSortCriteria,
+      state.selectedSpaceSortCriteria,
       state.sortOrder,
       state.loggedUser.lang
     )
@@ -177,14 +181,40 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState({ displayedSpaceList: sortedList })
   }
 
-  handleClickTitleToSort = (criteria) => {
+  setDisplayedUserList = () => {
+    const { state } = this
+
+    const sortedList = sortListBy(
+      state.content.userList,
+      state.selectedUserSortCriteria,
+      state.sortOrder,
+      state.loggedUser.lang
+    )
+
+    this.setState({ displayedUserList: sortedList })
+  }
+
+  handleClickSpaceTitleToSort = (criteria) => {
     this.setState(prev => {
-      const sortOrder = prev.selectedSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+      const sortOrder = prev.selectedSpaceSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
         displayedSpaceList: sortListBy(prev.displayedSpaceList, criteria, sortOrder, prev.loggedUser.lang),
-        selectedSortCriteria: criteria,
+        selectedSpaceSortCriteria: criteria,
+        sortOrder: sortOrder
+      }
+    })
+  }
+
+  handleClickUserTitleToSort = (criteria) => {
+    this.setState(prev => {
+      const sortOrder = prev.selectedUserSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+        ? SORT_ORDER.DESCENDING
+        : SORT_ORDER.ASCENDING
+      return {
+        displayedUserList: sortListBy(prev.displayedUserList, criteria, sortOrder, prev.loggedUser.lang),
+        selectedUserSortCriteria: criteria,
         sortOrder: sortOrder
       }
     })
@@ -590,16 +620,16 @@ export class AdminWorkspaceUser extends React.Component {
             onClickDeleteWorkspace={this.handleOpenPopupDeleteSpace}
             breadcrumbsList={state.breadcrumbsList}
             isEmailNotifActivated={state.config.system.config.email_notification_activated}
-            onClickTitle={this.handleClickTitleToSort}
+            onClickTitle={this.handleClickSpaceTitleToSort}
             isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-            selectedSortCriteria={state.selectedSortCriteria}
+            selectedSortCriteria={state.selectedSpaceSortCriteria}
           />
         )}
 
         {state.config.type === 'user' && (
           <AdminUser
             loaded={state.loaded}
-            userList={state.content.userList}
+            userList={state.displayedUserList}
             loggedUserId={state.loggedUser.userId}
             isEmailNotifActivated={state.config.system.config.email_notification_activated}
             onClickToggleUserBtn={this.handleToggleUser}
@@ -611,6 +641,9 @@ export class AdminWorkspaceUser extends React.Component {
             isUsernameValid={state.isUsernameValid}
             usernameInvalidMsg={state.usernameInvalidMsg}
             isEmailRequired={state.config.system.config.email_required}
+            onClickTitle={this.handleClickUserTitleToSort}
+            isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+            selectedSortCriteria={state.selectedUserSortCriteria}
           />
         )}
 

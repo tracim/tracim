@@ -41,6 +41,10 @@
     & th
       vertical-align middle
       text-align start
+      font-weight normal
+      padding standardSpacing 0
+      &.adminUser__table__active
+        padding standardSpacing
   &__description
     margin-bottom standardSpacing
   &__adduser
@@ -130,7 +134,7 @@
         & .profileNavigation:hover
           text-decoration underline
     &__active
-      width 17%
+      width 10%
     &__profile
       // INFO - GB - 2022-01-05 - 12px = 0.75rem is the bootstrap padding for ".table td, .table th" + fa-fw correction
       width bigIconSize + (2 * 14.5px)
@@ -138,13 +142,13 @@
         vertical-align middle
         font-size bigIconSize
     &__fullName
-      width 18%
-    &__username
-      width 17%
+      width 20%
+    &__username, &__line__username
+      width 20%
     &__user
       display none
-    &__email
-      width 18%
+    &__email, &__line__email
+      width 20%
     &__canCreate
       width 15%
     &__administrator
@@ -227,7 +231,7 @@
           font-size standardFontSize
       &__fullName
         display none
-      &__username
+      &__username, &__line__username
         display none
       &__user
         display table-cell
