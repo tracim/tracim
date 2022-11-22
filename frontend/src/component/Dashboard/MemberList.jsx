@@ -8,7 +8,9 @@ import {
   Loading,
   NewMemberForm,
   ProfileNavigation,
-  sortMemberList, FilterBar, ROLE_LIST
+  sortMemberList, 
+  FilterBar, 
+  ROLE_LIST
 } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
