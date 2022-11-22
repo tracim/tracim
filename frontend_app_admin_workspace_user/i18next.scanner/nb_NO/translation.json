@@ -48,5 +48,10 @@
   "Full name must be at least {{minimumCharactersPublicName}} characters": "Fullstendig navn nå være minst {{minimumCharactersPublicName}} tegn",
   "Linking an email address is required for the user to be able to reset the password.": "Å sammenlenke en e-postadresse kreves for at brukeren skal kunne tilbakestille passordet.",
   "If you do not link an email to this new user, please notify manually the username and password.": "Hvis du ikke lenker denne e-postadressen til en ny bruker må du merke deg brukernavnet og passordet og passordet manuelt.",
-  "Email notification are disabled, please manually notify users of any change": "E-postmerknader er avskrudd. Gi brukere beskjed om endringer manuelt."
+  "Email notification are disabled, please manually notify users of any change": "E-postmerknader er avskrudd. Gi brukere beskjed om endringer manuelt.",
+  "Inactive": "",
+  "Filter users": "",
+  "There are no users that matches you filter": "",
+  "Filter spaces": "",
+  "There are no spaces that matches you filter": ""
 }

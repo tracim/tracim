@@ -587,5 +587,10 @@
   "My Configuration links": "Mis enlaces de configuración",
   "Error while marking the notification group as read": "",
   "Error while marking notifications as read": "",
-  "Open emoticons menu": ""
+  "Open emoticons menu": "",
+  "Filter my favorites": "",
+  "There are no favorites that matches you filter": "",
+  "Filter visible contents": "",
+  "There are no spaces that matches your filter": "",
+  "Filter users": ""
 }
