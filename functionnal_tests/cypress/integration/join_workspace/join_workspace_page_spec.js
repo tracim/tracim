@@ -54,17 +54,20 @@ describe('Join space page', () => {
 
   describe('The icon tooltip', () => {
     it('should be translated', () => {
-      cy.get('.joinWorkspace__content__workspaceList__item i.fas').invoke('attr', 'title').then(title => expect(title).to.equal('On request'))
+      cy.changeLanguage('en')
+      cy.visitPage({ pageName: p.JOIN_WORKSPACE })
+      cy.contains('.pageTitleGeneric', 'Join a space')
+      cy.get('.joinWorkspace__content__workspaceList__item i.fa-handshake').invoke('attr', 'title').then(title => expect(title).to.equal('On request'))
 
       cy.changeLanguage('fr')
       cy.visitPage({ pageName: p.JOIN_WORKSPACE })
       cy.contains('.pageTitleGeneric', 'Rejoindre un espace')
-      cy.get('.joinWorkspace__content__workspaceList__item i.fas').invoke('attr', 'title').then(title => expect(title).to.equal('Sur demande'))
+      cy.get('.joinWorkspace__content__workspaceList__item i.fa-handshake').invoke('attr', 'title').then(title => expect(title).to.equal('Sur demande'))
 
       cy.changeLanguage('pt')
       cy.visitPage({ pageName: p.JOIN_WORKSPACE })
       cy.contains('.pageTitleGeneric', 'Junte-se a um espaço')
-      cy.get('.joinWorkspace__content__workspaceList__item i.fas').invoke('attr', 'title').then(title => expect(title).to.equal('A pedido'))
+      cy.get('.joinWorkspace__content__workspaceList__item i.fa-handshake').invoke('attr', 'title').then(title => expect(title).to.equal('A pedido'))
     })
   })
 })

@@ -190,7 +190,7 @@ const sortByPublicName = (list, lang) => {
   return list.sort((a, b) => {
     const aPublicName = a.publicName || a.public_name
     const bPublicName = b.publicName || b.public_name
-
+    console.log(aPublicName, bPublicName, lang)
     return compareStrings(aPublicName, bPublicName, lang)
   })
 }
