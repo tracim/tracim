@@ -8,8 +8,8 @@ const FilterBar = (props) => {
   return (
     <div className={`filterBar ${props.customClass}`}>
       <TextInput
-        customClass='form-control'
         {...props}
+        customClass='form-control'
       />
     </div>
   )
