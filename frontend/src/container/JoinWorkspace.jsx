@@ -164,7 +164,7 @@ export class JoinWorkspace extends React.Component {
   }
 
   filterWorkspaces (workspace) {
-    const spaceType = SPACE_TYPE_LIST.find(type => type.slug === workspace.accessType) || { label: ''}
+    const spaceType = SPACE_TYPE_LIST.find(type => type.slug === workspace.accessType) || { label: '' }
 
     return (
       workspace.label.toLowerCase().includes(this.state.filter) ||
