@@ -20,25 +20,25 @@ const AdminWorkspace = props => {
   const [userFilter, setUserFilter] = useState('')
 
   const filterWorkspaceList = () => {
-    return userFilter === ''
-      ? props.workspaceList
-      : props.workspaceList.filter(space => {
-        const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type) || { label: '' }
+    if (userFilter === '') return props.workspaceList
 
-        const includesFilter = stringIncludes(userFilter)
+    return props.workspaceList.filter(space => {
+      const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type) || { label: '' }
 
-        const hasFilterMatchOnLabel = includesFilter(space.label)
-        const hasFilterMatchOnDescription = includesFilter(space.description)
-        const hasFilterMatchOnType = includesFilter(props.t(spaceType.label))
-        const hasFilterMatchOnId = includesFilter(space.workspace_id.toString())
+      const includesFilter = stringIncludes(userFilter)
 
-        return (
-          hasFilterMatchOnLabel ||
-          hasFilterMatchOnDescription ||
-          hasFilterMatchOnType ||
-          hasFilterMatchOnId
-        )
-      })
+      const hasFilterMatchOnLabel = includesFilter(space.label)
+      const hasFilterMatchOnDescription = includesFilter(space.description)
+      const hasFilterMatchOnType = includesFilter(props.t(spaceType.label))
+      const hasFilterMatchOnId = includesFilter(space.workspace_id.toString())
+
+      return (
+        hasFilterMatchOnLabel ||
+        hasFilterMatchOnDescription ||
+        hasFilterMatchOnType ||
+        hasFilterMatchOnId
+      )
+    })
   }
 
   const filteredWorkspaceList = filterWorkspaceList()

@@ -633,14 +633,16 @@ export class WorkspaceContent extends React.Component {
       )
 
     const folderSet = new Set()
-    userFilteredList.map(content => { if (content.parentId !== null) folderSet.add(content.parentId) })
+    userFilteredList.map(content => {
+      if (content.parentId !== null && (content.type !== CONTENT_TYPE.FOLDER || matchesUserInput(content))) {
+        folderSet.add(content.parentId)
+      }
+    })
 
     return userFilter === ''
       ? userFilteredList
       : userFilteredList.filter(content =>
-        content.type !== CONTENT_TYPE.FOLDER ||
-          (content.type === CONTENT_TYPE.FOLDER &&
-          (folderSet.has(content.id) || matchesUserInput(content)))
+        content.type !== CONTENT_TYPE.FOLDER || folderSet.has(content.id) || matchesUserInput(content)
       )
   }
 

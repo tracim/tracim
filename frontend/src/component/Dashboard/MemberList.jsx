@@ -19,9 +19,10 @@ require('./MemberList.styl')
 export const MemberList = (props) => {
   const [userFilter, setUserFilter] = useState('')
 
-  const filteredMemberList = userFilter === ''
-    ? props.memberList
-    : props.memberList.filter(member => {
+  const filterMemberList = () => {
+    if (userFilter === '') return props.memberList
+
+    return props.memberList.filter(member => {
       const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
       const includesFilter = stringIncludes(userFilter)
@@ -36,6 +37,9 @@ export const MemberList = (props) => {
         hasFilterMatchOnRole
       )
     })
+  }
+
+  const filteredMemberList = filterMemberList()
 
   return (
     <div className='memberlist' data-cy='memberlist'>

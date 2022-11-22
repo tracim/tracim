@@ -63,9 +63,10 @@ export const UserSpacesConfig = (props) => {
   }, [spaceList])
 
   useEffect(() => {
-    const filteredSpaceList = userFilter === ''
-      ? spaceList
-      : spaceList.filter(space => {
+    const filterSpaceList = () => {
+      if (userFilter === '') return spaceList
+
+      return spaceList.filter(space => {
         const member = space.memberList.find(u => u.id === props.userToEditId)
         const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
@@ -79,6 +80,9 @@ export const UserSpacesConfig = (props) => {
           hasFilterMatchOnRole
         )
       })
+    }
+
+    const filteredSpaceList = filterSpaceList()
 
     const entrieList = filteredSpaceList
       .filter(space => space.memberList.length > 0 && space.memberList.find(u => u.id === props.userToEditId))

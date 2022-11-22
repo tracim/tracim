@@ -110,29 +110,30 @@ export class AdminUser extends React.Component {
 
   filterUserList = () => {
     const { props, state } = this
-    return state.userFilter === ''
-      ? props.userList
-      : props.userList.filter(user => {
-        const userProfile = PROFILE_LIST.find(type => type.slug === user.profile) || { label: '' }
 
-        const includesFilter = stringIncludes(state.userFilter)
+    if (state.userFilter === '') return props.userList
 
-        const hasFilterMatchOnPublicName = includesFilter(user.public_name)
-        const hasFilterMatchOnEmail = includesFilter(user.email)
-        const hasFilterMatchOnUsername = includesFilter(user.username)
-        const hasFilterMatchOnProfileType = includesFilter(props.t(userProfile.label))
-        const hasFilterMatchOnActive = includesFilter(props.t('Active')) && user.is_active
-        const hasFilterMatchOnInactive = includesFilter(props.t('Inactive')) && !user.is_active
+    return props.userList.filter(user => {
+      const userProfile = PROFILE_LIST.find(type => type.slug === user.profile) || { label: '' }
 
-        return (
-          hasFilterMatchOnPublicName ||
-          hasFilterMatchOnEmail ||
-          hasFilterMatchOnUsername ||
-          hasFilterMatchOnProfileType ||
-          hasFilterMatchOnActive ||
-          hasFilterMatchOnInactive
-        )
-      })
+      const includesFilter = stringIncludes(state.userFilter)
+
+      const hasFilterMatchOnPublicName = includesFilter(user.public_name)
+      const hasFilterMatchOnEmail = includesFilter(user.email)
+      const hasFilterMatchOnUsername = includesFilter(user.username)
+      const hasFilterMatchOnProfileType = includesFilter(props.t(userProfile.label))
+      const hasFilterMatchOnActive = includesFilter(props.t('Active')) && user.is_active
+      const hasFilterMatchOnInactive = includesFilter(props.t('Inactive')) && !user.is_active
+
+      return (
+        hasFilterMatchOnPublicName ||
+        hasFilterMatchOnEmail ||
+        hasFilterMatchOnUsername ||
+        hasFilterMatchOnProfileType ||
+        hasFilterMatchOnActive ||
+        hasFilterMatchOnInactive
+      )
+    })
   }
 
   render () {

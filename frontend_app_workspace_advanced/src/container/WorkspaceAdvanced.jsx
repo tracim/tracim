@@ -729,9 +729,10 @@ export class WorkspaceAdvanced extends React.Component {
   getMenuItemList = () => {
     const { props, state } = this
 
-    const filteredMemberList = state.userFilter === ''
-      ? state.content.memberList
-      : state.content.memberList.filter(member => {
+    const filterMemberList = () => {
+      if (state.userFilter === '') return state.content.memberList
+
+      return state.content.memberList.filter(member => {
         const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
         const includesFilter = stringIncludes(state.userFilter)
@@ -746,6 +747,9 @@ export class WorkspaceAdvanced extends React.Component {
           hasFilterMatchOnRole
         )
       })
+    }
+
+    const filteredMemberList = filterMemberList()
 
     const memberlistObject = {
       id: 'members_list',
