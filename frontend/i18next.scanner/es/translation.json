@@ -585,7 +585,7 @@
   "My Spaces": "Mis espacios",
   "My Password": "Mi contraseña",
   "My Configuration links": "Mis enlaces de configuración",
-  "Error while marking the notification group as read": "",
-  "Error while marking notifications as read": "",
-  "Open emoticons menu": ""
+  "Error while marking the notification group as read": "Error al marcar el grupo de notificaciones como leído",
+  "Error while marking notifications as read": "Error al marcar notificaciones como leídas",
+  "Open emoticons menu": "Abrir menú de emoticones"
 }
