@@ -88,9 +88,15 @@ export const AdminUserSpacesConfig = (props) => {
       const member = space.memberList.find(u => u.id === props.userToEditId)
       const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-      return props.t(userRole.label).toUpperCase().includes(filterList.toUpperCase()) ||
-        space.label.toUpperCase().includes(filterList.toUpperCase()) ||
-        space.id === Number(filterList)
+      const hasFilterMatchOnUserRole = props.t(userRole.label).toUpperCase().includes(filterList.toUpperCase())
+      const hasFilterMatchOnSpaceLabel = space.label.toUpperCase().includes(filterList.toUpperCase())
+      const hasFilterMatchOnSpaceId = space.id === Number(filterList)
+
+      return (
+        hasFilterMatchOnUserRole ||
+        hasFilterMatchOnSpaceLabel ||
+        hasFilterMatchOnSpaceId
+      )
     })
   }
 

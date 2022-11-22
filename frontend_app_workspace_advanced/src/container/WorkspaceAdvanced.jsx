@@ -733,9 +733,16 @@ export class WorkspaceAdvanced extends React.Component {
       : state.content.memberList.filter(member => {
         const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-        return member.user.public_name.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          member.user.username.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          props.t(userRole.label).toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnPublicName = member.user.public_name.toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnUsername = member.user.username.toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnRole = props.t(userRole.label).toUpperCase().includes(state.userFilter.toUpperCase())
+
+        return (
+          hasFilterMatchOnPublicName ||
+          hasFilterMatchOnUsername ||
+          hasFilterMatchOnRole
+        )
+
       })
 
     const memberlistObject = {

@@ -114,12 +114,21 @@ export class AdminUser extends React.Component {
       : props.userList.filter(user => {
         const userProfile = PROFILE_LIST.find(type => type.slug === user.profile) || { label: '' }
 
-        return user.public_name.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          user.email.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          user.username.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          props.t(userProfile.label).toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          (props.t('Active').toUpperCase().includes(state.userFilter.toUpperCase()) && user.is_active) ||
-          (props.t('Inactive').toUpperCase().includes(state.userFilter.toUpperCase()) && !user.is_active)
+        const hasFilterMatchOnPublicName = user.public_name.toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnEmail = user.email.toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnUsername = user.username.toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnProfileType = props.t(userProfile.label).toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnActive = (props.t('Active').toUpperCase().includes(state.userFilter.toUpperCase()) && user.is_active)
+        const hasFilterMatchOnInactive = (props.t('Inactive').toUpperCase().includes(state.userFilter.toUpperCase()) && !user.is_active)
+
+        return (
+          hasFilterMatchOnPublicName ||
+          hasFilterMatchOnEmail ||
+          hasFilterMatchOnUsername ||
+          hasFilterMatchOnProfileType ||
+          hasFilterMatchOnActive ||
+          hasFilterMatchOnInactive
+        )
       })
   }
 

@@ -68,8 +68,13 @@ export const UserSpacesConfig = (props) => {
         const member = space.memberList.find(u => u.id === props.userToEditId)
         const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-        return space.label.toUpperCase().includes(userFilter.toUpperCase()) ||
-          props.t(userRole.label).toUpperCase().includes(userFilter.toUpperCase())
+        const hasFilterMatchOnLabel = space.label.toUpperCase().includes(userFilter.toUpperCase())
+        const hasFilterMatchOnRole = props.t(userRole.label).toUpperCase().includes(userFilter.toUpperCase())
+
+        return (
+          hasFilterMatchOnLabel ||
+          hasFilterMatchOnRole
+        )
       })
 
     const entrieList = filteredSpaceList

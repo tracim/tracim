@@ -8,8 +8,8 @@ import {
   Loading,
   NewMemberForm,
   ProfileNavigation,
-  sortMemberList, 
-  FilterBar, 
+  sortMemberList,
+  FilterBar,
   ROLE_LIST
 } from 'tracim_frontend_lib'
 
@@ -23,9 +23,15 @@ export const MemberList = (props) => {
     : props.memberList.filter(member => {
       const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-      return member.publicName.toUpperCase().includes(userFilter.toUpperCase()) ||
-        member.username.toUpperCase().includes(userFilter.toUpperCase()) ||
-        props.t(userRole.label).toUpperCase().includes(userFilter.toUpperCase())
+      const hasFilterMatchOnPublicName = member.publicName.toUpperCase().includes(userFilter.toUpperCase())
+      const hasFilterMatchOnUsername = member.username.toUpperCase().includes(userFilter.toUpperCase())
+      const hasFilterMatchOnRole = props.t(userRole.label).toUpperCase().includes(userFilter.toUpperCase())
+
+      return (
+        hasFilterMatchOnPublicName ||
+        hasFilterMatchOnUsername ||
+        hasFilterMatchOnRole
+      )
     })
 
   return (

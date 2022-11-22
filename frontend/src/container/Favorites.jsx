@@ -269,12 +269,19 @@ export class Favorites extends React.Component {
         const statusInfo = contentTypeInfo.availableStatuses.find(
           s => s.slug === favorite.content.statusSlug
         )
+        const hasFilterMatchOnContentLabel = favorite.content.label.toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnLastModifier = favorite.content.lastModifier.publicName.toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => item.label.toUpperCase().includes(state.userFilter.toUpperCase()))
+        const hasFilterMatchOnContentType = props.t(contentTypeInfo.label).toUpperCase().includes(state.userFilter.toUpperCase())
+        const hasFilterMatchOnContentStatus = props.t(statusInfo.label).toUpperCase().includes(state.userFilter.toUpperCase())
 
-        return favorite.content.label.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          favorite.content.lastModifier.publicName.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          state.contentBreadcrumbsList[index].some(item => item.label.toUpperCase().includes(state.userFilter.toUpperCase())) ||
-          props.t(contentTypeInfo.label).toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          props.t(statusInfo.label).toUpperCase().includes(state.userFilter.toUpperCase())
+        return (
+          hasFilterMatchOnContentLabel ||
+          hasFilterMatchOnLastModifier ||
+          hasFilterMatchOnBreadcrumbs ||
+          hasFilterMatchOnContentType ||
+          hasFilterMatchOnContentStatus
+        )
       })
   }
 
