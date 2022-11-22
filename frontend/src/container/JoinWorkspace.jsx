@@ -15,7 +15,8 @@ import {
   IconButton,
   PAGE,
   htmlToText,
-  FilterBar
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 import {
@@ -166,9 +167,11 @@ export class JoinWorkspace extends React.Component {
   filterWorkspaces (workspace) {
     const spaceType = SPACE_TYPE_LIST.find(type => type.slug === workspace.accessType) || { label: '' }
 
-    const hasFilterMatchOnLabel = workspace.label.toLowerCase().includes(this.state.filter)
-    const hasFilterMatchOnDescription = workspace.description.toLowerCase().includes(this.state.filter)
-    const hasFilterMatchOnType = this.props.t(spaceType.label).toLowerCase().includes(this.state.filter.toLowerCase())
+    const includesFilter = stringIncludes(this.state.filter)
+
+    const hasFilterMatchOnLabel = includesFilter(workspace.label)
+    const hasFilterMatchOnDescription = includesFilter(workspace.description)
+    const hasFilterMatchOnType = includesFilter(this.props.t(spaceType.label))
 
     return (
       hasFilterMatchOnLabel ||

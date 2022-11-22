@@ -18,7 +18,8 @@ import {
   Icon,
   ListItemWrapper,
   Loading,
-  FilterBar
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 import {
@@ -262,27 +263,30 @@ export class Favorites extends React.Component {
   filterFavoriteList = () => {
     const { props, state } = this
 
-    return state.userFilter === ''
-      ? props.favoriteList
-      : props.favoriteList.filter((favorite, index) => {
-        const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
-        const statusInfo = contentTypeInfo.availableStatuses.find(
-          s => s.slug === favorite.content.statusSlug
-        )
-        const hasFilterMatchOnContentLabel = favorite.content.label.toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnLastModifier = favorite.content.lastModifier.publicName.toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => item.label.toUpperCase().includes(state.userFilter.toUpperCase()))
-        const hasFilterMatchOnContentType = props.t(contentTypeInfo.label).toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnContentStatus = props.t(statusInfo.label).toUpperCase().includes(state.userFilter.toUpperCase())
+    if (state.userFilter === '') return props.favoriteList
 
-        return (
-          hasFilterMatchOnContentLabel ||
-          hasFilterMatchOnLastModifier ||
-          hasFilterMatchOnBreadcrumbs ||
-          hasFilterMatchOnContentType ||
-          hasFilterMatchOnContentStatus
-        )
-      })
+    return props.favoriteList.filter((favorite, index) => {
+      const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
+      const statusInfo = contentTypeInfo.availableStatuses.find(
+        s => s.slug === favorite.content.statusSlug
+      )
+
+      const includesFilter = stringIncludes(state.userFilter)
+
+      const hasFilterMatchOnContentLabel = includesFilter(favorite.content.label)
+      const hasFilterMatchOnLastModifier = includesFilter(favorite.content.lastModifier.publicName)
+      const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => includesFilter(item.label))
+      const hasFilterMatchOnContentType = includesFilter(props.t(contentTypeInfo.label))
+      const hasFilterMatchOnContentStatus = includesFilter(props.t(statusInfo.label))
+
+      return (
+        hasFilterMatchOnContentLabel ||
+        hasFilterMatchOnLastModifier ||
+        hasFilterMatchOnBreadcrumbs ||
+        hasFilterMatchOnContentType ||
+        hasFilterMatchOnContentStatus
+      )
+    })
   }
 
   render () {

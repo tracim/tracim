@@ -11,7 +11,8 @@ import {
   SPACE_TYPE_LIST,
   htmlToText,
   EmptyListMessage,
-  FilterBar
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 const AdminWorkspace = props => {
@@ -24,10 +25,12 @@ const AdminWorkspace = props => {
       : props.workspaceList.filter(space => {
         const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type) || { label: '' }
 
-        const hasFilterMatchOnLabel = space.label.toUpperCase().includes(userFilter.toUpperCase())
-        const hasFilterMatchOnDescription = space.description.toUpperCase().includes(userFilter.toUpperCase())
-        const hasFilterMatchOnType = props.t(spaceType.label).toUpperCase().includes(userFilter.toUpperCase())
-        const hasFilterMatchOnId = space.workspace_id.toString().includes(userFilter)
+        const includesFilter = stringIncludes(userFilter)
+
+        const hasFilterMatchOnLabel = includesFilter(space.label)
+        const hasFilterMatchOnDescription = includesFilter(space.description)
+        const hasFilterMatchOnType = includesFilter(props.t(spaceType.label))
+        const hasFilterMatchOnId = includesFilter(space.workspace_id.toString())
 
         return (
           hasFilterMatchOnLabel ||

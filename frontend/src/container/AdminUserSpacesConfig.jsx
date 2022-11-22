@@ -13,7 +13,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TracimComponent,
-  FilterBar
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -88,9 +89,11 @@ export const AdminUserSpacesConfig = (props) => {
       const member = space.memberList.find(u => u.id === props.userToEditId)
       const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-      const hasFilterMatchOnUserRole = props.t(userRole.label).toUpperCase().includes(filterList.toUpperCase())
-      const hasFilterMatchOnSpaceLabel = space.label.toUpperCase().includes(filterList.toUpperCase())
-      const hasFilterMatchOnSpaceId = space.id === Number(filterList)
+      const includesFilter = stringIncludes(filterList)
+
+      const hasFilterMatchOnUserRole = includesFilter(props.t(userRole.label))
+      const hasFilterMatchOnSpaceLabel = includesFilter(space.label)
+      const hasFilterMatchOnSpaceId = includesFilter(space.id.toString())
 
       return (
         hasFilterMatchOnUserRole ||

@@ -33,7 +33,8 @@ import {
   TagList,
   Loading,
   FilterBar,
-  ROLE_LIST
+  ROLE_LIST,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -733,16 +734,17 @@ export class WorkspaceAdvanced extends React.Component {
       : state.content.memberList.filter(member => {
         const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-        const hasFilterMatchOnPublicName = member.user.public_name.toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnUsername = member.user.username.toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnRole = props.t(userRole.label).toUpperCase().includes(state.userFilter.toUpperCase())
+        const includesFilter = stringIncludes(state.userFilter)
+
+        const hasFilterMatchOnPublicName = includesFilter(member.user.public_name)
+        const hasFilterMatchOnUsername = includesFilter(member.user.username)
+        const hasFilterMatchOnRole = includesFilter(props.t(userRole.label))
 
         return (
           hasFilterMatchOnPublicName ||
           hasFilterMatchOnUsername ||
           hasFilterMatchOnRole
         )
-
       })
 
     const memberlistObject = {

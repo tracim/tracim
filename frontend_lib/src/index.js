@@ -71,7 +71,8 @@ import {
   USER_CALL_STATE,
   STATUSES,
   TIMELINE_TYPE,
-  sortMemberList
+  sortMemberList,
+  stringIncludes
 } from './helper.js'
 
 import {
@@ -508,5 +509,6 @@ export {
   STATUSES,
   TIMELINE_TYPE,
   sortMemberList,
+  stringIncludes,
   FilterBar
 }

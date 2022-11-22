@@ -34,7 +34,8 @@ import {
   TracimComponent,
   IconButton,
   sendGlobalFlashMessage,
-  FilterBar
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -609,28 +610,37 @@ export class WorkspaceContent extends React.Component {
         s => s.slug === content.statusSlug
       )
 
-      return content.label.toUpperCase().includes(userFilter.toUpperCase()) ||
-        content.lastModifier.public_name.toUpperCase().includes(userFilter.toUpperCase()) ||
-        props.t(contentTypeInfo.label).toUpperCase().includes(userFilter.toUpperCase()) ||
-        props.t(statusInfo.label).toUpperCase().includes(userFilter.toUpperCase())
+      const includesFilter = stringIncludes(userFilter)
+
+      const hasFilterMatchOnLabel = includesFilter(content.label)
+      const hasFilterMatchOnLastModifier = includesFilter(content.lastModifier.public_name)
+      const hasFilterMatchOnType = includesFilter(props.t(contentTypeInfo.label))
+      const hasFilterMatchOnStatus = includesFilter(props.t(statusInfo.label))
+
+      return (
+        hasFilterMatchOnLabel ||
+        hasFilterMatchOnLastModifier ||
+        hasFilterMatchOnType ||
+        hasFilterMatchOnStatus
+      )
     }
 
     const userFilteredList = userFilter === ''
       ? contentList
-      : contentList.filter(c =>
-        matchesUserInput(c) ||
-        c.type === CONTENT_TYPE.FOLDER
+      : contentList.filter(content =>
+        matchesUserInput(content) ||
+        content.type === CONTENT_TYPE.FOLDER
       )
 
     const folderSet = new Set()
-    userFilteredList.map(c => { if (c.parentId !== null) folderSet.add(c.parentId) })
+    userFilteredList.map(content => { if (content.parentId !== null) folderSet.add(content.parentId) })
 
     return userFilter === ''
       ? userFilteredList
-      : userFilteredList.filter(c =>
-        c.type !== CONTENT_TYPE.FOLDER ||
-          (c.type === CONTENT_TYPE.FOLDER &&
-          (folderSet.has(c.id) || matchesUserInput(c)))
+      : userFilteredList.filter(content =>
+        content.type !== CONTENT_TYPE.FOLDER ||
+          (content.type === CONTENT_TYPE.FOLDER &&
+          (folderSet.has(content.id) || matchesUserInput(content)))
       )
   }
 
@@ -641,7 +651,7 @@ export class WorkspaceContent extends React.Component {
       ? userFilteredList
       : userFilteredList.filter(c => c.type === CONTENT_TYPE.FOLDER ||
         filter.includes(c.type))
-  } // keep unfiltered files and folders
+  }
 
   displayWorkspaceEmptyMessage = (userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty) => {
     const { props } = this

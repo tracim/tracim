@@ -17,7 +17,8 @@ import {
   PROFILE_LIST,
   ProfileNavigation,
   EmptyListMessage,
-  FilterBar
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -114,12 +115,14 @@ export class AdminUser extends React.Component {
       : props.userList.filter(user => {
         const userProfile = PROFILE_LIST.find(type => type.slug === user.profile) || { label: '' }
 
-        const hasFilterMatchOnPublicName = user.public_name.toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnEmail = user.email.toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnUsername = user.username.toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnProfileType = props.t(userProfile.label).toUpperCase().includes(state.userFilter.toUpperCase())
-        const hasFilterMatchOnActive = (props.t('Active').toUpperCase().includes(state.userFilter.toUpperCase()) && user.is_active)
-        const hasFilterMatchOnInactive = (props.t('Inactive').toUpperCase().includes(state.userFilter.toUpperCase()) && !user.is_active)
+        const includesFilter = stringIncludes(state.userFilter)
+
+        const hasFilterMatchOnPublicName = includesFilter(user.public_name)
+        const hasFilterMatchOnEmail = includesFilter(user.email)
+        const hasFilterMatchOnUsername = includesFilter(user.username)
+        const hasFilterMatchOnProfileType = includesFilter(props.t(userProfile.label))
+        const hasFilterMatchOnActive = includesFilter(props.t('Active')) && user.is_active
+        const hasFilterMatchOnInactive = includesFilter(props.t('Inactive')) && !user.is_active
 
         return (
           hasFilterMatchOnPublicName ||

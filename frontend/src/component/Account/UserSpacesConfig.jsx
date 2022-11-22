@@ -18,7 +18,8 @@ import {
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   FilterBar,
-  ROLE_LIST
+  ROLE_LIST,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
@@ -68,8 +69,10 @@ export const UserSpacesConfig = (props) => {
         const member = space.memberList.find(u => u.id === props.userToEditId)
         const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-        const hasFilterMatchOnLabel = space.label.toUpperCase().includes(userFilter.toUpperCase())
-        const hasFilterMatchOnRole = props.t(userRole.label).toUpperCase().includes(userFilter.toUpperCase())
+        const includesFilter = stringIncludes(userFilter)
+
+        const hasFilterMatchOnLabel = includesFilter(space.label)
+        const hasFilterMatchOnRole = includesFilter(props.t(userRole.label))
 
         return (
           hasFilterMatchOnLabel ||

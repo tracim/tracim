@@ -10,7 +10,8 @@ import {
   ProfileNavigation,
   sortMemberList,
   FilterBar,
-  ROLE_LIST
+  ROLE_LIST,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 require('./MemberList.styl')
@@ -23,9 +24,11 @@ export const MemberList = (props) => {
     : props.memberList.filter(member => {
       const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
 
-      const hasFilterMatchOnPublicName = member.publicName.toUpperCase().includes(userFilter.toUpperCase())
-      const hasFilterMatchOnUsername = member.username.toUpperCase().includes(userFilter.toUpperCase())
-      const hasFilterMatchOnRole = props.t(userRole.label).toUpperCase().includes(userFilter.toUpperCase())
+      const includesFilter = stringIncludes(userFilter)
+
+      const hasFilterMatchOnPublicName = includesFilter(member.publicName)
+      const hasFilterMatchOnUsername = includesFilter(member.username)
+      const hasFilterMatchOnRole = includesFilter(props.t(userRole.label))
 
       return (
         hasFilterMatchOnPublicName ||
