@@ -16,7 +16,7 @@ import {
   SORT_BY,
   SORT_ORDER,
   sortListBy,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   TitleListHeader,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
@@ -53,7 +53,7 @@ export const UserSpacesConfig = (props) => {
   const [spaceBeingDeleted, setSpaceBeingDeleted] = useState(null)
   const [entries, setEntries] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedSortCriteria, setSelectedSortCriteria] = useState(SORT_BY.LABEL)
+  const [selectedSortCriterion, setSelectedSortCriterion] = useState(SORT_BY.LABEL)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export const UserSpacesConfig = (props) => {
 
     const sortedList = sortListBy(
       filteredListWithMember,
-      selectedSortCriteria,
+      selectedSortCriterion,
       sortOrder,
       props.user.lang
     )
@@ -95,7 +95,7 @@ export const UserSpacesConfig = (props) => {
       )
     })
     setEntries(entrieList)
-  }, [spaceList, sortOrder, selectedSortCriteria])
+  }, [spaceList, sortOrder, selectedSortCriterion])
 
   useEffect(() => {
     if (props.userToEditId === props.user.userId && props.workspaceList) {
@@ -152,7 +152,7 @@ export const UserSpacesConfig = (props) => {
       }))
     } else {
       const space = await fillMemberList(data.fields.workspace)
-      setSpaceList(sortListByMultipleCriterias([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
+      setSpaceList(sortListByMultipleCriteria([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
 
@@ -173,7 +173,7 @@ export const UserSpacesConfig = (props) => {
     Promise.all(fetchedSpaceList.map(userSpace => {
       return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
     })).then((spaceListResult) => {
-      setSpaceList(sortListByMultipleCriterias(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
+      setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
       setIsLoading(false)
     })
   }
@@ -194,11 +194,11 @@ export const UserSpacesConfig = (props) => {
     setSpaceBeingDeleted(spaceBeingDeleted)
   }
 
-  const handleClickTitleToSort = (criteria) => {
-    const newSortOrder = selectedSortCriteria === criteria && sortOrder === SORT_ORDER.ASCENDING
+  const handleClickTitleToSort = (criterion) => {
+    const newSortOrder = selectedSortCriterion === criterion && sortOrder === SORT_ORDER.ASCENDING
       ? SORT_ORDER.DESCENDING
       : SORT_ORDER.ASCENDING
-    setSelectedSortCriteria(criteria)
+    setSelectedSortCriterion(criterion)
     setSortOrder(newSortOrder)
   }
 
@@ -243,7 +243,7 @@ export const UserSpacesConfig = (props) => {
                           title={props.t('Space')}
                           onClickTitle={() => handleClickTitleToSort(SORT_BY.LABEL)}
                           isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
-                          isSelected={selectedSortCriteria === SORT_BY.LABEL}
+                          isSelected={selectedSortCriterion === SORT_BY.LABEL}
                           tootltip={props.t('Sort by title')}
                         />
                       </th>
@@ -252,7 +252,7 @@ export const UserSpacesConfig = (props) => {
                           title={props.t('Role')}
                           onClickTitle={() => handleClickTitleToSort(SORT_BY.ROLE)}
                           isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
-                          isSelected={selectedSortCriteria === SORT_BY.ROLE}
+                          isSelected={selectedSortCriterion === SORT_BY.ROLE}
                           tootltip={props.t('Sort by role')}
                         />
                       </th>

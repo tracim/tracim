@@ -11,7 +11,7 @@ export const ContentItemHeader = props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.CONTENT_TYPE)}
         customClass='content__header__type'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.CONTENT_TYPE}
+        isSelected={props.selectedSortCriterion === SORT_BY.CONTENT_TYPE}
         tootltip={props.t('Sort by type')}
       />
 
@@ -20,7 +20,7 @@ export const ContentItemHeader = props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
         customClass='content__header__name'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.LABEL}
+        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
         tootltip={props.t('Sort by title')}
       />
 
@@ -43,7 +43,7 @@ export const ContentItemHeader = props => {
           onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
           customClass='content__header__modification'
           isOrderAscending={props.isOrderAscending}
-          isSelected={props.selectedSortCriteria === SORT_BY.MODIFICATION_DATE}
+          isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
           tootltip={props.t('Sort by last modification')}
         />
       )}
@@ -59,7 +59,7 @@ export const ContentItemHeader = props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.STATUS)}
         customClass='content__header__status'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.STATUS}
+        isSelected={props.selectedSortCriterion === SORT_BY.STATUS}
         tootltip={props.t('Sort by status')}
       />
     </div>
@@ -71,7 +71,7 @@ export default translate()(ContentItemHeader)
 ContentItemHeader.propTypes = {
   isOrderAscending: PropTypes.bool,
   onClickTitle: PropTypes.func,
-  selectedSortCriteria: PropTypes.string,
+  selectedSortCriterion: PropTypes.string,
   showSearchDetails: PropTypes.bool,
   showLastModification: PropTypes.bool
 }
@@ -79,7 +79,7 @@ ContentItemHeader.propTypes = {
 ContentItemHeader.defaultProps = {
   isOrderAscending: true,
   onClickTitle: () => { },
-  selectedSortCriteria: '',
+  selectedSortCriterion: '',
   showSearchDetails: false,
   showLastModification: false
 }

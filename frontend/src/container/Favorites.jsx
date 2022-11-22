@@ -51,7 +51,7 @@ const FavoritesHeader = translate()(props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.CONTENT_TYPE)}
         customClass='favoritesHeader__type'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.CONTENT_TYPE}
+        isSelected={props.selectedSortCriterion === SORT_BY.CONTENT_TYPE}
         tootltip={props.t('Sort by type')}
       />
       <TitleListHeader
@@ -59,7 +59,7 @@ const FavoritesHeader = translate()(props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
         customClass='favoritesHeader__title'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.LABEL}
+        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
         tootltip={props.t('Sort by title')}
       />
       {/* Header for windows smaller than max-sm */}
@@ -68,7 +68,7 @@ const FavoritesHeader = translate()(props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
         customClass='favoritesHeader__title-max-sm'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.LABEL}
+        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
         tootltip={props.t('Sort by title')}
       />
       <TitleListHeader
@@ -76,7 +76,7 @@ const FavoritesHeader = translate()(props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
         customClass='favoritesHeader__modification'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.MODIFICATION_DATE}
+        isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
         tootltip={props.t('Sort by last modification')}
       />
       <TitleListHeader
@@ -84,7 +84,7 @@ const FavoritesHeader = translate()(props => {
         onClickTitle={() => props.onClickTitle(SORT_BY.STATUS)}
         customClass='favoritesHeader__information'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriteria === SORT_BY.STATUS}
+        isSelected={props.selectedSortCriterion === SORT_BY.STATUS}
         tootltip={props.t('Sort by information')}
       />
       <div className='favoritesHeader__favoriteButton'>
@@ -133,7 +133,7 @@ export class Favorites extends React.Component {
       contentBreadcrumbsList: [],
       displayedFavoritesList: [],
       isLoading: true,
-      selectedSortCriteria: SORT_BY.LABEL,
+      selectedSortCriterion: SORT_BY.LABEL,
       sortOrder: SORT_ORDER.ASCENDING
     }
 
@@ -299,7 +299,7 @@ export class Favorites extends React.Component {
 
     const sortedList = sortListBy(
       props.favoriteList,
-      state.selectedSortCriteria,
+      state.selectedSortCriterion,
       state.sortOrder,
       props.user.lang
     )
@@ -307,14 +307,14 @@ export class Favorites extends React.Component {
     this.setState({ displayedFavoritesList: sortedList })
   }
 
-  handleClickTitleToSort = (criteria) => {
+  handleClickTitleToSort = (criterion) => {
     this.setState(prev => {
-      const sortOrder = prev.selectedSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+      const sortOrder = prev.selectedSortCriterion === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criteria, sortOrder, this.props.user.lang),
-        selectedSortCriteria: criteria,
+        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criterion, sortOrder, this.props.user.lang),
+        selectedSortCriterion: criterion,
         sortOrder: sortOrder
       }
     })
@@ -341,7 +341,7 @@ export class Favorites extends React.Component {
                     <FavoritesHeader
                       onClickTitle={this.handleClickTitleToSort}
                       isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-                      selectedSortCriteria={state.selectedSortCriteria}
+                      selectedSortCriterion={state.selectedSortCriterion}
                     />
                     {state.displayedFavoritesList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
                   </PageContent>

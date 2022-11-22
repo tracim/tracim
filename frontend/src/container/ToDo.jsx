@@ -18,7 +18,7 @@ import {
   PageWrapper,
   putToDo,
   ROLE,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   SORT_BY,
   STATUSES,
   TextInput,
@@ -110,7 +110,7 @@ const ToDo = (props) => {
     setIsLoading(false)
 
     if (fetchGetToDo.apiResponse.status === 200) {
-      setToDoList(sortListByMultipleCriterias(
+      setToDoList(sortListByMultipleCriteria(
         fetchGetToDo.body,
         [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
       ))
@@ -149,7 +149,7 @@ const ToDo = (props) => {
       data.fields.content.content_id
     ))
 
-    setToDoList(sortListByMultipleCriterias(
+    setToDoList(sortListByMultipleCriteria(
       uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'),
       [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
     ))

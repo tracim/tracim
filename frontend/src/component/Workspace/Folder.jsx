@@ -183,7 +183,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {putFoldersAtListBeginning(sortListBy(folderContentList, props.selectedSortCriteria, props.sortOrder, props.lang))
+          {putFoldersAtListBeginning(sortListBy(folderContentList, props.selectedSortCriterion, props.sortOrder, props.lang))
             .map((content, i) => content.type === 'folder'
               ? (
                 <FolderContainer
@@ -207,7 +207,7 @@ class Folder extends React.Component {
                   key={content.id}
                   t={props.t}
                   location={props.location}
-                  selectedSortCriteria={props.selectedSortCriteria}
+                  selectedSortCriterion={props.selectedSortCriterion}
                   sortOrder={props.sortOrder}
                 />
               )

@@ -52,7 +52,7 @@ import {
   sendGlobalFlashMessage,
   TagList,
   getFileRevisionPreviewInfo,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   SORT_BY,
   ToDoManagement
 } from 'tracim_frontend_lib'
@@ -201,7 +201,7 @@ export class File extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: sortListByMultipleCriterias(
+      toDoList: sortListByMultipleCriteria(
         uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'),
         [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
       )

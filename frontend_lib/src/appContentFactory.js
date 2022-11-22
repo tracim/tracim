@@ -20,7 +20,7 @@ import {
 
 import {
   SORT_BY,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   sortTimelineByDate
 } from './sortListHelper.js'
 
@@ -205,7 +205,7 @@ export function appContentFactory (WrappedComponent) {
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
           setState({
-            toDoList: sortListByMultipleCriterias(
+            toDoList: sortListByMultipleCriteria(
               uniqBy(fetchGetToDo.body, 'content_id'),
               [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
             )

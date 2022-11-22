@@ -6,7 +6,6 @@ import { isAfter } from 'date-fns'
 
 // GIULIA do unit tests
 
-// GIULIA need documentation
 export const SORT_BY = {
   CONTENT_TYPE: 'contentType',
   CREATION_DATE: 'created',
@@ -23,24 +22,32 @@ export const SORT_BY = {
   USERNAME: 'username'
 }
 
-/*
-  INFO - GB - 2022-11-17 -
-    Ascending means smallest to largest, 0 to 9 or A to Z
-    Descending means largest to smallest, 9 to 0 or Z to A
-*/
+// INFO - GB - 2022-11-17 -
+// Ascending means smallest to largest, 0 to 9 or A to Z
+// Descending means largest to smallest, 9 to 0 or Z to A
 export const SORT_ORDER = {
   ASCENDING: 'ascending',
   DESCENDING: 'descending'
 }
 
-// GIULIA need documentation
-export const sortListBy = (list, criteria, order = SORT_ORDER.ASCENDING, lang = 'en') => {
-  return sortListByOneCriteria(sortById(list), criteria, order, lang)
+/**
+ * Sorts the list according to the criterion and order given.
+ * @param {Array} list The list to be sorted.
+ * @param {Enum <'SORT_BY'>} criterion
+ * The criterion that will be used to sort. It must be one of the options of the SORT_BY object found in the frontend_lib/src/sortListHelper.js file.
+ * @param {Enum <'SORT_ORDER'>} order
+ * (Optionnal) The order that the list will be sorte. It must be one of the options of the SORT_ORDER object
+ * found in the frontend_lib/src/sortListHelper.js file. The default value is SORT_ORDER.ASCENDING.
+ * @param {String} lang (Optionnal) The language that will be used as the basis for alphabetical order. The default value is 'en'.
+ * @returns {Array} The list sorted.
+ */
+export const sortListBy = (list, criterion, order = SORT_ORDER.ASCENDING, lang = 'en') => {
+  return sortListByOneCriterion(sortById(list), criterion, order, lang)
 }
 
-const sortListByOneCriteria = (list, criteria, order, lang) => {
+const sortListByOneCriterion = (list, criterion, order, lang) => {
   let sortedList = list
-  switch (criteria) {
+  switch (criterion) {
     case SORT_BY.CONTENT_TYPE:
       sortedList = sortByContentType(list, lang)
       break
@@ -88,13 +95,24 @@ const sortListByOneCriteria = (list, criteria, order, lang) => {
     : sortedList.reverse()
 }
 
-// GIULIA need documentation
-export const sortListByMultipleCriterias = (listToSort, criteriaList, order = SORT_ORDER.ASCENDING, lang = 'en') => {
+/**
+ * Sorts the list according to all the criteria and order given.
+ * @param {Array} listToSort The list to be sorted.
+ * @param {Array<Enum <'SORT_BY'>>} criteriaList
+ * The list of criteria that will be used to sort. It must be one of the options of the SORT_BY object found in the
+ * frontend_lib/src/sortListHelper.js file. The most important criterion should be first on the list and the least last.
+ * @param {Enum <'SORT_ORDER'>} order
+ * (Optionnal) The order that the list will be sorte. It must be one of the options of the SORT_ORDER object
+ * found in the frontend_lib/src/sortListHelper.js file. The default value is SORT_ORDER.ASCENDING.
+ * @param {String} lang (Optionnal) The language that will be used as the basis for alphabetical order. The default value is 'en'.
+ * @returns {Array} The list sorted.
+ */
+export const sortListByMultipleCriteria = (listToSort, criteriaList, order = SORT_ORDER.ASCENDING, lang = 'en') => {
   if (criteriaList.length === 1) {
-    return sortListByOneCriteria(listToSort, criteriaList[0], order, lang)
+    return sortListByOneCriterion(listToSort, criteriaList[0], order, lang)
   } else {
-    return sortListByMultipleCriterias(
-      sortListByOneCriteria(listToSort, criteriaList[criteriaList.length - 1], order),
+    return sortListByMultipleCriteria(
+      sortListByOneCriterion(listToSort, criteriaList[criteriaList.length - 1], order),
       criteriaList.slice(0, -1),
       order,
       lang
@@ -102,7 +120,6 @@ export const sortListByMultipleCriterias = (listToSort, criteriaList, order = SO
   }
 }
 
-// GIULIA need documentation ?
 const sortByContentType = (list, lang) => {
   return list.sort((a, b) => {
     const aContentType = a.contentType || a.type || a.content_type || a.originalType
@@ -182,7 +199,6 @@ const sortByRole = (list, lang) => {
   return list.sort((a, b) => compareStrings(a.member.role, b.member.role, lang))
 }
 
-// GIULIA need documentation
 const sortBySpaceType = (list, lang) => {
   return list.sort((a, b) => {
     const aSpaceType = a.accessType || a.access_type
@@ -192,7 +208,8 @@ const sortBySpaceType = (list, lang) => {
   })
 }
 
-// GIULIA need documentation
+// INFO - GB - 2022-11-22 - The statuses have an order of priority,
+// if a status is not in the list, it will be sorted in alphabetical order
 const sortByStatus = (list, lang) => {
   return list.sort((a, b) => {
     const aStatus = a.status || a.statusSlug || a.content.statusSlug

@@ -37,7 +37,7 @@ export class JoinWorkspace extends React.Component {
     this.state = {
       displayedFavoritesList: [],
       filter: '',
-      selectedSortCriteria: SORT_BY.LABEL,
+      selectedSortCriterion: SORT_BY.LABEL,
       sortOrder: SORT_ORDER.ASCENDING
     }
 
@@ -67,7 +67,7 @@ export class JoinWorkspace extends React.Component {
 
     const sortedList = sortListBy(
       props.accessibleWorkspaceList,
-      state.selectedSortCriteria,
+      state.selectedSortCriterion,
       state.sortOrder,
       props.user.lang
     )
@@ -75,14 +75,14 @@ export class JoinWorkspace extends React.Component {
     this.setState({ displayedFavoritesList: sortedList })
   }
 
-  handleClickTitleToSort = (criteria) => {
+  handleClickTitleToSort = (criterion) => {
     this.setState(prev => {
-      const sortOrder = prev.selectedSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+      const sortOrder = prev.selectedSortCriterion === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criteria, sortOrder, this.props.user.lang),
-        selectedSortCriteria: criteria,
+        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criterion, sortOrder, this.props.user.lang),
+        selectedSortCriterion: criterion,
         sortOrder: sortOrder
       }
     })
@@ -242,14 +242,14 @@ export class JoinWorkspace extends React.Component {
                     title={props.t('Type')}
                     onClickTitle={() => this.handleClickTitleToSort(SORT_BY.SPACE_TYPE)}
                     isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-                    isSelected={state.selectedSortCriteria === SORT_BY.SPACE_TYPE}
+                    isSelected={state.selectedSortCriterion === SORT_BY.SPACE_TYPE}
                     tootltip={props.t('Sort by type')}
                   />
                   <TitleListHeader
                     title={props.t('Title and description')}
                     onClickTitle={() => this.handleClickTitleToSort(SORT_BY.LABEL)}
                     isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-                    isSelected={state.selectedSortCriteria === SORT_BY.LABEL}
+                    isSelected={state.selectedSortCriterion === SORT_BY.LABEL}
                     tootltip={props.t('Sort by title')}
                   />
                 </div>

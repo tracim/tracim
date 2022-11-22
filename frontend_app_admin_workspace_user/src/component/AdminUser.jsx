@@ -175,7 +175,7 @@ export class AdminUser extends React.Component {
                       title={props.t('Full name')}
                       onClickTitle={() => props.onClickTitle(SORT_BY.PUBLIC_NAME)}
                       isOrderAscending={props.isOrderAscending}
-                      isSelected={props.selectedSortCriteria === SORT_BY.PUBLIC_NAME}
+                      isSelected={props.selectedSortCriterion === SORT_BY.PUBLIC_NAME}
                       tootltip={props.t('Sort by full name')}
                     />
                   </th>
@@ -184,7 +184,7 @@ export class AdminUser extends React.Component {
                       title={props.t('Username')}
                       onClickTitle={() => props.onClickTitle(SORT_BY.USERNAME)}
                       isOrderAscending={props.isOrderAscending}
-                      isSelected={props.selectedSortCriteria === SORT_BY.USERNAME}
+                      isSelected={props.selectedSortCriterion === SORT_BY.USERNAME}
                       tootltip={props.t('Sort by username')}
                     />
                   </th>
@@ -193,7 +193,7 @@ export class AdminUser extends React.Component {
                       title={props.t('User')}
                       onClickTitle={() => props.onClickTitle(SORT_BY.PUBLIC_NAME)}
                       isOrderAscending={props.isOrderAscending}
-                      isSelected={props.selectedSortCriteria === SORT_BY.PUBLIC_NAME}
+                      isSelected={props.selectedSortCriterion === SORT_BY.PUBLIC_NAME}
                       tootltip={props.t('Sort by full name')}
                     />
                   </th>
@@ -202,7 +202,7 @@ export class AdminUser extends React.Component {
                       title={props.t('Email')}
                       onClickTitle={() => props.onClickTitle(SORT_BY.EMAIL)}
                       isOrderAscending={props.isOrderAscending}
-                      isSelected={props.selectedSortCriteria === SORT_BY.EMAIL}
+                      isSelected={props.selectedSortCriterion === SORT_BY.EMAIL}
                       tootltip={props.t('Sort by email')}
                     />
                   </th>

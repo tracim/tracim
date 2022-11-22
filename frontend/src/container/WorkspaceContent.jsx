@@ -84,7 +84,7 @@ export class WorkspaceContent extends React.Component {
       contentLoaded: false,
       displayedContentList: [],
       loadingShareFolder: true,
-      selectedSortCriteria: SORT_BY.LABEL,
+      selectedSortCriterion: SORT_BY.LABEL,
       shareFolder: {
         isOpen: (qs.parse(props.location.search).share_folder || '') === '1'
       },
@@ -459,7 +459,7 @@ export class WorkspaceContent extends React.Component {
 
     const sortedList = sortListBy(
       filteredWorkspaceContentList.filter(c => c.parentId === null),
-      state.selectedSortCriteria,
+      state.selectedSortCriterion,
       state.sortOrder,
       props.user.lang
     )
@@ -467,14 +467,14 @@ export class WorkspaceContent extends React.Component {
     this.setState({ displayedContentList: putFoldersAtListBeginning(sortedList) })
   }
 
-  handleClickTitleToSort = (criteria) => {
+  handleClickTitleToSort = (criterion) => {
     this.setState(prev => {
-      const sortOrder = prev.selectedSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+      const sortOrder = prev.selectedSortCriterion === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedContentList: putFoldersAtListBeginning(sortListBy(prev.displayedContentList, criteria, sortOrder, this.props.user.lang)),
-        selectedSortCriteria: criteria,
+        displayedContentList: putFoldersAtListBeginning(sortListBy(prev.displayedContentList, criterion, sortOrder, this.props.user.lang)),
+        selectedSortCriterion: criterion,
         sortOrder: sortOrder
       }
     })
@@ -779,7 +779,7 @@ export class WorkspaceContent extends React.Component {
                 <ContentItemHeader
                   isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
                   onClickTitle={this.handleClickTitleToSort}
-                  selectedSortCriteria={state.selectedSortCriteria}
+                  selectedSortCriterion={state.selectedSortCriterion}
                   showLastModification
                 />
 
@@ -841,7 +841,7 @@ export class WorkspaceContent extends React.Component {
                         onSetFolderRead={this.handleSetFolderRead}
                         isLast={i === state.displayedContentList.length - 1}
                         key={content.id}
-                        selectedSortCriteria={state.selectedSortCriteria}
+                        selectedSortCriterion={state.selectedSortCriterion}
                         sortOrder={state.sortOrder}
                         t={t}
                       />

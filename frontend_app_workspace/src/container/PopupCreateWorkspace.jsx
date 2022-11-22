@@ -13,7 +13,7 @@ import {
   sendGlobalFlashMessage,
   SORT_BY,
   SORT_ORDER,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
@@ -110,7 +110,7 @@ export class PopupCreateWorkspace extends React.Component {
             })
           }
 
-          addSpacesToList(0, createSpaceTree(sortListByMultipleCriterias(
+          addSpacesToList(0, createSpaceTree(sortListByMultipleCriteria(
             fetchGetUserSpaces.body,
             [SORT_BY.LABEL, SORT_BY.ID],
             SORT_ORDER.ASCENDING,

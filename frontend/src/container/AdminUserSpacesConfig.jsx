@@ -10,7 +10,7 @@ import {
   ROLE_LIST,
   serialize,
   SORT_BY,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   TextInput,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -94,7 +94,7 @@ export const AdminUserSpacesConfig = (props) => {
         Promise.all(spaceList.map(userSpace => {
           return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
         })).then((spaceListResult) => {
-          setSpaceList(sortListByMultipleCriterias(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
+          setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
           setIsLoading(false)
         })
         break
@@ -153,7 +153,7 @@ export const AdminUserSpacesConfig = (props) => {
         }
       }))
     } else {
-      setSpaceList(sortListByMultipleCriterias([...spaceList, fillMemberList(space)], [SORT_BY.LABEL, SORT_BY.ID]))
+      setSpaceList(sortListByMultipleCriteria([...spaceList, fillMemberList(space)], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
 

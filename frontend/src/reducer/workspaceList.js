@@ -9,7 +9,7 @@ import {
   WORKSPACE_MEMBER,
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
-import { serialize, sortListByMultipleCriterias, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
+import { serialize, sortListByMultipleCriteria, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
 import { serializeSidebarEntryProps, serializeMember } from './currentWorkspace.js'
 import { uniqBy } from 'lodash'
 
@@ -50,7 +50,7 @@ export function workspaceList (state = [], action, lang) {
             memberList: []
           }))
       ]
-      return sortListByMultipleCriterias(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+      return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
     }
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
@@ -121,7 +121,7 @@ export function workspaceList (state = [], action, lang) {
           }
           : ws
       )
-      return sortListByMultipleCriterias(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+      return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
     }
 
     default:

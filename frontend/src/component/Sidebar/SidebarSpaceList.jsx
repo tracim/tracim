@@ -7,7 +7,7 @@ import {
   IconButton,
   ROLE_LIST,
   SORT_BY,
-  sortListByMultipleCriterias
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 import {
   findUserRoleIdInWorkspace,
@@ -102,7 +102,7 @@ const SidebarSpaceList = (props) => {
 
       {props.showSpaceList && props.spaceList.length !== 0 && (
         <div className='sidebar__spaces'>
-          {displaySpace(0, createSpaceTree(sortListByMultipleCriterias(props.spaceList, [SORT_BY.LABEL, SORT_BY.ID])))}
+          {displaySpace(0, createSpaceTree(sortListByMultipleCriteria(props.spaceList, [SORT_BY.LABEL, SORT_BY.ID])))}
         </div>
       )}
 

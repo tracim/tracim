@@ -52,7 +52,7 @@ const AdminWorkspace = props => {
                     title={props.t('Id')}
                     onClickTitle={() => props.onClickTitle(SORT_BY.ID)}
                     isOrderAscending={props.isOrderAscending}
-                    isSelected={props.selectedSortCriteria === SORT_BY.ID}
+                    isSelected={props.selectedSortCriterion === SORT_BY.ID}
                     tootltip={props.t('Sort by id')}
                   />
                 </th>
@@ -61,7 +61,7 @@ const AdminWorkspace = props => {
                     title={props.t('Type')}
                     onClickTitle={() => props.onClickTitle(SORT_BY.SPACE_TYPE)}
                     isOrderAscending={props.isOrderAscending}
-                    isSelected={props.selectedSortCriteria === SORT_BY.SPACE_TYPE}
+                    isSelected={props.selectedSortCriterion === SORT_BY.SPACE_TYPE}
                     tootltip={props.t('Sort by type')}
                   />
                 </th>
@@ -70,7 +70,7 @@ const AdminWorkspace = props => {
                     title={props.t('Space')}
                     onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
                     isOrderAscending={props.isOrderAscending}
-                    isSelected={props.selectedSortCriteria === SORT_BY.LABEL}
+                    isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
                     tootltip={props.t('Sort by title')}
                   />
                 </th>
@@ -79,7 +79,7 @@ const AdminWorkspace = props => {
                     title={props.t('Description')}
                     onClickTitle={() => props.onClickTitle(SORT_BY.DESCRIPTION)}
                     isOrderAscending={props.isOrderAscending}
-                    isSelected={props.selectedSortCriteria === SORT_BY.DESCRIPTION}
+                    isSelected={props.selectedSortCriterion === SORT_BY.DESCRIPTION}
                     tootltip={props.t('Sort by description')}
                   />
                 </th>
@@ -88,7 +88,7 @@ const AdminWorkspace = props => {
                     title={props.t('Members')}
                     onClickTitle={() => props.onClickTitle(SORT_BY.NUMBER_OF_MEMBERS)}
                     isOrderAscending={props.isOrderAscending}
-                    isSelected={props.selectedSortCriteria === SORT_BY.NUMBER_OF_MEMBERS}
+                    isSelected={props.selectedSortCriterion === SORT_BY.NUMBER_OF_MEMBERS}
                     tootltip={props.t('Sort by number of members')}
                   />
                 </th>

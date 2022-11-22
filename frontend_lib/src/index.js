@@ -71,7 +71,7 @@ import {
 import {
   putFoldersAtListBeginning,
   sortListBy,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   SORT_BY,
   SORT_ORDER,
   sortTimelineByDate
@@ -503,7 +503,7 @@ export {
   putFoldersAtListBeginning,
   putToDo,
   sortListBy,
-  sortListByMultipleCriterias,
+  sortListByMultipleCriteria,
   SORT_BY,
   SORT_ORDER,
   TimedEvent,

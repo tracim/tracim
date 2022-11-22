@@ -194,27 +194,27 @@ export class AdminWorkspaceUser extends React.Component {
     this.setState({ displayedUserList: sortedList })
   }
 
-  handleClickSpaceTitleToSort = (criteria) => {
+  handleClickSpaceTitleToSort = (criterion) => {
     this.setState(prev => {
-      const sortOrder = prev.selectedSpaceSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+      const sortOrder = prev.selectedSpaceSortCriteria === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedSpaceList: sortListBy(prev.displayedSpaceList, criteria, sortOrder, prev.loggedUser.lang),
-        selectedSpaceSortCriteria: criteria,
+        displayedSpaceList: sortListBy(prev.displayedSpaceList, criterion, sortOrder, prev.loggedUser.lang),
+        selectedSpaceSortCriteria: criterion,
         sortOrder: sortOrder
       }
     })
   }
 
-  handleClickUserTitleToSort = (criteria) => {
+  handleClickUserTitleToSort = (criterion) => {
     this.setState(prev => {
-      const sortOrder = prev.selectedUserSortCriteria === criteria && prev.sortOrder === SORT_ORDER.ASCENDING
+      const sortOrder = prev.selectedUserSortCriteria === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedUserList: sortListBy(prev.displayedUserList, criteria, sortOrder, prev.loggedUser.lang),
-        selectedUserSortCriteria: criteria,
+        displayedUserList: sortListBy(prev.displayedUserList, criterion, sortOrder, prev.loggedUser.lang),
+        selectedUserSortCriteria: criterion,
         sortOrder: sortOrder
       }
     })
@@ -622,7 +622,7 @@ export class AdminWorkspaceUser extends React.Component {
             isEmailNotifActivated={state.config.system.config.email_notification_activated}
             onClickTitle={this.handleClickSpaceTitleToSort}
             isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-            selectedSortCriteria={state.selectedSpaceSortCriteria}
+            selectedSortCriterion={state.selectedSpaceSortCriteria}
           />
         )}
 
@@ -643,7 +643,7 @@ export class AdminWorkspaceUser extends React.Component {
             isEmailRequired={state.config.system.config.email_required}
             onClickTitle={this.handleClickUserTitleToSort}
             isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-            selectedSortCriteria={state.selectedUserSortCriteria}
+            selectedSortCriterion={state.selectedUserSortCriteria}
           />
         )}
 
