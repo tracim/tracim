@@ -4,8 +4,6 @@ import {
 } from './helper.js'
 import { isAfter } from 'date-fns'
 
-// GIULIA do unit tests
-
 export const SORT_BY = {
   CONTENT_TYPE: 'contentType',
   CREATION_DATE: 'created',
@@ -42,10 +40,13 @@ export const SORT_ORDER = {
  * @returns {Array} The list sorted.
  */
 export const sortListBy = (list, criterion, order = SORT_ORDER.ASCENDING, lang = 'en') => {
-  return sortListByOneCriterion(sortById(list), criterion, order, lang)
+  const sortedList = sortListByOneCriterion(sortById(list), criterion, lang)
+  return order === SORT_ORDER.ASCENDING
+    ? sortedList
+    : sortedList.reverse()
 }
 
-const sortListByOneCriterion = (list, criterion, order, lang) => {
+const sortListByOneCriterion = (list, criterion, lang) => {
   let sortedList = list
   switch (criterion) {
     case SORT_BY.CONTENT_TYPE:
@@ -90,9 +91,7 @@ const sortListByOneCriterion = (list, criterion, order, lang) => {
     default:
       break
   }
-  return order === SORT_ORDER.ASCENDING
-    ? sortedList
-    : sortedList.reverse()
+  return sortedList
 }
 
 /**
@@ -109,10 +108,13 @@ const sortListByOneCriterion = (list, criterion, order, lang) => {
  */
 export const sortListByMultipleCriteria = (listToSort, criteriaList, order = SORT_ORDER.ASCENDING, lang = 'en') => {
   if (criteriaList.length === 1) {
-    return sortListByOneCriterion(listToSort, criteriaList[0], order, lang)
+    const sortedList = sortListByOneCriterion(listToSort, criteriaList[0], lang)
+    return order === SORT_ORDER.ASCENDING
+      ? sortedList
+      : sortedList.reverse()
   } else {
     return sortListByMultipleCriteria(
-      sortListByOneCriterion(listToSort, criteriaList[criteriaList.length - 1], order),
+      sortListByOneCriterion(listToSort, criteriaList[criteriaList.length - 1], lang),
       criteriaList.slice(0, -1),
       order,
       lang
@@ -190,7 +192,6 @@ const sortByPublicName = (list, lang) => {
   return list.sort((a, b) => {
     const aPublicName = a.publicName || a.public_name
     const bPublicName = b.publicName || b.public_name
-    console.log(aPublicName, bPublicName, lang)
     return compareStrings(aPublicName, bPublicName, lang)
   })
 }
@@ -230,7 +231,7 @@ const sortByUsername = (list, lang) => {
 }
 
 const compareStrings = (a, b, lang) => {
-  const locale = lang ? lang.replaceAll('_', '-') : undefined
+  const locale = lang ? lang.replace(/_/g, '-') : undefined
   const stringA = a || ''
   const stringB = b || ''
   return stringA.localeCompare(stringB, locale, { numeric: true })
