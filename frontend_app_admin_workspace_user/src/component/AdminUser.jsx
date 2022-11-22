@@ -111,15 +111,15 @@ export class AdminUser extends React.Component {
     const { props, state } = this
     return state.userFilter === ''
       ? props.userList
-      : props.userList.filter(usr => {
-        const userProfile = PROFILE_LIST.find(type => type.slug === usr.profile) || { label: '' }
+      : props.userList.filter(user => {
+        const userProfile = PROFILE_LIST.find(type => type.slug === user.profile) || { label: '' }
 
-        return usr.public_name.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          usr.email.toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          usr.username.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+        return user.public_name.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+          user.email.toUpperCase().includes(state.userFilter.toUpperCase()) ||
+          user.username.toUpperCase().includes(state.userFilter.toUpperCase()) ||
           props.t(userProfile.label).toUpperCase().includes(state.userFilter.toUpperCase()) ||
-          (props.t('Active').toUpperCase().includes(state.userFilter.toUpperCase()) && usr.is_active) ||
-          (props.t('Inactive').toUpperCase().includes(state.userFilter.toUpperCase()) && !usr.is_active)
+          (props.t('Active').toUpperCase().includes(state.userFilter.toUpperCase()) && user.is_active) ||
+          (props.t('Inactive').toUpperCase().includes(state.userFilter.toUpperCase()) && !user.is_active)
       })
   }
 
