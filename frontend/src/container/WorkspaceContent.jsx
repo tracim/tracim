@@ -611,7 +611,7 @@ export class WorkspaceContent extends React.Component {
       const includesFilter = stringIncludes(userFilter)
 
       const hasFilterMatchOnLabel = includesFilter(content.label)
-      const hasFilterMatchOnLastModifier = content.lastModifier !== undefined && includesFilter(content.lastModifier.public_name)
+      const hasFilterMatchOnLastModifier = content.lastModifier && includesFilter(content.lastModifier.public_name)
       const hasFilterMatchOnType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
       const hasFilterMatchOnStatus = statusInfo && includesFilter(props.t(statusInfo.label))
 
