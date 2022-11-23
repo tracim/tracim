@@ -461,7 +461,7 @@ export class WorkspaceContent extends React.Component {
       : []
 
     const sortedList = sortListBy(
-      filteredWorkspaceContentList.filter(c => c.parentId === null),
+      filteredWorkspaceContentList,
       state.selectedSortCriterion,
       state.sortOrder,
       props.user.lang
@@ -646,6 +646,8 @@ export class WorkspaceContent extends React.Component {
   }
 
   filterWorkspaceContentByUserInput = (contentList, userFilter) => {
+    if (userFilter === '') return contentList
+
     const { props } = this
 
     const matchesUserInput = (content) => {
@@ -667,12 +669,9 @@ export class WorkspaceContent extends React.Component {
       )
     }
 
-    const userFilteredList = userFilter === ''
-      ? contentList
-      : contentList.filter(content =>
-        matchesUserInput(content) ||
-        content.type === CONTENT_TYPE.FOLDER
-      )
+    const userFilteredList = contentList.filter(content =>
+      matchesUserInput(content) || content.type === CONTENT_TYPE.FOLDER
+    )
 
     const folderSet = new Set()
     userFilteredList.map(content => {
@@ -681,11 +680,9 @@ export class WorkspaceContent extends React.Component {
       }
     })
 
-    return userFilter === ''
-      ? userFilteredList
-      : userFilteredList.filter(content =>
-        content.type !== CONTENT_TYPE.FOLDER || folderSet.has(content.id) || matchesUserInput(content)
-      )
+    return userFilteredList.filter(content =>
+      content.type !== CONTENT_TYPE.FOLDER || folderSet.has(content.id) || matchesUserInput(content)
+    )
   }
 
   filterWorkspaceContent = (contentList, filter, userFilter) => {
@@ -753,8 +750,10 @@ export class WorkspaceContent extends React.Component {
       )
     ]
 
+    const filteredWorkspaceList = state.displayedContentList.filter(c => c.parentId === null)
+
     const isWorkspaceEmpty = workspaceContentList.length === 0
-    const isFilteredWorkspaceEmpty = state.displayedContentList.length === 0
+    const isFilteredWorkspaceEmpty = filteredWorkspaceList.length === 0
 
     return (
       <div className='tracim__content-scrollview fullWidthFullHeight' id='scrollableElement'>
@@ -860,7 +859,7 @@ export class WorkspaceContent extends React.Component {
                     onClickShareFolder={this.handleClickShareFolder}
                     contentType={contentType}
                     readStatusList={currentWorkspace.contentReadStatusList}
-                    rootContentList={state.displayedContentList}
+                    rootContentList={filteredWorkspaceList}
                     isLast={!state.contentLoaded || isWorkspaceEmpty || isFilteredWorkspaceEmpty}
                     sortOrder={state.sortOrder}
                     selectedSortCriterion={state.selectedSortCriterion}
@@ -870,7 +869,7 @@ export class WorkspaceContent extends React.Component {
 
                 {state.contentLoaded && ((isWorkspaceEmpty || isFilteredWorkspaceEmpty)
                   ? this.displayWorkspaceEmptyMessage(userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty)
-                  : state.displayedContentList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
+                  : filteredWorkspaceList.map((content, i) => content.type === CONTENT_TYPE.FOLDER
                     ? (
                       <Folder
                         loading={state[this.getLoadingFolderKey(content.id)]}
@@ -892,7 +891,7 @@ export class WorkspaceContent extends React.Component {
                         contentType={contentType}
                         readStatusList={currentWorkspace.contentReadStatusList}
                         onSetFolderRead={this.handleSetFolderRead}
-                        isLast={i === state.displayedContentList.length - 1}
+                        isLast={i === filteredWorkspaceList.length - 1}
                         key={content.id}
                         selectedSortCriterion={state.selectedSortCriterion}
                         sortOrder={state.sortOrder}
@@ -916,7 +915,7 @@ export class WorkspaceContent extends React.Component {
                         isTemplate={content.isTemplate}
                         statusSlug={content.statusSlug}
                         contentType={contentType.length ? contentType.find(ct => ct.slug === content.type) : null}
-                        isLast={i === state.displayedContentList.length - 1}
+                        isLast={i === filteredWorkspaceList.length - 1}
                         urlContent={`${PAGE.WORKSPACE.CONTENT(content.workspaceId, content.type, content.id)}${location.search}`}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         read={currentWorkspace.contentReadStatusList.includes(content.id)}
