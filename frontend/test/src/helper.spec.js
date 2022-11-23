@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 import {
-  sortContentList,
   findUserRoleIdInWorkspace,
   getUserProfile
 } from '../../src/util/helper.js'
