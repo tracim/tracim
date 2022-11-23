@@ -1,6 +1,18 @@
 @import '~tracim_frontend_lib/src/css/Variable.styl'
 
 .adminWorkspace
+  &__searchBar
+    border 1px solid lightGrey1
+    background-color offWhite
+    margin-top standardSpacing
+    margin-bottom standardSpacing * 2
+    border-radius standardBorderRadius
+    padding 0 standardSpacing
+  &__searchBar:focus-within
+    border 1px solid lightBlue
+  &__searchBar .textinput__box:focus-within
+    border 0
+
   &__description
     margin-bottom standardSpacing
   &__delimiter
@@ -45,6 +57,18 @@
       padding standardSpacing 0
       &.adminUser__table__active
         padding standardSpacing
+  &__searchBar
+    border 1px solid lightGrey1
+    background-color offWhite
+    margin-top standardSpacing
+    margin-bottom standardSpacing * 2
+    border-radius standardBorderRadius
+    padding 0 standardSpacing
+  &__searchBar:focus-within
+    border 1px solid lightBlue
+  &__searchBar .textinput__box:focus-within
+    border 0
+
   &__description
     margin-bottom standardSpacing
   &__adduser

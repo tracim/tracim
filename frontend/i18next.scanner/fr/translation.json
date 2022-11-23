@@ -587,5 +587,10 @@
   "My Configuration links": "Mes liens de configuration",
   "Error while marking the notification group as read": "Une erreur est survenue en marquant le groupe de notifications comme lu",
   "Error while marking notifications as read": "Une erreur est survenue en marquant les notifications comme lues",
-  "Open emoticons menu": "Ouvrir le menu d'emoticons"
+  "Open emoticons menu": "Ouvrir le menu d'emoticons",
+  "Filter my favorites": "",
+  "There are no favorites that matches you filter": "",
+  "Filter visible contents": "",
+  "There are no spaces that matches your filter": "",
+  "Filter users": ""
 }

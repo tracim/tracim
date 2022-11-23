@@ -179,8 +179,7 @@ ContentItem.propTypes = {
   userRoleIdInWorkspace: PropTypes.number,
   modified: PropTypes.string.isRequired,
   lang: PropTypes.string.isRequired,
-  currentRevisionType: PropTypes.string.isRequired,
-  lastModifier: PropTypes.object.isRequired
+  currentRevisionType: PropTypes.string.isRequired
 }
 
 ContentItem.defaultProps = {

@@ -48,5 +48,10 @@
   "Choose the user's type": "Choose the user's type",
   "Type": "Type",
   "Create and add to spaces": "Create and add to spaces",
-  "Create": "Create"
+  "Create": "Create",
+  "Inactive": "Inactive",
+  "Filter users": "Filter users",
+  "There are no users that matches you filter": "There are no users that matches you filter",
+  "Filter spaces": "Filter spaces",
+  "There are no spaces that matches you filter": "There are no spaces that matches you filter"
 }

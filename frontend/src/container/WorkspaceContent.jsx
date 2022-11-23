@@ -32,11 +32,13 @@ import {
   IconButton,
   PAGE,
   putFoldersAtListBeginning,
-  sendGlobalFlashMessage,
   SORT_BY,
   SORT_ORDER,
   sortListBy,
-  TracimComponent
+  TracimComponent,
+  sendGlobalFlashMessage,
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import {
   getFolderContentList,
@@ -83,6 +85,7 @@ export class WorkspaceContent extends React.Component {
       appOpenedType: false,
       contentLoaded: false,
       displayedContentList: [],
+      userFilter: '',
       loadingShareFolder: true,
       selectedSortCriterion: SORT_BY.LABEL,
       shareFolder: {
@@ -642,9 +645,57 @@ export class WorkspaceContent extends React.Component {
     props.history.push(props.location.pathname + '?' + qs.stringify(newUrlSearchObject, { encode: false }))
   }
 
-  filterWorkspaceContent = (contentList, filter) => filter.length === 0
-    ? contentList
-    : contentList.filter(c => c.type === CONTENT_TYPE.FOLDER || filter.includes(c.type)) // keep unfiltered files and folders
+  filterWorkspaceContentByUserInput = (contentList, userFilter) => {
+    const { props } = this
+
+    const matchesUserInput = (content) => {
+      const contentTypeInfo = props.contentType.find(info => info.slug === content.type)
+      const statusInfo = contentTypeInfo.availableStatuses.find(s => s.slug === content.statusSlug)
+
+      const includesFilter = stringIncludes(userFilter)
+
+      const hasFilterMatchOnLabel = includesFilter(content.label)
+      const hasFilterMatchOnLastModifier = content.lastModifier && includesFilter(content.lastModifier.public_name)
+      const hasFilterMatchOnType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
+      const hasFilterMatchOnStatus = statusInfo && includesFilter(props.t(statusInfo.label))
+
+      return (
+        hasFilterMatchOnLabel ||
+        hasFilterMatchOnLastModifier ||
+        hasFilterMatchOnType ||
+        hasFilterMatchOnStatus
+      )
+    }
+
+    const userFilteredList = userFilter === ''
+      ? contentList
+      : contentList.filter(content =>
+        matchesUserInput(content) ||
+        content.type === CONTENT_TYPE.FOLDER
+      )
+
+    const folderSet = new Set()
+    userFilteredList.map(content => {
+      if (content.parentId !== null && (content.type !== CONTENT_TYPE.FOLDER || matchesUserInput(content))) {
+        folderSet.add(content.parentId)
+      }
+    })
+
+    return userFilter === ''
+      ? userFilteredList
+      : userFilteredList.filter(content =>
+        content.type !== CONTENT_TYPE.FOLDER || folderSet.has(content.id) || matchesUserInput(content)
+      )
+  }
+
+  filterWorkspaceContent = (contentList, filter, userFilter) => {
+    const userFilteredList = this.filterWorkspaceContentByUserInput(contentList, userFilter)
+
+    return filter.length === 0
+      ? userFilteredList
+      : userFilteredList.filter(c => c.type === CONTENT_TYPE.FOLDER ||
+        filter.includes(c.type))
+  }
 
   displayWorkspaceEmptyMessage = (userRoleIdInWorkspace, isWorkspaceEmpty, isFilteredWorkspaceEmpty) => {
     const { props } = this
@@ -690,7 +741,7 @@ export class WorkspaceContent extends React.Component {
     const urlFilter = qs.parse(location.search).type
 
     const filteredWorkspaceContentList = workspaceContentList.length > 0
-      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
+      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [], state.userFilter)
       : []
 
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST)
@@ -776,6 +827,15 @@ export class WorkspaceContent extends React.Component {
               </div>
 
               <div className='workspace__content__file_and_folder folder__content active'>
+                <FilterBar
+                  onChange={e => {
+                    const newFilter = e.target.value
+                    this.setState({ userFilter: newFilter })
+                  }}
+                  value={state.userFilter}
+                  placeholder={props.t('Filter visible contents')}
+                />
+
                 <ContentItemHeader
                   isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
                   onClickTitle={this.handleClickTitleToSort}
@@ -808,6 +868,8 @@ export class WorkspaceContent extends React.Component {
                     readStatusList={currentWorkspace.contentReadStatusList}
                     rootContentList={state.displayedContentList}
                     isLast={!state.contentLoaded || isWorkspaceEmpty || isFilteredWorkspaceEmpty}
+                    sortOrder={state.sortOrder}
+                    selectedSortCriterion={state.selectedSortCriterion}
                     t={t}
                   />
                 )}
@@ -820,10 +882,7 @@ export class WorkspaceContent extends React.Component {
                         loading={state[this.getLoadingFolderKey(content.id)]}
                         availableApp={createContentAvailableApp}
                         folderData={content}
-                        modified={content.modified}
                         lang={props.user.lang}
-                        currentRevisionType={content.currentRevisionType}
-                        lastModifier={content.lastModifier}
                         workspaceContentList={filteredWorkspaceContentList}
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}

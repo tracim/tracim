@@ -20,7 +20,10 @@ import {
   TitleListHeader,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  FilterBar,
+  ROLE_LIST,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
@@ -55,6 +58,7 @@ export const UserSpacesConfig = (props) => {
   const [isLoading, setIsLoading] = useState(true)
   const [selectedSortCriterion, setSelectedSortCriterion] = useState(SORT_BY.LABEL)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
+  const [userFilter, setUserFilter] = useState('')
 
   useEffect(() => {
     props.registerLiveMessageHandlerList([
@@ -81,7 +85,9 @@ export const UserSpacesConfig = (props) => {
       props.user.lang
     )
 
-    const entrieList = sortedList.map(space => {
+    const filteredSpaceList = filterSpaceList(sortedList)
+
+    const entrieList = filteredSpaceList.map(space => {
       return (
         <UserSpacesConfigLine
           space={space}
@@ -95,7 +101,25 @@ export const UserSpacesConfig = (props) => {
       )
     })
     setEntries(entrieList)
-  }, [spaceList, sortOrder, selectedSortCriterion])
+  }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
+
+  const filterSpaceList = (list) => {
+    if (userFilter === '') return list
+
+    return list.filter(space => {
+      const userRole = ROLE_LIST.find(type => type.slug === space.member.role) || { label: '' }
+
+      const includesFilter = stringIncludes(userFilter)
+
+      const hasFilterMatchOnLabel = includesFilter(space.label)
+      const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
+
+      return (
+        hasFilterMatchOnLabel ||
+        hasFilterMatchOnRole
+      )
+    })
+  }
 
   useEffect(() => {
     if (props.userToEditId === props.user.userId && props.workspaceList) {
@@ -232,6 +256,15 @@ export const UserSpacesConfig = (props) => {
             />
           )}
 
+          <FilterBar
+            onChange={e => {
+              const newFilter = e.target.value
+              setUserFilter(newFilter)
+            }}
+            value={userFilter}
+            placeholder={props.t('Filter spaces')}
+          />
+
           {(entries.length
             ? (
               <div className='spaceconfig__table'>
@@ -282,9 +315,11 @@ export const UserSpacesConfig = (props) => {
                 ))}
               </div>
             ) : (
-              props.admin
-                ? props.t('This user is not a member of any space yet')
-                : props.t('You are not a member of any space yet')
+              userFilter !== ''
+                ? props.t('There are no spaces that matches your filter')
+                : props.admin
+                  ? props.t('This user is not a member of any space yet')
+                  : props.t('You are not a member of any space yet')
             )
           )}
         </div>

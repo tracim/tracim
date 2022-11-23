@@ -21,7 +21,9 @@ import {
   SORT_BY,
   SORT_ORDER,
   sortListBy,
-  TitleListHeader
+  TitleListHeader,
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 import {
@@ -134,7 +136,8 @@ export class Favorites extends React.Component {
       displayedFavoritesList: [],
       isLoading: true,
       selectedSortCriterion: SORT_BY.LABEL,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortOrder: SORT_ORDER.ASCENDING,
+      userFilter: ''
     }
 
     props.registerCustomEventHandlerList([
@@ -320,8 +323,41 @@ export class Favorites extends React.Component {
     })
   }
 
+  filterFavoriteList = () => {
+    const { props, state } = this
+
+    if (state.userFilter === '') return state.displayedFavoritesList
+
+    return state.displayedFavoritesList.filter((favorite, index) => {
+      if (!favorite.content || !state.contentBreadcrumbsList[index]) return false
+
+      const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
+      const statusInfo = contentTypeInfo.availableStatuses.find(
+        s => s.slug === favorite.content.statusSlug
+      )
+
+      const includesFilter = stringIncludes(state.userFilter)
+
+      const hasFilterMatchOnContentLabel = includesFilter(favorite.content.label)
+      const hasFilterMatchOnLastModifier = includesFilter(favorite.content.lastModifier.publicName)
+      const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => includesFilter(item.label))
+      const hasFilterMatchOnContentType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
+      const hasFilterMatchOnContentStatus = statusInfo && includesFilter(props.t(statusInfo.label))
+
+      return (
+        hasFilterMatchOnContentLabel ||
+        hasFilterMatchOnLastModifier ||
+        hasFilterMatchOnBreadcrumbs ||
+        hasFilterMatchOnContentType ||
+        hasFilterMatchOnContentStatus
+      )
+    })
+  }
+
   render () {
     const { props, state } = this
+    const filteredFavoriteList = this.filterFavoriteList()
+
     return (
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
@@ -335,22 +371,35 @@ export class Favorites extends React.Component {
           {state.isLoading
             ? <Loading />
             : (
-              state.displayedFavoritesList.length > 0
-                ? (
-                  <PageContent>
-                    <FavoritesHeader
-                      onClickTitle={this.handleClickTitleToSort}
-                      isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
-                      selectedSortCriterion={state.selectedSortCriterion}
-                    />
-                    {state.displayedFavoritesList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
-                  </PageContent>
-                )
-                : (
-                  <EmptyListMessage>
-                    {props.t('You did not add any content as favorite yet.')}
-                  </EmptyListMessage>
-                )
+              <PageContent>
+                <FilterBar
+                  onChange={e => {
+                    const newFilter = e.target.value
+                    this.setState({ userFilter: newFilter })
+                  }}
+                  value={state.userFilter}
+                  placeholder={props.t('Filter my favorites')}
+                />
+
+                {filteredFavoriteList.length > 0
+                  ? (
+                    <>
+                      <FavoritesHeader
+                        onClickTitle={this.handleClickTitleToSort}
+                        isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+                        selectedSortCriterion={state.selectedSortCriterion}
+                      />
+                      {filteredFavoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
+                    </>
+                  )
+                  : (
+                    <EmptyListMessage>
+                      {props.favoriteList.length <= 0
+                        ? props.t('You did not add any content as favorite yet.')
+                        : props.t('There are no favorites that matches you filter')}
+                    </EmptyListMessage>
+                  )}
+              </PageContent>
             )}
         </PageWrapper>
       </div>

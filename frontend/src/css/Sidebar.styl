@@ -1,17 +1,20 @@
 sidebar-animate-speed = 0.5s
 sidebarFontColorHover = grey
 borderWhenActive= 5px
+spacingInsideMenu = 40px
 
 .sidebar
   background-color var(--sidebarColor)
   transition all sidebar-animate-speed
   width sidebarWidth
   min-width sidebarWidth
-  z-index 10
+  z-index 20
   display flex
   flex-direction column
   height 100vh
   overflow-x auto
+  position sticky
+  top 0px
   &__header
     height headerHeight
     min-height headerHeight
@@ -45,6 +48,8 @@ borderWhenActive= 5px
     height 40px
     min-height 40px
     padding-inline-start borderWhenActive
+    &__inside_menu
+      padding-inline-start spacingInsideMenu
     &__unread
       font-weight bold
     &:hover
@@ -55,8 +60,10 @@ borderWhenActive= 5px
       border-inline-start-style solid
       border-inline-start-width borderWhenActive
       font-weight bold
+      &.sidebar__item__inside_menu
+        padding-inline-start spacingInsideMenu - borderWhenActive
       &.sidebar__item__space
-        padding-inline-start 0
+        padding-inline-start spacingInsideMenu + standardSpacing - borderWhenActive
       &.sidebar__search
         padding-inline-start textSpacing
     &__name
@@ -71,9 +78,10 @@ borderWhenActive= 5px
       & > span
         display flex
         align-items center
+        padding-inline-start standardSpacing
     &__space
       display flex
-      padding-inline-start borderWhenActive
+      padding-inline-start spacingInsideMenu + standardSpacing
       align-items center
       &__type
         padding-inline-start textSpacing
@@ -85,11 +93,15 @@ borderWhenActive= 5px
       &:hover
         background-color var(--sidebarColorDarken)
     &__withoutChildren
-      padding-inline-start 20px
+      padding-inline-start standardSpacing * 3
     &__foldChildren
       height 100%
-      &:hover > .iconbutton__icon
-        color sidebarFontColorHover
+      padding-inline-end 0
+      padding-inline-start 0
+      &:hover
+        background-color transparent
+        & > .iconbutton__icon
+          color sidebarFontColorHover
     &__dragNdrop
       margin-inline-start textSpacing
     &__menu
@@ -113,7 +125,7 @@ borderWhenActive= 5px
       display flex
       color var(--sidebarFontColor)
       font-weight bold
-      padding-inline-start 0
+      padding-inline-start standardSpacing
       align-items center
       flex 1
       height 100%
@@ -191,6 +203,7 @@ borderWhenActive= 5px
     & .sidebar__item
       justify-content center
       padding-inline-end borderWhenActive
+      padding-inline-start borderWhenActive
       & > span
         display none
       &__name
@@ -208,6 +221,8 @@ borderWhenActive= 5px
         display none
       &__menu
         display none
+    & .sidebar__item__current
+      padding-inline-start 0
     & .sidebar__spaces
       display none
     & .sidebar__footer
@@ -216,7 +231,6 @@ borderWhenActive= 5px
       & .sidebar__footer__text
         display none
     & .sidebar__title__button
-      padding-inline-start borderWhenActive
       justify-content center
       & > span
         display none

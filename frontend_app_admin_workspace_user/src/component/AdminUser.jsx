@@ -17,7 +17,10 @@ import {
   PROFILE_LIST,
   ProfileNavigation,
   SORT_BY,
-  TitleListHeader
+  TitleListHeader,
+  EmptyListMessage,
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import AddUserForm from './AddUserForm.jsx'
 import { getUserProfile } from '../helper.js'
@@ -27,7 +30,8 @@ export class AdminUser extends React.Component {
     super(props)
 
     this.state = {
-      displayAddUser: false
+      displayAddUser: false,
+      userFilter: ''
     }
   }
 
@@ -106,8 +110,37 @@ export class AdminUser extends React.Component {
     if (resultSuccess > 0) this.handleToggleAddUser()
   }
 
+  filterUserList = () => {
+    const { props, state } = this
+
+    if (state.userFilter === '') return props.userList
+
+    return props.userList.filter(user => {
+      const userProfile = PROFILE_LIST.find(type => type.slug === user.profile) || { label: '' }
+
+      const includesFilter = stringIncludes(state.userFilter)
+
+      const hasFilterMatchOnPublicName = includesFilter(user.public_name)
+      const hasFilterMatchOnEmail = includesFilter(user.email)
+      const hasFilterMatchOnUsername = includesFilter(user.username)
+      const hasFilterMatchOnProfileType = userProfile && includesFilter(props.t(userProfile.label))
+      const hasFilterMatchOnActive = includesFilter(props.t('Active')) && user.is_active
+      const hasFilterMatchOnInactive = includesFilter(props.t('Inactive')) && !user.is_active
+
+      return (
+        hasFilterMatchOnPublicName ||
+        hasFilterMatchOnEmail ||
+        hasFilterMatchOnUsername ||
+        hasFilterMatchOnProfileType ||
+        hasFilterMatchOnActive ||
+        hasFilterMatchOnInactive
+      )
+    })
+  }
+
   render () {
     const { props, state } = this
+    const filteredUserList = this.filterUserList()
 
     return (
       <PageWrapper customClass='adminUser'>
@@ -164,6 +197,15 @@ export class AdminUser extends React.Component {
 
           <Delimiter customClass='adminUser__delimiter' />
 
+          <FilterBar
+            onChange={e => {
+              const newFilter = e.target.value
+              this.setState({ userFilter: newFilter })
+            }}
+            value={state.userFilter}
+            placeholder={props.t('Filter users')}
+          />
+
           <div className='adminUser__table'>
             <table className='table'>
               <thead>
@@ -212,7 +254,7 @@ export class AdminUser extends React.Component {
               </thead>
 
               <tbody>
-                {props.loaded && props.userList.map(u => {
+                {props.loaded && filteredUserList.length > 0 && filteredUserList.map(u => {
                   const userProfile = getUserProfile(PROFILE_LIST, u.profile)
                   return (
                     <tr
@@ -326,6 +368,11 @@ export class AdminUser extends React.Component {
                 )}
               </tbody>
             </table>
+            {filteredUserList.length <= 0 && (
+              <EmptyListMessage>
+                {props.t('There are no users that matches you filter')}
+              </EmptyListMessage>
+            )}
           </div>
 
         </PageContent>
