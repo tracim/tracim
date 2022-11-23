@@ -201,7 +201,7 @@ export class WorkspaceContent extends React.Component {
       this.loadAllWorkspaceContent(workspaceId, false)
     } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
 
-    if (props.workspaceContentList !== prevProps.workspaceContentList) this.setDisplayedContentList()
+    if (props.workspaceContentList !== prevProps.workspaceContentList || state.userFilter !== prevState.userFilter) this.setDisplayedContentList()
   }
 
   componentWillUnmount () {
@@ -457,7 +457,7 @@ export class WorkspaceContent extends React.Component {
     const urlFilter = qs.parse(props.location.search).type
 
     const filteredWorkspaceContentList = workspaceContentList.length > 0
-      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [])
+      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [], state.userFilter)
       : []
 
     const sortedList = sortListBy(
@@ -738,12 +738,6 @@ export class WorkspaceContent extends React.Component {
       ? props.workspaceContentList.contentList
       : []
 
-    const urlFilter = qs.parse(location.search).type
-
-    const filteredWorkspaceContentList = workspaceContentList.length > 0
-      ? this.filterWorkspaceContent(workspaceContentList, urlFilter ? [urlFilter] : [], state.userFilter)
-      : []
-
     const userRoleIdInWorkspace = findUserRoleIdInWorkspace(user.userId, currentWorkspace.memberList, ROLE_LIST)
 
     const createContentAvailableApp = [
@@ -883,7 +877,7 @@ export class WorkspaceContent extends React.Component {
                         availableApp={createContentAvailableApp}
                         folderData={content}
                         lang={props.user.lang}
-                        workspaceContentList={filteredWorkspaceContentList}
+                        workspaceContentList={state.displayedContentList}
                         getContentParentList={this.getContentParentList}
                         userRoleIdInWorkspace={userRoleIdInWorkspace}
                         onClickExtendedAction={{
