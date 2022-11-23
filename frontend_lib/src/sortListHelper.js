@@ -171,8 +171,8 @@ const sortByLabel = (list, lang) => {
 
 const sortByModificationDate = (list) => {
   return list.sort((a, b) => {
-    const aModificationDate = a.modified || a.content.modified
-    const bModificationDate = b.modified || b.content.modified
+    const aModificationDate = a.modified || a.content ? a.content.modified : ''
+    const bModificationDate = b.modified || b.content ? b.content.modified : ''
 
     if (aModificationDate < bModificationDate) return 1
     if (aModificationDate > bModificationDate) return -1
@@ -213,8 +213,8 @@ const sortBySpaceType = (list, lang) => {
 // if a status is not in the list, it will be sorted in alphabetical order
 const sortByStatus = (list, lang) => {
   return list.sort((a, b) => {
-    const aStatus = a.status || a.statusSlug || a.content.statusSlug
-    const bStatus = b.status || b.statusSlug || b.content.statusSlug
+    const aStatus = a.status || a.statusSlug || a.content ? a.content.statusSlug : ''
+    const bStatus = b.status || b.statusSlug || b.content ? b.content.statusSlug : ''
 
     const statusOrder = [STATUSES.OPEN, STATUSES.VALIDATED, STATUSES.CANCELLED, STATUSES.DEPRECATED]
 
