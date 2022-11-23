@@ -29,8 +29,8 @@ const AdminWorkspace = props => {
 
       const hasFilterMatchOnLabel = includesFilter(space.label)
       const hasFilterMatchOnDescription = includesFilter(space.description)
-      const hasFilterMatchOnType = includesFilter(props.t(spaceType.label))
-      const hasFilterMatchOnId = includesFilter(space.workspace_id.toString())
+      const hasFilterMatchOnType = spaceType && includesFilter(props.t(spaceType.label))
+      const hasFilterMatchOnId = space.workspace_id && includesFilter(space.workspace_id.toString())
 
       return (
         hasFilterMatchOnLabel ||

@@ -171,7 +171,7 @@ export class JoinWorkspace extends React.Component {
 
     const hasFilterMatchOnLabel = includesFilter(workspace.label)
     const hasFilterMatchOnDescription = includesFilter(workspace.description)
-    const hasFilterMatchOnType = includesFilter(this.props.t(spaceType.label))
+    const hasFilterMatchOnType = spaceType && includesFilter(this.props.t(spaceType.label))
 
     return (
       hasFilterMatchOnLabel ||

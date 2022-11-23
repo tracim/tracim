@@ -29,7 +29,7 @@ export const MemberList = (props) => {
 
       const hasFilterMatchOnPublicName = includesFilter(member.publicName)
       const hasFilterMatchOnUsername = includesFilter(member.username)
-      const hasFilterMatchOnRole = includesFilter(props.t(userRole.label))
+      const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
 
       return (
         hasFilterMatchOnPublicName ||

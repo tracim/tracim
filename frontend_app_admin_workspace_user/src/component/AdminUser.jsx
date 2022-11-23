@@ -121,7 +121,7 @@ export class AdminUser extends React.Component {
       const hasFilterMatchOnPublicName = includesFilter(user.public_name)
       const hasFilterMatchOnEmail = includesFilter(user.email)
       const hasFilterMatchOnUsername = includesFilter(user.username)
-      const hasFilterMatchOnProfileType = includesFilter(props.t(userProfile.label))
+      const hasFilterMatchOnProfileType = userProfile && includesFilter(props.t(userProfile.label))
       const hasFilterMatchOnActive = includesFilter(props.t('Active')) && user.is_active
       const hasFilterMatchOnInactive = includesFilter(props.t('Inactive')) && !user.is_active
 

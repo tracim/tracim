@@ -984,5 +984,5 @@ export const sortMemberList = (a, b) => a.publicName.localeCompare(b.publicName)
 // Useful when you have to test if a single string is included in multiple others
 // Usage: const fn = stringIncludes('bc'); fn('abcd') -> Outputs: true
 export const stringIncludes = (a) => {
-  return (b) => b.toUpperCase().includes(a.toUpperCase())
+  return (b) => b && b.toUpperCase().includes(a.toUpperCase())
 }

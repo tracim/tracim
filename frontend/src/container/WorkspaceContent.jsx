@@ -606,16 +606,14 @@ export class WorkspaceContent extends React.Component {
 
     const matchesUserInput = (content) => {
       const contentTypeInfo = props.contentType.find(info => info.slug === content.type)
-      const statusInfo = contentTypeInfo.availableStatuses.find(
-        s => s.slug === content.statusSlug
-      )
+      const statusInfo = contentTypeInfo.availableStatuses.find(s => s.slug === content.statusSlug)
 
       const includesFilter = stringIncludes(userFilter)
 
       const hasFilterMatchOnLabel = includesFilter(content.label)
-      const hasFilterMatchOnLastModifier = includesFilter(content.lastModifier.public_name)
-      const hasFilterMatchOnType = includesFilter(props.t(contentTypeInfo.label))
-      const hasFilterMatchOnStatus = includesFilter(props.t(statusInfo.label))
+      const hasFilterMatchOnLastModifier = content.lastModifier !== undefined && includesFilter(content.lastModifier.public_name)
+      const hasFilterMatchOnType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
+      const hasFilterMatchOnStatus = statusInfo && includesFilter(props.t(statusInfo.label))
 
       return (
         hasFilterMatchOnLabel ||

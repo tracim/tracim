@@ -73,7 +73,7 @@ export const UserSpacesConfig = (props) => {
         const includesFilter = stringIncludes(userFilter)
 
         const hasFilterMatchOnLabel = includesFilter(space.label)
-        const hasFilterMatchOnRole = includesFilter(props.t(userRole.label))
+        const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
 
         return (
           hasFilterMatchOnLabel ||

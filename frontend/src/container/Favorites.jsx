@@ -266,6 +266,8 @@ export class Favorites extends React.Component {
     if (state.userFilter === '') return props.favoriteList
 
     return props.favoriteList.filter((favorite, index) => {
+      if (!favorite.content || !state.contentBreadcrumbsList[index]) return false
+
       const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
       const statusInfo = contentTypeInfo.availableStatuses.find(
         s => s.slug === favorite.content.statusSlug
@@ -276,8 +278,8 @@ export class Favorites extends React.Component {
       const hasFilterMatchOnContentLabel = includesFilter(favorite.content.label)
       const hasFilterMatchOnLastModifier = includesFilter(favorite.content.lastModifier.publicName)
       const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => includesFilter(item.label))
-      const hasFilterMatchOnContentType = includesFilter(props.t(contentTypeInfo.label))
-      const hasFilterMatchOnContentStatus = includesFilter(props.t(statusInfo.label))
+      const hasFilterMatchOnContentType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
+      const hasFilterMatchOnContentStatus = statusInfo && includesFilter(props.t(statusInfo.label))
 
       return (
         hasFilterMatchOnContentLabel ||
