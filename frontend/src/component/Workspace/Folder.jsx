@@ -321,9 +321,13 @@ Folder.propTypes = {
   modified: PropTypes.string.isRequired,
   lang: PropTypes.string.isRequired,
   currentRevisionType: PropTypes.string.isRequired,
-  lastModifier: PropTypes.object.isRequired
+  lastModifier: PropTypes.object
 }
 
 Folder.defaultProps = {
-  showCreateContentButton: true
+  showCreateContentButton: true,
+  lastModifier: {
+    public_name: 'External User',
+    user_id: 0
+  }
 }
