@@ -108,12 +108,12 @@ class Folder extends React.Component {
 
             <TimedEvent
               customClass='folder__header__lastModification'
-              operation={getRevisionTypeLabel(props.currentRevisionType, props.t)}
-              date={props.modified}
+              operation={getRevisionTypeLabel(props.folderData.currentRevisionType, props.t)}
+              date={props.folderData.modified}
               lang={props.lang}
               author={{
-                publicName: props.lastModifier.public_name,
-                userId: props.lastModifier.user_id
+                publicName: props.folderData.lastModifier.public_name,
+                userId: props.folderData.lastModifier.user_id
               }}
             />
 
@@ -318,16 +318,9 @@ Folder.propTypes = {
   app: PropTypes.array,
   onClickFolder: PropTypes.func.isRequired,
   isLast: PropTypes.bool.isRequired,
-  modified: PropTypes.string.isRequired,
-  lang: PropTypes.string.isRequired,
-  currentRevisionType: PropTypes.string.isRequired,
-  lastModifier: PropTypes.object
+  lang: PropTypes.string.isRequired
 }
 
 Folder.defaultProps = {
-  showCreateContentButton: true,
-  lastModifier: {
-    public_name: 'External User',
-    user_id: 0
-  }
+  showCreateContentButton: true
 }

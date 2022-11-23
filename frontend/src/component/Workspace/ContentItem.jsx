@@ -179,8 +179,7 @@ ContentItem.propTypes = {
   userRoleIdInWorkspace: PropTypes.number,
   modified: PropTypes.string.isRequired,
   lang: PropTypes.string.isRequired,
-  currentRevisionType: PropTypes.string.isRequired,
-  lastModifier: PropTypes.object
+  currentRevisionType: PropTypes.string.isRequired
 }
 
 ContentItem.defaultProps = {
@@ -191,9 +190,5 @@ ContentItem.defaultProps = {
   onClickItem: () => {},
   read: false,
   urlContent: '',
-  userRoleIdInWorkspace: ROLE.reader.id,
-  lastModifier: {
-    public_name: 'External User',
-    user_id: 0
-  }
+  userRoleIdInWorkspace: ROLE.reader.id
 }
