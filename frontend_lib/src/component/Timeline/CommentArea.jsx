@@ -326,18 +326,6 @@ export class CommentArea extends React.Component {
             { richtextedition: props.wysiwyg }
           )}
         >
-          {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
-            <AutoComplete
-              autoCompleteItemList={state.autoCompleteItemList}
-              style={style}
-              apiUrl={props.apiUrl}
-              autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-              onClickAutoCompleteItem={(m) => props.wysiwyg
-                ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this))
-                : this.handleClickAutoCompleteItem(m)}
-              delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-            />
-          )}
           <textarea
             id={props.id}
             className={props.customClass}
@@ -357,6 +345,19 @@ export class CommentArea extends React.Component {
             data-cy='commentArea__textinput'
             hidden={state.shouldLoadWysiwyg}
           />
+
+          {!props.disableComment && state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
+            <AutoComplete
+              autoCompleteItemList={state.autoCompleteItemList}
+              style={style}
+              apiUrl={props.apiUrl}
+              autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+              onClickAutoCompleteItem={(m) => props.wysiwyg
+                ? tinymceAutoCompleteHandleClickItem(m, this.setState.bind(this))
+                : this.handleClickAutoCompleteItem(m)}
+              delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+            />
+          )}
         </div>
 
         {!props.hideSendButtonAndOptions && (
