@@ -59,5 +59,6 @@
   "Error while deactivating news": "Error while deactivating news",
   "You cannot change this member role because there are no other space managers.": "You cannot change this member role because there are no other space managers.",
   "Use this link to integrate this agenda to your": "Use this link to integrate this agenda to your",
-  "CalDAV compatible software": "CalDAV compatible software"
+  "CalDAV compatible software": "CalDAV compatible software",
+  "Filter users": "Filter users"
 }

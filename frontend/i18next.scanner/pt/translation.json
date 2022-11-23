@@ -587,5 +587,10 @@
   "My Configuration links": "Minhas ligações de configuração",
   "Error while marking the notification group as read": "Erro ao marcar o grupo de notificações como lido",
   "Error while marking notifications as read": "Erro ao marcar notificações como lidas",
-  "Open emoticons menu": "Abrir o menu de emoticons"
+  "Open emoticons menu": "Abrir o menu de emoticons",
+  "Filter my favorites": "",
+  "There are no favorites that matches you filter": "",
+  "Filter visible contents": "",
+  "There are no spaces that matches your filter": "",
+  "Filter users": ""
 }

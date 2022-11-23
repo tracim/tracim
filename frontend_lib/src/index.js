@@ -71,7 +71,8 @@ import {
   USER_CALL_STATE,
   STATUSES,
   TIMELINE_TYPE,
-  sortMemberList
+  sortMemberList,
+  stringIncludes
 } from './helper.js'
 
 import {
@@ -184,6 +185,7 @@ import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
 import DistanceDate from './component/DistanceDate.jsx'
 import Icon from './component/Icon/Icon.jsx'
+import FilterBar from './component/FilterBar/FilterBar.jsx'
 
 import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
@@ -506,5 +508,7 @@ export {
   ToDoManagement,
   STATUSES,
   TIMELINE_TYPE,
-  sortMemberList
+  sortMemberList,
+  stringIncludes,
+  FilterBar
 }

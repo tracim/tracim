@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { translate } from 'react-i18next'
 import {
   Delimiter,
@@ -9,11 +9,40 @@ import {
   Icon,
   Loading,
   SPACE_TYPE_LIST,
-  htmlToText
+  htmlToText,
+  EmptyListMessage,
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 const AdminWorkspace = props => {
   const parser = new DOMParser()
+  const [userFilter, setUserFilter] = useState('')
+
+  const filterWorkspaceList = () => {
+    if (userFilter === '') return props.workspaceList
+
+    return props.workspaceList.filter(space => {
+      const spaceType = SPACE_TYPE_LIST.find(type => type.slug === space.access_type) || { label: '' }
+
+      const includesFilter = stringIncludes(userFilter)
+
+      const hasFilterMatchOnLabel = includesFilter(space.label)
+      const hasFilterMatchOnDescription = includesFilter(space.description)
+      const hasFilterMatchOnType = spaceType && includesFilter(props.t(spaceType.label))
+      const hasFilterMatchOnId = space.workspace_id && includesFilter(space.workspace_id.toString())
+
+      return (
+        hasFilterMatchOnLabel ||
+        hasFilterMatchOnDescription ||
+        hasFilterMatchOnType ||
+        hasFilterMatchOnId
+      )
+    })
+  }
+
+  const filteredWorkspaceList = filterWorkspaceList()
+
   return (
     <PageWrapper customClass='adminWorkspace'>
       <PageTitle
@@ -41,6 +70,15 @@ const AdminWorkspace = props => {
 
         <Delimiter customClass='adminWorkspace__delimiter' />
 
+        <FilterBar
+          onChange={e => {
+            const newFilter = e.target.value
+            setUserFilter(newFilter)
+          }}
+          value={userFilter}
+          placeholder={props.t('Filter spaces')}
+        />
+
         <div className='adminWorkspace__workspaceTable'>
           <table className='table'>
             <thead>
@@ -55,7 +93,7 @@ const AdminWorkspace = props => {
             </thead>
 
             <tbody>
-              {(props.workspaceList.length > 0 ? props.workspaceList.map(ws => {
+              {(props.workspaceList.length > 0 ? filteredWorkspaceList.map(ws => {
                 const spaceType = SPACE_TYPE_LIST.find(type => type.slug === ws.access_type) || { hexcolor: '', label: '', faIcon: '' }
                 const descriptionText = htmlToText(parser, ws.description)
                 return (
@@ -107,6 +145,11 @@ const AdminWorkspace = props => {
               )}
             </tbody>
           </table>
+          {filteredWorkspaceList.length <= 0 && (
+            <EmptyListMessage>
+              {props.t('There are no spaces that matches you filter')}
+            </EmptyListMessage>
+          )}
         </div>
       </PageContent>
     </PageWrapper>

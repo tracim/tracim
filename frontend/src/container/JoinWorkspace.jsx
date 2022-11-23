@@ -14,8 +14,9 @@ import {
   SUBSCRIPTION_TYPE,
   IconButton,
   PAGE,
-  TextInput,
-  htmlToText
+  htmlToText,
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 import {
@@ -164,9 +165,18 @@ export class JoinWorkspace extends React.Component {
   }
 
   filterWorkspaces (workspace) {
+    const spaceType = SPACE_TYPE_LIST.find(type => type.slug === workspace.accessType) || { label: '' }
+
+    const includesFilter = stringIncludes(this.state.filter)
+
+    const hasFilterMatchOnLabel = includesFilter(workspace.label)
+    const hasFilterMatchOnDescription = includesFilter(workspace.description)
+    const hasFilterMatchOnType = spaceType && includesFilter(this.props.t(spaceType.label))
+
     return (
-      workspace.label.toLowerCase().includes(this.state.filter) ||
-        workspace.description.toLowerCase().includes(this.state.filter)
+      hasFilterMatchOnLabel ||
+      hasFilterMatchOnDescription ||
+      hasFilterMatchOnType
     )
   }
 
@@ -187,13 +197,13 @@ export class JoinWorkspace extends React.Component {
             />
 
             <PageContent parentClass={`${className}__content`}>
-              <TextInput
-                customClass={`${className}__content__filter form-control`}
+
+              <FilterBar
                 onChange={e => this.handleWorkspaceFilter(e.target.value)}
-                placeholder={props.t('Filter spaces')}
-                icon='search'
                 value={this.state.filter}
+                placeholder={props.t('Filter spaces')}
               />
+
               <div className={`${className}__content__workspaceList`} data-cy='joinWorkspaceWorkspaceList'>
                 <div className={`${className}__content__workspaceList__item`}>
                   <b>{props.t('Type')}</b>

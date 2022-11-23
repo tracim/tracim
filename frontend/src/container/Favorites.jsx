@@ -17,7 +17,9 @@ import {
   getContentPath,
   Icon,
   ListItemWrapper,
-  Loading
+  Loading,
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 
 import {
@@ -102,6 +104,7 @@ export class Favorites extends React.Component {
     this.state = {
       contentCommentsCountList: [],
       contentBreadcrumbsList: [],
+      userFilter: '',
       isLoading: true
     }
 
@@ -257,8 +260,41 @@ export class Favorites extends React.Component {
     )
   }
 
+  filterFavoriteList = () => {
+    const { props, state } = this
+
+    if (state.userFilter === '') return props.favoriteList
+
+    return props.favoriteList.filter((favorite, index) => {
+      if (!favorite.content || !state.contentBreadcrumbsList[index]) return false
+
+      const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
+      const statusInfo = contentTypeInfo.availableStatuses.find(
+        s => s.slug === favorite.content.statusSlug
+      )
+
+      const includesFilter = stringIncludes(state.userFilter)
+
+      const hasFilterMatchOnContentLabel = includesFilter(favorite.content.label)
+      const hasFilterMatchOnLastModifier = includesFilter(favorite.content.lastModifier.publicName)
+      const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => includesFilter(item.label))
+      const hasFilterMatchOnContentType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
+      const hasFilterMatchOnContentStatus = statusInfo && includesFilter(props.t(statusInfo.label))
+
+      return (
+        hasFilterMatchOnContentLabel ||
+        hasFilterMatchOnLastModifier ||
+        hasFilterMatchOnBreadcrumbs ||
+        hasFilterMatchOnContentType ||
+        hasFilterMatchOnContentStatus
+      )
+    })
+  }
+
   render () {
     const { props, state } = this
+    const filteredFavoriteList = this.filterFavoriteList()
+
     return (
       <div className='tracim__content-scrollview'>
         <PageWrapper customClass='favorites__wrapper'>
@@ -272,18 +308,32 @@ export class Favorites extends React.Component {
           {state.isLoading
             ? <Loading />
             : (
-              props.favoriteList.length > 0
-                ? (
-                  <PageContent>
-                    <FavoritesHeader />
-                    {props.favoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
-                  </PageContent>
-                )
-                : (
-                  <EmptyListMessage>
-                    {props.t('You did not add any content as favorite yet.')}
-                  </EmptyListMessage>
-                )
+              <PageContent>
+
+                <FilterBar
+                  onChange={e => {
+                    const newFilter = e.target.value
+                    this.setState({ userFilter: newFilter })
+                  }}
+                  value={state.userFilter}
+                  placeholder={props.t('Filter my favorites')}
+                />
+
+                {filteredFavoriteList.length > 0
+                  ? (
+                    <>
+                      <FavoritesHeader />
+                      {filteredFavoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
+                    </>
+                  )
+                  : (
+                    <EmptyListMessage>
+                      {props.favoriteList.length <= 0
+                        ? props.t('You did not add any content as favorite yet.')
+                        : props.t('There are no favorites that matches you filter')}
+                    </EmptyListMessage>
+                  )}
+              </PageContent>
             )}
         </PageWrapper>
       </div>

@@ -48,5 +48,10 @@
   "Choose the user's type": "Wählen Sie die Art des Benutzers",
   "Type": "Art",
   "Create and add to spaces": "Bereiche erstellen und hinzufügen",
-  "Create": "Erstellen"
+  "Create": "Erstellen",
+  "Inactive": "",
+  "Filter users": "",
+  "There are no users that matches you filter": "",
+  "Filter spaces": "",
+  "There are no spaces that matches you filter": ""
 }
