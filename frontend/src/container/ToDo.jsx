@@ -18,8 +18,8 @@ import {
   PageWrapper,
   putToDo,
   ROLE,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus,
+  sortListByMultipleCriteria,
+  SORT_BY,
   STATUSES,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -110,7 +110,10 @@ const ToDo = (props) => {
     setIsLoading(false)
 
     if (fetchGetToDo.apiResponse.status === 200) {
-      setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(fetchGetToDo.body)))
+      setToDoList(sortListByMultipleCriteria(
+        fetchGetToDo.body,
+        [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+      ))
     } else props.dispatch(newFlashMessage(props.t('Error while loading to do list')))
   }
 
@@ -146,7 +149,10 @@ const ToDo = (props) => {
       data.fields.content.content_id
     ))
 
-    setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'))))
+    setToDoList(sortListByMultipleCriteria(
+      uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'),
+      [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+    ))
   }
 
   const handleToDoChanged = async data => {

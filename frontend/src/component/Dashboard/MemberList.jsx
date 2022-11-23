@@ -8,7 +8,9 @@ import {
   Loading,
   NewMemberForm,
   ProfileNavigation,
-  sortMemberList,
+  sortListBy,
+  SORT_BY,
+  SORT_ORDER,
   FilterBar,
   ROLE_LIST,
   stringIncludes
@@ -102,7 +104,7 @@ export const MemberList = (props) => {
                   )}
 
                   <ul className={classnames('memberlist__list', { withAddBtn: props.userRoleIdInWorkspace >= ROLE.workspaceManager.id })}>
-                    {filteredMemberList.sort(sortMemberList).map((m, index) =>
+                    {sortListBy(filteredMemberList, SORT_BY.PUBLIC_NAME, SORT_ORDER.ASCENDING, props.loggedUser.lang).map((m, index) =>
                       <li
                         className={classnames(
                           'memberlist__list__item',

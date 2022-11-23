@@ -12,6 +12,9 @@
       &:hover
         background-color transparent
       & > *:last-child
+        flex 17
+        padding standardSpacing 0
+      & > *
         text-align start
 
     &__item
@@ -33,24 +36,24 @@
 
       & > *
         margin-inline-start standardSpacing
-        flex auto
 
       // buttons "column"
       & > *:last-child
-        flex 0 0 220px
+        flex 2
         margin-inline-end standardSpacing
-        text-align center
+        padding standardSpacing
 
       // type "column"
       & > *:first-child
-        flex 0 0 60px
-        margin 0
-        text-align center
+        flex 1
+        padding 0
+        text-align start
 
       &__title_description
         display flex
         flex-direction column
         overflow hidden
+        flex 14
 
         & span
           overflow hidden

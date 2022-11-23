@@ -1,14 +1,14 @@
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
-import { FileItemHeader as FileItemHeaderWithoutHOC } from '../../../src/component/Workspace/ContentItemHeader.jsx'
+import { ContentItemHeader as ContentItemHeaderWithoutHOC } from '../../../src/component/Workspace/ContentItemHeader.jsx'
 
 describe('<ContentItemHeader />', () => {
   const props = {
     showSearchDetails: true
   }
 
-  const wrapper = shallow(<FileItemHeaderWithoutHOC {...props} t={key => key} />)
+  const wrapper = shallow(<ContentItemHeaderWithoutHOC {...props} t={key => key} />)
 
   describe('static design', () => {
     it('should display search details when showSearchDetails is true', () =>

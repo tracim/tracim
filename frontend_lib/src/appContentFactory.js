@@ -9,17 +9,20 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate,
   sendGlobalFlashMessage,
   TIMELINE_TYPE,
   CONTENT_TYPE,
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
   tinymceRemove,
-  addRevisionFromTLM,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus
+  addRevisionFromTLM
 } from './helper.js'
+
+import {
+  SORT_BY,
+  sortListByMultipleCriteria,
+  sortTimelineByDate
+} from './sortListHelper.js'
 
 import {
   LOCAL_STORAGE_FIELD,
@@ -201,7 +204,12 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy(fetchGetToDo.body, 'content_id'))) })
+          setState({
+            toDoList: sortListByMultipleCriteria(
+              uniqBy(fetchGetToDo.body, 'content_id'),
+              [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+            )
+          })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))

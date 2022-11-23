@@ -18,7 +18,12 @@ import {
   Icon,
   ListItemWrapper,
   Loading,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy,
+  TitleListHeader,
   FilterBar,
+  handleFetchResult,
   stringIncludes
 } from 'tracim_frontend_lib'
 
@@ -44,22 +49,47 @@ import ContentType from '../component/ContentType.jsx'
 const FavoritesHeader = translate()(props => {
   return (
     <div className='favoritesHeader content__header'>
-      <div className='favoritesHeader__type'>
-        {props.t('Type')}
-      </div>
-      <div className='favoritesHeader__title'>
-        {props.t('Title and path')}
-      </div>
+      <TitleListHeader
+        title={props.t('Type')}
+        onClickTitle={() => props.onClickTitle(SORT_BY.CONTENT_TYPE)}
+        customClass='favoritesHeader__type'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.CONTENT_TYPE}
+        tootltip={props.t('Sort by type')}
+      />
+      <TitleListHeader
+        title={props.t('Title and path')}
+        onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
+        customClass='favoritesHeader__title'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
+        tootltip={props.t('Sort by title')}
+      />
       {/* Header for windows smaller than max-sm */}
-      <div className='favoritesHeader__title-max-sm'>
-        {props.t('Title')}
-      </div>
-      <div className='favoritesHeader__modification'>
-        {props.t('Last Modification')}
-      </div>
-      <div className='favoritesHeader__information'>
-        {props.t('Information')}
-      </div>
+      <TitleListHeader
+        title={props.t('Title')}
+        onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
+        customClass='favoritesHeader__title-max-sm'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
+        tootltip={props.t('Sort by title')}
+      />
+      <TitleListHeader
+        title={props.t('Last Modification')}
+        onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
+        customClass='favoritesHeader__modification'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
+        tootltip={props.t('Sort by last modification')}
+      />
+      <TitleListHeader
+        title={props.t('Information')}
+        onClickTitle={() => props.onClickTitle(SORT_BY.STATUS)}
+        customClass='favoritesHeader__information'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.STATUS}
+        tootltip={props.t('Sort by information')}
+      />
       <div className='favoritesHeader__favoriteButton'>
         {props.t('Favorite')}
       </div>
@@ -103,9 +133,11 @@ export class Favorites extends React.Component {
 
     this.state = {
       contentCommentsCountList: [],
-      contentBreadcrumbsList: [],
-      userFilter: '',
-      isLoading: true
+      displayedFavoritesList: [],
+      isLoading: true,
+      selectedSortCriterion: SORT_BY.LABEL,
+      sortOrder: SORT_ORDER.ASCENDING,
+      userFilter: ''
     }
 
     props.registerCustomEventHandlerList([
@@ -139,6 +171,11 @@ export class Favorites extends React.Component {
     this.setHeadTitle()
     this.buildBreadcrumbs()
     this.loadFavoriteList()
+    this.setDisplayedFavoritesList()
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.favoriteList !== prevProps.favoriteList) this.setDisplayedFavoritesList()
   }
 
   loadFavoriteList = async () => {
@@ -169,25 +206,21 @@ export class Favorites extends React.Component {
     const contentCommentsCountList = await Promise.all(commentsFetchList)
 
     // Get the contents' paths (for breadcrumbs)
-    const contentBreadcrumbsFetchList = favoriteList.map(async favorite => {
+    await Promise.all(favoriteList.map(async favorite => {
       if (!favorite.content) return null
       // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
       // hence the snake-case properties
-      const response = await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
-      if (!response.ok) return []
-
+      const response = await handleFetchResult(
+        await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
+      )
       const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
 
-      return [{ label: workspace.label }].concat((await response.json()).items)
-    })
-    const contentBreadcrumbsList = await Promise.all(contentBreadcrumbsFetchList)
+      favorite.breadcrumbs = [{ label: workspace.label }].concat(response.body.items)
+    }))
 
-    this.setState({ contentCommentsCountList, contentBreadcrumbsList, isLoading: false })
-
-    props.dispatch(setFavoriteList(favoriteList))
+    this.setState({ contentCommentsCountList, isLoading: false })
+    props.dispatch(setFavoriteList([...favoriteList]))
   }
-
-  getAvailableFavoriteList = (favoriteList) => favoriteList.filter(favorite => favorite.content)
 
   handleClickRemoveFromFavoriteList = async (favorite) => {
     const { props } = this
@@ -221,7 +254,7 @@ export class Favorites extends React.Component {
       <FavoriteButton
         favoriteState={FAVORITE_STATE.FAVORITE}
         onClickRemoveFromFavoriteList={() => this.handleClickRemoveFromFavoriteList(favorite)}
-        onClickAddToFavoriteList={() => {}}
+        onClickAddToFavoriteList={() => { }}
         customClass='favorites__item__favoriteButton'
       />
     )
@@ -250,7 +283,7 @@ export class Favorites extends React.Component {
         key={favorite.contentId}
         isLast={isLast}
         isFirst={isFirst}
-        breadcrumbsList={state.contentBreadcrumbsList[index]}
+        breadcrumbsList={favorite.breadcrumbs}
         commentsCount={state.contentCommentsCountList[index]}
         customClass='favorites__item'
         dataCy='favorites__item'
@@ -260,13 +293,39 @@ export class Favorites extends React.Component {
     )
   }
 
+  setDisplayedFavoritesList = () => {
+    const { props, state } = this
+
+    const sortedList = sortListBy(
+      props.favoriteList,
+      state.selectedSortCriterion,
+      state.sortOrder,
+      props.user.lang
+    )
+
+    this.setState({ displayedFavoritesList: sortedList })
+  }
+
+  handleClickTitleToSort = (criterion) => {
+    this.setState(prev => {
+      const sortOrder = prev.selectedSortCriterion === criterion && prev.sortOrder === SORT_ORDER.ASCENDING
+        ? SORT_ORDER.DESCENDING
+        : SORT_ORDER.ASCENDING
+      return {
+        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criterion, sortOrder, this.props.user.lang),
+        selectedSortCriterion: criterion,
+        sortOrder: sortOrder
+      }
+    })
+  }
+
   filterFavoriteList = () => {
     const { props, state } = this
 
-    if (state.userFilter === '') return props.favoriteList
+    if (state.userFilter === '') return state.displayedFavoritesList
 
-    return props.favoriteList.filter((favorite, index) => {
-      if (!favorite.content || !state.contentBreadcrumbsList[index]) return false
+    return state.displayedFavoritesList.filter((favorite) => {
+      if (!favorite.content || !favorite.breadcrumbs) return false
 
       const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
       const statusInfo = contentTypeInfo.availableStatuses.find(
@@ -277,7 +336,7 @@ export class Favorites extends React.Component {
 
       const hasFilterMatchOnContentLabel = includesFilter(favorite.content.label)
       const hasFilterMatchOnLastModifier = includesFilter(favorite.content.lastModifier.publicName)
-      const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => includesFilter(item.label))
+      const hasFilterMatchOnBreadcrumbs = favorite.breadcrumbs.some(item => includesFilter(item.label))
       const hasFilterMatchOnContentType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
       const hasFilterMatchOnContentStatus = statusInfo && includesFilter(props.t(statusInfo.label))
 
@@ -309,7 +368,6 @@ export class Favorites extends React.Component {
             ? <Loading />
             : (
               <PageContent>
-
                 <FilterBar
                   onChange={e => {
                     const newFilter = e.target.value
@@ -322,7 +380,11 @@ export class Favorites extends React.Component {
                 {filteredFavoriteList.length > 0
                   ? (
                     <>
-                      <FavoritesHeader />
+                      <FavoritesHeader
+                        onClickTitle={this.handleClickTitleToSort}
+                        isOrderAscending={state.sortOrder === SORT_ORDER.ASCENDING}
+                        selectedSortCriterion={state.selectedSortCriterion}
+                      />
                       {filteredFavoriteList.map((favorite, index) => this.getFavoriteComponent(favorite, index))}
                     </>
                   )

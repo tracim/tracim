@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { translate } from 'react-i18next'
 import {
   Delimiter,
+  htmlToText,
   IconButton,
   PageWrapper,
   PageTitle,
@@ -9,7 +10,8 @@ import {
   Icon,
   Loading,
   SPACE_TYPE_LIST,
-  htmlToText,
+  SORT_BY,
+  TitleListHeader,
   EmptyListMessage,
   FilterBar,
   stringIncludes
@@ -83,11 +85,51 @@ const AdminWorkspace = props => {
           <table className='table'>
             <thead>
               <tr>
-                <th className='table__id' scope='col'>Id</th>
-                <th className='table__type' scope='col'>{props.t('Type')}</th>
-                <th className='table__sharedSpace' scope='col'>{props.t('Space')}</th>
-                <th className='table__description' scope='col'>{props.t('Description')}</th>
-                <th className='table__memberCount' scope='col'>{props.t('Members')}</th>
+                <th className='table__id' scope='col'>
+                  <TitleListHeader
+                    title={props.t('Id')}
+                    onClickTitle={() => props.onClickTitle(SORT_BY.ID)}
+                    isOrderAscending={props.isOrderAscending}
+                    isSelected={props.selectedSortCriterion === SORT_BY.ID}
+                    tootltip={props.t('Sort by id')}
+                  />
+                </th>
+                <th className='table__type' scope='col'>
+                  <TitleListHeader
+                    title={props.t('Type')}
+                    onClickTitle={() => props.onClickTitle(SORT_BY.SPACE_TYPE)}
+                    isOrderAscending={props.isOrderAscending}
+                    isSelected={props.selectedSortCriterion === SORT_BY.SPACE_TYPE}
+                    tootltip={props.t('Sort by type')}
+                  />
+                </th>
+                <th className='table__sharedSpace' scope='col'>
+                  <TitleListHeader
+                    title={props.t('Space')}
+                    onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
+                    isOrderAscending={props.isOrderAscending}
+                    isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
+                    tootltip={props.t('Sort by title')}
+                  />
+                </th>
+                <th className='table__description' scope='col'>
+                  <TitleListHeader
+                    title={props.t('Description')}
+                    onClickTitle={() => props.onClickTitle(SORT_BY.DESCRIPTION)}
+                    isOrderAscending={props.isOrderAscending}
+                    isSelected={props.selectedSortCriterion === SORT_BY.DESCRIPTION}
+                    tootltip={props.t('Sort by description')}
+                  />
+                </th>
+                <th className='table__memberCount' scope='col'>
+                  <TitleListHeader
+                    title={props.t('Members')}
+                    onClickTitle={() => props.onClickTitle(SORT_BY.NUMBER_OF_MEMBERS)}
+                    isOrderAscending={props.isOrderAscending}
+                    isSelected={props.selectedSortCriterion === SORT_BY.NUMBER_OF_MEMBERS}
+                    tootltip={props.t('Sort by number of members')}
+                  />
+                </th>
                 <th className='table__delete' scope='col'>{props.t('Delete')}</th>
               </tr>
             </thead>
