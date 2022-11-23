@@ -23,6 +23,7 @@ import {
   sortListBy,
   TitleListHeader,
   FilterBar,
+  handleFetchResult,
   stringIncludes
 } from 'tracim_frontend_lib'
 
@@ -132,7 +133,6 @@ export class Favorites extends React.Component {
 
     this.state = {
       contentCommentsCountList: [],
-      contentBreadcrumbsList: [],
       displayedFavoritesList: [],
       isLoading: true,
       selectedSortCriterion: SORT_BY.LABEL,
@@ -206,25 +206,21 @@ export class Favorites extends React.Component {
     const contentCommentsCountList = await Promise.all(commentsFetchList)
 
     // Get the contents' paths (for breadcrumbs)
-    const contentBreadcrumbsFetchList = favoriteList.map(async favorite => {
+    await Promise.all(favoriteList.map(async favorite => {
       if (!favorite.content) return null
       // NOTE - S.G. - 2021-04-01 - here we have the favorite as returned by the backend
       // hence the snake-case properties
-      const response = await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
-      if (!response.ok) return []
-
+      const response = await handleFetchResult(
+        await getContentPath(FETCH_CONFIG.apiUrl, favorite.content_id)
+      )
       const workspace = props.workspaceList.find(ws => ws.id === favorite.content.workspace_id)
 
-      return [{ label: workspace.label }].concat((await response.json()).items)
-    })
-    const contentBreadcrumbsList = await Promise.all(contentBreadcrumbsFetchList)
+      favorite.breadcrumbs = [{ label: workspace.label }].concat(response.body.items)
+    }))
 
-    this.setState({ contentCommentsCountList, contentBreadcrumbsList, isLoading: false })
-
-    props.dispatch(setFavoriteList(favoriteList))
+    this.setState({ contentCommentsCountList, isLoading: false })
+    props.dispatch(setFavoriteList([...favoriteList]))
   }
-
-  getAvailableFavoriteList = (favoriteList) => favoriteList.filter(favorite => favorite.content)
 
   handleClickRemoveFromFavoriteList = async (favorite) => {
     const { props } = this
@@ -287,7 +283,7 @@ export class Favorites extends React.Component {
         key={favorite.contentId}
         isLast={isLast}
         isFirst={isFirst}
-        breadcrumbsList={state.contentBreadcrumbsList[index]}
+        breadcrumbsList={favorite.breadcrumbs}
         commentsCount={state.contentCommentsCountList[index]}
         customClass='favorites__item'
         dataCy='favorites__item'
@@ -328,8 +324,8 @@ export class Favorites extends React.Component {
 
     if (state.userFilter === '') return state.displayedFavoritesList
 
-    return state.displayedFavoritesList.filter((favorite, index) => {
-      if (!favorite.content || !state.contentBreadcrumbsList[index]) return false
+    return state.displayedFavoritesList.filter((favorite) => {
+      if (!favorite.content || !favorite.breadcrumbs) return false
 
       const contentTypeInfo = props.contentType.find(info => info.slug === favorite.content.type)
       const statusInfo = contentTypeInfo.availableStatuses.find(
@@ -340,7 +336,7 @@ export class Favorites extends React.Component {
 
       const hasFilterMatchOnContentLabel = includesFilter(favorite.content.label)
       const hasFilterMatchOnLastModifier = includesFilter(favorite.content.lastModifier.publicName)
-      const hasFilterMatchOnBreadcrumbs = state.contentBreadcrumbsList[index].some(item => includesFilter(item.label))
+      const hasFilterMatchOnBreadcrumbs = favorite.breadcrumbs.some(item => includesFilter(item.label))
       const hasFilterMatchOnContentType = contentTypeInfo && includesFilter(props.t(contentTypeInfo.label))
       const hasFilterMatchOnContentStatus = statusInfo && includesFilter(props.t(statusInfo.label))
 
