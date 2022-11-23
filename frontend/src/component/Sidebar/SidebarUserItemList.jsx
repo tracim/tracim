@@ -24,7 +24,7 @@ const SidebarUserItemList = (props) => {
         <>
           {props.isToDoEnabled && (
             <SidebarItem
-              customClass='sidebar__tasks__item'
+              customClass='sidebar__tasks__item sidebar__item__inside_menu'
               to={PAGE.TODO}
               label={props.t('My tasks')}
               icon='fas fa-check-square'
@@ -33,7 +33,7 @@ const SidebarUserItemList = (props) => {
           )}
 
           <SidebarItem
-            customClass='sidebar__favorites__item'
+            customClass='sidebar__favorites__item sidebar__item__inside_menu'
             to={PAGE.FAVORITES}
             label={props.t('My favorites')}
             icon='fas fa-star'
@@ -43,7 +43,7 @@ const SidebarUserItemList = (props) => {
           {props.isAgendaEnabled && (
             <SidebarItem
               customColor={props.appList.find(app => app.slug === 'agenda').hexcolor}
-              customClass='sidebar__agendas__item'
+              customClass='sidebar__agendas__item sidebar__item__inside_menu'
               to={PAGE.AGENDA}
               label={props.t('My agendas')}
               icon='fas fa-calendar-alt'
