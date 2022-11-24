@@ -17,23 +17,25 @@ createInFolderButtonWidth = 74px
   &__item
     padding standardSpacing 0
   &__type
+    flex 1
     padding 0 standardSpacing
     font-size bigIconSize
-    text-align center
+    text-align start
   &__dragPreview
     display flex
     align-items center
-    flex 3
+    flex 8
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
   &__name
+    flex 10
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
     color fontColor
   &__lastModification
-    flex 1
+    flex 3
     white-space nowrap
     overflow hidden
     text-overflow ellipsis
@@ -41,7 +43,7 @@ createInFolderButtonWidth = 74px
     color fontColor
     padding textSpacing
   &__status
-    flex-grow 0
+    flex 1
     width 140px
     padding 0 standardSpacing
     display flex
@@ -50,6 +52,7 @@ createInFolderButtonWidth = 74px
     &__icon
       font-size bigIconSize
   &__actions
+    flex 1
     margin-inline-start createInFolderButtonWidth
 
 @media (max-width: max-md)

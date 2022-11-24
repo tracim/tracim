@@ -7,7 +7,11 @@ const TitleListHeader = props =>
   <button
     onClick={props.onClickTitle}
     title={props.tootltip}
-    className={classnames('titleListHeader transparentButton btn', props.customClass)}
+    className={classnames(
+      'titleListHeader transparentButton btn',
+      props.customClass,
+      { titleListHeader__notSelected: !props.isSelected }
+    )}
   >
     <span>{props.title}</span>
     {props.isSelected && (

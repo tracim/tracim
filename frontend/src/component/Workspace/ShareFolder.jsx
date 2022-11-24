@@ -69,7 +69,7 @@ class ShareFolder extends React.Component {
             </div>
           </div>
 
-          <div className='folder__header__button'>
+          <div className='shareFolder__header__button'>
             <div className='d-none d-md-flex' title={props.t('Actions')}>
               {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <DropdownMenu
