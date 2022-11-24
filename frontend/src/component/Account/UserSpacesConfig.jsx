@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import {
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   PAGE,
   PROFILE,
@@ -13,10 +13,17 @@ import {
   ConfirmPopup,
   IconButton,
   Loading,
-  sortWorkspaceList,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy,
+  sortListByMultipleCriteria,
+  TitleListHeader,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  FilterBar,
+  ROLE_LIST,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
@@ -37,7 +44,7 @@ export const onlyManager = (userToEditId, member, memberList) => {
 }
 
 export const fillMemberList = async (space) => {
-  const fetchMemberList = await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, space.id))
+  const fetchMemberList = await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, space.id))
   return {
     ...space,
     memberList: fetchMemberList.body.map(member => serializeMember(member)) || []
@@ -49,6 +56,9 @@ export const UserSpacesConfig = (props) => {
   const [spaceBeingDeleted, setSpaceBeingDeleted] = useState(null)
   const [entries, setEntries] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [selectedSortCriterion, setSelectedSortCriterion] = useState(SORT_BY.LABEL)
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
+  const [userFilter, setUserFilter] = useState('')
 
   useEffect(() => {
     props.registerLiveMessageHandlerList([
@@ -59,25 +69,57 @@ export const UserSpacesConfig = (props) => {
   }, [spaceList])
 
   useEffect(() => {
-    const entrieList = spaceList
-      .filter(space => space.memberList.length > 0 && space.memberList.find(u => u.id === props.userToEditId))
-      .map(space => {
-        const member = space.memberList.find(u => u.id === props.userToEditId)
-        return (
-          <UserSpacesConfigLine
-            space={space}
-            member={member}
-            key={space.id}
-            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-            onLeaveSpace={handleLeaveSpace}
-            admin={props.admin}
-            system={props.system}
-            onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
-          />
-        )
-      })
+    const filteredListWithMember = []
+
+    spaceList.forEach(space => {
+      const member = space.memberList.find(u => u.id === props.userToEditId)
+      if (space.memberList.length > 0 && member) {
+        filteredListWithMember.push({ ...space, member })
+      }
+    })
+
+    const sortedList = sortListBy(
+      filteredListWithMember,
+      selectedSortCriterion,
+      sortOrder,
+      props.user.lang
+    )
+
+    const filteredSpaceList = filterSpaceList(sortedList)
+
+    const entrieList = filteredSpaceList.map(space => {
+      return (
+        <UserSpacesConfigLine
+          space={space}
+          key={space.id}
+          onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+          onLeaveSpace={handleLeaveSpace}
+          admin={props.admin}
+          system={props.system}
+          onlyManager={onlyManager(props.userToEditId, space.member, space.memberList)}
+        />
+      )
+    })
     setEntries(entrieList)
-  }, [spaceList])
+  }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
+
+  const filterSpaceList = (list) => {
+    if (userFilter === '') return list
+
+    return list.filter(space => {
+      const userRole = ROLE_LIST.find(type => type.slug === space.member.role) || { label: '' }
+
+      const includesFilter = stringIncludes(userFilter)
+
+      const hasFilterMatchOnLabel = includesFilter(space.label)
+      const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
+
+      return (
+        hasFilterMatchOnLabel ||
+        hasFilterMatchOnRole
+      )
+    })
+  }
 
   useEffect(() => {
     if (props.userToEditId === props.user.userId && props.workspaceList) {
@@ -134,7 +176,7 @@ export const UserSpacesConfig = (props) => {
       }))
     } else {
       const space = await fillMemberList(data.fields.workspace)
-      setSpaceList(sortWorkspaceList([...spaceList, space]))
+      setSpaceList(sortListByMultipleCriteria([...spaceList, space], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
 
@@ -155,7 +197,7 @@ export const UserSpacesConfig = (props) => {
     Promise.all(fetchedSpaceList.map(userSpace => {
       return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
     })).then((spaceListResult) => {
-      setSpaceList(sortWorkspaceList(spaceListResult))
+      setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
       setIsLoading(false)
     })
   }
@@ -174,6 +216,14 @@ export const UserSpacesConfig = (props) => {
 
   const handleLeaveSpace = (spaceBeingDeleted) => {
     setSpaceBeingDeleted(spaceBeingDeleted)
+  }
+
+  const handleClickTitleToSort = (criterion) => {
+    const newSortOrder = selectedSortCriterion === criterion && sortOrder === SORT_ORDER.ASCENDING
+      ? SORT_ORDER.DESCENDING
+      : SORT_ORDER.ASCENDING
+    setSelectedSortCriterion(criterion)
+    setSortOrder(newSortOrder)
   }
 
   return (
@@ -206,14 +256,39 @@ export const UserSpacesConfig = (props) => {
             />
           )}
 
+          <FilterBar
+            onChange={e => {
+              const newFilter = e.target.value
+              setUserFilter(newFilter)
+            }}
+            value={userFilter}
+            placeholder={props.t('Filter spaces')}
+          />
+
           {(entries.length
             ? (
               <div className='spaceconfig__table'>
                 <table className='table'>
                   <thead>
                     <tr>
-                      <th>{props.t('Space')}</th>
-                      <th>{props.t('Role')}</th>
+                      <th>
+                        <TitleListHeader
+                          title={props.t('Space')}
+                          onClickTitle={() => handleClickTitleToSort(SORT_BY.LABEL)}
+                          isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
+                          isSelected={selectedSortCriterion === SORT_BY.LABEL}
+                          tootltip={props.t('Sort by title')}
+                        />
+                      </th>
+                      <th>
+                        <TitleListHeader
+                          title={props.t('Role')}
+                          onClickTitle={() => handleClickTitleToSort(SORT_BY.ROLE)}
+                          isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
+                          isSelected={selectedSortCriterion === SORT_BY.ROLE}
+                          tootltip={props.t('Sort by role')}
+                        />
+                      </th>
                       {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
                       <th />
                     </tr>
@@ -240,9 +315,11 @@ export const UserSpacesConfig = (props) => {
                 ))}
               </div>
             ) : (
-              props.admin
-                ? props.t('This user is not a member of any space yet')
-                : props.t('You are not a member of any space yet')
+              userFilter !== ''
+                ? props.t('There are no spaces that matches your filter')
+                : props.admin
+                  ? props.t('This user is not a member of any space yet')
+                  : props.t('You are not a member of any space yet')
             )
           )}
         </div>

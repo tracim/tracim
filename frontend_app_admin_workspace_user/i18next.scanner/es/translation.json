@@ -48,5 +48,10 @@
   "On this page you can manage the users of your Tracim instance.": "En esta página puede gestionar los usuarios de su instancia de Tracim.",
   "Account deactivated": "Cuenta desactivada",
   "Activated": "Activado",
-  "Deactivated": "Desactivado"
+  "Deactivated": "Desactivado",
+  "Inactive": "",
+  "Filter users": "",
+  "There are no users that matches you filter": "",
+  "Filter spaces": "",
+  "There are no spaces that matches you filter": ""
 }

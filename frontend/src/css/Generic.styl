@@ -29,7 +29,10 @@ div.tox-tinymce
 div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
   z-index 1050
   margin-inline-start closedSidebarWidth
-  width "calc(100% - %s)" % closedSidebarWidth !important // INFO - GB - 2022-08-23 - override TinyMCE calculated width
+  width 'calc(100% - %s)' % closedSidebarWidth !important // INFO - GB - 2022-08-23 - override TinyMCE calculated width
+  & ~ .autocomplete
+    margin-inline-start closedSidebarWidth + standardSpacing
+    width 'calc(100% - %s)' % (closedSidebarWidth + 2 * standardSpacing)
 
 div.tox .tox-toolbar
   background-image none // native TinyMCE borders are drawn using a background image

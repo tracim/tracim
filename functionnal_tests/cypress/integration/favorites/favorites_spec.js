@@ -8,6 +8,7 @@ const mimeType = 'image/png'
 
 let workspaceId
 let fileContentId
+let noteContentId
 
 const contentIdByType = {}
 
@@ -33,6 +34,7 @@ describe('Favorites', function () {
       cy.createHtmlDocument(`${contentName}Note`, workspaceId)
         .then(({ content_id: contentId }) => {
           contentIdByType['html-document'] = contentId
+          noteContentId = contentId
           addContentToFavorites(defaultAdmin.user_id, contentId)
         })
 
@@ -58,7 +60,7 @@ describe('Favorites', function () {
 
     it('should list contents available as favorites', () => {
       cy.get('[data-cy=favorites__item]').its('length').should('be.equal', 2)
-      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}Note`)
+      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}File`)
     })
 
     it('clicking on a favorite button should remove it from the page', () => {
@@ -66,7 +68,7 @@ describe('Favorites', function () {
       cy.get('[data-cy=favoriteButton]').first().click()
       cy.contains('[data-cy=flashmessage]', 'has been removed from your favourites.').should('be.visible')
       cy.get('[data-cy=favorites__item]').its('length').should('be.equal', 1)
-      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}File`)
+      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}Note`)
     })
 
     it('should redirect to users profile if click at author name', () => {
@@ -78,7 +80,7 @@ describe('Favorites', function () {
       cy.get('[data-cy=favorites__item]').its('length').should('be.equal', 1)
       cy.get('[data-cy=favorites__item]').first().click()
       cy.location('pathname')
-        .should('equal', `/ui/workspaces/${workspaceId}/contents/file/${fileContentId}`)
+        .should('equal', `/ui/workspaces/${workspaceId}/contents/html-document/${noteContentId}`)
       cy.get('[data-cy=favoriteButton] > .fa-fw.fas.fa-star').click()
     })
   })

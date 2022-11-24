@@ -18,15 +18,15 @@ import {
   PageWrapper,
   putToDo,
   ROLE,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus,
+  sortListByMultipleCriteria,
+  SORT_BY,
   STATUSES,
-  TextInput,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_SUB_TYPE as TLM_ST,
   ToDoItem,
-  TracimComponent
+  TracimComponent,
+  FilterBar
 } from 'tracim_frontend_lib'
 import {
   newFlashMessage,
@@ -110,7 +110,10 @@ const ToDo = (props) => {
     setIsLoading(false)
 
     if (fetchGetToDo.apiResponse.status === 200) {
-      setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(fetchGetToDo.body)))
+      setToDoList(sortListByMultipleCriteria(
+        fetchGetToDo.body,
+        [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+      ))
     } else props.dispatch(newFlashMessage(props.t('Error while loading to do list')))
   }
 
@@ -146,7 +149,10 @@ const ToDo = (props) => {
       data.fields.content.content_id
     ))
 
-    setToDoList(sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'))))
+    setToDoList(sortListByMultipleCriteria(
+      uniqBy([fecthGetToDo.body, ...toDoList], 'content_id'),
+      [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+    ))
   }
 
   const handleToDoChanged = async data => {
@@ -252,16 +258,16 @@ const ToDo = (props) => {
             >
               {toDoList.length > 0 ? (
                 <div className='toDo__list'>
-                  <TextInput
-                    customClass='form-control'
+
+                  <FilterBar
                     onChange={e => {
                       const newFilter = e.target.value
                       setToDoListFilter(newFilter)
                     }}
-                    placeholder={props.t('Filter my tasks')}
-                    icon='search'
                     value={toDoListFilter}
+                    placeholder={props.t('Filter my tasks')}
                   />
+
                   {toDoListFilter === '' &&
                     <div
                       className='toDo__progressBar_container'
