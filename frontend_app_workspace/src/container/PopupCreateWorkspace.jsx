@@ -10,8 +10,10 @@ import {
   handleFetchResult,
   Popover,
   ROLE_LIST,
-  sortWorkspaceList,
   sendGlobalFlashMessage,
+  SORT_BY,
+  SORT_ORDER,
+  sortListBy,
   SPACE_TYPE,
   SPACE_TYPE_LIST,
   TracimComponent
@@ -108,7 +110,12 @@ export class PopupCreateWorkspace extends React.Component {
             })
           }
 
-          addSpacesToList(0, createSpaceTree(sortWorkspaceList(fetchGetUserSpaces.body)))
+          addSpacesToList(0, createSpaceTree(sortListBy(
+            fetchGetUserSpaces.body,
+            SORT_BY.LABEL,
+            SORT_ORDER.ASCENDING,
+            state.loggedUser.lang
+          )))
 
           this.setState({ parentOptions: spaceList, newParentSpace: spaceList[0], isFirstStep: false })
           break

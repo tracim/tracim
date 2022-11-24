@@ -9,11 +9,13 @@ import {
   PROFILE,
   ROLE_LIST,
   serialize,
-  sortWorkspaceList,
-  TextInput,
+  SORT_BY,
+  sortListByMultipleCriteria,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TracimComponent
+  TracimComponent,
+  FilterBar,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -72,7 +74,7 @@ export const AdminUserSpacesConfig = (props) => {
     setAvailableSpaceList(availableSpaces)
     setDisplayedAvailableSpaceList(filterSpaceList(availableSpaces, availableSpaceListFilter))
     setMemberSpaceList(memberSpaces)
-    setDisplayedMemberSpaceList(filterSpaceList(memberSpaces, memberSpaceListFilter))
+    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaces, memberSpaceListFilter))
   }, [spaceList])
 
   useEffect(() => {
@@ -80,8 +82,27 @@ export const AdminUserSpacesConfig = (props) => {
   }, [availableSpaceListFilter])
 
   useEffect(() => {
-    setDisplayedMemberSpaceList(filterSpaceList(memberSpaceList, memberSpaceListFilter))
+    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaceList, memberSpaceListFilter))
   }, [memberSpaceListFilter])
+
+  const filterSpaceListWithUserRole = (list, filterList) => {
+    return list.filter(space => {
+      const member = space.memberList.find(u => u.id === props.userToEditId)
+      const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
+
+      const includesFilter = stringIncludes(filterList)
+
+      const hasFilterMatchOnUserRole = userRole && includesFilter(props.t(userRole.label))
+      const hasFilterMatchOnSpaceLabel = includesFilter(space.label)
+      const hasFilterMatchOnSpaceId = space.id && includesFilter(space.id.toString())
+
+      return (
+        hasFilterMatchOnUserRole ||
+        hasFilterMatchOnSpaceLabel ||
+        hasFilterMatchOnSpaceId
+      )
+    })
+  }
 
   const getSpaceList = async () => {
     setIsLoading(true)
@@ -93,7 +114,7 @@ export const AdminUserSpacesConfig = (props) => {
         Promise.all(spaceList.map(userSpace => {
           return props.workspaceList.find(space => space.id === userSpace.id && space.memberList.length > 0) || fillMemberList(userSpace)
         })).then((spaceListResult) => {
-          setSpaceList(sortWorkspaceList(spaceListResult))
+          setSpaceList(sortListByMultipleCriteria(spaceListResult, [SORT_BY.LABEL, SORT_BY.ID]))
           setIsLoading(false)
         })
         break
@@ -152,7 +173,7 @@ export const AdminUserSpacesConfig = (props) => {
         }
       }))
     } else {
-      setSpaceList(sortWorkspaceList([...spaceList, fillMemberList(space)]))
+      setSpaceList(sortListByMultipleCriteria([...spaceList, fillMemberList(space)], [SORT_BY.LABEL, SORT_BY.ID]))
     }
   }
 
@@ -211,16 +232,17 @@ export const AdminUserSpacesConfig = (props) => {
         <div className='adminUserSpacesConfig__zones__availableSpaces'>
           <div className='adminUserSpacesConfig__zones__title'>
             <b>{props.t('Available spaces')}</b>
-            <TextInput
-              customClass='form-control'
+
+            <FilterBar
+              customClass='adminUserSpacesConfig__zones__filterBar'
               onChange={e => {
                 const newFilter = e.target.value
                 setAvailableSpaceListFilter(newFilter)
               }}
-              placeholder={props.t('Filter spaces')}
-              icon='search'
               value={availableSpaceListFilter}
+              placeholder={props.t('Filter spaces')}
             />
+
           </div>
           {(isLoading
             ? <Loading />
@@ -248,16 +270,17 @@ export const AdminUserSpacesConfig = (props) => {
         <div className='adminUserSpacesConfig__zones__spacesMembership'>
           <div className='adminUserSpacesConfig__zones__title'>
             <b>{props.t('Spaces membership')}</b>&nbsp;({memberSpaceList.length})
-            <TextInput
-              customClass='form-control'
+
+            <FilterBar
+              customClass='adminUserSpacesConfig__zones__filterBar'
               onChange={e => {
                 const newFilter = e.target.value
                 setMemberSpaceListFilter(newFilter)
               }}
               placeholder={props.t('Filter spaces')}
-              icon='search'
               value={memberSpaceListFilter}
             />
+
           </div>
           {(isLoading
             ? <Loading />

@@ -9,7 +9,7 @@ import * as Cookies from 'js-cookie'
 import FooterLogin from '../component/Login/FooterLogin.jsx'
 import {
   CUSTOM_EVENT,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   checkEmailValidity,
   PAGE,
@@ -357,7 +357,7 @@ class Login extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 

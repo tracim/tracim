@@ -585,7 +585,12 @@
   "My Spaces": "Mis espacios",
   "My Password": "Mi contraseña",
   "My Configuration links": "Mis enlaces de configuración",
-  "Error while marking the notification group as read": "",
-  "Error while marking notifications as read": "",
-  "Open emoticons menu": ""
+  "Error while marking the notification group as read": "Error al marcar el grupo de notificaciones como leído",
+  "Error while marking notifications as read": "Error al marcar notificaciones como leídas",
+  "Open emoticons menu": "Abrir menú de emoticones",
+  "Filter my favorites": "",
+  "There are no favorites that matches you filter": "",
+  "Filter visible contents": "",
+  "There are no spaces that matches your filter": "",
+  "Filter users": ""
 }

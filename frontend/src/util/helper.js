@@ -1,7 +1,6 @@
 import i18n from './i18n.js'
 import {
   FETCH_CONFIG as LIB_FETCH_CONFIG,
-  naturalCompareLabels,
   PAGE,
   PROFILE_LIST,
   ROLE
@@ -162,16 +161,6 @@ const backendTranslationKeyList = [ // eslint-disable-line no-unused-vars
 ]
 
 export const ALL_CONTENT_TYPES = 'html-document,file,thread,folder,comment,kanban,todo'
-
-export const compareContents = (a, b, lang) => {
-  if (a.type === 'folder' && b.type !== 'folder') return -1
-  if (b.type === 'folder' && a.type !== 'folder') return 1
-  return naturalCompareLabels(a, b, lang)
-}
-
-export const sortContentList = (workspaceContents, lang) => {
-  return workspaceContents.sort((a, b) => compareContents(a, b, lang))
-}
 
 export const toggleFavicon = (hasUnreadNotification, hasUnreadMention) => {
   const originalHrefAttribute = 'originalHrefAttribute'

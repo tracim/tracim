@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import React from 'react'
 import i18n from './i18n.js'
-import { format, formatDistance, isAfter } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
 import color from 'color'
 import dateFnsFr from 'date-fns/locale/fr'
 import dateFnsEn from 'date-fns/locale/en-US'
@@ -527,28 +527,6 @@ export const STATUSES = {
   DEPRECATED: 'closed-deprecated'
 }
 
-export const sortContentByStatus = (contentList) => {
-  return contentList.sort((contantA, contentB) => {
-    if (contantA.status === STATUSES.VALIDATED && contentB.status === STATUSES.OPEN) {
-      return 1
-    } if (contantA.status === STATUSES.OPEN && contentB.status === STATUSES.VALIDATED) {
-      return -1
-    } else return 0
-  })
-}
-
-export const sortContentByCreatedDateAndID = (arrayToSort) => {
-  return arrayToSort.sort(function (a, b) {
-    if (a.created < b.created) return 1
-    if (a.created > b.created) return -1
-    if (a.created === b.created) {
-      if (a.id < b.id) return 1
-      if (a.id > b.id) return -1
-    }
-    return 0
-  })
-}
-
 export const buildTracimLiveMessageEventType = (entityType, coreEntityType, optionalSubType = null) => `${entityType}.${coreEntityType}${optionalSubType ? `.${optionalSubType}` : ''}`
 
 // INFO - CH - 2019-06-11 - This object must stay synchronized with the slugs of /api/system/content_types
@@ -572,20 +550,6 @@ export const TIMELINE_TYPE = {
   COMMENT: CONTENT_TYPE.COMMENT,
   COMMENT_AS_FILE: `${CONTENT_TYPE.COMMENT}AsFile`,
   REVISION: 'revision'
-}
-
-export const sortTimelineByDate = (timeline) => {
-  return timeline.sort((a, b) => {
-    // INFO - GB - 2021-12-07 - since we don't have the millisecond from backend, we can
-    // have contents created at the same second. So we sort on revision_id for revision,
-    // content_id for comments and we choose revision over comments if we have to sort between both.
-    if (a.created_raw === b.created_raw) {
-      if (a.revision_id && b.revision_id) return parseInt(a.revision_id) - parseInt(b.revision_id)
-      if (!a.revision_id && !b.revision_id) return parseInt(a.content_id) - parseInt(b.content_id)
-      else return a.revision_id ? -1 : 1
-    }
-    return isAfter(new Date(a.created_raw), new Date(b.created_raw)) ? 1 : -1
-  })
 }
 
 export const addRevisionFromTLM = (data, timeline, lang, isTokenClient = true) => {
@@ -759,25 +723,10 @@ export const createSpaceTree = spaceList => {
   return newSpaceList
 }
 
-export const naturalCompareLabels = (itemA, itemB, lang) => {
-  // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
-  return naturalCompare(itemA, itemB, lang, 'label')
-}
-
 export const naturalCompare = (itemA, itemB, lang, field) => {
   // 2020-09-04 - RJ - WARNING. Option ignorePunctuation is seducing but makes the sort unstable.
   const locale = lang ? lang.replaceAll('_', '-') : undefined
   return itemA[field].localeCompare(itemB[field], locale, { numeric: true })
-}
-
-export const sortWorkspaceList = (workspaceList, lang) => {
-  return workspaceList.sort((a, b) => {
-    let res = naturalCompareLabels(a, b, lang)
-    if (!res) {
-      res = getSpaceId(a) - getSpaceId(b)
-    }
-    return res
-  })
 }
 
 export const humanAndList = (list) => {
@@ -978,4 +927,9 @@ export const handleClickCopyLink = (contentId) => {
   } else navigator.clipboard.writeText(link)
 }
 
-export const sortMemberList = (a, b) => a.publicName.localeCompare(b.publicName)
+// INFO - ML - 2022-11-22 - Generates a function testing if 'b' includes 'a', ignoring letter case
+// Useful when you have to test if a single string is included in multiple others
+// Usage: const fn = stringIncludes('bc'); fn('abcd') -> Outputs: true
+export const stringIncludes = (a) => {
+  return (b) => b && b.toUpperCase().includes(a.toUpperCase())
+}

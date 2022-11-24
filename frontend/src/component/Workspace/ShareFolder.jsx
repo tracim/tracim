@@ -69,7 +69,7 @@ class ShareFolder extends React.Component {
             </div>
           </div>
 
-          <div className='folder__header__button'>
+          <div className='shareFolder__header__button'>
             <div className='d-none d-md-flex' title={props.t('Actions')}>
               {props.userRoleIdInWorkspace >= ROLE.contentManager.id && (
                 <DropdownMenu
@@ -115,6 +115,8 @@ class ShareFolder extends React.Component {
                 isLast={index === props.shareFolderContentList.length - 1}
                 key={content.id}
                 t={props.t}
+                selectedSortCriterion={props.selectedSortCriterion}
+                sortOrder={props.sortOrder}
               />
             )
             : (

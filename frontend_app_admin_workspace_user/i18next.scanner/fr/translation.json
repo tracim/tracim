@@ -48,5 +48,10 @@
   "Choose the user's type": "Choisir le type d'utilisateur",
   "Type": "Type",
   "Create and add to spaces": "Créer et ajouter aux espaces",
-  "Create": "Créer"
+  "Create": "Créer",
+  "Inactive": "",
+  "Filter users": "",
+  "There are no users that matches you filter": "",
+  "Filter spaces": "",
+  "There are no spaces that matches you filter": ""
 }

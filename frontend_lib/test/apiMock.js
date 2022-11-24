@@ -87,10 +87,10 @@ const mockPutContentDeleteRestore204 = (apiUrl, workspaceId, contentId) => {
     .reply(204, '')
 }
 
-const mockGetMyselfKnownMember200 = (apiUrl, workspaceId, knownMemberList) => {
+const mockGetSpaceMemberList200 = (apiUrl, spaceId, memberList) => {
   return nock(apiUrl)
-    .get(`/users/me/known_members?acp=&include_workspace_ids=${workspaceId}&limit=15`)
-    .reply(200, knownMemberList)
+    .get(`/workspaces/${spaceId}/members`)
+    .reply(200, memberList)
 }
 
 const mockGetReservedUsernames200 = (apiUrl) => {
@@ -145,7 +145,7 @@ export {
   mockPutContentDelete204,
   mockPutContentArchiveRestore204,
   mockPutContentDeleteRestore204,
-  mockGetMyselfKnownMember200,
+  mockGetSpaceMemberList200,
   mockGetReservedUsernames200,
   mockGetUsernameAvailability200,
   mockGetReservedUsernames500,
