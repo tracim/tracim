@@ -47,6 +47,7 @@ describe('At the space recent activities page', () => {
       cy.get('[data-cy=commentArea__comment__send]').click()
     })
     it('should display the file preview', () => {
+      cy.wait(2000)
       cy.get('[data-cy=FilenameWithBadges__label]').first().should('include.text', 'News')
       cy.get('.CommentFilePreview > .attachedFile').should('be.visible')
     })
