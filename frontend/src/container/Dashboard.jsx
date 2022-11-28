@@ -495,7 +495,10 @@ export class Dashboard extends React.Component {
                   <div className='dashboard__workspace__rightMenu__contents'>
                     <IconButton
                       icon='fas fa-fw fa-cog'
-                      text={props.t('Space settings')}
+                      text={(userRoleIdInWorkspace >= ROLE.contentManager.id
+                        ? props.t('Space settings')
+                        : props.t('Space information')
+                      )}
                       onClick={this.handleClickOpenAdvancedDashboard}
                     />
 
