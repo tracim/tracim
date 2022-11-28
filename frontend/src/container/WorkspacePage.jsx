@@ -16,7 +16,7 @@ import {
 } from '../action-creator.sync.js'
 import { FETCH_CONFIG } from '../util/helper.js'
 import {
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   PAGE,
   Loading
@@ -31,7 +31,7 @@ class WorkspacePage extends React.Component {
   async updateCurrentWorkspace () {
     const { props } = this
 
-    const requestMemberList = handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, props.workspaceId))
+    const requestMemberList = handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, props.workspaceId))
     const requestWorkspaceDetail = props.dispatch(getWorkspaceDetail(props.workspaceId))
 
     const [responseMemberList, responseWorkspaceDetail] = await Promise.all([

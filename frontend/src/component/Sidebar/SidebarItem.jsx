@@ -27,7 +27,7 @@ const SidebarItem = (props) => {
               title={props.label}
               color={props.customColor}
             />
-            <span>&nbsp;{props.label}</span>
+            <span>{props.label}</span>
           </div>
         </Link>
       ) : (
@@ -50,7 +50,7 @@ const SidebarItem = (props) => {
               title={props.label}
               color={props.customColor}
             />
-            <span>&nbsp;{props.label}</span>
+            <span>{props.label}</span>
             {props.unreadMentionCount > 0 && (
               <div className='sidebar__mention'>
                 {props.unreadMentionCount > 99 ? '99+' : props.unreadMentionCount}

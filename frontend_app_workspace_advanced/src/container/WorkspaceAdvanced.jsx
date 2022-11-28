@@ -9,7 +9,7 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   appContentFactory,
   addAllResourceI18n,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   PopinFixed,
   PopinFixedContent,
@@ -31,7 +31,10 @@ import {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange,
   TagList,
-  Loading
+  Loading,
+  FilterBar,
+  ROLE_LIST,
+  stringIncludes
 } from 'tracim_frontend_lib'
 import { debug } from '../debug.js'
 import {
@@ -88,7 +91,8 @@ export class WorkspaceAdvanced extends React.Component {
       autoCompleteClicked: false,
       searchedKnownMemberList: [],
       displayPopupValidateDeleteWorkspace: false,
-      subscriptionRequestList: []
+      subscriptionRequestList: [],
+      userFilter: ''
     }
 
     // i18n has been init, add resources from frontend
@@ -270,7 +274,7 @@ export class WorkspaceAdvanced extends React.Component {
     const { props, state } = this
 
     const fetchWorkspaceDetail = handleFetchResult(await getWorkspaceDetail(state.config.apiUrl, state.content.workspace_id))
-    const fetchWorkspaceMember = handleFetchResult(await getWorkspaceMemberList(state.config.apiUrl, state.content.workspace_id, false))
+    const fetchWorkspaceMember = handleFetchResult(await getSpaceMemberList(state.config.apiUrl, state.content.workspace_id, false))
     const fetchAppList = handleFetchResult(await getAppList(state.config.apiUrl))
 
     const [resDetail, resMember, resAppList] = await Promise.all([fetchWorkspaceDetail, fetchWorkspaceMember, fetchAppList])
@@ -724,6 +728,31 @@ export class WorkspaceAdvanced extends React.Component {
 
   getMenuItemList = () => {
     const { props, state } = this
+
+    const filterMemberList = () => {
+      if (state.userFilter === '') return state.content.memberList
+
+      return state.content.memberList.filter(member => {
+        if (!member.user) return false
+
+        const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
+
+        const includesFilter = stringIncludes(state.userFilter)
+
+        const hasFilterMatchOnPublicName = includesFilter(member.user.public_name)
+        const hasFilterMatchOnUsername = includesFilter(member.user.username)
+        const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
+
+        return (
+          hasFilterMatchOnPublicName ||
+          hasFilterMatchOnUsername ||
+          hasFilterMatchOnRole
+        )
+      })
+    }
+
+    const filteredMemberList = filterMemberList()
+
     const memberlistObject = {
       id: 'members_list',
       label: props.t('Members List'),
@@ -733,13 +762,23 @@ export class WorkspaceAdvanced extends React.Component {
           label={props.t('Members List')}
           showTitle={!state.displayFormNewMember}
         >
+          <FilterBar
+            customClass='workspace_advanced__filterBar'
+            onChange={e => {
+              const newFilter = e.target.value
+              this.setState({ userFilter: newFilter })
+            }}
+            value={state.userFilter}
+            placeholder={props.t('Filter users')}
+          />
+
           {
             state.isLoadingMembers
               ? <Loading />
               : (
                 <WorkspaceMembersList
                   displayFormNewMember={state.displayFormNewMember}
-                  memberList={state.content.memberList}
+                  memberList={filteredMemberList}
                   roleList={state.config.roleList}
                   apiUrl={props.data.config.apiUrl}
                   onClickNewRole={this.handleClickNewRole}

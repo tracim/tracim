@@ -83,7 +83,7 @@ export class AddUserForm extends React.Component {
 
           <input
             type='text'
-            className='userData__input form-control primaryColorBorderLighten'
+            className='userData__input form-control'
             id='adduser_name'
             placeholder={props.t('Full name')}
             value={state.newUserName}
@@ -98,7 +98,7 @@ export class AddUserForm extends React.Component {
           <div>
             <input
               type='text'
-              className='userData__input userData__input__username form-control primaryColorBorderLighten'
+              className='userData__input userData__input__username form-control'
               id='adduser_username'
               placeholder={props.t('Username')}
               value={state.newUserUsername}
@@ -143,7 +143,7 @@ export class AddUserForm extends React.Component {
 
           <input
             type='email'
-            className='userData__input form-control primaryColorBorderLighten'
+            className='userData__input form-control'
             id='adduser_email'
             placeholder={props.t('Email')}
             value={state.newUserEmail}
@@ -158,7 +158,7 @@ export class AddUserForm extends React.Component {
 
             <input
               type='text'
-              className='userData__input form-control primaryColorBorderLighten'
+              className='userData__input form-control'
               id='adduser_password'
               placeholder={props.t('Password')}
               value={state.newUserPassword}

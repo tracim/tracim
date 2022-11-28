@@ -68,15 +68,6 @@ function KanbanCardEditor (props) {
         <div className='kanban__KanbanPopup__description'>
           <label htmlFor={descriptionEditionId}>{props.t('Description:')}</label>
           <div>
-            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-              <AutoComplete
-                apiUrl={props.apiUrl}
-                autoCompleteItemList={props.autoCompleteItemList}
-                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-              />
-            )}
             <textarea
               autoFocus={props.focusOnDescription}
               id={descriptionEditionId}
@@ -86,6 +77,15 @@ function KanbanCardEditor (props) {
               rows='3'
               hidden
             />
+            {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
+              <AutoComplete
+                apiUrl={props.apiUrl}
+                autoCompleteItemList={props.autoCompleteItemList}
+                autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+                onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+                delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+              />
+            )}
           </div>
         </div>
 

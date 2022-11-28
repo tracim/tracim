@@ -16,7 +16,7 @@ export class TextInput extends React.Component {
   render () {
     const { props } = this
     return (
-      <div className='textinput__box primaryColorBorder'>
+      <div className='textinput__box'>
         <input
           autoFocus={props.autoFocus}
           type='text'

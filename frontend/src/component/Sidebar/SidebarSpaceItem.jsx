@@ -15,8 +15,8 @@ import {
   SPACE_TYPE
 } from 'tracim_frontend_lib'
 import { DRAG_AND_DROP, NO_ACTIVE_SPACE_ID } from '../../util/helper.js'
-import { putNotificationAsRead } from '../../action-creator.async.js'
-import { newFlashMessage, readNotification } from '../../action-creator.sync.js'
+import { putNotificationListAsRead } from '../../action-creator.async.js'
+import { newFlashMessage, readNotificationList } from '../../action-creator.sync.js'
 import { LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE } from '../../container/Sidebar.jsx'
 
 const qs = require('query-string')
@@ -104,34 +104,30 @@ class SidebarSpaceItem extends React.Component {
     const { props } = this
 
     if (this.state.unreadNotifications.length > 0) {
-      await Promise.all(
-        this.state.unreadNotifications
-          .map(n => n.id)
-          .map(async (notificationId) => {
-            const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
-            switch (fetchPutNotificationAsRead.status) {
-              case 204: {
-                props.dispatch(readNotification(notificationId))
-                break
-              }
-              default:
-                props.dispatch(newFlashMessage(props.t('Error while marking the notification as read'), 'warning'))
-            }
-          })
+      const notificationList = this.state.unreadNotifications.map(n => n.id)
+      const fetchPutNotificationListAsRead = await props.dispatch(
+        putNotificationListAsRead(props.user.userId, notificationList)
       )
+      switch (fetchPutNotificationListAsRead.status) {
+        case 204:
+          props.dispatch(readNotificationList(notificationList))
+          break
+        default:
+          props.dispatch(newFlashMessage(props.t('Error while marking notifications as read'), 'warning'))
+      }
     }
   }
 
   render () {
     const { props, state } = this
     const INDENT_WIDTH = 20
-    const BASE_MARGIN = 20
+    const BASE_MARGIN = 25
 
     return (
-      <div
+      <Link
         id={props.id}
         className={classnames(
-          'sidebar__item__space',
+          'sidebar__item__inside_menu sidebar__item__space',
           {
             'primaryColorBorder primaryColorBgOpacity sidebar__item__current':
               props.location.pathname.includes(`${PAGE.WORKSPACE.ROOT}/${props.spaceId}/`) && !props.isNotificationWallOpen
@@ -144,6 +140,8 @@ class SidebarSpaceItem extends React.Component {
         ref={props.connectDropTarget}
         onMouseEnter={this.handleMouseEnterItem}
         onMouseLeave={this.handleMouseLeaveItem}
+        to={PAGE.WORKSPACE.DASHBOARD(props.spaceId)}
+        onClick={this.handleClickSpace}
       >
         {// INFO - GB - 2020-10-14 - The  (level - 1) * 20 + 10 calculation is to have the sequence (10, 30, 50, 70, ...)
           // in other words, the margin starts at 10px at level 1 (first child) and increases by 20px at each new level.
@@ -161,45 +159,41 @@ class SidebarSpaceItem extends React.Component {
             customClass={`transparentButton sidebar__item__foldChildren ${LOCK_TOGGLE_SIDEBAR_WHEN_OPENED_ON_MOBILE}`}
             icon={`fas fa-caret-${props.foldChildren ? 'right' : 'down'}`}
             title={props.foldChildren ? props.t('Show subspaces') : props.t('Hide subspaces')}
-            intent='link'
-            mode='light'
-            onClick={() => props.onToggleFoldChildren(props.spaceId)}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              props.onToggleFoldChildren(props.spaceId)
+            }}
           />
         )}
 
-        <Link
+        {(props.canDrop && props.isOver) && (
+          <i className={`fas fa-fw ${this.getIcon()} sidebar__item__dragNdrop`} />
+        )}
+
+        <div
           className={classnames(
             'sidebar__item',
+            'sidebar__item__name',
             { sidebar__item__withoutChildren: !props.hasChildren }
           )}
-          to={PAGE.WORKSPACE.DASHBOARD(props.spaceId)}
-          onClick={this.handleClickSpace}
+          title={props.label}
         >
-          {(props.canDrop && props.isOver) && (
-            <i className={`fas fa-fw ${this.getIcon()} sidebar__item__dragNdrop`} />
-          )}
-
           <div
-            className='sidebar__item__name'
-            title={props.label}
+            className='label'
           >
-            <div
-              className='label'
-            >
-              {props.label}
-            </div>
-            {state.unreadMentionCount > 0 && <div className='sidebar__mention'>{state.unreadMentionCount}</div>}
-
-            {props.spaceType === SPACE_TYPE.confidential.slug && (
-              <Icon
-                customClass='sidebar__item__space__type'
-                icon={SPACE_TYPE.confidential.faIcon}
-                title={props.t('Confidential space')}
-              />
-            )}
+            {props.label}
           </div>
+          {state.unreadMentionCount > 0 && <div className='sidebar__mention'>{state.unreadMentionCount}</div>}
 
-        </Link>
+          {props.spaceType === SPACE_TYPE.confidential.slug && (
+            <Icon
+              customClass='sidebar__item__space__type'
+              icon={SPACE_TYPE.confidential.faIcon}
+              title={props.t('Confidential space')}
+            />
+          )}
+        </div>
 
         {state.showDropdownMenuButton && (
           <DropdownMenu
@@ -220,7 +214,7 @@ class SidebarSpaceItem extends React.Component {
             ))}
           </DropdownMenu>
         )}
-      </div>
+      </Link>
     )
   }
 }

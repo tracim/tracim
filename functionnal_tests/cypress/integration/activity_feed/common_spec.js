@@ -1,4 +1,4 @@
-import { PAGES, URLS } from '../../support/urls_commands.js'
+import { PAGES } from '../../support/urls_commands.js'
 
 const activityPages = [
   { name: 'Personal', page: PAGES.RECENT_ACTIVITIES, initialItemCount: 3 },
@@ -159,7 +159,7 @@ for (const pageTestCase of activityPages) {
 
         cy.get('.feedItem__preview__overflow').should('not.exist')
 
-        cy.get('.feedItem__preview__html')
+        cy.get('.feedItem__preview')
           .should('contain.text', smallContent)
       })
 
@@ -197,7 +197,7 @@ for (const pageTestCase of activityPages) {
 
         cy.get('.feedItem__preview__overflow').should('be.visible')
 
-        cy.get('.feedItem__preview__html')
+        cy.get('.feedItem__preview')
           .click()
         cy.location('pathname').should('be.equal', `/ui/workspaces/${workspaceId}/contents/html-document/${contentId}`)
       })

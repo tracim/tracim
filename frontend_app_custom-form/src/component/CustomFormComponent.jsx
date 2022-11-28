@@ -58,7 +58,7 @@ const CustomFormComponent = props => {
               />
               {props.mode === MODE.REVISION && (
                 <div
-                  className='custom-form__contentpage__textnote__lastversion outlineTextBtn'
+                  className='custom-form__contentpage__textnote__lastversion'
                 >
                   ({props.t('latest version :')} {props.lastVersion})
                 </div>

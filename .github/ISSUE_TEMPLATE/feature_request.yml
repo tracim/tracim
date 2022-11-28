@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest a new feature
+title: "✨ Feat: "
+labels: ["to sort", "feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for wanting to improve Tracim!
+        Before you submit, please make sure the feature hasn't already been suggested by searching [open](https://github.com/tracim/tracim/issues) and [closed](https://github.com/tracim/tracim/issues?q=is%3Aissue+is%3Aclosed).
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature description
+      description: |
+        Describe your feature/enhancement and why do you need it in Tracim.
+      placeholder: >
+        Add keyboard shortcuts to go to a specific content.
+        This would allow to navigate faster in Tracim.
+    validations:
+      required: true
+  - type: textarea
+    id: how-it-works
+    attributes:
+      label: How it works
+      description: |
+        Describe how your feature works.
+      placeholder: |
+        When the user presses Ctrl+Shift+G, a popup appears with a search field.
+        When the user types a search query, the popup shows a list of contents that match the query.
+        When the user selects a content, the popup closes and the user is redirected to the content.
+    validations:
+      required: true
+  - type: textarea
+    id: related-pr
+    attributes:
+      label: Related PR
+      description: |
+        Let us know if this is related to an open pull request.
+        Leave empty if there is no related PR or if you don't know.
+      placeholder: PR #0000
+    validations:
+      required: false

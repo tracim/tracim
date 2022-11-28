@@ -8,18 +8,6 @@ a
 .table td
   vertical-align middle
 
-.outlineTextBtn
-  padding standardSpacing
-  background-color transparent
-  cursor pointer
-  &:disabled
-    cursor not-allowed
-  &:hover
-    color offWhite
-  &.nohover
-    &:hover
-      color inherit
-
 .highlightBtn
   padding standardSpacing
   color offWhite
@@ -35,17 +23,19 @@ a
   &:disabled
     cursor not-allowed
 
-.tox-tinymce
+div.tox-tinymce
   min-height 150px
 
 div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
   z-index 1050
   margin-inline-start closedSidebarWidth
-  width "calc(100% - %s)" % closedSidebarWidth !important // INFO - GB - 2022-08-23 - override TinyMCE calculated width
+  width 'calc(100% - %s)' % closedSidebarWidth !important // INFO - GB - 2022-08-23 - override TinyMCE calculated width
+  & ~ .autocomplete
+    margin-inline-start closedSidebarWidth + standardSpacing
+    width 'calc(100% - %s)' % (closedSidebarWidth + 2 * standardSpacing)
 
-// NOTE - RJ - 2022-02-14 - remove some borders on TinyMCE toolbars
-.tox-toolbar
-  background-image none !important // native TinyMCE borders are drawn using a background image
+div.tox .tox-toolbar
+  background-image none // native TinyMCE borders are drawn using a background image
   &__group
     border 0 !important
     padding 0 !important
@@ -97,61 +87,6 @@ div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
   font-size titleFontSize
   margin-bottom standardSpacing
 
-.genericBtnInfoDashboard
-  &__btn
-    display flex
-    margin-bottom 30px
-    border-width 1px
-    border-style solid
-    border-radius standardBorderRadius
-    padding standardSpacing 25px
-    cursor pointer
-    &:hover
-      color offWhite
-    &__icon
-      margin-inline-end 20px
-      font-size bigIconSize
-  &__info
-    border borderStyle
-    border-radius standardBorderRadius
-    padding 15px 25px
-    &__text
-      margin-bottom 35px
-    &__link
-      display inline-block
-      margin-bottom 15px
-      border borderStyle
-      border-radius standardBorderRadius
-      padding 15px
-
-.notched // Côme - 2018/09/27 - this class requires a border-color to be defined (eg. with primaryColorBorder)
-  &::before
-    content ''
-    position absolute
-    width 28px
-    height 25px
-    border-style solid
-    top 0
-    right 0
-    border-top-width 6px
-    border-inline-end-width 6px
-    border-bottom-width 0
-    border-inline-start-width 0
-    border-color inherit
-  &::after
-    content ''
-    position absolute
-    width 28px
-    height 25px
-    border-style solid
-    bottom 0
-    left 0
-    border-top-width 0
-    border-inline-end-width 0
-    border-bottom-width 6px
-    border-inline-start-width 6px
-    border-color inherit
-
 #appFullscreenContainer
   height 100vh
   overflow hidden
@@ -165,4 +100,4 @@ div.tox-shadowhost.tox-fullscreen, div.tox.tox-tinymce.tox-fullscreen
       overflow-y auto
 
 .popover-body
-  font-family Quicksand
+  font-family Nunito

@@ -3,6 +3,8 @@ import datetime
 import typing
 
 import pytest
+from sqlalchemy import and_
+from sqlalchemy import null
 import transaction
 
 from tracim_backend.lib.utils.utils import DATETIME_FORMAT
@@ -10,17 +12,35 @@ import tracim_backend.models.event as tracim_event
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
-def create_events_and_messages(
+def create_user_messages(
     session,
-    unread: bool = False,
+    is_read: bool = True,
     sent_date: typing.Optional[datetime.datetime] = None,
     remove_existing_events: bool = True,
 ) -> typing.List[tracim_event.Message]:
+    """
+    Will generate 3 user events and their associated messages (3 messages)
+
+    Args:
+        is_read (bool, optional): Should the messages be read? Defaults to True.
+        sent_date (typing.Optional[datetime.datetime], optional): When the events should be sent?.\
+            Defaults to None.
+        remove_existing_events (bool, optional): Should remove the existing events? Defaults to\
+            True.
+
+    Returns:
+        typing.List[tracim_event.Message]: Messages created.
+    """
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
         if remove_existing_events:
             session.query(tracim_event.Message).delete()
+
+        read_datetime = None
+        if is_read:
+            read_datetime = datetime.datetime.utcnow()
+
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
             operation=tracim_event.OperationType.CREATED,
@@ -28,9 +48,6 @@ def create_events_and_messages(
             author_id=1,
         )
         session.add(event)
-        read_datetime = datetime.datetime.utcnow()
-        if unread:
-            read_datetime = None
         messages.append(
             tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
         )
@@ -42,7 +59,9 @@ def create_events_and_messages(
             author_id=2,
         )
         session.add(event)
-        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+        messages.append(
+            tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
+        )
 
         event = tracim_event.Event(
             entity_type=tracim_event.EntityType.USER,
@@ -51,7 +70,9 @@ def create_events_and_messages(
             author_id=None,
         )
         session.add(event)
-        messages.append(tracim_event.Message(event=event, receiver_id=1, sent=sent_date))
+        messages.append(
+            tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
+        )
 
         session.add_all(messages)
         session.flush()
@@ -60,12 +81,25 @@ def create_events_and_messages(
     return messages
 
 
-def create_workspace_messages(
+def create_space_messages(
     session,
-    unread: bool = False,
+    is_read: bool = True,
     sent_date: typing.Optional[datetime.datetime] = None,
     remove_existing_events: bool = True,
 ) -> typing.List[tracim_event.Message]:
+    """
+    Will generate 3 space events and their associated messages (3 messages)
+
+    Args:
+        is_read (bool, optional): Should the messages be read? Defaults to True.
+        sent_date (typing.Optional[datetime.datetime], optional): When the events should be sent?.\
+            Defaults to None.
+        remove_existing_events (bool, optional): Should remove the existing events? Defaults to\
+            True.
+
+    Returns:
+        typing.List[tracim_event.Message]: Messages created.
+    """
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
@@ -79,9 +113,9 @@ def create_workspace_messages(
             author_id=1,
         )
         session.add(event)
-        read_datetime = datetime.datetime.utcnow()
-        if unread:
-            read_datetime = None
+        read_datetime = None
+        if is_read:
+            read_datetime = datetime.datetime.utcnow()
         messages.append(
             tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
         )
@@ -113,10 +147,23 @@ def create_workspace_messages(
 
 def create_content_messages(
     session,
-    unread: bool = False,
+    is_read: bool = True,
     sent_date: typing.Optional[datetime.datetime] = None,
     remove_existing_events: bool = True,
 ) -> typing.List[tracim_event.Message]:
+    """
+    Will generate 4 content events and their associated messages (4 messages)
+
+    Args:
+        is_read (bool, optional): Should the messages be read? Defaults to True.
+        sent_date (typing.Optional[datetime.datetime], optional): When the events should be sent?.\
+            Defaults to None.
+        remove_existing_events (bool, optional): Should remove the existing events? Defaults to\
+            True.
+
+    Returns:
+        typing.List[tracim_event.Message]: Messages created.
+    """
     messages = []
     with transaction.manager:
         # remove messages created by the base fixture
@@ -130,9 +177,9 @@ def create_content_messages(
             author_id=1,
         )
         session.add(event)
-        read_datetime = datetime.datetime.utcnow()
-        if unread:
-            read_datetime = None
+        read_datetime = None
+        if is_read:
+            read_datetime = datetime.datetime.utcnow()
         messages.append(
             tracim_event.Message(event=event, receiver_id=1, read=read_datetime, sent=sent_date)
         )
@@ -189,7 +236,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint.
         """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        messages = create_user_messages(session, sent_date=datetime.datetime.utcnow())
         if read_status == "read":
             messages = [m for m in messages if m.read]
         elif read_status == "unread":
@@ -217,7 +264,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint.
         """
-        messages = create_events_and_messages(session, sent_date=None)
+        messages = create_user_messages(session, sent_date=None)
         if not include_not_sent:
             messages = []
 
@@ -243,7 +290,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint. Filter by author_ids
         """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        messages = create_user_messages(session, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
@@ -283,7 +330,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint. Filter by event_type
         """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        messages = create_user_messages(session, sent_date=datetime.datetime.utcnow())
 
         if event_type:
             messages = [m for m in messages if m.event_type == event_type]
@@ -372,7 +419,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint. Filter by event_type
         """
-        messages = create_events_and_messages(
+        messages = create_user_messages(
             session, sent_date=datetime.datetime.utcnow(), remove_existing_events=False
         )
         messages.extend(
@@ -381,7 +428,7 @@ class TestMessages(object):
             )
         )
         messages.extend(
-            create_workspace_messages(
+            create_space_messages(
                 session, sent_date=datetime.datetime.utcnow(), remove_existing_events=False
             )
         )
@@ -406,7 +453,7 @@ class TestMessages(object):
         """
         Get messages through the classic HTTP endpoint. Filter by workspace_id
         """
-        messages = create_workspace_messages(session, sent_date=datetime.datetime.utcnow())
+        messages = create_space_messages(session, sent_date=datetime.datetime.utcnow())
         if workspace_ids:
             new_messages = []
             for m in messages:
@@ -473,7 +520,7 @@ class TestMessages(object):
         """
         Check invalid event type case
         """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        messages = create_user_messages(session, sent_date=datetime.datetime.utcnow())
 
         if event_type:
             messages = [m for m in messages if m.event_type == event_type]
@@ -497,7 +544,7 @@ class TestMessages(object):
         Get messages through the classic HTTP endpoint.
         Paginate with both "count" and "before_event_id"
         """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        messages = create_user_messages(session, sent_date=datetime.datetime.utcnow())
         assert len(messages) == 3
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         message_dicts_0 = web_testapp.get("/api/users/1/messages", status=200,).json_body.get(
@@ -559,85 +606,99 @@ class TestMessages(object):
         assert message_dicts["code"] == 2001
         assert message_dicts["message"] == "Validation error of input data"
 
-    def test_api__read_all_messages__ok_204__nominal_case(self, session, web_testapp) -> None:
+    @pytest.mark.parametrize(
+        "api_end_url, user_id, params, ids, expected_code, expected_length",
+        [
+            pytest.param("read", 1, [], [[]], 204, 10, id="read_all"),
+            pytest.param("read", 1, ["event_ids"], [[0]], 204, 0, id="read_non_accessible_event",),
+            pytest.param("read", 1, ["event_ids"], [[2]], 204, 1, id="read_one_event"),
+            pytest.param("read", 1, ["event_ids"], [[2, 4]], 204, 2, id="read_some_events"),
+            pytest.param("read", 1, ["content_ids"], [[1]], 204, 1, id="read_one_content"),
+            pytest.param("read", 1, ["content_ids"], [[1, 2]], 204, 2, id="read_some_contents"),
+            pytest.param("read", 1, ["space_ids"], [[1]], 204, 1, id="read_one_space"),
+            pytest.param("read", 1, ["space_ids"], [[1, 2]], 204, 2, id="read_some_spaces"),
+            pytest.param("read", 1, ["parent_ids"], [[1]], 204, 1, id="read_on_parent"),
+            pytest.param(
+                "read",
+                1,
+                ["parent_ids"],
+                [[1, 2]],
+                204,
+                1,
+                id="read_some_parents_with_invalid_second_id",
+            ),
+            pytest.param("unread", 1, [], [[]], 204, 10, id="unread_all"),
+        ],
+    )
+    def test_api__read_unread_messages__ok_204__nominal_case(
+        self,
+        session,
+        web_testapp,
+        api_end_url,
+        user_id,
+        params,
+        ids,
+        expected_code,
+        expected_length,
+    ) -> None:
         """
-        Read all unread messages
+        Test the API messages/{read/unread}
         """
-        messages = create_events_and_messages(
-            session, unread=True, sent_date=datetime.datetime.utcnow()
+        is_read = api_end_url == "read"
+        create_user_messages(session, is_read=not is_read, sent_date=datetime.datetime.utcnow())
+        create_space_messages(
+            session,
+            is_read=not is_read,
+            remove_existing_events=False,
+            sent_date=datetime.datetime.utcnow(),
+        )
+        create_content_messages(
+            session,
+            is_read=not is_read,
+            remove_existing_events=False,
+            sent_date=datetime.datetime.utcnow(),
         )
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 3
+        end_url_str = "?"
+        for param in params:
+            ids_str = ",".join([str(i) for i in ids[params.index(param)]])
+            end_url_str += f"&{param}={ids_str}"
 
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=read", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 0
+        web_testapp.put(
+            f"/api/users/{user_id}/messages/{api_end_url}{end_url_str}", status=expected_code,
+        )
 
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(messages) == len(message_dicts) == 3
-        for message, message_dict in zip(messages, message_dicts):
-            assert not message_dict["read"]
+        condition = (
+            (tracim_event.Message.read != null())
+            if is_read
+            else (tracim_event.Message.read == null())
+        )
+        base_message_query = (
+            session.query(tracim_event.Message)
+            .join(tracim_event.Event, tracim_event.Message.event_id == tracim_event.Event.event_id)
+            .filter(and_(tracim_event.Message.receiver_id == user_id, condition,))
+        )
+        if "content_ids" in params:
+            base_message_query = base_message_query.filter(
+                tracim_event.Event.content_id.in_(ids[params.index("content_ids")])
+            )
+        if "event_ids" in params:
+            base_message_query = base_message_query.filter(
+                tracim_event.Message.event_id.in_(ids[params.index("event_ids")])
+            )
+        if "parent_ids" in params:
+            base_message_query = base_message_query.filter(
+                tracim_event.Event.parent_id.in_(ids[params.index("parent_ids")])
+            )
+        if "space_ids" in params:
+            base_message_query = base_message_query.filter(
+                tracim_event.Event.workspace_id.in_(ids[params.index("space_ids")])
+            )
+        messages = base_message_query.all()
 
-        web_testapp.put("/api/users/1/messages/read", status=204)
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(message_dicts) == 3
-        for message, message_dict in zip(messages, message_dicts):
-            assert message_dict["read"]
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 0
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=read", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 3
-
-    def test_api__read_content_related_messages__ok_204__nominal_case(
-        self, session, web_testapp
-    ) -> None:
-        """
-        Read all unread messages
-        """
-        create_content_messages(session, unread=True, sent_date=datetime.datetime.utcnow())
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 4
-
-        web_testapp.put("/api/users/1/messages/read?content_ids=1", status=204)
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 3
-        for message in message_dicts:
-            assert message["fields"].get("content", {}).get("content_id") != 1
-
-        web_testapp.put("/api/users/1/messages/read?parent_ids=1", status=204)
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 2
-        for message in message_dicts:
-            assert message["fields"].get("content", {}).get("parent_id") != 1
-
-        web_testapp.put("/api/users/1/messages/read?content_ids=3,4", status=204)
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 0
+        assert len(messages) == expected_length
 
     def test_api__read_message__err_400__message_does_not_exist(self, session, web_testapp) -> None:
         """
@@ -659,118 +720,18 @@ class TestMessages(object):
         result = web_testapp.put("/api/users/1/messages/{}/unread".format("1000"), status=400)
         assert result.json_body["code"] == 1009
 
-    def test_api__read_message__ok_204__nominal_case(self, session, web_testapp) -> None:
-        """
-        Read one unread message
-        """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(messages) == len(message_dicts) == 3
-
-        unread_event_id = None
-        for message, message_dict in zip(messages, message_dicts):
-            if not message_dict.get("read"):
-                unread_event_id = message.event_id
-
-        assert unread_event_id
-        message_dicts = web_testapp.put(
-            "/api/users/1/messages/{}/read".format(unread_event_id), status=204,
-        )
-
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(message_dicts) == 3
-
-        for message, message_dict in zip(messages, message_dicts):
-            if message_dict["event_id"] == unread_event_id:
-                assert message_dict["read"]
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 1
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=read", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 2
-
-    def test_api__read_message__ok_204__read_only_one_message(self, session, web_testapp) -> None:
-        """
-        Read one unread message, check if only one message as been read
-        """
-        create_events_and_messages(session, unread=True, sent_date=datetime.datetime.utcnow())
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 3
-
-        message_dicts = web_testapp.put("/api/users/1/messages/2/read", status=204,)
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 2
-        assert message_dicts[0]["event_id"] == 4
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=read", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 1
-        assert message_dicts[0]["event_id"] == 2
-
-    def test_api__unread_message__ok_204__nominal_case(self, session, web_testapp) -> None:
-        """
-        Read one unread message
-        """
-        messages = create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
-
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(messages) == len(message_dicts) == 3
-
-        read_event_id = None
-        for message, message_dict in zip(messages, message_dicts):
-            if message_dict.get("read"):
-                read_event_id = message.event_id
-
-        assert read_event_id
-        message_dicts = web_testapp.put(
-            "/api/users/1/messages/{}/unread".format(read_event_id), status=204,
-        )
-
-        message_dicts = web_testapp.get("/api/users/1/messages", status=200,).json_body.get("items")
-        assert len(message_dicts) == 3
-        for message, message_dict in zip(messages, message_dicts):
-            assert not message_dict["read"]
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=unread", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 3
-
-        message_dicts = web_testapp.get(
-            "/api/users/1/messages?read_status=read", status=200,
-        ).json_body.get("items")
-        assert len(message_dicts) == 0
-
     def test_api__messages_summary__ok_200__nominal_case(self, session, web_testapp) -> None:
         """
         check summary of messages
         """
-        create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        create_user_messages(session, is_read=False, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         message_dicts = web_testapp.get("/api/users/1/messages/summary", status=200,).json_body
         assert message_dicts["user_id"] == 1
-        assert message_dicts["unread_messages_count"] == 2
-        assert message_dicts["read_messages_count"] == 1
+        assert message_dicts["unread_messages_count"] == 3
+        assert message_dicts["read_messages_count"] == 0
         assert message_dicts["messages_count"] == 3
         assert message_dicts["user"]["user_id"] == 1
         assert message_dicts["user"]["username"] == "TheAdmin"
@@ -778,12 +739,12 @@ class TestMessages(object):
     @pytest.mark.parametrize(
         "include_exclude,event_types,read_messages_count,unread_messages_count",
         [
-            ("include", ["user.created", "user.modified"], 1, 2),
-            ("include", ["user.created"], 1, 0),
+            ("include", ["user.created", "user.modified"], 0, 3),
+            ("include", ["user.created"], 0, 1),
             ("include", ["user.modified"], 0, 2),
             ("exclude", ["user.created", "user.modified"], 0, 0),
             ("exclude", ["user.created"], 0, 2),
-            ("exclude", ["user.modified"], 1, 0),
+            ("exclude", ["user.modified"], 0, 1),
         ],
     )
     def test_api__messages_summary__ok_200__filter_event_types_all(
@@ -798,7 +759,7 @@ class TestMessages(object):
         """
         check summary of messages
         """
-        create_events_and_messages(session, sent_date=datetime.datetime.utcnow())
+        create_user_messages(session, is_read=False, sent_date=datetime.datetime.utcnow())
 
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         event_type_filter = ",".join(event_types)
@@ -842,7 +803,7 @@ class TestMessages(object):
     def test_api__messages_summary__ok_200__workspace_filter(
         self, session, web_testapp, workspace_ids, nb_messages
     ) -> None:
-        create_workspace_messages(session, sent_date=datetime.datetime.utcnow())
+        create_space_messages(session, sent_date=datetime.datetime.utcnow())
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         if not workspace_ids:
             workspace_ids_str = ""

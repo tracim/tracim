@@ -9,17 +9,20 @@ import {
   NUMBER_RESULTS_BY_PAGE,
   convertBackslashNToBr,
   displayDistanceDate,
-  sortTimelineByDate,
   sendGlobalFlashMessage,
   TIMELINE_TYPE,
   CONTENT_TYPE,
   permissiveNumberEqual,
   getOrCreateSessionClientToken,
   tinymceRemove,
-  addRevisionFromTLM,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus
+  addRevisionFromTLM
 } from './helper.js'
+
+import {
+  SORT_BY,
+  sortListByMultipleCriteria,
+  sortTimelineByDate
+} from './sortListHelper.js'
 
 import {
   LOCAL_STORAGE_FIELD,
@@ -53,7 +56,7 @@ import {
   getFavoriteContentList,
   getFileChildContent,
   getMyselfKnownContents,
-  getMyselfKnownMember,
+  getSpaceMemberList,
   getTemplateList,
   getToDoList,
   postContentToFavoriteList,
@@ -123,6 +126,7 @@ export function appContentFactory (WrappedComponent) {
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.COMMENT, handler: this.handleContentCommentModified },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.CREATED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentCreated },
         { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.DELETED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentDeleted },
+        { entityType: TLM_ET.CONTENT, coreEntityType: TLM_CET.MODIFIED, optionalSubType: TLM_ST.FILE, handler: this.handleChildContentModified },
         { entityType: TLM_ET.USER, coreEntityType: TLM_CET.MODIFIED, handler: this.handleUserModified }
       ])
 
@@ -200,7 +204,12 @@ export function appContentFactory (WrappedComponent) {
 
       switch (fetchGetToDo.apiResponse.status) {
         case 200:
-          setState({ toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy(fetchGetToDo.body, 'content_id'))) })
+          setState({
+            toDoList: sortListByMultipleCriteria(
+              uniqBy(fetchGetToDo.body, 'content_id'),
+              [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+            )
+          })
           break
         default:
           sendGlobalFlashMessage(i18n.t('Something went wrong'))
@@ -245,6 +254,28 @@ export function appContentFactory (WrappedComponent) {
         const wholeTimeline = prevState.wholeTimeline.filter(timelineItem => timelineItem.content_id !== tlm.fields.content.content_id)
         const timeline = this.getTimeline(wholeTimeline, prevState.timeline.length - 1)
         return { timeline, wholeTimeline }
+      })
+    }
+
+    handleChildContentModified = (tlm) => {
+      const { state, props } = this
+
+      if (
+        props.data === undefined ||
+        tlm.fields.content.workspace_id !== props.data.content.workspace_id ||
+        tlm.fields.content.parent_id !== props.data.content.content_id
+      ) return
+
+      const wholeTimeline = [...state.wholeTimeline]
+      const index = wholeTimeline.findIndex(element => element.content_id === tlm.fields.content.content_id)
+      if (index < 0) return
+
+      wholeTimeline[index] = this.buildTimelineItemCommentAsFile(tlm.fields.content, state.loggedUser)
+      const timeline = this.getTimeline(wholeTimeline, state.timeline.length)
+
+      this.setState({
+        wholeTimeline,
+        timeline
       })
     }
 
@@ -1017,10 +1048,18 @@ export function appContentFactory (WrappedComponent) {
         }
       } else {
         autoCompleteItemList = getMatchingGroupMentionList(keyword)
-        const fetchUserKnownMemberList = await handleFetchResult(await getMyselfKnownMember(this.apiUrl, keyword, workspaceId, null, NUMBER_RESULTS_BY_PAGE))
+        const fetchSpaceMemberList = await handleFetchResult(
+          await getSpaceMemberList(this.apiUrl, workspaceId)
+        )
 
-        switch (fetchUserKnownMemberList.apiResponse.status) {
-          case 200: return [...autoCompleteItemList, ...fetchUserKnownMemberList.body.filter(m => m.username).map(m => ({ mention: m.username, detail: m.public_name, ...m }))]
+        switch (fetchSpaceMemberList.apiResponse.status) {
+          case 200: return [
+            ...autoCompleteItemList,
+            ...fetchSpaceMemberList.body
+              .filter(m => m.user.username)
+              .filter(m => m.user.username.toLowerCase().includes(keyword.toLowerCase()))
+              .map(m => ({ mention: m.user.username, detail: m.user.public_name, ...m.user }))
+          ]
           default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list')); break
         }
       }

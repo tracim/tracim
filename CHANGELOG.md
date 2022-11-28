@@ -1,3 +1,62 @@
+# 4.4.2 / 2022-11-04
+
+### Fixed Issues
+
+- Frontend: [#4926](https://github.com/tracim/tracim/issues/4926)
+
+# 4.4.1 / 2022-10-28
+
+### Fixed Issues
+
+- Backend: [#5917](https://github.com/tracim/tracim/issues/5917)
+
+# 4.4.0 / 2022-10-27
+
+### New Features
+
+- Featuring a new font and borderless design
+- Modified comments are now easily identifiable
+- Code preview available (through advanced edition)
+- The user interface is now available in Norwegian
+- Video player for video previews
+- Improved pertinence of notifications about tasks
+- UX / UI improvements (sidebar, header, activities, news, mobile)
+
+### Fixed Issues
+
+- Frontend: [#3497](https://github.com/tracim/tracim/issues/3497),
+  [#4600](https://github.com/tracim/tracim/issues/4600),
+  [#5510](https://github.com/tracim/tracim/issues/5510),
+  [#5526](https://github.com/tracim/tracim/issues/5526),
+  [#5625](https://github.com/tracim/tracim/issues/5625),
+  [#5747](https://github.com/tracim/tracim/issues/5747),
+  [#5748](https://github.com/tracim/tracim/issues/5748),
+  [#5760](https://github.com/tracim/tracim/issues/5760),
+  [#5792](https://github.com/tracim/tracim/issues/5792),
+  [#5802](https://github.com/tracim/tracim/issues/5802),
+  [#5858](https://github.com/tracim/tracim/issues/5858),
+  [#5940](https://github.com/tracim/tracim/issues/5940),
+  [#5957](https://github.com/tracim/tracim/issues/5957)
+- Backend: [#5526](https://github.com/tracim/tracim/issues/5526),
+  [#5844](https://github.com/tracim/tracim/issues/5844),
+  [#5878](https://github.com/tracim/tracim/issues/5878),
+  [#5917](https://github.com/tracim/tracim/issues/5917)
+
+### Breaking/Important change
+
+- :warning: Two new colors (`sidebar/font` and `sidebar/logo`) were added in `branding/color.json`: this requires all existing instances to update their `frontend/dist/assets/branding/color.json` files to add these new colors. Otherwise the backend won't start at all. For more details see: [#5860](https://github.com/tracim/tracim/issues/5860).
+- Norwegian has been added as a possible interface language. If you have Custom Properties specific to your instance, you will need to make specific translations as well. See the documentation at `backend/doc/user_custom_properties.md`
+- A new variable was added `ui.notes.code_sample_languages` (`TRACIM_UI__NOTES__CODE_SAMPLE_LANGUAGES`) that defines the list of languages available to create code samples in the notes.
+- Some API URLs are deprecated. See [#5860](https://github.com/tracim/tracim/issues/5860) for more details.
+
+### Known Issues
+
+- The popups are hidden by the sidebar on mobile (issue [#5989](https://github.com/tracim/tracim/issues/5989))
+- The positioning of the notification wall is to be improved (issue [#5965](https://github.com/tracim/tracim/issues/5965))
+- The file app menu shows in two lines on mobile (issue [#5976](https://github.com/tracim/tracim/issues/5976))
+- The "My profile" button does not change its name when using admin rights to check the profile of another user. (issue [#5975](https://github.com/tracim/tracim/issues/5975))
+
+
 # 4.3.2 / 2022-08-09
 
 ### Fixed Issue

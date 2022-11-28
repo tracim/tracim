@@ -11,8 +11,8 @@ require('./UserSpacesConfigLine.styl')
 class UserSpacesConfigLine extends React.Component {
   render () {
     const { props } = this
-    const { space, member } = props
-    const memberRole = ROLE_LIST.find(r => r.slug === member.role)
+    const { space } = props
+    const memberRole = ROLE_LIST.find(r => r.slug === space.member.role)
     return (
       <tr>
         <td>
@@ -33,8 +33,8 @@ class UserSpacesConfigLine extends React.Component {
         {(props.system.config.email_notification_activated &&
           <td>
             <BtnSwitch
-              checked={member.doNotify}
-              onChange={() => props.onChangeSubscriptionNotif(space.id, !member.doNotify)}
+              checked={space.member.doNotify}
+              onChange={() => props.onChangeSubscriptionNotif(space.id, !space.member.doNotify)}
             />
           </td>
         )}

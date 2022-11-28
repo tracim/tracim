@@ -254,5 +254,8 @@
   "Click on \"New task\" button to create a new one.": "Click on \"New task\" button to create a new one.",
   "Email notifications are disabled": "Email notifications are disabled",
   "Participate": "Participate",
-  "modified": "modified"
+  "modified": "modified",
+  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
+  "of": "of",
+  "Download": "Download"
 }

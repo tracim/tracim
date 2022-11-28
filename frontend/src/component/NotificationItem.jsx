@@ -9,11 +9,11 @@ import {
   computeShortDate
 } from '../util/helper.js'
 import {
-  putNotificationAsRead
+  putNotificationListAsRead
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  readNotification
+  readNotificationList
 } from '../action-creator.sync.js'
 import {
   AVATAR_SIZE,
@@ -41,10 +41,10 @@ export const NotificationItem = props => {
   }
 
   const handleReadNotification = async (notificationId) => {
-    const fetchPutNotificationAsRead = await props.dispatch(putNotificationAsRead(props.user.userId, notificationId))
+    const fetchPutNotificationAsRead = await props.dispatch(putNotificationListAsRead(props.user.userId, [notificationId]))
     switch (fetchPutNotificationAsRead.status) {
       case 204: {
-        props.dispatch(readNotification(notificationId))
+        props.dispatch(readNotificationList([notificationId]))
         break
       }
       default:

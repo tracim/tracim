@@ -143,21 +143,6 @@ export class TextAreaApp extends React.Component {
 
     return (
       <div className='html-document__editionmode__container'>
-        {state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
-          <AutoComplete
-            apiUrl={props.apiUrl}
-            autoCompleteItemList={state.autoCompleteItemList}
-            autoCompleteCursorPosition={state.autoCompleteCursorPosition}
-            onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-            style={{
-              top: state.tinymcePosition.isSelectionToTheTop ? state.tinymcePosition.bottom : state.tinymcePosition.top,
-              transform: !state.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none',
-              position: state.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
-              zIndex: state.tinymcePosition.isFullscreen ? 1061 : 20
-            }}
-            delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-          />
-        )}
         <form className={`${props.customClass} editionmode`}>
           <textarea
             id={props.elementId}
@@ -167,6 +152,22 @@ export class TextAreaApp extends React.Component {
             autoFocus
             hidden
           />
+
+          {state.isAutoCompleteActivated && state.autoCompleteItemList.length > 0 && (
+            <AutoComplete
+              apiUrl={props.apiUrl}
+              autoCompleteItemList={state.autoCompleteItemList}
+              autoCompleteCursorPosition={state.autoCompleteCursorPosition}
+              onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+              style={{
+                top: state.tinymcePosition.isSelectionToTheTop ? state.tinymcePosition.bottom : state.tinymcePosition.top,
+                transform: !state.tinymcePosition.isSelectionToTheTop ? 'translateY(-100%)' : 'none',
+                position: state.tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
+                zIndex: state.tinymcePosition.isFullscreen ? 1061 : 20
+              }}
+              delimiterIndex={state.autoCompleteItemList.filter(item => item.isCommon).length - 1}
+            />
+          )}
 
           <div className={`${props.customClass}__button editionmode__button`}>
             <IconButton

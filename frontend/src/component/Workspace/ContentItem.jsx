@@ -5,14 +5,16 @@ import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
 import {
   ANCHOR_NAMESPACE,
-  DRAG_AND_DROP
+  DRAG_AND_DROP,
+  getRevisionTypeLabel
 } from '../../util/helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import {
   ROLE,
   ComposedIcon,
   FilenameWithBadges,
-  ListItemWrapper
+  ListItemWrapper,
+  TimedEvent
 } from 'tracim_frontend_lib'
 
 class ContentItem extends React.Component {
@@ -75,8 +77,19 @@ class ContentItem extends React.Component {
             <FilenameWithBadges file={props} isTemplate={props.isTemplate} customClass='content__name' />
           </div>
 
+          <TimedEvent
+            customClass='content__lastModification'
+            operation={getRevisionTypeLabel(props.currentRevisionType, props.t)}
+            date={props.modified}
+            lang={props.lang}
+            author={{
+              publicName: props.lastModifier.public_name,
+              userId: props.lastModifier.user_id
+            }}
+          />
+
           {props.userRoleIdInWorkspace >= ROLE.contributor.id && (
-            <div className='d-none d-md-block' title={props.t('Actions')}>
+            <div className='d-none d-md-block content__actions' title={props.t('Actions')}>
               <BtnExtandedAction
                 userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                 onClickExtendedAction={{
@@ -163,7 +176,10 @@ ContentItem.propTypes = {
   read: PropTypes.bool,
   statusSlug: PropTypes.string.isRequired,
   urlContent: PropTypes.string,
-  userRoleIdInWorkspace: PropTypes.number
+  userRoleIdInWorkspace: PropTypes.number,
+  modified: PropTypes.string.isRequired,
+  lang: PropTypes.string.isRequired,
+  currentRevisionType: PropTypes.string.isRequired
 }
 
 ContentItem.defaultProps = {

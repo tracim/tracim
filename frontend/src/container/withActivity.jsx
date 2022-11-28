@@ -23,7 +23,7 @@ import { FETCH_CONFIG } from '../util/helper.js'
 import { getNotificationList } from '../action-creator.async.js'
 import { newFlashMessage } from '../action-creator.sync.js'
 
-const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE
+const ACTIVITY_COUNT_PER_PAGE = NUMBER_RESULTS_BY_PAGE // 15
 const ACTIVITY_HISTORY_COUNT = 5
 const ACTIVITY_BATCH_COUNT = 5
 // NOTE - SG - 2021-05-05 - empirically we noted that building an activity
@@ -208,8 +208,10 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * Load the given count of activities.
      * Activities are loaded & dispatched by batch to update the display quicker.
      * @param {Number} minActivityCount minimum count of new activites to load
-     * @param {Boolean} resetList if true, the current list in props is reset before loading activities
-     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
+     * @param {Boolean} resetList if true, the current list in props is reset before loading
+     *  activities
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace
+     *  recent activities)
      * Wraps loadActivitiesBatch() so that the dispatches in redux can be cancelled.
      */
     loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
@@ -268,45 +270,72 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
 
     isLoggedUserMember = (activity) => this.props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
 
-    isNotPublicationOrInWorkspaceWithActivatedPublications = (activity) => {
-      const { props } = this
-      if (activity.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
-        !activity.newestMessage.fields.workspace) return true
-      const currentWorkspace = props.workspaceList.find(ws => ws.id === activity.newestMessage.fields.workspace.workspace_id)
-      if (!currentWorkspace) return true
-      return currentWorkspace.publicationEnabled
+    isNews = (activity) => {
+      const isNews = activity.content && (activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION)
+      const hasSpace = activity.newestMessage.fields.workspace
+      return isNews && hasSpace
     }
 
-    isActivityAnAttachedFileOnPublication = (activity) => activity.content
+    isInSpaceWithNews = (activity) => {
+      const space = this.props.workspaceList.find(
+        s => s.id === activity.newestMessage.fields.workspace.workspace_id
+      )
+      if (!space) return true
+      return space.publicationEnabled
+    }
+
+    /**
+     * Duplicate code from ActivityList
+     *
+     * Check if an activity is an attached file on a publication
+     * @param {*} activity the activity to check
+     * @returns true if the activity is an attached file on a publication
+     */
+    isActivityAnAttachedFileOnNews = (activity) => activity.content
       ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
       : false
 
     activityDisplayFilter = (activity) => {
       const { props } = this
-      const entityType = [TLM_ET.CONTENT, TLM_ET.SHAREDSPACE_MEMBER, TLM_ET.SHAREDSPACE_SUBSCRIPTION, TLM_ET.SHAREDSPACE]
+      const entityType = [
+        TLM_ET.CONTENT,
+        TLM_ET.SHAREDSPACE_MEMBER,
+        TLM_ET.SHAREDSPACE_SUBSCRIPTION,
+        TLM_ET.SHAREDSPACE
+      ]
+      const hasAttachedFile = this.isActivityAnAttachedFileOnNews(activity)
 
-      return entityType.includes(activity.entityType) && !this.isActivityAnAttachedFileOnPublication(activity) &&
+      const isContent = activity.entityType === TLM_ET.CONTENT
+      const isSharedSpace = activity.entityType === TLM_ET.SHAREDSPACE
+      const isNews = this.isNews(activity)
+      const isInSpaceWithNews = this.isInSpaceWithNews(activity)
+      const isSubscription = this.isSubscriptionRequestOrRejection(activity)
+      const isMember = this.isMemberCreatedOrModified(activity)
+      const isLoggedUser = this.isLoggedUserMember(activity)
+
+      return entityType.includes(activity.entityType) && !hasAttachedFile &&
         (
-          (activity.entityType === TLM_ET.CONTENT && this.isNotPublicationOrInWorkspaceWithActivatedPublications(activity)) ||
-          (this.isSubscriptionRequestOrRejection(activity) && this.isLoggedUserMember(activity)) ||
-          (this.isMemberCreatedOrModified(activity) && this.isLoggedUserMember(activity)) ||
-          (activity.entityType === TLM_ET.SHAREDSPACE && activity.newestMessage.fields.author.user_id !== props.user.userId)
+          (isContent && (!isNews || isInSpaceWithNews)) ||
+          (isSubscription && isLoggedUser) ||
+          (isMember && isLoggedUser) ||
+          (isSharedSpace && activity.newestMessage.fields.author.user_id !== props.user.userId)
         )
     }
 
     /**
      * DOC - SG - 2021-05-05
      * Load a batch of activities and merge them into the given list
-     * Activities are built by calling /api/users/<user_id>/messages
+     * Activities are built by calling /api/users/{user_id}/messages
      * @param {Array} activityList activity list to update
      * @param {boolean} hasNextPage are there remaining messages to load
      * @param {string} nextPageToken token to get the next page of messages
-     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace recent activities)
+     * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace
+     *  recent activities)
      */
     loadActivitiesBatch = async (activityList, hasNextPage, nextPageToken, workspaceId = null) => {
       const { props } = this
-      const initialActivityListLength = activityList.length
-      while (hasNextPage && activityList.length < initialActivityListLength + ACTIVITY_BATCH_COUNT) {
+      const activityListLengthGoal = activityList.length + ACTIVITY_BATCH_COUNT
+      while (hasNextPage && activityList.length < activityListLengthGoal) {
         const messageListResponse = await props.dispatch(getNotificationList(
           props.user.userId,
           {
