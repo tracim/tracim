@@ -49,9 +49,9 @@
   "Type": "Tipo",
   "Create and add to spaces": "Criar e acrescentar aos espaços",
   "Create": "Criar",
-  "Inactive": "",
-  "Filter users": "",
-  "There are no users that matches you filter": "",
-  "Filter spaces": "",
-  "There are no spaces that matches you filter": ""
+  "Inactive": "Inativo",
+  "Filter users": "Filtrar usuários",
+  "There are no users that matches you filter": "Não há usuários que correspondem ao seu filtro",
+  "Filter spaces": "Filtrar espaços",
+  "There are no spaces that matches you filter": "Não há espaços que correspondem ao seu filtro"
 }

@@ -132,7 +132,7 @@
   "Your role in the space": "Sua função no espaço",
   "You can change your notification status by clicking here": "Pode mudar seu status de notificação clicando aquí",
   "Edit": "Editar",
-  "Download": "Fazer download",
+  "Download": "Baixar",
   "Archive": "Arquivar",
   "Delete": "Eliminar",
   "Type": "Tipo",
@@ -588,9 +588,9 @@
   "Error while marking the notification group as read": "Erro ao marcar o grupo de notificações como lido",
   "Error while marking notifications as read": "Erro ao marcar notificações como lidas",
   "Open emoticons menu": "Abrir o menu de emoticons",
-  "Filter my favorites": "",
-  "There are no favorites that matches you filter": "",
-  "Filter visible contents": "",
-  "There are no spaces that matches your filter": "",
-  "Filter users": ""
+  "Filter my favorites": "Filtrar os meus favoritos",
+  "There are no favorites that matches you filter": "Não há favoritos que correspondem ao seu filtro",
+  "Filter visible contents": "Filtrar os conteúdos visíveis",
+  "There are no spaces that matches your filter": "Não há espaços que correspondem ao seu filtro",
+  "Filter users": "Filtrar usuários"
 }
