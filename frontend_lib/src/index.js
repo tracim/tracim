@@ -300,6 +300,7 @@ export { default as TagList } from './component/Tags/TagList.jsx'
 export { default as Tag } from './component/Tags/Tag.jsx'
 export { default as Loading } from './component/Loading/Loading.jsx'
 export { default as COLORS } from './colors.js'
+export { default as TracimTable } from './component/TracimTable/TracimTable'
 
 export {
   TRANSLATION_STATE,

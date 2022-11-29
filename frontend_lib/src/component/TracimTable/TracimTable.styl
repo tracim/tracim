@@ -1,0 +1,53 @@
+@import "../../css/Variable.styl"
+
+.TracimTable
+  &__header
+    display flex
+    flex-direction column
+    &__row
+      display flex
+      flex-direction row
+      white-space nowrap
+      padding standardSpacing 0
+      margin standardSpacing 0
+      &__cell
+        display flex
+        overflow hidden
+        text-overflow ellipsis
+        margin-inline-start standardSpacing
+        margin-inline-end standardSpacing
+      &__cell *
+        overflow hidden
+        text-overflow ellipsis
+  &__body
+    display flex
+    flex-direction column
+    &__row
+      display flex
+      flex-direction row
+      white-space nowrap
+      padding standardSpacing 0
+      &__cell
+        display flex
+        overflow hidden
+        text-overflow ellipsis
+        margin-inline-start standardSpacing
+        margin-inline-end standardSpacing
+      &__cell *
+        overflow hidden
+        text-overflow ellipsis
+        white-space nowrap
+  &__styles
+    &__flex
+      &__1
+        flex 1
+      &__4
+        flex 4
+      &__2
+        flex 2
+
+@media (max-width: max-md)
+  .TracimTable
+    &__hide
+      &__md
+        display none
