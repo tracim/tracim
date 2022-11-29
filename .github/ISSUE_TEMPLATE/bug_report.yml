@@ -1,0 +1,84 @@
+name: Bug report
+description: Report a bug you detected using tracim
+title: "🐛 Bug: "
+labels: ["to sort", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+        Before you submit, please make sure the issue hasn't already been reported by searching [open](https://github.com/tracim/tracim/issues) and [closed](https://github.com/tracim/tracim/issues?q=is%3Aissue+is%3Aclosed).
+  - type: input
+    id: tracim-version
+    attributes:
+      label: Tracim version
+      description: >
+        Specify the version of Tracim you are using.
+        You can find the version of Tracim used, at the bottom of the sidebar.
+      placeholder: 4.4.0, 4.4.0_build_098
+    validations:
+      required: true
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue description
+      description: |
+        Describe your issue briefly. What doesn't work and how do you expect it to work instead?
+        You can include images or videos with drag and drop.
+        If you know which component may be affected, feel free to mention it.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      description: |
+        List of steps or sample code that reproduces the issue. Having reproducible issues is a prerequisite for contributors to be able to solve them.
+        If you include screenshots below, you can detail how to get the same result here.
+      placeholder: |
+        1. Go to…
+        2. Click on…
+        3. Scroll down to…
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: |
+        Screenshots that display the bug. Highly recommended to speed up troubleshooting.
+        You can use [peek](https://github.com/phw/peek) to generate animated GIFs.
+        WARNING: take care of not revealing sensitive data in those screenshots/videos.
+        Drag and drop your screenshots to upload it.
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: What browsers are you seeing the problem on?
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Microsoft Edge
+        - Opera
+        - Safari
+        - Other
+  - type: dropdown
+    id: devices
+    attributes:
+      label: What devices are you seeing the problem on?
+      multiple: true
+      options:
+        - Desktop
+        - Smartphone
+        - Tablet
+        - Other
+  - type: textarea
+    id: related-pr
+    attributes:
+      label: Related PR
+      description: |
+        Let us know if this is related to an open pull request.
+        Leave empty if there is no related PR or if you don't know.
+      placeholder: PR #0000
+    validations:
+      required: false

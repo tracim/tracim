@@ -38,16 +38,17 @@ describe('At the space recent activities page', () => {
   })
 
   describe("a news with a file as it's only content", () => {
-    it("should create a news with a file as it's only content", () => {
+    it("should create a news with a file as it's only content and display the file preview", () => {
       cy.visitPage({ pageName: PAGES.WORKSPACE_RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
       cy.get('[data-cy=create_news]').click()
+      cy.contains('.tab__active > .tab__label', 'News')
+      cy.get('.emptyListMessage__text')
       cy.get('.publishArea__texteditor__submit > div > .iconbutton-secondary-dark').click()
       cy.dropFixtureInDropZone(fullFilename, 'image/png', '.filecontent__form', `${fileTitle}.png`)
       cy.get('[data-cy=popup__createcontent__form__button]').click()
       cy.get('[data-cy=commentArea__comment__send]').click()
-    })
-    it('should display the file preview', () => {
-      cy.get('[data-cy=FilenameWithBadges__label]').first().should('include.text', 'News')
+      cy.get('.attachedFile').should('be.visible')
+      cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, params: { workspaceId }, waitForTlm: true })
       cy.get('.CommentFilePreview > .attachedFile').should('be.visible')
     })
   })
