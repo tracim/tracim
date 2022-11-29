@@ -423,7 +423,7 @@
   "d": "d",
   "w": "u",
   "Log in": "Logg inn",
-  "{{author}} created {{content}}{{workspaceInfo}}": "{{author}} opprettet {{workspaceInfo}}",
+  "{{author}} created {{content}}{{workspaceInfo}}": "{{author}} opprettet {{content}}{{workspaceInfo}}",
   "{{author}} deleted {{content}}{{workspaceInfo}}": "{{author}} slettet {{content}}{{workspaceInfo}}",
   "{{author}} mentioned you in {{content}}": "{{author}} nevnte deg i {{content}}",
   "Decline": "Avslå",
