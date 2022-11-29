@@ -174,7 +174,7 @@
   "Server unreachable": "Servidor no disponible",
   "Information are missing, please use the link in the email your should have received to reset your password": "Falta información. Por favor, utilice el enlace en el correo electrónico que debería haber recibido para restablecer su contraseña",
   "Your password has been changed, you can now login": "Puede ya iniciar la sesión con su nueva contraseña.",
-  "Unexpected error, please inform an administrator": "Error inesperado, por favor, póngase en contacto con un administrador",
+  "Unexpected error, please inform an administrator": "Error inesperado, informe a un administrador",
   "List of": "Lista de",
   "This user already is in the space": "Este usuario ya está en el espacio",
   "Note, only administrators can send invitational email": "Nota, sólo los administradores pueden enviar correos electrónicos de invitación",
@@ -588,9 +588,9 @@
   "Error while marking the notification group as read": "Error al marcar el grupo de notificaciones como leído",
   "Error while marking notifications as read": "Error al marcar notificaciones como leídas",
   "Open emoticons menu": "Abrir menú de emoticones",
-  "Filter my favorites": "",
-  "There are no favorites that matches you filter": "",
-  "Filter visible contents": "",
-  "There are no spaces that matches your filter": "",
-  "Filter users": ""
+  "Filter my favorites": "Filtrar mis favoritos",
+  "There are no favorites that matches you filter": "No hay favoritos que coincidan con tú filtro",
+  "Filter visible contents": "Filtrar contenidos visibles",
+  "There are no spaces that matches your filter": "No hay espacios que coincidan con su filtro",
+  "Filter users": "Filtrar a los usuarios"
 }
