@@ -45,6 +45,7 @@ import {
 
 import ContentListItem from '../component/ContentListItem.jsx'
 import ContentType from '../component/ContentType.jsx'
+import FavoritesTable from './Tables/FavoriteTable/FavoritesTable'
 
 const FavoritesHeader = translate()(props => {
   return (
@@ -395,6 +396,10 @@ export class Favorites extends React.Component {
                         : props.t('There are no favorites that matches you filter')}
                     </EmptyListMessage>
                   )}
+                <FavoritesTable
+                  favoriteList={props.favoriteList}
+                  onFavoriteButtonClick={this.handleClickRemoveFromFavoriteList}
+                />
               </PageContent>
             )}
         </PageWrapper>
