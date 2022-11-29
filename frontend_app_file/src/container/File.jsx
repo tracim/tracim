@@ -938,6 +938,7 @@ export class File extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            codeLanguageList={state.config.system.config.code_languages}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
             loading={props.loadingTimeline}

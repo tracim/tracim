@@ -1,11 +1,11 @@
 import abc
 import typing
+import uuid
 
 from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
 
-from tracim_backend import UserDoesNotExist
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
@@ -23,30 +23,57 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import Event
 from tracim_backend.models.event import OperationType
-from tracim_backend.models.mention import ALL__GROUP_MENTIONS
+from tracim_backend.models.roles import WorkspaceRoles
 from tracim_backend.models.tracim_session import TracimSession
+
+
+class MentionType:
+    USER = 1
+    ROLE = 2
+    GROUP = 3  # TODO - MP - 2022-11-29 - This should be used for custom role. Should be renamed.
 
 
 class Mention:
     """A mention with its attributes: id and recipient."""
 
-    def __init__(self, recipient: str, id_: str) -> None:
+    def __init__(self, type: MentionType, recipient: int, id_: str) -> None:
+        self.type = type
         self.recipient = recipient
         self.id = id_
 
     def __eq__(self, other) -> bool:
         return (
-            isinstance(other, Mention) and other.recipient == self.recipient and other.id == self.id
+            isinstance(other, Mention)
+            and self.type == other.type
+            and other.recipient == self.recipient
+            and other.id == self.id
         )
 
     def __repr__(self) -> str:
-        return "<Mention(recipient={}, id={})>".format(self.recipient, self.id)
+        return f"<Mention(type={self.type}, recipient={self.recipient}, id={self.id})>"
 
     def __hash__(self) -> int:
         return hash(self.id)
 
 
 class BaseMentionParser(abc.ABC):
+    """Base class for mention parsers."""
+
+    @abc.abstractmethod
+    def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
+        """Seek and replace wrong mention in text.\n
+        Replace username="john" by userid="1"
+
+        Args:
+            text (str): The text to parse.
+            session (TracimSession): The session to use.
+            config (CFG): The config to use.
+
+        Returns:
+            str: The text with replaced mention.
+        """
+        ...
+
     @abc.abstractmethod
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
         """Parse mentions found in the given content revision and return them.
@@ -63,32 +90,54 @@ class DescriptionMentionParser(BaseMentionParser):
     mentions found in it considering description is HTML.
 
     HTML mentions must have the following structure:
-      <span id="mention-{a unique id}">@recipient</span>
+      `<html-mention id="mention-{a unique id}" {DATA}></html-mention>`
+
+    DATA should be one of theses:
+     - userid="{user_id}"
+     - roleid="{role_id}"
     """
 
-    MENTION_ID_START = "mention-"
-    MENTION_TAG_NAME = "span"
+    MENTION_ID_START = "mention-"  # TODO - MP - 2022-11-29 - Check if this is still used
+    MENTION_TAG_NAME = "html-mention"
+
+    @classmethod
+    def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
+        soup = BeautifulSoup(text, "lxml")
+        for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
+            mention_name = mention_tag.attrs.get("username")
+            if mention_name:
+                user_api = UserApi(session=session, config=config, current_user=None)
+                user_id = user_api.get_one_by_username(mention_name).user_id
+                text = text.replace(f'username="{mention_name}"', f'userid="{user_id}"')
+        return text
 
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
         return self.get_mentions_from_html(revision.raw_content)
 
     @classmethod
     def is_html_mention_tag(cls, tag: Tag) -> bool:
-        return (
-            cls.MENTION_TAG_NAME == tag.name
-            and tag.has_attr("id")
-            and tag["id"].startswith(cls.MENTION_ID_START)
-        )
+        return cls.MENTION_TAG_NAME == tag.name
 
+    # TODO - MP - 2022-11-29 - Check the variable names
+    # TODO - MP - 2022-11-29 - Edited mention are not handled
     @classmethod
     def get_mentions_from_html(cls, html: str) -> typing.List[Mention]:
-        # NOTE S.G - 2020-07-30: using lxml parser as it is the fastest in beautifulsoup
+        # NOTE S.G - 2020-07-30 - using lxml parser as it is the fastest in beautifulsoup
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            recipient = mention_tag.string[1:] if mention_tag.string else ""
-            id_ = mention_tag["id"].replace(cls.MENTION_ID_START, "")
-            mentions.append(Mention(recipient, id_))
+            # NOTE MP - 2022-11-16 - Fetching mentions that are typed by hand
+            # The mention either has userid or rolelevel
+            user_id: int = mention_tag.attrs.get("userid")
+            if user_id:
+                id_ = str(uuid.uuid4())
+                mentions.append(Mention(MentionType.USER, user_id, id_))
+                continue
+            role_level: int = mention_tag.attrs.get("rolelevel")
+            if role_level:
+                id_ = str(uuid.uuid4())
+                mentions.append(Mention(MentionType.ROLE, role_level, id_))
+                continue
         return mentions
 
 
@@ -156,45 +205,33 @@ class MentionBuilder:
     def get_receiver_ids(
         cls, event: Event, session: TracimSession, config: CFG
     ) -> typing.Iterable[int]:
-        recipient = event.fields[cls.MENTION_FIELD]["recipient"]
-        if recipient in ALL__GROUP_MENTIONS:
-            # send to all workspace users
+        mention = event.fields.get(cls.MENTION_FIELD)
+        recipient = mention["recipient"]
+        if mention["type"] == MentionType.USER:
+            return [int(recipient)]
+        elif mention["type"] == MentionType.ROLE:
             role_api = RoleApi(session=session, config=config, current_user=None)
-            workspace_id = event.workspace_id
-            return role_api.get_workspace_member_ids(workspace_id)
-        else:
-            # send to mentioned user
-            user_api = UserApi(session=session, config=config, current_user=None)
-            try:
-                user = user_api.get_one_by_username(recipient)
-                return [user.user_id]
-            except UserDoesNotExist:
-                logger.warning(
-                    cls,
-                    "Could not find user with username {} while obtaining the receiver list of event {}, "
-                    "user may have changed their username.".format(recipient, event.event_id),
-                )
-                return []
+            min_level = WorkspaceRoles.get_role_from_level(int(recipient))
+            return role_api.get_workspace_member_ids(event.workspace_id, min_level)
 
     @classmethod
     def _create_mention_events(
         cls, mentions: typing.Iterable[Mention], content: Content, context: TracimContext
     ) -> None:
         role_api = RoleApi(session=context.dbsession, config=context.app_config, current_user=None)
-
-        workspace_members_usernames = [
-            user.username for user in role_api.get_workspace_members(content.workspace_id)
-        ]
+        space_members_ids = role_api.get_workspace_member_ids(content.workspace_id)
 
         for mention in mentions:
+            if mention.type == MentionType.ROLE:
+                continue
+
             recipient = mention.recipient
-            if (
-                recipient not in workspace_members_usernames
-                and recipient not in ALL__GROUP_MENTIONS
-            ):
+            if int(recipient) not in space_members_ids:
                 raise UserNotMemberOfWorkspace(
-                    "This user is not a member of this workspace: {}".format(mention.recipient)
+                    f"The user of id {mention.recipient} is not a member of the workspace of id \
+                        {content.workspace_id}"
                 )
+                # TODO - MP - 2022-11-29 - We should send the notification to a dummy user
 
         current_user = context.safe_current_user()
         content_api = ContentApi(context.dbsession, current_user, context.app_config)
@@ -212,7 +249,13 @@ class MentionBuilder:
 
         event_api = EventApi(current_user, context.dbsession, context.app_config)
         for mention in mentions:
-            fields = {cls.MENTION_FIELD: {"recipient": mention.recipient, "id": mention.id}}
+            fields = {
+                cls.MENTION_FIELD: {
+                    "type": mention.type,
+                    "recipient": mention.recipient,
+                    "id": mention.id,
+                }
+            }
             fields.update(common_fields)
             event_api.create_event(
                 entity_type=EntityType.MENTION,

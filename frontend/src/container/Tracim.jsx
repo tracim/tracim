@@ -27,7 +27,7 @@ import WIPcomponent from './WIPcomponent.jsx'
 import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
-  getWorkspaceMemberList,
+  getSpaceMemberList,
   handleFetchResult,
   PROFILE,
   formatAbsoluteDate,
@@ -100,6 +100,7 @@ import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
 import ToDo from './ToDo.jsx'
+import HTMLMention from '../component/Mention/HTMLMention.js'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
@@ -115,6 +116,11 @@ export class Tracim extends React.Component {
       displayedUserId: 0,
       userCall: undefined,
       unansweredCallTimeoutId: -1
+    }
+
+    // TODO - MP - 2022-11-29 - Check that customElement exist, fallback if not
+    if (!window.customElements.get('html-mention')) {
+      window.customElements.define('html-mention', HTMLMention)
     }
 
     this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
@@ -467,7 +473,7 @@ export class Tracim extends React.Component {
     const fetchWorkspaceListMemberList = await Promise.all(
       workspaceList.map(async ws => ({
         workspaceId: ws.workspace_id,
-        fetchMemberList: await handleFetchResult(await getWorkspaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
+        fetchMemberList: await handleFetchResult(await getSpaceMemberList(FETCH_CONFIG.apiUrl, ws.workspace_id))
       }))
     )
 

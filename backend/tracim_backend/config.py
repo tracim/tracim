@@ -363,6 +363,14 @@ class CFG(object):
         self.log_config_header("Call config parameters:")
         self._load_call_config()
 
+        self.MENTION__DEFAULT_ROLES = [
+            {"level": "0", "label": "All"},
+            {"level": "1", "label": "Reader"},
+            {"level": "2", "label": "Contributor"},
+            {"level": "4", "label": "Content manager"},
+            {"level": "8", "label": "Space manager"},
+        ]
+
         app_lib = ApplicationApi(app_list=app_list)
         for app in app_lib.get_all():
             self.log_config_header('"{label}" app config parameters:'.format(label=app.label))

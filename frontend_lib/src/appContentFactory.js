@@ -554,44 +554,53 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
+    // TODO - MP - 2022-11-29 - Lot of function just like this one should be refactored
     saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id) => {
       // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
       // see https://github.com/tracim/tracim/issues/1101
-      const newCommentForApi = isCommentWysiwyg
-        ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
-        : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
-      let knownMentions = await this.searchForMentionOrLinkInQuery('', content.workspace_id)
-      knownMentions = knownMentions.map(member => `@${member.username}`)
-      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+      // const newCommentForApi = isCommentWysiwyg
+      //   ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
+      //   : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
+      // const newCommentForApi = tinymce.get(`wysiwygTimelineComment${id}`).getContent()
+      // let knownMentions = await this.searchForMentionOrLinkInQuery('', content.workspace_id)
+      // knownMentions = knownMentions.map(member => `@${member.username}`)
 
-      let newCommentForApiWithMention
-      try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
-      } catch (e) {
-        return Promise.reject(e)
-      }
+      // console.log('newCommentForApi', newCommentForApi)
 
-      let newCommentForApiWithMentionAndLink
-      try {
-        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      } catch (e) {
-        return Promise.reject(e)
-      }
+      // const invalidMentionList = getInvalidMentionList(newComment, knownMentions)
+
+      // let newCommentForApiWithMention
+      // try {
+      //   newCommentForApiWithMention = handleMentionsBeforeSave(newComment, loggedUsername, invalidMentionList)
+      // } catch (e) {
+      //   return Promise.reject(e)
+      // }
+
+      // console.log('newCommentForApiWithMention', newCommentForApiWithMention)
+
+      // let newCommentForApiWithMentionAndLink
+      // try {
+      //   newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
+      // } catch (e) {
+      //   return Promise.reject(e)
+      // }
+
+      // console.log('newCommentForApiWithMentionAndLink', newCommentForApiWithMentionAndLink)
 
       const response = await handleFetchResult(
         await postNewComment(
           this.apiUrl,
           content.workspace_id,
           content.content_id,
-          newCommentForApiWithMentionAndLink,
+          newComment,// newCommentForApiWithMentionAndLink,
           content.content_namespace
         )
       )
 
       switch (response.apiResponse.status) {
         case 200:
-          setState({ newComment: '', showInvalidMentionPopupInComment: false })
-          if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
+          // setState({ newComment: '', showInvalidMentionPopupInComment: false })
+          // if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
 
           removeLocalStorageItem(
             appSlug,

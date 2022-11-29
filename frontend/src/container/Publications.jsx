@@ -201,19 +201,19 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
-  handleClickPublish = (publication, publicationAsFileList) => {
-    const { props, state } = this
+  handleClickPublish = (actuality, publicationAsFileList) => {
+    console.log('handleClickPublish', actuality)
 
-    if (!handleInvalidMentionInComment(
-      props.currentWorkspace.memberList,
-      state.publicationWysiwyg,
-      publication,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnyway(publication, publicationAsFileList)
-      return true
-    }
-    return false
+    // if (!handleInvalidMentionInComment(
+    //   props.currentWorkspace.memberList,
+    //   state.publicationWysiwyg,
+    //   actuality,
+    //   this.setState.bind(this)
+    // )) {
+    this.handleClickValidateAnyway(actuality, publicationAsFileList)
+    return true
+    // }
+    // return false
   }
 
   handleContentCreatedOrRestored = (data) => {
@@ -433,10 +433,10 @@ export class Publications extends React.Component {
   saveThreadPublication = async (publication, publicationAsFileList) => {
     const { props, state } = this
 
-    const workspaceId = props.currentWorkspace.id
+    const spaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
 
-    const fetchPostPublication = await props.dispatch(postThreadPublication(workspaceId, publicationName))
+    const fetchPostPublication = await props.dispatch(postThreadPublication(spaceId, publicationName))
 
     if (fetchPostPublication.status !== 200) {
       props.dispatch(newFlashMessage(`${props.t('Error while saving new news')}`, 'warning'))
@@ -459,7 +459,7 @@ export class Publications extends React.Component {
     }
   }
 
-  handleClickValidateAnyway = async (publication, publicationAsFileList = []) => {
+  handleClickValidateAnyway = async (actuality, publicationAsFileList = []) => {
     const { state, props } = this
 
     if (state.showEditPopup) {
@@ -467,7 +467,7 @@ export class Publications extends React.Component {
       return
     }
 
-    this.saveThreadPublication(publication, publicationAsFileList)
+    this.saveThreadPublication(actuality, publicationAsFileList)
 
     setLocalStorageItem(
       CONTENT_TYPE.THREAD,
@@ -535,6 +535,7 @@ export class Publications extends React.Component {
               apiUrl={FETCH_CONFIG.apiUrl}
               bottomAutocomplete
               buttonLabel={props.t('Publish')}
+              codeLanguageList={props.system.config.code_languages}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
               customColor={COLORS.PUBLICATION}
@@ -599,6 +600,7 @@ export class Publications extends React.Component {
         {!state.loading && state.showEditPopup && (
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
+            codeLanguageList={props.system.config.code_languages}
             comment={state.commentToEdit.raw_content}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}

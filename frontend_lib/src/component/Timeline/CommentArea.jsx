@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
@@ -10,10 +10,14 @@ import {
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleSelectionChange
 } from '../../tinymceAutoCompleteHelper.js'
-import { autoCompleteItem } from '../../helper.js'
+
 import {
-  getLocalStorageItem,
+  autoCompleteItem
+} from '../../helper.js'
+import {
   LOCAL_STORAGE_FIELD,
+  getLocalStorageItem,
+  removeLocalStorageItem,
   setLocalStorageItem
 } from '../../localStorage.js'
 import AddFileToUploadButton from './AddFileToUploadButton.jsx'
@@ -21,8 +25,337 @@ import DisplayFileToUpload from './DisplayFileToUpload.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import ConfirmPopup from '../ConfirmPopup/ConfirmPopup.jsx'
 import Loading from '../Loading/Loading.jsx'
+import TinyEditor from '../TinyEditor/TinyEditor'
 
-export class CommentArea extends React.Component {
+export const CommentArea = props => {
+  const [isAdvancedEdition, setIsAdvancedEdition] = useState(false)
+  const [content, setContent] = useState('')
+  const [fileListToUpload, setFileListToUpload] = useState([])
+
+/*
+  const invalidMentionList = props.invalidMentionList || []
+
+  const style = {
+    transform: props.bottomAutocomplete ? 'none' : 'translateY(-100%)',
+    position: 'absolute',
+    ...(props.wysiwyg && {
+      top: tinymcePosition.isFullscreen && tinymcePosition.isSelectionToTheTop
+        ? tinymcePosition.bottom
+        : tinymcePosition.top,
+      position: tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
+      transform: (tinymcePosition.isFullscreen || props.bottomAutocomplete) && tinymcePosition.isSelectionToTheTop
+        ? 'none'
+        : 'translateY(-100%)',
+      zIndex: tinymcePosition.isFullscreen ? 1061 : 20
+    })
+  }*/
+/*
+  useEffect(() => {
+    if (props.newComment) {
+      setNewComment(props.newComment)
+    } else {
+      const savedComment = getLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+
+      if (!!savedComment && savedComment !== newComment) {
+        setNewComment(savedComment)
+      }
+    }
+
+    if (props.wysiwyg) {
+      // RJ - NOTE - 2022-02-16 - ensure TinyMCE loads with the comment in the local storage TinyMCE
+      // will be loaded after in componentDidUpdate, after render, so the textarea has the right
+      // value
+      setShouldLoadWysiwyg(true)
+    }
+  }, [])*/
+
+  useEffect(() => {
+    if (props.newComment) {
+      setContent(props.newComment)
+    } else {
+      console.log('props.contentId', props.contentId)
+      console.log('props.contentType', props.contentType)
+      console.log('props.workspaceId', props.workspaceId)
+      console.log('LOCAL_STORAGE_FIELD.COMMENT', LOCAL_STORAGE_FIELD.COMMENT)
+      const savedComment = getLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+
+      console.log('savedComment', savedComment)
+
+      if (!!savedComment && savedComment !== content) {
+        setContent(content)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    // setContent(ReactDOMServer.renderToStaticMarkup(content))
+    setLocalStorageItem(
+      props.contentType,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.COMMENT,
+      content
+    )
+  }, [content])
+/*
+  useEffect(() => {
+    const savedComment = getLocalStorageItem(
+      props.contentType,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.COMMENT
+    )
+    if (!!savedComment && savedComment !== newComment) {
+      setNewComment(savedComment)
+    }
+  }, [props.contentType])*/
+
+/*
+  const searchForMentionOrLinkCandidate = async () => {
+    const mentionOrLinkCandidate = getMentionOrLinkCandidate(newComment)
+    if (mentionOrLinkCandidate === undefined) {
+      if (isAutoCompleteActivated) setIsAutoCompleteActivated(false)
+      return
+    }
+
+    const autoCompleteItemList = await props.searchForMentionOrLinkInQuery(mentionOrLinkCandidate)
+    setIsAutoCompleteActivated(true)
+    setAutoCompleteCursorPosition(autoCompleteItemList.length - 1)
+    setAutoCompleteItemList(autoCompleteItemList) // NOTE - RJ - 2021-06-09 - reverse puts most interesting results closer
+  }
+
+  const getMentionOrLinkCandidate = newComment => {
+    const lastCharBeforeCursorIndex = textArea.current.selectionStart - 1
+    let index = lastCharBeforeCursorIndex
+    while (newComment[index] !== ' ' && index >= 0) {
+      if ((newComment[index] === '@' || newComment[index] === '#') && (index === 0 || newComment[index - 1] === ' ')) {
+        return newComment.slice(index, lastCharBeforeCursorIndex + 1)
+      }
+      index--
+    }
+    return undefined
+  }*/
+
+/*
+  const handleCloseInvalidMentionPopup = () => {
+    props.onClickCancelSave()
+  }
+*/
+
+/*
+  const handleValidateInvalidMentionPopup = () => {
+    props.onClickSaveAnyway(newComment, newCommentAsFileList)
+    setNewComment('')
+    setNewCommentAsFileList([])
+  }
+*/
+
+  const handleSend = () => {
+    let formattedContent = searchMentionAndPlaceBalise(content)
+    formattedContent = replaceHTMLUserMentionTagWithMention(formattedContent)
+    formattedContent = replaceHTMLRoleMentionTagWithMention(formattedContent)
+
+    if (props.onClickValidateNewCommentBtn(formattedContent, fileListToUpload)) {
+      setContent('')
+      setFileListToUpload([])
+      removeLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+    }
+  }
+
+  const handleValidateCommentFileListToUpload = (fileListToAdd) => {
+    if (!fileListToAdd.length) return
+
+    const fileListToUploadWithoutDuplicate = fileListToAdd.filter(
+      fileToAdd => !fileListToUpload.find(fileAdded => fileAdded.file.name === fileToAdd.file.name)
+    )
+
+    setFileListToUpload([...fileListToUpload, ...fileListToUploadWithoutDuplicate])
+  }
+
+  const handleRemoveCommentFileFromUploadList = (fileListToRemove) => {
+    if (!fileListToRemove) return
+    setFileListToUpload(fileListToUpload.filter(
+      commentFile => commentFile.file.name !== fileListToRemove.file.name
+    ))
+  }
+
+  const changeEditor = () => {
+    const newIsAdvancedEdition = !isAdvancedEdition
+    setIsAdvancedEdition(newIsAdvancedEdition)
+  }
+
+  /**
+   * Replace not formatted mention with html mention element
+   * @param {String} html Current content of the editor
+   * @returns {String} Correctly formatted html content
+   * Example:
+   * - Input: `<p>Test @Jhon</p>`
+   * - Output: `<p>Test <html-mention username="Jhon"/>`
+   */
+  const searchMentionAndPlaceBalise = (html) => {
+    // Regex explanation: https://regex101.com/r/hHosBa/8
+    // Match: '@XXX', '@XXX ', ' @XXX'
+    // Don't match: 'XXX@XXX', '@<span>XXX</span>', '@XXX:', '@XXX,', '@XXX.', '@XXX!', ...
+    const mentionRegex = /(?<=^|\s|\>)@([a-zA-Z0-9_]+)\b/g
+    const mentionList = html.match(mentionRegex)
+    if (!mentionList) return html
+
+    let newHtml = html
+
+    mentionList.forEach(mention => {
+      const mentionWithoutAt = mention.slice(1)
+      const formattedMention = `<html-mention username="${mentionWithoutAt}"/>`
+      newHtml = newHtml.replace(mention, formattedMention)
+    })
+
+    return newHtml
+  }
+
+  /**
+   * Replace span mention balise with html mention element
+   * @param {String} html Current content of the editor
+   * @returns Correctly formatted html content
+   * Example:
+   * - Input: `<p>Test <span mention-user-id="151">@John</span></p>`
+   * - Output: `<p>Test <html-mention user-id="151"/></p>`
+   */
+  const replaceHTMLUserMentionTagWithMention = (html) => {
+    // Regex explanation: https://regex101.com/r/QXb8Cd/2
+    // Match: '@<span mention-user-id="-1"></span>XXX'
+    const mentionRegex = /@<span mention-user-id="(\d+)"><\/span>([a-zA-Z0-9-_]+)/g
+    const mentionTagList = html.match(mentionRegex)
+    if (!mentionTagList) return html
+
+    let newHtml = html
+
+    mentionTagList.forEach(mentionTag => {
+      // Not sure we have to do this
+      const mentionTagData = mentionTag.match(/mention-user-id="(\d+)"/)
+      const userId = mentionTagData[1]
+
+      const mention = `<html-mention userid="${userId}"/>`
+      newHtml = newHtml.replace(mentionTag, mention)
+    })
+
+    return newHtml
+  }
+
+  const replaceHTMLRoleMentionTagWithMention = (html) => {
+    const mentionRegex = /@<span mention-role-level="(\d+)"><\/span>([a-zA-Z0-9-_]+)/g
+    const mentionTagList = html.match(mentionRegex)
+    if (!mentionTagList) return html
+
+    let newHtml = html
+
+    mentionTagList.forEach(mentionTag => {
+      const mentionTagData = mentionTag.match(/mention-role-level="(\d+)"/)
+      const roleLevel = mentionTagData[1]
+
+      const mention = `<html-mention rolelevel="${roleLevel}"/>`
+      newHtml = newHtml.replace(mentionTag, mention)
+    })
+
+    return newHtml
+  }
+
+  return (
+    <form className={`${props.customClass}__texteditor`}>
+      <TinyEditor
+        apiUrl={props.apiUrl}
+        codeLanguageList={props.codeLanguageList}
+        content={content}
+        handleSend={handleSend}
+        isAdvancedEdition={isAdvancedEdition}
+        setContent={setContent}
+        spaceId={props.workspaceId}
+      />
+      {!props.hideSendButtonAndOptions && (
+        <div className={
+            classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
+          }>
+          <div className={
+            classnames(
+              `${props.customClass}__texteditor__advancedtext`,
+              'commentArea__advancedtext'
+            )
+          }>
+            <IconButton
+              customClass={classnames(
+                `${props.customClass}__texteditor__advancedtext__btn commentArea__advancedtext__btn`
+              )}
+              disabled={props.disableComment}
+              text={isAdvancedEdition ? props.t('Simple edition') : props.t('Advanced edition')}
+              onClick={changeEditor}
+              intent='link'
+              mode='light'
+              key='commentArea__comment__advancedtext'
+            />
+            <DisplayFileToUpload
+              fileList={fileListToUpload}
+              onRemoveCommentAsFile={handleRemoveCommentFileFromUploadList}
+              color={props.customColor}
+            />
+          </div>
+
+          {props.isFileCommentLoading && (
+            <Loading />
+          )}
+
+          <div className={
+            classnames(
+              `${props.customClass}__texteditor__submit`,
+              'commentArea__submit'
+            )
+          }>
+            <AddFileToUploadButton
+              workspaceId={props.workspaceId}
+              color={props.customColor}
+              disabled={props.disableComment}
+              onValidateCommentFileToUpload={handleValidateCommentFileListToUpload}
+              multipleFiles={props.multipleFiles}
+            />
+            <IconButton
+              color={props.customColor}
+              customClass={
+                classnames(
+                  `${props.customClass}__texteditor__submit__btn `,
+                  'commentArea__submit__btn'
+                )
+              }
+              disabled={props.disableComment || (content === '' && fileListToUpload.length === 0)}
+              icon={props.icon}
+              intent='primary'
+              mode='light'
+              onClick={handleSend}
+              text={props.t('Send')}
+              type='button'
+              key='commentArea__comment__send'
+              dataCy='commentArea__comment__send'
+            />
+          </div>
+        </div>
+      )}
+    </form>
+  )
+}
+
+// TODO - MP - 2022-11-29 - This will be removed ; the sooner the better
+export class CommentArea_Legacy extends React.Component {
   constructor (props) {
     super(props)
 
@@ -271,7 +604,7 @@ export class CommentArea extends React.Component {
     this.setState({ newComment: '', newCommentAsFileList: [] })
   }
 
-  handleClickSend = () => {
+  handleSend = () => {
     const { props, state } = this
     if (props.onClickValidateNewCommentBtn(state.newComment, state.newCommentAsFileList)) {
       this.setState({ newComment: '', newCommentAsFileList: [] })
@@ -404,7 +737,7 @@ export class CommentArea extends React.Component {
                 icon={props.icon}
                 intent='primary'
                 mode='light'
-                onClick={this.handleClickSend}
+                onClick={this.handleSend}
                 text={props.buttonLabel || props.t('Send')}
                 type='button'
                 key='commentArea__comment__send'
@@ -423,6 +756,7 @@ export default translate()(CommentArea)
 CommentArea.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   buttonLabel: PropTypes.string,
+  codeLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customClass: PropTypes.string,
@@ -449,6 +783,7 @@ CommentArea.propTypes = {
 
 CommentArea.defaultProps = {
   buttonLabel: '',
+  codeLanguageList: [],
   contentId: 0,
   contentType: '',
   customClass: '',

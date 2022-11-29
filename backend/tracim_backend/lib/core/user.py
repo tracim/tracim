@@ -87,7 +87,7 @@ from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.mention import ALL__GROUP_MENTIONS
+from tracim_backend.models.mention import MENTION
 from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.user_custom_properties import UserCustomProperties
@@ -187,6 +187,7 @@ class UserApi(object):
             raise UserDoesNotExist(
                 'User for username "{}" not found in database'.format(username)
             ) from exc
+            # TODO - MP - 2022-11-25 - Return a dummy fixed user
         return user
 
     def get_current_user(self) -> User:
@@ -372,7 +373,13 @@ class UserApi(object):
         return [content_api.get_content_in_context(content) for content in contents]
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
-        return ALL__GROUP_MENTIONS
+        reserved_usernams = MENTION["all"]
+        reserved_usernams = reserved_usernams + MENTION["reader"]
+        reserved_usernams = reserved_usernams + MENTION["contributor"]
+        reserved_usernams = reserved_usernams + MENTION["reader"]
+        reserved_usernams = reserved_usernams + MENTION["contributor"]
+        reserved_usernams = reserved_usernams + MENTION["space-manager"]
+        return tuple(reserved_usernams)
 
     def get_user_workspaces_query(self, user_id: int) -> Query:
         return self._session.query(UserRoleInWorkspace.workspace_id).filter(

@@ -444,6 +444,7 @@ export class FeedItemWithPreview extends React.Component {
             {props.showCommentList && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
+                codeLanguageList={props.system.config.code_languages}
                 contentId={props.content.id}
                 contentType={props.content.type}
                 customClass='feedItem__timeline'

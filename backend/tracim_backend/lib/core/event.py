@@ -930,6 +930,9 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
     if not event.fields.get(Event.USER_FIELD):
         return None
     try:
+        # TODO - MP - 2022-11-29 - Should use line 934, keep testing like this and remove 935 before
+        # merge (comment start line 933)
+        # return int(event.user["user_id"])
         return session.query(User.user_id).filter(User.user_id == event.user["user_id"]).scalar()
     except (AttributeError, NoResultFound):
         # no user in event or user does not exist anymore
@@ -1086,7 +1089,7 @@ class BaseLiveMessageBuilder(abc.ABC):
             session = context.dbsession
             event = session.query(Event).filter(Event.event_id == event_id).one()
             receiver_ids = self.get_receiver_ids(event, session, self._config)
-            logger.debug(self, "Sending eventid: {} to users: {}".format(event_id, receiver_ids))
+            logger.debug(self, f"Sending eventid: {event_id} to users: {receiver_ids}")
             messages = [
                 Message(
                     receiver_id=receiver_id,

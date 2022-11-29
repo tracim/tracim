@@ -458,6 +458,7 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
+                codeLanguageList={state.config.system.config.code_languages}
                 contentId={state.content.content_id}
                 contentType={state.content.content_type}
                 loading={props.loadingTimeline}

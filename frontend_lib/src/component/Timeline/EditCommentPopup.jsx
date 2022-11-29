@@ -53,6 +53,7 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
+          codeLanguageList={props.codeLanguageList}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
           customClass='editCommentPopup'
@@ -98,6 +99,7 @@ EditCommentPopup.propTypes = {
   onClickClose: PropTypes.func.isRequired,
   onClickValidate: PropTypes.func.isRequired,
   apiUrl: PropTypes.string,
+  codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   loggedUserLanguage: PropTypes.string,
   workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -106,6 +108,7 @@ EditCommentPopup.propTypes = {
 
 EditCommentPopup.defaultProps = {
   apiUrl: '',
+  codeLanguageList: [],
   customColor: undefined,
   loggedUserLanguage: 'en',
   workspaceId: undefined,

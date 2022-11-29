@@ -2829,6 +2829,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tinymce/tinymce-react@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "@tinymce/tinymce-react@npm:4.2.0"
+  dependencies:
+    prop-types: ^15.6.2
+    tinymce: ^6.0.0 || ^5.5.1
+  peerDependencies:
+    react: ^18.0.0 || ^17.0.1 || ^16.7.0
+    react-dom: ^18.0.0 || ^17.0.1 || ^16.7.0
+  checksum: 4aed633830e79aff8c1ba3518180f9a12edecc3c681d150cb7959e2b04d6c6d0af2fed97d3ef6afae5722c0c1fe5499da648756621e3ecf2f2bc48aeb614947b
+  languageName: node
+  linkType: hard
+
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -11917,6 +11930,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
+    "@tinymce/tinymce-react": ^4.2.0
     eslint: ^6.8.0
   languageName: unknown
   linkType: soft
@@ -13075,6 +13089,13 @@ __metadata:
   version: 5.10.4
   resolution: "tinymce@npm:5.10.4"
   checksum: 2d34e70f41fa6a8b906802b89b003e32e7d97832417651901a6e6f6e84aa9e57596227dc3b65b28fd868bfe42a1669297c1c9191ad2a551fe2e4e419bc679986
+  languageName: node
+  linkType: hard
+
+"tinymce@npm:^6.0.0 || ^5.5.1":
+  version: 6.2.0
+  resolution: "tinymce@npm:6.2.0"
+  checksum: b1d7748f86f0869931ac736c85635a3d17db6120bdb06b66f09b4e01dfeefb4304b1227705b2d3a74d2a29e5285e58c1949d6552d8851dfba56aa1b439bf718f
   languageName: node
   linkType: hard
 

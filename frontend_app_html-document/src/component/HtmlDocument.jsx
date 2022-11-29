@@ -1,20 +1,23 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
-  ConfirmPopup,
   CONTENT_TYPE,
+  TRANSLATION_STATE,
+  HTMLContent,
+  ConfirmPopup,
   IconButton,
   PromptMessage,
-  HTMLContent,
   RefreshWarningMessage,
   TextAreaApp,
-  TRANSLATION_STATE
+  TinyEditor
 } from 'tracim_frontend_lib'
 
 export const HtmlDocument = props => {
+  const [text, setText] = useState('')
+
   const isTranslated = props.translationState === TRANSLATION_STATE.TRANSLATED
   const noteClass = 'html-document__contentpage__textnote__text'
   const noteClassName = classnames(
@@ -23,6 +26,11 @@ export const HtmlDocument = props => {
       [`${noteClass}-translated primaryColorBorder`]: isTranslated
     }
   )
+
+  useEffect(() => {
+    setText(props.text)
+    console.log(text)
+  }, [])
 
   return (
     <div className='html-document__contentpage__left__wrapper'>
@@ -134,24 +142,63 @@ export const HtmlDocument = props => {
         )}
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
-          <TextAreaApp
-            apiUrl={props.apiUrl}
-            contentId={props.contentId}
-            contentType={props.contentType}
-            customClass='html-document__editionmode'
-            customColor={props.customColor}
-            disableValidateBtn={props.disableValidateBtn}
-            elementId={props.wysiwygNewVersion}
-            isVisible={props.isVisible}
-            lang={props.lang}
-            mode={props.mode}
-            onClickCancelBtn={props.onClickCloseEditMode}
-            onClickValidateBtn={props.onClickValidateBtn}
-            searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-            text={props.text}
-            onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-            workspaceId={props.workspaceId}
-          />
+          (
+            <>
+              <TinyEditor
+                apiUrl={props.apiUrl}
+                codeLanguageList={[]}
+                content={text}
+                handleSend={props.onClickValidateBtn}
+                isAdvancedEdition={true}
+                setContent={setText}
+                spaceId={props.workspaceId}
+              />
+
+              <div className={`${props.customClass}__button editionmode__button`}>
+                <IconButton
+                  color={props.customColor}
+                  customClass={`${props.customClass}__cancel editionmode__button__cancel`}
+                  icon='fas fa-times'
+                  intent='secondary'
+                  key='TextAreaApp__cancel'
+                  onClick={props.onClickCloseEditMode}
+                  tabIndex='1'
+                  text={props.t('Cancel')}
+                />
+
+                <IconButton
+                  color={props.customColor}
+                  customClass={`${props.customClass}__submit editionmode__button__submit`}
+                  dataCy='editionmode__button__submit'
+                  disabled={props.disableValidateBtn(text)}
+                  icon='fas fa-check'
+                  intent='primary'
+                  key='TextAreaApp__validate'
+                  mode='light'
+                  onClick={() => props.onClickValidateBtn(text)}
+                  text={props.t('Validate')}
+                />
+              </div>
+            </>
+          )
+          // <TextAreaApp
+          //   apiUrl={props.apiUrl}
+          //   contentId={props.contentId}
+          //   contentType={props.contentType}
+          //   customClass='html-document__editionmode'
+          //   customColor={props.customColor}
+          //   disableValidateBtn={props.disableValidateBtn}
+          //   elementId={props.wysiwygNewVersion}
+          //   isVisible={props.isVisible}
+          //   lang={props.lang}
+          //   mode={props.mode}
+          //   onClickCancelBtn={props.onClickCloseEditMode}
+          //   onClickValidateBtn={props.onClickValidateBtn}
+          //   searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
+          //   text={props.text}
+          //   onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+          //   workspaceId={props.workspaceId}
+          // />
         )}
       </div>
     </div>
