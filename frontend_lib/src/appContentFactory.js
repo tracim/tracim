@@ -18,7 +18,8 @@ import {
   tinymceRemove,
   addRevisionFromTLM,
   sortContentByCreatedDateAndID,
-  sortContentByStatus
+  sortContentByStatus,
+  stringIncludes
 } from './helper.js'
 
 import {
@@ -1021,12 +1022,13 @@ export function appContentFactory (WrappedComponent) {
           await getSpaceMemberList(this.apiUrl, workspaceId)
         )
 
+        const includesKeyword = stringIncludes(keyword)
+
         switch (fetchSpaceMemberList.apiResponse.status) {
           case 200: return [
             ...autoCompleteItemList,
             ...fetchSpaceMemberList.body
-              .filter(m => m.user.username)
-              .filter(m => m.user.username.toLowerCase().includes(keyword.toLowerCase()))
+              .filter(m => includesKeyword(m.user.username) || includesKeyword(m.user.public_name))
               .map(m => ({ mention: m.user.username, detail: m.user.public_name, ...m.user }))
           ]
           default: sendGlobalFlashMessage(i18n.t('An error has happened while getting the known members list')); break
