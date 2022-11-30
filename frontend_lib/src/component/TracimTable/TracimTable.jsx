@@ -24,7 +24,7 @@ const DefaultWrapper = (props) => {
 
 const TracimTable = (props) => {
   const [userFilter, setUserFilter] = useState('')
-  const [sortCriterion, setSortCriterion] = useState(props.defaultSort)
+  const [sortCriterion, setSortCriterion] = useState(props.sortable ? props.defaultSort : '')
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
 
   const filter = () =>
@@ -37,6 +37,7 @@ const TracimTable = (props) => {
   const filteredData = userFilter !== '' ? filter() : props.data
 
   const handleClickToSort = (criterion) => {
+    if (!props.sortable) return
     const newSortOrder = sortCriterion === criterion && sortOrder === SORT_ORDER.ASCENDING
       ? SORT_ORDER.DESCENDING
       : SORT_ORDER.ASCENDING
@@ -47,7 +48,7 @@ const TracimTable = (props) => {
   const sort = () =>
     sortListBy(filteredData, sortCriterion, sortOrder, props.user.lang)
 
-  const sortedData = [...sort()]
+  const sortedData = props.sortable ? [...sort()] : filteredData
 
   const table = useReactTable({
     data: sortedData,
