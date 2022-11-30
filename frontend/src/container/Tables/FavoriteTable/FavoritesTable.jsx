@@ -14,10 +14,10 @@ require('./FavoriteTable.styl')
 
 const FavoritesTable = (props) => {
   const columns = [
-    contentTypeColumn(props.t('Type'), props.t, props.contentType),
-    filenameWithBadgesAndBreadcrumbsColumn(props.t('Title and path')),
-    timedEventColumn(props.t('Last Modification'), props.t),
-    contentInformationColumn(props.t('Information'), props.t, props.contentType),
+    contentTypeColumn(props.t('Type'), props.t('Sort by type'), props.contentType),
+    filenameWithBadgesAndBreadcrumbsColumn(props.t('Title and path'), props.t('Sort by title')),
+    timedEventColumn(props.t('Last Modification'), props.t('Sort by last modification')),
+    contentInformationColumn(props.t('Information'), props.t('Sort by information'), props.contentType),
     favoriteButtonColumn(props.t('Favorite'), props.onFavoriteButtonClick)
   ]
 

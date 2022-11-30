@@ -2,21 +2,28 @@ import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import {
   TimedEvent,
-  stringIncludes
+  stringIncludes, TitleListHeader, SORT_BY
 } from 'tracim_frontend_lib'
 import { getRevisionTypeLabel } from '../../../util/helper.js'
 
-const timedEventColumn = (header, translate) => {
+const timedEventColumn = (header, tooltip) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.content, {
-    header: () => (
-      <span>{header}</span>
+    header: (props) => (
+      <TitleListHeader
+        title={header}
+        onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
+        customClass='favoriteTable__row__btn'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
+        tootltip={tooltip}
+      />
     ),
     id: 'lastModification',
     cell: props => (
       <TimedEvent
         customClass='contentListItem__modification'
-        operation={getRevisionTypeLabel(props.getValue().currentRevisionType, translate)}
+        operation={getRevisionTypeLabel(props.getValue().currentRevisionType, props.translate)}
         date={props.getValue().modified}
         lang='fr'
         author={props.getValue().lastModifier}

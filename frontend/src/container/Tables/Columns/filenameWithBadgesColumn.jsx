@@ -1,12 +1,19 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { FilenameWithBadges, stringIncludes } from 'tracim_frontend_lib'
+import { FilenameWithBadges, SORT_BY, stringIncludes, TitleListHeader } from 'tracim_frontend_lib'
 
-const filenameWithBadgesColumn = (header) => {
+const filenameWithBadgesColumn = (header, tooltip) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
-    header: () => (
-      <span>{header}</span>
+    header: (props) => (
+      <TitleListHeader
+        title={header}
+        onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
+        customClass='favoriteTable__row__btn'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
+        tootltip={tooltip}
+      />
     ),
     id: 'title',
     cell: props => (
