@@ -74,33 +74,35 @@ const TracimTable = (props) => {
       {sortedData.length > 0
         ? (
           <>
-            <div className='TracimTable__header'>
-              {table.getHeaderGroups().map(headerGroup => (
-                <div
-                  className='TracimTable__header__row'
-                  key={headerGroup.id}
-                >
-                  {headerGroup.headers.map(header => (
-                    <div
-                      className={`TracimTable__header__row__cell ${header.column.columnDef.className}`}
-                      key={header.id}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          {
-                            ...header.getContext(),
-                            onClickTitle: handleClickToSort,
-                            isOrderAscending: sortOrder === SORT_ORDER.ASCENDING,
-                            selectedSortCriterion: sortCriterion
-                          }
-                        )}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
+            {!props.noHeader && (
+              <div className='TracimTable__header'>
+                {table.getHeaderGroups().map(headerGroup => (
+                  <div
+                    className='TracimTable__header__row'
+                    key={headerGroup.id}
+                  >
+                    {headerGroup.headers.map(header => (
+                      <div
+                        className={`TracimTable__header__row__cell ${header.column.columnDef.className}`}
+                        key={header.id}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                            header.column.columnDef.header,
+                            {
+                              ...header.getContext(),
+                              onClickTitle: handleClickToSort,
+                              isOrderAscending: sortOrder === SORT_ORDER.ASCENDING,
+                              selectedSortCriterion: sortCriterion
+                            }
+                          )}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
             <div className='TracimTable__body'>
               {table.getRowModel().rows.map(row => (
                 <RowWrapper key={`${row.id}-wrapper`} {...row.original} {...props.rowWrapperProps}>
@@ -144,6 +146,7 @@ const TracimTable = (props) => {
 TracimTable.propsType = {
   columns: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
+  noHeader: PropTypes.bool,
   emptyMessage: PropTypes.string,
   rowWrapper: PropTypes.func,
   rowWrapperProps: PropTypes.object,
@@ -155,6 +158,7 @@ TracimTable.propsType = {
 }
 
 TracimTable.defaultProps = {
+  noHeader: false,
   emptyMessage: 'This list is empty',
   customRowClass: '',
   rowWrapper: DefaultWrapper,
