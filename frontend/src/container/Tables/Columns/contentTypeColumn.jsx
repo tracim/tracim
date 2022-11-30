@@ -18,7 +18,7 @@ const contentTypeColumn = (header, translate, contentType) => {
         />
       )
     },
-    className: 'TracimTable__styles__flex__1',
+    className: 'TracimTable__styles__width__icon',
     filter: (data, userFilter) => {
       const contentTypeInfo = contentType.find(info => info.slug === data.content.type)
       return contentTypeInfo && stringIncludes(userFilter)(translate(contentTypeInfo.label))

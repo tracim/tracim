@@ -35,7 +35,7 @@ const contentInformationColumn = (header, translate, contentType) => {
         </div>
       )
     },
-    className: 'TracimTable__styles__flex__1 TracimTable__hide__md',
+    className: 'TracimTable__styles__flex__2 TracimTable__hide__md',
     filter: (data, userFilter) => {
       const contentTypeInfo = contentType.find(info => info.slug === data.content.type)
       const statusInfo = contentTypeInfo.availableStatuses.find(

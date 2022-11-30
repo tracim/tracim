@@ -16,9 +16,6 @@
         text-overflow ellipsis
         margin-inline-start standardSpacing
         margin-inline-end standardSpacing
-      &__cell *
-        overflow hidden
-        text-overflow ellipsis
   &__body
     display flex
     flex-direction column
@@ -33,11 +30,13 @@
         text-overflow ellipsis
         margin-inline-start standardSpacing
         margin-inline-end standardSpacing
-      &__cell *
-        overflow hidden
-        text-overflow ellipsis
-        white-space nowrap
+
   &__styles
+    &__width
+      &__icon
+        width listIconWidth
+        display flex
+        justify-content center
     &__flex
       &__1
         flex 1

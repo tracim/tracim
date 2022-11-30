@@ -20,7 +20,7 @@ const favoriteButtonColumn = (header, onClick) => {
         customClass='favorites__item__favoriteButton'
       />
     ),
-    className: 'TracimTable__styles__flex__1'
+    className: 'TracimTable__styles__width__icon'
   })
 }
 
