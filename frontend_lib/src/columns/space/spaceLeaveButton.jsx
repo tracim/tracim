@@ -4,11 +4,11 @@ import IconButton from '../../component/Button/IconButton.jsx'
 
 const spaceLeaveButton = (onClick, admin, system, onlyManager) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.space, {
+  return columnHelper.accessor(row => row, {
     header: () => '',
     id: 'spaceLeaveButton',
     cell: props => {
-      const isOnlyManager = onlyManager(props.userToEditId, props.getValue().member, props.getValue().memberList)
+      const isOnlyManager = onlyManager(props.getValue().member, props.getValue().memberList)
       return (
         <IconButton
           customClass='spaceconfig__table__leave_space_cell'
@@ -29,7 +29,8 @@ const spaceLeaveButton = (onClick, admin, system, onlyManager) => {
           }
         />
       )
-    }
+    },
+    className: 'TracimTable__styles__flex__1'
   })
 }
 

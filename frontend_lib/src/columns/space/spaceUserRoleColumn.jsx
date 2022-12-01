@@ -1,12 +1,21 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { ROLE_LIST } from '../../helper.js'
+import { ROLE_LIST, stringIncludes } from '../../helper.js'
+import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader'
+import { SORT_BY } from '../../sortListHelper'
 
-const spaceUserRoleColumn = (header) => {
+const spaceUserRoleColumn = (header, tooltip) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.space.member.role, {
-    header: () => (
-      <span>{header}</span>
+  return columnHelper.accessor(row => row.member.role, {
+    header: (props) => (
+      <TitleListHeader
+        title={header}
+        onClickTitle={() => props.onClickTitle(SORT_BY.ROLE)}
+        customClass='favoriteTable__row__btn'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.ROLE}
+        tootltip={tooltip}
+      />
     ),
     id: 'spaceUserRole',
     cell: props => {
@@ -22,6 +31,12 @@ const spaceUserRoleColumn = (header) => {
           </div>
         </div>
       )
+    },
+    className: 'TracimTable__styles__flex__1',
+    filter: (data, userFilter, translate) => {
+      const userRole = ROLE_LIST.find(type => type.slug === data.member.role) || { label: '' }
+
+      return userRole && stringIncludes(userFilter)(translate(userRole.label))
     }
   })
 }
