@@ -16,6 +16,48 @@ import {
 
 require('./FavoriteTable.styl')
 
+//  TODO: Manage Unavailable content
+
+//         <UnavailableContent
+//           contentTypeInfo={contentTypeInfo}
+//           label={favorite.originalLabel}
+//           key={favorite.contentId}
+//           isLast={isLast}
+//           isFirst={isFirst}
+//         >
+//           {favoriteButton}
+//         </UnavailableContent>
+
+// const UnavailableContent = translate()(props => {
+//   return (
+//     <ListItemWrapper
+//       label={props.label}
+//       read
+//       contentType={props.contentTypeInfo}
+//       isLast={props.isLast}
+//       isFirst={props.isFirst}
+//       customClass='unavailableContent contentListItem'
+//     >
+//       <ContentType
+//         contentTypeInfo={props.contentTypeInfo}
+//         customClass='contentListItem__type'
+//       />
+//       <div className='contentListItem__name_path unavailableContent__name_warning'>
+//         {props.label}
+//         <span className='unavailableContent__warning'>
+//           <Icon
+//             icon='fas fa-exclamation-triangle'
+//             title={props.t('Warning')}
+//           />
+//           &nbsp;
+//           {props.t('content is not available')}
+//         </span>
+//       </div>
+//       {props.children}
+//     </ListItemWrapper>
+//   )
+// })
+
 const FavoritesTable = (props) => {
   const columns = [
     contentTypeColumn(props.t('Type'), props.t('Sort by type'), props.contentType),
