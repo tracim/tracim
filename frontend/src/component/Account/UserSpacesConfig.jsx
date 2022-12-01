@@ -14,16 +14,10 @@ import {
   IconButton,
   Loading,
   SORT_BY,
-  SORT_ORDER,
-  sortListBy,
   sortListByMultipleCriteria,
-  TitleListHeader,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  FilterBar,
-  ROLE_LIST,
-  stringIncludes
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
@@ -31,7 +25,6 @@ import { FETCH_CONFIG } from '../../util/helper.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
-import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
 import UserSpacesConfigTable from '../../container/tables/Tables/UserSpacesConfigTable/UserSpacesConfigTable.jsx'
 
 export const onlyManager = (member, memberList) => {
@@ -56,11 +49,7 @@ export const UserSpacesConfig = (props) => {
   const [spaceList, setSpaceList] = useState([])
   const [spaceListWithMembers, setSpaceListWithMembers] = useState([])
   const [spaceBeingDeleted, setSpaceBeingDeleted] = useState(null)
-  const [entries, setEntries] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedSortCriterion, setSelectedSortCriterion] = useState(SORT_BY.LABEL)
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
-  const [userFilter, setUserFilter] = useState('')
 
   useEffect(() => {
     props.registerLiveMessageHandlerList([
@@ -80,49 +69,8 @@ export const UserSpacesConfig = (props) => {
       }
     })
 
-    const sortedList = sortListBy(
-      newSpaceList,
-      selectedSortCriterion,
-      sortOrder,
-      props.user.lang
-    )
-
-    const filteredSpaceList = filterSpaceList(sortedList)
-
-    const entrieList = filteredSpaceList.map(space => {
-      return (
-        <UserSpacesConfigLine
-          space={space}
-          key={space.id}
-          onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-          onLeaveSpace={handleLeaveSpace}
-          admin={props.admin}
-          system={props.system}
-          onlyManager={onlyManager(space.member, space.memberList)}
-        />
-      )
-    })
-    setEntries(entrieList)
     setSpaceListWithMembers(newSpaceList)
-  }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
-
-  const filterSpaceList = (list) => {
-    if (userFilter === '') return list
-
-    return list.filter(space => {
-      const userRole = ROLE_LIST.find(type => type.slug === space.member.role) || { label: '' }
-
-      const includesFilter = stringIncludes(userFilter)
-
-      const hasFilterMatchOnLabel = includesFilter(space.label)
-      const hasFilterMatchOnRole = userRole && includesFilter(props.t(userRole.label))
-
-      return (
-        hasFilterMatchOnLabel ||
-        hasFilterMatchOnRole
-      )
-    })
-  }
+  }, [spaceList])
 
   useEffect(() => {
     if (props.userToEditId === props.user.userId && props.workspaceList) {
@@ -221,14 +169,6 @@ export const UserSpacesConfig = (props) => {
     setSpaceBeingDeleted(spaceBeingDeleted)
   }
 
-  const handleClickTitleToSort = (criterion) => {
-    const newSortOrder = selectedSortCriterion === criterion && sortOrder === SORT_ORDER.ASCENDING
-      ? SORT_ORDER.DESCENDING
-      : SORT_ORDER.ASCENDING
-    setSelectedSortCriterion(criterion)
-    setSortOrder(newSortOrder)
-  }
-
   return (
     isLoading
       ? <Loading />
@@ -267,78 +207,29 @@ export const UserSpacesConfig = (props) => {
             onlyManager={onlyManager}
           />
 
-          <FilterBar
-            onChange={e => {
-              const newFilter = e.target.value
-              setUserFilter(newFilter)
-            }}
-            value={userFilter}
-            placeholder={props.t('Filter spaces')}
-          />
-
-          {(entries.length
-            ? (
-              <div className='spaceconfig__table'>
-                <table className='table'>
-                  <thead>
-                    <tr>
-                      <th>
-                        <TitleListHeader
-                          title={props.t('Space')}
-                          onClickTitle={() => handleClickTitleToSort(SORT_BY.LABEL)}
-                          isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
-                          isSelected={selectedSortCriterion === SORT_BY.LABEL}
-                          tootltip={props.t('Sort by title')}
-                        />
-                      </th>
-                      <th>
-                        <TitleListHeader
-                          title={props.t('Role')}
-                          onClickTitle={() => handleClickTitleToSort(SORT_BY.ROLE)}
-                          isOrderAscending={sortOrder === SORT_ORDER.ASCENDING}
-                          isSelected={selectedSortCriterion === SORT_BY.ROLE}
-                          tootltip={props.t('Sort by role')}
-                        />
-                      </th>
-                      {props.system.config.email_notification_activated && <th>{props.t('Email notifications')}</th>}
-                      <th />
-                    </tr>
-                  </thead>
-
-                  <tbody>{entries}</tbody>
-                </table>
-                {(spaceBeingDeleted && (
-                  <ConfirmPopup
-                    onConfirm={handleConfirmDeleteSpace}
-                    onCancel={() => setSpaceBeingDeleted(null)}
-                    msg={
-                      props.admin
-                        ? props.t('Are you sure you want to remove this member from the space?')
-                        : props.t('Are you sure you want to leave the space?')
-                    }
-                    confirmLabel={
-                      props.admin
-                        ? props.t('Remove from space')
-                        : props.t('Leave space')
-                    }
-                    confirmIcon='fa-fw fas fa-sign-out-alt'
-                  />
-                ))}
-              </div>
-            ) : (
-              userFilter !== ''
-                ? props.t('There are no spaces that matches your filter')
-                : props.admin
-                  ? props.t('This user is not a member of any space yet')
-                  : props.t('You are not a member of any space yet')
-            )
-          )}
+          {(spaceBeingDeleted && (
+            <ConfirmPopup
+              onConfirm={handleConfirmDeleteSpace}
+              onCancel={() => setSpaceBeingDeleted(null)}
+              msg={
+                props.admin
+                  ? props.t('Are you sure you want to remove this member from the space?')
+                  : props.t('Are you sure you want to leave the space?')
+              }
+              confirmLabel={
+                props.admin
+                  ? props.t('Remove from space')
+                  : props.t('Leave space')
+              }
+              confirmIcon='fa-fw fas fa-sign-out-alt'
+            />
+          ))}
         </div>
       )
   )
 }
 
-const mapStateToProps = ({ system, user, workspaceList }) => ({ system, user, workspaceList })
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(UserSpacesConfig))))
 
 UserSpacesConfig.propTypes = {
