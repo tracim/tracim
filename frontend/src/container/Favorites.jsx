@@ -13,7 +13,7 @@ import {
   getContentComment,
   getContentPath,
   Loading,
-  handleFetchResult,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 
 import {
@@ -40,7 +40,7 @@ export class Favorites extends React.Component {
 
     this.state = {
       contentCommentsCountList: [],
-      isLoading: true,
+      isLoading: true
     }
 
     props.registerCustomEventHandlerList([
