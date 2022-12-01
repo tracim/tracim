@@ -66,7 +66,8 @@ import {
   USER_CALL_STATE,
   STATUSES,
   TIMELINE_TYPE,
-  stringIncludes
+  stringIncludes,
+  getRevisionTypeLabel
 } from './helper.js'
 
 import {
@@ -199,6 +200,8 @@ import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
 import NewToDo from './component/ToDo/NewToDo.jsx'
 import ToDoItem from './component/ToDo/ToDoItem.jsx'
 
+import ContentType from './component/ContentType/ContentType.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -300,7 +303,23 @@ export { default as TagList } from './component/Tags/TagList.jsx'
 export { default as Tag } from './component/Tags/Tag.jsx'
 export { default as Loading } from './component/Loading/Loading.jsx'
 export { default as COLORS } from './colors.js'
-export { default as TracimTable } from './component/TracimTable/TracimTable'
+
+export { default as TracimTable } from './component/TracimTable/TracimTable.jsx'
+
+export { default as spaceNameColumn } from './columns/space/spaceNameColumn.jsx'
+export { default as spaceUserRoleColumn } from './columns/space/spaceUserRoleColumn.jsx'
+export { default as spaceLeaveButton } from './columns/space/spaceLeaveButton.jsx'
+
+export { default as contentFilenameWithBadgesAndBreadcrumbsColumn } from './columns/content/contentFilenameWithBadgesAndBreadcrumbsColumn.jsx'
+export { default as contentFilenameWithBadgesColumn } from './columns/content/contentFilenameWithBadgesColumn.jsx'
+export { default as contentInformationColumn } from './columns/content/contentInformationColumn.jsx'
+export { default as contentTypeColumn } from './columns/content/contentTypeColumn.jsx'
+
+export { default as userRemoveButton } from './columns/user/userRemoveButton.jsx'
+export { default as userSummaryColumn } from './columns/user/userSummaryColumn.jsx'
+
+export { default as favoriteButtonColumn } from './columns/favoriteButtonColumn.jsx'
+export { default as timedEventColumn } from './columns/timedEventColumn.jsx'
 
 export {
   TRANSLATION_STATE,
@@ -516,5 +535,7 @@ export {
   STATUSES,
   TIMELINE_TYPE,
   stringIncludes,
-  FilterBar
+  FilterBar,
+  ContentType,
+  getRevisionTypeLabel
 }

@@ -933,3 +933,32 @@ export const handleClickCopyLink = (contentId) => {
 export const stringIncludes = (a) => {
   return (b) => b && b.toUpperCase().includes(a.toUpperCase())
 }
+
+export const getRevisionTypeLabel = (revisionType, t) => {
+  switch (revisionType) {
+    case 'revision':
+      return t('modified')
+    case 'creation':
+      return t('created')
+    case 'edition':
+      return t('modified')
+    case 'deletion':
+      return t('deleted')
+    case 'undeletion':
+      return t('undeleted')
+    case 'mention':
+      return t('mention made')
+    case 'content-comment':
+      return t('commented')
+    case 'status-update':
+      return t('status modified')
+    case 'move':
+      return t('moved')
+    case 'copy':
+      return t('copied')
+    case 'unknown':
+      return t('unknown')
+  }
+
+  return revisionType
+}

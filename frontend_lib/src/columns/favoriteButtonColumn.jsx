@@ -1,9 +1,6 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import {
-  FAVORITE_STATE,
-  FavoriteButton
-} from 'tracim_frontend_lib'
+import FavoriteButton, { FAVORITE_STATE } from '../component/Button/FavoriteButton.jsx'
 
 const favoriteButtonColumn = (header, onClick) => {
   const columnHelper = createColumnHelper()

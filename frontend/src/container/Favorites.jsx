@@ -24,7 +24,8 @@ import {
   TitleListHeader,
   FilterBar,
   handleFetchResult,
-  stringIncludes
+  stringIncludes,
+  ContentType
 } from 'tracim_frontend_lib'
 
 import {
@@ -44,8 +45,7 @@ import {
 } from '../util/helper.js'
 
 import ContentListItem from '../component/ContentListItem.jsx'
-import ContentType from '../component/ContentType.jsx'
-import FavoritesTable from './Tables/FavoriteTable/FavoritesTable'
+import FavoritesTable from './tables/Tables/FavoriteTable/FavoritesTable'
 
 const FavoritesHeader = translate()(props => {
   return (

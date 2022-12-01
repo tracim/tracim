@@ -1,10 +1,13 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
+
+import TitleListHeader from '../component/Lists/ListHeader/TitleListHeader.jsx'
+import { SORT_BY } from '../sortListHelper.js'
+import TimedEvent from '../component/TimedEvent/TimedEvent.jsx'
 import {
-  TimedEvent,
-  stringIncludes, TitleListHeader, SORT_BY
-} from 'tracim_frontend_lib'
-import { getRevisionTypeLabel } from '../../../util/helper.js'
+  stringIncludes,
+  getRevisionTypeLabel
+} from '../helper.js'
 
 const timedEventColumn = (header, tooltip) => {
   const columnHelper = createColumnHelper()

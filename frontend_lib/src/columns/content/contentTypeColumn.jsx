@@ -1,7 +1,10 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import ContentType from '../../../component/ContentType.jsx'
-import { SORT_BY, stringIncludes, TitleListHeader } from 'tracim_frontend_lib'
+import ContentType from '../../component/ContentType/ContentType.jsx'
+
+import { stringIncludes } from '../../helper.js'
+import { SORT_BY } from '../../sortListHelper.js'
+import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 
 const contentTypeColumn = (header, tooltip, contentType) => {
   const columnHelper = createColumnHelper()

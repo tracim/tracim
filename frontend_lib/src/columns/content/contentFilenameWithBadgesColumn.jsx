@@ -1,8 +1,12 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { FilenameWithBadges, SORT_BY, stringIncludes, TitleListHeader } from 'tracim_frontend_lib'
 
-const filenameWithBadgesColumn = (header, tooltip) => {
+import { stringIncludes } from '../../helper.js'
+import { SORT_BY } from '../../sortListHelper.js'
+import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
+import { FilenameWithBadges } from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
+
+const contentFilenameWithBadgesColumn = (header, tooltip) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: (props) => (
@@ -26,4 +30,4 @@ const filenameWithBadgesColumn = (header, tooltip) => {
   })
 }
 
-export default filenameWithBadgesColumn
+export default contentFilenameWithBadgesColumn

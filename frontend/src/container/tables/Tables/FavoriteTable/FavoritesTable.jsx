@@ -2,20 +2,24 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-import { TracimTable } from 'tracim_frontend_lib'
-import contentTypeColumn from '../Columns/contentTypeColumn.jsx'
-import filenameWithBadgesAndBreadcrumbsColumn from '../Columns/filenameWithBadgesAndBreadcrumbsColumn.jsx'
-import timedEventColumn from '../Columns/timedEventColumn.jsx'
-import contentInformationColumn from '../Columns/contentInformationColumn.jsx'
-import favoriteButtonColumn from '../Columns/favoriteButtonColumn.jsx'
-import ListItemRowWrapper from '../RowWrappers/ListItemRowWrapper.jsx'
+
+import ListItemRowWrapper from '../../RowWrappers/ListItemRowWrapper.jsx'
+
+import {
+  TracimTable,
+  contentTypeColumn,
+  contentFilenameWithBadgesAndBreadcrumbsColumn,
+  contentInformationColumn,
+  favoriteButtonColumn,
+  timedEventColumn
+} from 'tracim_frontend_lib'
 
 require('./FavoriteTable.styl')
 
 const FavoritesTable = (props) => {
   const columns = [
     contentTypeColumn(props.t('Type'), props.t('Sort by type'), props.contentType),
-    filenameWithBadgesAndBreadcrumbsColumn(props.t('Title and path'), props.t('Sort by title')),
+    contentFilenameWithBadgesAndBreadcrumbsColumn(props.t('Title and path'), props.t('Sort by title')),
     timedEventColumn(props.t('Last Modification'), props.t('Sort by last modification')),
     contentInformationColumn(props.t('Information'), props.t('Sort by information'), props.contentType),
     favoriteButtonColumn(props.t('Favorite'), props.onFavoriteButtonClick)
