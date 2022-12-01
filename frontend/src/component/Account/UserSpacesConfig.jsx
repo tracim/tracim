@@ -32,15 +32,16 @@ import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
 import UserSpacesConfigLine from './UserSpacesConfigLine.jsx'
+import UserSpacesConfigTable from '../../container/tables/Tables/UserSpacesConfigTable/UserSpacesConfigTable.jsx'
 
-export const onlyManager = (userToEditId, member, memberList) => {
+export const onlyManager = (member, memberList) => {
   const manager = ROLE.workspaceManager.slug
 
   if (member.role !== manager) {
     return false
   }
 
-  return !memberList.some(m => m.user_id !== userToEditId && m.role === manager)
+  return !memberList.some(m => m.user_id !== member.user_id && m.role === manager)
 }
 
 export const fillMemberList = async (space) => {
@@ -53,6 +54,7 @@ export const fillMemberList = async (space) => {
 
 export const UserSpacesConfig = (props) => {
   const [spaceList, setSpaceList] = useState([])
+  const [spaceListWithMembers, setSpaceListWithMembers] = useState([])
   const [spaceBeingDeleted, setSpaceBeingDeleted] = useState(null)
   const [entries, setEntries] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -69,17 +71,17 @@ export const UserSpacesConfig = (props) => {
   }, [spaceList])
 
   useEffect(() => {
-    const filteredListWithMember = []
+    const newSpaceList = []
 
     spaceList.forEach(space => {
       const member = space.memberList.find(u => u.id === props.userToEditId)
       if (space.memberList.length > 0 && member) {
-        filteredListWithMember.push({ ...space, member })
+        newSpaceList.push({ ...space, member })
       }
     })
 
     const sortedList = sortListBy(
-      filteredListWithMember,
+      newSpaceList,
       selectedSortCriterion,
       sortOrder,
       props.user.lang
@@ -96,11 +98,12 @@ export const UserSpacesConfig = (props) => {
           onLeaveSpace={handleLeaveSpace}
           admin={props.admin}
           system={props.system}
-          onlyManager={onlyManager(props.userToEditId, space.member, space.memberList)}
+          onlyManager={onlyManager(space.member, space.memberList)}
         />
       )
     })
     setEntries(entrieList)
+    setSpaceListWithMembers(newSpaceList)
   }, [spaceList, sortOrder, selectedSortCriterion, userFilter])
 
   const filterSpaceList = (list) => {
@@ -255,6 +258,14 @@ export const UserSpacesConfig = (props) => {
               onClose={(() => props.history.push(PAGE.ADMIN.USER_EDIT(props.userToEditId), 'spacesConfig'))}
             />
           )}
+
+          <UserSpacesConfigTable
+            spaceList={spaceListWithMembers}
+            onLeaveSpaceClick={handleLeaveSpace}
+            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+            admin={props.admin}
+            onlyManager={onlyManager}
+          />
 
           <FilterBar
             onChange={e => {
