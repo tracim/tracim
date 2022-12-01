@@ -309,6 +309,7 @@ export { default as TracimTable } from './component/TracimTable/TracimTable.jsx'
 export { default as spaceNameColumn } from './columns/space/spaceNameColumn.jsx'
 export { default as spaceUserRoleColumn } from './columns/space/spaceUserRoleColumn.jsx'
 export { default as spaceLeaveButton } from './columns/space/spaceLeaveButton.jsx'
+export { default as spaceMailNotificationColumn } from './columns/space/spaceMailNotificationColumn.jsx'
 
 export { default as contentFilenameWithBadgesAndBreadcrumbsColumn } from './columns/content/contentFilenameWithBadgesAndBreadcrumbsColumn.jsx'
 export { default as contentFilenameWithBadgesColumn } from './columns/content/contentFilenameWithBadgesColumn.jsx'
