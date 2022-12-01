@@ -103,7 +103,7 @@ const TracimTable = (props) => {
                 ))}
               </div>
             )}
-            <div className='TracimTable__body'>
+            <div className={`TracimTable__body ${props.colored ? 'TracimTable__body__colored' : ''}`}>
               {table.getRowModel().rows.map(row => (
                 <RowWrapper key={`${row.id}-wrapper`} {...row.original} {...props.rowWrapperProps}>
                   <div
@@ -147,6 +147,7 @@ TracimTable.propsType = {
   columns: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
   noHeader: PropTypes.bool,
+  colored: PropTypes.bool,
   emptyMessage: PropTypes.string,
   rowWrapper: PropTypes.func,
   rowWrapperProps: PropTypes.object,
@@ -159,6 +160,7 @@ TracimTable.propsType = {
 
 TracimTable.defaultProps = {
   noHeader: false,
+  colored: false,
   emptyMessage: 'This list is empty',
   customRowClass: '',
   rowWrapper: DefaultWrapper,
