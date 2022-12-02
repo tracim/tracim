@@ -17,7 +17,7 @@ import {
   sortListByMultipleCriteria,
   TracimComponent,
   TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_CORE_EVENT_TYPE as TLM_CET
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../../reducer/workspaceList.js'
 import { serializeMember } from '../../reducer/currentWorkspace.js'
@@ -34,7 +34,10 @@ export const onlyManager = (member, memberList) => {
     return false
   }
 
-  return !memberList.some(m => m.user_id !== member.user_id && m.role === manager)
+  return !memberList.some((m) => {
+    if (m.id === member.id) return false
+    return m.role === manager
+  })
 }
 
 export const fillMemberList = async (space) => {
