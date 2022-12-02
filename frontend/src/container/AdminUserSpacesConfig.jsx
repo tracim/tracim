@@ -7,15 +7,12 @@ import {
   IconButton,
   Loading,
   PROFILE,
-  ROLE_LIST,
   serialize,
   SORT_BY,
   sortListByMultipleCriteria,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
-  TracimComponent,
-  FilterBar,
-  stringIncludes
+  TracimComponent
 } from 'tracim_frontend_lib'
 import { serializeWorkspaceListProps } from '../reducer/workspaceList.js'
 import { newFlashMessage } from '../action-creator.sync.js'
@@ -25,24 +22,15 @@ import {
   postWorkspaceMember,
   updateWorkspaceMember
 } from '../action-creator.async.js'
-import AdminUserSpacesConfigItem from '../component/Account/AdminUserSpacesConfigItem.jsx'
 import { fillMemberList, onlyManager } from '../component/Account/UserSpacesConfig.jsx'
 import { serializeMember } from '../reducer/currentWorkspace.js'
-
-const filterSpaceList = (list, filterList) => {
-  return list.filter(space =>
-    space.label.toUpperCase().includes(filterList.toUpperCase()) ||
-    space.id === Number(filterList)
-  )
-}
+import AdminSpacesUserConfigLeaveTable from './tables/Tables/AdminSpacesUserConfigLeaveTable/AdminSpacesUserConfigLeaveTable'
+import AdminSpacesUserConfigAddTable from './tables/Tables/AdminSpacesUserConfigAddTable/AdminSpacesUserConfigAddTable'
 
 export const AdminUserSpacesConfig = (props) => {
-  const [availableSpaceListFilter, setAvailableSpaceListFilter] = useState('')
   const [availableSpaceList, setAvailableSpaceList] = useState([])
-  const [displayedAvailableSpaceList, setDisplayedAvailableSpaceList] = useState([])
-  const [memberSpaceListFilter, setMemberSpaceListFilter] = useState('')
+  const [spaceListWithMembers, setSpaceListWithMembers] = useState([])
   const [memberSpaceList, setMemberSpaceList] = useState([])
-  const [displayedMemberSpaceList, setDisplayedMemberSpaceList] = useState([])
   const [spaceList, setSpaceList] = useState([])
   const [isLoading, setIsLoading] = useState(false)
 
@@ -71,38 +59,20 @@ export const AdminUserSpacesConfig = (props) => {
       if (space.memberList.find(u => u.id === props.userToEditId)) memberSpaces.push(space)
       else availableSpaces.push(space)
     })
-    setAvailableSpaceList(availableSpaces)
-    setDisplayedAvailableSpaceList(filterSpaceList(availableSpaces, availableSpaceListFilter))
-    setMemberSpaceList(memberSpaces)
-    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaces, memberSpaceListFilter))
-  }, [spaceList])
 
-  useEffect(() => {
-    setDisplayedAvailableSpaceList(filterSpaceList(availableSpaceList, availableSpaceListFilter))
-  }, [availableSpaceListFilter])
+    const newSpaceList = []
 
-  useEffect(() => {
-    setDisplayedMemberSpaceList(filterSpaceListWithUserRole(memberSpaceList, memberSpaceListFilter))
-  }, [memberSpaceListFilter])
-
-  const filterSpaceListWithUserRole = (list, filterList) => {
-    return list.filter(space => {
+    spaceList.forEach(space => {
       const member = space.memberList.find(u => u.id === props.userToEditId)
-      const userRole = ROLE_LIST.find(type => type.slug === member.role) || { label: '' }
-
-      const includesFilter = stringIncludes(filterList)
-
-      const hasFilterMatchOnUserRole = userRole && includesFilter(props.t(userRole.label))
-      const hasFilterMatchOnSpaceLabel = includesFilter(space.label)
-      const hasFilterMatchOnSpaceId = space.id && includesFilter(space.id.toString())
-
-      return (
-        hasFilterMatchOnUserRole ||
-        hasFilterMatchOnSpaceLabel ||
-        hasFilterMatchOnSpaceId
-      )
+      if (space.memberList.length > 0 && member) {
+        newSpaceList.push({ ...space, member })
+      }
     })
-  }
+
+    setSpaceListWithMembers(newSpaceList)
+    setAvailableSpaceList(availableSpaces)
+    setMemberSpaceList(memberSpaces)
+  }, [spaceList])
 
   const getSpaceList = async () => {
     setIsLoading(true)
@@ -177,11 +147,11 @@ export const AdminUserSpacesConfig = (props) => {
     }
   }
 
-  const handleLeaveSpace = async (space) => {
-    if (!space.id) return
+  const handleLeaveSpace = async (spaceId) => {
+    if (!spaceId) return
 
     try {
-      const fetchResult = await props.dispatch(deleteWorkspaceMember(space.id, props.userToEditId))
+      const fetchResult = await props.dispatch(deleteWorkspaceMember(spaceId, props.userToEditId))
       if (fetchResult.status !== 204) {
         props.dispatch(newFlashMessage(props.t('Error while leaving the space'), 'warning'))
       }
@@ -233,84 +203,32 @@ export const AdminUserSpacesConfig = (props) => {
           <div className='adminUserSpacesConfig__zones__title'>
             <b>{props.t('Available spaces')}</b>
 
-            <FilterBar
-              customClass='adminUserSpacesConfig__zones__filterBar'
-              onChange={e => {
-                const newFilter = e.target.value
-                setAvailableSpaceListFilter(newFilter)
-              }}
-              value={availableSpaceListFilter}
-              placeholder={props.t('Filter spaces')}
-            />
-
           </div>
           {(isLoading
             ? <Loading />
-            : availableSpaceList.length
-              ? (
-                <div className='adminUserSpacesConfig__zones__table'>
-                  <table className='table'>
-                    <tbody>
-                      {displayedAvailableSpaceList.map(space => {
-                        return (
-                          <AdminUserSpacesConfigItem
-                            key={`availableSpaceList_${space.id}`}
-                            onClickButton={handleAddToSpace}
-                            space={space}
-                          />
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              ) : <div>{props.t('No other spaces available')}</div>
+            : (
+              <AdminSpacesUserConfigAddTable
+                spaceList={availableSpaceList}
+                onAddSpaceClick={handleAddToSpace}
+              />
+            )
           )}
         </div>
 
         <div className='adminUserSpacesConfig__zones__spacesMembership'>
           <div className='adminUserSpacesConfig__zones__title'>
             <b>{props.t('Spaces membership')}</b>&nbsp;({memberSpaceList.length})
-
-            <FilterBar
-              customClass='adminUserSpacesConfig__zones__filterBar'
-              onChange={e => {
-                const newFilter = e.target.value
-                setMemberSpaceListFilter(newFilter)
-              }}
-              placeholder={props.t('Filter spaces')}
-              value={memberSpaceListFilter}
-            />
-
           </div>
           {(isLoading
             ? <Loading />
-            : (memberSpaceList.length
-              ? (
-                <div className='adminUserSpacesConfig__zones__table'>
-                  <table className='table'>
-                    <tbody>
-                      {displayedMemberSpaceList.map(space => {
-                        const member = space.memberList.find(u => u.id === props.userToEditId)
-                        const memberRole = ROLE_LIST.find(r => r.slug === member.role)
-
-                        return (
-                          <AdminUserSpacesConfigItem
-                            emailNotificationActivated={props.system.config.email_notification_activated}
-                            key={`memberSpaceList_${space.id}`}
-                            onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
-                            onClickButton={handleLeaveSpace}
-                            onClickChangeRole={handleClickChangeRole}
-                            onlyManager={onlyManager(props.userToEditId, member, space.memberList)}
-                            member={member}
-                            memberRole={memberRole}
-                            space={space}
-                          />
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              ) : <div>{props.t('This user is not a member of any space yet')}</div>
+            : (
+              <AdminSpacesUserConfigLeaveTable
+                spaceList={spaceListWithMembers}
+                onLeaveSpaceClick={handleLeaveSpace}
+                onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+                onClickChangeRole={handleClickChangeRole}
+                onlyManager={onlyManager}
+              />
             )
           )}
         </div>
@@ -326,7 +244,7 @@ export const AdminUserSpacesConfig = (props) => {
   )
 }
 
-const mapStateToProps = ({ system, user, workspaceList }) => ({ system, user, workspaceList })
+const mapStateToProps = ({ user, workspaceList }) => ({ user, workspaceList })
 export default connect(mapStateToProps)(translate()(TracimComponent(AdminUserSpacesConfig)))
 
 AdminUserSpacesConfig.propTypes = {
