@@ -2,18 +2,20 @@ import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import IconButton from '../../component/Button/IconButton.jsx'
 
-const spaceLeaveButton = (onClick, admin, system, onlyManager) => {
+const spaceLeaveButtonColumn = (onClick, admin, system, onlyManager) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => '',
-    id: 'spaceLeaveButton',
+    id: 'leaveButton',
     cell: props => {
       const isOnlyManager = onlyManager(props.getValue().member, props.getValue().memberList)
       return (
         <IconButton
+          dataCy='spaceconfig__remove_from_space'
           customClass='spaceconfig__table__leave_space_cell'
           mode='dark'
           intent='secondary'
+          iconColor='red'
           disabled={isOnlyManager}
           onClick={(() => onClick(props.getValue().id))}
           icon='fas fa-sign-out-alt'
@@ -34,8 +36,4 @@ const spaceLeaveButton = (onClick, admin, system, onlyManager) => {
   })
 }
 
-spaceLeaveButton.propsType = {}
-
-spaceLeaveButton.defaultProps = {}
-
-export default spaceLeaveButton
+export default spaceLeaveButtonColumn

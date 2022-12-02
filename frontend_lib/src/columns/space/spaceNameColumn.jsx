@@ -6,7 +6,7 @@ import { stringIncludes } from '../../helper'
 
 const spaceNameColumn = (header, tooltip) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.slug, {
+  return columnHelper.accessor(row => row.label, {
     header: (props) => (
       <TitleListHeader
         title={header}
