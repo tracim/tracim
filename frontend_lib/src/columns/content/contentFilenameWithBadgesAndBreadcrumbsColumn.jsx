@@ -7,17 +7,17 @@ import Breadcrumbs from '../../component/Breadcrumbs/Breadcrumbs.jsx'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 import { FilenameWithBadges } from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
 
-const contentFilenameWithBadgesAndBreadcrumbsColumn = (header, tooltip) => {
+const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: (props) => (
       <TitleListHeader
-        title={header}
+        title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
         customClass='favoriteTable__row__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
-        tootltip={tooltip}
+        tootltip={settings.tooltip}
       />
     ),
     id: 'titleWithPath',
@@ -30,7 +30,7 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (header, tooltip) => {
         />
       </div>
     ),
-    className: 'TracimTable__styles__flex__4',
+    className: settings.className,
     filter: (data, userFilter) => {
       const includesFilter = stringIncludes(userFilter)
       const hasFilterMatchOnContentLabel = includesFilter(data.content.label)

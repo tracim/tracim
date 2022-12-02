@@ -2,7 +2,7 @@ import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { stringIncludes } from '../../helper'
 
-const spaceIdColumn = () => {
+const spaceIdColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.id, {
     header: '',
@@ -12,7 +12,7 @@ const spaceIdColumn = () => {
         <span>{props.getValue()}</span>
       )
     },
-    className: 'TracimTable__styles__flex__1',
+    className: settings.className,
     filter: (data, userFilter) => {
       return stringIncludes(userFilter)(data.id.toString())
     }

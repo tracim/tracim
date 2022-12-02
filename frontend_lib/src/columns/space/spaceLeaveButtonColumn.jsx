@@ -2,7 +2,7 @@ import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import IconButton from '../../component/Button/IconButton.jsx'
 
-const spaceLeaveButtonColumn = (onClick, admin, system, onlyManager) => {
+const spaceLeaveButtonColumn = (settings, onClick, admin, system, onlyManager) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => '',
@@ -32,7 +32,7 @@ const spaceLeaveButtonColumn = (onClick, admin, system, onlyManager) => {
         />
       )
     },
-    className: 'TracimTable__styles__flex__1'
+    className: settings.className
   })
 }
 

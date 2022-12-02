@@ -6,17 +6,17 @@ import { SORT_BY } from '../../sortListHelper.js'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 import Icon from '../../component/Icon/Icon.jsx'
 
-const contentInformationColumn = (header, tooltip, contentType) => {
+const contentInformationColumn = (settings, contentType) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.content, {
     header: (props) => (
       <TitleListHeader
-        title={header}
+        title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.STATUS)}
         customClass='favoriteTable__row__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.STATUS}
-        tootltip={tooltip}
+        tootltip={settings.tooltip}
       />
     ),
     id: 'information',
@@ -43,7 +43,7 @@ const contentInformationColumn = (header, tooltip, contentType) => {
         </div>
       )
     },
-    className: 'TracimTable__styles__flex__2 TracimTable__hide__md',
+    className: settings.className,
     filter: (data, userFilter, translate) => {
       const contentTypeInfo = contentType.find(info => info.slug === data.content.type)
       const statusInfo = contentTypeInfo.availableStatuses.find(

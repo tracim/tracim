@@ -2,13 +2,13 @@ import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import BtnSwitch from '../../component/Input/BtnSwitch/BtnSwitch.jsx'
 
-const spaceMailNotificationColumn = (header, system, onChangeSubscriptionNotif) => {
+const spaceMailNotificationColumn = (settings, system, onChangeSubscriptionNotif) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => (
       <>
         {(system.config.email_notification_activated &&
-          <span>{header}</span>
+          <span>{settings.header}</span>
         )}
       </>
     ),
@@ -25,7 +25,7 @@ const spaceMailNotificationColumn = (header, system, onChangeSubscriptionNotif) 
         </>
       )
     },
-    className: 'TracimTable__styles__flex__1'
+    className: settings.className
   })
 }
 

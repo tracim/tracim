@@ -9,17 +9,17 @@ import {
   getRevisionTypeLabel
 } from '../helper.js'
 
-const timedEventColumn = (header, tooltip) => {
+const timedEventColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.content, {
     header: (props) => (
       <TitleListHeader
-        title={header}
+        title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
         customClass='favoriteTable__row__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
-        tootltip={tooltip}
+        tootltip={settings.tooltip}
       />
     ),
     id: 'lastModification',
@@ -32,7 +32,7 @@ const timedEventColumn = (header, tooltip) => {
         author={props.getValue().lastModifier}
       />
     ),
-    className: 'TracimTable__styles__flex__2  TracimTable__hide__md',
+    className: settings.className,
     filter: (data, userFilter) => {
       if (!data.content.lastModifier) return false
       return stringIncludes(userFilter)(data.content.lastModifier.publicName)

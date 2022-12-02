@@ -3,7 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { ROLE_LIST, stringIncludes } from '../../helper.js'
 import DropdownMenu from '../../component/DropdownMenu/DropdownMenu'
 
-const spaceRoleDropdownColumn = (onClickChangeRole) => {
+const spaceRoleDropdownColumn = (settings, onClickChangeRole) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => '',
@@ -31,7 +31,7 @@ const spaceRoleDropdownColumn = (onClickChangeRole) => {
         </DropdownMenu>
       )
     },
-    className: 'TracimTable__styles__flex__2 TracimTable__styles__overflow__visible',
+    className: settings.className, // '',
     filter: (data, userFilter, translate) => {
       const userRole = ROLE_LIST.find(type => type.slug === data.member.role) || { label: '' }
 

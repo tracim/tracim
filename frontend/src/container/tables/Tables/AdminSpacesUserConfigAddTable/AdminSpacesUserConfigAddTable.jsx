@@ -11,9 +11,19 @@ import {
 
 const AdminSpacesUserConfigAddTable = (props) => {
   const columns = [
-    spaceIdColumn(),
-    spaceNameColumn(props.t('Space'), props.t('Sort by title')),
-    spaceAddButtonColumn(props.onAddSpaceClick)
+    spaceIdColumn({
+      className: 'TracimTable__styles__flex__1'
+    }),
+
+    spaceNameColumn({
+      header: props.t('Space'),
+      tooltip: props.t('Sort by title'),
+      className: 'TracimTable__styles__flex__1'
+    }),
+
+    spaceAddButtonColumn({
+      className: 'TracimTable__styles__flex__1'
+    }, props.onAddSpaceClick)
   ]
 
   return (

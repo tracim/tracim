@@ -4,7 +4,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import { ROLE } from '../../helper.js'
 
 // TODO set in nested object
-const userRemoveButton = (userRoleIdInWorkspace, loggedUser, onClickRemoveMember) => {
+const userRemoveButton = (settings, userRoleIdInWorkspace, loggedUser, onClickRemoveMember) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => '',
@@ -22,7 +22,8 @@ const userRemoveButton = (userRoleIdInWorkspace, loggedUser, onClickRemoveMember
           )}
         </>
       )
-    }
+    },
+    className: settings.className
   })
 }
 

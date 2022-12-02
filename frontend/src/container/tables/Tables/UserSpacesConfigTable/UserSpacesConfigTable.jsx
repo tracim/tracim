@@ -13,14 +13,30 @@ import { translate } from 'react-i18next'
 
 const UserSpacesConfigTable = (props) => {
   const columns = [
-    spaceNameColumn(props.t('Space'), props.t('Sort by title')),
-    spaceUserRoleColumn(props.t('Role'), props.t('Sort by role'))
+    spaceNameColumn({
+      header: props.t('Space'),
+      tooltip: props.t('Sort by title'),
+      className: 'TracimTable__styles__flex__1'
+    }),
+
+    spaceUserRoleColumn({
+      header: props.t('Role'),
+      tooltip: props.t('Sort by role'),
+      className: 'TracimTable__styles__flex__1'
+    }),
+
+    spaceLeaveButtonColumn({
+      className: ' TracimTable__styles__flex__1'
+    }, props.onLeaveSpaceClick, props.admin, props.system, props.onlyManager)
   ]
 
   if (props.system.config.email_notification_activated) {
-    columns.push(spaceMailNotificationColumn(props.t('Email notifications'), props.system, props.onChangeSubscriptionNotif))
+    columns.splice(2, 0, spaceMailNotificationColumn({
+      header: props.t('Email notifications'),
+      tooltip: props.t('Email notifications'),
+      className: 'TracimTable__styles__flex__1'
+    }, props.system, props.onChangeSubscriptionNotif))
   }
-  columns.push(spaceLeaveButtonColumn(props.onLeaveSpaceClick, props.admin, props.system, props.onlyManager))
 
   return (
     <TracimTable

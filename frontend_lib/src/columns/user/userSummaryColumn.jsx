@@ -5,7 +5,7 @@ import { Avatar, AVATAR_SIZE } from '../../component/Avatar/Avatar.jsx'
 import ProfileNavigation from '../../component/ProfileNavigation/ProfileNavigation.jsx'
 
 // TODO set in nested object
-const userSummaryColumn = (roleList, apiUrl) => {
+const userSummaryColumn = (settings, roleList, apiUrl) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => '',
@@ -55,7 +55,7 @@ const userSummaryColumn = (roleList, apiUrl) => {
         </div>
       )
     },
-    className: 'TracimTable__styles__flex__1'
+    className: settings.className
   })
 }
 

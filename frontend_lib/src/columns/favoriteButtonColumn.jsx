@@ -2,11 +2,11 @@ import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import FavoriteButton, { FAVORITE_STATE } from '../component/Button/FavoriteButton.jsx'
 
-const favoriteButtonColumn = (header, onClick) => {
+const favoriteButtonColumn = (settings, onClick) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => (
-      <span>{header}</span>
+      <span>{settings.header}</span>
     ),
     id: 'favoriteButton',
     cell: props => (
@@ -17,7 +17,7 @@ const favoriteButtonColumn = (header, onClick) => {
         customClass='favorites__item__favoriteButton'
       />
     ),
-    className: 'TracimTable__styles__width__icon'
+    className: settings.className
   })
 }
 

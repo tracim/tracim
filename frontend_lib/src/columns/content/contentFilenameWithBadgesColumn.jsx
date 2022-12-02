@@ -6,24 +6,24 @@ import { SORT_BY } from '../../sortListHelper.js'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 import { FilenameWithBadges } from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
 
-const contentFilenameWithBadgesColumn = (header, tooltip) => {
+const contentFilenameWithBadgesColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: (props) => (
       <TitleListHeader
-        title={header}
+        title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
         customClass='favoriteTable__row__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
-        tootltip={tooltip}
+        tootltip={settings.tooltip}
       />
     ),
     id: 'title',
     cell: props => (
       <FilenameWithBadges file={props.getValue().content} />
     ),
-    className: 'TracimTable__styles__flex__4',
+    className: settings.className,
     filter: (data, userFilter) => {
       return stringIncludes(userFilter)(data.content.label)
     }

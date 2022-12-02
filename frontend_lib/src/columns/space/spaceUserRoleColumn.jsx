@@ -4,17 +4,17 @@ import { ROLE_LIST, stringIncludes } from '../../helper.js'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader'
 import { SORT_BY } from '../../sortListHelper'
 
-const spaceUserRoleColumn = (header, tooltip) => {
+const spaceUserRoleColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.member.role, {
     header: (props) => (
       <TitleListHeader
-        title={header}
+        title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.ROLE)}
         customClass='favoriteTable__row__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.ROLE}
-        tootltip={tooltip}
+        tootltip={settings.tooltip}
       />
     ),
     id: 'spaceUserRole',
@@ -32,7 +32,7 @@ const spaceUserRoleColumn = (header, tooltip) => {
         </div>
       )
     },
-    className: 'TracimTable__styles__flex__1',
+    className: settings.className,
     filter: (data, userFilter, translate) => {
       const userRole = ROLE_LIST.find(type => type.slug === data.member.role) || { label: '' }
 

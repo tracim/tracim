@@ -14,15 +14,32 @@ import {
 
 const AdminSpacesUserConfigLeaveTable = (props) => {
   const columns = [
-    spaceIdColumn(),
-    spaceNameColumn(props.t('Space'), props.t('Sort by title')),
-    spaceRoleDropdownColumn(props.onClickChangeRole)
+    spaceIdColumn({
+      className: 'TracimTable__styles__flex__1'
+    }),
+
+    spaceNameColumn({
+      header: props.t('Space'),
+      tooltip: props.t('Sort by title'),
+      className: 'TracimTable__styles__flex__1'
+    }),
+
+    spaceRoleDropdownColumn({
+      className: 'TracimTable__styles__flex__2 TracimTable__styles__overflow__visible'
+    }, props.onClickChangeRole),
+
+    spaceLeaveButtonColumn({
+        className: ' TracimTable__styles__flex__1'
+    }, props.onLeaveSpaceClick, true, props.system, props.onlyManager)
   ]
 
   if (props.system.config.email_notification_activated) {
-    columns.push(spaceMailNotificationColumn(props.t('Email notifications'), props.system, props.onChangeSubscriptionNotif))
+    columns.splice(2, 0, spaceMailNotificationColumn({
+      header: props.t('Email notif.'),
+      tooltip: props.t('Email notifications'),
+      className: 'TracimTable__styles__flex__1'
+    }, props.system, props.onChangeSubscriptionNotif))
   }
-  columns.push(spaceLeaveButtonColumn(props.onLeaveSpaceClick, true, props.system, props.onlyManager))
 
   return (
     <TracimTable
@@ -30,7 +47,6 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
       data={props.spaceList}
       emptyMessage={props.t('This user is not a member of any space yet')}
       filterable
-      noHeader
       colored
       filterPlaceholder={props.t('Filter spaces')}
     />
