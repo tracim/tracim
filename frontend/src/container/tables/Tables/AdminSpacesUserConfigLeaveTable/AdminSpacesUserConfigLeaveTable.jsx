@@ -1,50 +1,50 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
+
 import {
   TracimTable,
   spaceLeaveButtonColumn,
   spaceNameColumn,
-  spaceMailNotificationColumn,
-  spaceUserRoleColumn
+  spaceRoleDropdownColumn,
+  spaceIdColumn,
+  spaceMailNotificationColumn
 } from 'tracim_frontend_lib'
 
-import { connect } from 'react-redux'
-import { translate } from 'react-i18next'
-
-const UserSpacesConfigTable = (props) => {
+const AdminSpacesUserConfigLeaveTable = (props) => {
   const columns = [
+    spaceIdColumn(),
     spaceNameColumn(props.t('Space'), props.t('Sort by title')),
-    spaceUserRoleColumn(props.t('Role'), props.t('Sort by role'))
+    spaceRoleDropdownColumn(props.onClickChangeRole)
   ]
 
   if (props.system.config.email_notification_activated) {
     columns.push(spaceMailNotificationColumn(props.t('Email notifications'), props.system, props.onChangeSubscriptionNotif))
   }
-  columns.push(spaceLeaveButtonColumn(props.onLeaveSpaceClick, props.admin, props.system, props.onlyManager))
+  columns.push(spaceLeaveButtonColumn(props.onLeaveSpaceClick, true, props.system, props.onlyManager))
 
   return (
     <TracimTable
       columns={columns}
       data={props.spaceList}
-      emptyMessage={props.admin
-        ? props.t('This user is not a member of any space yet')
-        : props.t('You are not a member of any space yet')}
+      emptyMessage={props.t('This user is not a member of any space yet')}
       filterable
-      sortable
+      noHeader
       colored
       filterPlaceholder={props.t('Filter spaces')}
     />
   )
 }
 
-UserSpacesConfigTable.propsType = {
+AdminSpacesUserConfigLeaveTable.propsType = {
   spaceList: PropTypes.array.isRequired,
   onLeaveSpaceClick: PropTypes.func.isRequired,
   onChangeSubscriptionNotif: PropTypes.func.isRequired,
-  admin: PropTypes.bool.isRequired,
+  onClickChangeRole: PropTypes.func.isRequired,
   onlyManager: PropTypes.func.isRequired
 }
 
 const mapStateToProps = ({ system }) => ({ system })
 
-export default connect(mapStateToProps)(translate()(UserSpacesConfigTable))
+export default connect(mapStateToProps)(translate()(AdminSpacesUserConfigLeaveTable))
