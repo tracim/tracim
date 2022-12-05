@@ -6,6 +6,7 @@ import { SORT_BY } from '../../sortListHelper.js'
 import Breadcrumbs from '../../component/Breadcrumbs/Breadcrumbs.jsx'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 import { FilenameWithBadges } from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
+import Icon from '../../component/Icon/Icon.jsx'
 
 const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings) => {
   const columnHelper = createColumnHelper()
@@ -22,18 +23,34 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings) => {
     ),
     id: 'titleWithPath',
     cell: props => (
-      <div className='contentListItem__name_path'>
-        <FilenameWithBadges file={props.getValue().content} />
-        <Breadcrumbs
-          breadcrumbsList={props.getValue().breadcrumbs}
-          keepLastBreadcrumbAsLink
-        />
-      </div>
+      <>
+        {props.getValue().content ? (
+          <div className='contentListItem__name_path'>
+            <FilenameWithBadges file={props.getValue().content} />
+            <Breadcrumbs
+              breadcrumbsList={props.getValue().breadcrumbs}
+              keepLastBreadcrumbAsLink
+            />
+          </div>
+        ) : (
+          <div className='contentListItem__name_path unavailableContent__name_warning'>
+            {props.getValue().originalLabel}
+            <span className='unavailableContent__warning'>
+              <Icon
+                icon='fas fa-exclamation-triangle'
+                title={props.translate('Warning')}
+              />
+              &nbsp;
+              {props.translate('content is not available')}
+            </span>
+          </div>
+        )}
+      </>
     ),
     className: settings.className,
     filter: (data, userFilter) => {
       const includesFilter = stringIncludes(userFilter)
-      const hasFilterMatchOnContentLabel = includesFilter(data.content.label)
+      const hasFilterMatchOnContentLabel = includesFilter(data.content.label) || includesFilter(data.originalLabel)
       const hasFilterMatchOnBreadcrumbs = data.breadcrumbs.some(item => includesFilter(item.label))
 
       return hasFilterMatchOnContentLabel || hasFilterMatchOnBreadcrumbs

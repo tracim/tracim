@@ -8,7 +8,7 @@ import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.js
 
 const contentTypeColumn = (settings, contentType) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.content.type, {
+  return columnHelper.accessor(row => row, {
     header: (props) => (
       <TitleListHeader
         title={settings.header}
@@ -21,7 +21,7 @@ const contentTypeColumn = (settings, contentType) => {
     ),
     id: 'type',
     cell: props => {
-      const contentTypeInfo = contentType.find(info => info.slug === props.getValue())
+      const contentTypeInfo = contentType.find(info => info.slug === props.getValue().originalType)
       return (
         <ContentType
           contentTypeInfo={contentTypeInfo}
@@ -30,7 +30,7 @@ const contentTypeColumn = (settings, contentType) => {
     },
     className: settings.className,
     filter: (data, userFilter, translate) => {
-      const contentTypeInfo = contentType.find(info => info.slug === data.content.type)
+      const contentTypeInfo = contentType.find(info => info.slug === data.originalType)
       return contentTypeInfo && stringIncludes(userFilter)(translate(contentTypeInfo.label))
     }
   })

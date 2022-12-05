@@ -8,7 +8,7 @@ import Icon from '../../component/Icon/Icon.jsx'
 
 const contentInformationColumn = (settings, contentType) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.content, {
+  return columnHelper.accessor(row => row, {
     header: (props) => (
       <TitleListHeader
         title={settings.header}
@@ -21,9 +21,11 @@ const contentInformationColumn = (settings, contentType) => {
     ),
     id: 'information',
     cell: props => {
-      const contentTypeInfo = contentType.find(info => info.slug === props.getValue().type)
+      if (!props.getValue().content) return null
+
+      const contentTypeInfo = contentType.find(info => info.slug === props.getValue().content.type)
       const statusInfo = contentTypeInfo.availableStatuses.find(
-        s => s.slug === props.getValue().statusSlug
+        s => s.slug === props.getValue().content.statusSlug
       )
 
       return (
@@ -45,6 +47,8 @@ const contentInformationColumn = (settings, contentType) => {
     },
     className: settings.className,
     filter: (data, userFilter, translate) => {
+      if (!data.content) return false
+
       const contentTypeInfo = contentType.find(info => info.slug === data.content.type)
       const statusInfo = contentTypeInfo.availableStatuses.find(
         s => s.slug === data.content.statusSlug

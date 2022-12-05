@@ -23,18 +23,22 @@ const timedEventColumn = (settings) => {
       />
     ),
     id: 'lastModification',
-    cell: props => (
-      <TimedEvent
-        customClass='contentListItem__modification'
-        operation={getRevisionTypeLabel(props.getValue().currentRevisionType, props.translate)}
-        date={props.getValue().modified}
-        lang='fr'
-        author={props.getValue().lastModifier}
-      />
-    ),
+    cell: props => {
+      if (!props.getValue()) return null
+
+      return (
+        <TimedEvent
+          customClass='contentListItem__modification'
+          operation={getRevisionTypeLabel(props.getValue().currentRevisionType, props.translate)}
+          date={props.getValue().modified}
+          lang='fr'
+          author={props.getValue().lastModifier}
+        />
+      )
+    },
     className: settings.className,
     filter: (data, userFilter) => {
-      if (!data.content.lastModifier) return false
+      if (!data.content || !data.content.lastModifier) return false
       return stringIncludes(userFilter)(data.content.lastModifier.publicName)
     }
   })

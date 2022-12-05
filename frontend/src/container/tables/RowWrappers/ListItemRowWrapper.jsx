@@ -9,6 +9,10 @@ import {
 
 const ListItemRowWrapper = (props) => {
   const { content } = props
+  if (!content) return (
+    props.children
+  )
+
   const contentTypeInfo = props.contentType.find(info => info.slug === content.type)
   const contentAppUrl = PAGE.WORKSPACE.CONTENT(
     content.workspaceId,
@@ -37,6 +41,7 @@ const ListItemRowWrapper = (props) => {
 
 ListItemRowWrapper.propsType = {
   content: PropTypes.object.isRequired,
+  originalType: PropTypes.string.isRequired,
   isLast: PropTypes.bool,
   isFirst: PropTypes.bool,
   customClass: PropTypes.string,
