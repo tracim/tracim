@@ -83,8 +83,7 @@ export const SpaceDescription = (props) => {
                 <div className='dashboard__workspace__detail__description__missing'>
                   {props.t("This space doesn't have a description yet.")}
                 </div>
-              )
-            }
+              )}
             {!props.isReadOnlyMode && (
               <div className='workspace_advanced__description__bottom'>
                 <IconButton
@@ -96,8 +95,7 @@ export const SpaceDescription = (props) => {
               </div>
             )}
           </div>
-        )
-      }
+        )}
     </div>
   )
 }
@@ -105,13 +103,37 @@ export const SpaceDescription = (props) => {
 export default translate()(SpaceDescription)
 
 SpaceDescription.propTypes = {
+  apiUrl: PropTypes.string,
+  autoCompleteCursorPosition: PropTypes.number,
+  autoCompleteItemList: PropTypes.array,
   description: PropTypes.string,
+  isAutoCompleteActivated: PropTypes.bool,
+  isReadOnlyMode: PropTypes.bool,
   lang: PropTypes.string,
-  isReadOnlyMode: PropTypes.bool
+  onChangeDescription: PropTypes.func,
+  onClickAutoCompleteItem: PropTypes.func,
+  onClickValidateNewDescription: PropTypes.func,
+  onTinyMceInput: PropTypes.func,
+  onTinyMceKeyDown: PropTypes.func,
+  onTinyMceKeyUp: PropTypes.func,
+  onTinyMceSelectionChange: PropTypes.func,
+  textareaId: PropTypes.string
 }
 
 SpaceDescription.defaultProps = {
+  apiUrl: '/',
+  autoCompleteCursorPosition: 0,
+  autoCompleteItemList: [],
   description: '',
-  lang: '',
-  isReadOnlyMode: true
+  isAutoCompleteActivated: false,
+  isReadOnlyMode: true,
+  lang: 'en',
+  onChangeDescription: () => { },
+  onClickAutoCompleteItem: () => { },
+  onClickValidateNewDescription: () => { },
+  onTinyMceInput: () => { },
+  onTinyMceKeyDown: () => { },
+  onTinyMceKeyUp: () => { },
+  onTinyMceSelectionChange: () => { },
+  textareaId: 'spaceAdvancedTextAreaId'
 }

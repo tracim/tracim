@@ -53,14 +53,13 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
           apiUrl={props.apiUrl}
           autoCompleteCursorPosition={props.autoCompleteCursorPosition}
           autoCompleteItemList={props.autoCompleteItemList}
-          customColor={props.customColor}
           description={props.description}
           isAutoCompleteActivated={props.isAutoCompleteActivated}
           isReadOnlyMode={props.isReadOnlyMode}
           lang={props.lang}
           onChangeDescription={props.onChangeDescription}
-          onClickValidateNewDescription={props.onClickValidateNewDescription}
           onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+          onClickValidateNewDescription={props.onClickValidateNewDescription}
           onTinyMceInput={props.onTinyMceInput}
           onTinyMceKeyDown={props.onTinyMceKeyDown}
           onTinyMceKeyUp={props.onTinyMceKeyUp}
