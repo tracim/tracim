@@ -29,7 +29,7 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
     }, props.onClickChangeRole),
 
     spaceLeaveButtonColumn({
-        className: ' TracimTable__styles__flex__1'
+      className: ' TracimTable__styles__flex__1'
     }, props.onLeaveSpaceClick, true, props.system, props.onlyManager)
   ]
 

@@ -22,7 +22,7 @@ const spaceAddButtonColumn = (settings, onClick) => {
         />
       )
     },
-    className: settings.className,
+    className: settings.className
   })
 }
 
