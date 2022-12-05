@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { translate } from 'react-i18next'
 
 import {
   flexRender,
@@ -12,11 +13,10 @@ import {
   SORT_BY,
   SORT_ORDER,
   sortListBy
-} from '../../sortListHelper'
+} from '../../sortListHelper.js'
 
 import FilterBar from '../FilterBar/FilterBar.jsx'
 import EmptyListMessage from '../EmptyListMessage/EmptyListMessage.jsx'
-import { translate } from 'react-i18next'
 
 const DefaultWrapper = (props) => {
   return props.children

@@ -28,11 +28,12 @@ import {
   getFavoriteContentList,
   deleteContentFromFavoriteList
 } from '../action-creator.async.js'
+
 import {
   FETCH_CONFIG
 } from '../util/helper.js'
 
-import FavoritesTable from './tables/Tables/FavoriteTable/FavoritesTable'
+import FavoritesTable from './tables/Tables/FavoriteTable/FavoritesTable.jsx'
 
 export class Favorites extends React.Component {
   constructor (props) {

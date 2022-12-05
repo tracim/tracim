@@ -9,9 +9,7 @@ import {
 
 const ListItemRowWrapper = (props) => {
   const { content } = props
-  if (!content) return (
-    props.children
-  )
+  if (!content) return props.children
 
   const contentTypeInfo = props.contentType.find(info => info.slug === content.type)
   const contentAppUrl = PAGE.WORKSPACE.CONTENT(

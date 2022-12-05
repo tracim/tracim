@@ -1,3 +1,5 @@
+@import '~tracim_frontend_lib/src/css/Variable.styl'
+
 .favoriteTable__row
   color fontColor
   &:hover
@@ -5,13 +7,12 @@
   &__link
     z-index 1
     position absolute
-    // NOTE - 2022-11-30 - 75px is the 'listIconWidth' variable, variables are not working in calc
-    width calc(100% - 75px)
+    width (100% - listIconWidth)
     height 100%
   &__btn
     padding 0
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display flex
+    justify-content center
+    align-items: center
   &__btn:focus
     box-shadow none
