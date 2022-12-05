@@ -1,3 +1,10 @@
+# 4.4.3 / 2022-11-29
+
+### Fixed Issues
+
+- Frontend: [#6048](https://github.com/tracim/tracim/issues/6048)
+
+
 # 4.4.2 / 2022-11-04
 
 ### Fixed Issues
