@@ -13,7 +13,7 @@ const contentTypeColumn = (settings, contentType) => {
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.CONTENT_TYPE)}
-        customClass='favoriteTable__row__btn'
+        customClass='TracimTable__header__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.CONTENT_TYPE}
         tootltip={settings.tooltip}

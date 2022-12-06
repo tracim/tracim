@@ -2,11 +2,22 @@ import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { ROLE_LIST, stringIncludes } from '../../helper.js'
 import DropdownMenu from '../../component/DropdownMenu/DropdownMenu'
+import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader'
+import { SORT_BY } from '../../sortListHelper'
 
 const spaceRoleDropdownColumn = (settings, onClickChangeRole) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
-    header: () => '',
+    header: (props) => (
+      <TitleListHeader
+        title={settings.header}
+        onClickTitle={() => props.onClickTitle(SORT_BY.ROLE)}
+        customClass='TracimTable__header__btn'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.ROLE}
+        tootltip={settings.tooltip}
+      />
+    ),
     id: 'spaceLeaveButtonColumn',
     cell: props => {
       const memberRole = ROLE_LIST.find(r => r.slug === props.getValue().member.role)

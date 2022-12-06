@@ -15,16 +15,20 @@ import {
 const AdminSpacesUserConfigLeaveTable = (props) => {
   const columns = [
     spaceIdColumn({
+      header: props.t('ID'),
+      tooltip: props.t('Sort by ID'),
       className: 'TracimTable__styles__flex__1'
     }),
 
     spaceNameColumn({
       header: props.t('Space'),
-      tooltip: props.t('Sort by title'),
+      tooltip: props.t('Sort by name'),
       className: 'TracimTable__styles__flex__1'
     }),
 
     spaceRoleDropdownColumn({
+      header: props.t('Role'),
+      tooltip: props.t('Sort by role'),
       className: 'TracimTable__styles__flex__2 TracimTable__styles__overflow__visible'
     }, props.onClickChangeRole),
 
@@ -47,6 +51,7 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
       data={props.spaceList}
       emptyMessage={props.t('This user is not a member of any space yet')}
       filterable
+      sortable
       colored
       filterPlaceholder={props.t('Filter spaces')}
     />

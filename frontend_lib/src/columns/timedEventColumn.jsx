@@ -16,7 +16,7 @@ const timedEventColumn = (settings) => {
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
-        customClass='favoriteTable__row__btn'
+        customClass='TracimTable__header__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
         tootltip={settings.tooltip}

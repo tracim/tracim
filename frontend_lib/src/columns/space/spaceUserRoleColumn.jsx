@@ -11,7 +11,7 @@ const spaceUserRoleColumn = (settings) => {
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.ROLE)}
-        customClass='favoriteTable__row__btn'
+        customClass='TracimTable__header__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.ROLE}
         tootltip={settings.tooltip}

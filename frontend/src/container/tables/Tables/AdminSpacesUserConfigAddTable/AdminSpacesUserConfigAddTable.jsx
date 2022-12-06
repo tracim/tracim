@@ -12,12 +12,14 @@ import {
 const AdminSpacesUserConfigAddTable = (props) => {
   const columns = [
     spaceIdColumn({
+      header: props.t('ID'),
+      tooltip: props.t('Sort by Id'),
       className: 'TracimTable__styles__flex__1'
     }),
 
     spaceNameColumn({
       header: props.t('Space'),
-      tooltip: props.t('Sort by title'),
+      tooltip: props.t('Sort by name'),
       className: 'TracimTable__styles__flex__1'
     }),
 
@@ -32,7 +34,7 @@ const AdminSpacesUserConfigAddTable = (props) => {
       data={props.spaceList}
       emptyMessage={props.t('This user is not a member of any space yet')}
       filterable
-      noHeader
+      sortable
       colored
       filterPlaceholder={props.t('Filter spaces')}
     />
