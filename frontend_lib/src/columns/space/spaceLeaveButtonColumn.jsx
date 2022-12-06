@@ -4,11 +4,11 @@ import IconButton from '../../component/Button/IconButton.jsx'
 
 const spaceLeaveButtonColumn = (settings, onClick, admin, system, onlyManager) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.display({
     header: () => '',
     id: 'leaveButton',
     cell: props => {
-      const isOnlyManager = onlyManager(props.getValue().member, props.getValue().memberList)
+      const isOnlyManager = onlyManager(props.row.original.member, props.row.original.memberList)
       return (
         <IconButton
           dataCy='spaceconfig__remove_from_space'
@@ -17,7 +17,7 @@ const spaceLeaveButtonColumn = (settings, onClick, admin, system, onlyManager) =
           intent='secondary'
           iconColor='red'
           disabled={isOnlyManager}
-          onClick={(() => onClick(props.getValue().id))}
+          onClick={(() => onClick(props.row.original.id))}
           icon='fas fa-sign-out-alt'
           text={admin ? props.translate('Remove from space') : props.translate('Leave space')}
           title={

@@ -29,7 +29,7 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
     spaceRoleDropdownColumn({
       header: props.t('Role'),
       tooltip: props.t('Sort by role'),
-      className: 'TracimTable__styles__flex__2 TracimTable__styles__overflow__visible'
+      className: 'TracimTable__styles__flex__2'
     }, props.onClickChangeRole),
 
     spaceLeaveButtonColumn({

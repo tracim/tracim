@@ -4,7 +4,7 @@ import IconButton from '../../component/Button/IconButton'
 
 const spaceAddButtonColumn = (settings, onClick) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.display({
     header: () => '',
     id: 'addButton',
     cell: props => {
@@ -15,7 +15,7 @@ const spaceAddButtonColumn = (settings, onClick) => {
           mode='dark'
           intent='secondary'
           iconColor='green'
-          onClick={(() => onClick(props.getValue()))}
+          onClick={(() => onClick(props.row.original))}
           icon='fas fa-sign-in-alt'
           text={props.translate('Add to space')}
           title={props.translate('Add to space')}

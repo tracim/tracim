@@ -4,7 +4,7 @@ import FavoriteButton, { FAVORITE_STATE } from '../component/Button/FavoriteButt
 
 const favoriteButtonColumn = (settings, onClick) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.display({
     header: () => (
       <span>{settings.header}</span>
     ),
@@ -12,7 +12,7 @@ const favoriteButtonColumn = (settings, onClick) => {
     cell: props => (
       <FavoriteButton
         favoriteState={FAVORITE_STATE.FAVORITE}
-        onClickRemoveFromFavoriteList={() => onClick(props.getValue())}
+        onClickRemoveFromFavoriteList={() => onClick(props.row.original)}
         onClickAddToFavoriteList={() => { }}
         customClass='favorites__item__favoriteButton'
       />
