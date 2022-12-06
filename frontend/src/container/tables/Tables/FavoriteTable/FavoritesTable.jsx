@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
-import ListItemRowWrapper from '../../RowWrappers/ListItemRowWrapper.jsx'
-
 import {
   TracimTable,
+  ListItemRowWrapper,
   contentTypeColumn,
   contentFilenameWithBadgesAndBreadcrumbsColumn,
   contentInformationColumn,
@@ -15,48 +14,6 @@ import {
 } from 'tracim_frontend_lib'
 
 require('./FavoriteTable.styl')
-
-//  TODO: Manage Unavailable content
-
-//         <UnavailableContent
-//           contentTypeInfo={contentTypeInfo}
-//           label={favorite.originalLabel}
-//           key={favorite.contentId}
-//           isLast={isLast}
-//           isFirst={isFirst}
-//         >
-//           {favoriteButton}
-//         </UnavailableContent>
-
-// const UnavailableContent = translate()(props => {
-//   return (
-//     <ListItemWrapper
-//       label={props.label}
-//       read
-//       contentType={props.contentTypeInfo}
-//       isLast={props.isLast}
-//       isFirst={props.isFirst}
-//       customClass='unavailableContent contentListItem'
-//     >
-//       <ContentType
-//         contentTypeInfo={props.contentTypeInfo}
-//         customClass='contentListItem__type'
-//       />
-//       <div className='contentListItem__name_path unavailableContent__name_warning'>
-//         {props.label}
-//         <span className='unavailableContent__warning'>
-//           <Icon
-//             icon='fas fa-exclamation-triangle'
-//             title={props.t('Warning')}
-//           />
-//           &nbsp;
-//           {props.t('content is not available')}
-//         </span>
-//       </div>
-//       {props.children}
-//     </ListItemWrapper>
-//   )
-// })
 
 const FavoritesTable = (props) => {
   const columns = [
@@ -95,7 +52,7 @@ const FavoritesTable = (props) => {
       columns={columns}
       data={props.favoriteList}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
-      rowWrapperProps={{ customClass: 'favoriteTable__row' }}
+      rowWrapperProps={{ customClass: 'favoriteTable__row', contentType: props.contentType}}
       rowWrapper={ListItemRowWrapper}
       sortable
       filterable

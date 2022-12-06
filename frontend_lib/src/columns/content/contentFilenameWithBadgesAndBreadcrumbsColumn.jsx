@@ -34,7 +34,7 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings) => {
           </div>
         ) : (
           <div className='contentListItem__name_path unavailableContent__name_warning'>
-            {props.getValue().originalLabel}
+            <span> {props.getValue().originalLabel}</span>
             <span className='unavailableContent__warning'>
               <Icon
                 icon='fas fa-exclamation-triangle'
@@ -50,8 +50,8 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings) => {
     className: settings.className,
     filter: (data, userFilter) => {
       const includesFilter = stringIncludes(userFilter)
-      const hasFilterMatchOnContentLabel = includesFilter(data.content.label) || includesFilter(data.originalLabel)
-      const hasFilterMatchOnBreadcrumbs = data.breadcrumbs.some(item => includesFilter(item.label))
+      const hasFilterMatchOnContentLabel = includesFilter(data.originalLabel)
+      const hasFilterMatchOnBreadcrumbs = data.breadcrumbs && data.breadcrumbs.some(item => includesFilter(item.label))
 
       return hasFilterMatchOnContentLabel || hasFilterMatchOnBreadcrumbs
     }

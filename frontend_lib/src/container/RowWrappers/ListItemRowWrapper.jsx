@@ -1,26 +1,21 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import {
-  ListItemWrapper,
-  PAGE
-} from 'tracim_frontend_lib'
+
+import { PAGE } from '../../helper.js'
+import ListItemWrapper from '../../component/Lists/ListItemWrapper/ListItemWrapper.jsx'
 
 const ListItemRowWrapper = (props) => {
-  const { content } = props
-  if (!content) return props.children
-
-  const contentTypeInfo = props.contentType.find(info => info.slug === content.type)
-  const contentAppUrl = PAGE.WORKSPACE.CONTENT(
-    content.workspaceId,
+  const contentTypeInfo = props.contentType.find(info => info.slug === props.originalType)
+  const contentAppUrl = props.content ? PAGE.WORKSPACE.CONTENT(
+    props.content.workspaceId,
     contentTypeInfo.slug,
-    content.id
-  )
+    props.content.id
+  ) : undefined
 
   return (
     <ListItemWrapper
-      label={content.label}
+      label={props.originalLabel}
       read
       contentType={contentTypeInfo}
       isLast={props.isLast}
@@ -28,10 +23,12 @@ const ListItemRowWrapper = (props) => {
       customClass={props.customClass}
       dataCy={props.dataCy}
     >
-      <Link
-        to={contentAppUrl}
-        className={`${props.customClass}__link`}
-      />
+      {contentAppUrl && (
+        <Link
+          to={contentAppUrl}
+          className={`${props.customClass}__link`}
+        />
+      )}
       {props.children}
     </ListItemWrapper>
   )
@@ -40,6 +37,8 @@ const ListItemRowWrapper = (props) => {
 ListItemRowWrapper.propsType = {
   content: PropTypes.object.isRequired,
   originalType: PropTypes.string.isRequired,
+  originalLabel: PropTypes.string.isRequired,
+  contentType: PropTypes.string.isRequired,
   isLast: PropTypes.bool,
   isFirst: PropTypes.bool,
   customClass: PropTypes.string,
@@ -53,6 +52,4 @@ ListItemRowWrapper.defaultProps = {
   dataCy: null
 }
 
-const mapStateToProps = ({ contentType }) => ({ contentType })
-
-export default connect(mapStateToProps)(ListItemRowWrapper)
+export default ListItemRowWrapper

@@ -306,6 +306,8 @@ export { default as COLORS } from './colors.js'
 
 export { default as TracimTable } from './component/TracimTable/TracimTable.jsx'
 
+export { default as ListItemRowWrapper } from './container/RowWrappers/ListItemRowWrapper.jsx'
+
 export { default as spaceNameColumn } from './columns/space/spaceNameColumn.jsx'
 export { default as spaceUserRoleColumn } from './columns/space/spaceUserRoleColumn.jsx'
 export { default as spaceRoleDropdownColumn } from './columns/space/spaceRoleDropdownColumn.jsx'
