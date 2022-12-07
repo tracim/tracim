@@ -35,6 +35,7 @@ describe('<UserSpacesConfig />', () => {
 
   const memberManager1 = {
     user_id: 0,
+    id: 0,
     role: ROLE.workspaceManager.slug,
     doNotify: true,
     publicName: 'publicname_01',
@@ -42,6 +43,7 @@ describe('<UserSpacesConfig />', () => {
   }
   const memberNotManager = {
     user_id: 1,
+    id: 1,
     role: ROLE.contributor.slug,
     doNotify: true,
     publicName: 'publicname_02',
@@ -49,6 +51,7 @@ describe('<UserSpacesConfig />', () => {
   }
   const memberManager2 = {
     user_id: 2,
+    id: 2,
     role: ROLE.workspaceManager.slug,
     doNotify: true,
     publicName: 'publicname_03',
@@ -74,17 +77,17 @@ describe('<UserSpacesConfig />', () => {
 
   describe('onlyManager', () => {
     it('should return false if the member is not manager', () => {
-      const result = onlyManager(memberNotManager.user_id, memberNotManager, [])
+      const result = onlyManager(memberNotManager, [])
       expect(result).to.equal(false)
     })
 
     it('should return true if the member is the only manager', () => {
-      const result = onlyManager(props.userToEditId, memberManager1, memberListOneManager)
+      const result = onlyManager(memberManager1, memberListOneManager)
       expect(result).to.equal(true)
     })
 
     it('should return false if the member is not the only manager', () => {
-      const result = onlyManager(props.userToEditId, memberManager1, memberListTwoManagers)
+      const result = onlyManager(memberManager1, memberListTwoManagers)
       expect(result).to.equal(false)
     })
   })
