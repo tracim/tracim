@@ -8,8 +8,7 @@ The `TracimTable` manages the rendering, filtering, and sorting of your data.
 
 ###  How to create a new table
 
-A table is somewhat like a container of the `TracimTable` component, it manages which data and columns should be rendered.
-Along with multiple optional parameters that can be tweaked through the props.
+A table is somewhat like a container of the `TracimTable` component, it manages which data and columns should be rendered, along with multiple optional parameters that can be tweaked through the props.
 
 ---
 
@@ -29,7 +28,7 @@ myTable.propsType = {
 
 #### Step 2
 
-Then set the displayed columns in an array, note that the columns will be displayed in the order of the array, left to right.
+Set the displayed columns in an array, note that the columns will be displayed in the order of the array, left to right.
 
 ```javascript
 const myTable = (props) => {
@@ -44,9 +43,9 @@ myTable.propsType = {
 }
 ```
 
-(Assuming the use of pre-defined columns, to create a column, we will cover this in the [columns section](#Columns))
+(Assuming the use of pre-defined columns. We will cover the creation of columns below, in the [columns section](#Columns))
 
-(Settings and additional data can be passed to columns, we will see this in the [columns section](#Columns))
+(Settings and additional data can be passed to columns. We will cover this in the [columns section](#Columns))
 
 ---
 
@@ -74,7 +73,7 @@ myTable.propsType = {
 }
 ```
 
-(Additional props can be passed to `TracimTable`, we will see this in the [table props section](#props))
+(Additional props can be passed to `TracimTable`. We will see these in the [table props section](#props))
 
 Now the `TracimTable` will automatically render the column headers, and a row per entry in the data array.
 
@@ -106,7 +105,7 @@ A column is a core element of the `TracimTable`, it is the only way to render th
 
 The column is similar to a React Component, but it is not. A column needs to be stored in `frontend_lib/src/columns`
 
-A column should be designed to be reusable in different tables! (As long as the input data matches the expected format)
+A column should be designed to be reusable in different tables. (As long as the input data matches the expected format)
 
 ### How to create a new column
 
@@ -123,7 +122,7 @@ For this example we will use the following data format:
 
 #### Step 1
 
-You first have to create your column function and set it to receive a mandatory argument: `settings`. 
+Create your column function and set it to receive a mandatory argument: `settings`.
 
 ```javascript
 const myColumn = (settings) => {}
@@ -141,7 +140,7 @@ Additional arguments can be added after settings.
 
 #### Step 2
 
-Create its columnHelper with the imported function.
+Create its columnHelper with the relevant imported function.
 
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
@@ -178,16 +177,16 @@ const myColumn = (settings) => {
 }
 ```
 
-The `row => row` accessor function let you choose which data will be passed to the cell. If I wanted to only use the `age` field,
-I'd have to set the accessor function to `row => row.age`. Setting it to `row => row` gives you access to the whole object.
+The `row => row` accessor function is used to choose which data will be passed to the cell. If I wanted to only use the `age` field,
+I'd have to set the accessor function to `row => row.age`. Setting it to `row => row` gives access to the whole object.
 
-An additional field: `filter` can be added, we'll cover this later.
+An additional field: `filter` can be added, we'll cover it later.
 
 ---
 
 #### Step 4
 
-For now the column renders an empty header and cell. It's time to define a proper header!
+For now the column renders an empty header and cell. It's time to define a proper header.
 
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
@@ -205,7 +204,7 @@ const myColumn = (settings) => {
 }
 ```
 
-`header` is similar to a React Function Component, it's a function that has to return `HTML`.
+`header` is similar to a React Function Component, it's a function that has to return `HTML` code.
 
 ---
 
@@ -244,9 +243,9 @@ Note that `header` has props. These are the props passed by `TracimTable`.
 
 #### Step 5
 
-Now let's define how our cell will be rendered.
+Now Define how the cell will be rendered.
 
-The row's data is accessible through `props.getValue()`, which returns what you defined in the accessor function.
+The row's data is accessible through `props.getValue()`, which returns what is defined in the accessor function.
 
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
@@ -320,7 +319,7 @@ const myColumn = (settings) => {
 
 If the `filter` function is not defined, the column will be excluded from the `TracimTable` filtering algorithm.
 
-And you have now a complete column, it's filterable, sortable, has a header and a cell, you can now use it in your tables!
+Here is a complete column. It's filterable, sortable, has a header and a cell and can now be used it in tables!
 
 
 ## Example
