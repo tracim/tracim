@@ -52,7 +52,11 @@ const FavoritesTable = (props) => {
       columns={columns}
       data={props.favoriteList}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
-      rowWrapperProps={{ customClass: 'favoriteTable__row', contentType: props.contentType }}
+      rowWrapperProps={{
+        customClass: 'favoriteTable__row',
+        contentType: props.contentType,
+        dataCy: 'favorites__item'
+      }}
       rowWrapper={ListItemRowWrapper}
       sortable
       filterable
