@@ -931,7 +931,10 @@ export const handleClickCopyLink = (contentId) => {
 // Useful when you have to test if a single string is included in multiple others
 // Usage: const fn = stringIncludes('bc'); fn('abcd') -> Outputs: true
 export const stringIncludes = (a) => {
-  return (b) => b && b.toUpperCase().includes(a.toUpperCase())
+  return (b) => {
+    if (!a || !b) return false
+    return b.toUpperCase().includes(a.toUpperCase())
+  }
 }
 
 export const getRevisionTypeLabel = (revisionType, t) => {
