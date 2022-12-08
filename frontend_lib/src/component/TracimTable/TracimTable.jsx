@@ -103,7 +103,7 @@ const TracimTable = (props) => {
                 ))}
               </div>
             )}
-            <div className={`TracimTable__body ${props.colored ? 'TracimTable__body__colored' : ''}`}>
+            <div className={`TracimTable__body ${props.colored ? 'tracimTable__body__colored' : ''}`}>
               {table.getRowModel().rows.map(row => (
                 <RowWrapper key={`${row.id}-wrapper`} {...row.original} {...props.rowWrapperProps}>
                   <div

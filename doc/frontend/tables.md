@@ -397,7 +397,7 @@ const timedEventColumn = (settings) => {
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
-        customClass='TracimTable__header__btn'
+        customClass='tracimTable__header__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
         tootltip={settings.tooltip}
@@ -453,30 +453,30 @@ const FavoritesTable = (props) => {
     contentTypeColumn({
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
-      className: 'TracimTable__styles__width__icon'
+      className: 'tracimTable__styles__width__icon'
     }, props.contentType),
 
     contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
-      className: 'TracimTable__styles__flex__4'
+      className: 'tracimTable__styles__flex__4'
     }),
 
     timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
-      className: 'TracimTable__styles__flex__2  TracimTable__hide__md'
+      className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
     }),
 
     contentInformationColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
-      className: 'TracimTable__styles__flex__2 TracimTable__hide__md'
+      className: 'tracimTable__styles__flex__2 tracimTable__hide__md'
     }, props.contentType),
 
     favoriteButtonColumn({
       header: props.t('Favorite'),
-      className: 'TracimTable__styles__width__icon'
+      className: 'tracimTable__styles__width__icon'
     }, props.onFavoriteButtonClick)
   ]
 

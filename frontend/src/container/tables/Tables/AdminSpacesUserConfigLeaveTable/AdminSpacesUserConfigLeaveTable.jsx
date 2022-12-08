@@ -17,23 +17,23 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
     spaceIdColumn({
       header: props.t('ID'),
       tooltip: props.t('Sort by ID'),
-      className: 'TracimTable__styles__flex__1'
+      className: 'tracimTable__styles__flex__1'
     }),
 
     spaceNameColumn({
       header: props.t('Space'),
       tooltip: props.t('Sort by name'),
-      className: 'TracimTable__styles__flex__1'
+      className: 'tracimTable__styles__flex__1'
     }),
 
     spaceRoleDropdownColumn({
       header: props.t('Role'),
       tooltip: props.t('Sort by role'),
-      className: 'TracimTable__styles__flex__2'
+      className: 'tracimTable__styles__flex__2'
     }, props.onClickChangeRole),
 
     spaceLeaveButtonColumn({
-      className: 'TracimTable__styles__flex__1'
+      className: 'tracimTable__styles__flex__1'
     }, props.onLeaveSpaceClick, true, props.system, props.onlyManager)
   ]
 
@@ -41,7 +41,7 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
     columns.splice(2, 0, spaceMailNotificationColumn({
       header: props.t('Email notif.'),
       tooltip: props.t('Email notifications'),
-      className: 'TracimTable__styles__flex__1'
+      className: 'tracimTable__styles__flex__1'
     }, props.system, props.onChangeSubscriptionNotif))
   }
 

@@ -14,17 +14,17 @@ const AdminSpacesUserConfigAddTable = (props) => {
     spaceIdColumn({
       header: props.t('ID'),
       tooltip: props.t('Sort by Id'),
-      className: 'TracimTable__styles__flex__1'
+      className: 'tracimTable__styles__flex__1'
     }),
 
     spaceNameColumn({
       header: props.t('Space'),
       tooltip: props.t('Sort by name'),
-      className: 'TracimTable__styles__flex__1'
+      className: 'tracimTable__styles__flex__1'
     }),
 
     spaceAddButtonColumn({
-      className: 'TracimTable__styles__flex__1'
+      className: 'tracimTable__styles__flex__1'
     }, props.onAddSpaceClick)
   ]
 

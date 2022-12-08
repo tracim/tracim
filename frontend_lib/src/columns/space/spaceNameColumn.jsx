@@ -11,7 +11,7 @@ const spaceNameColumn = (settings) => {
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
-        customClass='TracimTable__header__btn'
+        customClass='tracimTable__header__btn'
         isOrderAscending={props.isOrderAscending}
         isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
         tootltip={settings.tooltip}
