@@ -59,7 +59,7 @@ const TracimTable = (props) => {
   const RowWrapper = props.rowWrapper
 
   return (
-    <div className='TracimTable'>
+    <div className='tracimTable'>
       {props.filterable && (
         <FilterBar
           onChange={e => {
@@ -75,15 +75,15 @@ const TracimTable = (props) => {
         ? (
           <>
             {!props.noHeader && (
-              <div className='TracimTable__header'>
+              <div className='tracimTable__header'>
                 {table.getHeaderGroups().map(headerGroup => (
                   <div
-                    className='TracimTable__header__row'
+                    className='tracimTable__header__row'
                     key={headerGroup.id}
                   >
                     {headerGroup.headers.map(header => (
                       <div
-                        className={`TracimTable__header__row__cell ${header.column.columnDef.className}`}
+                        className={`tracimTable__header__row__cell ${header.column.columnDef.className}`}
                         key={header.id}
                       >
                         {header.isPlaceholder
@@ -103,16 +103,16 @@ const TracimTable = (props) => {
                 ))}
               </div>
             )}
-            <div className={`TracimTable__body ${props.colored ? 'tracimTable__body__colored' : ''}`}>
+            <div className={`tracimTable__body ${props.colored ? 'tracimTable__body__colored' : ''}`}>
               {table.getRowModel().rows.map(row => (
                 <RowWrapper key={`${row.id}-wrapper`} {...row.original} {...props.rowWrapperProps}>
                   <div
-                    className={`TracimTable__body__row ${props.customRowClass}`}
+                    className={`tracimTable__body__row ${props.customRowClass}`}
                     key={row.id}
                   >
                     {row.getVisibleCells().map(cell => (
                       <div
-                        className={`TracimTable__body__row__cell ${cell.column.columnDef.className}`}
+                        className={`tracimTable__body__row__cell ${cell.column.columnDef.className}`}
                         key={cell.id}
                       >
                         {flexRender(
