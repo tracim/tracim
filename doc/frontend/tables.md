@@ -161,7 +161,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 const myColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
@@ -198,7 +198,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 const myColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
@@ -238,7 +238,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 const myColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
@@ -304,7 +304,7 @@ Set the displayed columns in an array, note that the columns will be displayed
 in the order of the array, left to right.
 
 ```javascript
-const myTable = (props) => {
+const myTable = props => {
   const columns = [
     column1(),
     column2()
@@ -393,7 +393,7 @@ import TitleListHeader from '../component/Lists/ListHeader/TitleListHeader.jsx'
 const timedEventColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.content, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}

@@ -7,7 +7,7 @@ import { stringIncludes } from '../../helper'
 const spaceNameColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.label, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}

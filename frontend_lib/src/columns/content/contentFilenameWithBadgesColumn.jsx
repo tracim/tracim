@@ -9,7 +9,7 @@ import { FilenameWithBadges } from '../../component/FilenameWithBadges/FilenameW
 const contentFilenameWithBadgesColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}

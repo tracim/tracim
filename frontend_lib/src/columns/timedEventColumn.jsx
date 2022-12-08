@@ -13,7 +13,7 @@ import TitleListHeader from '../component/Lists/ListHeader/TitleListHeader.jsx'
 const timedEventColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.content, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}

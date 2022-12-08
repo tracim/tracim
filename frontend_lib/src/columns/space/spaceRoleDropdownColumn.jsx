@@ -8,7 +8,7 @@ import { SORT_BY } from '../../sortListHelper'
 const spaceRoleDropdownColumn = (settings, onClickChangeRole) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
-    header: (props) => (
+    header: props => (
       <TitleListHeader
         title={settings.header}
         onClickTitle={() => props.onClickTitle(SORT_BY.ROLE)}
