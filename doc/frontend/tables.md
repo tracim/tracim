@@ -287,12 +287,14 @@ that can be tweaked through the props.
 #### Step 1
 
 A table will usually get its data, an array of similarly formatted data, from its props.
+It will also need the "user" props, usually passed by redux.
 
 ```javascript
 const myTable = (props) => {}
 
 myTable.propsType = {
-  myData: PropTypes.array.isRequired
+  myData: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired
 }
 ```
 
@@ -312,7 +314,8 @@ const myTable = props => {
 }
 
 myTable.propsType = {
-  myData: PropTypes.array.isRequired
+  myData: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired
 }
 ```
 
@@ -320,7 +323,7 @@ myTable.propsType = {
 
 #### Step 3
 
-Finally, render the `TracimTable` component with the data and columns props:
+Finally, render the `TracimTable` component with the data, columns and user props:
 
 ```javascript
 const myTable = (props) => {
@@ -333,12 +336,14 @@ const myTable = (props) => {
     <TracimTable
       data={props.myData}
       columns={columns}
+      user={props.user}
     />
   )
 }
 
 myTable.propsType = {
-  myData: PropTypes.array.isRequired
+  myData: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired
 }
 ```
 
@@ -484,6 +489,7 @@ const FavoritesTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.favoriteList}
+      user={props.user}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
       rowWrapperProps={{ customClass: 'favoriteTable__row', contentType: props.contentType }}
       rowWrapper={ListItemRowWrapper}
@@ -496,10 +502,11 @@ const FavoritesTable = (props) => {
 
 FavoritesTable.propsType = {
   favoriteList: PropTypes.array.isRequired,
-  onFavoriteButtonClick: PropTypes.func.isRequired
+  onFavoriteButtonClick: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired
 }
 
-const mapStateToProps = ({ contentType }) => ({ contentType })
+const mapStateToProps = ({ contentType, user }) => ({ contentType, user })
 
 export default connect(mapStateToProps)(translate()(FavoritesTable))
 ```

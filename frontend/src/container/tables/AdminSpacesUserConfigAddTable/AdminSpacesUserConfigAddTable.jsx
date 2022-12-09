@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import { connect } from 'react-redux'
 
 import {
   TracimTable,
@@ -32,6 +33,7 @@ const AdminSpacesUserConfigAddTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.spaceList}
+      user={props.user}
       emptyMessage={props.t('This user is not a member of any space yet')}
       filterable
       sortable
@@ -43,7 +45,9 @@ const AdminSpacesUserConfigAddTable = (props) => {
 
 AdminSpacesUserConfigAddTable.propsType = {
   spaceList: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
   onAddSpaceClick: PropTypes.func.isRequired
 }
+const mapStateToProps = ({ user }) => ({ user })
 
-export default translate()(AdminSpacesUserConfigAddTable)
+export default connect(mapStateToProps)(translate()(AdminSpacesUserConfigAddTable))

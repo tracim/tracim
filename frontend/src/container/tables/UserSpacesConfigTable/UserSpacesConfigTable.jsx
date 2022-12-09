@@ -54,6 +54,7 @@ const UserSpacesConfigTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.spaceList}
+      user={props.user}
       emptyMessage={props.admin
         ? props.t('This user is not a member of any space yet')
         : props.t('You are not a member of any space yet')}
@@ -67,12 +68,13 @@ const UserSpacesConfigTable = (props) => {
 
 UserSpacesConfigTable.propsType = {
   spaceList: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
   onLeaveSpaceClick: PropTypes.func.isRequired,
   onChangeSubscriptionNotif: PropTypes.func.isRequired,
   admin: PropTypes.bool.isRequired,
   onlyManager: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ system }) => ({ system })
+const mapStateToProps = ({ system, user }) => ({ system, user })
 
 export default connect(mapStateToProps)(translate()(UserSpacesConfigTable))

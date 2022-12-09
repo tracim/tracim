@@ -54,6 +54,7 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.spaceList}
+      user={props.user}
       emptyMessage={props.t('This user is not a member of any space yet')}
       filterable
       sortable
@@ -65,12 +66,13 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
 
 AdminSpacesUserConfigLeaveTable.propsType = {
   spaceList: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
   onLeaveSpaceClick: PropTypes.func.isRequired,
   onChangeSubscriptionNotif: PropTypes.func.isRequired,
   onClickChangeRole: PropTypes.func.isRequired,
   onlyManager: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ system }) => ({ system })
+const mapStateToProps = ({ system, user }) => ({ system, user })
 
 export default connect(mapStateToProps)(translate()(AdminSpacesUserConfigLeaveTable))

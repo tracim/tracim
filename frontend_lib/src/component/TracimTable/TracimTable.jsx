@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
 import {
@@ -171,6 +170,4 @@ TracimTable.defaultProps = {
   defaultSort: SORT_BY.LABEL
 }
 
-const mapStateToProps = ({ user }) => ({ user })
-
-export default connect(mapStateToProps)(translate()(TracimTable))
+export default translate()(TracimTable)

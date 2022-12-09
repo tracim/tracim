@@ -51,6 +51,7 @@ const FavoritesTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.favoriteList}
+      user={props.user}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
       rowWrapperProps={{
         customClass: 'favoriteTable__row',
@@ -67,9 +68,10 @@ const FavoritesTable = (props) => {
 
 FavoritesTable.propsType = {
   favoriteList: PropTypes.array.isRequired,
+  user: PropTypes.object.isRequired,
   onFavoriteButtonClick: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ contentType }) => ({ contentType })
+const mapStateToProps = ({ contentType, user }) => ({ contentType, user })
 
 export default connect(mapStateToProps)(translate()(FavoritesTable))
