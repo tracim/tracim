@@ -7,12 +7,18 @@ import {
   TracimTable,
   spaceLeaveButtonColumn,
   spaceRoleDropdownColumn,
-  spaceMailNotificationColumn,
+  toggleButtonColumn,
   spanColumn,
   SORT_BY
 } from 'tracim_frontend_lib'
 
 const AdminSpacesUserConfigLeaveTable = (props) => {
+  const isMailChecked = (data) => data.member.doNotify
+
+  const onMailChange = (e, data) => {
+    props.onChangeSubscriptionNotif(data.id, !data.member.doNotify)
+  }
+
   const columns = [
     spanColumn({
       header: props.t('ID'),
@@ -38,11 +44,11 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
   ]
 
   if (props.system.config.email_notification_activated) {
-    columns.splice(2, 0, spaceMailNotificationColumn({
+    columns.splice(2, 0, toggleButtonColumn({
       header: props.t('Email notif.'),
       tooltip: props.t('Email notifications'),
       className: 'tracimTable__styles__flex__1'
-    }, props.system, props.onChangeSubscriptionNotif))
+    }, 'mailNotification', onMailChange, isMailChecked))
   }
 
   return (

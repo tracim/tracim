@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import {
   TracimTable,
   spaceLeaveButtonColumn,
-  spaceMailNotificationColumn,
   spaceUserRoleColumn,
   spanColumn,
+  toggleButtonColumn,
   SORT_BY
 } from 'tracim_frontend_lib'
 
@@ -13,6 +13,12 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
 const UserSpacesConfigTable = (props) => {
+  const isMailChecked = (data) => data.member.doNotify
+
+  const onMailChange = (e, data) => {
+    props.onChangeSubscriptionNotif(data.id, !data.member.doNotify)
+  }
+
   const columns = [
     spanColumn({
       header: props.t('ID'),
@@ -38,11 +44,11 @@ const UserSpacesConfigTable = (props) => {
   ]
 
   if (props.system.config.email_notification_activated) {
-    columns.splice(2, 0, spaceMailNotificationColumn({
+    columns.splice(2, 0, toggleButtonColumn({
       header: props.t('Email notifications'),
       tooltip: props.t('Email notifications'),
       className: 'tracimTable__styles__flex__1'
-    }, props.system, props.onChangeSubscriptionNotif))
+    }, 'mailNotification', onMailChange, isMailChecked))
   }
 
   return (
