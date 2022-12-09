@@ -6,25 +6,25 @@ import { translate } from 'react-i18next'
 import {
   TracimTable,
   spaceLeaveButtonColumn,
-  spaceNameColumn,
   spaceRoleDropdownColumn,
-  spaceIdColumn,
-  spaceMailNotificationColumn
+  spaceMailNotificationColumn,
+  spanColumn,
+  SORT_BY
 } from 'tracim_frontend_lib'
 
 const AdminSpacesUserConfigLeaveTable = (props) => {
   const columns = [
-    spaceIdColumn({
+    spanColumn({
       header: props.t('ID'),
-      tooltip: props.t('Sort by ID'),
+      tooltip: props.t('Sort by Id'),
       className: 'tracimTable__styles__flex__1'
-    }),
+    }, row => row.id, 'spaceId', SORT_BY.ID),
 
-    spaceNameColumn({
+    spanColumn({
       header: props.t('Space'),
       tooltip: props.t('Sort by name'),
       className: 'tracimTable__styles__flex__1'
-    }),
+    }, row => row.label, 'spaceName', SORT_BY.LABEL),
 
     spaceRoleDropdownColumn({
       header: props.t('Role'),

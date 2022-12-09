@@ -308,12 +308,12 @@ export { default as TracimTable } from './component/TracimTable/TracimTable.jsx'
 
 export { default as ListItemRowWrapper } from './container/RowWrappers/ListItemRowWrapper.jsx'
 
-export { default as spaceNameColumn } from './columns/space/spaceNameColumn.jsx'
+export { default as spanColumn } from './columns/generic/spanColumn.jsx'
+
 export { default as spaceUserRoleColumn } from './columns/space/spaceUserRoleColumn.jsx'
 export { default as spaceRoleDropdownColumn } from './columns/space/spaceRoleDropdownColumn.jsx'
 export { default as spaceLeaveButtonColumn } from './columns/space/spaceLeaveButtonColumn.jsx'
 export { default as spaceAddButtonColumn } from './columns/space/spaceAddButtonColumn.jsx'
-export { default as spaceIdColumn } from './columns/space/spaceIdColumn.jsx'
 export { default as spaceMailNotificationColumn } from './columns/space/spaceMailNotificationColumn.jsx'
 
 export { default as contentFilenameWithBadgesAndBreadcrumbsColumn } from './columns/content/contentFilenameWithBadgesAndBreadcrumbsColumn.jsx'

@@ -1,23 +1,22 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import { SORT_BY } from '../../sortListHelper'
+import { stringIncludes } from '../../helper.js'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
-import { stringIncludes } from '../../helper'
 
-const spaceNameColumn = (settings) => {
+const spanColumn = (settings, accessor, id, sortBy) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.label, {
+  return columnHelper.accessor(accessor, {
     header: props => (
       <TitleListHeader
         title={settings.header}
-        onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
+        onClickTitle={() => props.onClickTitle(sortBy)}
         customClass='tracimTable__header__btn'
         isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
+        isSelected={props.selectedSortCriterion === sortBy}
         tootltip={settings.tooltip}
       />
     ),
-    id: 'spaceName',
+    id: id,
     cell: props => {
       return (
         <span>{props.getValue()}</span>
@@ -25,9 +24,9 @@ const spaceNameColumn = (settings) => {
     },
     className: settings.className,
     filter: (data, userFilter) => {
-      return stringIncludes(userFilter)(data.label)
+      return stringIncludes(userFilter)(accessor(data).toString())
     }
   })
 }
 
-export default spaceNameColumn
+export default spanColumn

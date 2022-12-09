@@ -3,9 +3,10 @@ import PropTypes from 'prop-types'
 import {
   TracimTable,
   spaceLeaveButtonColumn,
-  spaceNameColumn,
   spaceMailNotificationColumn,
-  spaceUserRoleColumn
+  spaceUserRoleColumn,
+  spanColumn,
+  SORT_BY
 } from 'tracim_frontend_lib'
 
 import { connect } from 'react-redux'
@@ -13,11 +14,17 @@ import { translate } from 'react-i18next'
 
 const UserSpacesConfigTable = (props) => {
   const columns = [
-    spaceNameColumn({
-      header: props.t('Space'),
-      tooltip: props.t('Sort by title'),
+    spanColumn({
+      header: props.t('ID'),
+      tooltip: props.t('Sort by Id'),
       className: 'tracimTable__styles__flex__1'
-    }),
+    }, row => row.id, 'spaceId', SORT_BY.ID),
+
+    spanColumn({
+      header: props.t('Space'),
+      tooltip: props.t('Sort by name'),
+      className: 'tracimTable__styles__flex__1'
+    }, row => row.label, 'spaceName', SORT_BY.LABEL),
 
     spaceUserRoleColumn({
       header: props.t('Role'),
