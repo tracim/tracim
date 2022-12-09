@@ -1,4 +1,5 @@
 import { PAGES } from '../../support/urls_commands'
+import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 const fakeLink = 'https://awesomearticle.invalid/littletest.html'
 const fakePreview = {
@@ -77,6 +78,18 @@ describe('Publications', () => {
       cy.contains('.linkPreview__content__title', fakePreview.title)
       cy.contains('.linkPreview__content__description', fakePreview.description)
       cy.get(`.linkPreview__img[src="${fakePreview.image}"]`).should('be.visible')
+    })
+
+    it('should filter by username when suggesting mentions', () => {
+      cy.get(publicationInput).type(`@${defaultAdmin.username.slice(0, 4)}`)
+      cy.get(':nth-child(1) > .autocomplete__item > .autocomplete__item__id')
+        .should('contain.text', `@${defaultAdmin.username}`)
+    })
+
+    it('should filter by public name when suggesting mentions', () => {
+      cy.get(publicationInput).type(`@${defaultAdmin.public_name.slice(0, 4)}`)
+      cy.get(':nth-child(1) > .autocomplete__item > .autocomplete__item__id')
+        .should('contain.text', `@${defaultAdmin.username}`)
     })
   })
 })

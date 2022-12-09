@@ -1,36 +1,35 @@
 name: Documentation request
 description: Raise an issue related to content.
-title: "📝 Doc:"
-labels: "documentation, to sort"
+title: "📝 Doc: "
+labels: ["documentation", "to sort"]
 body:
   - type: markdown
     attributes:
       value: |
-        * Please check that there is not an existing open [issue](https://github.com/tracim/tracim/labels/documentation) before you create a new one.
+        Thanks for wanting to improve Tracim!
+        Before you submit, please make sure the documentation change hasn't already been suggested by searching [open](https://github.com/tracim/tracim/issues) and [closed](https://github.com/tracim/tracim/issues?q=is%3Aissue+is%3Aclosed).
   - type: input
+    id: files
     attributes:
-      label: What content on github.com/tracim/tracim is affected?
-      placeholder: "github.com/tracim/tracim"
+      label: Which file(s) on Tracim is affected?
+      placeholder: Tracim README.md, tracim_frontend_lib BUILD.md, etc...
     validations:
       required: true
   - type: textarea
+    id: why-changes
     attributes:
-      label: What part(s) of the content would you like to see updated?
+      label: Which part(s) of the file would you like to see updated?
       description: |
-        - Give as much detail as you can to help us understand the change you want to see. 
-        - Why should the docs be changed? What use cases does it support? 
-        - What is the expected outcome?
+        - Why should the documentation be changed? Which use cases does it support?
     validations:
       required: true
   - type: textarea
+    id: related-pr
     attributes:
-      label: Additional context
-      placeholder: "Add any other context or screenshots about the feature request here."
-    validations:
-      required: false
-  - type: textarea
-    attributes:
-      label: Related PR(s)
-      placeholder: "Let us know if this is related to an open pull request"
+      label: Related PR
+      description: |
+        Let us know if this is related to an open pull request.
+        Leave empty if there is no related PR or if you don't know.
+      placeholder: PR #0000
     validations:
       required: false
