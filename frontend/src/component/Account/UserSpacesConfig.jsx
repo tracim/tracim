@@ -25,7 +25,7 @@ import { FETCH_CONFIG } from '../../util/helper.js'
 import { newFlashMessage } from '../../action-creator.sync.js'
 import { deleteWorkspaceMember, getUserWorkspaceList } from '../../action-creator.async.js'
 import AdminUserSpacesConfig from '../../container/AdminUserSpacesConfig.jsx'
-import UserSpacesConfigTable from '../../container/tables/Tables/UserSpacesConfigTable/UserSpacesConfigTable.jsx'
+import UserSpacesConfigTable from '../../container/tables/UserSpacesConfigTable/UserSpacesConfigTable.jsx'
 
 export const onlyManager = (member, memberList) => {
   const manager = ROLE.workspaceManager.slug

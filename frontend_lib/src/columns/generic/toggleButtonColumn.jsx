@@ -4,7 +4,7 @@ import { isMobile } from 'react-device-detect'
 
 import BtnSwitch from '../../component/Input/BtnSwitch/BtnSwitch.jsx'
 
-const toggleButtonColumn = (settings, id, onChange, checked, disabled = () => false) => {
+const toggleButtonColumn = (settings, id, onChange, checked, disabled = () => false, filter = undefined) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row, {
     header: () => (
@@ -23,7 +23,8 @@ const toggleButtonColumn = (settings, id, onChange, checked, disabled = () => fa
         />
       )
     },
-    className: settings.className
+    className: settings.className,
+    filter: filter
   })
 }
 

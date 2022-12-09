@@ -1,18 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  TracimTable,
-  spaceLeaveButtonColumn,
-  spaceUserRoleColumn,
-  spanColumn,
-  toggleButtonColumn,
-  SORT_BY
-} from 'tracim_frontend_lib'
-
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
-const UserSpacesConfigTable = (props) => {
+import {
+  TracimTable,
+  spaceLeaveButtonColumn,
+  spaceRoleDropdownColumn,
+  toggleButtonColumn,
+  spanColumn,
+  SORT_BY
+} from 'tracim_frontend_lib'
+
+const AdminSpacesUserConfigLeaveTable = (props) => {
   const isMailChecked = (data) => data.member.doNotify
 
   const onMailChange = (e, data) => {
@@ -32,21 +32,20 @@ const UserSpacesConfigTable = (props) => {
       className: 'tracimTable__styles__flex__1'
     }, row => row.label, 'spaceName', SORT_BY.LABEL),
 
-    spaceUserRoleColumn({
+    spaceRoleDropdownColumn({
       header: props.t('Role'),
       tooltip: props.t('Sort by role'),
-      className: 'tracimTable__styles__flex__1'
-    }),
+      className: 'tracimTable__styles__flex__2'
+    }, props.onClickChangeRole),
 
     spaceLeaveButtonColumn({
-      className: ' tracimTable__styles__flex__1'
-    }, props.onLeaveSpaceClick, props.admin, props.system, props.onlyManager)
+      className: 'tracimTable__styles__flex__1'
+    }, props.onLeaveSpaceClick, true, props.system, props.onlyManager)
   ]
 
   if (props.system.config.email_notification_activated) {
     columns.splice(2, 0, toggleButtonColumn({
-      header: props.t('Email notifications'),
-      tooltip: props.t('Email notifications'),
+      header: props.t('Email notif.'),
       className: 'tracimTable__styles__flex__1'
     }, 'mailNotification', onMailChange, isMailChecked))
   }
@@ -55,9 +54,7 @@ const UserSpacesConfigTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.spaceList}
-      emptyMessage={props.admin
-        ? props.t('This user is not a member of any space yet')
-        : props.t('You are not a member of any space yet')}
+      emptyMessage={props.t('This user is not a member of any space yet')}
       filterable
       sortable
       colored
@@ -66,14 +63,14 @@ const UserSpacesConfigTable = (props) => {
   )
 }
 
-UserSpacesConfigTable.propsType = {
+AdminSpacesUserConfigLeaveTable.propsType = {
   spaceList: PropTypes.array.isRequired,
   onLeaveSpaceClick: PropTypes.func.isRequired,
   onChangeSubscriptionNotif: PropTypes.func.isRequired,
-  admin: PropTypes.bool.isRequired,
+  onClickChangeRole: PropTypes.func.isRequired,
   onlyManager: PropTypes.func.isRequired
 }
 
 const mapStateToProps = ({ system }) => ({ system })
 
-export default connect(mapStateToProps)(translate()(UserSpacesConfigTable))
+export default connect(mapStateToProps)(translate()(AdminSpacesUserConfigLeaveTable))

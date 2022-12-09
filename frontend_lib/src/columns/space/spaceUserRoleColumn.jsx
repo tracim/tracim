@@ -34,7 +34,7 @@ const spaceUserRoleColumn = (settings) => {
     },
     className: settings.className,
     filter: (data, userFilter, translate) => {
-      const userRole = ROLE_LIST.find(type => type.slug === data.member.role) || { label: '' }
+      const userRole = ROLE_LIST.find(r => r.slug === data.member.role) || { label: '' }
 
       return userRole && stringIncludes(userFilter)(translate(userRole.label))
     }

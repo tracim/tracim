@@ -25,8 +25,8 @@ import {
 import { fillMemberList, onlyManager } from '../component/Account/UserSpacesConfig.jsx'
 import { serializeMember } from '../reducer/currentWorkspace.js'
 
-import AdminSpacesUserConfigLeaveTable from './tables/Tables/AdminSpacesUserConfigLeaveTable/AdminSpacesUserConfigLeaveTable.jsx'
-import AdminSpacesUserConfigAddTable from './tables/Tables/AdminSpacesUserConfigAddTable/AdminSpacesUserConfigAddTable.jsx'
+import AdminSpacesUserConfigLeaveTable from './tables/AdminSpacesUserConfigLeaveTable/AdminSpacesUserConfigLeaveTable.jsx'
+import AdminSpacesUserConfigAddTable from './tables/AdminSpacesUserConfigAddTable/AdminSpacesUserConfigAddTable.jsx'
 
 export const AdminUserSpacesConfig = (props) => {
   const [availableSpaceList, setAvailableSpaceList] = useState([])
