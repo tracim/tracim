@@ -10,19 +10,26 @@ import { translate } from 'react-i18next'
 export const SpaceDescription = (props) => {
   const [showEditionMode, setShowEditionMode] = useState(false)
 
+  const initWysiwyg = () => globalThis.wysiwyg(
+    `#${props.textareaId}`,
+    props.lang,
+    props.onChangeDescription,
+    props.onTinyMceInput,
+    props.onTinyMceKeyDown,
+    props.onTinyMceKeyUp,
+    props.onTinyMceSelectionChange
+  )
+
+  useEffect(() => {
+    if (showEditionMode) initWysiwyg()
+  }, [showEditionMode])
+
   useEffect(() => {
     if (showEditionMode) {
-      globalThis.wysiwyg(
-        `#${props.textareaId}`,
-        props.lang,
-        props.onChangeDescription,
-        props.onTinyMceInput,
-        props.onTinyMceKeyDown,
-        props.onTinyMceKeyUp,
-        props.onTinyMceSelectionChange
-      )
+      tinymceRemove(`#${props.textareaId}`)
+      initWysiwyg()
     }
-  }, [props.lang, showEditionMode])
+  }, [props.lang])
 
   useEffect(() => {
     return () => {
