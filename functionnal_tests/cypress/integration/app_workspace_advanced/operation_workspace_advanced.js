@@ -40,16 +40,14 @@ describe('Space settings', function () {
       cy.get('.workspace_advanced__description__bottom__btn').click()
 
       cy.waitForTinyMCELoaded().then(() => {
-        cy.clearTinyMCE().then(() => {
-          cy.typeInTinyMCE(newDescription).then(() => {
-            cy.get('.workspace_advanced__description__bottom__btn').click()
+        cy.typeInTinyMCE(newDescription).then(() => {
+          cy.get('.workspace_advanced__description__bottom__btn').click()
 
-            cy.get('.workspace_advanced__contentpage__header__close').click()
+          cy.get('.workspace_advanced__contentpage__header__close').click()
 
-            cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-              .find('.dashboard__workspace__detail__description')
-              .contains(newDescription)
-          })
+          cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
+            .find('.dashboard__workspace__detail__description')
+            .contains(newDescription)
         })
       })
     })
