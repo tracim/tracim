@@ -774,7 +774,7 @@ export class File extends React.Component {
 
     shareEmailList = shareEmailList.filter(shareEmail => !invalidEmails.includes(shareEmail))
 
-    if (invalidEmails.length > 0 || shareEmailList === 0) {
+    if (invalidEmails.length > 0 || shareEmailList.length === 0) {
       GLOBAL_dispatchEvent({
         type: CUSTOM_EVENT.ADD_FLASH_MSG,
         data: {

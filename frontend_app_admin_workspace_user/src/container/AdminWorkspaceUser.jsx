@@ -164,8 +164,8 @@ export class AdminWorkspaceUser extends React.Component {
     if (prevState.config.type !== state.config.type) {
       await this.refreshAll()
     }
-    if (state.content.workspaceList !== prevState.content.workspaceList) this.setDisplayedSpaceList()
-    if (state.content.userList !== prevState.content.userList) this.setDisplayedUserList()
+    if (JSON.stringify(state.content.workspaceList) !== JSON.stringify(prevState.content.workspaceList)) this.setDisplayedSpaceList()
+    if (JSON.stringify(state.content.userList) !== JSON.stringify(prevState.content.userList)) this.setDisplayedUserList()
   }
 
   setDisplayedSpaceList = () => {

@@ -36,7 +36,7 @@ export class JoinWorkspace extends React.Component {
     super(props)
 
     this.state = {
-      displayedFavoritesList: [],
+      displayedSpaceList: [],
       filter: '',
       selectedSortCriterion: SORT_BY.LABEL,
       sortOrder: SORT_ORDER.ASCENDING
@@ -54,16 +54,16 @@ export class JoinWorkspace extends React.Component {
     if (props.history.location.state && props.history.location.state.fromSearch) {
       this.setState({ filter: props.spaceSearch.searchString })
     }
-    this.setDisplayedFavoritesList()
+    this.setDisplayedSpaceList()
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.accessibleWorkspaceList !== prevProps.accessibleWorkspaceList) {
-      this.setDisplayedFavoritesList()
+    if (JSON.stringify(this.props.accessibleWorkspaceList) !== JSON.stringify(prevProps.accessibleWorkspaceList)) {
+      this.setDisplayedSpaceList()
     }
   }
 
-  setDisplayedFavoritesList = () => {
+  setDisplayedSpaceList = () => {
     const { props, state } = this
 
     const sortedList = sortListBy(
@@ -73,7 +73,7 @@ export class JoinWorkspace extends React.Component {
       props.user.lang
     )
 
-    this.setState({ displayedFavoritesList: sortedList })
+    this.setState({ displayedSpaceList: sortedList })
   }
 
   handleClickTitleToSort = (criterion) => {
@@ -82,7 +82,7 @@ export class JoinWorkspace extends React.Component {
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedFavoritesList: sortListBy(prev.displayedFavoritesList, criterion, sortOrder, this.props.user.lang),
+        displayedSpaceList: sortListBy(prev.displayedSpaceList, criterion, sortOrder, this.props.user.lang),
         selectedSortCriterion: criterion,
         sortOrder: sortOrder
       }
@@ -265,7 +265,7 @@ export class JoinWorkspace extends React.Component {
                   />
                 </div>
 
-                {state.displayedFavoritesList.filter(this.filterWorkspaces.bind(this)).map((workspace) => {
+                {state.displayedSpaceList.filter(this.filterWorkspaces.bind(this)).map((workspace) => {
                   const descriptionText = htmlToText(parser, workspace.description)
                   return (
                     <div key={workspace.id} className={`${className}__content__workspaceList__item`}>

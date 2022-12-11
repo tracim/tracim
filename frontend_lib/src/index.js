@@ -70,7 +70,7 @@ import {
 } from './helper.js'
 
 import {
-  putFoldersAtListBeginning,
+  sortWithFoldersAtListBeginning,
   sortListBy,
   sortListByMultipleCriteria,
   SORT_BY,
@@ -502,7 +502,7 @@ export {
   Popover,
   getBrowserLang,
   NewToDo,
-  putFoldersAtListBeginning,
+  sortWithFoldersAtListBeginning,
   putToDo,
   sortListBy,
   sortListByMultipleCriteria,

@@ -10,7 +10,7 @@ import {
   DropdownMenu,
   Icon,
   PAGE,
-  putFoldersAtListBeginning,
+  sortWithFoldersAtListBeginning,
   ROLE,
   sortListBy,
   TimedEvent
@@ -183,7 +183,7 @@ class Folder extends React.Component {
         </div>
 
         <div className='folder__content'>
-          {putFoldersAtListBeginning(sortListBy(folderContentList, props.selectedSortCriterion, props.sortOrder, props.lang))
+          {sortWithFoldersAtListBeginning(sortListBy(folderContentList, props.selectedSortCriterion, props.sortOrder, props.lang))
             .map((content, i) => content.type === 'folder'
               ? (
                 <FolderContainer

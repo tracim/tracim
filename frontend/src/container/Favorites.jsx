@@ -175,7 +175,7 @@ export class Favorites extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.favoriteList !== prevProps.favoriteList) this.setDisplayedFavoritesList()
+    if (JSON.stringify(this.props.favoriteList) !== JSON.stringify(prevProps.favoriteList)) this.setDisplayedFavoritesList()
   }
 
   loadFavoriteList = async () => {

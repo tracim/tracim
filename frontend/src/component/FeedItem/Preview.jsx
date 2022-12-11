@@ -178,7 +178,7 @@ export class Preview extends React.Component {
 
   isContentDifferent = (oldContent, newContent) => (
     newContent.firstComment !== oldContent.firstComment ||
-    newContent.commentList !== oldContent.commentList ||
+    JSON.stringify(newContent.commentList) !== JSON.stringify(oldContent.commentList) ||
     newContent.translatedRawContent !== oldContent.translatedRawContent ||
     newContent.currentRevisionId !== oldContent.currentRevisionId
   )

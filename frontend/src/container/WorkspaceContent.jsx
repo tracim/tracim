@@ -31,7 +31,7 @@ import {
   buildHeadTitle,
   IconButton,
   PAGE,
-  putFoldersAtListBeginning,
+  sortWithFoldersAtListBeginning,
   SORT_BY,
   SORT_ORDER,
   sortListBy,
@@ -201,7 +201,7 @@ export class WorkspaceContent extends React.Component {
       this.loadAllWorkspaceContent(workspaceId, false)
     } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
 
-    if (props.workspaceContentList !== prevProps.workspaceContentList || state.userFilter !== prevState.userFilter) this.setDisplayedContentList()
+    if (JSON.stringify(props.workspaceContentList) !== JSON.stringify(prevProps.workspaceContentList) || state.userFilter !== prevState.userFilter) this.setDisplayedContentList()
   }
 
   componentWillUnmount () {
@@ -467,7 +467,7 @@ export class WorkspaceContent extends React.Component {
       props.user.lang
     )
 
-    this.setState({ displayedContentList: putFoldersAtListBeginning(sortedList) })
+    this.setState({ displayedContentList: sortWithFoldersAtListBeginning(sortedList) })
   }
 
   handleClickTitleToSort = (criterion) => {
@@ -476,7 +476,7 @@ export class WorkspaceContent extends React.Component {
         ? SORT_ORDER.DESCENDING
         : SORT_ORDER.ASCENDING
       return {
-        displayedContentList: putFoldersAtListBeginning(sortListBy(prev.displayedContentList, criterion, sortOrder, this.props.user.lang)),
+        displayedContentList: sortWithFoldersAtListBeginning(sortListBy(prev.displayedContentList, criterion, sortOrder, this.props.user.lang)),
         selectedSortCriterion: criterion,
         sortOrder: sortOrder
       }
