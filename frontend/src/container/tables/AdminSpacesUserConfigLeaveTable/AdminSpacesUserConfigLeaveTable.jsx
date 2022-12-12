@@ -66,7 +66,6 @@ const AdminSpacesUserConfigLeaveTable = (props) => {
 
 AdminSpacesUserConfigLeaveTable.propsType = {
   spaceList: PropTypes.array.isRequired,
-  user: PropTypes.object.isRequired,
   onLeaveSpaceClick: PropTypes.func.isRequired,
   onChangeSubscriptionNotif: PropTypes.func.isRequired,
   onClickChangeRole: PropTypes.func.isRequired,

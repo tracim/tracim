@@ -68,7 +68,6 @@ const FavoritesTable = (props) => {
 
 FavoritesTable.propsType = {
   favoriteList: PropTypes.array.isRequired,
-  user: PropTypes.object.isRequired,
   onFavoriteButtonClick: PropTypes.func.isRequired
 }
 

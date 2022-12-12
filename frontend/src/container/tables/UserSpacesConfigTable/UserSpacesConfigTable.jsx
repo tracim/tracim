@@ -68,7 +68,6 @@ const UserSpacesConfigTable = (props) => {
 
 UserSpacesConfigTable.propsType = {
   spaceList: PropTypes.array.isRequired,
-  user: PropTypes.object.isRequired,
   onLeaveSpaceClick: PropTypes.func.isRequired,
   onChangeSubscriptionNotif: PropTypes.func.isRequired,
   admin: PropTypes.bool.isRequired,

@@ -45,7 +45,6 @@ const AdminSpacesUserConfigAddTable = (props) => {
 
 AdminSpacesUserConfigAddTable.propsType = {
   spaceList: PropTypes.array.isRequired,
-  user: PropTypes.object.isRequired,
   onAddSpaceClick: PropTypes.func.isRequired
 }
 const mapStateToProps = ({ user }) => ({ user })
