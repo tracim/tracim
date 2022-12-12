@@ -29,8 +29,9 @@ export const HtmlDocument = props => {
 
   useEffect(() => {
     setText(props.text)
-    console.log(text)
   }, [])
+
+  console.log('HtmlDocument props', props.memberList)
 
   return (
     <div className='html-document__contentpage__left__wrapper'>
@@ -149,7 +150,9 @@ export const HtmlDocument = props => {
                 codeLanguageList={[]}
                 content={text}
                 handleSend={props.onClickValidateBtn}
+                height={'100%'}
                 isAdvancedEdition={true}
+                userList={props.memberList}
                 setContent={setText}
                 spaceId={props.workspaceId}
               />
@@ -227,6 +230,7 @@ HtmlDocument.propTypes = {
   isRefreshNeeded: PropTypes.bool,
   isVisible: PropTypes.bool,
   lang: PropTypes.string,
+  memberList: PropTypes.array,
   mode: PropTypes.string,
   onClickAutoCompleteItem: PropTypes.func,
   onClickValidateBtn: PropTypes.func,
@@ -261,6 +265,7 @@ HtmlDocument.defaultProps = {
   isRefreshNeeded: false,
   isVisible: true,
   lang: 'en',
+  memberList: [],
   mode: APP_FEATURE_MODE.VIEW,
   onClickAutoCompleteItem: () => { },
   onClickCancelSave: () => { },

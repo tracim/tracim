@@ -29,6 +29,7 @@ import {
   getOrCreateSessionClientToken,
   FAVORITE_STATE,
   ROLE,
+  sendGlobalFlashMessage,
   ROLE_LIST,
   getFileContent,
   getFileRevision,
@@ -273,13 +274,14 @@ export class Kanban extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            apiUrl={state.config.apiUrl}
+            onClickSubmit={this.handleClickValidateAnywayNewComment}
             codeLanguageList={state.config.system.config.code_languages}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
             loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            apiUrl={state.config.apiUrl}
             loggedUser={state.loggedUser}
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}
@@ -401,14 +403,14 @@ export class Kanban extends React.Component {
     tinymceRemove('#wysiwygTimelineComment')
   }
 
-  sendGlobalFlashMessage = (msg, type = 'warning') => GLOBAL_dispatchEvent({
-    type: CUSTOM_EVENT.ADD_FLASH_MSG,
-    data: {
-      msg: msg,
-      type: type,
-      delay: undefined
-    }
-  })
+  // sendGlobalFlashMessage = (msg, type = 'warning') => GLOBAL_dispatchEvent({
+  //   type: CUSTOM_EVENT.ADD_FLASH_MSG,
+  //   data: {
+  //     msg: msg,
+  //     type: type,
+  //     delay: undefined
+  //   }
+  // })
 
   setHeadTitle = (contentName) => {
     const { state } = this
@@ -540,6 +542,7 @@ export class Kanban extends React.Component {
 
   handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
+    console.log("KANBAN - handleClickValidateAnywayNewComment", comment, commentAsFileList)
     try {
       props.appContentSaveNewComment(
         state.content,
@@ -550,15 +553,19 @@ export class Kanban extends React.Component {
         state.config.slug,
         state.loggedUser.username
       )
+      return true
     } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      // this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      return false
     }
   }
 
   handleClickCopyLink = () => {
     const { props, state } = this
     handleClickCopyLink(state.content.content_id)
-    this.sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+    sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
+    // this.sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))

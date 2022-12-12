@@ -1,3 +1,4 @@
+# import re
 import abc
 import typing
 import uuid
@@ -6,6 +7,8 @@ from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
 
+# from tracim_backend.exceptions import UserDoesNotExist
+# from tracim_backend.lib.core.user import UserApi
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
@@ -13,7 +16,6 @@ from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.plugins import hookimpl
-from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.userworkspace import RoleApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.logger import logger
@@ -59,20 +61,20 @@ class Mention:
 class BaseMentionParser(abc.ABC):
     """Base class for mention parsers."""
 
-    @abc.abstractmethod
-    def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
-        """Seek and replace wrong mention in text.\n
-        Replace username="john" by userid="1"
+    # @abc.abstractmethod
+    # def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
+    #     """Seek and replace wrong mention in text.\n
+    #     Replace username="john" by userid="1"
 
-        Args:
-            text (str): The text to parse.
-            session (TracimSession): The session to use.
-            config (CFG): The config to use.
+    #     Args:
+    #         text (str): The text to parse.
+    #         session (TracimSession): The session to use.
+    #         config (CFG): The config to use.
 
-        Returns:
-            str: The text with replaced mention.
-        """
-        ...
+    #     Returns:
+    #         str: The text with replaced mention.
+    #     """
+    #     ...
 
     @abc.abstractmethod
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
@@ -100,16 +102,28 @@ class DescriptionMentionParser(BaseMentionParser):
     MENTION_ID_START = "mention-"  # TODO - MP - 2022-11-29 - Check if this is still used
     MENTION_TAG_NAME = "html-mention"
 
-    @classmethod
-    def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
-        soup = BeautifulSoup(text, "lxml")
-        for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            mention_name = mention_tag.attrs.get("username")
-            if mention_name:
-                user_api = UserApi(session=session, config=config, current_user=None)
-                user_id = user_api.get_one_by_username(mention_name).user_id
-                text = text.replace(f'username="{mention_name}"', f'userid="{user_id}"')
-        return text
+    # # Regex explanation: https://regex101.com/r/F3Bv8W/3
+    # # Match (@XXX part): '@XXX', '@XXX_YYY', '@XXX ', ' @XXX', '@XXX:', '@XXX,', '@XXX.', '@XXX!', ...
+    # # Don't match: 'XXX@XXX', '@<span>XXX</span>', '@XXX-YYY', ...
+    # MENTION_REGEX = re.compile(r"(?<!\w)(@\w+)(?![\w-])")
+
+    # @classmethod
+    # def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
+    #     every_possible_mentions = re.findall(self.MENTION_REGEX, text)
+    #     user_api = UserApi(session=session, config=config, current_user=None)
+    #     for mention_name in every_possible_mentions:
+    #         try:
+    #             user = user_api.get_one_by_username(mention_name[1:])
+    #             text = text.replace(
+    #                 mention_name,
+    #                 f'<html-mention userid="{user.user_id}"></html-mention>'
+    #             )
+    #         except UserDoesNotExist:
+    #             logger.warning(
+    #                 self,
+    #                 f"User {mention_name} does not exist, mention will be ignored",
+    #             )
+    #     return text
 
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
         return self.get_mentions_from_html(revision.raw_content)

@@ -523,6 +523,7 @@ export class File extends React.Component {
 
   handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
+    console.log("FILE - handleClickValidateAnywayNewComment", comment, commentAsFileList)
     try {
       props.appContentSaveNewComment(
         state.content,
@@ -533,8 +534,10 @@ export class File extends React.Component {
         state.config.slug,
         state.loggedUser.username
       )
+      return true
     } catch (e) {
       sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      return false
     }
   }
 
@@ -938,13 +941,14 @@ export class File extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            apiUrl={state.config.apiUrl}
+            onClickSubmit={this.handleClickValidateAnywayNewComment}
             codeLanguageList={state.config.system.config.code_languages}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
             loading={props.loadingTimeline}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
-            apiUrl={state.config.apiUrl}
             loggedUser={state.loggedUser}
             timelineData={props.timeline}
             memberList={state.config.workspace.memberList}

@@ -68,6 +68,9 @@ const isAWrappedMention = (node) => (
   node.id.startsWith(MENTION_ID_PREFIX)
 )
 
+/**
+ * DUPLICATE IN HELPERS.JS
+ */
 export const handleInvalidMentionInComment = (memberList, isWysiwyg, comment, setState) => {
   const knownMembersMentions = memberList.map(member => `@${member.username}`)
   const content = isWysiwyg ? tinymce.activeEditor.getContent() : comment

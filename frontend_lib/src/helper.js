@@ -14,6 +14,7 @@ import dateFnsNbNO from 'date-fns/locale/nb'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
+  getContent,
   getContentPath,
   getReservedUsernames,
   getUsernameAvailability
@@ -979,3 +980,210 @@ export const handleClickCopyLink = (contentId) => {
 }
 
 export const sortMemberList = (a, b) => a.publicName.localeCompare(b.publicName)
+
+// /////////////////////////////////////////////////////////////////////////////
+// NOTE - MP - 2022-12-02 - MENTION SECTION
+// /////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Search mention in a string
+ * @param {String} text The text to search mentions in
+ * @returns {List[String]} List of mentions found
+ * Example:
+ * - Input: `<p>Test @Jhon</p>`
+ * - Output: `['@Jhon']`
+ */
+export const searchMention = (text) => {
+  // Regex explanation: https://regex101.com/r/hHosBa/9
+  // Match (@XXX part): '@XXX', '@XXX ', ' @XXX', '@XXX:', ':@XXX', '(@XXX)', '@XXX!', ...
+  // Don't match: 'XXX@XXX', '@<span>XXX</span>'
+  const mentionRegex = /(?<=^|\s|\W)@([a-zA-Z0-9_]+)\b/g
+  const mentionList = text.match(mentionRegex)
+  return mentionList || []
+}
+
+/**
+ * Replace not formatted mention with html mention element
+ * @param {List[role]} roleList List of role that can be mentionned
+ * @param {List[user]} userList List of user that can be mentionned
+ * @param {String} html Current content of the editor
+ * @returns {{html: String, invalidMentionList: List[String]}} Correctly formatted html content
+ * Example:
+ * - Input: `<p>Test @Jhon</p>`
+ * - Output:\
+ * {\
+ *   html: `<p>Test <html-mention userid="151"/></p>`;\
+ *   invalidMentionList: [];\
+ * }
+ */
+export const searchMentionAndPlaceBalise = (rolelist, userList, html) => {
+  const mentionList = searchMention(html)
+  const invalidMentionList = []
+
+  let newHtml = html
+
+  mentionList.forEach(mention => {
+    const mentionWithoutAt = mention.slice(1)
+    const role = rolelist.find(r => r.slug === mentionWithoutAt)
+    const user = userList.find(u => u.username === mentionWithoutAt)
+    if (role || user) {
+      const mentionBalise = `<html-mention ${
+        role ? 'roleid' : 'userid'
+      }="${
+        role ? role.role_id : user.id
+      }"></html-mention>`
+      newHtml = newHtml.replace(mention, mentionBalise)
+    } else {
+      invalidMentionList.push(mention)
+    }
+  })
+
+  return { html: newHtml, invalidMentionList }
+}
+
+// TODO - MP - 2022-12-09 - Should not be used, to remove
+export const replaceHTMLRoleMentionTagWithMention = (html) => {
+  const mentionRegex = /@<span mention-role-level="(\d+)"><\/span>([a-zA-Z0-9-_]+)/g
+  const mentionTagList = html.match(mentionRegex)
+  if (!mentionTagList) return html
+
+  let newHtml = html
+
+  mentionTagList.forEach(mentionTag => {
+    const mentionTagData = mentionTag.match(/mention-role-level="(\d+)"/)
+    const roleLevel = mentionTagData[1]
+
+    const mention = `<html-mention rolelevel="${roleLevel}"/>`
+    newHtml = newHtml.replace(mentionTag, mention)
+  })
+
+  return newHtml
+}
+
+const replaceHTMLElementWithMentionRole = (rolelist, html) => {
+  const mentionRegex = /<html-mention roleid="(\d+)"><\/html-mention>/g
+  const mentionTagList = html.match(mentionRegex)
+  if (!mentionTagList) return html
+
+  let newHtml = html
+
+  mentionTagList.forEach(mentionTag => {
+    const mentionTagData = mentionTag.match(/roleid="(\d+)"/)
+    const roleId = mentionTagData[1]
+
+    const role = rolelist.find(r => r.role_id === roleId)
+    const mention = `@${role.slug}`
+    newHtml = newHtml.replace(mentionTag, mention)
+  })
+
+  return newHtml
+}
+
+const replaceHTMLElementWithMentionUser = (userList, html) => {
+  const mentionRegex = /<html-mention userid="(\d+)"><\/html-mention>/g
+  const mentionTagList = html.match(mentionRegex)
+  if (!mentionTagList) return html
+
+  let newHtml = html
+
+  console.log('userList', userList)
+
+  mentionTagList.forEach(mentionTag => {
+    console.log('mentionTag', mentionTag)
+    const mentionTagData = mentionTag.match(/userid="(\d+)"/)
+    console.log('mentionTagData', mentionTagData)
+    const userId = mentionTagData[1]
+    console.log('userId', userId)
+
+    const user = userList.find(u => u.id === Number(userId))
+    let mention = ''
+    if (!user) {
+      console.warn(
+        `helper.js - replaceHTMLElementWithMentionUser - User from id ${userId} not found`
+      )
+      mention = `@UnknownUser`
+    } else {
+      mention = `@${user.username}`
+    }
+    newHtml = newHtml.replace(mentionTag, mention)
+  })
+
+  return newHtml
+}
+
+/**
+ * Replace html mention element with mention
+ * @param {List[role]} roleList List of role that can be mentionned
+ * @param {List[user]} userList List of user that can be mentionned
+ * @param {String} html Current content of the editor
+ * Example:
+ * - Input: `<p>Test <html-mention userid="151"/><html-mention></p>`
+ * - Output: `<p>Test @Jhon</p>`
+ */
+export const replaceHTMLElementWithMention = (rolelist, userList, html) => {
+  let newHtml = replaceHTMLElementWithMentionRole(rolelist, html)
+  newHtml = replaceHTMLElementWithMentionUser(userList, newHtml)
+  return newHtml
+}
+
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// NOTE - MP - 2022-12-09 - LINK SECTION
+// /////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Search content in a string
+ * @param {String} text The text to search mentions in
+ * @returns {List[String]} List of content id found
+ * Example:
+ * - Input: `<p>Test #844</p>`
+ * - Output: `['#844']`
+ */
+export const searchContent = (text) => {
+  // Regex explanation: https://regex101.com/r/z1WUUu/1
+  // Match (#XXX part): '#XXX', '#XXX ', ' #XXX', '#XXX:', ':#XXX', '(#XXX)', '#XXX!', ...
+  // Don't match: 'XXX#XXX', '#<span>XXX</span>'
+  const contentRegex = /(?<=^|\s|\W)#([0-9]+)\b/g
+  const contentList = text.match(contentRegex)
+  return contentList || []
+}
+
+// TODO - MP - 2022-12-09 - Replace hard written balise by a custom element (just like mention)
+/**
+ * Replace not formatted content with formatted content html
+ * @param {String} apiUrl Url of the api to get the content
+ * @param {String} html Current content of the editor
+ * @returns {{html: String, invalidContentList: List[String]}} Correctly formatted html content
+ * Example:
+ * - Input: `<p>Test #844</p>`
+ * - Output:\
+ * {\
+ *   html: `<p>Test <a class="internal_link primaryColorFont" href="/ui/contents/762" title="#844">\
+ * Jhon content</a>`;\
+ *   invalidContentList: [];\
+ * }
+ */
+export const searchContentAndPlaceBalise = async (apiUrl, html) => {
+  const contentList = searchContent(html)
+  const invalidContentList = []
+
+  let newHtml = html
+
+  await Promise.all(contentList.map(async content => {
+    const contentId = content.slice(1)
+    const fetchContent = await getContent(apiUrl, contentId)
+
+    if (fetchContent.status === 200) {
+      const contentTitle =  (await fetchContent.json()).label
+      const linkBalise = `<a class="internal_link primaryColorFont" href="${
+        PAGE.CONTENT(contentId)
+      }" title="${content}">${contentTitle}</a>`
+      newHtml = newHtml.replace(content, linkBalise)
+    } else {
+      invalidContentList.push(content)
+    }
+  }))
+
+  return { html: newHtml, invalidContentList }
+}

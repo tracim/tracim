@@ -491,29 +491,29 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentEditComment = async (workspaceId, contentId, commentId, loggedUsername) => {
+    appContentEditComment = async (workspaceId, contentId, commentId, newContent) => {
       this.checkApiUrl()
-      const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
-      let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
-      knownMentions = knownMentions.map(member => `@${member.username}`)
-      const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
+      // const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
+      // let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
+      // knownMentions = knownMentions.map(member => `@${member.username}`)
+      // const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
 
-      let newCommentForApiWithMention
-      try {
-        newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
-      } catch (e) {
-        return Promise.reject(e)
-      }
+      // let newCommentForApiWithMention
+      // try {
+      //   newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
+      // } catch (e) {
+      //   return Promise.reject(e)
+      // }
 
-      let newCommentForApiWithMentionAndLink
-      try {
-        newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      } catch (e) {
-        return Promise.reject(e)
-      }
+      // let newCommentForApiWithMentionAndLink
+      // try {
+      //   newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
+      // } catch (e) {
+      //   return Promise.reject(e)
+      // }
 
       const response = await handleFetchResult(
-        await putComment(this.apiUrl, workspaceId, contentId, commentId, newCommentForApiWithMentionAndLink)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newContent)
       )
 
       switch (response.apiResponse.status) {

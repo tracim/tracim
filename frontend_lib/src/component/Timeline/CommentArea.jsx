@@ -12,7 +12,11 @@ import {
 } from '../../tinymceAutoCompleteHelper.js'
 
 import {
-  autoCompleteItem
+  autoCompleteItem,
+  // replaceHTMLRoleMentionTagWithMention,
+  // replaceHTMLUserMentionTagWithMention,
+  searchContentAndPlaceBalise,
+  searchMentionAndPlaceBalise
 } from '../../helper.js'
 import {
   LOCAL_STORAGE_FIELD,
@@ -28,9 +32,11 @@ import Loading from '../Loading/Loading.jsx'
 import TinyEditor from '../TinyEditor/TinyEditor'
 
 export const CommentArea = props => {
-  const [isAdvancedEdition, setIsAdvancedEdition] = useState(false)
   const [content, setContent] = useState('')
   const [fileListToUpload, setFileListToUpload] = useState([])
+  const [invalidMentionList, setInvalidMentionList] = useState([])
+  const [isAdvancedEdition, setIsAdvancedEdition] = useState(false)
+  const [textToSend, setTextToSend] = useState('')
 
 /*
   const invalidMentionList = props.invalidMentionList || []
@@ -98,7 +104,6 @@ export const CommentArea = props => {
   }, [])
 
   useEffect(() => {
-    // setContent(ReactDOMServer.renderToStaticMarkup(content))
     setLocalStorageItem(
       props.contentType,
       props.contentId,
@@ -146,26 +151,26 @@ export const CommentArea = props => {
     return undefined
   }*/
 
-/*
-  const handleCloseInvalidMentionPopup = () => {
-    props.onClickCancelSave()
+  const handleTrytoSend = async () => {
+    let returnValue = searchMentionAndPlaceBalise(props.roleList, props.memberList, content)
+    if (returnValue.invalidMentionList.length > 0) {
+      setTextToSend(returnValue.html)
+      setInvalidMentionList(returnValue.invalidMentionList)
+    } else {
+      returnValue = await searchContentAndPlaceBalise(props.apiUrl, returnValue.html)
+      handleSend(returnValue.html)
+    }
   }
-*/
 
-/*
-  const handleValidateInvalidMentionPopup = () => {
-    props.onClickSaveAnyway(newComment, newCommentAsFileList)
-    setNewComment('')
-    setNewCommentAsFileList([])
-  }
-*/
+  /**
+   * Send the comment to the backend
+   */
+  const handleSend = (textToSend) => {
+    // NOTE - MP - 2022-12-06 - If we don't clear this variable we don't hide the popup.
+    // In case of an error it's preferable to hide the popup
+    setInvalidMentionList([])
 
-  const handleSend = () => {
-    let formattedContent = searchMentionAndPlaceBalise(content)
-    formattedContent = replaceHTMLUserMentionTagWithMention(formattedContent)
-    formattedContent = replaceHTMLRoleMentionTagWithMention(formattedContent)
-
-    if (props.onClickValidateNewCommentBtn(formattedContent, fileListToUpload)) {
+    if (props.onClickSubmit(textToSend, fileListToUpload)) {
       setContent('')
       setFileListToUpload([])
       removeLocalStorageItem(
@@ -199,90 +204,43 @@ export const CommentArea = props => {
     setIsAdvancedEdition(newIsAdvancedEdition)
   }
 
-  /**
-   * Replace not formatted mention with html mention element
-   * @param {String} html Current content of the editor
-   * @returns {String} Correctly formatted html content
-   * Example:
-   * - Input: `<p>Test @Jhon</p>`
-   * - Output: `<p>Test <html-mention username="Jhon"/>`
-   */
-  const searchMentionAndPlaceBalise = (html) => {
-    // Regex explanation: https://regex101.com/r/hHosBa/8
-    // Match: '@XXX', '@XXX ', ' @XXX'
-    // Don't match: 'XXX@XXX', '@<span>XXX</span>', '@XXX:', '@XXX,', '@XXX.', '@XXX!', ...
-    const mentionRegex = /(?<=^|\s|\>)@([a-zA-Z0-9_]+)\b/g
-    const mentionList = html.match(mentionRegex)
-    if (!mentionList) return html
-
-    let newHtml = html
-
-    mentionList.forEach(mention => {
-      const mentionWithoutAt = mention.slice(1)
-      const formattedMention = `<html-mention username="${mentionWithoutAt}"/>`
-      newHtml = newHtml.replace(mention, formattedMention)
-    })
-
-    return newHtml
-  }
-
-  /**
-   * Replace span mention balise with html mention element
-   * @param {String} html Current content of the editor
-   * @returns Correctly formatted html content
-   * Example:
-   * - Input: `<p>Test <span mention-user-id="151">@John</span></p>`
-   * - Output: `<p>Test <html-mention user-id="151"/></p>`
-   */
-  const replaceHTMLUserMentionTagWithMention = (html) => {
-    // Regex explanation: https://regex101.com/r/QXb8Cd/2
-    // Match: '@<span mention-user-id="-1"></span>XXX'
-    const mentionRegex = /@<span mention-user-id="(\d+)"><\/span>([a-zA-Z0-9-_]+)/g
-    const mentionTagList = html.match(mentionRegex)
-    if (!mentionTagList) return html
-
-    let newHtml = html
-
-    mentionTagList.forEach(mentionTag => {
-      // Not sure we have to do this
-      const mentionTagData = mentionTag.match(/mention-user-id="(\d+)"/)
-      const userId = mentionTagData[1]
-
-      const mention = `<html-mention userid="${userId}"/>`
-      newHtml = newHtml.replace(mentionTag, mention)
-    })
-
-    return newHtml
-  }
-
-  const replaceHTMLRoleMentionTagWithMention = (html) => {
-    const mentionRegex = /@<span mention-role-level="(\d+)"><\/span>([a-zA-Z0-9-_]+)/g
-    const mentionTagList = html.match(mentionRegex)
-    if (!mentionTagList) return html
-
-    let newHtml = html
-
-    mentionTagList.forEach(mentionTag => {
-      const mentionTagData = mentionTag.match(/mention-role-level="(\d+)"/)
-      const roleLevel = mentionTagData[1]
-
-      const mention = `<html-mention rolelevel="${roleLevel}"/>`
-      newHtml = newHtml.replace(mentionTag, mention)
-    })
-
-    return newHtml
-  }
-
   return (
     <form className={`${props.customClass}__texteditor`}>
+      {invalidMentionList.length > 0 && (
+        // TODO - MP - 2022-12-06 - Maybe check this popup
+        <ConfirmPopup
+          onCancel={() => handleSend(textToSend)}
+          onClose={() => setInvalidMentionList([])}
+          onConfirm={() => setInvalidMentionList([])}
+          msg={
+            <>
+              <span>
+                {props.t('Your text contains mentions that do not match any member of this space:')}
+              </span>
+              <div className='commentArea__mentions'>
+                {invalidMentionList.join(', ')}
+              </div>
+            </>
+          }
+          confirmLabel={props.t('Edit')}
+          confirmIcon='fas fa-edit'
+          cancelLabel={props.t('Validate anyway')}
+          cancelIcon='fas fa-fw fa-check'
+        />
+      )}
       <TinyEditor
         apiUrl={props.apiUrl}
         codeLanguageList={props.codeLanguageList}
         content={content}
-        handleSend={handleSend}
+        handleSend={handleTrytoSend}
+        height={100}
         isAdvancedEdition={isAdvancedEdition}
+        maxHeight={300}
+        minHeight={100}
+        roleList={props.roleList}
         setContent={setContent}
         spaceId={props.workspaceId}
+        userList={props.memberList}
       />
       {!props.hideSendButtonAndOptions && (
         <div className={
@@ -341,7 +299,7 @@ export const CommentArea = props => {
               icon={props.icon}
               intent='primary'
               mode='light'
-              onClick={handleSend}
+              onClick={handleTrytoSend}
               text={props.t('Send')}
               type='button'
               key='commentArea__comment__send'
@@ -755,6 +713,7 @@ export default translate()(CommentArea)
 
 CommentArea.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  onClickSubmit: PropTypes.func.isRequired,
   buttonLabel: PropTypes.string,
   codeLanguageList: PropTypes.array,
   contentId: PropTypes.number,
@@ -766,6 +725,8 @@ CommentArea.propTypes = {
   id: PropTypes.string.isRequired,
   invalidMentionList: PropTypes.array,
   lang: PropTypes.string,
+  memberList: PropTypes.array,
+  roleList: PropTypes.array,
   multipleFiles: PropTypes.bool,
   newComment: PropTypes.string,
   onClickCancelSave: PropTypes.func,
@@ -793,6 +754,8 @@ CommentArea.defaultProps = {
   id: '',
   invalidMentionList: [],
   lang: 'en',
+  memberList: [],
+  roleList: [],
   multipleFiles: true,
   newComment: '',
   onClickCancelSave: () => { },

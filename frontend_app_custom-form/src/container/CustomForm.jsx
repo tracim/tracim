@@ -611,10 +611,11 @@ class CustomForm extends React.Component {
 
           {this.state.config.apiUrl ? (
             <Timeline
+              apiUrl={this.state.config.apiUrl}
+              onClickSubmit={() => {}}
               customClass={`${config.slug}__contentpage`}
               customColor={this.state.hexcolor}
               loggedUser={loggedUser}
-              apiUrl={this.state.config.apiUrl}
               timelineData={timeline}
               showHeader
               newComment={newComment}

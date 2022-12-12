@@ -19,6 +19,7 @@ import {
   handleClickCopyLink,
   handleFetchResult,
   handleInvalidMentionInComment,
+  replaceHTMLElementWithMention,
   tinymceRemove,
   IconButton,
   Loading,
@@ -138,9 +139,9 @@ export class Publications extends React.Component {
       this.gotToCurrentPublication()
     }
 
-    if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
-      tinymceRemove(`#${wysiwygId}`)
-    }
+    // if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
+    //   tinymceRemove(`#${wysiwygId}`)
+    // }
 
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
       this.gotToCurrentPublication()
@@ -148,7 +149,7 @@ export class Publications extends React.Component {
   }
 
   componentWillUnmount () {
-    tinymceRemove(`#${wysiwygId}`)
+    // tinymceRemove(`#${wysiwygId}`)
   }
 
   handleAllAppChangeLanguage = (data) => {
@@ -210,10 +211,12 @@ export class Publications extends React.Component {
     //   actuality,
     //   this.setState.bind(this)
     // )) {
-    this.handleClickValidateAnyway(actuality, publicationAsFileList)
-    return true
+    // this.handleClickValidateAnyway(actuality, publicationAsFileList)
+    // return true
     // }
     // return false
+    this.saveThreadPublication(actuality, publicationAsFileList)
+    return true
   }
 
   handleContentCreatedOrRestored = (data) => {
@@ -294,7 +297,7 @@ export class Publications extends React.Component {
     this.props.dispatch(removePublication(data.fields.content.content_id))
   }
 
-  handleToggleWysiwyg = () => this.setState(prev => ({ publicationWysiwyg: !prev.publicationWysiwyg }))
+  // handleToggleWysiwyg = () => this.setState(prev => ({ publicationWysiwyg: !prev.publicationWysiwyg }))
 
   buildBreadcrumbs = () => {
     const { props } = this
@@ -387,35 +390,48 @@ export class Publications extends React.Component {
     this.setState({ showEditPopup: true, commentToEdit: publication.firstComment })
   }
 
-  handleClickValidateEdit = (publication) => {
-    const { props } = this
-    if (!handleInvalidMentionInComment(
-      props.currentWorkspace.memberList,
-      true,
-      publication,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayEdit()
-    }
-  }
+  // handleClickValidateEdit = (publication) => {
+  //   const { props } = this
+  //   if (!handleInvalidMentionInComment(
+  //     props.currentWorkspace.memberList,
+  //     true,
+  //     publication,
+  //     this.setState.bind(this)
+  //   )) {
+  //     this.handleClickValidateAnywayEdit()
+  //   }
+  // }
 
-  handleClickValidateAnywayEdit = () => {
-    this.setState({
-      invalidMentionList: [],
-      showEditPopup: false,
-      showInvalidMentionPopupInComment: false
-    })
-    this.handleEditPublication()
-  }
+  // handleClickValidateAnywayEdit = () => {
+  //   this.setState({
+  //     invalidMentionList: [],
+  //     showEditPopup: false,
+  //     showInvalidMentionPopupInComment: false
+  //   })
+  //   this.handleEditPublication()
+  // }
 
-  handleEditPublication = () => {
+  handleEditPublication = async () => {
     const { props, state } = this
-    props.appContentEditComment(
-      props.currentWorkspace.id,
-      state.commentToEdit.parent_id,
-      state.commentToEdit.content_id,
-      props.user.username
-    )
+
+    const content = tinymce.activeEditor.getContent()
+    const returnValue = searchMentionAndPlaceBalise([], state.config.workspace.memberList, content)
+    console.log('Publication returnValue', returnValue)
+    if (returnValue.invalidMentionList.length > 0) {
+      this.setState({
+        invalidMentionList: returnValue.invalidMentionList,
+        textToSend: returnValue.html
+      })
+    } else {
+      returnValue = await searchContentAndPlaceBalise(state.config.apiUrl, returnValue.html)
+      // Check if the order is correct
+      props.appContentEditComment(
+        props.currentWorkspace.id,
+        state.commentToEdit.parent_id,
+        state.commentToEdit.content_id,
+        returnValue.html
+      )
+    }
   }
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
@@ -462,20 +478,20 @@ export class Publications extends React.Component {
   handleClickValidateAnyway = async (actuality, publicationAsFileList = []) => {
     const { state, props } = this
 
-    if (state.showEditPopup) {
-      this.handleClickValidateAnywayEdit()
-      return
-    }
+    // if (state.showEditPopup) {
+    //   this.handleClickValidateAnywayEdit()
+    //   return
+    // }
 
     this.saveThreadPublication(actuality, publicationAsFileList)
 
-    setLocalStorageItem(
-      CONTENT_TYPE.THREAD,
-      newPublicationId,
-      parseInt(props.match.params.idws),
-      LOCAL_STORAGE_FIELD.COMMENT,
-      ''
-    )
+    // setLocalStorageItem(
+    //   CONTENT_TYPE.THREAD,
+    //   newPublicationId,
+    //   parseInt(props.match.params.idws),
+    //   LOCAL_STORAGE_FIELD.COMMENT,
+    //   ''
+    // )
   }
 
   handleClickCopyLink = content => {
@@ -518,6 +534,8 @@ export class Publications extends React.Component {
     const currentPublicationId = Number(props.match.params.idcts || 0)
     const isPublicationListEmpty = props.publicationPage.list.length === 0
 
+    console.log('props.currentWorkspace.memberList', props.currentWorkspace.memberList)
+
     return (
       <ScrollToBottomWrapper
         customClass='publications'
@@ -533,6 +551,7 @@ export class Publications extends React.Component {
           <div className='publishAreaContainer'>
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
+              onClickSubmit={this.handleClickValidateAnyway}
               bottomAutocomplete
               buttonLabel={props.t('Publish')}
               codeLanguageList={props.system.config.code_languages}
@@ -545,16 +564,18 @@ export class Publications extends React.Component {
               invalidMentionList={state.invalidMentionList}
               lang={props.user.lang}
               multipleFiles
+              memberList={props.currentWorkspace.memberList}
+              roleList={[]}
               onClickCancelSave={this.handleCancelSave}
               onClickSaveAnyway={this.handleClickValidateAnyway}
               onClickValidateNewCommentBtn={this.handleClickPublish}
-              onClickWysiwygBtn={this.handleToggleWysiwyg}
+              onClickWysiwygBtn={this.handleToggleWysiwyg} //
               placeHolder={props.t('Share a news...')}
-              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery} //
               showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
               workspaceId={parseInt(props.match.params.idws)}
-              wysiwygIdSelector={`#${wysiwygId}`}
-              wysiwyg={state.publicationWysiwyg}
+              wysiwygIdSelector={`#${wysiwygId}`} //
+              wysiwyg={state.publicationWysiwyg} //
             />
           </div>
         )}
@@ -601,7 +622,7 @@ export class Publications extends React.Component {
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             codeLanguageList={props.system.config.code_languages}
-            comment={state.commentToEdit.raw_content}
+            comment={replaceHTMLElementWithMention([], props.currentWorkspace.memberList, state.commentToEdit.raw_content)}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}

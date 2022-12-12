@@ -8,12 +8,13 @@ import { translate } from 'react-i18next'
 import Comment from './Comment.jsx'
 import Revision from './Revision.jsx'
 import {
+  PAGE,
+  ROLE,
+  TIMELINE_TYPE,
   darkenColor,
   displayDistanceDate,
   formatAbsoluteDate,
-  PAGE,
-  ROLE,
-  TIMELINE_TYPE
+  replaceHTMLElementWithMention
 } from '../../helper.js'
 import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
@@ -70,26 +71,28 @@ export class Timeline extends React.Component {
     this.setState({ showEditCommentPopup: true, newComment: comment })
   }
 
-  handleClickValidateEditComment = (comment) => {
-    const { props } = this
-    if (!handleInvalidMentionInComment(
-      props.memberList,
-      true,
-      comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayEditComment()
-    }
-  }
+  // TODO - MP - 2022-12-09 - Change this
+  // handleClickValidateEditComment = (comment) => {
+  //   const { props } = this
+  //   if (!handleInvalidMentionInComment(
+  //     props.memberList,
+  //     true,
+  //     comment,
+  //     this.setState.bind(this)
+  //   )) {
+  //     this.handleClickValidateAnywayEditComment()
+  //   }
+  // }
 
-  handleClickValidateAnywayEditComment = () => {
+  handleClickValidateAnywayEditComment = (comment) => {
     const { props, state } = this
     this.setState({
       invalidMentionList: [],
       showEditCommentPopup: false,
       showInvalidMentionPopupInComment: false
     })
-    props.onClickEditComment(state.newComment)
+    props.onClickEditComment(comment)
+    // props.onClickEditComment(state.newComment)
   }
 
   handleCloseInvalidMentionPopup = () => {
@@ -219,11 +222,12 @@ export class Timeline extends React.Component {
           <EditCommentPopup
             apiUrl={props.apiUrl}
             codeLanguageList={props.codeLanguageList}
-            comment={state.newComment.raw_content}
+            comment={replaceHTMLElementWithMention([], props.memberList, state.newComment.raw_content)}
             commentId={state.newComment.content_id}
             customColor={props.customColor}
             loggedUserLanguage={props.loggedUser.lang}
-            onClickValidate={this.handleClickValidateEditComment}
+            onClickValidate={this.handleClickValidateAnywayEditComment}
+            // onClickValidate={this.handleClickValidateEditComment}
             onClickClose={() => this.setState({ showEditCommentPopup: false })}
             workspaceId={props.workspaceId}
           />
@@ -243,6 +247,7 @@ export class Timeline extends React.Component {
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
+              onClickSubmit={props.onClickSubmit}
               buttonLabel={props.t('Send')}
               codeLanguageList={props.codeLanguageList}
               contentId={props.contentId}
@@ -253,16 +258,17 @@ export class Timeline extends React.Component {
               id={`wysiwygTimelineComment${props.id}`}
               invalidMentionList={props.invalidMentionList}
               lang={props.loggedUser.lang}
+              memberList={props.memberList}
               placeHolder={props.t('Write an answer...')}
               onClickCancelSave={props.onClickCancelSave}
               onClickSaveAnyway={props.onClickSaveAnyway}
               onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
-              onClickWysiwygBtn={props.onClickWysiwygBtn}
+              // onClickWysiwygBtn={props.onClickWysiwygBtn}
               searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
               showInvalidMentionPopup={props.showInvalidMentionPopup}
               workspaceId={props.workspaceId}
-              wysiwyg={props.wysiwyg}
-              wysiwygIdSelector={props.wysiwygIdSelector}
+              // wysiwyg={props.wysiwyg}
+              // wysiwygIdSelector={props.wysiwygIdSelector}
               isFileCommentLoading={props.isFileCommentLoading}
             />
           </div>
@@ -292,6 +298,7 @@ Timeline.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   loggedUser: PropTypes.object.isRequired,
   onClickRestoreComment: PropTypes.func.isRequired,
+  onClickSubmit: PropTypes.func.isRequired,
   onClickTranslateComment: PropTypes.func.isRequired,
   timelineData: PropTypes.array.isRequired,
   translationTargetLanguageCode: PropTypes.string.isRequired,

@@ -29,7 +29,7 @@ export class EditCommentPopup extends React.Component {
   }
 
   componentWillUnmount () {
-    tinymceRemove(wysiwygIdSelector)
+    // tinymceRemove(wysiwygIdSelector)
   }
 
   handleAllAppChangeLanguage = (data) => {
@@ -53,6 +53,7 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
+          onClickSubmit={props.onClickValidate}
           codeLanguageList={props.codeLanguageList}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
@@ -61,10 +62,10 @@ export class EditCommentPopup extends React.Component {
           id={wysiwygId}
           lang={props.loggedUserLanguage}
           newComment={state.newComment}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery} //
           workspaceId={props.workspaceId}
-          wysiwyg
-          wysiwygIdSelector={wysiwygIdSelector}
+          wysiwyg //
+          wysiwygIdSelector={wysiwygIdSelector} //
         />
 
         <div className='editCommentPopup__buttons'>
@@ -83,7 +84,8 @@ export class EditCommentPopup extends React.Component {
             icon='far fa-paper-plane'
             intent='primary'
             mode='light'
-            onClick={() => props.onClickValidate(state.newComment)}
+            onClick={props.onClickValidate}
+            // onClick={() => props.onClickValidateonClickValidate(state.newComment)}
             text={props.t('Send')}
             type='button'
           />
@@ -95,10 +97,10 @@ export class EditCommentPopup extends React.Component {
 export default translate()(appContentFactory(TracimComponent(EditCommentPopup)))
 
 EditCommentPopup.propTypes = {
+  apiUrl: PropTypes.string.isRequired,
   comment: PropTypes.string.isRequired,
   onClickClose: PropTypes.func.isRequired,
   onClickValidate: PropTypes.func.isRequired,
-  apiUrl: PropTypes.string,
   codeLanguageList: PropTypes.array,
   customColor: PropTypes.string,
   loggedUserLanguage: PropTypes.string,
@@ -107,7 +109,6 @@ EditCommentPopup.propTypes = {
 }
 
 EditCommentPopup.defaultProps = {
-  apiUrl: '',
   codeLanguageList: [],
   customColor: undefined,
   loggedUserLanguage: 'en',

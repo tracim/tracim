@@ -1,4 +1,5 @@
 import React, { useRef } from 'react'
+import ReactDOMServer from 'react-dom/server'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Editor } from '@tinymce/tinymce-react'
@@ -6,12 +7,17 @@ import { Editor } from '@tinymce/tinymce-react'
 import {
   handleFetchResult
 } from '../../helper.js'
-import { getSpaceMemberList } from '../../action.async.js'
+import {
+  getSpaceMemberList,
+  getMyselfKnownContents,
+  getMyselfKnownMember,
+} from '../../action.async.js'
 
 const defaultMentionList = [
   {
     type: 'cardmenuitem',
-    value: '@<span mention-role-level="0"></span>All ',
+    value: '@all ',
+    // value: '@<span mention-role-level="0"></span>All ',
     label: 'All',
     items: [
       {
@@ -33,7 +39,7 @@ const defaultMentionList = [
   },
   {
     type: 'cardmenuitem',
-    value: '@<span mention-role-level="1"></span>Reader ',
+    value: '@reader ',
     label: 'Reader',
     items: [
       {
@@ -55,7 +61,7 @@ const defaultMentionList = [
   },
   {
     type: 'cardmenuitem',
-    value: '@<span mention-role-level="2"></span>Contributor ',
+    value: '@contributor ',
     label: 'Contributor',
     items: [
       {
@@ -77,7 +83,7 @@ const defaultMentionList = [
   },
   {
     type: 'cardmenuitem',
-    value: '@<span mention-role-level="4"></span>content-manager ',
+    value: '@content-manager ',
     label: 'Content manager',
     items: [
       {
@@ -99,7 +105,7 @@ const defaultMentionList = [
   },
   {
     type: 'cardmenuitem',
-    value: '@<span mention-role-level="8"></span>space-manager ',
+    value: '@space-manager ',
     label: 'Space manager',
     items: [
       {
@@ -182,9 +188,9 @@ export const TinyEditor = props => {
         editorRef.current = editor
       }}
       init={{
-        min_height: 100,
-        height: 100,
-        max_height: 300,
+        height: props.height,
+        max_height: props.maxHeight,
+        min_height: props.minHeight,
         menubar: false,
         statusbar: true,
         toolbar: toolbar,
@@ -200,9 +206,10 @@ export const TinyEditor = props => {
         contextmenu: 'selectall copy paste link customInsertImage table',
         codesample_global_prismjs: true,
         codesample_languages: props.codeLanguageList,
+        // custom_elements: '~html-mention',
         paste_data_images: true,
         relative_urls: false,
-        extended_valid_elements: 'span[mention-user-id|mention-role-level]',
+        // extended_valid_elements: 'span[mention-user-id|mention-role-level|userid], html-mention[*]',
         setup: (editor) => {
           editor.ui.registry.addMenuButton('insert', {
             icon: 'plus',
@@ -297,64 +304,138 @@ export const TinyEditor = props => {
             minChars: 2,
             maxResults: 10,
             fetch: function (pattern) {
-              return new tinymce.util.Promise((resolve) => {
-                // NOTE - MP - 2022-11-08 - This load the list of members of the space
-                // and is called every time the user types a character after the @
-                fetchMemberList().then((memberList) => {
-                  const insensitivePattern = pattern.toLowerCase()
+              return new Promise((resolve) => {
+                getMyselfKnownMember(props.apiUrl, pattern, props.spaceId, null, 10).then((data) => {
+                  handleFetchResult(data).then(
+                    (data) => {
+                      const insensitivePattern = pattern.toLowerCase()
+                      const matchedMemberList = data.body.filter((user) => {
+                        const insensitiveUsername = user.username.toLowerCase()
+                        const insensitivePublicName = user.public_name.toLowerCase()
+                        const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
+                        const isPublicName = insensitivePublicName.indexOf(insensitivePattern) !== -1
+                        return isUsername || isPublicName
+                      })
+                      // const matchedMentionList = defaultMentionList.filter((mention) => {
+                      //   const insensitiveMentionLabel = mention.label.toLowerCase()
+                      //   return insensitiveMentionLabel.indexOf(insensitivePattern) !== -1
+                      // })
 
-                  const matchedMemberList = memberList.filter((member) => {
-                    const insensitiveUsername = member.user.username.toLowerCase()
-                    return insensitiveUsername.indexOf(insensitivePattern) !== -1
-                  })
-                  const matchedMentionList = defaultMentionList.filter((mention) => {
-                    const insensitiveMentionLabel = mention.label.toLowerCase()
-                    return insensitiveMentionLabel.indexOf(insensitivePattern) !== -1
-                  })
-
-                  var results = matchedMemberList.map((member) => {
-                    const metaData = `mention-user-id="${member.user.user_id}"`
-                    return {
-                      type: 'cardmenuitem',
-                      value: `@<span ${metaData}></span>${member.user.username} `,
-                      label: member.user.username,
-                      items: [
-                        {
-                          type: 'cardcontainer',
-                          direction: 'vertical',
+                      var results = matchedMemberList.map((user) => {
+                        return {
+                          type: 'cardmenuitem',
+                          value: `@${user.username} `,
+                          label: user.username,
                           items: [
                             {
                               type: 'cardcontainer',
-                              direction: 'horizontal',
+                              direction: 'vertical',
                               items: [
                                 {
-                                  //   type: 'cardimage',
-                                  //   src: "api/user/" + member.user.user_id + "/avatar/preview/25x25/avatar",
-                                  //   alt: member.user.public_name,
-                                  //   name: 'avatar'
-                                  // }, {
+                                  type: 'cardcontainer',
+                                  direction: 'horizontal',
+                                  items: [
+                                    {
+                                      //   type: 'cardimage',
+                                      //   src: "api/user/" + member.user.user_id + "/avatar/preview/25x25/avatar",
+                                      //   alt: member.user.public_name,
+                                      //   name: 'avatar'
+                                      // }, {
+                                      type: 'cardtext',
+                                      text: user.username,
+                                      name: 'user_name'
+                                    }
+                                  ]
+                                },
+                                {
                                   type: 'cardtext',
-                                  text: member.user.username,
-                                  name: 'user_name'
+                                  text: 'User'
                                 }
                               ]
-                            },
-                            {
-                              type: 'cardtext',
-                              text: 'User'
                             }
                           ]
                         }
-                      ]
+                      })
+
+                      resolve(results)
                     }
-                  })
-                  resolve(matchedMentionList.concat(results))
+                  )
                 })
               })
             },
             onAction: function (autocompleteApi, rng, value) {
               editor.selection.setRng(rng)
-              editor.insertContent(value, { 'raw': true })
+              editor.insertContent(value)
+              autocompleteApi.hide()
+            }
+          })
+          // /////////////////////////////////////////////
+          // Handle content link
+          editor.ui.registry.addAutocompleter('autocompletion', {
+            ch: '#',
+            columns: 1,
+            minChars: 2,
+            maxResults: 10,
+            fetch: function (pattern) {
+              return new Promise((resolve) => {
+                getMyselfKnownContents(props.apiUrl, pattern, 10).then((data) => {
+                  handleFetchResult(data).then(
+                    (data) => {
+                      const insensitivePattern = pattern.toLowerCase()
+                      const matchedContentList = data.body.filter((content) => {
+                        console.log('content', content)
+                        const insensitiveContentLabel = content.label.toLowerCase()
+                        const contentId = content.content_id
+                        const isLabel = insensitiveContentLabel.indexOf(insensitivePattern) !== -1
+                        const isId = contentId.toString().indexOf(insensitivePattern) !== -1
+                        return isLabel || isId
+                      })
+
+                      var results = matchedContentList.map((content) => {
+                        return {
+                          type: 'cardmenuitem',
+                          value: `#${content.content_id} `,
+                          label: content.label,
+                          items: [
+                            {
+                              type: 'cardcontainer',
+                              direction: 'vertical',
+                              items: [
+                                {
+                                  type: 'cardcontainer',
+                                  direction: 'horizontal',
+                                  items: [
+                                    {
+                                      type: 'cardtext',
+                                      text: content.label,
+                                      name: 'content_label'
+                                    },
+                                    {
+                                      type: 'cardtext',
+                                      text: content.content_id.toString(),
+                                      name: 'content_id'
+                                    }
+                                  ]
+                                },
+                                {
+                                  type: 'cardtext',
+                                  text: 'Content'
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      })
+
+                      resolve(results)
+                    }
+                  )
+                })
+              })
+            },
+            onAction: function (autocompleteApi, rng, value) {
+              editor.selection.setRng(rng)
+              editor.insertContent(value)
               autocompleteApi.hide()
             }
           })
@@ -380,14 +461,24 @@ TinyEditor.propTypes = {
   spaceId: PropTypes.number.isRequired,
   codeLanguageList: PropTypes.array,
   content: PropTypes.string,
+  customStyle: PropTypes.string,
   handleSend: PropTypes.func,
+  height: PropTypes.any,
   isAdvancedEdition: PropTypes.bool,
+  maxHeight: PropTypes.number,
+  minHeight: PropTypes.number,
+  roleList: PropTypes.array,
 }
 
 
 TinyEditor.defaultProps = {
   codeLanguageList: [],
   content: '',
+  customStyle: '',
   handleSend: () => {},
-  isAdvancedEdition: false
+  height: undefined,
+  isAdvancedEdition: false,
+  maxHeight: undefined,
+  minHeight: 100,
+  roleList: [],
 }

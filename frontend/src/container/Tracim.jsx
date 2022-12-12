@@ -27,22 +27,22 @@ import WIPcomponent from './WIPcomponent.jsx'
 import CardPopupUsername from './CardPopupUsername'
 import {
   CUSTOM_EVENT,
-  getSpaceMemberList,
-  handleFetchResult,
+  LIVE_MESSAGE_ERROR_CODE,
+  LIVE_MESSAGE_STATUS,
+  PAGE,
   PROFILE,
-  formatAbsoluteDate,
-  serialize,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  USER_CALL_STATE,
   CardPopup,
   IconButton,
+  LiveMessageManager,
   TracimComponent,
   buildHeadTitle,
-  LiveMessageManager,
-  LIVE_MESSAGE_STATUS,
-  LIVE_MESSAGE_ERROR_CODE,
-  PAGE,
-  USER_CALL_STATE,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET
+  formatAbsoluteDate,
+  getSpaceMemberList,
+  handleFetchResult,
+  serialize
 } from 'tracim_frontend_lib'
 import {
   COOKIE_FRONTEND,

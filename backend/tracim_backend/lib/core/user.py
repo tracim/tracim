@@ -269,11 +269,11 @@ class UserApi(object):
         elif include_workspace_ids:
             include_user_ids = set(self.get_members_of_workspaces(include_workspace_ids))
 
+        # TODO - MP - 2022-12-06 - Theses are two separates errors.
         if not user_in_every_included_workspaces and len(acp) < 2:
             raise TooShortAutocompleteString(
-                'String "{acp}" is too short, the acp string needs to have more than one character, or you need to be in every workspace you include.'.format(
-                    acp=acp
-                )
+                f"The acp {acp} is too short. The acp needs to have at least 2 characters, or you\
+need to be in every workspace you include."
             )
 
         if exclude_workspace_ids:
@@ -288,9 +288,9 @@ class UserApi(object):
         query = self.base_query().order_by(User.display_name)
         query = query.filter(
             or_(
-                User.display_name.ilike("%{}%".format(acp)),
-                User.email.ilike("%{}%".format(acp)),
-                User.username.ilike("%{}%".format(acp)),
+                User.display_name.ilike(f"%{acp}%"),
+                User.email.ilike(f"%{acp}%"),
+                User.username.ilike(f"%{acp}%"),
             )
         )
 
@@ -373,13 +373,13 @@ class UserApi(object):
         return [content_api.get_content_in_context(content) for content in contents]
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
-        reserved_usernams = MENTION["all"]
-        reserved_usernams = reserved_usernams + MENTION["reader"]
-        reserved_usernams = reserved_usernams + MENTION["contributor"]
-        reserved_usernams = reserved_usernams + MENTION["reader"]
-        reserved_usernams = reserved_usernams + MENTION["contributor"]
-        reserved_usernams = reserved_usernams + MENTION["space-manager"]
-        return tuple(reserved_usernams)
+        reserved_usernames = MENTION["all"]
+        reserved_usernames = reserved_usernames + MENTION["reader"]
+        reserved_usernames = reserved_usernames + MENTION["contributor"]
+        reserved_usernames = reserved_usernames + MENTION["reader"]
+        reserved_usernames = reserved_usernames + MENTION["contributor"]
+        reserved_usernames = reserved_usernames + MENTION["space-manager"]
+        return tuple(reserved_usernames)
 
     def get_user_workspaces_query(self, user_id: int) -> Query:
         return self._session.query(UserRoleInWorkspace.workspace_id).filter(

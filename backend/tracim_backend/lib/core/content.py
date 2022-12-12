@@ -517,7 +517,7 @@ class ContentApi(object):
         do_save=False,
         do_notify=True,
     ) -> Content:
-        from tracim_backend.lib.core.mention import DescriptionMentionParser
+        # from tracim_backend.lib.core.mention import DescriptionMentionParser
 
         # TODO: check parent allowed_type and workspace allowed_ type
         assert parent and parent.type != FOLDER_TYPE
@@ -536,9 +536,9 @@ class ContentApi(object):
 
         # Parse the raw_content to seek for uncorrect mentions
         # and replace them with correct mentions
-        content = DescriptionMentionParser.seek_and_replace_wrong_mention(
-            content, self._session, self._config
-        )
+        # content = DescriptionMentionParser.seek_and_replace_wrong_mention(
+        #     content, self._session, self._config
+        # )
 
         item = self.create(
             content_type_slug=content_type_list.Comment.slug,

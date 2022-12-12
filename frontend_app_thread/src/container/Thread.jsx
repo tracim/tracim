@@ -265,22 +265,25 @@ export class Thread extends React.Component {
   }
 
   handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
-    const { state } = this
+    // const { state } = this
 
-    if (!handleInvalidMentionInComment(
-      state.config.workspace && state.config.workspace.memberList,
-      state.timelineWysiwyg,
-      comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
-      return true
-    }
-    return false
+    // if (!handleInvalidMentionInComment(
+    //   state.config.workspace && state.config.workspace.memberList,
+    //   state.timelineWysiwyg,
+    //   comment,
+    //   this.setState.bind(this)
+    // )) {
+    //   this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+    //   return true
+    // }
+    // return false
+    this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
+    return true
   }
 
   handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
     const { props, state } = this
+    console.log("THREAD - handleClickValidateAnywayNewComment", comment, commentAsFileList)
     try {
       props.appContentSaveNewComment(
         state.content,
@@ -291,8 +294,10 @@ export class Thread extends React.Component {
         state.config.slug,
         state.loggedUser.username
       )
+      return true
     } catch (e) {
       sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
+      return false
     }
   }
 
@@ -458,6 +463,8 @@ export class Thread extends React.Component {
             https://github.com/tracim/tracim/issues/1840 */}
             {state.config.apiUrl ? (
               <Timeline
+                apiUrl={state.config.apiUrl}
+                onClickSubmit={this.handleClickValidateAnywayNewComment}
                 codeLanguageList={state.config.system.config.code_languages}
                 contentId={state.content.content_id}
                 contentType={state.content.content_type}
@@ -466,7 +473,6 @@ export class Thread extends React.Component {
                 customColor={color}
                 loggedUser={state.loggedUser}
                 memberList={state.config.workspace && state.config.workspace.memberList}
-                apiUrl={state.config.apiUrl}
                 timelineData={props.timeline}
                 disableComment={!state.content.is_editable}
                 availableStatusList={state.config.availableStatuses}

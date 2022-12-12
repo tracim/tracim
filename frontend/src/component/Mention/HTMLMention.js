@@ -8,9 +8,8 @@ class HTMLMention extends window.HTMLElement {
     render(createElement(MentionWrapped, Object.fromEntries(props)), this)
   }
 
-  // TODO - MP - 2022-11-29 - I got an error on that, check in depth
   disconnectedCallback() {
-    unmountComponentAtNode(MentionWrapped)
+    unmountComponentAtNode(this)
   }
 }
 

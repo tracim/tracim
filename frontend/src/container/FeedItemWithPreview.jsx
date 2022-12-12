@@ -162,6 +162,7 @@ export class FeedItemWithPreview extends React.Component {
 
   handleClickValidateAnyway = async (comment, commentAsFileList) => {
     const { props, state } = this
+    console.log("FEEDITEMWITHPREVIEW - handleClickValidateAnyway", comment, commentAsFileList)
     try {
       props.appContentSaveNewComment(
         {
@@ -444,6 +445,7 @@ export class FeedItemWithPreview extends React.Component {
             {props.showCommentList && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
+                onClickSubmit={this.handleClickValidateAnyway}
                 codeLanguageList={props.system.config.code_languages}
                 contentId={props.content.id}
                 contentType={props.content.type}
