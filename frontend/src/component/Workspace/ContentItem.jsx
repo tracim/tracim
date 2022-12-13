@@ -5,8 +5,7 @@ import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
 import {
   ANCHOR_NAMESPACE,
-  DRAG_AND_DROP,
-  getRevisionTypeLabel
+  DRAG_AND_DROP
 } from '../../util/helper.js'
 import BtnExtandedAction from './BtnExtandedAction.jsx'
 import {
@@ -14,6 +13,7 @@ import {
   ComposedIcon,
   FilenameWithBadges,
   ListItemWrapper,
+  getRevisionTypeLabel,
   TimedEvent
 } from 'tracim_frontend_lib'
 

@@ -13,13 +13,13 @@ import {
   putFoldersAtListBeginning,
   ROLE,
   sortListBy,
-  TimedEvent
+  TimedEvent,
+  getRevisionTypeLabel
 } from 'tracim_frontend_lib'
 import {
   DRAG_AND_DROP,
   SHARE_FOLDER_ID,
-  ANCHOR_NAMESPACE,
-  getRevisionTypeLabel
+  ANCHOR_NAMESPACE
 } from '../../util/helper.js'
 import { HACK_COLLABORA_CONTENT_TYPE } from '../../container/WorkspaceContent.jsx'
 

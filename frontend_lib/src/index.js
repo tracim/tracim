@@ -66,7 +66,8 @@ import {
   USER_CALL_STATE,
   STATUSES,
   TIMELINE_TYPE,
-  stringIncludes
+  stringIncludes,
+  getRevisionTypeLabel
 } from './helper.js'
 
 import {
@@ -198,6 +199,8 @@ import ProfileNavigation from './component/ProfileNavigation/ProfileNavigation.j
 import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
 import NewToDo from './component/ToDo/NewToDo.jsx'
 import ToDoItem from './component/ToDo/ToDoItem.jsx'
+
+import ContentType from './component/ContentType/ContentType.jsx'
 
 import {
   tinymceAutoCompleteHandleInput,
@@ -515,5 +518,7 @@ export {
   STATUSES,
   TIMELINE_TYPE,
   stringIncludes,
-  FilterBar
+  FilterBar,
+  ContentType,
+  getRevisionTypeLabel
 }
