@@ -21,25 +21,25 @@ const FavoritesTable = (props) => {
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
       className: 'tracimTable__styles__width__icon'
-    }, props.contentType),
+    }, props.contentType, props.t),
 
     contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
       className: 'tracimTable__styles__flex__4'
-    }),
+    }, props.t),
 
     timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
       className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
-    }),
+    }, props.t),
 
     contentInformationColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
       className: 'tracimTable__styles__flex__2 tracimTable__hide__md'
-    }, props.contentType),
+    }, props.contentType, props.t),
 
     favoriteButtonColumn({
       header: props.t('Favorite'),

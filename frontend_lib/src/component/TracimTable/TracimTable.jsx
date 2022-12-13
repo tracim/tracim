@@ -1,58 +1,36 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
 import {
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   useReactTable
 } from '@tanstack/react-table'
 
-import {
-  SORT_BY,
-  SORT_ORDER,
-  sortListBy
-} from '../../sortListHelper.js'
-
-import FilterBar from '../FilterBar/FilterBar.jsx'
 import EmptyListMessage from '../EmptyListMessage/EmptyListMessage.jsx'
+import FilterBar from '../FilterBar/FilterBar.jsx'
+import classnames from 'classnames'
 
 const DefaultWrapper = (props) => {
   return props.children
 }
 
 const TracimTable = (props) => {
-  const [userFilter, setUserFilter] = useState('')
-  const [sortCriterion, setSortCriterion] = useState(props.sortable ? props.defaultSort : '')
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.ASCENDING)
-
-  const filter = () =>
-    props.data.filter(item =>
-      props.columns.some(column =>
-        column.filter && column.filter(item, userFilter, props.t)
-      )
-    )
-
-  const filteredData = userFilter !== '' ? filter() : props.data
-
-  const handleClickToSort = (criterion) => {
-    if (!props.sortable) return
-    const newSortOrder = sortCriterion === criterion && sortOrder === SORT_ORDER.ASCENDING
-      ? SORT_ORDER.DESCENDING
-      : SORT_ORDER.ASCENDING
-    setSortOrder(newSortOrder)
-    setSortCriterion(criterion)
+  const globalFilterFn = (row, columnId, value, addMeta) => {
+    return table.getColumn(columnId).getFilterFn()(row, columnId, value, addMeta)
   }
 
-  const sort = () =>
-    sortListBy(filteredData, sortCriterion, sortOrder, props.user.lang)
-
-  const sortedData = props.sortable ? [...sort()] : filteredData
-
   const table = useReactTable({
-    data: sortedData,
+    data: props.data,
+    globalFilterFn,
     columns: props.columns,
-    getCoreRowModel: getCoreRowModel()
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    debugTable: true, // TODO Remove this
+    debugHeaders: true,
+    debugColumns: true
   })
 
   const RowWrapper = props.rowWrapper
@@ -63,14 +41,13 @@ const TracimTable = (props) => {
         <FilterBar
           onChange={e => {
             const newFilter = e.target.value
-            setUserFilter(newFilter)
+            table.setGlobalFilter(newFilter)
           }}
-          value={userFilter}
+          value={table.getState().globalFilter || ''}
           placeholder={props.filterPlaceholder}
         />
       )}
-
-      {sortedData.length > 0
+      {props.data.length > 0
         ? (
           <>
             {!props.noHeader && (
@@ -82,7 +59,7 @@ const TracimTable = (props) => {
                   >
                     {headerGroup.headers.map(header => (
                       <div
-                        className={`tracimTable__header__row__cell ${header.column.columnDef.className}`}
+                        className={classnames('tracimTable__header__row__cell', header.column.columnDef.className)}
                         key={header.id}
                       >
                         {header.isPlaceholder
@@ -90,10 +67,7 @@ const TracimTable = (props) => {
                           : flexRender(
                             header.column.columnDef.header,
                             {
-                              ...header.getContext(),
-                              onClickTitle: handleClickToSort,
-                              isOrderAscending: sortOrder === SORT_ORDER.ASCENDING,
-                              selectedSortCriterion: sortCriterion
+                              ...header.getContext()
                             }
                           )}
                       </div>
@@ -102,23 +76,22 @@ const TracimTable = (props) => {
                 ))}
               </div>
             )}
-            <div className={`tracimTable__body ${props.colored ? 'tracimTable__body__colored' : ''}`}>
-              {table.getRowModel().rows.map(row => (
+            <div className={classnames('tracimTable__body', { tracimTable__body__colored: props.colored })}>
+              {table.getFilteredRowModel().rows.map(row => (
                 <RowWrapper key={`${row.id}-wrapper`} {...row.original} {...props.rowWrapperProps}>
                   <div
-                    className={`tracimTable__body__row ${props.customRowClass}`}
+                    className={classnames('tracimTable__body__row', props.customRowClass)}
                     key={row.id}
                   >
                     {row.getVisibleCells().map(cell => (
                       <div
-                        className={`tracimTable__body__row__cell ${cell.column.columnDef.className}`}
+                        className={classnames('tracimTable__body__row__cell', cell.column.columnDef.className)}
                         key={cell.id}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
                           {
-                            ...cell.getContext(),
-                            translate: props.t
+                            ...cell.getContext()
                           }
                         )}
                       </div>
@@ -138,6 +111,7 @@ const TracimTable = (props) => {
             }
           </EmptyListMessage>
         )}
+      <pre>{JSON.stringify(table.getState(), null, 2)}</pre>
     </div>
   )
 }
@@ -166,8 +140,7 @@ TracimTable.defaultProps = {
   rowWrapperProps: {},
   filterable: false,
   filterPlaceholder: undefined,
-  sortable: false,
-  defaultSort: SORT_BY.LABEL
+  sortable: false
 }
 
 export default translate()(TracimTable)

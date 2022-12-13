@@ -1,14 +1,21 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import { stringIncludes } from '../../helper.js'
 import { SORT_BY } from '../../sortListHelper.js'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 import Icon from '../../component/Icon/Icon.jsx'
 
-const contentInformationColumn = (settings, contentType) => {
+const contentInformationColumn = (settings, contentType, t) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.accessor(row => {
+    if (!row.content) return undefined
+    const contentTypeInfo = contentType.find(info => info.slug === row.content.type) || { label: '' }
+    const statusInfo = contentTypeInfo.availableStatuses.find(
+      s => s.slug === row.content.statusSlug
+    ) || { label: '' }
+
+    return t(statusInfo.label)
+  }, {
     header: props => (
       <TitleListHeader
         title={settings.header}
@@ -21,40 +28,32 @@ const contentInformationColumn = (settings, contentType) => {
     ),
     id: 'information',
     cell: props => {
-      if (!props.getValue().content) return null
+      if (!props.row.original.content) return null
 
-      const contentTypeInfo = contentType.find(info => info.slug === props.getValue().content.type)
+      const contentTypeInfo = contentType.find(info => info.slug === props.row.original.content.type) || { label: '' }
       const statusInfo = contentTypeInfo.availableStatuses.find(
-        s => s.slug === props.getValue().content.statusSlug
-      )
+        s => s.slug === props.row.original.content.statusSlug
+      ) || { label: '' }
 
       return (
         <div className='contentListItem__information'>
           <span className='contentListItem__information__status'>
             <Icon
               icon={`${statusInfo.faIcon}`}
-              title={props.translate(statusInfo.label)}
+              title={t(statusInfo.label)}
               color={statusInfo.hexcolor}
             />
             <span
-              title={props.translate(statusInfo.label)}
+              title={t(statusInfo.label)}
             >
-              {props.translate(statusInfo.label)}
+              {t(statusInfo.label)}
             </span>
           </span>
         </div>
       )
     },
     className: settings.className,
-    filter: (data, userFilter, translate) => {
-      if (!data.content) return false
-
-      const contentTypeInfo = contentType.find(info => info.slug === data.content.type)
-      const statusInfo = contentTypeInfo.availableStatuses.find(
-        s => s.slug === data.content.statusSlug
-      )
-      return statusInfo && stringIncludes(userFilter)(translate(statusInfo.label))
-    }
+    filterFn: 'includesString'
   })
 }
 

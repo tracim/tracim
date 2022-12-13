@@ -1,18 +1,18 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import {
-  stringIncludes,
-  getRevisionTypeLabel
-} from '../helper.js'
+import { getRevisionTypeLabel } from '../helper.js'
 
 import { SORT_BY } from '../sortListHelper.js'
 import TimedEvent from '../component/TimedEvent/TimedEvent.jsx'
 import TitleListHeader from '../component/Lists/ListHeader/TitleListHeader.jsx'
 
-const timedEventColumn = (settings) => {
+const timedEventColumn = (settings, t) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.content, {
+  return columnHelper.accessor(row => {
+    if (!row.content || !row.content.lastModifier) return undefined
+    return row.content.lastModifier.publicName
+  }, {
     header: props => (
       <TitleListHeader
         title={settings.header}
@@ -25,23 +25,20 @@ const timedEventColumn = (settings) => {
     ),
     id: 'lastModification',
     cell: props => {
-      if (!props.getValue()) return null
+      if (!props.row.original.content) return null
 
       return (
         <TimedEvent
           customClass='contentListItem__modification'
-          operation={getRevisionTypeLabel(props.getValue().currentRevisionType, props.translate)}
-          date={props.getValue().modified}
+          operation={getRevisionTypeLabel(props.row.original.content.currentRevisionType, t)}
+          date={props.row.original.content.modified}
           lang='fr'
-          author={props.getValue().lastModifier}
+          author={props.row.original.content.lastModifier}
         />
       )
     },
     className: settings.className,
-    filter: (data, userFilter) => {
-      if (!data.content || !data.content.lastModifier) return false
-      return stringIncludes(userFilter)(data.content.lastModifier.publicName)
-    }
+    filterFn: 'includesString'
   })
 }
 

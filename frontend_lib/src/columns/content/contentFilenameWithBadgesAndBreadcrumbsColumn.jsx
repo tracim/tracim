@@ -1,16 +1,18 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import { stringIncludes } from '../../helper.js'
 import { SORT_BY } from '../../sortListHelper.js'
 import Breadcrumbs from '../../component/Breadcrumbs/Breadcrumbs.jsx'
 import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 import { FilenameWithBadges } from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
 import Icon from '../../component/Icon/Icon.jsx'
 
-const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings) => {
+const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.accessor(row => {
+    const breadcrumbs = row.breadcrumbs ? row.breadcrumbs.map(b => b.label).join('') : ''
+    return `${row.originalLabel} ${breadcrumbs}`
+  }, {
     header: props => (
       <TitleListHeader
         title={settings.header}
@@ -24,37 +26,31 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings) => {
     id: 'titleWithPath',
     cell: props => (
       <>
-        {props.getValue().content ? (
+        {props.row.original.content ? (
           <div className='contentListItem__name_path'>
-            <FilenameWithBadges file={props.getValue().content} />
+            <FilenameWithBadges file={props.row.original.content} />
             <Breadcrumbs
-              breadcrumbsList={props.getValue().breadcrumbs}
+              breadcrumbsList={props.row.original.breadcrumbs}
               keepLastBreadcrumbAsLink
             />
           </div>
         ) : (
           <div className='contentListItem__name_path unavailableContent__name_warning'>
-            <span> {props.getValue().originalLabel}</span>
+            <span> {props.row.original.originalLabel}</span>
             <span className='unavailableContent__warning'>
               <Icon
                 icon='fas fa-exclamation-triangle'
-                title={props.translate('Warning')}
+                title={t('Warning')}
               />
               &nbsp;
-              {props.translate('content is not available')}
+              {t('content is not available')}
             </span>
           </div>
         )}
       </>
     ),
     className: settings.className,
-    filter: (data, userFilter) => {
-      const includesFilter = stringIncludes(userFilter)
-      const hasFilterMatchOnContentLabel = includesFilter(data.originalLabel)
-      const hasFilterMatchOnBreadcrumbs = data.breadcrumbs && data.breadcrumbs.some(item => includesFilter(item.label))
-
-      return hasFilterMatchOnContentLabel || hasFilterMatchOnBreadcrumbs
-    }
+    filterFn: 'includesString'
   })
 }
 

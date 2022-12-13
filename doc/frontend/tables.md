@@ -3,11 +3,13 @@
 Table and columns in Tracim are a new way of coding and rendering tables and listings
 for Tracim. It contributes to a more consistent interface in Tracim.
 
-For developers, it provides an easier way to design tables. It is designed to reduce development time,
-since columns are designed to be reusable in different tables. It also removes the necessity to implement
+For developers, it provides an easier way to design tables. 
+It is designed to reduce development time,
+since columns are designed to be reusable in different tables. 
+It also removes the necessity to implement
 per table sorting and filtering, since it is managed by the columns.
 
-It also drastically reduces the code size for your pages. Since the rendering, filtering and sorting
+It also drastically reduces the code size for pages. Since the rendering, filtering and sorting
 of the data is managed by the tables and columns.
 
 
@@ -51,7 +53,9 @@ For this example we will use the following data format:
 ```json
 {
   "status": "online",
-  "username": "John",
+  "username": "xXJohnXx",
+  "firstName": "John",
+  "lastName": "Doe",
   "age": 25
 }
 ```
@@ -60,7 +64,7 @@ For this example we will use the following data format:
 
 #### Step 1
 
-Create your column function and set it to receive a mandatory argument: `settings`.
+Create a column function and set it to receive a mandatory argument: `settings`.
 
 ```javascript
 const myColumn = (settings) => {}
@@ -88,7 +92,8 @@ const myColumn = (settings) => {
 }
 ```
 
-For more information about this function refer to the library's documentation on [tanstack.com](https://tanstack.com/).
+For more information about this function refer to the library's documentation on 
+[tanstack.com](https://tanstack.com/).
 
 ---
 
@@ -105,25 +110,28 @@ Define the various required sections of a column:
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
 
-const myColumn = (settings) => {
+const usernameColumn = (settings) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.accessor(row => row.username, {
     header: () => '',
-    id: 'myColumn',
+    id: 'username',
     cell: props => '',
     className: settings.className
   })
 }
 ```
 
-The `row => row` accessor function is used to choose which data will be passed to the cell.
-If I wanted to only use the `age` field, I'd have to set the accessor function to `row => row.age`.
-Setting it to `row => row` gives access to the whole object.
+The `row => row.username` accessor function is used to choose which data 
+will be passed to the filter function.
+Its return value needs to be set to a primitive for this feature to work.
+(e.g. `row => row.username`).
 
-To use more than one field of the data (`age` and `status` for example), 
-it is required to import the whole object.
+Preprocessing complex data to output a primitive should be considered.
+(e.g. ``row => `${row.firstName} ${row.lastName}` ``)
 
-An additional field: `filter` can be added, we'll cover it later.
+This however brings limitations for the sorting and filtering functions, 
+it is still possible to circumvent this limitation. 
+(e.g. serializing the JSON to a string, and deserialize it in the filter function).
 
 ---
 
@@ -134,13 +142,13 @@ For now the column renders an empty header and cell. It's time to define a prope
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
 
-const myColumn = (settings) => {
+const usernameColumn = (settings) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.accessor(row => row.username, {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'myColumn',
+    id: 'username',
     cell: props => '',
     className: settings.className
   })
@@ -158,9 +166,9 @@ To make this column sortable, use the `TitleListHeader` component:
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
 
-const myColumn = (settings) => {
+const usernameColumn = (settings) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.accessor(row => row.username, {
     header: props => (
       <TitleListHeader
         title={settings.header}
@@ -171,7 +179,7 @@ const myColumn = (settings) => {
         tootltip={settings.tooltip}
       />
     ),
-    id: 'myColumn',
+    id: 'username',
     cell: props => '',
     className: settings.className
   })
@@ -179,7 +187,7 @@ const myColumn = (settings) => {
 ```
 
 It is required to set `TitleListHeader` as demonstrated, otherwise it will not work properly.
-The only things you should change are the `SORT_BY` fields and the customClass prop.
+The only things that should be changed are the `SORT_BY` fields and the customClass prop.
 
 Note that `header` has props. These are the props passed by `TracimTable`.
 
@@ -195,9 +203,9 @@ the accessor function.
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
 
-const myColumn = (settings) => {
+const usernameColumn = (settings) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.accessor(row => row.username, {
     header: props => (
       <TitleListHeader
         title={settings.header}
@@ -208,16 +216,15 @@ const myColumn = (settings) => {
         tootltip={settings.tooltip}
       />
     ),
-    id: 'myColumn',
+    id: 'username',
     cell: props => (
-      <span>{`${props.translate('Hello')} ${props.getValue().username}, how are you?`}</span>
+      <span>{`Hello ${props.row.original.username}, how are you?`}</span>
     ),
     className: settings.className
   })
 }
 ```
-
-An additional prop is passed: `props.translate` it's equivalent to `props.t` in a component.
+The row's data is stored in `props.row.original`.
 
 Like `header`, `cell` is similar to a React Function Component.
 
@@ -225,19 +232,22 @@ Like `header`, `cell` is similar to a React Function Component.
 
 #### Step 6 (Optional)
 
-To make this column filterable, define a filter function.
+If the accessor is properly set, the column will be filterable by default.
+The appropriate filter function will be automatically chosen from the built-in filters.
+however it is preferable to specify it in the `filterFn` field to avoid any unexpected behavior.
 
-It takes, three argument, with the last one being optional:
-- `data`: The row's data
-- `userFilter`: The user input in the filter bar
-- `translate`: The same element as the cell's `props.translate`
+The list of built-in filter functions can be found on 
+[tanstack.com](https://tanstack.com/table/v8/docs/api/features/filters#filter-functions).
+
+Instead of using a built-in, it is possible to set it to a custom filter function 
+instead of the built-in's string.
 
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
 
-const myColumn = (settings) => {
+const myCousernameColumnlumn = (settings) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row, {
+  return columnHelper.accessor(row => row.username, {
     header: props => (
       <TitleListHeader
         title={settings.header}
@@ -248,33 +258,27 @@ const myColumn = (settings) => {
         tootltip={settings.tooltip}
       />
     ),
-    id: 'myColumn',
+    id: 'username',
     cell: props => (
       <span>{`${props.translate('Hello')} ${props.getValue().username}`}</span>
     ),
     className: settings.className,
-    filter: (data, userFilter) => {
-      return stringIncludes(userFilter)(data.username)
-    }
+    filterFn: 'includesString'
   })
 }
 ```
 
-(In this example, `translate` is not used)
-
-If the `filter` function is not defined, the column will be excluded from the
-`TracimTable` filtering algorithm.
+If the accessor is not properly set, the column will be ignored by the filtering algorithm.
 
 Here is a complete column. It's filterable, sortable, has a header and a cell and
 can now be used it in tables!
-
 
 ## Tables
 
 A table or a listing is a container rendering the `TracimTable` component 
 (`frontend_lib/src/component/TracimTable/TracimTable.jsx`).
 
-The `TracimTable` manages the rendering, filtering, and sorting of your data.
+The `TracimTable` manages the rendering, filtering, and sorting of the data.
 
 ###  How to create a new table
 
@@ -347,7 +351,8 @@ myTable.propsType = {
 }
 ```
 
-(Additional props can be passed to `TracimTable`. We will see these in the [table props section](#props))
+(Additional props can be passed to `TracimTable`. We will see these in the 
+[table props section](#props))
 
 Now the `TracimTable` will automatically render the column headers, 
 and a row per entry in the data array.
@@ -358,20 +363,20 @@ and a row per entry in the data array.
 
 The `TracimTable` is highly configurable through its props. Here is an exhaustive list:
 
-| Name              | Type                   | Required ? | Default Value                     | Definition                                                                                                                                                                      |
-|-------------------|------------------------|------------|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| columns           | Array                  | Yes        | N/A                               | An array of columns, defines (in the order of the array) which columns will be rendered in the table.                                                                           |
-| data              | Array                  | Yes        | N/A                               | The data used to render the table, an entry is a row.                                                                                                                           |
-| noHeader          | Bool                   | No         | false                             | Set to true to skip the headers rendering.                                                                                                                                      |
-| colored           | Bool                   | No         | false                             | Set to true to set a different background-color for even rows, creating an alternating pattern, easier to discern each row in some tables.                                      |
-| filterable        | Bool                   | No         | false                             | Set to true to enable filtering for your table, the filter bar will be rendered accordingly. Filtering rules are defined in the columns. The table manages filtering by itself. |
-| sortable          | Bool                   | No         | false                             | Set to true to enable sorting for your table, the sorting parameters are defined in each columns. The table manages sorting by itself.                                          |
-| emptyMessage      | String                 | No         | 'This list is empty'              | The message to display when your table has no data. Note that it is not related to the message displayed when filtering.                                                        |
-| filterPlaceholder | String                 | No         | 'Filter this list'                | The placeholder to put in the filter bar's input field.                                                                                                                         |
-| defaultSort       | String                 | No         | SORT_BY.LABEL                     | The default value on which the table should sort it's data. Use the `SORT_BY` constant. Refer to your columns to see which values are available.                                |
-| customRowClass    | String                 | No         | ''                                | A custom class applied to each and every row.                                                                                                                                   |
-| rowWrapper        | Func (React Component) | No         | DefaultWrapper (no logic wrapper) | A custom wrapper applied around each and every row, in order to apply code logic to row level (As in content listings for example).                                             |
-| rowWrapperProps   | Object                 | No         | {}                                | Props passed as is to your custom wrapper if set.                                                                                                                               |
+| Name              | Type                   | Required ? | Default Value                     | Definition                                                                                                                                                                     |
+|-------------------|------------------------|------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| columns           | Array                  | Yes        | N/A                               | An array of columns, defines (in the order of the array) which columns will be rendered in the table.                                                                          |
+| data              | Array                  | Yes        | N/A                               | The data used to render the table, an entry is a row.                                                                                                                          |
+| noHeader          | Bool                   | No         | false                             | Set to true to skip the headers rendering.                                                                                                                                     |
+| colored           | Bool                   | No         | false                             | Set to true to set a different background-color for even rows, creating an alternating pattern, easier to discern each row in some tables.                                     |
+| filterable        | Bool                   | No         | false                             | Set to true to enable filtering for the table, the filter bar will be rendered accordingly. Filtering rules are defined in the columns. The table manages filtering by itself. |
+| sortable          | Bool                   | No         | false                             | Set to true to enable sorting for the table, the sorting parameters are defined in each columns. The table manages sorting by itself.                                          |
+| emptyMessage      | String                 | No         | 'This list is empty'              | The message to display when the table has no data. Note that it is not related to the message displayed when filtering.                                                        |
+| filterPlaceholder | String                 | No         | 'Filter this list'                | The placeholder to put in the filter bar's input field.                                                                                                                        |
+| defaultSort       | String                 | No         | SORT_BY.LABEL                     | The default value on which the table should sort it's data. Use the `SORT_BY` constant. Refer to your columns to see which values are available.                               |
+| customRowClass    | String                 | No         | ''                                | A custom class applied to each and every row.                                                                                                                                  |
+| rowWrapper        | Func (React Component) | No         | DefaultWrapper (no logic wrapper) | A custom wrapper applied around each and every row, in order to apply code logic to row level (As in content listings for example).                                            |
+| rowWrapperProps   | Object                 | No         | {}                                | Props passed as is to the custom wrapper if set.                                                                                                                               |
 
 
 ## Example
@@ -386,18 +391,18 @@ The shown code is the code of the `FavoritesTable` and the `Last Modification` c
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import {
-  stringIncludes,
-  getRevisionTypeLabel
-} from '../helper.js'
+import { getRevisionTypeLabel } from '../helper.js'
 
 import { SORT_BY } from '../sortListHelper.js'
 import TimedEvent from '../component/TimedEvent/TimedEvent.jsx'
 import TitleListHeader from '../component/Lists/ListHeader/TitleListHeader.jsx'
 
-const timedEventColumn = (settings) => {
+const timedEventColumn = (settings, t) => {
   const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.content, {
+  return columnHelper.accessor(row => {
+    if (!row.content || !row.content.lastModifier) return undefined
+    return row.content.lastModifier.publicName
+  }, {
     header: props => (
       <TitleListHeader
         title={settings.header}
@@ -410,23 +415,20 @@ const timedEventColumn = (settings) => {
     ),
     id: 'lastModification',
     cell: props => {
-      if (!props.getValue()) return null
+      if (!props.row.original.content) return null
 
       return (
         <TimedEvent
           customClass='contentListItem__modification'
-          operation={getRevisionTypeLabel(props.getValue().currentRevisionType, props.translate)}
-          date={props.getValue().modified}
+          operation={getRevisionTypeLabel(props.row.original.content.currentRevisionType, t)}
+          date={props.row.original.content.modified}
           lang='fr'
-          author={props.getValue().lastModifier}
+          author={props.row.original.content.lastModifier}
         />
       )
     },
     className: settings.className,
-    filter: (data, userFilter) => {
-      if (!data.content || !data.content.lastModifier) return false
-      return stringIncludes(userFilter)(data.content.lastModifier.publicName)
-    }
+    filterFn: 'includesString'
   })
 }
 
@@ -459,25 +461,25 @@ const FavoritesTable = (props) => {
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
       className: 'tracimTable__styles__width__icon'
-    }, props.contentType),
+    }, props.contentType, props.t),
 
     contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
       className: 'tracimTable__styles__flex__4'
-    }),
+    }, props.t),
 
     timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
       className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
-    }),
+    }, props.t),
 
     contentInformationColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
       className: 'tracimTable__styles__flex__2 tracimTable__hide__md'
-    }, props.contentType),
+    }, props.contentType, props.t),
 
     favoriteButtonColumn({
       header: props.t('Favorite'),
@@ -491,7 +493,11 @@ const FavoritesTable = (props) => {
       data={props.favoriteList}
       user={props.user}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
-      rowWrapperProps={{ customClass: 'favoriteTable__row', contentType: props.contentType }}
+      rowWrapperProps={{
+        customClass: 'favoriteTable__row',
+        contentType: props.contentType,
+        dataCy: 'favorites__item'
+      }}
       rowWrapper={ListItemRowWrapper}
       sortable
       filterable
@@ -502,8 +508,7 @@ const FavoritesTable = (props) => {
 
 FavoritesTable.propsType = {
   favoriteList: PropTypes.array.isRequired,
-  onFavoriteButtonClick: PropTypes.func.isRequired,
-  user: PropTypes.object.isRequired
+  onFavoriteButtonClick: PropTypes.func.isRequired
 }
 
 const mapStateToProps = ({ contentType, user }) => ({ contentType, user })
