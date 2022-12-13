@@ -34,6 +34,7 @@ const TracimTable = (props) => {
   })
 
   const RowWrapper = props.rowWrapper
+  const rows = props.filterable ? table.getFilteredRowModel().rows : table.getRowModel().rows
 
   return (
     <div className='tracimTable'>
@@ -47,7 +48,7 @@ const TracimTable = (props) => {
           placeholder={props.filterPlaceholder}
         />
       )}
-      {props.data.length > 0
+      {rows.length > 0
         ? (
           <>
             {!props.noHeader && (
@@ -77,7 +78,7 @@ const TracimTable = (props) => {
               </div>
             )}
             <div className={classnames('tracimTable__body', { tracimTable__body__colored: props.colored })}>
-              {table.getFilteredRowModel().rows.map(row => (
+              {rows.map(row => (
                 <RowWrapper key={`${row.id}-wrapper`} {...row.original} {...props.rowWrapperProps}>
                   <div
                     className={classnames('tracimTable__body__row', props.customRowClass)}
