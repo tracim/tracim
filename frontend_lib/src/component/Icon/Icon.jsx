@@ -12,13 +12,14 @@ const Icon = props => (
 )
 
 Icon.propTypes = {
-  icon: PropTypes.string.isRequired,
+  icon: PropTypes.string,
   title: PropTypes.string.isRequired,
   color: PropTypes.string,
   customClass: PropTypes.string
 }
 
 Icon.defaultProps = {
+  icon: 'fas fa-question',
   color: '',
   customClass: ''
 }

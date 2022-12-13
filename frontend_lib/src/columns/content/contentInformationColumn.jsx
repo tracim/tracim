@@ -1,8 +1,6 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import { SORT_BY } from '../../sortListHelper.js'
-import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
 import Icon from '../../component/Icon/Icon.jsx'
 
 const contentInformationColumn = (settings, contentType, t) => {
@@ -16,15 +14,8 @@ const contentInformationColumn = (settings, contentType, t) => {
 
     return t(statusInfo.label)
   }, {
-    header: props => (
-      <TitleListHeader
-        title={settings.header}
-        onClickTitle={() => props.onClickTitle(SORT_BY.STATUS)}
-        customClass='tracimTable__header__btn'
-        isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriterion === SORT_BY.STATUS}
-        tootltip={settings.tooltip}
-      />
+    header: () => (
+      <span>{settings.header}</span>
     ),
     id: 'information',
     cell: props => {

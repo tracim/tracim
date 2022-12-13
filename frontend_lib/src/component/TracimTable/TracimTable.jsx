@@ -6,12 +6,14 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
 
 import EmptyListMessage from '../EmptyListMessage/EmptyListMessage.jsx'
 import FilterBar from '../FilterBar/FilterBar.jsx'
 import classnames from 'classnames'
+import Icon from '../Icon/Icon.jsx'
 
 const DefaultWrapper = (props) => {
   return props.children
@@ -28,14 +30,14 @@ const TracimTable = (props) => {
     columns: props.columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: props.sortable && getSortedRowModel(),
     debugTable: true, // TODO Remove debug flags
     debugHeaders: true,
     debugColumns: true
   })
 
   const RowWrapper = props.rowWrapper
-  const rows = props.filterable ? table.getFilteredRowModel().rows : table.getRowModel().rows
-
+  const rows = table.getRowModel().rows
   return (
     <div className='tracimTable'>
       {props.filterable && (
@@ -60,16 +62,34 @@ const TracimTable = (props) => {
                   >
                     {headerGroup.headers.map(header => (
                       <div
-                        className={classnames('tracimTable__header__row__cell', header.column.columnDef.className)}
+                        onClick={props.sortable && header.column.getToggleSortingHandler()}
+                        className={classnames('tracimTable__header__row__cell',
+                          header.column.columnDef.className,
+                          { tracimTable__styles__clickable: props.sortable }
+                        )}
                         key={header.id}
                       >
                         {header.isPlaceholder
                           ? null
-                          : flexRender(
-                            header.column.columnDef.header,
-                            {
-                              ...header.getContext()
-                            }
+                          : (
+                            <>
+                              {flexRender(
+                                header.column.columnDef.header,
+                                {
+                                  ...header.getContext()
+                                }
+                              )}
+                              {props.sortable && (
+                                <Icon
+                                  icon={{
+                                    asc: 'fas fa-sort-amount-down-alt',
+                                    desc: 'fas fa-sort-amount-up-alt'
+                                  }[header.column.getIsSorted()] || null}
+                                  customClass={classnames('titleListHeader__icon', { tracimTable__styles__hide: !header.column.getIsSorted() })}
+                                  title={header.column.columnDef.tooltip}
+                                />
+                              )}
+                            </>
                           )}
                       </div>
                     ))}
@@ -130,8 +150,7 @@ TracimTable.propsType = {
   customRowClass: PropTypes.string,
   filterable: PropTypes.bool,
   filterPlaceholder: PropTypes.string,
-  sortable: PropTypes.bool,
-  defaultSort: PropTypes.string
+  sortable: PropTypes.bool
 }
 
 TracimTable.defaultProps = {

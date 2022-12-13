@@ -1,10 +1,8 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import { SORT_BY } from '../../sortListHelper.js'
 import Breadcrumbs from '../../component/Breadcrumbs/Breadcrumbs.jsx'
-import TitleListHeader from '../../component/Lists/ListHeader/TitleListHeader.jsx'
-import { FilenameWithBadges } from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
+import FilenameWithBadges from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
 import Icon from '../../component/Icon/Icon.jsx'
 
 const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
@@ -13,15 +11,8 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
     const breadcrumbs = row.breadcrumbs ? row.breadcrumbs.map(b => b.label).join('') : ''
     return `${row.originalLabel} ${breadcrumbs}`
   }, {
-    header: props => (
-      <TitleListHeader
-        title={settings.header}
-        onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
-        customClass='tracimTable__header__btn'
-        isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
-        tootltip={settings.tooltip}
-      />
+    header: () => (
+      <span>{settings.header}</span>
     ),
     id: 'titleWithPath',
     cell: props => (
@@ -50,7 +41,8 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
       </>
     ),
     className: settings.className,
-    filterFn: 'includesString'
+    filterFn: 'includesString',
+    sortingFn: 'alphanumeric'
   })
 }
 
