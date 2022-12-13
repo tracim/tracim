@@ -306,6 +306,15 @@ export { default as COLORS } from './colors.js'
 
 export { default as TracimTable } from './component/TracimTable/TracimTable.jsx'
 
+export { default as ListItemRowWrapper } from './container/RowWrappers/ListItemRowWrapper.jsx'
+
+export { default as contentFilenameWithBadgesAndBreadcrumbsColumn } from './columns/content/contentFilenameWithBadgesAndBreadcrumbsColumn.jsx'
+export { default as contentInformationColumn } from './columns/content/contentInformationColumn.jsx'
+export { default as contentTypeColumn } from './columns/content/contentTypeColumn.jsx'
+
+export { default as favoriteButtonColumn } from './columns/favoriteButtonColumn.jsx'
+export { default as timedEventColumn } from './columns/timedEventColumn.jsx'
+
 export {
   TRANSLATION_STATE,
   handleTranslateComment,
