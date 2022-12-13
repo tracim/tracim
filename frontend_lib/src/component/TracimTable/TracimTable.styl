@@ -1,0 +1,71 @@
+@import "../../css/Variable.styl"
+
+.tracimTable
+  &__header
+    display flex
+    flex-direction column
+    &__btn
+      padding 0
+      display flex
+      justify-content center
+      align-items: center
+    &__btn:focus
+       box-shadow none
+    &__row
+      display flex
+      flex-direction row
+      white-space nowrap
+      padding standardSpacing 0
+      margin standardSpacing 0
+      &__cell
+        display flex
+        overflow hidden
+        text-overflow ellipsis
+        margin-inline-start standardSpacing
+        margin-inline-end standardSpacing
+      &__cell *
+        overflow hidden
+        text-overflow ellipsis
+  &__body
+    display flex
+    flex-direction column
+    &__row
+      display flex
+      flex-direction row
+      white-space nowrap
+      padding standardSpacing 0
+      &__cell
+        display flex
+        overflow hidden
+        text-overflow ellipsis
+        margin-inline-start standardSpacing
+        margin-inline-end standardSpacing
+      &__cell *
+        overflow hidden
+        text-overflow ellipsis
+
+  &__styles
+    &__overflow
+      &__visible
+        overflow visible
+    &__width
+      &__icon
+        width listIconWidth
+        display flex
+        justify-content center
+    &__flex
+      &__1
+        flex 1
+      &__4
+        flex 4
+      &__2
+        flex 2
+
+@media (max-width: max-md)
+  .tracimTable
+    &__hide
+      &__md
+        display none
+
+.tracimTable__body__colored .tracimTable__body__row:nth-child(even)
+  background-color lightGrey2
