@@ -28,7 +28,7 @@ const TracimTable = (props) => {
     columns: props.columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    debugTable: true, // TODO Remove this
+    debugTable: true, // TODO Remove debug flags
     debugHeaders: true,
     debugColumns: true
   })
@@ -116,6 +116,8 @@ const TracimTable = (props) => {
     </div>
   )
 }
+
+// TODO Remove debug renders (l.115)
 
 TracimTable.propsType = {
   columns: PropTypes.array.isRequired,
