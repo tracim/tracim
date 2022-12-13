@@ -264,41 +264,23 @@ export class Thread extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
-    // const { state } = this
-
-    // if (!handleInvalidMentionInComment(
-    //   state.config.workspace && state.config.workspace.memberList,
-    //   state.timelineWysiwyg,
-    //   comment,
-    //   this.setState.bind(this)
-    // )) {
-    //   this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
-    //   return true
-    // }
-    // return false
-    this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
-    return true
-  }
-
-  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
+  handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    console.log("THREAD - handleClickValidateAnywayNewComment", comment, commentAsFileList)
-    try {
-      props.appContentSaveNewComment(
-        state.content,
-        state.timelineWysiwyg,
-        comment,
-        commentAsFileList,
-        this.setState.bind(this),
-        state.config.slug,
-        state.loggedUser.username
-      )
-      return true
-    } catch (e) {
-      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-      return false
-    }
+    console.log("THREAD - handleClickValidateNewComment", comment, commentAsFileList)
+    console.log("THREAD - 1")
+    await props.appContentSaveNewCommentText(
+      state.content,
+      comment,
+      state.config.slug,
+    )
+    console.log("THREAD - 2")
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      state.content,
+      commentAsFileList,
+    )
+    console.log("THREAD - 3")
+    return true
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -336,13 +318,16 @@ export class Thread extends React.Component {
     sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
 
-  handleClickEditComment = (comment) => {
+  handleClickEditComment = (comment, contentId, parentId) => {
+    console.log("THREAD - handleClickEditComment", comment)
     const { props, state } = this
     props.appContentEditComment(
+      [],
+      state.config.workspace.memberList,
       state.content.workspace_id,
-      comment.parent_id,
-      comment.content_id,
-      state.loggedUser.username
+      parentId,
+      contentId,
+      comment
     )
   }
 
@@ -464,53 +449,46 @@ export class Thread extends React.Component {
             {state.config.apiUrl ? (
               <Timeline
                 apiUrl={state.config.apiUrl}
-                onClickSubmit={this.handleClickValidateAnywayNewComment}
-                codeLanguageList={state.config.system.config.code_languages}
-                contentId={state.content.content_id}
-                contentType={state.content.content_type}
-                loading={props.loadingTimeline}
-                customClass={`${state.config.slug}__contentpage`}
-                customColor={color}
                 loggedUser={state.loggedUser}
-                memberList={state.config.workspace && state.config.workspace.memberList}
-                timelineData={props.timeline}
-                disableComment={!state.content.is_editable}
-                availableStatusList={state.config.availableStatuses}
-                wysiwyg={state.timelineWysiwyg}
-                onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-                onClickWysiwygBtn={this.handleToggleWysiwyg}
-                allowClickOnRevision={false}
-                onClickRevisionBtn={() => { }}
-                shouldScrollToBottom
-                isArchived={state.content.is_archived}
-                onClickRestoreArchived={this.handleClickRestoreArchive}
-                isDeleted={state.content.is_deleted}
-                onClickRestoreDeleted={this.handleClickRestoreDelete}
-                isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
-                deprecatedStatus={state.config.availableStatuses[3]}
-                invalidMentionList={state.invalidMentionList}
-                isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
-                onClickCancelSave={this.handleCancelSave}
-                onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-                wysiwygIdSelector='#wysiwygTimelineComment'
-                workspaceId={state.content.workspace_id}
-                showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-                searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
+                onClickRestoreComment={props.handleRestoreComment}
+                onClickSubmit={this.handleClickValidateNewComment}
                 onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
                   comment,
                   state.content.workspace_id,
                   languageCode || state.translationTargetLanguageCode
                 )}
-                onClickRestoreComment={props.handleRestoreComment}
-                onClickEditComment={this.handleClickEditComment}
-                onClickDeleteComment={this.handleClickDeleteComment}
-                onClickOpenFileComment={this.handleClickOpenFileComment}
-                translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                timelineData={props.timeline}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
-                onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-                onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+                translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
+                workspaceId={state.content.workspace_id}
+                // /////////////////////////////////////////////////////////////
+                allowClickOnRevision={false}
+                availableStatusList={state.config.availableStatuses}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+                codeLanguageList={state.config.system.config.code_languages}
+                contentId={state.content.content_id}
+                contentType={state.content.content_type}
+                customClass={`${state.config.slug}__contentpage`}
+                customColor={color}
+                deprecatedStatus={state.config.availableStatuses[3]}
+                disableComment={!state.content.is_editable}
+                invalidMentionList={state.invalidMentionList}
+                isArchived={state.content.is_archived}
+                isDeleted={state.content.is_deleted}
+                isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
                 isFileCommentLoading={state.isFileCommentLoading}
+                isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
+                loading={props.loadingTimeline}
+                memberList={state.config.workspace && state.config.workspace.memberList}
+                onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                onClickDeleteComment={this.handleClickDeleteComment}
+                onClickEditComment={this.handleClickEditComment}
+                onClickOpenFileComment={this.handleClickOpenFileComment}
+                onClickRestoreArchived={this.handleClickRestoreArchive}
+                onClickRestoreDeleted={this.handleClickRestoreDelete}
+                onClickRevisionBtn={() => { }}
+                onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+                shouldScrollToBottom
               />
             ) : null}
           </div>

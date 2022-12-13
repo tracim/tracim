@@ -5,15 +5,12 @@ import i18n from '../../i18n.js'
 import { TracimComponent } from '../../tracimComponent.js'
 import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
-import { CONTENT_TYPE, tinymceRemove } from '../../helper.js'
+import { CONTENT_TYPE } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import IconButton from '../Button/IconButton.jsx'
 import CommentArea from './CommentArea.jsx'
 
 // require('./EditCommentPopup.styl') // see https://github.com/tracim/tracim/issues/1156
-
-const wysiwygId = 'wysiwygTimelineCommentEdit'
-const wysiwygIdSelector = `#${wysiwygId}`
 
 export class EditCommentPopup extends React.Component {
   constructor (props) {
@@ -28,16 +25,8 @@ export class EditCommentPopup extends React.Component {
     }
   }
 
-  componentWillUnmount () {
-    // tinymceRemove(wysiwygIdSelector)
-  }
-
   handleAllAppChangeLanguage = (data) => {
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, true)
-  }
-
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
   }
 
   render () {
@@ -53,19 +42,21 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
-          onClickSubmit={props.onClickValidate}
+          onClickSubmit={
+            () => props.onClickValidate(
+              tinymce.activeEditor.getContent(), props.commentId, props.parentId
+            )
+          }
           codeLanguageList={props.codeLanguageList}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
           customClass='editCommentPopup'
+          customColor={props.customColor}
           hideSendButtonAndOptions
-          id={wysiwygId}
-          lang={props.loggedUserLanguage}
           newComment={state.newComment}
-          searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery} //
+          roleList={[]}
+          memberList={props.memberList}
           workspaceId={props.workspaceId}
-          wysiwyg //
-          wysiwygIdSelector={wysiwygIdSelector} //
         />
 
         <div className='editCommentPopup__buttons'>
@@ -84,8 +75,11 @@ export class EditCommentPopup extends React.Component {
             icon='far fa-paper-plane'
             intent='primary'
             mode='light'
-            onClick={props.onClickValidate}
-            // onClick={() => props.onClickValidateonClickValidate(state.newComment)}
+            onClick={
+              () => props.onClickValidate(
+                tinymce.activeEditor.getContent(), props.commentId, props.parentId
+              )
+            }
             text={props.t('Send')}
             type='button'
           />
@@ -102,16 +96,20 @@ EditCommentPopup.propTypes = {
   onClickClose: PropTypes.func.isRequired,
   onClickValidate: PropTypes.func.isRequired,
   codeLanguageList: PropTypes.array,
+  commentId: PropTypes.number,
   customColor: PropTypes.string,
   loggedUserLanguage: PropTypes.string,
+  memberList: PropTypes.array,
+  parentId: PropTypes.number,
   workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  commentId: PropTypes.number
 }
 
 EditCommentPopup.defaultProps = {
   codeLanguageList: [],
+  commentId: 0,
   customColor: undefined,
   loggedUserLanguage: 'en',
+  memberList: [],
+  parentId: 0,
   workspaceId: undefined,
-  commentId: 0
 }

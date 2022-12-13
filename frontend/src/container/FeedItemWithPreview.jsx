@@ -11,25 +11,26 @@ import {
   FETCH_CONFIG
 } from '../util/helper.js'
 import {
-  appContentFactory,
   COLORS,
-  Comment,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  PAGE,
+  ROLE_LIST,
+  ROLE,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  TRANSLATION_STATE,
+  Comment,
+  Timeline,
+  TracimComponent,
+  appContentFactory,
   getDefaultTranslationState,
-  handleInvalidMentionInComment,
   handleTranslateComment,
   handleTranslateHtmlContent,
-  PAGE,
-  ROLE,
-  ROLE_LIST,
-  Timeline,
+  searchContentAndPlaceBalise,
+  searchMentionAndPlaceBalise,
   tinymceRemove,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_SUB_TYPE as TLM_ST,
-  TracimComponent,
-  TRANSLATION_STATE
 } from 'tracim_frontend_lib'
 
 export class FeedItemWithPreview extends React.Component {
@@ -117,13 +118,20 @@ export class FeedItemWithPreview extends React.Component {
     props.appContentChangeComment(e, props.content, this.setState.bind(this), props.content.slug)
   }
 
-  handleClickEditComment = (comment) => {
-    const { props } = this
+  handleClickEditComment = async (comment, contentId, parentId) => {
+    console.log("FeedItemWithPreview - handleClickEditComment", comment, contentId, parentId)
+    const { props, state } = this
+    let newComment = searchMentionAndPlaceBalise([], props.memberList, comment)
+    console.log("FeedItemWithPreview - handleClickEditComment - newComment", newComment.html)
+    newComment = await searchContentAndPlaceBalise(props.apiUrl, newComment.html)
+    console.log("FeedItemWithPreview - handleClickEditComment - newComment", newComment.html)
     props.appContentEditComment(
-      props.content.workspaceId,
-      comment.parent_id,
-      comment.content_id,
-      props.user.username
+      [],
+      state.config.workspace.memberList,
+      state.content.workspace_id,
+      parentId,
+      contentId,
+      comment
     )
   }
 
@@ -146,41 +154,28 @@ export class FeedItemWithPreview extends React.Component {
     ))
   }
 
-  handleClickSend = (comment, commentAsFileList) => {
+  handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    if (!handleInvalidMentionInComment(
-      props.memberList,
-      state.timelineWysiwyg,
+    console.log("FEEDITEMWITHPREVIEW - handleClickValidateNewComment", comment, commentAsFileList)
+    console.log("FEEDITEMWITHPREVIEW - 1")
+    const content = {
+      ...props.content,
+      content_id: props.content.id,
+      workspace_id: props.content.workspaceId
+    }
+    await props.appContentSaveNewCommentText(
+      content,
       comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnyway(comment, commentAsFileList)
-      return true
-    }
-    return false
-  }
-
-  handleClickValidateAnyway = async (comment, commentAsFileList) => {
-    const { props, state } = this
-    console.log("FEEDITEMWITHPREVIEW - handleClickValidateAnyway", comment, commentAsFileList)
-    try {
-      props.appContentSaveNewComment(
-        {
-          ...props.content,
-          content_id: props.content.id,
-          workspace_id: props.content.workspaceId
-        },
-        state.timelineWysiwyg,
-        comment,
-        commentAsFileList,
-        this.setState.bind(this),
-        props.content.type,
-        props.user.username,
-        props.content.id
+      props.content.type,
+    )
+    console.log("FEEDITEMWITHPREVIEW - 2")
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      content,
+      commentAsFileList
       )
-    } catch (e) {
-      this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-    }
+    console.log("FEEDITEMWITHPREVIEW - 3")
+    return true
   }
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
@@ -445,30 +440,9 @@ export class FeedItemWithPreview extends React.Component {
             {props.showCommentList && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
-                onClickSubmit={this.handleClickValidateAnyway}
-                codeLanguageList={props.system.config.code_languages}
-                contentId={props.content.id}
-                contentType={props.content.type}
-                customClass='feedItem__timeline'
-                customColor={contentType.hexcolor}
-                id={props.content.id}
-                invalidMentionList={state.invalidMentionList}
                 loggedUser={loggedUser}
-                memberList={props.memberList}
-                onRemoveCommentAsFile={this.handleRemoveCommentAsFile}
-                onClickDeleteComment={this.handleClickDeleteComment}
-                onClickEditComment={this.handleClickEditComment}
-                onClickValidateNewCommentBtn={this.handleClickSend}
-                onClickWysiwygBtn={this.handleToggleWysiwyg}
-                shouldScrollToBottom={false}
-                showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-                timelineData={commentList}
-                wysiwyg={state.timelineWysiwyg}
-                onClickCancelSave={this.handleCancelSave}
-                onClickOpenFileComment={this.handleClickOpenFileComment}
-                onClickSaveAnyway={this.handleClickValidateAnyway}
-                searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-                workspaceId={props.workspaceId}
+                onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
+                onClickSubmit={this.handleClickValidateNewComment}
                 onClickTranslateComment={(
                   comment => handleTranslateComment(
                     FETCH_CONFIG.apiUrl,
@@ -480,12 +454,25 @@ export class FeedItemWithPreview extends React.Component {
                     (...args) => this.commentSetState(comment.content_id, ...args)
                   )
                 )}
-                onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
-                translationTargetLanguageList={props.system.config.translation_service__target_languages}
+                timelineData={commentList}
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
+                translationTargetLanguageList={props.system.config.translation_service__target_languages}
+                workspaceId={props.workspaceId}
+                // /////////////////////////////////////////////////////////////
+                codeLanguageList={props.system.config.code_languages}
+                contentId={props.content.id}
+                contentType={props.content.type}
+                customClass='feedItem__timeline'
+                customColor={contentType.hexcolor}
+                id={props.content.id}
+                invalidMentionList={state.invalidMentionList}
+                memberList={props.memberList}
                 onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+                onClickDeleteComment={this.handleClickDeleteComment}
+                onClickEditComment={this.handleClickEditComment}
+                onClickOpenFileComment={this.handleClickOpenFileComment}
+                shouldScrollToBottom={false}
                 showParticipateButton={props.showParticipateButton}
-                wysiwygIdSelector={this.getWysiwygId(props.content.id)}
               />
             )}
           </>

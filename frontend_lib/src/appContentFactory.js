@@ -17,6 +17,8 @@ import {
   getOrCreateSessionClientToken,
   tinymceRemove,
   addRevisionFromTLM,
+  searchContentAndPlaceBalise,
+  searchMentionAndPlaceBalise,
   sortContentByCreatedDateAndID,
   sortContentByStatus
 } from './helper.js'
@@ -30,10 +32,7 @@ import {
 
 import {
   addClassToMentionsOfUser,
-  handleMentionsBeforeSave,
-  getInvalidMentionList,
-  getMatchingGroupMentionList,
-  handleLinksBeforeSave
+  getMatchingGroupMentionList
 } from './mentionOrLink.js'
 
 import {
@@ -136,7 +135,7 @@ export function appContentFactory (WrappedComponent) {
 
     checkApiUrl = () => {
       if (!this.apiUrl) {
-        console.error("Warning from appContentFactory. apiUrl hasn't been set. You must call props.setApiUrl in your component's constructor.")
+        console.error('Error from appContentFactory. `apiUrl` hasn\'t been set. You must call `props.setApiUrl` in your component\'s constructor.')
       }
     }
 
@@ -491,7 +490,10 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    appContentEditComment = async (workspaceId, contentId, commentId, newContent) => {
+    // TODO - MP - 2022-12-13 - To refactor like appContentSaveNewComment
+    appContentEditComment = async (
+      roleList, memberList, workspaceId, contentId, commentId, newContent
+    ) => {
       this.checkApiUrl()
       // const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
       // let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
@@ -512,8 +514,16 @@ export function appContentFactory (WrappedComponent) {
       //   return Promise.reject(e)
       // }
 
+      let formattedContent = searchMentionAndPlaceBalise(
+        roleList, memberList, newContent
+      )
+
+      formattedContent = await searchContentAndPlaceBalise(
+        this.apiUrl, formattedContent.html
+      )
+
       const response = await handleFetchResult(
-        await putComment(this.apiUrl, workspaceId, contentId, commentId, newContent)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, formattedContent.html)
       )
 
       switch (response.apiResponse.status) {
@@ -554,54 +564,21 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    // TODO - MP - 2022-11-29 - Lot of function just like this one should be refactored
-    saveCommentAsText = async (content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id) => {
-      // @FIXME - Côme - 2018/10/31 - line below is a hack to force send html to api
-      // see https://github.com/tracim/tracim/issues/1101
-      // const newCommentForApi = isCommentWysiwyg
-      //   ? tinymce.get(`wysiwygTimelineComment${id}`).getContent()
-      //   : Autolinker.link(`<p>${convertBackslashNToBr(newComment)}</p>`, { stripPrefix: false })
-      // const newCommentForApi = tinymce.get(`wysiwygTimelineComment${id}`).getContent()
-      // let knownMentions = await this.searchForMentionOrLinkInQuery('', content.workspace_id)
-      // knownMentions = knownMentions.map(member => `@${member.username}`)
-
-      // console.log('newCommentForApi', newCommentForApi)
-
-      // const invalidMentionList = getInvalidMentionList(newComment, knownMentions)
-
-      // let newCommentForApiWithMention
-      // try {
-      //   newCommentForApiWithMention = handleMentionsBeforeSave(newComment, loggedUsername, invalidMentionList)
-      // } catch (e) {
-      //   return Promise.reject(e)
-      // }
-
-      // console.log('newCommentForApiWithMention', newCommentForApiWithMention)
-
-      // let newCommentForApiWithMentionAndLink
-      // try {
-      //   newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      // } catch (e) {
-      //   return Promise.reject(e)
-      // }
-
-      // console.log('newCommentForApiWithMentionAndLink', newCommentForApiWithMentionAndLink)
+    appContentSaveNewCommentText = async (content, newComment, appSlug) => {
+      this.checkApiUrl()
 
       const response = await handleFetchResult(
         await postNewComment(
           this.apiUrl,
           content.workspace_id,
           content.content_id,
-          newComment,// newCommentForApiWithMentionAndLink,
+          newComment,
           content.content_namespace
         )
       )
 
       switch (response.apiResponse.status) {
         case 200:
-          // setState({ newComment: '', showInvalidMentionPopupInComment: false })
-          // if (isCommentWysiwyg) tinymce.get(`wysiwygTimelineComment${id}`).setContent('')
-
           removeLocalStorageItem(
             appSlug,
             content.content_id,
@@ -631,7 +608,9 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    saveCommentAsFile = async (content, newCommentAsFile) => {
+    appContentSaveNewCommentFile = async (content, file) => {
+      this.checkApiUrl()
+
       const errorMessageList = [
         { status: 400, code: 3002, message: i18n.t('A content with the same name already exists') },
         { status: 400, code: 6002, message: i18n.t('The file is larger than the maximum file size allowed') },
@@ -640,7 +619,7 @@ export function appContentFactory (WrappedComponent) {
       ]
       const parentNamespace = content.contentNamespace ? content.contentNamespace : content.content_namespace
       return uploadFile(
-        newCommentAsFile,
+        file,
         `${this.apiUrl}/workspaces/${content.workspace_id}/files`,
         {
           additionalFormData: {
@@ -655,23 +634,38 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
+    appContentSaveNewCommentFileList = async (setState, content, fileList) => {
+      this.checkApiUrl()
+
+      setState({ isFileCommentLoading: true })
+      const responseList = await Promise.all(
+        fileList.map(file => this.appContentSaveNewCommentFile(content, file))
+      )
+      const uploadFailedList = responseList.filter(upload => isFileUploadInErrorState(upload))
+      uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
+
+      setState({ fileList: uploadFailedList, isFileCommentLoading: false })
+    }
+
+    //TODO - MP - 2022-12-13 - Remove this function
     appContentSaveNewComment = async (
-      content, isCommentWysiwyg, newComment, newCommentAsFileList, setState, appSlug, loggedUsername, id = ''
+      content,
+      isCommentWysiwyg,
+      newComment,
+      newCommentAsFileList,
+      setState,
+      appSlug,
+      loggedUsername,
+      id = ''
     ) => {
       this.checkApiUrl()
+
       if (newComment) {
-        await this.saveCommentAsText(content, isCommentWysiwyg, newComment, setState, appSlug, loggedUsername, id)
+        await this.appContentSaveNewCommentText(content, newComment, appSlug)
       }
 
       if (newCommentAsFileList && newCommentAsFileList.length > 0) {
-        setState({ isFileCommentLoading: true })
-        const responseList = await Promise.all(
-          newCommentAsFileList.map(newCommentAsFile => this.saveCommentAsFile(content, newCommentAsFile))
-        )
-        const uploadFailedList = responseList.filter(oneUpload => isFileUploadInErrorState(oneUpload))
-        uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
-
-        setState({ newCommentAsFileList: uploadFailedList, isFileCommentLoading: false })
+        appContentSaveNewCommentFileList(setState, content, newCommentAsFileList)
       }
     }
 
@@ -1156,7 +1150,9 @@ export function appContentFactory (WrappedComponent) {
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
           appContentMarkAsTemplate={this.appContentMarkAsTemplate}
-          appContentSaveNewComment={this.appContentSaveNewComment}
+          appContentSaveNewComment={this.appContentSaveNewComment} // To remove?
+          appContentSaveNewCommentText={this.appContentSaveNewCommentText}
+          appContentSaveNewCommentFileList={this.appContentSaveNewCommentFileList}
           appContentChangeStatus={this.appContentChangeStatus}
           appContentArchive={this.appContentArchive}
           appContentDelete={this.appContentDelete}

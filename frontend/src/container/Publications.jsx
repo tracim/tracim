@@ -202,23 +202,6 @@ export class Publications extends React.Component {
     props.dispatch(setCommentListToPublication(parentPublication.id, newTimeline))
   }
 
-  handleClickPublish = (actuality, publicationAsFileList) => {
-    console.log('handleClickPublish', actuality)
-
-    // if (!handleInvalidMentionInComment(
-    //   props.currentWorkspace.memberList,
-    //   state.publicationWysiwyg,
-    //   actuality,
-    //   this.setState.bind(this)
-    // )) {
-    // this.handleClickValidateAnyway(actuality, publicationAsFileList)
-    // return true
-    // }
-    // return false
-    this.saveThreadPublication(actuality, publicationAsFileList)
-    return true
-  }
-
   handleContentCreatedOrRestored = (data) => {
     if (
       data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION ||
@@ -402,14 +385,15 @@ export class Publications extends React.Component {
   //   }
   // }
 
-  // handleClickValidateAnywayEdit = () => {
-  //   this.setState({
-  //     invalidMentionList: [],
-  //     showEditPopup: false,
-  //     showInvalidMentionPopupInComment: false
-  //   })
-  //   this.handleEditPublication()
-  // }
+  handleClickValidateAnywayEdit = () => {
+    console.log("PUBLICATION - handleClickValidateAnywayEdit")
+    this.setState({
+      invalidMentionList: [],
+      showEditPopup: false,
+      showInvalidMentionPopupInComment: false
+    })
+    this.handleEditPublication()
+  }
 
   handleEditPublication = async () => {
     const { props, state } = this
@@ -423,7 +407,12 @@ export class Publications extends React.Component {
         textToSend: returnValue.html
       })
     } else {
+      console.log("--------------------------------------------------------------------------------")
+      console.log("state.commentToEdit.parent_id", state.commentToEdit.parent_id)
+      console.log("state.commentToEdit.content_id", state.commentToEdit.content_id)
       returnValue = await searchContentAndPlaceBalise(state.config.apiUrl, returnValue.html)
+      console.log("state.commentToEdit.parent_id", state.commentToEdit.parent_id)
+      console.log("state.commentToEdit.content_id", state.commentToEdit.content_id)
       // Check if the order is correct
       props.appContentEditComment(
         props.currentWorkspace.id,
@@ -431,6 +420,9 @@ export class Publications extends React.Component {
         state.commentToEdit.content_id,
         returnValue.html
       )
+      console.log("state.commentToEdit.parent_id", state.commentToEdit.parent_id)
+      console.log("state.commentToEdit.content_id", state.commentToEdit.content_id)
+      console.log("--------------------------------------------------------------------------------")
     }
   }
 
@@ -459,39 +451,21 @@ export class Publications extends React.Component {
       return
     }
 
-    try {
-      props.appContentSaveNewComment(
-        fetchPostPublication.json,
-        state.publicationWysiwyg,
-        publication,
-        publicationAsFileList,
-        this.setState.bind(this),
-        '',
-        props.user.username,
-        'Publication'
-      )
-    } catch (e) {
-      props.dispatch(newFlashMessage(e.message || props.t('Error while saving the comment')))
-    }
-  }
-
-  handleClickValidateAnyway = async (actuality, publicationAsFileList = []) => {
-    const { state, props } = this
-
-    // if (state.showEditPopup) {
-    //   this.handleClickValidateAnywayEdit()
-    //   return
-    // }
-
-    this.saveThreadPublication(actuality, publicationAsFileList)
-
-    // setLocalStorageItem(
-    //   CONTENT_TYPE.THREAD,
-    //   newPublicationId,
-    //   parseInt(props.match.params.idws),
-    //   LOCAL_STORAGE_FIELD.COMMENT,
-    //   ''
-    // )
+    console.log("PUBLICATIONS - saveThreadPublication", publication, publicationAsFileList)
+    console.log("PUBLICATIONS - 1")
+    await props.appContentSaveNewCommentText(
+      fetchPostPublication.json,
+      publication,
+      '',
+    )
+    console.log("PUBLICATIONS - 2")
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      fetchPostPublication.json,
+      publicationAsFileList,
+    )
+    console.log("PUBLICATIONS - 3")
+    return true
   }
 
   handleClickCopyLink = content => {
@@ -551,8 +525,7 @@ export class Publications extends React.Component {
           <div className='publishAreaContainer'>
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
-              onClickSubmit={this.handleClickValidateAnyway}
-              bottomAutocomplete
+              onClickSubmit={this.saveThreadPublication}
               buttonLabel={props.t('Publish')}
               codeLanguageList={props.system.config.code_languages}
               contentId={newPublicationId}
@@ -560,22 +533,12 @@ export class Publications extends React.Component {
               customColor={COLORS.PUBLICATION}
               customClass='publishArea'
               icon='fa-fw far fa-paper-plane'
-              id={wysiwygId}
               invalidMentionList={state.invalidMentionList}
-              lang={props.user.lang}
-              multipleFiles
               memberList={props.currentWorkspace.memberList}
-              roleList={[]}
-              onClickCancelSave={this.handleCancelSave}
-              onClickSaveAnyway={this.handleClickValidateAnyway}
-              onClickValidateNewCommentBtn={this.handleClickPublish}
-              onClickWysiwygBtn={this.handleToggleWysiwyg} //
+              multipleFiles
               placeHolder={props.t('Share a news...')}
-              searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery} //
-              showInvalidMentionPopup={!state.loading && state.showInvalidMentionPopupInComment}
+              roleList={[]}
               workspaceId={parseInt(props.match.params.idws)}
-              wysiwygIdSelector={`#${wysiwygId}`} //
-              wysiwyg={state.publicationWysiwyg} //
             />
           </div>
         )}
@@ -626,8 +589,9 @@ export class Publications extends React.Component {
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}
-            onClickValidate={this.handleClickValidateEdit}
+            memberList={props.memberList}
             onClickClose={() => this.setState({ showEditPopup: false })}
+            onClickValidate={this.handleClickValidateAnywayEdit}
             workspaceId={props.currentWorkspace.id}
           />
         )}

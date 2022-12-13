@@ -465,7 +465,7 @@ export class HtmlDocument extends React.Component {
   handleClickSaveDocument = async () => {
     const { state } = this
     const content = tinymce.activeEditor.getContent()
-    const returnValue = searchMentionAndPlaceBalise([], state.config.workspace.memberList, content)
+    let returnValue = searchMentionAndPlaceBalise([], state.config.workspace.memberList, content)
     console.log('HtmlDocument returnValue', returnValue)
     if (returnValue.invalidMentionList.length > 0) {
       this.setState({
@@ -478,31 +478,9 @@ export class HtmlDocument extends React.Component {
     }
   }
 
+  // TODO - MP - 2022-12-13 - This function should be fusioned with handleClickSaveDocument
   handleSaveHtmlDocument = async (textToSend) => {
     const { state, props } = this
-
-    // const content = tinymce.activeEditor.getContent()
-    // const allInvalidMentionList = [...state.oldInvalidMentionList, ...state.invalidMentionList]
-
-    // let newDocumentForApiWithMention
-    // try {
-    //   newDocumentForApiWithMention = handleMentionsBeforeSave(
-    //     content,
-    //     state.loggedUser.username,
-    //     allInvalidMentionList
-    //   )
-    // } catch (e) {
-    //   sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
-    //   return
-    // }
-
-    // let newDocumentForApiWithMentionAndLink
-    // try {
-    //   newDocumentForApiWithMentionAndLink = await handleLinksBeforeSave(newDocumentForApiWithMention, state.config.apiUrl)
-    // } catch (e) {
-    //   return Promise.reject(e.message || props.t('Error while saving the new version'))
-    // }
-
 
     const fetchResultSaveHtmlDoc = await handleFetchResult(
       await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, textToSend)
@@ -563,23 +541,23 @@ export class HtmlDocument extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
+  handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    try {
-      props.appContentSaveNewComment(
-        state.content,
-        state.timelineWysiwyg,
-        comment,
-        commentAsFileList,
-        this.setState.bind(this),
-        state.config.slug,
-        state.loggedUser.username
-      )
-      return true
-    } catch (e) {
-      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-      return false
-    }
+    console.log("HTMLDOC - handleClickValidateNewComment", comment, commentAsFileList)
+    console.log("HTMLDOC - 1")
+    await props.appContentSaveNewCommentText(
+      state.content,
+      comment,
+      state.config.slug,
+    )
+    console.log("HTMLDOC - 2")
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      state.content,
+      commentAsFileList,
+    )
+    console.log("HTMLDOC - 3")
+    return true
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -774,13 +752,15 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
-  handleClickEditComment = (comment) => {
+  handleClickEditComment = (comment, contentId, parentId) => {
     const { props, state } = this
     props.appContentEditComment(
+      [],
+      state.config.workspace.memberList,
       state.content.workspace_id,
-      comment.parent_id,
-      comment.content_id,
-      state.loggedUser.username
+      parentId,
+      contentId,
+      comment
     )
   }
 
@@ -839,7 +819,7 @@ export class HtmlDocument extends React.Component {
         >
           <Timeline
             apiUrl={state.config.apiUrl}
-            onClickSubmit={this.handleClickValidateAnywayNewComment}
+            onClickSubmit={this.handleClickValidateNewComment}
             codeLanguageList={state.config.system.config.code_languages}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
@@ -852,8 +832,7 @@ export class HtmlDocument extends React.Component {
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
             availableStatusList={state.config.availableStatuses}
             wysiwyg={state.timelineWysiwyg}
-            // onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickValidateNewCommentBtn={this.handleClickValidateAnywayNewComment}
+           onClickValidateNewCommentBtn={this.handleClickValidateNewComment}
             onClickWysiwygBtn={this.handleToggleWysiwyg}
             onClickRevisionBtn={this.handleClickShowRevision}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
@@ -861,7 +840,7 @@ export class HtmlDocument extends React.Component {
             key='Timeline'
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+            onClickSaveAnyway={this.handleClickValidateNewComment}
             wysiwygIdSelector='#wysiwygTimelineComment'
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}

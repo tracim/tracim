@@ -191,6 +191,7 @@ export const TinyEditor = props => {
         height: props.height,
         max_height: props.maxHeight,
         min_height: props.minHeight,
+        width: '100%',
         menubar: false,
         statusbar: true,
         toolbar: toolbar,
@@ -201,7 +202,7 @@ export const TinyEditor = props => {
           // /////////////////////////////////////////////
           'advlist autolink lists link image charmap print preview anchor',
           'searchreplace visualblocks code codesample fullscreen',
-          'insertdatetime media table paste code help wordcount textcolor'
+          'insertdatetime media table paste code help wordcount'
         ],
         contextmenu: 'selectall copy paste link customInsertImage table',
         codesample_global_prismjs: true,
@@ -298,7 +299,7 @@ export const TinyEditor = props => {
           })
           // /////////////////////////////////////////////
           // Handle mentions
-          editor.ui.registry.addAutocompleter('autocompletion', {
+          editor.ui.registry.addAutocompleter('mentions', {
             ch: '@',
             columns: 1,
             minChars: 2,
@@ -371,7 +372,7 @@ export const TinyEditor = props => {
           })
           // /////////////////////////////////////////////
           // Handle content link
-          editor.ui.registry.addAutocompleter('autocompletion', {
+          editor.ui.registry.addAutocompleter('content', {
             ch: '#',
             columns: 1,
             minChars: 2,
@@ -441,8 +442,8 @@ export const TinyEditor = props => {
           })
           // /////////////////////////////////////////////
           // Handle shortcuts
-          editor.addShortcut('ctrl+enter', '', () => {
-            props.handleSend()
+          editor.addShortcut('ctrl+13', 'Send comment', () => {
+            props.handleCtrlEnter(editor.getContent())
           })
         }
       }}
@@ -462,7 +463,7 @@ TinyEditor.propTypes = {
   codeLanguageList: PropTypes.array,
   content: PropTypes.string,
   customStyle: PropTypes.string,
-  handleSend: PropTypes.func,
+  handleCtrlEnter: PropTypes.func,
   height: PropTypes.any,
   isAdvancedEdition: PropTypes.bool,
   maxHeight: PropTypes.number,
@@ -475,7 +476,7 @@ TinyEditor.defaultProps = {
   codeLanguageList: [],
   content: '',
   customStyle: '',
-  handleSend: () => {},
+  handleCtrlEnter: () => {},
   height: undefined,
   isAdvancedEdition: false,
   maxHeight: undefined,

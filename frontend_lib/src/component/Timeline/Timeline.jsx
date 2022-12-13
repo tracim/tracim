@@ -71,42 +71,15 @@ export class Timeline extends React.Component {
     this.setState({ showEditCommentPopup: true, newComment: comment })
   }
 
-  // TODO - MP - 2022-12-09 - Change this
-  // handleClickValidateEditComment = (comment) => {
-  //   const { props } = this
-  //   if (!handleInvalidMentionInComment(
-  //     props.memberList,
-  //     true,
-  //     comment,
-  //     this.setState.bind(this)
-  //   )) {
-  //     this.handleClickValidateAnywayEditComment()
-  //   }
-  // }
-
-  handleClickValidateAnywayEditComment = (comment) => {
+  handleClickValidateEditComment = (comment, commentId, parentId) => {
+    console.log('TIMELINE - handleClickValidateEditComment', comment, commentId, parentId)
     const { props, state } = this
     this.setState({
       invalidMentionList: [],
       showEditCommentPopup: false,
       showInvalidMentionPopupInComment: false
     })
-    props.onClickEditComment(comment)
-    // props.onClickEditComment(state.newComment)
-  }
-
-  handleCloseInvalidMentionPopup = () => {
-    const { props } = this
-    props.showInvalidMentionPopup
-      ? props.onClickCancelSave()
-      : this.setState({ showInvalidMentionPopupInComment: false })
-  }
-
-  handleValidateInvalidMentionPopup = () => {
-    const { props } = this
-    props.showInvalidMentionPopup
-      ? props.onClickSaveAnyway()
-      : this.handleClickValidateAnywayEditComment()
+    props.onClickEditComment(comment, commentId, parentId)
   }
 
   render () {
@@ -226,9 +199,10 @@ export class Timeline extends React.Component {
             commentId={state.newComment.content_id}
             customColor={props.customColor}
             loggedUserLanguage={props.loggedUser.lang}
-            onClickValidate={this.handleClickValidateAnywayEditComment}
-            // onClickValidate={this.handleClickValidateEditComment}
+            memberList={props.memberList}
             onClickClose={() => this.setState({ showEditCommentPopup: false })}
+            onClickValidate={this.handleClickValidateEditComment}
+            parentId={state.newComment.parent_id}
             workspaceId={props.workspaceId}
           />
         )}
@@ -255,21 +229,11 @@ export class Timeline extends React.Component {
               customClass={props.customClass}
               customColor={props.customColor}
               disableComment={disableComment}
-              id={`wysiwygTimelineComment${props.id}`}
               invalidMentionList={props.invalidMentionList}
-              lang={props.loggedUser.lang}
+              isFileCommentLoading={props.isFileCommentLoading}
               memberList={props.memberList}
               placeHolder={props.t('Write an answer...')}
-              onClickCancelSave={props.onClickCancelSave}
-              onClickSaveAnyway={props.onClickSaveAnyway}
-              onClickValidateNewCommentBtn={props.onClickValidateNewCommentBtn}
-              // onClickWysiwygBtn={props.onClickWysiwygBtn}
-              searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-              showInvalidMentionPopup={props.showInvalidMentionPopup}
               workspaceId={props.workspaceId}
-              // wysiwyg={props.wysiwyg}
-              // wysiwygIdSelector={props.wysiwygIdSelector}
-              isFileCommentLoading={props.isFileCommentLoading}
             />
           </div>
         )}
@@ -304,6 +268,7 @@ Timeline.propTypes = {
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
+  // /////////////////////////////////////////////////////////////
   allowClickOnRevision: PropTypes.bool,
   availableStatusList: PropTypes.array,
   canLoadMoreTimelineItems: PropTypes.func,
@@ -321,24 +286,18 @@ Timeline.propTypes = {
   isDeprecated: PropTypes.bool,
   isFileCommentLoading: PropTypes.bool,
   isLastTimelineItemCurrentToken: PropTypes.bool,
+  loading: PropTypes.bool,
   memberList: PropTypes.array,
-  onClickCancelSave: PropTypes.func,
+  onChangeTranslationTargetLanguageCode: PropTypes.func,
   onClickDeleteComment: PropTypes.func,
   onClickEditComment: PropTypes.func,
   onClickOpenFileComment: PropTypes.func,
   onClickRestoreArchived: PropTypes.func,
   onClickRestoreDeleted: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
-  onClickSaveAnyway: PropTypes.func,
   onClickShowMoreTimelineItems: PropTypes.func,
-  onClickValidateNewCommentBtn: PropTypes.func,
-  onClickWysiwygBtn: PropTypes.func,
-  searchForMentionOrLinkInQuery: PropTypes.func,
   shouldScrollToBottom: PropTypes.bool,
-  showInvalidMentionPopup: PropTypes.bool,
   showParticipateButton: PropTypes.bool,
-  wysiwyg: PropTypes.bool,
-  wysiwygIdSelector: PropTypes.string
 }
 
 Timeline.defaultProps = {
@@ -361,23 +320,17 @@ Timeline.defaultProps = {
   isDeprecated: false,
   isFileCommentLoading: false,
   isLastTimelineItemCurrentToken: false,
+  loading: false,
   memberList: [],
-  onClickCancelSave: () => { },
+  onChangeTranslationTargetLanguageCode: () => { },
   onClickDeleteComment: () => { },
   onClickEditComment: () => { },
   onClickOpenFileComment: () => { },
   onClickRestoreComment: content => { },
   onClickRevisionBtn: () => { },
-  onClickSaveAnyway: () => { },
   onClickShowMoreTimelineItems: () => { },
   onClickTranslateComment: content => { },
-  onClickValidateNewCommentBtn: () => { },
-  onClickWysiwygBtn: () => { },
-  searchForMentionOrLinkInQuery: () => { },
   shouldScrollToBottom: true,
-  showInvalidMentionPopup: false,
   showParticipateButton: false,
   timelineData: [],
-  wysiwyg: false,
-  wysiwygIdSelector: ''
 }

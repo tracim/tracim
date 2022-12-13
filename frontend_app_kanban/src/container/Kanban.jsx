@@ -275,7 +275,7 @@ export class Kanban extends React.Component {
         >
           <Timeline
             apiUrl={state.config.apiUrl}
-            onClickSubmit={this.handleClickValidateAnywayNewComment}
+            onClickSubmit={this.handleClickValidateNewComment}
             codeLanguageList={state.config.system.config.code_languages}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
@@ -296,7 +296,7 @@ export class Kanban extends React.Component {
             key='Timeline'
             invalidMentionList={state.invalidMentionList}
             onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
+            onClickSaveAnyway={this.handleClickValidateNewComment}
             wysiwygIdSelector='#wysiwygTimelineComment'
             showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
             searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
@@ -525,47 +525,29 @@ export class Kanban extends React.Component {
     return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
   }
 
-  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
-    const { state } = this
-
-    if (!handleInvalidMentionInComment(
-      state.config.workspace && state.config.workspace.memberList,
-      state.timelineWysiwyg,
-      comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
-      return true
-    }
-    return false
-  }
-
-  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
+  handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    console.log("KANBAN - handleClickValidateAnywayNewComment", comment, commentAsFileList)
-    try {
-      props.appContentSaveNewComment(
-        state.content,
-        state.timelineWysiwyg,
-        comment,
-        commentAsFileList,
-        this.setState.bind(this),
-        state.config.slug,
-        state.loggedUser.username
-      )
-      return true
-    } catch (e) {
-      // this.sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-      return false
-    }
+    console.log("KANBAN - handleClickValidateNewComment", comment, commentAsFileList)
+    console.log("KANBAN - 1")
+    await props.appContentSaveNewCommentText(
+      state.content,
+      comment,
+      state.config.slug,
+    )
+    console.log("KANBAN - 2")
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      state.content,
+      commentAsFileList,
+    )
+    console.log("KANBAN - 3")
+    return true
   }
 
   handleClickCopyLink = () => {
     const { props, state } = this
     handleClickCopyLink(state.content.content_id)
     sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
-    // this.sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
 
   handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
@@ -604,13 +586,15 @@ export class Kanban extends React.Component {
     this.setState(prevState => ({ fullscreen: !prevState.fullscreen }))
   }
 
-  handleClickEditComment = (comment) => {
+  handleClickEditComment = (comment, contentId, parentId) => {
     const { props, state } = this
     props.appContentEditComment(
+      [],
+      state.config.workspace.memberList,
       state.content.workspace_id,
-      comment.parent_id,
-      comment.content_id,
-      state.loggedUser.username
+      parentId,
+      contentId,
+      comment
     )
   }
 

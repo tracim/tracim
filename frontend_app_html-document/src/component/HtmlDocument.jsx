@@ -149,7 +149,7 @@ export const HtmlDocument = props => {
                 apiUrl={props.apiUrl}
                 codeLanguageList={[]}
                 content={text}
-                handleSend={props.onClickValidateBtn}
+                handleCtrlEnter={props.onClickValidateBtn}
                 height={'100%'}
                 isAdvancedEdition={true}
                 userList={props.memberList}
