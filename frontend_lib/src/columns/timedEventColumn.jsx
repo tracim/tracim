@@ -5,7 +5,7 @@ import { getRevisionTypeLabel } from '../helper.js'
 
 import TimedEvent from '../component/TimedEvent/TimedEvent.jsx'
 
-const timedEventColumn = (settings, t) => {
+const timedEventColumn = (settings, lang, t) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => {
     if (!row.content || !row.content.lastModifier) return undefined
@@ -24,7 +24,7 @@ const timedEventColumn = (settings, t) => {
           customClass='contentListItem__modification'
           operation={getRevisionTypeLabel(props.row.original.content.currentRevisionType, t)}
           date={props.row.original.content.modified}
-          lang='fr'
+          lang={lang}
           author={props.row.original.content.lastModifier}
         />
       )

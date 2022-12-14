@@ -33,7 +33,7 @@ import {
   FETCH_CONFIG
 } from '../util/helper.js'
 
-import FavoritesTable from './tables/FavoriteTable/FavoritesTable.jsx'
+import FavoritesTable from './tables/FavoritesTable/FavoritesTable.jsx'
 
 export class Favorites extends React.Component {
   constructor (props) {

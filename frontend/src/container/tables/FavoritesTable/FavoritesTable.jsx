@@ -13,7 +13,7 @@ import {
   timedEventColumn
 } from 'tracim_frontend_lib'
 
-require('./FavoriteTable.styl')
+require('./FavoritesTable.styl')
 
 const FavoritesTable = (props) => {
   const columns = [
@@ -33,7 +33,7 @@ const FavoritesTable = (props) => {
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
       className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
-    }, props.t),
+    }, props.user.lang, props.t),
 
     contentInformationColumn({
       header: props.t('Information'),

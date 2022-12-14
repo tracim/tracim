@@ -15,9 +15,9 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
       <span>{settings.header}</span>
     ),
     id: 'titleWithPath',
-    cell: props => (
-      <>
-        {props.row.original.content ? (
+    cell: props => {
+      if (props.row.original.content) {
+        return (
           <div className='contentListItem__name_path'>
             <FilenameWithBadges file={props.row.original.content} />
             <Breadcrumbs
@@ -25,21 +25,22 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
               keepLastBreadcrumbAsLink
             />
           </div>
-        ) : (
-          <div className='contentListItem__name_path unavailableContent__name_warning'>
-            <span> {props.row.original.originalLabel}</span>
-            <span className='unavailableContent__warning'>
-              <Icon
-                icon='fas fa-exclamation-triangle'
-                title={t('Warning')}
-              />
-              &nbsp;
-              {t('content is not available')}
-            </span>
-          </div>
-        )}
-      </>
-    ),
+        )
+      }
+      return (
+        <div className='contentListItem__name_path unavailableContent__name_warning'>
+          <span> {props.row.original.originalLabel}</span>
+          <span className='unavailableContent__warning'>
+            <Icon
+              icon='fas fa-exclamation-triangle'
+              title={t('Warning')}
+            />
+            &nbsp;
+            {t('content is not available')}
+          </span>
+        </div>
+      )
+    },
     className: settings.className,
     filterFn: 'includesString',
     sortingFn: 'alphanumeric'

@@ -453,7 +453,7 @@ import {
   timedEventColumn
 } from 'tracim_frontend_lib'
 
-require('./FavoriteTable.styl')
+require('./FavoritesTable.styl')
 
 const FavoritesTable = (props) => {
   const columns = [
