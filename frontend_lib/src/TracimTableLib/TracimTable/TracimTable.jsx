@@ -30,10 +30,7 @@ const TracimTable = (props) => {
     columns: props.columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: props.sortable && getSortedRowModel(),
-    debugTable: true, // TODO Remove debug flags
-    debugHeaders: true,
-    debugColumns: true
+    getSortedRowModel: props.sortable && getSortedRowModel()
   })
 
   const RowWrapper = props.rowWrapper
