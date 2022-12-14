@@ -1,9 +1,9 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import Breadcrumbs from '../../component/Breadcrumbs/Breadcrumbs.jsx'
-import FilenameWithBadges from '../../component/FilenameWithBadges/FilenameWithBadges.jsx'
-import Icon from '../../component/Icon/Icon.jsx'
+import Breadcrumbs from '../../../component/Breadcrumbs/Breadcrumbs.jsx'
+import FilenameWithBadges from '../../../component/FilenameWithBadges/FilenameWithBadges.jsx'
+import Icon from '../../../component/Icon/Icon.jsx'
 
 const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
   const columnHelper = createColumnHelper()

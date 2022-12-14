@@ -1,9 +1,9 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import { getRevisionTypeLabel } from '../helper.js'
+import { getRevisionTypeLabel } from '../../helper.js'
 
-import TimedEvent from '../component/TimedEvent/TimedEvent.jsx'
+import TimedEvent from '../../component/TimedEvent/TimedEvent.jsx'
 
 const timedEventColumn = (settings, lang, t) => {
   const columnHelper = createColumnHelper()

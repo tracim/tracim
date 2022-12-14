@@ -1,6 +1,6 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import ContentType from '../../component/ContentType/ContentType.jsx'
+import ContentType from '../../../component/ContentType/ContentType.jsx'
 
 const contentTypeColumn = (settings, contentType, t) => {
   const columnHelper = createColumnHelper()

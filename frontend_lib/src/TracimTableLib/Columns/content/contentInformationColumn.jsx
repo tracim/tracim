@@ -1,7 +1,7 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import Icon from '../../component/Icon/Icon.jsx'
+import Icon from '../../../component/Icon/Icon.jsx'
 
 const contentInformationColumn = (settings, contentType, t) => {
   const columnHelper = createColumnHelper()

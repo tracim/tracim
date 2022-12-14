@@ -4,44 +4,40 @@ import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
 import {
-  TracimTable,
-  ListItemRowWrapper,
-  contentTypeColumn,
-  contentFilenameWithBadgesAndBreadcrumbsColumn,
-  contentInformationColumn,
-  favoriteButtonColumn,
-  timedEventColumn
+  tracimTableLib
 } from 'tracim_frontend_lib'
 
 require('./FavoritesTable.styl')
 
+const { TracimTable, Columns, RowWrappers } = tracimTableLib
+
 const FavoritesTable = (props) => {
   const columns = [
-    contentTypeColumn({
+    Columns.content.contentTypeColumn({
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
       className: 'tracimTable__styles__width__icon'
     }, props.contentType, props.t),
 
-    contentFilenameWithBadgesAndBreadcrumbsColumn({
+    Columns.content.contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
       className: 'tracimTable__styles__flex__4'
     }, props.t),
 
-    timedEventColumn({
+    Columns.timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
       className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
     }, props.user.lang, props.t),
 
-    contentInformationColumn({
+    Columns.content.contentInformationColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
       className: 'tracimTable__styles__flex__2 tracimTable__hide__md'
     }, props.contentType, props.t),
 
-    favoriteButtonColumn({
+    Columns.favoriteButtonColumn({
       header: props.t('Favorite'),
       className: 'tracimTable__styles__width__icon'
     }, props.onFavoriteButtonClick)
@@ -58,7 +54,7 @@ const FavoritesTable = (props) => {
         contentType: props.contentType,
         dataCy: 'favorites__item'
       }}
-      rowWrapper={ListItemRowWrapper}
+      rowWrapper={RowWrappers.ListItemRowWrapper}
       sortable
       filterable
       filterPlaceholder={props.t('Filter my favorites')}

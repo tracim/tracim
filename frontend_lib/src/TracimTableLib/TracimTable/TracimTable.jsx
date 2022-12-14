@@ -10,10 +10,10 @@ import {
   useReactTable
 } from '@tanstack/react-table'
 
-import EmptyListMessage from '../EmptyListMessage/EmptyListMessage.jsx'
-import FilterBar from '../FilterBar/FilterBar.jsx'
+import EmptyListMessage from '../../component/EmptyListMessage/EmptyListMessage.jsx'
+import FilterBar from '../../component/FilterBar/FilterBar.jsx'
 import classnames from 'classnames'
-import Icon from '../Icon/Icon.jsx'
+import Icon from '../../component/Icon/Icon.jsx'
 
 const DefaultWrapper = (props) => {
   return props.children

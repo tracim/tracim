@@ -1,6 +1,6 @@
 import React from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
-import FavoriteButton, { FAVORITE_STATE } from '../component/Button/FavoriteButton.jsx'
+import FavoriteButton, { FAVORITE_STATE } from '../../component/Button/FavoriteButton.jsx'
 
 const favoriteButtonColumn = (settings, onClick) => {
   const columnHelper = createColumnHelper()
