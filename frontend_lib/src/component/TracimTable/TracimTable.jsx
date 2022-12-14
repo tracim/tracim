@@ -86,7 +86,7 @@ const TracimTable = (props) => {
                                     desc: 'fas fa-sort-amount-up-alt'
                                   }[header.column.getIsSorted()] || null}
                                   customClass={classnames('titleListHeader__icon', { tracimTable__styles__hide: !header.column.getIsSorted() })}
-                                  title={header.column.columnDef.tooltip}
+                                  title={header.column.columnDef.tooltip || ''}
                                 />
                               )}
                             </>
