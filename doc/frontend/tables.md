@@ -21,9 +21,10 @@ of the data is managed by the tables and columns.
     - [Step 2](#step-2)
     - [Step 3](#step-3)
     - [Step 4](#step-4)
-    - [Step 4.5](#step-45)
     - [Step 5](#step-5)
     - [Step 6 (Optional)](#step-6--optional-)
+    - [Step 7 (Optional)](#step-7--optional-)
+    - [Conclusion](#conclusion)
 * [Tables](#tables)
   + [How to create a new table](#how-to-create-a-new-table)
     - [Step 1](#step-1-1)
@@ -159,40 +160,6 @@ const usernameColumn = (settings) => {
 
 ---
 
-#### Step 4.5
-
-To make this column sortable, use the `TitleListHeader` component:
-
-```javascript
-import { createColumnHelper } from '@tanstack/react-table'
-
-const usernameColumn = (settings) => {
-  const columnHelper = createColumnHelper()
-  return columnHelper.accessor(row => row.username, {
-    header: props => (
-      <TitleListHeader
-        title={settings.header}
-        onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
-        customClass='table__customClass'
-        isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
-        tootltip={settings.tooltip}
-      />
-    ),
-    id: 'username',
-    cell: props => '',
-    className: settings.className
-  })
-}
-```
-
-It is required to set `TitleListHeader` as demonstrated, otherwise it will not work properly.
-The only things that should be changed are the `SORT_BY` fields and the customClass prop.
-
-Note that `header` has props. These are the props passed by `TracimTable`.
-
----
-
 #### Step 5
 
 Now Define how the cell will be rendered.
@@ -233,19 +200,17 @@ Like `header`, `cell` is similar to a React Function Component.
 #### Step 6 (Optional)
 
 If the accessor is properly set, the column will be filterable by default.
+
 The appropriate filter function will be automatically chosen from the built-in filters.
 however it is preferable to specify it in the `filterFn` field to avoid any unexpected behavior.
 
 The list of built-in filter functions can be found on 
 [tanstack.com](https://tanstack.com/table/v8/docs/api/features/filters#filter-functions).
 
-Instead of using a built-in, it is possible to set it to a custom filter function 
-instead of the built-in's string.
-
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
 
-const myCousernameColumnlumn = (settings) => {
+const usernameColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.username, {
     header: props => (
@@ -268,7 +233,78 @@ const myCousernameColumnlumn = (settings) => {
 }
 ```
 
-If the accessor is not properly set, the column will be ignored by the filtering algorithm.
+Instead of using a built-in, it is possible to set it to a custom filter function
+instead of the built-in's string.
+
+Here is the signature of a filter function:
+```javascript
+FilterFn = (row, columnId, filterValue) => boolean
+```
+
+The first parameter is react-table's `Row` object, the second is the column's id.
+The accessor function is callable through `row.getValue(columnId)`, this calls the column's accessor function.
+
+The third parameter is the filter value, it is the value that the user typed in the filter input.
+
+It has to return a boolean, false to filter out, true to filter in.
+
+---
+
+#### Step 7 (Optional)
+
+If the accessor is properly set, the column will be sortable by default.
+
+The appropriate sorting function will be automatically chosen from the built-ins.
+however it is preferable to specify it in the `sortingFn` field to avoid any unexpected behavior.
+
+The list of built-in filter functions can be found on
+[tanstack.com](https://tanstack.com/table/v8/docs/api/features/sorting#sorting-functions).
+
+```javascript
+import { createColumnHelper } from '@tanstack/react-table'
+
+const usernameColumn = (settings) => {
+  const columnHelper = createColumnHelper()
+  return columnHelper.accessor(row => row.username, {
+    header: props => (
+      <TitleListHeader
+        title={settings.header}
+        onClickTitle={() => props.onClickTitle(SORT_BY.LABEL)}
+        customClass='table__customClass'
+        isOrderAscending={props.isOrderAscending}
+        isSelected={props.selectedSortCriterion === SORT_BY.LABEL}
+        tootltip={settings.tooltip}
+      />
+    ),
+    id: 'username',
+    cell: props => (
+      <span>{`${props.translate('Hello')} ${props.getValue().username}`}</span>
+    ),
+    className: settings.className,
+    filterFn: 'includesString',
+    sortingFn: 'alphanumeric'
+  })
+}
+```
+
+Instead of using a built-in, it is possible to set it to a custom filter function
+instead of the built-in's string.
+
+Here is the signature of a filter function:
+```javascript
+SortingFn = (rowA, rowB, columnId) => number
+```
+
+The first parameter is react-table's `Row` object, the second is another row to compare against.
+The third parameter is the columnId.
+
+The accessor function is callable through `row.getValue(columnId)`, this calls the column's accessor function.
+
+It has to return `-1` if `a < b`, `0` if `a === b`, `1` if `a > b`.
+
+---
+
+#### Conclusion
 
 Here is a complete column. It's filterable, sortable, has a header and a cell and
 can now be used it in tables!
@@ -393,25 +429,17 @@ import { createColumnHelper } from '@tanstack/react-table'
 
 import { getRevisionTypeLabel } from '../helper.js'
 
-import { SORT_BY } from '../sortListHelper.js'
 import TimedEvent from '../component/TimedEvent/TimedEvent.jsx'
-import TitleListHeader from '../component/Lists/ListHeader/TitleListHeader.jsx'
 
-const timedEventColumn = (settings, t) => {
+const timedEventColumn = (settings, lang, t) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => {
     if (!row.content || !row.content.lastModifier) return undefined
-    return row.content.lastModifier.publicName
+    const date = new Date(row.content.modified)
+    return `${date.getFullYear()}${date.getMonth()}${date.getDate()} ${row.content.lastModifier.publicName}`
   }, {
-    header: props => (
-      <TitleListHeader
-        title={settings.header}
-        onClickTitle={() => props.onClickTitle(SORT_BY.MODIFICATION_DATE)}
-        customClass='tracimTable__header__btn'
-        isOrderAscending={props.isOrderAscending}
-        isSelected={props.selectedSortCriterion === SORT_BY.MODIFICATION_DATE}
-        tootltip={settings.tooltip}
-      />
+    header: () => (
+      <span>{settings.header}</span>
     ),
     id: 'lastModification',
     cell: props => {
@@ -422,13 +450,14 @@ const timedEventColumn = (settings, t) => {
           customClass='contentListItem__modification'
           operation={getRevisionTypeLabel(props.row.original.content.currentRevisionType, t)}
           date={props.row.original.content.modified}
-          lang='fr'
+          lang={lang}
           author={props.row.original.content.lastModifier}
         />
       )
     },
     className: settings.className,
-    filterFn: 'includesString'
+    filterFn: 'includesString',
+    sortingFn: 'alphanumeric'
   })
 }
 
@@ -473,7 +502,7 @@ const FavoritesTable = (props) => {
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
       className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
-    }, props.t),
+    }, props.user.lang, props.t),
 
     contentInformationColumn({
       header: props.t('Information'),
