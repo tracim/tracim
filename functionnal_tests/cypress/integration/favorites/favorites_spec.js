@@ -75,7 +75,7 @@ describe('Favorites', function () {
 
     it('should list contents available as favorites', () => {
       cy.get('[data-cy=favorites__item]').its('length').should('be.equal', numberOfFavorites)
-      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}File`)
+      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}Note`)
     })
 
     it('should filter contents by type', () => {
@@ -85,10 +85,10 @@ describe('Favorites', function () {
     })
 
     it('should filter contents by name', () => {
-      cy.get('.textinput__text').type('2')
+      cy.get('.textinput__text').type('Note2')
       cy.get('[title="TitleNote2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
       cy.get('[title="TitleNote"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
-      cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('be.visible')
+      cy.get('[title="TitleFile2"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
       cy.get('[title="TitleFile"][data-cy="favorites__item"] > .favoriteTable__row__link').should('not.be.visible')
     })
 
