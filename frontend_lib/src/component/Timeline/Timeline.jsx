@@ -86,7 +86,7 @@ export class Timeline extends React.Component {
     const { props, state } = this
 
     if (!Array.isArray(props.timelineData)) {
-      console.log('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
+      console.error('Error in Timeline.jsx, props.timelineData is not an array. timelineData: ', props.timelineData)
       return null
     }
 

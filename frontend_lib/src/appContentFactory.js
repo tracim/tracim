@@ -490,40 +490,11 @@ export function appContentFactory (WrappedComponent) {
       return response
     }
 
-    // TODO - MP - 2022-12-13 - To refactor like appContentSaveNewComment
-    appContentEditComment = async (
-      roleList, memberList, workspaceId, contentId, commentId, newContent
-    ) => {
+    appContentEditComment = async (workspaceId, contentId, commentId, newComment) => {
       this.checkApiUrl()
-      // const newCommentForApi = tinymce.get('wysiwygTimelineCommentEdit').getContent()
-      // let knownMentions = await this.searchForMentionOrLinkInQuery('', workspaceId)
-      // knownMentions = knownMentions.map(member => `@${member.username}`)
-      // const invalidMentionList = getInvalidMentionList(newCommentForApi, knownMentions)
-
-      // let newCommentForApiWithMention
-      // try {
-      //   newCommentForApiWithMention = handleMentionsBeforeSave(newCommentForApi, loggedUsername, invalidMentionList)
-      // } catch (e) {
-      //   return Promise.reject(e)
-      // }
-
-      // let newCommentForApiWithMentionAndLink
-      // try {
-      //   newCommentForApiWithMentionAndLink = await handleLinksBeforeSave(newCommentForApiWithMention, this.apiUrl)
-      // } catch (e) {
-      //   return Promise.reject(e)
-      // }
-
-      let formattedContent = searchMentionAndPlaceBalise(
-        roleList, memberList, newContent
-      )
-
-      formattedContent = await searchContentAndPlaceBalise(
-        this.apiUrl, formattedContent.html
-      )
 
       const response = await handleFetchResult(
-        await putComment(this.apiUrl, workspaceId, contentId, commentId, formattedContent.html)
+        await putComment(this.apiUrl, workspaceId, contentId, commentId, newComment)
       )
 
       switch (response.apiResponse.status) {

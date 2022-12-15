@@ -118,17 +118,11 @@ export class FeedItemWithPreview extends React.Component {
     props.appContentChangeComment(e, props.content, this.setState.bind(this), props.content.slug)
   }
 
-  handleClickEditComment = async (comment, contentId, parentId) => {
+  handleClickEditComment = (comment, contentId, parentId) => {
     console.log("FeedItemWithPreview - handleClickEditComment", comment, contentId, parentId)
-    const { props, state } = this
-    let newComment = searchMentionAndPlaceBalise([], props.memberList, comment)
-    console.log("FeedItemWithPreview - handleClickEditComment - newComment", newComment.html)
-    newComment = await searchContentAndPlaceBalise(props.apiUrl, newComment.html)
-    console.log("FeedItemWithPreview - handleClickEditComment - newComment", newComment.html)
+    const { props } = this
     props.appContentEditComment(
-      [],
-      state.config.workspace.memberList,
-      state.content.workspace_id,
+      props.content.workspaceId,
       parentId,
       contentId,
       comment

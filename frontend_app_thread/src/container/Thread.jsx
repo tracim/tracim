@@ -322,8 +322,6 @@ export class Thread extends React.Component {
     console.log("THREAD - handleClickEditComment", comment)
     const { props, state } = this
     props.appContentEditComment(
-      [],
-      state.config.workspace.memberList,
       state.content.workspace_id,
       parentId,
       contentId,

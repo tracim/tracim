@@ -13,6 +13,7 @@ import {
   getMyselfKnownMember,
 } from '../../action.async.js'
 
+// TODO - MP - 2022-12-13 - Generate the list from the backend role data
 const defaultMentionList = [
   {
     type: 'cardmenuitem',
@@ -443,7 +444,8 @@ export const TinyEditor = props => {
           // /////////////////////////////////////////////
           // Handle shortcuts
           editor.addShortcut('ctrl+13', 'Send comment', () => {
-            props.handleCtrlEnter(editor.getContent())
+            props.handleCtrlEnter(editor.getContent(), false)
+            document.activeElement.blur()
           })
         }
       }}

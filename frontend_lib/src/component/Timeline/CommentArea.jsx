@@ -35,7 +35,7 @@ export const CommentArea = props => {
   const [content, setContent] = useState('')
   const [fileListToUpload, setFileListToUpload] = useState([])
   const [invalidMentionList, setInvalidMentionList] = useState([])
-  const [isAdvancedEdition, setIsAdvancedEdition] = useState(false)
+  const [isAdvancedEdition, setIsAdvancedEdition] = useState(props.isAdvancedEdition)
   const [textToSend, setTextToSend] = useState('')
 
 /*
@@ -123,29 +123,35 @@ export const CommentArea = props => {
     }
   }, [props.contentType])*/
 
-  const validateComment = async (comment) => {
-    console.log("validateComment", props.roleList, props.memberList, comment)
-    let returnValue = searchMentionAndPlaceBalise(props.roleList, props.memberList, comment)
-    console.log("validateComment returnValue", returnValue)
-    if (returnValue.invalidMentionList.length > 0) {
-      setTextToSend(returnValue.html)
-      setInvalidMentionList(returnValue.invalidMentionList)
-    } else {
-      returnValue = await searchContentAndPlaceBalise(props.apiUrl, returnValue.html)
-      sendComment(returnValue.html)
-    }
-  }
-
   /**
    * Send the comment to the backend
+   * @param {string} comment The comment to send
+   * @param {boolean} force Force the comment to be sent and ignore validations
    */
-  const sendComment = async (comment) => {
+  const sendComment = async (comment, force = false) => {
+    let commentToSend = comment
+
+    if (!force) {
+      console.log("sendComment", props.roleList, props.memberList, commentToSend)
+      let returnValue = searchMentionAndPlaceBalise(props.roleList, props.memberList, commentToSend)
+      console.log("sendComment returnValue", returnValue)
+      commentToSend = returnValue.html
+      if (returnValue.invalidMentionList.length > 0) {
+        setTextToSend(commentToSend)
+        setInvalidMentionList(returnValue.invalidMentionList)
+        return
+      }
+    }
+
+    let returnValue = await searchContentAndPlaceBalise(props.apiUrl, commentToSend)
+    console.log("sendComment sending", returnValue.html)
+
     // NOTE - MP - 2022-12-06 - If we don't clear this variable we don't hide the popup.
     // In case of an error it's preferable to hide the popup
     setInvalidMentionList([])
 
-    console.log("sendComment", comment, fileListToUpload)
-    const result = await props.onClickSubmit(comment, fileListToUpload)
+    console.log("sendComment", returnValue.html, fileListToUpload)
+    const result = await props.onClickSubmit(returnValue.html, fileListToUpload)
     if (result) {
       setContent('')
       setFileListToUpload([])
@@ -185,7 +191,7 @@ export const CommentArea = props => {
       {invalidMentionList.length > 0 && (
         // TODO - MP - 2022-12-06 - Maybe check this popup
         <ConfirmPopup
-          onCancel={() => sendComment(textToSend)}
+          onCancel={() => sendComment(textToSend, true)}
           onClose={() => setInvalidMentionList([])}
           onConfirm={() => setInvalidMentionList([])}
           msg={
@@ -208,7 +214,7 @@ export const CommentArea = props => {
         apiUrl={props.apiUrl}
         codeLanguageList={props.codeLanguageList}
         content={content}
-        handleCtrlEnter={validateComment}
+        handleCtrlEnter={sendComment}
         height={100}
         isAdvancedEdition={isAdvancedEdition}
         maxHeight={300}
@@ -218,33 +224,36 @@ export const CommentArea = props => {
         spaceId={props.workspaceId}
         userList={props.memberList}
       />
-      {!props.hideSendButtonAndOptions && (
+      {/* {!props.hideSendButtonAndOptions && ( */}
         <div className={
-            classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
-          }>
-          <div className={
-            classnames(
-              `${props.customClass}__texteditor__advancedtext`,
-              'commentArea__advancedtext'
-            )
-          }>
-            <IconButton
-              customClass={classnames(
-                `${props.customClass}__texteditor__advancedtext__btn commentArea__advancedtext__btn`
-              )}
-              disabled={props.disableComment}
-              text={isAdvancedEdition ? props.t('Simple edition') : props.t('Advanced edition')}
-              onClick={changeEditor}
-              intent='link'
-              mode='light'
-              key='commentArea__comment__advancedtext'
-            />
-            <DisplayFileToUpload
-              fileList={fileListToUpload}
-              onRemoveCommentAsFile={handleRemoveCommentFileFromUploadList}
-              color={props.customColor}
-            />
-          </div>
+          classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
+        }>
+          {props.isDisplayedAdvancedEdition && (
+            <div className={
+              classnames(
+                `${props.customClass}__texteditor__advancedtext`,
+                'commentArea__advancedtext'
+              )
+            }>
+              <IconButton
+                customClass={classnames(
+                  `${props.customClass}__texteditor__advancedtext__btn commentArea__advancedtext__btn`
+                )}
+                disabled={props.disableComment}
+                text={isAdvancedEdition ? props.t('Simple edition') : props.t('Advanced edition')}
+                onClick={changeEditor}
+                intent='link'
+                mode='light'
+                key='commentArea__comment__advancedtext'
+              />
+            </div>
+          )}
+
+          <DisplayFileToUpload
+            fileList={fileListToUpload}
+            onRemoveCommentAsFile={handleRemoveCommentFileFromUploadList}
+            color={props.customColor}
+          />
 
           {props.isFileCommentLoading && (
             <Loading />
@@ -256,34 +265,51 @@ export const CommentArea = props => {
               'commentArea__submit'
             )
           }>
-            <AddFileToUploadButton
-              workspaceId={props.workspaceId}
-              color={props.customColor}
-              disabled={props.disableComment}
-              onValidateCommentFileToUpload={handleValidateCommentFileListToUpload}
-              multipleFiles={props.multipleFiles}
-            />
-            <IconButton
-              color={props.customColor}
-              customClass={
-                classnames(
-                  `${props.customClass}__texteditor__submit__btn `,
-                  'commentArea__submit__btn'
-                )
-              }
-              disabled={props.disableComment || (content === '' && fileListToUpload.length === 0)}
-              icon={props.icon}
-              intent='primary'
-              mode='light'
-              onClick={() => validateComment(content)}
-              text={props.buttonLabel}
-              type='button'
-              key='commentArea__comment__send'
-              dataCy='commentArea__comment__send'
-            />
+            {props.isDisplayedUploadFile && (
+              <AddFileToUploadButton
+                workspaceId={props.workspaceId}
+                color={props.customColor}
+                disabled={props.disableComment}
+                onValidateCommentFileToUpload={handleValidateCommentFileListToUpload}
+                multipleFiles={props.multipleFiles}
+              />
+            )}
+
+            {props.isDisplayedCancel && (
+              <IconButton
+                color={props.customColor}
+                icon='fas fa-times'
+                intent='secondary'
+                mode='dark'
+                onClick={props.onClickWithstand}
+                text={props.withstandLabel}
+                type='button'
+              />
+            )}
+
+            {props.isDisplayedSend && (
+              <IconButton
+                color={props.customColor}
+                customClass={
+                  classnames(
+                    `${props.customClass}__texteditor__submit__btn `,
+                    'commentArea__submit__btn'
+                  )
+                }
+                disabled={props.disableComment || (content === '' && fileListToUpload.length === 0)}
+                icon={props.submitIcon}
+                intent='primary'
+                mode='light'
+                onClick={() => sendComment(content, false)}
+                text={props.submitLabel}
+                type='button'
+                key='commentArea__comment__send'
+                dataCy='commentArea__comment__send'
+              />
+            )}
           </div>
         </div>
-      )}
+      {/* )} */}
     </form>
   )
 }
@@ -294,7 +320,8 @@ export default translate()(CommentArea)
 CommentArea.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   onClickSubmit: PropTypes.func.isRequired,
-  buttonLabel: PropTypes.string,
+  submitLabel: PropTypes.string,
+  withstandLabel: PropTypes.string,
   codeLanguageList: PropTypes.array,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
@@ -302,19 +329,26 @@ CommentArea.propTypes = {
   customColor: PropTypes.string,
   disableComment: PropTypes.bool,
   hideSendButtonAndOptions: PropTypes.bool,
-  icon: PropTypes.string,
+  submitIcon: PropTypes.string,
   invalidMentionList: PropTypes.array,
+  isAdvancedEdition: PropTypes.bool,
+  isDisplayedAdvancedEdition: PropTypes.bool,
+  isDisplayedCancel: PropTypes.bool,
+  isDisplayedUploadFile: PropTypes.bool,
+  isDisplayedSend: PropTypes.bool,
   isFileCommentLoading: PropTypes.bool,
   memberList: PropTypes.array,
   multipleFiles: PropTypes.bool,
   newComment: PropTypes.string,
+  onClickWithstand: PropTypes.func,
   placeHolder: PropTypes.string,
   roleList: PropTypes.array,
   workspaceId: PropTypes.number,
 }
 
 CommentArea.defaultProps = {
-  buttonLabel: 'Send',
+  submitLabel: 'Submit',
+  withstandLabel: 'Withstand',
   codeLanguageList: [],
   contentId: 0,
   contentType: '',
@@ -322,12 +356,18 @@ CommentArea.defaultProps = {
   customColor: '',
   disableComment: false,
   hideSendButtonAndOptions: false,
-  icon: 'far fa-paper-plane',
+  submitIcon: 'far fa-paper-plane',
   invalidMentionList: [],
+  isAdvancedEdition: false,
+  isDisplayedAdvancedEdition: true,
+  isDisplayedCancel: false,
+  isDisplayedUploadFile: true,
+  isDisplayedSend: true,
   isFileCommentLoading: false,
   memberList: [],
   multipleFiles: true,
   newComment: '',
+  onClickWithstand: () => {},
   placeHolder: 'Write a comment...',
   roleList: [],
   workspaceId: 0,

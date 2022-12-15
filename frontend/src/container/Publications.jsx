@@ -371,62 +371,21 @@ export class Publications extends React.Component {
 
   handleClickEdit = (publication) => {
     this.setState({ showEditPopup: true, commentToEdit: publication.firstComment })
+    console.log(publication.firstComment)
   }
 
-  // handleClickValidateEdit = (publication) => {
-  //   const { props } = this
-  //   if (!handleInvalidMentionInComment(
-  //     props.currentWorkspace.memberList,
-  //     true,
-  //     publication,
-  //     this.setState.bind(this)
-  //   )) {
-  //     this.handleClickValidateAnywayEdit()
-  //   }
-  // }
-
-  handleClickValidateAnywayEdit = () => {
-    console.log("PUBLICATION - handleClickValidateAnywayEdit")
-    this.setState({
-      invalidMentionList: [],
-      showEditPopup: false,
-      showInvalidMentionPopupInComment: false
-    })
-    this.handleEditPublication()
+  handleClickValidateEdit = (comment, commentId, parentId) => {
+    const { props } = this
+    console.log("PUBLICATION - handleClickValidateEdit")
+    console.log(`PUBLICATION ${comment}, ${commentId}, ${parentId}`)
+    props.appContentEditComment(
+      props.currentWorkspace.id,
+      parentId,
+      commentId,
+      comment
+    )
+    this.setState({ showEditPopup: false })
   }
-
-  handleEditPublication = async () => {
-    const { props, state } = this
-
-    const content = tinymce.activeEditor.getContent()
-    const returnValue = searchMentionAndPlaceBalise([], state.config.workspace.memberList, content)
-    console.log('Publication returnValue', returnValue)
-    if (returnValue.invalidMentionList.length > 0) {
-      this.setState({
-        invalidMentionList: returnValue.invalidMentionList,
-        textToSend: returnValue.html
-      })
-    } else {
-      console.log("--------------------------------------------------------------------------------")
-      console.log("state.commentToEdit.parent_id", state.commentToEdit.parent_id)
-      console.log("state.commentToEdit.content_id", state.commentToEdit.content_id)
-      returnValue = await searchContentAndPlaceBalise(state.config.apiUrl, returnValue.html)
-      console.log("state.commentToEdit.parent_id", state.commentToEdit.parent_id)
-      console.log("state.commentToEdit.content_id", state.commentToEdit.content_id)
-      // Check if the order is correct
-      props.appContentEditComment(
-        props.currentWorkspace.id,
-        state.commentToEdit.parent_id,
-        state.commentToEdit.content_id,
-        returnValue.html
-      )
-      console.log("state.commentToEdit.parent_id", state.commentToEdit.parent_id)
-      console.log("state.commentToEdit.content_id", state.commentToEdit.content_id)
-      console.log("--------------------------------------------------------------------------------")
-    }
-  }
-
-  handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 
   buildPublicationName = (authorName, userLang) => {
     const { props } = this
@@ -477,10 +436,6 @@ export class Publications extends React.Component {
   handleClickReorder = () => {
     this.props.dispatch(updatePublicationList())
     this.setState({ showReorderButton: false })
-  }
-
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.props.currentWorkspace.id)
   }
 
   getPreviewLinkParameters = (publication) => {
@@ -589,9 +544,10 @@ export class Publications extends React.Component {
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}
-            memberList={props.memberList}
+            memberList={props.currentWorkspace.memberList}
             onClickClose={() => this.setState({ showEditPopup: false })}
-            onClickValidate={this.handleClickValidateAnywayEdit}
+            onClickValidate={this.handleClickValidateEdit}
+            parentId={state.commentToEdit.parent_id}
             workspaceId={props.currentWorkspace.id}
           />
         )}

@@ -43,47 +43,28 @@ export class EditCommentPopup extends React.Component {
         <CommentArea
           apiUrl={props.apiUrl}
           onClickSubmit={
-            () => props.onClickValidate(
-              tinymce.activeEditor.getContent(), props.commentId, props.parentId
-            )
+            (comment, fileList) => {
+              props.onClickValidate(comment, props.commentId, props.parentId)
+              return true
+            }
           }
           codeLanguageList={props.codeLanguageList}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
           customClass='editCommentPopup'
           customColor={props.customColor}
-          hideSendButtonAndOptions
+          isAdvancedEdition
+          isDisplayedAdvancedEdition={false}
+          isDisplayedCancel
+          isDisplayedUploadFile={false}
           newComment={state.newComment}
+          onClickWithstand={props.onClickClose}
           roleList={[]}
           memberList={props.memberList}
+          submitLabel={props.t('Send')}
+          withstandLabel={props.t('Cancel')}
           workspaceId={props.workspaceId}
         />
-
-        <div className='editCommentPopup__buttons'>
-          <IconButton
-            color={props.customColor}
-            icon='fas fa-times'
-            intent='secondary'
-            mode='dark'
-            onClick={props.onClickClose}
-            text={props.t('Cancel')}
-            type='button'
-          />
-          <IconButton
-            color={props.customColor}
-            disabled={state.newComment === ''}
-            icon='far fa-paper-plane'
-            intent='primary'
-            mode='light'
-            onClick={
-              () => props.onClickValidate(
-                tinymce.activeEditor.getContent(), props.commentId, props.parentId
-              )
-            }
-            text={props.t('Send')}
-            type='button'
-          />
-        </div>
       </CardPopup>
     )
   }

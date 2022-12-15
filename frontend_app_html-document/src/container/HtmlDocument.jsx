@@ -755,8 +755,6 @@ export class HtmlDocument extends React.Component {
   handleClickEditComment = (comment, contentId, parentId) => {
     const { props, state } = this
     props.appContentEditComment(
-      [],
-      state.config.workspace.memberList,
       state.content.workspace_id,
       parentId,
       contentId,
