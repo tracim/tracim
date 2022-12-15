@@ -116,7 +116,7 @@ const TracimTable = (props) => {
               {rows.map(row => {
                 const Line = props.lineComponent || GenericTracimTableLine
                 return (
-                  <Line key={`${props.rowData.id}-line`} rowData={row} customRowClass={props.customRowClass} />
+                  <Line key={`${row.id}-line`} rowData={row} customRowClass={props.customRowClass} />
                 )
               })}
             </div>
