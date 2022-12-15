@@ -9,8 +9,7 @@ const timedEventColumn = (settings, lang, t) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => {
     if (!row.content || !row.content.lastModifier) return undefined
-    const date = new Date(row.content.modified)
-    return `${date.getFullYear()} ${date.getMonth()} ${date.getDate()} ${row.content.lastModifier.publicName}`
+    return `${row.content.modified} ${row.content.lastModifier.publicName}`
   }, {
     header: () => (
       <span>{settings.header}</span>
