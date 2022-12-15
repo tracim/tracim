@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
@@ -51,6 +51,12 @@ const TracimTable = (props) => {
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: props.sortable && getSortedRowModel()
   })
+
+  useEffect(() => {
+    if (props.sortable && props.defaultSortColumnId) {
+      table.setSorting([{ id: props.defaultSortColumnId, desc: false }])
+    }
+  }, [props.sortable, props.defaultSortColumnId])
 
   const rows = table.getRowModel().rows
   return (
@@ -145,7 +151,8 @@ TracimTable.propsType = {
   customRowClass: PropTypes.string,
   filterable: PropTypes.bool,
   filterPlaceholder: PropTypes.string,
-  sortable: PropTypes.bool
+  sortable: PropTypes.bool,
+  defaultSortColumnId: PropTypes.string
 }
 
 TracimTable.defaultProps = {
@@ -156,7 +163,8 @@ TracimTable.defaultProps = {
   lineComponent: undefined,
   filterable: false,
   filterPlaceholder: undefined,
-  sortable: false
+  sortable: false,
+  defaultSortColumnId: undefined
 }
 
 export default translate()(TracimTable)

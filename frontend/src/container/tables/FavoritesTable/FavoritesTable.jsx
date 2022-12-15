@@ -54,6 +54,7 @@ const FavoritesTable = (props) => {
       sortable
       filterable
       filterPlaceholder={props.t('Filter my favorites')}
+      defaultSortColumnId='titleWithPath'
     />
   )
 }
