@@ -3,13 +3,15 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
+import FavoriteLineComponent from './FavoriteLineComponent.jsx'
+
 import {
   tracimTableLib
 } from 'tracim_frontend_lib'
 
 require('./FavoritesTable.styl')
 
-const { TracimTable, Columns, RowWrappers } = tracimTableLib
+const { TracimTable, Columns } = tracimTableLib
 
 const FavoritesTable = (props) => {
   const columns = [
@@ -47,14 +49,8 @@ const FavoritesTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.favoriteList}
-      user={props.user}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
-      rowWrapperProps={{
-        customClass: 'favoriteTable__row',
-        contentType: props.contentType,
-        dataCy: 'favorites__item'
-      }}
-      rowWrapper={RowWrappers.ListItemRowWrapper}
+      lineComponent={FavoriteLineComponent}
       sortable
       filterable
       filterPlaceholder={props.t('Filter my favorites')}

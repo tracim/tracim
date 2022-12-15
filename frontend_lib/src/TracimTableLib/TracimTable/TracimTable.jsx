@@ -15,8 +15,27 @@ import FilterBar from '../../component/FilterBar/FilterBar.jsx'
 import classnames from 'classnames'
 import Icon from '../../component/Icon/Icon.jsx'
 
-const DefaultWrapper = (props) => {
-  return props.children
+export const GenericTracimTableLine = props => {
+  return (
+    <div
+      className={`tracimTable__body__row ${props.customRowClass}`}
+      key={props.rowData.id}
+    >
+      {props.rowData.getVisibleCells().map(cell => (
+        <div
+          className={`tracimTable__body__row__cell ${cell.column.columnDef.className}`}
+          key={cell.id}
+        >
+          {flexRender(
+            cell.column.columnDef.cell,
+            {
+              ...cell.getContext()
+            }
+          )}
+        </div>
+      ))}
+    </div>
+  )
 }
 
 const TracimTable = (props) => {
@@ -33,7 +52,6 @@ const TracimTable = (props) => {
     getSortedRowModel: props.sortable && getSortedRowModel()
   })
 
-  const RowWrapper = props.rowWrapper
   const rows = table.getRowModel().rows
   return (
     <div className='tracimTable'>
@@ -95,28 +113,12 @@ const TracimTable = (props) => {
               </div>
             )}
             <div className={classnames('tracimTable__body', { tracimTable__body__colored: props.colored })}>
-              {rows.map(row => (
-                <RowWrapper key={`${row.id}-wrapper`} {...row.original} {...props.rowWrapperProps}>
-                  <div
-                    className={classnames('tracimTable__body__row', props.customRowClass)}
-                    key={row.id}
-                  >
-                    {row.getVisibleCells().map(cell => (
-                      <div
-                        className={classnames('tracimTable__body__row__cell', cell.column.columnDef.className)}
-                        key={cell.id}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          {
-                            ...cell.getContext()
-                          }
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </RowWrapper>
-              ))}
+              {rows.map(row => {
+                const Line = props.lineComponent || GenericTracimTableLine
+                return (
+                  <Line key={`${props.rowData.id}-line`} rowData={row} customRowClass={props.customRowClass} />
+                )
+              })}
             </div>
           </>
         )
@@ -129,12 +131,9 @@ const TracimTable = (props) => {
             }
           </EmptyListMessage>
         )}
-      <pre>{JSON.stringify(table.getState(), null, 2)}</pre>
     </div>
   )
 }
-
-// TODO Remove debug renders (l.115)
 
 TracimTable.propsType = {
   columns: PropTypes.array.isRequired,
@@ -142,8 +141,7 @@ TracimTable.propsType = {
   noHeader: PropTypes.bool,
   colored: PropTypes.bool,
   emptyMessage: PropTypes.string,
-  rowWrapper: PropTypes.func,
-  rowWrapperProps: PropTypes.object,
+  lineComponent: PropTypes.func,
   customRowClass: PropTypes.string,
   filterable: PropTypes.bool,
   filterPlaceholder: PropTypes.string,
@@ -155,8 +153,7 @@ TracimTable.defaultProps = {
   colored: false,
   emptyMessage: 'This list is empty',
   customRowClass: '',
-  rowWrapper: DefaultWrapper,
-  rowWrapperProps: {},
+  lineComponent: undefined,
   filterable: false,
   filterPlaceholder: undefined,
   sortable: false
