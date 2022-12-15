@@ -1,28 +1,53 @@
+//  HACK - ML - 2022-15-11 - This is the width of the createInFolderButton. This is used to align folder's and content's
+//  lastModification column. This will be removed in a content listings refactor
+//  https://github.com/tracim/tracim/issues/6034
+createInFolderButtonWidth = 74px
+
 .content__header
   display flex
   &__type
-    flex-grow 0
+    flex 1
     padding standardSpacing
-    text-align center
+    text-align start
   &__name
-    flex-grow 2
+    flex 12
     padding standardSpacing
+    text-align start
   &__status
-    flex-grow 0
+    flex 2
     padding standardSpacing
     width 140px
-    text-align center
+    text-align start
+  &__modification
+    flex 5
+    padding standardSpacing
+    text-align start
+  &__actions
+    flex 3
+    padding standardSpacing
   &__search
     display flex
-    flex-grow 5
+    flex-grow 18
     &__path
-      flex 2
+      flex 3
       padding 15px 5px
-    &__modif
-      flex 1
+      text-align start
+    &__modification
+      flex 3
       padding 15px 5px
+      text-align start
 
 @media (max-width: max-xs)
   .content__header__status
     width 70px
     text-align end
+
+@media (max-width: max-sm)
+  .content__header
+    &__actions
+      display none
+
+@media (max-width: max-md)
+  .content__header
+      &__modification
+        display none

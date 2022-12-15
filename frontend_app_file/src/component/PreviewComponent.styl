@@ -14,11 +14,15 @@ playButtonSize = 40px
   justify-content center
   flex-direction column
   flex 1
+  padding standardSpacing
   &__fileimg
     display flex
     flex-direction column
     justify-content center
-    width 100%
+    align-items center
+    margin auto
+    min-height 0
+    max-height 100%
     &__play
       position absolute
       left "calc(50% - %s)" % (playButtonSize / 2)
@@ -28,8 +32,10 @@ playButtonSize = 40px
       & .previewcomponent__fileimg__play
         opacity 1
     &__img
+      object-fit contain
       margin auto
       max-height 100%
+      min-height 0
       max-width 100%
     &__text
       text-align center
@@ -41,21 +47,29 @@ playButtonSize = 40px
     &.previewAvailable
       cursor pointer
   &__navigationButton
-    margin standardSpacing
-    padding 0
+    padding standardSpacing
     font-size titleFontSize
     cursor pointer
+    &:first-child
+      margin-inline-start auto
+    &:last-child
+      margin-inline-end auto
     &:focus
       box-shadow 0 0 0 0
       outline 0
   &__pagecount
     font-size metadataFontSize
     align-self end
-    padding-bottom pageSpacing
+    padding-bottom standardSpacing
     padding-inline-end pageSpacing
   &__filepreview
     display flex
     flex 1
+    flex-direction row
+    max-height 100%
+    min-height 0
+    width 100%
+    justify-content center
 
 @media (min-width: max-xs) and (max-width: max-lg)
   .previewcomponent

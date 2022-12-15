@@ -429,7 +429,6 @@
   "Attached files": "ملفات مرفقة",
   "Send": "إرسال",
   "Welcome to Tracim": "مرحبا بك في Tracim",
-  "Please select a space in the left sidebar by clicking on it": "اختر فضاء من فضلك على الشريط الجانبي الأيسر عبر النقر عليه",
   "Have a good day!": "يوما طيبا!",
   "You can join an existing space or create your first space": "بإمكانك الإنضمام إلى فضاء موجود مسبقا أو إنشاء فضائك الأول",
   "You can create your first space": "بإمكانك إنشاء فضائك الأول",
@@ -499,7 +498,6 @@
   "moved": "تم النقل",
   "copied": "تم النسخ",
   "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "هل تريد أن تواصل في تحميل {{filename}} رغم أن حجمه يتجاوز 1 ميغابايت؟",
-  "Configuration links": "روابط الضبط",
   "Sunday": "الأحد",
   "Monday": "الإثنين",
   "Tuesday": "الثلاثاء",
@@ -626,5 +624,13 @@
   "My profile": "ملفي الشخصي",
   "My Spaces": "",
   "My Password": "",
-  "My Configuration links": ""
+  "My Configuration links": "",
+  "Error while marking the notification group as read": "",
+  "Error while marking notifications as read": "",
+  "Open emoticons menu": "",
+  "Filter my favorites": "",
+  "There are no favorites that matches you filter": "",
+  "Filter visible contents": "",
+  "There are no spaces that matches your filter": "",
+  "Filter users": ""
 }

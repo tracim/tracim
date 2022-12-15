@@ -7,13 +7,19 @@ import { IMG_LOAD_STATE } from 'tracim_frontend_lib'
 describe('<PreviewComponent />', () => {
   const loadingMessage = 'Preview loading...'
   const noPreviewMessage = 'No preview available'
+  const preview = {
+    url: 'randomPreviewUrl',
+    name: 'randomPreviewUrl',
+    size: '50w'
+  }
 
   const props = {
     filePageNb: 0,
     fileCurrentPage: 0,
     isJpegAvailable: true,
     isPdfAvailable: true,
-    previewUrl: 'randomPreviewUrl',
+    preview: preview,
+    previewList: [preview],
     downloadPdfPageUrl: 'randomDownloadPdfPageUrl',
     color: 'randomColor',
     downloadRawUrl: 'randomDownloadRawUrl',
@@ -51,7 +57,7 @@ describe('<PreviewComponent />', () => {
       )
 
       it('should display the preview in `img` html tag', () =>
-        expect(wrapper.find('img.previewcomponent__fileimg__img').prop('src')).to.equal(props.previewUrl)
+        expect(wrapper.find('img.previewcomponent__fileimg__img').prop('src')).to.equal(props.preview.url)
       )
 
       it('should display the page counter and 2 navigations buttons if the file has more than 1 page', () => {

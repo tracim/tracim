@@ -32,6 +32,7 @@ export const serializeContentProps = {
   is_template: 'isTemplate',
   isOpen: 'isOpen',
   label: 'label',
+  last_modifier: 'lastModifier',
   modified: 'modified',
   parent_content_namespace: 'parentContentNamespace',
   parent_content_type: 'parentContentType',

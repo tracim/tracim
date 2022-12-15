@@ -98,7 +98,6 @@
   "Welcome to Tracim": "Willkommen bei Tracim",
   "You aren't member of any space yet": "Sie sind noch in keinem Bereich Mitglied",
   "Have a good day!": "Schönen Tag noch!",
-  "Please select a space in the left sidebar by clicking on it": "Bitte wählen Sie einen Bereich in der linken Seitenleiste durch Anklicken aus",
   "Forgot password": "Passwort vergessen",
   "Did you forget your password?": "Haben Sie Ihr Passwort vergessen?",
   "Reset password": "Passwort zurücksetzen",
@@ -547,7 +546,6 @@
   "Comment_verb": "Kommentieren",
   "Image": "Bild",
   "New language:": "Neue Sprache:",
-  "Configuration links": "Links zur Konfiguration",
   " on {{content}}": " in {{content}}",
   "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> schuf den Bereich <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> löschte den Bereich <2><0><0>{{workspaceLabel}}</0></0></2>",
@@ -586,5 +584,13 @@
   "My profile": "Mein Profil",
   "My Spaces": "",
   "My Password": "",
-  "My Configuration links": ""
+  "My Configuration links": "",
+  "Error while marking the notification group as read": "",
+  "Error while marking notifications as read": "",
+  "Open emoticons menu": "",
+  "Filter my favorites": "",
+  "There are no favorites that matches you filter": "",
+  "Filter visible contents": "",
+  "There are no spaces that matches your filter": "",
+  "Filter users": ""
 }

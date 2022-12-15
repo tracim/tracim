@@ -9,25 +9,25 @@ import {
   WORKSPACE_MEMBER,
   WORKSPACE_DETAIL
 } from '../action-creator.sync.js'
-import { serialize, sortWorkspaceList } from 'tracim_frontend_lib'
+import { serialize, sortListByMultipleCriteria, SORT_BY, SORT_ORDER } from 'tracim_frontend_lib'
 import { serializeSidebarEntryProps, serializeMember } from './currentWorkspace.js'
 import { uniqBy } from 'lodash'
 
 export const serializeWorkspaceListProps = {
+  access_type: 'accessType',
   agenda_enabled: 'agendaEnabled',
   default_user_role: 'defaultRole',
+  description: 'description',
+  public_download_enabled: 'downloadEnabled',
+  workspace_id: 'id',
   is_deleted: 'isDeleted',
   label: 'label',
+  memberList: 'memberList',
   parent_id: 'parentId',
-  public_download_enabled: 'downloadEnabled',
-  public_upload_enabled: 'uploadEnabled',
+  publication_enabled: 'publicationEnabled',
   sidebar_entries: 'sidebarEntryList',
   slug: 'slug',
-  workspace_id: 'id',
-  description: 'description',
-  memberList: 'memberList',
-  access_type: 'accessType',
-  publication_enabled: 'publicationEnabled'
+  public_upload_enabled: 'uploadEnabled'
 }
 
 export function workspaceList (state = [], action, lang) {
@@ -39,8 +39,8 @@ export function workspaceList (state = [], action, lang) {
         memberList: []
       }))
 
-    case `${ADD}/${WORKSPACE_LIST}`:
-      return sortWorkspaceList([
+    case `${ADD}/${WORKSPACE_LIST}`: {
+      const spaceList = [
         ...state,
         ...action.workspaceList
           .filter(w => !state.some(s => s.id === w.workspace_id))
@@ -49,7 +49,9 @@ export function workspaceList (state = [], action, lang) {
             sidebarEntryList: ws.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps)),
             memberList: []
           }))
-      ], lang)
+      ]
+      return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+    }
 
     case `${REMOVE}/${WORKSPACE_LIST}`:
       return state.filter(ws => ws.id !== action.workspace.workspace_id)
@@ -108,20 +110,19 @@ export function workspaceList (state = [], action, lang) {
         : ws
       )
 
-    case `${UPDATE}/${WORKSPACE_DETAIL}`:
+    case `${UPDATE}/${WORKSPACE_DETAIL}`: {
       if (!state.some(ws => ws.id === action.workspaceDetail.workspace_id)) return state
-      return sortWorkspaceList(
-        state.map(
-          ws => ws.id === action.workspaceDetail.workspace_id
-            ? {
-              ...ws,
-              ...serialize(action.workspaceDetail, serializeWorkspaceListProps),
-              sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
-            }
-            : ws
-        ),
-        lang
+      const spaceList = state.map(
+        ws => ws.id === action.workspaceDetail.workspace_id
+          ? {
+            ...ws,
+            ...serialize(action.workspaceDetail, serializeWorkspaceListProps),
+            sidebarEntryList: action.workspaceDetail.sidebar_entries.map(sbe => serialize(sbe, serializeSidebarEntryProps))
+          }
+          : ws
       )
+      return sortListByMultipleCriteria(spaceList, [SORT_BY.LABEL, SORT_BY.ID], SORT_ORDER.ASCENDING, lang)
+    }
 
     default:
       return state

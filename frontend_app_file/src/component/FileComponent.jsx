@@ -149,7 +149,8 @@ export class FileComponent extends React.Component {
             isVideo={props.isVideo}
             downloadPdfPageUrl={props.downloadPdfPageUrl}
             downloadPdfFullUrl={props.downloadPdfFullUrl}
-            previewUrl={props.previewUrl}
+            previewList={props.previewList}
+            preview={props.preview}
             filePageNb={props.filePageNb}
             fileCurrentPage={props.fileCurrentPage}
             lightboxUrlList={props.lightboxUrlList}
@@ -218,7 +219,9 @@ FileComponent.propTypes = {
   mode: PropTypes.string,
   onClickLastVersion: PropTypes.func,
   onClickRefresh: PropTypes.func,
-  onTogglePreviewVideo: PropTypes.func
+  onTogglePreviewVideo: PropTypes.func,
+  preview: PropTypes.object,
+  previewList: PropTypes.array
 }
 
 FileComponent.defaultProps = {
@@ -229,5 +232,6 @@ FileComponent.defaultProps = {
   mode: APP_FEATURE_MODE.VIEW,
   onClickLastVersion: () => { },
   onClickRefresh: () => { },
-  onTogglePreviewVideo: () => { }
+  onTogglePreviewVideo: () => { },
+  previewList: []
 }

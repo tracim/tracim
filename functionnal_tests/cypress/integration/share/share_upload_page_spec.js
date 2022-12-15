@@ -18,7 +18,7 @@ describe('Open the share folder advanced', () => {
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId)
     }).then(() => {
       cy.visitPage({ pageName: PAGES.CONTENTS, params: { workspaceId: workspaceId } })
-      cy.get('.folder__header__button').should('be.visible').click()
+      cy.get('.shareFolder__header__button [data-cy=extended_action]').should('be.visible').click()
       cy.get('.dropdownMenuItem .fa-pencil-alt').first().should('be.visible').click()
     })
   })

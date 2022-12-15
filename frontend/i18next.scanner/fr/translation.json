@@ -143,7 +143,6 @@
   "Welcome to Tracim": "Bienvenue sur Tracim",
   "You aren't member of any space yet": "Vous n'êtes pas encore membre d'un espace",
   "Have a good day!": "Bonne journée !",
-  "Please select a space in the left sidebar by clicking on it": "Veuillez sélectionner un espace présent dans la barre latérale en cliquant dessus",
   "Forgot password": "Mot de passe oublié",
   "Did you forget your password?": "Vous avez oublié votre mot de passe ?",
   "Reset password": "Réinitialisez votre mot de passe",
@@ -547,7 +546,6 @@
   "Comment": "Commentaire",
   "Image": "Image",
   "New language:": "Nouvelle langue :",
-  "Configuration links": "Liens de configuration",
   " on {{content}}": " dans {{content}}",
   "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> a créé l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> a supprimé l'espace <2><0><0>{{workspaceLabel}}</0></0></2>",
@@ -586,5 +584,13 @@
   "My profile": "Mon profil",
   "My Spaces": "Mes espaces",
   "My Password": "Mon mot de passe",
-  "My Configuration links": "Mes liens de configuration"
+  "My Configuration links": "Mes liens de configuration",
+  "Error while marking the notification group as read": "Une erreur est survenue en marquant le groupe de notifications comme lu",
+  "Error while marking notifications as read": "Une erreur est survenue en marquant les notifications comme lues",
+  "Open emoticons menu": "Ouvrir le menu d'emoticons",
+  "Filter my favorites": "Filtrer mes favoris",
+  "There are no favorites that matches you filter": "Aucun favoris ne correspond à votre filtre",
+  "Filter visible contents": "Filtrer les contenus visibles",
+  "There are no spaces that matches your filter": "Aucun espace ne correspond à votre filtre",
+  "Filter users": "Filtrer les utilisateurs"
 }

@@ -4,6 +4,12 @@ import Avatar, { AVATAR_SIZE } from '../../Avatar/Avatar'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 
+// INFO - GB - 2022-11-16 -If this component is used with advanced editing, it must be placed AFTER the textarea.
+// Explanation why: The moment we make Tinymce fullscreen mode, we overwrite its css to take into account the
+// sidebar. This operation is done in frontend/src/css/Generic.styl.
+// However, the auto-completion popup does not take this into account, so we have to do the same for it.
+// We use the sibling selector, since they are on the same level, but with it it is only possible to change later elements.
+
 export const AutoComplete = props => {
   return (
     <div className='autocomplete' style={props.style}>

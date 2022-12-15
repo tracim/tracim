@@ -29,7 +29,7 @@
   "User created and email sent": "Usuario creado y correo electrónico enviado",
   "User created": "Usuario creado",
   "Create a user": "Crear un usuario",
-  "Email already exists": "Dirección de correo electrónico ya utilizada",
+  "Email already exists": "El email ya existe",
   "Please set a password": "Por favor, establezca una contraseña",
   "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "El nombre de usuario debe tener entre {{minimumCharactersUsername}} y {{maximumCharactersUsername}} caracteres",
   "Email notification are disabled, please manually notify users of any change": "Las notificaciones por correo electrónico están deshabilitadas, por favor notifique manualmente a los usuarios de cualquier cambio",
@@ -48,5 +48,10 @@
   "On this page you can manage the users of your Tracim instance.": "En esta página puede gestionar los usuarios de su instancia de Tracim.",
   "Account deactivated": "Cuenta desactivada",
   "Activated": "Activado",
-  "Deactivated": "Desactivado"
+  "Deactivated": "Desactivado",
+  "Inactive": "Inactivo",
+  "Filter users": "Filtrar a los usuarios",
+  "There are no users that matches you filter": "No hay usuarios que coincidan con tu filtro",
+  "Filter spaces": "Filtrar espacios",
+  "There are no spaces that matches you filter": "No hay espacios que coincidan con tu filtro"
 }

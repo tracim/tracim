@@ -423,7 +423,7 @@
   "d": "d",
   "w": "u",
   "Log in": "Logg inn",
-  "{{author}} created {{content}}{{workspaceInfo}}": "{{author}} opprettet {{workspaceInfo}}",
+  "{{author}} created {{content}}{{workspaceInfo}}": "{{author}} opprettet {{content}}{{workspaceInfo}}",
   "{{author}} deleted {{content}}{{workspaceInfo}}": "{{author}} slettet {{content}}{{workspaceInfo}}",
   "{{author}} mentioned you in {{content}}": "{{author}} nevnte deg i {{content}}",
   "Decline": "Avslå",
@@ -598,5 +598,13 @@
   "Confidential space": "Konfidensielt rom",
   "My Spaces": "",
   "My Password": "",
-  "My Configuration links": ""
+  "My Configuration links": "",
+  "Error while marking the notification group as read": "",
+  "Error while marking notifications as read": "",
+  "Open emoticons menu": "",
+  "Filter my favorites": "",
+  "There are no favorites that matches you filter": "",
+  "Filter visible contents": "",
+  "There are no spaces that matches your filter": "",
+  "Filter users": ""
 }

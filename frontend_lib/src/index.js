@@ -55,7 +55,6 @@ import {
   htmlToText,
   initMentionRenderer,
   lightenColor,
-  naturalCompareLabels,
   parserStringToList,
   permissiveNumberEqual,
   removeAtInUsername,
@@ -68,15 +67,20 @@ import {
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus,
-  sortMemberList,
-  sortTimelineByDate,
-  sortWorkspaceList,
   splitFilenameExtension,
+  stringIncludes,
   tinymceRemove,
   updateTLMUser
 } from './helper.js'
+
+import {
+  SORT_BY,
+  SORT_ORDER,
+  putFoldersAtListBeginning,
+  sortListBy,
+  sortListByMultipleCriteria,
+  sortTimelineByDate
+} from './sortListHelper.js'
 
 import {
   GROUP_MENTION_TRANSLATION_LIST,
@@ -115,6 +119,7 @@ import { defaultDebug } from './debug.js'
 import AgendaInfo from './component/AgendaInfo/AgendaInfo.jsx'
 import { Breadcrumbs } from './component/Breadcrumbs/Breadcrumbs.jsx'
 import EmptyListMessage from './component/EmptyListMessage/EmptyListMessage.jsx'
+import TitleListHeader from './component/Lists/ListHeader/TitleListHeader.jsx'
 
 import PopinFixed from './component/PopinFixed/PopinFixed.jsx'
 import PopinFixedHeader from './component/PopinFixed/PopinFixedHeader.jsx'
@@ -189,6 +194,7 @@ import UserInfo from './component/UserInfo/UserInfo.jsx'
 import TextInput from './component/Input/TextInput.jsx'
 import DistanceDate from './component/DistanceDate.jsx'
 import Icon from './component/Icon/Icon.jsx'
+import FilterBar from './component/FilterBar/FilterBar.jsx'
 
 import PopupUploadFile from './container/PopupUploadFile.jsx'
 import PopupProgressUpload from './container/PopupProgressUpload.jsx'
@@ -334,6 +340,8 @@ export {
   PROFILE,
   ROLE_LIST,
   ROLE,
+  SORT_BY,
+  SORT_ORDER,
   SPACE_TYPE_LIST,
   SPACE_TYPE,
   STATUSES,
@@ -368,6 +376,7 @@ export {
   ErrorFlashMessageTemplateHtml,
   FileDropzone,
   FileUploadList,
+  FilterBar,
   GenericButton,
   Icon,
   IconButton,
@@ -403,6 +412,7 @@ export {
   TimedEvent,
   Timeline,
   TinyEditor,
+  TitleListHeader,
   ToDoItem,
   ToDoManagement,
   TracimComponent,
@@ -475,7 +485,6 @@ export {
   isFileUploadInErrorState,
   isFileUploadInList,
   lightenColor,
-  naturalCompareLabels,
   parserStringToList,
   permissiveNumberEqual,
   postNewComment,
@@ -489,6 +498,7 @@ export {
   putEditStatus,
   putFileDescription,
   putFileIsDeleted,
+  putFoldersAtListBeginning,
   putMyselfFileRead,
   putRawFileContent,
   putToDo,
@@ -503,12 +513,11 @@ export {
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus,
-  sortMemberList,
+  sortListBy,
+  sortListByMultipleCriteria,
   sortTimelineByDate,
-  sortWorkspaceList,
   splitFilenameExtension,
+  stringIncludes,
   tinymceAutoCompleteHandleClickItem,
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,

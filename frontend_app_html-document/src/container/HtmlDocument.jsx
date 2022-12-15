@@ -13,6 +13,7 @@ import {
   PAGE,
   ROLE_LIST,
   ROLE,
+  SORT_BY,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
@@ -50,8 +51,7 @@ import {
   searchContentAndPlaceBalise,
   searchMentionAndPlaceBalise,
   sendGlobalFlashMessage,
-  sortContentByCreatedDateAndID,
-  sortContentByStatus,
+  sortListByMultipleCriteria,
   tinymceAutoCompleteHandleClickItem,
   tinymceRemove
 } from 'tracim_frontend_lib'
@@ -230,7 +230,10 @@ export class HtmlDocument extends React.Component {
     ))
 
     this.setState(prevState => ({
-      toDoList: sortContentByStatus(sortContentByCreatedDateAndID(uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id')))
+      toDoList: sortListByMultipleCriteria(
+        uniqBy([fecthGetToDo.body, ...prevState.toDoList], 'content_id'),
+        [SORT_BY.STATUS, SORT_BY.CREATION_DATE, SORT_BY.ID]
+      )
     }))
   }
 

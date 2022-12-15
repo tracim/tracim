@@ -138,7 +138,6 @@
   "Welcome to Tracim": "Welcome to Tracim",
   "You aren't member of any space yet": "You aren't member of any space yet",
   "Have a good day!": "Have a good day!",
-  "Please select a space in the left sidebar by clicking on it": "Please select a space in the left sidebar by clicking on it",
   "Forgot password": "Forgot password",
   "Did you forget your password?": "Did you forget your password?",
   "Reset password": "Reset password",
@@ -547,7 +546,6 @@
   "Comment_verb": "Comment",
   "Image": "Image",
   "New language:": "New language:",
-  "Configuration links": "Configuration links",
   "<0><0>{{userPublicName}}</0></0>  created the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> created the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "<0><0>{{userPublicName}}</0></0>  deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>": "<0><0>{{userPublicName}}</0></0> deleted the space <2><0><0>{{workspaceLabel}}</0></0></2>",
   "Error loading unread notification number": "Error loading unread notification number",
@@ -586,5 +584,13 @@
   "My profile": "My profile",
   "My Spaces": "My Spaces",
   "My Password": "My Password",
-  "My Configuration links": "My Configuration Links"
+  "My Configuration links": "My Configuration Links",
+  "Error while marking the notification group as read": "Error while marking the notification group as read",
+  "Error while marking notifications as read": "Error while marking notifications as read",
+  "Open emoticons menu": "Open emoticons menu",
+  "Filter my favorites": "Filter my favorites",
+  "There are no favorites that matches you filter": "There are no favorites that matches you filter",
+  "Filter visible contents": "Filter visible contents",
+  "There are no spaces that matches your filter": "There are no spaces that matches your filter",
+  "Filter users": "Filter users"
 }
