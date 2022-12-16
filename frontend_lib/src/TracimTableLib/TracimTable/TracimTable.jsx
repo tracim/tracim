@@ -39,13 +39,13 @@ export const GenericTracimTableLine = props => {
 }
 
 const TracimTable = (props) => {
-  const globalFilterFn = (row, columnId, value, addMeta) => {
+  const handleGlobalFilter = (row, columnId, value, addMeta) => {
     return table.getColumn(columnId).getFilterFn()(row, columnId, value, addMeta)
   }
 
   const table = useReactTable({
     data: props.data,
-    globalFilterFn,
+    globalFilterFn: handleGlobalFilter,
     columns: props.columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

@@ -21,7 +21,8 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   permissiveNumberEqual,
-  updateTLMUser, stringIncludes
+  updateTLMUser, 
+  stringIncludes
 } from '../src/helper.js'
 
 import {

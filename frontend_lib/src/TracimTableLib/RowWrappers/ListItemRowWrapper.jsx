@@ -6,7 +6,7 @@ import { PAGE } from '../../helper.js'
 import ListItemWrapper from '../../component/Lists/ListItemWrapper/ListItemWrapper.jsx'
 
 const ListItemRowWrapper = (props) => {
-  const contentTypeInfo = props.contentType.find(info => info.slug === props.originalType)
+  const contentTypeInfo = props.contentType.find(type => type.slug === props.originalType) || { slug: '' }
   const contentAppUrl = props.content ? PAGE.WORKSPACE.CONTENT(
     props.content.workspaceId,
     contentTypeInfo.slug,

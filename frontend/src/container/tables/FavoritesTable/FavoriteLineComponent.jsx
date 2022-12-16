@@ -12,9 +12,9 @@ const FavoriteLineComponent = props => {
   const Wrapper = RowWrappers.ListItemRowWrapper
   return (
     <Wrapper
-      customClass='favoriteTable__row'
-      contentType={props.contentType}
       {...props.rowData.original}
+      contentType={props.contentType}
+      customClass='favoriteTable__row'
       key={`${props.rowData.id}-wrapper`}
       dataCy='favorites__item'
     >
