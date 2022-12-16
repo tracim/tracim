@@ -278,6 +278,7 @@ export const CommentArea = props => {
             {props.isDisplayedCancel && (
               <IconButton
                 color={props.customColor}
+                customClassName='commentArea__withstand__btn'
                 icon='fas fa-times'
                 intent='secondary'
                 mode='dark'
