@@ -76,9 +76,9 @@ class TracimContext(ABC):
             yield
         finally:
             self._disable_events = False
-            self.plugin_manager.hook.on_batched_events_finished(
-                operation_type=operation_type, obj=obj, context=self
-            )
+        self.plugin_manager.hook.on_batched_events_finished(
+            operation_type=operation_type, obj=obj, context=self
+        )
 
     @property
     def pending_events(self) -> typing.List[Event]:
