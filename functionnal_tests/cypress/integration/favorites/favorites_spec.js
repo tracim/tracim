@@ -75,7 +75,7 @@ describe('Favorites', function () {
 
     it('should list contents available as favorites', () => {
       cy.get('[data-cy=favorites__item]').its('length').should('be.equal', numberOfFavorites)
-      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}Note`)
+      cy.get('[data-cy=favorites__item]').first().should('contain', `${contentName}File`)
     })
 
     it('should filter contents by type', () => {
