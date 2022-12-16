@@ -78,9 +78,13 @@ from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import RevisionReadStatus
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
+from tracim_backend.models.event import OperationType
 from tracim_backend.models.favorites import FavoriteContent
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.tracim_session import TracimSession
+
+if typing.TYPE_CHECKING:
+    from tracim_backend.lib.utils.request import TracimContext
 
 __author__ = "damien"
 
@@ -1300,6 +1304,7 @@ class ContentApi(object):
     def copy(
         self,
         item: Content,
+        context: "TracimContext",
         new_parent: Content = None,
         new_label: str = None,
         new_workspace: Workspace = None,
@@ -1390,22 +1395,24 @@ class ContentApi(object):
                 "content {} of type {} should always have a label "
                 "and a valid filename".format(item.content_id, content_type_slug)
             )
-
-        copy_result = self._copy(item, content_namespace, parent)
-
-        copy_result = self._add_copy_revisions(
-            original_content=item,
-            new_content=copy_result.new_content,
-            original_content_children=copy_result.original_children_dict,
-            new_content_children=copy_result.new_children_dict,
-            new_parent=parent,
-            new_label=label,
-            new_workspace=workspace,
-            new_file_extension=file_extension,
-            new_content_namespace=content_namespace,
-            do_save=do_save,
-            do_notify=do_notify,
-        )
+        new_content = Content()
+        with context.batched_events(
+            operation_type=OperationType.COPIED, obj=new_content,
+        ):
+            copy_result = self._copy(item, new_content, content_namespace, parent)
+            copy_result = self._add_copy_revisions(
+                original_content=item,
+                new_content=copy_result.new_content,
+                original_content_children=copy_result.original_children_dict,
+                new_content_children=copy_result.new_children_dict,
+                new_parent=parent,
+                new_label=label,
+                new_workspace=workspace,
+                new_file_extension=file_extension,
+                new_content_namespace=content_namespace,
+                do_save=do_save,
+                do_notify=do_notify,
+            )
         return copy_result.new_content
 
     def copy_from_template(
@@ -1432,6 +1439,7 @@ class ContentApi(object):
     def _copy(
         self,
         content: Content,
+        new_content: Content,
         new_content_namespace: ContentNamespaces = None,
         new_parent: Content = None,
     ) -> AddCopyRevisionsResult:
@@ -1443,7 +1451,6 @@ class ContentApi(object):
         :return: new content created based on original root content,
         dict of new children content and original children content with original content id as key.
         """
-        new_content = Content()
         # INFO - G.M - 2019-04-30 - we store all children content created and old content id of them
         # to be able to retrieve them for applying new revisions on them easily. key of dict is
         # original content_id.

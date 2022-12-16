@@ -1213,6 +1213,7 @@ class TestContentApi(object):
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1262,7 +1263,9 @@ class TestContentApi(object):
             do_save=True,
         )
 
-        api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
+        api2.copy(
+            item=text_file, context=test_context, new_parent=folderb, new_label="test_file_copy"
+        )
 
         transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", folderb)
@@ -1297,6 +1300,7 @@ class TestContentApi(object):
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1330,6 +1334,7 @@ class TestContentApi(object):
 
         api2.copy(
             item=text_file,
+            context=test_context,
             new_content_namespace=ContentNamespaces.UPLOAD,
             new_label="test_file_copy",
         )
@@ -1358,6 +1363,7 @@ class TestContentApi(object):
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1420,7 +1426,9 @@ class TestContentApi(object):
             do_save=True,
         )
 
-        api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
+        api2.copy(
+            item=text_file, context=test_context, new_parent=folderb, new_label="test_file_copy"
+        )
 
         transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", folderb)
@@ -1453,6 +1461,7 @@ class TestContentApi(object):
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1501,13 +1510,16 @@ class TestContentApi(object):
         api2.save(folderb)
 
         with pytest.raises(UnallowedSubContent):
-            api2.copy(item=text_file, new_parent=folderb, new_label="test_file_copy")
+            api2.copy(
+                item=text_file, context=test_context, new_parent=folderb, new_label="test_file_copy"
+            )
 
     def test_unit_copy_file__same_label_different_parent_ok(
         self,
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1552,7 +1564,7 @@ class TestContentApi(object):
             label="folder b",
             do_save=True,
         )
-        api2.copy(item=text_file, new_parent=folderb)
+        api2.copy(item=text_file, context=test_context, new_parent=folderb)
 
         transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent("test_file", folderb)
@@ -1577,6 +1589,7 @@ class TestContentApi(object):
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1613,7 +1626,7 @@ class TestContentApi(object):
         api.save(text_file, ActionDescription.CREATION)
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
 
-        api2.copy(item=text_file, new_label="test_file_copy")
+        api2.copy(item=text_file, context=test_context, new_label="test_file_copy")
 
         transaction.commit()
         text_file_copy = api2.get_one_by_label_and_parent("test_file_copy", foldera)
@@ -1638,6 +1651,7 @@ class TestContentApi(object):
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1682,13 +1696,14 @@ class TestContentApi(object):
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
 
         with pytest.raises(UnallowedSubContent):
-            api2.copy(item=text_file, new_label="test_file_copy")
+            api2.copy(item=text_file, context=test_context, new_label="test_file_copy")
 
     def test_unit_copy_file_different_label_same_parent__err__label_already_used(
         self,
         user_api_factory,
         workspace_api_factory,
         session,
+        test_context,
         app_config,
         content_type_list,
         role_api_factory,
@@ -1732,7 +1747,7 @@ class TestContentApi(object):
         api.save(text_file, ActionDescription.CREATION)
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
         with pytest.raises(ContentFilenameAlreadyUsedInFolder):
-            api2.copy(item=text_file, new_label="already_exist")
+            api2.copy(item=text_file, context=test_context, new_label="already_exist")
 
         transaction.commit()
         new_already_exist = api2.get_one_by_label_and_parent("already_exist", foldera)

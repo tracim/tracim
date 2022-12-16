@@ -30,6 +30,8 @@ class OperationType(enum.Enum):
     MODIFIED = "modified"
     DELETED = "deleted"
     UNDELETED = "undeleted"
+    COPIED = "copied"
+    MOVED = "moved"
 
     def __str__(self) -> str:
         return self.value
