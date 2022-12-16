@@ -1,4 +1,3 @@
-# import re
 import abc
 import typing
 import uuid
@@ -7,8 +6,6 @@ from bs4 import BeautifulSoup
 from bs4 import Tag
 from pluggy import PluginManager
 
-# from tracim_backend.exceptions import UserDoesNotExist
-# from tracim_backend.lib.core.user import UserApi
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
@@ -61,21 +58,6 @@ class Mention:
 class BaseMentionParser(abc.ABC):
     """Base class for mention parsers."""
 
-    # @abc.abstractmethod
-    # def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
-    #     """Seek and replace wrong mention in text.\n
-    #     Replace username="john" by userid="1"
-
-    #     Args:
-    #         text (str): The text to parse.
-    #         session (TracimSession): The session to use.
-    #         config (CFG): The config to use.
-
-    #     Returns:
-    #         str: The text with replaced mention.
-    #     """
-    #     ...
-
     @abc.abstractmethod
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
         """Parse mentions found in the given content revision and return them.
@@ -92,38 +74,14 @@ class DescriptionMentionParser(BaseMentionParser):
     mentions found in it considering description is HTML.
 
     HTML mentions must have the following structure:
-      `<html-mention id="mention-{a unique id}" {DATA}></html-mention>`
+      `<html-mention id="{a unique id}" {DATA}></html-mention>`
 
     DATA should be one of theses:
      - userid="{user_id}"
      - roleid="{role_id}"
     """
 
-    MENTION_ID_START = "mention-"  # TODO - MP - 2022-11-29 - Check if this is still used
     MENTION_TAG_NAME = "html-mention"
-
-    # # Regex explanation: https://regex101.com/r/F3Bv8W/3
-    # # Match (@XXX part): '@XXX', '@XXX_YYY', '@XXX ', ' @XXX', '@XXX:', '@XXX,', '@XXX.', '@XXX!', ...
-    # # Don't match: 'XXX@XXX', '@<span>XXX</span>', '@XXX-YYY', ...
-    # MENTION_REGEX = re.compile(r"(?<!\w)(@\w+)(?![\w-])")
-
-    # @classmethod
-    # def seek_and_replace_wrong_mention(self, text: str, session: TracimSession, config: CFG) -> str:
-    #     every_possible_mentions = re.findall(self.MENTION_REGEX, text)
-    #     user_api = UserApi(session=session, config=config, current_user=None)
-    #     for mention_name in every_possible_mentions:
-    #         try:
-    #             user = user_api.get_one_by_username(mention_name[1:])
-    #             text = text.replace(
-    #                 mention_name,
-    #                 f'<html-mention userid="{user.user_id}"></html-mention>'
-    #             )
-    #         except UserDoesNotExist:
-    #             logger.warning(
-    #                 self,
-    #                 f"User {mention_name} does not exist, mention will be ignored",
-    #             )
-    #     return text
 
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
         return self.get_mentions_from_html(revision.raw_content)
@@ -140,17 +98,15 @@ class DescriptionMentionParser(BaseMentionParser):
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            # NOTE MP - 2022-11-16 - Fetching mentions that are typed by hand
-            # The mention either has userid or rolelevel
             user_id: int = mention_tag.attrs.get("userid")
             if user_id:
                 id_ = str(uuid.uuid4())
                 mentions.append(Mention(MentionType.USER, user_id, id_))
                 continue
-            role_level: int = mention_tag.attrs.get("rolelevel")
-            if role_level:
+            role_id: int = mention_tag.attrs.get("roleid")
+            if role_id:
                 id_ = str(uuid.uuid4())
-                mentions.append(Mention(MentionType.ROLE, role_level, id_))
+                mentions.append(Mention(MentionType.ROLE, role_id, id_))
                 continue
         return mentions
 
