@@ -19,7 +19,11 @@ const DropdownMenu = props => {
         data-toggle='dropdown'
         disabled={props.buttonDisabled}
         onClick={e => { e.stopPropagation(); props.buttonClick() }}
-        title={props.buttonTooltip ? props.buttonTooltip : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)}
+        title={
+          props.buttonTooltip
+            ? props.buttonTooltip
+            : ((typeof props.buttonLabel) === 'string' ? props.buttonLabel : undefined)
+        }
         type='button'
       >
         {props.buttonOpts}
