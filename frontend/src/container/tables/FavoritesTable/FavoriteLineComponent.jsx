@@ -17,6 +17,7 @@ const FavoriteLineComponent = props => {
       customClass='favoriteTable__row'
       key={`${props.rowData.id}-wrapper`}
       dataCy='favorites__item'
+      read
     >
       <GenericTracimTableLine {...props} />
     </Wrapper>

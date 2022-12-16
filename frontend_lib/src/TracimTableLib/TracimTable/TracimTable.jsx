@@ -133,7 +133,7 @@ const TracimTable = (props) => {
             {
               props.data.length <= 0
                 ? props.emptyMessage
-                : 'Nothing matches you filter'
+                : props.t('Nothing matches you filter')
             }
           </EmptyListMessage>
         )}

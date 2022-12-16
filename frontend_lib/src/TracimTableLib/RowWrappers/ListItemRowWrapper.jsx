@@ -16,7 +16,7 @@ const ListItemRowWrapper = (props) => {
   return (
     <ListItemWrapper
       label={props.originalLabel}
-      read
+      read={props.read}
       contentType={contentTypeInfo}
       isLast={props.isLast}
       isFirst={props.isFirst}
@@ -41,6 +41,7 @@ ListItemRowWrapper.propsType = {
   contentType: PropTypes.string.isRequired,
   isLast: PropTypes.bool,
   isFirst: PropTypes.bool,
+  read: PropTypes.bool,
   customClass: PropTypes.string,
   dataCy: PropTypes.string
 }
@@ -48,6 +49,7 @@ ListItemRowWrapper.propsType = {
 ListItemRowWrapper.defaultProps = {
   isLast: false,
   isFirst: false,
+  read: false,
   customClass: null,
   dataCy: null
 }
