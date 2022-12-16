@@ -1088,10 +1088,10 @@ export const replaceHTMLElementWithMention = (rolelist, userList, html) => {
  * - Output: `['#844']`
  */
 export const searchContent = (text) => {
-  // Regex explanation: https://regex101.com/r/z1WUUu/1
+  // Regex explanation: https://regex101.com/r/z1WUUu/3
   // Match (#XXX part): '#XXX', '#XXX ', ' #XXX', '#XXX:', ':#XXX', '(#XXX)', '#XXX!', ...
-  // Don't match: 'XXX#XXX', '#<span>XXX</span>'
-  const contentRegex = /(?<=^|\s|\W)#([0-9]+)\b/g
+  // Don't match: 'XXX#XXX', '#<span>XXX</span>', 'title="#XXX'
+  const contentRegex = /(?<=^|\s|\W)(?<!title=")#([0-9]+)\b/g
   const contentList = text.match(contentRegex)
   return contentList || []
 }
