@@ -53,5 +53,14 @@
   "Filter users": "",
   "There are no users that matches you filter": "",
   "Filter spaces": "",
-  "There are no spaces that matches you filter": ""
+  "There are no spaces that matches you filter": "",
+  "Sort by full name": "",
+  "Sort by username": "",
+  "Sort by email": "",
+  "Id": "",
+  "Sort by id": "",
+  "Sort by type": "",
+  "Sort by title": "",
+  "Sort by description": "",
+  "Sort by number of members": ""
 }
