@@ -54,7 +54,7 @@
     "style-loader": "^0.23.1",
     "stylus": "^0.54.5",
     "tracim_frontend_lib": "^1.1.9",
-    "url-loader": "^2.0.1"
+    "url-loader": "^4.1.1"
   },
   "devDependencies": {
     "i18next-scanner": "^2.6.1",

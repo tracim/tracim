@@ -2414,7 +2414,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.0, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.0.0-rc.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.13, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.0, @babel/runtime@npm:^7.17.2, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.6.2, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
   version: 7.17.9
   resolution: "@babel/runtime@npm:7.17.9"
   dependencies:
@@ -2660,6 +2660,24 @@ __metadata:
     prop-types: ^15.0.0
     react: ">=0.14.0"
   checksum: d2f069a562e138057aa067e1483e28cea3193bbacd33ca9528131f31e656939cfeb552af760b3be437d3a8074315a8854fc6d5d89878e2746618ad930c817122
+  languageName: node
+  linkType: hard
+
+"@jonkoops/matomo-tracker-react@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "@jonkoops/matomo-tracker-react@npm:0.7.0"
+  dependencies:
+    "@jonkoops/matomo-tracker": ^0.7.0
+  peerDependencies:
+    react: ">= 16.8.0"
+  checksum: 515503f2cf0e2909832e3cb51eb44d7301fa23d3804bd3938374cfe65d8faa14b22e51c252f7c4da07678424ba90a34d32b0f1ec4ecb0d6def4c991770dfb67a
+  languageName: node
+  linkType: hard
+
+"@jonkoops/matomo-tracker@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "@jonkoops/matomo-tracker@npm:0.7.0"
+  checksum: 63a4ef6c205676cead3b30d1c161c51c9516de49fe215e864f9b7e462c1bae781342ad19830fc25904d731b0cca4da71144a1f9338949e45fe6f0f24c0168eb0
   languageName: node
   linkType: hard
 
@@ -9248,32 +9266,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime@npm:^2.4.4":
-  version: 2.6.0
-  resolution: "mime@npm:2.6.0"
-  bin:
-    mime: cli.js
-  checksum: 1497ba7b9f6960694268a557eae24b743fd2923da46ec392b042469f4b901721ba0adcf8b0d3c2677839d0e243b209d76e5edcbd09cfdeffa2dfb6bb4df4b862
-  languageName: node
-  linkType: hard
-
 "mimic-fn@npm:^2.1.0":
   version: 2.1.0
   resolution: "mimic-fn@npm:2.1.0"
   checksum: d2421a3444848ce7f84bd49115ddacff29c15745db73f54041edc906c14b131a38d05298dae3081667627a59b2eb1ca4b436ff2e1b80f69679522410418b478a
-  languageName: node
-  linkType: hard
-
-"mini-create-react-context@npm:^0.4.0":
-  version: 0.4.1
-  resolution: "mini-create-react-context@npm:0.4.1"
-  dependencies:
-    "@babel/runtime": ^7.12.1
-    tiny-warning: ^1.0.3
-  peerDependencies:
-    prop-types: ^15.0.0
-    react: ^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
-  checksum: f8cb2c7738aac355fe9ce7e8425f371b7fa90daddd5133edda4ccfdc18c49043b2ec04be6f3abf09b60a0f52549d54f158d5bfd81cdfb1a658531e5b9fe7bc6a
   languageName: node
   linkType: hard
 
@@ -11159,23 +11155,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^5.2.0":
-  version: 5.3.1
-  resolution: "react-router-dom@npm:5.3.1"
-  dependencies:
-    "@babel/runtime": ^7.12.13
-    history: ^4.9.0
-    loose-envify: ^1.3.1
-    prop-types: ^15.6.2
-    react-router: 5.3.1
-    tiny-invariant: ^1.0.2
-    tiny-warning: ^1.0.0
-  peerDependencies:
-    react: ">=15"
-  checksum: efbf80c91d64bf51e61fa5dd9e4b7e9c350a0a560d575992d3ee214e0e48da38210b5d8a03c6b270a21f8fd6fa020d076f2af191db5a722c28a68fcad9cefde6
-  languageName: node
-  linkType: hard
-
 "react-router-dom@npm:^5.3.3":
   version: 5.3.4
   resolution: "react-router-dom@npm:5.3.4"
@@ -11190,26 +11169,6 @@ __metadata:
   peerDependencies:
     react: ">=15"
   checksum: b86a6f2f5222f041e38adf4e4b32c7643d6735a1a915ef25855b2db285fd059d72ba8d62e5bcd5d822b8ef9520a80453209e55077f5a90d0f72e908979b8f535
-  languageName: node
-  linkType: hard
-
-"react-router@npm:5.3.1":
-  version: 5.3.1
-  resolution: "react-router@npm:5.3.1"
-  dependencies:
-    "@babel/runtime": ^7.12.13
-    history: ^4.9.0
-    hoist-non-react-statics: ^3.1.0
-    loose-envify: ^1.3.1
-    mini-create-react-context: ^0.4.0
-    path-to-regexp: ^1.7.0
-    prop-types: ^15.6.2
-    react-is: ^16.6.0
-    tiny-invariant: ^1.0.2
-    tiny-warning: ^1.0.0
-  peerDependencies:
-    react: ">=15"
-  checksum: b85c7b4dee5a011f542a654a673489bdedb8cd217e32838d13bc9b2c93f068fd37777bc7ef6cbebd6675cadc4e89add75f5e52e452be6c5b1f92070ad7f7e505
   languageName: node
   linkType: hard
 
@@ -11308,17 +11267,6 @@ __metadata:
     react: ">=16.6.0"
     react-dom: ">=16.6.0"
   checksum: b67bf5b3e86dbab72d658b9a52a3589e5960583ab28c7c66272427d8fe30d4c7de422d5046ae96bd2683cdf80cc3264b2516f5ce80cae1dbe6cf3ca6dda392c5
-  languageName: node
-  linkType: hard
-
-"react@npm:16.13.1":
-  version: 16.13.1
-  resolution: "react@npm:16.13.1"
-  dependencies:
-    loose-envify: ^1.1.0
-    object-assign: ^4.1.1
-    prop-types: ^15.6.2
-  checksum: 4508f4207caca6bef55736284cbf2ce18d2edfee4c1457fc0bb2086b34ed5bcf9b44acdb71e27574e73a5b5d4d093720b5b4ec0bf92bb89394ee3a0a7c42c2d4
   languageName: node
   linkType: hard
 
@@ -11432,12 +11380,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux-thunk@npm:^2.3.0":
-  version: 2.4.1
-  resolution: "redux-thunk@npm:2.4.1"
-  peerDependencies:
-    redux: ^4
-  checksum: af5abb425fb9dccda02e5f387d6f3003997f62d906542a3d35fc9420088f550dc1a018bdc246c7d23ee852b4d4ab8b5c64c5be426e45a328d791c4586a3c6b6e
+"redux-thunk@npm:2.2.0":
+  version: 2.2.0
+  resolution: "redux-thunk@npm:2.2.0"
+  checksum: 25e6d655cf13cacb443d6a7630e2a04a51e915b61a3e2d1bfbcd769b0c65fce9b55ac8e122eded7f03d8cb1aca90f588741f6f7698239e23d1b187d1f6a68212
   languageName: node
   linkType: hard
 
@@ -12023,7 +11969,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"schema-utils@npm:^2.5.0, schema-utils@npm:^2.6.5, schema-utils@npm:^2.7.0":
+"schema-utils@npm:^2.6.5, schema-utils@npm:^2.7.0":
   version: 2.7.1
   resolution: "schema-utils@npm:2.7.1"
   dependencies:
@@ -13064,7 +13010,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-warning@npm:^1.0.0, tiny-warning@npm:^1.0.3":
+"tiny-warning@npm:^1.0.0":
   version: 1.0.3
   resolution: "tiny-warning@npm:1.0.3"
   checksum: da62c4acac565902f0624b123eed6dd3509bc9a8d30c06e017104bedcf5d35810da8ff72864400ad19c5c7806fc0a8323c68baf3e326af7cb7d969f846100d71
@@ -13196,6 +13142,7 @@ __metadata:
     "@babel/preset-env": ^7.19.3
     "@babel/preset-react": ^7.18.6
     "@babel/register": ^7.18.9
+    "@jonkoops/matomo-tracker-react": ^0.7.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
     chai: ^4.2.0
@@ -13240,7 +13187,7 @@ __metadata:
     redux: 3.7.2
     redux-logger: ^3.0.6
     redux-mock-store: ^1.5.3
-    redux-thunk: ^2.3.0
+    redux-thunk: 2.2.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13249,7 +13196,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.4.8
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     uuid: ^8.1.0
     vinyl-fs: ^3.0.3
     webpack: ^5.72.0
@@ -13301,7 +13248,7 @@ __metadata:
     react-dom: ^16.13.1
     react-i18next: 7.4.0
     react-json-editor-ajrm: ^2.5.9
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13310,7 +13257,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13353,7 +13300,7 @@ __metadata:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     script-loader: ^0.7.2
     standard: ^14
@@ -13362,7 +13309,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13409,7 +13356,7 @@ __metadata:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^9.0.2
     standard: ^14
@@ -13418,7 +13365,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13470,7 +13417,7 @@ __metadata:
     style-loader: ^0.23.1
     stylus: ^0.54.5
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13516,7 +13463,7 @@ __metadata:
     react-dom: ^16.13.1
     react-i18next: 7.4.0
     react-image-lightbox: ^5.1.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13525,7 +13472,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13569,7 +13516,7 @@ __metadata:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     standard: ^14
     standard-loader: ^7.0.0
@@ -13577,7 +13524,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13628,7 +13575,7 @@ __metadata:
     react-full-screen: ^0.2.4
     react-i18next: 7.4.0
     react-image-lightbox: ^5.1.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     react-slick: ^0.29.0
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
@@ -13639,7 +13586,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13684,7 +13631,7 @@ __metadata:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13693,7 +13640,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13738,7 +13685,7 @@ __metadata:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13747,7 +13694,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13789,11 +13736,11 @@ __metadata:
     pnp-webpack-plugin: ^1.6.4
     prop-types: ^15.7.2
     radium: ^0.25.2
-    react: 16.13.1
+    react: ^16.13.1
     react-device-detect: ^1.7.5
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13802,7 +13749,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13846,7 +13793,7 @@ __metadata:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13855,7 +13802,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13905,7 +13852,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -13950,7 +13897,7 @@ __metadata:
     react: ^16.13.1
     react-dom: ^16.13.1
     react-i18next: 7.4.0
-    react-router-dom: ^5.2.0
+    react-router-dom: ^5.3.3
     regenerator-runtime: ^0.13.2
     sinon: ^7.4.1
     standard: ^14
@@ -13959,7 +13906,7 @@ __metadata:
     stylus: ^0.54.5
     stylus-native-loader: ^1.1.0
     tracim_frontend_lib: ^1.1.9
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
     webpack-dev-server: ^4.8.1
@@ -14025,7 +13972,7 @@ __metadata:
     style-loader: ^0.23.1
     stylus: ^0.54.5
     stylus-native-loader: ^1.4.8
-    url-loader: ^2.0.1
+    url-loader: ^4.1.1
     uuid: ^8.1.0
     webpack: ^5.72.0
     webpack-cli: ^4.9.2
@@ -14343,20 +14290,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"url-loader@npm:^2.0.1":
-  version: 2.3.0
-  resolution: "url-loader@npm:2.3.0"
+"url-loader@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "url-loader@npm:4.1.1"
   dependencies:
-    loader-utils: ^1.2.3
-    mime: ^2.4.4
-    schema-utils: ^2.5.0
+    loader-utils: ^2.0.0
+    mime-types: ^2.1.27
+    schema-utils: ^3.0.0
   peerDependencies:
     file-loader: "*"
-    webpack: ^4.0.0
+    webpack: ^4.0.0 || ^5.0.0
   peerDependenciesMeta:
     file-loader:
       optional: true
-  checksum: c0a8a6e728331e2189a6538373b9ce4b5589389805c4e98a0386ee5d18cc4ba4c5dec5514d8c852dd533b857461c30c3efc135ed07b6b31a96c5a6fb812a4757
+  checksum: c1122a992c6cff70a7e56dfc2b7474534d48eb40b2cc75467cde0c6972e7597faf8e43acb4f45f93c2473645dfd803bcbc20960b57544dd1e4c96e77f72ba6fd
   languageName: node
   linkType: hard
 

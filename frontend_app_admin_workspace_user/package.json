@@ -41,14 +41,14 @@
     "react-dom": "^16.13.1",
     "react-i18next": "7.4.0",
     "react-json-editor-ajrm": "^2.5.9",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^5.3.3",
     "regenerator-runtime": "^0.13.2",
     "standard": "^14",
     "standard-loader": "^7.0.0",
     "style-loader": "^0.23.1",
     "stylus": "^0.54.5",
     "tracim_frontend_lib": "^1.1.9",
-    "url-loader": "^2.0.1"
+    "url-loader": "^4.1.1"
   },
   "devDependencies": {
     "@babel/register": "^7.12.10",
