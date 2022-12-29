@@ -18,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@jonkoops/matomo-tracker-react": "^0.7.0",
     "classnames": "^2.2.6",
     "color": "^3.1.2",
     "core-js": "^3.25.5",
