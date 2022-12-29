@@ -159,6 +159,8 @@ prettytable==2.1.0
     # via cliff
 preview-generator==0.29
     # via tracim-backend (setup.py)
+prometheus-client==0.15.0
+    # via tracim-backend (setup.py)
 pubcontrol==3.2.0
     # via gripcontrol
 pyasn1==0.4.8
@@ -269,6 +271,9 @@ sqlalchemy==1.3.24
     #   sqlakeyset
     #   tracim-backend (setup.py)
     #   zope-sqlalchemy
+sqlalchemy-easy-profile==1.2.1
+    # via
+    #   tracim-backend (setup.py)
 stevedore==3.3.0
     # via cliff
 text-unidecode==1.3

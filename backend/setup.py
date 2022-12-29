@@ -85,6 +85,8 @@ requires = [
     # note pdf preview
     "pypandoc",
     "weasyprint<53",
+    "sqlalchemy-easy-profile",
+    "prometheus-client",
 ]
 
 tests_require = [

@@ -3,9 +3,15 @@ from abc import ABC
 from abc import abstractmethod
 import contextlib
 from json import JSONDecodeError
+import re
+import threading
+import time
 import typing
 
+from easy_profile import SessionProfiler
 import pluggy
+from prometheus_client import Summary
+import psutil
 from pyramid.request import Request
 from sqlalchemy.orm import Session
 
@@ -370,11 +376,49 @@ class TracimRequest(TracimContext, Request):
     Request with tracim specific params/methods
     """
 
+    REQUEST_LATENCY = Summary(
+        "http_request_latency_seconds", "Latency of every HTTP request", ("method", "path")
+    )
+    REQUEST_CPU_TIME = Summary(
+        "http_request_cpu_time_seconds", "CPU time of every HTTP request", ("method", "path")
+    )
+    REQUEST_DB_TIME = Summary(
+        "http_request_db_time_seconds", "DB time of every HTTP request", ("method", "path")
+    )
+
     def __init__(self, environ, charset=None, unicode_errors=None, decode_param_names=None, **kw):
         Request.__init__(self, environ, charset, unicode_errors, decode_param_names, **kw)
         TracimContext.__init__(self)
+        self._start_time = time.monotonic()
+        self._start_thread_stats = self._get_thread_stats()
+        self._session_profiler = SessionProfiler()
+        self._session_profiler.begin()
+        self.add_finished_callback(self._report_duration)
         # INFO - G.M - 18-05-2018 - Close db at the end of the request
         self.add_finished_callback(lambda r: r.cleanup())
+
+    def _get_thread_stats(self) -> typing.Tuple[int, float, float]:
+        return next(
+            thread
+            for thread in psutil.Process().threads()
+            if thread.id == threading.current_thread().native_id
+        )
+
+    def _report_duration(self, _) -> None:
+        duration = max(time.monotonic() - self._start_time, 0)
+        path_category = re.sub(r"\/\d+(\/|$)", "/*/", self.path)
+        end_thread_stats = self._get_thread_stats()
+        total_cpu_time = (
+            end_thread_stats.user_time
+            - self._start_thread_stats.user_time
+            + end_thread_stats.system_time
+            - self._start_thread_stats.system_time
+        )
+        self._session_profiler.commit()
+        db_time = self._session_profiler.stats["duration"]
+        self.REQUEST_LATENCY.labels(path=path_category, method=self.method).observe(duration)
+        self.REQUEST_CPU_TIME.labels(path=path_category, method=self.method).observe(total_cpu_time)
+        self.REQUEST_DB_TIME.labels(path=path_category, method=self.method).observe(db_time)
 
     @property
     def current_user(self) -> User:
