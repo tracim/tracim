@@ -315,8 +315,9 @@ class CFG(object):
 
         # FIXME - G.M - 2020-01-27 - Ordering: add unordered app at the end of the list.
         # see issue https://github.com/tracim/tracim/issues/2326
-        for app in loaded_apps.values():
-            if app not in app_list:
+        for app_slug, app in loaded_apps.items():
+            if app_slug in enabled_app_slug_list and app not in app_list:
+                app.is_active = True
                 app_list.append(app)
 
         # TODO - G.M - 2018-08-08 - We need to update validators each time
