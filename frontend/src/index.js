@@ -19,13 +19,26 @@ require('./css/index.styl')
 require('./util/appInterface.js')
 require('./util/tinymceInit.js')
 
+// NOTE - SGD - 2022-12-30 - Taken from https://web.dev/vitals/
+const postMetric = metric => {
+  const blob = new Blob([JSON.stringify(metric)], { type: 'application/json' })
+  // Use `navigator.sendBeacon()` if available, falling back to `fetch()`.
+  console.log('MONITORING SEND METRIC', metric)
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon('/api/metrics', blob)
+  } else {
+    fetch('/api/metrics', { body: blob, method: 'POST', keepalive: true })
+  }
+}
+
 /**
- * MatomoRouterProvider provides Matomo hooks for children components
+ * MetricsProvider provides Matomo hooks for children components
  * and it tracks page views on location change.
  *
  * It should be embedded within <Router>
  */
-export const MatomoRouterProvider = ({children}) => {
+export const MetricsProvider = ({ children }) => {
+  // FIXME - SGD - 2022-12-30 - Find a way to parametrize the matomo server (and configuration?)
   const instance = createInstance({
     urlBase: 'http://localhost:8080',
     siteId: 1,
@@ -47,25 +60,50 @@ export const MatomoRouterProvider = ({children}) => {
   React.useEffect(() => { instance.trackPageView() }, [location])
 
   React.useEffect(() => {
-    let startTime = performance.now()
+    const path = location.pathname
+    const pageEntryTime = performance.now()
     let lastEntry = null
+    let pageExitTime = null
+
+    const sendIrreIfAvailableAndDisconnect = observer => {
+      if (pageExitTime) {
+        if (lastEntry) {
+          postMetric({
+            name: 'irre',
+            value: 1e-3 * (lastEntry.responseEnd - pageEntryTime),
+            labels: [path]
+          })
+          observer.disconnect()
+        }
+      }
+    }
+
+    // INFO - SGD - 2022-12-30 - An entry is initial if:
+    // - its start time is less than 1 second after pageEntryTime
+    // - its start time is less than pageExitTime if defined
+    const isInitialEntry = entry => {
+      return (
+        entry.startTime < pageEntryTime + 1000 &&
+        (!pageExitTime || entry.startTime < pageExitTime)
+      )
+    }
+
+    console.log('MONITORING START', path, pageEntryTime)
+    // TODO - SGD - 2022-12-30 - The computation could be improved:
+    // - initial requests made after 1s are not taken into account
     const observer = new PerformanceObserver(list => {
-      const perfEntries = list.getEntries().filter(entry => entry.startTime < startTime + 1000)
-      const last = perfEntries[perfEntries.length - 1]
+      console.log('MONITORING OBSERVER', observer, list)
+      const initialEntries = list.getEntries().filter(isInitialEntry)
+      const last = initialEntries[initialEntries.length - 1]
       lastEntry = last || lastEntry
+      sendIrreIfAvailableAndDisconnect(observer)
     })
-    observer.observe({entryTypes: ['resource']});
+    observer.observe({ entryTypes: ['resource'] })
 
     return () => {
-      if (lastEntry) {
-        instance.trackEvent({
-          category: 'Performance',
-          action: 'IRRE',
-          name: location.pathname,
-          value: lastEntry.responseEnd - startTime
-        })
-      }
-      observer.disconnect()
+      pageExitTime = performance.now()
+      console.log('MONITORING END', path, pageEntryTime, pageExitTime, lastEntry)
+      sendIrreIfAvailableAndDisconnect(observer)
     }
   }, [location])
 
@@ -77,16 +115,16 @@ export const MatomoRouterProvider = ({children}) => {
 }
 
 ReactDOM.render(
-    <Provider store={store}>
-      <Router history={history}>
-        <MatomoRouterProvider>
-          <I18nextProvider i18n={i18n}>
-            <DragDropContextProvider backend={HTML5Backend}>
-              <Tracim />
-            </DragDropContextProvider>
-          </I18nextProvider>
-        </MatomoRouterProvider>
-      </Router>
-    </Provider>
+  <Provider store={store}>
+    <Router history={history}>
+      <MetricsProvider>
+        <I18nextProvider i18n={i18n}>
+          <DragDropContextProvider backend={HTML5Backend}>
+            <Tracim />
+          </DragDropContextProvider>
+        </I18nextProvider>
+      </MetricsProvider>
+    </Router>
+  </Provider>
   , document.getElementById('content')
 )

@@ -115,7 +115,10 @@
       "DOMParser",
       "Audio",
       "Notification",
-      "DragEvent"
+      "DragEvent",
+      "Blob",
+      "performance",
+      "PerformanceObserver"
     ],
     "parser": "babel-eslint",
     "ignore": []
