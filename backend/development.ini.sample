@@ -89,10 +89,11 @@ basic_setup.session_secret = change_this_value_please!
 # - share_content -> allow user to share Tracim content with external user
 # - upload_permission -> allow external with permission to upload some file in a space.
 # - gallery -> add gallery app in Tracim
+# - prometheus-metrics -> compute and expose prometheus metrics on /api/metrics
 # default app.enabled config explicit list config:
 ; app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,share_content,upload_permission,gallery
 # With all apps (add collaborative document edition):
-# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,collaborative_document_edition,share_content,upload_permission,gallery
+# app.enabled = contents/thread,contents/file,contents/html-document,contents/folder,contents/kanban,contents/todo,agenda,collaborative_document_edition,share_content,upload_permission,gallery,prometheus-metrics
 
 ### Live Messages ###
 # control_uri for GRIP protocol reverse-proxy (PushPin)

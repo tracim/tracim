@@ -6,12 +6,10 @@ import sys
 import warnings
 
 from hapic.ext.pyramid import PyramidContext
-from prometheus_client import make_wsgi_app
 from pyramid.config import Configurator
 from pyramid.events import NewResponse
 from pyramid.request import Request
 from pyramid.router import Router
-from pyramid.wsgi import wsgiapp2
 import pyramid_beaker
 from pyramid_multiauth import MultiAuthenticationPolicy
 from sqlalchemy.exc import OperationalError
@@ -325,10 +323,6 @@ def web(global_config: OrderedDict, **local_settings) -> Router:
     plugin_manager.hook.web_include(configurator=configurator, app_config=app_config)
 
     hapic.add_documentation_view("/api/doc", "Tracim API", "API of Tracim")
-
-    # Prometheus metrics
-    metrics_view = wsgiapp2(make_wsgi_app())
-    configurator.add_view(metrics_view, "metrics")
 
     return configurator.make_wsgi_app()
 
