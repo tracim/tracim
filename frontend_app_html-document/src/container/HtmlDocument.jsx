@@ -83,7 +83,6 @@ export class HtmlDocument extends React.Component {
       loadingContent: true,
       lockedToDoList: [],
       loggedUser: param.loggedUser,
-      timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
@@ -528,10 +527,6 @@ export class HtmlDocument extends React.Component {
     window.history.replaceState(null, '', PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.content.content_type, state.content.content_id))
   }
 
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
-  }
-
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
@@ -546,8 +541,6 @@ export class HtmlDocument extends React.Component {
     )
     return true
   }
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
@@ -631,7 +624,6 @@ export class HtmlDocument extends React.Component {
 
   handleClickRefresh = () => {
     const { state } = this
-    // tinymceRemove('#wysiwygNewVersion')
 
     const newObjectContent = {
       ...state.content,
@@ -1011,7 +1003,6 @@ export class HtmlDocument extends React.Component {
             lang={state.loggedUser.lang}
             memberList={state.config.workspace.memberList}
             mode={state.mode}
-            wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
             onClickValidateBtn={this.handleClickSaveDocument}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
@@ -1034,7 +1025,6 @@ export class HtmlDocument extends React.Component {
             showInvalidMentionPopup={state.invalidMentionList.length > 0}
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
-            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
           />
 

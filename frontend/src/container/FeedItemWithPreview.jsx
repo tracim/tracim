@@ -47,7 +47,6 @@ export class FeedItemWithPreview extends React.Component {
       contentTranslationState: this.getInitialTranslationState(props),
       translationStateByCommentId: {},
       showInvalidMentionPopupInComment: false,
-      timelineWysiwyg: false,
       translationTargetLanguageCode: props.user.lang
     }
   }
@@ -76,31 +75,9 @@ export class FeedItemWithPreview extends React.Component {
         this.setState({ contentTranslationState })
       }
     }
-
-    if (props.showCommentList && prevState.timelineWysiwyg && !state.timelineWysiwyg) {
-      tinymceRemove(this.getWysiwygId(props.content.id))
-    }
-  }
-
-  componentWillUnmount () {
-    const { props } = this
-    if (props.showCommentList) tinymceRemove(this.getWysiwygId(props.content.id))
-  }
-
-  handleAllAppChangeLanguage = (data) => {
-    const { props, state } = this
-    if (state.timelineWysiwyg) {
-      const wysiwygId = this.getWysiwygId(props.content.id)
-      tinymceRemove(wysiwygId)
-      globalThis.wysiwyg(wysiwygId, data, this.handleChangeNewComment)
-    }
   }
 
   // TLM Handlers
-
-  getWysiwygId = (contentId) => `#wysiwygTimelineComment${contentId}`
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeNewComment = e => {
     const { props } = this
@@ -157,10 +134,6 @@ export class FeedItemWithPreview extends React.Component {
   }
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
-
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.props.workspaceId)
-  }
 
   handleTranslateComment = (languageCode) => {
     const { props, state } = this

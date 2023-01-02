@@ -198,7 +198,6 @@ export default translate()(HtmlDocument)
 HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  wysiwygNewVersion: PropTypes.string.isRequired,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customColor: PropTypes.string,
@@ -229,7 +228,6 @@ HtmlDocument.propTypes = {
   onClickRestoreDeleted: PropTypes.func,
   onClickSaveAnyway: PropTypes.func,
   onClickShowDraft: PropTypes.func,
-  searchForMentionOrLinkInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool
 }
 
@@ -264,6 +262,5 @@ HtmlDocument.defaultProps = {
   onClickSaveAnyway: () => { },
   onClickShowDraft: () => { },
   showInvalidMentionPopup: false,
-  searchForMentionOrLinkInQuery: () => { },
   text: ''
 }

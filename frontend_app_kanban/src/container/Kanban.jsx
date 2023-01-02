@@ -32,7 +32,6 @@ import {
   ROLE_LIST,
   getFileContent,
   getFileRevision,
-  tinymceRemove,
   TagList,
   putMyselfFileRead,
   sortListByMultipleCriteria,
@@ -72,7 +71,6 @@ export class Kanban extends React.Component {
       loggedUser: param.loggedUser,
       loading: false,
       newContent: {},
-      timelineWysiwyg: false,
       showInvalidMentionPopupInComment: false,
       showProgress: true,
       showRefreshWarning: false,
@@ -389,23 +387,7 @@ export class Kanban extends React.Component {
           : state.content.current_revision_id
       })
     }
-
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
   }
-
-  componentWillUnmount () {
-    console.log('%c<Kanban> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymceRemove('#wysiwygTimelineComment')
-  }
-
-  // sendGlobalFlashMessage = (msg, type = 'warning') => GLOBAL_dispatchEvent({
-  //   type: CUSTOM_EVENT.ADD_FLASH_MSG,
-  //   data: {
-  //     msg: msg,
-  //     type: type,
-  //     delay: undefined
-  //   }
-  // })
 
   setHeadTitle = (contentName) => {
     const { state } = this
@@ -516,10 +498,6 @@ export class Kanban extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
-  }
-
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
@@ -540,8 +518,6 @@ export class Kanban extends React.Component {
     handleClickCopyLink(state.content.content_id)
     sendGlobalFlashMessage(props.t('The link has been copied to clipboard'), 'info')
   }
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 

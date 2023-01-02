@@ -13,7 +13,6 @@ const props = {
   apiUrl: 'http://localhost/api',
   mode: APP_FEATURE_MODE.VIEW,
   customColor: '#654321',
-  wysiwygNewVersion: 'wysiwygNewVersionTest',
   disableValidateBtn: () => false,
   version: '42',
   lastVersion: 1337,

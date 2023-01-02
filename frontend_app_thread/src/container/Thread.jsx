@@ -24,7 +24,6 @@ import {
   TracimComponent,
   getOrCreateSessionClientToken,
   sendGlobalFlashMessage,
-  tinymceRemove,
   FAVORITE_STATE,
   ROLE,
   COLORS,
@@ -52,7 +51,6 @@ export class Thread extends React.Component {
       loggedUser: param.loggedUser,
       loading: false,
       newContent: {},
-      timelineWysiwyg: false,
       externalTranslationList: [
         props.t('Thread'),
         props.t('Threads'),
@@ -162,13 +160,6 @@ export class Thread extends React.Component {
     if (prevState.content.content_id !== state.content.content_id) {
       this.updateTimelineAndContent()
     }
-
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
-  }
-
-  componentWillUnmount () {
-    console.log('%c<Thread> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymceRemove('#wysiwygTimelineComment')
   }
 
   setHeadTitle = (contentName) => {
@@ -254,26 +245,20 @@ export class Thread extends React.Component {
     props.appContentChangeComment(e, state.content, this.setState.bind(this), state.appName)
   }
 
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
-  }
-
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
       state.content,
       comment,
-      state.config.slug,
+      state.config.slug
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       state.content,
-      commentAsFileList,
+      commentAsFileList
     )
     return true
   }
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleCancelSave = () => this.setState({ showInvalidMentionPopupInComment: false })
 

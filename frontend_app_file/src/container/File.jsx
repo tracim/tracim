@@ -33,7 +33,6 @@ import {
   removeExtensionOfFilename,
   buildFilePreviewUrl,
   buildHeadTitle,
-  tinymceRemove,
   ROLE,
   ROLE_LIST,
   APP_FEATURE_MODE,
@@ -95,7 +94,6 @@ export class File extends React.Component {
       newFile: '',
       newFilePreview: FILE_PREVIEW_STATE.NO_FILE,
       fileCurrentPage: 1,
-      timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       progressUpload: {
         display: false,
@@ -322,13 +320,6 @@ export class File extends React.Component {
       )
       this.setState({ previewInfo: previewInfoResponse.body })
     }
-
-    if (prevState.timelineWysiwyg && !state.timelineWysiwyg) tinymceRemove('#wysiwygTimelineComment')
-  }
-
-  componentWillUnmount () {
-    console.log('%c<File> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymceRemove('#wysiwygTimelineComment')
   }
 
   setHeadTitle = (contentName) => {
@@ -500,10 +491,6 @@ export class File extends React.Component {
     props.appContentMarkAsTemplate(this.setState.bind(this), state.content, isTemplate)
   }
 
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
-  }
-
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
     await props.appContentSaveNewCommentText(
@@ -518,8 +505,6 @@ export class File extends React.Component {
     )
     return true
   }
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleChangeStatus = async newStatus => {
     const { props, state } = this

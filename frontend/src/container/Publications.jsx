@@ -18,9 +18,7 @@ import {
   getOrCreateSessionClientToken,
   handleClickCopyLink,
   handleFetchResult,
-  handleInvalidMentionInComment,
   replaceHTMLElementWithMention,
-  tinymceRemove,
   IconButton,
   Loading,
   PAGE,
@@ -67,7 +65,6 @@ import {
 import TabBar from '../component/TabBar/TabBar.jsx'
 import FeedItemWithPreview, { LINK_TYPE } from './FeedItemWithPreview.jsx'
 
-const wysiwygId = 'wysiwygTimelineCommentPublication'
 // INFO - G.B. - 2021-10-18 - The value below is used only for local storage, it's a fake id for the
 // publication that is being written but has not been sent yet (i.e. does not have an id)
 const newPublicationId = -5
@@ -105,7 +102,6 @@ export class Publications extends React.Component {
       newCurrentPublication: !!this.props.match.params.idcts,
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
-      publicationWysiwyg: false,
       showEditPopup: false,
       showInvalidMentionPopupInComment: false,
       showReorderButton: false
@@ -141,24 +137,12 @@ export class Publications extends React.Component {
       this.gotToCurrentPublication()
     }
 
-    // if (prevState.publicationWysiwyg && !state.publicationWysiwyg) {
-    //   tinymceRemove(`#${wysiwygId}`)
-    // }
-
     if (prevProps.match.params.idcts !== props.match.params.idcts || state.newCurrentPublication) {
       this.gotToCurrentPublication()
     }
   }
 
-  componentWillUnmount () {
-    // tinymceRemove(`#${wysiwygId}`)
-  }
-
   handleAllAppChangeLanguage = (data) => {
-    if (this.state.publicationWysiwyg) {
-      tinymceRemove(`#${wysiwygId}`)
-      globalThis.wysiwyg(`#${wysiwygId}`, data, this.handleChangeNewPublication)
-    }
     this.buildBreadcrumbs()
     this.setHeadTitle()
   }
@@ -303,8 +287,6 @@ export class Publications extends React.Component {
     if (data.fields.content.content_namespace !== CONTENT_NAMESPACE.PUBLICATION) return
     this.props.dispatch(removePublication(data.fields.content.content_id))
   }
-
-  // handleToggleWysiwyg = () => this.setState(prev => ({ publicationWysiwyg: !prev.publicationWysiwyg }))
 
   buildBreadcrumbs = () => {
     const { props } = this

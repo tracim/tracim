@@ -72,7 +72,6 @@ export class Timeline extends React.Component {
   }
 
   handleClickValidateEditComment = (comment, commentId, parentId) => {
-    console.log('TIMELINE - handleClickValidateEditComment', comment, commentId, parentId)
     const { props, state } = this
     this.setState({
       invalidMentionList: [],

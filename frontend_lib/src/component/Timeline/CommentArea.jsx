@@ -151,93 +151,91 @@ export const CommentArea = props => {
         spaceId={props.workspaceId}
         userList={props.memberList}
       />
-      {/* {!props.hideSendButtonAndOptions && ( */}
-        <div className={
-          classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
-        }>
-          {props.isDisplayedAdvancedEdition && (
-            <div className={
-              classnames(
-                `${props.customClass}__texteditor__advancedtext`,
-                'commentArea__advancedtext'
-              )
-            }>
-              <IconButton
-                customClass={classnames(
-                  `${props.customClass}__texteditor__advancedtext__btn commentArea__advancedtext__btn`
-                )}
-                disabled={props.disableComment}
-                text={isAdvancedEdition ? props.t('Simple edition') : props.t('Advanced edition')}
-                onClick={changeEditor}
-                intent='link'
-                mode='light'
-                key='commentArea__comment__advancedtext'
-              />
-            </div>
-          )}
-
-          <DisplayFileToUpload
-            fileList={fileListToUpload}
-            onRemoveCommentAsFile={handleRemoveCommentFileFromUploadList}
-            color={props.customColor}
-          />
-
-          {props.isFileCommentLoading && (
-            <Loading />
-          )}
-
+      <div className={
+        classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
+      }>
+        {props.isDisplayedAdvancedEdition && (
           <div className={
             classnames(
-              `${props.customClass}__texteditor__submit`,
-              'commentArea__submit'
+              `${props.customClass}__texteditor__advancedtext`,
+              'commentArea__advancedtext'
             )
           }>
-            {props.isDisplayedUploadFile && (
-              <AddFileToUploadButton
-                workspaceId={props.workspaceId}
-                color={props.customColor}
-                disabled={props.disableComment}
-                onValidateCommentFileToUpload={handleValidateCommentFileListToUpload}
-                multipleFiles={props.multipleFiles}
-              />
-            )}
-
-            {props.isDisplayedCancel && (
-              <IconButton
-                color={props.customColor}
-                customClassName='commentArea__withstand__btn'
-                icon='fas fa-times'
-                intent='secondary'
-                mode='dark'
-                onClick={props.onClickWithstand}
-                text={props.withstandLabel}
-                type='button'
-              />
-            )}
-
-            {props.isDisplayedSend && (
-              <IconButton
-                color={props.customColor}
-                customClass={
-                  classnames(
-                    `${props.customClass}__texteditor__submit__btn `,
-                    'commentArea__submit__btn'
-                  )
-                }
-                disabled={props.disableComment || (content === '' && fileListToUpload.length === 0)}
-                icon={props.submitIcon}
-                intent='primary'
-                mode='light'
-                onClick={() => sendComment(content, false)}
-                text={props.submitLabel}
-                type='button'
-                key='commentArea__comment__send'
-                dataCy='commentArea__comment__send'
-              />
-            )}
+            <IconButton
+              customClass={classnames(
+                `${props.customClass}__texteditor__advancedtext__btn commentArea__advancedtext__btn`
+              )}
+              disabled={props.disableComment}
+              text={isAdvancedEdition ? props.t('Simple edition') : props.t('Advanced edition')}
+              onClick={changeEditor}
+              intent='link'
+              mode='light'
+              key='commentArea__comment__advancedtext'
+            />
           </div>
+        )}
+
+        <DisplayFileToUpload
+          fileList={fileListToUpload}
+          onRemoveCommentAsFile={handleRemoveCommentFileFromUploadList}
+          color={props.customColor}
+        />
+
+        {props.isFileCommentLoading && (
+          <Loading />
+        )}
+
+        <div className={
+          classnames(
+            `${props.customClass}__texteditor__submit`,
+            'commentArea__submit'
+          )
+        }>
+          {props.isDisplayedUploadFile && (
+            <AddFileToUploadButton
+              workspaceId={props.workspaceId}
+              color={props.customColor}
+              disabled={props.disableComment}
+              onValidateCommentFileToUpload={handleValidateCommentFileListToUpload}
+              multipleFiles={props.multipleFiles}
+            />
+          )}
+
+          {props.isDisplayedCancel && (
+            <IconButton
+              color={props.customColor}
+              customClassName='commentArea__withstand__btn'
+              icon='fas fa-times'
+              intent='secondary'
+              mode='dark'
+              onClick={props.onClickWithstand}
+              text={props.withstandLabel}
+              type='button'
+            />
+          )}
+
+          {props.isDisplayedSend && (
+            <IconButton
+              color={props.customColor}
+              customClass={
+                classnames(
+                  `${props.customClass}__texteditor__submit__btn `,
+                  'commentArea__submit__btn'
+                )
+              }
+              disabled={props.disableComment || (content === '' && fileListToUpload.length === 0)}
+              icon={props.submitIcon}
+              intent='primary'
+              mode='light'
+              onClick={() => sendComment(content, false)}
+              text={props.submitLabel}
+              type='button'
+              key='commentArea__comment__send'
+              dataCy='commentArea__comment__send'
+            />
+          )}
         </div>
-      {/* )} */}
+      </div>
     </form>
   )
 }
@@ -256,7 +254,6 @@ CommentArea.propTypes = {
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   disableComment: PropTypes.bool,
-  hideSendButtonAndOptions: PropTypes.bool,
   submitIcon: PropTypes.string,
   invalidMentionList: PropTypes.array,
   isAdvancedEdition: PropTypes.bool,
@@ -283,7 +280,6 @@ CommentArea.defaultProps = {
   customClass: '',
   customColor: '',
   disableComment: false,
-  hideSendButtonAndOptions: false,
   submitIcon: 'far fa-paper-plane',
   invalidMentionList: [],
   isAdvancedEdition: false,
@@ -295,7 +291,7 @@ CommentArea.defaultProps = {
   memberList: [],
   multipleFiles: true,
   newComment: '',
-  onClickWithstand: () => {},
+  onClickWithstand: () => { },
   placeHolder: 'Write a comment...',
   roleList: [],
   workspaceId: 0,
