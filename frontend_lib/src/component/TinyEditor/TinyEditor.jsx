@@ -10,12 +10,17 @@ import {
 import {
   getMyselfKnownContents,
 } from '../../action.async.js'
+import {
+  CUSTOM_EVENT
+} from '../../customEvent.js'
 
 // require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
 
 export const TinyEditor = props => {
   const editorRef = useRef(null)
+
   let defaultRoleList = []
+  let isFullScreen = false
 
   const advancedToolBar = 'formatselect alignleft aligncenter alignright alignjustify | ' +
     'bold italic underline strikethrough | forecolor backcolor | link customInsertImage charmap | ' +
@@ -162,17 +167,11 @@ export const TinyEditor = props => {
             onAction: function () {
               editor.execCommand('mceFullScreen')
 
-              // customFullscreen = {
-              //   active: !customFullscreen.active,
-              //   originalHeight: customFullscreen.originalHeight,
-              //   newHeight: customFullscreen.active ?
-              //     customFullscreen.originalHeight :
-              //     currentHeightInt - headerHeight
-              // }
+              isFullScreen = !isFullScreen
 
-              // if (customFullscreen.active) {
-              //   GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: { } })
-              // }
+              if (isFullScreen) {
+                GLOBAL_dispatchEvent({ type: CUSTOM_EVENT.HIDE_SIDEBAR, data: { } })
+              }
             }
           }
           editor.ui.registry.addMenuItem('customFullscreen', {
