@@ -4,20 +4,23 @@ import PropTypes from 'prop-types'
 import { Editor } from '@tinymce/tinymce-react'
 
 import {
+  getAvatarBaseUrl,
   handleFetchResult
 } from '../../helper.js'
 import {
   getMyselfKnownContents,
 } from '../../action.async.js'
 
+// require('./TinyEditor.styl') // see https://github.com/tracim/tracim/issues/1156
+
 export const TinyEditor = props => {
   const editorRef = useRef(null)
   let defaultRoleList = []
 
   const advancedToolBar = 'formatselect alignleft aligncenter alignright alignjustify | ' +
-  'bold italic underline strikethrough | forecolor backcolor | link customInsertImage charmap | ' +
-  'bullist numlist outdent indent | table | code codesample | insert | removeformat | ' +
-  'customFullscreen help'
+    'bold italic underline strikethrough | forecolor backcolor | link customInsertImage charmap | ' +
+    'bullist numlist outdent indent | table | code codesample | insert | removeformat | ' +
+    'customFullscreen help'
 
   const simpleToolBar = 'bold italic underline | bullist numlist'
 
@@ -30,20 +33,34 @@ export const TinyEditor = props => {
       newRoleList.push({
         type: 'cardmenuitem',
         value: `@${role.slug} `,
-        label: role.label,
+        label: `@${role.slug}`,
         items: [
           {
             type: 'cardcontainer',
             direction: 'vertical',
             items: [
               {
-                type: 'cardtext',
-                text: role.label,
-                name: 'role_name'
+                type: 'cardcontainer',
+                direction: 'horizontal',
+                items: [
+                  {
+                    type: 'cardtext',
+                    text: role.description,
+                    name: 'roleDescription'
+                  }
+                ]
               },
               {
-                type: 'cardtext',
-                text: 'Role'
+                type: 'cardcontainer',
+                direction: 'horizontal',
+                items: [
+                  {
+                    type: 'cardtext',
+                    text: `@${role.slug}`,
+                    name: 'roleName',
+                    classes: ['tinymce-username']
+                  }
+                ]
               }
             ]
           }
@@ -201,7 +218,8 @@ export const TinyEditor = props => {
           editor.ui.registry.addAutocompleter('mentions', {
             ch: '@',
             columns: 1,
-            minChars: 2,
+            highlightOn: ['roleName', 'publicName', 'username'],
+            minChars: 1,
             maxResults: 10,
             fetch: function (pattern) {
               return new Promise((resolve) => {
@@ -222,38 +240,46 @@ export const TinyEditor = props => {
                   return {
                     type: 'cardmenuitem',
                     value: `@${user.username} `,
-                    label: user.username,
+                    label: `@${user.username}`,
                     items: [
                       {
                         type: 'cardcontainer',
                         direction: 'vertical',
                         items: [
+                              // {
+                              //   type: 'cardimage',
+                              //   src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/preview/jpg/25x25/avatar`,
+                              //   alt: user.publicName,
+                              //   name: 'avatar'
+                              // },
                           {
                             type: 'cardcontainer',
                             direction: 'horizontal',
                             items: [
                               {
-                                //   type: 'cardimage',
-                                //   src: "api/user/" + member.user.user_id + "/avatar/preview/25x25/avatar",
-                                //   alt: member.user.public_name,
-                                //   name: 'avatar'
-                                // }, {
                                 type: 'cardtext',
-                                text: user.username,
-                                name: 'user_name'
+                                text: user.publicName,
+                                name: 'publicName'
                               }
                             ]
                           },
                           {
-                            type: 'cardtext',
-                            text: 'User'
+                            type: 'cardcontainer',
+                            direction: 'horizontal',
+                            items: [
+                              {
+                                type: 'cardtext',
+                                text: `@${user.username}`,
+                                name: 'username',
+                                classes: ['tinymce-username']
+                              }
+                            ]
                           }
                         ]
                       }
                     ]
                   }
                 })
-
 
                 resolve(matchedRoleList.concat(userResults))
               })
@@ -269,6 +295,7 @@ export const TinyEditor = props => {
           editor.ui.registry.addAutocompleter('content', {
             ch: '#',
             columns: 1,
+            highlightOn: ['content_label', 'content_id'],
             minChars: 2,
             maxResults: 10,
             fetch: function (pattern) {
@@ -278,7 +305,6 @@ export const TinyEditor = props => {
                     (data) => {
                       const insensitivePattern = pattern.toLowerCase()
                       const matchedContentList = data.body.filter((content) => {
-                        console.log('content', content)
                         const insensitiveContentLabel = content.label.toLowerCase()
                         const contentId = content.content_id
                         const isLabel = insensitiveContentLabel.indexOf(insensitivePattern) !== -1
@@ -372,7 +398,7 @@ TinyEditor.defaultProps = {
   codeLanguageList: [],
   content: '',
   customStyle: '',
-  handleCtrlEnter: () => {},
+  handleCtrlEnter: () => { },
   height: undefined,
   isAdvancedEdition: false,
   maxHeight: undefined,

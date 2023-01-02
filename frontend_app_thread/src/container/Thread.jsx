@@ -486,6 +486,7 @@ export class Thread extends React.Component {
                 onClickRevisionBtn={() => { }}
                 onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
                 roleList={[{
+                  description: props.t('Every members of the space'),
                   id: 0,
                   label: props.t('All'),
                   slug: props.t('all')

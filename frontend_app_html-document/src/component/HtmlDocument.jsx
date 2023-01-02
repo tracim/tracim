@@ -150,6 +150,7 @@ export const HtmlDocument = props => {
                 height={'100%'}
                 isAdvancedEdition={true}
                 roleList={[{
+                  description: props.t('Every members of the space'),
                   id: 0,
                   label: props.t('All'),
                   slug: props.t('all')

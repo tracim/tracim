@@ -962,6 +962,7 @@ export class File extends React.Component {
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
             roleList={[{
+              description: props.t('Every members of the space'),
               id: 0,
               label: props.t('All'),
               slug: props.t('all')

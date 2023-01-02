@@ -626,6 +626,7 @@ class CustomForm extends React.Component {
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               onClickRevisionBtn={this.handleClickShowRevision}
               roleList={[{
+                description: props.t('Every members of the space'),
                 id: 0,
                 label: props.t('All'),
                 slug: props.t('all')

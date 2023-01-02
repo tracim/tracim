@@ -60,6 +60,7 @@ export class EditCommentPopup extends React.Component {
           newComment={state.newComment}
           onClickWithstand={props.onClickClose}
           roleList={[{
+            description: props.t('Every members of the space'),
             id: 0,
             label: props.t('All'),
             slug: props.t('all')

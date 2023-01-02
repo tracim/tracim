@@ -466,6 +466,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
                 roleList={[{
+                  description: props.t('Every members of the space'),
                   id: 0,
                   label: props.t('All'),
                   slug: props.t('all')
