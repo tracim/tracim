@@ -26,7 +26,7 @@ const TimedEvent = (props) => {
         userId: event.author.user_id
       }}
       lang={props.lang}
-      operation={event.eventType}
+      operation={props.t(event.eventType)}
       t={props.t}
       customClass={props.customClass || ''}
       isRoot={false}
