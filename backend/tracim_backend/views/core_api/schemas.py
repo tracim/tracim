@@ -2100,7 +2100,6 @@ class ConfigSchema(marshmallow.Schema):
     limitation__maximum_online_users_message = marshmallow.fields.String()
     call__enabled = marshmallow.fields.Bool()
     call__unanswered_timeout = marshmallow.fields.Int()
-    mention__default_roles = marshmallow.fields.Nested(RoleSchema, many=True)
 
 
 class ConditionFileSchema(marshmallow.Schema):

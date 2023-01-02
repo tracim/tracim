@@ -59,7 +59,11 @@ export class EditCommentPopup extends React.Component {
           isDisplayedUploadFile={false}
           newComment={state.newComment}
           onClickWithstand={props.onClickClose}
-          roleList={[]}
+          roleList={[{
+            id: 0,
+            label: props.t('All'),
+            slug: props.t('all')
+          }]}
           memberList={props.memberList}
           submitLabel={props.t('Send')}
           withstandLabel={props.t('Cancel')}

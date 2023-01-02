@@ -625,6 +625,11 @@ class CustomForm extends React.Component {
               onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               onClickRevisionBtn={this.handleClickShowRevision}
+              roleList={[{
+                id: 0,
+                label: props.t('All'),
+                slug: props.t('all')
+              }]}
               shouldScrollToBottom={mode !== MODE.REVISION}
             />
           ) : null}

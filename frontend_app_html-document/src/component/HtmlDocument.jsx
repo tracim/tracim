@@ -11,7 +11,6 @@ import {
   IconButton,
   PromptMessage,
   RefreshWarningMessage,
-  TextAreaApp,
   TinyEditor
 } from 'tracim_frontend_lib'
 
@@ -30,8 +29,6 @@ export const HtmlDocument = props => {
   useEffect(() => {
     setText(props.text)
   }, [])
-
-  console.log('HtmlDocument props', props.memberList)
 
   return (
     <div className='html-document__contentpage__left__wrapper'>
@@ -152,9 +149,14 @@ export const HtmlDocument = props => {
                 handleCtrlEnter={props.onClickValidateBtn}
                 height={'100%'}
                 isAdvancedEdition={true}
-                userList={props.memberList}
+                roleList={[{
+                  id: 0,
+                  label: props.t('All'),
+                  slug: props.t('all')
+                }]}
                 setContent={setText}
                 spaceId={props.workspaceId}
+                userList={props.memberList}
               />
 
               <div className={`${props.customClass}__button editionmode__button`}>
@@ -184,24 +186,6 @@ export const HtmlDocument = props => {
               </div>
             </>
           )
-          // <TextAreaApp
-          //   apiUrl={props.apiUrl}
-          //   contentId={props.contentId}
-          //   contentType={props.contentType}
-          //   customClass='html-document__editionmode'
-          //   customColor={props.customColor}
-          //   disableValidateBtn={props.disableValidateBtn}
-          //   elementId={props.wysiwygNewVersion}
-          //   isVisible={props.isVisible}
-          //   lang={props.lang}
-          //   mode={props.mode}
-          //   onClickCancelBtn={props.onClickCloseEditMode}
-          //   onClickValidateBtn={props.onClickValidateBtn}
-          //   searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-          //   text={props.text}
-          //   onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-          //   workspaceId={props.workspaceId}
-          // />
         )}
       </div>
     </div>

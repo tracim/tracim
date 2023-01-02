@@ -29,7 +29,6 @@ from tracim_backend.models.tracim_session import TracimSession
 class MentionType:
     USER = 1
     ROLE = 2
-    GROUP = 3  # TODO - MP - 2022-11-29 - This should be used for custom role. Should be renamed.
 
 
 class Mention:

@@ -40,20 +40,14 @@ import {
   getToDo,
   handleClickCopyLink,
   handleFetchResult,
-  handleInvalidMentionInComment,
-  handleLinksBeforeSave,
-  handleMentionsBeforeSave,
   handleTranslateHtmlContent,
   putUserConfiguration,
   removeLocalStorageItem,
-  // replaceHTMLRoleMentionTagWithMention,
-  replaceHTMLUserMentionTagWithMention,
   searchContentAndPlaceBalise,
   searchMentionAndPlaceBalise,
   sendGlobalFlashMessage,
   sortListByMultipleCriteria,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceRemove
+  tinymceAutoCompleteHandleClickItem
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -852,6 +846,11 @@ export class HtmlDocument extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            roleList={[{
+              id: 0,
+              label: props.t('All'),
+              slug: props.t('all')
+            }]}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>

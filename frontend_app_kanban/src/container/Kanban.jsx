@@ -12,7 +12,6 @@ import {
   FilenameWithBadges,
   handleClickCopyLink,
   handleFetchResult,
-  handleInvalidMentionInComment,
   getToDo,
   PAGE,
   PopinFixed,
@@ -310,6 +309,11 @@ export class Kanban extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            roleList={[{
+              id: 0,
+              label: props.t('All'),
+              slug: props.t('all')
+            }]}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>

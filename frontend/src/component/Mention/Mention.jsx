@@ -1,8 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { connect, Provider } from 'react-redux'
+import { translate } from 'react-i18next'
 import classnames from 'classnames'
-import { store } from '../../store.js'
 import { ROLE_LIST } from 'tracim_frontend_lib'
+import { store } from '../../store.js'
+
+import {
+  getUser
+} from '../../action-creator.async.js'
 
 const MentionWrapped = props => {
   return (
@@ -13,12 +18,20 @@ const MentionWrapped = props => {
 }
 
 export const Mention = props => {
-  const mention = {
-    id: undefined,    // User id of the mention
+  const DEFAULT_MENTION = props.t('UnknownUser')
+
+  const [mention, setMention] = useState({
+    id: undefined, // User id of the mention
     level: undefined, // 0: all, 1: reader, 2: contributor, 4: content manager, 8: workspace manager
-    isToMe: false,    // true: mention to me, false: mention to someone else
-    text: undefined,  // Text to display in the mention
-  }
+    isToMe: false, // true: mention to me, false: mention to someone else
+    text: DEFAULT_MENTION, // Text to display in the mention
+  })
+
+  const completeRoleList = ROLE_LIST.concat([{
+    id: 0,
+    label: props.t('All'),
+    slug: props.t('all')
+  }])
 
   if (props.userid) {
     mention.id = Number(props.userid)
@@ -39,28 +52,27 @@ export const Mention = props => {
           testedSpace++
         }
 
-        if (mention.text === undefined) {
+        if (mention.text === DEFAULT_MENTION) {
           // Fetch from API
+          props.dispatch(getUser(mention.id)).then((response) => {
+            if (response.status === 200) {
+              const user = response.json
+              setMention({ ...mention, text: user.username })
+            }
+          })
         }
       } else {
         mention.text = user.username
       }
     }
+  } else if (props.roleid) {
+    mention.level = Number(props.roleid)
+    mention.text = props.t('UnknownRole')
 
-    // We really don't know who this guy is
-    if (mention.text === undefined) {
-      mention.text = 'Unknown'
-    }
-  } else if (props.rolelevel) {
-    mention.level = Number(props.rolelevel)
+    const role = completeRoleList.find(r => Number(r.id) === mention.level)
 
-    const currentRoleList = store.getState().system.config.mention__default_roles
-    const role = currentRoleList.find(r => Number(r.level) === mention.level)
-
-    if (role === undefined) {
-      mention.text = 'UnknownRole'
-    } else {
-      mention.text = role.label
+    if (role) {
+      mention.text = role.slug
     }
 
     if (mention.level === 0) {
@@ -68,17 +80,14 @@ export const Mention = props => {
     } else {
       // FIXME - Doesn't work in recent activities
       const myRole = props.currentWorkspace.memberList.find(m => m.id === props.user.userId).role
-      const myRoleLevel = ROLE_LIST.find(r => r.slug === myRole).id
-      mention.isToMe = (myRoleLevel === mention.level)
+      const myRoleLevel = completeRoleList.find(r => r.slug === myRole).id
+      mention.isToMe = (myRoleLevel >= mention.level)
     }
-  } else if (props.rolename) {
-      mention.text = props.rolename
   }
-
 
   const data = classnames(
     'mention',
-    'mention-v2',
+    'mention-v2', // NOTE - MP - 2023-01-02 - Not used yet
     { 'mention-me': mention.isToMe }
   )
 
@@ -88,10 +97,10 @@ export const Mention = props => {
 }
 
 const mapStateToProps = (
-  { currentWorkspace, workspaceList, user }
+  { currentWorkspace, system, user, workspaceList }
 ) => (
-  { currentWorkspace, workspaceList, user }
+  { currentWorkspace, system, user, workspaceList }
 )
-const ConnectedMention = connect(mapStateToProps)(Mention)
+const ConnectedMention = translate()(connect(mapStateToProps)(Mention))
 
 export default MentionWrapped

@@ -195,7 +195,15 @@ export class Timeline extends React.Component {
           <EditCommentPopup
             apiUrl={props.apiUrl}
             codeLanguageList={props.codeLanguageList}
-            comment={replaceHTMLElementWithMention([], props.memberList, state.newComment.raw_content)}
+            comment={replaceHTMLElementWithMention(
+              [{
+                id: 0,
+                label: props.t('All'),
+                slug: props.t('all')
+              }],
+              props.memberList,
+              state.newComment.raw_content
+            )}
             commentId={state.newComment.content_id}
             customColor={props.customColor}
             loggedUserLanguage={props.loggedUser.lang}
@@ -222,6 +230,7 @@ export class Timeline extends React.Component {
             <CommentArea
               apiUrl={props.apiUrl}
               onClickSubmit={props.onClickSubmit}
+              // ///////////////////////////////////////////////////////////////
               buttonLabel={props.t('Send')}
               codeLanguageList={props.codeLanguageList}
               contentId={props.contentId}
@@ -233,6 +242,7 @@ export class Timeline extends React.Component {
               isFileCommentLoading={props.isFileCommentLoading}
               memberList={props.memberList}
               placeHolder={props.t('Write an answer...')}
+              roleList={props.roleList}
               workspaceId={props.workspaceId}
             />
           </div>
@@ -296,6 +306,7 @@ Timeline.propTypes = {
   onClickRestoreDeleted: PropTypes.func,
   onClickRevisionBtn: PropTypes.func,
   onClickShowMoreTimelineItems: PropTypes.func,
+  roleList: PropTypes.array,
   shouldScrollToBottom: PropTypes.bool,
   showParticipateButton: PropTypes.bool,
 }
@@ -330,6 +341,7 @@ Timeline.defaultProps = {
   onClickRevisionBtn: () => { },
   onClickShowMoreTimelineItems: () => { },
   onClickTranslateComment: content => { },
+  roleList: [],
   shouldScrollToBottom: true,
   showParticipateButton: false,
   timelineData: [],

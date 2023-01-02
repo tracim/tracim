@@ -516,7 +516,11 @@ export class Publications extends React.Component {
               memberList={props.currentWorkspace.memberList}
               multipleFiles
               placeHolder={props.t('Share a news...')}
-              roleList={[]}
+              roleList={[{
+                id: 0,
+                label: props.t('All'),
+                slug: props.t('all')
+              }]}
               workspaceId={parseInt(props.match.params.idws)}
             />
           </div>
@@ -564,7 +568,15 @@ export class Publications extends React.Component {
           <EditCommentPopup
             apiUrl={FETCH_CONFIG.apiUrl}
             codeLanguageList={props.system.config.code_languages}
-            comment={replaceHTMLElementWithMention([], props.currentWorkspace.memberList, state.commentToEdit.raw_content)}
+            comment={replaceHTMLElementWithMention(
+              [{
+                id: 0,
+                label: props.t('All'),
+                slug: props.t('all')
+              }],
+              props.currentWorkspace.memberList,
+              state.commentToEdit.raw_content
+            )}
             commentId={state.commentToEdit.content_id}
             customColor={COLORS.PUBLICATION}
             loggedUserLanguage={props.user.lang}

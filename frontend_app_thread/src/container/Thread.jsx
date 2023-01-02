@@ -10,7 +10,6 @@ import {
   CONTENT_TYPE,
   handleClickCopyLink,
   handleFetchResult,
-  handleInvalidMentionInComment,
   PAGE,
   PopinFixed,
   PopinFixedHeader,
@@ -486,6 +485,11 @@ export class Thread extends React.Component {
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 onClickRevisionBtn={() => { }}
                 onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+                roleList={[{
+                  id: 0,
+                  label: props.t('All'),
+                  slug: props.t('all')
+                }]}
                 shouldScrollToBottom
               />
             ) : null}

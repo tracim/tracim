@@ -1,5 +1,4 @@
-import React, { useRef } from 'react'
-import ReactDOMServer from 'react-dom/server'
+import React, { useEffect, useRef } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Editor } from '@tinymce/tinymce-react'
@@ -8,128 +7,12 @@ import {
   handleFetchResult
 } from '../../helper.js'
 import {
-  getSpaceMemberList,
   getMyselfKnownContents,
-  getMyselfKnownMember,
 } from '../../action.async.js'
-
-// TODO - MP - 2022-12-13 - Generate the list from the backend role data
-const defaultMentionList = [
-  {
-    type: 'cardmenuitem',
-    value: '@all ',
-    // value: '@<span mention-role-level="0"></span>All ',
-    label: 'All',
-    items: [
-      {
-        type: 'cardcontainer',
-        direction: 'vertical',
-        items: [
-          {
-            type: 'cardtext',
-            text: 'All',
-            name: 'role_name'
-          },
-          {
-            type: 'cardtext',
-            text: 'Role'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    type: 'cardmenuitem',
-    value: '@reader ',
-    label: 'Reader',
-    items: [
-      {
-        type: 'cardcontainer',
-        direction: 'vertical',
-        items: [
-          {
-            type: 'cardtext',
-            text: 'Reader',
-            name: 'role_name'
-          },
-          {
-            type: 'cardtext',
-            text: 'Role'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    type: 'cardmenuitem',
-    value: '@contributor ',
-    label: 'Contributor',
-    items: [
-      {
-        type: 'cardcontainer',
-        direction: 'vertical',
-        items: [
-          {
-            type: 'cardtext',
-            text: 'Contributor',
-            name: 'role_name'
-          },
-          {
-            type: 'cardtext',
-            text: 'Role'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    type: 'cardmenuitem',
-    value: '@content-manager ',
-    label: 'Content manager',
-    items: [
-      {
-        type: 'cardcontainer',
-        direction: 'vertical',
-        items: [
-          {
-            type: 'cardtext',
-            text: 'Content manager',
-            name: 'role_name'
-          },
-          {
-            type: 'cardtext',
-            text: 'Role'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    type: 'cardmenuitem',
-    value: '@space-manager ',
-    label: 'Space manager',
-    items: [
-      {
-        type: 'cardcontainer',
-        direction: 'vertical',
-        items: [
-          {
-            type: 'cardtext',
-            text: 'Space manager',
-            name: 'role_name'
-          },
-          {
-            type: 'cardtext',
-            text: 'Role'
-          }
-        ]
-      }
-    ]
-  },
-]
 
 export const TinyEditor = props => {
   const editorRef = useRef(null)
+  let defaultRoleList = []
 
   const advancedToolBar = 'formatselect alignleft aligncenter alignright alignjustify | ' +
   'bold italic underline strikethrough | forecolor backcolor | link customInsertImage charmap | ' +
@@ -141,17 +24,34 @@ export const TinyEditor = props => {
   const toolbar = props.isAdvancedEdition ? advancedToolBar : simpleToolBar
   const editorKey = props.isAdvancedEdition ? 'advanced_key' : 'simple_key'
 
-  const fetchMemberList = async () => {
-    const fetchResult = await handleFetchResult(
-      await getSpaceMemberList(props.apiUrl, props.spaceId)
-    )
-
-    if (fetchResult.apiResponse.status === 200) {
-      return fetchResult.body
-    } else {
-      return []
-    }
-  }
+  useEffect(() => {
+    const newRoleList = []
+    props.roleList.forEach((role) => {
+      newRoleList.push({
+        type: 'cardmenuitem',
+        value: `@${role.slug} `,
+        label: role.label,
+        items: [
+          {
+            type: 'cardcontainer',
+            direction: 'vertical',
+            items: [
+              {
+                type: 'cardtext',
+                text: role.label,
+                name: 'role_name'
+              },
+              {
+                type: 'cardtext',
+                text: 'Role'
+              }
+            ]
+          }
+        ]
+      })
+    })
+    defaultRoleList = newRoleList
+  }, [props.roleList])
 
   const base64EncodeAndTinyMceInsert = (files) => {
     for (let i = 0; i < files.length; i++) {
@@ -208,10 +108,8 @@ export const TinyEditor = props => {
         contextmenu: 'selectall copy paste link customInsertImage table',
         codesample_global_prismjs: true,
         codesample_languages: props.codeLanguageList,
-        // custom_elements: '~html-mention',
         paste_data_images: true,
         relative_urls: false,
-        // extended_valid_elements: 'span[mention-user-id|mention-role-level|userid], html-mention[*]',
         setup: (editor) => {
           editor.ui.registry.addMenuButton('insert', {
             icon: 'plus',
@@ -307,62 +205,57 @@ export const TinyEditor = props => {
             maxResults: 10,
             fetch: function (pattern) {
               return new Promise((resolve) => {
-                getMyselfKnownMember(props.apiUrl, pattern, props.spaceId, null, 10).then((data) => {
-                  handleFetchResult(data).then(
-                    (data) => {
-                      const insensitivePattern = pattern.toLowerCase()
-                      const matchedMemberList = data.body.filter((user) => {
-                        const insensitiveUsername = user.username.toLowerCase()
-                        const insensitivePublicName = user.public_name.toLowerCase()
-                        const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
-                        const isPublicName = insensitivePublicName.indexOf(insensitivePattern) !== -1
-                        return isUsername || isPublicName
-                      })
-                      // const matchedMentionList = defaultMentionList.filter((mention) => {
-                      //   const insensitiveMentionLabel = mention.label.toLowerCase()
-                      //   return insensitiveMentionLabel.indexOf(insensitivePattern) !== -1
-                      // })
-
-                      var results = matchedMemberList.map((user) => {
-                        return {
-                          type: 'cardmenuitem',
-                          value: `@${user.username} `,
-                          label: user.username,
-                          items: [
-                            {
-                              type: 'cardcontainer',
-                              direction: 'vertical',
-                              items: [
-                                {
-                                  type: 'cardcontainer',
-                                  direction: 'horizontal',
-                                  items: [
-                                    {
-                                      //   type: 'cardimage',
-                                      //   src: "api/user/" + member.user.user_id + "/avatar/preview/25x25/avatar",
-                                      //   alt: member.user.public_name,
-                                      //   name: 'avatar'
-                                      // }, {
-                                      type: 'cardtext',
-                                      text: user.username,
-                                      name: 'user_name'
-                                    }
-                                  ]
-                                },
-                                {
-                                  type: 'cardtext',
-                                  text: 'User'
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      })
-
-                      resolve(results)
-                    }
-                  )
+                const insensitivePattern = pattern.toLowerCase()
+                const matchedMemberList = props.userList.filter((user) => {
+                  const insensitiveUsername = user.username.toLowerCase()
+                  const insensitivePublicName = user.publicName.toLowerCase()
+                  const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
+                  const isPublicName = insensitivePublicName.indexOf(insensitivePattern) !== -1
+                  return isUsername || isPublicName
                 })
+                const matchedRoleList = defaultRoleList.filter((role) => {
+                  const insensitiveRoleLabel = role.label.toLowerCase()
+                  const isRole = insensitiveRoleLabel.indexOf(insensitivePattern) !== -1
+                  return isRole
+                })
+                const userResults = matchedMemberList.map((user) => {
+                  return {
+                    type: 'cardmenuitem',
+                    value: `@${user.username} `,
+                    label: user.username,
+                    items: [
+                      {
+                        type: 'cardcontainer',
+                        direction: 'vertical',
+                        items: [
+                          {
+                            type: 'cardcontainer',
+                            direction: 'horizontal',
+                            items: [
+                              {
+                                //   type: 'cardimage',
+                                //   src: "api/user/" + member.user.user_id + "/avatar/preview/25x25/avatar",
+                                //   alt: member.user.public_name,
+                                //   name: 'avatar'
+                                // }, {
+                                type: 'cardtext',
+                                text: user.username,
+                                name: 'user_name'
+                              }
+                            ]
+                          },
+                          {
+                            type: 'cardtext',
+                            text: 'User'
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                })
+
+
+                resolve(matchedRoleList.concat(userResults))
               })
             },
             onAction: function (autocompleteApi, rng, value) {
@@ -471,6 +364,7 @@ TinyEditor.propTypes = {
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   roleList: PropTypes.array,
+  userList: PropTypes.array,
 }
 
 
@@ -484,4 +378,5 @@ TinyEditor.defaultProps = {
   maxHeight: undefined,
   minHeight: 100,
   roleList: [],
+  userList: [],
 }

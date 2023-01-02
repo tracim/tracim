@@ -465,6 +465,11 @@ export class FeedItemWithPreview extends React.Component {
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
+                roleList={[{
+                  id: 0,
+                  label: props.t('All'),
+                  slug: props.t('all')
+                }]}
                 shouldScrollToBottom={false}
                 showParticipateButton={props.showParticipateButton}
               />
