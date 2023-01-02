@@ -2,19 +2,8 @@ import React, { useEffect, useState } from 'react'
 import classnames from 'classnames'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
-import AutoComplete from '../Input/AutoComplete/AutoComplete'
-import {
-  tinymceAutoCompleteHandleInput,
-  tinymceAutoCompleteHandleKeyUp,
-  tinymceAutoCompleteHandleKeyDown,
-  tinymceAutoCompleteHandleClickItem,
-  tinymceAutoCompleteHandleSelectionChange
-} from '../../tinymceAutoCompleteHelper.js'
 
 import {
-  autoCompleteItem,
-  // replaceHTMLRoleMentionTagWithMention,
-  // replaceHTMLUserMentionTagWithMention,
   searchContentAndPlaceBalise,
   searchMentionAndPlaceBalise
 } from '../../helper.js'
@@ -38,54 +27,10 @@ export const CommentArea = props => {
   const [isAdvancedEdition, setIsAdvancedEdition] = useState(props.isAdvancedEdition)
   const [textToSend, setTextToSend] = useState('')
 
-/*
-  const style = {
-    transform: props.bottomAutocomplete ? 'none' : 'translateY(-100%)',
-    position: 'absolute',
-    ...(props.wysiwyg && {
-      top: tinymcePosition.isFullscreen && tinymcePosition.isSelectionToTheTop
-        ? tinymcePosition.bottom
-        : tinymcePosition.top,
-      position: tinymcePosition.isFullscreen ? 'fixed' : 'absolute',
-      transform: (tinymcePosition.isFullscreen || props.bottomAutocomplete) && tinymcePosition.isSelectionToTheTop
-        ? 'none'
-        : 'translateY(-100%)',
-      zIndex: tinymcePosition.isFullscreen ? 1061 : 20
-    })
-  }*/
-/*
-  useEffect(() => {
-    if (props.newComment) {
-      setNewComment(props.newComment)
-    } else {
-      const savedComment = getLocalStorageItem(
-        props.contentType,
-        props.contentId,
-        props.workspaceId,
-        LOCAL_STORAGE_FIELD.COMMENT
-      )
-
-      if (!!savedComment && savedComment !== newComment) {
-        setNewComment(savedComment)
-      }
-    }
-
-    if (props.wysiwyg) {
-      // RJ - NOTE - 2022-02-16 - ensure TinyMCE loads with the comment in the local storage TinyMCE
-      // will be loaded after in componentDidUpdate, after render, so the textarea has the right
-      // value
-      setShouldLoadWysiwyg(true)
-    }
-  }, [])*/
-
   useEffect(() => {
     if (props.newComment) {
       setContent(props.newComment)
     } else {
-      console.log('props.contentId', props.contentId)
-      console.log('props.contentType', props.contentType)
-      console.log('props.workspaceId', props.workspaceId)
-      console.log('LOCAL_STORAGE_FIELD.COMMENT', LOCAL_STORAGE_FIELD.COMMENT)
       const savedComment = getLocalStorageItem(
         props.contentType,
         props.contentId,
@@ -93,10 +38,8 @@ export const CommentArea = props => {
         LOCAL_STORAGE_FIELD.COMMENT
       )
 
-      console.log('savedComment', savedComment)
-
       if (!!savedComment && savedComment !== content) {
-        setContent(content)
+        setContent(savedComment)
       }
     }
   }, [])
@@ -110,18 +53,6 @@ export const CommentArea = props => {
       content
     )
   }, [content])
-/*
-  useEffect(() => {
-    const savedComment = getLocalStorageItem(
-      props.contentType,
-      props.contentId,
-      props.workspaceId,
-      LOCAL_STORAGE_FIELD.COMMENT
-    )
-    if (!!savedComment && savedComment !== newComment) {
-      setNewComment(savedComment)
-    }
-  }, [props.contentType])*/
 
   /**
    * Send the comment to the backend
@@ -132,9 +63,7 @@ export const CommentArea = props => {
     let commentToSend = comment
 
     if (!force) {
-      console.log("sendComment", props.roleList, props.memberList, commentToSend)
       let returnValue = searchMentionAndPlaceBalise(props.roleList, props.memberList, commentToSend)
-      console.log("sendComment returnValue", returnValue)
       commentToSend = returnValue.html
       if (returnValue.invalidMentionList.length > 0) {
         setTextToSend(commentToSend)
@@ -144,13 +73,11 @@ export const CommentArea = props => {
     }
 
     let returnValue = await searchContentAndPlaceBalise(props.apiUrl, commentToSend)
-    console.log("sendComment sending", returnValue.html)
 
     // NOTE - MP - 2022-12-06 - If we don't clear this variable we don't hide the popup.
     // In case of an error it's preferable to hide the popup
     setInvalidMentionList([])
 
-    console.log("sendComment", returnValue.html, fileListToUpload)
     const result = await props.onClickSubmit(returnValue.html, fileListToUpload)
     if (result) {
       setContent('')
