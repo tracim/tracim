@@ -463,7 +463,6 @@ export class HtmlDocument extends React.Component {
     const { state } = this
     const content = tinymce.activeEditor.getContent()
     let returnValue = searchMentionAndPlaceBalise([], state.config.workspace.memberList, content)
-    console.log('HtmlDocument returnValue', returnValue)
     if (returnValue.invalidMentionList.length > 0) {
       this.setState({
         invalidMentionList: returnValue.invalidMentionList,
@@ -540,20 +539,16 @@ export class HtmlDocument extends React.Component {
 
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    console.log("HTMLDOC - handleClickValidateNewComment", comment, commentAsFileList)
-    console.log("HTMLDOC - 1")
     await props.appContentSaveNewCommentText(
       state.content,
       comment,
       state.config.slug,
     )
-    console.log("HTMLDOC - 2")
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       state.content,
       commentAsFileList,
     )
-    console.log("HTMLDOC - 3")
     return true
   }
 

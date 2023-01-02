@@ -265,20 +265,16 @@ export class Thread extends React.Component {
 
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    console.log("THREAD - handleClickValidateNewComment", comment, commentAsFileList)
-    console.log("THREAD - 1")
     await props.appContentSaveNewCommentText(
       state.content,
       comment,
       state.config.slug,
     )
-    console.log("THREAD - 2")
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       state.content,
       commentAsFileList,
     )
-    console.log("THREAD - 3")
     return true
   }
 
@@ -318,7 +314,6 @@ export class Thread extends React.Component {
   }
 
   handleClickEditComment = (comment, contentId, parentId) => {
-    console.log("THREAD - handleClickEditComment", comment)
     const { props, state } = this
     props.appContentEditComment(
       state.content.workspace_id,

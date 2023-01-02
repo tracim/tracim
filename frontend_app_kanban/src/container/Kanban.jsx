@@ -527,20 +527,16 @@ export class Kanban extends React.Component {
 
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    console.log("KANBAN - handleClickValidateNewComment", comment, commentAsFileList)
-    console.log("KANBAN - 1")
     await props.appContentSaveNewCommentText(
       state.content,
       comment,
       state.config.slug,
     )
-    console.log("KANBAN - 2")
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       state.content,
       commentAsFileList,
     )
-    console.log("KANBAN - 3")
     return true
   }
 

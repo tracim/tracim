@@ -511,20 +511,16 @@ export class File extends React.Component {
 
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    console.log("FILE - handleClickValidateNewComment", comment, commentAsFileList)
-    console.log("FILE - 1")
     await props.appContentSaveNewCommentText(
       state.content,
       comment,
       state.config.slug,
     )
-    console.log("FILE - 2")
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       state.content,
       commentAsFileList,
     )
-    console.log("FILE - 3")
     return true
   }
 

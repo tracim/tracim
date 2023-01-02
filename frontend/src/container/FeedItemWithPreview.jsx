@@ -119,7 +119,6 @@ export class FeedItemWithPreview extends React.Component {
   }
 
   handleClickEditComment = (comment, contentId, parentId) => {
-    console.log("FeedItemWithPreview - handleClickEditComment", comment, contentId, parentId)
     const { props } = this
     props.appContentEditComment(
       props.content.workspaceId,
@@ -150,8 +149,6 @@ export class FeedItemWithPreview extends React.Component {
 
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    console.log("FEEDITEMWITHPREVIEW - handleClickValidateNewComment", comment, commentAsFileList)
-    console.log("FEEDITEMWITHPREVIEW - 1")
     const content = {
       ...props.content,
       content_id: props.content.id,
@@ -162,13 +159,11 @@ export class FeedItemWithPreview extends React.Component {
       comment,
       props.content.type,
     )
-    console.log("FEEDITEMWITHPREVIEW - 2")
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       content,
       commentAsFileList
       )
-    console.log("FEEDITEMWITHPREVIEW - 3")
     return true
   }
 

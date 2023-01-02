@@ -395,13 +395,10 @@ export class Publications extends React.Component {
 
   handleClickEdit = (publication) => {
     this.setState({ showEditPopup: true, commentToEdit: publication.firstComment })
-    console.log(publication.firstComment)
   }
 
   handleClickValidateEdit = (comment, commentId, parentId) => {
     const { props } = this
-    console.log("PUBLICATION - handleClickValidateEdit")
-    console.log(`PUBLICATION ${comment}, ${commentId}, ${parentId}`)
     props.appContentEditComment(
       props.currentWorkspace.id,
       parentId,
@@ -434,20 +431,16 @@ export class Publications extends React.Component {
       return
     }
 
-    console.log("PUBLICATIONS - saveThreadPublication", publication, publicationAsFileList)
-    console.log("PUBLICATIONS - 1")
     await props.appContentSaveNewCommentText(
       fetchPostPublication.json,
       publication,
       '',
     )
-    console.log("PUBLICATIONS - 2")
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       fetchPostPublication.json,
       publicationAsFileList,
     )
-    console.log("PUBLICATIONS - 3")
     return true
   }
 
