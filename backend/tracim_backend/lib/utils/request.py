@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABC
 from abc import abstractmethod
+import contextlib
 from json import JSONDecodeError
 import typing
 
@@ -61,7 +62,23 @@ class TracimContext(ABC):
         self._client_token = None  # type: typing.Optional[str]
         # Pending events: have been created but are commited to the DB
         self._pending_events = []  # type: typing.List[Event]
+        self._disable_events = False
         self.force_anonymous_context = False
+
+    @property
+    def disable_events(self):
+        return self._disable_events
+
+    @contextlib.contextmanager
+    def batched_events(self, operation_type, obj: object):
+        self._disable_events = True
+        try:
+            yield
+        finally:
+            self._disable_events = False
+        self.plugin_manager.hook.on_batched_events_finished(
+            operation_type=operation_type, obj=obj, context=self
+        )
 
     @property
     def pending_events(self) -> typing.List[Event]:

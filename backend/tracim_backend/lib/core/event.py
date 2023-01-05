@@ -615,9 +615,20 @@ class EventBuilder:
         else:
             self._create_content_event(OperationType.MODIFIED, content, context)
 
+    @hookimpl
+    def on_batched_events_finished(
+        self, operation_type: OperationType, obj: object, context: TracimContext
+    ) -> None:
+        if isinstance(obj, Content):
+            self._create_content_event(operation_type, obj, context)
+        else:
+            raise NotImplementedError
+
     def _create_content_event(
         self, operation: OperationType, content: Content, context: TracimContext
     ) -> None:
+        if context.disable_events:
+            return
         current_user = context.safe_current_user()
         content_api = ContentApi(context.dbsession, current_user, self._config)
         content_in_context = content_api.get_content_in_context(content)

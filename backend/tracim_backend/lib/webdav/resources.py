@@ -1032,6 +1032,7 @@ class FileResource(DAVNonCollection):
         try:
             self.content_api.copy(
                 item=self.content,
+                context=self.tracim_context,
                 new_label=new_label,
                 new_file_extension=new_file_extension,
                 new_parent=destination_parent,

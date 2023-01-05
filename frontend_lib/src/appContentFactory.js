@@ -995,22 +995,6 @@ export function appContentFactory (WrappedComponent) {
       )
     }
 
-    /**
-     * Update both timeline and wholeTimeline with the new comment from the TLM
-     * @param {TLM} tlm TLM received that contains the new comment information
-     */
-    updateComment = async (tlm) => {
-      const comment = await this.getComment(tlm.fields.workspace.workspace_id, tlm.fields.content.parent_id, tlm.fields.content.content_id)
-      this.setState(prev => ({
-        timeline: prev.timeline.map(
-          item => item.content_id === comment.content_id ? { ...item, ...comment } : item
-        ),
-        wholeTimeline: prev.wholeTimeline.map(
-          item => item.content_id === comment.content_id ? { ...item, ...comment } : item
-        )
-      }))
-    }
-
     searchForMentionOrLinkInQuery = async (query, workspaceId) => {
       function matchingContentIdsFirst (contentA, contentB) {
         const aContentId = contentA.content_id.toString()
@@ -1098,7 +1082,7 @@ export function appContentFactory (WrappedComponent) {
       }
 
       const newTimeline = timeline.map(timelineItem => timelineItem.content_id === comment.content_id
-        ? { ...timelineItem, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
+        ? { ...timelineItem, ...comment, raw_content: addClassToMentionsOfUser(comment.raw_content, loggedUserUsername) }
         : timelineItem
       )
       return newTimeline
@@ -1210,7 +1194,6 @@ export function appContentFactory (WrappedComponent) {
           timeline={this.state.timeline}
           loadTimeline={this.loadTimeline}
           loadMoreTimelineItems={this.loadMoreTimelineItems}
-          updateComment={this.updateComment}
           resetTimeline={this.resetTimeline}
           canLoadMoreTimelineItems={this.canLoadMoreTimelineItems}
           isLastTimelineItemCurrentToken={this.state.isLastTimelineItemCurrentToken}
