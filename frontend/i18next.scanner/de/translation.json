@@ -113,7 +113,6 @@
   "Please enter a login and a password": "Bitte geben Sie ein Login und ein Passwort ein",
   "This account is deactivated": "Dieses Konto ist deaktiviert",
   "Error while adding the member to the space": "Fehler beim Hinzufügen des Mitglieds zum Bereich",
-  "Unexpected error, please inform an administrator": "Unerwarteter Fehler, bitte informieren Sie einen Administrator",
   "Cannot reset password while email are disabled, please contact an administrator": "Passwort kann nicht zurückgesetzt werden, da E-Mails deaktiviert sind, bitte kontaktieren Sie einen Administrator",
   "Not a valid email": "Keine gültige E-Mail",
   "An error has happened": "Ein Fehler ist aufgetreten",
@@ -252,7 +251,6 @@
   "This notification has no associated content": "Diese Meldung hat keinen zugehörigen Inhalt",
   "Join a space": "Einem Bereich beitreten",
   "Title and description": "Titel und Beschreibung",
-  "Access request": "Zugriffsanfrage",
   "Request access": "Zugang anfordern",
   "Request sent": "Anfrage gesendet",
   "Join the space": "Verbinden Sie den Bereich",
@@ -592,5 +590,11 @@
   "There are no favorites that matches you filter": "",
   "Filter visible contents": "",
   "There are no spaces that matches your filter": "",
-  "Filter users": ""
+  "Filter users": "",
+  "Sort by type": "",
+  "Sort by title": "",
+  "Sort by last modification": "",
+  "Sort by information": "",
+  "Sort by role": "",
+  "Sort by status": ""
 }

@@ -153,7 +153,6 @@
   "Please enter a login and a password": "Please enter a login and a password",
   "This account is deactivated": "This account is deactivated",
   "Error while adding the member to the space": "Error while adding the member to the space",
-  "Unexpected error, please inform an administrator": "Unexpected error, please inform an administrator",
   "Cannot reset password while email are disabled, please contact an administrator": "Cannot reset password while e-mail addresses are disabled, please contact an administrator",
   "Not a valid email": "Not a valid e-mail address",
   "An error has happened": "An error has happened",
@@ -292,7 +291,6 @@
   "This notification has no associated content": "This notification has no associated content",
   "Join a space": "Join a space",
   "Title and description": "Title and description",
-  "Access request": "Access request",
   "Request access": "Request access",
   "Request sent": "Request sent",
   "Join the space": "Join the space",
@@ -592,5 +590,11 @@
   "There are no favorites that matches you filter": "There are no favorites that matches you filter",
   "Filter visible contents": "Filter visible contents",
   "There are no spaces that matches your filter": "There are no spaces that matches your filter",
-  "Filter users": "Filter users"
+  "Filter users": "Filter users",
+  "Sort by type": "Sort by type",
+  "Sort by title": "Sort by title",
+  "Sort by last modification": "Sort by last modification",
+  "Sort by information": "Sort by information",
+  "Sort by role": "Sort by role",
+  "Sort by status": "Sort by status"
 }

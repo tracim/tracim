@@ -168,7 +168,6 @@
   "Unknown space type": "نوع الفضاء غير معروف",
   "Your request to join {{space}} will be handled by a space manager. The result will be shown on the notification wall.": "سيتم النظر في طلبك بالانضمام إلى {{space}} من قبل مدير فضاء. ستظهر النتيجة على حائط الإشعارات.",
   "Title and description": "عنوان و وصف",
-  "Access request": "طلب دخول",
   "You have been disconnected, please login again": "لقد تم تسجيل خروجك. من فضلك سجل دخولك من جديد.",
   "Log in": "ولوج",
   "All fields are required. Please enter a name, an email and a password.": "يجب إدخال كل المعلومات، أضف من فضلك الاسم، البريد الإلكتروني و كلمة المرور.",
@@ -478,7 +477,6 @@
   "Received files": "الملفات المستلمة",
   "Manage": "إشراف",
   "Create": "إنشاء",
-  "Unexpected error, please inform an administrator": "خطأ غير متوقع، أعلم مديرا من فضلك",
   "Server unreachable": "خادم غير متوفر",
   "You have reached your storage limit, you cannot add new files": "لقد بلغت الحد الأقصى من التخزين، لم يعد بإمكانك إضافة ملفات جديدة",
   "open": "مفتوح",
@@ -632,5 +630,11 @@
   "There are no favorites that matches you filter": "",
   "Filter visible contents": "",
   "There are no spaces that matches your filter": "",
-  "Filter users": ""
+  "Filter users": "",
+  "Sort by type": "",
+  "Sort by title": "",
+  "Sort by last modification": "",
+  "Sort by information": "",
+  "Sort by role": "",
+  "Sort by status": ""
 }
