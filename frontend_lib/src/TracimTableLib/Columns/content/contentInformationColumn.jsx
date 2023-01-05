@@ -6,7 +6,7 @@ import Icon from '../../../component/Icon/Icon.jsx'
 const contentInformationColumn = (settings, contentType, t) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => {
-    if (!row.content) return undefined
+    if (!row.content) return ''
     const contentTypeInfo = contentType.find(info => info.slug === row.content.type) || { label: '' }
     const statusInfo = contentTypeInfo.availableStatuses.find(
       s => s.slug === row.content.statusSlug

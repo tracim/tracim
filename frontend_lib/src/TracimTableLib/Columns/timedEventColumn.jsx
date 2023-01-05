@@ -8,7 +8,7 @@ import TimedEvent from '../../component/TimedEvent/TimedEvent.jsx'
 const timedEventColumn = (settings, lang, t) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => {
-    if (!row.content || !row.content.lastModifier) return undefined
+    if (!row.content || !row.content.lastModifier) return ''
     return `${row.content.modified} ${row.content.lastModifier.publicName}`
   }, {
     header: () => (
