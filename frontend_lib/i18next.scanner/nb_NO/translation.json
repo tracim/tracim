@@ -253,7 +253,7 @@
   "This content has no task to do associated.": "Dette innholdet har ikke noe tilknyttet gjøremål.",
   "+username please read the document": "+brukernavn, les dokumentet",
   "modified": "endret",
-  "Unexpected error, please inform an administrator": "",
-  "of": "",
-  "Download": ""
+  "Unexpected error, please inform an administrator": "Uventet feil. Gi en administrator beskjed om dette.",
+  "of": "av",
+  "Download": "Last ned"
 }
