@@ -493,15 +493,6 @@ export class Dashboard extends React.Component {
                   />
 
                   <div className='dashboard__workspace__rightMenu__contents'>
-                    <IconButton
-                      icon='fas fa-fw fa-cog'
-                      text={(userRoleIdInWorkspace >= ROLE.contentManager.id
-                        ? props.t('Space settings')
-                        : props.t('Space information')
-                      )}
-                      onClick={this.handleClickOpenAdvancedDashboard}
-                    />
-
                     {contentTypeButtonList.map(app => {
                       return (userRoleIdInWorkspace >= ROLE.contributor.id || ALWAYS_ALLOWED_BUTTON_SLUGS.includes(app.slug)) && (
                         <ContentTypeBtn
@@ -519,6 +510,15 @@ export class Dashboard extends React.Component {
                         />
                       )
                     })}
+
+                    <IconButton
+                      icon='fas fa-fw fa-cog'
+                      text={(userRoleIdInWorkspace >= ROLE.contentManager.id
+                        ? props.t('Space settings')
+                        : props.t('Space information')
+                      )}
+                      onClick={this.handleClickOpenAdvancedDashboard}
+                    />
                   </div>
 
                   <MemberList
