@@ -29,7 +29,7 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
       }
       return (
         <div className='contentListItem__name_path unavailableContent__name_warning'>
-          <span> {props.row.original.originalLabel}</span>
+          <span>{props.row.original.originalLabel}</span>
           <span className='unavailableContent__warning'>
             <Icon
               icon='fas fa-exclamation-triangle'
