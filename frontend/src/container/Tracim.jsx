@@ -118,9 +118,14 @@ export class Tracim extends React.Component {
       unansweredCallTimeoutId: -1
     }
 
-    // TODO - MP - 2022-11-29 - Check that customElement exist, fallback if not
-    if (!window.customElements.get('html-mention')) {
-      window.customElements.define('html-mention', HTMLMention)
+    if (window.customElements) {
+      if (!window.customElements.get('html-mention')) {
+        window.customElements.define('html-mention', HTMLMention)
+      }
+    } else {
+      window.alert(props.t(
+        'Tracim doesn\'t support the current version of your browser. Please upgrade your browser.'
+      ))
     }
 
     this.audioCall = new Audio('/assets/branding/incoming-call.ogg')

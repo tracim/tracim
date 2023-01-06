@@ -101,7 +101,6 @@ export class Publications extends React.Component {
       isLastItemAddedFromCurrentToken: false,
       invalidMentionList: [],
       showEditPopup: false,
-      showInvalidMentionPopupInComment: false,
       showReorderButton: false
     }
   }
