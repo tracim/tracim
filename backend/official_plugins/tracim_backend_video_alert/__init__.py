@@ -1,8 +1,8 @@
 from pluggy import PluginManager
 
-# from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
+from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import Content
@@ -44,9 +44,9 @@ class VideoAlertPlugin:
             Not using the `current_user` since it is not required to work,
             however everything is in place for it to be used.
             """
-            # user = UserApi(
-            #     session=context.dbsession, config=context.app_config, current_user=None
-            # ).get_one_by_username(config["username"])
+            UserApi(
+                session=context.dbsession, config=context.app_config, current_user=None
+            ).get_one_by_username(config["username"])
 
             workspace = WorkspaceApi(
                 session=context.dbsession, config=context.app_config, current_user=None
