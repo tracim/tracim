@@ -1,6 +1,7 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { isEqual } from 'lodash'
 import {
   buildFilePreviewUrl as jpgPreviewUrl,
   removeExtensionOfFilename,
@@ -178,7 +179,7 @@ export class Preview extends React.Component {
 
   isContentDifferent = (oldContent, newContent) => (
     newContent.firstComment !== oldContent.firstComment ||
-    JSON.stringify(newContent.commentList) !== JSON.stringify(oldContent.commentList) ||
+    !isEqual(newContent.commentList, oldContent.commentList) ||
     newContent.translatedRawContent !== oldContent.translatedRawContent ||
     newContent.currentRevisionId !== oldContent.currentRevisionId
   )

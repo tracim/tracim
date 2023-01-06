@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
-
+import { isEqual } from 'lodash'
 import {
   PageWrapper,
   PageTitle,
@@ -58,7 +58,7 @@ export class JoinWorkspace extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (JSON.stringify(this.props.accessibleWorkspaceList) !== JSON.stringify(prevProps.accessibleWorkspaceList)) {
+    if (!isEqual(this.props.accessibleWorkspaceList, prevProps.accessibleWorkspaceList)) {
       this.setDisplayedSpaceList()
     }
   }

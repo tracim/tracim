@@ -4,6 +4,7 @@ import { withRouter, Route } from 'react-router-dom'
 import appFactory from '../util/appFactory.js'
 import i18n from '../util/i18n.js'
 import { translate } from 'react-i18next'
+import { isEqual } from 'lodash'
 import {
   findUserRoleIdInWorkspace,
   SHARE_FOLDER_ID,
@@ -201,7 +202,7 @@ export class WorkspaceContent extends React.Component {
       this.loadAllWorkspaceContent(workspaceId, false)
     } else if (!state.appOpenedType && prevState.appOpenedType) this.buildBreadcrumbs()
 
-    if (JSON.stringify(props.workspaceContentList) !== JSON.stringify(prevProps.workspaceContentList) || state.userFilter !== prevState.userFilter) this.setDisplayedContentList()
+    if (!isEqual(props.workspaceContentList, prevProps.workspaceContentList) || state.userFilter !== prevState.userFilter) this.setDisplayedContentList()
   }
 
   componentWillUnmount () {

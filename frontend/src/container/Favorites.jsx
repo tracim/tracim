@@ -1,6 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
+import { isEqual } from 'lodash'
 import {
   BREADCRUMBS_TYPE,
   buildHeadTitle,
@@ -175,7 +176,7 @@ export class Favorites extends React.Component {
   }
 
   componentDidUpdate (prevProps) {
-    if (JSON.stringify(this.props.favoriteList) !== JSON.stringify(prevProps.favoriteList)) this.setDisplayedFavoritesList()
+    if (!isEqual(this.props.favoriteList, prevProps.favoriteList)) this.setDisplayedFavoritesList()
   }
 
   loadFavoriteList = async () => {
