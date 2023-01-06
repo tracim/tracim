@@ -33,7 +33,6 @@ import {
 import sinon from 'sinon'
 
 describe('helper.js', () => {
-
   describe('updateTLMUser()', () => {
     it('should return the author object added with is_from_system_admin if author is not null', () => {
       const author = { username: 'Author' }
