@@ -72,7 +72,7 @@ export class Timeline extends React.Component {
   }
 
   handleClickValidateEditComment = (comment, commentId, parentId) => {
-    const { props, state } = this
+    const { props } = this
     this.setState({
       invalidMentionList: [],
       showEditCommentPopup: false,
@@ -307,7 +307,7 @@ Timeline.propTypes = {
   onClickShowMoreTimelineItems: PropTypes.func,
   roleList: PropTypes.array,
   shouldScrollToBottom: PropTypes.bool,
-  showParticipateButton: PropTypes.bool,
+  showParticipateButton: PropTypes.bool
 }
 
 Timeline.defaultProps = {
@@ -343,5 +343,5 @@ Timeline.defaultProps = {
   roleList: [],
   shouldScrollToBottom: true,
   showParticipateButton: false,
-  timelineData: [],
+  timelineData: []
 }

@@ -7,7 +7,6 @@ import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { CONTENT_TYPE } from '../../helper.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
-import IconButton from '../Button/IconButton.jsx'
 import CommentArea from './CommentArea.jsx'
 
 // require('./EditCommentPopup.styl') // see https://github.com/tracim/tracim/issues/1156
@@ -42,12 +41,10 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
-          onClickSubmit={
-            (comment, fileList) => {
-              props.onClickValidate(comment, props.commentId, props.parentId)
-              return true
-            }
-          }
+          onClickSubmit={(comment, fileList) => {
+            props.onClickValidate(comment, props.commentId, props.parentId)
+            return true
+          }}
           codeLanguageList={props.codeLanguageList}
           contentId={props.commentId}
           contentType={CONTENT_TYPE.COMMENT}
@@ -87,7 +84,8 @@ EditCommentPopup.propTypes = {
   loggedUserLanguage: PropTypes.string,
   memberList: PropTypes.array,
   parentId: PropTypes.number,
-  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  // NOTE - MP - 2023-01-06 - There is no workspaceId in string
+  workspaceId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 }
 
 EditCommentPopup.defaultProps = {
@@ -97,5 +95,5 @@ EditCommentPopup.defaultProps = {
   loggedUserLanguage: 'en',
   memberList: [],
   parentId: 0,
-  workspaceId: undefined,
+  workspaceId: undefined
 }

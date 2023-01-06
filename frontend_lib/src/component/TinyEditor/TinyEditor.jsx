@@ -8,7 +8,7 @@ import {
   handleFetchResult
 } from '../../helper.js'
 import {
-  getMyselfKnownContents,
+  getMyselfKnownContents
 } from '../../action.async.js'
 import {
   CUSTOM_EVENT
@@ -102,7 +102,6 @@ export const TinyEditor = props => {
       }
     }
   }
-
 
   return (
     <Editor
@@ -245,12 +244,12 @@ export const TinyEditor = props => {
                         type: 'cardcontainer',
                         direction: 'vertical',
                         items: [
-                              // {
-                              //   type: 'cardimage',
-                              //   src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/preview/jpg/25x25/avatar`,
-                              //   alt: user.publicName,
-                              //   name: 'avatar'
-                              // },
+                          // {
+                          //   type: 'cardimage',
+                          //   src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/preview/jpg/25x25/avatar`,
+                          //   alt: user.publicName,
+                          //   name: 'avatar'
+                          // },
                           {
                             type: 'cardcontainer',
                             direction: 'horizontal',
@@ -389,9 +388,8 @@ TinyEditor.propTypes = {
   maxHeight: PropTypes.number,
   minHeight: PropTypes.number,
   roleList: PropTypes.array,
-  userList: PropTypes.array,
+  userList: PropTypes.array
 }
-
 
 TinyEditor.defaultProps = {
   codeLanguageList: [],
@@ -403,5 +401,5 @@ TinyEditor.defaultProps = {
   maxHeight: undefined,
   minHeight: 100,
   roleList: [],
-  userList: [],
+  userList: []
 }

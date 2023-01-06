@@ -63,7 +63,11 @@ export const CommentArea = props => {
     let commentToSend = comment
 
     if (!force) {
-      let returnValue = searchMentionAndPlaceBalise(props.roleList, props.memberList, commentToSend)
+      const returnValue = searchMentionAndPlaceBalise(
+        props.roleList,
+        props.memberList,
+        commentToSend
+      )
       commentToSend = returnValue.html
       if (returnValue.invalidMentionList.length > 0) {
         setTextToSend(commentToSend)
@@ -72,7 +76,7 @@ export const CommentArea = props => {
       }
     }
 
-    let returnValue = await searchContentAndPlaceBalise(props.apiUrl, commentToSend)
+    const returnValue = await searchContentAndPlaceBalise(props.apiUrl, commentToSend)
 
     // NOTE - MP - 2022-12-06 - If we don't clear this variable we don't hide the popup.
     // In case of an error it's preferable to hide the popup
@@ -151,16 +155,18 @@ export const CommentArea = props => {
         spaceId={props.workspaceId}
         userList={props.memberList}
       />
-      <div className={
-        classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
-      }>
+      <div
+        className={
+          classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
+        }
+      >
         {props.isDisplayedAdvancedEdition && (
-          <div className={
-            classnames(
+          <div
+            className={classnames(
               `${props.customClass}__texteditor__advancedtext`,
               'commentArea__advancedtext'
-            )
-          }>
+            )}
+          >
             <IconButton
               customClass={classnames(
                 `${props.customClass}__texteditor__advancedtext__btn commentArea__advancedtext__btn`
@@ -185,12 +191,9 @@ export const CommentArea = props => {
           <Loading />
         )}
 
-        <div className={
-          classnames(
-            `${props.customClass}__texteditor__submit`,
-            'commentArea__submit'
-          )
-        }>
+        <div
+          className={classnames(`${props.customClass}__texteditor__submit`, 'commentArea__submit')}
+        >
           {props.isDisplayedUploadFile && (
             <AddFileToUploadButton
               workspaceId={props.workspaceId}
@@ -217,12 +220,10 @@ export const CommentArea = props => {
           {props.isDisplayedSend && (
             <IconButton
               color={props.customColor}
-              customClass={
-                classnames(
-                  `${props.customClass}__texteditor__submit__btn `,
-                  'commentArea__submit__btn'
-                )
-              }
+              customClass={classnames(
+                `${props.customClass}__texteditor__submit__btn `,
+                'commentArea__submit__btn'
+              )}
               disabled={props.disableComment || (content === '' && fileListToUpload.length === 0)}
               icon={props.submitIcon}
               intent='primary'
@@ -239,7 +240,6 @@ export const CommentArea = props => {
     </form>
   )
 }
-
 
 export default translate()(CommentArea)
 
@@ -268,7 +268,7 @@ CommentArea.propTypes = {
   onClickWithstand: PropTypes.func,
   placeHolder: PropTypes.string,
   roleList: PropTypes.array,
-  workspaceId: PropTypes.number,
+  workspaceId: PropTypes.number
 }
 
 CommentArea.defaultProps = {
@@ -294,5 +294,5 @@ CommentArea.defaultProps = {
   onClickWithstand: () => { },
   placeHolder: 'Write a comment...',
   roleList: [],
-  workspaceId: 0,
+  workspaceId: 0
 }

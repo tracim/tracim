@@ -1008,11 +1008,11 @@ const replaceHTMLElementWithMentionRole = (roleList, html) => {
 
     const role = roleList.find(r => r.id === roleId)
     let mention = ''
-    if (!user) {
+    if (!role) {
       console.warn(
         `helper.js - replaceHTMLElementWithMentionRole - Role from id ${roleId} not found`
       )
-      mention = `@UnknownRole`
+      mention = '@UnknownRole'
     } else {
       mention = `@${role.slug}`
     }
@@ -1048,7 +1048,7 @@ const replaceHTMLElementWithMentionUser = (userList, html) => {
       console.warn(
         `helper.js - replaceHTMLElementWithMentionUser - User from id ${userId} not found`
       )
-      mention = `@UnknownUser`
+      mention = '@UnknownUser'
     } else {
       mention = `@${user.username}`
     }
@@ -1072,8 +1072,6 @@ export const replaceHTMLElementWithMention = (roleList, userList, html) => {
   newHtml = replaceHTMLElementWithMentionUser(userList, newHtml)
   return newHtml
 }
-
-
 
 // /////////////////////////////////////////////////////////////////////////////
 // NOTE - MP - 2022-12-09 - LINK SECTION
@@ -1122,7 +1120,7 @@ export const searchContentAndPlaceBalise = async (apiUrl, html) => {
     const fetchContent = await getContent(apiUrl, contentId)
 
     if (fetchContent.status === 200) {
-      const contentTitle =  (await fetchContent.json()).label
+      const contentTitle = (await fetchContent.json()).label
       const linkBalise = `<a class="internal_link primaryColorFont" href="${
         PAGE.CONTENT(contentId)
       }" title="${content}">${contentTitle}</a>`
