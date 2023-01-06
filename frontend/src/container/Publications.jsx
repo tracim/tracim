@@ -34,8 +34,6 @@ import {
   CONTENT_TYPE,
   getFileDownloadUrl,
   NUMBER_RESULTS_BY_PAGE,
-  LOCAL_STORAGE_FIELD,
-  setLocalStorageItem,
   displayDistanceDate,
   TIMELINE_TYPE
 } from 'tracim_frontend_lib'
@@ -400,8 +398,8 @@ export class Publications extends React.Component {
     })
   }
 
-  saveThreadPublication = async (publication, publicationAsFileList) => {
-    const { props, state } = this
+  handleSaveThreadPublication = async (publication, publicationAsFileList) => {
+    const { props } = this
 
     const spaceId = props.currentWorkspace.id
     const publicationName = this.buildPublicationName(props.user.publicName, props.user.lang)
@@ -416,12 +414,12 @@ export class Publications extends React.Component {
     await props.appContentSaveNewCommentText(
       fetchPostPublication.json,
       publication,
-      '',
+      ''
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       fetchPostPublication.json,
-      publicationAsFileList,
+      publicationAsFileList
     )
     return true
   }
@@ -479,7 +477,7 @@ export class Publications extends React.Component {
           <div className='publishAreaContainer'>
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
-              onClickSubmit={this.saveThreadPublication}
+              onClickSubmit={this.handleSaveThreadPublication}
               buttonLabel={props.t('Publish')}
               codeLanguageList={props.system.config.code_languages}
               contentId={newPublicationId}

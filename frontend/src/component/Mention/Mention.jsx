@@ -24,7 +24,7 @@ export const Mention = props => {
     id: undefined, // User id of the mention
     level: undefined, // 0: all, 1: reader, 2: contributor, 4: content manager, 8: workspace manager
     isToMe: false, // true: mention to me, false: mention to someone else
-    text: DEFAULT_MENTION, // Text to display in the mention
+    text: DEFAULT_MENTION // Text to display in the mention
   })
 
   const completeRoleList = ROLE_LIST.concat([{

@@ -26,8 +26,7 @@ import {
   appContentFactory,
   getDefaultTranslationState,
   handleTranslateComment,
-  handleTranslateHtmlContent,
-  tinymceRemove,
+  handleTranslateHtmlContent
 } from 'tracim_frontend_lib'
 
 export class FeedItemWithPreview extends React.Component {
@@ -114,7 +113,7 @@ export class FeedItemWithPreview extends React.Component {
   }
 
   handleClickValidateNewComment = async (comment, commentAsFileList) => {
-    const { props, state } = this
+    const { props } = this
     const content = {
       ...props.content,
       content_id: props.content.id,
@@ -123,13 +122,13 @@ export class FeedItemWithPreview extends React.Component {
     await props.appContentSaveNewCommentText(
       content,
       comment,
-      props.content.type,
+      props.content.type
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       content,
       commentAsFileList
-      )
+    )
     return true
   }
 
