@@ -1,15 +1,17 @@
 from pluggy import PluginManager
 
+from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.plugins import hookimpl
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import Content
-from tracim_backend.lib.core.content import ContentApi
 
 from .config import config
-from .utils import is_content_supported, is_content_whitelisted, is_content_blacklisted, \
-    wrap_in_mention_node
+from .utils import is_content_blacklisted
+from .utils import is_content_supported
+from .utils import is_content_whitelisted
+from .utils import wrap_in_mention_node
 
 
 class VideoAlertPlugin:

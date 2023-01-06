@@ -1,7 +1,8 @@
 import uuid
 
-from .config import config
 from tracim_backend.models.data import Content
+
+from .config import config
 
 MENTION_NODE_NAME = 'span'
 MENTION_ID_PREFIX = 'mention-'
