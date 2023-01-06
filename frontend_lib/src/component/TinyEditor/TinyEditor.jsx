@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react'
 import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
+import i18n from '../../i18n.js'
 import { Editor } from '@tinymce/tinymce-react'
 
 import {
-  getAvatarBaseUrl,
+  // getAvatarBaseUrl,
   handleFetchResult
 } from '../../helper.js'
 import {
@@ -102,6 +103,16 @@ export const TinyEditor = props => {
       }
     }
   }
+
+  const hiddenTinymceFileInput = document.createElement('input')
+  hiddenTinymceFileInput.id = 'hidden_tinymce_fileinput'
+  hiddenTinymceFileInput.type = 'file'
+  hiddenTinymceFileInput.style.display = 'none'
+  hiddenTinymceFileInput.addEventListener('change', () => {
+    base64EncodeAndTinyMceInsert(hiddenTinymceFileInput.files)
+  })
+
+  document.body.append(hiddenTinymceFileInput)
 
   return (
     <Editor
