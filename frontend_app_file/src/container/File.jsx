@@ -17,7 +17,6 @@ import {
   appContentFactory,
   addAllResourceI18n,
   handleFetchResult,
-  handleInvalidMentionInComment,
   getToDo,
   PopinFixed,
   PopinFixedContent,

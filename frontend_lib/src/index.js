@@ -85,7 +85,6 @@ import {
   GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
-  handleInvalidMentionInComment,
   handleLinksBeforeSave,
   handleMentionsBeforeSave
 } from './mentionOrLink.js'
@@ -474,7 +473,6 @@ export {
   getWorkspaceDetail,
   handleClickCopyLink,
   handleFetchResult,
-  handleInvalidMentionInComment,
   handleLinksBeforeSave,
   handleMentionsBeforeSave,
   hasSpaces,

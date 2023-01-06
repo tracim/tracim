@@ -16,7 +16,6 @@ import {
   formatAbsoluteDate,
   replaceHTMLElementWithMention
 } from '../../helper.js'
-import { handleInvalidMentionInComment } from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'
