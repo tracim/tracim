@@ -7,7 +7,6 @@ import {
   handleFetchResult,
   APP_FEATURE_MODE,
   NUMBER_RESULTS_BY_PAGE,
-  convertBackslashNToBr,
   displayDistanceDate,
   sendGlobalFlashMessage,
   TIMELINE_TYPE,

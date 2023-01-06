@@ -3,7 +3,6 @@ import {
   buildFilePreviewUrl,
   checkEmailValidity,
   createSpaceTree,
-  convertBackslashNToBr,
   formatAbsoluteDate,
   handleFetchResult,
   hasSpaces,
@@ -34,14 +33,6 @@ import {
 import sinon from 'sinon'
 
 describe('helper.js', () => {
-  describe('convertBackslashNToBr()', () => {
-    it('should return the proper msg', () => {
-      const msg = 'random\nMessage'
-      const expectedMsg = 'random<br />Message'
-      const returnedMsg = convertBackslashNToBr(msg)
-      expect(returnedMsg).to.equal(expectedMsg)
-    })
-  })
 
   describe('updateTLMUser()', () => {
     it('should return the author object added with is_from_system_admin if author is not null', () => {
