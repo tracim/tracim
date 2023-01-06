@@ -53,9 +53,7 @@ class VideoAlertPlugin:
             ).get_one(content.workspace_id)
 
             ContentApi(
-                session=context.dbsession,
-                current_user=None,
-                config=context.app_config,
+                session=context.dbsession, current_user=None, config=context.app_config,
             ).create_comment(
                 workspace=workspace,
                 parent=content,
