@@ -26,15 +26,12 @@ class VideoAlertPlugin:
         """
         This method is called when the plugin is loaded.
         """
-        print("### VideoAlertPlugin: loaded ###")
 
     @hookimpl
     def on_content_created(self, content: Content, context: TracimContext) -> None:
         """
         Add a comment to the content if it is a video and not a mp4 file.
         """
-
-        print("### VideoAlertPlugin: on_content_created ###")
 
         if not is_content_supported(content) and is_content_whitelisted(content):
             return
