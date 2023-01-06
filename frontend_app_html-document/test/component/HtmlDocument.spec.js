@@ -3,10 +3,10 @@ import { expect } from 'chai'
 import { shallow, mount } from 'enzyme'
 import { HtmlDocument } from '../../src/component/HtmlDocument.jsx'
 import {
-  TextAreaApp,
-  PromptMessage,
   APP_FEATURE_MODE,
-  TRANSLATION_STATE
+  TRANSLATION_STATE,
+  PromptMessage,
+  TinyEditor
 } from 'tracim_frontend_lib'
 
 const props = {
@@ -147,7 +147,7 @@ describe('in EDIT mode', () => {
     />
   )
 
-  it('should contain a <TextAreaApp /> component', () =>
-    expect(wrapper.find('.html-document__contentpage__textnote')).to.have.descendants(TextAreaApp)
+  it('should contain a <TinyEditor /> component', () =>
+    expect(wrapper.find('.html-document__contentpage__textnote')).to.have.descendants(TinyEditor)
   )
 })

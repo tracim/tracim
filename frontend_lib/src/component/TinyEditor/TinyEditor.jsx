@@ -372,7 +372,7 @@ export const TinyEditor = props => {
           // /////////////////////////////////////////////
           // Handle shortcuts
           editor.addShortcut('ctrl+13', 'Send comment', () => {
-            props.handleCtrlEnter(editor.getContent(), false)
+            props.onCtrlEnterEvent(editor.getContent(), false)
             document.activeElement.blur()
           })
         }
@@ -393,7 +393,7 @@ TinyEditor.propTypes = {
   codeLanguageList: PropTypes.array,
   content: PropTypes.string,
   customStyle: PropTypes.string,
-  handleCtrlEnter: PropTypes.func,
+  onCtrlEnterEvent: PropTypes.func,
   height: PropTypes.any,
   isAdvancedEdition: PropTypes.bool,
   maxHeight: PropTypes.number,
@@ -406,7 +406,7 @@ TinyEditor.defaultProps = {
   codeLanguageList: [],
   content: '',
   customStyle: '',
-  handleCtrlEnter: () => { },
+  onCtrlEnterEvent: () => { },
   height: undefined,
   isAdvancedEdition: false,
   maxHeight: undefined,

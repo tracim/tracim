@@ -532,12 +532,12 @@ export class HtmlDocument extends React.Component {
     await props.appContentSaveNewCommentText(
       state.content,
       comment,
-      state.config.slug,
+      state.config.slug
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       state.content,
-      commentAsFileList,
+      commentAsFileList
     )
     return true
   }
@@ -1020,8 +1020,8 @@ export class HtmlDocument extends React.Component {
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
-            onClickCancelSave={() => {this.setState({invalidMentionList: []})}}
-            onClickSaveAnyway={() => {this.handleSaveHtmlDocument(state.textToSend)}}
+            onClickCancelSave={() => { this.setState({ invalidMentionList: [] }) }}
+            onClickSaveAnyway={() => { this.handleSaveHtmlDocument(state.textToSend) }}
             showInvalidMentionPopup={state.invalidMentionList.length > 0}
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}

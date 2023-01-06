@@ -146,9 +146,9 @@ export const HtmlDocument = props => {
                 apiUrl={props.apiUrl}
                 codeLanguageList={[]}
                 content={text}
-                handleCtrlEnter={props.onClickValidateBtn}
-                height={'100%'}
-                isAdvancedEdition={true}
+                onCtrlEnterEvent={props.onClickValidateBtn}
+                height='100%'
+                isAdvancedEdition
                 roleList={[{
                   description: props.t('Every members of the space'),
                   id: 0,

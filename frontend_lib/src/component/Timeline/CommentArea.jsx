@@ -145,7 +145,7 @@ export const CommentArea = props => {
         apiUrl={props.apiUrl}
         codeLanguageList={props.codeLanguageList}
         content={content}
-        handleCtrlEnter={sendComment}
+        onCtrlEnterEvent={sendComment}
         height={100}
         isAdvancedEdition={isAdvancedEdition}
         maxHeight={300}
