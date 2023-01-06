@@ -361,14 +361,15 @@ describe('appContentFactory.js', () => {
 
       before(async () => {
         wrapper.instance().checkApiUrl = fakeCheckApiUrl
-        const loggedUser = {
-          username: 'foo',
-          lang: 'en'
-        }
-        const isCommentWysiwyg = true
-        mockPostContentComment200(fakeApiUrl, fakeContent.workspace_id, fakeContent.content_id, newComment, fakeContent.content_namespace)
-        response = await wrapper.instance().saveCommentAsText(
-          fakeContent, isCommentWysiwyg, newComment, fakeSetState, appContentSlug, loggedUser, 'foo'
+        mockPostContentComment200(
+          fakeApiUrl,
+          fakeContent.workspace_id,
+          fakeContent.content_id,
+          newComment,
+          fakeContent.content_namespace
+        )
+        response = await wrapper.instance().appContentSaveNewCommentText(
+          fakeContent, newComment, appContentSlug
         )
       })
 
@@ -377,10 +378,6 @@ describe('appContentFactory.js', () => {
         fakeTinymceSetContent.resetHistory()
         global.localStorage.removeItem.resetHistory()
         global.GLOBAL_dispatchEvent.resetHistory()
-      })
-
-      it('should reset the tinymce comment field since we set param isCommentWysiwyg to true', () => {
-        sinon.assert.calledWith(fakeTinymceSetContent, '')
       })
 
       it('should remove the localStorage value', () => {

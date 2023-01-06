@@ -12,7 +12,6 @@ import { reactstrapPopoverHack } from '../testHelper.js'
 const nock = require('nock')
 
 describe('<Timeline />', () => {
-  const onClickWysiwygBtnCallBack = sinon.spy()
   const onClickRevisionBtnCallBack = sinon.spy()
   const onClickRestoreArchivedCallBack = sinon.spy()
   const onClickRestoreDeletedCallBack = sinon.spy()
@@ -29,8 +28,6 @@ describe('<Timeline />', () => {
       name: 'randomNameLogin',
       userRoleIdInWorkspace: ROLE.contentManager.id
     },
-    wysiwyg: false,
-    onClickWysiwygBtn: onClickWysiwygBtnCallBack,
     onClickRevisionBtn: onClickRevisionBtnCallBack,
     allowClickOnRevision: true,
     shouldScrollToBottom: true,
@@ -71,13 +68,6 @@ describe('<Timeline />', () => {
       wrapper.setProps({ disableComment: true })
       expect(wrapper.find('.commentArea__advancedtext__btn').prop('disabled')).to.equal(true)
       wrapper.setProps({ disableComment: false })
-    })
-  })
-
-  describe('Handlers', () => {
-    it('onClickWysiwygBtnCallBack should be called when the advancedText button is clicked', () => {
-      wrapper.find(`.${props.customClass}__texteditor__advancedtext__btn`).simulate('click')
-      expect(onClickWysiwygBtnCallBack.called).to.equal(true)
     })
   })
 })
