@@ -607,5 +607,9 @@
   "New content": "",
   "Home": "",
   "Account Settings": "",
-  "Tasks": ""
+  "Tasks": "",
+  "One mail will be sent for each event of the space.": "",
+  "One mail will be sent every 24 hours with a daily digest of all actions in this space.": "",
+  "UnknownRole": "",
+  "No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to 'Daily'.": ""
 }
