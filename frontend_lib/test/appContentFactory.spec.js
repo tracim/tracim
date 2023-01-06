@@ -76,7 +76,6 @@ describe('appContentFactory.js', () => {
         'appContentDeleteComment',
         'appContentEditComment',
         'appContentNotifyAll',
-        'appContentSaveNewComment',
         'appContentChangeStatus',
         'appContentArchive',
         'appContentDelete',
@@ -396,31 +395,6 @@ describe('appContentFactory.js', () => {
           .to.have.property('apiResponse')
           .and.have.property('body')
       })
-    })
-  })
-
-  describe('function appContentSaveNewComment', () => {
-    const newComment = 'Edited comment'
-
-    before(() => {
-      wrapper.instance().checkApiUrl = fakeCheckApiUrl
-      const loggedUser = {
-        username: 'foo',
-        lang: 'en'
-      }
-      const fileChildContentList = []
-      const isCommentWysiwyg = true
-      wrapper.instance().appContentSaveNewComment(
-        fakeContent, isCommentWysiwyg, newComment, fileChildContentList, fakeSetState, appContentSlug, loggedUser, 'foo'
-      )
-    })
-
-    after(() => {
-      fakeCheckApiUrl.resetHistory()
-    })
-
-    it('should call the function checkApiUrl', () => {
-      expect(fakeCheckApiUrl.called).to.equal(true)
     })
   })
 

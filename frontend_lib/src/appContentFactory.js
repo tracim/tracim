@@ -15,7 +15,6 @@ import {
   getOrCreateSessionClientToken,
   tinymceRemove,
   addRevisionFromTLM,
-  searchContentAndPlaceBalise,
   stringIncludes
 } from './helper.js'
 
@@ -650,28 +649,6 @@ export function appContentFactory (WrappedComponent) {
       setState({ fileList: uploadFailedList, isFileCommentLoading: false })
     }
 
-    //TODO - MP - 2022-12-13 - Remove this function
-    appContentSaveNewComment = async (
-      content,
-      isCommentWysiwyg,
-      newComment,
-      newCommentAsFileList,
-      setState,
-      appSlug,
-      loggedUsername,
-      id = ''
-    ) => {
-      this.checkApiUrl()
-
-      if (newComment) {
-        await this.appContentSaveNewCommentText(content, newComment, appSlug)
-      }
-
-      if (newCommentAsFileList && newCommentAsFileList.length > 0) {
-        appContentSaveNewCommentFileList(setState, content, newCommentAsFileList)
-      }
-    }
-
     appContentChangeStatus = async (content, newStatus, appSlug) => {
       this.checkApiUrl()
 
@@ -788,9 +765,12 @@ export function appContentFactory (WrappedComponent) {
     }
 
     appContentNotifyAll = (content, setState, appSlug) => {
-      const notifyAllComment = i18n.t('@all Please notice that I did an important update on this content.')
+      const notifyAllComment = i18n.t(
+        '<html-mention roleid="0"></html-mention> Please notice that I did an important update' +
+        ' on this content.'
+      )
 
-      this.appContentSaveNewComment(content, false, notifyAllComment, setState, appSlug)
+      this.appContentSaveNewCommentText(content, notifyAllComment, appSlug)
     }
 
     buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({
@@ -1146,7 +1126,6 @@ export function appContentFactory (WrappedComponent) {
           appContentDeleteToDo={this.appContentDeleteToDo}
           appContentEditComment={this.appContentEditComment}
           appContentMarkAsTemplate={this.appContentMarkAsTemplate}
-          appContentSaveNewComment={this.appContentSaveNewComment} // To remove?
           appContentSaveNewCommentText={this.appContentSaveNewCommentText}
           appContentSaveNewCommentFileList={this.appContentSaveNewCommentFileList}
           appContentChangeStatus={this.appContentChangeStatus}

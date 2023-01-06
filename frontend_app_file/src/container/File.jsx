@@ -1087,7 +1087,7 @@ export class File extends React.Component {
   handleClickNotifyAll = async () => {
     const { state, props } = this
 
-    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    props.appContentNotifyAll(state.content, state.config.slug)
     this.handleCloseNotifyAllMessage()
   }
 
