@@ -4,9 +4,9 @@ from tracim_backend.models.data import Content
 
 from .config import config
 
-MENTION_NODE_NAME = 'span'
-MENTION_ID_PREFIX = 'mention-'
-MENTION_CLASS = 'mention'
+MENTION_NODE_NAME = "span"
+MENTION_ID_PREFIX = "mention-"
+MENTION_CLASS = "mention"
 
 
 def wrap_in_mention_node(username: str):
@@ -19,8 +19,10 @@ def wrap_in_mention_node(username: str):
 
     if username == "":
         return ""
-    return f'<{MENTION_NODE_NAME} id="{MENTION_ID_PREFIX}{uuid.uuid4()}" ' + \
-        f'class="{MENTION_CLASS}">@{username}</{MENTION_NODE_NAME}>'
+    return (
+        f'<{MENTION_NODE_NAME} id="{MENTION_ID_PREFIX}{uuid.uuid4()}" '
+        + f'class="{MENTION_CLASS}">@{username}</{MENTION_NODE_NAME}>'
+    )
 
 
 def is_content_supported(content: Content):
