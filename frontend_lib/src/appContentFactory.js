@@ -568,12 +568,14 @@ export function appContentFactory (WrappedComponent) {
     appContentSaveNewCommentText = async (content, newComment, appSlug) => {
       this.checkApiUrl()
 
+      const contentToSend = Autolinker.link(newComment, { stripPrefix: false })
+
       const response = await handleFetchResult(
         await postNewComment(
           this.apiUrl,
           content.workspace_id,
           content.content_id,
-          newComment,
+          contentToSend,
           content.content_namespace
         )
       )

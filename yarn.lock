@@ -3924,12 +3924,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autolinker@npm:^3.13.0":
-  version: 3.15.0
-  resolution: "autolinker@npm:3.15.0"
+"autolinker@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "autolinker@npm:4.0.0"
   dependencies:
     tslib: ^2.3.0
-  checksum: 2fce8f3ceaae48bf392762e226038026675a045e1de166f383004fd67705d3392e40bee51bc5dabdb5671d340ccc50668a8d09cc52039eb67f04055e19fc097e
+  checksum: d5a1192b321b3527a6cfee777c2714ede05c2a503be1ce223ff8a277152b39dc5c62e663310b57ed69f186c2ba7da52611597a00f215bef268b5b37d7bd38e47
   languageName: node
   linkType: hard
 
@@ -14002,7 +14002,7 @@ __metadata:
     "@babel/preset-react": ^7.18.6
     "@babel/register": ^7.18.9
     abort-controller: ^3.0.0
-    autolinker: ^3.13.0
+    autolinker: ^4.0.0
     babel-eslint: ^10.1.0
     babel-loader: ^8.2.2
     babel-plugin-prismjs: ^2.1.0
