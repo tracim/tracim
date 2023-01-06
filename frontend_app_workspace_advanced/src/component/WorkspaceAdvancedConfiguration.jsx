@@ -3,8 +3,6 @@ import Radium from 'radium'
 import PropTypes from 'prop-types'
 import {
   AgendaInfo,
-  AutoComplete,
-  BtnSwitch,
   ConfirmPopup,
   IconButton,
   Popover,
@@ -13,6 +11,7 @@ import {
   tinymceRemove
 } from 'tracim_frontend_lib'
 import { translate } from 'react-i18next'
+import SpaceDescription from './SpaceDescription.jsx'
 
 export class WorkspaceAdvancedConfiguration extends React.Component {
   componentDidMount () {
@@ -50,48 +49,23 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
 
     return (
       <div className='workspace_advanced-content'>
-        <div className='workspace_advanced__description formBlock'>
-          <div className='formBlock__title workspace_advanced__description__title '>
-            {props.t('Description')}
-          </div>
-          {props.isReadOnlyMode
-            ? <div dangerouslySetInnerHTML={{ __html: props.description }} />
-            : (
-              <div>
-                <div className='formBlock__field workspace_advanced__description__text '>
-                  <textarea
-                    id={props.textareaId}
-                    className='workspace_advanced__description__text__textarea'
-                    placeholder={props.t("Space's description")}
-                    value={props.description}
-                    onChange={props.onChangeDescription}
-                    rows='3'
-                    hidden
-                  />
-                </div>
-                {props.isAutoCompleteActivated && props.autoCompleteItemList.length > 0 && (
-                  <AutoComplete
-                    apiUrl={props.apiUrl}
-                    autoCompleteItemList={props.autoCompleteItemList}
-                    autoCompleteCursorPosition={props.autoCompleteCursorPosition}
-                    onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-                    delimiterIndex={props.autoCompleteItemList.filter(item => item.isCommon).length - 1}
-                  />
-                )}
-
-                <div className='workspace_advanced__description__bottom'>
-                  <button
-                    type='button'
-                    className='workspace_advanced__description__bottom__btn btn highlightBtn'
-                    onClick={props.onClickValidateNewDescription}
-                    style={{ backgroundColor: props.customColor }}
-                  >
-                    {props.t('Confirm')}
-                  </button>
-                </div>
-              </div>
-            )}
-        </div>
+        <SpaceDescription
+          apiUrl={props.apiUrl}
+          autoCompleteCursorPosition={props.autoCompleteCursorPosition}
+          autoCompleteItemList={props.autoCompleteItemList}
+          description={props.description}
+          isAutoCompleteActivated={props.isAutoCompleteActivated}
+          isReadOnlyMode={props.isReadOnlyMode}
+          lang={props.lang}
+          onChangeDescription={props.onChangeDescription}
+          onClickAutoCompleteItem={props.onClickAutoCompleteItem}
+          onClickValidateNewDescription={props.onClickValidateNewDescription}
+          onTinyMceInput={props.onTinyMceInput}
+          onTinyMceKeyDown={props.onTinyMceKeyDown}
+          onTinyMceKeyUp={props.onTinyMceKeyUp}
+          onTinyMceSelectionChange={props.onTinyMceSelectionChange}
+          textareaId={props.textareaId}
+        />
 
         {!props.isReadOnlyMode && (
           <div className='workspace_advanced__defaultRole formBlock'>
@@ -140,65 +114,29 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
         )}
 
         {!props.isReadOnlyMode && (
-          <div>
-            <div className='formBlock workspace_advanced__delete'>
-              <div className='formBlock__title workspace_advanced__delete__title'>
-                {props.t('Delete space')}
-              </div>
-
-              <div className='formBlock__field workspace_advanced__delete__content'>
-                <IconButton
-                  icon='far fa-trash-alt'
-                  onClick={props.onClickDeleteWorkspaceBtn}
-                  text={props.t('Delete')}
-                  textMobile={props.t('Delete')}
-                />
-                <div className='workspace_advanced__delete__content__warning' />
-              </div>
-
-              {(props.displayPopupValidateDeleteWorkspace &&
-                <ConfirmPopup
-                  onConfirm={props.onClickValidatePopupDeleteWorkspace}
-                  onCancel={props.onClickClosePopupDeleteWorkspace}
-                  confirmLabel={props.t('Delete')}
-                  confirmIcon='far fa-fw fa-trash-alt'
-                />
-              )}
+          <div className='formBlock workspace_advanced__delete'>
+            <div className='formBlock__title workspace_advanced__delete__title'>
+              {props.t('Delete space')}
             </div>
 
-            <div
-              className='workspace_advanced__functionality'
-              style={{ display: 'none' }}
-            // Côme - 2018/09/10 - hide this div until webdav and/or visioconf is activated
-            >
-              <div className='workspace_advanced__functionality__title'>
-                Liste des fonctionnalités
-              </div>
-
-              <div className='workspace_advanced__functionality__text'>
-                Liste des fonctionnalités présentes sur Tracim que vous pouvez désactiver :
-              </div>
-
-              <ul className='workspace_advanced__functionality__list'>
-                <li className='workspace_advanced__functionality__list__item'>
-                  <div className='item__text'>
-                    Calendrier de l'espace de travail :
-                  </div>
-                  <div className='item__btnswitch'>
-                    <BtnSwitch />
-                  </div>
-                </li>
-
-                <li className='workspace_advanced__functionality__list__item'>
-                  <div className='item__text'>
-                    Visioconférence :
-                  </div>
-                  <div className='item__btnswitch'>
-                    <BtnSwitch />
-                  </div>
-                </li>
-              </ul>
+            <div className='formBlock__field workspace_advanced__delete__content'>
+              <IconButton
+                icon='far fa-trash-alt'
+                onClick={props.onClickDeleteWorkspaceBtn}
+                text={props.t('Delete')}
+                textMobile={props.t('Delete')}
+              />
+              <div className='workspace_advanced__delete__content__warning' />
             </div>
+
+            {(props.displayPopupValidateDeleteWorkspace &&
+              <ConfirmPopup
+                onConfirm={props.onClickValidatePopupDeleteWorkspace}
+                onCancel={props.onClickClosePopupDeleteWorkspace}
+                confirmLabel={props.t('Delete')}
+                confirmIcon='far fa-fw fa-trash-alt'
+              />
+            )}
           </div>
         )}
       </div>
