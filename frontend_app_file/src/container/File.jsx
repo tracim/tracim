@@ -495,12 +495,12 @@ export class File extends React.Component {
     await props.appContentSaveNewCommentText(
       state.content,
       comment,
-      state.config.slug,
+      state.config.slug
     )
     await props.appContentSaveNewCommentFileList(
       this.setState.bind(this),
       state.content,
-      commentAsFileList,
+      commentAsFileList
     )
     return true
   }
