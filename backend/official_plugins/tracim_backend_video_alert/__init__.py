@@ -75,5 +75,4 @@ class VideoAlertPlugin:
 
 
 def register_tracim_plugin(plugin_manager: PluginManager):
-    print("### VideoAlertPlugin: registering ###")
     plugin_manager.register(VideoAlertPlugin())
