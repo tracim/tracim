@@ -765,12 +765,10 @@ export function appContentFactory (WrappedComponent) {
     }
 
     appContentNotifyAll = (content, setState, appSlug) => {
-      const notifyAllComment = i18n.t(
-        '<html-mention roleid="0"></html-mention> Please notice that I did an important update' +
-        ' on this content.'
-      )
+      const comment = i18n.t('Please notice that I did an important update on this content.')
+      const commentWithMention = `<html-mention roleid="0"></html-mention> ${comment}`
 
-      this.appContentSaveNewCommentText(content, notifyAllComment, appSlug)
+      this.appContentSaveNewCommentText(content, commentWithMention, appSlug)
     }
 
     buildTimelineItemComment = (content, loggedUser, initialCommentTranslationState) => ({

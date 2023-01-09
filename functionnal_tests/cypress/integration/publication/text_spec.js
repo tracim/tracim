@@ -55,25 +55,15 @@ describe('Publications', () => {
       cy.cancelXHR()
     })
 
-    it('should show the first message as preview for simple edition', function () {
-      cy.get(publicationInput).type(exampleText)
+    it('should show the first message as preview ', function () {
+      cy.inputInTinyMCE(exampleText)
       cy.contains(publishButton, 'Publish').click()
-      cy.contains('.timeline__comment__body__content__textAndPreview', exampleText).should('be.visible')
-    })
-
-    it.skip('should show the first message as preview for advanced edition', function () {
-      // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
-      cy.get(publicationInput).type('!')
-      cy.get('.commentArea__advancedtext__btn').click()
-      cy.waitForTinyMCELoaded().then(() => {
-        cy.typeInTinyMCE(exampleText)
-        cy.contains(publishButton, 'Publish').click()
-        cy.contains('.timeline__comment__body__content__textAndPreview', exampleText).should('be.visible')
-      })
+      cy.contains('.timeline__comment__body__content__textAndPreview', exampleText)
+        .should('be.visible')
     })
 
     it('should preview links', function () {
-      cy.get(publicationInput).type(fakeLink)
+      cy.inputInTinyMCE(fakeLink)
       cy.contains(publishButton, 'Publish').click()
       cy.contains('.linkPreview__content__title', fakePreview.title)
       cy.contains('.linkPreview__content__description', fakePreview.description)
@@ -81,14 +71,14 @@ describe('Publications', () => {
     })
 
     it('should filter by username when suggesting mentions', () => {
-      cy.get(publicationInput).type(`@${defaultAdmin.username.slice(0, 4)}`)
-      cy.get(':nth-child(1) > .autocomplete__item > .autocomplete__item__id')
+      cy.inputInTinyMCE(`@${defaultAdmin.username.slice(0, 4)}`)
+      cy.get(':nth-child(1) > .tox-collection__item')
         .should('contain.text', `@${defaultAdmin.username}`)
     })
 
     it('should filter by public name when suggesting mentions', () => {
-      cy.get(publicationInput).type(`@${defaultAdmin.public_name.slice(0, 4)}`)
-      cy.get(':nth-child(1) > .autocomplete__item > .autocomplete__item__id')
+      cy.inputInTinyMCE(`@${defaultAdmin.public_name.slice(0, 4)}`)
+      cy.get(':nth-child(1) > .tox-collection__item')
         .should('contain.text', `@${defaultAdmin.username}`)
     })
   })

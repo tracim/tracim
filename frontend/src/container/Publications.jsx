@@ -477,7 +477,6 @@ export class Publications extends React.Component {
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
               onClickSubmit={this.handleSaveThreadPublication}
-              buttonLabel={props.t('Publish')}
               codeLanguageList={props.system.config.code_languages}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
@@ -494,6 +493,7 @@ export class Publications extends React.Component {
                 label: props.t('All'),
                 slug: props.t('all')
               }]}
+              submitLabel={props.t('Publish')}
               workspaceId={parseInt(props.match.params.idws)}
             />
           </div>

@@ -229,7 +229,6 @@ export class Timeline extends React.Component {
               apiUrl={props.apiUrl}
               onClickSubmit={props.onClickSubmit}
               // ///////////////////////////////////////////////////////////////
-              buttonLabel={props.t('Send')}
               codeLanguageList={props.codeLanguageList}
               contentId={props.contentId}
               contentType={props.contentType}
@@ -241,6 +240,7 @@ export class Timeline extends React.Component {
               memberList={props.memberList}
               placeHolder={props.t('Write an answer...')}
               roleList={props.roleList}
+              submitLabel={props.t('Send')}
               workspaceId={props.workspaceId}
             />
           </div>
