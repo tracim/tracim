@@ -76,7 +76,6 @@
   "Undo change in title": "Endre endring i overskrift",
   "Archive": "Arkiv",
   "Send an invitational email to this user": "Send en invitasjon til brukeren per e-post",
-  "Unknown error, please inform an administrator": "Ukjent feil. La dette komme en administrator til kjenne.",
   "This content is deprecated": "Innholdet er foreldet",
   "Drag and drop your file here": "Dra og slipp filene dine her",
   "Drag and drop your files here": "Dra og slipp filene dine hit",
@@ -231,7 +230,6 @@
   "{{count}} tasks performed on {{numberOfTasks}}_plural": "{{count}} gjøremål utført på {{numberOfTasks}}",
   "Email notifications are disabled": "E-postmerknader er avskrudd",
   "Each new line corresponds to a new task.": "Hver nye linje samsvarer med et nytt gjøremål.",
-  "Information": "Info",
   "Error while loading timeline": "Kunne ikke laste inn tidslinje",
   "Template": "Mal",
   "You are not allowed to change the status of this to do": "Du tillates ikke å endre dette gjøremålets status",
@@ -244,7 +242,6 @@
   "Participate": "Delta",
   "Trusted user + create users, administration of instance": "Betrodd bruker + opprett brukere, administrasjon av instans",
   "User + create spaces, add members in spaces": "Bruker + opprett rom, legg til medlemmer i rom",
-  "@all Please notice that I did an important update on this content.": "@all Legg merke til at jeg har gjort en viktig oppdatering av dette innholdet.",
   "Error while detecting the mentions": "Kunne ikke ta rede på nevnelser",
   "No Emoji Found": "Fant ingen emoji-er",
   "Smileys & Emotion": "Smilefjes og følelsesuttrykk",
@@ -257,5 +254,12 @@
   "modified": "endret",
   "Unexpected error, please inform an administrator": "",
   "of": "",
-  "Download": ""
+  "Download": "",
+  "Every members of the space": "",
+  "All": "",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "",
+  "Insert": "",
+  "Image": "",
+  "Fullscreen": "",
+  "Please notice that I did an important update on this content.": ""
 }

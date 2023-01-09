@@ -74,7 +74,6 @@
   "Send an invitational email to this user": "Enviar un correo electrónico de invitación a este usuario",
   "Search user...": "Buscar usuario…",
   "Unknown": "Desconocido",
-  "Unknown error, please inform an administrator": "Error desconocido, por favor informe a un administrador",
   "This content is archived": "Este contenido está archivado",
   "This content is deleted": "Este contenido es eliminado",
   "Status changed to {{status}}": "Estado cambiado a {{status}}",
@@ -162,7 +161,6 @@
   "Reader + create/modify content": "Lector + crear/modificar contenido",
   "Error while saving the title": "Error al guardar el título",
   "Error while removing your reaction": "Error al eliminar su reacción",
-  "@all Please notice that I did an important update on this content.": "@todos Por favor, noten que hice una actualización importante de este contenido.",
   "Error while detecting the mentions": "Error al detectar las menciones",
   "Username can't contain any whitespace": "El nombre de usuario no puede contener ningún espacio",
   "You can't send an empty comment": "No se puede enviar un comentario vacío",
@@ -245,7 +243,6 @@
   "You are not allowed to change the status of this to do": "No está permitido cambiar el estado de esta tarea",
   "Error while deleting to do": "Error al eliminar esta tarea",
   "You are not allowed to delete this to do": "No puede eliminar esta tarea",
-  "Information": "Información",
   "To create a task, type the + character followed by the username, then the text of your task.": "Para crear una tarea, escriba el carácter + seguido del nombre de usuario y luego el texto de su tarea.",
   "Each new line corresponds to a new task.": "Cada nueva línea corresponde a una nueva tarea.",
   "For the task to be assigned to a member, the username must be at the beginning of the line.": "Para que la tarea se asigne a un miembro, el nombre de usuario debe estar al principio de la línea.",
@@ -257,5 +254,12 @@
   "modified": "modificado",
   "Unexpected error, please inform an administrator": "Error inesperado, informe a un administrador",
   "of": "de",
-  "Download": "Descargar"
+  "Download": "Descargar",
+  "Every members of the space": "",
+  "All": "",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "",
+  "Insert": "",
+  "Image": "",
+  "Fullscreen": "",
+  "Please notice that I did an important update on this content.": ""
 }
