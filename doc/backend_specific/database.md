@@ -67,6 +67,7 @@ In this case, delete the user and database and start over:
 [//]: # (         --command="GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO tracimuser;")
 
 ## Mariadb 10.3+ or Mysql 8.0.1+ ##
+❗: Since [Tracim 4.0.0](https://github.com/tracim/tracim/blob/maintenance/4.4/CHANGELOG.md#400--2021-10-29), mysql is not officialy supported by Tracim team. You are on your own when using it.
 
 :warning: Newest version of Tracim (3.0+) doesn't support anymore old mariadb and mysql version. You need at least
 mariadb 10.3 or mysql 8.0.1 (We need database that are able to support recursive CTE query).
