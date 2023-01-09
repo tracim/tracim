@@ -35,6 +35,7 @@ Useful to migrate old databases, to run before applying v3.0.0 migration scripts
     tracimcli db update-naming-conventions
 
 ### Migrate Mysql/Mariadb database to utf8mb4 (added for tracim 3.7)
+❗: Since [Tracim 4.0.0](https://github.com/tracim/tracim/blob/maintenance/4.4/CHANGELOG.md#400--2021-10-29), mysql is not officialy supported by Tracim team. You are on your own when using it.
 
 :warning: This will modify the character set and collation of Tracim's database, including the already existing tables. We strongly suggest you to do a backup of the database before applying this command. We suggest you to follow official documentation of your database to do so.
 
