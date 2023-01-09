@@ -24,9 +24,9 @@ export const TinyEditor = props => {
   let isFullScreen = false
 
   const advancedToolBar = 'formatselect alignleft aligncenter alignright alignjustify | ' +
-    'bold italic underline strikethrough | forecolor backcolor | link customInsertImage charmap | ' +
-    'bullist numlist outdent indent | table | code codesample | insert | removeformat | ' +
-    'customFullscreen help'
+    'bold italic underline strikethrough | forecolor backcolor | ' +
+    'link customInsertImage emoticons charmap | bullist numlist outdent indent | table | ' +
+    'code codesample | insert | removeformat | customFullscreen help'
 
   const simpleToolBar = 'bold italic underline | bullist numlist'
 
@@ -134,7 +134,7 @@ export const TinyEditor = props => {
           // 'autocompletion',
           // /////////////////////////////////////////////
           'advlist autolink lists link image charmap print preview anchor',
-          'searchreplace visualblocks code codesample fullscreen',
+          'searchreplace visualblocks code codesample fullscreen emoticons',
           'insertdatetime media table paste code help wordcount'
         ],
         contextmenu: 'selectall copy paste link customInsertImage table',
