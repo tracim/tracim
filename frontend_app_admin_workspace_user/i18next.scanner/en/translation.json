@@ -51,7 +51,16 @@
   "Create": "Create",
   "Inactive": "Inactive",
   "Filter users": "Filter users",
-  "There are no users that matches you filter": "There are no users that matches you filter",
+  "There are no users that matches you filter": "No users match your filter",
   "Filter spaces": "Filter spaces",
-  "There are no spaces that matches you filter": "There are no spaces that matches you filter"
+  "There are no spaces that matches you filter": "No spaces match your filter",
+  "Sort by full name": "Sort by full name",
+  "Sort by username": "Sort by username",
+  "Sort by email": "Sort by email",
+  "Id": "Id",
+  "Sort by id": "Sort by id",
+  "Sort by type": "Sort by type",
+  "Sort by title": "Sort by title",
+  "Sort by description": "Sort by description",
+  "Sort by number of members": "Sort by number of members"
 }

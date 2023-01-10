@@ -1594,7 +1594,7 @@ class ContentApi(object):
     def update_container_content(
         self,
         item: Content,
-        allowed_content_type_slug_list: typing.List[str],
+        allowed_content_type_slug_list: typing.Optional[typing.List[str]],
         new_label: str,
         new_description: typing.Optional[str] = None,
         new_raw_content: typing.Optional[str] = None,
@@ -1610,11 +1610,13 @@ class ContentApi(object):
          of content.
         :return:
         """
-        try:
-            item = self.set_allowed_content(item, allowed_content_type_slug_list)
-            content_has_changed = True
-        except SameValueError:
-            content_has_changed = False
+        content_has_changed = False
+        if allowed_content_type_slug_list is not None:
+            try:
+                item = self.set_allowed_content(item, allowed_content_type_slug_list)
+                content_has_changed = True
+            except SameValueError:
+                pass
         item = self.update_content(
             item,
             new_label,

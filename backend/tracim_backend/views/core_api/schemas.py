@@ -2018,9 +2018,7 @@ class ContentModifySchema(ContentModifyAbstractSchema):
 class FolderContentModifySchema(ContentModifyAbstractSchema):
     sub_content_types = marshmallow.fields.List(
         StrippedString(example="html-document", validate=all_content_types_validator),
-        description="list of content types allowed as sub contents. "
-        "This field is required for folder contents, "
-        "set it to empty list in other cases",
+        description="list of content types allowed as sub contents.",
         required=False,
     )
 

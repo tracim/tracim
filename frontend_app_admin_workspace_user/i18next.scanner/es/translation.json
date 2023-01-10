@@ -29,7 +29,7 @@
   "User created and email sent": "Usuario creado y correo electrónico enviado",
   "User created": "Usuario creado",
   "Create a user": "Crear un usuario",
-  "Email already exists": "El email ya existe",
+  "Email already exists": "Esta dirección de correo electrónico ya existe",
   "Please set a password": "Por favor, establezca una contraseña",
   "Username must be between {{minimumCharactersUsername}} and {{maximumCharactersUsername}} characters long": "El nombre de usuario debe tener entre {{minimumCharactersUsername}} y {{maximumCharactersUsername}} caracteres",
   "Email notification are disabled, please manually notify users of any change": "Las notificaciones por correo electrónico están deshabilitadas, por favor notifique manualmente a los usuarios de cualquier cambio",
@@ -53,5 +53,14 @@
   "Filter users": "Filtrar a los usuarios",
   "There are no users that matches you filter": "No hay usuarios que coincidan con tu filtro",
   "Filter spaces": "Filtrar espacios",
-  "There are no spaces that matches you filter": "No hay espacios que coincidan con tu filtro"
+  "There are no spaces that matches you filter": "No hay espacios que coincidan con tu filtro",
+  "Sort by full name": "",
+  "Sort by username": "",
+  "Sort by email": "",
+  "Id": "",
+  "Sort by id": "",
+  "Sort by type": "",
+  "Sort by title": "",
+  "Sort by description": "",
+  "Sort by number of members": ""
 }

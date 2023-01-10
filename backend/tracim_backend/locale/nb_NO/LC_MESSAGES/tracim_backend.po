@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-07-18 13:54+0200\n"
-"PO-Revision-Date: 2022-09-01 15:01+0000\n"
+"PO-Revision-Date: 2022-12-16 22:50+0000\n"
 "Last-Translator: Allan Nordhøy <epost@anotheragency.no>\n"
 "Language-Team: Norwegian Bokmål <https://hosted.weblate.org/projects/tracim/"
 "backend/nb_NO/>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14.1-dev\n"
+"X-Generator: Weblate 4.15\n"
 "Generated-By: Babel 2.9.1\n"
 
 #: tracim_backend/config.py:688
@@ -133,11 +133,10 @@ msgid "{username} & all members of {workspace}"
 msgstr "{username} og alle medlemmer i {workspace}"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:31
-#, fuzzy
 msgid ""
 "I modified the status of {content_name}. The new status is "
 "<i>{new_status}</i>"
-msgstr "Jeg endret status for {content_name}. Ny status er  <i>{new_status}</i>"
+msgstr "Jeg endret status for {content_name}. Ny status er <i>{new_status}</i>"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:35
 msgid "I added an item entitled {content_name}."
@@ -189,12 +188,11 @@ msgstr "Hei {username},"
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:8
 msgid "{origin_user_name} invited you to join <i>{website_title}</i>."
-msgstr ""
-"{origin_user_name} inviterte deg til å ta del i  <i>{website_title}</i>."
+msgstr "{origin_user_name} inviterte deg til å ta del i <i>{website_title}</i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:10
 msgid "Someone invited you to join <i>{website_title}</i>."
-msgstr "Noen inviterte deg til å ta del i  <i>{website_title}</i>."
+msgstr "Noen inviterte deg til å ta del i <i>{website_title}</i>."
 
 #: tracim_backend/templates/mail/created_account_body_html.mak:13
 #, fuzzy

@@ -387,6 +387,43 @@ class TestFolder(object):
             k: v for k, v in workspace.items() if k != "description"
         }
 
+    def test_api__update_folder__ok_200__no_allowed_content_given(
+        self,
+        workspace_api_factory,
+        content_api_factory,
+        web_testapp,
+        content_type_list,
+        event_helper,
+    ) -> None:
+        """
+        Update(put) one content without giving sub_content_types parameter
+        """
+
+        workspace_api = workspace_api_factory.get()
+        content_api = content_api_factory.get()
+        test_workspace = workspace_api.create_workspace(label="test", save_now=True)
+        folder = content_api.create(
+            label="test_folder",
+            content_type_slug=content_type_list.Folder.slug,
+            workspace=test_workspace,
+            do_save=True,
+            do_notify=False,
+        )
+        transaction.commit()
+        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
+        params = {
+            "label": "My New label",
+        }
+        headers = {"X-Tracim-ClientToken": "justaclienttoken"}
+        web_testapp.put_json(
+            "/api/workspaces/{workspace_id}/folders/{content_id}".format(
+                workspace_id=test_workspace.workspace_id, content_id=folder.content_id
+            ),
+            params=params,
+            status=200,
+            headers=headers,
+        )
+
     def test_api__update_folder__err_400__not_modified(
         self, workspace_api_factory, content_api_factory, web_testapp, content_type_list
     ) -> None:

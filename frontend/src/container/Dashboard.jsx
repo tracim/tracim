@@ -443,15 +443,6 @@ export class Dashboard extends React.Component {
       : []
     )
 
-    // INFO - CH - 2019-04-03 - hard coding the button "explore contents" since it is not an app for now
-    contentTypeButtonList.push({
-      slug: 'content/all', // INFO - CH - 2019-04-03 - This will be overridden but it avoid a unique key warning
-      ...props.currentWorkspace.sidebarEntryList.find(se => se.slug === 'contents/all'),
-      creationLabel: props.t('Explore contents'),
-      route: PAGE.WORKSPACE.CONTENT_LIST(props.currentWorkspace.id),
-      hexcolor: '#999' // INFO - CH - 2019-04-08 - different color from sidebar because it is more readable here
-    })
-
     const description = addExternalLinksIcons(props.currentWorkspace.description.trim())
 
     return (
@@ -481,13 +472,6 @@ export class Dashboard extends React.Component {
                         </div>
                       )
                     )}
-                    <div className='dashboard__workspace__detail__buttons'>
-                      <IconButton
-                        icon='fas fa-fw fa-cog'
-                        text={props.t('Space settings')}
-                        onClick={this.handleClickOpenAdvancedDashboard}
-                      />
-                    </div>
                   </div>
                   {props.currentWorkspace && props.currentWorkspace.id && <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />}
                 </div>
@@ -526,6 +510,15 @@ export class Dashboard extends React.Component {
                         />
                       )
                     })}
+
+                    <IconButton
+                      icon='fas fa-fw fa-cog'
+                      text={(userRoleIdInWorkspace >= ROLE.contentManager.id
+                        ? props.t('Space settings')
+                        : props.t('Space information')
+                      )}
+                      onClick={this.handleClickOpenAdvancedDashboard}
+                    />
                   </div>
 
                   <MemberList
@@ -541,8 +534,6 @@ export class Dashboard extends React.Component {
                     isLoading={state.isMemberListLoading}
                     onChangePersonalData={this.handleChangePersonalData}
                     onClickKnownMember={this.handleClickKnownMember}
-                    // createAccount={state.newMember.createAccount}
-                    // onChangeCreateAccount={this.handleChangeNewMemberCreateAccount}
                     role={state.newMember.role}
                     onChangeRole={this.handleChangeNewMemberRole}
                     onClickValidateNewMember={this.handleClickValidateNewMember}
