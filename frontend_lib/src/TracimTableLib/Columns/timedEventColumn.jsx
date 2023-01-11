@@ -20,7 +20,7 @@ const timedEventColumn = (settings, lang, t) => {
 
       return (
         <TimedEvent
-          customClass='contentListItem__modification'
+          customClass='timedEventColumn__modification'
           operation={getRevisionTypeLabel(props.row.original.content.currentRevisionType, t)}
           date={props.row.original.content.modified}
           lang={lang}

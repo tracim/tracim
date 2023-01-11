@@ -18,7 +18,7 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
     cell: props => {
       if (props.row.original.content) {
         return (
-          <div className='contentListItem__name_path'>
+          <div className='contentFilenameColumn__name_path'>
             <FilenameWithBadges file={props.row.original.content} />
             <Breadcrumbs
               breadcrumbsList={props.row.original.breadcrumbs}
@@ -28,9 +28,9 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
         )
       }
       return (
-        <div className='contentListItem__name_path unavailableContent__name_warning'>
+        <div className='contentFilenameColumn__name_path contentFilenameColumn__unavailableContent__name_warning'>
           <span>{props.row.original.originalLabel}</span>
-          <span className='unavailableContent__warning'>
+          <span className='contentFilenameColumn__unavailableContent__warning'>
             <Icon
               icon='fas fa-exclamation-triangle'
               title={t('Warning')}

@@ -27,8 +27,8 @@ const contentStatusColumn = (settings, contentType, t) => {
       ) || { label: '' }
 
       return (
-        <div className='contentListItem__information'>
-          <span className='contentListItem__information__status'>
+        <div className='contentStatusColumn__status'>
+          <span>
             <Icon
               icon={`${statusInfo.faIcon}`}
               title={t(statusInfo.label)}
