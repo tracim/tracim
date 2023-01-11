@@ -36,7 +36,7 @@ const FavoritesTable = (props) => {
       id: 'lastModification'
     }, props.user.lang, props.t),
 
-    Columns.content.contentInformationColumn({
+    Columns.content.contentStatusColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
       className: 'tracimTable__styles__flex__2 tracimTable__hide__md',

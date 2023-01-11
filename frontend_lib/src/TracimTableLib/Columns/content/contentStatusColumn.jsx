@@ -3,7 +3,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 
 import Icon from '../../../component/Icon/Icon.jsx'
 
-const contentInformationColumn = (settings, contentType, t) => {
+const contentStatusColumn = (settings, contentType, t) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => {
     if (!row.content) return ''
@@ -48,4 +48,4 @@ const contentInformationColumn = (settings, contentType, t) => {
   })
 }
 
-export default contentInformationColumn
+export default contentStatusColumn

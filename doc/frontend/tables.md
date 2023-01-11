@@ -476,7 +476,7 @@ import {
   ListItemRowWrapper,
   contentTypeColumn,
   contentFilenameWithBadgesAndBreadcrumbsColumn,
-  contentInformationColumn,
+  contentStatusColumn,
   favoriteButtonColumn,
   timedEventColumn
 } from 'tracim_frontend_lib'
@@ -503,7 +503,7 @@ const FavoritesTable = (props) => {
       className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
     }, props.user.lang, props.t),
 
-    contentInformationColumn({
+    contentStatusColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
       className: 'tracimTable__styles__flex__2 tracimTable__hide__md'
