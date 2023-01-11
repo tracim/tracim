@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import Breadcrumbs from '../../../component/Breadcrumbs/Breadcrumbs.jsx'
@@ -7,6 +8,7 @@ import Icon from '../../../component/Icon/Icon.jsx'
 
 const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
   const columnHelper = createColumnHelper()
+  console.log(settings)
   return columnHelper.accessor(row => {
     const breadcrumbs = row.breadcrumbs ? row.breadcrumbs.map(b => b.label).join('') : ''
     return `${row.originalLabel} ${breadcrumbs}`
@@ -42,6 +44,7 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
       )
     },
     className: settings.className,
+    style: classnames(settings.style),
     filterFn: 'includesString',
     sortingFn: 'alphanumeric'
   })

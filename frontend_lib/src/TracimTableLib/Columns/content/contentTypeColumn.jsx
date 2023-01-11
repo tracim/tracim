@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import { createColumnHelper } from '@tanstack/react-table'
 import ContentType from '../../../component/ContentType/ContentType.jsx'
 
@@ -22,6 +23,7 @@ const contentTypeColumn = (settings, contentType, t) => {
     },
     tooltip: settings.tooltip,
     className: settings.className,
+    style: classnames(settings.style),
     filterFn: 'includesString'
   })
 }

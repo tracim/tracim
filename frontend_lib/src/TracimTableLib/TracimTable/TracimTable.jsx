@@ -23,7 +23,8 @@ export const GenericTracimTableRow = (props) => {
     >
       {props.rowData.getVisibleCells().map(cell => (
         <div
-          className={`tracimTable__body__row__cell ${cell.column.columnDef.className}`}
+          className={classnames('tracimTable__body__row__cell',
+            cell.column.columnDef.className, cell.column.columnDef.style)}
           key={cell.id}
         >
           {flexRender(
@@ -52,8 +53,8 @@ const TracimTableHeader = (props) => {
     <div
       onClick={props.sortable && props.headerData.column.getToggleSortingHandler()}
       className={classnames('tracimTable__header__row__cell',
-        props.headerData.column.columnDef.className,
-        { tracimTable__styles__clickable: props.sortable }
+        props.headerData.column.columnDef.className, props.headerData.column.columnDef.style,
+        { tracimTable__helperClasses__clickable: props.sortable }
       )}
     >
       {props.headerData.isPlaceholder
@@ -73,7 +74,7 @@ const TracimTableHeader = (props) => {
                   desc: 'fas fa-sort-amount-up-alt'
                 }[props.headerData.column.getIsSorted()] || null}
                 customClass={classnames('titleListHeader__icon',
-                  { tracimTable__styles__hide: !props.headerData.column.getIsSorted() }
+                  { tracimTable__helperClasses__hidden: !props.headerData.column.getIsSorted() }
                 )}
                 title={props.headerData.column.columnDef.tooltip || ''}
               />

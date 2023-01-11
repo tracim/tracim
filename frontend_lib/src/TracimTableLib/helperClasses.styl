@@ -1,0 +1,46 @@
+@import '../css/Variable.styl'
+
+.tracimTable
+  &__helperClasses
+    &__clickable
+      cursor pointer
+    &__hidden
+      opacity 0
+    &__overflow
+      &__visible
+        overflow visible
+    &__width
+      &__icon
+        width listIconWidth
+        display flex
+        justify-content center
+    &__flex
+      &__1
+        flex 1
+      &__2
+        flex 2
+      &__3
+        flex 3
+      &__4
+        flex 4
+
+@media (max-width: max-lg)
+  .tracimTable
+    &__helperClasses
+      &__hidden
+        &__lg
+          display none !important
+
+@media (max-width: max-md)
+  .tracimTable
+    &__helperClasses
+      &__hidden
+        &__md
+          display none !important
+
+@media (max-width: max-sm)
+  .tracimTable
+    &__helperClasses
+      &__hidden
+        &__sm
+          display none !important

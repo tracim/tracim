@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import { createColumnHelper } from '@tanstack/react-table'
 import FavoriteButton, { FAVORITE_STATE } from '../../component/Button/FavoriteButton.jsx'
 
@@ -17,7 +18,8 @@ const favoriteButtonColumn = (settings, onClick) => {
         customClass='favorites__item__favoriteButton'
       />
     ),
-    className: settings.className
+    className: settings.className,
+    style: classnames(settings.style)
   })
 }
 

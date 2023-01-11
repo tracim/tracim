@@ -11,41 +11,41 @@ import {
 
 require('./FavoritesTable.styl')
 
-const { TracimTable, Columns } = tracimTableLib
+const { TracimTable, Columns, STYLE } = tracimTableLib
 
 const FavoritesTable = (props) => {
   const columns = [
     Columns.content.contentTypeColumn({
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
-      className: 'tracimTable__styles__width__icon',
+      style: [STYLE.width.icon],
       id: 'type'
     }, props.contentType, props.t),
 
     Columns.content.contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
-      className: 'tracimTable__styles__flex__4',
+      style: [STYLE.flex.four],
       id: 'titleWithPath'
     }, props.t),
 
     Columns.timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
-      className: 'tracimTable__styles__flex__2  tracimTable__hide__md',
+      style: [STYLE.flex.two, STYLE.hiddenAt.md],
       id: 'lastModification'
     }, props.user.lang, props.t),
 
     Columns.content.contentStatusColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
-      className: 'tracimTable__styles__flex__2 tracimTable__hide__md',
+      style: [STYLE.flex.two, STYLE.hiddenAt.md],
       id: 'information'
     }, props.contentType, props.t),
 
     Columns.favoriteButtonColumn({
       header: props.t('Favorite'),
-      className: 'tracimTable__styles__width__icon',
+      style: [STYLE.width.icon],
       id: 'favoriteButton'
     }, props.onFavoriteButtonClick)
   ]

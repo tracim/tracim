@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import Icon from '../../../component/Icon/Icon.jsx'
@@ -44,6 +45,7 @@ const contentStatusColumn = (settings, contentType, t) => {
       )
     },
     className: settings.className,
+    style: classnames(settings.style),
     filterFn: 'includesString'
   })
 }

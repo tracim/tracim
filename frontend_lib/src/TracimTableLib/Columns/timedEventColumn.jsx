@@ -1,4 +1,5 @@
 import React from 'react'
+import classnames from 'classnames'
 import { createColumnHelper } from '@tanstack/react-table'
 
 import { getRevisionTypeLabel } from '../../helper.js'
@@ -29,6 +30,7 @@ const timedEventColumn = (settings, lang, t) => {
       )
     },
     className: settings.className,
+    style: classnames(settings.style),
     filterFn: 'includesString',
     sortingFn: 'alphanumeric'
   })
