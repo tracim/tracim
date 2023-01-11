@@ -50,6 +50,7 @@ import {
   SEARCH_TYPE,
   WELCOME_ELEMENT_ID,
   getUserProfile,
+  initializeCustomElements,
   toggleFavicon,
   unLoggedAllowedPageList
 } from '../util/helper.js'
@@ -100,7 +101,6 @@ import Favorites from './Favorites.jsx'
 import ContentRedirection from './ContentRedirection.jsx'
 import WorkspacePage from './WorkspacePage.jsx'
 import ToDo from './ToDo.jsx'
-import HTMLMention from '../component/Mention/HTMLMention.js'
 
 const CONNECTION_MESSAGE_DISPLAY_DELAY_MS = 4000
 const UNANSWERED_CALL_TIMEOUT = 120000 // 2 minutes
@@ -118,15 +118,7 @@ export class Tracim extends React.Component {
       unansweredCallTimeoutId: -1
     }
 
-    if (window.customElements) {
-      if (!window.customElements.get('html-mention')) {
-        window.customElements.define('html-mention', HTMLMention)
-      }
-    } else {
-      window.alert(props.t(
-        'Tracim doesn\'t support the current version of your browser. Please upgrade your browser.'
-      ))
-    }
+    initializeCustomElements()
 
     this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
     this.liveMessageManager = new LiveMessageManager()

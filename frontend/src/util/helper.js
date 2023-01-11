@@ -6,6 +6,8 @@ import {
   ROLE
 } from 'tracim_frontend_lib'
 
+import HTMLMention from '../component/Mention/HTMLMention.js'
+
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
 
 const versionFile = require('../version.json')
@@ -124,6 +126,18 @@ export const unLoggedAllowedPageList = [
   PAGE.GUEST_UPLOAD(''),
   PAGE.GUEST_DOWNLOAD('')
 ]
+
+export const initializeCustomElements = () => {
+  if (window.customElements) {
+    if (!window.customElements.get('html-mention')) {
+      window.customElements.define('html-mention', HTMLMention)
+    }
+  } else {
+    window.alert(i18n.t(
+      'Tracim doesn\'t support the current version of your browser. Please upgrade your browser.'
+    ))
+  }
+}
 
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
   const user = memberList.find(u => u.id === userId) || { role: ROLE.reader.slug }

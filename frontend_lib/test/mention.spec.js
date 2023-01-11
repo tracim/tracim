@@ -1,17 +1,87 @@
 import { expect } from 'chai'
 import {
-  wrapMentionsInSpanTags,
+  MENTION_ID_PREFIX,
+  MENTION_ME_CLASS,
   addClassToMentionsOfUser,
   getInvalidMentionList,
-  removeMentionMeClass,
   handleMentionsBeforeSave,
-  MENTION_ID_PREFIX,
-  MENTION_ME_CLASS
+  removeMentionMeClass,
+  searchMention,
+  wrapMentionsInSpanTags
 } from '../src/mentionOrLink.js'
 
 const invalidMentionsList = ['@invalid_mention', '@not_a_member']
 
 describe('mentions on mentionOrLink.js', () => {
+  describe('regex mention', () => {
+    const possibleTests = [
+      {
+        content: '<p>Hello @foo</p>',
+        expected: ['@foo'],
+        description: 'Single mention'
+      },
+      {
+        content: '<p>Hello @foo and @bar</p>',
+        expected: ['@foo', '@bar'],
+        description: 'Multiple mentions'
+      },{
+        content: '<p>Hello @foo, how are you?</p>',
+        expected: ['@foo'],
+        description: 'Single mention with text before and after'
+      },
+      {
+        content: '<p>Hello @foo_bar, how are you?</p>',
+        expected: ['@foo_bar'],
+        description: 'Single mention with underscores'
+      },
+      {
+        content: '<p>Hello @1foobar, how are you?</p>',
+        expected: ['@1foobar'],
+        description: 'Single mention with numbers'
+      },
+      {
+        content: '<p>Hello @FOOBAR, how are you?</p>',
+        expected: ['@FOOBAR'],
+        description: 'Single mention with uppercase letters'
+      },
+      {
+        content: '<p>Hello@foo, how are you?</p>',
+        expected: [],
+        description: 'Mention without leading whitespace'
+      },
+      {
+        content: '<p>Hello @foo!</p>',
+        expected: ['@foo'],
+        description: 'Mention followed by punctuation'
+      },
+      {
+        content: '<p>Hello,@foo</p>',
+        expected: ['@foo'],
+        description: 'Mention with punctuation before'
+      },
+      {
+        content: '<p>Hello @foo_bar-baz, how are you?</p>',
+        expected: ['@foo_bar-baz'],
+        description: 'Single mention with underscores and hyphens'
+      },
+      {
+        content: '<p>Hello @foo_bar baz, how are you?</p>',
+        expected: ['@foo_bar'],
+        description: 'Single mention with underscore before whitespace'
+      }
+    ]
+    possibleTests.forEach(test => {
+      const { content, expected, description } = test
+      const result = searchMention(content)
+      const expectedResult = `have ${expected.length} results`
+      describe(`For: ${description}`, () => {
+        it(`should ${expectedResult}`, () => {
+          expect(result).to.equal(expected)
+        })
+      })
+    })
+  })
+
   describe('function wrapMentionsInSpanTags', () => {
     const parser = new global.DOMParser()
 

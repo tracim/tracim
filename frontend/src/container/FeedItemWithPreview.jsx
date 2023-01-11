@@ -14,6 +14,7 @@ import {
   COLORS,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  DEFAULT_ROLES,
   PAGE,
   ROLE_LIST,
   ROLE,
@@ -408,7 +409,7 @@ export class FeedItemWithPreview extends React.Component {
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
                 translationTargetLanguageList={props.system.config.translation_service__target_languages}
                 workspaceId={props.workspaceId}
-                // /////////////////////////////////////////////////////////////
+                // End of required props ///////////////////////////////////////
                 codeLanguageList={props.system.config.code_languages}
                 contentId={props.content.id}
                 contentType={props.content.type}
@@ -421,12 +422,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
-                roleList={[{
-                  description: props.t('Every members of the space'),
-                  id: 0,
-                  label: props.t('All'),
-                  slug: props.t('all')
-                }]}
+                roleList={DEFAULT_ROLES}
                 shouldScrollToBottom={false}
                 showParticipateButton={props.showParticipateButton}
               />

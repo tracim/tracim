@@ -8,6 +8,7 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  DEFAULT_ROLES,
   FAVORITE_STATE,
   LOCAL_STORAGE_FIELD,
   PAGE,
@@ -430,7 +431,7 @@ export class HtmlDocument extends React.Component {
         ...prev.content,
         raw_content: previouslyUnsavedRawContent || prev.content.raw_content
       },
-      rawContentBeforeEdit: prev.content.raw_content, // for cancel btn
+      rawContentBeforeEdit: prev.content.raw_content, // for cancel button
       mode: APP_FEATURE_MODE.EDIT
     }))
   }
@@ -452,23 +453,35 @@ export class HtmlDocument extends React.Component {
     )
   }
 
-  // TODO - MP - 2022-12-02 - Check this function
+  /**
+   * This function is used to search mention and links for the current content of the document.
+   */
   handleClickSaveDocument = async () => {
     const { state } = this
     const content = tinymce.activeEditor.getContent()
-    let returnValue = searchMentionAndPlaceBalise([], state.config.workspace.memberList, content)
-    if (returnValue.invalidMentionList.length > 0) {
+    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+      state.config.apiUrl,
+      content
+    )
+    const parsedMentionCommentObject = searchMentionAndPlaceBalise(
+      DEFAULT_ROLES,
+      state.config.workspace.memberList,
+      parsedContentCommentObject.html
+    )
+    if (parsedMentionCommentObject.invalidMentionList.length > 0) {
       this.setState({
-        invalidMentionList: returnValue.invalidMentionList,
-        textToSend: returnValue.html
+        invalidMentionList: parsedMentionCommentObject.invalidMentionList,
+        textToSend: parsedMentionCommentObject.html
       })
     } else {
-      returnValue = await searchContentAndPlaceBalise(state.config.apiUrl, returnValue.html)
-      this.handleSaveHtmlDocument(returnValue.html)
+      this.handleSaveHtmlDocument(parsedMentionCommentObject.html)
     }
   }
 
-  // TODO - MP - 2022-12-13 - This function should be fusioned with handleClickSaveDocument
+  /**
+   * This function is used to send the content of the document to the server
+   * @param {String} textToSend Content to send to the server
+   */
   handleSaveHtmlDocument = async (textToSend) => {
     const { state, props } = this
 
@@ -808,7 +821,7 @@ export class HtmlDocument extends React.Component {
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             workspaceId={state.content.workspace_id}
-            // /////////////////////////////////////////////////////////////
+            // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
             codeLanguageList={state.config.system.config.code_languages}
@@ -828,12 +841,7 @@ export class HtmlDocument extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-            roleList={[{
-              description: props.t('Every members of the space'),
-              id: 0,
-              label: props.t('All'),
-              slug: props.t('all')
-            }]}
+            roleList={DEFAULT_ROLES}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>
@@ -1010,7 +1018,16 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
+            isDraftAvailable={
+              state.mode === APP_FEATURE_MODE.VIEW
+              && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
+              && getLocalStorageItem(
+                state.appName,
+                state.content.content_id,
+                state.content.workspace_id,
+                LOCAL_STORAGE_FIELD.RAW_CONTENT
+              )
+            }
             // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}

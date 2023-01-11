@@ -21,5 +21,5 @@ Mentionning everyone in a space:
 
 ## Why
 
-We store in the database the id of the actor who is mentioned. This way we have a dynamic system,
-where the mention is linked to the actor using the ID.
+We store in the database the ID of the actor who is mentioned. This way we have a dynamic system,
+where the mention is linked to the actor using their ID.

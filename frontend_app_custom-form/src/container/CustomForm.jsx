@@ -3,6 +3,7 @@ import CustomFormComponent from '../component/CustomFormComponent.jsx'
 import { translate } from 'react-i18next'
 import i18n from '../i18n.js'
 import {
+  DEFAULT_ROLES,
   buildContentPathBreadcrumbs,
   handleFetchResult,
   PopinFixed,
@@ -626,12 +627,7 @@ class CustomForm extends React.Component {
               onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
               onClickWysiwygBtn={this.handleToggleWysiwyg}
               onClickRevisionBtn={this.handleClickShowRevision}
-              roleList={[{
-                description: props.t('Every members of the space'),
-                id: 0,
-                label: props.t('All'),
-                slug: props.t('all')
-              }]}
+              roleList={DEFAULT_ROLES}
               shouldScrollToBottom={mode !== MODE.REVISION}
             />
           ) : null}

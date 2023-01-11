@@ -27,8 +27,7 @@ import {
 import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
-  setLocalStorageItem,
-  removeLocalStorageItem
+  setLocalStorageItem
 } from './localStorage.js'
 
 import {
@@ -581,12 +580,7 @@ export function appContentFactory (WrappedComponent) {
 
       switch (response.apiResponse.status) {
         case 200:
-          removeLocalStorageItem(
-            appSlug,
-            content.content_id,
-            content.workspace_id,
-            LOCAL_STORAGE_FIELD.COMMENT
-          )
+          // Nothing to do
           break
         case 400:
           switch (response.body.code) {
@@ -643,6 +637,10 @@ export function appContentFactory (WrappedComponent) {
       const responseList = await Promise.all(
         fileList.map(file => this.appContentSaveNewCommentFile(content, file))
       )
+
+      // TODO - MP - 2023-01-11 - Send ONE global flash message for every files in error instead of
+      // one message per file
+      // [#6090}(https://github.com/tracim/tracim/issues/6090)
       const uploadFailedList = responseList.filter(upload => isFileUploadInErrorState(upload))
       uploadFailedList.forEach(fileInError => sendGlobalFlashMessage(fileInError.errorMessage))
 

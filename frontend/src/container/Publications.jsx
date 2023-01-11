@@ -3,39 +3,40 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { translate } from 'react-i18next'
 import {
-  CONTENT_NAMESPACE,
-  formatAbsoluteDate,
-  appContentFactory,
   BREADCRUMBS_TYPE,
-  buildHeadTitle,
-  CommentArea,
-  CUSTOM_EVENT,
-  EditCommentPopup,
-  EmptyListMessage,
-  getComment,
-  getContentComment,
-  getFileChildContent,
-  getOrCreateSessionClientToken,
-  handleClickCopyLink,
-  handleFetchResult,
-  replaceHTMLElementWithMention,
-  IconButton,
-  Loading,
-  PAGE,
-  ROLE,
-  ROLE_LIST,
   COLORS,
-  ScrollToBottomWrapper,
+  CONTENT_NAMESPACE,
+  CONTENT_TYPE,
+  CUSTOM_EVENT,
+  DEFAULT_ROLES,
+  NUMBER_RESULTS_BY_PAGE,
+  PAGE,
+  ROLE_LIST,
+  ROLE,
+  TIMELINE_TYPE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
-  TracimComponent,
   TRANSLATION_STATE,
-  CONTENT_TYPE,
-  getFileDownloadUrl,
-  NUMBER_RESULTS_BY_PAGE,
+  CommentArea,
+  EditCommentPopup,
+  EmptyListMessage,
+  IconButton,
+  Loading,
+  ScrollToBottomWrapper,
+  TracimComponent,
+  appContentFactory,
+  buildHeadTitle,
   displayDistanceDate,
-  TIMELINE_TYPE
+  formatAbsoluteDate,
+  getComment,
+  getContentComment,
+  getFileChildContent,
+  getFileDownloadUrl,
+  getOrCreateSessionClientToken,
+  handleClickCopyLink,
+  handleFetchResult,
+  replaceHTMLElementWithMention
 } from 'tracim_frontend_lib'
 import {
   FETCH_CONFIG,
@@ -459,8 +460,6 @@ export class Publications extends React.Component {
     const currentPublicationId = Number(props.match.params.idcts || 0)
     const isPublicationListEmpty = props.publicationPage.list.length === 0
 
-    console.log('props.currentWorkspace.memberList', props.currentWorkspace.memberList)
-
     return (
       <ScrollToBottomWrapper
         customClass='publications'
@@ -487,12 +486,7 @@ export class Publications extends React.Component {
               memberList={props.currentWorkspace.memberList}
               multipleFiles
               placeHolder={props.t('Share a news...')}
-              roleList={[{
-                description: props.t('Every members of the space'),
-                id: 0,
-                label: props.t('All'),
-                slug: props.t('all')
-              }]}
+              roleList={DEFAULT_ROLES}
               submitLabel={props.t('Publish')}
               workspaceId={parseInt(props.match.params.idws)}
             />

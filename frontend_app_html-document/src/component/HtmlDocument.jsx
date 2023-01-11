@@ -5,13 +5,16 @@ import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
   CONTENT_TYPE,
+  DEFAULT_ROLES,
+  LOCAL_STORAGE_FIELD,
   TRANSLATION_STATE,
-  HTMLContent,
   ConfirmPopup,
+  HTMLContent,
   IconButton,
   PromptMessage,
   RefreshWarningMessage,
-  TinyEditor
+  TinyEditor,
+  setLocalStorageItem
 } from 'tracim_frontend_lib'
 
 export const HtmlDocument = props => {
@@ -28,7 +31,18 @@ export const HtmlDocument = props => {
 
   useEffect(() => {
     setText(props.text)
-  }, [])
+  }, [props.text])
+
+  const updateText = (text) => {
+    setText(text)
+    setLocalStorageItem(
+      props.contentType,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.RAW_CONTENT,
+      text
+    )
+  }
 
   return (
     <div className='html-document__contentpage__left__wrapper'>
@@ -149,13 +163,8 @@ export const HtmlDocument = props => {
                 onCtrlEnterEvent={props.onClickValidateBtn}
                 height='100%'
                 isAdvancedEdition
-                roleList={[{
-                  description: props.t('Every members of the space'),
-                  id: 0,
-                  label: props.t('All'),
-                  slug: props.t('all')
-                }]}
-                setContent={setText}
+                roleList={DEFAULT_ROLES}
+                setContent={updateText}
                 spaceId={props.workspaceId}
                 userList={props.memberList}
               />

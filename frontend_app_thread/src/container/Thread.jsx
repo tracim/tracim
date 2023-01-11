@@ -8,6 +8,7 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
+  DEFAULT_ROLES,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
@@ -433,7 +434,7 @@ export class Thread extends React.Component {
                 translationTargetLanguageCode={state.translationTargetLanguageCode}
                 translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
                 workspaceId={state.content.workspace_id}
-                // /////////////////////////////////////////////////////////////
+                // End of required props ///////////////////////////////////////
                 allowClickOnRevision={false}
                 availableStatusList={state.config.availableStatuses}
                 canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
@@ -460,12 +461,7 @@ export class Thread extends React.Component {
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 onClickRevisionBtn={() => { }}
                 onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-                roleList={[{
-                  description: props.t('Every members of the space'),
-                  id: 0,
-                  label: props.t('All'),
-                  slug: props.t('all')
-                }]}
+                roleList={DEFAULT_ROLES}
                 shouldScrollToBottom
               />
             ) : null}

@@ -228,7 +228,7 @@ export class Timeline extends React.Component {
             <CommentArea
               apiUrl={props.apiUrl}
               onClickSubmit={props.onClickSubmit}
-              // ///////////////////////////////////////////////////////////////
+              // End of required props /////////////////////////////////////////
               codeLanguageList={props.codeLanguageList}
               contentId={props.contentId}
               contentType={props.contentType}
@@ -276,7 +276,7 @@ Timeline.propTypes = {
   translationTargetLanguageCode: PropTypes.string.isRequired,
   translationTargetLanguageList: PropTypes.arrayOf(PropTypes.object).isRequired,
   workspaceId: PropTypes.number.isRequired,
-  // /////////////////////////////////////////////////////////////
+  // End of required props /////////////////////////////////////////////////////
   allowClickOnRevision: PropTypes.bool,
   availableStatusList: PropTypes.array,
   canLoadMoreTimelineItems: PropTypes.func,

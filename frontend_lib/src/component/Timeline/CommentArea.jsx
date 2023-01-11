@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import {
   searchContentAndPlaceBalise,
   searchMentionAndPlaceBalise
-} from '../../helper.js'
+} from '../../mentionOrLink.js'
 import {
   LOCAL_STORAGE_FIELD,
   getLocalStorageItem,
@@ -25,7 +25,7 @@ export const CommentArea = props => {
   const [fileListToUpload, setFileListToUpload] = useState([])
   const [invalidMentionList, setInvalidMentionList] = useState([])
   const [isAdvancedEdition, setIsAdvancedEdition] = useState(props.isAdvancedEdition)
-  const [textToSend, setTextToSend] = useState('')
+  let textToSend = ''
 
   useEffect(() => {
     if (props.newComment) {
@@ -45,13 +45,22 @@ export const CommentArea = props => {
   }, [])
 
   useEffect(() => {
-    setLocalStorageItem(
-      props.contentType,
-      props.contentId,
-      props.workspaceId,
-      LOCAL_STORAGE_FIELD.COMMENT,
-      content
-    )
+    if (content) {
+      setLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT,
+        content
+      )
+    } else {
+      removeLocalStorageItem(
+        props.contentType,
+        props.contentId,
+        props.workspaceId,
+        LOCAL_STORAGE_FIELD.COMMENT
+      )
+    }
   }, [content])
 
   /**
@@ -63,35 +72,35 @@ export const CommentArea = props => {
     let commentToSend = comment
 
     if (!force) {
-      const returnValue = searchMentionAndPlaceBalise(
+      const parsedMentionCommentObject = searchMentionAndPlaceBalise(
         props.roleList,
         props.memberList,
         commentToSend
       )
-      commentToSend = returnValue.html
-      if (returnValue.invalidMentionList.length > 0) {
-        setTextToSend(commentToSend)
-        setInvalidMentionList(returnValue.invalidMentionList)
+      commentToSend = parsedMentionCommentObject.html
+      if (parsedMentionCommentObject.invalidMentionList.length > 0) {
+        textToSend = commentToSend
+        setInvalidMentionList(parsedMentionCommentObject.invalidMentionList)
         return
       }
     }
 
-    const returnValue = await searchContentAndPlaceBalise(props.apiUrl, commentToSend)
+    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+      props.apiUrl,
+      commentToSend
+    )
 
     // NOTE - MP - 2022-12-06 - If we don't clear this variable we don't hide the popup.
     // In case of an error it's preferable to hide the popup
     setInvalidMentionList([])
 
-    const result = await props.onClickSubmit(returnValue.html, fileListToUpload)
-    if (result) {
+    const submitSuccessfull = await props.onClickSubmit(
+      parsedContentCommentObject.html,
+      fileListToUpload
+    )
+    if (submitSuccessfull) {
       setContent('')
       setFileListToUpload([])
-      removeLocalStorageItem(
-        props.contentType,
-        props.contentId,
-        props.workspaceId,
-        LOCAL_STORAGE_FIELD.COMMENT
-      )
     }
   }
 
@@ -112,7 +121,7 @@ export const CommentArea = props => {
     ))
   }
 
-  const changeEditor = () => {
+  const handleClickChangeEditor = () => {
     const newIsAdvancedEdition = !isAdvancedEdition
     setIsAdvancedEdition(newIsAdvancedEdition)
   }
@@ -120,7 +129,6 @@ export const CommentArea = props => {
   return (
     <form className={`${props.customClass}__texteditor`}>
       {invalidMentionList.length > 0 && (
-        // TODO - MP - 2022-12-06 - Maybe check this popup
         <ConfirmPopup
           onCancel={() => sendComment(textToSend, true)}
           onClose={() => setInvalidMentionList([])}
@@ -143,6 +151,8 @@ export const CommentArea = props => {
       )}
       <TinyEditor
         apiUrl={props.apiUrl}
+        setContent={setContent}
+        // End of required props ///////////////////////////////////////////////
         codeLanguageList={props.codeLanguageList}
         content={content}
         onCtrlEnterEvent={sendComment}
@@ -150,9 +160,8 @@ export const CommentArea = props => {
         isAdvancedEdition={isAdvancedEdition}
         maxHeight={300}
         minHeight={100}
+        placeholder={props.placeholder}
         roleList={props.roleList}
-        setContent={setContent}
-        spaceId={props.workspaceId}
         userList={props.memberList}
       />
       <div
@@ -160,7 +169,7 @@ export const CommentArea = props => {
           classnames(`${props.customClass}__texteditor__wrapper`, 'commentArea__wrapper')
         }
       >
-        {props.isDisplayedAdvancedEdition && (
+        {props.isDisplayedAdvancedEditionButton && (
           <div
             className={classnames(
               `${props.customClass}__texteditor__advancedtext`,
@@ -173,7 +182,7 @@ export const CommentArea = props => {
               )}
               disabled={props.disableComment}
               text={isAdvancedEdition ? props.t('Simple edition') : props.t('Advanced edition')}
-              onClick={changeEditor}
+              onClick={handleClickChangeEditor}
               intent='link'
               mode='light'
               key='commentArea__comment__advancedtext'
@@ -194,7 +203,7 @@ export const CommentArea = props => {
         <div
           className={classnames(`${props.customClass}__texteditor__submit`, 'commentArea__submit')}
         >
-          {props.isDisplayedUploadFile && (
+          {props.isDisplayedUploadFileButton && (
             <AddFileToUploadButton
               workspaceId={props.workspaceId}
               color={props.customColor}
@@ -204,7 +213,7 @@ export const CommentArea = props => {
             />
           )}
 
-          {props.isDisplayedCancel && (
+          {props.isDisplayedCancelButton && (
             <IconButton
               color={props.customColor}
               customClassName='commentArea__withstand__btn'
@@ -217,7 +226,7 @@ export const CommentArea = props => {
             />
           )}
 
-          {props.isDisplayedSend && (
+          {props.isDisplayedSendButton && (
             <IconButton
               color={props.customColor}
               customClass={classnames(
@@ -254,16 +263,16 @@ CommentArea.propTypes = {
   disableComment: PropTypes.bool,
   invalidMentionList: PropTypes.array,
   isAdvancedEdition: PropTypes.bool,
-  isDisplayedAdvancedEdition: PropTypes.bool,
-  isDisplayedCancel: PropTypes.bool,
-  isDisplayedSend: PropTypes.bool,
-  isDisplayedUploadFile: PropTypes.bool,
+  isDisplayedAdvancedEditionButton: PropTypes.bool,
+  isDisplayedCancelButton: PropTypes.bool,
+  isDisplayedSendButton: PropTypes.bool,
+  isDisplayedUploadFileButton: PropTypes.bool,
   isFileCommentLoading: PropTypes.bool,
   memberList: PropTypes.array,
   multipleFiles: PropTypes.bool,
   newComment: PropTypes.string,
   onClickWithstand: PropTypes.func,
-  placeHolder: PropTypes.string,
+  placeholder: PropTypes.string,
   roleList: PropTypes.array,
   submitIcon: PropTypes.string,
   submitLabel: PropTypes.string,
@@ -280,16 +289,16 @@ CommentArea.defaultProps = {
   disableComment: false,
   invalidMentionList: [],
   isAdvancedEdition: false,
-  isDisplayedAdvancedEdition: true,
-  isDisplayedCancel: false,
-  isDisplayedSend: true,
-  isDisplayedUploadFile: true,
+  isDisplayedAdvancedEditionButton: true,
+  isDisplayedCancelButton: false,
+  isDisplayedSendButton: true,
+  isDisplayedUploadFileButton: true,
   isFileCommentLoading: false,
   memberList: [],
   multipleFiles: true,
   newComment: '',
   onClickWithstand: () => { },
-  placeHolder: 'Write a comment...',
+  placeholder: 'Write a comment...',
   roleList: [],
   submitIcon: 'far fa-paper-plane',
   submitLabel: 'Submit',

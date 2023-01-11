@@ -7,7 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   COLLABORA_EXTENSIONS,
   CONTENT_TYPE,
-  formatAbsoluteDate,
+  DEFAULT_ROLES,
   handleClickCopyLink,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_CORE_EVENT_TYPE as TLM_CET,
@@ -16,6 +16,7 @@ import {
   buildContentPathBreadcrumbs,
   appContentFactory,
   addAllResourceI18n,
+  formatAbsoluteDate,
   handleFetchResult,
   getToDo,
   PopinFixed,
@@ -916,7 +917,7 @@ export class File extends React.Component {
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             workspaceId={state.content.workspace_id}
-            // /////////////////////////////////////////////////////////////
+            // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
             codeLanguageList={state.config.system.config.code_languages}
@@ -936,12 +937,7 @@ export class File extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-            roleList={[{
-              description: props.t('Every members of the space'),
-              id: 0,
-              label: props.t('All'),
-              slug: props.t('all')
-            }]}
+            roleList={DEFAULT_ROLES}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>

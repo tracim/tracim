@@ -58,11 +58,8 @@ import {
   permissiveNumberEqual,
   removeAtInUsername,
   removeExtensionOfFilename,
-  replaceHTMLElementWithMention,
   revisionTypeList,
   scrollIntoViewIfNeeded,
-  searchContentAndPlaceBalise,
-  searchMentionAndPlaceBalise,
   sendGlobalFlashMessage,
   serialize,
   setupCommonRequestHeaders,
@@ -82,11 +79,15 @@ import {
 } from './sortListHelper.js'
 
 import {
+  DEFAULT_ROLES,
   GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
   handleLinksBeforeSave,
-  handleMentionsBeforeSave
+  handleMentionsBeforeSave,
+  replaceHTMLElementWithMention,
+  searchContentAndPlaceBalise,
+  searchMentionAndPlaceBalise
 } from './mentionOrLink.js'
 
 import { TracimComponent } from './tracimComponent.js'
@@ -324,6 +325,7 @@ export {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   DATE_FNS_LOCALE,
+  DEFAULT_ROLES,
   FETCH_CONFIG,
   FILE_PREVIEW_STATE,
   GROUP_MENTION_TRANSLATION_LIST,

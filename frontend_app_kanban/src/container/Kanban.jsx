@@ -3,40 +3,41 @@ import i18n from '../i18n.js'
 import { translate } from 'react-i18next'
 import { uniqBy } from 'lodash'
 import {
-  appContentFactory,
-  addAllResourceI18n,
   APP_FEATURE_MODE,
   BREADCRUMBS_TYPE,
-  buildContentPathBreadcrumbs,
   CONTENT_TYPE,
-  FilenameWithBadges,
-  handleClickCopyLink,
-  handleFetchResult,
-  getToDo,
+  CUSTOM_EVENT,
+  DEFAULT_ROLES,
+  FAVORITE_STATE,
   PAGE,
+  ROLE_LIST,
+  ROLE,
+  SORT_BY,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  FilenameWithBadges,
   PopinFixed,
   PopinFixedContent,
   PopinFixedRightPart,
   PopinFixedRightPartContent,
+  TagList,
   Timeline,
-  CUSTOM_EVENT,
-  buildHeadTitle,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
+  ToDoManagement,
   TracimComponent,
-  getOrCreateSessionClientToken,
-  FAVORITE_STATE,
-  ROLE,
-  sendGlobalFlashMessage,
-  ROLE_LIST,
+  addAllResourceI18n,
+  appContentFactory,
+  buildContentPathBreadcrumbs,
+  buildHeadTitle,
   getFileContent,
   getFileRevision,
-  TagList,
+  getOrCreateSessionClientToken,
+  getToDo,
+  handleClickCopyLink,
+  handleFetchResult,
   putMyselfFileRead,
-  sortListByMultipleCriteria,
-  SORT_BY,
-  ToDoManagement
+  sendGlobalFlashMessage,
+  sortListByMultipleCriteria
 } from 'tracim_frontend_lib'
 
 import KanbanComponent from '../component/Kanban.jsx'
@@ -282,7 +283,7 @@ export class Kanban extends React.Component {
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
             workspaceId={state.content.workspace_id}
-            // /////////////////////////////////////////////////////////////
+            // End of required props ///////////////////////////////////////////
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
             codeLanguageList={state.config.system.config.code_languages}
@@ -302,12 +303,7 @@ export class Kanban extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-            roleList={[{
-              description: props.t('Every members of the space'),
-              id: 0,
-              label: props.t('All'),
-              slug: props.t('all')
-            }]}
+            roleList={DEFAULT_ROLES}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>
