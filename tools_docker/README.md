@@ -6,9 +6,9 @@
 
 Environment variables can be given to the container:
 
-* DATABASE_TYPE (values: postgresql, mysql, sqlite)
+* DATABASE_TYPE (values: postgresql, sqlite)
 
-If DATABASE_TYPE is `postgresql` or `mysql` set these variables:
+If DATABASE_TYPE is `postgresql` set these variables:
 
 * DATABASE_USER
 * DATABASE_PASSWORD
@@ -109,6 +109,7 @@ Example with PostgreSQL:
                -v ~/tracim/etc:/etc/tracim -v ~/tracim/var:/var/tracim algoo/tracim
 
 Example with MySQL:
+❗: Since [Tracim 4.0.0](https://github.com/tracim/tracim/blob/maintenance/4.4/CHANGELOG.md#400--2021-10-29), mysql is not officialy supported by Tracim team. You are on your own when using it.
 
     docker run -e DATABASE_TYPE=mysql -e DATABASE_HOST=192.168.1.2 -e DATABASE_PORT=3306 \
                -e DATABASE_USER=tracim -e DATABASE_PASSWORD=tracim -e DATABASE_NAME=tracim \

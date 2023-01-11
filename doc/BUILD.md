@@ -120,20 +120,14 @@ Install the project in editable mode with its develop requirements:
     pip install -r requirements-test.txt
     pip install -e "."
 
-If you want to use PostgreSQL, MySQL or MariaDB database engine instead of
-the default one (SQLite bundled with python), you need to install the python driver for those databases
-that are supported by SQLAlchemy.
+If you want to use PostgreSQL, database engine instead of the default one (SQLite bundled with 
+python), you need to install the python driver for those databases that are supported by SQLAlchemy.
 
-For PostgreSQL and MariaDB/MySQL, those are shortcuts to install Tracim with test and
-specific driver.
+For PostgreSQL, those are shortcuts to install Tracim with test and specific driver.
 
 For PostgreSQL:
 
     pip install -r requirements-db-postgres.txt
-
-For MySQL/MariaDB:
-
-    pip install -r requirements-db-mysql.txt
 
 If you want to store files on s3, you need to install the S3 driver:
 
