@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
+import i18n from '../../i18n.js'
 
 import {
   flexRender,
@@ -180,7 +181,7 @@ TracimTable.propsType = {
 TracimTable.defaultProps = {
   showHeader: true,
   colored: false,
-  emptyMessage: 'This list is empty',
+  emptyMessage: i18n.t('This list is empty'),
   customRowClass: '',
   rowComponent: undefined,
   filterable: false,
