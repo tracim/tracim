@@ -208,7 +208,7 @@ const wrapLinksFromText = async (text, doc, apiUrl) => {
 
 // NOTE - MP - 2023-01-11 - This should be fusionned with ROLE_LIST. However, since we only support
 // `all` role, it requires some additional processing.
-export const DEFAULT_ROLES = [
+export const DEFAULT_ROLE_LIST = [
   {
     description: i18n.t('Every members of the space'),
     id: 0,
@@ -417,8 +417,6 @@ export const searchContentAndPlaceBalise = async (apiUrl, html) => {
       invalidContentList.push(content)
     }
   }))
-
-  console.log('NEW HTML: ', newHtml)
 
   return { html: newHtml, invalidContentList }
 }

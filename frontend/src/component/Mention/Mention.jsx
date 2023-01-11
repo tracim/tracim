@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { connect, Provider } from 'react-redux'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
-import { DEFAULT_ROLES } from 'tracim_frontend_lib'
+import { DEFAULT_ROLE_LIST } from 'tracim_frontend_lib'
 import { store } from '../../store.js'
 
 import {
@@ -71,7 +71,7 @@ const calculateRoleMention = (props) => {
   }
   // 0: all, 1: reader, 2: contributor, 4: content manager, 8: workspace manager
   const roleId = Number(props.roleid)
-  const role = DEFAULT_ROLES.find(r => Number(r.id) === roleId)
+  const role = DEFAULT_ROLE_LIST.find(r => Number(r.id) === roleId)
 
   if (role) {
     mention.text = role.slug

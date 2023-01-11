@@ -14,7 +14,7 @@ import {
   COLORS,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLES,
+  DEFAULT_ROLE_LIST,
   PAGE,
   ROLE_LIST,
   ROLE,
@@ -422,7 +422,7 @@ export class FeedItemWithPreview extends React.Component {
                 onClickDeleteComment={this.handleClickDeleteComment}
                 onClickEditComment={this.handleClickEditComment}
                 onClickOpenFileComment={this.handleClickOpenFileComment}
-                roleList={DEFAULT_ROLES}
+                roleList={DEFAULT_ROLE_LIST}
                 shouldScrollToBottom={false}
                 showParticipateButton={props.showParticipateButton}
               />

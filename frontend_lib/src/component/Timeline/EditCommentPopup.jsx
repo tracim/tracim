@@ -6,7 +6,7 @@ import { TracimComponent } from '../../tracimComponent.js'
 import { appContentFactory } from '../../appContentFactory.js'
 import { CUSTOM_EVENT } from '../../customEvent.js'
 import { CONTENT_TYPE } from '../../helper.js'
-import { DEFAULT_ROLES } from '../../mentionOrLink.js'
+import { DEFAULT_ROLE_LIST } from '../../mentionOrLink.js'
 import CardPopup from '../CardPopup/CardPopup.jsx'
 import CommentArea from './CommentArea.jsx'
 
@@ -57,7 +57,7 @@ export class EditCommentPopup extends React.Component {
           isDisplayedUploadFileButton={false}
           newComment={state.newComment}
           onClickWithstand={props.onClickClose}
-          roleList={DEFAULT_ROLES}
+          roleList={DEFAULT_ROLE_LIST}
           memberList={props.memberList}
           submitLabel={props.t('Send')}
           withstandLabel={props.t('Cancel')}

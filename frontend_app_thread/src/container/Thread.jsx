@@ -8,7 +8,7 @@ import {
   buildContentPathBreadcrumbs,
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
-  DEFAULT_ROLES,
+  DEFAULT_ROLE_LIST,
   handleClickCopyLink,
   handleFetchResult,
   PAGE,
@@ -461,7 +461,7 @@ export class Thread extends React.Component {
                 onClickRestoreDeleted={this.handleClickRestoreDelete}
                 onClickRevisionBtn={() => { }}
                 onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-                roleList={DEFAULT_ROLES}
+                roleList={DEFAULT_ROLE_LIST}
                 shouldScrollToBottom
               />
             ) : null}

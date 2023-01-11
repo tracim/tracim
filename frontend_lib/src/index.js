@@ -79,7 +79,7 @@ import {
 } from './sortListHelper.js'
 
 import {
-  DEFAULT_ROLES,
+  DEFAULT_ROLE_LIST,
   GROUP_MENTION_TRANSLATION_LIST,
   addClassToMentionsOfUser,
   getInvalidMentionList,
@@ -325,7 +325,7 @@ export {
   CONTENT_TYPE,
   CUSTOM_EVENT,
   DATE_FNS_LOCALE,
-  DEFAULT_ROLES,
+  DEFAULT_ROLE_LIST,
   FETCH_CONFIG,
   FILE_PREVIEW_STATE,
   GROUP_MENTION_TRANSLATION_LIST,

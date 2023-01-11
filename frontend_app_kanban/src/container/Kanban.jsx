@@ -7,7 +7,7 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLES,
+  DEFAULT_ROLE_LIST,
   FAVORITE_STATE,
   PAGE,
   ROLE_LIST,
@@ -303,7 +303,7 @@ export class Kanban extends React.Component {
             onClickOpenFileComment={this.handleClickOpenFileComment}
             onClickRevisionBtn={this.handleClickShowRevision}
             onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
-            roleList={DEFAULT_ROLES}
+            roleList={DEFAULT_ROLE_LIST}
             shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>

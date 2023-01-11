@@ -13,9 +13,11 @@ import {
   TIMELINE_TYPE,
   darkenColor,
   displayDistanceDate,
-  formatAbsoluteDate,
-  replaceHTMLElementWithMention
+  formatAbsoluteDate
 } from '../../helper.js'
+import {
+  replaceHTMLElementWithMention
+} from '../../mentionOrLink.js'
 import { TRANSLATION_STATE } from '../../translation.js'
 import PromptMessage from '../PromptMessage/PromptMessage.jsx'
 import { CUSTOM_EVENT } from '../../customEvent.js'

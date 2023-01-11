@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
   CONTENT_TYPE,
-  DEFAULT_ROLES,
+  DEFAULT_ROLE_LIST,
   LOCAL_STORAGE_FIELD,
   TRANSLATION_STATE,
   ConfirmPopup,
@@ -163,7 +163,7 @@ export const HtmlDocument = props => {
                 onCtrlEnterEvent={props.onClickValidateBtn}
                 height='100%'
                 isAdvancedEdition
-                roleList={DEFAULT_ROLES}
+                roleList={DEFAULT_ROLE_LIST}
                 setContent={updateText}
                 spaceId={props.workspaceId}
                 userList={props.memberList}

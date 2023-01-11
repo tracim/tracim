@@ -8,7 +8,7 @@ import {
   CONTENT_NAMESPACE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
-  DEFAULT_ROLES,
+  DEFAULT_ROLE_LIST,
   NUMBER_RESULTS_BY_PAGE,
   PAGE,
   ROLE_LIST,
@@ -486,7 +486,7 @@ export class Publications extends React.Component {
               memberList={props.currentWorkspace.memberList}
               multipleFiles
               placeHolder={props.t('Share a news...')}
-              roleList={DEFAULT_ROLES}
+              roleList={DEFAULT_ROLE_LIST}
               submitLabel={props.t('Publish')}
               workspaceId={parseInt(props.match.params.idws)}
             />
