@@ -3,8 +3,6 @@ import { translate } from 'react-i18next'
 import PropTypes from 'prop-types'
 import IconButton from '../Button/IconButton.jsx'
 
-require('./TagList.styl')
-
 export const Tag = props => {
   return (
     <div className='tagList__list__item__wrapper'>

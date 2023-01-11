@@ -186,9 +186,10 @@ class TagList extends React.Component {
                   apiUrl={props.apiUrl}
                   contentId={props.contentId}
                   contentTagList={state.tagList}
+                  customColor={props.customColor}
                   spaceTagList={state.spaceTagList}
-                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   userProfile={props.userProfile}
+                  userRoleIdInWorkspace={props.userRoleIdInWorkspace}
                   workspaceId={props.workspaceId}
                 />
               )}
@@ -241,12 +242,14 @@ TagList.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
   contentId: PropTypes.number,
+  customColor: PropTypes.string,
   userRoleIdInWorkspace: PropTypes.number,
   userProfile: PropTypes.string
 }
 
 TagList.defaultProps = {
   contentId: 0,
+  customColor: '',
   userRoleIdInWorkspace: ROLE.reader.id,
   userProfile: PROFILE.user.slug
 }
