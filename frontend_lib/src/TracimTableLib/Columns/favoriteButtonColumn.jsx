@@ -8,7 +8,7 @@ const favoriteButtonColumn = (settings, onClick) => {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'favoriteButton',
+    id: settings.id,
     cell: props => (
       <FavoriteButton
         favoriteState={FAVORITE_STATE.FAVORITE}

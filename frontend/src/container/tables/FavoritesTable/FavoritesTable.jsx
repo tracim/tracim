@@ -18,30 +18,35 @@ const FavoritesTable = (props) => {
     Columns.content.contentTypeColumn({
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
-      className: 'tracimTable__styles__width__icon'
+      className: 'tracimTable__styles__width__icon',
+      id: 'type'
     }, props.contentType, props.t),
 
     Columns.content.contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
-      className: 'tracimTable__styles__flex__4'
+      className: 'tracimTable__styles__flex__4',
+      id: 'titleWithPath'
     }, props.t),
 
     Columns.timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
-      className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
+      className: 'tracimTable__styles__flex__2  tracimTable__hide__md',
+      id: 'lastModification'
     }, props.user.lang, props.t),
 
     Columns.content.contentInformationColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
-      className: 'tracimTable__styles__flex__2 tracimTable__hide__md'
+      className: 'tracimTable__styles__flex__2 tracimTable__hide__md',
+      id: 'information'
     }, props.contentType, props.t),
 
     Columns.favoriteButtonColumn({
       header: props.t('Favorite'),
-      className: 'tracimTable__styles__width__icon'
+      className: 'tracimTable__styles__width__icon',
+      id: 'favoriteButton'
     }, props.onFavoriteButtonClick)
   ]
 

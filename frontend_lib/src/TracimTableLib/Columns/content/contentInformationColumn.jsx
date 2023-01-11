@@ -17,7 +17,7 @@ const contentInformationColumn = (settings, contentType, t) => {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'information',
+    id: settings.id,
     cell: props => {
       if (!props.row.original.content) return null
 

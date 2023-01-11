@@ -14,7 +14,7 @@ const contentFilenameWithBadgesAndBreadcrumbsColumn = (settings, t) => {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'titleWithPath',
+    id: settings.id,
     cell: props => {
       if (props.row.original.content) {
         return (

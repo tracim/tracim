@@ -14,7 +14,7 @@ const timedEventColumn = (settings, lang, t) => {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'lastModification',
+    id: settings.id,
     cell: props => {
       if (!props.row.original.content) return null
 

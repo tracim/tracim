@@ -11,7 +11,7 @@ const contentTypeColumn = (settings, contentType, t) => {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'type',
+    id: settings.id,
     cell: props => {
       const contentTypeInfo = contentType.find(info => info.slug === props.row.original.originalType)
       return (
