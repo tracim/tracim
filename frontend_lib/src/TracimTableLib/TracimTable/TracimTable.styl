@@ -4,6 +4,15 @@
   &__header
     display flex
     flex-direction column
+    &__icon
+      position absolute
+      top calc(50% - 8px)
+      right 0
+      padding-inline-start textSpacing
+      color darkGrey1
+      &:hover
+        & .tracimTable__header__icon
+          color fontColor
     &__btn
       padding 0
       display flex
@@ -14,11 +23,12 @@
     &__row
       display flex
       flex-direction row
-      white-space nowrap
+      align-items center
       padding standardSpacing 0
       margin standardSpacing 0
       &__cell
         display flex
+        position relative
         overflow hidden
         text-overflow ellipsis
         margin-inline-start standardSpacing

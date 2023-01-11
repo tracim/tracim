@@ -12,17 +12,19 @@
     &__width
       &__icon
         width listIconWidth
-        display flex
-        justify-content center
-    &__flex
-      &__1
-        flex 1
-      &__2
-        flex 2
-      &__3
-        flex 3
-      &__4
-        flex 4
+    &__layout
+      &__justify-content
+        &__center
+          justify-content center
+      &__flex
+        &__1
+          flex 1
+        &__2
+          flex 2
+        &__3
+          flex 3
+        &__4
+          flex 4
 
 @media (max-width: max-lg)
   .tracimTable
@@ -44,3 +46,6 @@
       &__hidden
         &__sm
           display none !important
+      &__width
+        &__icon
+          width 'calc(%s / 2)' % listIconWidth

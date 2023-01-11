@@ -18,34 +18,34 @@ const FavoritesTable = (props) => {
     Columns.content.contentTypeColumn({
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
-      style: [STYLE.width.icon],
+      style: [STYLE.layout.iconWidthCentered],
       id: 'type'
     }, props.contentType, props.t),
 
     Columns.content.contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
-      style: [STYLE.flex.four],
+      style: [STYLE.layout.flex4],
       id: 'titleWithPath'
     }, props.t),
 
     Columns.timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
-      style: [STYLE.flex.two, STYLE.hiddenAt.md],
+      style: [STYLE.layout.flex2, STYLE.hiddenAt.md],
       id: 'lastModification'
     }, props.user.lang, props.t),
 
     Columns.content.contentStatusColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
-      style: [STYLE.flex.two, STYLE.hiddenAt.md],
+      style: [STYLE.layout.flex2, STYLE.hiddenAt.md],
       id: 'information'
     }, props.contentType, props.t),
 
     Columns.favoriteButtonColumn({
       header: props.t('Favorite'),
-      style: [STYLE.width.icon],
+      style: [STYLE.layout.iconWidthCentered],
       id: 'favoriteButton'
     }, props.onFavoriteButtonClick)
   ]

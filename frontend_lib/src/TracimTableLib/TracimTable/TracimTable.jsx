@@ -74,7 +74,7 @@ const TracimTableHeader = (props) => {
                   asc: 'fas fa-sort-amount-down-alt',
                   desc: 'fas fa-sort-amount-up-alt'
                 }[props.headerData.column.getIsSorted()] || null}
-                customClass={classnames('titleListHeader__icon',
+                customClass={classnames('tracimTable__header__icon',
                   { tracimTable__helperClasses__hidden: !props.headerData.column.getIsSorted() }
                 )}
                 title={props.headerData.column.columnDef.tooltip || ''}

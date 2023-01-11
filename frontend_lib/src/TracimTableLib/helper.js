@@ -14,14 +14,11 @@ export const STYLE = {
     visible: `${prefix}__overflow__visible`
   },
 
-  width: {
-    icon: `${prefix}__width__icon`
-  },
-
-  flex: {
-    one: `${prefix}__flex__1`,
-    two: `${prefix}__flex__2`,
-    three: `${prefix}__flex__3`,
-    four: `${prefix}__flex__4`
+  layout: {
+    flex1: `${prefix}__layout__flex__1`,
+    flex2: `${prefix}__layout__flex__2`,
+    flex3: `${prefix}__layout__flex__3`,
+    flex4: `${prefix}__layout__flex__4`,
+    iconWidthCentered: `${prefix}__width__icon ${prefix}__layout__justify-content__center`
   }
 }
