@@ -6,9 +6,9 @@ import {
   tracimTableLib
 } from 'tracim_frontend_lib'
 
-const { GenericTracimTableLine, RowWrappers } = tracimTableLib
+const { GenericTracimTableRow, RowWrappers } = tracimTableLib
 
-const FavoriteLineComponent = props => {
+const FavoriteRowComponent = props => {
   const Wrapper = RowWrappers.ListItemRowWrapper
   return (
     <Wrapper
@@ -19,15 +19,15 @@ const FavoriteLineComponent = props => {
       dataCy='favorites__item'
       read
     >
-      <GenericTracimTableLine {...props} />
+      <GenericTracimTableRow {...props} />
     </Wrapper>
   )
 }
 
-FavoriteLineComponent.propsTypes = {
+FavoriteRowComponent.propsTypes = {
   rowData: PropTypes.object.isRequired
 }
 
 const mapStateToProps = ({ contentType, user }) => ({ contentType, user })
 
-export default connect(mapStateToProps)(FavoriteLineComponent)
+export default connect(mapStateToProps)(FavoriteRowComponent)

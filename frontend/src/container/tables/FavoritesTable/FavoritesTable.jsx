@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
-import FavoriteLineComponent from './FavoriteLineComponent.jsx'
+import FavoriteRowComponent from './FavoriteRowComponent.jsx'
 
 import {
   tracimTableLib
@@ -50,7 +50,7 @@ const FavoritesTable = (props) => {
       columns={columns}
       data={props.favoriteList}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
-      lineComponent={FavoriteLineComponent}
+      rowComponent={FavoriteRowComponent}
       sortable
       filterable
       filterPlaceholder={props.t('Filter my favorites')}

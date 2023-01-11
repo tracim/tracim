@@ -15,7 +15,7 @@ import FilterBar from '../../component/FilterBar/FilterBar.jsx'
 import classnames from 'classnames'
 import Icon from '../../component/Icon/Icon.jsx'
 
-export const GenericTracimTableLine = props => {
+export const GenericTracimTableRow = props => {
   return (
     <div
       className={`tracimTable__body__row ${props.customRowClass}`}
@@ -120,9 +120,9 @@ const TracimTable = (props) => {
             )}
             <div className={classnames('tracimTable__body', { tracimTable__body__colored: props.colored })}>
               {rows.map(row => {
-                const Line = props.lineComponent || GenericTracimTableLine
+                const Row = props.rowComponent || GenericTracimTableRow
                 return (
-                  <Line key={`${row.id}-line`} rowData={row} customRowClass={props.customRowClass} />
+                  <Row key={`${row.id}-row`} rowData={row} customRowClass={props.customRowClass} />
                 )
               })}
             </div>
@@ -147,7 +147,7 @@ TracimTable.propsType = {
   noHeader: PropTypes.bool,
   colored: PropTypes.bool,
   emptyMessage: PropTypes.string,
-  lineComponent: PropTypes.func,
+  rowComponent: PropTypes.func,
   customRowClass: PropTypes.string,
   filterable: PropTypes.bool,
   filterPlaceholder: PropTypes.string,
@@ -160,7 +160,7 @@ TracimTable.defaultProps = {
   colored: false,
   emptyMessage: 'This list is empty',
   customRowClass: '',
-  lineComponent: undefined,
+  rowComponent: undefined,
   filterable: false,
   filterPlaceholder: undefined,
   sortable: false,

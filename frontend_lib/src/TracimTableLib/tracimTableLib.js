@@ -1,4 +1,4 @@
-import TracimTable, { GenericTracimTableLine } from './TracimTable/TracimTable.jsx'
+import TracimTable, { GenericTracimTableRow } from './TracimTable/TracimTable.jsx'
 import contentFilenameWithBadgesAndBreadcrumbsColumn from './Columns/content/contentFilenameWithBadgesAndBreadcrumbsColumn.jsx'
 import contentInformationColumn from './Columns/content/contentInformationColumn.jsx'
 import contentTypeColumn from './Columns/content/contentTypeColumn.jsx'
@@ -8,7 +8,7 @@ import ListItemRowWrapper from './RowWrappers/ListItemRowWrapper.jsx'
 
 const tracimTableLib = {
   TracimTable,
-  GenericTracimTableLine,
+  GenericTracimTableRow,
   Columns: {
     content: {
       contentFilenameWithBadgesAndBreadcrumbsColumn,
