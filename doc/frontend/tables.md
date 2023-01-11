@@ -481,47 +481,50 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { translate } from 'react-i18next'
 
+import FavoriteRowComponent from './FavoriteRowComponent.jsx'
+
 import {
-  TracimTable,
-  ContentRowWrapper,
-  contentTypeColumn,
-  contentFilenameWithBadgesAndBreadcrumbsColumn,
-  contentStatusColumn,
-  favoriteButtonColumn,
-  timedEventColumn
+  tracimTableLib
 } from 'tracim_frontend_lib'
 
 require('./FavoritesTable.styl')
 
+const { TracimTable, Columns, STYLE } = tracimTableLib
+
 const FavoritesTable = (props) => {
   const columns = [
-    contentTypeColumn({
+    Columns.content.contentTypeColumn({
       header: props.t('Type'),
       tooltip: props.t('Sort by type'),
-      className: 'tracimTable__styles__width__icon'
+      style: [STYLE.width.icon],
+      id: 'type'
     }, props.contentType, props.t),
 
-    contentFilenameWithBadgesAndBreadcrumbsColumn({
+    Columns.content.contentFilenameWithBadgesAndBreadcrumbsColumn({
       header: props.t('Title and path'),
       tooltip: props.t('Sort by title'),
-      className: 'tracimTable__styles__flex__4'
+      style: [STYLE.flex.four],
+      id: 'titleWithPath'
     }, props.t),
 
-    timedEventColumn({
+    Columns.timedEventColumn({
       header: props.t('Last Modification'),
       tooltip: props.t('Sort by last modification'),
-      className: 'tracimTable__styles__flex__2  tracimTable__hide__md'
+      style: [STYLE.flex.two, STYLE.hiddenAt.md],
+      id: 'lastModification'
     }, props.user.lang, props.t),
 
-    contentStatusColumn({
+    Columns.content.contentStatusColumn({
       header: props.t('Information'),
       tooltip: props.t('Sort by information'),
-      className: 'tracimTable__styles__flex__2 tracimTable__hide__md'
+      style: [STYLE.flex.two, STYLE.hiddenAt.md],
+      id: 'information'
     }, props.contentType, props.t),
 
-    favoriteButtonColumn({
+    Columns.favoriteButtonColumn({
       header: props.t('Favorite'),
-      className: 'tracimTable__styles__width__icon'
+      style: [STYLE.width.icon],
+      id: 'favoriteButton'
     }, props.onFavoriteButtonClick)
   ]
 
@@ -529,17 +532,12 @@ const FavoritesTable = (props) => {
     <TracimTable
       columns={columns}
       data={props.favoriteList}
-      user={props.user}
       emptyMessage={props.t('You did not add any content as favorite yet.')}
-      rowWrapperProps={{
-        customClass: 'favoriteTable__row',
-        contentType: props.contentType,
-        dataCy: 'favorites__item'
-      }}
-      rowWrapper={ContentRowWrapper}
+      rowComponent={FavoriteRowComponent}
       sortable
       filterable
       filterPlaceholder={props.t('Filter my favorites')}
+      defaultSortColumnId='titleWithPath'
     />
   )
 }
