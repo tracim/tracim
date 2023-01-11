@@ -125,7 +125,7 @@ const TracimTable = (props) => {
       {rows.length > 0
         ? (
           <>
-            {!props.noHeader && (
+            {props.showHeader && (
               <div className='tracimTable__header'>
                 {table.getHeaderGroups().map(headerGroup => (
                   <div
@@ -165,7 +165,7 @@ const TracimTable = (props) => {
 TracimTable.propsType = {
   columns: PropTypes.array.isRequired,
   data: PropTypes.array.isRequired,
-  noHeader: PropTypes.bool,
+  showHeader: PropTypes.bool,
   colored: PropTypes.bool,
   emptyMessage: PropTypes.string,
   rowComponent: PropTypes.func,
@@ -177,7 +177,7 @@ TracimTable.propsType = {
 }
 
 TracimTable.defaultProps = {
-  noHeader: false,
+  showHeader: true,
   colored: false,
   emptyMessage: 'This list is empty',
   customRowClass: '',
