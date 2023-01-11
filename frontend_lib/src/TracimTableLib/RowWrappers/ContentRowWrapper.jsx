@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { PAGE } from '../../helper.js'
 import ListItemWrapper from '../../component/Lists/ListItemWrapper/ListItemWrapper.jsx'
 
-const ListItemRowWrapper = (props) => {
+const ContentRowWrapper = (props) => {
   const contentTypeInfo = props.contentType.find(type => type.slug === props.originalType) || { slug: '' }
   const contentAppUrl = props.content ? PAGE.WORKSPACE.CONTENT(
     props.content.workspaceId,
@@ -34,7 +34,7 @@ const ListItemRowWrapper = (props) => {
   )
 }
 
-ListItemRowWrapper.propsType = {
+ContentRowWrapper.propsType = {
   content: PropTypes.object.isRequired,
   originalType: PropTypes.string.isRequired,
   originalLabel: PropTypes.string.isRequired,
@@ -46,7 +46,7 @@ ListItemRowWrapper.propsType = {
   dataCy: PropTypes.string
 }
 
-ListItemRowWrapper.defaultProps = {
+ContentRowWrapper.defaultProps = {
   isLast: false,
   isFirst: false,
   read: false,
@@ -54,4 +54,4 @@ ListItemRowWrapper.defaultProps = {
   dataCy: null
 }
 
-export default ListItemRowWrapper
+export default ContentRowWrapper

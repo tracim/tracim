@@ -9,7 +9,7 @@ import {
 const { GenericTracimTableRow, RowWrappers } = tracimTableLib
 
 const FavoriteRowComponent = props => {
-  const Wrapper = RowWrappers.ListItemRowWrapper
+  const Wrapper = RowWrappers.ContentRowWrapper
   return (
     <Wrapper
       {...props.rowData.original}

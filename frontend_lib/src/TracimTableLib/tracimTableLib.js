@@ -4,7 +4,7 @@ import contentStatusColumn from './Columns/content/contentStatusColumn.jsx'
 import contentTypeColumn from './Columns/content/contentTypeColumn.jsx'
 import favoriteButtonColumn from './Columns/favoriteButtonColumn.jsx'
 import timedEventColumn from './Columns/timedEventColumn.jsx'
-import ListItemRowWrapper from './RowWrappers/ListItemRowWrapper.jsx'
+import ContentRowWrapper from './RowWrappers/ContentRowWrapper.jsx'
 
 const tracimTableLib = {
   TracimTable,
@@ -19,7 +19,7 @@ const tracimTableLib = {
     timedEventColumn
   },
   RowWrappers: {
-    ListItemRowWrapper
+    ContentRowWrapper
   }
 }
 

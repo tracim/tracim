@@ -473,7 +473,7 @@ import { translate } from 'react-i18next'
 
 import {
   TracimTable,
-  ListItemRowWrapper,
+  ContentRowWrapper,
   contentTypeColumn,
   contentFilenameWithBadgesAndBreadcrumbsColumn,
   contentStatusColumn,
@@ -526,7 +526,7 @@ const FavoritesTable = (props) => {
         contentType: props.contentType,
         dataCy: 'favorites__item'
       }}
-      rowWrapper={ListItemRowWrapper}
+      rowWrapper={ContentRowWrapper}
       sortable
       filterable
       filterPlaceholder={props.t('Filter my favorites')}
