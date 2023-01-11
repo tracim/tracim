@@ -311,6 +311,14 @@ class EventApi:
         query = self._base_query(user_id=user_id, after_event_id=after_event_id,)
         return query.all()
 
+    def get_mentions_for_content(self, content_id: int, after_event_id: int = 0) -> List[Message]:
+        query = self._base_query(
+            content_ids=[content_id],
+            after_event_id=after_event_id,
+            include_event_types=[EntityType.MENTION],
+        )
+        return query.all()
+
     def get_paginated_messages_for_user(
         self,
         user_id: int,
@@ -941,10 +949,7 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
     if not event.fields.get(Event.USER_FIELD):
         return None
     try:
-        # TODO - MP - 2022-12-16 - Keep testing like this, swap lines and keep as it was if doesn't
-        # work before merge
         return int(event.user["user_id"])
-        # return session.query(User.user_id).filter(User.user_id == event.user["user_id"]).scalar()
     except (AttributeError, NoResultFound):
         # no user in event or user does not exist anymore
         return None

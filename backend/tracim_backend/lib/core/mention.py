@@ -1,6 +1,5 @@
 import abc
 import typing
-import uuid
 
 from bs4 import BeautifulSoup
 from bs4 import Tag
@@ -34,24 +33,26 @@ class MentionType:
 class Mention:
     """A mention with its attributes: id and recipient."""
 
-    def __init__(self, type: MentionType, recipient: int, id_: str) -> None:
+    def __init__(self, type: MentionType, recipient: int, content_id: str) -> None:
         self.type = type
         self.recipient = recipient
-        self.id = id_
+        self.content_id = content_id
 
     def __eq__(self, other) -> bool:
         return (
             isinstance(other, Mention)
             and self.type == other.type
             and other.recipient == self.recipient
-            and other.id == self.id
+            and other.content_id == self.content_id
         )
 
     def __repr__(self) -> str:
-        return f"<Mention(type={self.type}, recipient={self.recipient}, id={self.id})>"
+        return (
+            f"<Mention(type={self.type}, recipient={self.recipient}, content_id={self.content_id})>"
+        )
 
     def __hash__(self) -> int:
-        return hash(self.id)
+        return hash(self.content_id)
 
 
 class BaseMentionParser(abc.ABC):
@@ -73,7 +74,7 @@ class DescriptionMentionParser(BaseMentionParser):
     mentions found in it considering description is HTML.
 
     HTML mentions must have the following structure:
-      `<html-mention id="{a unique id}" {DATA}></html-mention>`
+      `<html-mention {DATA}></html-mention>`
 
     DATA should be one of theses:
      - userid="{user_id}"
@@ -83,29 +84,25 @@ class DescriptionMentionParser(BaseMentionParser):
     MENTION_TAG_NAME = "html-mention"
 
     def get_mentions(self, revision: ContentRevisionRO) -> typing.List[Mention]:
-        return self.get_mentions_from_html(revision.raw_content)
+        return self.get_mentions_from_html(revision.content_id, revision.raw_content)
 
     @classmethod
     def is_html_mention_tag(cls, tag: Tag) -> bool:
         return cls.MENTION_TAG_NAME == tag.name
 
-    # TODO - MP - 2022-11-29 - Check the variable names
-    # TODO - MP - 2022-11-29 - Edited mention are not handled
     @classmethod
-    def get_mentions_from_html(cls, html: str) -> typing.List[Mention]:
+    def get_mentions_from_html(cls, content_id: int, html: str) -> typing.List[Mention]:
         # NOTE S.G - 2020-07-30 - using lxml parser as it is the fastest in beautifulsoup
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
             user_id: int = mention_tag.attrs.get("userid")
             if user_id:
-                id_ = str(uuid.uuid4())
-                mentions.append(Mention(MentionType.USER, user_id, id_))
+                mentions.append(Mention(MentionType.USER, user_id, content_id))
                 continue
             role_id: int = mention_tag.attrs.get("roleid")
             if role_id:
-                id_ = str(uuid.uuid4())
-                mentions.append(Mention(MentionType.ROLE, role_id, id_))
+                mentions.append(Mention(MentionType.ROLE, role_id, content_id))
                 continue
         return mentions
 
@@ -222,7 +219,7 @@ class MentionBuilder:
                 cls.MENTION_FIELD: {
                     "type": mention.type,
                     "recipient": mention.recipient,
-                    "id": mention.id,
+                    "content_id": mention.content_id,
                 }
             }
             fields.update(common_fields)
