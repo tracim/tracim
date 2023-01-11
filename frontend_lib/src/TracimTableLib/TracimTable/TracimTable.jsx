@@ -40,11 +40,11 @@ export const GenericTracimTableRow = (props) => {
 
 GenericTracimTableRow.propsType = {
   rowData: PropTypes.object.isRequired,
-  customRowClass: PropTypes.string,
+  customRowClass: PropTypes.string
 }
 
 GenericTracimTableRow.defaultProps = {
-  customRowClass: ""
+  customRowClass: ''
 }
 
 const TracimTableHeader = (props) => {
@@ -55,7 +55,6 @@ const TracimTableHeader = (props) => {
         props.headerData.column.columnDef.className,
         { tracimTable__styles__clickable: props.sortable }
       )}
-      key={props.headerData.id}
     >
       {props.headerData.isPlaceholder
         ? null
@@ -134,7 +133,7 @@ const TracimTable = (props) => {
                     key={headerGroup.id}
                   >
                     {headerGroup.headers.map(header => (
-                      <TracimTableHeader headerData={header} sortable={props.sortable}/>
+                      <TracimTableHeader key={`${header.id}`} headerData={header} sortable={props.sortable} />
                     ))}
                   </div>
                 ))}
