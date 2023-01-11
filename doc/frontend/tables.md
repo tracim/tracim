@@ -76,6 +76,8 @@ const myColumn = (settings) => {}
 - `header`: Text that should be displayed in the header.
 - `tooltip`: Text that should be used as the header's tooltip.
 - `className`: The classes that should be applied to each cell of the column.
+- `id`: The id of the column, must be unique
+- `style`: An array of styles brought by the STYLE constant.
 
 Additional arguments can be added after settings.
 
@@ -105,18 +107,21 @@ Define the various required sections of a column:
 - `header`: The header of the column
 - `id`: The id of the column, must be unique
 - `cell`: How the cell will be rendered.
+- `style`: Styles applied from the STYLE constant.
 - `className`: The custom classes applied to its cells and header.
   It's value must include the `settings.className` argument.
 
 ```javascript
 import { createColumnHelper } from '@tanstack/react-table'
+import classnames from 'classnames'
 
 const usernameColumn = (settings) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => row.username, {
     header: () => '',
-    id: 'username',
+    id: settings.id,
     cell: props => '',
+    style: classnames(settings.style),
     className: settings.className
   })
 }
@@ -149,8 +154,9 @@ const usernameColumn = (settings) => {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'username',
+    id: settings.id,
     cell: props => '',
+    style: classnames(settings.style),
     className: settings.className
   })
 }
@@ -183,10 +189,11 @@ const usernameColumn = (settings) => {
         tootltip={settings.tooltip}
       />
     ),
-    id: 'username',
+    id: settings.id,
     cell: props => (
       <span>{`Hello ${props.row.original.username}, how are you?`}</span>
     ),
+    style: classnames(settings.style),
     className: settings.className
   })
 }
@@ -223,10 +230,11 @@ const usernameColumn = (settings) => {
         tootltip={settings.tooltip}
       />
     ),
-    id: 'username',
+    id: settings.id,
     cell: props => (
       <span>{`${props.translate('Hello')} ${props.getValue().username}`}</span>
     ),
+    style: classnames(settings.style),
     className: settings.className,
     filterFn: 'includesString'
   })
@@ -276,11 +284,12 @@ const usernameColumn = (settings) => {
         tootltip={settings.tooltip}
       />
     ),
-    id: 'username',
+    id: settings.id,
     cell: props => (
       <span>{`${props.translate('Hello')} ${props.getValue().username}`}</span>
     ),
     className: settings.className,
+    style: classnames(settings.style),
     filterFn: 'includesString',
     sortingFn: 'alphanumeric'
   })
@@ -399,19 +408,19 @@ and a row per entry in the data array.
 
 The `TracimTable` is highly configurable through its props. Here is an exhaustive list:
 
-| Name                  | Type                   | Required ? | Default Value        | Definition                                                                                                                                                                     |
-|-----------------------|------------------------|------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| columns               | Array                  | Yes        | N/A                  | An array of columns, defines (in the order of the array) which columns will be rendered in the table.                                                                          |
-| data                  | Array                  | Yes        | N/A                  | The data used to render the table, an entry is a row.                                                                                                                          |
-| noHeader              | Bool                   | No         | false                | Set to true to skip the headers rendering.                                                                                                                                     |
-| colored               | Bool                   | No         | false                | Set to true to set a different background-color for even rows, creating an alternating pattern, easier to discern each row in some tables.                                     |
-| filterable            | Bool                   | No         | false                | Set to true to enable filtering for the table, the filter bar will be rendered accordingly. Filtering rules are defined in the columns. The table manages filtering by itself. |
-| sortable              | Bool                   | No         | false                | Set to true to enable sorting for the table, the sorting parameters are defined in each columns. The table manages sorting by itself.                                          |
-| emptyMessage          | String                 | No         | 'This list is empty' | The message to display when the table has no data. Note that it is not related to the message displayed when filtering.                                                        |
-| filterPlaceholder     | String                 | No         | 'Filter this list'   | The placeholder to put in the filter bar's input field.                                                                                                                        |
-| defaultSortColumnId   | String                 | No         | undefined            | The default columnId on which the table should sort it's data                                                                                                                  |
-| customRowClass        | String                 | No         | ''                   | A custom class applied to each and every row.                                                                                                                                  |
-| lineComponent         | Func (React Component) | No         | none                 | A custom component for the lines, in order to apply code logic to row level (As in content listings for example).                                                              |
+| Name                | Type                   | Required ? | Default Value        | Definition                                                                                                                                                                     |
+|---------------------|------------------------|------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| columns             | Array                  | Yes        | N/A                  | An array of columns, defines (in the order of the array) which columns will be rendered in the table.                                                                          |
+| data                | Array                  | Yes        | N/A                  | The data used to render the table, an entry is a row.                                                                                                                          |
+| showHeader          | Bool                   | No         | true                 | Set to false to skip the headers rendering.                                                                                                                                    |
+| colored             | Bool                   | No         | false                | Set to true to set a different background-color for even rows, creating an alternating pattern, easier to discern each row in some tables.                                     |
+| emptyMessage        | String                 | No         | 'This list is empty' | The message to display when the table has no data. Note that it is not related to the message displayed when filtering.                                                        |
+| rowComponent        | Func (React Component) | No         | none                 | A custom component for the lines, in order to apply code logic to row level (As in content listings for example).                                                              |
+| customRowClass      | String                 | No         | ''                   | A custom class applied to each and every row.                                                                                                                                  |
+| filterable          | Bool                   | No         | false                | Set to true to enable filtering for the table, the filter bar will be rendered accordingly. Filtering rules are defined in the columns. The table manages filtering by itself. |
+| filterPlaceholder   | String                 | No         | 'Filter this list'   | The placeholder to put in the filter bar's input field.                                                                                                                        |
+| sortable            | Bool                   | No         | false                | Set to true to enable sorting for the table, the sorting parameters are defined in each columns. The table manages sorting by itself.                                          |
+| defaultSortColumnId | String                 | No         | undefined            | The default columnId on which the table should sort it's data                                                                                                                  |
 
 
 ## Example
@@ -424,29 +433,29 @@ The shown code is the code of the `FavoritesTable` and the `Last Modification` c
 
 ```javascript
 import React from 'react'
+import classnames from 'classnames'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import { getRevisionTypeLabel } from '../helper.js'
+import { getRevisionTypeLabel } from '../../helper.js'
 
-import TimedEvent from '../component/TimedEvent/TimedEvent.jsx'
+import TimedEvent from '../../component/TimedEvent/TimedEvent.jsx'
 
 const timedEventColumn = (settings, lang, t) => {
   const columnHelper = createColumnHelper()
   return columnHelper.accessor(row => {
-    if (!row.content || !row.content.lastModifier) return undefined
-    const date = new Date(row.content.modified)
-    return `${date.getFullYear()}${date.getMonth()}${date.getDate()} ${row.content.lastModifier.publicName}`
+    if (!row.content || !row.content.lastModifier) return ''
+    return `${row.content.modified} ${row.content.lastModifier.publicName}`
   }, {
     header: () => (
       <span>{settings.header}</span>
     ),
-    id: 'lastModification',
+    id: settings.id,
     cell: props => {
       if (!props.row.original.content) return null
 
       return (
         <TimedEvent
-          customClass='contentListItem__modification'
+          customClass='timedEventColumn__modification'
           operation={getRevisionTypeLabel(props.row.original.content.currentRevisionType, t)}
           date={props.row.original.content.modified}
           lang={lang}
@@ -455,6 +464,7 @@ const timedEventColumn = (settings, lang, t) => {
       )
     },
     className: settings.className,
+    style: classnames(settings.style),
     filterFn: 'includesString',
     sortingFn: 'alphanumeric'
   })
