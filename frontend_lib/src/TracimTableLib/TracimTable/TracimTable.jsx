@@ -15,7 +15,7 @@ import FilterBar from '../../component/FilterBar/FilterBar.jsx'
 import classnames from 'classnames'
 import Icon from '../../component/Icon/Icon.jsx'
 
-export const GenericTracimTableRow = props => {
+export const GenericTracimTableRow = (props) => {
   return (
     <div
       className={`tracimTable__body__row ${props.customRowClass}`}
@@ -36,6 +36,58 @@ export const GenericTracimTableRow = props => {
       ))}
     </div>
   )
+}
+
+GenericTracimTableRow.propsType = {
+  rowData: PropTypes.object.isRequired,
+  customRowClass: PropTypes.string,
+}
+
+GenericTracimTableRow.defaultProps = {
+  customRowClass: ""
+}
+
+const TracimTableHeader = (props) => {
+  return (
+    <div
+      onClick={props.sortable && props.headerData.column.getToggleSortingHandler()}
+      className={classnames('tracimTable__header__row__cell',
+        props.headerData.column.columnDef.className,
+        { tracimTable__styles__clickable: props.sortable }
+      )}
+      key={props.headerData.id}
+    >
+      {props.headerData.isPlaceholder
+        ? null
+        : (
+          <>
+            {flexRender(
+              props.headerData.column.columnDef.header,
+              {
+                ...props.headerData.getContext()
+              }
+            )}
+            {props.sortable && (
+              <Icon
+                icon={{
+                  asc: 'fas fa-sort-amount-down-alt',
+                  desc: 'fas fa-sort-amount-up-alt'
+                }[props.headerData.column.getIsSorted()] || null}
+                customClass={classnames('titleListHeader__icon',
+                  { tracimTable__styles__hide: !props.headerData.column.getIsSorted() }
+                )}
+                title={props.headerData.column.columnDef.tooltip || ''}
+              />
+            )}
+          </>
+        )}
+    </div>
+  )
+}
+
+TracimTableHeader.propsType = {
+  headerData: PropTypes.object.isRequired,
+  sortable: PropTypes.bool.isRequired
 }
 
 const TracimTable = (props) => {
@@ -82,37 +134,7 @@ const TracimTable = (props) => {
                     key={headerGroup.id}
                   >
                     {headerGroup.headers.map(header => (
-                      <div
-                        onClick={props.sortable && header.column.getToggleSortingHandler()}
-                        className={classnames('tracimTable__header__row__cell',
-                          header.column.columnDef.className,
-                          { tracimTable__styles__clickable: props.sortable }
-                        )}
-                        key={header.id}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : (
-                            <>
-                              {flexRender(
-                                header.column.columnDef.header,
-                                {
-                                  ...header.getContext()
-                                }
-                              )}
-                              {props.sortable && (
-                                <Icon
-                                  icon={{
-                                    asc: 'fas fa-sort-amount-down-alt',
-                                    desc: 'fas fa-sort-amount-up-alt'
-                                  }[header.column.getIsSorted()] || null}
-                                  customClass={classnames('titleListHeader__icon', { tracimTable__styles__hide: !header.column.getIsSorted() })}
-                                  title={header.column.columnDef.tooltip || ''}
-                                />
-                              )}
-                            </>
-                          )}
-                      </div>
+                      <TracimTableHeader headerData={header} sortable={props.sortable}/>
                     ))}
                   </div>
                 ))}
