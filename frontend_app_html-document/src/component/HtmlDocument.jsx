@@ -18,7 +18,7 @@ import {
 } from 'tracim_frontend_lib'
 
 export const HtmlDocument = props => {
-  const [text, setText] = useState('')
+  const [textToEdit, setTextToEdit] = useState('')
 
   const isTranslated = props.translationState === TRANSLATION_STATE.TRANSLATED
   const noteClass = 'html-document__contentpage__textnote__text'
@@ -30,11 +30,11 @@ export const HtmlDocument = props => {
   )
 
   useEffect(() => {
-    setText(props.text)
+    setTextToEdit(props.text)
   }, [props.text])
 
-  const updateText = (text) => {
-    setText(text)
+  const updateTextToEdit = (text) => {
+    setTextToEdit(text)
     setLocalStorageItem(
       props.contentType,
       props.contentId,
@@ -159,12 +159,12 @@ export const HtmlDocument = props => {
               <TinyEditor
                 apiUrl={props.apiUrl}
                 codeLanguageList={[]}
-                content={text}
+                content={textToEdit}
                 onCtrlEnterEvent={props.onClickValidateBtn}
                 height='100%'
                 isAdvancedEdition
                 roleList={DEFAULT_ROLE_LIST}
-                setContent={updateText}
+                setContent={updateTextToEdit}
                 spaceId={props.workspaceId}
                 userList={props.memberList}
               />
@@ -185,12 +185,12 @@ export const HtmlDocument = props => {
                   color={props.customColor}
                   customClass={`${props.customClass}__submit editionmode__button__submit`}
                   dataCy='editionmode__button__submit'
-                  disabled={props.disableValidateBtn(text)}
+                  disabled={props.disableValidateBtn(textToEdit)}
                   icon='fas fa-check'
                   intent='primary'
                   key='TextAreaApp__validate'
                   mode='light'
-                  onClick={() => props.onClickValidateBtn(text)}
+                  onClick={() => props.onClickValidateBtn(textToEdit)}
                   text={props.t('Validate')}
                 />
               </div>
