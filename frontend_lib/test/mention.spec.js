@@ -24,7 +24,8 @@ describe('mentions on mentionOrLink.js', () => {
         content: '<p>Hello @foo and @bar</p>',
         expected: ['@foo', '@bar'],
         description: 'Multiple mentions'
-      },{
+      },
+      {
         content: '<p>Hello @foo, how are you?</p>',
         expected: ['@foo'],
         description: 'Single mention with text before and after'
@@ -76,7 +77,7 @@ describe('mentions on mentionOrLink.js', () => {
       const expectedResult = `have ${expected.length} results`
       describe(`For: ${description}`, () => {
         it(`should ${expectedResult}`, () => {
-          expect(result).to.equal(expected)
+          expect(result).to.deep.equal(expected)
         })
       })
     })

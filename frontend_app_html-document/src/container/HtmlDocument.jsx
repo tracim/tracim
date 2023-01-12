@@ -1019,14 +1019,13 @@ export class HtmlDocument extends React.Component {
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
             isDraftAvailable={
-              state.mode === APP_FEATURE_MODE.VIEW
-              && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id
-              && getLocalStorageItem(
+              state.mode === APP_FEATURE_MODE.VIEW &&
+              state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+              getLocalStorageItem(
                 state.appName,
                 state.content.content_id,
                 state.content.workspace_id,
-                LOCAL_STORAGE_FIELD.RAW_CONTENT
-              )
+                LOCAL_STORAGE_FIELD.RAW_CONTENT)
             }
             // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}

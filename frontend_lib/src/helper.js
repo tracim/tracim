@@ -14,7 +14,6 @@ import dateFnsNbNO from 'date-fns/locale/nb'
 import ErrorFlashMessageTemplateHtml from './component/ErrorFlashMessageTemplateHtml/ErrorFlashMessageTemplateHtml.jsx'
 import { CUSTOM_EVENT } from './customEvent.js'
 import {
-  getContent,
   getContentPath,
   getReservedUsernames,
   getUsernameAvailability

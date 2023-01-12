@@ -89,7 +89,7 @@ export const Mention = props => {
   const DEFAULT_MENTION_USER = props.t('UnknownUser')
   const DEFAULT_MENTION_ROLE = props.t('UnknownRole')
 
-  const [text, setText] = useState("")
+  const [text, setText] = useState('')
   const [isToMe, setIsToMe] = useState(false)
 
   useEffect(() => {

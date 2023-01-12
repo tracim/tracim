@@ -110,11 +110,11 @@ export const TinyEditor = props => {
   return (
     <>
       <input
-        id="hidden_tinymce_fileinput"
+        id='hidden_tinymce_fileinput'
         onChange={(e) => handleFileSelected(e, editorRef)}
         ref={inputRef}
         style={{ display: 'none' }}
-        type="file"
+        type='file'
       />
       <Editor
         key={editorKey}
@@ -291,7 +291,7 @@ export const TinyEditor = props => {
                   ]
                 }))
 
-                return(matchedRoleList.concat(userResultList))
+                return matchedRoleList.concat(userResultList)
               },
               onAction: function (autocompleteApi, rng, value) {
                 editor.selection.setRng(rng)
@@ -321,7 +321,7 @@ export const TinyEditor = props => {
                     return isLabel || isId
                   })
 
-                  let resultList = matchedContentList.map((content) => {
+                  const resultList = matchedContentList.map((content) => {
                     return {
                       type: 'cardmenuitem',
                       value: `#${content.content_id} `,
@@ -358,7 +358,7 @@ export const TinyEditor = props => {
                   })
 
                   return resultList
-                } catch (e){
+                } catch (e) {
                   console.error(
                     'Error in TinyEditor.jsx, couldn\'t fetch content list properly:\n', e
                   )

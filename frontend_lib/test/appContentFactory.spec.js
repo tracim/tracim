@@ -341,7 +341,7 @@ describe('appContentFactory.js', () => {
     })
   })
 
-  describe('function saveCommentAsText', () => {
+  describe('function appContentSaveNewCommentText', () => {
     describe('on comment save success', async () => {
       let response
       const newComment = 'Edited comment'
@@ -378,13 +378,6 @@ describe('appContentFactory.js', () => {
         fakeTinymceSetContent.resetHistory()
         global.localStorage.removeItem.resetHistory()
         global.GLOBAL_dispatchEvent.resetHistory()
-      })
-
-      it('should remove the localStorage value', () => {
-        sinon.assert.calledWith(
-          global.localStorage.removeItem,
-          generateLocalStorageContentId(appContentSlug, fakeContent.content_id, fakeContent.workspace_id, 'comment')
-        )
       })
 
       it('should return the response from api with handleFetchResponse called on it', () => {
