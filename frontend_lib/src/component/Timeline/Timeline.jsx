@@ -229,11 +229,12 @@ export class Timeline extends React.Component {
           <div className='timeline__texteditor'>
             <CommentArea
               apiUrl={props.apiUrl}
-              onClickSubmit={props.onClickSubmit}
-              // End of required props /////////////////////////////////////////
-              codeLanguageList={props.codeLanguageList}
               contentId={props.contentId}
               contentType={props.contentType}
+              onClickSubmit={props.onClickSubmit}
+              workspaceId={props.workspaceId}
+              // End of required props /////////////////////////////////////////
+              codeLanguageList={props.codeLanguageList}
               customClass={props.customClass}
               customColor={props.customColor}
               disableComment={disableComment}
@@ -243,7 +244,6 @@ export class Timeline extends React.Component {
               placeHolder={props.t('Write an answer...')}
               roleList={props.roleList}
               submitLabel={props.t('Send')}
-              workspaceId={props.workspaceId}
             />
           </div>
         )}
@@ -270,6 +270,8 @@ export default translate()(Radium(TracimComponent(Timeline)))
 
 Timeline.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  contentId: PropTypes.number.isRequired,
+  contentType: PropTypes.string.isRequired,
   loggedUser: PropTypes.object.isRequired,
   onClickRestoreComment: PropTypes.func.isRequired,
   onClickSubmit: PropTypes.func.isRequired,
@@ -283,8 +285,6 @@ Timeline.propTypes = {
   availableStatusList: PropTypes.array,
   canLoadMoreTimelineItems: PropTypes.func,
   codeLanguageList: PropTypes.array,
-  contentId: PropTypes.number,
-  contentType: PropTypes.string,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   deprecatedStatus: PropTypes.object,
@@ -316,8 +316,6 @@ Timeline.defaultProps = {
   availableStatusList: [],
   canLoadMoreTimelineItems: () => false,
   codeLanguageList: [],
-  contentId: 0,
-  contentType: '',
   customClass: '',
   customColor: '',
   deprecatedStatus: {

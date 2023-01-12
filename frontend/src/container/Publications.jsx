@@ -475,10 +475,12 @@ export class Publications extends React.Component {
           <div className='publishAreaContainer'>
             <CommentArea
               apiUrl={FETCH_CONFIG.apiUrl}
-              onClickSubmit={this.handleSaveThreadPublication}
-              codeLanguageList={props.system.config.code_languages}
               contentId={newPublicationId}
               contentType={CONTENT_TYPE.THREAD}
+              onClickSubmit={this.handleSaveThreadPublication}
+              workspaceId={parseInt(props.match.params.idws)}
+              // End of required props /////////////////////////////////////////
+              codeLanguageList={props.system.config.code_languages}
               customColor={COLORS.PUBLICATION}
               customClass='publishArea'
               icon='fa-fw far fa-paper-plane'
@@ -488,7 +490,6 @@ export class Publications extends React.Component {
               placeHolder={props.t('Share a news...')}
               roleList={DEFAULT_ROLE_LIST}
               submitLabel={props.t('Publish')}
-              workspaceId={parseInt(props.match.params.idws)}
             />
           </div>
         )}

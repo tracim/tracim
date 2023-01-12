@@ -614,6 +614,9 @@ class CustomForm extends React.Component {
           {this.state.config.apiUrl ? (
             <Timeline
               apiUrl={this.state.config.apiUrl}
+              contentId={this.state.content.content_id}
+              contentType={this.state.content.content_type}
+              workspaceId={this.state.content.workspace_id}
               onClickSubmit={() => {}}
               customClass={`${config.slug}__contentpage`}
               customColor={this.state.hexcolor}

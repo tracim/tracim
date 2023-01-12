@@ -391,6 +391,8 @@ export class FeedItemWithPreview extends React.Component {
             {props.showCommentList && state.isDiscussionDisplayed && (
               <Timeline
                 apiUrl={FETCH_CONFIG.apiUrl}
+                contentId={props.content.id}
+                contentType={props.content.type}
                 loggedUser={loggedUser}
                 onClickRestoreComment={comment => this.handleRestoreCommentTranslation(comment.content_id)}
                 onClickSubmit={this.handleClickValidateNewComment}
@@ -411,8 +413,6 @@ export class FeedItemWithPreview extends React.Component {
                 workspaceId={props.workspaceId}
                 // End of required props ///////////////////////////////////////
                 codeLanguageList={props.system.config.code_languages}
-                contentId={props.content.id}
-                contentType={props.content.type}
                 customClass='feedItem__timeline'
                 customColor={contentType.hexcolor}
                 id={props.content.id}

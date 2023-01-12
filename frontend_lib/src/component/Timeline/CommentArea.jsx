@@ -25,7 +25,7 @@ export const CommentArea = props => {
   const [fileListToUpload, setFileListToUpload] = useState([])
   const [invalidMentionList, setInvalidMentionList] = useState([])
   const [isAdvancedEdition, setIsAdvancedEdition] = useState(props.isAdvancedEdition)
-  let textToSend = ''
+  const [textToSend, setTextToSend] = useState('')
 
   useEffect(() => {
     if (props.newComment) {
@@ -42,7 +42,7 @@ export const CommentArea = props => {
         setContent(savedComment)
       }
     }
-  }, [])
+  }, [props.contentType, props.contentId, props.workspaceId])
 
   useEffect(() => {
     if (content) {
@@ -79,7 +79,7 @@ export const CommentArea = props => {
       )
       commentToSend = parsedMentionCommentObject.html
       if (parsedMentionCommentObject.invalidMentionList.length > 0) {
-        textToSend = commentToSend
+        setTextToSend(commentToSend)
         setInvalidMentionList(parsedMentionCommentObject.invalidMentionList)
         return
       }
@@ -254,10 +254,11 @@ export default translate()(CommentArea)
 
 CommentArea.propTypes = {
   apiUrl: PropTypes.string.isRequired,
+  contentId: PropTypes.number.isRequired,
+  contentType: PropTypes.string.isRequired,
   onClickSubmit: PropTypes.func.isRequired,
+  workspaceId: PropTypes.number.isRequired,
   codeLanguageList: PropTypes.array,
-  contentId: PropTypes.number,
-  contentType: PropTypes.string,
   customClass: PropTypes.string,
   customColor: PropTypes.string,
   disableComment: PropTypes.bool,
@@ -276,14 +277,11 @@ CommentArea.propTypes = {
   roleList: PropTypes.array,
   submitIcon: PropTypes.string,
   submitLabel: PropTypes.string,
-  withstandLabel: PropTypes.string,
-  workspaceId: PropTypes.number
+  withstandLabel: PropTypes.string
 }
 
 CommentArea.defaultProps = {
   codeLanguageList: [],
-  contentId: 0,
-  contentType: '',
   customClass: '',
   customColor: '',
   disableComment: false,
@@ -296,12 +294,11 @@ CommentArea.defaultProps = {
   isFileCommentLoading: false,
   memberList: [],
   multipleFiles: true,
-  newComment: '',
+  newComment: undefined,
   onClickWithstand: () => { },
   placeholder: 'Write a comment...',
   roleList: [],
   submitIcon: 'far fa-paper-plane',
   submitLabel: 'Submit',
-  withstandLabel: 'Withstand',
-  workspaceId: 0
+  withstandLabel: 'Withstand'
 }

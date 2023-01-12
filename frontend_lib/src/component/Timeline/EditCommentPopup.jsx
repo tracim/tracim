@@ -42,13 +42,15 @@ export class EditCommentPopup extends React.Component {
       >
         <CommentArea
           apiUrl={props.apiUrl}
+          contentId={props.commentId}
+          contentType={CONTENT_TYPE.COMMENT}
           onClickSubmit={(comment, fileList) => {
             props.onClickValidate(comment, props.commentId, props.parentId)
             return true
           }}
+          workspaceId={props.workspaceId}
+          // End of required props /////////////////////////////////////////////
           codeLanguageList={props.codeLanguageList}
-          contentId={props.commentId}
-          contentType={CONTENT_TYPE.COMMENT}
           customClass='editCommentPopup'
           customColor={props.customColor}
           isAdvancedEdition
@@ -61,7 +63,6 @@ export class EditCommentPopup extends React.Component {
           memberList={props.memberList}
           submitLabel={props.t('Send')}
           withstandLabel={props.t('Cancel')}
-          workspaceId={props.workspaceId}
         />
       </CardPopup>
     )

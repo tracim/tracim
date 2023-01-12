@@ -10,7 +10,7 @@ const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attr
 
 const commentArea = '.timeline__comment__body'
 const commentText = '.timeline__comment__body__content__text'
-const cancelDocBtn = '.html-document__editionmode__cancel'
+const cancelDocBtn = '.editionmode__button__cancel'
 const submitBtn = '.commentArea__submit__btn'
 
 describe('Add a new comment', () => {

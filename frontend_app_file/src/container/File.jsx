@@ -905,6 +905,8 @@ export class File extends React.Component {
         >
           <Timeline
             apiUrl={state.config.apiUrl}
+            contentId={state.content.content_id}
+            contentType={state.content.content_type}
             loggedUser={state.loggedUser}
             onClickRestoreComment={props.handleRestoreComment}
             onClickSubmit={this.handleClickValidateNewComment}
@@ -921,8 +923,6 @@ export class File extends React.Component {
             availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
             codeLanguageList={state.config.system.config.code_languages}
-            contentId={state.content.content_id}
-            contentType={state.content.content_type}
             customClass={`${state.config.slug}__contentpage`}
             customColor={state.config.hexcolor}
             disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
