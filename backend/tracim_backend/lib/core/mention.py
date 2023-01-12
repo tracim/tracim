@@ -33,7 +33,7 @@ class MentionType:
 class Mention:
     """A mention with its attributes: id and recipient."""
 
-    def __init__(self, type: MentionType, recipient: int, content_id: str) -> None:
+    def __init__(self, type: MentionType, recipient: int, content_id: int) -> None:
         self.type = type
         self.recipient = recipient
         self.content_id = content_id
@@ -42,8 +42,8 @@ class Mention:
         return (
             isinstance(other, Mention)
             and self.type == other.type
-            and other.recipient == self.recipient
-            and other.content_id == self.content_id
+            and self.recipient == other.recipient
+            and self.content_id == other.content_id
         )
 
     def __repr__(self) -> str:
@@ -96,13 +96,13 @@ class DescriptionMentionParser(BaseMentionParser):
         soup = BeautifulSoup(html, "lxml")
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
-            user_id: int = mention_tag.attrs.get("userid")
+            user_id = mention_tag.attrs.get("userid")
             if user_id:
-                mentions.append(Mention(MentionType.USER, user_id, content_id))
+                mentions.append(Mention(MentionType.USER, int(user_id), content_id))
                 continue
-            role_id: int = mention_tag.attrs.get("roleid")
+            role_id = mention_tag.attrs.get("roleid")
             if role_id:
-                mentions.append(Mention(MentionType.ROLE, role_id, content_id))
+                mentions.append(Mention(MentionType.ROLE, int(role_id), content_id))
                 continue
         return mentions
 

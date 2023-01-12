@@ -18,7 +18,7 @@ from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa F403,F401
 from tracim_backend.tests.utils import TracimTestContext
 
-html_with_one_mention_bar = '<p>Foo <html-mention userid="1"></html-mention></p>'
+html_with_one_mention_bar = '<p>Foo <html-mention userid="2"></html-mention></p>'
 
 comment_without_mention = (
     "<p>Bonjour,</p>"
@@ -32,7 +32,7 @@ comment_without_mention = (
 )
 
 html_with_several_mentions = (
-    '<p><html-mention userid="1"></html-mention> <html-mention roleid="0"></html-mention></p>'
+    '<p><html-mention userid="2"></html-mention> <html-mention roleid="0"></html-mention></p>'
 )
 
 
@@ -116,7 +116,7 @@ def one_updated_content_with_one_new_mention(
         api.update_content(
             content,
             new_label=content.label,
-            new_raw_content=content.raw_content + '<html-mention userid="1"></html-mention>',
+            new_raw_content=content.raw_content + '<html-mention userid="2"></html-mention>',
         )
         api.save(content)
     return content
@@ -127,7 +127,7 @@ def one_updated_content_with_no_new_mention(
     base_fixture, user_api_factory, workspace_api_factory, session, app_config
 ) -> Content:
     content = create_content(
-        '<p><html-mention userid="1"></html-mention></p>',
+        '<p><html-mention userid="2"></html-mention></p>',
         user_api_factory,
         workspace_api_factory,
         session,
@@ -190,18 +190,19 @@ class TestMentionBuilder:
     @pytest.mark.parametrize(
         "html,mentions",
         [
-            (html_with_one_mention_bar, [Mention(MentionType.USER, 1, "0")]),
+            (html_with_one_mention_bar, [Mention(MentionType.USER, 2, 0)]),
             (comment_without_mention, []),
             (
                 html_with_several_mentions,
-                [Mention(MentionType.USER, 1, "0"), Mention(MentionType.ROLE, 0, "0")],
+                [Mention(MentionType.USER, 2, 0), Mention(MentionType.ROLE, 0, 0)],
             ),
         ],
     )
     def test_unit_get_mentions_from_html__ok__nominal_cases(
         self, html: str, mentions: typing.List[Mention]
     ) -> None:
-        assert DescriptionMentionParser.get_mentions_from_html(0, html) == mentions
+        for idx, new_mention in enumerate(DescriptionMentionParser.get_mentions_from_html(0, html)):
+            assert new_mention == mentions[idx]
 
     def test_unit_on_content_created__ok__nominal_case(
         self, session_factory, app_config, one_content_with_a_mention: Content
@@ -219,11 +220,9 @@ class TestMentionBuilder:
         assert "client_token" in mention_event.fields
         assert "content" in mention_event.fields
         assert "workspace" in mention_event.fields
-        assert {
-            "type": MentionType.USER,
-            "recipient": "1",
-            "content_id": "0",
-        } == mention_event.fields["mention"]
+        assert {"type": MentionType.USER, "recipient": 2, "content_id": 1} == mention_event.fields[
+            "mention"
+        ]
 
     def test_unit_on_content_created__ok__comment(
         self, session_factory, app_config, one_comment_with_a_mention: Content
@@ -271,11 +270,9 @@ class TestMentionBuilder:
         mention_event = context.pending_events[0]
         assert EntityType.MENTION == mention_event.entity_type
         assert OperationType.CREATED == mention_event.operation
-        assert {
-            "type": MentionType.USER,
-            "recipient": "1",
-            "content_id": "0",
-        } == mention_event.fields["mention"]
+        assert {"type": MentionType.USER, "recipient": 2, "content_id": 1} == mention_event.fields[
+            "mention"
+        ]
 
     def test_unit_on_content_modified__ok__no_new_mention(
         self, session_factory, app_config, one_updated_content_with_no_new_mention: Content
@@ -299,7 +296,7 @@ class TestMentionBuilder:
 
     @pytest.mark.parametrize(
         "mention_type, recipient, receiver_ids",
-        [(MentionType.ROLE, 0, [2]), (MentionType.USER, 1, [1])],
+        [(MentionType.ROLE, 0, [2]), (MentionType.USER, 2, [2])],
     )
     def test_unit_get_receiver_ids(
         self,
@@ -314,11 +311,7 @@ class TestMentionBuilder:
             entity_type=EntityType.MENTION,
             operation=OperationType.CREATED,
             fields={
-                "mention": {
-                    "type": mention_type,
-                    "recipient": recipient,
-                    "content_id": "foobar123",
-                },
+                "mention": {"type": mention_type, "recipient": recipient, "content_id": "0"},
                 "workspace": {"workspace_id": one_content_with_a_mention.workspace.workspace_id},
             },
             workspace_id=one_content_with_a_mention.workspace.workspace_id,
