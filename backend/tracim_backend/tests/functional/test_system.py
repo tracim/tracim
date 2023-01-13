@@ -7,6 +7,7 @@ import transaction
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.utils.utils import get_timezones_list
+from tracim_backend.models.mention import MENTION
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
 
@@ -189,9 +190,9 @@ class TestUsernameEndpoints(object):
             ("anotherOne", True),
             ("all", False),
             ("tous", False),
-            ("todos", False),
-            ("alle", False),
-            ("الكل", False),
+            ("inhoud-beheerder", False),
+            ("contribuidor", False),
+            ("مدير", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
@@ -206,7 +207,7 @@ class TestUsernameEndpoints(object):
     def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/reserved-usernames", status=200)
-        assert set(res.json["items"]) == set(("all", "tous", "todos", "alle", "الكل"))
+        assert set(res.json["items"]) == set(MENTION)
 
 
 @pytest.mark.usefixtures("test_fixture")

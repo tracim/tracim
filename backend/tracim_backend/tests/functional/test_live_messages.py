@@ -362,7 +362,7 @@ class TestLiveMessages(object):
 
         with messages_stream_client() as client_events:
             params = {
-                "raw_content": '<p><span id="mention-foo123">@all</span>This is just an html comment!</p>'
+                "raw_content": '<p><html-mention roleid="0"></html-mention> This is just an html comment!</p>'
             }
             post_comment = requests.post(
                 "http://localhost:7999/api/workspaces/{}/contents/{}/comments".format(
