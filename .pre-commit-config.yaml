@@ -1,35 +1,53 @@
 ---
 repos:
+    # commit
+    - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+      rev: v9.4.0
+      hooks:
+          - id: commitlint
+            stages: [commit-msg]
+            additional_dependencies: ['@commitlint/config-conventional']
+    # global
     - repo: https://github.com/pre-commit/pre-commit-hooks.git
       rev: v2.2.1
       hooks:
           - id: trailing-whitespace
             args: [--markdown-linebreak-ext=md]
             exclude: ^frontend/dist/assets/.*$
+            stages: [commit, merge-commit]
           - id: end-of-file-fixer
             exclude: ^frontend/dist/assets/.*$
+            stages: [commit, merge-commit]
           - id: check-json
+            stages: [commit, merge-commit]
           - id: check-yaml
+            stages: [commit, merge-commit]
           - id: debug-statements
+            stages: [commit, merge-commit]
           - id: check-merge-conflict
+            stages: [commit, merge-commit]
     # backend specific
     - repo: https://github.com/ambv/black
       rev: 19.10b0
       hooks:
           - id: black
             files: 'backend'
+            stages: [commit, merge-commit]
     - repo: https://github.com/asottile/seed-isort-config
       rev: v1.8.0
       hooks:
           - id: seed-isort-config
             args: [--settings-path=backend]
+            stages: [commit, merge-commit]
     - repo: https://github.com/pre-commit/mirrors-isort
       rev: v4.3.18
       hooks:
           - id: isort
             files: 'backend'
+            stages: [commit, merge-commit]
     - repo: https://gitlab.com/pycqa/flake8
       rev: 3.7.9
       hooks:
           - id: flake8
             files: 'backend'
+            stages: [commit, merge-commit]
