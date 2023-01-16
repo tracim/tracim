@@ -339,17 +339,20 @@ export const TinyEditor = props => {
                                   type: 'cardtext',
                                   text: content.label,
                                   name: 'content_label'
-                                },
-                                {
-                                  type: 'cardtext',
-                                  text: content.content_id.toString(),
-                                  name: 'content_id'
                                 }
                               ]
                             },
                             {
-                              type: 'cardtext',
-                              text: 'Content'
+                              type: 'cardcontainer',
+                              direction: 'horizontal',
+                              items: [
+                                {
+                                  type: 'cardtext',
+                                  text: `#${content.content_id.toString()}`,
+                                  name: 'content_id',
+                                  classes: ['tinymce-username']
+                                }
+                              ]
                             }
                           ]
                         }
