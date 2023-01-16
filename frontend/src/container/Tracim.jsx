@@ -86,6 +86,7 @@ import {
   setHeadTitle,
   setAccessibleWorkspaceList
 } from '../action-creator.sync.js'
+import HTMLMention from '../component/Mention/HTMLMention.js'
 import NotificationWall from './NotificationWall.jsx'
 import AdvancedSearch from './AdvancedSearch.jsx'
 import SimpleSearch from './SimpleSearch.jsx'
@@ -118,7 +119,7 @@ export class Tracim extends React.Component {
       unansweredCallTimeoutId: -1
     }
 
-    initializeCustomElements()
+    initializeCustomElements('html-mention', HTMLMention)
 
     this.audioCall = new Audio('/assets/branding/incoming-call.ogg')
     this.liveMessageManager = new LiveMessageManager()

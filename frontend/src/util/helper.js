@@ -6,8 +6,6 @@ import {
   ROLE
 } from 'tracim_frontend_lib'
 
-import HTMLMention from '../component/Mention/HTMLMention.js'
-
 const configEnv = process.env.NODE_ENV === 'test' ? require('../../configEnv-test.json') : require('../../configEnv.json')
 
 const versionFile = require('../version.json')
@@ -127,10 +125,15 @@ export const unLoggedAllowedPageList = [
   PAGE.GUEST_DOWNLOAD('')
 ]
 
-export const initializeCustomElements = () => {
+/**
+ * Function to initialize a custom element
+ * @param {String} htmlTag tag name that will be replaced with the HTML Element
+ * @param {HTMLElement} htmlElement HTML element that whill replace the tag name
+ */
+export const initializeCustomElements = (htmlTag, htmlElement) => {
   if (window.customElements) {
-    if (!window.customElements.get('html-mention')) {
-      window.customElements.define('html-mention', HTMLMention)
+    if (!window.customElements.get(htmlTag)) {
+      window.customElements.define(htmlTag, htmlElement)
     }
   } else {
     window.alert(i18n.t(
