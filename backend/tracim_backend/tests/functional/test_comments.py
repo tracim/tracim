@@ -351,50 +351,28 @@ class TestCommentsEndpoint(object):
         assert "code" in res.json_body
         assert res.json_body["code"] == ErrorCode.EMPTY_COMMENT_NOT_ALLOWED
 
-    def test_api__post_content_comment__err_400__nasty_mention(
-        self, web_testapp, html_with_nasty_mention
+    @pytest.mark.parametrize(
+        "comment_to_send, expected_error",
+        [
+            ("html_with_nasty_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_wrong_user_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_empty_mention", ErrorCode.INVALID_MENTION),
+        ],
+    )
+    def test_api__post_content_comment__err_400(
+        self, web_testapp, request, comment_to_send: str, expected_error: ErrorCode,
     ) -> None:
         """
         This test should raise an error as the html contains a mention to a user not member of the workspace
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": html_with_nasty_mention}
+        params = {"raw_content": request.getfixturevalue(comment_to_send)}
         res = web_testapp.post_json(
             "/api/workspaces/2/contents/7/comments", params=params, status=400
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__post_content_comment__err_400__user_not_member_of_workspace(
-        self, web_testapp, html_with_wrong_user_mention
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention to a user not member of the workspace
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": html_with_wrong_user_mention}
-        res = web_testapp.post_json(
-            "/api/workspaces/2/contents/7/comments", params=params, status=400
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__post_content_comment__err_400__empty_mention(
-        self, web_testapp, html_with_empty_mention
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention to a user not member of the workspace
-        """
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        params = {"raw_content": html_with_empty_mention}
-        res = web_testapp.post_json(
-            "/api/workspaces/2/contents/7/comments", params=params, status=400
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
+        assert res.json_body["code"] == expected_error
 
     def test_api__post_content_comment__ok__200__empty_iframes_are_not_deleted(
         self, web_testapp

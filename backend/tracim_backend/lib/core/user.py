@@ -377,7 +377,7 @@ need to be in every workspace you include."
         reserved_usernames = reserved_usernames + MENTION["reader"]
         reserved_usernames = reserved_usernames + MENTION["contributor"]
         reserved_usernames = reserved_usernames + MENTION["reader"]
-        reserved_usernames = reserved_usernames + MENTION["contributor"]
+        reserved_usernames = reserved_usernames + MENTION["content-manager"]
         reserved_usernames = reserved_usernames + MENTION["space-manager"]
         return tuple(reserved_usernames)
 
