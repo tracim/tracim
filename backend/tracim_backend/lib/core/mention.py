@@ -7,7 +7,7 @@ from pluggy import PluginManager
 
 from tracim_backend.app_models.contents import COMMENT_TYPE
 from tracim_backend.config import CFG
-from tracim_backend.exceptions import MentionInvalid
+from tracim_backend.exceptions import InvalidMention
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.lib.core.content import ContentApi
 from tracim_backend.lib.core.event import BaseLiveMessageBuilder
@@ -53,7 +53,7 @@ class Mention:
         )
 
     def __hash__(self) -> int:
-        return hash(self.content_id)
+        return hash((self.type, self.recipient, self.content_id))
 
 
 class BaseMentionParser(abc.ABC):
@@ -89,7 +89,9 @@ class DescriptionMentionParser(BaseMentionParser):
 
     @classmethod
     def is_html_mention_tag(cls, tag: Tag) -> bool:
-        return cls.MENTION_TAG_NAME == tag.name
+        return cls.MENTION_TAG_NAME == tag.name and (
+            tag.has_attr("userid") or tag.has_attr("roleid")
+        )
 
     @classmethod
     def get_mentions_from_html(cls, content_id: int, html: str) -> typing.List[Mention]:
@@ -98,14 +100,14 @@ class DescriptionMentionParser(BaseMentionParser):
         mentions = []
         for mention_tag in soup.find_all(DescriptionMentionParser.is_html_mention_tag):
             user_id = mention_tag.attrs.get("userid")
+            role_id = mention_tag.attrs.get("roleid")
             if user_id and user_id != "":
                 mentions.append(Mention(MentionType.USER, int(user_id), content_id))
                 continue
-            role_id = mention_tag.attrs.get("roleid")
-            if role_id and role_id != "":
+            elif role_id and role_id != "":
                 mentions.append(Mention(MentionType.ROLE, int(role_id), content_id))
                 continue
-            raise MentionInvalid(
+            raise InvalidMention(
                 f"The current mention is empty: no userid and no roleid specified."
             )
         return mentions

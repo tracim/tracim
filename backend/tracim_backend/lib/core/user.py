@@ -87,7 +87,7 @@ from tracim_backend.models.context_models import UserInContext
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
-from tracim_backend.models.mention import MENTION
+from tracim_backend.models.mention import TRANSLATED_GROUP_MENTIONS
 from tracim_backend.models.social import UserFollower
 from tracim_backend.models.tracim_session import TracimSession
 from tracim_backend.models.user_custom_properties import UserCustomProperties
@@ -373,12 +373,10 @@ need to be in every workspace you include."
         return [content_api.get_content_in_context(content) for content in contents]
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
-        reserved_usernames = MENTION["all"]
-        reserved_usernames = reserved_usernames + MENTION["reader"]
-        reserved_usernames = reserved_usernames + MENTION["contributor"]
-        reserved_usernames = reserved_usernames + MENTION["reader"]
-        reserved_usernames = reserved_usernames + MENTION["content-manager"]
-        reserved_usernames = reserved_usernames + MENTION["space-manager"]
+        reserved_usernames = []
+        for key in TRANSLATED_GROUP_MENTIONS.keys():
+            # reserved_usernames += value
+            reserved_usernames += self._config.TRANSLATIONS[key].values()
         return tuple(reserved_usernames)
 
     def get_user_workspaces_query(self, user_id: int) -> Query:

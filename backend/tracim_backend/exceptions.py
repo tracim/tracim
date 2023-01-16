@@ -684,5 +684,5 @@ class UserCallNotFound(NotFound):
     error_code = ErrorCode.USER_CALL_NOT_FOUND
 
 
-class MentionInvalid(TracimException):
+class InvalidMention(TracimException):
     error_code = ErrorCode.INVALID_MENTION
