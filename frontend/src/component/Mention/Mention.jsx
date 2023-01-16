@@ -39,7 +39,7 @@ const calculateUserMention = (props) => {
   }
 
   // Fetch from other spaces
-  for (space in props.workspaceList) {
+  for (const space in props.workspaceList) {
     const user = space.memberList.find(m => m.id === userId)
     if (user) {
       mention.text = user.username
