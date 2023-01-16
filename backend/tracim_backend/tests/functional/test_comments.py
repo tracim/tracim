@@ -503,14 +503,22 @@ class TestEditComment(object):
         )
         assert new_res_get.json_body == res_put.json_body
 
-    def test_api__edit_comment__err_400__nasty_mention(
+    @pytest.mark.parametrize(
+        "comment_to_send, expected_error",
+        [
+            ("html_with_nasty_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_wrong_user_mention", ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE),
+            ("html_with_empty_mention", ErrorCode.INVALID_MENTION),
+        ],
+    )
+    def test_api__edit_comment__err_400(
         self,
         web_testapp,
         workspace_api_factory,
         content_api_factory,
-        content_type_list,
-        session,
-        html_with_nasty_mention,
+        request,
+        comment_to_send: str,
+        expected_error: ErrorCode,
     ) -> None:
         """
         This test should raise an error as the html contains a mention to a user not member of the workspace
@@ -528,7 +536,7 @@ class TestEditComment(object):
             status=200,
         )
         assert res_get.json_body["raw_content"] == "First version"
-        params = {"raw_content": html_with_nasty_mention}
+        params = {"raw_content": request.getfixturevalue(comment_to_send)}
         res = web_testapp.put_json(
             "/api/workspaces/{}/contents/{}/comments/{}".format(
                 workspace.workspace_id, test_html_document.content_id, comment.content_id,
@@ -538,82 +546,7 @@ class TestEditComment(object):
         )
         assert res.json_body
         assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__edit_comment__err_400__user_not_in_workspace(
-        self,
-        web_testapp,
-        workspace_api_factory,
-        content_api_factory,
-        content_type_list,
-        session,
-        html_with_wrong_user_mention,
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention to a user not member of the workspace
-        """
-        workspace_api = workspace_api_factory.get()
-        content_api = content_api_factory.get()
-        workspace, test_html_document, comment = create_doc_and_comment(
-            workspace_api, content_api, content_api
-        )
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res_get = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            status=200,
-        )
-        assert res_get.json_body["raw_content"] == "First version"
-        params = {"raw_content": html_with_wrong_user_mention}
-        res = web_testapp.put_json(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            params=params,
-            status=400,
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
-
-    def test_api__edit_comment__err_400__empty_mention(
-        self,
-        web_testapp,
-        workspace_api_factory,
-        content_api_factory,
-        content_type_list,
-        session,
-        html_with_empty_mention,
-    ) -> None:
-        """
-        This test should raise an error as the html contains a mention empty (without anyway to
-        detect the user)
-        """
-        workspace_api = workspace_api_factory.get()
-        content_api = content_api_factory.get()
-        workspace, test_html_document, comment = create_doc_and_comment(
-            workspace_api, content_api, content_api
-        )
-        web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res_get = web_testapp.get(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            status=200,
-        )
-        assert res_get.json_body["raw_content"] == "First version"
-        params = {"raw_content": html_with_empty_mention}
-        res = web_testapp.put_json(
-            "/api/workspaces/{}/contents/{}/comments/{}".format(
-                workspace.workspace_id, test_html_document.content_id, comment.content_id,
-            ),
-            params=params,
-            status=400,
-        )
-        assert res.json_body
-        assert "code" in res.json_body
-        assert res.json_body["code"] == ErrorCode.USER_NOT_MEMBER_OF_WORKSPACE
+        assert res.json_body["code"] == expected_error
 
     def test_api__edit_comment__err__empty_raw_content(
         self, web_testapp, workspace_api_factory, content_api_factory, content_type_list, session,
