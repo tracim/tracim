@@ -39,14 +39,12 @@ const calculateUserMention = (props) => {
   }
 
   // Fetch from other spaces
-  let testedSpace = 0
-  while (testedSpace < props.workspaceList.length) {
-    const user = props.workspaceList[testedSpace].memberList.find(m => m.id === userId)
+  for (space in props.workspaceList) {
+    const user = space.memberList.find(m => m.id === userId)
     if (user) {
       mention.text = user.username
       return mention
     }
-    testedSpace++
   }
 
   // Fetch from API (can't use async since it's used to render)
