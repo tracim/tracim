@@ -8,7 +8,6 @@
       position absolute
       // INFO - ML - 2023-01-11 - The 8px corresponds to the half of the sort icon's height
       top calc(50% - 8px)
-      right 0
       padding-inline-start textSpacing
       color darkGrey1
       &:hover
@@ -17,8 +16,8 @@
     &__btn
       padding 10px 0
       width 100%
-      text-align left
-      white-space wrap
+      text-align inherit
+      white-space break-spaces
     &__row
       display flex
       flex-direction row
@@ -30,7 +29,8 @@
         position relative
         overflow hidden
         text-overflow ellipsis
-        margin-inline-start standardSpacing
+        padding buttonShadowOutline
+        margin-inline-start "calc(%s - %s)" % (standardSpacing buttonShadowOutline)
         margin-inline-end standardSpacing
       &__cell *
         overflow hidden
@@ -55,3 +55,9 @@
 
 .tracimTable__body__colored .tracimTable__body__row:nth-child(even)
   background-color lightGrey2
+
+[dir=ltr] .tracimTable__header__icon
+  right buttonShadowOutline
+
+[dir=rtl] .tracimTable__header__icon
+  left buttonShadowOutline
