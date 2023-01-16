@@ -61,7 +61,7 @@ const TracimTableHeader = (props) => {
       {props.headerData.isPlaceholder
         ? null
         : (
-          <button className="btn transparentButton tracimTable__header__btn">
+          <button className='btn transparentButton tracimTable__header__btn'>
             {flexRender(
               props.headerData.column.columnDef.header,
               {
