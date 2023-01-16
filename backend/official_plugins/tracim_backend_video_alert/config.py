@@ -5,10 +5,7 @@ config = {
     "message": "This is video is not provided in the mp4 format, therefore it is not playable from\
                Tracim's interface. Please upload this video as a mp4 file.",
     # List of extensions that should not trigger a warning.
-    "ok_extensions": [
-        ".mp4",
-        ".webm"
-    ],
+    "ok_extensions": [".mp4", ".webm"],
     # List of mimetypes that should not trigger a warning. Not considered for now.
     "ok_mimetypes": ["video/mp4"],
     # List of Tracim content types supported by this plugin.
