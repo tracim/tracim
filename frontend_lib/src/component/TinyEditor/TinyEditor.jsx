@@ -228,12 +228,13 @@ export const TinyEditor = props => {
             })
             // /////////////////////////////////////////////
             // Handle mentions
+            const maxFetchResults = 15
             editor.ui.registry.addAutocompleter('mentions', {
               ch: '@',
               columns: 1,
               highlightOn: ['roleName', 'publicName', 'username'],
               minChars: 1,
-              maxResults: 10,
+              maxResults: maxFetchResults,
               fetch: async function (pattern) {
                 const insensitivePattern = pattern.toLowerCase()
                 const matchedMemberList = props.userList.filter((user) => {
@@ -306,11 +307,11 @@ export const TinyEditor = props => {
               columns: 1,
               highlightOn: ['content_label', 'content_id'],
               minChars: 1,
-              maxResults: 10,
+              maxResults: maxFetchResults,
               fetch: async function (pattern) {
                 try {
                   const contentList = await handleFetchResult(
-                    await getMyselfKnownContents(props.apiUrl, pattern, 10)
+                    await getMyselfKnownContents(props.apiUrl, pattern, maxFetchResults)
                   )
                   const insensitivePattern = pattern.toLowerCase()
                   const matchedContentList = contentList.body.filter((content) => {
