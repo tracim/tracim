@@ -205,9 +205,12 @@ class TestUserApi(object):
         with pytest.raises(UsernameAlreadyExists):
             api.create_minimal_user(username="boby", email="boby2@boba.fet", save_now=True)
 
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+    )
     @pytest.mark.parametrize("username", ["all"])
     def test_unit__create_minimal_user__error__reserved_username(
-        self, session, app_config, username: str
+        self, get_reserved_usernames_mock, session, app_config, username: str
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         with pytest.raises(ReservedUsernameError):
@@ -262,9 +265,12 @@ class TestUserApi(object):
         with pytest.raises(UsernameAlreadyExists):
             api.update(user=u1, username="jean")
 
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+    )
     @pytest.mark.parametrize("username", ["all"])
     def test_unit__update_user_username__error__reserved_username(
-        self, session, app_config, username: str
+        self, get_reserved_usernames_mock, session, app_config, username: str
     ):
         api = UserApi(current_user=None, session=session, config=app_config)
         u1 = api.create_minimal_user(username="boby", email="boby@boba.fet", save_now=True)
