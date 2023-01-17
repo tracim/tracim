@@ -133,23 +133,23 @@ msgstr "{username} & all members of {workspace}"
 
 #: tracim_backend/models/mention.py:5
 msgid "all"
-msgstr ""
+msgstr "all"
 
 #: tracim_backend/models/mention.py:6
 msgid "reader"
-msgstr ""
+msgstr "reader"
 
 #: tracim_backend/models/mention.py:7
 msgid "contributor"
-msgstr ""
+msgstr "contributor"
 
 #: tracim_backend/models/mention.py:8
 msgid "content-manager"
-msgstr ""
+msgstr "content-manager"
 
 #: tracim_backend/models/mention.py:9
 msgid "space-manager"
-msgstr ""
+msgstr "space-manager"
 
 #: tracim_backend/templates/mail/content_update_body_html.mak:31
 msgid ""
