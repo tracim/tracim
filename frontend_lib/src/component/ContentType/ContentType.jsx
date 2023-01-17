@@ -2,11 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
-import {
-  Icon
-} from 'tracim_frontend_lib'
-
-require('./ContentType.styl')
+import Icon from '../Icon/Icon.jsx'
 
 const ContentType = props => {
   return (

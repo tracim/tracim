@@ -53,6 +53,7 @@ export class WorkspaceAdvancedConfiguration extends React.Component {
           apiUrl={props.apiUrl}
           autoCompleteCursorPosition={props.autoCompleteCursorPosition}
           autoCompleteItemList={props.autoCompleteItemList}
+          customColor={props.customColor}
           description={props.description}
           isAutoCompleteActivated={props.isAutoCompleteActivated}
           isReadOnlyMode={props.isReadOnlyMode}
@@ -148,6 +149,7 @@ export default translate()(Radium(WorkspaceAdvancedConfiguration))
 
 WorkspaceAdvancedConfiguration.propTypes = {
   agendaUrl: PropTypes.string,
+  customColor: PropTypes.string,
   description: PropTypes.string,
   lang: PropTypes.string,
   isReadOnlyMode: PropTypes.bool,
@@ -157,6 +159,7 @@ WorkspaceAdvancedConfiguration.propTypes = {
 
 WorkspaceAdvancedConfiguration.defaultProps = {
   agendaUrl: '',
+  customColor: '',
   description: '',
   lang: '',
   isReadOnlyMode: true,

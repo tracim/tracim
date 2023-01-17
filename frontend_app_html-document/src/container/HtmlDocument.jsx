@@ -891,6 +891,7 @@ export class HtmlDocument extends React.Component {
         >
           <TagList
             apiUrl={state.config.apiUrl}
+            customColor={state.config.hexcolor}
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}

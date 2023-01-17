@@ -48,6 +48,7 @@ import {
   getCurrentContentVersionNumber,
   getFileDownloadUrl,
   getOrCreateSessionClientToken,
+  getRevisionTypeLabel,
   handleClickCopyLink,
   handleFetchResult,
   hasSpaces,
@@ -202,6 +203,8 @@ import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
 import NewToDo from './component/ToDo/NewToDo.jsx'
 import ToDoItem from './component/ToDo/ToDoItem.jsx'
 
+import ContentType from './component/ContentType/ContentType.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -304,6 +307,8 @@ export { default as Tag } from './component/Tags/Tag.jsx'
 export { default as Loading } from './component/Loading/Loading.jsx'
 export { default as COLORS } from './colors.js'
 
+export { default as tracimTableLib } from './TracimTableLib/tracimTableLib.js'
+
 export {
   TRANSLATION_STATE,
   handleTranslateComment,
@@ -365,6 +370,7 @@ export {
   Checkbox,
   CommentArea,
   ComposedIcon,
+  ContentType,
   DateInput,
   Delimiter,
   DisplayFileToUpload,
@@ -464,6 +470,7 @@ export {
   getOrCreateSessionClientToken,
   getRawFileContent,
   getReservedUsernames,
+  getRevisionTypeLabel,
   getSpaceContent,
   getSpaceMemberFromId,
   getSpaceMemberList,
