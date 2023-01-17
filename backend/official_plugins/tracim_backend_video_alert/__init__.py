@@ -7,11 +7,27 @@ from tracim_backend.lib.core.workspace import WorkspaceApi
 from tracim_backend.lib.utils.request import TracimContext
 from tracim_backend.models.data import Content
 
-from .config import config
 from .utils import is_content_blacklisted
 from .utils import is_content_supported
 from .utils import is_content_whitelisted
 from .utils import wrap_in_mention_node
+
+# Envoi de la mention
+# Check sur le mimetype (se plugger sur le hook de modification de contenu, mais pas trigger le rename)
+# La config doit passer depuis l'env, avec des valeurs par défaut
+# Lire un user depuis l'env, mettre un user par défaut sur l'auteur du fichier
+# Tout remettre dans un seul fichier
+
+# Rédaction d'un micro-tuto pour expliquer comment faire un plugin (markdown, hors de Tracim)
+
+config = {
+    # Message of the warning. Note that a mention to the file's author will be appended.
+    "message": "Oops, I uploaded a video that is not a supported. I should send a mp4 or webm file instead.",
+    # List of mimetypes that should bypass the blacklist.
+    "ok_mimetypes": ["video/mp4", "video/webm"],
+    # List of mimetypes that should trigger a warning
+    "nok_mimetypes": ["video/", "image/gif", "image/webp"],
+}
 
 
 class VideoAlertPlugin:
