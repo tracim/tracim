@@ -21,7 +21,8 @@ import {
   MINIMUM_CHARACTERS_USERNAME,
   MAXIMUM_CHARACTERS_USERNAME,
   permissiveNumberEqual,
-  updateTLMUser
+  updateTLMUser,
+  stringIncludes
 } from '../src/helper.js'
 
 import {
@@ -550,6 +551,152 @@ describe('helper.js', () => {
 
     it('should return true if the string has two not-empty parts with an @ between even if multiples @', () => {
       expect(checkEmailValidity('something@something@something')).to.equal(true)
+    })
+  })
+
+  describe('stringIncludes()', () => {
+    const token = 'abc'
+    const tests = [
+      {
+        title: 'should return false with an undefined string and token',
+        expect: false
+      },
+      {
+        title: 'should return false with an undefined string',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false with an undefined token',
+        value: 'hello there',
+        expect: false
+      },
+      {
+        title: 'should return false with an empty string and token',
+        value: '',
+        token: '',
+        expect: false
+      },
+      {
+        title: 'should return false with an empty token',
+        value: 'general kenobi',
+        token: '',
+        expect: false
+      },
+      {
+        title: 'should return false with an empty string',
+        value: '',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false with smaller string (1 char)',
+        value: 'a',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false with smaller string (2 char)',
+        value: 'ab',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return true with an exact match (case matching)',
+        value: 'abc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (start) (case matching)',
+        value: 'abcdefghijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (middle) (case matching)',
+        value: 'defgabchijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (end) (case matching)',
+        value: 'defghijklabc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with token repeated in string (case matching)',
+        value: 'deabcfghiabcjklabc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with an exact match (case not matching)',
+        value: 'Abc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (start) (case not matching)',
+        value: 'aBcdefghijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (middle) (case not matching)',
+        value: 'defgaBChijkl',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with a greater string (end) (case not matching)',
+        value: 'defghijklAbC',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true with token repeated in string (case not matching)',
+        value: 'deAbcfghiaBcjklabc',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return false with token scattered in string',
+        value: 'f38kqV89oxyPp%^h98F2a7kYinuyj!b@po1129xEst#UP3CZSp5N',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return true in string with special characters',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöabcö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: token,
+        expect: true
+      },
+      {
+        title: 'should return true in string and token with special characters',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöabcö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: '\0x% fðßghœþäöab',
+        expect: true
+      },
+      {
+        title: 'should return false in string with special characters when there is no match',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: token,
+        expect: false
+      },
+      {
+        title: 'should return false in string and token with special characters when there is no match',
+        value: 'f38kqV89oxyPp\0x% fðßghœþäöabcö«öó³¤€²³¤¹²ähgf»¬æææ¤̛‘’¥FGGØÖÅØ§÷áßþghœøïúhœö¶```ðßfgðëfühfþg’‘öóœþüïåþ²³äëþ²³¹ëä¤œø³²åóáøç¶öí¶óíó«úüïßðfë^h98 \tF2a7\nYinuyj!b@po1129x\tEst#UP3CZSp5N',
+        token: '\0x% fðßgœþäöab',
+        expect: false
+      }
+    ]
+
+    tests.forEach(test => {
+      it(test.title, () => {
+        expect(stringIncludes(test.token)(test.value)).to.equal(test.expect)
+      })
     })
   })
 })

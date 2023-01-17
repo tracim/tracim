@@ -1,0 +1,26 @@
+@import '../../css/Variable.styl'
+
+.timedEventColumn
+  &__modification
+    flex 1
+    &.timedEvent
+      overflow hidden
+
+@media (max-width: max-lg)
+  .timedEventColumn
+    &__modification
+      overflow hidden
+      text-overflow ellipsis
+  .timedEvent.timedEventColumn__modification
+    & .timedEvent__operation
+      display none
+
+@media (max-width: max-sm)
+  .timedEvent
+    &__author
+      overflow hidden
+      text-overflow ellipsis
+      white-space nowrap
+  .timedEventColumn
+    &__modification
+      display none

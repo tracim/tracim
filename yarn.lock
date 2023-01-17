@@ -2816,6 +2816,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tanstack/react-table@npm:8.7.0":
+  version: 8.7.0
+  resolution: "@tanstack/react-table@npm:8.7.0"
+  dependencies:
+    "@tanstack/table-core": 8.7.0
+  peerDependencies:
+    react: ">=16"
+    react-dom: ">=16"
+  checksum: 5f739f619dacfd134449bc8cff819d7e1b9549b8c8b20c293f2c786098a53d20fe5755727d8abb6fa56a64583792bbc89d8b1c7cd24ac3497495d2c20bac9e77
+  languageName: node
+  linkType: hard
+
+"@tanstack/table-core@npm:8.7.0":
+  version: 8.7.0
+  resolution: "@tanstack/table-core@npm:8.7.0"
+  checksum: 835511727ab5651066a4cbc98916fbc2463ec6d6ddc5c74c1fec5713eeba8e26641653c1a35b69b303f0c58f574416a09e26da44cf7e9a884cb954fc26b12afd
+  languageName: node
+  linkType: hard
+
 "@tinymce/tinymce-react@npm:^3.2.0":
   version: 3.14.0
   resolution: "@tinymce/tinymce-react@npm:3.14.0"
@@ -13980,6 +13999,7 @@ __metadata:
     "@babel/preset-env": ^7.19.3
     "@babel/preset-react": ^7.18.6
     "@babel/register": ^7.18.9
+    "@tanstack/react-table": 8.7.0
     abort-controller: ^3.0.0
     autolinker: ^3.13.0
     babel-eslint: ^10.1.0

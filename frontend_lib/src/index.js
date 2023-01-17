@@ -66,7 +66,8 @@ import {
   USER_CALL_STATE,
   STATUSES,
   TIMELINE_TYPE,
-  stringIncludes
+  stringIncludes,
+  getRevisionTypeLabel
 } from './helper.js'
 
 import {
@@ -199,6 +200,8 @@ import ToDoManagement from './component/ToDo/ToDoManagement.jsx'
 import NewToDo from './component/ToDo/NewToDo.jsx'
 import ToDoItem from './component/ToDo/ToDoItem.jsx'
 
+import ContentType from './component/ContentType/ContentType.jsx'
+
 import {
   tinymceAutoCompleteHandleInput,
   tinymceAutoCompleteHandleKeyDown,
@@ -300,6 +303,8 @@ export { default as TagList } from './component/Tags/TagList.jsx'
 export { default as Tag } from './component/Tags/Tag.jsx'
 export { default as Loading } from './component/Loading/Loading.jsx'
 export { default as COLORS } from './colors.js'
+
+export { default as tracimTableLib } from './TracimTableLib/tracimTableLib.js'
 
 export {
   TRANSLATION_STATE,
@@ -515,5 +520,7 @@ export {
   STATUSES,
   TIMELINE_TYPE,
   stringIncludes,
-  FilterBar
+  FilterBar,
+  ContentType,
+  getRevisionTypeLabel
 }
