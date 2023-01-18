@@ -44,6 +44,7 @@ import {
   handleTranslateHtmlContent,
   putUserConfiguration,
   removeLocalStorageItem,
+  replaceHTMLElementWithMention,
   searchContentAndPlaceBalise,
   searchMentionAndPlaceBalise,
   sendGlobalFlashMessage,
@@ -419,17 +420,28 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
+    const { props, state } = this
     const previouslyUnsavedRawContent = getLocalStorageItem(
-      this.state.appName,
-      this.state.content.content_id,
-      this.state.content.workspace_id,
+      state.appName,
+      state.content.content_id,
+      state.content.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
+    )
+
+    const rawContent = replaceHTMLElementWithMention(
+      [{
+        id: 0,
+        label: props.t('All'),
+        slug: props.t('all')
+      }],
+      state.config.workspace.memberList,
+      previouslyUnsavedRawContent || state.content.raw_content
     )
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        raw_content: previouslyUnsavedRawContent || prev.content.raw_content
+        raw_content: rawContent
       },
       rawContentBeforeEdit: prev.content.raw_content, // for cancel button
       mode: APP_FEATURE_MODE.EDIT
