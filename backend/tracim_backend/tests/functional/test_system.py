@@ -207,11 +207,11 @@ class TestUsernameEndpoints(object):
     def test_api__get_reserved_usernames__ok_200__nominal_case(self, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get("/api/system/reserved-usernames", status=200)
-        assert set(TRANSLATED_GROUP_MENTIONS["all"]).issubset(set(res.json["items"]))
-        assert set(TRANSLATED_GROUP_MENTIONS["reader"]).issubset(set(res.json["items"]))
-        assert set(TRANSLATED_GROUP_MENTIONS["contributor"]).issubset(set(res.json["items"]))
-        assert set(TRANSLATED_GROUP_MENTIONS["content-manager"]).issubset(set(res.json["items"]))
-        assert set(TRANSLATED_GROUP_MENTIONS["space-manager"]).issubset(set(res.json["items"]))
+        assert set([TRANSLATED_GROUP_MENTIONS["all"]]).issubset(set(res.json["items"]))
+        assert set([TRANSLATED_GROUP_MENTIONS["reader"]]).issubset(set(res.json["items"]))
+        assert set([TRANSLATED_GROUP_MENTIONS["contributor"]]).issubset(set(res.json["items"]))
+        assert set([TRANSLATED_GROUP_MENTIONS["content-manager"]]).issubset(set(res.json["items"]))
+        assert set([TRANSLATED_GROUP_MENTIONS["space-manager"]]).issubset(set(res.json["items"]))
 
 
 @pytest.mark.usefixtures("test_fixture")
