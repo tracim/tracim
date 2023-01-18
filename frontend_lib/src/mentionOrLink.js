@@ -264,7 +264,13 @@ export const searchMentionAndPlaceBalise = (rolelist, userList, html) => {
       }="${
         role ? role.id : user.id
       }"></html-mention>`
-      newHtml = newHtml.replace(mention, mentionBalise)
+      const mentionText = role ? role.slug : user.username
+      // Regex explanation: https://regex101.com/r/hHosBa/10
+      // Match (@XXX part): '@XXX', ' @XXX ', '@XXX-', ':@XXX:', '(@XXX)', '!@XXX!', ...
+      // Don't match: 'XXX@XXX', '@<span>XXX</span>'
+      // ${mentionText} will be repladed with role or user variable
+      const mentionRegex = new RegExp(`(?<=^|\\s|\\W)@${mentionText}\\b`, 'g')
+      newHtml = newHtml.replace(mentionRegex, mentionBalise)
     } else {
       invalidMentionList.push(mention)
     }
@@ -412,7 +418,12 @@ export const searchContentAndPlaceBalise = async (apiUrl, html) => {
       const linkBalise = `<a class="internal_link primaryColorFont" href="${
         PAGE.CONTENT(contentId)
       }" title="${content}">${contentTitle}</a>`
-      newHtml = newHtml.replace(content, linkBalise)
+      // Regex explanation: https://regex101.com/r/z1WUUu/3
+      // Match (#XXX part): '#XXX', '#XXX ', ' #XXX', '#XXX:', ':#XXX', '(#XXX)', '#XXX!', ...
+      // Don't match: 'XXX#XXX', '#<span>XXX</span>', 'title="#XXX'
+      // ${contentId} will be repladed with contentId
+      const mentionRegex = new RegExp(`(?<=^|\\s|\\W)(?<!title=")#${contentId}\\b`, 'g')
+      newHtml = newHtml.replace(mentionRegex, linkBalise)
     } else {
       invalidContentList.push(content)
     }
