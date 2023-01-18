@@ -227,6 +227,13 @@ export const TinyEditor = props => {
               }
             })
             // /////////////////////////////////////////////
+            // Autocompleter functions
+            const onAction = function (autocompleteApi, rng, value) {
+              editor.selection.setRng(rng)
+              editor.insertContent(value)
+              autocompleteApi.hide()
+            }
+            // /////////////////////////////////////////////
             // Handle mentions
             const maxFetchResults = 15
             editor.ui.registry.addAutocompleter('mentions', {
@@ -294,11 +301,7 @@ export const TinyEditor = props => {
 
                 return matchedRoleList.concat(userResultList)
               },
-              onAction: function (autocompleteApi, rng, value) {
-                editor.selection.setRng(rng)
-                editor.insertContent(value)
-                autocompleteApi.hide()
-              }
+              onAction: onAction
             })
             // /////////////////////////////////////////////
             // Handle content link
@@ -369,10 +372,17 @@ export const TinyEditor = props => {
                   return []
                 }
               },
-              onAction: function (autocompleteApi, rng, value) {
-                editor.selection.setRng(rng)
-                editor.insertContent(value)
-                autocompleteApi.hide()
+              onAction: onAction
+            })
+            // /////////////////////////////////////////////
+            // Handle tab to select autocomplete
+            editor.on('keydown', function (e) {
+              if (e.key === 'Tab') {
+                const autoCompleteElement = document.querySelector('.tox-collection__item--active')
+                if (autoCompleteElement) {
+                  e.preventDefault()
+                  autoCompleteElement.click()
+                }
               }
             })
             // /////////////////////////////////////////////
