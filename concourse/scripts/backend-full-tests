@@ -19,6 +19,7 @@ start_docker "" "$docker_registry"
 "$script_dir/install_backend_packages"
 "$script_dir/create_backend_dirs" backend/test_storage_dir
 cd backend
+./update_i18n_json_file.sh
 pip install $(for r in requirements*.txt; do echo "-r $r"; done)
 python setup.py develop
 docker compose up -d
