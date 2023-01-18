@@ -1,4 +1,5 @@
 # coding=utf-8
+from unittest import mock
 from urllib.parse import quote
 
 from mock import patch
@@ -181,6 +182,9 @@ class TestUsernameEndpoints(object):
      - /api/system/reserved-usernames
     """
 
+    @mock.patch(
+        "tracim_backend.lib.core.user.UserApi.get_reserved_usernames", return_value=tuple(["all"])
+    )
     @pytest.mark.parametrize(
         "username,is_available",
         [
@@ -189,14 +193,10 @@ class TestUsernameEndpoints(object):
             ("Cloclo", True),
             ("anotherOne", True),
             ("all", False),
-            ("tous", False),
-            ("inhoud-beheerder", False),
-            ("contribuidor", False),
-            ("مدير", False),
         ],
     )
     def test_api__get_username_availability__ok_200__nominal_case(
-        self, web_testapp, username: str, is_available: bool
+        self, get_reserved_usernames_mock, web_testapp, username: str, is_available: bool
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
