@@ -373,7 +373,7 @@ need to be in every workspace you include."
         return [content_api.get_content_in_context(content) for content in contents]
 
     def get_reserved_usernames(self) -> typing.Tuple[str, ...]:
-        reserved_usernames = []
+        reserved_usernames = ["all", "reader", "contributor", "content-manager", "space-manager"]
         for key in TRANSLATED_GROUP_MENTIONS.keys():
             for lang in self._config.TRANSLATIONS["GLOBAL"].keys():
                 reserved_usernames += [self._config.TRANSLATIONS["GLOBAL"][lang][key]]
