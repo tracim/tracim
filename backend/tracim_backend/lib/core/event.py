@@ -949,7 +949,10 @@ def get_event_user_id(session: TracimSession, event: Event) -> typing.Optional[i
     if not event.fields.get(Event.USER_FIELD):
         return None
     try:
-        return int(event.user["user_id"])
+        # TODO - MP - 2022-11-29 - Should use line 934, keep testing like this and remove 935 before
+        # merge (comment start line 933)
+        # return int(event.user["user_id"])
+        return session.query(User.user_id).filter(User.user_id == event.user["user_id"]).scalar()
     except (AttributeError, NoResultFound):
         # no user in event or user does not exist anymore
         return None
