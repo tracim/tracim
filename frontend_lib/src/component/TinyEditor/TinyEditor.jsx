@@ -5,7 +5,7 @@ import i18n from '../../i18n.js'
 import { Editor } from '@tinymce/tinymce-react'
 
 import {
-  // getAvatarBaseUrl,
+  getAvatarBaseUrl,
   handleFetchResult
 } from '../../helper.js'
 import {
@@ -71,6 +71,7 @@ export const TinyEditor = props => {
   useEffect(() => {
     defaultRoleList = props.roleList.map(role => ({
       type: 'cardmenuitem',
+      direction: 'horizontal',
       value: `@${role.slug} `,
       label: `@${role.slug}`,
       items: [
@@ -260,41 +261,25 @@ export const TinyEditor = props => {
                   type: 'cardmenuitem',
                   value: `@${user.username} `,
                   label: `@${user.username}`,
+                  direction: 'horizontal',
                   items: [
                     {
-                      type: 'cardcontainer',
-                      direction: 'vertical',
-                      items: [
-                        // {
-                        //   type: 'cardimage',
-                        //   src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/preview/jpg/25x25/avatar`,
-                        //   alt: user.publicName,
-                        //   name: 'avatar'
-                        // },
-                        {
-                          type: 'cardcontainer',
-                          direction: 'horizontal',
-                          items: [
-                            {
-                              type: 'cardtext',
-                              text: user.publicName,
-                              name: 'publicName'
-                            }
-                          ]
-                        },
-                        {
-                          type: 'cardcontainer',
-                          direction: 'horizontal',
-                          items: [
-                            {
-                              type: 'cardtext',
-                              text: `@${user.username}`,
-                              name: 'username',
-                              classes: ['tinymce-username']
-                            }
-                          ]
-                        }
-                      ]
+                      type: 'cardimage',
+                      src: `${getAvatarBaseUrl(props.apiUrl, user.id)}/raw/avatar`,
+                      alt: user.publicName,
+                      name: 'avatar',
+                      classes: ['tinymce-avatar']
+                    },
+                    {
+                      type: 'cardtext',
+                      text: ` ${user.publicName}`,
+                      name: 'publicName'
+                    },
+                    {
+                      type: 'cardtext',
+                      text: `- @${user.username}`,
+                      name: 'username',
+                      classes: ['tinymce-username']
                     }
                   ]
                 }))

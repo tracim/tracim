@@ -2,6 +2,7 @@
 import datetime
 import io
 import os
+import re
 from smtplib import SMTPException
 from smtplib import SMTPRecipientsRefused
 import typing as typing
@@ -99,6 +100,7 @@ AVATAR_RATIO = ImageRatio(1, 1)
 COVER_RATIO = ImageRatio(35, 4)
 DEFAULT_AVATAR_SIZE = ImageSize(100, 100)
 DEFAULT_COVER_SIZE = ImageSize(1300, 150)
+SVG_MIMETYPE = "image/svg+xml"
 
 
 class UserApi(object):
@@ -1268,7 +1270,7 @@ need to be in every workspace you include."
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.avatar:
-            raise UserImageNotFound("avatar of user {} not found".format(user_id))
+            self.set_avatar(user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user))
         return StorageLib(self._config).get_raw_file(
             depot_file=user.avatar,
             filename=filename,
@@ -1287,7 +1289,7 @@ need to be in every workspace you include."
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cropped_avatar:
-            raise UserImageNotFound("cropped version of user {} avatar not found".format(user_id))
+            self.set_avatar(user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user))
         _, original_file_extension = os.path.splitext(user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_avatar,
@@ -1405,3 +1407,38 @@ need to be in every workspace you include."
                     online_user_count, self._config.LIMITATION__MAXIMUM_ONLINE_USERS
                 )
             )
+
+    def _get_default_avatar(self, user: User) -> typing.BinaryIO:
+        """Generates an image with a colored circle and initials based on the user's display name.
+
+        If the user doesn't have a display name, a "?" is used instead.
+        Taken from the historical frontend code and adapted to python.
+        """
+        name = user.display_name
+        if name is None:
+            color_string = "#f3f3f3"
+            avatar_name = "?"
+        else:
+            color_as_int = 0
+            for c in name:
+                color_as_int = ord(c) + (color_as_int << 5) - color_as_int
+            # INFO - SGD - 2023-01-25 - Convert into an hexadecimal string.
+            # #RRGGBB, padding if the generated number has less than 6 significant digits.
+            # For instance 16 becomes "#000010".
+            color_as_int = color_as_int & 0x00FFFFFF
+            color_string = f"#{color_as_int:0>6x}"
+
+            # INFO - SGD - 2023-01-25 - Extract the initials of the name in uppercase.
+            # If the name cannot be split into two non-empty parts, use its first 2 characters.
+            parts = [p for p in re.split("[ -.]", name) if p != ""]
+            avatar_name = f"{parts[0][0]}{parts[1][0]}" if len(parts) >= 2 else name[0:2]
+            avatar_name = avatar_name.upper()
+
+        # INFO - SGD - 2023-01-25 - Create the avatar as an SVG file as this will allow proper resizing.
+        width = DEFAULT_AVATAR_SIZE.width
+        height = DEFAULT_AVATAR_SIZE.height
+        svg_string = f"""<svg viewBox="0 0 {width} {height}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50%" cy="50%" r="50%" fill="{color_string}" style="filter: saturate(90%)" />
+        <text fill="#fdfdfd" font-family="Nunito" font-weight="bold" font-size="50" x="50" y="65" text-anchor="middle">{avatar_name}</text>
+</svg>"""
+        return io.BytesIO(svg_string.encode())

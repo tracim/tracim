@@ -182,7 +182,7 @@ class User(TrashableMixin, DeclarativeBase):
 
     @property
     def has_avatar(self) -> bool:
-        return bool(self.avatar)
+        return True
 
     @property
     def has_cover(self) -> bool:

@@ -2753,7 +2753,7 @@ class TestUserDiskSpace(object):
         res = res.json_body
         assert res["used_space"] == 6210
         assert res["user"]["public_name"] == "bob"
-        assert res["user"]["has_avatar"] is False
+        assert res["user"]["has_avatar"] is True
         assert res["allowed_space"] == 134217728
 
 
@@ -3343,13 +3343,13 @@ class TestUsersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
         assert res[0]["email"] == test_user.email
 
         assert res[1]["user_id"] == admin_user.user_id
         assert res[1]["public_name"] == admin_user.display_name
         assert res[1]["username"] == admin_user.username
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
         assert res[1]["email"] == admin_user.email
 
     def test_api__get_user__err_403__normal_user(self, user_api_factory, web_testapp):
@@ -3420,11 +3420,11 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_exclude_user(
         self, web_testapp, user_api_factory, admin_user
@@ -3466,7 +3466,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace(
         self, user_api_factory, workspace_api_factory, admin_user, role_api_factory, web_testapp
@@ -3513,7 +3513,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_exclude_workspace_and_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
@@ -3575,7 +3575,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_name_include_workspace_and__exclude_user(
         self, admin_user, user_api_factory, workspace_api_factory, role_api_factory, web_testapp
@@ -3637,7 +3637,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__known_members_fails_when_both_including_and_excluding_workspaces(
         self, admin_user, web_testapp
@@ -3693,7 +3693,7 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 1
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
     def test_api__get_user__ok_200__admin__by_email(
         self, user_api_factory, admin_user, web_testapp
@@ -3734,11 +3734,11 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
     def test_api__get_user__err_403__admin__too_small_acp(
         self, user_api_factory, admin_user, web_testapp
@@ -3833,11 +3833,11 @@ class TestKnownMembersEndpoint(object):
         assert len(res) == 2
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -4007,15 +4007,15 @@ class TestKnownMembersEndpointKnownMembersFilterDisabled(object):
         assert len(res) == 3
         assert res[0]["user_id"] == test_user.user_id
         assert res[0]["public_name"] == test_user.display_name
-        assert res[0]["has_avatar"] is False
+        assert res[0]["has_avatar"] is True
 
         assert res[1]["user_id"] == test_user2.user_id
         assert res[1]["public_name"] == test_user2.display_name
-        assert res[1]["has_avatar"] is False
+        assert res[1]["has_avatar"] is True
 
         assert res[2]["user_id"] == test_user3.user_id
         assert res[2]["public_name"] == test_user3.display_name
-        assert res[2]["has_avatar"] is False
+        assert res[2]["has_avatar"] is True
 
 
 @pytest.mark.usefixtures("base_fixture")
@@ -5870,7 +5870,7 @@ class TestUserAvatarEndpoints:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
 
         res = web_testapp.get("/api/users/{}".format(admin_user.user_id), status=200)
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
 
         image = create_1000px_png_test_image()
         web_testapp.put(

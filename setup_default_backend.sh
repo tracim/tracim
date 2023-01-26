@@ -185,6 +185,12 @@ function translate_email {
     ./update_i18n_json_file.sh || exit 1
 }
 
+function install_font {
+    log "Installing Tracim font in system..."
+    $SUDO cp -r frontend/dist/assets/font/Nunito/ /usr/share/fonts/nunito
+    $SUDO fc-cache -f
+}
+
 ############################################
 
 # Check if running as root
@@ -197,6 +203,7 @@ else
 fi
 
 install_npm_and_nodejs
+install_font
 cd "$script_dir/backend"  || exit 1
 if [ -z "$IGNORE_APT_INSTALL" ]; then
     install_backend_system_dep

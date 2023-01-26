@@ -6,7 +6,6 @@ import { translate } from 'react-i18next'
 import { getAvatarBaseUrl } from '../../helper.js'
 
 // require('./Avatar.styl')  // see https://github.com/tracim/tracim/issues/1156
-const color = require('color')
 
 export const AVATAR_SIZE = {
   BIG: '100px',
@@ -16,47 +15,13 @@ export const AVATAR_SIZE = {
 }
 
 export class Avatar extends React.Component {
-  stringToHashCode = str => str.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0)
-
-  intToRGB = i => {
-    const c = (i & 0x00FFFFFF).toString(16).toUpperCase()
-    return '00000'.substring(0, 6 - c.length) + c
-  }
-
-  generateColorFromName = publicName => {
-    // INFO - G.B. - 20210112 - The default value is "lightGrey2" at frontend_lib/css/Variable.styl
-    if (!publicName || publicName.length === 0) return '#f3f3f3'
-    // code from https://stackoverflow.com/questions/3426404/create-a-hexadecimal-colour-based-on-a-string-with-javascript
-    const str = this.intToRGB(this.stringToHashCode(publicName))
-    return color('#' + str).desaturate(0.90).hex()
-  }
-
-  getTwoLetters = name => {
-    const trimedName = name.trim()
-    const splitSpace = trimedName.split(' ')
-    if (splitSpace.length >= 2) return `${splitSpace[0].substr(0, 1)}${splitSpace[1].substr(0, 1)}`
-
-    const splitDash = trimedName.split('-')
-    if (splitDash.length >= 2) return `${splitDash[0].substr(0, 1)}${splitDash[1].substr(0, 1)}`
-
-    const splitDot = trimedName.split('.')
-    if (splitDot.length >= 2) return `${splitDot[0].substr(0, 1)}${splitDot[1].substr(0, 1)}`
-
-    return trimedName.substr(0, 2)
-  }
-
   render () {
     const { props } = this
 
     const publicName = props.user.publicName || props.user.public_name
-    const hasAvatar = Object.keys(props.user).includes('hasAvatar') ? props.user.hasAvatar : props.user.has_avatar
     const filenameInUrl = props.user.profileAvatarName || 'avatar'
-    const letterAvatar = publicName ? this.getTwoLetters(publicName.toUpperCase()) : '?'
     const sizeAsNumber = parseInt(props.size.replace('px', ''))
     const avatarBaseUrl = getAvatarBaseUrl(props.apiUrl, props.user.userId || props.user.user_id || props.user.id)
-
-    const generatedColor = this.generateColorFromName(publicName)
-    const fontSize = (widthInt => (widthInt / 2) % 2 === 0 ? widthInt : widthInt + 2)(parseInt(props.size)) / 2
 
     return (
       <div
@@ -64,24 +29,11 @@ export class Avatar extends React.Component {
         style={{ ...props.style }}
         title={publicName || props.t('Unknown')}
       >
-        <div
+        <img
           className='avatar'
-          data-cy='avatar'
-          style={{
-            width: props.size,
-            height: props.size,
-            backgroundColor: generatedColor,
-            fontSize: fontSize
-          }}
-        >
-          {hasAvatar ? (
-            <img
-              className='avatar__img'
-              src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
-              alt={props.t('Avatar of {{publicName}}', { publicName })}
-            />
-          ) : <span>{letterAvatar}</span>}
-        </div>
+          src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
+          alt={props.t('Avatar of {{publicName}}', { publicName })}
+        />
       </div>
     )
   }

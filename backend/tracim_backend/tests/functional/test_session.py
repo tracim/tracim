@@ -34,7 +34,7 @@ class TestLoginEndpoint(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "administrators"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "internal"
 
     def test_api__try_login_enpoint__ok_200__with_username(self, web_testapp):
@@ -146,7 +146,7 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
         with freeze_time("2002-01-01 12:00:00"):
@@ -166,7 +166,7 @@ class TestLDAPAuthOnlyEndpointAnonymous(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
 
@@ -189,7 +189,7 @@ class TestLDAPAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
         with freeze_time("2002-01-01 12:00:00"):
@@ -209,7 +209,7 @@ class TestLDAPAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
     def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self, web_testapp):
@@ -250,7 +250,7 @@ class TestLDAPAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
         with freeze_time("2002-01-01 12:00:00"):
@@ -270,7 +270,7 @@ class TestLDAPAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(
@@ -311,7 +311,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
         with freeze_time("2002-01-01 12:00:00"):
@@ -331,7 +331,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
     def test_api__try_login_enpoint_ldap_auth__err_403__valid_internal_db_user(self, web_testapp):
@@ -372,7 +372,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
         with freeze_time("2002-01-01 12:00:00"):
@@ -392,7 +392,7 @@ class TestLDAPAuthOnlyUsingUsernameLoginEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_auth__err__403__valid_internal_db_user(
@@ -432,7 +432,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
         with freeze_time("2002-01-01 12:00:00"):
@@ -452,7 +452,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
     def test_api__try_login_enpoint_ldap_internal_auth__ok__200__valid_internal_db_user(
@@ -468,7 +468,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "administrators"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "internal"
 
     def test_api__try_login_enpoint_ldap_internal_auth__err_403__unvalid_user(self, web_testapp):
@@ -499,7 +499,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
         with freeze_time("2002-01-01 12:00:00"):
@@ -519,7 +519,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
             assert res.json_body["is_active"]
             assert res.json_body["profile"]
             assert res.json_body["profile"] == "users"
-            assert res.json_body["has_avatar"] is False
+            assert res.json_body["has_avatar"] is True
             assert res.json_body["auth_type"] == "ldap"
 
     def test_api_try_whoami_basic_auth_endpoint_ldap_internal_auth__ok__200__valid_internal_db_user(
@@ -534,7 +534,7 @@ class TestLDAPandInternalAuthOnlyEndpoint(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "administrators"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["lang"] is None
         assert res.json_body["auth_type"] == "internal"
 
@@ -561,7 +561,7 @@ class TestWhoamiEndpoint(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "administrators"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["lang"] is None
         assert res.json_body["auth_type"] == "internal"
 
@@ -626,7 +626,7 @@ class TestWhoamiEndpointWithApiKey(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "administrators"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "internal"
 
     def test_api__try_whoami_endpoint_with_api_key__ok_200__username(self, web_testapp):
@@ -639,7 +639,7 @@ class TestWhoamiEndpointWithApiKey(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "administrators"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "internal"
 
     def test_api__try_whoami_enpoint_with_api_key__ok_200__case_insensitive_email(
@@ -721,7 +721,7 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "users"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "remote"
         user_id = res.json_body["user_id"]
 
@@ -733,7 +733,7 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "users"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "remote"
         assert res.json_body["user_id"] == user_id
 
@@ -748,7 +748,7 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "users"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "remote"
         user_id = res.json_body["user_id"]
 
@@ -760,7 +760,7 @@ class TestWhoamiEndpointWithRemoteHeader(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "users"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "remote"
         assert res.json_body["user_id"] == user_id
 
@@ -949,5 +949,5 @@ class TestWhoamiEndpointWithUserAuthToken(object):
         assert res.json_body["is_active"]
         assert res.json_body["profile"]
         assert res.json_body["profile"] == "administrators"
-        assert res.json_body["has_avatar"] is False
+        assert res.json_body["has_avatar"] is True
         assert res.json_body["auth_type"] == "internal"

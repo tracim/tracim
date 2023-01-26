@@ -763,7 +763,7 @@ class TestUserApi(object):
         assert new_user.email == "admin@tracim.tracim"
         assert new_user.display_name == "Admin"
         assert new_user.is_active is True
-        assert new_user.has_avatar is False
+        assert new_user.has_avatar is True
 
     def test_unit__get_current_user_ok__nominal_case(self, session, app_config):
         user = User(email="admin@tracim.tracim")
@@ -1117,3 +1117,31 @@ class TestFakeLDAPUserApi(object):
         api._user = u
         with pytest.raises(ExternalAuthUserEmailModificationDisallowed):
             api.set_email(u, "pass", "bob@bobi")
+
+    @pytest.mark.parametrize(
+        "display_name, avatar_initials",
+        [
+            pytest.param("bob", "BO", id="One word"),
+            pytest.param("bob.leponge", "BL", id="Two words with '.'"),
+            pytest.param("bob leponge", "BL", id="Two words with ' '"),
+            pytest.param("bob junior leponge", "BJ", id="Three words"),
+            pytest.param("   bob     leponge    ", "BL", id="Superfluous spaces"),
+        ],
+    )
+    def test_unit__get_avatar__ok__default_avatar(
+        self, session, app_config, display_name, avatar_initials
+    ):
+        api = UserApi(current_user=None, session=session, config=app_config)
+        u = api.create_user(
+            email="bob@bob",
+            password=None,
+            name=display_name,
+            lang="en",
+            do_save=True,
+            do_notify=False,
+        )
+        hapic_file = api.get_avatar(u.user_id, "avatar.svg", "avatar.svg")
+        assert u.avatar
+        assert u.cropped_avatar
+        content = hapic_file.file_object.read().decode()
+        assert avatar_initials in content

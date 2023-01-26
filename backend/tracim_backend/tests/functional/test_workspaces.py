@@ -145,7 +145,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["public_download_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         assert workspace["owner"]["user_id"] == 1
-        assert workspace["owner"]["has_avatar"] is False
+        assert workspace["owner"]["has_avatar"] is True
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
@@ -196,7 +196,7 @@ class TestWorkspaceCreationEndpointWorkspaceAccessTypeChecks(object):
         assert workspace["public_download_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         assert workspace["owner"]["user_id"] == 1
-        assert workspace["owner"]["has_avatar"] is False
+        assert workspace["owner"]["has_avatar"] is True
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
@@ -729,7 +729,7 @@ class TestWorkspaceEndpoint(object):
         assert workspace["public_download_enabled"] is False
         assert workspace["description"] == "mysuperdescription"
         assert workspace["owner"]["user_id"] == 1
-        assert workspace["owner"]["has_avatar"] is False
+        assert workspace["owner"]["has_avatar"] is True
         assert workspace["owner"]["public_name"] == "Global manager"
         assert workspace["owner"]["username"] == "TheAdmin"
         assert workspace["owner"]
@@ -1371,7 +1371,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is True
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
-        assert user_role["user"]["has_avatar"] is False
+        assert user_role["user"]["has_avatar"] is True
 
     def test_api__get_workspace_members__ok_200_show_disabled_users(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user
@@ -1522,7 +1522,7 @@ class TestWorkspaceMembersEndpoint(object):
         assert user_role["do_notify"] is True
         # TODO - G.M - 24-05-2018 - [Avatar] Replace
         # by correct value when avatar feature will be enabled
-        assert user_role["user"]["has_avatar"] is False
+        assert user_role["user"]["has_avatar"] is True
 
     def test_api__get_workspace_member__ok_200__as_admin(
         self, web_testapp, user_api_factory, workspace_api_factory, role_api_factory, admin_user

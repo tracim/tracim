@@ -157,6 +157,7 @@ ALLOWED__AVATAR_MIMETYPES = [
     "image/bmp",
     "image/x-ms-bmp",
     "image/gif",
+    "image/svg+xml",
 ]
 
 
