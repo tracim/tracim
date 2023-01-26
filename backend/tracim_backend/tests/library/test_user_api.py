@@ -763,7 +763,7 @@ class TestUserApi(object):
         assert new_user.email == "admin@tracim.tracim"
         assert new_user.display_name == "Admin"
         assert new_user.is_active is True
-        assert new_user.has_avatar is False
+        assert new_user.has_avatar is True
 
     def test_unit__get_current_user_ok__nominal_case(self, session, app_config):
         user = User(email="admin@tracim.tracim")

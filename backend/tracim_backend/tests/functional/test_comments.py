@@ -121,7 +121,7 @@ class TestCommentsEndpoint(object):
         assert comment["raw_content"] == raw_content
         assert comment["author"]
         assert comment["author"]["user_id"] == 1
-        assert comment["author"]["has_avatar"] is False
+        assert comment["author"]["has_avatar"] is True
         assert comment["author"]["public_name"] == "Global manager"
         assert comment["author"]["username"] == "TheAdmin"
 
@@ -171,7 +171,7 @@ class TestCommentsEndpoint(object):
         assert comment["author"]
         assert comment["author"]["user_id"] == admin_user.user_id
         # TODO - G.M - 2018-06-172 - [avatar] setup avatar url
-        assert comment["author"]["has_avatar"] is False
+        assert comment["author"]["has_avatar"] is True
         assert comment["author"]["public_name"] == admin_user.display_name
         assert comment["author"]["username"] == admin_user.username
         # TODO - G.M - 2018-06-179 - better check for datetime
