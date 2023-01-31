@@ -877,6 +877,16 @@ need to be in every workspace you include."
 
         if name is not None:
             user.display_name = name
+            if user.is_avatar_default:
+                # Update with default avatar if the user didn't set one explicitely
+                self.set_avatar(
+                    user.user_id,
+                    "avatar.svg",
+                    SVG_MIMETYPE,
+                    self._get_default_avatar(user),
+                    user=user,
+                    is_default=True,
+                )
 
         if auth_type is not None:
             if (
@@ -1044,6 +1054,15 @@ need to be in every workspace you include."
         if not profile:
             profile = Profile.get_profile_from_slug(self._config.USER__DEFAULT_PROFILE)
         user.profile = profile
+
+        self.set_avatar(
+            user.user_id,
+            "avatar.svg",
+            SVG_MIMETYPE,
+            self._get_default_avatar(user),
+            user=user,
+            is_default=True,
+        )
 
         if save_now:
             self.save(user)
@@ -1271,7 +1290,9 @@ need to be in every workspace you include."
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.avatar:
-            self.set_avatar(user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user))
+            self.set_avatar(
+                user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user), is_default=True
+            )
         return StorageLib(self._config).get_raw_file(
             depot_file=user.avatar,
             filename=filename,
@@ -1290,7 +1311,9 @@ need to be in every workspace you include."
     ) -> HapicFile:
         user = self.get_one(user_id)
         if not user.cropped_avatar:
-            self.set_avatar(user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user))
+            self.set_avatar(
+                user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user), is_default=True
+            )
         _, original_file_extension = os.path.splitext(user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
             depot_file=user.cropped_avatar,
@@ -1304,9 +1327,16 @@ need to be in every workspace you include."
         )
 
     def set_avatar(
-        self, user_id: int, new_filename: str, new_mimetype: str, new_content: typing.BinaryIO
+        self,
+        user_id: int,
+        new_filename: str,
+        new_mimetype: str,
+        new_content: typing.BinaryIO,
+        user: typing.Optional[User] = None,
+        is_default: bool = False,
     ) -> None:
-        user = self.get_one(user_id)
+        user = user or self.get_one(user_id)
+        user.is_avatar_default = is_default
 
         self._session.add(user)
         (user.avatar, user.cropped_avatar) = self._crop_and_prepare_depot_storage(
@@ -1409,7 +1439,7 @@ need to be in every workspace you include."
                 )
             )
 
-    def _get_default_avatar(self, user: User) -> typing.BinaryIO:
+    def _get_default_avatar(self, user: User) -> io.BytesIO:
         """Create a SVG image with a colored circle and initials based on the user's display name.
 
         If the user doesn't have a display name, a "?" is used instead.
