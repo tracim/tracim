@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import hashlib
 import io
 import os
 import re
@@ -1409,27 +1410,16 @@ need to be in every workspace you include."
             )
 
     def _get_default_avatar(self, user: User) -> typing.BinaryIO:
-        """Generates an image with a colored circle and initials based on the user's display name.
+        """Create a SVG image with a colored circle and initials based on the user's display name.
 
         If the user doesn't have a display name, a "?" is used instead.
-        Taken from the historical frontend code and adapted to python.
         """
         name = user.display_name
         if name is None:
             color_string = "#f3f3f3"
             avatar_name = "?"
         else:
-            color_as_int = 0
-            for c in name:
-                color_as_int = ord(c) + (color_as_int << 5) - color_as_int
-            # INFO - SGD - 2023-01-25 - Convert into an hexadecimal string.
-            # #RRGGBB, padding if the generated number has less than 6 significant digits.
-            # For instance 16 becomes "#000010".
-            color_as_int = color_as_int & 0x00FFFFFF
-            color_string = f"#{color_as_int:0>6x}"
-
-            # INFO - SGD - 2023-01-25 - Extract the initials of the name in uppercase.
-            # If the name cannot be split into two non-empty parts, use its first 2 characters.
+            color_string = "#" + hashlib.blake2b(name.encode(), digest_size=3).hexdigest()
             parts = [p for p in re.split("[ -.]", name) if p != ""]
             avatar_name = f"{parts[0][0]}{parts[1][0]}" if len(parts) >= 2 else name[0:2]
             avatar_name = avatar_name.upper()

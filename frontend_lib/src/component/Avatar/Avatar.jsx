@@ -28,6 +28,7 @@ export class Avatar extends React.Component {
         className={classnames('avatar-wrapper', props.customClass)}
         style={{ ...props.style }}
         title={publicName || props.t('Unknown')}
+        data-cy='avatar'
       >
         <img
           className='avatar'
