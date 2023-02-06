@@ -76,33 +76,15 @@ export const TinyEditor = props => {
       label: `@${role.slug}`,
       items: [
         {
-          type: 'cardcontainer',
-          direction: 'vertical',
-          items: [
-            {
-              type: 'cardcontainer',
-              direction: 'horizontal',
-              items: [
-                {
-                  type: 'cardtext',
-                  text: role.description,
-                  name: 'roleDescription'
-                }
-              ]
-            },
-            {
-              type: 'cardcontainer',
-              direction: 'horizontal',
-              items: [
-                {
-                  type: 'cardtext',
-                  text: `@${role.slug}`,
-                  name: 'roleName',
-                  classes: ['tinymce-username']
-                }
-              ]
-            }
-          ]
+          type: 'cardtext',
+          text: role.description,
+          name: 'roleDescription'
+        },
+        {
+          type: 'cardtext',
+          text: `@${role.slug}`,
+          name: 'roleName',
+          classes: ['tinymce-username']
         }
       ]
     }))
@@ -277,7 +259,7 @@ export const TinyEditor = props => {
                     },
                     {
                       type: 'cardtext',
-                      text: `- @${user.username}`,
+                      text: `@${user.username}`,
                       name: 'username',
                       classes: ['tinymce-username']
                     }

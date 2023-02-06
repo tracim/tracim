@@ -157,6 +157,7 @@ class User(TrashableMixin, DeclarativeBase):
     reset_password_token_created = Column(DateTime, nullable=True, default=None)
     allowed_space = Column(BigInteger, nullable=False, server_default=str(DEFAULT_ALLOWED_SPACE))
     profile = Column(Enum(Profile), nullable=False, server_default=Profile.NOBODY.name)
+    is_avatar_default = Column(Boolean, default=False, nullable=False)
     avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
     cropped_avatar = Column(TracimUploadedFileField, unique=False, nullable=True)
     cover = Column(TracimUploadedFileField, unique=False, nullable=True)
