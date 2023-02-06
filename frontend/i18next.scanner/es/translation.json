@@ -79,7 +79,7 @@
   "member list": "lista de miembros",
   "An error has happened while setting \"mark all as read\"": "Se ha producido un error al activar \"marcar todo como leído\"",
   "known members list": "lista de miembros conocidos",
-  "Please set a name, an email or a username": "Por favor, ponga un nombre, una dirección de correo electrónico o un nombre de usuario",
+  "Please set a name, an email or a username": "Por favor introduzca un nombre, una dirección de correo electrónico o un nombre de usuario",
   "Please set a role": "Por favor, establezca un rol",
   "Member removed": "Miembro eliminado",
   "Error while saving new lang": "Error al guardar el nuevo idioma",
@@ -593,8 +593,8 @@
   "Filter users": "Filtrar a los usuarios",
   "Sort by type": "",
   "Sort by title": "",
-  "Sort by last modification": "",
-  "Sort by information": "",
-  "Sort by role": "",
-  "Sort by status": ""
+  "Sort by last modification": "Ordenar por la última modificación",
+  "Sort by information": "Ordenar por la información",
+  "Sort by role": "Ordenar por función",
+  "Sort by status": "Ordenar por el estado"
 }
