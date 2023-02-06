@@ -886,6 +886,7 @@ need to be in every workspace you include."
                     self._get_default_avatar(user),
                     user=user,
                     is_default=True,
+                    do_save=False,
                 )
 
         if auth_type is not None:
@@ -1062,6 +1063,7 @@ need to be in every workspace you include."
             self._get_default_avatar(user),
             user=user,
             is_default=True,
+            do_save=False,
         )
 
         if save_now:
@@ -1291,7 +1293,12 @@ need to be in every workspace you include."
         user = self.get_one(user_id)
         if not user.avatar:
             self.set_avatar(
-                user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user), is_default=True
+                user_id,
+                filename,
+                SVG_MIMETYPE,
+                self._get_default_avatar(user),
+                is_default=True,
+                do_save=True,
             )
         return StorageLib(self._config).get_raw_file(
             depot_file=user.avatar,
@@ -1312,7 +1319,12 @@ need to be in every workspace you include."
         user = self.get_one(user_id)
         if not user.cropped_avatar:
             self.set_avatar(
-                user_id, filename, SVG_MIMETYPE, self._get_default_avatar(user), is_default=True
+                user_id,
+                filename,
+                SVG_MIMETYPE,
+                self._get_default_avatar(user),
+                is_default=True,
+                do_save=True,
             )
         _, original_file_extension = os.path.splitext(user.cropped_avatar.filename)
         return StorageLib(self._config).get_jpeg_preview(
@@ -1334,15 +1346,17 @@ need to be in every workspace you include."
         new_content: typing.BinaryIO,
         user: typing.Optional[User] = None,
         is_default: bool = False,
+        do_save: bool = False,
     ) -> None:
         user = user or self.get_one(user_id)
         user.is_avatar_default = is_default
 
-        self._session.add(user)
         (user.avatar, user.cropped_avatar) = self._crop_and_prepare_depot_storage(
             new_filename, new_mimetype, new_content.read(), "avatar", AVATAR_RATIO
         )
-        self._session.flush()
+        if do_save:
+            self._session.add(user)
+            self._session.flush()
 
     def get_cover(
         self, user_id: int, filename: str, default_filename: str, force_download: bool = False,
