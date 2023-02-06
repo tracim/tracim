@@ -41,14 +41,14 @@ for (const pageTestCase of activityPages) {
       cy.cancelXHR()
     })
 
-    it('should ignore if when a comment for the content is modified', () => {
+    it('should ignore when a comment is modified', () => {
       cy.get('[data-cy=activityList__item]').first().should('contain.text', fileName3WithoutExtention)
       cy.putComment(workspaceId, contentId, commentId, 'Update comment')
       cy.get('[data-cy=activityList__refresh]').should('not.be.visible')
       cy.get('[data-cy=activityList__item]').first().should('contain.text', fileName3WithoutExtention)
     })
 
-    it('should ignore if when a comment for the content is deleted', () => {
+    it('should ignore when a comment is deleted', () => {
       cy.get('[data-cy=activityList__item]').first().should('contain.text', fileName3WithoutExtention)
       cy.deleteComment(workspaceId, contentId, commentId, 'Update comment')
       cy.get('[data-cy=activityList__refresh]').should('not.be.visible')

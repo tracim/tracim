@@ -5842,9 +5842,6 @@ class TestUserAvatarEndpoints:
         self, admin_user: User, web_testapp
     ) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
-        )
         image = create_1000px_png_test_image()
         web_testapp.put(
             "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, image.name),
@@ -5859,12 +5856,15 @@ class TestUserAvatarEndpoints:
         new_image = Image.open(io.BytesIO(res.body))
         assert 1000, 1000 == new_image.size
 
-    def test_api__get_user_avatar__err_400__no_avatar(self, admin_user: User, web_testapp) -> None:
+    def test_api__get_user_avatar__ok__create_avatar(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         res = web_testapp.get(
-            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=400
+            "/api/users/{}/avatar/raw/something.jpg".format(admin_user.user_id), status=200
         )
-        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
+        res = web_testapp.get(
+            "/api/users/{}/avatar/raw/{}".format(admin_user.user_id, "something.jpg"), status=200,
+        )
+        assert res.content_type == "image/svg+xml"
 
     def test_api__set_user_avatar__ok__nominal_case(self, admin_user: User, web_testapp) -> None:
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))

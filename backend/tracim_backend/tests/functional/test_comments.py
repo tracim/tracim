@@ -20,7 +20,7 @@ oldest_comment = {
     "raw_content": "<p>What is for you the best cake ever? <br/> I personnally vote for Chocolate cupcake!</p>",
     "author": {
         "user_id": 1,
-        "has_avatar": False,
+        "has_avatar": True,
         "public_name": "Global manager",
         "username": "TheAdmin",
     },
@@ -33,7 +33,7 @@ newest_comment = {
     "parent_content_namespace": "content",
     "parent_label": "Best Cakes?",
     "raw_content": "<p>You are right, but Kouign-amann are clearly better.</p>",
-    "author": {"user_id": 4, "has_avatar": False, "public_name": "John Reader", "username": None},
+    "author": {"user_id": 4, "has_avatar": True, "public_name": "John Reader", "username": None},
 }
 
 

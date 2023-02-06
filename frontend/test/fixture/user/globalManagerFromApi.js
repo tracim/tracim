@@ -14,6 +14,6 @@ export const globalManagerFromApi = {
   lang: 'en',
   agendaUrl: '',
   is_deleted: false,
-  has_avatar: false,
+  has_avatar: true,
   has_cover: false
 }
