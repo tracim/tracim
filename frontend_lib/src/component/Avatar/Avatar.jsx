@@ -19,9 +19,13 @@ export class Avatar extends React.Component {
     const { props } = this
 
     const publicName = props.user.publicName || props.user.public_name
+    const userId = props.user.userId || props.user.user_id || props.user.id
     const filenameInUrl = props.user.profileAvatarName || 'avatar'
     const sizeAsNumber = parseInt(props.size.replace('px', ''))
-    const avatarBaseUrl = getAvatarBaseUrl(props.apiUrl, props.user.userId || props.user.user_id || props.user.id)
+    const avatarBaseUrl = getAvatarBaseUrl(
+      props.apiUrl,
+      userId
+    )
 
     return (
       <div
@@ -30,18 +34,20 @@ export class Avatar extends React.Component {
         title={publicName || props.t('Unknown')}
         data-cy='avatar'
       >
-        <img
-          className='avatar'
-          src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
-          alt={props.t('Avatar of {{publicName}}', { publicName })}
-        />
+        {userId && (
+          <img
+            className='avatar'
+            src={`${avatarBaseUrl}/preview/jpg/${sizeAsNumber}x${sizeAsNumber}/${filenameInUrl}`}
+            alt={props.t('Avatar of {{publicName}}', { publicName })}
+          />
+        )}
       </div>
     )
   }
 }
 
 Avatar.propTypes = {
-  user: PropTypes.object,
+  user: PropTypes.object.isRequired,
   apiUrl: PropTypes.string.isRequired,
   customClass: PropTypes.string,
   size: PropTypes.oneOf(Object.values(AVATAR_SIZE)),
@@ -50,7 +56,6 @@ Avatar.propTypes = {
 
 Avatar.defaultProps = {
   customClass: '',
-  user: { publicName: '' },
   size: AVATAR_SIZE.MEDIUM,
   style: {}
 }

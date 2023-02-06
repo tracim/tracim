@@ -183,13 +183,19 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           }
         }
       }
-      const updatedActivityList = await addMessageToActivityList(activity, props.activity.list, FETCH_CONFIG.apiUrl)
-      props.dispatch(setActivityList(updatedActivityList))
-      const showRefresh = (
-        updatedActivityList.length > 0 &&
-        updatedActivityList[0].newestMessage.event_id !== data.event_id
+      const updatedActivityList = await addMessageToActivityList(
+        activity, props.activity.list, FETCH_CONFIG.apiUrl
       )
-      this.setState({ showRefresh })
+      props.dispatch(setActivityList(updatedActivityList))
+      if (data.event_type.includes(TLM_SUB.COMMENT) && !(
+        data.event_type.includes(TLM_CET.MODIFIED) || data.event_type.includes(TLM_CET.DELETED)
+      )) {
+        const showRefresh = (
+          updatedActivityList.length > 0 &&
+          updatedActivityList[0].newestMessage.event_id !== data.event_id
+        )
+        this.setState({ showRefresh })
+      }
       this.changingActivityList = false
     }
 
