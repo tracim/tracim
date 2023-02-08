@@ -1,4 +1,5 @@
 import React from 'react'
+import { isEqual } from 'lodash'
 
 import {
   CONTENT_TYPE,
@@ -129,7 +130,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      */
     getComment = async (spaceId, contentId, commentId) => {
       const { props } = this
-      const fetchGetComment = await handleFetchResult(await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId))
+      const fetchGetComment = await handleFetchResult(
+        await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId)
+      )
       switch (fetchGetComment.apiResponse.status) {
         case 200: return fetchGetComment.body
         default:
@@ -186,7 +189,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       const updatedActivityList = await addMessageToActivityList(
         activity, props.activity.list, FETCH_CONFIG.apiUrl
       )
-      props.dispatch(setActivityList(updatedActivityList))
+      if (!isEqual(props.activityList.list, updatedActivityList)) {
+        props.dispatch(setActivityList(updatedActivityList))
+      }
       if (data.event_type.includes(TLM_SUB.COMMENT) && !(
         data.event_type.includes(TLM_CET.MODIFIED) || data.event_type.includes(TLM_CET.DELETED)
       )) {
