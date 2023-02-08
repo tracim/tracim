@@ -7,7 +7,10 @@ require('../../src/component/Avatar/Avatar.styl')
 
 describe('<Avatar />', () => {
   const props = {
-    user: { publicName: 'myName' },
+    user: {
+      publicName: 'GlobalManager',
+      id: 1
+    },
     apiUrl: '/',
     size: AVATAR_SIZE.BIG,
     style: {
