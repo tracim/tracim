@@ -50,11 +50,15 @@ export class PersonalRecentActivities extends React.Component {
    */
   handleTlm = async (data) => {
     const { props } = this
+    console.log("handleTlm - Start - ", props.activity.list)
     if (data.event_type === `${TLM_ET.SHAREDSPACE_MEMBER}.${TLM_CET.MODIFIED}`) {
-      const space = props.workspaceList.find(space => space.id === data.fields.workspace.workspace_id) || { memberList: [] }
+      const space = props.workspaceList.find(
+        space => space.id === data.fields.workspace.workspace_id
+      ) || { memberList: [] }
       const member = space.memberList.find(user => user.id === data.fields.user.user_id)
       if (!member || member.role === data.fields.member.role) return
     }
+    console.log("handleTlm - End - ", props.activity.list)
     props.handleTlm(data)
   }
 

@@ -20,6 +20,7 @@ const userActivity = (state = defaultUserActivityState, action) => {
     case `${RESET}/${USER_ACTIVITY}`:
       return defaultUserActivityState
     case `${SET}/${USER_ACTIVITY}/${LIST}`:
+      console.log('REDUX - userActivity - Change from ', state.list, ' to ', action.activityList)
       return { ...state, list: action.activityList }
     case `${SET}/${USER_ACTIVITY}/${NEXT_PAGE}`:
       return { ...state, hasNextPage: action.hasNextPage, nextPageToken: action.nextPageToken }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { isEqual } from 'lodash'
 
 import {
   CONTENT_TYPE,
@@ -129,7 +130,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      */
     getComment = async (spaceId, contentId, commentId) => {
       const { props } = this
-      const fetchGetComment = await handleFetchResult(await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId))
+      const fetchGetComment = await handleFetchResult(
+        await getComment(FETCH_CONFIG.apiUrl, spaceId, contentId, commentId)
+      )
       switch (fetchGetComment.apiResponse.status) {
         case 200: return fetchGetComment.body
         default:
@@ -146,7 +149,10 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      */
     updateActivityListFromTlm = async (data) => {
       const { props } = this
+      console.log("updateActivityListFromTlm - Start - ", props.activity.list)
+      console.log("updateActivityListFromTlm - Before waitForNoChange - ", props.activity.list)
       await this.waitForNoChange()
+      console.log("updateActivityListFromTlm - After waitForNoChange -", props.activity.list)
       this.changingActivityList = true
       let activity = data
       if (data.event_type.includes(TLM_SUB.COMMENT) ||
@@ -183,10 +189,25 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           }
         }
       }
+      // The race condition is done ~here
+      // We got props.activity.list.length = 4
+      // And on the other side we got props.activity.list.length = 0
       const updatedActivityList = await addMessageToActivityList(
         activity, props.activity.list, FETCH_CONFIG.apiUrl
       )
-      props.dispatch(setActivityList(updatedActivityList))
+      // If everything is ok updatedActivityList.length = 4 (because the TLM doesn't change the activity list)
+      // Else updatedActivityList.length = 0 (because it's based onprops.activity.list which is not updated yet)
+
+      // A quick solution (fixing only tests) is to update only if the list are different:
+      // Indeed, doesn't fix the race condition. If TLM gives [C] and we got [A, B] with loading actualities
+      // The result can be [A, B, C] or [C] due to the race condition
+      // See https://github.com/tracim/tracim/issues/3866
+      if (!isEqual(props.activityList.list, updatedActivityList)) {
+        console.log("updateActivityListFromTlm - before redux update - ", props.activity.list)
+        console.log("updateActivityListFromTlm - giving redux - ", updatedActivityList)
+        props.dispatch(setActivityList(updatedActivityList))
+        console.log("updateActivityListFromTlm - after redux update - ", props.activity.list)
+      }
       if (data.event_type.includes(TLM_SUB.COMMENT) && !(
         data.event_type.includes(TLM_CET.MODIFIED) || data.event_type.includes(TLM_CET.DELETED)
       )) {
@@ -196,6 +217,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         )
         this.setState({ showRefresh })
       }
+      console.log("updateActivityListFromTlm - End - ", props.activity.list)
       this.changingActivityList = false
     }
 
@@ -222,7 +244,10 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      */
     loadActivities = async (minActivityCount, resetList = false, workspaceId = null) => {
       const { props } = this
+      console.log("loadActivities - Start - ", props.activity.list)
+      console.log("loadActivities - Before waitForNoChange - ", props.activity.list)
       await this.waitForNoChange()
+      console.log("loadActivities - After waitForNoChange - ", props.activity.list)
       this.changingActivityList = true
       let activityList = props.activity.list
       let hasNextPage = props.activity.hasNextPage
@@ -247,7 +272,10 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           activityList = activitiesParams.activityList
           hasNextPage = activitiesParams.hasNextPage
           nextPageToken = activitiesParams.nextPageToken
+          console.log("loadActivities - before redux update - ", props.activity.list)
+          console.log("loadActivities - giving redux - ", activityList)
           props.dispatch(setActivityList(activityList))
+          console.log("loadActivities - after redux update - ", props.activity.list)
           props.dispatch(setActivityNextPage(hasNextPage, nextPageToken))
         } catch (e) {
           this.changingActivityList = false
@@ -257,6 +285,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         }
         this.loadActivitiesPromise = null
       }
+      console.log("loadActivities - End - ", props.activity.list)
       this.changingActivityList = false
     }
 
