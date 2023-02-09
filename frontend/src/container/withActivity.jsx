@@ -189,7 +189,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       const updatedActivityList = await addMessageToActivityList(
         activity, props.activity.list, FETCH_CONFIG.apiUrl
       )
-      if (!isEqual(props.activityList.list, updatedActivityList)) {
+      if (!isEqual(props.activity.list, updatedActivityList)) {
         props.dispatch(setActivityList(updatedActivityList))
       }
       if (data.event_type.includes(TLM_SUB.COMMENT) && !(
