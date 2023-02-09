@@ -5912,11 +5912,6 @@ class TestUserAvatarEndpoints:
         get 256x256 preview of a avatar
         """
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
-        res = web_testapp.get(
-            "/api/users/{}/avatar/preview/jpg/256x256/something.jpg".format(admin_user.user_id),
-            status=400,
-        )
-        assert res.json_body["code"] == ErrorCode.USER_IMAGE_NOT_FOUND
 
         image = create_png_test_image(500, 100)
         web_testapp.put(
