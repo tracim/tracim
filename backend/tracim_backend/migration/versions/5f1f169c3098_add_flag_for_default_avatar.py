@@ -15,7 +15,15 @@ down_revision = "b7aa3b477519"
 
 def upgrade():
     with op.batch_alter_table("users") as bop:
-        bop.add_column(sa.Column("is_avatar_default", sa.Boolean(), nullable=False, default=True))
+        bop.add_column(
+            sa.Column(
+                "is_avatar_default",
+                sa.Boolean(),
+                nullable=False,
+                default=True,
+                server_default=sa.sql.expression.literal(True),
+            )
+        )
     connection = op.get_bind()
     connection.execute("UPDATE users SET is_avatar_default=(avatar = '' OR avatar IS NULL)")
 
