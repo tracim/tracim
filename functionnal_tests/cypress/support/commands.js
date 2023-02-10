@@ -20,22 +20,24 @@ Cypress.Commands.add('login', (user, role) => {
       email: user.email,
       password: user.password
     }
-  }).then(response => {
-    cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
-      if (cookie && cookie.value) {
-        return cy.saveCookieValue(role, cookie.value)
-      }
-      return false
-    }))
-    return cy.request({
-      method: 'PUT',
-      url: '/api/users/' + response.body.user_id,
-      body: {
-        lang: 'en',
-        public_name: response.body.public_name,
-        timezone: 'Europe/Paris'
-      }
-    })
+  // NOTE - MP - 10-02-2023 - This is removed to avoid concurency and UNIQUE constraint error in
+  // database. I'll create an issue if the tests on concourse are valid.
+  // }).then(response => {
+  //   cy.waitUntil(() => cy.getCookie('session_key').then(cookie => {
+  //     if (cookie && cookie.value) {
+  //       return cy.saveCookieValue(role, cookie.value)
+  //     }
+  //     return false
+  //   }))
+  //   return cy.request({
+  //     method: 'PUT',
+  //     url: '/api/users/' + response.body.user_id,
+  //     body: {
+  //       lang: 'en',
+  //       public_name: response.body.public_name,
+  //       timezone: 'Europe/Paris'
+  //     }
+  //   })
   }).then(response => response.body)
 })
 
