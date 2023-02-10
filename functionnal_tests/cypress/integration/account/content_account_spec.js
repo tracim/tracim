@@ -7,13 +7,17 @@ import defaultAdmin from '../../fixtures/defaultAdmin.json'
 
 describe('Account page', () => {
   beforeEach(() => {
-    cy.cancelXHR()
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('users')
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.log('Todo must be reworked')
   })
+
+  afterEach(() => {
+    cy.cancelXHR()
+  })
+
   const validateButton = 'Validate'
 
   describe('Account header', () => {
@@ -282,10 +286,13 @@ describe('Account page', () => {
 
 describe('Profile link button', () => {
   beforeEach(() => {
-    cy.cancelXHR()
     cy.resetDB()
     cy.setupBaseDB()
     cy.loginAs('administrators')
+  })
+
+  afterEach(() => {
+    cy.cancelXHR()
   })
 
   it("should redirect to user's public profile", () => {
