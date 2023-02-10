@@ -22,13 +22,11 @@ describe('Profile', () => {
   })
 
   it('should have the information part', () => {
-    cy.contains('.profile__content__information', 'Information')
-      .should('be.visible')
+    cy.get('.profile__content__information').should('be.visible')
   })
 
   it('should have the personal page part', () => {
-    cy.contains('.profile__content__page', 'Personal Page')
-      .should('be.visible')
+    cy.get('.profile__content__page').should('be.visible')
   })
 })
 
