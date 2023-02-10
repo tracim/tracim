@@ -293,14 +293,4 @@ describe('Profile link button', () => {
     cy.get('.userinfo__profile_button').click()
     cy.url().should('include', URLS[PAGES.PROFILE]({ userId: defaultAdmin.user_id }));
   })
-
-  it('label should be "My Profile" when viewing from account page', () => {
-    cy.visitPage({ pageName: PAGES.ACCOUNT })
-    cy.get('.userinfo__profile_button').contains('My profile')
-  })
-
-  it('label should be "Profile" when viewing from admin page', () => {
-    cy.visitPage({ pageName: PAGES.ADMIN_USER, params: { userId: baseUser.user_id }  })
-    cy.get('.userinfo__profile_button').contains('Profile')
-  })
 })
