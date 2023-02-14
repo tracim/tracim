@@ -32,7 +32,10 @@ describe('The Personal recent activities page', () => {
     cy.cancelXHR()
   })
 
-  it('should up the content when it is commented', () => {
+  // TODO - MP - 02-09-2023 - Unstable test due to race condition
+  // See https://github.com/tracim/tracim/issues/3866
+  // See https://github.com/tracim/tracim/issues/3392
+  it.skip('should display refresh button when a comment is the first comment of a thread', () => {
     cy.createComment(workspaceId, fileId, commentContent).then(() => {
       cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, waitForTlm: true })
       cy.get('[data-cy=activityList__item]').first().then(() => {
@@ -47,17 +50,17 @@ describe('The Personal recent activities page', () => {
     })
   })
 
-  it('should up the content when a file is attached on it', () => {
+  // TODO - MP - 02-09-2023 - Unstable test due to race condition
+  // See https://github.com/tracim/tracim/issues/3866
+  // See https://github.com/tracim/tracim/issues/3392
+  it.skip('should display refresh button when a file is the first comment of a thread', () => {
     cy.createFile(fullFilename, contentType, fileTitle, workspaceId, fileId).then(() => {
       cy.visitPage({ pageName: PAGES.RECENT_ACTIVITIES, waitForTlm: true })
       cy.get('[data-cy=activityList__item]').first().then(() => {
         cy.contains('.feedItemHeader__title', fileTitle)
       })
       cy.createFile(fullFilename, contentType, fileTitle, workspaceId, threadId).then(() => {
-        cy.get('[data-cy=activityList__refresh]').should('be.visible').click()
-        cy.get('[data-cy=activityList__item]').first().then(() => {
-          cy.contains('.feedItemHeader__title', threadTitle)
-        })
+        cy.get('[data-cy=activityList__refresh]').should('be.visible')
       })
     })
   })

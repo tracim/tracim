@@ -1,19 +1,22 @@
 # Tests
 
-To test [Tracim](https://www.algoo.fr/fr/tracim), you first need to be able to build the backend and the frontend.<br>
+To test [Tracim](https://www.algoo.fr/fr/tracim), you first need to be able to
+build the backend and the frontend.
 See [how to build](./BUILD.md).
 
 ## Table of contents
 
-1. [Backend](#backend)
-    1. [Prerequisites](#prerequisites)
-    2. [Tests](#tests-with-pytest)
-    3. [Configuration test](#configuration-test)
-    4. [Docker compose test](#docker-compose-test-file)
-2. [Frontend](#fronted)
-    1. [Prerequisites](#prerequisites-1)
-    1. [Unit tests](#unit-tests)
-    2. [Functional tests](#functional-tests)
+- [Tests](#tests)
+  - [Table of contents](#table-of-contents)
+  - [Backend](#backend)
+    - [Prerequisites](#prerequisites)
+    - [Configuration test](#configuration-test)
+    - [Tests with pytest](#tests-with-pytest)
+    - [Docker compose test file](#docker-compose-test-file)
+  - [Frontend](#frontend)
+    - [Prerequisites](#prerequisites-1)
+    - [Unit tests](#unit-tests)
+    - [Functional tests](#functional-tests)
 
 ## Backend
 
@@ -44,6 +47,7 @@ To test every databases, you will need the pytest-forked plugin.
 ### Configuration test
 
 To run backend tests, you need several configurations:
+
 - A specific configuration for specific tests is
 available in `TEST_CONFIG_FILE_PATH` (by default: `./tests_configs.ini` in backend folder).
 - For a more general configuration, pytest rely on dotenv `.env` file (by default `.test.env` in backend folder)
@@ -56,6 +60,7 @@ For example, if you want to use another database:
     pytest
 
 Order of usage is (from less to more important, last is used if set):
+
 - specific TEST_CONFIG_FILE_PATH config (different for each test)
 - default env var setting in .test.env
 - env var set by user
@@ -67,7 +72,6 @@ Run tests with the following commands:
     docker compose up -d
     pytest
     docker compose down
-
 
 By default the tests will be executed with the `sqlite` database, this can be changed using the `--database` argument of pytest:
 

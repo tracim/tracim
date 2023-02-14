@@ -10,9 +10,8 @@ const contentHtmlDocGetter = formatTag({ selectorName: s.CONTENT_IN_SEARCH, attr
 
 const commentArea = '.timeline__comment__body'
 const commentText = '.timeline__comment__body__content__text'
-const cancelDocBtn = '.html-document__editionmode__cancel'
+const cancelDocBtn = '.editionmode__button__cancel'
 const submitBtn = '.commentArea__submit__btn'
-const commentField = '#wysiwygTimelineComment'
 
 describe('Add a new comment', () => {
   before(function () {
@@ -57,7 +56,7 @@ describe('Add a new comment', () => {
     cy.get(contentHtmlDocGetter).click()
     cy.get(cancelDocBtn).click()
 
-    cy.get(commentField).type(veryLongComment)
+    cy.inputInTinyMCE(veryLongComment)
     cy.get(submitBtn).click()
 
     cy.get(commentText).invoke('css', 'width').then(largeCommentSize => {

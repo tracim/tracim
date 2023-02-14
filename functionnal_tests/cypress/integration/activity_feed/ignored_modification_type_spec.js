@@ -1,4 +1,4 @@
-import { PAGES, URLS } from '../../support/urls_commands.js'
+import { PAGES } from '../../support/urls_commands.js'
 
 const activityPages = [
   { name: 'Personal', page: PAGES.RECENT_ACTIVITIES, initialItemCount: 3 },
@@ -17,40 +17,36 @@ const fileType = 'image/png'
 for (const pageTestCase of activityPages) {
   const { name, page, initialItemCount } = pageTestCase
   describe(`The ${name} recent activities page`, () => {
-    let workspaceId = null
     let contentId = null
     let commentId = null
     beforeEach(() => {
       cy.resetDB()
       cy.setupBaseDB()
       cy.loginAs('administrators')
-      cy.createWorkspace().then(workspace => {
-        workspaceId = workspace.workspace_id
-        cy.createFile(fileImage, fileType, fileName2, workspaceId).then(content => {
-          contentId = content.content_id
-          cy.postComment(workspaceId, contentId, 'A comment').then(comment => {
-            commentId = comment.content_id
-          })
+      cy.createFile(fileImage, fileType, fileName2, 1).then(content => {
+        contentId = content.content_id
+        cy.postComment(1, contentId, 'A comment').then(comment => {
+          commentId = comment.content_id
         })
-        cy.createFile(fileImage, fileType, fileName3, workspaceId)
-        cy.visitPage({ pageName: page, params: { workspaceId }, waitForTlm: true })
       })
+      cy.createFile(fileImage, fileType, fileName3, 1)
+      cy.visitPage({ pageName: page, params: { workspaceId: 1 }, waitForTlm: true })
     })
 
     afterEach(function () {
       cy.cancelXHR()
     })
 
-    it('should ignore if when a comment for the content is modified', () => {
+    it('should ignore when a comment is modified', () => {
       cy.get('[data-cy=activityList__item]').first().should('contain.text', fileName3WithoutExtention)
-      cy.putComment(workspaceId, contentId, commentId, 'Update comment')
+      cy.putComment(1, contentId, commentId, 'Update comment')
       cy.get('[data-cy=activityList__refresh]').should('not.be.visible')
       cy.get('[data-cy=activityList__item]').first().should('contain.text', fileName3WithoutExtention)
     })
 
-    it('should ignore if when a comment for the content is deleted', () => {
+    it('should ignore when a comment is deleted', () => {
       cy.get('[data-cy=activityList__item]').first().should('contain.text', fileName3WithoutExtention)
-      cy.deleteComment(workspaceId, contentId, commentId, 'Update comment')
+      cy.deleteComment(1, contentId, commentId, 'Update comment')
       cy.get('[data-cy=activityList__refresh]').should('not.be.visible')
       cy.get('[data-cy=activityList__item]').first().should('contain.text', fileName3WithoutExtention)
     })

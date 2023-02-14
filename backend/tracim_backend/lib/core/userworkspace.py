@@ -213,6 +213,15 @@ class RoleApi(object):
     def get_workspace_member_ids(
         self, workspace_id: int, min_role: typing.Optional[WorkspaceRoles] = None
     ) -> typing.List[int]:
+        """Get a list of user ids that are members of the workspace.
+
+        Args:
+            workspace_id (int): The workspace id.
+            min_role (typing.Optional[WorkspaceRoles], optional): Minimum role. Defaults to None.
+
+        Returns:
+            typing.List[int]: The list of user ids.
+        """
         return [user.user_id for user in self.get_workspace_members(workspace_id, min_role)]
 
     def get_common_workspace_ids(self, user_id: int) -> typing.List[int]:

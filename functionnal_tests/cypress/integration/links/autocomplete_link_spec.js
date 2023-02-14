@@ -13,8 +13,7 @@ let workspaceId
 
 const linkChar = '#'
 
-describe.skip('A comment in advanced edition', () => {
-  // RJ - FIXME - 2021-06-10 - unstable test disabled, see https://github.com/tracim/tracim/issues/3986
+describe('A comment in TinyMCE', () => {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -39,9 +38,6 @@ describe.skip('A comment in advanced edition', () => {
       pageName: PAGES.CONTENT_OPEN,
       params: { contentId: threadId }
     })
-    cy.get('.commentArea__advancedtext__btn')
-      .should('be.visible')
-      .click()
   })
 
   afterEach(() => {
@@ -50,34 +46,29 @@ describe.skip('A comment in advanced edition', () => {
 
   describe(`type ${linkChar}`, () => {
     it('should show autocomplete', () => {
-      cy.inputInTinyMCE(linkChar)
-      cy.get('.autocomplete')
+      cy.inputInTinyMCE(`${linkChar}ti`)
+      cy.get('.tox-autocompleter')
         .should('be.visible')
     })
 
     it('should contain the id and the title in an autocomplete item', () => {
-      cy.inputInTinyMCE(linkChar)
-      cy.contains('.autocomplete__item', noteId)
+      cy.inputInTinyMCE(`${linkChar}ti`)
+      cy.contains('.tox-collection__item', noteId)
         .should('be.visible')
-      cy.contains('.autocomplete__item', noteTitle)
+      cy.contains('.tox-collection__item', noteTitle)
         .should('be.visible')
     })
 
     it('should contain all created contents in autocomplete', () => {
-      cy.inputInTinyMCE(linkChar)
-      cy.contains('.autocomplete__item', fileId)
-        .should('be.visible')
-      cy.contains('.autocomplete__item', noteId)
-        .should('be.visible')
-      cy.contains('.autocomplete__item', threadId)
-        .should('be.visible')
+      cy.inputInTinyMCE(`${linkChar}ti`)
+      cy.get('.tox-collection__item').should('have.length', 3)
     })
   })
 
   describe('click on an item of autocomplete popup', () => {
     it('should complete the comment with content id', () => {
-      cy.inputInTinyMCE(linkChar)
-      cy.contains('.autocomplete__item', fileTitle)
+      cy.inputInTinyMCE(`${linkChar}ti`)
+      cy.contains('.tox-collection__item', fileTitle)
         .click()
       cy.assertTinyMCEContent(`${linkChar}${fileId}`)
     })

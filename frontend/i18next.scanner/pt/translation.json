@@ -401,7 +401,6 @@
   "Recent activities": "Atividades recentes",
   "Loading recent activities…": "Carregando atividades recentes…",
   "undeleted": "restaurado",
-  "Error while saving the comment": "Erro ao guardar o comentário",
   "publication list": "lista de publicações",
   "Reorder": "Reordenar",
   "Space settings": "Definições do espaço",
@@ -595,6 +594,12 @@
   "Sort by title": "",
   "Sort by last modification": "",
   "Sort by information": "",
+  "Every members of the space": "",
+  "All": "",
+  "all": "",
+  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "",
   "Sort by role": "",
+  "UnknownUser": "",
+  "UnknownRole": "",
   "Sort by status": ""
 }

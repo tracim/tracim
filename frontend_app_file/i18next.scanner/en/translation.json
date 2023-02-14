@@ -3,7 +3,6 @@
   "Last version": "Last version",
   "Restore": "Restore",
   "Error while creating file": "Error while creating file",
-  "Error while saving the comment": "Error while saving the comment",
   "Cancel": "Cancel",
   "Validate": "Validate",
   "Download file": "Download file",
@@ -65,5 +64,8 @@
   "Delete": "Delete",
   "Tasks": "Tasks",
   "The link has been copied to clipboard": "Link copied to clipboard",
-  "Copy content link": "Copy content link"
+  "Copy content link": "Copy content link",
+  "Every members of the space": "Every members of the space",
+  "All": "All",
+  "all": "all"
 }

@@ -398,7 +398,6 @@
   "Recent activities": "Activités récentes",
   "Loading recent activities…": "Chargement des activités récentes…",
   "undeleted": "restauré",
-  "Error while saving the comment": "Erreur pendant la sauvegarde du commentaire",
   "publication list": "liste de publications",
   "Reorder": "Réorganiser",
   "This space doesn't have a description yet.": "Cet espace n'a pas encore de description.",
@@ -595,6 +594,12 @@
   "Sort by title": "",
   "Sort by last modification": "",
   "Sort by information": "",
+  "Every members of the space": "",
+  "All": "",
+  "all": "",
+  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "",
   "Sort by role": "",
+  "UnknownUser": "",
+  "UnknownRole": "",
   "Sort by status": ""
 }

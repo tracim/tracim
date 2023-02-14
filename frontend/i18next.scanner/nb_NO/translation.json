@@ -457,7 +457,6 @@
   "{{author}} removed their reaction {{reaction}} to {{content}}": "{{author}} fjernet sin {{reaction}}-reaksjon på {{content}}",
   "Sign in": "Logg inn",
   "{{author}} deleted their account": "{{author}} slettet kontoen sin",
-  "Error while saving the comment": "Kunne ikke lagre kommentaren",
   "Login:": "Innlogging:",
   "An error has happened while removing the favorite": "Kunne ikke fjerne favoritten",
   "{{author}} joined a space": "{{author}} tok del i et rom",
@@ -592,6 +591,12 @@
   "Sort by title": "",
   "Sort by last modification": "",
   "Sort by information": "",
+  "Every members of the space": "",
+  "All": "",
+  "all": "",
+  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "",
   "Sort by role": "",
+  "UnknownUser": "",
+  "UnknownRole": "",
   "Sort by status": ""
 }

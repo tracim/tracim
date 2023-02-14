@@ -360,7 +360,6 @@
   "Reaction deleted": "Reacción borrada",
   "Reorder": "Reordenar",
   "{{author}} removed their reaction {{reaction}} to {{content}}": "{{author}} quitó su reacción {{reaction}} a {{content}}",
-  "Error while saving the comment": "Error al guardar el comentario",
   "publication list": "lista de publicaciones",
   "Password:": "Contraseña:",
   "content is not available": "el contenido no está disponible",
@@ -595,6 +594,12 @@
   "Sort by title": "",
   "Sort by last modification": "",
   "Sort by information": "",
+  "Every members of the space": "",
+  "All": "",
+  "all": "",
+  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "",
   "Sort by role": "",
+  "UnknownUser": "",
+  "UnknownRole": "",
   "Sort by status": ""
 }
