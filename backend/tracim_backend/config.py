@@ -494,9 +494,7 @@ class CFG(object):
         )
         self.KNOWN_MEMBERS__FILTER = asbool(self.get_raw_config("known_members.filter", "True"))
         self.DEBUG = asbool(self.get_raw_config("debug", "False"))
-        self.BUILD_VERSION = self.get_raw_config(
-            "build_version", get_build_version(os.path.abspath(__file__))
-        )
+        self.BUILD_VERSION = self.get_raw_config("build_version", get_build_version())
         self.PREVIEW__JPG__RESTRICTED_DIMS = asbool(
             self.get_raw_config("preview.jpg.restricted_dims", "False")
         )
@@ -514,9 +512,7 @@ class CFG(object):
         tracim_folder = os.path.dirname(backend_folder)
         backend_i18n_folder = os.path.join(backend_folder, "tracim_backend", "locale")
 
-        self.FRONTEND__CACHE_TOKEN = self.get_raw_config(
-            "frontend.cache_token", get_cache_token(os.path.abspath(__file__))
-        )
+        self.FRONTEND__CACHE_TOKEN = self.get_raw_config("frontend.cache_token", get_cache_token())
 
         self.BACKEND__I18N_FOLDER_PATH = self.get_raw_config(
             "backend.i18n_folder_path", backend_i18n_folder
