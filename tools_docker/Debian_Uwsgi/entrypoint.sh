@@ -105,6 +105,10 @@ case "$DATABASE_TYPE" in
     ;;
 esac
 loggood "checking of database success"
+
+# Start the redis server before initializing the database to store avatars
+service redis-server start  # async jobs (for mails and TLMs)
+
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
     log "Initialise Database"
@@ -165,7 +169,6 @@ log "Start all services"
 # starting services
 service pushpin start # tracim live messages (TLMs) sending
 service zurl start # tracim live messages (TLMs) sending
-service redis-server start  # async jobs (for mails and TLMs)
 service apache2 restart
 log "Run supervisord"
 supervisord -c "$docker_script_dir/supervisord_tracim.conf"
