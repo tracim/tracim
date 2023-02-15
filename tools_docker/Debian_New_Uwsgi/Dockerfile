@@ -16,7 +16,7 @@ ARG BRANCH
 ARG TAG
 RUN apt-get update \
    && apt-get upgrade -qy \
-   && apt-get install apt-utils git -qy \
+   && apt-get install apt-utils git -qy
 COPY ./clone_repo.sh /clone_repo.sh
 RUN /clone_repo.sh "${REPO}" "${BRANCH}" "${TAG}"
 RUN rm /clone_repo.sh
