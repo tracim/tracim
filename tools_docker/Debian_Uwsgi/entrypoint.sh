@@ -104,10 +104,12 @@ case "$DATABASE_TYPE" in
     fi
     ;;
 esac
-loggood "checking of database success"
+loggood "Checking of database success"
 
+log "Starting redis server..."
 # Start the redis server before initializing the database to store avatars
 service redis-server start  # async jobs (for mails and TLMs)
+loggood "Redis server started"
 
 # Initialize database if needed
 if [ "$INIT_DATABASE" = true ] ; then
@@ -165,11 +167,17 @@ sed -i "s|^;\s*app.enabled = .*|app.enabled = $DEFAULT_APP_LIST|g" /etc/tracim/d
 cd /tracim/backend/
 tracimcli_as_user "search index-create"
 
-log "Start all services"
-# starting services
+# Starting remaining services
+log "Starting Puspin service..."
 service pushpin start # tracim live messages (TLMs) sending
+loggood "Pushpin started"
+log "Starting Zurl service..."
 service zurl start # tracim live messages (TLMs) sending
+loggood "Zurl started"
+log "Restarting Apache2 service..."
 service apache2 restart
+loggood "Apache2 restarted"
+
 log "Run supervisord"
 supervisord -c "$docker_script_dir/supervisord_tracim.conf"
 # Activate daemon for reply by email
