@@ -223,11 +223,14 @@ export const TinyEditor = props => {
               ch: '@',
               columns: 1,
               highlightOn: ['roleName', 'publicName', 'username'],
-              minChars: 1,
+              minChars: 0,
               maxResults: maxFetchResults,
               fetch: async function (pattern) {
                 const insensitivePattern = pattern.toLowerCase()
                 const matchedMemberList = props.userList.filter((user) => {
+                  if (!user.username) {
+                    return false
+                  }
                   const insensitiveUsername = user.username.toLowerCase()
                   const insensitivePublicName = user.publicName.toLowerCase()
                   const isUsername = insensitiveUsername.indexOf(insensitivePattern) !== -1
