@@ -88,7 +88,7 @@ export const TinyEditor = props => {
         }
       ]
     }))
-  }, [props.roleList])
+  }, [props.isAdvancedEdition, props.roleList])
 
   return (
     <>
@@ -256,15 +256,23 @@ export const TinyEditor = props => {
                       classes: ['tinymce-avatar']
                     },
                     {
-                      type: 'cardtext',
-                      text: ` ${user.publicName}`,
-                      name: 'publicName'
-                    },
-                    {
-                      type: 'cardtext',
-                      text: `@${user.username}`,
-                      name: 'username',
-                      classes: ['tinymce-username']
+                      type: 'cardcontainer',
+                      direction: 'horizontal',
+                      align: 'left',
+                      valign: 'middle',
+                      items: [
+                        {
+                          type: 'cardtext',
+                          text: ` ${user.publicName}`,
+                          name: 'publicName'
+                        },
+                        {
+                          type: 'cardtext',
+                          text: `@${user.username}`,
+                          name: 'username',
+                          classes: ['tinymce-username']
+                        }
+                      ]
                     }
                   ]
                 }))
