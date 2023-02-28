@@ -109,6 +109,9 @@ fi
 # Create pushpin route file
 echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 
+# Create summary mails cron job
+echo "0 0 * * * tracimcli periodic send-summary-mails -c /etc/tracim/development.ini --since 24" > /etc/cron.d/tracim_send_summary_mails
+
 # Create and link branding directory if it does not exist
 if [ ! -d /etc/tracim/branding ]; then
     cp -r /tracim/frontend/dist/assets/branding.sample /etc/tracim/branding
