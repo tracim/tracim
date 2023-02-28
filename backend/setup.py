@@ -152,7 +152,7 @@ setup(
             "db migrate-mysql-charset = tracim_backend.command.database:MigrateMysqlCharsetCommand",
             "db migrate-storage = tracim_backend.command.database:MigrateStorageCommand",
             # periodically
-            "send-summaries = tracim_backend.command.periodic:SendMailSummariesCommand",
+            "periodic send-summary-mails = tracim_backend.command.periodic:SendMailSummariesCommand",
             # search
             "search index-create = tracim_backend.command.search:SearchIndexInitCommand",
             "search index-populate = tracim_backend.command.search:SearchIndexIndexCommand",
