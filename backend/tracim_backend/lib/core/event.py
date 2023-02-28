@@ -16,6 +16,7 @@ from sqlakeyset import Page
 from sqlakeyset import get_page
 from sqlalchemy import and_
 from sqlalchemy import event as sqlalchemy_event
+from sqlalchemy import func
 from sqlalchemy import inspect
 from sqlalchemy import not_
 from sqlalchemy import null
@@ -307,8 +308,23 @@ class EventApi:
         self._session.flush()
         return unread_messages
 
-    def get_messages_for_user(self, user_id: int, after_event_id: int = 0) -> List[Message]:
-        query = self._base_query(user_id=user_id, after_event_id=after_event_id,)
+    def get_messages_for_user(
+        self,
+        user_id: int,
+        after_event_id: int = 0,
+        created_after: Optional[datetime] = None,
+        event_type: Optional[EventTypeDatabaseParameters] = None,
+        read_status: ReadStatus = ReadStatus.ALL,
+    ) -> List[Message]:
+        query = self._base_query(
+            user_id=user_id,
+            after_event_id=after_event_id,
+            include_event_types=[event_type] if event_type is not None else None,
+            read_status=read_status,
+        )
+        if created_after:
+            query = query.filter(Event.created >= created_after)
+
         return query.all()
 
     def get_paginated_messages_for_user(
@@ -357,6 +373,20 @@ class EventApi:
             workspace_ids=workspace_ids,
             related_to_content_ids=related_to_content_ids,
         ).count()
+
+    def get_unread_messages_summary(
+        self, user_id: int, created_after: datetime,
+    ) -> List[typing.Tuple[int, str]]:
+        query = (
+            self._session.query(func.count(Message.event_id), Workspace.label)
+            .join(Event)
+            .join(Workspace, Event.workspace_id == Workspace.workspace_id)
+        )
+        query = query.filter(Message.receiver_id == user_id)
+        query = query.filter(Message.read is None)
+        query = query.filter(Event.created >= created_after)
+        query = query.group_by(Workspace.workspace_id)
+        return query.all()
 
     def create_event(
         self,

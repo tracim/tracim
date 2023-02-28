@@ -787,6 +787,11 @@ class CFG(object):
             _("[{website_title}] A password reset has been requested"),
         )
 
+        # Summary
+        self.EMAIL__SUMMARY__TEMPLATE__HTML = self.get_raw_config(
+            "email.summary.template.html", "{}/{}".format(template_dir, "summary_body_html.mak"),
+        )
+
         # TODO - G.M - 2019-01-22 - add feature to process notification email
         # asynchronously see issue https://github.com/tracim/tracim/issues/1345
         self.EMAIL__NOTIFICATION__ACTIVATED = asbool(
