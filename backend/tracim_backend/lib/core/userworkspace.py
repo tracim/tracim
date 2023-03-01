@@ -130,7 +130,7 @@ class RoleApi(object):
                 )
             role.role = role_level
         if email_notification_type_value != "":
-            role.email_notification_type = email_notification_type_value
+            role.email_notification_type = EmailNotificationType(email_notification_type_value)
         if save_now:
             self.save(role)
 
@@ -156,7 +156,7 @@ class RoleApi(object):
         role.user = user
         role.workspace = workspace
         role.role = role_level
-        role.email_notification_type = email_notification_type.name
+        role.email_notification_type = email_notification_type
         if flush:
             self._session.flush()
         return role
