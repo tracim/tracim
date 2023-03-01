@@ -11,6 +11,7 @@ from webtest import TestResponse
 
 from tracim_backend.error import ErrorCode
 from tracim_backend.models.auth import Profile
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
 
@@ -276,8 +277,18 @@ class TestAccountKnownMembersEndpoint(object):
         uapi.save(test_user3)
         workspace = workspace_api_factory.get().create_workspace("test workspace", save_now=True)
         role_api = role_api_factory.get()
-        role_api.create_one(test_user, workspace, UserRoleInWorkspace.READER, False)
-        role_api.create_one(test_user2, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            test_user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
+        role_api.create_one(
+            test_user2,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         int(test_user.user_id)
 

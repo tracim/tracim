@@ -106,8 +106,8 @@ class SearchApi(ABC):
         Get user workspace list or None if no user set
         """
         if self._user:
-            rapi = RoleApi(config=self._config, session=self._session, current_user=self._user)
-            return rapi.get_user_workspaces_ids(self._user.user_id, min_role)
+            role_api = RoleApi(config=self._config, session=self._session, current_user=self._user)
+            return role_api.get_user_workspaces_ids(self._user.user_id, min_role)
         return None
 
     def offset_from_pagination(self, size: int, page_nb: int) -> int:

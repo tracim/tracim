@@ -1526,7 +1526,7 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
 
 class EmailNotificationTypeSchema(marshmallow.Schema):
     email_notification_type = StrippedString(
-        example=EmailNotificationType.SUMMARY,
+        example=EmailNotificationType.SUMMARY.name,
         description="Type of email notification for a specific space",
     )
 

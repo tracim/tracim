@@ -16,6 +16,7 @@ from tracim_backend.models.auth import User
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -910,8 +911,13 @@ class TestContentApi(object):
         workspace = workspace_api_factory.get(current_user=user2).create_workspace(
             "test workspace", save_now=True
         )
-        rapi = role_api_factory.get(current_user=user2)
-        rapi.create_one(user, workspace, UserRoleInWorkspace.CONTENT_MANAGER, False)
+        role_api = role_api_factory.get(current_user=user2)
+        role_api.create_one(
+            user,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         api2 = ContentApi(current_user=user2, session=session, config=app_config)
         c = api2.create(
             content_type_slug=content_type_list.Folder.slug,
@@ -1018,7 +1024,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1081,7 +1090,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1152,7 +1164,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1228,7 +1243,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1315,7 +1333,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         with session.no_autoflush:
@@ -1381,7 +1402,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1476,7 +1500,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1534,7 +1561,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1604,7 +1634,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1670,7 +1703,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1718,7 +1754,10 @@ class TestContentApi(object):
             "test workspace", save_now=True
         )
         role_api_factory.get().create_one(
-            user2, workspace, UserRoleInWorkspace.WORKSPACE_MANAGER, with_notif=False
+            user2,
+            workspace,
+            UserRoleInWorkspace.WORKSPACE_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
         )
         api = ContentApi(current_user=user, session=session, config=app_config)
         foldera = api.create(
@@ -1975,7 +2014,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2051,7 +2094,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2118,7 +2165,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2191,7 +2242,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
 
         # Test starts here
@@ -2263,7 +2318,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2340,7 +2399,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2409,7 +2472,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2477,7 +2544,11 @@ class TestContentApi(object):
         user2 = uapi.create_minimal_user("this.is@another.user")
         uapi.save(user2)
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # Test starts here
@@ -2546,7 +2617,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=False, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.NONE,
+            flush=True,
         )
         api = ContentApi(current_user=user1, session=session, config=app_config)
         with session.no_autoflush:
@@ -2598,7 +2673,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # show archived is used at the top end of the test
@@ -2687,7 +2766,11 @@ class TestContentApi(object):
         uapi.save(user2)
 
         role_api_factory.get(current_user=user1).create_one(
-            user2, workspace, UserRoleInWorkspace.CONTENT_MANAGER, with_notif=True, flush=True
+            user2,
+            workspace,
+            UserRoleInWorkspace.CONTENT_MANAGER,
+            email_notification_type=EmailNotificationType.SUMMARY,
+            flush=True,
         )
 
         # show archived is used at the top end of the test

@@ -8,6 +8,7 @@ from tracim_backend.app_models.contents import THREAD_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.exceptions import FavoriteContentNotFound
 from tracim_backend.lib.core.content import ContentApi
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.revision_protection import new_revision
@@ -297,7 +298,7 @@ class TestFavoriteContent(object):
             riyad_user,
             test_workspace,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
-            with_notif=False,
+            email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)
@@ -341,7 +342,7 @@ class TestFavoriteContent(object):
             riyad_user,
             test_workspace,
             role_level=UserRoleInWorkspace.CONTENT_MANAGER,
-            with_notif=False,
+            email_notification_type=EmailNotificationType.NONE,
         )
         content_api = content_api_factory.get(current_user=riyad_user)  # type: ContentApi
         test_thread = create_content(content_api, test_workspace, set_as_favorite=True)

@@ -720,8 +720,8 @@ class CFG(object):
         ###
         # EMAIL related stuff (notification, reply)
         ##
-        self.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION = asbool(
-            self.get_raw_config("email.notification.enabled_on_invitation", "True")
+        self.EMAIL__NOTIFICATION__TYPE_ON_INVITATION = asbool(
+            self.get_raw_config("email.notification.type_on_invitation", "summary")
         )
 
         # TODO - G.M - 2019-04-05 - keep as parameters

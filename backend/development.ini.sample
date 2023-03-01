@@ -545,10 +545,13 @@ website.usage_conditions =
 
 ## send some notification when user make specific action in Tracim
 ; email.notification.activated = False
-## you can enable or disable if invited user to space will be notified
-## on this space by default.
+## you can change the type of email notification when a user is invited to a space by default.
+## possible values are:
+## - 'summary': send a daily mail containing notification summary
+## - 'individual': send a mail for every notification received
+## - 'none': doesn't send any mail
 ## NB: new users will not being notified until they login to Tracim a first time
-; email.notification.enabled_on_invitation = True
+; email.notification.type_on_invitation = summary
 # You can enable notification-specific logs using the 'tracim_email_notification' logger.
 
 

@@ -273,15 +273,15 @@ class WorkspaceController(Controller):
         Returns the list of space members with their role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user,
             session=request.dbsession,
             config=app_config,
             show_disabled_user=hapic_data.query.show_disabled_user,
         )
 
-        roles = rapi.get_all_for_workspace(workspace=request.current_workspace)
-        return [rapi.get_user_role_workspace_with_context(user_role) for user_role in roles]
+        roles = role_api.get_all_for_workspace(workspace=request.current_workspace)
+        return [role_api.get_user_role_workspace_with_context(user_role) for user_role in roles]
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_see_workspace_information)
@@ -294,14 +294,14 @@ class WorkspaceController(Controller):
         Returns given space member with its role, avatar, etc.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
 
-        role = rapi.get_one(
+        role = role_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        return rapi.get_user_role_workspace_with_context(role)
+        return role_api.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @hapic.handle_exception(UserRoleNotFound, HTTPStatus.BAD_REQUEST)
@@ -318,15 +318,15 @@ class WorkspaceController(Controller):
         This feature is for workspace managers, trusted users and administrators.
         """
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
 
-        role = rapi.get_one(
+        role = role_api.get_one(
             user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
         )
-        role = rapi.update_role(role, role_level=hapic_data.body.role.level)
-        return rapi.get_user_role_workspace_with_context(role)
+        role = role_api.update_role(role, role_level=hapic_data.body.role.level)
+        return role_api.get_user_role_workspace_with_context(role)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
     @check_right(can_leave_workspace)
@@ -343,10 +343,12 @@ class WorkspaceController(Controller):
         """
 
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
-        rapi.delete_one(user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id)
+        role_api.delete_one(
+            user_id=hapic_data.path.user_id, workspace_id=hapic_data.path.workspace_id
+        )
         return
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_MEMBERS_ENDPOINTS])
@@ -368,7 +370,7 @@ class WorkspaceController(Controller):
         newly_created = False
         email_sent = False
         app_config = request.registry.settings["CFG"]  # type: CFG
-        rapi = RoleApi(
+        role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
         )
         uapi = UserApi(
@@ -429,14 +431,14 @@ class WorkspaceController(Controller):
                 )
             newly_created = True
 
-        role = rapi.create_one(
+        role = role_api.create_one(
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
-            with_notif=app_config.EMAIL__NOTIFICATION__ENABLED_ON_INVITATION,
+            email_notification_type=app_config.EMAIL__NOTIFICATION__TYPE_ON_INVITATION,
             flush=True,
         )
-        return rapi.get_user_role_workspace_with_context(
+        return role_api.get_user_role_workspace_with_context(
             role, newly_created=newly_created, email_sent=email_sent
         )
 
