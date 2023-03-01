@@ -368,7 +368,6 @@ class WorkspaceController(Controller):
         This feature is for workspace managers and administrators.
         """
         newly_created = False
-        email_sent = False
         app_config = request.registry.settings["CFG"]  # type: CFG
         role_api = RoleApi(
             current_user=request.current_user, session=request.dbsession, config=app_config
@@ -413,12 +412,6 @@ class WorkspaceController(Controller):
                     creation_type=UserCreationType.INVITATION,
                     creation_author=request.current_user,
                 )
-                if (
-                    app_config.EMAIL__NOTIFICATION__ACTIVATED
-                    and app_config.NEW_USER__INVITATION__DO_NOTIFY
-                    and app_config.JOBS__PROCESSING_MODE == app_config.CST.SYNC
-                ):
-                    email_sent = True
             else:
                 user = uapi.create_user(
                     auth_type=AuthType.UNKNOWN,
@@ -438,9 +431,7 @@ class WorkspaceController(Controller):
             email_notification_type=app_config.EMAIL__NOTIFICATION__TYPE_ON_INVITATION,
             flush=True,
         )
-        return role_api.get_user_role_workspace_with_context(
-            role, newly_created=newly_created, email_sent=email_sent
-        )
+        return role_api.get_user_role_workspace_with_context(role, newly_created=newly_created)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__WORKSPACE_SUBSCRIPTION_ENDPOINTS])
     @check_right(can_modify_workspace)
