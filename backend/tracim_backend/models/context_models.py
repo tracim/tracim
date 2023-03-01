@@ -37,7 +37,6 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import ContentSortOrder
-from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -1210,8 +1209,8 @@ class UserRoleWorkspaceInContext(object):
         return self.user.is_active
 
     @property
-    def email_notification_type(self) -> EmailNotificationType:
-        return self.user_role.email_notification_type
+    def email_notification_type(self) -> str:
+        return self.user_role.email_notification_type.value
 
     @property
     def user(self) -> UserInContext:
