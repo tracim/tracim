@@ -118,15 +118,16 @@ class RoleApi(object):
         :param save_now: database flush
         :return: updated role
         """
-        if role.role == WorkspaceRoles.WORKSPACE_MANAGER.level and self._is_last_workspace_manager(
-            role.user_id, role.workspace_id
-        ):
-            raise LastWorkspaceManagerRoleCantBeModified(
-                "last workspace manager {} can't change their own role in workspace".format(
-                    role.user_id
-                )
-            )
         if role_level is not None:
+            if (
+                role.role == WorkspaceRoles.WORKSPACE_MANAGER.level
+                and self._is_last_workspace_manager(role.user_id, role.workspace_id)
+            ):
+                raise LastWorkspaceManagerRoleCantBeModified(
+                    "last workspace manager {} can't change their own role in workspace".format(
+                        role.user_id
+                    )
+                )
             role.role = role_level
         if email_notification_type_value != "":
             role.email_notification_type = email_notification_type_value
