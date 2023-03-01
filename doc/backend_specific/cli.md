@@ -247,6 +247,27 @@ you can run:
 
     tracimcli webdav start
 
+## Periodic tasks
+
+### Send summary mails
+
+This command will send mails for users who selected to receive a summary of changes/mentions instead of getting notified immediately.
+
+```shell
+tracimcli periodic send-summary-mails
+```
+
+It can easily be called from a cron job, for example every 24h:
+
+2. setup a cron job:
+```shell
+crontab -e
+```
+3. add a line and save the crontab file:
+```crontab
+0 0 * * * tracimcli periodic send-summary-mails -c <path to development.ini> --since 24
+```
+
 ## Help
 
     tracimcli -h

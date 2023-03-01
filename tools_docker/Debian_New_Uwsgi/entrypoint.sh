@@ -176,6 +176,8 @@ service pushpin start # tracim live messages (TLMs) sending
 service zurl start # tracim live messages (TLMs) sending
 service redis-server start  # async jobs (for mails and TLMs)
 service apache2 restart
+service cron start
+
 log "Run supervisord"
 supervisord -c "$docker_script_dir/supervisord_tracim.conf"
 # Activate daemon for reply by email
