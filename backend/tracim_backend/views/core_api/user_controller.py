@@ -699,7 +699,7 @@ class UserController(Controller):
         role_in_space = role_api.get_one(user_id=user_id, workspace_id=space_id)
         role_api.update_role(
             role=role_in_space,
-            email_notification_type=hapic_data.body["email_notification_type"],
+            email_notification_type_value=hapic_data.body["email_notification_type"],
             save_now=True,
         )
 

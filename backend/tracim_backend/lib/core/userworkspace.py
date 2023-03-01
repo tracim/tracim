@@ -107,14 +107,14 @@ class RoleApi(object):
         self,
         role: UserRoleInWorkspace,
         role_level: int,
-        email_notification_type: typing.Optional[EmailNotificationType] = None,
+        email_notification_type_value: str = "",
         save_now: bool = False,
     ):
         """
         Update role of user in this workspace
         :param role: UserRoleInWorkspace object
         :param role_level: level of new role wanted
-        :param email_notification_type: mail notification type
+        :param email_notification_type_value: mail notification type value
         :param save_now: database flush
         :return: updated role
         """
@@ -127,8 +127,8 @@ class RoleApi(object):
                 )
             )
         role.role = role_level
-        if email_notification_type is not None:
-            role.email_notification_type = email_notification_type.name
+        if email_notification_type_value != "":
+            role.email_notification_type = email_notification_type_value
         if save_now:
             self.save(role)
 
