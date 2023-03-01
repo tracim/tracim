@@ -7,6 +7,7 @@ import transaction
 from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
 from tracim_backend.error import ErrorCode
 from tracim_backend.lib.translate.services.systran import FILE_TRANSLATION_ENDPOINT
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.tests.fixtures import *  # noqa: F403,F40
@@ -757,7 +758,12 @@ class TestEditComment(object):
         workspace, test_html_document, comment = create_doc_and_comment(
             workspace_api, content_api, content_api
         )
-        role_api.create_one(riyad_user, workspace, UserRoleInWorkspace.READER, False)
+        role_api.create_one(
+            riyad_user,
+            workspace,
+            UserRoleInWorkspace.READER,
+            email_notification_type=EmailNotificationType.NONE,
+        )
         transaction.commit()
         web_testapp.authorization = ("Basic", (riyad_user.username, "password"))
         res_get = web_testapp.get(
