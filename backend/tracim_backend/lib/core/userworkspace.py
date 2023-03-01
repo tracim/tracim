@@ -106,7 +106,7 @@ class RoleApi(object):
     def update_role(
         self,
         role: UserRoleInWorkspace,
-        role_level: int,
+        role_level: typing.Optional[int] = None,
         email_notification_type_value: str = "",
         save_now: bool = False,
     ):
@@ -126,7 +126,8 @@ class RoleApi(object):
                     role.user_id
                 )
             )
-        role.role = role_level
+        if role_level is not None:
+            role.role = role_level
         if email_notification_type_value != "":
             role.email_notification_type = email_notification_type_value
         if save_now:
