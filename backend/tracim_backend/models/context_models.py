@@ -37,6 +37,7 @@ from tracim_backend.models.data import Content
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentRevisionRO
 from tracim_backend.models.data import ContentSortOrder
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -1157,14 +1158,12 @@ class UserRoleWorkspaceInContext(object):
         config: CFG,
         # Extended params
         newly_created: bool = None,
-        email_sent: bool = None,
     ) -> None:
         self.user_role = user_role
         self.dbsession = dbsession
         self.config = config
         # Extended params
         self.newly_created = newly_created
-        self.email_sent = email_sent
 
     @property
     def user_id(self) -> int:
@@ -1211,8 +1210,8 @@ class UserRoleWorkspaceInContext(object):
         return self.user.is_active
 
     @property
-    def do_notify(self) -> bool:
-        return self.user_role.do_notify
+    def email_notification_type(self) -> EmailNotificationType:
+        return self.user_role.email_notification_type
 
     @property
     def user(self) -> UserInContext:

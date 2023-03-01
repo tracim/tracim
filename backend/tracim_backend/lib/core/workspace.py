@@ -21,6 +21,7 @@ from tracim_backend.models.auth import AuthType
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import WorkspaceInContext
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.data import WorkspaceAccessType
@@ -417,16 +418,6 @@ class WorkspaceApi(object):
             )
         return workspaces
 
-    def disable_notifications(self, user: User, workspace: Workspace):
-        for role in user.roles:
-            if role.workspace == workspace:
-                role.do_notify = False
-
-    def enable_notifications(self, user: User, workspace: Workspace):
-        for role in user.roles:
-            if role.workspace == workspace:
-                role.do_notify = True
-
     def get_notifiable_roles(
         self, workspace: Workspace, force_notify: bool = False
     ) -> typing.List[UserRoleInWorkspace]:
@@ -440,7 +431,7 @@ class WorkspaceApi(object):
         roles = []
         for role in workspace.roles:
             if (
-                (force_notify or role.do_notify is True)
+                (force_notify or role.email_notification_type != EmailNotificationType.NONE)
                 and (not self._user or role.user != self._user)
                 and role.user.is_active
                 and not role.user.is_deleted

@@ -108,6 +108,7 @@ from tracim_backend.models.context_models import WorkspaceUpdate
 from tracim_backend.models.data import ActionDescription
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import ContentSortOrder
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceAccessType
 from tracim_backend.models.event import EntityType
 from tracim_backend.models.event import EventTypeDatabaseParameters
@@ -1523,11 +1524,15 @@ class WorkspaceDiskSpaceSchema(marshmallow.Schema):
     workspace = marshmallow.fields.Nested(WorkspaceDigestSchema(), attribute="workspace_in_context")
 
 
-class WorkspaceMemberDigestSchema(marshmallow.Schema):
-    role = StrippedString(example="contributor", validate=user_role_validator)
-    do_notify = marshmallow.fields.Bool(
-        description="has user enabled notification for this workspace", example=True
+class EmailNotificationTypeSchema(marshmallow.Schema):
+    email_notification_type = StrippedString(
+        example=EmailNotificationType.SUMMARY,
+        description="Type of email notification for a specific space",
     )
+
+
+class WorkspaceMemberDigestSchema(EmailNotificationTypeSchema):
+    role = StrippedString(example="contributor", validate=user_role_validator)
 
 
 class WorkspaceMemberSchema(WorkspaceMemberDigestSchema):

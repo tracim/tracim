@@ -11,6 +11,7 @@ from tracim_backend.exceptions import UserRoleNotFound
 from tracim_backend.models.auth import Profile
 from tracim_backend.models.auth import User
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import UserRoleInWorkspace
 from tracim_backend.models.data import Workspace
 from tracim_backend.models.roles import WorkspaceRoles
@@ -55,7 +56,7 @@ class RoleApi(object):
             .filter(UserRoleInWorkspace.user_id == user_id)
             .filter(UserRoleInWorkspace.role >= min_role)
             .join(Workspace)
-            .filter(Workspace.is_deleted == False)  # noqa: E711
+            .filter(Workspace.is_deleted is False)
             .all()
         )
         workspaces_ids = []
@@ -64,7 +65,7 @@ class RoleApi(object):
         return workspaces_ids
 
     def get_user_role_workspace_with_context(
-        self, user_role: UserRoleInWorkspace, newly_created: bool = None, email_sent: bool = None,
+        self, user_role: UserRoleInWorkspace, newly_created: bool = None,
     ) -> UserRoleWorkspaceInContext:
         """
         Return WorkspaceInContext object from Workspace
@@ -75,7 +76,6 @@ class RoleApi(object):
             dbsession=self._session,
             config=self._config,
             newly_created=newly_created,
-            email_sent=email_sent,
         )
         return workspace
 
@@ -107,14 +107,14 @@ class RoleApi(object):
         self,
         role: UserRoleInWorkspace,
         role_level: int,
-        with_notif: typing.Optional[bool] = None,
+        email_notification_type: typing.Optional[EmailNotificationType] = None,
         save_now: bool = False,
     ):
         """
         Update role of user in this workspace
         :param role: UserRoleInWorkspace object
         :param role_level: level of new role wanted
-        :param with_notif: is user notification enabled in this workspace ?
+        :param email_notification_type: mail notification type
         :param save_now: database flush
         :return: updated role
         """
@@ -127,8 +127,8 @@ class RoleApi(object):
                 )
             )
         role.role = role_level
-        if with_notif is not None:
-            role.do_notify = with_notif
+        if email_notification_type is not None:
+            role.email_notification_type = email_notification_type
         if save_now:
             self.save(role)
 
@@ -139,7 +139,7 @@ class RoleApi(object):
         user: User,
         workspace: Workspace,
         role_level: int,
-        with_notif: bool,
+        email_notification_type: EmailNotificationType,
         flush: bool = True,
     ) -> UserRoleInWorkspace:
         # INFO - G.M - 2018-10-29 - Check if role already exists
@@ -154,7 +154,7 @@ class RoleApi(object):
         role.user = user
         role.workspace = workspace
         role.role = role_level
-        role.do_notify = with_notif
+        role.email_notification_type = email_notification_type
         if flush:
             self._session.flush()
         return role
