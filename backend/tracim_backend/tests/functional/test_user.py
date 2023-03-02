@@ -1825,7 +1825,7 @@ class TestUserSetWorkspaceAsRead(object):
 @pytest.mark.parametrize("config_section", [{"name": "functional_test"}], indirect=True)
 class TestUserChangeEmailNotification(object):
     """
-    Tests for /api/users/{user_id}/workspaces/{workspace_id}/notifications/activate
+    Tests for /api/users/{user_id}/workspaces/{workspace_id}/email_notification_type
     """
 
     def test_api_change_email_notification__ok__200__admin(
@@ -1862,14 +1862,14 @@ class TestUserChangeEmailNotification(object):
         )
         transaction.commit()
         role = role_api.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.email_notification_type == EmailNotificationType.NONE.name
+        assert role.email_notification_type == EmailNotificationType.NONE
         session.close()
         web_testapp.authorization = ("Basic", ("admin@admin.admin", "admin@admin.admin"))
         params = {
-            "email_notification_type": EmailNotificationType.SUMMARY.name,
+            "email_notification_type": EmailNotificationType.SUMMARY.value,
         }
         web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/email_notification_type".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             params=params,
@@ -1877,7 +1877,7 @@ class TestUserChangeEmailNotification(object):
         )
         role_api = role_api_factory.get()
         role = role_api.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.email_notification_type == EmailNotificationType.SUMMARY.name
+        assert role.email_notification_type == EmailNotificationType.SUMMARY
 
     def test_api_change_email_notification__ok__200__user_itself(
         self,
@@ -1913,14 +1913,14 @@ class TestUserChangeEmailNotification(object):
         )
         transaction.commit()
         role = role_api.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.email_notification_type == EmailNotificationType.NONE.name
+        assert role.email_notification_type == EmailNotificationType.NONE
         session.close()
         web_testapp.authorization = ("Basic", ("test@test.test", "password"))
         params = {
-            "email_notification_type": EmailNotificationType.SUMMARY.name,
+            "email_notification_type": EmailNotificationType.SUMMARY.value,
         }
         web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/email_notification_type".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             params=params,
@@ -1928,7 +1928,7 @@ class TestUserChangeEmailNotification(object):
         )
         role_api = role_api_factory.get()
         role = role_api.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.email_notification_type == EmailNotificationType.SUMMARY.name
+        assert role.email_notification_type == EmailNotificationType.SUMMARY
 
     def test_api_change_email_notification__err__403__other_user(
         self,
@@ -1980,13 +1980,13 @@ class TestUserChangeEmailNotification(object):
         )
         transaction.commit()
         role = role_api.get_one(test_user.user_id, workspace.workspace_id)
-        assert role.email_notification_type == EmailNotificationType.NONE.name
+        assert role.email_notification_type == EmailNotificationType.NONE
         web_testapp.authorization = ("Basic", ("test2@test2.test2", "password"))
         params = {
-            "email_notification_type": EmailNotificationType.SUMMARY.name,
+            "email_notification_type": EmailNotificationType.SUMMARY.value,
         }
         res = web_testapp.put_json(
-            "/api/users/{user_id}/workspaces/{workspace_id}/notifications/activate".format(
+            "/api/users/{user_id}/workspaces/{workspace_id}/email_notification_type".format(
                 user_id=test_user.user_id, workspace_id=workspace.workspace_id
             ),
             params=params,
