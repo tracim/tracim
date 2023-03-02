@@ -268,7 +268,21 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
         DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
     }
 
-    isLoggedUserMember = (activity) => this.props.workspaceList.find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
+    isLoggedUserMember = (activity) => this.props.workspaceList
+      .find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
+
+    isRoleChange = (activity) => {
+      // FIXME - CH - 20230203 - We should not create an activity when user change their email subscription
+      // Currently, we cannot know if an event_type: "workspace_member.modified" is for role or email_notification_type
+      // So display neither of them.
+      // Only display the member added
+      // See https://github.com/tracim/tracim/issues/6106 known issues
+      const coreEventType = activity.newestMessage.event_type.split('.')[1]
+      return (
+        activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+        coreEventType === TLM_CET.CREATED
+      )
+    }
 
     isNews = (activity) => {
       const isNews = activity.content && (activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION)
@@ -311,13 +325,14 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       const isInSpaceWithNews = this.isInSpaceWithNews(activity)
       const isSubscription = this.isSubscriptionRequestOrRejection(activity)
       const isMember = this.isMemberCreatedOrModified(activity)
-      const isLoggedUser = this.isLoggedUserMember(activity)
+      const isLoggedUserMember = this.isLoggedUserMember(activity)
+      const isRoleChange = this.isRoleChange(activity)
 
       return entityType.includes(activity.entityType) && !hasAttachedFile &&
         (
           (isContent && (!isNews || isInSpaceWithNews)) ||
-          (isSubscription && isLoggedUser) ||
-          (isMember && isLoggedUser) ||
+          (isSubscription && isLoggedUserMember) ||
+          (isMember && isLoggedUserMember && isRoleChange) ||
           (isSharedSpace && activity.newestMessage.fields.author.user_id !== props.user.userId)
         )
     }

@@ -125,6 +125,12 @@ export const unLoggedAllowedPageList = [
   PAGE.GUEST_DOWNLOAD('')
 ]
 
+export const EMAIL_NOTIFICATION_TYPE = {
+  INDIVIDUAL: 'individual',
+  SUMMARY: 'summary',
+  NONE: 'none'
+}
+
 export const findUserRoleIdInWorkspace = (userId, memberList, roleList) => {
   const user = memberList.find(u => u.id === userId) || { role: ROLE.reader.slug }
   return (roleList.find(r => user.role === r.slug) || { id: 1 }).id

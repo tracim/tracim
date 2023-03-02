@@ -1,12 +1,12 @@
 import React from 'react'
 import { translate } from 'react-i18next'
 import {
-  BtnSwitch,
   DropdownMenu,
   IconButton,
   ROLE_LIST
 } from 'tracim_frontend_lib'
 import PropTypes from 'prop-types'
+import EmailNotificationTypeButton from '../EmailNotificationTypeButton.jsx'
 
 export const AdminUserSpacesConfigItem = props => {
   let buttonTitle = ''
@@ -44,12 +44,13 @@ export const AdminUserSpacesConfigItem = props => {
           </DropdownMenu>
         </td>
       )}
-      {(props.emailNotificationActivated &&
+      {props.emailNotificationActivated && (
         <td className='adminUserSpacesConfig__zones__table__notifications'>
-          <div>{props.t('Email notif.')}</div>
-          <BtnSwitch
-            checked={props.member.doNotify}
-            onChange={() => props.onChangeSubscriptionNotif(props.space.id, !props.member.doNotify)}
+          <EmailNotificationTypeButton
+            currentEmailNotificationType={props.member.emailNotificationType}
+            onClickChangeEmailNotificationType={props.onChangeEmailNotificationType}
+            flexJustifyContent='flex-start'
+            formName={`notificationType_${props.space.id}`}
           />
         </td>
       )}
@@ -76,7 +77,7 @@ AdminUserSpacesConfigItem.propTypes = {
   emailNotificationActivated: PropTypes.bool,
   memberRole: PropTypes.object,
   onlyManager: PropTypes.bool,
-  onChangeSubscriptionNotif: PropTypes.func,
+  onChangeEmailNotificationType: PropTypes.func,
   member: PropTypes.object,
   onClickChangeRole: PropTypes.func
 }
@@ -84,9 +85,9 @@ AdminUserSpacesConfigItem.propTypes = {
 AdminUserSpacesConfigItem.defaultProps = {
   emailNotificationActivated: false,
   onlyManager: false,
-  onChangeSubscriptionNotif: () => { },
+  onChangeEmailNotificationType: () => { },
   member: {
-    doNotify: false
+    emailNotificationType: false
   },
   onClickChangeRole: () => { }
 }

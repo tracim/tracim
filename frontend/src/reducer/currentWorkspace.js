@@ -10,7 +10,7 @@ import {
   WORKSPACE_MEMBER,
   UPDATE,
   USER,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   FOLDER_READ,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
@@ -18,6 +18,7 @@ import {
   WORKSPACE_LOADED
 } from '../action-creator.sync.js'
 import { serializeContentProps } from './workspaceContentList.js'
+import { EMAIL_NOTIFICATION_TYPE } from '../util/helper.js'
 import { serialize } from 'tracim_frontend_lib'
 
 const defaultWorkspace = {
@@ -67,7 +68,7 @@ export const serializeMember = m => {
     publicName: m.user.public_name,
     username: m.user.username,
     role: m.role,
-    doNotify: m.do_notify || false,
+    emailNotificationType: m.email_notification_type || EMAIL_NOTIFICATION_TYPE.NONE,
     hasAvatar: m.user.has_avatar || false,
     hasCover: m.user.has_cover || false
   }
@@ -196,12 +197,12 @@ export default function currentWorkspace (state = defaultWorkspace, action) {
         ]
       }
 
-    case `${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`:
+    case `${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`:
       return action.workspaceId === state.id
         ? {
           ...state,
           memberList: state.memberList.map(u => u.id === action.userId
-            ? { ...u, doNotify: action.doNotify }
+            ? { ...u, emailNotificationType: action.emailNotificationType }
             : u
           )
         }

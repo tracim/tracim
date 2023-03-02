@@ -92,7 +92,9 @@ export const UserSpacesConfig = (props) => {
         <UserSpacesConfigLine
           space={space}
           key={space.id}
-          onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+          onChangeEmailNotificationType={
+            emailNotificationType => props.onChangeEmailNotificationType(space.id, emailNotificationType)
+          }
           onLeaveSpace={handleLeaveSpace}
           admin={props.admin}
           system={props.system}
@@ -129,22 +131,17 @@ export const UserSpacesConfig = (props) => {
   }, [props.userToEditId])
 
   const handleMemberModified = (data) => {
-    setSpaceList(spaceList.map(space => {
-      if (space.id === data.fields.workspace.workspace_id) {
-        return {
-          ...space,
-          memberList: space.memberList.map(member => {
-            if (member.id === data.fields.user.user_id) {
-              return { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
-            } else {
-              return member
-            }
-          })
-        }
-      } else {
-        return space
+    const newSpaceList = spaceList.map(space => space.id === data.fields.workspace.workspace_id
+      ? {
+        ...space,
+        memberList: space.memberList.map(member => member.id === data.fields.user.user_id
+          ? { ...member, ...serializeMember({ user: data.fields.user, ...data.fields.member }) }
+          : member
+        )
       }
-    }))
+      : space
+    )
+    setSpaceList(newSpaceList)
   }
 
   const handleMemberDeleted = async (data) => {
@@ -251,7 +248,7 @@ export const UserSpacesConfig = (props) => {
               userEmail={props.userEmail}
               userPublicName={props.userPublicName}
               userUsername={props.userUsername}
-              onChangeSubscriptionNotif={props.onChangeSubscriptionNotif}
+              onChangeEmailNotificationType={props.onChangeEmailNotificationType}
               onClose={(() => props.history.push(PAGE.ADMIN.USER_EDIT(props.userToEditId), 'spacesConfig'))}
             />
           )}
@@ -332,10 +329,10 @@ export default connect(mapStateToProps)(withRouter(translate()(TracimComponent(U
 
 UserSpacesConfig.propTypes = {
   userToEditId: PropTypes.number.isRequired,
-  onChangeSubscriptionNotif: PropTypes.func,
+  onChangeEmailNotificationType: PropTypes.func,
   admin: PropTypes.bool.isRequired
 }
 
 UserSpacesConfig.defaultProps = {
-  onChangeSubscriptionNotif: () => { }
+  onChangeEmailNotificationType: () => { }
 }

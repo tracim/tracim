@@ -26,11 +26,10 @@ import {
   getSubscriptions,
   postWorkspaceMember,
   deleteWorkspaceMember,
-  putMyselfWorkspaceDoNotify
+  putMyselfWorkspaceEmailNotificationType
 } from '../action-creator.async.js'
 import {
   newFlashMessage,
-  updateUserWorkspaceSubscriptionNotif,
   setBreadcrumbs,
   setHeadTitle
 } from '../action-creator.sync.js'
@@ -197,8 +196,6 @@ export class Dashboard extends React.Component {
 
   handleClickCloseAddMemberBtn = () => this.setState({ displayNewMemberForm: false })
 
-  handleToggleNotifBtn = () => this.setState(prevState => ({ displayNotifBtn: !prevState.displayNotifBtn }))
-
   handleToggleWebdavBtn = () => this.setState(prevState => ({ displayWebdavBtn: !prevState.displayWebdavBtn }))
 
   handleSearchUser = async personalDataToSearch => {
@@ -356,21 +353,20 @@ export class Dashboard extends React.Component {
     this.setState({ advancedDashboardOpenedId: props.currentWorkspace.id })
   }
 
-  handleClickAddNotification = async () => {
+  handleClickChangeEmailNotificationType = async (emailNotificationType) => {
     const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, true))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, true)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
-    }
-  }
 
-  handleClickRemoveNotification = async () => {
-    const { props } = this
-    const fetchWorkspaceUserAddNotification = await props.dispatch(putMyselfWorkspaceDoNotify(props.currentWorkspace.id, false))
-    switch (fetchWorkspaceUserAddNotification.status) {
-      case 204: props.dispatch(updateUserWorkspaceSubscriptionNotif(props.user.userId, props.currentWorkspace.id, false)); break
-      default: props.dispatch(newFlashMessage(props.t('Error while changing subscription'), 'warning'))
+    let fetchChangeEmailNotificationType
+    try {
+      fetchChangeEmailNotificationType = await props.dispatch(putMyselfWorkspaceEmailNotificationType(
+        props.currentWorkspace.id, emailNotificationType
+      ))
+    } catch (e) {
+      props.dispatch(newFlashMessage(props.t('Error while changing email subscription'), 'warning'))
+      console.error(
+        'Error while changing email subscription. handleClickChangeEmailNotificationType.',
+        fetchChangeEmailNotificationType
+      )
     }
   }
 
@@ -489,7 +485,9 @@ export class Dashboard extends React.Component {
                       />
                     </div>
                   </div>
-                  {props.currentWorkspace && props.currentWorkspace.id && <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />}
+                  {props.currentWorkspace && props.currentWorkspace.id && (
+                    <WorkspaceRecentActivities workspaceId={props.currentWorkspace.id} />
+                  )}
                 </div>
 
                 <div className='dashboard__workspace__rightMenu'>
@@ -502,9 +500,7 @@ export class Dashboard extends React.Component {
                       props.currentWorkspace.accessType === SPACE_TYPE.onRequest.slug
                     }
                     newSubscriptionRequestsNumber={state.newSubscriptionRequestsNumber}
-                    onClickToggleNotifBtn={this.handleToggleNotifBtn}
-                    onClickAddNotify={this.handleClickAddNotification}
-                    onClickRemoveNotify={this.handleClickRemoveNotification}
+                    onClickChangeEmailNotificationType={this.handleClickChangeEmailNotificationType}
                     t={props.t}
                   />
 

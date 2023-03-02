@@ -21,13 +21,13 @@ import {
   setWorkspaceReadStatusList,
   UPDATE,
   updateUser,
-  updateUserWorkspaceSubscriptionNotif,
+  updateUserWorkspaceEmailNotificationType,
   updateWorkspaceContentList,
   updateWorkspaceDetail,
   updateWorkspaceMember,
   addWorkspaceReadStatus,
   USER,
-  USER_WORKSPACE_DO_NOTIFY,
+  USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE,
   WORKSPACE_AGENDA_URL,
   WORKSPACE_CONTENT,
   WORKSPACE_DETAIL,
@@ -203,11 +203,11 @@ describe('reducer currentWorkspace.js', () => {
       })
     })
 
-    describe(`${UPDATE}/${USER_WORKSPACE_DO_NOTIFY}`, () => {
+    describe(`${UPDATE}/${USER_WORKSPACE_EMAIL_NOTIFICATION_TYPE}`, () => {
       const initialStateWithMember = { ...initialState, memberList: [{ ...globalManagerAsMember, doNotify: true }] }
       const rez = currentWorkspace(
         initialStateWithMember,
-        updateUserWorkspaceSubscriptionNotif(globalManagerAsMember.id, initialState.id, false)
+        updateUserWorkspaceEmailNotificationType(globalManagerAsMember.id, initialState.id, false)
       )
       it('should return a workspace object with the member as notification disabled', () => {
         expect(rez).to.deep.equal({
