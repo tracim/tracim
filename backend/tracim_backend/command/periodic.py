@@ -86,7 +86,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             print("Email notification are disabled")
             return
 
-        created_after = datetime.utcnow() - timedelta(milliseconds=int(parsed_args.since))
+        created_after = datetime.utcnow() - timedelta(hours=int(parsed_args.since))
 
         event_api = EventApi(current_user=None, session=session, config=config)
         user_api = UserApi(current_user=None, session=session, config=config)
@@ -116,6 +116,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 }
                 translator = Translator(config, default_lang=user.lang)
                 body = SendMailSummariesCommand._render_template(config, context, translator)
+                # print(body)
                 SendMailSummariesCommand._send_mail(config, user.email, body)
                 mail_sent += 1
             except Exception:

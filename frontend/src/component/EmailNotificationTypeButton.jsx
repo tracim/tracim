@@ -81,7 +81,7 @@ export const EmailNotificationTypeButton = props => {
             value='no'
             checked={props.currentEmailNotificationType === EMAIL_NOTIFICATION_TYPE.NONE}
           />
-          {props.t('No')}
+          {props.t('None')}
         </label>
       </div>
 
@@ -129,9 +129,9 @@ const PopoverBodyCustom = translate()(props => (
         {props.t('All')}
       </div>
       <div className='EmailNotificationTypeButton__popover__type__description'>
-        {props.t('One mail received for each notification of the space.')}<br />
-        {props.t('Use this for spaces where you need to know everything that happen.')}<br />
-        {props.t('Careful, it can create a lot a mails, we advise you to pair this feature with filters or folders in your mailbox')}
+        {props.t('One mail will be sent for each event of the space.')}<br />
+        {props.t('Use this setting for spaces where you need to be kept informed of  everything that happens.')}<br />
+        {props.t('Be careful: this might result in a lot of e-mails. We advise you to pair this feature with filters and/or folders in your mailbox.')}
       </div>
     </div>
 
@@ -140,16 +140,17 @@ const PopoverBodyCustom = translate()(props => (
         {props.t('Daily')}
       </div>
       <div className='EmailNotificationTypeButton__popover__type__description'>
-        {props.t("If at least one space is set to 'Daily', you will receive a daily mail with all the mentions and notifications you haven't read in the last 24h.")}
+        {props.t('One mail will be sent every 24 hours with a daily digest of all actions in this space.')}
+        {props.t("No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to Daily.")}
       </div>
     </div>
 
     <div className='EmailNotificationTypeButton__popover__type'>
       <div className='EmailNotificationTypeButton__popover__type__label'>
-        {props.t('No')}
+        {props.t('None')}
       </div>
       <div className='EmailNotificationTypeButton__popover__type__description'>
-        {props.t("No mail will be sent for this space. You will have to rely on Tracim's Notifications only")}
+        {props.t("No notification for this space will be sent by mail. You will have to rely solely on Tracim's notifications wall.")}
       </div>
     </div>
   </div>

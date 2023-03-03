@@ -378,12 +378,12 @@ class EventApi:
         self, user_id: int, created_after: datetime,
     ) -> List[typing.Tuple[int, str]]:
         query = (
-            self._session.query(func.count(Message.event_id), Workspace.label)
+            self._session.query(func.count(Message.event_id), Workspace.workspace_id, Workspace.label)
             .join(Event)
             .join(Workspace, Event.workspace_id == Workspace.workspace_id)
         )
         query = query.filter(Message.receiver_id == user_id)
-        query = query.filter(Message.read is None)
+        query = query.filter(Message.read == None)
         query = query.filter(Event.created >= created_after)
         query = query.group_by(Workspace.workspace_id)
         return query.all()
