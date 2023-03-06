@@ -212,7 +212,7 @@ class EmailManager(object):
             show_deleted=True,
         ).get_one(event_content_id, content_type_list.Any_SLUG)
         workspace_api = WorkspaceApi(session=self.session, current_user=user, config=self.config)
-        workpace_in_context = workspace_api.get_workspace_with_context(
+        workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content.workspace_id)
         )
         main_content = content.parent if content.type == content_type_list.Comment.slug else content
@@ -255,7 +255,7 @@ class EmailManager(object):
             _ = translator.get_translation
             # INFO - G.M - 2017-11-15 - set content_id in header to permit reply
             # references can have multiple values, but only one in this case.
-            replyto_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace(
+            reply_to_addr = self.config.EMAIL__NOTIFICATION__REPLY_TO__EMAIL.replace(
                 "{content_id}", str(main_content.content_id)
             )
 
@@ -292,7 +292,7 @@ class EmailManager(object):
                 role,
                 content_in_context,
                 parent_in_context,
-                workpace_in_context,
+                workspace_in_context,
                 user,
                 translator,
             )
@@ -301,9 +301,9 @@ class EmailManager(object):
                 subject=subject,
                 from_header=self._get_sender(user),
                 to_header=EmailAddress(role.user.display_name, role.user.email),
-                reply_to=EmailAddress(reply_to_label, replyto_addr),
+                reply_to=EmailAddress(reply_to_label, reply_to_addr),
                 # INFO - G.M - 2017-11-15
-                # References can theorically have label, but in pratice, references
+                # References can theoretically have label, but in practice, references
                 # contains only message_id from parents post in thread.
                 # To link this email to a content we create a virtual parent
                 # in reference who contain the content_id.
@@ -464,17 +464,6 @@ class EmailManager(object):
         workspace_url = workspace_in_context.frontend_url
         role_label = role.role_as_label()
         logo_url = get_email_logo_frontend_url(self.config)
-
-        # FIXME: remove/readapt assert to debug easily broken case
-        # assert user
-        # assert workspace
-        # assert main_title
-        # assert status_label
-        # # assert status_icon_url
-        # assert role_label
-        # # assert content_intro
-        # assert content_text or content_text == content.description
-        # assert logo_url
 
         return {
             "user": role.user,

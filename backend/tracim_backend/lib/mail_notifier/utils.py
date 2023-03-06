@@ -46,7 +46,7 @@ class EST(object):
     """
     EST = Email Subject Tags - this is a convenient class - no business logic
     here
-    This class is intended to agregate all dynamic content that may be included
+    This class is intended to aggregate all dynamic content that may be included
     in email subjects
     """
 

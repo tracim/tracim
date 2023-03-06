@@ -47,12 +47,13 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
             config.EMAIL__NOTIFICATION__SMTP__AUTHENTICATION,
         )
         sender = EmailSender(config, smtp_config, True)
+        reply_to_address = config.EMAIL__NOTIFICATION__FROM__EMAIL.replace("{user_id}", "0")
 
         msg = EmailNotificationMessage(
-            subject="Votre récapitulatif quotidien",
-            from_header=EmailAddress("", config.EMAIL__NOTIFICATION__FROM__EMAIL),
+            subject="Your daily summary",
+            from_header=EmailAddress("Administrator", reply_to_address),
             to_header=EmailAddress("", user_mail),
-            reply_to=EmailAddress("", config.EMAIL__NOTIFICATION__FROM__EMAIL),
+            reply_to=EmailAddress("Administrator", reply_to_address),
             lang="en",
             body_html=body,
         )
