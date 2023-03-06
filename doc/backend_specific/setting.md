@@ -267,7 +267,6 @@ the summary mail daily
 
     echo "0 0 * * * tracimcli periodic send-summary-mails --since 24" > /etc/cron.d/cron_task_tracim_send_summary_mails
 
-
 ### Configuring Invitations in Spaces
 
 You can set the behavior of the invitation feature depending on how you use Tracim.
