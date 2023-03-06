@@ -116,7 +116,6 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 }
                 translator = Translator(config, default_lang=user.lang)
                 body = SendMailSummariesCommand._render_template(config, context, translator)
-                # print(body)
                 SendMailSummariesCommand._send_mail(config, user.email, body)
                 mail_sent += 1
             except Exception:

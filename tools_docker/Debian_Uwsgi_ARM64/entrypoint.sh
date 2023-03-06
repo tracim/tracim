@@ -72,6 +72,9 @@ log "Ensuring www-data is the owner of /var/tracim files"
 find /var/tracim/ \( ! -user www-data -o ! -group www-data \) -exec chown www-data:www-data {} \;
 loggood "Ensuring www-data is the owner of /var/tracim files: success"
 
+log "[HACK - MP - 06-03-2023] Storing HEAD information in a file while finding a fix. See https://github.com/gitpython-developers/GitPython/issues/1016"
+git rev-parse HEAD > /var/tracim/data/revision.txt
+
 log "Checking database"
 case "$DATABASE_TYPE" in
   mysql)

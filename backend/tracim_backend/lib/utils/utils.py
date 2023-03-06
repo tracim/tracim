@@ -22,10 +22,10 @@ from urllib.parse import urlencode
 from urllib.parse import urljoin
 import uuid
 
+# from git import InvalidGitRepositoryError
 from babel import UnknownLocaleError
 from babel.dates import format_date
 from colour import Color
-from git import InvalidGitRepositoryError
 import jsonschema
 from jsonschema import SchemaError
 from jsonschema import ValidationError as JsonSchemaValidationError
@@ -452,13 +452,20 @@ def get_current_git_hash(path: str) -> Optional[str]:
     :param path:  path of git repository
     :return: commit hash or None
     """
-    try:
-        import git
+    # try:
+    #     import git
 
-        repo = git.Repo(path, search_parent_directories=True)
-    except (ImportError, InvalidGitRepositoryError):
-        return None
-    return repo.head.object.hexsha[:10]
+    #     repo = git.Repo(path, search_parent_directories=True)
+    # except (ImportError, InvalidGitRepositoryError):
+    #     return None
+    # return repo.head.object.hexsha[:10]
+    try:
+        f = open("./revision.txt", "r")
+        token = f.readline()
+        f.close()
+        return token[:10]
+    except Exception:
+        return "NoTokenFound"
 
 
 def get_build_version(path: str) -> str:
@@ -467,19 +474,26 @@ def get_build_version(path: str) -> str:
     :param path: path of git repository
     :return: tag or commit hash
     """
-    try:
-        import git
+    # try:
+    #     import git
 
-        repo = git.Repo(path, search_parent_directories=True)
-    except (ImportError, InvalidGitRepositoryError):
-        return UNKNOWN_BUILD_VERSION
+    #     repo = git.Repo(path, search_parent_directories=True)
+    # except (ImportError, InvalidGitRepositoryError):
+    #     return UNKNOWN_BUILD_VERSION
 
+    # try:
+    #     # INFO - G.M - 2020-01-13 - return first associated tag to head commit
+    #     return next((tag for tag in repo.tags if tag.commit == repo.head.commit))
+    # except StopIteration:
+    #     # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
+    #     return repo.head.object.hexsha[:10]
     try:
-        # INFO - G.M - 2020-01-13 - return first associated tag to head commit
-        return next((tag for tag in repo.tags if tag.commit == repo.head.commit))
-    except StopIteration:
-        # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
-        return repo.head.object.hexsha[:10]
+        f = open("./revision.txt", "r")
+        token = f.readline()
+        f.close()
+        return token[:10]
+    except Exception:
+        return "NoTokenFound"
 
 
 def validate_page_token(page_token: str) -> None:
