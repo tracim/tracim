@@ -264,6 +264,11 @@ we do provide this command:
 This will send a test email to the provided email address (here: myemailadress@mydomain.local)
 with the same parameters as tracim config.
 
+If you have set `setting email.notification.activated` to True, you need to add the cron task that will send
+the summary mail daily
+
+    echo "0 0 * * * tracimcli periodic send-summary-mails --since 24" > /etc/cron.d/cron_task_tracim_send_summary_mails
+
 
 ### Configuring Invitations in Spaces
 

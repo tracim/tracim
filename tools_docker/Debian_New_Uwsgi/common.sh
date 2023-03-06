@@ -109,7 +109,12 @@ fi
 echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 
 # Create summary mails cron job
-echo "0 0 * * * tracimcli periodic send-summary-mails -c /etc/tracim/development.ini --since 24" > /etc/cron.d/tracim_send_summary_mails
+if [ ! -f /etc/tracim/cron_task_tracim_send_summary_mails ]; then
+    cp /tracim/tools_docker/Debian_Uwsgi/cron_task_tracim_send_summary_mails.sample /etc/tracim/cron_task_tracim_send_summary_mails
+if
+if [ ! -L /etc/cron.d/cron_task_tracim_send_summary_mails ]; then
+    ln -s /etc/tracim/cron_task_tracim_send_summary_mails /etc/cron.d/cron_task_tracim_send_summary_mails
+if
 
 # Create and link branding directory if it does not exist
 if [ ! -d /etc/tracim/branding ]; then
