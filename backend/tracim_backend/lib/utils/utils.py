@@ -459,13 +459,17 @@ def get_current_git_hash(path: str) -> Optional[str]:
     # except (ImportError, InvalidGitRepositoryError):
     #     return None
     # return repo.head.object.hexsha[:10]
+
+    # FIXME: This is a hack that is supposed to be removed. This won't work for custom/basic
+    # installations and will only work with docker images.
+    # The solution is to use git package
     try:
-        f = open("./revision.txt", "r")
+        f = open("/tracim/revision.txt", "r")
         token = f.readline()
         f.close()
         return token[:10]
     except Exception:
-        return "NoTokenFound"
+        return "unknown"
 
 
 def get_build_version(path: str) -> str:
@@ -487,13 +491,17 @@ def get_build_version(path: str) -> str:
     # except StopIteration:
     #     # INFO - G.M - 2020-01-13 - return the 10 first letter of current commit hash
     #     return repo.head.object.hexsha[:10]
+
+    # FIXME: This is a hack that is supposed to be removed. This won't work for custom/basic
+    # installations and will only work with docker images.
+    # The solution is to use git package
     try:
-        f = open("./revision.txt", "r")
+        f = open("/tracim/revision.txt", "r")
         token = f.readline()
         f.close()
         return token[:10]
     except Exception:
-        return "NoTokenFound"
+        return "unknown"
 
 
 def validate_page_token(page_token: str) -> None:
