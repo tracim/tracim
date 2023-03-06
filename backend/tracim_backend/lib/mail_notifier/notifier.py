@@ -125,7 +125,7 @@ class EmailNotifier(INotifier):
 
 class EmailManager(object):
     """
-    Compared to Notifier, this class is independant from the HTTP request thread
+    Compared to Notifier, this class is independent from the HTTP request thread
     This class will build Email and send it for both created account and content
     update
     """
@@ -143,7 +143,7 @@ class EmailManager(object):
 
     def _get_sender(self, user: User = None) -> EmailAddress:
         """
-        Return sender EmailAdress object, which permit to get rfc compliant address:
+        Return sender EmailAddress object, which permit to get rfc compliant address:
         "Bob Dylan (via Tracim) <notification@mail.com>"
         :param user: user to extract display name
         :return: sender string
