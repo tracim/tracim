@@ -8,6 +8,8 @@ frontend/dist/assets/branding/
 color.json
 /backend/venv3.7/
 backend/env
+# hack file ; used to keep the revision id since breaking change with pythongit
+backend/tracim_backend/lib/utils/revision.txt
 *~
 
 #ignore file or folder about cypress tests
