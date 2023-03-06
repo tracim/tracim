@@ -12,6 +12,7 @@ from tracim_backend.config import CFG
 from tracim_backend.lib.core.event import EventApi
 from tracim_backend.lib.core.user import UserApi
 from tracim_backend.lib.mail_notifier.sender import EmailSender
+from tracim_backend.lib.mail_notifier.utils import EST
 from tracim_backend.lib.mail_notifier.utils import EmailAddress
 from tracim_backend.lib.mail_notifier.utils import EmailNotificationMessage
 from tracim_backend.lib.mail_notifier.utils import SmtpConfiguration
@@ -38,6 +39,10 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
 
     @staticmethod
     def _send_mail(config: CFG, user_mail: str, body: str) -> None:
+        # TODO: Traduction are still static here. Need to add the user language.
+        translator = Translator(app_config=config, default_lang=config.DEFAULT_LANG)
+        _ = translator.get_translation
+
         smtp_config = SmtpConfiguration(
             config.EMAIL__NOTIFICATION__SMTP__SERVER,
             config.EMAIL__NOTIFICATION__SMTP__PORT,
@@ -50,10 +55,22 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         reply_to_address = config.EMAIL__NOTIFICATION__FROM__EMAIL.replace("{user_id}", "0")
 
         msg = EmailNotificationMessage(
-            subject="Your daily summary",
-            from_header=EmailAddress("Administrator", reply_to_address),
+            subject=_(f"[{EST.WEBSITE_TITLE}] Your daily summary").replace(
+                EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
+            ),
+            from_header=EmailAddress(
+                _(f"Administrator via {EST.WEBSITE_TITLE}").replace(
+                    EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
+                ),
+                reply_to_address,
+            ),
             to_header=EmailAddress("", user_mail),
-            reply_to=EmailAddress("Administrator", reply_to_address),
+            reply_to=EmailAddress(
+                _(f"Administrator via {EST.WEBSITE_TITLE}").replace(
+                    EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
+                ),
+                reply_to_address,
+            ),
             lang="en",
             body_html=body,
         )
