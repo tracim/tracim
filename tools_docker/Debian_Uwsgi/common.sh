@@ -113,6 +113,8 @@ echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 # Create summary mails cron job
 if [ ! -f /etc/tracim/cron_task_tracim_send_summary_mails ]; then
     cp /tracim/tools_docker/Debian_Uwsgi/cron_task_tracim_send_summary_mails.sample /etc/tracim/cron_task_tracim_send_summary_mails
+    sed -i "s|<PATH TO tracimcli>|/usr/local/bin/tracimcli|g" /etc/tracim/cron_task_tracim_send_summary_mails
+    sed -i "s|<PATH TO development.ini>|/etc/tracim/development.ini|g" /etc/tracim/cron_task_tracim_send_summary_mails
 fi
 if [ ! -L /etc/cron.d/cron_task_tracim_send_summary_mails ]; then
     ln -s /etc/tracim/cron_task_tracim_send_summary_mails /etc/cron.d/cron_task_tracim_send_summary_mails
@@ -159,6 +161,7 @@ if [ ! -d /var/tracim/logs ]; then
     touch /var/tracim/logs/pushpin/pushpin-handler.log
     touch /var/tracim/logs/pushpin/pushpin-proxy.log
     touch /var/tracim/logs/zurl.log
+    touch /var/tracim/logs/cron_task_tracim_send_summary_mails.log
     chown www-data:www-data -R /var/tracim/logs
     chmod 775 -R /var/tracim/logs
 fi
@@ -204,6 +207,7 @@ create_log_symlink /var/tracim/logs/pushpin/mongrel2_7999.log /var/log/mongrel2_
 create_log_symlink /var/tracim/logs/pushpin/pushpin-handler.log /var/log/pushpin-handler.log
 create_log_symlink /var/tracim/logs/pushpin/pushpin-proxy.log /var/log/pushpin-proxy.log
 create_log_symlink /var/tracim/logs/zurl.log /var/log/zurl.log
+create_log_symlink /var/tracim/logs/cron_task_tracim_send_summary_mails.log /var/log/cron_task_tracim_send_summary_mails.log
 
 # Modify default log path for Pushpin, Redis, Zurl (since Tracim 3.0.0)
 sed -i "s|^logdir=.*|logdir=/var/tracim/logs/pushpin/|g" /etc/pushpin/pushpin.conf
