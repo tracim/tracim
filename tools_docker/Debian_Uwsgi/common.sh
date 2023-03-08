@@ -114,6 +114,7 @@ echo "* ${tracim_web_internal_listen}" > /etc/pushpin/routes
 if [ ! -f /etc/tracim/cron_task_tracim_send_summary_mails ]; then
     cp /tracim/tools_docker/Debian_Uwsgi/cron_task_tracim_send_summary_mails /etc/tracim/cron_task_tracim_send_summary_mails
     cp /tracim/tools_docker/Debian_Uwsgi/send_summary_mails.sh.sample /etc/tracim/send_summary_mails.sh
+    chmod 755 /etc/tracim/send_summary_mails.sh
     sed -i "s|<PATH TO tracimcli>|/usr/local/bin/tracimcli|g" /etc/tracim/send_summary_mails.sh
     sed -i "s|<PATH TO development.ini>|/etc/tracim/development.ini|g" /etc/tracim/send_summary_mails.sh
 fi
