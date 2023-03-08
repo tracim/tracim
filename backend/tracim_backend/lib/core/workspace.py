@@ -438,7 +438,7 @@ class WorkspaceApi(object):
         roles = []
         for role in workspace.roles:
             if (
-                (force_notify or role.email_notification_type != EmailNotificationType.NONE)
+                (force_notify or role.email_notification_type == EmailNotificationType.INDIVIDUAL)
                 and (not self._user or role.user != self._user)
                 and role.user.is_active
                 and not role.user.is_deleted
