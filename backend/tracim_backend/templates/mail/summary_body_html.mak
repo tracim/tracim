@@ -4,7 +4,7 @@
   <p>${_('Hello {username},').format(username=user.display_name)}</p>
 
   % if len(mentions) > 0:
-    <p>${_('Here is a list of your unread mentions in the last 24h:')}</p>
+    <p>${_('Here is the list of your unread mentions in the last 24h:')}</p>
     <ul>
     % for mention in mentions:
       % if mention.event.content["content_type"] == 'comment':
@@ -21,7 +21,7 @@
 
       <li>
         <% mention_link = config.WEBSITE__BASE_URL + "/ui/contents/" + str(mention.event.content[content_to_display_id]) %>
-        ${_('{author} mentionned you in').format(author=mention.event.author["public_name"])}
+        ${_('{author} mentioned you in').format(author=mention.event.author["public_name"])}
         <a href="${mention_link}" target="_blank">${mention.event.content[type]}</a>
       </li>
     % endfor
@@ -29,7 +29,7 @@
   % endif
 
   % if len(notification_summary) > 0:
-    <p>${_('Here is a summary of your unread notifications in the last 24h:')}</p>
+    <p>${_('Here is the summary of your unread notifications in the last 24h:')}</p>
     <ul>
     % for notification in notification_summary:
       <li>
