@@ -22,7 +22,7 @@
       <li>
         <% mention_link = config.WEBSITE__BASE_URL + "/ui/contents/" + str(mention.event.content[content_to_display_id]) %>
         ${_('{author} mentioned you in').format(author=mention.event.author["public_name"])}
-        <a href="${mention_link}" target="_blank">${mention.event.content[type]}</a>
+        <a href="${mention_link}" target="_blank">${mention.event.content[type]} (${mention.event.workspace['label']})<</a>
       </li>
     % endfor
     </ul>
