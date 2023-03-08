@@ -1,1 +1,1 @@
-0 0 * * * <PATH TO tracimcli> periodic send-summary-mails -c <PATH TO development.ini> --since 24 > /var/tracim/logs/cron_task_tracim_send_summary_mails.log > 2>&1
+0 0 * * * root <PATH TO tracimcli> periodic send-summary-mails -c <PATH TO development.ini> --since 24 >> /var/tracim/logs/cron_task_tracim_send_summary_mails.log 2>&1
