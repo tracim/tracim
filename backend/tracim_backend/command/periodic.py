@@ -55,18 +55,18 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         reply_to_address = config.EMAIL__NOTIFICATION__FROM__EMAIL.replace("{user_id}", "0")
 
         msg = EmailNotificationMessage(
-            subject=_(f"[{EST.WEBSITE_TITLE}] Your daily summary").replace(
+            subject=_("[{website_title}] Your daily summary").replace(
                 EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
             ),
             from_header=EmailAddress(
-                _(f"Administrator via {EST.WEBSITE_TITLE}").replace(
+                _("Administrator (through {website_title})").replace(
                     EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
                 ),
                 reply_to_address,
             ),
             to_header=EmailAddress("", user_mail),
             reply_to=EmailAddress(
-                _(f"Administrator via {EST.WEBSITE_TITLE}").replace(
+                _("Administrator (through {website_title})").replace(
                     EST.WEBSITE_TITLE, config.WEBSITE__TITLE.__str__()
                 ),
                 reply_to_address,
