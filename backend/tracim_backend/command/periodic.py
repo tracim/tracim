@@ -38,9 +38,9 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
         )
 
     @staticmethod
-    def _send_mail(config: CFG, user_mail: str, body: str) -> None:
-        # TODO: Traduction are still static here. Need to add the user language.
-        translator = Translator(app_config=config, default_lang=config.DEFAULT_LANG)
+    def _send_mail(
+        config: CFG, translator: Translator, user_mail: str, user_lang: str, body: str
+    ) -> None:
         _ = translator.get_translation
 
         smtp_config = SmtpConfiguration(
@@ -71,7 +71,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                 ),
                 reply_to_address,
             ),
-            lang="en",
+            lang=user_lang,
             body_html=body,
         )
         sender.send_mail(msg)
@@ -95,7 +95,7 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
 
     def take_app_action(self, parsed_args: argparse.Namespace, app_context: AppEnvironment) -> None:
         session = app_context["request"].dbsession
-        config = app_context["registry"].settings["CFG"]
+        config: CFG = app_context["registry"].settings["CFG"]
 
         mail_sent = 0
         mail_not_sent = 0
@@ -132,9 +132,17 @@ class SendMailSummariesCommand(AppContextCommand, ABC):
                     "mentions": mentions,
                     "notification_summary": notification_summary,
                 }
-                translator = Translator(config, default_lang=user.lang)
+                translator = Translator(
+                    app_config=config, default_lang=user.lang, fallback_lang=config.DEFAULT_LANG
+                )
                 body = SendMailSummariesCommand._render_template(config, context, translator)
-                SendMailSummariesCommand._send_mail(config, user.email, body)
+                SendMailSummariesCommand._send_mail(
+                    config=config,
+                    translator=translator,
+                    user_mail=user.email,
+                    user_lang=user.lang,
+                    body=body,
+                )
                 mail_sent += 1
             except Exception:
                 mail_not_sent += 1
