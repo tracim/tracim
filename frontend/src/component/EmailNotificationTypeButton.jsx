@@ -130,7 +130,7 @@ const PopoverBodyCustom = translate()(props => (
       </div>
       <div className='EmailNotificationTypeButton__popover__type__description'>
         {props.t('One mail will be sent for each event of the space.')}<br />
-        {props.t('Use this setting for spaces where you need to be kept informed of  everything that happens.')}<br />
+        {props.t('Use this setting for spaces where you need to be kept informed of everything that happens.')}<br />
         {props.t('Be careful: this might result in a lot of e-mails. We advise you to pair this feature with filters and/or folders in your mailbox.')}
       </div>
     </div>
@@ -141,7 +141,7 @@ const PopoverBodyCustom = translate()(props => (
       </div>
       <div className='EmailNotificationTypeButton__popover__type__description'>
         {props.t('One mail will be sent every 24 hours with a daily digest of all actions in this space.')}
-        {props.t("No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to Daily.")}
+        {props.t("No matter how many spaces are set to 'Daily', only one mail will be sent. This daily mail will include all notifications (including mentions) you haven't read in the last 24h for each space set to 'Daily'.")}
       </div>
     </div>
 

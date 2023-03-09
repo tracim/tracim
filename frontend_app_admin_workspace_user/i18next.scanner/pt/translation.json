@@ -53,5 +53,14 @@
   "Filter users": "Filtrar usuários",
   "There are no users that matches you filter": "Não há usuários que correspondem ao seu filtro",
   "Filter spaces": "Filtrar espaços",
-  "There are no spaces that matches you filter": "Não há espaços que correspondem ao seu filtro"
+  "There are no spaces that matches you filter": "Não há espaços que correspondem ao seu filtro",
+  "Sort by full name": "",
+  "Sort by username": "",
+  "Sort by email": "",
+  "Id": "",
+  "Sort by id": "",
+  "Sort by type": "",
+  "Sort by title": "",
+  "Sort by description": "",
+  "Sort by number of members": ""
 }

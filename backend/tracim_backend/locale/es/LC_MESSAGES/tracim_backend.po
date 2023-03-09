@@ -97,11 +97,11 @@ msgstr "Subido por {username}."
 
 #: tracim_backend/command/periodic.py:58
 msgid "[{website_title}] Your daily summary"
-msgstr ""
+msgstr "[{website_title}] Su resumen diario"
 
 #: tracim_backend/command/periodic.py:62 tracim_backend/command/periodic.py:69
 msgid "Administrator (through {website_title})"
-msgstr ""
+msgstr "Administrador (de {website_title})"
 
 #: tracim_backend/lib/core/content.py:752
 msgid "Space {workspace_name}"
@@ -375,19 +375,19 @@ msgstr "{username} (a través de Tracim)"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:7
 msgid "Here is the list of your unread mentions in the last 24h:"
-msgstr ""
+msgstr "Aquí tiene la lista de sus menciones no leídas en las últimas 24h:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:24
 msgid "{author} mentioned you in"
-msgstr ""
+msgstr "{autor} le mencionó en"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:32
 msgid "Here is the summary of your unread notifications in the last 24h:"
-msgstr ""
+msgstr "Aquí tiene el resumen de sus notificaciones no leídas en las últimas 24h:"
 
 #: tracim_backend/templates/mail/summary_body_html.mak:36
 msgid "{event_count} events in the space"
-msgstr ""
+msgstr "{event_count} eventos en el espacio"
 
 #: tracim_backend/templates/mail/upload_permission_to_emitter_body_html.mak:5
 msgid ""
