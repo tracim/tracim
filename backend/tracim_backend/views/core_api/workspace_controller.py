@@ -56,6 +56,7 @@ from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import Content
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import ContentNamespaces
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision
@@ -428,7 +429,7 @@ class WorkspaceController(Controller):
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
-            email_notification_type=app_config.EMAIL__NOTIFICATION__TYPE_ON_INVITATION,
+            email_notification_type=EmailNotificationType(app_config.EMAIL__NOTIFICATION__TYPE_ON_INVITATION),
             flush=True,
         )
         return role_api.get_user_role_workspace_with_context(role, newly_created=newly_created)

@@ -68,16 +68,16 @@ class RoleApi(object):
         self, user_role: UserRoleInWorkspace, newly_created: bool = None,
     ) -> UserRoleWorkspaceInContext:
         """
-        Return WorkspaceInContext object from Workspace
+        Return member (UserRoleWorkspaceInContext) object from UserRoleInWorkspace
         """
         assert self._config
-        workspace = UserRoleWorkspaceInContext(
+        member = UserRoleWorkspaceInContext(
             user_role=user_role,
             dbsession=self._session,
             config=self._config,
             newly_created=newly_created,
         )
-        return workspace
+        return member
 
     def _get_one_rsc(self, user_id: int, workspace_id: int) -> Query:
         """
