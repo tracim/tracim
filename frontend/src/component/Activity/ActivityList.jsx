@@ -8,14 +8,15 @@ import {
   IconButton,
   PAGE,
   serialize,
-  SUBSCRIPTION_TYPE,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET
 } from 'tracim_frontend_lib'
 import { serializeContentProps } from '../../reducer/workspaceContentList.js'
 import FeedItemWithPreview from '../../container/FeedItemWithPreview.jsx'
 import ContentWithoutPreviewActivity from './ContentWithoutPreviewActivity.jsx'
 import MemberActivity from './MemberActivity.jsx'
+import {
+  activityDisplayFilter
+} from '../../util/activity.js'
 
 require('./ActivityList.styl')
 
@@ -115,9 +116,14 @@ const ActivityList = (props) => {
     return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
+  // debugger
 
   const activityList = props.activity.list.filter(
-    (activity) => activityDisplayFilter(activity, props.userId)
+    (activity) => activityDisplayFilter(
+      activity,
+      props.workspaceList,
+      props.userId
+    )
   ).map(renderActivityComponent)
 
   return (

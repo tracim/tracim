@@ -43,7 +43,7 @@ export class PersonalRecentActivities extends React.Component {
   /**
    * Function to handle TLM which will be triggered on every global TLM
    *
-   * See also WorspaceRecentActivities.handleTlm
+   * See also WorkspaceRecentActivities.handleTlm
    * @async
    * @param {TLM} data
    * @returns

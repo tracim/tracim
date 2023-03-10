@@ -1,5 +1,8 @@
 import {
+  CONTENT_NAMESPACE,
   CONTENT_TYPE,
+  SUBSCRIPTION_TYPE,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_ST,
   getContent,
@@ -12,8 +15,10 @@ import {
   TIMELINE_TYPE
 } from 'tracim_frontend_lib'
 
+const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
+const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
-const isLoggedUserMember = (activity) => props.workspaceList.find(
+const isLoggedUserMember = (activity, spaceList) => spaceList.find(
   space => space.id === activity.newestMessage.fields.workspace.workspace_id
 )
 
@@ -49,9 +54,9 @@ const isNews = (activity) => {
   return isNews && hasSpace
 }
 
-const isInSpaceWithNews = (activity) => {
-  const space = this.props.workspaceList.find(
-    s => s.id === activity.newestMessage.fields.workspace.workspace_id
+const isInSpaceWithNews = (activity, spaceList) => {
+  const space = spaceList.find(
+    space => space.id === activity.newestMessage.fields.workspace.workspace_id
   )
   if (!space) return true
   return space.publicationEnabled
@@ -66,7 +71,7 @@ const isActivityAnAttachedFileOnNews = (activity) => activity.content
   ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
   : false
 
-export const activityDisplayFilter = (activity, userId) => {
+export const activityDisplayFilter = (activity, spaceList, userId) => {
   const entityType = [
     TLM_ET.CONTENT,
     TLM_ET.SHAREDSPACE_MEMBER,
@@ -78,11 +83,13 @@ export const activityDisplayFilter = (activity, userId) => {
   const _isContent = activity.entityType === TLM_ET.CONTENT
   const _isSharedSpace = activity.entityType === TLM_ET.SHAREDSPACE
   const _isNews = isNews(activity)
-  const _isInSpaceWithNews = isInSpaceWithNews(activity)
+  const _isInSpaceWithNews = isInSpaceWithNews(activity, spaceList)
   const _isSubscription = isSubscriptionRequestOrRejection(activity)
   const _isMember = isMemberCreatedOrModified(activity)
-  const _isLoggedUserMember = isLoggedUserMember(activity)
+  const _isLoggedUserMember = isLoggedUserMember(activity, spaceList)
   const _isRoleChange = isRoleChange(activity)
+
+  // debugger
 
   return entityType.includes(activity.entityType) && !hasAttachedFile &&
     (

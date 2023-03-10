@@ -7,7 +7,6 @@ import {
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_SUB,
-  SUBSCRIPTION_TYPE,
   getComment,
   getContent,
   handleClickCopyLink,
@@ -44,9 +43,6 @@ const makeCancelable = (promise) => {
     cancel: () => { isCanceled = true }
   }
 }
-
-const DISPLAYED_SUBSCRIPTION_STATE_LIST = [SUBSCRIPTION_TYPE.rejected.slug]
-const DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST = [TLM_CET.CREATED, TLM_CET.MODIFIED]
 
 /**
  * Higher-Order Component which factorizes the common behavior between workspace and personal
@@ -218,7 +214,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
      * DOC - SG - 2021-05-05
      * Load the given count of activities.
      * Activities are loaded & dispatched by batch to update the display quicker.
-     * @param {Number} minActivityCount minimum count of new activites to load
+     * @param {Number} minActivityCount minimum count of new activities to load
      * @param {Boolean} resetList if true, the current list in props is reset before loading
      *  activities
      * @param {Number} workspaceId filter the messages by workspace id (useful for the workspace
@@ -295,7 +291,7 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           FETCH_CONFIG.apiUrl
         )
         activityList = activityList.filter(
-          (activity) => activityDisplayFilter(activity, props.user.userId)
+          (activity) => activityDisplayFilter(activity, props.workspaceList, props.user.userId)
         )
         hasNextPage = messageListResponse.json.has_next
         nextPageToken = messageListResponse.json.next_page_token
