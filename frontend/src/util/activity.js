@@ -12,6 +12,87 @@ import {
   TIMELINE_TYPE
 } from 'tracim_frontend_lib'
 
+
+const isLoggedUserMember = (activity) => props.workspaceList.find(
+  space => space.id === activity.newestMessage.fields.workspace.workspace_id
+)
+
+const isSubscriptionRequestOrRejection = (activity) => {
+  return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
+    DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
+}
+
+const isMemberCreatedOrModified = (activity) => {
+  const coreEventType = activity.newestMessage.event_type.split('.')[1]
+  return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+    DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
+}
+
+const isRoleChange = (activity) => {
+  // FIXME - CH - 20230203 - We should not create an activity when user change their email subscription
+  // Currently, we cannot know if an event_type: "workspace_member.modified" is for role or email_notification_type
+  // So display neither of them.
+  // Only display the member added
+  // See https://github.com/tracim/tracim/issues/6106 known issues
+  const coreEventType = activity.newestMessage.event_type.split('.')[1]
+  return (
+    activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
+    coreEventType === TLM_CET.CREATED
+  )
+}
+
+const isNews = (activity) => {
+  const isNews = activity.content && (
+    activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION
+  )
+  const hasSpace = activity.newestMessage.fields.workspace
+  return isNews && hasSpace
+}
+
+const isInSpaceWithNews = (activity) => {
+  const space = this.props.workspaceList.find(
+    s => s.id === activity.newestMessage.fields.workspace.workspace_id
+  )
+  if (!space) return true
+  return space.publicationEnabled
+}
+
+/**
+ * Check if an activity is an attached file on a publication
+ * @param {*} activity the activity to check
+ * @returns true if the activity is an attached file on a publication
+ */
+const isActivityAnAttachedFileOnNews = (activity) => activity.content
+  ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
+  : false
+
+export const activityDisplayFilter = (activity, userId) => {
+  const entityType = [
+    TLM_ET.CONTENT,
+    TLM_ET.SHAREDSPACE_MEMBER,
+    TLM_ET.SHAREDSPACE_SUBSCRIPTION,
+    TLM_ET.SHAREDSPACE
+  ]
+  const hasAttachedFile = isActivityAnAttachedFileOnNews(activity)
+
+  const _isContent = activity.entityType === TLM_ET.CONTENT
+  const _isSharedSpace = activity.entityType === TLM_ET.SHAREDSPACE
+  const _isNews = isNews(activity)
+  const _isInSpaceWithNews = isInSpaceWithNews(activity)
+  const _isSubscription = isSubscriptionRequestOrRejection(activity)
+  const _isMember = isMemberCreatedOrModified(activity)
+  const _isLoggedUserMember = isLoggedUserMember(activity)
+  const _isRoleChange = isRoleChange(activity)
+
+  return entityType.includes(activity.entityType) && !hasAttachedFile &&
+    (
+      (_isContent && (!_isNews || _isInSpaceWithNews)) ||
+      (_isSubscription && _isLoggedUserMember) ||
+      (_isMember && _isLoggedUserMember && _isRoleChange) ||
+      (_isSharedSpace && activity.newestMessage.fields.author.user_id !== userId)
+    )
+}
+
 const createActivityEvent = (message) => {
   const [, eventType, subEntityType] = message.event_type.split('.')
   return {
@@ -291,7 +372,7 @@ export const addMessageToActivityList = async (message, activityList, apiUrl) =>
  * Set the event list of a given activity by building them from messages.
  * Does nothing if the activity is not in the given list
  * @param {str} activityId id of the activity to modify
- * @param {*} activityList list of activitiesx
+ * @param {*} activityList list of activities
  * @param {*} messageList list of messages for building events
  * @return updated activity
  */

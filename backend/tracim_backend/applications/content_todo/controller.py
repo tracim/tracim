@@ -5,6 +5,7 @@ import typing
 from pyramid.config import Configurator
 import transaction
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.applications.content_todo.schema import SetTodoSchema
 from tracim_backend.applications.content_todo.schema import TodoPathSchema
@@ -144,7 +145,7 @@ class TodoController(Controller):
         try:
             parent = content_api.get_one(
                 content_id=request.current_content.content_id,
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
             )
         except ContentNotFound as exc:
             raise ParentNotFound(

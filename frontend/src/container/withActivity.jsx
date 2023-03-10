@@ -2,21 +2,21 @@ import React from 'react'
 
 import {
   CONTENT_TYPE,
-  getComment,
-  getContent,
-  handleClickCopyLink,
-  handleFetchResult,
   NUMBER_RESULTS_BY_PAGE,
   TLM_CORE_EVENT_TYPE as TLM_CET,
   TLM_ENTITY_TYPE as TLM_ET,
   TLM_SUB_TYPE as TLM_SUB,
-  CONTENT_NAMESPACE,
-  SUBSCRIPTION_TYPE
+  SUBSCRIPTION_TYPE,
+  getComment,
+  getContent,
+  handleClickCopyLink,
+  handleFetchResult
 } from 'tracim_frontend_lib'
 
 import {
-  mergeWithActivityList,
+  activityDisplayFilter,
   addMessageToActivityList,
+  mergeWithActivityList,
   sortActivityList
 } from '../util/activity.js'
 import { FETCH_CONFIG } from '../util/helper.js'
@@ -254,89 +254,6 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
       this.changingActivityList = false
     }
 
-    // FIXME - MB - 2021-05-26 - this code is duplicated for activityDisplayFilter, in ActivityList
-    // See this ticket https://github.com/tracim/tracim/issues/4677
-
-    isSubscriptionRequestOrRejection = (activity) => {
-      return (activity.entityType === TLM_ET.SHAREDSPACE_SUBSCRIPTION &&
-        DISPLAYED_SUBSCRIPTION_STATE_LIST.includes(activity.newestMessage.fields.subscription.state))
-    }
-
-    isMemberCreatedOrModified = (activity) => {
-      const coreEventType = activity.newestMessage.event_type.split('.')[1]
-      return (activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
-        DISPLAYED_MEMBER_CORE_EVENT_TYPE_LIST.includes(coreEventType))
-    }
-
-    isLoggedUserMember = (activity) => this.props.workspaceList
-      .find(space => space.id === activity.newestMessage.fields.workspace.workspace_id)
-
-    isRoleChange = (activity) => {
-      // FIXME - CH - 20230203 - We should not create an activity when user change their email subscription
-      // Currently, we cannot know if an event_type: "workspace_member.modified" is for role or email_notification_type
-      // So display neither of them.
-      // Only display the member added
-      // See https://github.com/tracim/tracim/issues/6106 known issues
-      const coreEventType = activity.newestMessage.event_type.split('.')[1]
-      return (
-        activity.entityType === TLM_ET.SHAREDSPACE_MEMBER &&
-        coreEventType === TLM_CET.CREATED
-      )
-    }
-
-    isNews = (activity) => {
-      const isNews = activity.content && (activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION)
-      const hasSpace = activity.newestMessage.fields.workspace
-      return isNews && hasSpace
-    }
-
-    isInSpaceWithNews = (activity) => {
-      const space = this.props.workspaceList.find(
-        s => s.id === activity.newestMessage.fields.workspace.workspace_id
-      )
-      if (!space) return true
-      return space.publicationEnabled
-    }
-
-    /**
-     * Duplicate code from ActivityList
-     *
-     * Check if an activity is an attached file on a publication
-     * @param {*} activity the activity to check
-     * @returns true if the activity is an attached file on a publication
-     */
-    isActivityAnAttachedFileOnNews = (activity) => activity.content
-      ? activity.content.content_namespace === CONTENT_NAMESPACE.PUBLICATION && activity.content.content_type === CONTENT_TYPE.FILE
-      : false
-
-    activityDisplayFilter = (activity) => {
-      const { props } = this
-      const entityType = [
-        TLM_ET.CONTENT,
-        TLM_ET.SHAREDSPACE_MEMBER,
-        TLM_ET.SHAREDSPACE_SUBSCRIPTION,
-        TLM_ET.SHAREDSPACE
-      ]
-      const hasAttachedFile = this.isActivityAnAttachedFileOnNews(activity)
-
-      const isContent = activity.entityType === TLM_ET.CONTENT
-      const isSharedSpace = activity.entityType === TLM_ET.SHAREDSPACE
-      const isNews = this.isNews(activity)
-      const isInSpaceWithNews = this.isInSpaceWithNews(activity)
-      const isSubscription = this.isSubscriptionRequestOrRejection(activity)
-      const isMember = this.isMemberCreatedOrModified(activity)
-      const isLoggedUserMember = this.isLoggedUserMember(activity)
-      const isRoleChange = this.isRoleChange(activity)
-
-      return entityType.includes(activity.entityType) && !hasAttachedFile &&
-        (
-          (isContent && (!isNews || isInSpaceWithNews)) ||
-          (isSubscription && isLoggedUserMember) ||
-          (isMember && isLoggedUserMember && isRoleChange) ||
-          (isSharedSpace && activity.newestMessage.fields.author.user_id !== props.user.userId)
-        )
-    }
-
     /**
      * DOC - SG - 2021-05-05
      * Load a batch of activities and merge them into the given list
@@ -366,7 +283,9 @@ const withActivity = (WrappedComponent, setActivityList, setActivityNextPage, re
           activityList,
           FETCH_CONFIG.apiUrl
         )
-        activityList = activityList.filter(this.activityDisplayFilter)
+        activityList = activityList.filter(
+          (activity) => activityDisplayFilter(activity, props.user.userId)
+        )
         hasNextPage = messageListResponse.json.has_next
         nextPageToken = messageListResponse.json.next_page_token
       }

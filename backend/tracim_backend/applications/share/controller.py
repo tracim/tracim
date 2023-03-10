@@ -4,8 +4,7 @@ import typing
 from hapic.data import HapicFile
 from pyramid.config import Configurator
 
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.applications.share.authorization import has_public_download_enabled
 from tracim_backend.applications.share.lib import ShareLib
 from tracim_backend.applications.share.models import ContentShare
@@ -45,7 +44,7 @@ SWAGGER_TAG__CONTENT_SHARE_SECTION = "Share"
 SWAGGER_TAG__CONTENT_FILE_ENDPOINTS = generate_documentation_swagger_tag(
     SWAGGER_TAG__CONTENT_ENDPOINTS, SWAGGER_TAG__CONTENT_SHARE_SECTION
 )
-shareables_content_type = [FILE_TYPE]
+shareables_content_type = [ContentTypeSlug.FILE.value]
 is_shareable_content_type = ContentTypeChecker(shareables_content_type)
 
 
@@ -144,7 +143,7 @@ class ShareController(Controller):
         # we should considered do these check at decorator level
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
-        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        ).get_one(content_share.content_id, content_type=ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(
             current_user=None, session=request.dbsession, config=app_config
         )
@@ -176,7 +175,7 @@ class ShareController(Controller):
         api.check_password(content_share, password=hapic_data.body.password)
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
-        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        ).get_one(content_share.content_id, content_type=ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(
             current_user=None, session=request.dbsession, config=app_config
         )
@@ -230,7 +229,7 @@ class ShareController(Controller):
         api.check_password(content_share, password=password)
         content = ContentApi(
             current_user=None, session=request.dbsession, config=app_config
-        ).get_one(content_share.content_id, content_type=content_type_list.Any_SLUG)
+        ).get_one(content_share.content_id, content_type=ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(
             current_user=None, session=request.dbsession, config=app_config
         )

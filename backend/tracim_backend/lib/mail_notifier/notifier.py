@@ -5,6 +5,7 @@ import typing
 from mako.template import Template
 from sqlalchemy.orm import Session
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import EmailTemplateError
@@ -120,7 +121,7 @@ class EmailNotifier(INotifier):
                 self._user.user_id, content.content_id
             )
         except Exception:
-            logger.exception(self, "Exception catched during email notification")
+            logger.exception(self, "Exception has been caught during email notification")
 
 
 class EmailManager(object):
@@ -210,7 +211,7 @@ class EmailManager(object):
             config=self.config,
             show_archived=True,
             show_deleted=True,
-        ).get_one(event_content_id, content_type_list.Any_SLUG)
+        ).get_one(event_content_id, ContentTypeSlug.ANY.value)
         workspace_api = WorkspaceApi(session=self.session, current_user=user, config=self.config)
         workspace_in_context = workspace_api.get_workspace_with_context(
             workspace_api.get_one(content.workspace_id)

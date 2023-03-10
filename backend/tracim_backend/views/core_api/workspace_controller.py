@@ -5,8 +5,7 @@ from pyramid.config import Configurator
 from pyramid.httpexceptions import HTTPFound
 import transaction
 
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import KANBAN_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import ConflictingMoveInChild
@@ -56,8 +55,8 @@ from tracim_backend.models.context_models import ListItemsObject
 from tracim_backend.models.context_models import PaginatedObject
 from tracim_backend.models.context_models import UserRoleWorkspaceInContext
 from tracim_backend.models.data import Content
-from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import ContentNamespaces
+from tracim_backend.models.data import EmailNotificationType
 from tracim_backend.models.data import WorkspaceSubscription
 from tracim_backend.models.revision_protection import new_revision
 from tracim_backend.models.roles import WorkspaceRoles
@@ -429,7 +428,9 @@ class WorkspaceController(Controller):
             user=user,
             workspace=request.current_workspace,
             role_level=WorkspaceRoles.get_role_from_slug(hapic_data.body.role).level,
-            email_notification_type=EmailNotificationType(app_config.EMAIL__NOTIFICATION__TYPE_ON_INVITATION),
+            email_notification_type=EmailNotificationType(
+                app_config.EMAIL__NOTIFICATION__TYPE_ON_INVITATION
+            ),
             flush=True,
         )
         return role_api.get_user_role_workspace_with_context(role, newly_created=newly_created)
@@ -509,7 +510,7 @@ class WorkspaceController(Controller):
             parent_ids=content_filter.parent_ids,
             complete_path_to_id=content_filter.complete_path_to_id,
             workspaces=[request.current_workspace],
-            content_type=content_filter.content_type or content_type_list.Any_SLUG,
+            content_type=content_filter.content_type or ContentTypeSlug.ANY.value,
             label=content_filter.label,
             order_by_properties=[
                 get_sort_expression(content_filter.sort, Content, {"modified": "updated"}),
@@ -549,7 +550,7 @@ class WorkspaceController(Controller):
         if creation_data.parent_id:
             try:
                 parent = api.get_one(
-                    content_id=creation_data.parent_id, content_type=content_type_list.Any_SLUG
+                    content_id=creation_data.parent_id, content_type=ContentTypeSlug.ANY.value
                 )
             except ContentNotFound as exc:
                 raise ParentNotFound(
@@ -617,12 +618,12 @@ class WorkspaceController(Controller):
             config=app_config,
         )
         content = api.get_one(
-            content_id=hapic_data.path["content_id"], content_type=content_type_list.Any_SLUG
+            content_id=hapic_data.path["content_id"], content_type=ContentTypeSlug.ANY.value
         )
         content_type = content_type_list.get_one_by_slug(content.type).slug
 
-        if content_type == KANBAN_TYPE:
-            content_type = FILE_TYPE
+        if content_type == ContentTypeSlug.KANBAN.value:
+            content_type = ContentTypeSlug.FILE.value
 
         # TODO - G.M - 2018-08-03 - Jsonify redirect response ?
         raise HTTPFound(
@@ -692,8 +693,8 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
-        new_parent = api.get_one(move_data.new_parent_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
+        new_parent = api.get_one(move_data.new_parent_id, content_type=ContentTypeSlug.ANY.value)
 
         new_workspace = request.candidate_workspace
 
@@ -705,7 +706,7 @@ class WorkspaceController(Controller):
                 new_content_namespace=ContentNamespaces.CONTENT,
                 must_stay_in_same_workspace=False,
             )
-        updated_content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        updated_content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         return api.get_content_in_context(updated_content)
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_ALL_TRASH_AND_RESTORE_ENDPOINTS])
@@ -727,7 +728,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.delete(content)
         return
@@ -749,7 +750,7 @@ class WorkspaceController(Controller):
             show_deleted=True,
             show_archived=True,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.undelete(content)
         return
@@ -775,7 +776,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.archive(content)
         return
@@ -797,7 +798,7 @@ class WorkspaceController(Controller):
             show_archived=True,
             show_deleted=True,
         )
-        content = api.get_one(path_data.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(path_data.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.unarchive(content)
         return
@@ -819,7 +820,7 @@ class WorkspaceController(Controller):
             session=request.dbsession,
             config=app_config,
         )
-        content = api.get_one(hapic_data.path.content_id, content_type=content_type_list.Any_SLUG)
+        content = api.get_one(hapic_data.path.content_id, content_type=ContentTypeSlug.ANY.value)
         with new_revision(session=request.dbsession, tm=transaction.manager, content=content):
             api.set_template(content, hapic_data.body.is_template)
             api.save(content)

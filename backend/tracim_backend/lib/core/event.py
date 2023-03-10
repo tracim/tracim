@@ -25,12 +25,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-from tracim_backend.app_models.contents import COMMENT_TYPE
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import FOLDER_TYPE
-from tracim_backend.app_models.contents import HTML_DOCUMENTS_TYPE
-from tracim_backend.app_models.contents import THREAD_TYPE
-from tracim_backend.app_models.contents import TODO_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import MessageDoesNotExist
 from tracim_backend.exceptions import UserDoesNotExist
@@ -93,12 +88,12 @@ class EventApi:
     workspace_schema = WorkspaceSchema()
     workspace_without_description_schema = WorkspaceWithoutDescriptionSchema()
     content_schemas = {
-        COMMENT_TYPE: MessageCommentSchema(),
-        HTML_DOCUMENTS_TYPE: MessageContentSchema(),
-        FILE_TYPE: FileContentSchema(),
-        FOLDER_TYPE: MessageContentSchema(),
-        THREAD_TYPE: MessageContentSchema(),
-        TODO_TYPE: ToDoSchema(),
+        ContentTypeSlug.COMMENT.value: MessageCommentSchema(),
+        ContentTypeSlug.HTML_DOCUMENTS.value: MessageContentSchema(),
+        ContentTypeSlug.FILE.value: FileContentSchema(),
+        ContentTypeSlug.FOLDER.value: MessageContentSchema(),
+        ContentTypeSlug.THREAD.value: MessageContentSchema(),
+        ContentTypeSlug.TODO.value: ToDoSchema(),
     }
     reaction_schema = ReactionSchema()
     tag_schema = TagSchema()

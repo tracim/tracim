@@ -20,6 +20,7 @@ from wsgidav.dav_provider import DAVCollection
 from wsgidav.dav_provider import DAVNonCollection
 from wsgidav.dav_provider import _DAVResource
 
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import content_type_list
 from tracim_backend.exceptions import ContentNotFound
 from tracim_backend.exceptions import FileSizeOverMaxLimitation
@@ -310,14 +311,14 @@ class ContentOnlyContainer(WebdavContainer):
         if self.content:
             parent_id = self.content.content_id
             children = self.content_api.get_all(
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
                 workspaces=[self.workspace],
                 parent_ids=[parent_id],
                 order_by_properties=["content_id"],
             )
         else:
             children = self.content_api.get_all(
-                content_type=content_type_list.Any_SLUG,
+                content_type=ContentTypeSlug.ANY.value,
                 workspaces=[self.workspace],
                 parent_ids=[0],
                 order_by_properties=["content_id"],

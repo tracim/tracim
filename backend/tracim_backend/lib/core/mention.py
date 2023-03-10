@@ -6,7 +6,7 @@ from bs4 import Tag
 from pluggy import PluginManager
 
 from tracim_backend import UserDoesNotExist
-from tracim_backend.app_models.contents import COMMENT_TYPE
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.config import CFG
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.lib.core.content import ContentApi
@@ -103,7 +103,7 @@ class MentionBuilder:
     """
 
     _parsers = {
-        COMMENT_TYPE: DescriptionMentionParser()
+        ContentTypeSlug.COMMENT.value: DescriptionMentionParser()
     }  # type: typing.Dict[str, BaseMentionParser]
 
     MENTION_FIELD = "mention"

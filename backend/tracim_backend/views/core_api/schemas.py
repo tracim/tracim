@@ -10,8 +10,7 @@ from marshmallow.fields import String
 from marshmallow.fields import ValidatedField
 from marshmallow.validate import OneOf
 
-from tracim_backend.app_models.contents import FILE_TYPE
-from tracim_backend.app_models.contents import content_type_list
+from tracim_backend.app_models.contents import ContentTypeSlug
 from tracim_backend.app_models.contents import open_status
 from tracim_backend.app_models.email_validators import RFCEmailValidator
 from tracim_backend.app_models.email_validators import TracimEmailValidator
@@ -380,7 +379,9 @@ class FileCreationFormSchema(marshmallow.Schema):
     content_namespace = EnumField(
         ContentNamespaces, missing=ContentNamespaces.CONTENT, example="content"
     )
-    content_type = marshmallow.fields.String(missing=FILE_TYPE, example=FILE_TYPE)
+    content_type = marshmallow.fields.String(
+        missing=ContentTypeSlug.FILE.value, example=ContentTypeSlug.FILE.value
+    )
     template_id = marshmallow.fields.Int(
         example=2, default=0, validate=positive_int_validator, allow_none=True
     )
@@ -1158,8 +1159,8 @@ class FilterContentQuerySchema(BaseOptionalPaginatedQuerySchema):
         validate=bool_as_int_validator,
     )
     content_type = StrippedString(
-        example=content_type_list.Any_SLUG,
-        default=content_type_list.Any_SLUG,
+        example=ContentTypeSlug.ANY.value,
+        default=ContentTypeSlug.ANY.value,
         validate=all_content_types_validator,
     )
     label = StrippedString(
