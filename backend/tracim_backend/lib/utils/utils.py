@@ -22,7 +22,6 @@ from urllib.parse import urlencode
 from urllib.parse import urljoin
 import uuid
 
-# from git import InvalidGitRepositoryError
 from babel import UnknownLocaleError
 from babel.dates import format_date
 from colour import Color

@@ -116,8 +116,6 @@ const ActivityList = (props) => {
     return <div className='activityList__item' data-cy='activityList__item' key={activity.id}>{component}</div>
   }
 
-  // debugger
-
   const activityList = props.activity.list.filter(
     (activity) => activityDisplayFilter(
       activity,

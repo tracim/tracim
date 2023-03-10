@@ -89,8 +89,6 @@ export const activityDisplayFilter = (activity, spaceList, userId) => {
   const _isLoggedUserMember = isLoggedUserMember(activity, spaceList)
   const _isRoleChange = isRoleChange(activity)
 
-  // debugger
-
   return entityType.includes(activity.entityType) && !hasAttachedFile &&
     (
       (_isContent && (!_isNews || _isInSpaceWithNews)) ||
