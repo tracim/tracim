@@ -1,7 +1,6 @@
 import { PAGES } from '../../support/urls_commands'
 import { SELECTORS } from '../../support/generic_selector_commands'
 
-const publicationInput = '#wysiwygTimelineCommentPublication'
 const publishButton = '.commentArea__submit__btn'
 const addFileButton = '.AddFileToCommentButton'
 
@@ -83,8 +82,9 @@ describe('Publications', () => {
           .get('[data-cy=popup__createcontent__form__button]')
           .click()
         cy.contains('.DisplayFileToUpload__message__text', '1')
-        cy.get(publicationInput).type(exampleText)
-        cy.contains(publishButton, 'Publish').click()
+        cy.inputInTinyMCE(exampleText).then(() => {
+          cy.contains(publishButton, 'Publish').click()
+        })
       })
     })
 

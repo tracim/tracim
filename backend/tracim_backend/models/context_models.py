@@ -977,7 +977,7 @@ class UserInContext(object):
 
     @property
     def has_avatar(self) -> bool:
-        return bool(self.user.avatar)
+        return True
 
     @property
     def has_cover(self) -> bool:

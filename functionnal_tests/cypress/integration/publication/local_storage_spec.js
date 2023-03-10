@@ -1,8 +1,7 @@
 import { PAGES } from '../../support/urls_commands'
 
-let workspaceId
-const publishCommentArea = '#wysiwygTimelineCommentPublication'
 const text = 'Hello world'
+let spaceId
 
 describe('News page', () => {
   beforeEach(function () {
@@ -10,7 +9,7 @@ describe('News page', () => {
     cy.setupBaseDB()
     cy.loginAs('administrators')
     cy.fixture('baseWorkspace').as('workspace').then((workspace) => {
-      workspaceId = workspace.workspace_id
+      spaceId = workspace.workspace_id
       cy.visitPage({
         pageName: PAGES.PUBLICATION,
         params: { workspaceId: workspace.workspace_id },
@@ -24,14 +23,16 @@ describe('News page', () => {
   })
 
   it('should save the news draft', () => {
-    cy.get(publishCommentArea).type(text)
+    cy.inputInTinyMCE(text)
     cy.visitPage({ pageName: PAGES.ACCOUNT })
     cy.contains('.account__userpreference__setting', 'Change my account settings')
     cy.visitPage({
       pageName: PAGES.PUBLICATION,
-      params: { workspaceId: workspaceId },
+      params: { workspaceId: spaceId },
       waitForTlm: true
     })
-    cy.contains(publishCommentArea, text)
+    cy.getActiveTinyMCEEditor().then((editor) => {
+      expect(editor.getContent()).to.contain(text)
+    })
   })
 })

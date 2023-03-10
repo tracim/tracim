@@ -2024,9 +2024,7 @@ class ContentModifySchema(ContentModifyAbstractSchema):
 class FolderContentModifySchema(ContentModifyAbstractSchema):
     sub_content_types = marshmallow.fields.List(
         StrippedString(example="html-document", validate=all_content_types_validator),
-        description="list of content types allowed as sub contents. "
-        "This field is required for folder contents, "
-        "set it to empty list in other cases",
+        description="list of content types allowed as sub contents.",
         required=False,
     )
 
@@ -2073,6 +2071,11 @@ class CodeSampleLanguageSchema(marshmallow.Schema):
     text = marshmallow.fields.String(required=True, example="Markup")
 
 
+class RoleSchema(marshmallow.Schema):
+    level = marshmallow.fields.String(required=True, example="1")
+    label = marshmallow.fields.String(required=True, example="Reader")
+
+
 class ConfigSchema(marshmallow.Schema):
     email_notification_activated = marshmallow.fields.Bool()
     new_user_invitation_do_notify = marshmallow.fields.Bool()
@@ -2093,6 +2096,8 @@ class ConfigSchema(marshmallow.Schema):
     )
     user__self_registration__enabled = marshmallow.fields.Bool()
     ui__spaces__creation__parent_space_choice__visible = marshmallow.fields.Bool()
+    # NOTE - MP - 2022-11-29 - The line under is probably wrong and do not require
+    # `marshmallow.fields.items`
     ui__notes__code_sample_languages = marshmallow.fields.items = marshmallow.fields.Nested(
         CodeSampleLanguageSchema, many=True
     )

@@ -73,7 +73,7 @@ describe('reducer currentWorkspace.js', () => {
           role: globalManagerAsMemberFromApi.role,
           doNotify: globalManagerAsMemberFromApi.do_notify,
           username: globalManagerAsMemberFromApi.user.username,
-          hasAvatar: false,
+          hasAvatar: true,
           hasCover: false
         })
       })

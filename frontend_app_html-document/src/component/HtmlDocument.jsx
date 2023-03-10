@@ -1,20 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { translate } from 'react-i18next'
 import classnames from 'classnames'
 import {
   APP_FEATURE_MODE,
-  ConfirmPopup,
   CONTENT_TYPE,
+  DEFAULT_ROLE_LIST,
+  LOCAL_STORAGE_FIELD,
+  TRANSLATION_STATE,
+  ConfirmPopup,
+  HTMLContent,
   IconButton,
   PromptMessage,
-  HTMLContent,
   RefreshWarningMessage,
-  TextAreaApp,
-  TRANSLATION_STATE
+  TinyEditor,
+  setLocalStorageItem
 } from 'tracim_frontend_lib'
 
 export const HtmlDocument = props => {
+  const [textToEdit, setTextToEdit] = useState('')
+
   const isTranslated = props.translationState === TRANSLATION_STATE.TRANSLATED
   const noteClass = 'html-document__contentpage__textnote__text'
   const noteClassName = classnames(
@@ -23,6 +28,21 @@ export const HtmlDocument = props => {
       [`${noteClass}-translated primaryColorBorder`]: isTranslated
     }
   )
+
+  useEffect(() => {
+    setTextToEdit(props.text)
+  }, [props.text])
+
+  const updateTextToEdit = (text) => {
+    setTextToEdit(text)
+    setLocalStorageItem(
+      props.contentType,
+      props.contentId,
+      props.workspaceId,
+      LOCAL_STORAGE_FIELD.RAW_CONTENT,
+      text
+    )
+  }
 
   return (
     <div className='html-document__contentpage__left__wrapper'>
@@ -134,24 +154,48 @@ export const HtmlDocument = props => {
         )}
 
         {(props.mode === APP_FEATURE_MODE.EDIT &&
-          <TextAreaApp
-            apiUrl={props.apiUrl}
-            contentId={props.contentId}
-            contentType={props.contentType}
-            customClass='html-document__editionmode'
-            customColor={props.customColor}
-            disableValidateBtn={props.disableValidateBtn}
-            elementId={props.wysiwygNewVersion}
-            isVisible={props.isVisible}
-            lang={props.lang}
-            mode={props.mode}
-            onClickCancelBtn={props.onClickCloseEditMode}
-            onClickValidateBtn={props.onClickValidateBtn}
-            searchForMentionOrLinkInQuery={props.searchForMentionOrLinkInQuery}
-            text={props.text}
-            onClickAutoCompleteItem={props.onClickAutoCompleteItem}
-            workspaceId={props.workspaceId}
-          />
+          (
+            <>
+              <TinyEditor
+                apiUrl={props.apiUrl}
+                codeLanguageList={[]}
+                content={textToEdit}
+                onCtrlEnterEvent={props.onClickValidateBtn}
+                height='100%'
+                isAdvancedEdition
+                roleList={DEFAULT_ROLE_LIST}
+                setContent={updateTextToEdit}
+                spaceId={props.workspaceId}
+                userList={props.memberList}
+              />
+
+              <div className={`${props.customClass}__button editionmode__button`}>
+                <IconButton
+                  color={props.customColor}
+                  customClass={`${props.customClass}__cancel editionmode__button__cancel`}
+                  icon='fas fa-times'
+                  intent='secondary'
+                  key='TextAreaApp__cancel'
+                  onClick={props.onClickCloseEditMode}
+                  tabIndex='1'
+                  text={props.t('Cancel')}
+                />
+
+                <IconButton
+                  color={props.customColor}
+                  customClass={`${props.customClass}__submit editionmode__button__submit`}
+                  dataCy='editionmode__button__submit'
+                  disabled={props.disableValidateBtn(textToEdit)}
+                  icon='fas fa-check'
+                  intent='primary'
+                  key='TextAreaApp__validate'
+                  mode='light'
+                  onClick={() => props.onClickValidateBtn(textToEdit)}
+                  text={props.t('Validate')}
+                />
+              </div>
+            </>
+          )
         )}
       </div>
     </div>
@@ -163,7 +207,6 @@ export default translate()(HtmlDocument)
 HtmlDocument.propTypes = {
   apiUrl: PropTypes.string.isRequired,
   workspaceId: PropTypes.number.isRequired,
-  wysiwygNewVersion: PropTypes.string.isRequired,
   contentId: PropTypes.number,
   contentType: PropTypes.string,
   customColor: PropTypes.string,
@@ -180,6 +223,7 @@ HtmlDocument.propTypes = {
   isRefreshNeeded: PropTypes.bool,
   isVisible: PropTypes.bool,
   lang: PropTypes.string,
+  memberList: PropTypes.array,
   mode: PropTypes.string,
   onClickAutoCompleteItem: PropTypes.func,
   onClickValidateBtn: PropTypes.func,
@@ -193,7 +237,6 @@ HtmlDocument.propTypes = {
   onClickRestoreDeleted: PropTypes.func,
   onClickSaveAnyway: PropTypes.func,
   onClickShowDraft: PropTypes.func,
-  searchForMentionOrLinkInQuery: PropTypes.func,
   showInvalidMentionPopup: PropTypes.bool
 }
 
@@ -214,6 +257,7 @@ HtmlDocument.defaultProps = {
   isRefreshNeeded: false,
   isVisible: true,
   lang: 'en',
+  memberList: [],
   mode: APP_FEATURE_MODE.VIEW,
   onClickAutoCompleteItem: () => { },
   onClickCancelSave: () => { },
@@ -227,6 +271,5 @@ HtmlDocument.defaultProps = {
   onClickSaveAnyway: () => { },
   onClickShowDraft: () => { },
   showInvalidMentionPopup: false,
-  searchForMentionOrLinkInQuery: () => { },
   text: ''
 }

@@ -19,7 +19,7 @@ from tracim_backend.lib.mail_fetcher.email_processing.sanitizer_config.tag_white
     TAG_WHITELIST,
 )
 
-ALLOWED_EMPTY_TAGS = ["video", "img", "source", "iframe"]
+ALLOWED_EMPTY_TAGS = ["video", "img", "source", "iframe", "html-mention"]
 
 
 class HtmlSanitizerConfig(object):

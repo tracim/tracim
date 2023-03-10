@@ -23,30 +23,30 @@ describe('Dashboard button list', () => {
   })
 
   describe('if agenda is enabled', () => {
-    it('should show button agenda and explore content', () => {
+    it('should show button agenda and space settings', () => {
       cy.get('button[title="Open the agenda"]').should('be.visible')
-      cy.get('button[title="Explore contents"]').should('be.visible')
+      cy.get('button[title="Space settings"]').should('be.visible')
     })
   })
 
   describe('if agenda is not enabled', () => {
-    it('should show button explore content but not agenda', () => {
+    it('should show button space settings but not agenda', () => {
       cy.enableAgenda(workspaceTest, false)
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceTest.workspace_id } })
       cy.get('button[title="Open the agenda"]').should('not.exist')
-      cy.get('button[title="Explore contents"]').should('be.visible')
+      cy.get('button[title="Space settings"]').should('be.visible')
     })
 
   })
   describe('if publication is enabled', () => {
-    it('should show button publication and explore content', () => {
+    it('should show button publication and space settings', () => {
       cy.get('button[title="Publish some news"]').should('be.visible')
-      cy.get('button[title="Explore contents"]').should('be.visible')
+      cy.get('button[title="Space settings"]').should('be.visible')
     })
   })
 
   describe('if publication is not enabled', () => {
-    it('should show button explore content but not publication', () => {
+    it('should show button space settings but not publication', () => {
       cy.contains('.userstatus__role__text', 'Space manager')
       cy.get('button[title="Space settings"]').click()
       cy.contains('.workspace_advanced__contentpage__header__title', workspaceTest.label)
@@ -56,7 +56,7 @@ describe('Dashboard button list', () => {
       cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: workspaceTest.workspace_id } })
 
       cy.get('button[title="Publish some news"]').should('not.exist')
-      cy.get('button[title="Explore contents"]').should('be.visible')
+      cy.get('button[title="Space settings"]').should('be.visible')
     })
   })
 

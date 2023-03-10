@@ -11,6 +11,7 @@ from tracim_backend.config import CFG
 from tracim_backend.exceptions import ContentFilenameAlreadyUsedInFolder
 from tracim_backend.exceptions import ContentStatusException
 from tracim_backend.exceptions import EmptyLabelNotAllowed
+from tracim_backend.exceptions import InvalidMention
 from tracim_backend.exceptions import UserNotMemberOfWorkspace
 from tracim_backend.extensions import hapic
 from tracim_backend.lib.core.content import ContentApi
@@ -168,8 +169,9 @@ class HTMLDocumentController(Controller):
         )
 
     @hapic.with_api_doc(tags=[SWAGGER_TAG__CONTENT_HTML_DOCUMENT_ENDPOINTS])
-    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(ContentFilenameAlreadyUsedInFolder, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(EmptyLabelNotAllowed, HTTPStatus.BAD_REQUEST)
+    @hapic.handle_exception(InvalidMention, HTTPStatus.BAD_REQUEST)
     @hapic.handle_exception(UserNotMemberOfWorkspace, HTTPStatus.BAD_REQUEST)
     @check_right(is_contributor)
     @check_right(is_html_document_content)

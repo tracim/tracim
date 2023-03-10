@@ -397,7 +397,6 @@
   "{{author}} reacted to {{content}} with {{reaction}}": "{{author}} reacted to {{content}} with {{reaction}}",
   "Reaction deleted": "Reaction deleted",
   "{{author}} removed their reaction {{reaction}} to {{content}}": "{{author}} removed their reaction {{reaction}} to {{content}}",
-  "Error while saving the comment": "Error while saving the comment",
   "publication list": "publication list",
   "Reorder": "Reorder",
   "This space doesn't have a description yet.": "This space doesn't have a description yet.",
@@ -589,7 +588,6 @@
   "There are no spaces that matches your filter": "There are no spaces that matches your filter",
   "Filter users": "Filter users",
   "Email notification:": "Email notification:",
-  "All": "All",
   "Daily": "Daily",
   "None": "None",
   "One mail will be sent for each event of the space.": "One mail will be sent for each event of the space.",
@@ -604,5 +602,11 @@
   "Sort by last modification": "Sort by last modification",
   "Sort by information": "Sort by information",
   "Sort by role": "Sort by role",
+  "Every members of the space": "Every members of the space",
+  "All": "All",
+  "all": "all",
+  "Tracim doesn't support the current version of your browser. Please upgrade your browser.": "Tracim doesn't support the current version of your browser. Please upgrade your browser.",
+  "UnknownUser": "UnknownUser",
+  "UnknownRole": "UnknownRole",
   "Sort by status": "Sort by status"
 }

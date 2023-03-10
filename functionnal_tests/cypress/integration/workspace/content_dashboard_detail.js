@@ -3,7 +3,7 @@ import { PAGES } from '../../support/urls_commands'
 let workspaceId
 let workspaceLabel
 
-describe('content :: workspace > dashboard', function () {
+describe('Dashboard', function () {
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
@@ -23,7 +23,7 @@ describe('content :: workspace > dashboard', function () {
     cy.cancelXHR()
   })
 
-  it('part of dashboard', function () {
+  it('should have navigation menus', function () {
     cy.get('.dashboard.pageWrapperGeneric').should('be.visible')
     cy.get('.pageTitleGeneric').should('be.visible')
     cy.get('.tabBar').should('be.visible')
@@ -31,12 +31,12 @@ describe('content :: workspace > dashboard', function () {
     cy.get('.dashboard__workspace__rightMenu').should('be.visible')
   })
 
-  it('dashboard__header__title', function () {
+  it('show display title', function () {
     cy.contains('.pageTitleGeneric', workspaceLabel).should('be.visible')
   })
 
-  it('dashboard__workspace > dashboard__workspace__detail', function () {
+  it('should display description and settings', function () {
     cy.get('.pageContentGeneric .dashboard__workspace__detail__description').should('be.visible')
-    cy.get('.dashboard__workspace__detail__buttons .iconbutton').should('have.attr', 'type', 'button').should('be.visible')
+    cy.get('.dashboard__workspace__rightMenu__contents .fa-cog').should('be.visible')
   })
 })

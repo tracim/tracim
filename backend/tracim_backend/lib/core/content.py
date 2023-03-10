@@ -431,7 +431,7 @@ class ContentApi(object):
         self._check_valid_content_type_in_dir(content_type, parent, workspace)
         content = Content()
 
-        # NOTE - MP - 2022-07-04 - We should copy the template, note try to create a copy
+        # NOTE - MP - 2022-07-04 - We should copy the template, not try to create a copy
         if template_id:
             template = self.get_one(template_id)
             content = self.copy_from_template(
@@ -440,7 +440,6 @@ class ContentApi(object):
                 new_parent=parent,
                 new_content_namespace=content_namespace,
             )
-
         else:
             content.revision_type = ActionDescription.CREATION
 
@@ -533,6 +532,7 @@ class ContentApi(object):
         config = HtmlSanitizerConfig(tag_blacklist=["script"], tag_whitelist=list())
         sanitizer = HtmlSanitizer(html_body=content, config=config)
         content = sanitizer.sanitize_html()
+
         if (not content) or sanitizer.html_is_empty():
             raise EmptyCommentContentNotAllowed()
 
@@ -545,6 +545,7 @@ class ContentApi(object):
             do_save=False,
             label="",
         )
+
         item.raw_content = content
         item.revision_type = ActionDescription.COMMENT
         if do_save:
@@ -1593,7 +1594,7 @@ class ContentApi(object):
     def update_container_content(
         self,
         item: Content,
-        allowed_content_type_slug_list: typing.List[str],
+        allowed_content_type_slug_list: typing.Optional[typing.List[str]],
         new_label: str,
         new_description: typing.Optional[str] = None,
         new_raw_content: typing.Optional[str] = None,
@@ -1609,11 +1610,13 @@ class ContentApi(object):
          of content.
         :return:
         """
-        try:
-            item = self.set_allowed_content(item, allowed_content_type_slug_list)
-            content_has_changed = True
-        except SameValueError:
-            content_has_changed = False
+        content_has_changed = False
+        if allowed_content_type_slug_list is not None:
+            try:
+                item = self.set_allowed_content(item, allowed_content_type_slug_list)
+                content_has_changed = True
+            except SameValueError:
+                pass
         item = self.update_content(
             item,
             new_label,
@@ -2014,9 +2017,12 @@ class ContentApi(object):
     def save(self, content: Content, action_description: str = None, do_flush=True, do_notify=True):
         """
         Save an object, flush the session and set the revision_type property
-        :param content:
-        :param action_description:
-        :return:
+
+        Args:
+            content (Content): Content to save
+            action_description (str, optional): Action done on the content. Defaults to None.
+            do_flush (bool, optional): Should it flush. Defaults to True.
+            do_notify (bool, optional): Should it notify users. Defaults to True.
         """
         assert (
             action_description is None or action_description in ActionDescription.allowed_values()

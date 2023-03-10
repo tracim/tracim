@@ -31,14 +31,14 @@ export const ProfileMainBar = props => {
         <Avatar
           customClass='profile__mainBar__avatar__big'
           apiUrl={FETCH_CONFIG.apiUrl}
-          user={hasUser ? props.displayedUser : {}}
+          user={props.displayedUser}
           size={AVATAR_SIZE.BIG}
           dataCy='profile-avatar'
         />
         <Avatar
           customClass='profile__mainBar__avatar__medium'
           apiUrl={FETCH_CONFIG.apiUrl}
-          user={hasUser ? props.displayedUser : {}}
+          user={props.displayedUser}
           size={AVATAR_SIZE.MEDIUM}
         />
         {props.changeAvatarEnabled && (

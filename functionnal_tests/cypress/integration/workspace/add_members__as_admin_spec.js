@@ -25,7 +25,10 @@ describe('Add a member from the dashboard', () => {
     cy.cancelXHR()
   })
 
-  it('should add a new member as space manager using email', () => {
+  // TODO - MP - 09-02-2023
+  // See https://github.com/tracim/tracim/issues/6097
+  // Also https://github.com/tracim/tracim/issues/2872
+  it.skip('should add a new member as space manager using email', () => {
     cy.createRandomUser()
     .then(user => {
       cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
@@ -41,7 +44,10 @@ describe('Add a member from the dashboard', () => {
     })
   })
 
-  it('should add a new member as space manager using public name', () => {
+  // TODO - MP - 09-02-2023
+  // See https://github.com/tracim/tracim/issues/6097
+  // Also https://github.com/tracim/tracim/issues/2872
+  it.skip('should add a new member as space manager using public name', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.public_name)
@@ -57,7 +63,10 @@ describe('Add a member from the dashboard', () => {
       })
   })
 
-  it('should add a new member as space manager using username with @', () => {
+  // TODO - MP - 09-02-2023
+  // See https://github.com/tracim/tracim/issues/6097
+  // Also https://github.com/tracim/tracim/issues/2872
+  it.skip('should add a new member as space manager using username with @', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(`@${user.username}`)
@@ -73,7 +82,10 @@ describe('Add a member from the dashboard', () => {
       })
   })
 
-  it('should add a new member as space manager using username without @', () => {
+  // TODO - MP - 09-02-2023
+  // See https://github.com/tracim/tracim/issues/6097
+  // Also https://github.com/tracim/tracim/issues/2872
+  it.skip('should add a new member as space manager using username without @', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)
@@ -89,7 +101,10 @@ describe('Add a member from the dashboard', () => {
       })
   })
 
-  it('should disable button if no role is selected', () => {
+  // TODO - MP - 09-02-2023
+  // See https://github.com/tracim/tracim/issues/6097
+  // Also https://github.com/tracim/tracim/issues/2872
+  it.skip('should disable button if no role is selected', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
@@ -102,7 +117,10 @@ describe('Add a member from the dashboard', () => {
       })
   })
 
-  it('should not allow to add a member twice using the same public name', () => {
+  // TODO - MP - 09-02-2023
+  // See https://github.com/tracim/tracim/issues/6097
+  // Also https://github.com/tracim/tracim/issues/2872
+  it.skip('should not allow to add a member twice using the same public name', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
@@ -127,7 +145,10 @@ describe('Add a member from the dashboard', () => {
       })
   })
 
-  it('should not allow to add a member twice using the same email', () => {
+  // TODO - MP - 09-02-2023
+  // See https://github.com/tracim/tracim/issues/6097
+  // Also https://github.com/tracim/tracim/issues/2872
+  it.skip('should not allow to add a member twice using the same email', () => {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.email)
@@ -152,8 +173,9 @@ describe('Add a member from the dashboard', () => {
       })
   })
 
-  it('should not allow adding a member twice using the same username', function () {
-    this.skip() // RJ - 2020-09-24 - unstable test, see issue #3483
+  // TODO - RJ - 2020-09-24 (MP - 09-02-2023 - Just changing the format)
+  // See https://github.com/tracim/tracim/issues/3483
+  it.skip('should not allow adding a member twice using the same username', function () {
     cy.createRandomUser()
       .then(user => {
         cy.get('[data-cy=addmember]').should('be.visible').type(user.username)

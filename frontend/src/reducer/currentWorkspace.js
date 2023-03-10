@@ -69,7 +69,7 @@ export const serializeMember = m => {
     username: m.user.username,
     role: m.role,
     emailNotificationType: m.email_notification_type || EMAIL_NOTIFICATION_TYPE.NONE,
-    hasAvatar: m.user.has_avatar || false,
+    hasAvatar: m.user.has_avatar || true,
     hasCover: m.user.has_cover || false
   }
 }

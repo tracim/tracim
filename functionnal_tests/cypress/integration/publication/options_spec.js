@@ -15,7 +15,7 @@ describe('Publications page', () => {
         params: { workspaceId: workspace.workspace_id },
         waitForTlm: true
       })
-      cy.get('#wysiwygTimelineCommentPublication').type(text)
+      cy.inputInTinyMCE(text)
       cy.contains(publishButton, 'Publish').click()
     })
   })
@@ -33,9 +33,7 @@ describe('Publications page', () => {
 
   it('should be possible to comment a publication', () => {
     cy.contains('.buttonComments', 'Comment').should('be.visible').click()
-    cy.get('#wysiwygTimelineComment1')
-      .should('be.visible')
-      .type(text)
+    cy.inputInTinyMCE(text)
     cy.contains(sendButton, 'Send')
       .should('be.enabled')
       .click()
@@ -52,16 +50,14 @@ describe('Publications page', () => {
       cy.get('.flashmessage__container .bg-info').should('be.visible')
     })
 
-    it.skip('should be able to edit publication', () => {
-      // FIXME - RJ - 2022-02-16 - disabled test (see #5436)
+    it('should be able to edit publication', () => {
       cy.contains('.feedItem__publication__body__content__text', text)
       cy.get('.feedItemHeader__actionMenu__item[title="Edit"]').click()
       cy.get('.cardPopup__header__title').should('be.visible')
-      cy.waitForTinyMCELoaded().then(() => {
-        cy.typeInTinyMCE(`${text}!`)
-        cy.contains('.editCommentPopup__buttons .iconbutton', 'Send').click()
-        cy.contains('.feedItem__publication__body__content__text', `${text}!`)
-      })
+      cy.inputInTinyMCE(`${text}!`)
+      cy.contains('.editCommentPopup__texteditor__submit > .commentArea__submit__btn', 'Send')
+        .click()
+      cy.contains('.feedItem__publication__body__content__text', `${text}!`)
     })
 
     it('should be able to open as a content', () => {

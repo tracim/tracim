@@ -1,6 +1,5 @@
 {
   "Create a Kanban board": "Create a Kanban board",
-  "Error while saving the comment": "Error while saving the comment",
   "Delete": "Delete",
   "A content with the same name already exists": "Content with the same name already exists",
   "Error while creating kanban": "Error while creating kanban",
@@ -46,5 +45,8 @@
   "You have reached your storage limit, you cannot add new files": "You have reached your storage limit, you cannot add new files",
   "Tasks": "Tasks",
   "The link has been copied to clipboard": "Link copied to clipboard",
-  "Copy content link": "Copy content link"
+  "Copy content link": "Copy content link",
+  "Every members of the space": "Every members of the space",
+  "All": "All",
+  "all": "all"
 }

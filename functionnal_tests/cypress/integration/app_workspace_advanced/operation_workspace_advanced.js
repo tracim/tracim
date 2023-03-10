@@ -1,48 +1,53 @@
 import { SELECTORS as s } from '../../support/generic_selector_commands'
 import { PAGES as p } from '../../support/urls_commands'
 
-describe('App Workspace Advanced', function () {
+describe('Space settings', function () {
+  const oldDescription = 'A super description of my space.'
   const newDescription = 'description'
-  let workspaceId = 1
+  let spaceId = 1
+  let spaceLabel
 
   before(() => {
     cy.resetDB()
     cy.setupBaseDB()
-    cy.fixture('baseWorkspace').as('workspace').then(workspace => {
-      workspaceId = workspace.workspace_id
+    cy.fixture('baseWorkspace').then(space => {
+      spaceId = space.workspace_id
+      spaceLabel = space.label
     })
   })
 
   beforeEach(function () {
     cy.loginAs('administrators')
-    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+    cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: spaceId } })
 
-    cy.get('.userstatus__role__text')
-      .contains('Space manager')
+    cy.contains('.userstatus__role__text', 'Space manager')
 
     cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-      .find('.dashboard__workspace__detail__buttons .iconbutton')
+      .find('.dashboard__workspace__rightMenu__contents .fa-cog')
       .click()
+
+    cy.contains('.workspace_advanced__contentpage__header__title', spaceLabel)
   })
 
   afterEach(function () {
     cy.cancelXHR()
   })
 
-  describe("Changing the workspace's description", () => {
+  describe("Changing the space's description", () => {
     it('Should update the description in the dashboard', function () {
+      cy.contains('.workspace_advanced__description', oldDescription)
+
+      cy.get('.workspace_advanced__description__bottom__btn').click()
+
       cy.waitForTinyMCELoaded().then(() => {
-        cy.clearTinyMCE().then(() => {
-          cy.typeInTinyMCE(newDescription).then(() => {
-            cy.get('.workspace_advanced__description__bottom__btn')
-              .click()
+        cy.typeInTinyMCE(newDescription).then(() => {
+          cy.get('.workspace_advanced__description__bottom__btn').click()
 
-            cy.get('.workspace_advanced__contentpage__header__close').click()
+          cy.get('.workspace_advanced__contentpage__header__close').click()
 
-            cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-              .find('.dashboard__workspace__detail__description')
-              .contains(newDescription)
-          })
+          cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
+            .find('.dashboard__workspace__detail__description')
+            .contains(newDescription)
         })
       })
     })
@@ -67,20 +72,18 @@ describe('App Workspace Advanced', function () {
     })
   })
 
-  describe.skip('Member list of the workspace', () => {
-    // NOTE - MP - 05-11-2021 - 2 users: GlobalManager and Jhon Doe
-    // FIXME - MB - Unstable test https://github.com/tracim/tracim/issues/5091
+  describe('Member list of the space', () => {
+    // INFO - MP - 2021-11-05 - 2 users: GlobalManager and John Doe
     let numberOfUserInWorkSpace = 2
     let userId = 0
     let userPublicName = ''
     let userEmail = ''
     let userUsername = ''
 
-    // NOTE - MP - 2021-11-05 - We add an user everytime before a test
     beforeEach(() => {
-      // FIXME - MP - 2021-11-05 - We need this assert to wait for the
-      // workspace to be successfully updated. We can remove this assert
-      // when we upgrade cypress to > 6 and wait for a response
+      cy.contains('.workspace_advanced__contentpage__header__title', spaceLabel)
+      cy.contains('.wsContentGeneric__content__right__content__title', 'Members List')
+
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .get(`.workspace_advanced__userlist__list__item`)
         .should('be.visible')
@@ -88,6 +91,7 @@ describe('App Workspace Advanced', function () {
 
       cy.getTag({ selectorName: s.CONTENT_FRAME })
         .get('div.workspace_advanced__userlist__adduser__button')
+        .should('be.visible')
         .click()
 
       cy.createRandomUser().then(user => {
@@ -98,8 +102,8 @@ describe('App Workspace Advanced', function () {
       })
     })
 
-    describe('Modify user list of a workspace', () => {
-      // NOTE - MP - 05-11-2021 - Finish the process to add an user
+    describe('Modify user list of a space', () => {
+      // INFO - MP - 2021-11-05 - Finish the process to add an user
       const finishAddUser = () => {
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .get('div.autocomplete__item')
@@ -115,13 +119,13 @@ describe('App Workspace Advanced', function () {
           .click()
       }
 
-      // NOTE - MP - 05-11-2021 - Validate the test; not in aftereach since it is
+      // INFO - MP - 2021-11-05 - Validate the test; not in aftereach since it is
       // not a cleaning method
       const successfullyAdded = (userId) => {
         cy.getTag({ selectorName: s.FLASH_MESSAGE })
           .should('be.visible')
 
-        // NOTE: MP - 04-11-2021 - We got a success flash message the
+        // INFO - MP - 2021-11-04 - We got a success flash message the
         // user is successfully added to the database
         cy.getTag({ selectorName: s.FLASH_TYPE })
           .should('have.class', 'bg-info')
@@ -155,8 +159,8 @@ describe('App Workspace Advanced', function () {
           .clear()
           .type(userEmail)
 
-          finishAddUser()
-          successfullyAdded(userId)
+        finishAddUser()
+        successfullyAdded(userId)
       })
 
       it('Should be able to add an user with his username', () => {
@@ -165,13 +169,12 @@ describe('App Workspace Advanced', function () {
           .clear()
           .type(userUsername)
 
-          finishAddUser()
-          successfullyAdded(userId)
+        finishAddUser()
+        successfullyAdded(userId)
       })
 
-      it('Should be able to remove an user of a workspace', () => {
-        // NOTE - MP - 05-11-2021 - Before this test: add an user to
-        // remove
+      it('Should be able to remove an user of a space', () => {
+        // INFO - MP - 2021-11-05 - Before this test: add an user to remove
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .get('#addmember')
           .clear()
@@ -181,7 +184,7 @@ describe('App Workspace Advanced', function () {
 
         numberOfUserInWorkSpace += 1
 
-        // Note - MP - 05-11-2021 - Start the current test
+        // INFO - MP - 2021-11-05 - Start the current test
         cy.getTag({ selectorName: s.WORKSPACE_ADVANCED_USER_DELETE })
           .last()
           .click()
@@ -189,7 +192,7 @@ describe('App Workspace Advanced', function () {
         cy.getTag({ selectorName: s.FLASH_MESSAGE })
           .should('be.visible')
 
-        // NOTE: MP - 04-11-2021 - We got a success flash message the
+        // INFO - MP - 2021-11-04 - We got a success flash message the
         // user is successfully added to the database
         cy.getTag({ selectorName: s.FLASH_TYPE })
           .should('have.class', 'bg-info')
@@ -209,32 +212,32 @@ describe('App Workspace Advanced', function () {
 
     describe('Disabled user', () => {
       beforeEach(() => {
-          cy.getTag({ selectorName: s.CONTENT_FRAME })
-            .get('#addmember')
-            .clear()
-            .type(userPublicName)
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('#addmember')
+          .clear()
+          .type(userPublicName)
 
-          cy.getTag({ selectorName: s.CONTENT_FRAME })
-            .get('div.autocomplete__item')
-            .click()
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('div.autocomplete__item')
+          .click()
 
-          cy.getTag({ selectorName: s.CONTENT_FRAME })
-            .get('.memberlist__form__role .singleChoiceList__item__radioButton > input')
-            .first()
-            .click()
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('.memberlist__form__role .singleChoiceList__item__radioButton > input')
+          .first()
+          .click()
 
-          cy.getTag({ selectorName: s.CONTENT_FRAME })
-            .get('.memberlist__form__submitbtn > button')
-            .click()
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get('.memberlist__form__submitbtn > button')
+          .click()
 
-          cy.getTag({ selectorName: s.FLASH_MESSAGE })
+        cy.getTag({ selectorName: s.FLASH_MESSAGE })
 
-          numberOfUserInWorkSpace += 1
+        numberOfUserInWorkSpace += 1
 
-          cy.getTag({ selectorName: s.CONTENT_FRAME })
-            .get(`.workspace_advanced__userlist__list__item`)
-            .should('be.visible')
-            .and('have.length', numberOfUserInWorkSpace)
+        cy.getTag({ selectorName: s.CONTENT_FRAME })
+          .get(`.workspace_advanced__userlist__list__item`)
+          .should('be.visible')
+          .and('have.length', numberOfUserInWorkSpace)
       })
 
       it('Should not display disabled user of the workspace', () => {
@@ -246,22 +249,22 @@ describe('App Workspace Advanced', function () {
 
 
         cy.loginAs('administrators')
-        cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId } })
+        cy.visitPage({ pageName: p.DASHBOARD, params: { workspaceId: spaceId } })
 
-        // NOTE - MP - 05-11-2021 - If the page isn't loaded after 30s
-        // there is a problem somewhere
-        cy.get('.userstatus__role__text', { timeout: 30000 })
-          .contains('Space manager')
+        cy.contains('.pageTitleGeneric__title__label', spaceLabel)
+        cy.contains('.userstatus__role__text', 'Space manager')
 
         cy.getTag({ selectorName: s.WORKSPACE_DASHBOARD })
-          .get('.dashboard__workspace__detail__buttons .iconbutton')
+          .get('.dashboard__workspace__rightMenu__contents .fa-cog')
           .click()
 
-        // NOTE - MP - 05-11-2021 - Waiting for the app to be fully loaded
-        // ie: member list displayed
+        cy.contains('.workspace_advanced__contentpage__header__title', spaceLabel)
+
+        cy.contains('.wsContentGeneric__content__right__content__title', 'Members List')
+
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-1]`)
-          .should('be.not.visible')
+          .should('be.visible')
 
         cy.getTag({ selectorName: s.CONTENT_FRAME })
           .find(`.workspace_advanced__userlist__list__item[data-cy=workspace_advanced__member-${userId}]`)

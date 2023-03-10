@@ -43,7 +43,7 @@ describe('At the space recent activities page', () => {
       cy.get('[data-cy=create_news]').click()
       cy.contains('.tab__active > .tab__label', 'News')
       cy.get('.emptyListMessage__text')
-      cy.get('.publishArea__texteditor__submit > div > .iconbutton-secondary-dark').click()
+      cy.get('.publishArea__texteditor__submit > .iconbutton-secondary-dark').click()
       cy.dropFixtureInDropZone(fullFilename, 'image/png', '.filecontent__form', `${fileTitle}.png`)
       cy.get('[data-cy=popup__createcontent__form__button]').click()
       cy.get('[data-cy=commentArea__comment__send]').click()

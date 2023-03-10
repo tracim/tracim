@@ -161,7 +161,6 @@
   "Reader + create/modify content": "Lector + crear/modificar contenido",
   "Error while saving the title": "Error al guardar el título",
   "Error while removing your reaction": "Error al eliminar su reacción",
-  "@all Please notice that I did an important update on this content.": "@todos Por favor, noten que hice una actualización importante de este contenido.",
   "Error while detecting the mentions": "Error al detectar las menciones",
   "Username can't contain any whitespace": "El nombre de usuario no puede contener ningún espacio",
   "You can't send an empty comment": "No se puede enviar un comentario vacío",
@@ -255,5 +254,12 @@
   "modified": "modificado",
   "Unexpected error, please inform an administrator": "Error inesperado, informe a un administrador",
   "of": "de",
-  "Download": "Descargar"
+  "Download": "Descargar",
+  "Every members of the space": "",
+  "All": "",
+  "{{filename}} is bigger than 1MB, this may take a while to upload, do you want to continue?": "",
+  "Insert": "",
+  "Image": "",
+  "Fullscreen": "",
+  "Please notice that I did an important update on this content.": ""
 }

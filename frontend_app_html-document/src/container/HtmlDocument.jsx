@@ -8,48 +8,48 @@ import {
   BREADCRUMBS_TYPE,
   CONTENT_TYPE,
   CUSTOM_EVENT,
+  DEFAULT_ROLE_LIST,
+  FAVORITE_STATE,
+  LOCAL_STORAGE_FIELD,
+  PAGE,
+  ROLE_LIST,
+  ROLE,
+  SORT_BY,
+  TLM_CORE_EVENT_TYPE as TLM_CET,
+  TLM_ENTITY_TYPE as TLM_ET,
+  TLM_SUB_TYPE as TLM_ST,
+  TRANSLATION_STATE,
   FilenameWithBadges,
+  PopinFixed,
+  PopinFixedContent,
+  PopinFixedRightPart,
+  PopinFixedRightPartContent,
+  TagList,
+  Timeline,
+  ToDoManagement,
   addAllResourceI18n,
+  addClassToMentionsOfUser,
+  addExternalLinksIcons,
   appContentFactory,
   buildContentPathBreadcrumbs,
   buildHeadTitle,
   getContent,
+  getDefaultTranslationState,
   getInvalidMentionList,
+  getLocalStorageItem,
   getOrCreateSessionClientToken,
   getToDo,
   handleClickCopyLink,
   handleFetchResult,
-  handleInvalidMentionInComment,
-  PAGE,
-  PopinFixed,
-  PopinFixedContent,
-  PopinFixedRightPart,
-  ROLE,
-  ROLE_LIST,
-  Timeline,
-  TagList,
-  TLM_CORE_EVENT_TYPE as TLM_CET,
-  TLM_ENTITY_TYPE as TLM_ET,
-  TLM_SUB_TYPE as TLM_ST,
-  tinymceAutoCompleteHandleClickItem,
-  LOCAL_STORAGE_FIELD,
-  getLocalStorageItem,
-  removeLocalStorageItem,
-  handleMentionsBeforeSave,
-  handleLinksBeforeSave,
-  addClassToMentionsOfUser,
-  putUserConfiguration,
-  TRANSLATION_STATE,
   handleTranslateHtmlContent,
-  getDefaultTranslationState,
+  putUserConfiguration,
+  removeLocalStorageItem,
+  replaceHTMLElementWithMention,
+  searchContentAndPlaceBalise,
+  searchMentionAndPlaceBalise,
   sendGlobalFlashMessage,
-  tinymceRemove,
-  FAVORITE_STATE,
-  addExternalLinksIcons,
-  PopinFixedRightPartContent,
   sortListByMultipleCriteria,
-  SORT_BY,
-  ToDoManagement
+  tinymceAutoCompleteHandleClickItem
 } from 'tracim_frontend_lib'
 import {
   getHtmlDocContent,
@@ -85,7 +85,6 @@ export class HtmlDocument extends React.Component {
       loadingContent: true,
       lockedToDoList: [],
       loggedUser: param.loggedUser,
-      timelineWysiwyg: false,
       mode: APP_FEATURE_MODE.VIEW,
       showRefreshWarning: false,
       editionAuthor: '',
@@ -93,6 +92,7 @@ export class HtmlDocument extends React.Component {
       oldInvalidMentionList: [],
       showInvalidMentionPopupInComment: false,
       showInvalidMentionPopupInContent: false,
+      textToSend: '',
       translatedRawContent: null,
       translationState: TRANSLATION_STATE.DISABLED,
       translationTargetLanguageCode: param.loggedUser.lang,
@@ -260,7 +260,7 @@ export class HtmlDocument extends React.Component {
   // Custom Event Handlers
   handleShowApp = data => {
     const { props, state } = this
-    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP, data)
+    // console.debug('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.SHOW_APP, data)
 
     props.appContentCustomEventHandlerShowApp(data.content, state.content, this.setState.bind(this), this.buildBreadcrumbs)
     if (data.content.content_id === state.content.content_id) this.setHeadTitle(state.content.label)
@@ -268,23 +268,20 @@ export class HtmlDocument extends React.Component {
 
   handleHideApp = data => {
     const { props } = this
-    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP, data)
+    // console.debug('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.HIDE_APP, data)
 
     props.appContentCustomEventHandlerHideApp(this.setState.bind(this))
-    tinymceRemove('#wysiwygNewVersion')
   }
 
   handleReloadContent = data => {
     const { props, state } = this
-    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT, data)
+    // console.debug('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.RELOAD_CONTENT, data)
 
     props.appContentCustomEventHandlerReloadContent(data, this.setState.bind(this), state.appName)
-    tinymceRemove('#wysiwygNewVersion')
   }
 
   handleAllAppChangeLanguage = data => {
-    console.log('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
-
+    // console.debug('%c<HtmlDocument> Custom event', 'color: #28a745', CUSTOM_EVENT.ALL_APP_CHANGE_LANGUAGE, data)
     this.props.appContentCustomEventHandlerAllAppChangeLanguage(data, this.setState.bind(this), i18n, false)
   }
 
@@ -296,25 +293,17 @@ export class HtmlDocument extends React.Component {
 
   componentDidUpdate (prevProps, prevState) {
     const { state } = this
-    // console.log('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
+    // console.debug('%c<HtmlDocument> did update', `color: ${state.config.hexcolor}`, prevState, state)
 
     if (!prevState.content || !state.content) return
 
     if (prevState.content.content_id !== state.content.content_id) {
       this.loadContent()
     }
-
-    if (!prevState.timelineWysiwyg && state.timelineWysiwyg) {
-      tinymceRemove('#wysiwygNewVersion')
-    } else if (prevState.timelineWysiwyg && !state.timelineWysiwyg) {
-      tinymceRemove('#wysiwygTimelineComment')
-    }
   }
 
   componentWillUnmount () {
-    console.log('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
-    tinymceRemove('#wysiwygNewVersion')
-    tinymceRemove('#wysiwygTimelineComment')
+    // console.debug('%c<HtmlDocument> will Unmount', `color: ${this.state.config.hexcolor}`)
   }
 
   setHeadTitle = (contentName) => {
@@ -431,26 +420,35 @@ export class HtmlDocument extends React.Component {
   }
 
   handleClickNewVersion = () => {
+    const { props, state } = this
     const previouslyUnsavedRawContent = getLocalStorageItem(
-      this.state.appName,
-      this.state.content.content_id,
-      this.state.content.workspace_id,
+      state.appName,
+      state.content.content_id,
+      state.content.workspace_id,
       LOCAL_STORAGE_FIELD.RAW_CONTENT
+    )
+
+    const rawContent = replaceHTMLElementWithMention(
+      [{
+        id: 0,
+        label: props.t('All'),
+        slug: props.t('all')
+      }],
+      state.config.workspace.memberList,
+      previouslyUnsavedRawContent || state.content.raw_content
     )
 
     this.setState(prev => ({
       content: {
         ...prev.content,
-        raw_content: previouslyUnsavedRawContent || prev.content.raw_content
+        raw_content: rawContent
       },
-      rawContentBeforeEdit: prev.content.raw_content, // for cancel btn
+      rawContentBeforeEdit: prev.content.raw_content, // for cancel button
       mode: APP_FEATURE_MODE.EDIT
     }))
   }
 
   handleCloseNewVersion = () => {
-    tinymceRemove('#wysiwygNewVersion')
-
     this.setState(prev => ({
       content: {
         ...prev.content,
@@ -467,50 +465,40 @@ export class HtmlDocument extends React.Component {
     )
   }
 
+  /**
+   * This function is used to search mention and links for the current content of the document.
+   */
   handleClickSaveDocument = async () => {
     const { state } = this
-    const knownMentions = state.config.workspace.memberList.map(member => `@${member.username}`)
     const content = tinymce.activeEditor.getContent()
-    const allInvalidMentionList = getInvalidMentionList(content, knownMentions)
-    const newInvalidMentionList = allInvalidMentionList.filter(mention => {
-      return state.oldInvalidMentionList.indexOf(mention) === -1
-    })
-
-    if (newInvalidMentionList.length > 0) {
+    const parsedContentCommentObject = await searchContentAndPlaceBalise(
+      state.config.apiUrl,
+      content
+    )
+    const parsedMentionCommentObject = searchMentionAndPlaceBalise(
+      DEFAULT_ROLE_LIST,
+      state.config.workspace.memberList,
+      parsedContentCommentObject.html
+    )
+    if (parsedMentionCommentObject.invalidMentionList.length > 0) {
       this.setState({
-        invalidMentionList: newInvalidMentionList,
-        showInvalidMentionPopupInContent: true
+        invalidMentionList: parsedMentionCommentObject.invalidMentionList,
+        textToSend: parsedMentionCommentObject.html
       })
-    } else this.handleSaveHtmlDocument()
+    } else {
+      this.handleSaveHtmlDocument(parsedMentionCommentObject.html)
+    }
   }
 
-  handleSaveHtmlDocument = async () => {
+  /**
+   * This function is used to send the content of the document to the server
+   * @param {String} textToSend Content to send to the server
+   */
+  handleSaveHtmlDocument = async (textToSend) => {
     const { state, props } = this
 
-    const content = tinymce.activeEditor.getContent()
-    const allInvalidMentionList = [...state.oldInvalidMentionList, ...state.invalidMentionList]
-
-    let newDocumentForApiWithMention
-    try {
-      newDocumentForApiWithMention = handleMentionsBeforeSave(
-        content,
-        state.loggedUser.username,
-        allInvalidMentionList
-      )
-    } catch (e) {
-      sendGlobalFlashMessage(e.message || props.t('Error while saving the new version'))
-      return
-    }
-
-    let newDocumentForApiWithMentionAndLink
-    try {
-      newDocumentForApiWithMentionAndLink = await handleLinksBeforeSave(newDocumentForApiWithMention, state.config.apiUrl)
-    } catch (e) {
-      return Promise.reject(e.message || props.t('Error while saving the new version'))
-    }
-
     const fetchResultSaveHtmlDoc = await handleFetchResult(
-      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, newDocumentForApiWithMentionAndLink)
+      await putHtmlDocContent(state.config.apiUrl, state.content.workspace_id, state.content.content_id, state.content.label, textToSend)
     )
 
     switch (fetchResultSaveHtmlDoc.apiResponse.status) {
@@ -523,15 +511,14 @@ export class HtmlDocument extends React.Component {
         )
 
         state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`] = true
-        tinymceRemove('#wysiwygNewVersion')
         this.setState(previousState => {
           return {
             mode: APP_FEATURE_MODE.VIEW,
             content: {
               ...previousState.content,
-              raw_content: addExternalLinksIcons(newDocumentForApiWithMentionAndLink)
+              raw_content: addExternalLinksIcons(textToSend)
             },
-            oldInvalidMentionList: allInvalidMentionList,
+            invalidMentionList: [],
             showInvalidMentionPopupInContent: false,
             translatedRawContent: null,
             translationState: getDefaultTranslationState(previousState.config.system.config)
@@ -565,43 +552,20 @@ export class HtmlDocument extends React.Component {
     window.history.replaceState(null, '', PAGE.WORKSPACE.CONTENT(state.content.workspace_id, state.content.content_type, state.content.content_id))
   }
 
-  searchForMentionOrLinkInQuery = async (query) => {
-    return await this.props.searchForMentionOrLinkInQuery(query, this.state.content.workspace_id)
-  }
-
-  handleClickValidateAnywayNewComment = (comment, commentAsFileList) => {
+  handleClickValidateNewComment = async (comment, commentAsFileList) => {
     const { props, state } = this
-    try {
-      props.appContentSaveNewComment(
-        state.content,
-        state.timelineWysiwyg,
-        comment,
-        commentAsFileList,
-        this.setState.bind(this),
-        state.config.slug,
-        state.loggedUser.username
-      )
-    } catch (e) {
-      sendGlobalFlashMessage(e.message || props.t('Error while saving the comment'))
-    }
-  }
-
-  handleClickValidateNewCommentBtn = (comment, commentAsFileList) => {
-    const { state } = this
-
-    if (!handleInvalidMentionInComment(
-      state.config.workspace.memberList,
-      state.timelineWysiwyg,
+    await props.appContentSaveNewCommentText(
+      state.content,
       comment,
-      this.setState.bind(this)
-    )) {
-      this.handleClickValidateAnywayNewComment(comment, commentAsFileList)
-      return true
-    }
-    return false
+      state.config.slug
+    )
+    await props.appContentSaveNewCommentFileList(
+      this.setState.bind(this),
+      state.content,
+      commentAsFileList
+    )
+    return true
   }
-
-  handleToggleWysiwyg = () => this.setState(prev => ({ timelineWysiwyg: !prev.timelineWysiwyg }))
 
   handleSaveEditTitle = async newTitle => {
     const { props, state } = this
@@ -685,7 +649,6 @@ export class HtmlDocument extends React.Component {
 
   handleClickRefresh = () => {
     const { state } = this
-    tinymceRemove('#wysiwygNewVersion')
 
     const newObjectContent = {
       ...state.content,
@@ -765,7 +728,7 @@ export class HtmlDocument extends React.Component {
   handleClickNotifyAll = async () => {
     const { state, props } = this
 
-    props.appContentNotifyAll(state.content, this.setState.bind(this), state.config.slug)
+    props.appContentNotifyAll(state.content, state.config.slug)
     this.handleCloseNotifyAllMessage()
   }
 
@@ -793,13 +756,13 @@ export class HtmlDocument extends React.Component {
     return !!state.loggedUser.config[`content.${state.content.content_id}.notify_all_members_message`]
   }
 
-  handleClickEditComment = (comment) => {
+  handleClickEditComment = (comment, contentId, parentId) => {
     const { props, state } = this
     props.appContentEditComment(
       state.content.workspace_id,
-      comment.parent_id,
-      comment.content_id,
-      state.loggedUser.username
+      parentId,
+      contentId,
+      comment
     )
   }
 
@@ -857,46 +820,41 @@ export class HtmlDocument extends React.Component {
           label={props.t('Timeline')}
         >
           <Timeline
+            apiUrl={state.config.apiUrl}
             contentId={state.content.content_id}
             contentType={state.content.content_type}
-            loading={props.loadingTimeline}
-            customClass={`${state.config.slug}__contentpage__timeline`}
-            customColor={state.config.hexcolor}
-            apiUrl={state.config.apiUrl}
             loggedUser={state.loggedUser}
-            timelineData={props.timeline}
-            memberList={state.config.workspace.memberList}
-            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
-            availableStatusList={state.config.availableStatuses}
-            wysiwyg={state.timelineWysiwyg}
-            onClickValidateNewCommentBtn={this.handleClickValidateNewCommentBtn}
-            onClickWysiwygBtn={this.handleToggleWysiwyg}
-            onClickRevisionBtn={this.handleClickShowRevision}
-            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
-            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
-            key='Timeline'
-            invalidMentionList={state.invalidMentionList}
-            onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleClickValidateAnywayNewComment}
-            wysiwygIdSelector='#wysiwygTimelineComment'
-            showInvalidMentionPopup={state.showInvalidMentionPopupInComment}
-            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
-            workspaceId={state.content.workspace_id}
+            onClickRestoreComment={props.handleRestoreComment}
+            onClickSubmit={this.handleClickValidateNewComment}
             onClickTranslateComment={(comment, languageCode = null) => props.handleTranslateComment(
               comment,
               state.content.workspace_id,
               languageCode || state.translationTargetLanguageCode
             )}
-            onClickRestoreComment={props.handleRestoreComment}
-            onClickEditComment={this.handleClickEditComment}
-            onClickDeleteComment={this.handleClickDeleteComment}
-            onClickOpenFileComment={this.handleClickOpenFileComment}
+            timelineData={props.timeline}
             translationTargetLanguageList={state.config.system.config.translation_service__target_languages}
             translationTargetLanguageCode={state.translationTargetLanguageCode}
-            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
-            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            workspaceId={state.content.workspace_id}
+            // End of required props ///////////////////////////////////////////
+            availableStatusList={state.config.availableStatuses}
             canLoadMoreTimelineItems={props.canLoadMoreTimelineItems}
+            codeLanguageList={state.config.system.config.code_languages}
+            customClass={`${state.config.slug}__contentpage__timeline`}
+            customColor={state.config.hexcolor}
+            disableComment={state.mode === APP_FEATURE_MODE.REVISION || state.mode === APP_FEATURE_MODE.EDIT || !state.content.is_editable}
+            invalidMentionList={state.invalidMentionList}
             isFileCommentLoading={state.isFileCommentLoading}
+            isLastTimelineItemCurrentToken={props.isLastTimelineItemCurrentToken}
+            loading={props.loadingTimeline}
+            memberList={state.config.workspace.memberList}
+            onChangeTranslationTargetLanguageCode={this.handleChangeTranslationTargetLanguageCode}
+            onClickDeleteComment={this.handleClickDeleteComment}
+            onClickEditComment={this.handleClickEditComment}
+            onClickOpenFileComment={this.handleClickOpenFileComment}
+            onClickRevisionBtn={this.handleClickShowRevision}
+            onClickShowMoreTimelineItems={this.handleLoadMoreTimelineItems}
+            roleList={DEFAULT_ROLE_LIST}
+            shouldScrollToBottom={state.mode !== APP_FEATURE_MODE.REVISION}
           />
         </PopinFixedRightPartContent>
       ) : null
@@ -945,6 +903,7 @@ export class HtmlDocument extends React.Component {
         >
           <TagList
             apiUrl={state.config.apiUrl}
+            customColor={state.config.hexcolor}
             workspaceId={state.content.workspace_id}
             contentId={state.content.content_id}
             userRoleIdInWorkspace={state.loggedUser.userRoleIdInWorkspace}
@@ -1063,8 +1022,8 @@ export class HtmlDocument extends React.Component {
             invalidMentionList={state.invalidMentionList}
             isVisible={state.isVisible}
             lang={state.loggedUser.lang}
+            memberList={state.config.workspace.memberList}
             mode={state.mode}
-            wysiwygNewVersion='wysiwygNewVersion'
             onClickCloseEditMode={this.handleCloseNewVersion}
             onClickValidateBtn={this.handleClickSaveDocument}
             text={displayTranslatedText ? state.translatedRawContent : state.content.raw_content}
@@ -1072,7 +1031,15 @@ export class HtmlDocument extends React.Component {
             isDeleted={state.content.is_deleted}
             isDeprecated={state.content.status === state.config.availableStatuses[3].slug}
             deprecatedStatus={state.config.availableStatuses[3]}
-            isDraftAvailable={state.mode === APP_FEATURE_MODE.VIEW && state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id && getLocalStorageItem(state.appName, state.content.content_id, state.content.workspace_id, LOCAL_STORAGE_FIELD.RAW_CONTENT)}
+            isDraftAvailable={
+              state.mode === APP_FEATURE_MODE.VIEW &&
+              state.loggedUser.userRoleIdInWorkspace >= ROLE.contributor.id &&
+              getLocalStorageItem(
+                state.appName,
+                state.content.content_id,
+                state.content.workspace_id,
+                LOCAL_STORAGE_FIELD.RAW_CONTENT)
+            }
             // onClickRestoreArchived={this.handleClickRestoreArchive}
             onClickRestoreDeleted={this.handleClickRestoreDelete}
             onClickShowDraft={this.handleClickNewVersion}
@@ -1082,12 +1049,11 @@ export class HtmlDocument extends React.Component {
             displayNotifyAllMessage={this.shouldDisplayNotifyAllMessage()}
             onClickCloseNotifyAllMessage={this.handleCloseNotifyAllMessage}
             onClickNotifyAll={this.handleClickNotifyAll}
-            onClickCancelSave={this.handleCancelSave}
-            onClickSaveAnyway={this.handleSaveHtmlDocument}
-            showInvalidMentionPopup={state.showInvalidMentionPopupInContent}
+            onClickCancelSave={() => { this.setState({ invalidMentionList: [] }) }}
+            onClickSaveAnyway={() => { this.handleSaveHtmlDocument(state.textToSend) }}
+            showInvalidMentionPopup={state.invalidMentionList.length > 0}
             onClickRefresh={this.handleClickRefresh}
             onClickLastVersion={this.handleClickLastVersion}
-            searchForMentionOrLinkInQuery={this.searchForMentionOrLinkInQuery}
             workspaceId={state.content.workspace_id}
           />
 
