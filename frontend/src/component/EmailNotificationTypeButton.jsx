@@ -11,10 +11,11 @@ require('./EmailNotificationTypeButton.styl')
 export const EmailNotificationTypeButton = props => {
   return (
     <div className='EmailNotificationTypeButton' style={{ justifyContent: props.flexJustifyRadio }}>
-      {props.displayLabel &&
-        <div className='EmailNotificationTypeButton__title'>
-          {props.t('Email notification:')}
-        </div>
+      {
+        props.displayLabel &&
+          <div className='EmailNotificationTypeButton__title'>
+            {props.t('Email notification:')}
+          </div>
       }
 
       <div

@@ -29,7 +29,6 @@ import {
 import { mount } from 'enzyme'
 import {
   mockGetLoggedUserCalendar200,
-  mockMyselfWorkspaceDoNotify204,
   mockPutMyselfPassword204,
   mockPutMyselfPassword403
 } from '../../apiMock'
@@ -123,17 +122,6 @@ describe('In <Account />', () => {
       it('should call newFlashMessageWarningCallBack with invalid new Name', (done) => {
         accountInstance.handleSubmitPersonalData('d', '', '').then(() => {
           expect(newFlashMessageWarningCallBack.called).to.equal(true)
-        }).then(done, done)
-      })
-    })
-
-    describe('handleChangeSubscriptionNotif', () => {
-      it('should call newFlashMessageWarningCallBack with invalid workspaceId', (done) => {
-        mockMyselfWorkspaceDoNotify204(FETCH_CONFIG.apiUrl, 1, true)
-
-        accountInstance.handleChangeSubscriptionNotif(0, 'activate').then(() => {
-          expect(newFlashMessageWarningCallBack.called).to.equal(true)
-          restoreHistoryCallBack([newFlashMessageWarningCallBack])
         }).then(done, done)
       })
     })
